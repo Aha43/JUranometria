@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-28
+
+Sprint 2 — Navigate the chart. Reviewed by Codex before release; the
+review trail lives in `docs/reviews/`.
+
 ### Added
 
 - The first interactive controls: a compact atlas toolbar with zoom in,
