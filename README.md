@@ -42,6 +42,15 @@ Extras for the look and feel, JSVG for SVG icon rendering, and the standalone
 JUnit console runner (test only). Downloaded JARs live in `lib/` and
 `lib/test/` and are not committed.
 
+The bundled regional catalogue under `src/resources/catalog/m31/` is a
+generated resource. To reproduce it from the pinned upstream inputs
+(never needed for normal building or running):
+
+```sh
+scripts/download-catalogue-sources.sh   # ~170 MB into gitignored imports/raw/
+make import-catalogue                   # verifies checksums, regenerates the resources
+```
+
 ## Using the atlas
 
 `make run` opens the M31 region chart. The toolbar above the page:
@@ -62,10 +71,10 @@ theme; the chart page itself stays white paper in both themes.
 ## Licensing
 
 The code and documentation are MIT licensed ([LICENSE](LICENSE)).
-Bundled data resources keep their own licenses — including, once the
-Sprint 3 catalogue import lands, a Tycho-2-derived star resource under
-CC BY-NC 3.0 IGO that may not be used commercially, which makes the
-packaged application redistributable non-commercially only. See
+Bundled data resources keep their own licenses — including a
+Tycho-2-derived star resource under CC BY-NC 3.0 IGO that may not be
+used commercially, which makes the packaged application
+redistributable non-commercially only. See
 [LICENSING.md](LICENSING.md) for the complete picture.
 
 ## Status

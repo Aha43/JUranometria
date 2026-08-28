@@ -12,21 +12,20 @@ the application.
 | Resource | License | Notice |
 |---|---|---|
 | Tabler icons (`src/resources/icons/*.svg`) | MIT | [`src/resources/icons/LICENSE`](src/resources/icons/LICENSE), listed in [`ICONS.md`](src/resources/icons/ICONS.md) |
-| M31-region fixture (`src/resources/catalog/`) | SIMBAD extract, used with acknowledgment | [`src/resources/catalog/PROVENANCE.md`](src/resources/catalog/PROVENANCE.md) |
+| M31-region fixture (`src/resources/catalog/*.csv`) | SIMBAD extract, used with acknowledgment | [`src/resources/catalog/PROVENANCE.md`](src/resources/catalog/PROVENANCE.md) |
+| Tycho-2-derived stars (`src/resources/catalog/m31/stars.csv`) | **CC BY-NC 3.0 IGO** — may not be used commercially | [`src/resources/catalog/m31/NOTICE-tycho2.md`](src/resources/catalog/m31/NOTICE-tycho2.md) |
+| OpenNGC-derived DSOs (`src/resources/catalog/m31/dsos.csv`) | CC-BY-SA-4.0 | [`src/resources/catalog/m31/NOTICE-openngc.md`](src/resources/catalog/m31/NOTICE-openngc.md), full text beside it |
 
-Two generated catalogue resources arrive with the Sprint 3 import
-(see [`docs/decisions/catalogue-sources.md`](docs/decisions/catalogue-sources.md)),
-each with a generated notice beside the data:
-
-- an **OpenNGC-derived** deep-sky resource — CC-BY-SA-4.0;
-- a **Tycho-2-derived** star resource — **CC BY-NC 3.0 IGO**, which
-  may not be used commercially.
+The generated catalogue resources are reproduced from pinned upstream
+inputs; see
+[`docs/decisions/catalogue-sources.md`](docs/decisions/catalogue-sources.md)
+and the generated `PROVENANCE.md` beside the data.
 
 ## The non-commercial exception, stated plainly
 
 JUranometria's code and documentation are MIT licensed. Releases
-currently bundle (once the Sprint 3 import lands) a Tycho-2-derived
-star catalogue under CC BY-NC 3.0 IGO. That resource may not be used
+currently bundle a Tycho-2-derived star catalogue under
+CC BY-NC 3.0 IGO. That resource may not be used
 commercially. Commercial redistribution or use of the packaged
 application therefore requires removing or replacing the
 Tycho-derived catalogue.

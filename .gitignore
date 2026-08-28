@@ -62,3 +62,6 @@ replay_pid*
 
 # === System-wide ignore patterns (if present) ===
 !.gitignore
+
+# Raw catalogue import inputs (large, re-downloadable)
+/imports/
