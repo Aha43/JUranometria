@@ -56,18 +56,29 @@ the exact files used, since CDS publishes none.
 **CC-BY-NC-3.0 IGO** (the Tycho data are an ESA mission product).
 Conclusion: redistribution of a derived regional extract inside this
 repository and its releases is permitted **with attribution, for
-non-commercial purposes**. JUranometria is a personal, non-commercial
-project, and the repository currently carries no top-level license, so
-no conflict exists today. Two consequences are accepted and recorded:
+non-commercial purposes**. JUranometria has no commercial plans: the
+owner's intent (recorded 2026-08-29) is a personal project released as
+open source so others can use and contribute — the code under a
+permissive license (a Sprint 3 issue adopts one; MIT is the family
+convention in NamDesktop and NamWeb), while bundled data resources
+keep their own licenses, exactly as the Tabler icons already do. A
+permissive *code* license does not conflict with NC *data*: the NC
+restriction travels with the star resource and its NOTICE, and binds
+what downstream users may do with that data, not with the code. Three
+consequences are accepted and recorded:
 
 1. The generated star resource ships with its own NOTICE file naming
    the license and attribution (the per-directory notice pattern
    already used for the Tabler icons), and the packaging test guards
    it.
-2. If the project ever adopts a permissive license or a commercial
-   use appears, the star data must be re-imported from a source with
-   compatible terms — the Gaia exit path below. The importer contract
-   is written so only the source adapter would change.
+2. The repository's licensing documentation must state plainly that
+   the bundled Tycho-2 extract is non-commercial data inside an
+   otherwise permissively licensed project, so contributors and
+   downstream users are never surprised.
+3. If a commercial use of the bundled data ever appears, the star
+   data must be re-imported from a source with compatible terms — the
+   Gaia exit path below. The importer contract is written so only the
+   source adapter would change.
 
 **Attribution (required):** "This work has made use of data from the
 Tycho-2 Catalogue (Høg et al. 2000, A&A 355, L27)" plus the standard
