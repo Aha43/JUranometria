@@ -16,7 +16,7 @@ TEST_SOURCES := $(shell find $(TEST_DIR) -name "*.java" 2>/dev/null)
 
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-1.10.2.jar
 
-.PHONY: all help clean classes jar app run test chart-image
+.PHONY: all help clean classes jar app run test chart-image import-catalogue
 
 all: app
 
@@ -27,6 +27,7 @@ help:
 	@echo "  run    Build and launch the app"
 	@echo "  test         Compile and run unit tests"
 	@echo "  chart-image  Write the deterministic reference chart image"
+	@echo "  import-catalogue  Regenerate src/resources/catalog/m31 from pinned inputs"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -63,6 +64,9 @@ run: app
 
 chart-image: classes
 	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.app.ChartImageMain
+
+import-catalogue: classes
+	java -cp "$(CLASSES_DIR)" juranometria.tool.CatalogueImportMain
 
 test: classes
 	rm -rf $(TEST_CLASSES)
