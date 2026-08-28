@@ -11,6 +11,7 @@ import juranometria.chart.SkyPosition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ChartComponentTest {
 
@@ -26,7 +27,7 @@ class ChartComponentTest {
         ChartComponent[] holder = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
             holder[0] = new ChartComponent(
-                    new SceneAssembler(catalogue, M31, "Test chart"));
+                    new SceneAssembler(catalogue, M31, "Test chart", 10.0));
             holder[0].setSize(300, 200);
         });
         flushEventQueue();
@@ -50,7 +51,7 @@ class ChartComponentTest {
     @Test
     void exposesAnAccessibleContextWithAName() {
         ChartComponent component = new ChartComponent(new SceneAssembler(
-                new SceneAssemblerTest.CountingCatalogue(), M31, "Test chart"));
+                new SceneAssemblerTest.CountingCatalogue(), M31, "Test chart", 10.0));
         assertNotNull(component.getAccessibleContext());
         assertEquals("Star chart", component.getAccessibleContext().getAccessibleName());
     }
@@ -82,6 +83,21 @@ class ChartComponentTest {
         assertEquals(3, catalogue.starQueries, "reset assembles the default scene");
         assertEquals(8.0, component.scene().viewport().fieldWidthDegrees());
         assertEquals(8.0, component.scene().limitingMagnitude());
+    }
+
+    @Test
+    void tallWindowsLetterboxThePageToTheHonestHeight() throws Exception {
+        SceneAssemblerTest.CountingCatalogue catalogue =
+                new SceneAssemblerTest.CountingCatalogue();
+        ChartComponent component = sizedComponent(catalogue);
+
+        SwingUtilities.invokeAndWait(() -> component.setSize(400, 1000));
+        flushEventQueue();
+
+        assertEquals(400, component.scene().viewport().widthPx());
+        assertTrue(component.scene().viewport().heightPx() < 1000,
+                "the page must not promise sky beyond the bundled coverage");
+        paint(component);
     }
 
     @Test

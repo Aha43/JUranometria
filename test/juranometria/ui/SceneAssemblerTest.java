@@ -13,6 +13,7 @@ import juranometria.chart.SkyRegion;
 import juranometria.chart.Star;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SceneAssemblerTest {
@@ -54,6 +55,24 @@ class SceneAssemblerTest {
     }
 
     @Test
+    void pagesBeyondTheBundledCoverageAreRefusedNotSilentlySparse() {
+        // Codex review, Sprint 3: a 400x1000 page at an 8-degree field has
+        // corners 10.6 degrees out - past the 10-degree data cone. The
+        // assembler refuses it; the component letterboxes to the maximum
+        // honest page height instead.
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, "Test chart", 10.0);
+        IllegalArgumentException refused = assertThrows(IllegalArgumentException.class,
+                () -> assembler.assemble(ChartViewState.DEFAULT, 400, 1000));
+        assertTrue(refused.getMessage().contains("coverage ends at 10.0"));
+
+        int maxHeight = assembler.maxPageHeightPx(8.0, 400);
+        assertTrue(maxHeight < 1000, "the honest page is shorter than the window");
+        ChartScene clamped = assembler.assemble(ChartViewState.DEFAULT, 400, maxHeight);
+        assertEquals(maxHeight, clamped.viewport().heightPx());
+    }
+
+    @Test
     void assembledScenesCarryTheViewStateAndTheQueriedObjects() {
         CountingCatalogue catalogue = new CountingCatalogue();
         Star cornerStar = new Star("corner",
@@ -62,7 +81,7 @@ class SceneAssemblerTest {
                 new SkyPosition(10.684708, 41.268750 + 9.0), 6.0);
         catalogue.stars = List.of(cornerStar, outsideStar);
 
-        SceneAssembler assembler = new SceneAssembler(catalogue, M31, "Test chart");
+        SceneAssembler assembler = new SceneAssembler(catalogue, M31, "Test chart", 10.0);
         ChartViewState state = ChartViewState.DEFAULT.decreaseMagnitudeLimit();
         ChartScene scene = assembler.assemble(state, 900, 700);
 
