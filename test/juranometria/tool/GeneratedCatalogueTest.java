@@ -40,6 +40,44 @@ class GeneratedCatalogueTest {
         assertTrue(ids.contains("NGC 224"), "M31 itself must be present");
     }
 
+    @Test
+    void everyBundledRowLiesInsideTheDeclaredCoverage() {
+        // The scene assembler's coverage rule promises data to 10 degrees
+        // of the M31 centre; this ties that constant to the actual rows.
+        juranometria.chart.SkyRegion coverage = new juranometria.chart.SkyRegion(
+                new juranometria.chart.SkyPosition(10.684708, 41.268750), 10.0);
+        for (String resource : new String[] {
+                "/resources/catalog/m31/stars.csv", "/resources/catalog/m31/dsos.csv"}) {
+            for (double[] position : positions(resource)) {
+                assertTrue(coverage.contains(
+                                new juranometria.chart.SkyPosition(position[0], position[1])),
+                        resource + " holds a row outside the declared coverage");
+            }
+        }
+    }
+
+    private static List<double[]> positions(String resource) {
+        List<double[]> positions = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                assertResource(resource), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank() || line.startsWith("#")) {
+                    continue;
+                }
+                String[] fields = line.split(",", -1);
+                // Stars carry ra,dec at indices 1,2; DSOs at 3,4.
+                int raIndex = fields.length == 4 ? 1 : 3;
+                positions.add(new double[] {
+                        Double.parseDouble(fields[raIndex]),
+                        Double.parseDouble(fields[raIndex + 1])});
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return positions;
+    }
+
     private static List<String> firstFields(String resource) {
         List<String> ids = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(

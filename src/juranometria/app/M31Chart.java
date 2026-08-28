@@ -1,41 +1,36 @@
 package juranometria.app;
 
-import java.util.List;
-
 import juranometria.catalog.BundledCatalogue;
-import juranometria.catalog.Catalogue;
-import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
-import juranometria.chart.SkyRegion;
-import juranometria.chart.Star;
+import juranometria.ui.SceneAssembler;
 
 /**
- * Assembles the fixed M31 chart from the bundled regional catalogue.
- * The catalogue is loaded once, at first use during application setup,
- * never during painting.
+ * The fixed M31 chart wiring: the bundled regional catalogue behind a
+ * scene assembler centred on M31. The catalogue is loaded once, at first
+ * use during application setup, never during painting.
  */
 public final class M31Chart {
 
     public static final SkyPosition CENTRE = new SkyPosition(10.684708, 41.268750);
     public static final String TITLE = "M31 · Andromeda Galaxy region";
 
-    /** Covers the corners of an 8-degree-wide chart at common aspect ratios. */
-    private static final double QUERY_RADIUS_DEGREES = 6.0;
+    /**
+     * The bundled data's cone radius, matching the import region stated in
+     * src/resources/catalog/m31/PROVENANCE.md; a test guards that every
+     * bundled row actually lies within it.
+     */
+    public static final double DATA_COVERAGE_RADIUS_DEGREES = 10.0;
 
     private M31Chart() {
     }
 
     private static final class Holder {
-        static final Catalogue CATALOGUE = BundledCatalogue.load();
+        static final SceneAssembler ASSEMBLER = new SceneAssembler(
+                BundledCatalogue.load(), CENTRE, TITLE, DATA_COVERAGE_RADIUS_DEGREES);
     }
 
-    /** The M31-region stars from the bundled catalogue. */
-    public static List<Star> loadStars() {
-        return Holder.CATALOGUE.starsIn(new SkyRegion(CENTRE, QUERY_RADIUS_DEGREES));
-    }
-
-    /** The M31-region deep-sky objects from the bundled catalogue. */
-    public static List<DeepSkyObject> loadDeepSkyObjects() {
-        return Holder.CATALOGUE.deepSkyObjectsIn(new SkyRegion(CENTRE, QUERY_RADIUS_DEGREES));
+    /** The application's scene assembler over the bundled catalogue. */
+    public static SceneAssembler assembler() {
+        return Holder.ASSEMBLER;
     }
 }

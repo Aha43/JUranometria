@@ -9,6 +9,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Chart scenes are now assembled by querying the local catalogue from the
+  current view state and window geometry: zooming, magnitude changes, and
+  window resizes issue a fresh bounded query whose radius always covers
+  the visible chart corners (including tall or wide windows), while plain
+  repaints reuse the assembled scene without touching the catalogue.
 - The chart now draws from the bundled regional catalogue generated from
   Tycho-2 and OpenNGC (3204 stars to V 10.0 and 47 galaxies within 10
   degrees of M31) instead of the hand-curated SIMBAD fixture. M31's

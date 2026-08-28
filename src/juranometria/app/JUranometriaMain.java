@@ -28,8 +28,7 @@ public final class JUranometriaMain {
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        ChartComponent chart = new ChartComponent(M31Chart.CENTRE, M31Chart.TITLE,
-                M31Chart.loadStars(), M31Chart.loadDeepSkyObjects());
+        ChartComponent chart = new ChartComponent(M31Chart.assembler());
         ChartViewController controller = new ChartViewController();
         controller.onChange(chart::setViewState);
 
