@@ -59,6 +59,15 @@ V 8.0 within its region, and the atlas never claims deeper or wider
 coverage than it holds. A `--dark` argument runs the dark application
 theme; the chart page itself stays white paper in both themes.
 
+## Licensing
+
+The code and documentation are MIT licensed ([LICENSE](LICENSE)).
+Bundled data resources keep their own licenses — including, once the
+Sprint 3 catalogue import lands, a Tycho-2-derived star resource under
+CC BY-NC 3.0 IGO that may not be used commercially, which makes the
+packaged application redistributable non-commercially only. See
+[LICENSING.md](LICENSING.md) for the complete picture.
+
 ## Status
 
 The project has an executable Swing foundation and is otherwise in
