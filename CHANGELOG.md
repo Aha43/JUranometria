@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- The chart now draws from the bundled regional catalogue generated from
+  Tycho-2 and OpenNGC (3204 stars to V 10.0 and 47 galaxies within 10
+  degrees of M31) instead of the hand-curated SIMBAD fixture. M31's
+  ellipse takes its OpenNGC dimensions (177.8 by 69.7 arcminutes), M110
+  now shows its true oriented shape, Messier objects are labelled by
+  their Messier names, and fainter catalogue galaxies appear as
+  unlabelled symbols.
+
 ## [0.2.0] - 2026-08-28
 
 Sprint 2 — Navigate the chart. Reviewed by Codex before release; the

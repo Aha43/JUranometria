@@ -92,6 +92,25 @@ class ChartRendererTest {
     }
 
     @Test
+    void labelsPreferTheMessierNameAndSkipLowPriorityObjects() {
+        DeepSkyObject m31Like = new DeepSkyObject("NGC 224",
+                List.of("M 31", "Andromeda Galaxy"), DsoType.GALAXY,
+                M31_CENTRE, 60.0, 20.0, 90.0, 3.4, 1);
+        assertEquals("M 31", ChartRenderer.labelFor(m31Like));
+        DeepSkyObject unnamed = new DeepSkyObject("NGC 404", List.of(), DsoType.GALAXY,
+                M31_CENTRE, 60.0, 20.0, 90.0, 10.0, 2);
+        assertEquals("NGC 404", ChartRenderer.labelFor(unnamed));
+
+        // A priority-2 galaxy draws its symbol but no label beside it.
+        ChartScene scene =
+                new ChartScene(VIEWPORT, List.of(), List.of(unnamed), "Test chart", 8.0);
+        BufferedImage image = RENDERER.renderToImage(scene);
+        assertTrue(image.getRGB(450, 350) != 0xFFFFFFFF, "the symbol still draws");
+        assertEquals(0, countInk(image, 450 + 62, 335, 60, 30),
+                "no label ink beyond the symbol for low-priority objects");
+    }
+
+    @Test
     void tinyGalaxiesGetThePracticalMinimumSymbol() {
         DeepSkyObject speck = new DeepSkyObject("SPECK", List.of(), DsoType.GALAXY,
                 M31_CENTRE, 0.2, 0.1, 0.0, 9.0, 2);

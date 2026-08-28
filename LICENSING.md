@@ -12,7 +12,6 @@ the application.
 | Resource | License | Notice |
 |---|---|---|
 | Tabler icons (`src/resources/icons/*.svg`) | MIT | [`src/resources/icons/LICENSE`](src/resources/icons/LICENSE), listed in [`ICONS.md`](src/resources/icons/ICONS.md) |
-| M31-region fixture (`src/resources/catalog/*.csv`) | SIMBAD extract, used with acknowledgment | [`src/resources/catalog/PROVENANCE.md`](src/resources/catalog/PROVENANCE.md) |
 | Tycho-2-derived stars (`src/resources/catalog/m31/stars.csv`) | **CC BY-NC 3.0 IGO** — may not be used commercially | [`src/resources/catalog/m31/NOTICE-tycho2.md`](src/resources/catalog/m31/NOTICE-tycho2.md) |
 | OpenNGC-derived DSOs (`src/resources/catalog/m31/dsos.csv`) | CC-BY-SA-4.0 | [`src/resources/catalog/m31/NOTICE-openngc.md`](src/resources/catalog/m31/NOTICE-openngc.md), full text beside it |
 
