@@ -56,27 +56,39 @@ the exact files used, since CDS publishes none.
 **CC-BY-NC-3.0 IGO** (the Tycho data are an ESA mission product).
 Conclusion: redistribution of a derived regional extract inside this
 repository and its releases is permitted **with attribution, for
-non-commercial purposes**. JUranometria has no commercial plans: the
-owner's intent (recorded 2026-08-29) is a personal project released as
-open source so others can use and contribute — the code under a
-permissive license (a Sprint 3 issue adopts one; MIT is the family
-convention in NamDesktop and NamWeb), while bundled data resources
-keep their own licenses, exactly as the Tabler icons already do. A
-permissive *code* license does not conflict with NC *data*: the NC
-restriction travels with the star resource and its NOTICE, and binds
-what downstream users may do with that data, not with the code. Three
-consequences are accepted and recorded:
+non-commercial purposes**. That makes the extract **restricted data,
+not open data**: the [Open Source Definition](https://opensource.org/osd)
+requires permission for commercial use, so NC-licensed material does
+not itself qualify as open source
+([CC BY-NC 3.0 IGO legal code](https://creativecommons.org/licenses/by-nc/3.0/igo/legalcode.en)).
 
-1. The generated star resource ships with its own NOTICE file naming
-   the license and attribution (the per-directory notice pattern
-   already used for the Tabler icons), and the packaging test guards
-   it.
-2. The repository's licensing documentation must state plainly that
-   the bundled Tycho-2 extract is non-commercial data inside an
-   otherwise permissively licensed project, so contributors and
-   downstream users are never surprised.
-3. If a commercial use of the bundled data ever appears, the star
-   data must be re-imported from a source with compatible terms — the
+The distribution must therefore be described precisely:
+
+> JUranometria's code and documentation are MIT licensed. Releases
+> currently bundle a Tycho-2-derived star catalogue under
+> CC BY-NC 3.0 IGO. That resource may not be used commercially.
+> Commercial redistribution or use of the packaged application
+> therefore requires removing or replacing the Tycho-derived
+> catalogue.
+
+The restriction affects practical use of the packaged application even
+though it does not relicense the Java code; the project must never be
+described as unrestricted open source without this bundled-data
+exception. Consequences accepted and recorded:
+
+1. The generated star resource ships with attribution **and the
+   complete CC BY-NC 3.0 IGO license text, or an adequate notice with
+   the canonical license link**, beside the data (the per-directory
+   notice pattern already used for the Tabler icons). The packaging
+   test asserts that content ships, not merely that a notice file
+   exists.
+2. The top-level `LICENSE` stays the **unaltered MIT text**; its scope
+   and every resource exception are explained in a dedicated licensing
+   section (`LICENSING.md` or README), stating plainly that the
+   packaged application is redistributable non-commercially only,
+   while it bundles this resource (issue #28).
+3. If JUranometria needs a release whose complete contents permit
+   commercial use, the Tycho-derived resource must be replaced — the
    Gaia exit path below. The importer contract is written so only the
    source adapter would change.
 
