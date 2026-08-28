@@ -1,0 +1,116 @@
+# Development workflow
+
+JUranometria combines two practices already proven in the Nam projects:
+
+- NamDesktop supplies the simple, direct Java/Swing organization.
+- NamWeb supplies issue-sized work, sprint milestones, pull requests,
+  changelog discipline, and deliberate releases.
+
+The workflow should remain lightweight enough for a personal project. Its
+purpose is to preserve intent and make AI-assisted work reviewable, not to
+imitate a large organization.
+
+## Unit of work
+
+Every implementation change starts with a GitHub issue. An issue describes:
+
+- the observable result;
+- why it belongs in the product;
+- what is deliberately outside its scope;
+- acceptance criteria;
+- relevant design or data-source notes.
+
+Work one issue at a time. Use a short descriptive branch, implement and verify
+the issue, open a pull request, and merge it before beginning the next issue.
+Follow-up discoveries become separate issues unless they are required for the
+current acceptance criteria.
+
+## Sprint milestones
+
+A sprint is a coherent vertical step, represented by a GitHub milestone. It is
+not a time box and does not need a deadline. Name milestones after the result,
+for example:
+
+```text
+Sprint 1 — The first convincing chart
+Sprint 2 — Move around the atlas
+```
+
+Before implementation, create the sprint milestone and attach its ordered
+issues. Keep a sprint small enough that its completed result can be judged as a
+whole. Close the milestone only after the integrated application has been run
+and reviewed.
+
+The Markdown sprint document explains the product arc. GitHub issues are the
+live execution record. If they diverge, update the document or explicitly note
+the changed decision.
+
+## Branches, commits, and pull requests
+
+1. Start from current `main`.
+2. Create a branch such as `feature/gnomonic-projection` or
+   `fix/east-left-orientation`.
+3. Keep the branch limited to one issue.
+4. Add or adjust focused tests alongside the implementation.
+5. Run the application for visual changes and run the full test suite.
+6. Add an entry under `Unreleased` in `CHANGELOG.md` for user-visible work.
+7. Open a pull request that links the issue with `Closes #NN`.
+8. Merge only after checks pass and the result has been reviewed.
+
+Prefer a small number of meaningful commits over preserving every experiment.
+Commit messages state the result and may include `Closes #NN` when the commit
+itself completes the issue.
+
+## Definition of done
+
+An issue is complete when:
+
+- its acceptance criteria are met;
+- relevant focused tests pass;
+- the complete test suite passes;
+- visual behaviour has been exercised by running the application;
+- source/data attribution is present where applicable;
+- the changelog describes user-visible behaviour;
+- no known regression or unexplained warning is being carried forward.
+
+For a renderer issue, also save or inspect a deterministic reference image so
+the chart can be judged rather than inferred from tests alone.
+
+## Releases
+
+Merging is not the same as releasing. Changes accumulate under `Unreleased`.
+The natural release boundary is a completed sprint whose integrated result is
+worth naming.
+
+Use semantic versions:
+
+- `0.MINOR.0` for a completed pre-1.0 sprint or coherent feature milestone;
+- `0.MINOR.PATCH` for an off-cycle fix worth releasing independently;
+- `1.0.0` only when the atlas is useful and its core behaviour is stable.
+
+To release:
+
+1. Review the complete change since the previous release.
+2. Run all tests and exercise the packaged application.
+3. Move the accumulated changelog entries into a dated version section.
+4. Update `VERSION` in a release pull request.
+5. Merge the release PR.
+6. Create and push an annotated `vX.Y.Z` tag.
+7. Publish a GitHub Release using the matching changelog section.
+8. Close the sprint milestone if it is not already closed.
+
+Automate GitHub Release creation from tags once the first release makes the
+exact package artifact and release notes format concrete.
+
+## Working with AI coding agents
+
+The issue is the contract. Before editing, the agent reads the issue, relevant
+project documents, and current code. During implementation it should prefer the
+smallest direct design that meets the acceptance criteria. It reports what
+changed, how it was verified, and any decision that should alter the project
+documents.
+
+An agent should not silently begin the next sprint issue. Finishing one issue
+is a review point for the human owner, especially while the atlas's visual
+language is being discovered.
+

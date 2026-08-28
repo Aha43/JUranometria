@@ -1,0 +1,57 @@
+# Catalogue strategy
+
+## Principle
+
+Normal chart drawing should not depend on a public service being available.
+Bundle or preprocess the data required at each supported scale, then use public
+services selectively for discovery and future catalogue-building tools.
+
+## Candidate sources
+
+| Need | Candidate | Intended use |
+|---|---|---|
+| Named-object resolution | SIMBAD | Optional lookup for names absent locally |
+| Precise stars | Gaia DR3 | Source for a reduced, preprocessed star catalogue |
+| Catalogue discovery | VizieR | Access to specialist catalogues when needed |
+| NGC/IC deep-sky objects | OpenNGC | Bundled, normalized DSO data |
+| Constellation geometry | Public IAU-derived datasets | Bundled lines and boundaries |
+
+Public-service terms, attribution requirements, query limits, and redistribution
+licenses must be checked before data is added to a release.
+
+## Staged data plan
+
+### Stage 1: hand-curated M31 fixture
+
+Store only enough stars and DSOs to design one chart. Keep it human-readable
+and reviewable. It is a test fixture, not the beginning of a custom catalogue.
+
+### Stage 2: reproducible preprocessing
+
+Add a separate import tool that downloads or reads a pinned source release,
+normalizes required fields, and emits a compact application resource. Generated
+catalogue data must be reproducible and carry source/version metadata.
+
+### Stage 3: spatially indexed local catalogue
+
+Partition stars into sky tiles so a viewport reads only relevant records.
+Choose the index and binary encoding after measuring realistic datasets. Avoid
+loading all Gaia rows or issuing a remote query during each repaint.
+
+## Minimum data fields
+
+Stars initially need an identifier, right ascension, declination, and a
+brightness value. Gaia G magnitude is sufficient for the prototype, although
+it is not visual V magnitude.
+
+Deep-sky objects initially need identifiers and aliases, type, right ascension,
+declination, apparent major/minor dimensions, position angle when known, and a
+label priority.
+
+## Network behaviour
+
+Name resolution may use a remote service on an explicit search action. Drawing,
+panning, zooming, printing, and reopening a known chart should remain local.
+Failures must leave the atlas usable and explain that name resolution, rather
+than chart rendering, is unavailable.
+
