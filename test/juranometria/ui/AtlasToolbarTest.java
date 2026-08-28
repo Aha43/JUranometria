@@ -90,6 +90,36 @@ class AtlasToolbarTest {
     }
 
     @Test
+    void buttonsDriveTheControllerThroughTheirActionListeners() throws Exception {
+        // Codex review, PR #20: activate the real buttons rather than the
+        // controller, so a missing ActionListener cannot pass the suite.
+        ChartViewController controller = new ChartViewController();
+        AtlasToolbar toolbar = new AtlasToolbar(controller);
+
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            button(toolbar, "Zoom in").doClick();
+            button(toolbar, "Fewer stars").doClick();
+        });
+        assertEquals(6.0, controller.state().fieldWidthDegrees());
+        assertEquals(7.0, controller.state().limitingMagnitude());
+
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            button(toolbar, "Zoom out").doClick();
+            button(toolbar, "More stars").doClick();
+        });
+        assertEquals(juranometria.chart.ChartViewState.DEFAULT, controller.state());
+
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            button(toolbar, "Zoom in").doClick();
+            button(toolbar, "Fewer stars").doClick();
+            button(toolbar, "Reset view").doClick();
+        });
+        assertEquals(juranometria.chart.ChartViewState.DEFAULT, controller.state(),
+                "reset via its button restores the default after both changed");
+        assertEquals("Field 8° · Stars to V 8.0", readout(toolbar).getText());
+    }
+
+    @Test
     void resetRestoresTheCompleteDefaultAfterBothControlsChanged() {
         ChartViewController controller = new ChartViewController();
         AtlasToolbar toolbar = new AtlasToolbar(controller);
