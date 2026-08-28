@@ -20,8 +20,31 @@ the M31 region from bundled sample data.
 - [Development workflow](docs/development.md)
 - [First sprint](docs/sprint-01.md)
 
+## Requirements
+
+- JDK 21 or later (Java 21 is the recorded minimum; sources compile with
+  `--release 21`)
+- GNU Make
+- PowerShell (`pwsh`) for the dependency download script
+
+## Build and run
+
+From the repository root:
+
+```sh
+pwsh scripts/download-libs.ps1   # download pinned dependencies into lib/
+make test                        # compile and run the test suite
+make run                         # build and launch the application
+```
+
+Dependencies are pinned in `scripts/download-libs.ps1`: FlatLaf and FlatLaf
+Extras for the look and feel, JSVG for SVG icon rendering, and the standalone
+JUnit console runner (test only). Downloaded JARs live in `lib/` and
+`lib/test/` and are not committed.
+
 ## Status
 
-The project is in specification and visual-prototype stage. It will follow the
-simple Java/Swing structure proven in NamDesktop and the issue-driven sprint
-and release rhythm proven in NamWeb.
+The project has an executable Swing foundation and is otherwise in
+specification and visual-prototype stage. It follows the simple Java/Swing
+structure proven in NamDesktop and the issue-driven sprint and release rhythm
+proven in NamWeb.
