@@ -3,7 +3,8 @@ package juranometria.ui;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.List;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -11,48 +12,61 @@ import javax.swing.JComponent;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
-import juranometria.chart.ChartViewport;
-import juranometria.chart.DeepSkyObject;
-import juranometria.chart.SkyPosition;
-import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
 import juranometria.render.ChartRenderer;
 
 /**
- * The atlas page. Holds pre-loaded chart content and delegates painting to
- * the renderer; painting fetches nothing and mutates nothing.
+ * The atlas page. Scenes are assembled by the {@link SceneAssembler} when
+ * the view state or the component size changes; painting only renders the
+ * current scene and performs no catalogue query. Repainting an unchanged
+ * view reuses the assembled scene untouched.
  */
 public final class ChartComponent extends JComponent {
 
     private final ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
-    private final SkyPosition centre;
-    private final String title;
-    private final List<Star> stars;
-    private final List<DeepSkyObject> deepSkyObjects;
+    private final SceneAssembler assembler;
     private ChartViewState viewState = ChartViewState.DEFAULT;
+    private ChartScene scene;
 
-    public ChartComponent(SkyPosition centre, String title,
-                          List<Star> stars, List<DeepSkyObject> deepSkyObjects) {
-        this.centre = centre;
-        this.title = title;
-        this.stars = List.copyOf(stars);
-        this.deepSkyObjects = List.copyOf(deepSkyObjects);
+    public ChartComponent(SceneAssembler assembler) {
+        if (assembler == null) {
+            throw new IllegalArgumentException("scene assembler must not be null");
+        }
+        this.assembler = assembler;
         setOpaque(true);
         setPreferredSize(new Dimension(900, 700));
         getAccessibleContext().setAccessibleName("Star chart");
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent event) {
+                assembleScene();
+            }
+        });
     }
 
-    /** Adopts a new view state and repaints; the scene is rebuilt on paint. */
+    /** Adopts a new view state, assembles its scene, and repaints. */
     public void setViewState(ChartViewState viewState) {
         if (viewState == null) {
             throw new IllegalArgumentException("view state must not be null");
         }
         this.viewState = viewState;
-        repaint();
+        assembleScene();
     }
 
     public ChartViewState viewState() {
         return viewState;
+    }
+
+    ChartScene scene() {
+        return scene;
+    }
+
+    private void assembleScene() {
+        if (getWidth() <= 0 || getHeight() <= 0) {
+            return;
+        }
+        scene = assembler.assemble(viewState, getWidth(), getHeight());
+        repaint();
     }
 
     @Override
@@ -72,13 +86,12 @@ public final class ChartComponent extends JComponent {
 
     @Override
     protected void paintComponent(Graphics g) {
-        if (getWidth() <= 0 || getHeight() <= 0) {
+        if (scene == null || scene.viewport().widthPx() != getWidth()
+                || scene.viewport().heightPx() != getHeight()) {
+            // A resize event is already on its way for this geometry; skip
+            // the stale frame rather than querying inside painting.
             return;
         }
-        ChartScene scene = new ChartScene(
-                new ChartViewport(centre, viewState.fieldWidthDegrees(),
-                        getWidth(), getHeight()),
-                stars, deepSkyObjects, title, viewState.limitingMagnitude());
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             renderer.render(g2, scene);

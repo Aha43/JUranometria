@@ -48,6 +48,13 @@ Partition stars into sky tiles so a viewport reads only relevant records.
 Choose the index and binary encoding after measuring realistic datasets. Avoid
 loading all Gaia rows or issuing a remote query during each repaint.
 
+Stages 1 and 2 are complete: the bundled regional resources are generated
+reproducibly (see the decision document) and chart scenes query them
+through the `Catalogue` boundary on view-state and window changes, never
+during painting. Stage 3 remains deferred until all-sky volumes supply
+measurements; the scene-assembly seam is where a tiled catalogue would
+plug in.
+
 ## Minimum data fields
 
 Stars initially need an identifier, right ascension, declination, and a
