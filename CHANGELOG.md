@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-29
+
+Sprint 3 — Local catalogue foundation. Reviewed by Codex before release;
+the review trail lives in `docs/reviews/`.
+
 ### Changed
 
 - Chart scenes are now assembled by querying the local catalogue from the
