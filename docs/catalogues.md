@@ -1,5 +1,15 @@
 # Catalogue strategy
 
+## Decisions
+
+The Sprint 3 decision on concrete sources, licensing, magnitude
+semantics, regional coverage, and the reproducible import contract is
+recorded in [catalogue sources](decisions/catalogue-sources.md):
+Tycho-2 (CDS I/259) for stars with Johnson V derived from BT/VT, and
+OpenNGC (pinned release) for NGC/IC objects, over a 10-degree region
+around M31. Gaia DR3 remains the intended all-sky star source for a
+later sprint.
+
 ## Principle
 
 Normal chart drawing should not depend on a public service being available.
