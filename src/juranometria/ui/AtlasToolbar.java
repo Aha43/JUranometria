@@ -12,33 +12,47 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import juranometria.chart.ChartViewState;
 
 /**
- * The compact atlas toolbar: zoom in, zoom out, reset view, and the
- * current field-width readout. It frames the chart rather than competing
- * with it; controls disable themselves at the fixture bounds through the
- * view state's can-queries.
+ * The compact atlas toolbar: zoom, magnitude-limit, and reset controls
+ * with a combined field/limit readout. It frames the chart rather than
+ * competing with it; controls disable themselves at the fixture bounds
+ * through the view state's can-queries, so the toolbar can never promise
+ * data the fixture does not hold.
  */
 public final class AtlasToolbar extends JToolBar {
 
     private final JButton zoomIn;
     private final JButton zoomOut;
+    private final JButton fewerStars;
+    private final JButton moreStars;
     private final JButton resetView;
-    private final JLabel fieldWidthReadout = new JLabel();
+    private final JLabel readout = new JLabel();
 
     public AtlasToolbar(ChartViewController controller) {
         setFloatable(false);
 
-        zoomIn = iconButton("zoom-in", "Zoom in", controller::zoomIn);
-        zoomOut = iconButton("zoom-out", "Zoom out", controller::zoomOut);
-        resetView = iconButton("zoom-reset", "Reset view", controller::reset);
+        zoomIn = iconButton("zoom-in", "Zoom in",
+                "Zoom in", controller::zoomIn);
+        zoomOut = iconButton("zoom-out", "Zoom out",
+                "Zoom out", controller::zoomOut);
+        fewerStars = iconButton("minus", "Fewer stars",
+                "Fewer stars (brighter magnitude limit)",
+                controller::decreaseMagnitudeLimit);
+        moreStars = iconButton("plus", "More stars",
+                "More stars (fainter magnitude limit)",
+                controller::increaseMagnitudeLimit);
+        resetView = iconButton("zoom-reset", "Reset view",
+                "Reset view", controller::reset);
 
         add(zoomIn);
         add(zoomOut);
         addSeparator();
+        add(fewerStars);
+        add(moreStars);
+        addSeparator();
         add(resetView);
         add(Box.createHorizontalGlue());
-        add(fieldWidthReadout);
-        fieldWidthReadout.setBorder(
-                javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 8));
+        add(readout);
+        readout.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 8));
 
         controller.onChange(this::sync);
     }
@@ -46,14 +60,18 @@ public final class AtlasToolbar extends JToolBar {
     private void sync(ChartViewState state) {
         zoomIn.setEnabled(state.canZoomIn());
         zoomOut.setEnabled(state.canZoomOut());
-        fieldWidthReadout.setText(String.format(Locale.ROOT,
-                "Field %.0f°", state.fieldWidthDegrees()));
+        fewerStars.setEnabled(state.canDecreaseMagnitudeLimit());
+        moreStars.setEnabled(state.canIncreaseMagnitudeLimit());
+        readout.setText(String.format(Locale.ROOT,
+                "Field %.0f° · Stars to V %.1f",
+                state.fieldWidthDegrees(), state.limitingMagnitude()));
     }
 
-    private static JButton iconButton(String icon, String name, Runnable action) {
+    private static JButton iconButton(String icon, String name, String tooltip,
+                                      Runnable action) {
         JButton button = new JButton(
                 new FlatSVGIcon("resources/icons/" + icon + ".svg", 16, 16));
-        button.setToolTipText(name);
+        button.setToolTipText(tooltip);
         button.getAccessibleContext().setAccessibleName(name);
         button.setFocusable(true);
         button.addActionListener(e -> action.run());

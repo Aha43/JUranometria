@@ -4,9 +4,12 @@ Source: [Tabler Icons](https://github.com/tabler/tabler-icons), outline
 style, release **v3.46.0**, downloaded 2026-08-28 with
 `scripts/download-icons.sh` (the pinned version lives in that script).
 
-License: MIT (Tabler Icons, Paweł Kuna). The SVG files are bundled
-unmodified; FlatLaf recolors the monochrome strokes at runtime for
-theme contrast, which does not alter the files.
+License: MIT (Tabler Icons, Paweł Kuna). The complete upstream
+copyright and permission notice is bundled beside the icons in
+[`LICENSE`](LICENSE) and ships as an application resource, as the MIT
+license requires. The SVG files are bundled unmodified; FlatLaf
+recolors the monochrome strokes at runtime for theme contrast, which
+does not alter the files.
 
 Icons bundled:
 
@@ -15,6 +18,8 @@ Icons bundled:
 | `zoom-in.svg` | Toolbar: zoom in |
 | `zoom-out.svg` | Toolbar: zoom out |
 | `zoom-reset.svg` | Toolbar: reset view |
+| `minus.svg` | Toolbar: fewer stars (brighter magnitude limit) |
+| `plus.svg` | Toolbar: more stars (fainter magnitude limit) |
 
 Add an icon only when a real action needs it: add the name to the
 script's `ICONS` list, re-run the script, and record it here.

@@ -13,6 +13,10 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   zoom out, and reset view, stepping the field width through 8, 6, 4, 3,
   2, and 1 degrees centred on M31, with a live field-width readout,
   bundled Tabler icons, and controls that disable at the fixture bounds.
+- A limiting-magnitude control: fewer/more stars step the stellar limit
+  between V 4.0 and V 8.0 in whole magnitudes with immediate chart
+  updates; the toolbar readout, title block, and rendered stars always
+  agree, and reset restores the complete 8°/V 8.0 default view.
 
 ## [0.1.0] - 2026-08-28
 

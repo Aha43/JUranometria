@@ -132,6 +132,23 @@ class ChartRendererTest {
     }
 
     @Test
+    void anIntermediateMagnitudeLimitCullsHonestly() {
+        // A V 6.0 scene: a 5.5 star at the centre draws, a 6.5 star does not,
+        // and the field width is untouched by the magnitude change.
+        Star bright = new Star("bright", M31_CENTRE, 5.5);
+        Star faint = new Star("faint", M31_CENTRE, 6.5);
+
+        ChartScene brightScene = new ChartScene(
+                VIEWPORT, List.of(bright), List.of(), "Test chart", 6.0);
+        assertTrue(RENDERER.renderToImage(brightScene).getRGB(450, 350) != 0xFFFFFFFF);
+
+        ChartScene faintScene = new ChartScene(
+                VIEWPORT, List.of(faint), List.of(), "Test chart", 6.0);
+        assertEquals(0xFFFFFFFF, RENDERER.renderToImage(faintScene).getRGB(450, 350));
+        assertEquals(8.0, faintScene.viewport().fieldWidthDegrees());
+    }
+
+    @Test
     void chartNotationIsIndependentOfTheDefaultLocale() {
         Locale original = Locale.getDefault();
         try {
