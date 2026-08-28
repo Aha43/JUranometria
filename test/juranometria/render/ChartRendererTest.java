@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Locale;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewport;
@@ -112,6 +113,46 @@ class ChartRendererTest {
                 "the label must sit right of the symbol");
         assertTrue(countInk(image, 12, 700 - 12 - 70, 220, 70) > 100,
                 "the title block must occupy the lower-left corner");
+    }
+
+    @Test
+    void starsFainterThanTheSceneLimitAreNotDrawn() {
+        Star atLimit = new Star("at limit", M31_CENTRE, 8.0);
+        Star beyondLimit = new Star("beyond limit", M31_CENTRE, 8.01);
+
+        ChartScene faintScene = new ChartScene(
+                VIEWPORT, List.of(beyondLimit), List.of(), "Test chart", 8.0);
+        assertEquals(0xFFFFFFFF, RENDERER.renderToImage(faintScene).getRGB(450, 350),
+                "a star fainter than the stated limit must not be drawn");
+
+        ChartScene limitScene = new ChartScene(
+                VIEWPORT, List.of(atLimit), List.of(), "Test chart", 8.0);
+        assertTrue(RENDERER.renderToImage(limitScene).getRGB(450, 350) != 0xFFFFFFFF,
+                "a star exactly at the stated limit is still drawn");
+    }
+
+    @Test
+    void chartNotationIsIndependentOfTheDefaultLocale() {
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("nb-NO"));
+            int[] norwegian = pixels(RENDERER.renderToImage(SCENE));
+            Locale.setDefault(Locale.US);
+            int[] us = pixels(RENDERER.renderToImage(SCENE));
+            assertArrayEquals(norwegian, us,
+                    "rendering must not depend on the machine locale");
+        } finally {
+            Locale.setDefault(original);
+        }
+    }
+
+    @Test
+    void titleBlockIsOmittedWhenTheViewportCannotHoldIt() {
+        ChartViewport tiny = new ChartViewport(M31_CENTRE, 8.0, 120, 90);
+        ChartScene scene = new ChartScene(tiny, List.of(), List.of(), "Test chart", 8.0);
+        BufferedImage image = RENDERER.renderToImage(scene);
+        assertEquals(0, countInk(image, 3, 3, 114, 84),
+                "a viewport too small for the title block omits it instead of clipping");
     }
 
     private static int countInk(BufferedImage image, int x, int y, int w, int h) {

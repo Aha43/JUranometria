@@ -10,6 +10,7 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Locale;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.DeepSkyObject;
@@ -79,6 +80,11 @@ public final class ChartRenderer {
         }
         g.setColor(INK);
         for (Star star : scene.stars()) {
+            // The scene's stated limit governs what is drawn; the size
+            // policy only decides mark sizes (Codex review, issue #13).
+            if (star.magnitude() > scene.limitingMagnitude()) {
+                continue;
+            }
             projection.project(star.position()).ifPresent(plane -> {
                 PixelPoint pixel = mapping.toPixel(plane);
                 double radius = starSizePolicy.radiusFor(star.magnitude());
@@ -168,7 +174,8 @@ public final class ChartRenderer {
                 "Centre " + formatRa(scene.viewport().centre().raDegrees())
                         + ", " + formatDec(scene.viewport().centre().decDegrees())
                         + " · ICRS J2000",
-                String.format("Field %.1f° · Stars to V %.1f · North up, east left",
+                String.format(Locale.ROOT,
+                        "Field %.1f° · Stars to V %.1f · North up, east left",
                         scene.viewport().fieldWidthDegrees(), scene.limitingMagnitude()),
         };
 
@@ -186,6 +193,13 @@ public final class ChartRenderer {
         int boxHeight = lines.length * lineHeight + 2 * TITLE_PADDING_PX;
         int boxX = TITLE_MARGIN_PX;
         int boxY = scene.viewport().heightPx() - TITLE_MARGIN_PX - boxHeight;
+
+        // A viewport too small to hold the block with its margins omits it
+        // rather than clipping formal notation (Codex review, PR #12).
+        if (boxWidth + 2 * TITLE_MARGIN_PX > scene.viewport().widthPx()
+                || boxHeight + 2 * TITLE_MARGIN_PX > scene.viewport().heightPx()) {
+            return;
+        }
 
         g.setColor(PAPER);
         g.fillRect(boxX, boxY, boxWidth, boxHeight);
@@ -209,7 +223,7 @@ public final class ChartRenderer {
         double hours = raDegrees / 15.0;
         int wholeHours = (int) hours;
         double minutes = (hours - wholeHours) * 60.0;
-        return String.format("%dh %04.1fm", wholeHours, minutes);
+        return String.format(Locale.ROOT, "%dh %04.1fm", wholeHours, minutes);
     }
 
     private static String formatDec(double decDegrees) {
@@ -221,6 +235,6 @@ public final class ChartRenderer {
             wholeDegrees++;
             arcminutes = 0;
         }
-        return String.format("%s%d° %02d′", sign, wholeDegrees, arcminutes);
+        return String.format(Locale.ROOT, "%s%d° %02d′", sign, wholeDegrees, arcminutes);
     }
 }
