@@ -1,0 +1,6 @@
+# M31-region deep-sky objects, hand-curated fixture for Sprint 1.
+# See PROVENANCE.md in this directory for source and terms.
+# id,aliases(|-separated),type,ra_deg,dec_deg,major_arcmin,minor_arcmin,pa_deg,vmag,label_priority
+M31,NGC 224|Andromeda Galaxy,GALAXY,10.684708,41.268750,199.53,70.79,35.0,3.44,1
+M32,NGC 221,GALAXY,10.674270,40.865170,3.38,2.73,160.0,8.08,2
+M110,NGC 205,GALAXY,10.091905,41.685419,3.33,2.10,165.0,8.07,2
