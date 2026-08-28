@@ -16,3 +16,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Executable project foundation: Make-based build targeting Java 21, pinned
   dependency download script (FlatLaf, FlatLaf Extras, JSVG, JUnit console
   runner), and a minimal FlatLaf application window launched on the EDT.
+- The first rendered chart: the application window now shows a fixed
+  8-degree M31-region star chart on white paper with a restrained frame,
+  drawn from the bundled fixture, with a tunable magnitude-to-radius star
+  scale and a `make chart-image` target that writes a deterministic
+  reference image.

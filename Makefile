@@ -16,7 +16,7 @@ TEST_SOURCES := $(shell find $(TEST_DIR) -name "*.java" 2>/dev/null)
 
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-1.10.2.jar
 
-.PHONY: all help clean classes jar app run test
+.PHONY: all help clean classes jar app run test chart-image
 
 all: app
 
@@ -25,8 +25,9 @@ help:
 	@echo ""
 	@echo "  all    Build the app (default)"
 	@echo "  run    Build and launch the app"
-	@echo "  test   Compile and run unit tests"
-	@echo "  clean  Delete build output"
+	@echo "  test         Compile and run unit tests"
+	@echo "  chart-image  Write the deterministic reference chart image"
+	@echo "  clean        Delete build output"
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -59,6 +60,9 @@ run: app
 	java \
 		-cp "$(APP_DIR)/$(MAIN_JAR):$(APP_DIR)/lib/*" \
 		$(MAIN_CLASS)
+
+chart-image: classes
+	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.app.ChartImageMain
 
 test: classes
 	rm -rf $(TEST_CLASSES)

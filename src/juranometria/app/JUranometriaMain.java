@@ -3,6 +3,8 @@ package juranometria.app;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import juranometria.ui.ChartComponent;
+
 /** Application entry point. */
 public final class JUranometriaMain {
 
@@ -20,7 +22,9 @@ public final class JUranometriaMain {
         UiTheme.apply();
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 700);
+        frame.setContentPane(new ChartComponent(
+                M31Chart.CENTRE, M31Chart.FIELD_WIDTH_DEGREES, M31Chart.loadStars()));
+        frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
