@@ -8,7 +8,7 @@ TABLER_VERSION="v3.46.0"
 ICONS_DIR="$(dirname "$0")/../src/resources/icons"
 BASE_URL="https://raw.githubusercontent.com/tabler/tabler-icons/$TABLER_VERSION/icons/outline"
 
-ICONS="zoom-in zoom-out zoom-reset"
+ICONS="zoom-in zoom-out zoom-reset minus plus"
 
 mkdir -p "$ICONS_DIR"
 for icon in $ICONS; do

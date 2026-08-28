@@ -15,6 +15,8 @@ Icons bundled:
 | `zoom-in.svg` | Toolbar: zoom in |
 | `zoom-out.svg` | Toolbar: zoom out |
 | `zoom-reset.svg` | Toolbar: reset view |
+| `minus.svg` | Toolbar: fewer stars (brighter magnitude limit) |
+| `plus.svg` | Toolbar: more stars (fainter magnitude limit) |
 
 Add an icon only when a real action needs it: add the name to the
 script's `ICONS` list, re-run the script, and record it here.

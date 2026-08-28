@@ -42,6 +42,23 @@ Extras for the look and feel, JSVG for SVG icon rendering, and the standalone
 JUnit console runner (test only). Downloaded JARs live in `lib/` and
 `lib/test/` and are not committed.
 
+## Using the atlas
+
+`make run` opens the M31 region chart. The toolbar above the page:
+
+- **Zoom in / Zoom out** step the field width through 8°, 6°, 4°, 3°,
+  2°, and 1°, always centred on M31.
+- **Fewer stars / More stars** step the stellar limiting magnitude
+  between V 4.0 and V 8.0 in whole magnitudes.
+- **Reset view** returns to the default 8° field with stars to V 8.0.
+- The readout on the right and the chart's title block always state the
+  active field width and magnitude limit.
+
+Controls disable at their bounds: the bundled fixture carries stars to
+V 8.0 within its region, and the atlas never claims deeper or wider
+coverage than it holds. A `--dark` argument runs the dark application
+theme; the chart page itself stays white paper in both themes.
+
 ## Status
 
 The project has an executable Swing foundation and is otherwise in
