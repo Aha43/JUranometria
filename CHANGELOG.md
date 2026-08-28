@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-28
+
+Sprint 1 — The first convincing chart. Reviewed by Codex before release;
+the review trail lives in `docs/reviews/`.
+
 ### Added
 
 - Initial product, chart, architecture, catalogue, development, and Sprint 1
