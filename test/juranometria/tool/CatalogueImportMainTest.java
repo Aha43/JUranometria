@@ -27,21 +27,38 @@ class CatalogueImportMainTest {
     @Test
     void boundarySelectionRespectsRegionAndLimit() {
         List<StarRow> stars = new ArrayList<>();
+        java.util.Set<String> seen = new java.util.HashSet<>();
         Counts counts = new Counts();
 
         CatalogueImportMain.accept(Optional.of(row("in", 10.7, 41.3, 9.99)),
-                REGION, stars, counts);
+                REGION, stars, seen, counts);
         CatalogueImportMain.accept(Optional.of(row("at limit", 10.7, 41.3, 10.0)),
-                REGION, stars, counts);
+                REGION, stars, seen, counts);
         CatalogueImportMain.accept(Optional.of(row("too faint", 10.7, 41.3, 10.01)),
-                REGION, stars, counts);
+                REGION, stars, seen, counts);
         CatalogueImportMain.accept(Optional.of(row("outside", 10.7, 52.0, 5.0)),
-                REGION, stars, counts);
-        CatalogueImportMain.accept(Optional.empty(), REGION, stars, counts);
+                REGION, stars, seen, counts);
+        CatalogueImportMain.accept(Optional.empty(), REGION, stars, seen, counts);
 
         assertEquals(List.of("in", "at limit"),
                 stars.stream().map(StarRow::id).toList());
         assertEquals(1, counts.droppedNoVt);
+    }
+
+    @Test
+    void anIdentifierCollisionKeepsTheFirstEntryAndCountsTheSkip() {
+        List<StarRow> stars = new ArrayList<>();
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        Counts counts = new Counts();
+
+        CatalogueImportMain.accept(Optional.of(row("TYC 2794-1098-1", 3.142351, 44.707198, 6.52)),
+                REGION, stars, seen, counts);
+        CatalogueImportMain.accept(Optional.of(row("TYC 2794-1098-1", 3.142175, 44.707449, 9.77)),
+                REGION, stars, seen, counts);
+
+        assertEquals(1, stars.size(), "the main-catalogue entry wins the collision");
+        assertEquals(6.52, stars.get(0).vmag());
+        assertEquals(1, counts.supplementComponentsSkipped);
     }
 
     @Test

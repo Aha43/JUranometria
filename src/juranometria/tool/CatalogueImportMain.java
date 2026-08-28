@@ -59,7 +59,8 @@ public final class CatalogueImportMain {
             Map.entry("tyc2.dat.19.gz", "f59605a38116f517a31a7dbdee3469c077658f2f40b8afe5da2aeb832eaee3dd"),
             Map.entry("suppl_1.dat.gz", "d256a9fc47259d506e4849b054e9392a62b2ed128e48ac6a25a3a60fcc317f0e"),
             Map.entry("openngc-NGC.csv", "840fe0c9ee1332e551b2e722a0e92726cd7b157914a3d2177602832aadd3aa9e"),
-            Map.entry("openngc-addendum.csv", "1d8f0914e643ada325a5a94d88d8fefad6a4937a2f77cc34f21483af22b11983"));
+            Map.entry("openngc-addendum.csv", "1d8f0914e643ada325a5a94d88d8fefad6a4937a2f77cc34f21483af22b11983"),
+            Map.entry("openngc-CC-BY-SA-4.0.txt", "cde7883b9050a1104f4ac19a1572aafd6e5d7323b68351aaf51fbf4beba54966"));
 
     private CatalogueImportMain() {
     }
@@ -76,15 +77,19 @@ public final class CatalogueImportMain {
         Counts counts = new Counts();
 
         List<StarRow> stars = new ArrayList<>();
+        java.util.Set<String> seenIds = new java.util.HashSet<>();
         for (int i = 0; i <= 19; i++) {
             Path file = rawDir.resolve(String.format(Locale.ROOT, "tyc2.dat.%02d.gz", i));
             readGzLines(file, line ->
-                    accept(Tycho2Records.fromMainLine(line), region, stars, counts));
+                    accept(Tycho2Records.fromMainLine(line), region, stars, seenIds, counts));
         }
         counts.mainStars = stars.size();
         readGzLines(rawDir.resolve("suppl_1.dat.gz"), line ->
-                accept(Tycho2Records.fromSupplementLine(line), region, stars, counts));
+                accept(Tycho2Records.fromSupplementLine(line), region, stars, seenIds, counts));
         counts.supplementStars = stars.size() - counts.mainStars;
+        if (seenIds.size() != stars.size()) {
+            throw new IllegalStateException("duplicate star identifiers survived the import");
+        }
         stars.sort(Comparator.comparingDouble(StarRow::vmag).thenComparing(StarRow::id));
 
         List<String[]> dsoRows = importDsos(rawDir, region, counts);
@@ -110,6 +115,7 @@ public final class CatalogueImportMain {
         int vtWithoutBt;
         int hpMagnitudes;
         int droppedNoVt;
+        int supplementComponentsSkipped;
         int galaxies;
         int skippedOtherTypes;
         int skippedDupNonEx;
@@ -120,7 +126,7 @@ public final class CatalogueImportMain {
     }
 
     static void accept(java.util.Optional<StarRow> parsed, SkyRegion region,
-                               List<StarRow> stars, Counts counts) {
+                       List<StarRow> stars, java.util.Set<String> seenIds, Counts counts) {
         if (parsed.isEmpty()) {
             counts.droppedNoVt++;
             return;
@@ -128,6 +134,15 @@ public final class CatalogueImportMain {
         StarRow row = parsed.get();
         if (row.vmag() > STAR_LIMIT_V
                 || !region.contains(new SkyPosition(row.raDegrees(), row.decDegrees()))) {
+            return;
+        }
+        // Component policy: the main catalogue wins. A supplement-1 record
+        // reusing an already-imported TYC identifier is a resolved component
+        // of a Hipparcos double whose photocentre the main entry carries
+        // (e.g. TYC 2794-1098-1, CCDM 1009A in main versus 1009B in the
+        // supplement); it is skipped and counted.
+        if (!seenIds.add(row.id())) {
+            counts.supplementComponentsSkipped++;
             return;
         }
         if (row.usedFallbackPosition()) {

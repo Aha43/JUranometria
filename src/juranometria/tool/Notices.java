@@ -55,6 +55,11 @@ final class Notices {
                   unchanged when BT is absent. Supplement-1 positions are at
                   their catalogue epoch J1991.25 without proper-motion
                   propagation (out of scope; sub-arcsecond at chart scales).
+                  Identifier collisions follow a main-catalogue-wins policy:
+                  a supplement-1 record reusing an imported TYC id is a
+                  resolved Hipparcos-double component whose photocentre the
+                  main entry already carries, and is skipped with its count
+                  below. Identifiers in `stars.csv` are unique.
                 - Deep-sky objects: every OpenNGC galaxy (type G) in the
                   region; other types wait for their chart symbols.
 
@@ -68,6 +73,7 @@ final class Notices {
                 | - using the observed (fallback) position | %d |
                 | - V taken from VT alone (no BT) | %d |
                 | - V taken from an Hp magnitude | %d |
+                | - supplement components skipped for an existing TYC id | %d |
                 | Records dropped for missing VT (whole sky) | %d |
                 | Galaxies written | %d |
                 | In-region objects of other types, skipped | %d |
@@ -86,7 +92,7 @@ final class Notices {
                 CatalogueImportMain.STAR_LIMIT_V,
                 starCount, counts.mainStars, counts.supplementStars,
                 counts.fallbackPositions, counts.vtWithoutBt, counts.hpMagnitudes,
-                counts.droppedNoVt,
+                counts.supplementComponentsSkipped, counts.droppedNoVt,
                 dsoCount, counts.skippedOtherTypes, counts.skippedDupNonEx,
                 counts.missingPositionAngle, counts.missingMinorAxis,
                 counts.vmagFromB, counts.droppedNoMagnitude);
