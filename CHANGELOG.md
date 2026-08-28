@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The first interactive controls: a compact atlas toolbar with zoom in,
+  zoom out, and reset view, stepping the field width through 8, 6, 4, 3,
+  2, and 1 degrees centred on M31, with a live field-width readout,
+  bundled Tabler icons, and controls that disable at the fixture bounds.
+
 ## [0.1.0] - 2026-08-28
 
 Sprint 1 — The first convincing chart. Reviewed by Codex before release;

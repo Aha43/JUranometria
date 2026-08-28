@@ -15,11 +15,7 @@ import juranometria.chart.Star;
 public final class M31Chart {
 
     public static final SkyPosition CENTRE = new SkyPosition(10.684708, 41.268750);
-    public static final double FIELD_WIDTH_DEGREES = 8.0;
     public static final String TITLE = "M31 · Andromeda Galaxy region";
-
-    /** The fixture's stellar depth; stated in the title block. */
-    public static final double LIMITING_MAGNITUDE = 8.0;
 
     /** Covers the corners of an 8-degree-wide chart at common aspect ratios. */
     private static final double QUERY_RADIUS_DEGREES = 6.0;
