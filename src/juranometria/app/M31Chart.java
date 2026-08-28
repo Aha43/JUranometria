@@ -2,15 +2,17 @@ package juranometria.app;
 
 import java.util.List;
 
-import juranometria.catalog.FixtureCatalogue;
+import juranometria.catalog.BundledCatalogue;
+import juranometria.catalog.Catalogue;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.SkyRegion;
 import juranometria.chart.Star;
 
 /**
- * Assembles the fixed Sprint 1 chart: the M31 region from the bundled
- * fixture. Loading happens up front, never during painting.
+ * Assembles the fixed M31 chart from the bundled regional catalogue.
+ * The catalogue is loaded once, at first use during application setup,
+ * never during painting.
  */
 public final class M31Chart {
 
@@ -23,15 +25,17 @@ public final class M31Chart {
     private M31Chart() {
     }
 
-    /** Loads the fixture stars around the M31 centre. */
-    public static List<Star> loadStars() {
-        return FixtureCatalogue.loadBundled()
-                .starsIn(new SkyRegion(CENTRE, QUERY_RADIUS_DEGREES));
+    private static final class Holder {
+        static final Catalogue CATALOGUE = BundledCatalogue.load();
     }
 
-    /** Loads the fixture deep-sky objects around the M31 centre. */
+    /** The M31-region stars from the bundled catalogue. */
+    public static List<Star> loadStars() {
+        return Holder.CATALOGUE.starsIn(new SkyRegion(CENTRE, QUERY_RADIUS_DEGREES));
+    }
+
+    /** The M31-region deep-sky objects from the bundled catalogue. */
     public static List<DeepSkyObject> loadDeepSkyObjects() {
-        return FixtureCatalogue.loadBundled()
-                .deepSkyObjectsIn(new SkyRegion(CENTRE, QUERY_RADIUS_DEGREES));
+        return Holder.CATALOGUE.deepSkyObjectsIn(new SkyRegion(CENTRE, QUERY_RADIUS_DEGREES));
     }
 }

@@ -41,6 +41,13 @@ public final class ChartRenderer {
     /** Practical minimum drawn major axis; the true axis ratio is kept. */
     private static final double MIN_GALAXY_MAJOR_PX = 6.0;
 
+    /**
+     * Restrained labelling at the fixed Sprint chart: only the most
+     * important objects (Messier priority) carry labels, preserving the
+     * page's character now that the catalogue holds dozens of galaxies.
+     */
+    private static final int MAX_LABELED_PRIORITY = 1;
+
     private static final Font LABEL_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
     private static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
     private static final int TITLE_MARGIN_PX = 12;
@@ -94,6 +101,9 @@ public final class ChartRenderer {
             });
         }
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            if (dso.labelPriority() > MAX_LABELED_PRIORITY) {
+                continue;
+            }
             projection.project(dso.position()).ifPresent(plane ->
                     drawLabel(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
         }
@@ -165,7 +175,15 @@ public final class ChartRenderer {
         g.setColor(TEXT_INK);
         float x = (float) (centre.x() + halfExtentX + 5.0);
         float y = (float) (centre.y() + g.getFontMetrics().getAscent() / 2.0 - 1.0);
-        g.drawString(dso.id(), x, y);
+        g.drawString(labelFor(dso), x, y);
+    }
+
+    /** The atlas labels Messier objects by their Messier name. */
+    static String labelFor(DeepSkyObject dso) {
+        return dso.aliases().stream()
+                .filter(alias -> alias.startsWith("M "))
+                .findFirst()
+                .orElse(dso.id());
     }
 
     private void drawTitleBlock(Graphics2D g, ChartScene scene) {
