@@ -11,6 +11,7 @@ import javax.swing.JComponent;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewport;
+import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
@@ -25,12 +26,20 @@ public final class ChartComponent extends JComponent {
     private final ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
     private final SkyPosition centre;
     private final double fieldWidthDegrees;
+    private final String title;
+    private final double limitingMagnitude;
     private final List<Star> stars;
+    private final List<DeepSkyObject> deepSkyObjects;
 
-    public ChartComponent(SkyPosition centre, double fieldWidthDegrees, List<Star> stars) {
+    public ChartComponent(SkyPosition centre, double fieldWidthDegrees,
+                          String title, double limitingMagnitude,
+                          List<Star> stars, List<DeepSkyObject> deepSkyObjects) {
         this.centre = centre;
         this.fieldWidthDegrees = fieldWidthDegrees;
+        this.title = title;
+        this.limitingMagnitude = limitingMagnitude;
         this.stars = List.copyOf(stars);
+        this.deepSkyObjects = List.copyOf(deepSkyObjects);
         setOpaque(true);
         setPreferredSize(new Dimension(900, 700));
         getAccessibleContext().setAccessibleName("Star chart");
@@ -58,7 +67,7 @@ public final class ChartComponent extends JComponent {
         }
         ChartScene scene = new ChartScene(
                 new ChartViewport(centre, fieldWidthDegrees, getWidth(), getHeight()),
-                stars);
+                stars, deepSkyObjects, title, limitingMagnitude);
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             renderer.render(g2, scene);

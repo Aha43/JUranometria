@@ -21,3 +21,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   drawn from the bundled fixture, with a tunable magnitude-to-radius star
   scale and a `make chart-image` target that writes a deterministic
   reference image.
+- The complete Sprint 1 chart: M31, M32, and M110 drawn as oriented
+  ellipses from their catalogued dimensions and position angles, restrained
+  labels, and a formal title block stating target, centre, ICRS J2000,
+  field width, limiting magnitude, and orientation. A `--dark` flag runs
+  the dark application theme; the chart stays white paper in both.

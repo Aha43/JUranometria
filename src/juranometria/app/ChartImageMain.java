@@ -23,7 +23,8 @@ public final class ChartImageMain {
         File target = new File(args.length > 0 ? args[0] : "build/m31-chart.png");
         ChartScene scene = new ChartScene(
                 new ChartViewport(M31Chart.CENTRE, M31Chart.FIELD_WIDTH_DEGREES, 900, 700),
-                M31Chart.loadStars());
+                M31Chart.loadStars(), M31Chart.loadDeepSkyObjects(),
+                M31Chart.TITLE, M31Chart.LIMITING_MAGNITUDE);
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         ImageIO.write(renderer.renderToImage(scene), "png", target);
         System.out.println("Wrote " + target.getPath());

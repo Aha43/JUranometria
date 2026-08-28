@@ -4,9 +4,12 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Locale;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewport;
+import juranometria.chart.DeepSkyObject;
+import juranometria.chart.DsoType;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
@@ -24,7 +27,8 @@ class ChartRendererTest {
     static final Star NU_AND = new Star("nu And", new SkyPosition(12.453526, 41.078911), 4.53);
 
     static final ChartViewport VIEWPORT = new ChartViewport(M31_CENTRE, 8.0, 900, 700);
-    static final ChartScene SCENE = new ChartScene(VIEWPORT, List.of(NU_AND));
+    static final ChartScene SCENE =
+            new ChartScene(VIEWPORT, List.of(NU_AND), List.of(), "Test chart", 8.0);
 
     static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT);
 
@@ -43,7 +47,7 @@ class ChartRendererTest {
     void paperInsideTheFrameIsWhite() {
         BufferedImage image = RENDERER.renderToImage(SCENE);
         assertEquals(0xFFFFFFFF, image.getRGB(10, 10));
-        assertEquals(0xFFFFFFFF, image.getRGB(889, 689));
+        assertEquals(0xFFFFFFFF, image.getRGB(889, 10));
     }
 
     @Test
@@ -62,9 +66,104 @@ class ChartRendererTest {
     void starsBehindTheTangentPlaneAreSkippedNotFailed() {
         Star antipode = new Star("antipode",
                 new SkyPosition(190.684708, -41.268750), 1.0);
-        ChartScene scene = new ChartScene(VIEWPORT, List.of(antipode));
+        ChartScene scene =
+                new ChartScene(VIEWPORT, List.of(antipode), List.of(), "Test chart", 8.0);
         BufferedImage image = RENDERER.renderToImage(scene);
         assertEquals(0xFFFFFFFF, image.getRGB(450, 350),
                 "an unprojectable star must simply not be drawn");
+    }
+
+    @Test
+    void galaxyEllipsesFollowTheirPositionAngle() {
+        // Position angle 90 degrees points the major axis east, which is
+        // horizontal on the chart: a 60' x 20' galaxy at the centre must be
+        // filled 40 px sideways but not 30 px above the centre.
+        DeepSkyObject galaxy = new DeepSkyObject("TEST", List.of(), DsoType.GALAXY,
+                M31_CENTRE, 60.0, 20.0, 90.0, 5.0, 1);
+        ChartScene scene =
+                new ChartScene(VIEWPORT, List.of(), List.of(galaxy), "Test chart", 8.0);
+        BufferedImage image = RENDERER.renderToImage(scene);
+        assertTrue(image.getRGB(450 - 40, 350) != 0xFFFFFFFF,
+                "inside the major axis must be filled");
+        assertTrue(image.getRGB(450 + 40, 350) != 0xFFFFFFFF,
+                "inside the major axis must be filled");
+        assertEquals(0xFFFFFFFF, image.getRGB(450, 350 - 30),
+                "beyond the minor axis must stay paper");
+    }
+
+    @Test
+    void tinyGalaxiesGetThePracticalMinimumSymbol() {
+        DeepSkyObject speck = new DeepSkyObject("SPECK", List.of(), DsoType.GALAXY,
+                M31_CENTRE, 0.2, 0.1, 0.0, 9.0, 2);
+        ChartScene scene =
+                new ChartScene(VIEWPORT, List.of(), List.of(speck), "Test chart", 8.0);
+        BufferedImage image = RENDERER.renderToImage(scene);
+        assertTrue(image.getRGB(450, 350) != 0xFFFFFFFF,
+                "a below-minimum galaxy must still be visibly drawn");
+    }
+
+    @Test
+    void labelsAndTitleBlockLeaveInkWhereExpected(){
+        DeepSkyObject galaxy = new DeepSkyObject("TEST", List.of(), DsoType.GALAXY,
+                M31_CENTRE, 60.0, 20.0, 90.0, 5.0, 1);
+        ChartScene scene =
+                new ChartScene(VIEWPORT, List.of(), List.of(galaxy), "Test chart", 8.0);
+        BufferedImage image = RENDERER.renderToImage(scene);
+        assertTrue(countInk(image, 450 + 45, 335, 60, 30) > 10,
+                "the label must sit right of the symbol");
+        assertTrue(countInk(image, 12, 700 - 12 - 70, 220, 70) > 100,
+                "the title block must occupy the lower-left corner");
+    }
+
+    @Test
+    void starsFainterThanTheSceneLimitAreNotDrawn() {
+        Star atLimit = new Star("at limit", M31_CENTRE, 8.0);
+        Star beyondLimit = new Star("beyond limit", M31_CENTRE, 8.01);
+
+        ChartScene faintScene = new ChartScene(
+                VIEWPORT, List.of(beyondLimit), List.of(), "Test chart", 8.0);
+        assertEquals(0xFFFFFFFF, RENDERER.renderToImage(faintScene).getRGB(450, 350),
+                "a star fainter than the stated limit must not be drawn");
+
+        ChartScene limitScene = new ChartScene(
+                VIEWPORT, List.of(atLimit), List.of(), "Test chart", 8.0);
+        assertTrue(RENDERER.renderToImage(limitScene).getRGB(450, 350) != 0xFFFFFFFF,
+                "a star exactly at the stated limit is still drawn");
+    }
+
+    @Test
+    void chartNotationIsIndependentOfTheDefaultLocale() {
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("nb-NO"));
+            int[] norwegian = pixels(RENDERER.renderToImage(SCENE));
+            Locale.setDefault(Locale.US);
+            int[] us = pixels(RENDERER.renderToImage(SCENE));
+            assertArrayEquals(norwegian, us,
+                    "rendering must not depend on the machine locale");
+        } finally {
+            Locale.setDefault(original);
+        }
+    }
+
+    @Test
+    void titleBlockIsOmittedWhenTheViewportCannotHoldIt() {
+        ChartViewport tiny = new ChartViewport(M31_CENTRE, 8.0, 120, 90);
+        ChartScene scene = new ChartScene(tiny, List.of(), List.of(), "Test chart", 8.0);
+        BufferedImage image = RENDERER.renderToImage(scene);
+        assertEquals(0, countInk(image, 3, 3, 114, 84),
+                "a viewport too small for the title block omits it instead of clipping");
+    }
+
+    private static int countInk(BufferedImage image, int x, int y, int w, int h) {
+        int ink = 0;
+        for (int px = x; px < x + w; px++) {
+            for (int py = y; py < y + h; py++) {
+                if (image.getRGB(px, py) != 0xFFFFFFFF) {
+                    ink++;
+                }
+            }
+        }
+        return ink;
     }
 }

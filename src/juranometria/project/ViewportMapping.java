@@ -29,6 +29,12 @@ public final class ViewportMapping {
         this.pixelsPerPlaneUnit = viewport.widthPx() / (2.0 * Math.tan(halfFieldRadians));
     }
 
+    /** Pixels per tangent-plane unit; multiply an angle in radians to get
+     *  its small-angle pixel extent at the chart centre. */
+    public double pixelsPerPlaneUnit() {
+        return pixelsPerPlaneUnit;
+    }
+
     /** Converts a tangent-plane point to pixels; east left, north up. */
     public PixelPoint toPixel(PlanePoint point) {
         return new PixelPoint(

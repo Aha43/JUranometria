@@ -17,7 +17,8 @@ class ChartComponentTest {
     @Test
     void exposesAnAccessibleContextWithAName() {
         ChartComponent component = new ChartComponent(
-                new SkyPosition(10.684708, 41.268750), 8.0, List.of());
+                new SkyPosition(10.684708, 41.268750), 8.0,
+                "Test chart", 8.0, List.of(), List.of());
         assertNotNull(component.getAccessibleContext());
         assertEquals("Star chart", component.getAccessibleContext().getAccessibleName());
     }
