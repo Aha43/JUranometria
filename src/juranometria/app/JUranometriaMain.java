@@ -1,9 +1,13 @@
 package juranometria.app;
 
+import java.awt.BorderLayout;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import juranometria.ui.AtlasToolbar;
 import juranometria.ui.ChartComponent;
+import juranometria.ui.ChartViewController;
 
 /** Application entry point. */
 public final class JUranometriaMain {
@@ -23,10 +27,15 @@ public final class JUranometriaMain {
         UiTheme.apply(dark);
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setContentPane(new ChartComponent(
-                M31Chart.CENTRE, M31Chart.FIELD_WIDTH_DEGREES,
-                M31Chart.TITLE, M31Chart.LIMITING_MAGNITUDE,
-                M31Chart.loadStars(), M31Chart.loadDeepSkyObjects()));
+
+        ChartComponent chart = new ChartComponent(M31Chart.CENTRE, M31Chart.TITLE,
+                M31Chart.loadStars(), M31Chart.loadDeepSkyObjects());
+        ChartViewController controller = new ChartViewController();
+        controller.onChange(chart::setViewState);
+
+        frame.setLayout(new BorderLayout());
+        frame.add(new AtlasToolbar(controller), BorderLayout.NORTH);
+        frame.add(chart, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

@@ -10,6 +10,7 @@ import javax.accessibility.AccessibleRole;
 import javax.swing.JComponent;
 
 import juranometria.chart.ChartScene;
+import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
@@ -25,24 +26,33 @@ public final class ChartComponent extends JComponent {
 
     private final ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
     private final SkyPosition centre;
-    private final double fieldWidthDegrees;
     private final String title;
-    private final double limitingMagnitude;
     private final List<Star> stars;
     private final List<DeepSkyObject> deepSkyObjects;
+    private ChartViewState viewState = ChartViewState.DEFAULT;
 
-    public ChartComponent(SkyPosition centre, double fieldWidthDegrees,
-                          String title, double limitingMagnitude,
+    public ChartComponent(SkyPosition centre, String title,
                           List<Star> stars, List<DeepSkyObject> deepSkyObjects) {
         this.centre = centre;
-        this.fieldWidthDegrees = fieldWidthDegrees;
         this.title = title;
-        this.limitingMagnitude = limitingMagnitude;
         this.stars = List.copyOf(stars);
         this.deepSkyObjects = List.copyOf(deepSkyObjects);
         setOpaque(true);
         setPreferredSize(new Dimension(900, 700));
         getAccessibleContext().setAccessibleName("Star chart");
+    }
+
+    /** Adopts a new view state and repaints; the scene is rebuilt on paint. */
+    public void setViewState(ChartViewState viewState) {
+        if (viewState == null) {
+            throw new IllegalArgumentException("view state must not be null");
+        }
+        this.viewState = viewState;
+        repaint();
+    }
+
+    public ChartViewState viewState() {
+        return viewState;
     }
 
     @Override
@@ -66,8 +76,9 @@ public final class ChartComponent extends JComponent {
             return;
         }
         ChartScene scene = new ChartScene(
-                new ChartViewport(centre, fieldWidthDegrees, getWidth(), getHeight()),
-                stars, deepSkyObjects, title, limitingMagnitude);
+                new ChartViewport(centre, viewState.fieldWidthDegrees(),
+                        getWidth(), getHeight()),
+                stars, deepSkyObjects, title, viewState.limitingMagnitude());
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             renderer.render(g2, scene);
