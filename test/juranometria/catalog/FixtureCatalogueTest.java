@@ -22,7 +22,7 @@ class FixtureCatalogueTest {
     void loadsTheBundledFixtureFromTheClasspath() {
         FixtureCatalogue catalogue = FixtureCatalogue.loadBundled();
         SkyRegion wholeRegion = new SkyRegion(M31_CENTRE, 10.0);
-        assertEquals(20, catalogue.starsIn(wholeRegion).size());
+        assertEquals(104, catalogue.starsIn(wholeRegion).size());
         assertEquals(3, catalogue.deepSkyObjectsIn(wholeRegion).size());
     }
 
@@ -35,9 +35,10 @@ class FixtureCatalogueTest {
                 .map(DeepSkyObject::id).toList();
         assertEquals(List.of("M31", "M32", "M110"), dsoIds);
 
-        // The nearest fixture stars (nu And, 32 And) sit more than one
-        // degree from the M31 centre.
-        assertEquals(List.of(), catalogue.starsIn(oneDegree));
+        // Only three faint fixture stars sit within one degree of the centre.
+        List<String> starIds = catalogue.starsIn(oneDegree).stream()
+                .map(Star::id).toList();
+        assertEquals(List.of("HD 3914", "EG And", "HD 4322"), starIds);
     }
 
     @Test
@@ -47,9 +48,11 @@ class FixtureCatalogueTest {
 
         List<String> starIds = catalogue.starsIn(twoDegrees).stream()
                 .map(Star::id).toList();
-        assertEquals(List.of("nu And", "32 And"), starIds);
-        assertTrue(starIds.stream().noneMatch("bet And"::equals),
-                "Mirach lies about seven degrees away and must be excluded");
+        assertEquals(12, starIds.size());
+        assertTrue(starIds.contains("nu And"));
+        assertTrue(starIds.contains("32 And"));
+        assertTrue(starIds.stream().noneMatch("mu And"::equals),
+                "mu And lies almost four degrees away and must be excluded");
     }
 
     @Test
