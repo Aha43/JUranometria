@@ -1,5 +1,6 @@
 package juranometria.app;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
 /**
@@ -13,8 +14,17 @@ public final class UiTheme {
     private UiTheme() {
     }
 
-    /** Installs the application look and feel. Must run before UI creation. */
+    /** Installs the light application look and feel. */
     public static void apply() {
-        FlatLightLaf.setup();
+        apply(false);
+    }
+
+    /** Installs the application look and feel. Must run before UI creation. */
+    public static void apply(boolean dark) {
+        if (dark) {
+            FlatDarkLaf.setup();
+        } else {
+            FlatLightLaf.setup();
+        }
     }
 }
