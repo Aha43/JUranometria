@@ -55,11 +55,12 @@ final class PackNotices {
                   unchanged when BT is absent. Supplement-1 positions are at
                   epoch J1991.25 without proper-motion propagation. Identifier
                   collisions follow the main-catalogue-wins component policy.
-                - Deep-sky objects: every usable OpenNGC type; the type column
-                  carries the OpenNGC token. Objects without any V or B
-                  magnitude are dropped (the chart model requires one);
-                  missing dimensions receive a nominal arcminute, counted
-                  below.
+                - Deep-sky objects: every OpenNGC object with a position,
+                  including those without photometry or dimensions; the type
+                  column carries the OpenNGC token. Unknown values stay
+                  explicitly empty - the pack preserves facts and never
+                  invents dimensions, angles, or magnitudes. V and B
+                  magnitudes are stored in their own columns.
 
                 ## Row counts and normalizations
 
@@ -76,11 +77,10 @@ final class PackNotices {
                 | Deep-sky objects written | %d |
                 %s| Dup/NonEx entries skipped | %d |
                 | - dropped for missing position | %d |
-                | - dropped for missing V and B | %d |
-                | - major axis absent, nominal 1.0 arcmin | %d |
-                | - minor axis absent, set to major | %d |
-                | - position angle absent, recorded as 0.0 | %d |
-                | - V magnitude taken from B | %d |
+                | - without any magnitude (kept, fields empty) | %d |
+                | - without V but with B (kept, vmag empty) | %d |
+                | - without dimensions (kept, fields empty) | %d |
+                | - without a position angle (kept, field empty) | %d |
 
                 Stars are ordered by (vmag, id) within each tile; deep-sky
                 objects by id. Identical pinned inputs reproduce every file
@@ -98,9 +98,9 @@ final class PackNotices {
                 counts.fallbackPositions, counts.vtWithoutBt, counts.hpMagnitudes,
                 counts.supplementComponentsSkipped, counts.droppedNoVt,
                 counts.dsosWritten, types.toString(), counts.skippedDupNonEx,
-                counts.droppedNoPosition, counts.droppedNoMagnitude,
-                counts.missingMajorAxis, counts.missingMinorAxis,
-                counts.missingPositionAngle, counts.vmagFromB);
+                counts.droppedNoPosition, counts.dsosWithoutAnyMagnitude,
+                counts.dsosWithoutVMagnitude, counts.dsosWithoutDimensions,
+                counts.dsosWithoutPositionAngle);
     }
 
     static String tycho2() {

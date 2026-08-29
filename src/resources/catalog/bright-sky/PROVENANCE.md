@@ -33,11 +33,12 @@ every generated tile file.
   unchanged when BT is absent. Supplement-1 positions are at
   epoch J1991.25 without proper-motion propagation. Identifier
   collisions follow the main-catalogue-wins component policy.
-- Deep-sky objects: every usable OpenNGC type; the type column
-  carries the OpenNGC token. Objects without any V or B
-  magnitude are dropped (the chart model requires one);
-  missing dimensions receive a nominal arcminute, counted
-  below.
+- Deep-sky objects: every OpenNGC object with a position,
+  including those without photometry or dimensions; the type
+  column carries the OpenNGC token. Unknown values stay
+  explicitly empty - the pack preserves facts and never
+  invents dimensions, angles, or magnitudes. V and B
+  magnitudes are stored in their own columns.
 
 ## Row counts and normalizations
 
@@ -51,31 +52,32 @@ every generated tile file.
 | - V taken from an Hp magnitude | 40 |
 | - supplement components skipped for an existing TYC id | 0 |
 | Records dropped for missing VT (whole sky) | 25 |
-| Deep-sky objects written | 11544 |
-| - type * | 63 |
-| - type ** | 15 |
-| - type *Ass | 15 |
-| - type Cl+N | 41 |
-| - type EmN | 4 |
-| - type G | 10459 |
-| - type GCl | 197 |
-| - type GPair | 25 |
-| - type GTrpl | 3 |
-| - type HII | 40 |
-| - type Neb | 38 |
+| Deep-sky objects written | 13371 |
+| - type * | 546 |
+| - type ** | 244 |
+| - type *Ass | 64 |
+| - type Cl+N | 67 |
+| - type DrkN | 2 |
+| - type EmN | 8 |
+| - type G | 10521 |
+| - type GCl | 208 |
+| - type GGroup | 13 |
+| - type GPair | 231 |
+| - type GTrpl | 26 |
+| - type HII | 83 |
+| - type Neb | 94 |
 | - type Nova | 3 |
-| - type OCl | 487 |
-| - type Other | 6 |
-| - type PN | 129 |
-| - type RfN | 13 |
-| - type SNR | 6 |
+| - type OCl | 663 |
+| - type Other | 419 |
+| - type PN | 130 |
+| - type RfN | 38 |
+| - type SNR | 11 |
 | Dup/NonEx entries skipped | 662 |
 | - dropped for missing position | 0 |
-| - dropped for missing V and B | 1827 |
-| - major axis absent, nominal 1.0 arcmin | 88 |
-| - minor axis absent, set to major | 663 |
-| - position angle absent, recorded as 0.0 | 884 |
-| - V magnitude taken from B | 7276 |
+| - without any magnitude (kept, fields empty) | 1827 |
+| - without V but with B (kept, vmag empty) | 7276 |
+| - without dimensions (kept, fields empty) | 1300 |
+| - without a position angle (kept, field empty) | 2596 |
 
 Stars are ordered by (vmag, id) within each tile; deep-sky
 objects by id. Identical pinned inputs reproduce every file

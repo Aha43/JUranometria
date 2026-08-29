@@ -41,20 +41,22 @@ class BrightSkyPackTest {
         assertEquals("all-sky", manifest.coverage());
         assertEquals(8.0, manifest.starLimitVmag());
         assertEquals("45630", manifest.entries().get("rows.stars.total"));
-        assertEquals("11544", manifest.entries().get("rows.dsos.total"));
+        assertEquals("13371", manifest.entries().get("rows.dsos.total"));
     }
 
     @Test
     void representativeRecordsLandInTheirPredictedTiles() {
         assertTrue(tileContains("r02-d2/dsos.csv",
-                        "NGC 1976,M 42|Great Orion Nebula|Orion Nebula,Cl+N,"),
+                        "NGC 1976,M 42|Great Orion Nebula|Orion Nebula,Cl+N,83.818667,-5.389667,90.00,60.00,,4.00,4.00,1"),
                 "M42 with its aliases in the Orion tile");
         assertTrue(tileContains("r01-d3/dsos.csv", "Mel022,M 45|Pleiades,OCl,"),
                 "the Pleiades in their tile");
         assertTrue(tileContains("r01-d5/stars.csv", "TYC 4628-237-1,37.946619,89.264135,1.98"),
                 "Polaris in the polar tile via the fallback position");
-        assertTrue(tileContains("r00-d0/dsos.csv", "NGC 104,"),
-                "47 Tucanae in the far southern tile");
+        assertTrue(tileContains("r00-d0/dsos.csv", "NGC 104,47 Tuc Cluster,GCl,6.022333,-72.081444,31.80,,,4.09,5.78,2"),
+                "47 Tucanae with its honestly empty minor axis and angle");
+        assertTrue(tileContains("r00-d4/dsos.csv", "NGC 7801,,OCl,0.089333,50.745000,4.20,,,,,2"),
+                "a positioned object without any photometry ships with empty fields");
         assertTrue(tileContains("r00-d4/dsos.csv", "NGC 224,M 31|Andromeda Galaxy,G,"),
                 "M31 unchanged in its home tile");
         assertTrue(lines("tiles/r11-d4/stars.csv").size() > 100,
@@ -90,7 +92,32 @@ class BrightSkyPackTest {
         }
         assertTrue(checksummed >= 72, "every tile file carries a checksum");
         assertEquals(45630, starIds.size(), "star total matches the manifest");
-        assertEquals(11544, dsoIds.size(), "DSO total matches the manifest");
+        assertEquals(13371, dsoIds.size(), "DSO total matches the manifest");
+    }
+
+    @Test
+    void everyTileFileOnDiskHasAManifestEntry() throws Exception {
+        // The reverse direction of the checksum guard (Codex review, PR #45):
+        // a stale file from an earlier generation would ship unchecksummed.
+        java.net.URL manifestUrl = BrightSkyPackTest.class
+                .getResource(PACK + "manifest.properties");
+        org.junit.jupiter.api.Assumptions.assumeTrue(
+                "file".equals(manifestUrl.getProtocol()),
+                "directory-classpath run required to walk the pack");
+        java.nio.file.Path packDir = java.nio.file.Path.of(manifestUrl.toURI()).getParent();
+        Set<String> manifestFiles = new HashSet<>();
+        for (String key : manifest().entries().keySet()) {
+            if (key.startsWith("checksum.")) {
+                manifestFiles.add(key.substring("checksum.".length()));
+            }
+        }
+        try (var walk = java.nio.file.Files.walk(packDir.resolve("tiles"))) {
+            for (java.nio.file.Path file : walk.filter(java.nio.file.Files::isRegularFile).toList()) {
+                String relative = packDir.relativize(file).toString().replace('\\', '/');
+                assertTrue(manifestFiles.contains(relative),
+                        "unchecksummed stale file in the pack: " + relative);
+            }
+        }
     }
 
     @Test

@@ -49,6 +49,9 @@ public final class AllSkyPackMain {
         Map<String, List<StarRow>> starTiles = collectStars(rawDir, counts);
         Map<String, List<String[]>> dsoTiles = collectDsos(rawDir, counts);
 
+        // The generator owns outDir completely: regenerate from clean so a
+        // changed catalogue can never leave stale, unchecksummed files.
+        deleteRecursively(outDir);
         Files.createDirectories(outDir.resolve("tiles"));
         Map<String, String> checksums = new TreeMap<>();
         long dataBytes = 0;
@@ -96,11 +99,10 @@ public final class AllSkyPackMain {
         int dsosWritten;
         int skippedDupNonEx;
         int droppedNoPosition;
-        int droppedNoMagnitude;
-        int missingMajorAxis;
-        int missingMinorAxis;
-        int missingPositionAngle;
-        int vmagFromB;
+        int dsosWithoutAnyMagnitude;
+        int dsosWithoutVMagnitude;
+        int dsosWithoutDimensions;
+        int dsosWithoutPositionAngle;
         final Map<String, Integer> dsoTypes = new TreeMap<>();
     }
 
@@ -178,9 +180,6 @@ public final class AllSkyPackMain {
                     continue;
                 }
                 String[] row = dsoRow(dso, counts);
-                if (row == null) {
-                    continue;
-                }
                 if (!seenIds.add(dso.id())) {
                     throw new IllegalStateException("duplicate DSO identifier: " + dso.id());
                 }
@@ -197,35 +196,27 @@ public final class AllSkyPackMain {
         return tiles;
     }
 
-    /** Normalizes any usable OpenNGC type into the pack's row format. */
+    /**
+     * Normalizes any usable OpenNGC type into the pack's row format.
+     * Unknown values stay explicitly empty - the pack preserves facts and
+     * never invents dimensions, angles, or magnitudes - and positioned
+     * objects without any photometry are kept (Codex review, PR #45).
+     */
     private static String[] dsoRow(DsoRow dso, PackCounts counts) {
-        double vmag = dso.vmag();
-        if (Double.isNaN(vmag)) {
-            vmag = dso.bmag();
-            if (Double.isNaN(vmag)) {
-                counts.droppedNoMagnitude++;
-                return null;
-            }
-            counts.vmagFromB++;
+        if (Double.isNaN(dso.vmag()) && Double.isNaN(dso.bmag())) {
+            counts.dsosWithoutAnyMagnitude++;
+        } else if (Double.isNaN(dso.vmag())) {
+            counts.dsosWithoutVMagnitude++;
         }
-        double major = dso.majorAxisArcmin();
-        if (Double.isNaN(major) || major <= 0) {
-            // Many non-galaxy objects carry no dimensions; a nominal
-            // arcminute keeps the model honest about a minimum extent.
-            major = 1.0;
-            counts.missingMajorAxis++;
-        }
-        double minor = dso.minorAxisArcmin();
-        if (Double.isNaN(minor) || minor <= 0) {
-            minor = major;
-            counts.missingMinorAxis++;
+        if (Double.isNaN(dso.majorAxisArcmin())) {
+            counts.dsosWithoutDimensions++;
         }
         double pa = dso.positionAngleDegrees();
         if (Double.isNaN(pa)) {
-            pa = 0.0;
-            counts.missingPositionAngle++;
+            counts.dsosWithoutPositionAngle++;
+        } else {
+            pa = ((pa % 180.0) + 180.0) % 180.0;
         }
-        pa = ((pa % 180.0) + 180.0) % 180.0;
         boolean messier = dso.aliases().stream().anyMatch(alias -> alias.startsWith("M "));
         return new String[] {
                 dso.id(),
@@ -233,12 +224,18 @@ public final class AllSkyPackMain {
                 dso.type(),
                 String.format(Locale.ROOT, "%.6f", dso.raDegrees()),
                 String.format(Locale.ROOT, "%.6f", dso.decDegrees()),
-                String.format(Locale.ROOT, "%.2f", major),
-                String.format(Locale.ROOT, "%.2f", minor),
-                String.format(Locale.ROOT, "%.1f", pa),
-                String.format(Locale.ROOT, "%.2f", vmag),
+                optional(dso.majorAxisArcmin(), "%.2f"),
+                optional(dso.minorAxisArcmin(), "%.2f"),
+                Double.isNaN(dso.positionAngleDegrees()) ? ""
+                        : String.format(Locale.ROOT, "%.1f", pa),
+                optional(dso.vmag(), "%.2f"),
+                optional(dso.bmag(), "%.2f"),
                 messier ? "1" : "2",
         };
+    }
+
+    private static String optional(double value, String format) {
+        return Double.isNaN(value) ? "" : String.format(Locale.ROOT, format, value);
     }
 
     private static String starsCsv(List<StarRow> stars) {
@@ -258,7 +255,8 @@ public final class AllSkyPackMain {
         csv.append("# Bright-sky pack DSO tile generated from OpenNGC.\n");
         csv.append("# Generated resource - do not edit; see ../../PROVENANCE.md.\n");
         csv.append("# id,aliases(|-separated),type(OpenNGC token),ra_deg,dec_deg,"
-                + "major_arcmin,minor_arcmin,pa_deg,vmag,label_priority\n");
+                + "major_arcmin,minor_arcmin,pa_deg,vmag,bmag,label_priority\n");
+        csv.append("# Empty fields mean the source records no value.\n");
         for (String[] row : rows) {
             csv.append(String.join(",", row)).append('\n');
         }
@@ -300,5 +298,16 @@ public final class AllSkyPackMain {
             checksums.put(checksumKey, PinnedInputs.sha256Hex(bytes));
         }
         return bytes.length;
+    }
+
+    private static void deleteRecursively(Path root) throws IOException {
+        if (!Files.exists(root)) {
+            return;
+        }
+        try (var walk = Files.walk(root)) {
+            for (Path path : walk.sorted(Comparator.reverseOrder()).toList()) {
+                Files.delete(path);
+            }
+        }
     }
 }
