@@ -160,9 +160,24 @@ class AtlasTest {
         assertTrue(present.containsAll(at36.geography().latinNames().keySet()),
                 "names attach only to constellations whose figures are present");
 
-        // The actual reset transition from the searched 36-degree view:
-        // it restores the exact released default state, and the decided
-        // geography default at 8 degrees is none (Sprint 7 finish).
+        // Sprint 8: a real pan from the wide searched view departs the
+        // target honestly - label and identity clear together and the
+        // assembled page titles by its coordinates - while field and
+        // magnitude carry on around the panned centre.
+        assertTrue(controller.pan(controller.state().centre(),
+                        new juranometria.project.PlanePoint(0.08, -0.05)),
+                "the pan from the searched wide view is accepted");
+        assertEquals(null, controller.state().targetLabel());
+        assertEquals(null, controller.state().targetIdentity());
+        assertEquals(36.0, controller.state().fieldWidthDegrees());
+        var panned = Atlas.assembler().assemble(controller.state(), 900, 700);
+        assertTrue(panned.title().contains("h ")
+                        && panned.title().contains("°"),
+                "the panned page titles by coordinates: " + panned.title());
+
+        // The actual reset transition from the searched, zoomed, and
+        // panned view: it restores the exact released default state, and
+        // the decided geography default at 8 degrees is none.
         controller.reset();
         assertEquals(juranometria.chart.ChartViewState.DEFAULT,
                 controller.state(),

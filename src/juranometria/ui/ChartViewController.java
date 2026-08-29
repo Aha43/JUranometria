@@ -104,6 +104,39 @@ public final class ChartViewController {
                 .withFieldWidth(fieldWidthDegrees));
     }
 
+    /**
+     * One atomic pan transition per docs/decisions/pan-navigation.md:
+     * solves the new centre for which {@code grabbed} - the sky
+     * position under the pointer at press time - sits at the pointer's
+     * current tangent-plane point, and applies it as a single
+     * anonymous recenter. Field width and limiting magnitude are
+     * untouched; the searched target's label and identity clear
+     * together on the first accepted pan (the atomic rule), so the
+     * chart titles honestly by its coordinates; already-anonymous
+     * views stay anonymous. A past-pole hold or a centre the coverage
+     * predicate refuses changes nothing and notifies nobody.
+     *
+     * The caller (the UI issue) is responsible for the drag threshold:
+     * pointer jitter below it must never reach this transition.
+     *
+     * @return true when the pan was accepted and applied
+     */
+    public boolean pan(juranometria.chart.SkyPosition grabbed,
+                       juranometria.project.PlanePoint target) {
+        juranometria.project.PanSolver.PanSolution solution =
+                juranometria.project.PanSolver.solveCentre(
+                        grabbed, target, state.centre());
+        if (solution.centre().isEmpty()) {
+            return false;
+        }
+        ChartViewState panned = state.recenteredAt(solution.centre().get());
+        if (panned.equals(state) || !isViewValid.test(panned)) {
+            return false;
+        }
+        update(panned);
+        return true;
+    }
+
     public void reset() {
         update(state.reset());
     }
