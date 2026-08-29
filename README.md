@@ -72,6 +72,13 @@ make import-allsky                      # verifies checksums, regenerates the pa
   stay exactly as before. (Line figures follow the IAU/Sky & Telescope
   chart convention; stick figures are not an IAU standard - the
   boundaries and names are.)
+- **Grab to pan**: press anywhere on the paper and drag - the sky
+  position under the pointer follows the hand exactly, at every field,
+  across RA 0, and honestly near the poles (a north-up chart lets a
+  polar grab follow only as far as its geometry allows). A real drag
+  leaves any searched target behind and titles the chart by its
+  coordinates; clicks and small jitter change nothing. An open hand
+  marks the draggable paper, a closed hand a live grab.
 - **Fewer stars / More stars** step the stellar limiting magnitude
   between V 4.0 and V 8.0 in whole magnitudes.
 - **Search** finds bundled objects and coordinates entirely offline,

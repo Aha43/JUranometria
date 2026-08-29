@@ -213,6 +213,24 @@ class PanInteractionTest {
                 holder[0].pageOffsetY() + 90, 1, false, MouseEvent.BUTTON3)));
         Fixture.flush();
         assertSame(before, controller.state(), "secondary buttons never pan");
+
+        // A primary drag ON the paper of the letterboxed window pans.
+        int top = holder[0].pageOffsetY();
+        SwingUtilities.invokeAndWait(() -> holder[0].dispatchEvent(new MouseEvent(
+                holder[0], MouseEvent.MOUSE_PRESSED, 5,
+                MouseEvent.BUTTON1_DOWN_MASK, 200, top + 100, 1, false,
+                MouseEvent.BUTTON1)));
+        SwingUtilities.invokeAndWait(() -> holder[0].dispatchEvent(new MouseEvent(
+                holder[0], MouseEvent.MOUSE_DRAGGED, 6,
+                MouseEvent.BUTTON1_DOWN_MASK, 240, top + 130, 1, false,
+                MouseEvent.BUTTON1)));
+        SwingUtilities.invokeAndWait(() -> holder[0].dispatchEvent(new MouseEvent(
+                holder[0], MouseEvent.MOUSE_RELEASED, 7, 0, 240, top + 130, 1,
+                false, MouseEvent.BUTTON1)));
+        Fixture.flush();
+        assertTrue(controller.state().centre().separationDegrees(
+                        before.centre()) > 0.0,
+                "the paper pans inside a letterboxed window");
     }
 
     @Test
