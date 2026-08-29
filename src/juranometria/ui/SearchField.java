@@ -32,10 +32,13 @@ public final class SearchField extends JTextField {
 
     /**
      * A famous name such as M42 finds nothing because only the M31 region
-     * is bundled; the message must carry that reason, not just "no match".
+     * is bundled, and nonsense finds nothing because it names nothing; the
+     * catalogue cannot tell those apart, so the message states the one
+     * fact true of both — no match in the bundled data — without implying
+     * the query names a real object.
      */
     private static final String NO_MATCH_MESSAGE =
-            "Not in the bundled M31-region data";
+            "No match in the bundled M31-region data";
     private static final String NO_FIT_MESSAGE =
             "Found, but beyond the bundled M31-region coverage";
 
