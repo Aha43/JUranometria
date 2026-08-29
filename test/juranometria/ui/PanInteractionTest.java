@@ -242,6 +242,117 @@ class PanInteractionTest {
     }
 
     @Test
+    void offCentreGrabsPanThePolarPageFreelyThroughTheMouse() throws Exception {
+        Fixture fixture = new Fixture();
+        SwingUtilities.invokeAndWait(() -> fixture.controller.recenter(
+                new SkyPosition(37.946619, 89.264135)));
+        Fixture.flush();
+        SkyPosition grabbed = PanSolver.skyFromPlane(
+                fixture.controller.state().centre(),
+                PanSolver.planeFromPixel(fixture.chart.scene().viewport(),
+                        new PixelPoint(200, 550)));
+
+        fixture.press(200, 550);
+        fixture.drag(400, 550);
+        fixture.release(400, 550);
+
+        PixelPoint now = pixelOf(fixture.chart, grabbed);
+        assertTrue(Math.hypot(now.x() - 400, now.y() - 550) < 1e-3,
+                "an off-centre polar grab tracks the pointer exactly");
+    }
+
+    @Test
+    void aPinnedPolarGrabFollowsAsFarAsGeometryAllowsWithoutWaste()
+            throws Exception {
+        Fixture fixture = new Fixture();
+        SwingUtilities.invokeAndWait(() -> fixture.controller.recenter(
+                new SkyPosition(37.946619, 89.264135)));
+        Fixture.flush();
+        SkyPosition before = fixture.controller.state().centre();
+        var viewport = fixture.chart.scene().viewport();
+        SkyPosition grabbed = PanSolver.skyFromPlane(before,
+                PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
+
+        // A horizontal pull on the near-polar grab: constrained follow.
+        fixture.press(450, 350);
+        fixture.drag(650, 350);
+        assertTrue(fixture.controller.state().centre()
+                        .separationDegrees(before) > 0.0,
+                "the sky follows the hand partway - never frozen");
+        var achieved = new GnomonicProjection(
+                fixture.controller.state().centre())
+                .project(grabbed).orElseThrow();
+        var requested = PanSolver.planeFromPixel(viewport,
+                new PixelPoint(650, 350));
+        assertEquals(requested.etaNorth(), achieved.etaNorth(), 1e-6,
+                "the vertical component tracks exactly");
+        assertTrue(Math.abs(achieved.xiEast())
+                        < Math.abs(requested.xiEast()),
+                "the horizontal component stops at the feasibility boundary");
+
+        // For a grab this close to the pole the feasibility boundary is
+        // the pole itself: the constrained follow centres the chart there.
+        assertTrue(fixture.controller.state().centre().decDegrees() > 89.9,
+                "the boundary centre for an extreme polar grab is the pole");
+
+        // Pulling further along the pinned axis is saturated: the solve
+        // lands on the same boundary centre, so the controller refuses
+        // the no-op and nothing reassembles.
+        int queries = fixture.catalogue.starQueries;
+        fixture.drag(850, 350);
+        assertEquals(queries, fixture.catalogue.starQueries,
+                "a saturated event assembles no new scene");
+
+        // From the pole, pulling the grab downward would cross it - a
+        // held event - while pulling upward resumes the follow.
+        fixture.drag(850, 420);
+        assertEquals(queries, fixture.catalogue.starQueries,
+                "a past-pole event within the gesture holds");
+        fixture.drag(850, 280);
+        assertTrue(fixture.catalogue.starQueries > queries,
+                "upward movement resumes panning within the gesture");
+        fixture.release(850, 280);
+        assertFalse(fixture.interaction.dragging());
+    }
+
+    @Test
+    void aPastPoleHoldChangesNothingAndLeavesNoStuckState() throws Exception {
+        // The gate's genuine past-pole geometry, through the mouse: the
+        // near-south-pole grab pulled far upward at the 36-degree field
+        // has no valid centre anywhere.
+        Fixture fixture = new Fixture();
+        SwingUtilities.invokeAndWait(() -> {
+            fixture.controller.recenter(new SkyPosition(80.893750, -85.0));
+            while (fixture.controller.state().fieldWidthDegrees() < 36.0) {
+                fixture.controller.zoomOut();
+            }
+        });
+        Fixture.flush();
+
+        fixture.press(450, 350);
+        fixture.drag(450, 340); // arm the gesture past the threshold
+        ChartViewState afterArm = fixture.controller.state();
+        int armedQueries = fixture.catalogue.starQueries;
+        fixture.drag(450, 170);
+        assertSame(afterArm, fixture.controller.state(),
+                "a past-pole event holds the previous centre");
+        assertEquals(armedQueries, fixture.catalogue.starQueries,
+                "a held event assembles no scene");
+        assertTrue(fixture.interaction.dragging(),
+                "the gesture stays live through the hold");
+
+        // Pulling back inside the feasible range resumes the follow.
+        fixture.drag(450, 330);
+        assertTrue(fixture.catalogue.starQueries > armedQueries,
+                "the gesture resumes when the pointer returns");
+        fixture.release(450, 330);
+        assertFalse(fixture.interaction.dragging(), "no stuck drag state");
+        fixture.move(450, 330);
+        assertNotEquals(Cursor.getDefaultCursor(), fixture.chart.getCursor(),
+                "the open hand returns after the held gesture");
+    }
+
+    @Test
     void zoomMagnitudeAndHomeKeepWorkingAfterADrag() throws Exception {
         Fixture fixture = new Fixture();
         fixture.press(450, 350);
