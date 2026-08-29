@@ -6,9 +6,13 @@ The Sprint 3 decision on concrete sources, licensing, magnitude
 semantics, regional coverage, and the reproducible import contract is
 recorded in [catalogue sources](decisions/catalogue-sources.md):
 Tycho-2 (CDS I/259) for stars with Johnson V derived from BT/VT, and
-OpenNGC (pinned release) for NGC/IC objects, over a 10-degree region
-around M31. Gaia DR3 remains the intended all-sky star source for a
-later sprint.
+OpenNGC (pinned release) for NGC/IC objects - originally over a
+10-degree region around M31, extended in Sprint 5 to the bundled
+all-sky bright-sky pack (V ≤ 8.0 stars and all OpenNGC objects in 72
+tiles). The Sprint 6 regional zoom to 36-degree fields draws from the
+same pack at the same depth ([regional
+zoom](decisions/regional-zoom.md)). Gaia DR3 remains the intended
+source for deeper star packs in a later sprint.
 
 ## Principle
 

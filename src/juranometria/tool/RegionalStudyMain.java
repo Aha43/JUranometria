@@ -43,7 +43,11 @@ public final class RegionalStudyMain {
             new Target("m42", new SkyPosition(83.818667, -5.389667)),
             new Target("m45", new SkyPosition(56.869167, 24.105278)),
             new Target("m13", new SkyPosition(250.421250, 36.461667)),
-            new Target("polar", new SkyPosition(37.946619, 89.264135)));
+            new Target("polar", new SkyPosition(37.946619, 89.264135)),
+            // Sprint finish (#57): a far-southern giant object and an
+            // RA-wrap field, so the representative pages reproduce here.
+            new Target("lmc", new SkyPosition(80.893750, -69.756111)),
+            new Target("rawrap", new SkyPosition(359.457625, -32.591028)));
 
     private RegionalStudyMain() {
     }

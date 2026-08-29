@@ -229,6 +229,17 @@ class SearchFieldTest {
         assertEquals(24.0, fixture.controller.state().fieldWidthDegrees(),
                 "every step is reversible");
 
+        // Issue #57: the magnitude limit changes honestly at regional
+        // fields too, and carries through further zooming with the target.
+        SwingUtilities.invokeAndWait(() -> fixture.controller.decreaseMagnitudeLimit());
+        assertEquals(7.0, fixture.controller.state().limitingMagnitude());
+        SwingUtilities.invokeAndWait(() -> fixture.controller.zoomOut());
+        assertEquals(36.0, fixture.controller.state().fieldWidthDegrees());
+        assertEquals(7.0, fixture.controller.state().limitingMagnitude(),
+                "the user's limit is preserved at every scale");
+        assertEquals("NGC 224", fixture.controller.state().targetIdentity(),
+                "a magnitude change never drops the target");
+
         SwingUtilities.invokeAndWait(() -> fixture.controller.reset());
         assertEquals(ChartViewState.DEFAULT, fixture.controller.state(),
                 "reset from a searched wide view restores the exact default");
