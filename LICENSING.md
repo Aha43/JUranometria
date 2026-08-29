@@ -14,6 +14,8 @@ the application.
 | Tabler icons (`src/resources/icons/*.svg`) | MIT | [`src/resources/icons/LICENSE`](src/resources/icons/LICENSE), listed in [`ICONS.md`](src/resources/icons/ICONS.md) |
 | Tycho-2-derived stars (`src/resources/catalog/m31/stars.csv`) | **CC BY-NC 3.0 IGO** — may not be used commercially | [`src/resources/catalog/m31/NOTICE-tycho2.md`](src/resources/catalog/m31/NOTICE-tycho2.md) |
 | OpenNGC-derived DSOs (`src/resources/catalog/m31/dsos.csv`) | CC-BY-SA-4.0 | [`src/resources/catalog/m31/NOTICE-openngc.md`](src/resources/catalog/m31/NOTICE-openngc.md), full text beside it |
+| Bright-sky pack star tiles (`src/resources/catalog/bright-sky/tiles/*/stars.csv`) | **CC BY-NC 3.0 IGO** — may not be used commercially | [`src/resources/catalog/bright-sky/NOTICE-tycho2.md`](src/resources/catalog/bright-sky/NOTICE-tycho2.md) |
+| Bright-sky pack DSO tiles (`src/resources/catalog/bright-sky/tiles/*/dsos.csv`) | CC-BY-SA-4.0 | [`src/resources/catalog/bright-sky/NOTICE-openngc.md`](src/resources/catalog/bright-sky/NOTICE-openngc.md), full text beside it |
 
 The generated catalogue resources are reproduced from pinned upstream
 inputs; see
