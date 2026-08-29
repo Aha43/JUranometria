@@ -55,7 +55,12 @@ the changed decision.
 5. Run the application for visual changes and run the full test suite.
 6. Add an entry under `Unreleased` in `CHANGELOG.md` for user-visible work.
 7. Open a pull request that links the issue with `Closes #NN`.
-8. Merge only after checks pass and the result has been reviewed.
+8. Merge only after checks pass and the result has been reviewed. The
+   check is the `test` GitHub Actions workflow
+   (`.github/workflows/test.yml`): it bootstraps the pinned
+   dependencies with `scripts/download-libs.sh` and runs `make test`
+   on JDK 21 for every pull request to `main` - the same command a
+   contributor runs locally.
 
 Prefer a small number of meaningful commits over preserving every experiment.
 Commit messages state the result and may include `Closes #NN` when the commit
