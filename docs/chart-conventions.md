@@ -49,6 +49,26 @@ The first prototype needs only the types present around M31:
 Symbols must remain legible when an object's true apparent size would be
 smaller than a practical minimum. That minimum is part of chart styling.
 
+## Constellation geography
+
+From Sprint 7 the regional charts carry constellation geography, per
+[the constellation-geography decision](decisions/constellation-geography.md):
+
+- **Line figures** (thin grey, from 12°): the traditional stick
+  figures of the IAU/Sky & Telescope chart convention. Figures are an
+  editorial convention - the IAU standardizes boundaries and names,
+  never stick figures - and the atlas must never imply otherwise.
+- **Names** (small capitals, quiet grey, from 12°): the IAU Latin
+  names, placed at the centroid of each figure's visible ink so the
+  name always sits on the visible part of its constellation.
+- **Boundaries** (faint dotted, from 18°): Delporte's official IAU
+  boundaries, reconstructed along their constant-coordinate B1875
+  arcs to within one arcminute, so they curve truly around the poles
+  and cross RA 0 without seams.
+
+Geography draws beneath stars, deep-sky symbols, labels, and the
+title block; the 8° and narrower pages carry none of it.
+
 ## Detail by scale
 
 Zooming does not simply enlarge identical content. Each scale selects useful

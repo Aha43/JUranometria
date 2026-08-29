@@ -64,7 +64,14 @@ make import-allsky                      # verifies checksums, regenerates the pa
   deep-sky symbol remains drawn and labelled. (Types the chart
   deliberately never draws - stellar entries, associations, novae -
   still recentre and title the chart, and a searched star remains
-  subject to the stellar magnitude limit.)
+  subject to the stellar magnitude limit.) From 12° the charts teach
+  constellation geography: traditional line figures with Latin
+  constellation names in quiet grey, joined from 18° by the official
+  IAU boundaries as faint dotted lines - so zooming out from M42 ends
+  with the whole of Orion named around it. The 8° and closer pages
+  stay exactly as before. (Line figures follow the IAU/Sky & Telescope
+  chart convention; stick figures are not an IAU standard - the
+  boundaries and names are.)
 - **Fewer stars / More stars** step the stellar limiting magnitude
   between V 4.0 and V 8.0 in whole magnitudes.
 - **Search** finds bundled objects and coordinates entirely offline,

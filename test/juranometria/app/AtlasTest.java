@@ -155,6 +155,14 @@ class AtlasTest {
                 .collect(java.util.stream.Collectors.toSet());
         assertTrue(present.containsAll(at36.geography().latinNames().keySet()),
                 "names attach only to constellations whose figures are present");
+
+        // Reset restores the exact released default - and the decided
+        // geography default at 8 degrees is: none (Sprint 7 finish).
+        var reset = Atlas.assembler().assemble(
+                juranometria.chart.ChartViewState.DEFAULT, 900, 700);
+        assertEquals("M31 · Andromeda Galaxy region", reset.title());
+        assertEquals(juranometria.chart.SceneGeography.EMPTY, reset.geography(),
+                "the default 8-degree page carries no geography");
     }
 
     @Test

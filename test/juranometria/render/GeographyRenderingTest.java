@@ -84,6 +84,18 @@ class GeographyRenderingTest {
     }
 
     @Test
+    void chartInkIsIdenticalUnderBothApplicationThemes() {
+        // Sprint 7 finish: the chart owns its palette; geography included,
+        // a page renders byte-identically whichever theme the chrome uses.
+        com.formdev.flatlaf.FlatLightLaf.setup();
+        int[] light = pixels(RENDERER.renderToImage(scene(36.0, GEOGRAPHY)));
+        com.formdev.flatlaf.FlatDarkLaf.setup();
+        int[] dark = pixels(RENDERER.renderToImage(scene(36.0, GEOGRAPHY)));
+        assertArrayEquals(light, dark,
+                "geography ink is the chart's own, independent of theme");
+    }
+
+    @Test
     void nameOrderIsDeterministicWhateverTheInsertionOrder() {
         // PR #69 review: iteration order reaches the renderer, so
         // overlapping name text must stack identically on every render.
