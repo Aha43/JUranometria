@@ -77,11 +77,13 @@ real toolbar's Reset button — restoring the exact released M31
 | Full query-to-pixels per drag event, 18° | 2.6 ms | 4.1 ms | 8.8 ms |
 | Full query-to-pixels per drag event, 36° | 4.0 ms | 4.6 ms | 6.2 ms |
 
-**Method**: solve-only and transition rows from a 10,000-event
-harness over a wandering 36° drag (all distinct-target events
-accepted, exactly one notification each); the query-to-pixels rows
-are `make pan-study`'s 120-event drag burst through the real seam,
-one warm run. Every row sits far inside the 16.7 ms frame budget,
+**Method**: every row reproduces from `make pan-study`. The
+solve-only and transition rows are the study's committed
+microbenchmarks - 10,000 samples each over a wandering 36° drag with
+distinct targets, sample count and operation boundaries printed with
+the results (the transition row is solve + state update + one
+no-render listener notification); the query-to-pixels rows are the
+study's 120-event drag burst through the real seam, one warm run. Every row sits far inside the 16.7 ms frame budget,
 confirming the gate's synchronous-EDT decision; saturated and held
 events assemble nothing, so no queue of obsolete assemblies can form
 (AWT's native drag coalescing remains the backstop). Packaged jar:
@@ -127,7 +129,13 @@ geography numbers are unchanged from the Sprint 7 handover.
   presses and secondary buttons are inert; gestures continue beyond
   the page and window; release anywhere ends the gesture and restores
   the hover cursor; held events keep the gesture live and it resumes
-  when the pointer returns; no stuck state exists (tested).
+  when the pointer returns. **Cancellation is a defined path, not an
+  assumption**: a gesture whose release the chart can never receive -
+  the chart hidden or removed mid-drag, or its window deactivated -
+  ends through the same gesture-ending method, restoring the default
+  cursor; tested while a closed-hand drag was live, including that
+  stray post-cancellation drags change nothing and the open hand
+  returns on the next hover.
 - **Do the measurements support the synchronous EDT design?** Beyond
   doubt: the geometry costs tenths of microseconds, the whole
   transition under two microseconds, and the complete query-to-pixels

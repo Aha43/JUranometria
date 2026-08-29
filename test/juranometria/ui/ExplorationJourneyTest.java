@@ -47,8 +47,12 @@ class ExplorationJourneyTest {
         flush();
         ChartComponent chart = chartHolder[0];
 
-        // Search M42 and zoom out until the geography names the region.
-        SwingUtilities.invokeAndWait(() -> searchHolder[0].handle("m 42"));
+        // Search M42 through the real field action - typed text and the
+        // Enter key's action event, not the test seam beneath it.
+        SwingUtilities.invokeAndWait(() -> {
+            searchHolder[0].setText("m 42");
+            searchHolder[0].postActionEvent();
+        });
         SwingUtilities.invokeAndWait(() -> {
             while (controller.state().fieldWidthDegrees() < 18.0) {
                 controller.zoomOut();
@@ -93,18 +97,22 @@ class ExplorationJourneyTest {
         assertEquals(24.0, controller.state().fieldWidthDegrees());
         assertEquals(7.0, controller.state().limitingMagnitude());
 
-        // Home, through the real toolbar button.
+        // Home, through the real toolbar button - exactly one exists.
+        int[] resetButtons = new int[1];
         SwingUtilities.invokeAndWait(() -> {
             for (java.awt.Component component
                     : toolbarHolder[0].getComponents()) {
                 if (component instanceof javax.swing.JButton button
                         && "Reset view".equals(button.getAccessibleContext()
                                 .getAccessibleName())) {
+                    resetButtons[0]++;
                     button.doClick();
                 }
             }
         });
         flush();
+        assertEquals(1, resetButtons[0],
+                "exactly one Reset view button exists and was clicked");
         assertEquals(ChartViewState.DEFAULT, controller.state(),
                 "Home restores the exact released default");
         assertEquals("M31 · Andromeda Galaxy region", chart.scene().title());

@@ -407,6 +407,36 @@ class PanInteractionTest {
     }
 
     @Test
+    void hidingTheChartCancelsALiveGestureCleanly() throws Exception {
+        // The defined cancellation signal, exercised while a closed-hand
+        // drag is live: the chart hidden mid-gesture (a window closing or
+        // layout removing it) ends the gesture without a release.
+        Fixture fixture = new Fixture();
+        fixture.press(450, 350);
+        fixture.drag(520, 400);
+        assertTrue(fixture.interaction.dragging(), "premise: a live grab");
+        ChartViewState during = fixture.controller.state();
+
+        SwingUtilities.invokeAndWait(() -> fixture.chart.setVisible(false));
+        Fixture.flush();
+        assertFalse(fixture.interaction.dragging(),
+                "hiding the chart cancels the gesture");
+        assertEquals(Cursor.getDefaultCursor(), fixture.chart.getCursor(),
+                "cancellation restores the default cursor");
+
+        // After cancellation, stray drags without a press change nothing
+        // and the next hover offers the open hand again.
+        SwingUtilities.invokeAndWait(() -> fixture.chart.setVisible(true));
+        Fixture.flush();
+        fixture.drag(600, 300);
+        assertSame(during, fixture.controller.state(),
+                "no pan without a new press after cancellation");
+        fixture.move(450, 350);
+        assertNotEquals(Cursor.getDefaultCursor(), fixture.chart.getCursor(),
+                "the open hand returns after a cancelled gesture");
+    }
+
+    @Test
     void zoomMagnitudeAndHomeKeepWorkingAfterADrag() throws Exception {
         Fixture fixture = new Fixture();
         fixture.press(450, 350);

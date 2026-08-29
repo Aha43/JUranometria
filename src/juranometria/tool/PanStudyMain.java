@@ -79,7 +79,63 @@ public final class PanStudyMain {
                 + " accumulate the genuine spherical holonomy of north-up"
                 + " panning; geometry, not numerical drift.");
         System.out.println();
+        microBenchmarks();
         dragBurst();
+    }
+
+    /**
+     * The per-event pipeline, decomposed: solve-only geometry (one
+     * PanSolver.solveCentre call), and the accepted controller
+     * transition (solve + state update + one no-render listener
+     * notification). 10,000 samples each over a wandering 36-degree
+     * drag with distinct targets; percentiles printed with the sample
+     * count so the handover's rows reproduce from this command.
+     */
+    private static void microBenchmarks() {
+        SkyPosition centre = new SkyPosition(83.818667, -5.389667);
+        ChartViewport viewport = new ChartViewport(centre, 36.0, WIDTH, HEIGHT);
+        SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+                PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
+
+        long[] solve = new long[10_000];
+        SkyPosition current = centre;
+        for (int i = 0; i < solve.length; i++) {
+            var target = PanSolver.planeFromPixel(viewport, new PixelPoint(
+                    450 + (i % 200), 350 + (i % 140)));
+            long t0 = System.nanoTime();
+            var solution = PanSolver.solveCentre(grabbed, target, current);
+            solve[i] = System.nanoTime() - t0;
+            current = solution.centre().orElse(current);
+        }
+        reportMicros("solve-only geometry per event", solve);
+
+        juranometria.ui.ChartViewController controller =
+                new juranometria.ui.ChartViewController();
+        int[] notifications = new int[1];
+        controller.onChange(state -> notifications[0]++);
+        long[] transition = new long[10_000];
+        for (int i = 0; i < transition.length; i++) {
+            var target = PanSolver.planeFromPixel(viewport, new PixelPoint(
+                    450 + (i % 200), 350 + (i % 140)));
+            long t0 = System.nanoTime();
+            controller.pan(grabbed, target);
+            transition[i] = System.nanoTime() - t0;
+        }
+        reportMicros("accepted pan transition (solve + state + notify,"
+                + " no render)", transition);
+        System.out.printf(Locale.ROOT,
+                "  (%d accepted notifications for %d events, plus the"
+                        + " registration callback)%n%n",
+                notifications[0] - 1, transition.length);
+    }
+
+    private static void reportMicros(String name, long[] times) {
+        java.util.Arrays.sort(times);
+        System.out.printf(Locale.ROOT,
+                "%s: %d samples, median %.1f us, p95 %.1f us, max %.1f us%n",
+                name, times.length, times[times.length / 2] / 1e3,
+                times[(int) (times.length * 0.95)] / 1e3,
+                times[times.length - 1] / 1e3);
     }
 
     /**

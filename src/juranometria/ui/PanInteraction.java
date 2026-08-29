@@ -64,10 +64,51 @@ public final class PanInteraction extends MouseAdapter {
         PanInteraction interaction = new PanInteraction(chart, controller);
         chart.addMouseListener(interaction);
         chart.addMouseMotionListener(interaction);
+        // The cancellation contract: a gesture whose release the chart
+        // can never receive - the chart hidden or removed mid-drag, or
+        // its window deactivated (the platform switching applications) -
+        // is cancelled through the same gesture-ending path as a
+        // release, restoring the default cursor. The next hover offers
+        // the open hand again.
+        chart.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentHidden(java.awt.event.ComponentEvent event) {
+                interaction.cancelGesture();
+            }
+        });
+        chart.addHierarchyListener(event -> {
+            if ((event.getChangeFlags()
+                    & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0
+                    && !chart.isShowing()) {
+                interaction.cancelGesture();
+            }
+        });
+        java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager()
+                .addPropertyChangeListener("activeWindow", event -> {
+                    if (event.getNewValue() == null
+                            || (chart.isShowing() && event.getNewValue()
+                                    != SwingUtilities.getWindowAncestor(chart))) {
+                        interaction.cancelGesture();
+                    }
+                });
         chart.getAccessibleContext().setAccessibleDescription(
                 "Press and drag the chart to pan across the sky;"
                         + " Reset view returns home.");
         return interaction;
+    }
+
+    /**
+     * Ends a live gesture without a release: clears the press state and
+     * restores the default cursor. Idempotent; safe with no gesture.
+     */
+    void cancelGesture() {
+        if (pressPoint == null) {
+            return;
+        }
+        pressPoint = null;
+        grabbed = null;
+        dragging = false;
+        chart.setCursor(Cursor.getDefaultCursor());
     }
 
     @Override
