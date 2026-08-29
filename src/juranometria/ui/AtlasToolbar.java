@@ -27,7 +27,7 @@ public final class AtlasToolbar extends JToolBar {
     private final JButton resetView;
     private final JLabel readout = new JLabel();
 
-    public AtlasToolbar(ChartViewController controller) {
+    public AtlasToolbar(ChartViewController controller, SearchField searchField) {
         setFloatable(false);
 
         zoomIn = iconButton("zoom-in", "Zoom in",
@@ -41,7 +41,10 @@ public final class AtlasToolbar extends JToolBar {
                 "More stars (fainter magnitude limit)",
                 controller::increaseMagnitudeLimit);
         resetView = iconButton("zoom-reset", "Reset view",
-                "Reset view", controller::reset);
+                "Reset view", () -> {
+                    controller.reset();
+                    searchField.clearSearch();
+                });
 
         add(zoomIn);
         add(zoomOut);
@@ -50,6 +53,8 @@ public final class AtlasToolbar extends JToolBar {
         add(moreStars);
         addSeparator();
         add(resetView);
+        addSeparator();
+        add(searchField);
         add(Box.createHorizontalGlue());
         add(readout);
         readout.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 8));

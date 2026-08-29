@@ -59,7 +59,16 @@ make import-catalogue                   # verifies checksums, regenerates the re
   2°, and 1°, always centred on M31.
 - **Fewer stars / More stars** step the stellar limiting magnitude
   between V 4.0 and V 8.0 in whole magnitudes.
-- **Reset view** returns to the default 8° field with stars to V 8.0.
+- **Search** finds bundled objects and coordinates entirely offline:
+  names and identifiers forgivingly (`M31`, `Messier 31`, `NGC 224`,
+  `Andromeda Galaxy`, `TYC 2801-2090-1`), and coordinates in decimal
+  degrees (`10.68 41.27`) or sexagesimal (`0:42:44 +41:16:09`, RA in
+  hours). Selecting a result recentres the chart, keeping the current
+  field width when the bundled coverage allows, otherwise stepping to
+  the widest field that stays complete; a result beyond local coverage
+  leaves the chart unchanged and says so.
+- **Reset view** returns to the default M31 centre, 8° field, and
+  stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the
   active field width and magnitude limit.
 

@@ -14,6 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AtlasToolbarTest {
 
+    private static AtlasToolbar toolbar(ChartViewController controller) {
+        return new AtlasToolbar(controller, new SearchField(
+                new juranometria.search.LocalSearch(java.util.List.of(), java.util.List.of()),
+                new SceneAssembler(new SceneAssemblerTest.CountingCatalogue(),
+                        new juranometria.chart.SkyPosition(10.684708, 41.268750),
+                        "Test chart", 10.0),
+                controller));
+    }
+
     private static JButton button(AtlasToolbar toolbar, String accessibleName) {
         for (Component component : toolbar.getComponents()) {
             if (component instanceof JButton button && accessibleName.equals(
@@ -35,7 +44,7 @@ class AtlasToolbarTest {
 
     @Test
     void buttonsCarryAccessibleNamesTooltipsAndIcons() {
-        AtlasToolbar toolbar = new AtlasToolbar(new ChartViewController());
+        AtlasToolbar toolbar = toolbar(new ChartViewController());
         for (String name : new String[] {
                 "Zoom in", "Zoom out", "Fewer stars", "More stars", "Reset view"}) {
             JButton button = button(toolbar, name);
@@ -47,7 +56,7 @@ class AtlasToolbarTest {
     @Test
     void readoutAndEnablementStaySynchronizedWithTheState() {
         ChartViewController controller = new ChartViewController();
-        AtlasToolbar toolbar = new AtlasToolbar(controller);
+        AtlasToolbar toolbar = toolbar(controller);
 
         assertEquals("Field 8° · Stars to V 8.0", readout(toolbar).getText());
         assertFalse(button(toolbar, "Zoom out").isEnabled(),
@@ -71,7 +80,7 @@ class AtlasToolbarTest {
     @Test
     void magnitudeControlsWalkTheirBoundsAndStaySynchronized() {
         ChartViewController controller = new ChartViewController();
-        AtlasToolbar toolbar = new AtlasToolbar(controller);
+        AtlasToolbar toolbar = toolbar(controller);
 
         assertFalse(button(toolbar, "More stars").isEnabled(),
                 "the fixture holds nothing fainter than V 8.0");
@@ -94,7 +103,7 @@ class AtlasToolbarTest {
         // Codex review, PR #20: activate the real buttons rather than the
         // controller, so a missing ActionListener cannot pass the suite.
         ChartViewController controller = new ChartViewController();
-        AtlasToolbar toolbar = new AtlasToolbar(controller);
+        AtlasToolbar toolbar = toolbar(controller);
 
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             button(toolbar, "Zoom in").doClick();
@@ -122,7 +131,7 @@ class AtlasToolbarTest {
     @Test
     void resetRestoresTheCompleteDefaultAfterBothControlsChanged() {
         ChartViewController controller = new ChartViewController();
-        AtlasToolbar toolbar = new AtlasToolbar(controller);
+        AtlasToolbar toolbar = toolbar(controller);
 
         controller.zoomIn();
         controller.zoomIn();

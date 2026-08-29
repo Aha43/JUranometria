@@ -31,9 +31,11 @@ public final class JUranometriaMain {
         ChartComponent chart = new ChartComponent(M31Chart.assembler());
         ChartViewController controller = new ChartViewController();
         controller.onChange(chart::setViewState);
+        juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
+                M31Chart.search(), M31Chart.assembler(), controller);
 
         frame.setLayout(new BorderLayout());
-        frame.add(new AtlasToolbar(controller), BorderLayout.NORTH);
+        frame.add(new AtlasToolbar(controller, searchField), BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
