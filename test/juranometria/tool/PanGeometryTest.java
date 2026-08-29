@@ -61,28 +61,40 @@ class PanGeometryTest {
                             drag[0] + drag[2], drag[1] + drag[3]);
                     SkyPosition grabbed = PanGeometry.skyFromPlane(centre,
                             PanGeometry.planeFromPixel(viewport, press));
-                    Optional<SkyPosition> newCentre = PanGeometry.solveCentre(
+                    PanGeometry.PanSolution solution = PanGeometry.solveCentre(
                             grabbed,
                             PanGeometry.planeFromPixel(viewport, release),
                             centre);
-                    if (newCentre.isEmpty()) {
-                        continue; // explicit no-op, verified elsewhere
+                    if (solution.centre().isEmpty()) {
+                        // Every empty must carry the solver's own
+                        // past-pole classification - and can only occur
+                        // for near-polar grabs (PR #76 follow-up).
+                        assertTrue(solution.pastPole(),
+                                "an empty result must be past-pole");
+                        assertTrue(Math.abs(grabbed.decDegrees()) > 80.0,
+                                "past-pole holds only occur near a pole,"
+                                        + " not at " + grabbed);
+                        continue;
                     }
                     solved++;
+                    SkyPosition newCentre = solution.centre().get();
                     ChartViewport moved = new ChartViewport(
-                            newCentre.get(), field, 900, 700);
+                            newCentre, field, 900, 700);
                     PlanePoint requested =
                             PanGeometry.planeFromPixel(viewport, release);
-                    PlanePoint achieved = new GnomonicProjection(newCentre.get())
+                    PlanePoint achieved = new GnomonicProjection(newCentre)
                             .project(grabbed).orElseThrow();
                     PixelPoint reprojected =
                             new ViewportMapping(moved).toPixel(achieved);
                     double error = Math.hypot(reprojected.x() - release.x(),
                             reprojected.y() - release.y());
                     if (error >= 1e-3) {
-                        // Constrained polar follow: the vertical component
-                        // must still track exactly; the horizontal stopped
-                        // at the feasibility boundary.
+                        // Constrained polar follow: the solver must say
+                        // so, the vertical component must track exactly.
+                        assertTrue(solution.constrained(),
+                                "a large shortfall must be a"
+                                        + " solver-classified constrained"
+                                        + " follow");
                         assertEquals(requested.etaNorth(),
                                 achieved.etaNorth(), 1e-6,
                                 "constrained follow tracks the vertical at "
@@ -112,7 +124,7 @@ class PanGeometryTest {
             current = PanGeometry.solveCentre(grabbed,
                             PanGeometry.planeFromPixel(viewport,
                                     new PixelPoint(w[0], w[1])), current)
-                    .orElseThrow();
+                    .centre().orElseThrow();
         }
         assertEquals(RA_WRAP.raDegrees(), current.raDegrees(), 1e-9);
         assertEquals(RA_WRAP.decDegrees(), current.decDegrees(), 1e-9);
@@ -126,7 +138,7 @@ class PanGeometryTest {
                 PanGeometry.planeFromPixel(viewport, press));
         SkyPosition solved = PanGeometry.solveCentre(grabbed,
                         PanGeometry.planeFromPixel(viewport, press), M42)
-                .orElseThrow();
+                .centre().orElseThrow();
         assertEquals(M42.raDegrees(), solved.raDegrees(), 1e-9);
         assertEquals(M42.decDegrees(), solved.decDegrees(), 1e-9);
     }
@@ -142,8 +154,11 @@ class PanGeometryTest {
                 new PixelPoint(650, 350));
         SkyPosition grabbed = PanGeometry.skyFromPlane(POLAR_N,
                 PanGeometry.planeFromPixel(viewport, new PixelPoint(450, 350)));
-        SkyPosition solved = PanGeometry.solveCentre(grabbed, requested,
-                POLAR_N).orElseThrow();
+        PanGeometry.PanSolution polar = PanGeometry.solveCentre(grabbed,
+                requested, POLAR_N);
+        assertTrue(polar.constrained(),
+                "the solver classifies the polar follow as constrained");
+        SkyPosition solved = polar.centre().orElseThrow();
         PlanePoint achieved = new GnomonicProjection(solved)
                 .project(grabbed).orElseThrow();
         assertEquals(requested.etaNorth(), achieved.etaNorth(), 1e-6,
@@ -159,7 +174,7 @@ class PanGeometryTest {
         assertTrue(PanGeometry.solveCentre(offCentre,
                         PanGeometry.planeFromPixel(viewport,
                                 new PixelPoint(400, 550)), POLAR_N)
-                .isPresent(), "off-centre grabs pan the polar page");
+                .centre().isPresent(), "off-centre grabs pan the polar page");
     }
 
     @Test
@@ -169,9 +184,12 @@ class PanGeometryTest {
         ChartViewport viewport = new ChartViewport(POLAR_S, 36.0, 900, 700);
         SkyPosition grabbed = PanGeometry.skyFromPlane(POLAR_S,
                 PanGeometry.planeFromPixel(viewport, new PixelPoint(450, 350)));
-        assertTrue(PanGeometry.solveCentre(grabbed,
-                        PanGeometry.planeFromPixel(viewport,
-                                new PixelPoint(450, 170)), POLAR_S)
-                .isEmpty(), "no centre beyond the pole; explicit no-op");
+        PanGeometry.PanSolution pastPole = PanGeometry.solveCentre(grabbed,
+                PanGeometry.planeFromPixel(viewport,
+                        new PixelPoint(450, 170)), POLAR_S);
+        assertTrue(pastPole.centre().isEmpty(),
+                "no centre beyond the pole; explicit hold");
+        assertTrue(pastPole.pastPole(),
+                "the hold carries the solver's own past-pole evidence");
     }
 }

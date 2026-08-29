@@ -22,6 +22,19 @@ import juranometria.project.PlanePoint;
 public final class PanGeometry {
 
     /**
+     * A classified solver outcome: {@code centre} is present unless the
+     * request would carry the chart centre past a celestial pole, in
+     * which case {@code pastPole} is true - the only legitimate empty.
+     * {@code constrained} marks a polar follow whose horizontal
+     * component was clamped to the feasibility boundary. Any empty
+     * without past-pole evidence is a solver invariant violation and
+     * throws rather than passing as a quiet no-op (PR #76 follow-up).
+     */
+    public record PanSolution(Optional<SkyPosition> centre,
+                              boolean constrained, boolean pastPole) {
+    }
+
+    /**
      * Solver acceptance: a candidate centre must reproject the grabbed
      * position onto the requested plane point this closely (plane
      * units; at the widest released page one plane unit is ~1385 px,
@@ -94,9 +107,9 @@ public final class PanGeometry {
      * inside the valid declination range - panning past the pole -
      * which is an explicit hold, never NaN state.
      */
-    public static Optional<SkyPosition> solveCentre(SkyPosition grabbed,
-                                                    PlanePoint target,
-                                                    SkyPosition previousCentre) {
+    public static PanSolution solveCentre(SkyPosition grabbed,
+                                          PlanePoint target,
+                                          SkyPosition previousCentre) {
         double xi = target.xiEast();
         double eta = target.etaNorth();
 
@@ -123,19 +136,25 @@ public final class PanGeometry {
         // s . e = xi/N with e = (-sin a, cos a, 0):
         // cos(decS) * sin(raS - a) = xi/N.
         double sinOffset = xi / (n * cosDecS);
-        // Clamp pure floating-point overshoot at the boundary (a grab on
-        // the horizontal axis lands at exactly 1); genuinely infeasible
-        // values remain rejected. Every surviving candidate is verified
-        // by full reprojection below, so the clamp can never let a wrong
-        // centre through.
+        // After the feasibility clamp above this cannot exceed 1 beyond
+        // floating-point rounding (|xi|/N < 1 always holds off the polar
+        // path); anything larger is a solver invariant violation, never
+        // a quiet no-op. The clamp below absorbs pure rounding at the
+        // boundary, where a grab on the horizontal axis lands at exactly
+        // 1; every surviving candidate is verified by full reprojection.
         if (Math.abs(sinOffset) > 1.0 + 1e-9) {
-            return Optional.empty();
+            throw new IllegalStateException(String.format(
+                    java.util.Locale.ROOT,
+                    "pan solver invariant violated: infeasible RA equation"
+                            + " after clamping (%.12f) for grab %s",
+                    sinOffset, grabbed));
         }
         double offset = Math.asin(Math.clamp(sinOffset, -1.0, 1.0));
         double[] alphaCandidates = {raS - offset, raS - (Math.PI - offset)};
 
         SkyPosition best = null;
         double bestSeparation = Double.MAX_VALUE;
+        boolean sawOutOfRangeDeclination = false;
         for (double alpha : alphaCandidates) {
             // s . c = 1/N: p cos d + sz sin d = 1/N with
             // p = sx cos a + sy sin a.
@@ -150,6 +169,9 @@ public final class PanGeometry {
                     -1.0, 1.0));
             for (double delta : new double[] {phase + acos, phase - acos}) {
                 if (Math.abs(delta) >= Math.PI / 2.0) {
+                    // An algebraic root beyond a pole: the only source
+                    // of a legitimate empty result.
+                    sawOutOfRangeDeclination = true;
                     continue;
                 }
                 SkyPosition candidate = new SkyPosition(
@@ -167,7 +189,17 @@ public final class PanGeometry {
                 }
             }
         }
-        return Optional.ofNullable(best);
+        if (best == null) {
+            if (!sawOutOfRangeDeclination) {
+                throw new IllegalStateException(String.format(
+                        java.util.Locale.ROOT,
+                        "pan solver invariant violated: no centre for grab"
+                                + " %s at plane (%.9f, %.9f) and no past-pole"
+                                + " evidence", grabbed, xi, eta));
+            }
+            return new PanSolution(Optional.empty(), constrained, true);
+        }
+        return new PanSolution(Optional.of(best), constrained, false);
     }
 
     /** Full-projection verification of a candidate centre. */

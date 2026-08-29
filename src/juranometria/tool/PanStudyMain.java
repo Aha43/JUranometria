@@ -101,11 +101,11 @@ public final class PanStudyMain {
             current = PanGeometry.solveCentre(grabbed,
                             PanGeometry.planeFromPixel(viewport, waypoint),
                             current)
-                    .orElse(current);
+                    .centre().orElse(current);
         }
         SkyPosition back = PanGeometry.solveCentre(grabbed,
                         PanGeometry.planeFromPixel(viewport, press), current)
-                .orElse(current);
+                .centre().orElse(current);
         var plane = new GnomonicProjection(centre).project(back);
         if (plane.isEmpty()) {
             return Double.POSITIVE_INFINITY;
@@ -124,18 +124,22 @@ public final class PanStudyMain {
                     drag[0] + drag[2], drag[1] + drag[3]);
             SkyPosition grabbed = PanGeometry.skyFromPlane(centre,
                     PanGeometry.planeFromPixel(viewport, press));
-            Optional<SkyPosition> solved = PanGeometry.solveCentre(grabbed,
+            PanGeometry.PanSolution solved = PanGeometry.solveCentre(grabbed,
                     PanGeometry.planeFromPixel(viewport, release), centre);
-            if (solved.isEmpty()) {
+            if (solved.centre().isEmpty()) {
+                // The solver classified this itself; any unexplained
+                // empty throws inside solveCentre instead.
                 System.out.printf(Locale.ROOT,
-                        "  (past-pole hold: drag %s at %.0f deg)%n",
+                        "  (past-pole hold, solver-classified: drag %s at"
+                                + " %.0f deg)%n",
                         java.util.Arrays.toString(drag), field);
                 continue;
             }
+            SkyPosition newCentre = solved.centre().get();
             ChartViewport moved = new ChartViewport(
-                    solved.get(), field, WIDTH, HEIGHT);
+                    newCentre, field, WIDTH, HEIGHT);
             PixelPoint reprojected = new ViewportMapping(moved).toPixel(
-                    new GnomonicProjection(solved.get())
+                    new GnomonicProjection(newCentre)
                             .project(grabbed).orElseThrow());
             double error = Math.hypot(reprojected.x() - release.x(),
                     reprojected.y() - release.y());
@@ -178,7 +182,7 @@ public final class PanStudyMain {
         return PanGeometry.solveCentre(grabbed,
                         PanGeometry.planeFromPixel(viewport,
                                 new PixelPoint(450 + dx, 350 + dy)), centre)
-                .orElse(centre);
+                .centre().orElse(centre);
     }
 
     /**
@@ -216,7 +220,7 @@ public final class PanStudyMain {
                 SkyPosition moved = PanGeometry.solveCentre(grabbed,
                                 PanGeometry.planeFromPixel(viewport, pointer),
                                 state.centre())
-                        .orElse(state.centre());
+                        .centre().orElse(state.centre());
                 state = state.recenteredAt(moved);
                 renderer.renderToImage(assembler.assemble(state, WIDTH, HEIGHT));
                 times[i] = System.nanoTime() - t0;

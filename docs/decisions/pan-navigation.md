@@ -48,11 +48,16 @@ approximation anywhere.
 - Measured closure over the acceptance grid (8°/18°/36° × ordinary,
   RA-wrap, both polar centres × straight, diagonal, near-corner, and
   edge-crossing drags): worst **9.6e-5 px**, typically 1e-10 px.
-- **Failure is explicit, never silent**: an infeasible horizontal
-  request follows to the feasibility boundary (below); only a
-  past-the-pole request holds the previous centre, per event. Nothing
-  NaN or out-of-range ever reaches `ChartViewState` (`SkyPosition`
-  validation plus `Optional` make illegal states unrepresentable).
+- **Failure is explicit, classified, and never silent**: the solver
+  returns a classified outcome (exact, constrained follow, or
+  past-pole hold). An infeasible horizontal request follows to the
+  feasibility boundary (below); only a past-the-pole request holds
+  the previous centre, and that hold carries the solver's own
+  evidence (an algebraic declination root beyond the pole). **An
+  empty result without past-pole evidence is a solver invariant
+  violation and throws** - other failure modes cannot hide behind a
+  quiet no-op. Nothing NaN or out-of-range ever reaches
+  `ChartViewState`.
 
 ## Gesture semantics: the press-time grab is the reference
 
