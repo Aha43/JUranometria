@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Large objects can no longer be silently omitted from a chart: the
+  query margin now comes from the pack manifest's declared maximum
+  object semi-extent (5.39 degrees, the Large Magellanic Cloud)
+  instead of a constant sized for M31, so the LMC, the Hyades, and
+  other giants appear whenever their symbols reach into the visible
+  frame.
+
 ### Added
 
 - The local sky: the application now loads, queries, and searches the

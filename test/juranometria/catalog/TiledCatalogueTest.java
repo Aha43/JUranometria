@@ -104,6 +104,7 @@ class TiledCatalogueTest {
                 coverage.type=all-sky
                 stars.limit.vmag=8.0
                 tiling.scheme=radec-grid-30
+                objects.max.semi.extent.degrees=5.39
                 sources.tycho2.catalogue=I/259
                 sources.openngc.release=v20260501
                 license.stars=CC BY-NC 3.0 IGO

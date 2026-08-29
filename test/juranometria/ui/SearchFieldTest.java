@@ -31,7 +31,7 @@ class SearchFieldTest {
         final SceneAssemblerTest.CountingCatalogue catalogue =
                 new SceneAssemblerTest.CountingCatalogue();
         final SceneAssembler assembler =
-                new SceneAssembler(catalogue, DATA_CENTRE, "Test chart", 10.0);
+                new SceneAssembler(catalogue, DATA_CENTRE, "Test chart", 10.0, 1.5);
         final ChartViewController controller = new ChartViewController(this::valid);
         final SearchField field;
 

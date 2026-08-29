@@ -33,7 +33,8 @@ public final class Atlas {
                         + catalogue.manifest().coverage()
                         + "; regional packs need a data centre this wiring does not define");
             }
-            return SceneAssembler.allSky(catalogue, TITLE);
+            return SceneAssembler.allSky(catalogue, TITLE,
+                    catalogue.manifest().maxObjectSemiExtentDegrees());
         }
 
         private static SkyRegion wholeSky() {

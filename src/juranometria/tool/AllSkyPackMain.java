@@ -104,6 +104,7 @@ public final class AllSkyPackMain {
         int dsosWithoutVMagnitude;
         int dsosWithoutDimensions;
         int dsosWithoutPositionAngle;
+        double maxObjectSemiExtentDegrees;
         final Map<String, Integer> dsoTypes = new TreeMap<>();
     }
 
@@ -218,6 +219,10 @@ public final class AllSkyPackMain {
         } else {
             pa = ((pa % 180.0) + 180.0) % 180.0;
         }
+        if (!Double.isNaN(dso.majorAxisArcmin())) {
+            counts.maxObjectSemiExtentDegrees = Math.max(
+                    counts.maxObjectSemiExtentDegrees, dso.majorAxisArcmin() / 120.0);
+        }
         boolean messier = dso.aliases().stream().anyMatch(alias -> alias.startsWith("M "));
         return new String[] {
                 dso.id(),
@@ -290,6 +295,9 @@ public final class AllSkyPackMain {
                 String.format(Locale.ROOT, "%.1f", STAR_LIMIT_V));
         entries.put("tiling.scheme", PackManifest.TILING_SCHEME);
         entries.put("layers", "stars,dsos");
+        // Rounded up so the declared value is always a safe query margin.
+        entries.put("objects.max.semi.extent.degrees", String.format(Locale.ROOT,
+                "%.2f", Math.ceil(counts.maxObjectSemiExtentDegrees * 100.0) / 100.0));
         entries.put("rows.stars.total", Integer.toString(counts.starsWritten));
         entries.put("rows.dsos.total", Integer.toString(counts.dsosWritten));
         entries.put("sources.tycho2.catalogue", "I/259");

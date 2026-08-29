@@ -27,7 +27,7 @@ class ChartComponentTest {
         ChartComponent[] holder = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
             holder[0] = new ChartComponent(
-                    new SceneAssembler(catalogue, M31, "Test chart", 10.0));
+                    new SceneAssembler(catalogue, M31, "Test chart", 10.0, 1.5));
             holder[0].setSize(300, 200);
         });
         flushEventQueue();
@@ -51,7 +51,7 @@ class ChartComponentTest {
     @Test
     void exposesAnAccessibleContextWithAName() {
         ChartComponent component = new ChartComponent(new SceneAssembler(
-                new SceneAssemblerTest.CountingCatalogue(), M31, "Test chart", 10.0));
+                new SceneAssemblerTest.CountingCatalogue(), M31, "Test chart", 10.0, 1.5));
         assertNotNull(component.getAccessibleContext());
         assertEquals("Star chart", component.getAccessibleContext().getAccessibleName());
     }

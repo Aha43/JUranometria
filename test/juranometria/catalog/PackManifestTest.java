@@ -16,6 +16,7 @@ class PackManifestTest {
             coverage.type=all-sky
             stars.limit.vmag=8.0
             tiling.scheme=radec-grid-30
+            objects.max.semi.extent.degrees=5.39
             sources.tycho2.catalogue=I/259
             sources.openngc.release=v20260501
             license.stars=CC BY-NC 3.0 IGO
@@ -35,6 +36,7 @@ class PackManifestTest {
         assertEquals("all-sky", manifest.coverage());
         assertEquals(8.0, manifest.starLimitVmag());
         assertEquals("radec-grid-30", manifest.tilingScheme());
+        assertEquals(5.39, manifest.maxObjectSemiExtentDegrees());
         assertEquals("abc123", manifest.entries().get("checksum.tiles/r00-d4/stars.csv"),
                 "checksum entries survive as raw entries");
     }
@@ -58,5 +60,8 @@ class PackManifestTest {
                         "tiling.scheme=healpix-64")));
         assertThrows(IllegalArgumentException.class,
                 () -> parse(VALID.replace("stars.limit.vmag=8.0", "stars.limit.vmag=bright")));
+        assertThrows(IllegalArgumentException.class,
+                () -> parse(VALID.replace("objects.max.semi.extent.degrees=5.39",
+                        "objects.max.semi.extent.degrees=-1")));
     }
 }

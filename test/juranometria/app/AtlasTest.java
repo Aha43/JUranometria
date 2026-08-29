@@ -83,6 +83,32 @@ class AtlasTest {
     }
 
     @Test
+    void theAssemblerMarginComesFromTheManifestNotAConstant() {
+        assertEquals(5.39, Atlas.assembler().objectExtentMarginDegrees(),
+                "the pack's declared LMC semi-extent drives the query margin");
+    }
+
+    @Test
+    void largeObjectsReachingIntoTheFrameAreNeverOmitted() {
+        // Codex review, Sprint 5 release finding 1: with the old 1.5-degree
+        // margin, a centre 8 degrees north of the LMC omitted it even
+        // though its 5.38-degree semi-extent reaches into the frame.
+        ChartScene lmcEdge = Atlas.assembler().assemble(ChartViewState.DEFAULT
+                .recenteredAt(new SkyPosition(80.893750, -61.756111)), 900, 700);
+        assertTrue(lmcEdge.deepSkyObjects().stream()
+                        .anyMatch(dso -> dso.id().equals("ESO056-115")),
+                "the LMC must be in the scene when its ellipse reaches the frame");
+
+        // The Hyades (329', semi-extent 2.74 degrees), centre 7 degrees away:
+        // outside the old reach of 6.56, inside the manifest-driven 10.45.
+        ChartScene hyadesEdge = Atlas.assembler().assemble(ChartViewState.DEFAULT
+                .recenteredAt(new SkyPosition(66.725, 22.866667)), 900, 700);
+        assertTrue(hyadesEdge.deepSkyObjects().stream()
+                        .anyMatch(dso -> dso.id().equals("C041")),
+                "the Hyades must be in the scene from seven degrees away");
+    }
+
+    @Test
     void resetStillMeansM31() {
         assertEquals(new SkyPosition(10.684708, 41.268750),
                 ChartViewState.DEFAULT.centre());
