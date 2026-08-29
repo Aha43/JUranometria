@@ -98,9 +98,45 @@ class ChartViewStateTest {
 
     @Test
     void offSequenceValuesAreRejected() {
-        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(5.0, 8.0));
-        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(8.0, 7.5));
-        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(0.5, 8.0));
-        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(8.0, 9.0));
+        SkyPosition m31 = ChartViewState.DEFAULT.centre();
+        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 5.0, 8.0));
+        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 8.0, 7.5));
+        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 0.5, 8.0));
+        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 8.0, 9.0));
+        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(null, 8.0, 8.0));
+    }
+
+    @Test
+    void theDefaultCentreIsM31() {
+        assertEquals(new SkyPosition(10.684708, 41.268750), ChartViewState.DEFAULT.centre());
+    }
+
+    @Test
+    void recentringKeepsFieldAndLimitAndTransitionsKeepTheCentre() {
+        SkyPosition offset = new SkyPosition(12.0, 43.0);
+        ChartViewState moved = ChartViewState.DEFAULT
+                .zoomIn().decreaseMagnitudeLimit().recenteredAt(offset);
+        assertEquals(offset, moved.centre());
+        assertEquals(6.0, moved.fieldWidthDegrees(), "recentring keeps the field width");
+        assertEquals(7.0, moved.limitingMagnitude(), "recentring keeps the limit");
+
+        assertEquals(offset, moved.zoomIn().centre(), "zoom keeps the centre");
+        assertEquals(offset, moved.increaseMagnitudeLimit().centre(),
+                "magnitude changes keep the centre");
+        assertEquals(4.0, moved.withFieldWidth(4.0).fieldWidthDegrees());
+        assertEquals(offset, moved.withFieldWidth(4.0).centre());
+    }
+
+    @Test
+    void resetRestoresTheM31CentreToo() {
+        ChartViewState wandered = ChartViewState.DEFAULT
+                .recenteredAt(new SkyPosition(12.0, 43.0)).zoomIn();
+        assertEquals(ChartViewState.DEFAULT, wandered.reset());
+    }
+
+    @Test
+    void fieldWidthStepsAreExposedWidestFirst() {
+        assertEquals(java.util.List.of(8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
+                ChartViewState.fieldWidthSteps());
     }
 }

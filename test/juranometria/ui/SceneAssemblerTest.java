@@ -66,10 +66,55 @@ class SceneAssemblerTest {
                 () -> assembler.assemble(ChartViewState.DEFAULT, 400, 1000));
         assertTrue(refused.getMessage().contains("coverage ends at 10.0"));
 
-        int maxHeight = assembler.maxPageHeightPx(8.0, 400);
+        int maxHeight = assembler.maxPageHeightPx(M31, 8.0, 400);
         assertTrue(maxHeight < 1000, "the honest page is shorter than the window");
         ChartScene clamped = assembler.assemble(ChartViewState.DEFAULT, 400, maxHeight);
         assertEquals(maxHeight, clamped.viewport().heightPx());
+    }
+
+    @Test
+    void aSafeOffsetCentreAssemblesAroundItself() {
+        CountingCatalogue catalogue = new CountingCatalogue();
+        SceneAssembler assembler = new SceneAssembler(catalogue, M31, "Test chart", 10.0);
+        SkyPosition offset = new SkyPosition(10.684708, 43.268750); // 2 degrees north
+
+        assertTrue(assembler.fits(offset, 8.0), "2 + 4 + 1.5 stays inside 10");
+        ChartScene scene = assembler.assemble(
+                ChartViewState.DEFAULT.recenteredAt(offset), 900, 700);
+        assertEquals(offset, scene.viewport().centre());
+        assertEquals(offset, catalogue.lastRegion.centre(),
+                "the query is centred on the state's position, not the data centre");
+    }
+
+    @Test
+    void anEdgeCentreNeedsANarrowerFieldAndFarBeyondNothingFits() {
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, "Test chart", 10.0);
+
+        SkyPosition edge = new SkyPosition(10.684708, 46.268750); // 5 degrees out
+        assertTrue(!assembler.fits(edge, 8.0), "5 + 4 + 1.5 exceeds 10");
+        assertEquals(6.0, assembler.widestFittingFieldDegrees(edge).orElseThrow(),
+                "the widest complete field at 5 degrees offset is the 6-degree step");
+
+        SkyPosition beyond = new SkyPosition(10.684708, 49.968750); // 8.7 degrees out
+        assertTrue(assembler.widestFittingFieldDegrees(beyond).isEmpty(),
+                "not even the 1-degree step fits at 8.7 degrees offset");
+
+        assertThrows(IllegalArgumentException.class, () -> assembler.assemble(
+                ChartViewState.DEFAULT.recenteredAt(edge), 900, 700),
+                "assembling an unfitting view is an error, never sparse sky");
+    }
+
+    @Test
+    void letterboxingTightensWithAnOffsetCentre() {
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, "Test chart", 10.0);
+        SkyPosition offset = new SkyPosition(10.684708, 43.268750);
+        int atDataCentre = assembler.maxPageHeightPx(M31, 8.0, 900);
+        int atOffset = assembler.maxPageHeightPx(offset, 8.0, 900);
+        assertTrue(atOffset < atDataCentre,
+                "an offset centre has less honest height available");
+        assertTrue(atOffset > 0, "a 2-degree offset still supports a real page");
     }
 
     @Test

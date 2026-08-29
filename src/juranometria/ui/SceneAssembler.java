@@ -1,5 +1,7 @@
 package juranometria.ui;
 
+import java.util.OptionalDouble;
+
 import juranometria.catalog.Catalogue;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
@@ -11,9 +13,15 @@ import juranometria.chart.SkyRegion;
  * Assembles complete immutable chart scenes by querying the local
  * catalogue from the current view state and pixel viewport. This is the
  * seam between interaction and data: it runs on state or size changes at
- * the UI boundary, never inside painting, and a future recentring or
- * search feature changes what is asked for here without touching the
- * renderer.
+ * the UI boundary, never inside painting.
+ *
+ * The assembler distinguishes the mutable chart centre (part of the view
+ * state) from the fixed data centre of the bundled coverage cone. The
+ * declared coverage rule for any view is: the chart centre's offset from
+ * the data centre, plus the visible corner radius, plus the object-extent
+ * margin, must stay inside the coverage cone. {@link #fits} and
+ * {@link #widestFittingFieldDegrees} answer coverage questions without
+ * querying or painting.
  */
 public final class SceneAssembler {
 
@@ -26,18 +34,19 @@ public final class SceneAssembler {
     static final double OBJECT_EXTENT_MARGIN_DEGREES = 1.5;
 
     private final Catalogue catalogue;
-    private final SkyPosition centre;
+    private final SkyPosition dataCentre;
     private final String title;
     private final double coverageRadiusDegrees;
 
     /**
+     * @param dataCentre the fixed centre of the bundled data's coverage
+     *     cone (distinct from the mutable chart centre)
      * @param coverageRadiusDegrees the bundled data's cone radius around
-     *     the centre; the declared coverage rule is that the visible
-     *     corners plus the object-extent margin never exceed it.
+     *     the data centre
      */
-    public SceneAssembler(Catalogue catalogue, SkyPosition centre, String title,
+    public SceneAssembler(Catalogue catalogue, SkyPosition dataCentre, String title,
                           double coverageRadiusDegrees) {
-        if (catalogue == null || centre == null || title == null) {
+        if (catalogue == null || dataCentre == null || title == null) {
             throw new IllegalArgumentException("catalogue, centre, and title are required");
         }
         if (!(coverageRadiusDegrees > OBJECT_EXTENT_MARGIN_DEGREES)) {
@@ -45,29 +54,30 @@ public final class SceneAssembler {
                     "coverage must exceed the object margin: " + coverageRadiusDegrees);
         }
         this.catalogue = catalogue;
-        this.centre = centre;
+        this.dataCentre = dataCentre;
         this.title = title;
         this.coverageRadiusDegrees = coverageRadiusDegrees;
     }
 
     /**
-     * Queries the catalogue and builds the scene for one page. The page
-     * dimensions must respect {@link #maxPageHeightPx}; a query that would
-     * reach beyond the bundled coverage is an error, never a silently
-     * sparse chart.
+     * Queries the catalogue around the state's centre and builds the scene
+     * for one page. The page dimensions must respect
+     * {@link #maxPageHeightPx}; a view that would reach beyond the bundled
+     * coverage is an error, never a silently sparse chart.
      */
     public ChartScene assemble(ChartViewState state, int widthPx, int heightPx) {
+        double offset = state.centre().separationDegrees(dataCentre);
         double radius = queryRadiusDegrees(state.fieldWidthDegrees(), widthPx, heightPx);
-        if (radius > coverageRadiusDegrees) {
+        if (offset + radius > coverageRadiusDegrees) {
             throw new IllegalArgumentException(String.format(java.util.Locale.ROOT,
-                    "page %dx%d at a %.1f-degree field needs %.2f degrees of data"
-                            + " but coverage ends at %.1f",
-                    widthPx, heightPx, state.fieldWidthDegrees(), radius,
-                    coverageRadiusDegrees));
+                    "page %dx%d at a %.1f-degree field offset %.2f degrees needs data"
+                            + " to %.2f degrees but coverage ends at %.1f",
+                    widthPx, heightPx, state.fieldWidthDegrees(), offset,
+                    offset + radius, coverageRadiusDegrees));
         }
-        ChartViewport viewport =
-                new ChartViewport(centre, state.fieldWidthDegrees(), widthPx, heightPx);
-        SkyRegion query = new SkyRegion(centre, radius);
+        ChartViewport viewport = new ChartViewport(
+                state.centre(), state.fieldWidthDegrees(), widthPx, heightPx);
+        SkyRegion query = new SkyRegion(state.centre(), radius);
         return new ChartScene(viewport,
                 catalogue.starsIn(query),
                 catalogue.deepSkyObjectsIn(query),
@@ -75,15 +85,48 @@ public final class SceneAssembler {
     }
 
     /**
-     * The tallest page (in pixels) whose corners, plus the object-extent
-     * margin, stay inside the bundled coverage at this field width. A
-     * taller window letterboxes the page rather than promising sky the
-     * data does not hold.
+     * Whether a centre/field combination can be drawn completely: the
+     * centre's offset plus the field's half width plus the object margin
+     * stay inside the coverage cone. Geometry-independent — the page
+     * height letterboxes separately via {@link #maxPageHeightPx}.
      */
-    public int maxPageHeightPx(double fieldWidthDegrees, int widthPx) {
+    public boolean fits(SkyPosition centre, double fieldWidthDegrees) {
+        return centre.separationDegrees(dataCentre)
+                + fieldWidthDegrees / 2.0
+                + OBJECT_EXTENT_MARGIN_DEGREES <= coverageRadiusDegrees;
+    }
+
+    /**
+     * The widest supported field step that can be drawn completely around
+     * the centre, or empty when not even the narrowest step fits there.
+     */
+    public OptionalDouble widestFittingFieldDegrees(SkyPosition centre) {
+        for (double step : ChartViewState.fieldWidthSteps()) {
+            if (fits(centre, step)) {
+                return OptionalDouble.of(step);
+            }
+        }
+        return OptionalDouble.empty();
+    }
+
+    /**
+     * The tallest page (in pixels) whose corners, plus the object-extent
+     * margin, stay inside the bundled coverage for this centre and field
+     * width. A taller window letterboxes the page rather than promising
+     * sky the data does not hold; an offset centre allows less height.
+     */
+    public int maxPageHeightPx(SkyPosition centre, double fieldWidthDegrees, int widthPx) {
         double halfWidthPlane = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
-        double maxCornerPlane = Math.tan(Math.toRadians(
-                coverageRadiusDegrees - OBJECT_EXTENT_MARGIN_DEGREES));
+        double allowedCornerDegrees = coverageRadiusDegrees
+                - OBJECT_EXTENT_MARGIN_DEGREES
+                - centre.separationDegrees(dataCentre);
+        if (allowedCornerDegrees <= 0) {
+            return 0;
+        }
+        double maxCornerPlane = Math.tan(Math.toRadians(allowedCornerDegrees));
+        if (maxCornerPlane <= halfWidthPlane) {
+            return 0;
+        }
         double halfHeightPlane = Math.sqrt(
                 maxCornerPlane * maxCornerPlane - halfWidthPlane * halfWidthPlane);
         return (int) Math.floor(widthPx * halfHeightPlane / halfWidthPlane);
