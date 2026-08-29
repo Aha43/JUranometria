@@ -28,6 +28,7 @@ help:
 	@echo "  test         Compile and run unit tests"
 	@echo "  chart-image  Write the deterministic reference chart image"
 	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
+	@echo "  regional-study    Render the Sprint 6 regional-zoom candidate charts"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -67,6 +68,9 @@ chart-image: classes
 
 import-allsky: classes
 	java -cp "$(CLASSES_DIR)" juranometria.tool.AllSkyPackMain
+
+regional-study: classes
+	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.RegionalStudyMain
 
 test: classes
 	rm -rf $(TEST_CLASSES)
