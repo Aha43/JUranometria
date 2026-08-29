@@ -44,7 +44,7 @@ public final class ChartRenderer {
     private static final double MIN_SYMBOL_MAJOR_PX = 6.0;
 
     /** The symbol families of docs/chart-conventions.md. */
-    enum Symbol { ELLIPSE, DOTTED_CIRCLE, CROSSED_CIRCLE, BOX, PLANETARY, NONE }
+    public enum Symbol { ELLIPSE, DOTTED_CIRCLE, CROSSED_CIRCLE, BOX, PLANETARY, NONE }
 
     private static final java.awt.Stroke OUTLINE_STROKE = new BasicStroke(1.0f);
     private static final java.awt.Stroke DOTTED_STROKE = new BasicStroke(
@@ -241,7 +241,7 @@ public final class ChartRenderer {
      * associations such as NGC 206 inside M31 await their own judgement -
      * though all remain searchable.
      */
-    static Symbol symbolFor(DeepSkyObject dso) {
+    public static Symbol symbolFor(DeepSkyObject dso) {
         return switch (dso.type()) {
             case GALAXY, GALAXY_PAIR, GALAXY_TRIPLET, GALAXY_GROUP -> Symbol.ELLIPSE;
             case OPEN_CLUSTER -> Symbol.DOTTED_CIRCLE;
@@ -253,7 +253,7 @@ public final class ChartRenderer {
         };
     }
 
-    static boolean hasSymbol(DeepSkyObject dso) {
+    public static boolean hasSymbol(DeepSkyObject dso) {
         return symbolFor(dso) != Symbol.NONE;
     }
 

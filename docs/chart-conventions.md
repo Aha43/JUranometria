@@ -62,7 +62,12 @@ detail:
 | 60°+ | Broad celestial geography; deferred |
 
 Automatic magnitude limits, label priorities, and grid intervals will be
-specified after the first chart can be judged visually.
+specified after the first chart can be judged visually. The regional
+range for this table's wider bands is decided, from rendered evidence,
+in [the regional zoom decision](decisions/regional-zoom.md): fields to
+36 degrees on the gnomonic chart, with the user's magnitude limit
+preserved at every scale and a detail policy for deep-sky symbols
+beyond 18 degrees.
 
 ## Title block
 
