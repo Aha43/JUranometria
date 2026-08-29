@@ -27,4 +27,13 @@ fetch constellations.json
 fetch constellations.lines.json
 fetch constellations.bounds.json
 
+# The upstream licence text ships verbatim inside the generated pack.
+dest="$RAW_DIR/LICENSE"
+if [ -f "$dest" ]; then
+  echo "Already exists: LICENSE"
+else
+  echo "Downloading LICENSE..."
+  curl -fsSL "https://raw.githubusercontent.com/ofrohn/d3-celestial/$D3C_COMMIT/LICENSE" -o "$dest"
+fi
+
 echo "Done. Files in $RAW_DIR"

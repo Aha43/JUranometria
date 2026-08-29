@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The application now bundles reproducible constellation geography:
+  the 88 IAU constellation identities (Latin names, genitives,
+  abbreviations), traditional line-figure segments, and the official
+  IAU boundaries reconstructed along their constant-coordinate B1875
+  arcs to within one arcminute - generated offline from pinned,
+  checksum-verified sources (d3-celestial, BSD-3-Clause; provenance
+  and notices bundled) via make import-constellations. Nothing draws
+  yet; the rendering arrives with the constellation layer.
+
 ## [0.6.0] - 2026-08-29
 
 Sprint 6 — Reveal the wider sky. Reviewed by Codex before release; the

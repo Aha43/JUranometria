@@ -9,7 +9,7 @@ import juranometria.chart.SkyPosition;
  * accurate to well under an arcsecond - far inside the one-arcminute
  * boundary tolerance of docs/decisions/constellation-geography.md.
  */
-final class PrecessionB1875 {
+public final class PrecessionB1875 {
 
     /** Julian date of Besselian epoch 1875.0. */
     static final double JD_B1875 = 2405889.25855;
@@ -21,11 +21,11 @@ final class PrecessionB1875 {
     private PrecessionB1875() {
     }
 
-    static SkyPosition toB1875(SkyPosition j2000) {
+    public static SkyPosition toB1875(SkyPosition j2000) {
         return toSphere(multiply(TO_B1875, toVector(j2000)));
     }
 
-    static SkyPosition toJ2000(SkyPosition b1875) {
+    public static SkyPosition toJ2000(SkyPosition b1875) {
         return toSphere(multiply(TO_J2000, toVector(b1875)));
     }
 
