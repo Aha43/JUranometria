@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-29
+
+Sprint 4 — Search and recenter. Reviewed by Codex before release; the
+review trail lives in `docs/reviews/`.
+
 ### Added
 
 - Search and recenter: a compact toolbar search resolves bundled object
