@@ -111,3 +111,24 @@ bootstrap against poisoned partial files, then merge PR #91, close milestone
 follow-up maintenance sprint. It can also wait until after a product sprint;
 the new automatic check and shared pins already provide the intended safety
 net.
+
+## Follow-up — 2026-08-30
+
+Reviewed the fixes at `99b223f`. All three findings are resolved:
+
+- The application manifest now carries the version-derived runtime
+  `Class-Path`. A packaged launch resolves FlatLaf from the adjacent `lib/`
+  directory; the headless verification reached Swing window creation without
+  a missing-class failure, and the normal GUI launch was also exercised.
+- The repository is public and `main` branch protection requires the `test`
+  check, including for administrators. Force pushes and branch deletion remain
+  disabled.
+- Both bootstrap scripts now verify pinned SHA-256 hashes, replace corrupt or
+  partial files, download through temporary files, and refuse an incorrect
+  pin. The shared variable parser also accepts digits in checksum variable
+  names.
+
+Follow-up verification: required GitHub checks green, 206/206 tests pass, the
+M31 reference image is byte-identical, and the diff passes whitespace checks.
+
+**Final recommendation: approve and merge.**
