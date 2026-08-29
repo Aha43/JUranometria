@@ -37,6 +37,7 @@ public final class SceneAssembler {
     private final SkyPosition dataCentre;
     private final String title;
     private final double coverageRadiusDegrees;
+    private final boolean allSky;
 
     /**
      * @param dataCentre the fixed centre of the bundled data's coverage
@@ -57,7 +58,33 @@ public final class SceneAssembler {
         this.dataCentre = dataCentre;
         this.title = title;
         this.coverageRadiusDegrees = coverageRadiusDegrees;
+        this.allSky = false;
     }
+
+    private SceneAssembler(Catalogue catalogue, String title) {
+        this.catalogue = catalogue;
+        this.dataCentre = null;
+        this.title = title;
+        this.coverageRadiusDegrees = Double.NaN;
+        this.allSky = true;
+    }
+
+    /**
+     * An assembler over complete all-sky coverage: every centre fits at
+     * every supported field, there is no data centre to be offset from,
+     * and the page height is bounded only by projection sanity (chart
+     * corners stay within {@link #PROJECTION_CORNER_LIMIT_DEGREES} of the
+     * centre, far beyond any realistic window).
+     */
+    public static SceneAssembler allSky(Catalogue catalogue, String title) {
+        if (catalogue == null || title == null) {
+            throw new IllegalArgumentException("catalogue and title are required");
+        }
+        return new SceneAssembler(catalogue, title);
+    }
+
+    /** Gnomonic charts degrade far from the centre; cap the page there. */
+    static final double PROJECTION_CORNER_LIMIT_DEGREES = 60.0;
 
     /**
      * Queries the catalogue around the state's centre and builds the scene
@@ -66,8 +93,11 @@ public final class SceneAssembler {
      * coverage is an error, never a silently sparse chart.
      */
     public ChartScene assemble(ChartViewState state, int widthPx, int heightPx) {
-        double offset = state.centre().separationDegrees(dataCentre);
         double radius = queryRadiusDegrees(state.fieldWidthDegrees(), widthPx, heightPx);
+        if (allSky) {
+            return assembleScene(state, widthPx, heightPx, radius);
+        }
+        double offset = state.centre().separationDegrees(dataCentre);
         if (offset + radius > coverageRadiusDegrees) {
             throw new IllegalArgumentException(String.format(java.util.Locale.ROOT,
                     "page %dx%d at a %.1f-degree field offset %.2f degrees needs data"
@@ -75,9 +105,14 @@ public final class SceneAssembler {
                     widthPx, heightPx, state.fieldWidthDegrees(), offset,
                     offset + radius, coverageRadiusDegrees));
         }
+        return assembleScene(state, widthPx, heightPx, radius);
+    }
+
+    private ChartScene assembleScene(ChartViewState state, int widthPx, int heightPx,
+                                     double radius) {
         ChartViewport viewport = new ChartViewport(
                 state.centre(), state.fieldWidthDegrees(), widthPx, heightPx);
-        SkyRegion query = new SkyRegion(state.centre(), radius);
+        SkyRegion query = new SkyRegion(state.centre(), Math.min(radius, 180.0));
         return new ChartScene(viewport,
                 catalogue.starsIn(query),
                 catalogue.deepSkyObjectsIn(query),
@@ -101,6 +136,9 @@ public final class SceneAssembler {
      * scene assembly.
      */
     public boolean fits(SkyPosition centre, double fieldWidthDegrees) {
+        if (allSky) {
+            return true;
+        }
         return centre.separationDegrees(dataCentre)
                 + fieldWidthDegrees / 2.0
                 + OBJECT_EXTENT_MARGIN_DEGREES
@@ -133,6 +171,12 @@ public final class SceneAssembler {
      */
     public int maxPageHeightPx(SkyPosition centre, double fieldWidthDegrees, int widthPx) {
         double halfWidthPlane = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
+        if (allSky) {
+            double limitPlane = Math.tan(Math.toRadians(PROJECTION_CORNER_LIMIT_DEGREES));
+            double halfHeightPlane = Math.sqrt(
+                    limitPlane * limitPlane - halfWidthPlane * halfWidthPlane);
+            return (int) Math.floor(widthPx * halfHeightPlane / halfWidthPlane);
+        }
         double allowedCornerDegrees = coverageRadiusDegrees
                 - OBJECT_EXTENT_MARGIN_DEGREES
                 - centre.separationDegrees(dataCentre);

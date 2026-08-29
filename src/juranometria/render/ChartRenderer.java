@@ -82,6 +82,9 @@ public final class ChartRenderer {
 
         g.setClip(1, 1, width - 2, height - 2);
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            if (!hasSymbol(dso)) {
+                continue;
+            }
             projection.project(dso.position()).ifPresent(plane ->
                     drawGalaxy(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
         }
@@ -101,7 +104,7 @@ public final class ChartRenderer {
             });
         }
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (dso.labelPriority() > MAX_LABELED_PRIORITY) {
+            if (!hasSymbol(dso) || dso.labelPriority() > MAX_LABELED_PRIORITY) {
                 continue;
             }
             projection.project(dso.position()).ifPresent(plane ->
@@ -176,6 +179,16 @@ public final class ChartRenderer {
         float x = (float) (centre.x() + halfExtentX + 5.0);
         float y = (float) (centre.y() + g.getFontMetrics().getAscent() / 2.0 - 1.0);
         g.drawString(labelFor(dso), x, y);
+    }
+
+    /**
+     * The chart draws (and labels) only types that have a symbol; today
+     * that is the galaxy ellipse. Other catalogued types load, search,
+     * and recenter, and receive their docs/chart-conventions.md symbols
+     * in a later issue.
+     */
+    static boolean hasSymbol(DeepSkyObject dso) {
+        return dso.type() == juranometria.chart.DsoType.GALAXY;
     }
 
     /** The atlas labels Messier objects by their Messier name. */

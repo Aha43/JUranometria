@@ -21,7 +21,7 @@ public final class ChartImageMain {
 
     public static void main(String[] args) throws IOException {
         File target = new File(args.length > 0 ? args[0] : "build/m31-chart.png");
-        ChartScene scene = M31Chart.assembler()
+        ChartScene scene = Atlas.assembler()
                 .assemble(ChartViewState.DEFAULT, 900, 700);
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         ImageIO.write(renderer.renderToImage(scene), "png", target);

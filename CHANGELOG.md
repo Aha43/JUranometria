@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The local sky: the application now loads, queries, and searches the
+  bundled bright all-sky catalogue pack - the complete sky to stars of
+  V 8.0 with 13,371 deep-sky objects - so offline searches such as M42,
+  the Pleiades, or 47 Tuc recenter onto complete local charts anywhere,
+  including across the RA wrap and near the poles. Scene queries read
+  only the tiles a view needs, each verified against its manifest
+  checksum at first read, and a missing, corrupt, or incompatible pack
+  fails with a clear diagnostic instead of a sparse sky. Non-galaxy
+  deep-sky types are searchable and recentre the chart but await their
+  chart symbols. The Sprint 3 M31 regional resource retired; the M31
+  reference chart reproduces from the pack byte-identically.
+
 ## [0.4.0] - 2026-08-29
 
 Sprint 4 — Search and recenter. Reviewed by Codex before release; the

@@ -42,13 +42,13 @@ Extras for the look and feel, JSVG for SVG icon rendering, and the standalone
 JUnit console runner (test only). Downloaded JARs live in `lib/` and
 `lib/test/` and are not committed.
 
-The bundled regional catalogue under `src/resources/catalog/m31/` is a
-generated resource. To reproduce it from the pinned upstream inputs
-(never needed for normal building or running):
+The bundled all-sky catalogue under `src/resources/catalog/bright-sky/`
+is a generated resource. To reproduce it from the pinned upstream
+inputs (never needed for normal building or running):
 
 ```sh
 scripts/download-catalogue-sources.sh   # ~170 MB into gitignored imports/raw/
-make import-catalogue                   # verifies checksums, regenerates the resources
+make import-allsky                      # verifies checksums, regenerates the pack
 ```
 
 ## Using the atlas
@@ -59,22 +59,23 @@ make import-catalogue                   # verifies checksums, regenerates the re
   2°, and 1°, always centred on M31.
 - **Fewer stars / More stars** step the stellar limiting magnitude
   between V 4.0 and V 8.0 in whole magnitudes.
-- **Search** finds bundled objects and coordinates entirely offline:
-  names and identifiers forgivingly (`M31`, `Messier 31`, `NGC 224`,
-  `Andromeda Galaxy`, `TYC 2801-2090-1`), and coordinates in decimal
-  degrees (`10.68 41.27`) or sexagesimal (`0:42:44 +41:16:09`, RA in
-  hours). Selecting a result recentres the chart, keeping the current
-  field width when the bundled coverage allows, otherwise stepping to
-  the widest field that stays complete; a result beyond local coverage
-  leaves the chart unchanged and says so.
+- **Search** finds bundled objects and coordinates entirely offline,
+  across the whole sky: names and identifiers forgivingly (`M42`,
+  `Messier 31`, `NGC 224`, `Orion Nebula`, `Pleiades`,
+  `TYC 4628-237-1`), and coordinates in decimal degrees
+  (`83.82 -5.39`) or sexagesimal (`0:42:44 +41:16:09`, RA in hours).
+  Selecting a result recentres the chart anywhere under the bundled
+  all-sky coverage, keeping the current field width.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the
   active field width and magnitude limit.
 
-Controls disable at their bounds: the bundled fixture carries stars to
-V 8.0 within its region, and the atlas never claims deeper or wider
-coverage than it holds. A `--dark` argument runs the dark application
+Controls disable at their bounds: the bundled bright-sky pack carries
+the complete sky to stars of V 8.0 (45,630 Tycho-2 stars and 13,371
+OpenNGC objects in about 2.5 MiB), and the atlas never claims deeper
+coverage than it holds. Non-galaxy deep-sky types are searchable and
+recentre the chart but await their chart symbols. A `--dark` argument runs the dark application
 theme; the chart page itself stays white paper in both themes.
 
 ## Licensing
