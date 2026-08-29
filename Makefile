@@ -65,11 +65,18 @@ classes: check-libs
 	@if [ -d $(SRC_DIR)/resources ]; then cp -r $(SRC_DIR)/resources $(CLASSES_DIR)/; fi
 	cp VERSION $(CLASSES_DIR)/
 
+# FlatLaf loads a native library for platform window integration; on
+# JDK 24+ (JEP 472) that is a restricted call needing explicit
+# permission. The manifest attribute grants it for java -jar; the run
+# target passes the launcher flag for the -cp launch. See
+# docs/development.md, "Native access".
 jar: classes
 	mkdir -p $(APP_DIR)
+	printf 'Enable-Native-Access: ALL-UNNAMED\n' > $(BUILD_DIR)/manifest-extra.mf
 	jar \
 		--create \
 		--file $(APP_DIR)/$(MAIN_JAR) \
+		--manifest $(BUILD_DIR)/manifest-extra.mf \
 		--main-class $(MAIN_CLASS) \
 		-C $(CLASSES_DIR) .
 
@@ -80,6 +87,7 @@ app: jar
 
 run: app
 	java \
+		--enable-native-access=ALL-UNNAMED \
 		-cp "$(APP_DIR)/$(MAIN_JAR):$(APP_DIR)/lib/*" \
 		$(MAIN_CLASS)
 

@@ -119,3 +119,24 @@ An agent should not silently begin the next sprint issue. Finishing one issue
 is a review point for the human owner, especially while the atlas's visual
 language is being discovered.
 
+## Native access
+
+FlatLaf loads a small native library for platform window integration
+(macOS full-window content, window decorations). From JDK 24, JEP 472
+("Prepare to Restrict the Use of JNI") makes that a restricted call:
+without explicit permission the JVM prints a four-line warning, and
+under `--illegal-native-access=deny` FlatLaf logs SEVERE and its
+platform integration degrades. The permission is therefore granted
+deliberately in two places and must not be removed as noise:
+
+- the `run` target passes `--enable-native-access=ALL-UNNAMED`
+  (required for `-cp` launches, where the manifest attribute is
+  ignored);
+- the packaged jar carries `Enable-Native-Access: ALL-UNNAMED` in its
+  manifest, honoured by `java -jar` even under `deny`.
+
+JDK 21, the recorded minimum, accepts the flag and is unaffected.
+Measured on JDK 26.0.1 with FlatLaf 3.4.1 (issue #82): the flag
+silences the warning, and the manifest attribute keeps a plain
+`java -jar` launch silent even under the stricter default.
+
