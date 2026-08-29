@@ -59,6 +59,8 @@ class BrightSkyPackTest {
                 "a positioned object without any photometry ships with empty fields");
         assertTrue(tileContains("r00-d4/dsos.csv", "NGC 224,M 31|Andromeda Galaxy,G,"),
                 "M31 unchanged in its home tile");
+        assertTrue(tileContains("r05-d2/dsos.csv", "NGC 3110,NGC 3122|NGC 3518,G,"),
+                "comma-separated cross references become separate aliases");
         assertTrue(lines("tiles/r11-d4/stars.csv").size() > 100,
                 "the RA-wrap column is populated");
     }
@@ -81,12 +83,17 @@ class BrightSkyPackTest {
             assertEquals(entry.getValue(), PinnedInputs.sha256Hex(bytes),
                     tileFile + " must match its manifest checksum");
             checksummed++;
-            Set<String> ids = tileFile.endsWith("stars.csv") ? starIds : dsoIds;
+            boolean stars = tileFile.endsWith("stars.csv");
+            Set<String> ids = stars ? starIds : dsoIds;
+            int expectedFields = stars ? 4 : 11;
             for (String line : new String(bytes, StandardCharsets.UTF_8).split("\n")) {
                 if (line.isBlank() || line.startsWith("#")) {
                     continue;
                 }
-                assertTrue(ids.add(line.substring(0, line.indexOf(','))),
+                String[] fields = line.split(",", -1);
+                assertEquals(expectedFields, fields.length,
+                        "malformed row in " + tileFile + ": " + line);
+                assertTrue(ids.add(fields[0]),
                         "duplicate identifier in " + tileFile + ": " + line);
             }
         }

@@ -80,10 +80,15 @@ final class OpenNgcRecords {
         if (!messier.isEmpty()) {
             aliases.add("M " + Integer.parseInt(messier));
         }
+        // A cross-reference column may hold several comma-separated
+        // identifications (e.g. NGC "3122,3518"); each becomes its own
+        // alias, so no alias can ever contain a comma.
         for (String column : new String[] {"NGC", "IC"}) {
-            String crossRef = fields[header.get(column)].trim();
-            if (!crossRef.isEmpty()) {
-                aliases.add(normalizeName(column + crossRef));
+            for (String crossRef : fields[header.get(column)].split(",")) {
+                String trimmed = crossRef.trim();
+                if (!trimmed.isEmpty()) {
+                    aliases.add(normalizeName(column + trimmed));
+                }
             }
         }
         for (String common : fields[header.get("Common names")].split(",")) {

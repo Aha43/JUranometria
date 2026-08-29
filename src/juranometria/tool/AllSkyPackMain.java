@@ -51,6 +51,7 @@ public final class AllSkyPackMain {
 
         // The generator owns outDir completely: regenerate from clean so a
         // changed catalogue can never leave stale, unchecksummed files.
+        ensureSafeToClean(outDir);
         deleteRecursively(outDir);
         Files.createDirectories(outDir.resolve("tiles"));
         Map<String, String> checksums = new TreeMap<>();
@@ -250,6 +251,21 @@ public final class AllSkyPackMain {
         return csv.toString();
     }
 
+    /**
+     * The comma-separated row format cannot represent a comma inside a
+     * field; the generator fails rather than emitting a malformed row
+     * (Codex review, PR #45 follow-up).
+     */
+    private static void requireNoCommas(String[] row) {
+        for (String field : row) {
+            if (field.indexOf(',') >= 0) {
+                throw new IllegalStateException(
+                        "field contains a comma the row format cannot represent: "
+                                + field + " (row " + row[0] + ")");
+            }
+        }
+    }
+
     private static String dsosCsv(List<String[]> rows) {
         StringBuilder csv = new StringBuilder();
         csv.append("# Bright-sky pack DSO tile generated from OpenNGC.\n");
@@ -258,6 +274,7 @@ public final class AllSkyPackMain {
                 + "major_arcmin,minor_arcmin,pa_deg,vmag,bmag,label_priority\n");
         csv.append("# Empty fields mean the source records no value.\n");
         for (String[] row : rows) {
+            requireNoCommas(row);
             csv.append(String.join(",", row)).append('\n');
         }
         return csv.toString();
@@ -298,6 +315,31 @@ public final class AllSkyPackMain {
             checksums.put(checksumKey, PinnedInputs.sha256Hex(bytes));
         }
         return bytes.length;
+    }
+
+    /**
+     * Refuses to clean a directory the generator does not own: an existing
+     * non-empty output location must carry this pack's manifest as an
+     * ownership marker, so a mistyped argument can never delete arbitrary
+     * files (Codex review, PR #45 follow-up).
+     */
+    static void ensureSafeToClean(Path outDir) throws IOException {
+        if (!Files.exists(outDir)) {
+            return;
+        }
+        try (var entries = Files.list(outDir)) {
+            if (entries.findAny().isEmpty()) {
+                return;
+            }
+        }
+        Path marker = outDir.resolve("manifest.properties");
+        if (!Files.exists(marker)
+                || !Files.readString(marker, StandardCharsets.UTF_8)
+                        .contains("pack.name=" + PACK_NAME)) {
+            throw new IllegalStateException("refusing to clean " + outDir
+                    + ": it is not an existing " + PACK_NAME
+                    + " pack (no owning manifest found)");
+        }
     }
 
     private static void deleteRecursively(Path root) throws IOException {
