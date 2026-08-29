@@ -28,6 +28,7 @@ help:
 	@echo "  test         Compile and run unit tests"
 	@echo "  chart-image  Write the deterministic reference chart image"
 	@echo "  import-catalogue  Regenerate src/resources/catalog/m31 from pinned inputs"
+	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -67,6 +68,9 @@ chart-image: classes
 
 import-catalogue: classes
 	java -cp "$(CLASSES_DIR)" juranometria.tool.CatalogueImportMain
+
+import-allsky: classes
+	java -cp "$(CLASSES_DIR)" juranometria.tool.AllSkyPackMain
 
 test: classes
 	rm -rf $(TEST_CLASSES)

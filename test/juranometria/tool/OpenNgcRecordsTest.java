@@ -49,6 +49,20 @@ class OpenNgcRecordsTest {
     }
 
     @Test
+    void commaSeparatedCrossReferencesBecomeSeparateAliases() {
+        // OpenNGC packs multiple identifications into one column
+        // (e.g. NGC "3122,3518"); each must become its own alias so no
+        // alias can carry a comma into the row format.
+        Map<String, Integer> header = OpenNgcRecords.headerIndex(HEADER);
+        String line = M31_LINE.replace(";031;;;", ";031;3122,3518;0547, 2494;");
+        DsoRow row = OpenNgcRecords.fromLine(line, header);
+        assertTrue(row.aliases().containsAll(java.util.List.of(
+                "NGC 3122", "NGC 3518", "IC 547", "IC 2494")));
+        assertTrue(row.aliases().stream().noneMatch(alias -> alias.contains(",")),
+                "no alias may contain a comma");
+    }
+
+    @Test
     void southernDeclinationsKeepTheirSign() {
         Map<String, Integer> header = OpenNgcRecords.headerIndex(HEADER);
         String line = M31_LINE.replace("+41:16:08.6", "-05:20:10.0");

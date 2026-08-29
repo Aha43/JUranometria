@@ -92,15 +92,21 @@ src/resources/catalog/bright-sky/
   ...
 ```
 
-Rows use the existing CSV formats unchanged (stars: id, ra, dec,
-vmag; DSOs: id, aliases, type, ra, dec, major, minor, pa, vmag,
-label priority) — so the M31 chart data at V ≤ 8.0 is reproduced with
-identifiers, aliases, magnitude semantics, DSO dimensions, and
-provenance intact. The DSO `type` column now carries every usable
+Star rows use the existing CSV format unchanged (id, ra, dec, vmag).
+DSO rows — *revised after the PR #45 review* — preserve unknown
+astronomical values instead of inventing them: eleven columns (id,
+aliases, type, ra, dec, major, minor, pa, **vmag, bmag**, label
+priority) where **an empty field means the source records no value**.
+No nominal dimensions, no zeroed position angles, no B magnitudes
+stored under a V name — and every positioned OpenNGC object ships,
+including the 1,827 without any photometry, so a temporary chart-model
+restriction can never decide which objects exist in the local sky.
+How the loader maps unknowns into the chart model (and how unrendered
+types appear) is a #43 decision. The DSO `type` column carries every
 OpenNGC type (Cl+N, OCl, Neb, PN, …), not only `G`: search must find
 M42 (NGC 1976, type Cl+N, V 4.0, 90′×60′) even though the renderer
-only has a galaxy symbol today; how unrendered types appear on the
-chart is a #43 decision. No database, no service, no binary format —
+only has a galaxy symbol today. The measured DSO layer is therefore
+13,371 rows ≈ 0.7 MiB rather than the originally stated 11,544. No database, no service, no binary format —
 at these sizes (largest tile well under 200 KiB) the measurements
 demonstrate no need.
 
@@ -167,10 +173,11 @@ guard.
 
 ## Consequences
 
-- The 1,827 OpenNGC objects without any magnitude stay out of the
-  pack (the chart model requires a magnitude); the count is recorded
-  in generated provenance. A future search-only name listing could
-  recover them.
+- The 1,827 OpenNGC objects without any magnitude ship in the pack
+  with explicitly empty photometry (revised after the PR #45 review;
+  the original decision dropped them). How they participate in
+  rendering and magnitude culling is decided at the loader, not in
+  the data.
 - The Tycho-2 CC BY-NC 3.0 IGO terms now cover the all-sky star
   layer; the packaged application remains redistributable
   non-commercially only (`LICENSING.md` continues to apply, with
