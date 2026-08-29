@@ -92,6 +92,25 @@ class SceneAssemblerTest {
     }
 
     @Test
+    void theTargetIdentityReachesTheAssembledScene() {
+        // PR #59 follow-up: #56's rendering policy consumes the identity
+        // from ChartScene, so assembly must carry it - and only for
+        // catalogue targets, never for anonymous coordinate views.
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, 10.0, TEST_MARGIN);
+
+        ChartScene searched = assembler.assemble(ChartViewState.DEFAULT, 900, 700);
+        assertEquals("NGC 224", searched.targetIdentity(),
+                "the state's stable catalogue identity lands in the scene");
+        assertEquals("M31 · Andromeda Galaxy region", searched.title());
+
+        ChartScene anonymous = assembler.assemble(
+                ChartViewState.DEFAULT.recenteredAt(M31), 900, 700);
+        assertEquals(null, anonymous.targetIdentity(),
+                "a coordinate recenter reaches the scene with no identity");
+    }
+
+    @Test
     void anEdgeCentreNeedsANarrowerFieldAndFarBeyondNothingFits() {
         SceneAssembler assembler = new SceneAssembler(
                 new CountingCatalogue(), M31, 10.0, TEST_MARGIN);

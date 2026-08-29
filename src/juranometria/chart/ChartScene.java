@@ -30,6 +30,10 @@ public record ChartScene(ChartViewport viewport, List<Star> stars,
             throw new IllegalArgumentException(
                     "limiting magnitude must be finite: " + limitingMagnitude);
         }
+        if (targetIdentity != null && targetIdentity.isBlank()) {
+            throw new IllegalArgumentException(
+                    "target identity must be null (no target) or non-blank");
+        }
         stars = List.copyOf(stars);
         deepSkyObjects = List.copyOf(deepSkyObjects);
     }
