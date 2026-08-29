@@ -84,6 +84,28 @@ class GeographyRenderingTest {
     }
 
     @Test
+    void chartInkIsIdenticalUnderBothApplicationThemes() throws Exception {
+        // Sprint 7 finish: the chart owns its palette; geography included,
+        // a page renders byte-identically whichever theme the chrome uses.
+        // Look-and-feel is process-wide state: restore it afterwards so
+        // this structural guarantee never orders other tests (PR #70).
+        javax.swing.LookAndFeel previous =
+                javax.swing.UIManager.getLookAndFeel();
+        try {
+            com.formdev.flatlaf.FlatLightLaf.setup();
+            int[] light = pixels(RENDERER.renderToImage(scene(36.0, GEOGRAPHY)));
+            com.formdev.flatlaf.FlatDarkLaf.setup();
+            int[] dark = pixels(RENDERER.renderToImage(scene(36.0, GEOGRAPHY)));
+            assertArrayEquals(light, dark,
+                    "geography ink is the chart's own, independent of theme");
+        } finally {
+            if (previous != null) {
+                javax.swing.UIManager.setLookAndFeel(previous);
+            }
+        }
+    }
+
+    @Test
     void nameOrderIsDeterministicWhateverTheInsertionOrder() {
         // PR #69 review: iteration order reaches the renderer, so
         // overlapping name text must stack identically on every render.
