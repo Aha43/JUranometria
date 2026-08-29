@@ -106,6 +106,27 @@ class SceneAssemblerTest {
     }
 
     @Test
+    void exactHorizontalEqualityDoesNotCountAsFitting() {
+        // Codex review P2: at exactly 4.5 degrees offset with an 8-degree
+        // field, offset + half field + margin equals the 10-degree cone and
+        // the letterboxed page height is zero - fitting must demand a
+        // positive drawable page.
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, "Test chart", 10.0);
+        SkyPosition atEquality = new SkyPosition(10.684708, 45.768750);   // 4.5 out
+        SkyPosition justInside = new SkyPosition(10.684708, 45.668750);   // 4.4 out
+        SkyPosition justOutside = new SkyPosition(10.684708, 45.868750);  // 4.6 out
+
+        assertTrue(!assembler.fits(atEquality, 8.0),
+                "equality would allow only a zero-height page");
+        assertEquals(0, assembler.maxPageHeightPx(atEquality, 8.0, 900));
+        assertTrue(assembler.fits(justInside, 8.0));
+        assertTrue(assembler.maxPageHeightPx(justInside, 8.0, 900) > 0,
+                "everything that fits must be drawably tall");
+        assertTrue(!assembler.fits(justOutside, 8.0));
+    }
+
+    @Test
     void letterboxingTightensWithAnOffsetCentre() {
         SceneAssembler assembler = new SceneAssembler(
                 new CountingCatalogue(), M31, "Test chart", 10.0);

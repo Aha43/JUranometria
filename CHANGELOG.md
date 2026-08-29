@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Search and recenter: a compact toolbar search resolves bundled object
+  names, identifiers, and coordinates entirely offline and recentres the
+  atlas. The current field width is preserved when the bundled coverage
+  allows; otherwise the chart steps to the widest field that remains
+  complete, and a result beyond local coverage leaves the chart unchanged
+  with a concise message. Reset restores the M31 default and clears the
+  search. Windows taller than the honest page letterbox the atlas page on
+  the application surface.
+
 ## [0.3.0] - 2026-08-29
 
 Sprint 3 — Local catalogue foundation. Reviewed by Codex before release;

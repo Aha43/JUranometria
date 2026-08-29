@@ -98,6 +98,21 @@ class LocalSearchTest {
         assertEquals(List.of(), SEARCH.search("400.0 41.0"), "RA out of range");
         assertEquals(List.of(), SEARCH.search("10.0 95.0"), "Dec out of range");
         assertEquals(List.of(), SEARCH.search("10:0 41:0"), "malformed sexagesimal");
+        assertEquals(List.of(), SEARCH.search("0:60:00 +41:00:00"), "minutes of 60");
+        assertEquals(List.of(), SEARCH.search("0:30:60 +41:00:00"), "seconds of 60");
+        assertEquals(List.of(), SEARCH.search("1:-30:00 +41:00:00"), "negative minutes");
+        assertEquals(List.of(), SEARCH.search("0:30:-5 +41:00:00"), "negative seconds");
+        assertEquals(List.of(), SEARCH.search("0:30:00 +41:60:00"), "dec arcminutes of 60");
+    }
+
+    @Test
+    void sexagesimalBoundariesJustBelowSixtyAreValid() {
+        List<SearchResult> results = SEARCH.search("0:59:59.9 +41:59:59.9");
+        assertEquals(SearchResult.Kind.COORDINATES, results.get(0).kind());
+        assertEquals((59.0 / 60.0 + 59.9 / 3600.0) * 15.0,
+                results.get(0).position().raDegrees(), 1e-9);
+        assertEquals(41.0 + 59.0 / 60.0 + 59.9 / 3600.0,
+                results.get(0).position().decDegrees(), 1e-9);
     }
 
     @Test
