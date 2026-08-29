@@ -27,8 +27,11 @@ the M31 region from bundled sample data.
 - JDK 21 or later (Java 21 is the recorded minimum; sources compile with
   `--release 21`)
 - GNU Make
-- `curl` (present on macOS and most Linux systems); on Windows,
-  PowerShell (`pwsh`) runs the dependency download script instead
+- `curl` (present on macOS and most Linux systems)
+
+The supported contributor environments are macOS and Linux; on
+Windows, use WSL. (A native Windows workflow may return later as a
+complete, tested path if there is real demand.)
 
 ## Build and run
 
@@ -36,12 +39,12 @@ From the repository root:
 
 ```sh
 scripts/download-libs.sh         # download pinned dependencies into lib/
-                                 # (Windows: pwsh scripts/download-libs.ps1)
 make test                        # compile and run the test suite
 make run                         # build and launch the application
 ```
 
-Dependencies are pinned in `scripts/download-libs.ps1`: FlatLaf and FlatLaf
+Dependencies are pinned (versions and SHA-256) in
+`scripts/lib-versions.env`: FlatLaf and FlatLaf
 Extras for the look and feel, JSVG for SVG icon rendering, and the standalone
 JUnit console runner (test only). Downloaded JARs live in `lib/` and
 `lib/test/` and are not committed.

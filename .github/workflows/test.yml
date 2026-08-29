@@ -1,7 +1,7 @@
 # The required check behind docs/development.md's merge rule: every
 # pull request to main (and every push to main) compiles and runs the
 # full test suite on the recorded JDK 21 baseline, bootstrapping the
-# pinned dependencies with the POSIX script - no PowerShell needed.
+# pinned dependencies with the POSIX bootstrap script.
 name: test
 
 on:

@@ -1,8 +1,8 @@
 #!/bin/sh
 # Downloads the pinned runtime and test dependencies into lib/ and
-# lib/test/ - the POSIX twin of download-libs.ps1. Idempotent: files
-# that already exist are skipped. Versions come from lib-versions.env,
-# the single authority shared with the PowerShell script and Makefile.
+# lib/test/. Idempotent: files whose pinned SHA-256 already verifies
+# are skipped. Versions and checksums come from lib-versions.env, the
+# single authority shared with the Makefile.
 set -e
 
 SCRIPT_DIR="$(dirname "$0")"

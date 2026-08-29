@@ -50,7 +50,7 @@ check-libs:
 		if [ ! -f "$$jar" ]; then echo "Missing dependency: $$jar"; missing=1; fi; \
 	done; \
 	if [ "$$missing" != "0" ]; then \
-		echo "Run scripts/download-libs.sh (or scripts/download-libs.ps1 on Windows) to fetch the pinned dependencies."; \
+		echo "Run scripts/download-libs.sh to fetch the pinned dependencies."; \
 		exit 1; \
 	fi
 
