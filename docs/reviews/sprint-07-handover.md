@@ -88,8 +88,11 @@ of ~250 ms and report the following runs; the study tool's `qry`,
 `make regional-study`) are the reproducible per-page path, with `rnd`
 timing the real assembled page, geography included. The honest
 statement: **geography costs ~40 ms once at startup (checksummed
-load), ~2 ms per widest-page assembly, and single-digit milliseconds
-per render — the whole warm query-to-pixels path stays under ~10 ms.**
+load) and ~2 ms per widest-page assembly; warm renders are generally
+single-digit milliseconds with observed outliers to 20 ms — so warm
+query-to-pixels is generally under 10 ms, bounded by ~23 ms in the
+worst observed warm case. Comfortable for synchronous assembly; not a
+hard real-time bound, and not claimed as one.**
 
 ## Worth extra scrutiny
 
@@ -147,9 +150,10 @@ per render — the whole warm query-to-pixels path stays under ~10 ms.**
   regenerates byte-identically from `scripts/
   download-constellation-sources.sh`. LICENSING.md carries the layer.
 - **Do measurements support synchronous scene assembly?** Comfortably:
-  +2 ms assembly and single-digit-millisecond rendering at the widest
-  field, heap +2 MiB, jar +0.22 MiB. Nothing motivates asynchrony,
-  an index, or tiling for 13,929 segments.
+  +2 ms assembly and generally single-digit-millisecond rendering at
+  the widest field (observed warm outliers to 20 ms), heap +2 MiB,
+  jar +0.22 MiB. Nothing motivates asynchrony, an index, or tiling
+  for 13,929 segments.
 - **Is star naming/Bayer–Flamsteed the highest-value next sprint?**
   Yes. The wide pages now name the constellations but the bright
   stars anchoring the figures are anonymous — Betelgeuse, Rigel, and
