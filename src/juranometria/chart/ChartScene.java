@@ -9,7 +9,15 @@ import java.util.List;
  */
 public record ChartScene(ChartViewport viewport, List<Star> stars,
                          List<DeepSkyObject> deepSkyObjects,
-                         String title, double limitingMagnitude) {
+                         String title, double limitingMagnitude,
+                         String targetIdentity) {
+
+    /** A scene without a named target. */
+    public ChartScene(ChartViewport viewport, List<Star> stars,
+                      List<DeepSkyObject> deepSkyObjects,
+                      String title, double limitingMagnitude) {
+        this(viewport, stars, deepSkyObjects, title, limitingMagnitude, null);
+    }
 
     public ChartScene {
         if (viewport == null) {

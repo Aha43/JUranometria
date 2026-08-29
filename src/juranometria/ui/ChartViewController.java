@@ -87,8 +87,9 @@ public final class ChartViewController {
     }
 
     /** Recentres on a named target whose label titles the chart. */
-    public void recenter(juranometria.chart.SkyPosition centre, String targetLabel) {
-        update(state.recenteredAt(centre, targetLabel));
+    public void recenter(juranometria.chart.SkyPosition centre, String targetLabel,
+                         String targetIdentity) {
+        update(state.recenteredAt(centre, targetLabel, targetIdentity));
     }
 
     /** Anonymous recenter with a field change in one notification. */
@@ -98,8 +99,9 @@ public final class ChartViewController {
 
     /** Named-target recenter with a field change in one notification. */
     public void recenter(juranometria.chart.SkyPosition centre, double fieldWidthDegrees,
-                         String targetLabel) {
-        update(state.recenteredAt(centre, targetLabel).withFieldWidth(fieldWidthDegrees));
+                         String targetLabel, String targetIdentity) {
+        update(state.recenteredAt(centre, targetLabel, targetIdentity)
+                .withFieldWidth(fieldWidthDegrees));
     }
 
     public void reset() {

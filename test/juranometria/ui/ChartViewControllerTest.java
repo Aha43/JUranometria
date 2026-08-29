@@ -40,11 +40,18 @@ class ChartViewControllerTest {
         List<ChartViewState> seen = new ArrayList<>();
         controller.onChange(seen::add);
 
-        controller.zoomOut();                 // already at 8 degrees
+        while (controller.state().canZoomOut()) {
+            controller.zoomOut();             // walk to the 36-degree bound
+        }
+        int afterWalk = seen.size();
+        controller.zoomOut();                 // already at 36 degrees
         controller.increaseMagnitudeLimit();  // already at V 8.0
+        assertEquals(afterWalk, seen.size(),
+                "bounded no-op transitions notify nobody");
+        controller.reset();
         controller.reset();                   // already the default
-
-        assertEquals(1, seen.size(), "only the registration callback fires");
+        assertEquals(afterWalk + 1, seen.size(),
+                "a repeated reset is a no-op after the first");
     }
 
     @Test

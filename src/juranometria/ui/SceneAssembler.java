@@ -137,7 +137,7 @@ public final class SceneAssembler {
         return new ChartScene(viewport,
                 catalogue.starsIn(query),
                 catalogue.deepSkyObjectsIn(query),
-                titleFor(state), state.limitingMagnitude());
+                titleFor(state), state.limitingMagnitude(), state.targetIdentity());
     }
 
     /**

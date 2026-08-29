@@ -31,9 +31,16 @@ class ChartViewStateTest {
     }
 
     @Test
-    void zoomingOutStopsAtEightDegrees() {
-        assertFalse(ChartViewState.DEFAULT.canZoomOut());
-        assertSame(ChartViewState.DEFAULT, ChartViewState.DEFAULT.zoomOut());
+    void zoomingOutStopsAtThirtySixDegrees() {
+        ChartViewState state = ChartViewState.DEFAULT;
+        double[] expected = {12.0, 18.0, 24.0, 36.0};
+        for (double fieldWidth : expected) {
+            assertTrue(state.canZoomOut());
+            state = state.zoomOut();
+            assertEquals(fieldWidth, state.fieldWidthDegrees());
+        }
+        assertFalse(state.canZoomOut());
+        assertSame(state, state.zoomOut(), "zooming out at the bound is a clean no-op");
     }
 
     @Test
@@ -136,7 +143,7 @@ class ChartViewStateTest {
 
     @Test
     void fieldWidthStepsAreExposedWidestFirst() {
-        assertEquals(java.util.List.of(8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
+        assertEquals(java.util.List.of(36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
                 ChartViewState.fieldWidthSteps());
     }
 }

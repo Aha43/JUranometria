@@ -59,9 +59,17 @@ class AtlasToolbarTest {
         AtlasToolbar toolbar = toolbar(controller);
 
         assertEquals("Field 8° · Stars to V 8.0", readout(toolbar).getText());
-        assertFalse(button(toolbar, "Zoom out").isEnabled(),
-                "zoom out is disabled at the 8-degree bound");
+        assertTrue(button(toolbar, "Zoom out").isEnabled(),
+                "regional steps open above the 8-degree default");
         assertTrue(button(toolbar, "Zoom in").isEnabled());
+
+        while (controller.state().canZoomOut()) {
+            controller.zoomOut();
+        }
+        assertEquals("Field 36° · Stars to V 8.0", readout(toolbar).getText());
+        assertFalse(button(toolbar, "Zoom out").isEnabled(),
+                "zoom out is disabled at the 36-degree bound");
+        controller.reset();
 
         while (controller.state().canZoomIn()) {
             controller.zoomIn();
@@ -74,7 +82,7 @@ class AtlasToolbarTest {
         controller.reset();
         assertEquals("Field 8° · Stars to V 8.0", readout(toolbar).getText());
         assertTrue(button(toolbar, "Zoom in").isEnabled());
-        assertFalse(button(toolbar, "Zoom out").isEnabled());
+        assertTrue(button(toolbar, "Zoom out").isEnabled());
     }
 
     @Test
@@ -141,7 +149,8 @@ class AtlasToolbarTest {
 
         controller.reset();
         assertEquals("Field 8° · Stars to V 8.0", readout(toolbar).getText());
-        assertFalse(button(toolbar, "Zoom out").isEnabled());
+        assertTrue(button(toolbar, "Zoom out").isEnabled(),
+                "regional steps stay available after reset");
         assertFalse(button(toolbar, "More stars").isEnabled());
         assertTrue(button(toolbar, "Zoom in").isEnabled());
         assertTrue(button(toolbar, "Fewer stars").isEnabled());

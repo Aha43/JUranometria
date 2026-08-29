@@ -30,16 +30,20 @@ class SearchFieldTest {
     private static final class Fixture {
         final SceneAssemblerTest.CountingCatalogue catalogue =
                 new SceneAssemblerTest.CountingCatalogue();
-        final SceneAssembler assembler =
-                new SceneAssembler(catalogue, DATA_CENTRE, 10.0, 1.5);
-        final ChartViewController controller = new ChartViewController(this::valid);
+        final SceneAssembler assembler;
+        final ChartViewController controller;
         final SearchField field;
 
-        private boolean valid(ChartViewState state) {
-            return assembler.fits(state);
+        Fixture() throws Exception {
+            this(false);
         }
 
-        Fixture() throws Exception {
+        /** All-sky fixtures exercise the regional zoom journey. */
+        Fixture(boolean allSky) throws Exception {
+            assembler = allSky
+                    ? SceneAssembler.allSky(catalogue, 1.5)
+                    : new SceneAssembler(catalogue, DATA_CENTRE, 10.0, 1.5);
+            controller = new ChartViewController(assembler::fits);
             LocalSearch search = new LocalSearch(List.of(), List.of(
                     new DeepSkyObject("NGC 224", List.of("M 31", "Andromeda Galaxy"),
                             DsoType.GALAXY, M31_POSITION, 177.83, 69.66, 35.0, 3.44, 1),
@@ -199,6 +203,51 @@ class SearchFieldTest {
         assertEquals("M31 · Andromeda Galaxy region",
                 SceneAssembler.titleFor(ChartViewState.DEFAULT),
                 "reset restores the exact default title");
+    }
+
+    @Test
+    void aSearchedTargetSurvivesTheWholeRegionalZoomJourney() throws Exception {
+        // Issue #55 acceptance: search, zoom out through every new step,
+        // and the exact catalogue position, title, and identity remain.
+        Fixture fixture = new Fixture(true);
+        fixture.handle("m 31");
+        SkyPosition target = fixture.controller.state().centre();
+        String label = fixture.controller.state().targetLabel();
+        assertEquals("NGC 224", fixture.controller.state().targetIdentity(),
+                "the stable catalogue identity rides the state");
+
+        double[] journey = {12.0, 18.0, 24.0, 36.0};
+        for (double field : journey) {
+            SwingUtilities.invokeAndWait(() -> fixture.controller.zoomOut());
+            assertEquals(field, fixture.controller.state().fieldWidthDegrees());
+            assertEquals(target, fixture.controller.state().centre(),
+                    "the searched position stays the exact centre");
+            assertEquals(label, fixture.controller.state().targetLabel());
+            assertEquals("NGC 224", fixture.controller.state().targetIdentity());
+        }
+        SwingUtilities.invokeAndWait(() -> fixture.controller.zoomIn());
+        assertEquals(24.0, fixture.controller.state().fieldWidthDegrees(),
+                "every step is reversible");
+
+        SwingUtilities.invokeAndWait(() -> fixture.controller.reset());
+        assertEquals(ChartViewState.DEFAULT, fixture.controller.state(),
+                "reset from a searched wide view restores the exact default");
+    }
+
+    @Test
+    void coordinateViewsStayCoordinateTitledThroughZoom() throws Exception {
+        Fixture fixture = new Fixture(true);
+        fixture.handle("12.45 41.08");
+        SwingUtilities.invokeAndWait(() -> {
+            fixture.controller.zoomOut();
+            fixture.controller.zoomOut();
+        });
+        assertEquals(18.0, fixture.controller.state().fieldWidthDegrees());
+        assertEquals(null, fixture.controller.state().targetLabel());
+        assertEquals(null, fixture.controller.state().targetIdentity());
+        assertEquals("0h 49.8m, +41° 05′",
+                SceneAssembler.titleFor(fixture.controller.state()),
+                "the coordinate title follows through zoom");
     }
 
     @Test

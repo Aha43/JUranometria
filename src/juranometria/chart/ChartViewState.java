@@ -22,10 +22,13 @@ package juranometria.chart;
  * unavailable transition instead of offering a dead control.
  */
 public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
-                             double limitingMagnitude, String targetLabel) {
+                             double limitingMagnitude, String targetLabel,
+                             String targetIdentity) {
 
-    /** Zoom sequence, widest first; zooming in walks toward 1 degree. */
-    private static final double[] FIELD_WIDTH_STEPS = {8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
+    /** Zoom sequence, widest first; zooming in walks toward 1 degree.
+     *  The regional steps above 8 come from docs/decisions/regional-zoom.md. */
+    private static final double[] FIELD_WIDTH_STEPS =
+            {36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
 
     /** Magnitude-limit sequence, brightest first; fainter walks toward 8. */
     private static final double[] MAGNITUDE_LIMIT_STEPS = {4.0, 5.0, 6.0, 7.0, 8.0};
@@ -33,12 +36,12 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     /** The Sprint 1 chart: M31, 8-degree field, stars to V 8.0. */
     public static final ChartViewState DEFAULT = new ChartViewState(
             new SkyPosition(10.684708, 41.268750), 8.0, 8.0,
-            "M31 \u00b7 Andromeda Galaxy region");
+            "M31 \u00b7 Andromeda Galaxy region", "NGC 224");
 
     /** A view without a named target; its title is its coordinates. */
     public ChartViewState(SkyPosition centre, double fieldWidthDegrees,
                           double limitingMagnitude) {
-        this(centre, fieldWidthDegrees, limitingMagnitude, null);
+        this(centre, fieldWidthDegrees, limitingMagnitude, null, null);
     }
 
     public ChartViewState {
@@ -56,6 +59,10 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         if (targetLabel != null && targetLabel.isBlank()) {
             throw new IllegalArgumentException(
                     "target label must be null (no target) or non-blank");
+        }
+        if (targetIdentity != null && targetIdentity.isBlank()) {
+            throw new IllegalArgumentException(
+                    "target identity must be null (no target) or non-blank");
         }
     }
 
@@ -87,7 +94,7 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         return canZoomIn()
                 ? new ChartViewState(centre,
                         FIELD_WIDTH_STEPS[fieldWidthIndex() + 1], limitingMagnitude,
-                        targetLabel)
+                        targetLabel, targetIdentity)
                 : this;
     }
 
@@ -96,7 +103,7 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         return canZoomOut()
                 ? new ChartViewState(centre,
                         FIELD_WIDTH_STEPS[fieldWidthIndex() - 1], limitingMagnitude,
-                        targetLabel)
+                        targetLabel, targetIdentity)
                 : this;
     }
 
@@ -104,7 +111,7 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState decreaseMagnitudeLimit() {
         return canDecreaseMagnitudeLimit()
                 ? new ChartViewState(centre, fieldWidthDegrees,
-                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() - 1], targetLabel)
+                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() - 1], targetLabel, targetIdentity)
                 : this;
     }
 
@@ -112,7 +119,7 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState increaseMagnitudeLimit() {
         return canIncreaseMagnitudeLimit()
                 ? new ChartViewState(centre, fieldWidthDegrees,
-                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() + 1], targetLabel)
+                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() + 1], targetLabel, targetIdentity)
                 : this;
     }
 
@@ -121,22 +128,32 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
      * target; the chart titles itself by its coordinates.
      */
     public ChartViewState recenteredAt(SkyPosition newCentre) {
-        return recenteredAt(newCentre, null);
+        return recenteredAt(newCentre, null, null);
     }
 
     /** Recentres on a named target whose label titles the chart. */
     public ChartViewState recenteredAt(SkyPosition newCentre, String newTargetLabel) {
+        return recenteredAt(newCentre, newTargetLabel, null);
+    }
+
+    /**
+     * Recentres on a named target: the label titles the chart, and the
+     * stable catalogue identity keeps the target drawn and labelled at
+     * regional fields (docs/decisions/regional-zoom.md).
+     */
+    public ChartViewState recenteredAt(SkyPosition newCentre, String newTargetLabel,
+                                       String newTargetIdentity) {
         if (newCentre == null) {
             throw new IllegalArgumentException("centre must not be null");
         }
         return new ChartViewState(newCentre, fieldWidthDegrees, limitingMagnitude,
-                newTargetLabel);
+                newTargetLabel, newTargetIdentity);
     }
 
     /** This centre, target, and limit at another supported field width. */
     public ChartViewState withFieldWidth(double newFieldWidthDegrees) {
         return new ChartViewState(centre, newFieldWidthDegrees, limitingMagnitude,
-                targetLabel);
+                targetLabel, targetIdentity);
     }
 
     /** The complete default state: M31, 8-degree field, stars to V 8.0. */
