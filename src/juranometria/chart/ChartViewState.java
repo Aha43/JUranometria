@@ -64,6 +64,13 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
             throw new IllegalArgumentException(
                     "target identity must be null (no target) or non-blank");
         }
+        // A catalogue target is atomic: label and identity together, or
+        // neither (PR #59 review) - a chart may never name a target whose
+        // identity the rendering policy cannot preserve.
+        if ((targetLabel == null) != (targetIdentity == null)) {
+            throw new IllegalArgumentException(
+                    "target label and identity must both be present or both absent");
+        }
     }
 
     /** The supported field widths, widest first, for coverage decisions. */
@@ -129,11 +136,6 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
      */
     public ChartViewState recenteredAt(SkyPosition newCentre) {
         return recenteredAt(newCentre, null, null);
-    }
-
-    /** Recentres on a named target whose label titles the chart. */
-    public ChartViewState recenteredAt(SkyPosition newCentre, String newTargetLabel) {
-        return recenteredAt(newCentre, newTargetLabel, null);
     }
 
     /**
