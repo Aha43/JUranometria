@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Regional zoom: the field width now extends through 12, 18, 24, and 36
+  degrees, so zooming out from a searched object progressively reveals
+  its celestial neighbourhood - Orion whole around M42, Cassiopeia and
+  the Perseus Milky Way around M31 - while the searched target's exact
+  position, title, and identity remain the centre through every step.
+  Reset still restores exactly M31 at 8 degrees and V 8.0.
+
 ## [0.5.0] - 2026-08-29
 
 Sprint 5 — Build the local sky. Reviewed by Codex before release; the

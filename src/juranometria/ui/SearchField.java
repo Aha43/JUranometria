@@ -94,16 +94,18 @@ public final class SearchField extends JTextField {
     Outcome apply(SearchResult result) {
         // A named object titles the chart; coordinates leave it anonymous
         // so the title falls back to the position itself.
-        String targetLabel = result.kind() == SearchResult.Kind.COORDINATES
-                ? null : result.regionTitle();
+        boolean coordinates = result.kind() == SearchResult.Kind.COORDINATES;
+        String targetLabel = coordinates ? null : result.regionTitle();
+        String targetIdentity = coordinates ? null : result.identity();
         double currentField = controller.state().fieldWidthDegrees();
         if (assembler.fits(result.position(), currentField)) {
-            controller.recenter(result.position(), targetLabel);
+            controller.recenter(result.position(), targetLabel, targetIdentity);
             return Outcome.RECENTERED;
         }
         OptionalDouble widest = assembler.widestFittingFieldDegrees(result.position());
         if (widest.isPresent()) {
-            controller.recenter(result.position(), widest.getAsDouble(), targetLabel);
+            controller.recenter(result.position(), widest.getAsDouble(),
+                    targetLabel, targetIdentity);
             return Outcome.RECENTERED_NARROWER;
         }
         return Outcome.NO_FIT;

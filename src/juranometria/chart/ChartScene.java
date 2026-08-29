@@ -9,7 +9,15 @@ import java.util.List;
  */
 public record ChartScene(ChartViewport viewport, List<Star> stars,
                          List<DeepSkyObject> deepSkyObjects,
-                         String title, double limitingMagnitude) {
+                         String title, double limitingMagnitude,
+                         String targetIdentity) {
+
+    /** A scene without a named target. */
+    public ChartScene(ChartViewport viewport, List<Star> stars,
+                      List<DeepSkyObject> deepSkyObjects,
+                      String title, double limitingMagnitude) {
+        this(viewport, stars, deepSkyObjects, title, limitingMagnitude, null);
+    }
 
     public ChartScene {
         if (viewport == null) {
@@ -21,6 +29,10 @@ public record ChartScene(ChartViewport viewport, List<Star> stars,
         if (!Double.isFinite(limitingMagnitude)) {
             throw new IllegalArgumentException(
                     "limiting magnitude must be finite: " + limitingMagnitude);
+        }
+        if (targetIdentity != null && targetIdentity.isBlank()) {
+            throw new IllegalArgumentException(
+                    "target identity must be null (no target) or non-blank");
         }
         stars = List.copyOf(stars);
         deepSkyObjects = List.copyOf(deepSkyObjects);

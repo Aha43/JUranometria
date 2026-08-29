@@ -31,9 +31,16 @@ class ChartViewStateTest {
     }
 
     @Test
-    void zoomingOutStopsAtEightDegrees() {
-        assertFalse(ChartViewState.DEFAULT.canZoomOut());
-        assertSame(ChartViewState.DEFAULT, ChartViewState.DEFAULT.zoomOut());
+    void zoomingOutStopsAtThirtySixDegrees() {
+        ChartViewState state = ChartViewState.DEFAULT;
+        double[] expected = {12.0, 18.0, 24.0, 36.0};
+        for (double fieldWidth : expected) {
+            assertTrue(state.canZoomOut());
+            state = state.zoomOut();
+            assertEquals(fieldWidth, state.fieldWidthDegrees());
+        }
+        assertFalse(state.canZoomOut());
+        assertSame(state, state.zoomOut(), "zooming out at the bound is a clean no-op");
     }
 
     @Test
@@ -107,6 +114,20 @@ class ChartViewStateTest {
     }
 
     @Test
+    void aTargetIsAtomicLabelAndIdentityTogetherOrNeither() {
+        // PR #59 review: a chart may never name a target whose identity
+        // the rendering policy cannot preserve, and vice versa.
+        SkyPosition somewhere = new SkyPosition(12.0, 43.0);
+        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(
+                somewhere, 8.0, 8.0, "M 42 · Great Orion Nebula region", null));
+        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(
+                somewhere, 8.0, 8.0, null, "NGC 1976"));
+        assertEquals("NGC 1976", ChartViewState.DEFAULT
+                .recenteredAt(somewhere, "M 42 region", "NGC 1976").targetIdentity());
+        assertEquals(null, ChartViewState.DEFAULT.recenteredAt(somewhere).targetLabel());
+    }
+
+    @Test
     void theDefaultCentreIsM31() {
         assertEquals(new SkyPosition(10.684708, 41.268750), ChartViewState.DEFAULT.centre());
     }
@@ -136,7 +157,7 @@ class ChartViewStateTest {
 
     @Test
     void fieldWidthStepsAreExposedWidestFirst() {
-        assertEquals(java.util.List.of(8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
+        assertEquals(java.util.List.of(36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
                 ChartViewState.fieldWidthSteps());
     }
 }
