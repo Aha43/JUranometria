@@ -91,15 +91,42 @@ public final class ConstellationStudyMain {
         File outDir = new File("build/constellation-study");
         outDir.mkdirs();
 
+        List<String> ringIds = new ArrayList<>();
+        List<List<SkyPosition>> rings = loadBoundaryRings(
+                new File(rawDir, "constellations.bounds.json"), ringIds);
+        BoundaryReconstruction.Report boundaries =
+                BoundaryReconstruction.reconstructRings(rings, ringIds);
         ConstellationStudyMain study = new ConstellationStudyMain(
                 loadSegments(new File(rawDir, "constellations.lines.json")),
-                loadBoundaries(new File(rawDir, "constellations.bounds.json")),
+                boundaries.reconstructed(),
                 loadNames(new File(rawDir, "constellations.json")));
         System.out.printf(Locale.ROOT,
-                "loaded: %d figure segments, %d boundary corner segments,"
-                        + " %d names%n%n",
+                "loaded: %d figure segments, %d reconstructed boundary"
+                        + " pieces, %d names%n%n",
                 study.figureSegments.size(), study.boundarySegments.size(),
                 study.names.size());
+        System.out.println("Boundary reconstruction (B1875 constant-coordinate"
+                + " edges, IAU-1976 precession):");
+        System.out.printf(Locale.ROOT,
+                "  %d constant-RA edges, %d constant-Dec edges%n",
+                boundaries.constantRaEdges(), boundaries.constantDecEdges());
+        for (String chain : boundaries.exceptionalChains()) {
+            System.out.println("  exceptional: " + chain);
+        }
+        System.out.printf(Locale.ROOT,
+                "  straight J2000 corner chords (rejected by the decision)"
+                        + " deviate from the true edges by up to %.3f deg;"
+                        + " %d edges exceed 3 arcmin%n",
+                boundaries.worstChordDeviationDegrees(),
+                boundaries.chordsOverThreeArcmin());
+        System.out.printf(Locale.ROOT,
+                "  reconstructed polyline worst deviation: %.4f arcmin"
+                        + " (tolerance %.1f arcmin) -> %s%n%n",
+                boundaries.worstReconstructionDeviationDegrees() * 60.0,
+                BoundaryReconstruction.RECONSTRUCTION_TOLERANCE_DEGREES * 60.0,
+                boundaries.worstReconstructionDeviationDegrees()
+                        <= BoundaryReconstruction.RECONSTRUCTION_TOLERANCE_DEGREES
+                        ? "WITHIN TOLERANCE" : "TOLERANCE EXCEEDED");
 
         TiledCatalogue catalogue = TiledCatalogue.load();
         SceneAssembler assembler = SceneAssembler.allSky(
@@ -163,9 +190,9 @@ public final class ConstellationStudyMain {
      * still contribute exactly their visible portion. Returns how many
      * segments left any ink inside the frame.
      */
-    private static int drawSegments(Graphics2D g, List<Segment> segments,
-                                    GnomonicProjection projection,
-                                    ViewportMapping mapping) {
+    static int drawSegments(Graphics2D g, List<Segment> segments,
+                            GnomonicProjection projection,
+                            ViewportMapping mapping) {
         int visible = 0;
         for (Segment segment : segments) {
             boolean inked = false;
@@ -183,9 +210,14 @@ public final class ConstellationStudyMain {
                 }
                 PixelPoint pixel = mapping.toPixel(plane.get());
                 if (previous != null) {
-                    if (onPage(previous) || onPage(pixel)) {
-                        g.draw(new java.awt.geom.Line2D.Double(
-                                previous.x(), previous.y(), pixel.x(), pixel.y()));
+                    // A real line-versus-page test: a piece whose endpoints
+                    // both lie off-page can still cross it (PR #67 review).
+                    java.awt.geom.Line2D.Double piece =
+                            new java.awt.geom.Line2D.Double(
+                                    previous.x(), previous.y(),
+                                    pixel.x(), pixel.y());
+                    if (piece.intersects(0, 0, WIDTH, HEIGHT)) {
+                        g.draw(piece);
                         inked = true;
                     }
                 }
@@ -328,21 +360,24 @@ public final class ConstellationStudyMain {
         return segments;
     }
 
-    private static List<Segment> loadBoundaries(File file) throws Exception {
-        List<Segment> segments = new ArrayList<>();
+    static List<List<SkyPosition>> loadBoundaryRings(File file, List<String> ids)
+            throws Exception {
+        List<List<SkyPosition>> rings = new ArrayList<>();
         for (Object feature : features(file)) {
             Map<String, Object> f = MiniJson.object(feature);
             String id = (String) f.get("id");
             Map<String, Object> geometry = MiniJson.object(f.get("geometry"));
             for (Object ringObject : MiniJson.array(geometry.get("coordinates"))) {
                 List<Object> ring = MiniJson.array(ringObject);
-                for (int i = 1; i < ring.size(); i++) {
-                    segments.add(new Segment(id,
-                            point(ring.get(i - 1)), point(ring.get(i))));
+                List<SkyPosition> corners = new ArrayList<>(ring.size());
+                for (Object corner : ring) {
+                    corners.add(point(corner));
                 }
+                rings.add(corners);
+                ids.add(id);
             }
         }
-        return segments;
+        return rings;
     }
 
     private static List<Name> loadNames(File file) throws Exception {

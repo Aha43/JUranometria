@@ -65,15 +65,29 @@ grey lines; both live under the star ink.
   edge near the south pole — with 313 edges off by more than 3′ and
   96 by more than 15′. The polar study page shows chords visibly
   cutting the Ursa Minor/Cepheus staircase.
-- Therefore #64 interpolates at import: precess each corner J2000 →
-  B1875 (IAU-1976 angles; 1,562 of 1,570 pairs verify as constant-RA
-  or constant-Dec within 0.02°, confirming the reconstruction), walk
-  the constant coordinate in steps of at most 1°, precess samples
-  back to J2000, and store the sampled polyline. **Tolerance: the
-  stored polyline stays within 1′ of the true edge**; the import tool
-  proves it and the 8 non-aligned pairs (ring-closure artifacts of
-  the source's polygon encoding) must be resolved or rejected with a
-  diagnostic there, never silently bent.
+- Therefore the boundary is **reconstructed, never chord-drawn**:
+  precess each corner J2000 → B1875 (IAU-1976 angles; 1,562 of 1,570
+  pairs verify as constant-RA or constant-Dec within 0.02°), walk the
+  constant coordinate in steps of at most 1°, precess samples back to
+  J2000, and store the sampled polyline. The reconstruction is
+  implemented and measured **in the reproducible study tool**
+  (`BoundaryReconstruction`, run by `make constellation-study`): 778
+  constant-RA and 786 constant-Dec edges yield 13,186 polyline pieces
+  whose worst deviation from the true edges is **0.065′ — inside the
+  1′ tolerance** the decision requires, proven again by unit test on
+  the worst polar case. The study pages render these reconstructed
+  boundaries, not the rejected chords.
+- **The 8 non-aligned corner pairs are classified**: they are the four
+  shared edges of the Ursa Minor/Cepheus border (each appearing in
+  both rings) where the source itself replaced the true constant-Dec
+  +88.0000° B1875 arc (RA 345° → 120°) with great-circle chord
+  samples — the chain's endpoints sit exactly on +88° while its
+  interior vertices dip to +87.55°. The reconstruction detects such
+  chains, requires their endpoints to share declination, and restores
+  the true arc (visible on the polar study page as the smooth circle
+  around Polaris). Any shape fitting neither constant coordinate is a
+  hard error with a diagnostic — boundaries are never silently bent —
+  and both behaviours are unit-tested.
 
 ## Model and query contract
 
@@ -90,11 +104,12 @@ grey lines; both live under the star ink.
   study proved the geometry cases: 8 figure segments legitimately
   cross RA 0 (e.g. Andromeda 9.22° → 354.53°) and draw seamlessly on
   the RA-wrap pages; the highest boundary corner (Cepheus, dec
-  +88.66°) draws through the pole-adjacent projection; segments with
-  both endpoints off-page still contribute exactly their visible
-  portion (drawn subdivided at 0.5° steps along the sky, so partial
-  crossings never vanish and never draw as false straight chords
-  across the gnomonic page).
+  +88.70°) draws through the pole-adjacent projection; and segments
+  are drawn subdivided at 0.5° steps along the sky with a **real
+  line-versus-page intersection test per piece**, so a segment whose
+  endpoints both lie off-page still contributes exactly its visible
+  crossing (regression-tested with a corner-clipping segment whose
+  endpoints and subdivision samples all project off-page).
 
 ## Scale policy (from the rendered comparisons)
 
@@ -102,7 +117,7 @@ grey lines; both live under the star ink.
 |---|---|---|
 | Line figures | **12° and wider** | 34 segments at M42/36° teach Orion whole; 6 at 12° already orient; at 8° the released pages stay untouched |
 | Names | **12° and wider** | 1–6 names per page, always on visible figure ink |
-| Boundaries | **18° and wider** | dotted boundaries earn their ink where neighbouring constellations enter (16–88 edges); below 18° they mostly repeat the title's message |
+| Boundaries | **18° and wider** | dotted reconstructed boundaries earn their ink where neighbouring constellations enter (32–832 pieces on the 18° pages); below 18° they mostly repeat the title's message |
 
 - **The released 1–8° pages keep exactly their shipped ink** — the
   M31 8° reference remains byte-identical. The close fields are for
@@ -175,11 +190,13 @@ this policy.
 
 ## Consequences
 
-- #64 implements acquisition, precession-interpolation with the 1′
-  tolerance proof, the bundled resource with manifest/notices, and
-  the bounded query; #65 implements exactly the rendering and scale
-  policy above and nothing more; the study tool
-  (`make constellation-study`) stays as the reproducibility path.
+- #64 productionizes the study's proven reconstruction
+  (`PrecessionB1875` + `BoundaryReconstruction`) into the import
+  pipeline with the same 1′ tolerance proof, and builds the bundled
+  resource with manifest/notices and the bounded query; #65
+  implements exactly the rendering and scale policy above and nothing
+  more; the study tool (`make constellation-study`) stays as the
+  reproducibility path for every number and page in this decision.
 - LICENSING.md gains the BSD-3-Clause d3-celestial layer beside the
   existing Tycho-2 (CC BY-NC 3.0 IGO) and OpenNGC (CC-BY-SA-4.0)
   entries; the packaged application's licence position is unchanged
