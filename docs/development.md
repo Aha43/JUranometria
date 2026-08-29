@@ -63,7 +63,9 @@ hold the measured design gates.
    (`.github/workflows/test.yml`): it bootstraps the pinned
    dependencies with `scripts/download-libs.sh` and runs `make test`
    on JDK 21 for every pull request to `main` - the same command a
-   contributor runs locally.
+   contributor runs locally. Branch protection on `main` requires the
+   check (administrators included), so a red or absent `test` status
+   technically blocks the merge, not just culturally.
 
 Prefer a small number of meaningful commits over preserving every experiment.
 Commit messages state the result and may include `Closes #NN` when the commit

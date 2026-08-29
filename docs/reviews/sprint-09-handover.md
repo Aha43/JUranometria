@@ -26,7 +26,11 @@ second, fresh Mac actually exposed.
   Actions workflow runs `scripts/download-libs.sh` + `make test` on
   JDK 21 for every pull request to `main` and every push to `main`,
   with the jars cached by the hash of the version file.
-  `docs/development.md` names the check beside its merge rule.
+  `docs/development.md` names the check beside its merge rule — and
+  after the review (which found the private-plan gap) the owner made
+  the repository public and branch protection now **requires** the
+  `test` check on `main`, administrators included: the rule is
+  technical, not cultural.
 - **Native access is deliberate, not a warning**: the `run` target
   passes `--enable-native-access=ALL-UNNAMED` and the packaged jar
   carries `Enable-Native-Access: ALL-UNNAMED` in its manifest
@@ -62,6 +66,18 @@ git status              -> clean
 The PowerShell path was executed against the same shared version file
 into a separate directory: **all four jars byte-identical** to the
 shell script's set.
+
+After the review, the bootstrap gained **pinned SHA-256 verification**
+(the hashes live beside the versions in `lib-versions.env`): both
+scripts verify existing files (a corrupt or zero-byte jar is reported
+and re-downloaded), download to a temporary name, verify, and only
+then move into place - exercised with deliberately corrupted and
+truncated jars on both the shell and PowerShell paths, and with a
+deliberately wrong pin (rejected with an actionable message, exit 1,
+temporary file removed). The packaged jar also gained its manifest
+`Class-Path`, and `java -jar build/app/JUranometria.jar` was launched
+and observed running - the native-access attribute is now attached to
+a launch mode that works.
 
 ## CI verification
 

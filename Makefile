@@ -72,7 +72,7 @@ classes: check-libs
 # docs/development.md, "Native access".
 jar: classes
 	mkdir -p $(APP_DIR)
-	printf 'Enable-Native-Access: ALL-UNNAMED\n' > $(BUILD_DIR)/manifest-extra.mf
+	printf 'Enable-Native-Access: ALL-UNNAMED\nClass-Path: lib/flatlaf-$(FLATLAF_VERSION).jar \n lib/flatlaf-extras-$(FLATLAF_VERSION).jar \n lib/jsvg-$(JSVG_VERSION).jar\n' > $(BUILD_DIR)/manifest-extra.mf
 	jar \
 		--create \
 		--file $(APP_DIR)/$(MAIN_JAR) \

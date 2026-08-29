@@ -11,20 +11,26 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - A POSIX dependency bootstrap: `scripts/download-libs.sh` fetches the
   pinned dependencies on macOS and Linux without PowerShell, sharing
-  one authoritative version file (`scripts/lib-versions.env`) with the
-  PowerShell script and the Makefile. A build without the dependencies
-  now stops with a one-line instruction naming the script instead of
-  compiler errors.
+  one authoritative version-and-checksum file
+  (`scripts/lib-versions.env`) with the PowerShell script and the
+  Makefile. Both scripts verify every existing and downloaded jar
+  against its pinned SHA-256 (repairing partial or corrupt files,
+  downloading atomically), and a build without the dependencies stops
+  with a one-line instruction naming the script instead of compiler
+  errors.
 - A required GitHub Actions check: every pull request runs the full
   test suite on JDK 21 with the same command a contributor runs
-  locally.
+  locally, and branch protection on `main` requires it before any
+  merge.
 
 ### Fixed
 
 - The application grants FlatLaf explicit native access (launcher flag
   on `make run`, manifest attribute in the packaged jar), so JDK 24+
   launches carry no restricted-native-access warning and keep native
-  window integration under the stricter future default.
+  window integration under the stricter future default. The packaged
+  jar's manifest also carries the runtime `Class-Path`, so
+  `java -jar build/app/JUranometria.jar` now actually launches.
 - The README's status, document list, and the development guide's
   sprint-record convention describe the repository as it exists after
   eight releases; a dead `.gitignore` section is gone.
