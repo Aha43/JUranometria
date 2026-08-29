@@ -77,8 +77,9 @@ public final class RegionalStudyMain {
             System.out.println();
         }
         System.out.println("Timing columns, one warm run per row: qry = catalogue"
-                + " query, scn = scene construction, rnd = render; e2e = the real"
-                + " SceneAssembler.assemble end to end (query + construction).");
+                + " query, scn = scene construction (study scene); e2e = the real"
+                + " SceneAssembler.assemble end to end (query + construction);"
+                + " rnd = render of the real assembled page, geography included.");
         System.out.println("Distortion columns: radial linear scale (sec^2 theta)"
                 + " at the horizontal edge and the corner, centre = 1.000.");
         System.out.println("Charts written to " + outDir);
@@ -104,8 +105,6 @@ public final class RegionalStudyMain {
         ChartScene scene = new ChartScene(viewport, stars, dsos,
                 target.name() + " study " + field, LIMIT_V);
         long t2 = System.nanoTime();
-        var image = renderer.renderToImage(scene);
-        long t3 = System.nanoTime();
 
         // The real production path, end to end: every study field is a
         // released zoom step since #55, so the view state accepts it and
@@ -117,6 +116,11 @@ public final class RegionalStudyMain {
         long e0 = System.nanoTime();
         ChartScene assembled = assembler.assemble(state, WIDTH, HEIGHT);
         long e1 = System.nanoTime();
+        // rnd times the real assembled page - constellation geography
+        // included since #65 (PR #69 review) - the image that is written.
+        long r0 = System.nanoTime();
+        var image = renderer.renderToImage(assembled);
+        long r1 = System.nanoTime();
 
         // Visibly drawn = projected inside the frame (and V-limited for stars).
         var projection = new juranometria.project.GnomonicProjection(target.centre());
@@ -180,12 +184,12 @@ public final class RegionalStudyMain {
                         + " | %4.1f %5.2f %4.0f %5.1f | %5.3f %5.3f%n",
                 target.name(), field, stars.size(), drawnStars, dsos.size(), drawnDsos,
                 labels, policyDrawn, policyLabels, tiles, collisions,
-                (t1 - t0) / 1e6, (t2 - t1) / 1e6, (t3 - t2) / 1e6,
+                (t1 - t0) / 1e6, (t2 - t1) / 1e6, (r1 - r0) / 1e6,
                 (e1 - e0) / 1e6, edgeScale, cornerScale);
 
         // The committed page is the product truth: the assembled scene
         // through the real seam, constellation geography included (#65).
-        ImageIO.write(renderer.renderToImage(assembled), "png", new File(outDir,
+        ImageIO.write(image, "png", new File(outDir,
                 String.format(Locale.ROOT, "%s-%02.0fdeg.png", target.name(), field)));
     }
 

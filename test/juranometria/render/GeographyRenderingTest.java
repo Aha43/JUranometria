@@ -84,6 +84,27 @@ class GeographyRenderingTest {
     }
 
     @Test
+    void nameOrderIsDeterministicWhateverTheInsertionOrder() {
+        // PR #69 review: iteration order reaches the renderer, so
+        // overlapping name text must stack identically on every render.
+        java.util.Map<String, String> forwards = new java.util.LinkedHashMap<>();
+        forwards.put("Ori", "Orion");
+        forwards.put("Eri", "Eridanus");
+        forwards.put("Lep", "Lepus");
+        java.util.Map<String, String> backwards = new java.util.LinkedHashMap<>();
+        backwards.put("Lep", "Lepus");
+        backwards.put("Eri", "Eridanus");
+        backwards.put("Ori", "Orion");
+        SceneGeography a = new SceneGeography(List.of(), List.of(), forwards);
+        SceneGeography b = new SceneGeography(List.of(), List.of(), backwards);
+        assertEquals(List.copyOf(a.latinNames().keySet()),
+                List.copyOf(b.latinNames().keySet()),
+                "names iterate in one sorted order regardless of insertion");
+        assertEquals(List.of("Eri", "Lep", "Ori"),
+                List.copyOf(a.latinNames().keySet()));
+    }
+
+    @Test
     void boundariesDrawDottedFromEighteenDegrees() {
         BufferedImage with = RENDERER.renderToImage(scene(18.0, GEOGRAPHY));
         BufferedImage without = RENDERER.renderToImage(scene(18.0,

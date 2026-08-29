@@ -22,6 +22,10 @@ public record SceneGeography(List<GeoSegment> figureSegments,
     public SceneGeography {
         figureSegments = List.copyOf(figureSegments);
         boundarySegments = List.copyOf(boundarySegments);
-        latinNames = Map.copyOf(latinNames);
+        // Sorted by constellation id, not Map.copyOf: iteration order
+        // reaches the renderer, and overlapping name text must stack
+        // identically on every render (PR #69 review).
+        latinNames = java.util.Collections.unmodifiableSortedMap(
+                new java.util.TreeMap<>(latinNames));
     }
 }
