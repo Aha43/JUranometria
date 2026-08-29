@@ -2,7 +2,8 @@
 
 Decided 2026-08-29 for Sprint 6, "Reveal the wider sky" (issue #54),
 from rendered evidence and measurements over the real catalogue,
-assembler mathematics, projection, and renderer (`make regional-study`;
+assembler mathematics, projection, and renderer, with symbol sizes
+measured at the renderer's exact viewport scale (`make regional-study`;
 representative charts committed under `docs/studies/regional-zoom/`).
 Candidate fields 12°, 18°, 24°, and 36° were studied over M31, M42,
 M45, M13, and the Polaris field at the released 900×700 aspect and
@@ -17,7 +18,7 @@ V 8.0.
 | M31 | 24° | 571 | 143 | **4** | 2 | 8 | ~11 ms |
 | M31 | 36° | 1,252 | 303 | **6** | 3 | 9 | ~10 ms |
 | M42 | 36° | 1,510 | 241 | **10** | 2 | 8 | ~9 ms |
-| M13 | 36° | 880 | 256 | **2** | 2 | 9 | ~5 ms |
+| M13 | 36° | 880 | 256 | **2** | 2 (1 at exact scale) | 9 | ~5 ms |
 | Polaris | 36° | 1,047 | 145 | **1** | 0 | 12 | ~4 ms |
 
 Gnomonic radial linear scale (centre = 1.000): horizontal edge /
@@ -72,12 +73,24 @@ collide (the M31/M32/M110 stack). Therefore, **at fields wider than
 18°**:
 
 - a DSO symbol draws only at its **true projected size**, when that
-  reaches the practical minimum — no clamp inflation;
+  reaches the practical minimum — no clamp inflation (true size is
+  computed with the renderer's exact viewport scale; the study's
+  original linear approximation sat 3.3% off at 36° and was corrected
+  after the PR #58 review);
 - **priority-1 (Messier) objects are always drawn**, clamped when
-  necessary, so a searched target never vanishes;
-- **labels attach only to objects drawn at true size** — which
-  dissolves the measured label collisions naturally (M32 and M110
-  fall silent at 36° while M31, M33, and M42 keep their names).
+  necessary;
+- **the searched target is always drawn and always labelled**,
+  clamped when necessary, regardless of its type, priority, or size —
+  the chart may never title itself by an object it does not show. The
+  target's **stable catalogue identity** (not merely its display
+  label) therefore travels in the view state to the scene and the
+  rendering policy; #55/#56 thread it beside the existing target
+  label (PR #58 review finding 1);
+- **labels attach only to objects drawn at true size, plus the
+  target** — which dissolves the measured label collisions naturally
+  (M32 and M110 fall silent at 36° while M31, M33, and M42 keep
+  their names; at exact scale even M92's 14′ symbol drops its label
+  at 36° — precisely why the target exemption is required).
 
 Measured effect: M31/36° goes from 303 drawn symbols to 6; M13/36°
 from 256 to 2; the pages match the chart conventions' own
