@@ -59,7 +59,8 @@ public final class RegionalStudyMain {
         TiledCatalogue catalogue = TiledCatalogue.load();
         double margin = catalogue.manifest().maxObjectSemiExtentDegrees();
         juranometria.ui.SceneAssembler assembler =
-                juranometria.ui.SceneAssembler.allSky(catalogue, margin);
+                juranometria.ui.SceneAssembler.allSky(catalogue, margin,
+                        juranometria.geo.ConstellationGeography.load());
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
 
         System.out.printf(Locale.ROOT,
@@ -114,7 +115,7 @@ public final class RegionalStudyMain {
         ChartViewState state = new ChartViewState(
                 target.centre(), field, LIMIT_V, null, null);
         long e0 = System.nanoTime();
-        assembler.assemble(state, WIDTH, HEIGHT);
+        ChartScene assembled = assembler.assemble(state, WIDTH, HEIGHT);
         long e1 = System.nanoTime();
 
         // Visibly drawn = projected inside the frame (and V-limited for stars).
@@ -182,7 +183,9 @@ public final class RegionalStudyMain {
                 (t1 - t0) / 1e6, (t2 - t1) / 1e6, (t3 - t2) / 1e6,
                 (e1 - e0) / 1e6, edgeScale, cornerScale);
 
-        ImageIO.write(image, "png", new File(outDir,
+        // The committed page is the product truth: the assembled scene
+        // through the real seam, constellation geography included (#65).
+        ImageIO.write(renderer.renderToImage(assembled), "png", new File(outDir,
                 String.format(Locale.ROOT, "%s-%02.0fdeg.png", target.name(), field)));
     }
 

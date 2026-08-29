@@ -4,6 +4,7 @@ import java.util.OptionalDouble;
 
 import juranometria.catalog.Catalogue;
 import juranometria.chart.ChartScene;
+import juranometria.chart.SceneGeography;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
@@ -39,6 +40,8 @@ public final class SceneAssembler {
     private final SkyPosition dataCentre;
     private final double coverageRadiusDegrees;
     private final boolean allSky;
+    /** Bundled constellation geography; null keeps every page bare. */
+    private final juranometria.geo.ConstellationGeography geography;
 
     /**
      * @param dataCentre the fixed centre of the bundled data's coverage
@@ -48,6 +51,14 @@ public final class SceneAssembler {
      */
     public SceneAssembler(Catalogue catalogue, SkyPosition dataCentre,
                           double coverageRadiusDegrees, double objectExtentMarginDegrees) {
+        this(catalogue, dataCentre, coverageRadiusDegrees,
+                objectExtentMarginDegrees, null);
+    }
+
+    public SceneAssembler(Catalogue catalogue, SkyPosition dataCentre,
+                          double coverageRadiusDegrees,
+                          double objectExtentMarginDegrees,
+                          juranometria.geo.ConstellationGeography geography) {
         if (catalogue == null || dataCentre == null) {
             throw new IllegalArgumentException("catalogue and centre are required");
         }
@@ -61,14 +72,17 @@ public final class SceneAssembler {
         this.coverageRadiusDegrees = coverageRadiusDegrees;
         this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = false;
+        this.geography = geography;
     }
 
-    private SceneAssembler(Catalogue catalogue, double objectExtentMarginDegrees) {
+    private SceneAssembler(Catalogue catalogue, double objectExtentMarginDegrees,
+                           juranometria.geo.ConstellationGeography geography) {
         this.catalogue = catalogue;
         this.dataCentre = null;
         this.coverageRadiusDegrees = Double.NaN;
         this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = true;
+        this.geography = geography;
     }
 
     /**
@@ -83,11 +97,17 @@ public final class SceneAssembler {
      */
     public static SceneAssembler allSky(Catalogue catalogue,
                                         double objectExtentMarginDegrees) {
+        return allSky(catalogue, objectExtentMarginDegrees, null);
+    }
+
+    public static SceneAssembler allSky(Catalogue catalogue,
+                                        double objectExtentMarginDegrees,
+                                        juranometria.geo.ConstellationGeography geography) {
         if (catalogue == null) {
             throw new IllegalArgumentException("catalogue is required");
         }
         requireValidMargin(objectExtentMarginDegrees);
-        return new SceneAssembler(catalogue, objectExtentMarginDegrees);
+        return new SceneAssembler(catalogue, objectExtentMarginDegrees, geography);
     }
 
     private static void requireValidMargin(double objectExtentMarginDegrees) {
@@ -137,7 +157,40 @@ public final class SceneAssembler {
         return new ChartScene(viewport,
                 catalogue.starsIn(query),
                 catalogue.deepSkyObjectsIn(query),
-                titleFor(state), state.limitingMagnitude(), state.targetIdentity());
+                titleFor(state), state.limitingMagnitude(), state.targetIdentity(),
+                geographyFor(state, query));
+    }
+
+    /**
+     * Queries the geography layers the scale policy admits at this field
+     * - and only those, so narrow pages perform no geography work at all.
+     */
+    private SceneGeography geographyFor(ChartViewState state, SkyRegion query) {
+        if (geography == null) {
+            return SceneGeography.EMPTY;
+        }
+        var policy = new juranometria.render.GeographyDetailPolicy(
+                state.fieldWidthDegrees());
+        java.util.List<juranometria.geo.GeoSegment> figures =
+                policy.figuresDrawn() ? geography.figureSegmentsIn(query)
+                        : java.util.List.of();
+        java.util.List<juranometria.geo.GeoSegment> boundaries =
+                policy.boundariesDrawn() ? geography.boundarySegmentsIn(query)
+                        : java.util.List.of();
+        java.util.Map<String, String> names = new java.util.LinkedHashMap<>();
+        if (policy.namesDrawn()) {
+            java.util.Set<String> present = new java.util.LinkedHashSet<>();
+            for (juranometria.geo.GeoSegment segment : figures) {
+                present.add(segment.constellationId());
+            }
+            for (juranometria.geo.Constellation constellation
+                    : geography.constellations()) {
+                if (present.contains(constellation.id())) {
+                    names.put(constellation.id(), constellation.latinName());
+                }
+            }
+        }
+        return new SceneGeography(figures, boundaries, names);
     }
 
     /**

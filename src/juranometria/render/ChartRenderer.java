@@ -14,6 +14,8 @@ import java.util.Locale;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.DeepSkyObject;
+import juranometria.chart.SkyPosition;
+import juranometria.geo.GeoSegment;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
 import juranometria.project.GnomonicProjection;
@@ -39,6 +41,17 @@ public final class ChartRenderer {
     /** Nebulae are faint; their boxes recede so the page stays restrained. */
     private static final Color NEBULA_OUTLINE = new Color(150, 150, 150);
     private static final Color TEXT_INK = new Color(34, 34, 34);
+    /** Geography sits under everything: quiet greys, dotted boundaries. */
+    private static final Color FIGURE_INK = new Color(120, 120, 120);
+    private static final Color BOUNDARY_INK = new Color(190, 190, 190);
+    private static final Color CONSTELLATION_NAME_INK = new Color(120, 120, 120);
+    private static final java.awt.Stroke BOUNDARY_STROKE = new BasicStroke(
+            1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
+            new float[] {1.0f, 3.0f}, 0.0f);
+    private static final Font CONSTELLATION_NAME_FONT =
+            new Font(Font.SANS_SERIF, Font.PLAIN, 12);
+    /** Subdivision step along geography segments, degrees on the sky. */
+    private static final double GEOGRAPHY_STEP_DEGREES = 0.5;
 
     /** The symbol families of docs/chart-conventions.md. */
     public enum Symbol { ELLIPSE, DOTTED_CIRCLE, CROSSED_CIRCLE, BOX, PLANETARY, NONE }
@@ -83,6 +96,7 @@ public final class ChartRenderer {
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
 
         g.setClip(1, 1, width - 2, height - 2);
+        drawGeography(g, scene, projection, mapping);
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
             if (!policy.drawn(dso)) {
                 continue;
@@ -119,6 +133,139 @@ public final class ChartRenderer {
         g.setColor(FRAME);
         g.setStroke(new BasicStroke(1.0f));
         g.draw(new Rectangle2D.Double(0.5, 0.5, width - 1.0, height - 1.0));
+    }
+
+    /**
+     * Draws constellation geography - boundaries, then figures, then
+     * names - under every other layer, guarded by the scale policy so
+     * even a hand-built scene cannot put geography on a page the
+     * decision keeps clean. Segments are subdivided along the sky and
+     * each piece is drawn only if it truly intersects the page, so
+     * RA-wrap and pole geometry come out curved and complete, with no
+     * straight jumps across the page.
+     */
+    private static void drawGeography(Graphics2D g, ChartScene scene,
+                                      GnomonicProjection projection,
+                                      ViewportMapping mapping) {
+        GeographyDetailPolicy policy = new GeographyDetailPolicy(
+                scene.viewport().fieldWidthDegrees());
+        if (policy.boundariesDrawn()) {
+            g.setColor(BOUNDARY_INK);
+            g.setStroke(BOUNDARY_STROKE);
+            for (GeoSegment segment : scene.geography().boundarySegments()) {
+                drawGeographySegment(g, segment, scene, projection, mapping, null);
+            }
+        }
+        if (policy.figuresDrawn()) {
+            g.setColor(FIGURE_INK);
+            g.setStroke(OUTLINE_STROKE);
+            java.util.Map<String, double[]> visibleInk =
+                    new java.util.LinkedHashMap<>();
+            for (GeoSegment segment : scene.geography().figureSegments()) {
+                drawGeographySegment(g, segment, scene, projection, mapping,
+                        visibleInk);
+            }
+            if (policy.namesDrawn()) {
+                drawConstellationNames(g, scene, visibleInk);
+            }
+        }
+    }
+
+    private static void drawGeographySegment(Graphics2D g, GeoSegment segment,
+                                             ChartScene scene,
+                                             GnomonicProjection projection,
+                                             ViewportMapping mapping,
+                                             java.util.Map<String, double[]> visibleInk) {
+        int width = scene.viewport().widthPx();
+        int height = scene.viewport().heightPx();
+        int steps = Math.max(1, (int) Math.ceil(
+                separationDegrees(segment.from(), segment.to())
+                        / GEOGRAPHY_STEP_DEGREES));
+        PixelPoint previous = null;
+        for (int i = 0; i <= steps; i++) {
+            var plane = projection.project(
+                    slerp(segment.from(), segment.to(), (double) i / steps));
+            if (plane.isEmpty()) {
+                previous = null;
+                continue;
+            }
+            PixelPoint pixel = mapping.toPixel(plane.get());
+            if (previous != null) {
+                java.awt.geom.Line2D.Double piece = new java.awt.geom.Line2D.Double(
+                        previous.x(), previous.y(), pixel.x(), pixel.y());
+                if (piece.intersects(0, 0, width, height)) {
+                    g.draw(piece);
+                    if (visibleInk != null) {
+                        double[] sum = visibleInk.computeIfAbsent(
+                                segment.constellationId(), key -> new double[3]);
+                        sum[0] += (previous.x() + pixel.x()) / 2.0;
+                        sum[1] += (previous.y() + pixel.y()) / 2.0;
+                        sum[2] += 1.0;
+                    }
+                }
+            }
+            previous = pixel;
+        }
+    }
+
+    /**
+     * The decision's naming policy: a constellation is named when its
+     * figure leaves ink on the page, at the centroid of the visible
+     * sampled ink - deterministic, always on the visible part of its
+     * constellation. Names may clip at page edges (honest position over
+     * pretty placement); the title block draws later and always wins.
+     */
+    private static void drawConstellationNames(Graphics2D g, ChartScene scene,
+                                               java.util.Map<String, double[]> visibleInk) {
+        g.setFont(CONSTELLATION_NAME_FONT);
+        g.setColor(CONSTELLATION_NAME_INK);
+        for (java.util.Map.Entry<String, String> name
+                : scene.geography().latinNames().entrySet()) {
+            double[] sum = visibleInk.get(name.getKey());
+            if (sum == null) {
+                continue;
+            }
+            String text = name.getValue().toUpperCase(Locale.ROOT);
+            int textWidth = g.getFontMetrics().stringWidth(text);
+            g.drawString(text, (float) (sum[0] / sum[2] - textWidth / 2.0),
+                    (float) (sum[1] / sum[2]));
+        }
+    }
+
+    private static SkyPosition slerp(SkyPosition from, SkyPosition to, double t) {
+        double[] a = unitVector(from);
+        double[] b = unitVector(to);
+        double omega = Math.acos(Math.clamp(
+                a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1.0, 1.0));
+        double sa;
+        double sb;
+        if (omega < 1e-9) {
+            sa = 1.0 - t;
+            sb = t;
+        } else {
+            sa = Math.sin((1.0 - t) * omega) / Math.sin(omega);
+            sb = Math.sin(t * omega) / Math.sin(omega);
+        }
+        double x = sa * a[0] + sb * b[0];
+        double y = sa * a[1] + sb * b[1];
+        double z = sa * a[2] + sb * b[2];
+        double ra = Math.toDegrees(Math.atan2(y, x));
+        return new SkyPosition((ra + 360.0) % 360.0,
+                Math.toDegrees(Math.asin(Math.clamp(z, -1.0, 1.0))));
+    }
+
+    private static double separationDegrees(SkyPosition from, SkyPosition to) {
+        double[] a = unitVector(from);
+        double[] b = unitVector(to);
+        return Math.toDegrees(Math.acos(Math.clamp(
+                a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1.0, 1.0)));
+    }
+
+    private static double[] unitVector(SkyPosition position) {
+        double ra = Math.toRadians(position.raDegrees());
+        double dec = Math.toRadians(position.decDegrees());
+        return new double[] {Math.cos(dec) * Math.cos(ra),
+                Math.cos(dec) * Math.sin(ra), Math.sin(dec)};
     }
 
     /** Renders the scene into a fresh raster image, for export and tests. */

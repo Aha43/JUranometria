@@ -110,6 +110,54 @@ class AtlasTest {
     }
 
     @Test
+    void theM42JourneyGainsOrionExactlyAtThePolicyThresholds() {
+        // Sprint 7 acceptance: search M42, zoom out - Orion's figure and
+        // name establish the neighbourhood while M42 stays centred and
+        // titled; each layer appears exactly at its decided threshold.
+        var m42 = Atlas.search().search("m 42").get(0);
+        var state = juranometria.chart.ChartViewState.DEFAULT.recenteredAt(
+                m42.position(), m42.regionTitle(), m42.identity());
+
+        var at8 = Atlas.assembler().assemble(state, 900, 700);
+        assertEquals(0, at8.geography().figureSegments().size(),
+                "the released 8-degree page carries no geography");
+        assertEquals(0, at8.geography().boundarySegments().size());
+
+        state = state.zoomOut(); // 12 degrees
+        var at12 = Atlas.assembler().assemble(state, 900, 700);
+        assertTrue(!at12.geography().figureSegments().isEmpty(),
+                "figures arrive exactly at 12 degrees");
+        assertTrue(at12.geography().latinNames().containsValue("Orion"),
+                "Orion is named on its visible figure");
+        assertEquals(0, at12.geography().boundarySegments().size(),
+                "boundaries wait for 18 degrees");
+
+        state = state.zoomOut(); // 18 degrees
+        var at18 = Atlas.assembler().assemble(state, 900, 700);
+        assertTrue(!at18.geography().boundarySegments().isEmpty(),
+                "boundaries arrive exactly at 18 degrees");
+
+        while (state.fieldWidthDegrees() < 36.0) {
+            state = state.zoomOut();
+        }
+        var at36 = Atlas.assembler().assemble(state, 900, 700);
+        assertEquals("M 42 · Great Orion Nebula region", at36.title(),
+                "M 42 still titles its page at the widest field");
+        assertEquals(m42.position(), at36.viewport().centre());
+        assertTrue(at36.geography().figureSegments().stream().anyMatch(
+                        segment -> segment.constellationId().equals("Ori")),
+                "Orion's figure is on the widest page");
+        assertTrue(at36.geography().latinNames().size() >= 4,
+                "the neighbourhood is named around Orion");
+        // Every name belongs to a constellation with figure ink present.
+        var present = at36.geography().figureSegments().stream()
+                .map(juranometria.geo.GeoSegment::constellationId)
+                .collect(java.util.stream.Collectors.toSet());
+        assertTrue(present.containsAll(at36.geography().latinNames().keySet()),
+                "names attach only to constellations whose figures are present");
+    }
+
+    @Test
     void resetStillMeansM31() {
         assertEquals(new SkyPosition(10.684708, 41.268750),
                 ChartViewState.DEFAULT.centre());
