@@ -30,8 +30,14 @@ public final class SearchField extends JTextField {
         EMPTY, NO_MATCH, RECENTERED, RECENTERED_NARROWER, NO_FIT, CHOICES
     }
 
-    private static final String NO_MATCH_MESSAGE = "No local match";
-    private static final String NO_FIT_MESSAGE = "Beyond local catalogue coverage";
+    /**
+     * A famous name such as M42 finds nothing because only the M31 region
+     * is bundled; the message must carry that reason, not just "no match".
+     */
+    private static final String NO_MATCH_MESSAGE =
+            "Not in the bundled M31-region data";
+    private static final String NO_FIT_MESSAGE =
+            "Found, but beyond the bundled M31-region coverage";
 
     private final LocalSearch search;
     private final SceneAssembler assembler;

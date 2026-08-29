@@ -98,7 +98,14 @@ through the entire sprint.
   consider a small name cross-reference (e.g. IAU named stars plus
   Bayer/Flamsteed from a redistributable source). Constellation names
   and boundaries are the other absence the product vision already
-  anticipates.
+  anticipates. Owner testing surfaced the same boundary from another
+  angle: searching "M42" finds nothing because only the M31 region is
+  bundled, and the original "No local match" message did not say why —
+  the messages now name the bundled region. A future all-sky name
+  index (names without chartable data) could distinguish "unknown"
+  from "known but outside coverage" properly; today the catalogue
+  cannot tell them apart. Search also runs on Enter only — deliberate
+  quietness, but worth judging whether the field should hint at it.
 
 ## Process expectations
 
