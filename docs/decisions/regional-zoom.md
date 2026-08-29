@@ -79,13 +79,17 @@ collide (the M31/M32/M110 stack). Therefore, **at fields wider than
   after the PR #58 review);
 - **priority-1 (Messier) objects are always drawn**, clamped when
   necessary;
-- **the searched target is always drawn and always labelled**,
-  clamped when necessary, regardless of its type, priority, or size —
-  the chart may never title itself by an object it does not show. The
-  target's **stable catalogue identity** (not merely its display
-  label) therefore travels in the view state to the scene and the
-  rendering policy; #55/#56 thread it beside the existing target
-  label (PR #58 review finding 1);
+- **a searched target whose type has an established chart symbol is
+  always drawn and always labelled**, clamped when necessary,
+  regardless of its priority or size — the chart may never title
+  itself by a *drawable* object it does not show. Types that
+  deliberately have no symbol (stellar records, associations, novae,
+  `OTHER`) still recenter and title honestly, exactly as at the
+  released fields; the guarantee does not force symbols into
+  existence (PR #58 follow-up). The target's **stable catalogue
+  identity** (not merely its display label) travels in the view
+  state to the scene and the rendering policy; #55/#56 thread it
+  beside the existing target label (PR #58 review finding 1);
 - **labels attach only to objects drawn at true size, plus the
   target** — which dissolves the measured label collisions naturally
   (M32 and M110 fall silent at 36° while M31, M33, and M42 keep
