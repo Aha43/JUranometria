@@ -20,6 +20,9 @@ class SceneAssemblerTest {
 
     static final SkyPosition M31 = new SkyPosition(10.684708, 41.268750);
 
+    /** The historical regional margin, keeping these fixtures' geometry. */
+    static final double TEST_MARGIN = 1.5;
+
     /** Records the bounded queries the assembler issues. */
     static final class CountingCatalogue implements Catalogue {
         int starQueries;
@@ -42,16 +45,18 @@ class SceneAssemblerTest {
     @Test
     void queryRadiusReachesTheCornersPlusTheObjectMargin() {
         // 8-degree field at 900x700: the corners sit 5.06 degrees out.
-        double radius = SceneAssembler.queryRadiusDegrees(8.0, 900, 700);
-        assertEquals(5.06 + SceneAssembler.OBJECT_EXTENT_MARGIN_DEGREES, radius, 0.01);
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, "Test chart", 10.0, TEST_MARGIN);
+        assertEquals(5.06 + TEST_MARGIN, assembler.queryRadiusDegrees(8.0, 900, 700), 0.01);
     }
 
     @Test
     void tallWindowsAreNotSilentlyClipped() {
         // A 500x1000 window at an 8-degree field is nearly 16 degrees tall;
         // its corners sit 8.89 degrees from the centre.
-        double radius = SceneAssembler.queryRadiusDegrees(8.0, 500, 1000);
-        assertEquals(8.89 + SceneAssembler.OBJECT_EXTENT_MARGIN_DEGREES, radius, 0.01);
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, "Test chart", 10.0, TEST_MARGIN);
+        assertEquals(8.89 + TEST_MARGIN, assembler.queryRadiusDegrees(8.0, 500, 1000), 0.01);
     }
 
     @Test
@@ -61,7 +66,7 @@ class SceneAssemblerTest {
         // assembler refuses it; the component letterboxes to the maximum
         // honest page height instead.
         SceneAssembler assembler = new SceneAssembler(
-                new CountingCatalogue(), M31, "Test chart", 10.0);
+                new CountingCatalogue(), M31, "Test chart", 10.0, TEST_MARGIN);
         IllegalArgumentException refused = assertThrows(IllegalArgumentException.class,
                 () -> assembler.assemble(ChartViewState.DEFAULT, 400, 1000));
         assertTrue(refused.getMessage().contains("coverage ends at 10.0"));
@@ -75,7 +80,7 @@ class SceneAssemblerTest {
     @Test
     void aSafeOffsetCentreAssemblesAroundItself() {
         CountingCatalogue catalogue = new CountingCatalogue();
-        SceneAssembler assembler = new SceneAssembler(catalogue, M31, "Test chart", 10.0);
+        SceneAssembler assembler = new SceneAssembler(catalogue, M31, "Test chart", 10.0, TEST_MARGIN);
         SkyPosition offset = new SkyPosition(10.684708, 43.268750); // 2 degrees north
 
         assertTrue(assembler.fits(offset, 8.0), "2 + 4 + 1.5 stays inside 10");
@@ -89,7 +94,7 @@ class SceneAssemblerTest {
     @Test
     void anEdgeCentreNeedsANarrowerFieldAndFarBeyondNothingFits() {
         SceneAssembler assembler = new SceneAssembler(
-                new CountingCatalogue(), M31, "Test chart", 10.0);
+                new CountingCatalogue(), M31, "Test chart", 10.0, TEST_MARGIN);
 
         SkyPosition edge = new SkyPosition(10.684708, 46.268750); // 5 degrees out
         assertTrue(!assembler.fits(edge, 8.0), "5 + 4 + 1.5 exceeds 10");
@@ -112,7 +117,7 @@ class SceneAssemblerTest {
         // the letterboxed page height is zero - fitting must demand a
         // positive drawable page.
         SceneAssembler assembler = new SceneAssembler(
-                new CountingCatalogue(), M31, "Test chart", 10.0);
+                new CountingCatalogue(), M31, "Test chart", 10.0, TEST_MARGIN);
         SkyPosition atEquality = new SkyPosition(10.684708, 45.768750);   // 4.5 out
         SkyPosition justInside = new SkyPosition(10.684708, 45.668750);   // 4.4 out
         SkyPosition justOutside = new SkyPosition(10.684708, 45.868750);  // 4.6 out
@@ -129,7 +134,7 @@ class SceneAssemblerTest {
     @Test
     void letterboxingTightensWithAnOffsetCentre() {
         SceneAssembler assembler = new SceneAssembler(
-                new CountingCatalogue(), M31, "Test chart", 10.0);
+                new CountingCatalogue(), M31, "Test chart", 10.0, TEST_MARGIN);
         SkyPosition offset = new SkyPosition(10.684708, 43.268750);
         int atDataCentre = assembler.maxPageHeightPx(M31, 8.0, 900);
         int atOffset = assembler.maxPageHeightPx(offset, 8.0, 900);
@@ -147,7 +152,7 @@ class SceneAssemblerTest {
                 new SkyPosition(10.684708, 41.268750 + 9.0), 6.0);
         catalogue.stars = List.of(cornerStar, outsideStar);
 
-        SceneAssembler assembler = new SceneAssembler(catalogue, M31, "Test chart", 10.0);
+        SceneAssembler assembler = new SceneAssembler(catalogue, M31, "Test chart", 10.0, TEST_MARGIN);
         ChartViewState state = ChartViewState.DEFAULT.decreaseMagnitudeLimit();
         ChartScene scene = assembler.assemble(state, 900, 700);
 

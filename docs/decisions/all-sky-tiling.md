@@ -131,7 +131,12 @@ silently wrong sky.
 ### Query contract
 
 1. A cone query (the scene assembler's region, already padded by the
-   1.5° object-extent margin) selects a tile when the centre lies
+   object-extent margin the pack manifest declares —
+   `objects.max.semi.extent.degrees`, 5.39° for the bright-sky pack,
+   set by the Large Magellanic Cloud; revised after the Sprint 5
+   review, which found the original fixed 1.5° margin could omit the
+   LMC, the Hyades, and other large objects) selects a tile when the
+   centre lies
    inside it, or when any one-degree boundary sample of the tile lies
    within the radius plus the 0.5° `SELECTION_PADDING_DEGREES`.
 2. Selection completeness has a one-line proof: boundary samples sit

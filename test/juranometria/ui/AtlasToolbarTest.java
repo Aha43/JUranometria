@@ -19,7 +19,7 @@ class AtlasToolbarTest {
                 new juranometria.search.LocalSearch(java.util.List.of(), java.util.List.of()),
                 new SceneAssembler(new SceneAssemblerTest.CountingCatalogue(),
                         new juranometria.chart.SkyPosition(10.684708, 41.268750),
-                        "Test chart", 10.0),
+                        "Test chart", 10.0, 1.5),
                 controller));
     }
 

@@ -27,11 +27,13 @@ public final class SceneAssembler {
 
     /**
      * Added to the corner distance so an object whose centre lies outside
-     * the frame but whose symbol reaches in is still queried. M31 itself
-     * is the largest catalogued object at a 88.9 arcminute semi-major
-     * axis, comfortably under this margin.
+     * the frame but whose symbol reaches in is still queried. The value
+     * is the installed pack's declared maximum object semi-extent from
+     * its manifest (5.39 degrees for the bright-sky pack, the Large
+     * Magellanic Cloud) - never a constant sized for one region (Sprint 5
+     * Codex review).
      */
-    static final double OBJECT_EXTENT_MARGIN_DEGREES = 1.5;
+    private final double objectExtentMarginDegrees;
 
     private final Catalogue catalogue;
     private final SkyPosition dataCentre;
@@ -46,11 +48,12 @@ public final class SceneAssembler {
      *     the data centre
      */
     public SceneAssembler(Catalogue catalogue, SkyPosition dataCentre, String title,
-                          double coverageRadiusDegrees) {
+                          double coverageRadiusDegrees, double objectExtentMarginDegrees) {
         if (catalogue == null || dataCentre == null || title == null) {
             throw new IllegalArgumentException("catalogue, centre, and title are required");
         }
-        if (!(coverageRadiusDegrees > OBJECT_EXTENT_MARGIN_DEGREES)) {
+        requireValidMargin(objectExtentMarginDegrees);
+        if (!(coverageRadiusDegrees > objectExtentMarginDegrees)) {
             throw new IllegalArgumentException(
                     "coverage must exceed the object margin: " + coverageRadiusDegrees);
         }
@@ -58,14 +61,17 @@ public final class SceneAssembler {
         this.dataCentre = dataCentre;
         this.title = title;
         this.coverageRadiusDegrees = coverageRadiusDegrees;
+        this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = false;
     }
 
-    private SceneAssembler(Catalogue catalogue, String title) {
+    private SceneAssembler(Catalogue catalogue, String title,
+                           double objectExtentMarginDegrees) {
         this.catalogue = catalogue;
         this.dataCentre = null;
         this.title = title;
         this.coverageRadiusDegrees = Double.NaN;
+        this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = true;
     }
 
@@ -75,12 +81,31 @@ public final class SceneAssembler {
      * and the page height is bounded only by projection sanity (chart
      * corners stay within {@link #PROJECTION_CORNER_LIMIT_DEGREES} of the
      * centre, far beyond any realistic window).
+     *
+     * @param objectExtentMarginDegrees the pack's declared maximum object
+     *     semi-extent, from its manifest
      */
-    public static SceneAssembler allSky(Catalogue catalogue, String title) {
+    public static SceneAssembler allSky(Catalogue catalogue, String title,
+                                        double objectExtentMarginDegrees) {
         if (catalogue == null || title == null) {
             throw new IllegalArgumentException("catalogue and title are required");
         }
-        return new SceneAssembler(catalogue, title);
+        requireValidMargin(objectExtentMarginDegrees);
+        return new SceneAssembler(catalogue, title, objectExtentMarginDegrees);
+    }
+
+    private static void requireValidMargin(double objectExtentMarginDegrees) {
+        if (!(objectExtentMarginDegrees > 0.0)
+                || !Double.isFinite(objectExtentMarginDegrees)) {
+            throw new IllegalArgumentException(
+                    "object extent margin must be positive and finite: "
+                            + objectExtentMarginDegrees);
+        }
+    }
+
+    /** The margin this assembler queries with; for tests and diagnostics. */
+    public double objectExtentMarginDegrees() {
+        return objectExtentMarginDegrees;
     }
 
     /** Gnomonic charts degrade far from the centre; cap the page there. */
@@ -141,7 +166,7 @@ public final class SceneAssembler {
         }
         return centre.separationDegrees(dataCentre)
                 + fieldWidthDegrees / 2.0
-                + OBJECT_EXTENT_MARGIN_DEGREES
+                + objectExtentMarginDegrees
                 + MINIMUM_PAGE_ALLOWANCE_DEGREES <= coverageRadiusDegrees;
     }
 
@@ -178,7 +203,7 @@ public final class SceneAssembler {
             return (int) Math.floor(widthPx * halfHeightPlane / halfWidthPlane);
         }
         double allowedCornerDegrees = coverageRadiusDegrees
-                - OBJECT_EXTENT_MARGIN_DEGREES
+                - objectExtentMarginDegrees
                 - centre.separationDegrees(dataCentre);
         if (allowedCornerDegrees <= 0) {
             return 0;
@@ -198,11 +223,11 @@ public final class SceneAssembler {
      * extent margin — so no eligible object is silently clipped even in
      * tall or wide windows.
      */
-    static double queryRadiusDegrees(double fieldWidthDegrees, int widthPx, int heightPx) {
+    double queryRadiusDegrees(double fieldWidthDegrees, int widthPx, int heightPx) {
         double halfWidthPlane = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
         double halfHeightPlane = halfWidthPlane * heightPx / (double) widthPx;
         double cornerDegrees = Math.toDegrees(
                 Math.atan(Math.hypot(halfWidthPlane, halfHeightPlane)));
-        return cornerDegrees + OBJECT_EXTENT_MARGIN_DEGREES;
+        return cornerDegrees + objectExtentMarginDegrees;
     }
 }

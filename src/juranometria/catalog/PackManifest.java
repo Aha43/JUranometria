@@ -16,6 +16,7 @@ import java.util.TreeMap;
  */
 public record PackManifest(int formatVersion, String packName, String coverage,
                            double starLimitVmag, String tilingScheme,
+                           double maxObjectSemiExtentDegrees,
                            Map<String, String> entries) {
 
     public static final int SUPPORTED_FORMAT_VERSION = 1;
@@ -23,7 +24,8 @@ public record PackManifest(int formatVersion, String packName, String coverage,
 
     private static final String[] REQUIRED_KEYS = {
             "format.version", "pack.name", "coverage.type", "stars.limit.vmag",
-            "tiling.scheme", "sources.tycho2.catalogue", "sources.openngc.release",
+            "tiling.scheme", "objects.max.semi.extent.degrees",
+            "sources.tycho2.catalogue", "sources.openngc.release",
             "license.stars", "license.dsos",
     };
 
@@ -66,8 +68,16 @@ public record PackManifest(int formatVersion, String packName, String coverage,
             throw new IllegalArgumentException("pack manifest " + name
                     + " has invalid stars.limit.vmag " + entries.get("stars.limit.vmag"));
         }
+        double maxSemiExtent = parseDouble(entries.get("objects.max.semi.extent.degrees"),
+                "objects.max.semi.extent.degrees", name);
+        if (!(maxSemiExtent > 0.0) || !Double.isFinite(maxSemiExtent)) {
+            throw new IllegalArgumentException("pack manifest " + name
+                    + " has invalid objects.max.semi.extent.degrees "
+                    + entries.get("objects.max.semi.extent.degrees"));
+        }
         return new PackManifest(formatVersion, entries.get("pack.name"),
-                entries.get("coverage.type"), starLimit, tilingScheme, entries);
+                entries.get("coverage.type"), starLimit, tilingScheme,
+                maxSemiExtent, entries);
     }
 
     private static int parseInt(String value, String key, String name) {

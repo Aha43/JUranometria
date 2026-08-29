@@ -49,7 +49,10 @@ final class PackNotices {
 
                 - Coverage: the complete sky, partitioned into %d populated
                   radec-grid-30 tiles; every object lives in exactly one home
-                  tile chosen by its centre position.
+                  tile chosen by its centre position. The manifest declares
+                  the largest object semi-extent (the Large Magellanic Cloud)
+                  so queries can never omit an object whose symbol reaches
+                  into a chart.
                 - Stars: Johnson V <= %.1f, derived per the I/259 ReadMe as
                   V = VT - 0.090 * (BT - VT); VT (or Hp in supplement-1) used
                   unchanged when BT is absent. Supplement-1 positions are at
