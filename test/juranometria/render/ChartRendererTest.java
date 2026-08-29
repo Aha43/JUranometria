@@ -184,6 +184,52 @@ class ChartRendererTest {
     }
 
     @Test
+    void theRegionalPolicyGovernsInkAtWideFields() {
+        // Issue #56: at 24 degrees a 2-arcmin faint galaxy is far below
+        // the practical minimum. It vanishes entirely - the page with it
+        // is pixel-identical to the page without - unless it is the
+        // searched target, in which case it is drawn clamped and labelled.
+        ChartViewport wide = new ChartViewport(M31_CENTRE, 24.0, 900, 700);
+        DeepSkyObject speck = new DeepSkyObject("PGC 1234", List.of(),
+                DsoType.GALAXY, M31_CENTRE, 2.0, 1.0, 0.0, 14.0, 3);
+
+        BufferedImage without = RENDERER.renderToImage(new ChartScene(
+                wide, List.of(), List.of(), "Test chart", 8.0));
+        BufferedImage with = RENDERER.renderToImage(new ChartScene(
+                wide, List.of(), List.of(speck), "Test chart", 8.0));
+        assertArrayEquals(pixels(without), pixels(with),
+                "a sub-minimum faint object leaves no ink at regional fields");
+
+        BufferedImage asTarget = RENDERER.renderToImage(new ChartScene(
+                wide, List.of(), List.of(speck), "Test chart", 8.0, "PGC 1234"));
+        assertTrue(asTarget.getRGB(450, 350) != 0xFFFFFFFF,
+                "the searched target is drawn clamped at the centre");
+        assertTrue(countInk(asTarget, 450 + 8, 335, 80, 30) > 10,
+                "the searched target carries its label");
+    }
+
+    @Test
+    void aClampedMessierSymbolDrawsButFallsSilentRegionally() {
+        // The M32/M110 cure: priority-1 ink survives at 36 degrees, its
+        // label does not, because the symbol is clamp-inflated not true-size.
+        ChartViewport wide = new ChartViewport(M31_CENTRE, 36.0, 900, 700);
+        DeepSkyObject m32Like = new DeepSkyObject("NGC 221", List.of("M 32"),
+                DsoType.GALAXY, M31_CENTRE, 6.5, 5.4, 0.0, 8.1, 1);
+        BufferedImage image = RENDERER.renderToImage(new ChartScene(
+                wide, List.of(), List.of(m32Like), "Test chart", 8.0));
+        assertTrue(image.getRGB(450, 350) != 0xFFFFFFFF,
+                "the Messier symbol is always drawn, clamped when necessary");
+        assertEquals(0, countInk(image, 450 + 10, 335, 80, 30),
+                "no label beside a clamp-inflated Messier symbol");
+
+        BufferedImage classic = RENDERER.renderToImage(new ChartScene(
+                new ChartViewport(M31_CENTRE, 8.0, 900, 700),
+                List.of(), List.of(m32Like), "Test chart", 8.0));
+        assertTrue(countInk(classic, 450 + 10, 335, 80, 30) > 10,
+                "the same object keeps its label at the released fields");
+    }
+
+    @Test
     void starsFainterThanTheSceneLimitAreNotDrawn() {
         Star atLimit = new Star("at limit", M31_CENTRE, 8.0);
         Star beyondLimit = new Star("beyond limit", M31_CENTRE, 8.01);

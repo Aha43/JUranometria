@@ -15,6 +15,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the Perseus Milky Way around M31 - while the searched target's exact
   position, title, and identity remain the centre through every step.
   Reset still restores exactly M31 at 8 degrees and V 8.0.
+- Regional detail policy: at fields wider than 18 degrees, deep-sky
+  symbols draw only at their true projected size - the practical-minimum
+  clamp no longer inflates hundreds of sub-pixel objects into speckle
+  (M13's 36-degree page drops from 256 drawn symbols to 2). Messier
+  objects are always drawn, clamped when necessary, and the searched
+  target is always drawn and labelled when its type has a chart symbol;
+  labels otherwise attach only to Messier objects shown at true size,
+  which dissolves the M31/M32/M110 label pile naturally. The 18-degree
+  and narrower pages, and the user's star magnitude limit, are untouched.
 
 ## [0.5.0] - 2026-08-29
 

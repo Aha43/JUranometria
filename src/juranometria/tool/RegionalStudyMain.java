@@ -115,22 +115,22 @@ public final class RegionalStudyMain {
                 labelAnchors.add(new double[] {pixel.x(), pixel.y()});
             }
         }
-        // Candidate regional policy: draw at true size only (no minimum
-        // clamp inflation), keep priority-1 objects, label only true-size.
-        // True size uses the renderer's exact viewport scale, not the
-        // linear field/pixel ratio (PR #58 review: 3.3% apart at 36 deg).
+        // Since #56 the regional detail policy is the implementation, not
+        // a prediction: measure through the renderer's own policy object.
+        // (These study scenes carry no searched target, exactly like the
+        // decision's numbers; the target exemption is renderer-tested.)
+        var policy = new juranometria.render.RegionalDetailPolicy(
+                scene, mapping.pixelsPerPlaneUnit());
         int policyDrawn = 0;
         int policyLabels = 0;
         for (DeepSkyObject dso : dsos) {
-            if (!ChartRenderer.hasSymbol(dso) || !inFrame(projection, mapping, dso.position())) {
+            if (!inFrame(projection, mapping, dso.position())) {
                 continue;
             }
-            boolean trueSize = Math.toRadians(dso.majorAxisArcmin() / 60.0)
-                    * mapping.pixelsPerPlaneUnit() >= 6.0;
-            if (trueSize || dso.labelPriority() <= 1) {
+            if (policy.drawn(dso)) {
                 policyDrawn++;
             }
-            if (trueSize && dso.labelPriority() <= 1) {
+            if (policy.labelled(dso)) {
                 policyLabels++;
             }
         }

@@ -40,9 +40,6 @@ public final class ChartRenderer {
     private static final Color NEBULA_OUTLINE = new Color(150, 150, 150);
     private static final Color TEXT_INK = new Color(34, 34, 34);
 
-    /** Practical minimum drawn major axis; the true axis ratio is kept. */
-    private static final double MIN_SYMBOL_MAJOR_PX = 6.0;
-
     /** The symbol families of docs/chart-conventions.md. */
     public enum Symbol { ELLIPSE, DOTTED_CIRCLE, CROSSED_CIRCLE, BOX, PLANETARY, NONE }
 
@@ -50,13 +47,6 @@ public final class ChartRenderer {
     private static final java.awt.Stroke DOTTED_STROKE = new BasicStroke(
             1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
             new float[] {2.5f, 2.5f}, 0.0f);
-
-    /**
-     * Restrained labelling at the fixed Sprint chart: only the most
-     * important objects (Messier priority) carry labels, preserving the
-     * page's character now that the catalogue holds dozens of galaxies.
-     */
-    private static final int MAX_LABELED_PRIORITY = 1;
 
     private static final Font LABEL_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
     private static final Font TITLE_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 11);
@@ -89,14 +79,17 @@ public final class ChartRenderer {
 
         GnomonicProjection projection = new GnomonicProjection(scene.viewport().centre());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        RegionalDetailPolicy policy =
+                new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
 
         g.setClip(1, 1, width - 2, height - 2);
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (!hasSymbol(dso)) {
+            if (!policy.drawn(dso)) {
                 continue;
             }
             projection.project(dso.position()).ifPresent(plane ->
-                    drawSymbol(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
+                    drawSymbol(g, dso, policy, mapping.toPixel(plane),
+                            mapping.pixelsPerPlaneUnit()));
         }
         g.setColor(INK);
         for (Star star : scene.stars()) {
@@ -114,7 +107,7 @@ public final class ChartRenderer {
             });
         }
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (!hasSymbol(dso) || dso.labelPriority() > MAX_LABELED_PRIORITY) {
+            if (!policy.labelled(dso)) {
                 continue;
             }
             projection.project(dso.position()).ifPresent(plane ->
@@ -143,11 +136,13 @@ public final class ChartRenderer {
     }
 
     private static void drawSymbol(Graphics2D g, DeepSkyObject dso,
+                                   RegionalDetailPolicy policy,
                                    PixelPoint centre, double pixelsPerPlaneUnit) {
         double majorPx = arcminToPx(dso.majorAxisArcmin(), pixelsPerPlaneUnit);
         double minorPx = arcminToPx(dso.minorAxisArcmin(), pixelsPerPlaneUnit);
-        if (majorPx < MIN_SYMBOL_MAJOR_PX) {
-            double enlarge = MIN_SYMBOL_MAJOR_PX / majorPx;
+        if (majorPx < RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX
+                && policy.clampAllowed(dso)) {
+            double enlarge = RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX / majorPx;
             majorPx *= enlarge;
             minorPx *= enlarge;
         }
@@ -191,7 +186,7 @@ public final class ChartRenderer {
                 }
                 case PLANETARY -> {
                     // A small crossed circle: four spokes reaching beyond it.
-                    double r = Math.max(MIN_SYMBOL_MAJOR_PX, majorPx) / 2.0;
+                    double r = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX, majorPx) / 2.0;
                     double spoke = r * 1.7;
                     g2.setColor(GALAXY_OUTLINE);
                     g2.setStroke(OUTLINE_STROKE);
@@ -215,7 +210,7 @@ public final class ChartRenderer {
      */
     private static void drawLabel(Graphics2D g, DeepSkyObject dso,
                                   PixelPoint centre, double pixelsPerPlaneUnit) {
-        double majorPx = Math.max(MIN_SYMBOL_MAJOR_PX,
+        double majorPx = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
                 arcminToPx(dso.majorAxisArcmin(), pixelsPerPlaneUnit));
         double minorPx = arcminToPx(dso.minorAxisArcmin(), pixelsPerPlaneUnit);
         double paRadians = Math.toRadians(dso.positionAngleDegrees());
