@@ -81,14 +81,25 @@ public final class ChartViewController {
         update(state.increaseMagnitudeLimit());
     }
 
-    /** Moves the chart centre, keeping field width and limiting magnitude. */
+    /** Moves the chart centre anonymously; the chart titles by position. */
     public void recenter(juranometria.chart.SkyPosition centre) {
         update(state.recenteredAt(centre));
     }
 
-    /** Recentres and changes field width in one notification. */
+    /** Recentres on a named target whose label titles the chart. */
+    public void recenter(juranometria.chart.SkyPosition centre, String targetLabel) {
+        update(state.recenteredAt(centre, targetLabel));
+    }
+
+    /** Anonymous recenter with a field change in one notification. */
     public void recenter(juranometria.chart.SkyPosition centre, double fieldWidthDegrees) {
         update(state.recenteredAt(centre).withFieldWidth(fieldWidthDegrees));
+    }
+
+    /** Named-target recenter with a field change in one notification. */
+    public void recenter(juranometria.chart.SkyPosition centre, double fieldWidthDegrees,
+                         String targetLabel) {
+        update(state.recenteredAt(centre, targetLabel).withFieldWidth(fieldWidthDegrees));
     }
 
     public void reset() {

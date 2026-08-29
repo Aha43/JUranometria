@@ -16,7 +16,6 @@ import juranometria.ui.SceneAssembler;
 public final class Atlas {
 
     public static final SkyPosition DEFAULT_CENTRE = new SkyPosition(10.684708, 41.268750);
-    public static final String TITLE = "M31 \u00b7 Andromeda Galaxy region";
 
     private Atlas() {
     }
@@ -33,7 +32,7 @@ public final class Atlas {
                         + catalogue.manifest().coverage()
                         + "; regional packs need a data centre this wiring does not define");
             }
-            return SceneAssembler.allSky(catalogue, TITLE,
+            return SceneAssembler.allSky(catalogue,
                     catalogue.manifest().maxObjectSemiExtentDegrees());
         }
 

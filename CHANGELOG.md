@@ -9,6 +9,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- The chart title follows the current view instead of always claiming
+  the M31 region: a search target titles its chart (for example
+  "M 42 · Great Orion Nebula region"), a coordinate recenter titles by
+  its position, zooming keeps the target, and reset restores the exact
+  M31 default. Search messages now state what is true of the whole
+  bundled catalogue.
 - Large objects can no longer be silently omitted from a chart: the
   query margin now comes from the pack manifest's declared maximum
   object semi-extent (5.39 degrees, the Large Magellanic Cloud)

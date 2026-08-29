@@ -47,11 +47,13 @@ public final class LocalSearch {
                 keys.add(normalize(alias));
             }
             built.add(new Entry(new SearchResult(displayLabel(dso), dso.id(),
-                    SearchResult.Kind.DEEP_SKY_OBJECT, dso.position()), keys));
+                    SearchResult.Kind.DEEP_SKY_OBJECT, dso.position(),
+                    regionTitle(dso)), keys));
         }
         for (Star star : stars) {
             built.add(new Entry(new SearchResult(star.id(), star.id(),
-                    SearchResult.Kind.STAR, star.position()),
+                    SearchResult.Kind.STAR, star.position(),
+                    star.id() + " region"),
                     List.of(normalize(star.id()))));
         }
         this.entries = List.copyOf(built);
@@ -68,7 +70,7 @@ public final class LocalSearch {
             String display = SkyFormat.formatRa(position.raDegrees())
                     + ", " + SkyFormat.formatDec(position.decDegrees());
             return List.of(new SearchResult(display, display,
-                    SearchResult.Kind.COORDINATES, position));
+                    SearchResult.Kind.COORDINATES, position, display));
         }
 
         String normalized = normalize(query);
@@ -101,6 +103,16 @@ public final class LocalSearch {
                 .sorted(Comparator.comparing(SearchResult::label)
                         .thenComparing(SearchResult::identity))
                 .toList();
+    }
+
+    /** The chart title for a result: label, common name, and "region". */
+    private static String regionTitle(DeepSkyObject dso) {
+        String label = displayLabel(dso);
+        return dso.aliases().stream()
+                .filter(alias -> !alias.startsWith("M ") && !alias.equals(label))
+                .findFirst()
+                .map(common -> label + " \u00b7 " + common + " region")
+                .orElse(label + " region");
     }
 
     /** The atlas names Messier objects by their Messier name. */
