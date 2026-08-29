@@ -55,8 +55,16 @@ make import-allsky                      # verifies checksums, regenerates the pa
 
 `make run` opens the M31 region chart. The toolbar above the page:
 
-- **Zoom in / Zoom out** step the field width through 8°, 6°, 4°, 3°,
-  2°, and 1°, always centred on M31.
+- **Zoom in / Zoom out** step the field width through 36°, 24°, 18°,
+  12°, 8°, 6°, 4°, 3°, 2°, and 1°, always centred on the current
+  target - zooming out from a searched object progressively reveals
+  its celestial neighbourhood. Beyond 18°, deep-sky symbols draw only
+  at their true projected size, so the wide pages stay readable;
+  Messier objects remain, and a searched target with an established
+  deep-sky symbol remains drawn and labelled. (Types the chart
+  deliberately never draws - stellar entries, associations, novae -
+  still recentre and title the chart, and a searched star remains
+  subject to the stellar magnitude limit.)
 - **Fewer stars / More stars** step the stellar limiting magnitude
   between V 4.0 and V 8.0 in whole magnitudes.
 - **Search** finds bundled objects and coordinates entirely offline,

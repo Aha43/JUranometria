@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import juranometria.catalog.SkyTiling;
 import juranometria.catalog.TiledCatalogue;
 import juranometria.chart.ChartScene;
+import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
@@ -43,7 +44,11 @@ public final class RegionalStudyMain {
             new Target("m42", new SkyPosition(83.818667, -5.389667)),
             new Target("m45", new SkyPosition(56.869167, 24.105278)),
             new Target("m13", new SkyPosition(250.421250, 36.461667)),
-            new Target("polar", new SkyPosition(37.946619, 89.264135)));
+            new Target("polar", new SkyPosition(37.946619, 89.264135)),
+            // Sprint finish (#57): a far-southern giant object and an
+            // RA-wrap field, so the representative pages reproduce here.
+            new Target("lmc", new SkyPosition(80.893750, -69.756111)),
+            new Target("rawrap", new SkyPosition(359.457625, -32.591028)));
 
     private RegionalStudyMain() {
     }
@@ -53,26 +58,35 @@ public final class RegionalStudyMain {
         outDir.mkdirs();
         TiledCatalogue catalogue = TiledCatalogue.load();
         double margin = catalogue.manifest().maxObjectSemiExtentDegrees();
+        juranometria.ui.SceneAssembler assembler =
+                juranometria.ui.SceneAssembler.allSky(catalogue, margin);
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
 
         System.out.printf(Locale.ROOT,
-                "%-6s %5s | %6s %5s | %6s %5s %6s | %5s %5s | %4s %5s | %5s %5s %5s | %5s %5s%n",
+                "%-6s %5s | %6s %5s | %6s %5s %6s | %5s %5s | %4s %5s"
+                        + " | %5s %5s %5s %5s | %5s %5s%n",
                 "target", "field", "stars", "drawn", "dsos", "drawn", "labels",
-                "pDrw", "pLbl", "tile", "coll", "qry", "asm", "rnd", "edge", "corn");
+                "pDrw", "pLbl", "tile", "coll", "qry", "scn", "rnd", "e2e",
+                "edge", "corn");
 
         for (Target target : TARGETS) {
             for (double field : FIELDS) {
-                study(catalogue, renderer, margin, target, field, outDir);
+                study(catalogue, assembler, renderer, margin, target, field, outDir);
             }
             System.out.println();
         }
+        System.out.println("Timing columns, one warm run per row: qry = catalogue"
+                + " query, scn = scene construction, rnd = render; e2e = the real"
+                + " SceneAssembler.assemble end to end (query + construction).");
         System.out.println("Distortion columns: radial linear scale (sec^2 theta)"
                 + " at the horizontal edge and the corner, centre = 1.000.");
         System.out.println("Charts written to " + outDir);
     }
 
-    private static void study(TiledCatalogue catalogue, ChartRenderer renderer,
-                              double margin, Target target, double field, File outDir)
+    private static void study(TiledCatalogue catalogue,
+                              juranometria.ui.SceneAssembler assembler,
+                              ChartRenderer renderer, double margin,
+                              Target target, double field, File outDir)
             throws Exception {
         // Mirrors SceneAssembler#queryRadiusDegrees.
         double halfW = Math.tan(Math.toRadians(field) / 2.0);
@@ -91,6 +105,17 @@ public final class RegionalStudyMain {
         long t2 = System.nanoTime();
         var image = renderer.renderToImage(scene);
         long t3 = System.nanoTime();
+
+        // The real production path, end to end: every study field is a
+        // released zoom step since #55, so the view state accepts it and
+        // SceneAssembler.assemble (catalogue query + scene construction)
+        // can be measured as the application runs it (Codex review,
+        // Sprint 6 finding 1). Warmed by the queries above.
+        ChartViewState state = new ChartViewState(
+                target.centre(), field, LIMIT_V, null, null);
+        long e0 = System.nanoTime();
+        assembler.assemble(state, WIDTH, HEIGHT);
+        long e1 = System.nanoTime();
 
         // Visibly drawn = projected inside the frame (and V-limited for stars).
         var projection = new juranometria.project.GnomonicProjection(target.centre());
@@ -151,10 +176,11 @@ public final class RegionalStudyMain {
         int tiles = SkyTiling.tilesIntersecting(query).size();
         System.out.printf(Locale.ROOT,
                 "%-6s %4.0f° | %6d %5d | %6d %5d %6d | %5d %5d | %4d %5d"
-                        + " | %4.0fms %4.1fms %4.0fms | %5.3f %5.3f%n",
+                        + " | %4.1f %5.2f %4.0f %5.1f | %5.3f %5.3f%n",
                 target.name(), field, stars.size(), drawnStars, dsos.size(), drawnDsos,
                 labels, policyDrawn, policyLabels, tiles, collisions,
-                (t1 - t0) / 1e6, (t2 - t1) / 1e6, (t3 - t2) / 1e6, edgeScale, cornerScale);
+                (t1 - t0) / 1e6, (t2 - t1) / 1e6, (t3 - t2) / 1e6,
+                (e1 - e0) / 1e6, edgeScale, cornerScale);
 
         ImageIO.write(image, "png", new File(outDir,
                 String.format(Locale.ROOT, "%s-%02.0fdeg.png", target.name(), field)));
