@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.project;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,15 +6,11 @@ import java.util.Optional;
 
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
-import juranometria.project.GnomonicProjection;
-import juranometria.project.PixelPoint;
-import juranometria.project.PlanePoint;
-import juranometria.project.ViewportMapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PanGeometryTest {
+class PanSolverTest {
 
     static final SkyPosition M42 = new SkyPosition(83.818667, -5.389667);
     static final SkyPosition RA_WRAP = new SkyPosition(359.457625, -32.591028);
@@ -28,7 +24,7 @@ class PanGeometryTest {
             for (double xi : new double[] {-0.3, 0.0, 0.17}) {
                 for (double eta : new double[] {-0.22, 0.0, 0.3}) {
                     PlanePoint plane = new PlanePoint(xi, eta);
-                    SkyPosition sky = PanGeometry.skyFromPlane(centre, plane);
+                    SkyPosition sky = PanSolver.skyFromPlane(centre, plane);
                     PlanePoint back = projection.project(sky).orElseThrow();
                     assertEquals(xi, back.xiEast(), 1e-12);
                     assertEquals(eta, back.etaNorth(), 1e-12);
@@ -59,11 +55,11 @@ class PanGeometryTest {
                     PixelPoint press = new PixelPoint(drag[0], drag[1]);
                     PixelPoint release = new PixelPoint(
                             drag[0] + drag[2], drag[1] + drag[3]);
-                    SkyPosition grabbed = PanGeometry.skyFromPlane(centre,
-                            PanGeometry.planeFromPixel(viewport, press));
-                    PanGeometry.PanSolution solution = PanGeometry.solveCentre(
+                    SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+                            PanSolver.planeFromPixel(viewport, press));
+                    PanSolver.PanSolution solution = PanSolver.solveCentre(
                             grabbed,
-                            PanGeometry.planeFromPixel(viewport, release),
+                            PanSolver.planeFromPixel(viewport, release),
                             centre);
                     if (solution.centre().isEmpty()) {
                         // Every empty must carry the solver's own
@@ -81,7 +77,7 @@ class PanGeometryTest {
                     ChartViewport moved = new ChartViewport(
                             newCentre, field, 900, 700);
                     PlanePoint requested =
-                            PanGeometry.planeFromPixel(viewport, release);
+                            PanSolver.planeFromPixel(viewport, release);
                     PlanePoint achieved = new GnomonicProjection(newCentre)
                             .project(grabbed).orElseThrow();
                     PixelPoint reprojected =
@@ -116,13 +112,13 @@ class PanGeometryTest {
         // press-time grab, so out-and-back inside one gesture closes.
         ChartViewport viewport = new ChartViewport(RA_WRAP, 36.0, 900, 700);
         PixelPoint press = new PixelPoint(300, 500);
-        SkyPosition grabbed = PanGeometry.skyFromPlane(RA_WRAP,
-                PanGeometry.planeFromPixel(viewport, press));
+        SkyPosition grabbed = PanSolver.skyFromPlane(RA_WRAP,
+                PanSolver.planeFromPixel(viewport, press));
         SkyPosition current = RA_WRAP;
         int[][] waypoints = {{700, 100}, {120, 640}, {880, 350}, {300, 500}};
         for (int[] w : waypoints) {
-            current = PanGeometry.solveCentre(grabbed,
-                            PanGeometry.planeFromPixel(viewport,
+            current = PanSolver.solveCentre(grabbed,
+                            PanSolver.planeFromPixel(viewport,
                                     new PixelPoint(w[0], w[1])), current)
                     .centre().orElseThrow();
         }
@@ -134,10 +130,10 @@ class PanGeometryTest {
     void zeroMovementSolvesToTheSameCentre() {
         ChartViewport viewport = new ChartViewport(M42, 18.0, 900, 700);
         PixelPoint press = new PixelPoint(600, 200);
-        SkyPosition grabbed = PanGeometry.skyFromPlane(M42,
-                PanGeometry.planeFromPixel(viewport, press));
-        SkyPosition solved = PanGeometry.solveCentre(grabbed,
-                        PanGeometry.planeFromPixel(viewport, press), M42)
+        SkyPosition grabbed = PanSolver.skyFromPlane(M42,
+                PanSolver.planeFromPixel(viewport, press));
+        SkyPosition solved = PanSolver.solveCentre(grabbed,
+                        PanSolver.planeFromPixel(viewport, press), M42)
                 .centre().orElseThrow();
         assertEquals(M42.raDegrees(), solved.raDegrees(), 1e-9);
         assertEquals(M42.decDegrees(), solved.decDegrees(), 1e-9);
@@ -150,11 +146,11 @@ class PanGeometryTest {
         // boundary - the honest partial follow of PR #76's review -
         // tracking the vertical component exactly.
         ChartViewport viewport = new ChartViewport(POLAR_N, 18.0, 900, 700);
-        PlanePoint requested = PanGeometry.planeFromPixel(viewport,
+        PlanePoint requested = PanSolver.planeFromPixel(viewport,
                 new PixelPoint(650, 350));
-        SkyPosition grabbed = PanGeometry.skyFromPlane(POLAR_N,
-                PanGeometry.planeFromPixel(viewport, new PixelPoint(450, 350)));
-        PanGeometry.PanSolution polar = PanGeometry.solveCentre(grabbed,
+        SkyPosition grabbed = PanSolver.skyFromPlane(POLAR_N,
+                PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
+        PanSolver.PanSolution polar = PanSolver.solveCentre(grabbed,
                 requested, POLAR_N);
         assertTrue(polar.constrained(),
                 "the solver classifies the polar follow as constrained");
@@ -169,10 +165,10 @@ class PanGeometryTest {
                 "the follow is partial, not frozen");
 
         // Grabbing any less extreme point pans the polar page freely.
-        SkyPosition offCentre = PanGeometry.skyFromPlane(POLAR_N,
-                PanGeometry.planeFromPixel(viewport, new PixelPoint(200, 550)));
-        assertTrue(PanGeometry.solveCentre(offCentre,
-                        PanGeometry.planeFromPixel(viewport,
+        SkyPosition offCentre = PanSolver.skyFromPlane(POLAR_N,
+                PanSolver.planeFromPixel(viewport, new PixelPoint(200, 550)));
+        assertTrue(PanSolver.solveCentre(offCentre,
+                        PanSolver.planeFromPixel(viewport,
                                 new PixelPoint(400, 550)), POLAR_N)
                 .centre().isPresent(), "off-centre grabs pan the polar page");
     }
@@ -182,10 +178,10 @@ class PanGeometryTest {
         // Dragging the near-south-pole point far downward would carry
         // the centre beyond the pole; no valid centre exists.
         ChartViewport viewport = new ChartViewport(POLAR_S, 36.0, 900, 700);
-        SkyPosition grabbed = PanGeometry.skyFromPlane(POLAR_S,
-                PanGeometry.planeFromPixel(viewport, new PixelPoint(450, 350)));
-        PanGeometry.PanSolution pastPole = PanGeometry.solveCentre(grabbed,
-                PanGeometry.planeFromPixel(viewport,
+        SkyPosition grabbed = PanSolver.skyFromPlane(POLAR_S,
+                PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
+        PanSolver.PanSolution pastPole = PanSolver.solveCentre(grabbed,
+                PanSolver.planeFromPixel(viewport,
                         new PixelPoint(450, 170)), POLAR_S);
         assertTrue(pastPole.centre().isEmpty(),
                 "no centre beyond the pole; explicit hold");

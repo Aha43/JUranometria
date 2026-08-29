@@ -1,25 +1,21 @@
-package juranometria.tool;
+package juranometria.project;
 
 import java.util.Optional;
 
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
-import juranometria.project.PixelPoint;
-import juranometria.project.PlanePoint;
 
 /**
- * The Sprint 8 pan geometry (issue #72), proven here before any mouse
- * code exists: the exact inverse of the chart's gnomonic page - pixel
- * to sky - and the exact grab solver - given that the sky position
- * grabbed at press time must sit under the moved pointer, find the new
- * chart centre. Both are closed-form in the projection's own frame
- * (xi east, eta north; east left, north up on the page), never a
- * degrees-per-pixel approximation.
- *
- * The production home of this geometry is decided by the design gate;
- * issue #73 moves it into the projection package.
+ * The grab-to-pan geometry of docs/decisions/pan-navigation.md: the
+ * exact inverse of the chart's gnomonic page - pixel to sky - and the
+ * exact grab solver - given that the sky position grabbed at press
+ * time must sit under the moved pointer, find the new chart centre.
+ * Both are closed-form in the projection's own frame (xi east, eta
+ * north; east left, north up on the page), never a degrees-per-pixel
+ * approximation. Proven and measured by the Sprint 8 design gate
+ * (make pan-study); production home per that decision.
  */
-public final class PanGeometry {
+public final class PanSolver {
 
     /**
      * A classified solver outcome: {@code centre} is present unless the
@@ -45,7 +41,7 @@ public final class PanGeometry {
      */
     static final double PLANE_TOLERANCE = 1e-6;
 
-    private PanGeometry() {
+    private PanSolver() {
     }
 
     /** The tangent-plane point under a pixel; the mapping's inverse. */
@@ -205,7 +201,7 @@ public final class PanGeometry {
     /** Full-projection verification of a candidate centre. */
     private static boolean reprojects(SkyPosition centre, SkyPosition grabbed,
                                       double xi, double eta) {
-        var projection = new juranometria.project.GnomonicProjection(centre);
+        var projection = new GnomonicProjection(centre);
         var plane = projection.project(grabbed);
         return plane.isPresent()
                 && Math.abs(plane.get().xiEast() - xi) <= PLANE_TOLERANCE
