@@ -51,9 +51,15 @@ loading all Gaia rows or issuing a remote query during each repaint.
 Stages 1 and 2 are complete: the bundled regional resources are generated
 reproducibly (see the decision document) and chart scenes query them
 through the `Catalogue` boundary on view-state and window changes, never
-during painting. Stage 3 remains deferred until all-sky volumes supply
-measurements; the scene-assembly seam is where a tiled catalogue would
-plug in.
+during painting.
+
+Stage 3's contract is decided in
+[the all-sky tiling decision](decisions/all-sky-tiling.md), from real
+measurements: one built-in bright pack at V ≤ 8.0 (about 2.4 MiB) on a
+fixed 30-degree RA/Dec grid of 72 tiles with a plain-properties
+manifest, conservative padded tile selection, and home-tile uniqueness
+so queries cannot duplicate. Deeper packs remain future options the
+same shape can carry.
 
 ## Minimum data fields
 
