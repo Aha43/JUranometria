@@ -41,9 +41,12 @@ issues. Keep a sprint small enough that its completed result can be judged as a
 whole. Close the milestone only after the integrated application has been run
 and reviewed.
 
-The Markdown sprint document explains the product arc. GitHub issues are the
-live execution record. If they diverge, update the document or explicitly note
-the changed decision.
+Sprint 1 has a Markdown sprint document (`docs/sprint-01.md`); from
+Sprint 2 onward the sprint record is the GitHub milestone with its
+ordered issues, plus the handover and independent-review pair
+committed under `docs/reviews/` before each release. GitHub issues are
+the live execution record; decision documents under `docs/decisions/`
+hold the measured design gates.
 
 ## Branches, commits, and pull requests
 
@@ -55,7 +58,14 @@ the changed decision.
 5. Run the application for visual changes and run the full test suite.
 6. Add an entry under `Unreleased` in `CHANGELOG.md` for user-visible work.
 7. Open a pull request that links the issue with `Closes #NN`.
-8. Merge only after checks pass and the result has been reviewed.
+8. Merge only after checks pass and the result has been reviewed. The
+   check is the `test` GitHub Actions workflow
+   (`.github/workflows/test.yml`): it bootstraps the pinned
+   dependencies with `scripts/download-libs.sh` and runs `make test`
+   on JDK 21 for every pull request to `main` - the same command a
+   contributor runs locally. Branch protection on `main` requires the
+   check (administrators included), so a red or absent `test` status
+   technically blocks the merge, not just culturally.
 
 Prefer a small number of meaningful commits over preserving every experiment.
 Commit messages state the result and may include `Closes #NN` when the commit
@@ -113,4 +123,25 @@ documents.
 An agent should not silently begin the next sprint issue. Finishing one issue
 is a review point for the human owner, especially while the atlas's visual
 language is being discovered.
+
+## Native access
+
+FlatLaf loads a small native library for platform window integration
+(macOS full-window content, window decorations). From JDK 24, JEP 472
+("Prepare to Restrict the Use of JNI") makes that a restricted call:
+without explicit permission the JVM prints a four-line warning, and
+under `--illegal-native-access=deny` FlatLaf logs SEVERE and its
+platform integration degrades. The permission is therefore granted
+deliberately in two places and must not be removed as noise:
+
+- the `run` target passes `--enable-native-access=ALL-UNNAMED`
+  (required for `-cp` launches, where the manifest attribute is
+  ignored);
+- the packaged jar carries `Enable-Native-Access: ALL-UNNAMED` in its
+  manifest, honoured by `java -jar` even under `deny`.
+
+JDK 21, the recorded minimum, accepts the flag and is unaffected.
+Measured on JDK 26.0.1 with FlatLaf 3.4.1 (issue #82): the flag
+silences the warning, and the manifest attribute keeps a plain
+`java -jar` launch silent even under the stricter default.
 

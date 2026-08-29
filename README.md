@@ -18,21 +18,25 @@ the M31 region from bundled sample data.
 - [Technical architecture](docs/architecture.md)
 - [Catalogue strategy](docs/catalogues.md)
 - [Development workflow](docs/development.md)
-- [First sprint](docs/sprint-01.md)
+- [First sprint](docs/sprint-01.md) — Sprint 1's product document;
+  from Sprint 2 onward the sprint record is the GitHub milestones and
+  the handover/review pairs in [docs/reviews/](docs/reviews/)
 
 ## Requirements
 
 - JDK 21 or later (Java 21 is the recorded minimum; sources compile with
   `--release 21`)
 - GNU Make
-- PowerShell (`pwsh`) for the dependency download script
+- `curl` (present on macOS and most Linux systems); on Windows,
+  PowerShell (`pwsh`) runs the dependency download script instead
 
 ## Build and run
 
 From the repository root:
 
 ```sh
-pwsh scripts/download-libs.ps1   # download pinned dependencies into lib/
+scripts/download-libs.sh         # download pinned dependencies into lib/
+                                 # (Windows: pwsh scripts/download-libs.ps1)
 make test                        # compile and run the test suite
 make run                         # build and launch the application
 ```
@@ -111,7 +115,13 @@ redistributable non-commercially only. See
 
 ## Status
 
-The project has an executable Swing foundation and is otherwise in
-specification and visual-prototype stage. It follows the simple Java/Swing
-structure proven in NamDesktop and the issue-driven sprint and release rhythm
-proven in NamWeb.
+Eight releases in (v0.1.0 through v0.8.0; see `CHANGELOG.md`), the
+atlas is a working instrument: it bundles the complete bright sky
+offline (45,630 Tycho-2 stars to V 8.0 and 13,371 OpenNGC objects),
+searches it by name, identifier, or coordinates, zooms from 1 to 36
+degree fields with scale-honest deep-sky and constellation-geography
+policies, and pans by grabbing the paper with an exact
+projection-correct drag. Every release is preceded by an independent
+review whose trail lives in `docs/reviews/`. The deliberately simple
+plain-Java/Make organization proven in NamDesktop, and the
+issue-driven sprint rhythm proven in NamWeb, both still hold.

@@ -41,13 +41,6 @@ target/
 *.swp
 *.swo
 
-# === Maven/Gradle ===
-.mvn/
-!**/src/**/.mvn/ # allow if inside source
-.gradle/
-build/
-**/target/
-
 # === Java module system ===
 module-info.class
 
