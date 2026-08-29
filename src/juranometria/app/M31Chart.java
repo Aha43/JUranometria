@@ -25,12 +25,25 @@ public final class M31Chart {
     }
 
     private static final class Holder {
+        static final BundledCatalogue CATALOGUE = BundledCatalogue.load();
         static final SceneAssembler ASSEMBLER = new SceneAssembler(
-                BundledCatalogue.load(), CENTRE, TITLE, DATA_COVERAGE_RADIUS_DEGREES);
+                CATALOGUE, CENTRE, TITLE, DATA_COVERAGE_RADIUS_DEGREES);
+        static final juranometria.search.LocalSearch SEARCH =
+                new juranometria.search.LocalSearch(
+                        CATALOGUE.starsIn(coverage()), CATALOGUE.deepSkyObjectsIn(coverage()));
+
+        private static juranometria.chart.SkyRegion coverage() {
+            return new juranometria.chart.SkyRegion(CENTRE, DATA_COVERAGE_RADIUS_DEGREES);
+        }
     }
 
     /** The application's scene assembler over the bundled catalogue. */
     public static SceneAssembler assembler() {
         return Holder.ASSEMBLER;
+    }
+
+    /** The application's local search over the same bundled catalogue. */
+    public static juranometria.search.LocalSearch search() {
+        return Holder.SEARCH;
     }
 }
