@@ -16,7 +16,7 @@ TEST_SOURCES := $(shell find $(TEST_DIR) -name "*.java" 2>/dev/null)
 
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-1.10.2.jar
 
-.PHONY: all help clean classes jar app run test chart-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study
 
 all: app
 
@@ -29,6 +29,7 @@ help:
 	@echo "  chart-image  Write the deterministic reference chart image"
 	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
 	@echo "  regional-study    Render the Sprint 6 regional-zoom candidate charts"
+	@echo "  constellation-study  Render the Sprint 7 constellation-geography study"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -71,6 +72,9 @@ import-allsky: classes
 
 regional-study: classes
 	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.RegionalStudyMain
+
+constellation-study: classes
+	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ConstellationStudyMain
 
 test: classes
 	rm -rf $(TEST_CLASSES)
