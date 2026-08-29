@@ -28,12 +28,12 @@ public final class JUranometriaMain {
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        ChartComponent chart = new ChartComponent(M31Chart.assembler());
+        ChartComponent chart = new ChartComponent(Atlas.assembler());
         ChartViewController controller =
-                new ChartViewController(M31Chart.assembler()::fits);
+                new ChartViewController(Atlas.assembler()::fits);
         controller.onChange(chart::setViewState);
         juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
-                M31Chart.search(), M31Chart.assembler(), controller);
+                Atlas.search(), Atlas.assembler(), controller);
 
         frame.setLayout(new BorderLayout());
         frame.add(new AtlasToolbar(controller, searchField), BorderLayout.NORTH);

@@ -88,11 +88,10 @@ final class PackNotices {
 
                 ## Relation to the M31 regional resource
 
-                `src/resources/catalog/m31/` remains the application's live
-                data source until the loader switches to this pack (Sprint 5,
-                issue #43), at which point the regional resource retires.
-                Until then the two coexist deliberately: this pack is not yet
-                read by the application.
+                The Sprint 3 regional resource retired when the application
+                switched to this pack (Sprint 5, issue #43); this pack is
+                the single source of bundled catalogue data, and the M31
+                reference chart reproduces from it byte-identically.
                 """.formatted(AUDIT_DATE, tileCount, AllSkyPackMain.STAR_LIMIT_V,
                 counts.starsWritten, counts.mainStars, counts.supplementStars,
                 counts.fallbackPositions, counts.vtWithoutBt, counts.hpMagnitudes,

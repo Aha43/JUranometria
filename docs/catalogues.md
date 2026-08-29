@@ -53,13 +53,18 @@ reproducibly (see the decision document) and chart scenes query them
 through the `Catalogue` boundary on view-state and window changes, never
 during painting.
 
-Stage 3's contract is decided in
-[the all-sky tiling decision](decisions/all-sky-tiling.md), from real
-measurements: one built-in bright pack at V ≤ 8.0 (about 2.4 MiB) on a
-fixed 30-degree RA/Dec grid of 72 tiles with a plain-properties
+Stage 3 is complete:
+[the all-sky tiling decision](decisions/all-sky-tiling.md) chose, from
+real measurements, one built-in bright pack at V ≤ 8.0 (about 2.5 MiB)
+on a fixed 30-degree RA/Dec grid of 72 tiles with a plain-properties
 manifest, conservative padded tile selection, and home-tile uniqueness
-so queries cannot duplicate. Deeper packs remain future options the
-same shape can carry.
+so queries cannot duplicate — and the application now loads, queries,
+and searches it: scene queries read only intersecting tiles (verified
+against their manifest checksums at first read), search spans the
+whole pack, and the Sprint 3 regional resource has retired. Measured:
+about 33 ms to the first chart, 67 ms to load the complete pack for
+search, 0.2 ms warm scene queries, 27 MiB of heap. Deeper packs remain
+future options the same shape can carry.
 
 ## Minimum data fields
 

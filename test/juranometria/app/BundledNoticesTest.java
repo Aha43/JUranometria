@@ -35,38 +35,6 @@ class BundledNoticesTest {
         }
     }
 
-    @Test
-    void tycho2NoticeShipsWithTheStarResourceAndStatesTheNcTerms() {
-        String notice = resourceText("/resources/catalog/m31/NOTICE-tycho2.md");
-        assertTrue(notice.contains("CC BY-NC 3.0 IGO"));
-        assertTrue(notice.contains("creativecommons.org/licenses/by-nc/3.0/igo"),
-                "the canonical license link must be present");
-        assertTrue(notice.contains("Hog E."), "the Tycho-2 attribution must be present");
-        assertTrue(notice.contains("may not be used commercially"),
-                "the non-commercial restriction must be stated");
-    }
-
-    @Test
-    void openNgcNoticeAndLicenseTextShipWithTheDsoResource() {
-        String notice = resourceText("/resources/catalog/m31/NOTICE-openngc.md");
-        assertTrue(notice.contains("CC-BY-SA-4.0"));
-        assertTrue(notice.contains("Mattia Verga"), "the OpenNGC attribution must be present");
-        String license = resourceText("/resources/catalog/m31/LICENSE-CC-BY-SA-4.0.txt");
-        assertTrue(license.contains("Attribution-ShareAlike 4.0"),
-                "the complete CC-BY-SA-4.0 text must ship beside the data");
-    }
-
-    @Test
-    void generatedCatalogueResourcesShipWithProvenance() {
-        for (String resource : new String[] {
-                "/resources/catalog/m31/stars.csv",
-                "/resources/catalog/m31/dsos.csv",
-                "/resources/catalog/m31/PROVENANCE.md"}) {
-            assertNotNull(BundledNoticesTest.class.getResource(resource),
-                    resource + " must ship on the classpath");
-        }
-    }
-
     private static String resourceText(String resource) {
         try (InputStream stream = BundledNoticesTest.class.getResourceAsStream(resource)) {
             assertNotNull(stream, resource + " must ship on the classpath");
