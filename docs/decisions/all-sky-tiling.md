@@ -125,15 +125,24 @@ silently wrong sky.
 ### Query contract
 
 1. A cone query (the scene assembler's region, already padded by the
-   1.5° object-extent margin) selects every tile whose bounds'
-   clamped nearest point lies within the radius plus a 0.5°
-   `SELECTION_PADDING_DEGREES`.
-2. Selection is deliberately conservative: the padding covers the
-   clamped-nearest-point approximation on the sphere, so a tile can
-   be over-selected (cost: reading one small extra file) but never
-   missed; a completeness test sweeps positions inside a
-   boundary-straddling region and asserts every home tile was
-   selected.
+   1.5° object-extent margin) selects a tile when the centre lies
+   inside it, or when any one-degree boundary sample of the tile lies
+   within the radius plus the 0.5° `SELECTION_PADDING_DEGREES`.
+2. Selection completeness has a one-line proof: boundary samples sit
+   at most one degree of path apart (exactly one degree along
+   meridians, one degree times cos(dec) along parallels), so the true
+   nearest boundary point is within half a degree of a sample, and by
+   the triangle inequality every intersecting tile has a sample
+   within radius + 0.5°. Independently clamping RA and Dec was the
+   original design and is rejected: near the poles right-ascension
+   lines converge and the nearest route into a tile runs through
+   higher latitude, which clamping misses — the Sprint 5 Codex review
+   demonstrated a 2° south-pole query whose contained object's home
+   tile went unselected. The review's exact counterexample and a
+   whole-sky completeness sweep across representative radii, both
+   poles, the RA wrap, and boundary crossings guard the rule.
+   Over-selection can still occur (cost: reading one small extra
+   file).
 3. Rows from selected tiles are then filtered by the true query
    region — correctness never depends on tile-selection precision,
    only completeness does.
