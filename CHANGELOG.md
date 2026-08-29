@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The chart is now directly draggable: press on the paper and the sky
+  position under the pointer follows the hand exactly - anchored to
+  the press-time grab for the whole gesture, solved with the real
+  projection (never degrees-per-pixel), smooth across RA 0 and honest
+  near the poles, where the sky follows as far as a north-up chart
+  allows. A real drag departs a searched target into an honest
+  coordinate title; clicks and jitter change nothing; field width and
+  magnitude ride along untouched; Reset view still returns exactly
+  home. An open hand marks the draggable paper, a closed hand the
+  live grab.
+
 ## [0.7.0] - 2026-08-29
 
 Sprint 7 — Give the wider sky its geography. Reviewed by Codex before
