@@ -79,8 +79,21 @@ public final class ChartComponent extends JComponent {
         repaint();
     }
 
-    private int pageOffsetY() {
-        return (getHeight() - scene.viewport().heightPx()) / 2;
+    /** Top of the paper page inside the (possibly letterboxed) canvas. */
+    int pageOffsetY() {
+        return scene == null ? 0
+                : (getHeight() - scene.viewport().heightPx()) / 2;
+    }
+
+    /** Whether a component point lies on the paper page, not the chrome. */
+    boolean isOnPaper(java.awt.Point point) {
+        if (scene == null) {
+            return false;
+        }
+        int top = pageOffsetY();
+        return point.x >= 0 && point.x < scene.viewport().widthPx()
+                && point.y >= top
+                && point.y < top + scene.viewport().heightPx();
     }
 
     @Override
