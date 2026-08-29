@@ -25,14 +25,16 @@ the M31 region from bundled sample data.
 - JDK 21 or later (Java 21 is the recorded minimum; sources compile with
   `--release 21`)
 - GNU Make
-- PowerShell (`pwsh`) for the dependency download script
+- `curl` (present on macOS and most Linux systems); on Windows,
+  PowerShell (`pwsh`) runs the dependency download script instead
 
 ## Build and run
 
 From the repository root:
 
 ```sh
-pwsh scripts/download-libs.ps1   # download pinned dependencies into lib/
+scripts/download-libs.sh         # download pinned dependencies into lib/
+                                 # (Windows: pwsh scripts/download-libs.ps1)
 make test                        # compile and run the test suite
 make run                         # build and launch the application
 ```

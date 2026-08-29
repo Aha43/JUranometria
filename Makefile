@@ -14,9 +14,14 @@ APP_DIR      := $(BUILD_DIR)/app
 SOURCES      := $(shell find $(SRC_DIR) -name "*.java")
 TEST_SOURCES := $(shell find $(TEST_DIR) -name "*.java" 2>/dev/null)
 
-JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-1.10.2.jar
+# The single authoritative dependency pin set, shared with both
+# download scripts.
+include scripts/lib-versions.env
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study
+REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
+JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
+
+.PHONY: all help clean classes jar app run test chart-image constellation-study check-libs
 
 all: app
 
@@ -37,7 +42,19 @@ help:
 clean:
 	rm -rf $(BUILD_DIR)
 
-classes:
+# Stop with a readable instruction instead of compiler errors when the
+# downloaded dependencies are missing (issue #80).
+check-libs:
+	@missing=0; \
+	for jar in $(REQUIRED_LIBS) $(JUNIT_JAR); do \
+		if [ ! -f "$$jar" ]; then echo "Missing dependency: $$jar"; missing=1; fi; \
+	done; \
+	if [ "$$missing" != "0" ]; then \
+		echo "Run scripts/download-libs.sh (or scripts/download-libs.ps1 on Windows) to fetch the pinned dependencies."; \
+		exit 1; \
+	fi
+
+classes: check-libs
 	rm -rf $(CLASSES_DIR)
 	mkdir -p $(CLASSES_DIR)
 	javac \
@@ -84,7 +101,7 @@ constellation-study: classes
 pan-study: classes
 	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PanStudyMain
 
-test: classes
+test: check-libs classes
 	rm -rf $(TEST_CLASSES)
 	mkdir -p $(TEST_CLASSES)
 	javac \

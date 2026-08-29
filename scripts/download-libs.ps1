@@ -1,10 +1,15 @@
 $ErrorActionPreference = "Stop"
 
-$FlatLafVersion = "3.4.1"
-$JsvgVersion    = "1.7.2"
-$JUnitVersion   = "1.10.2"
-
+# Versions come from lib-versions.env, the single authority shared
+# with download-libs.sh and the Makefile.
 $ScriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Path
+$Versions = @{}
+Get-Content (Join-Path $ScriptDir "lib-versions.env") | ForEach-Object {
+    if ($_ -match '^([A-Z_]+)=(.+)$') { $Versions[$Matches[1]] = $Matches[2] }
+}
+$FlatLafVersion = $Versions["FLATLAF_VERSION"]
+$JsvgVersion    = $Versions["JSVG_VERSION"]
+$JUnitVersion   = $Versions["JUNIT_VERSION"]
 $RootDir    = Resolve-Path (Join-Path $ScriptDir "..")
 $LibDir     = Join-Path $RootDir "lib"
 $TestLibDir = Join-Path $RootDir "lib/test"
