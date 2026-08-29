@@ -7,6 +7,28 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- A POSIX dependency bootstrap: `scripts/download-libs.sh` fetches the
+  pinned dependencies on macOS and Linux without PowerShell, sharing
+  one authoritative version file (`scripts/lib-versions.env`) with the
+  PowerShell script and the Makefile. A build without the dependencies
+  now stops with a one-line instruction naming the script instead of
+  compiler errors.
+- A required GitHub Actions check: every pull request runs the full
+  test suite on JDK 21 with the same command a contributor runs
+  locally.
+
+### Fixed
+
+- The application grants FlatLaf explicit native access (launcher flag
+  on `make run`, manifest attribute in the packaged jar), so JDK 24+
+  launches carry no restricted-native-access warning and keep native
+  window integration under the stricter future default.
+- The README's status, document list, and the development guide's
+  sprint-record convention describe the repository as it exists after
+  eight releases; a dead `.gitignore` section is gone.
+
 ## [0.8.0] - 2026-08-30
 
 Sprint 8 — Pan across the local sky. Reviewed by Codex before release;
