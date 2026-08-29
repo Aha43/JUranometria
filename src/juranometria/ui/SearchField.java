@@ -38,9 +38,10 @@ public final class SearchField extends JTextField {
      * the query names a real object.
      */
     private static final String NO_MATCH_MESSAGE =
-            "No match in the bundled M31-region data";
+            "No match in the bundled catalogue";
+    /** Unreachable under an all-sky pack; kept for regional packs. */
     private static final String NO_FIT_MESSAGE =
-            "Found, but beyond the bundled M31-region coverage";
+            "Found, but beyond this pack's coverage";
 
     private final LocalSearch search;
     private final SceneAssembler assembler;
@@ -91,14 +92,18 @@ public final class SearchField extends JTextField {
 
     /** Recentres under the coverage policy; the chart never moves on NO_FIT. */
     Outcome apply(SearchResult result) {
+        // A named object titles the chart; coordinates leave it anonymous
+        // so the title falls back to the position itself.
+        String targetLabel = result.kind() == SearchResult.Kind.COORDINATES
+                ? null : result.regionTitle();
         double currentField = controller.state().fieldWidthDegrees();
         if (assembler.fits(result.position(), currentField)) {
-            controller.recenter(result.position());
+            controller.recenter(result.position(), targetLabel);
             return Outcome.RECENTERED;
         }
         OptionalDouble widest = assembler.widestFittingFieldDegrees(result.position());
         if (widest.isPresent()) {
-            controller.recenter(result.position(), widest.getAsDouble());
+            controller.recenter(result.position(), widest.getAsDouble(), targetLabel);
             return Outcome.RECENTERED_NARROWER;
         }
         return Outcome.NO_FIT;

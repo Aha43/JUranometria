@@ -22,7 +22,7 @@ package juranometria.chart;
  * unavailable transition instead of offering a dead control.
  */
 public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
-                             double limitingMagnitude) {
+                             double limitingMagnitude, String targetLabel) {
 
     /** Zoom sequence, widest first; zooming in walks toward 1 degree. */
     private static final double[] FIELD_WIDTH_STEPS = {8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
@@ -31,8 +31,15 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     private static final double[] MAGNITUDE_LIMIT_STEPS = {4.0, 5.0, 6.0, 7.0, 8.0};
 
     /** The Sprint 1 chart: M31, 8-degree field, stars to V 8.0. */
-    public static final ChartViewState DEFAULT =
-            new ChartViewState(new SkyPosition(10.684708, 41.268750), 8.0, 8.0);
+    public static final ChartViewState DEFAULT = new ChartViewState(
+            new SkyPosition(10.684708, 41.268750), 8.0, 8.0,
+            "M31 \u00b7 Andromeda Galaxy region");
+
+    /** A view without a named target; its title is its coordinates. */
+    public ChartViewState(SkyPosition centre, double fieldWidthDegrees,
+                          double limitingMagnitude) {
+        this(centre, fieldWidthDegrees, limitingMagnitude, null);
+    }
 
     public ChartViewState {
         if (centre == null) {
@@ -45,6 +52,10 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         if (indexOf(MAGNITUDE_LIMIT_STEPS, limitingMagnitude) < 0) {
             throw new IllegalArgumentException(
                     "limiting magnitude is not a supported step: " + limitingMagnitude);
+        }
+        if (targetLabel != null && targetLabel.isBlank()) {
+            throw new IllegalArgumentException(
+                    "target label must be null (no target) or non-blank");
         }
     }
 
@@ -75,7 +86,8 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState zoomIn() {
         return canZoomIn()
                 ? new ChartViewState(centre,
-                        FIELD_WIDTH_STEPS[fieldWidthIndex() + 1], limitingMagnitude)
+                        FIELD_WIDTH_STEPS[fieldWidthIndex() + 1], limitingMagnitude,
+                        targetLabel)
                 : this;
     }
 
@@ -83,7 +95,8 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState zoomOut() {
         return canZoomOut()
                 ? new ChartViewState(centre,
-                        FIELD_WIDTH_STEPS[fieldWidthIndex() - 1], limitingMagnitude)
+                        FIELD_WIDTH_STEPS[fieldWidthIndex() - 1], limitingMagnitude,
+                        targetLabel)
                 : this;
     }
 
@@ -91,7 +104,7 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState decreaseMagnitudeLimit() {
         return canDecreaseMagnitudeLimit()
                 ? new ChartViewState(centre, fieldWidthDegrees,
-                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() - 1])
+                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() - 1], targetLabel)
                 : this;
     }
 
@@ -99,21 +112,31 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState increaseMagnitudeLimit() {
         return canIncreaseMagnitudeLimit()
                 ? new ChartViewState(centre, fieldWidthDegrees,
-                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() + 1])
+                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() + 1], targetLabel)
                 : this;
     }
 
-    /** The same field and limit centred on a new position. */
+    /**
+     * The same field and limit centred on a new position without a named
+     * target; the chart titles itself by its coordinates.
+     */
     public ChartViewState recenteredAt(SkyPosition newCentre) {
+        return recenteredAt(newCentre, null);
+    }
+
+    /** Recentres on a named target whose label titles the chart. */
+    public ChartViewState recenteredAt(SkyPosition newCentre, String newTargetLabel) {
         if (newCentre == null) {
             throw new IllegalArgumentException("centre must not be null");
         }
-        return new ChartViewState(newCentre, fieldWidthDegrees, limitingMagnitude);
+        return new ChartViewState(newCentre, fieldWidthDegrees, limitingMagnitude,
+                newTargetLabel);
     }
 
-    /** This centre and limit at another supported field width. */
+    /** This centre, target, and limit at another supported field width. */
     public ChartViewState withFieldWidth(double newFieldWidthDegrees) {
-        return new ChartViewState(centre, newFieldWidthDegrees, limitingMagnitude);
+        return new ChartViewState(centre, newFieldWidthDegrees, limitingMagnitude,
+                targetLabel);
     }
 
     /** The complete default state: M31, 8-degree field, stars to V 8.0. */

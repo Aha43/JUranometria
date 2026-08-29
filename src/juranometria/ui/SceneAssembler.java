@@ -37,7 +37,6 @@ public final class SceneAssembler {
 
     private final Catalogue catalogue;
     private final SkyPosition dataCentre;
-    private final String title;
     private final double coverageRadiusDegrees;
     private final boolean allSky;
 
@@ -47,10 +46,10 @@ public final class SceneAssembler {
      * @param coverageRadiusDegrees the bundled data's cone radius around
      *     the data centre
      */
-    public SceneAssembler(Catalogue catalogue, SkyPosition dataCentre, String title,
+    public SceneAssembler(Catalogue catalogue, SkyPosition dataCentre,
                           double coverageRadiusDegrees, double objectExtentMarginDegrees) {
-        if (catalogue == null || dataCentre == null || title == null) {
-            throw new IllegalArgumentException("catalogue, centre, and title are required");
+        if (catalogue == null || dataCentre == null) {
+            throw new IllegalArgumentException("catalogue and centre are required");
         }
         requireValidMargin(objectExtentMarginDegrees);
         if (!(coverageRadiusDegrees > objectExtentMarginDegrees)) {
@@ -59,17 +58,14 @@ public final class SceneAssembler {
         }
         this.catalogue = catalogue;
         this.dataCentre = dataCentre;
-        this.title = title;
         this.coverageRadiusDegrees = coverageRadiusDegrees;
         this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = false;
     }
 
-    private SceneAssembler(Catalogue catalogue, String title,
-                           double objectExtentMarginDegrees) {
+    private SceneAssembler(Catalogue catalogue, double objectExtentMarginDegrees) {
         this.catalogue = catalogue;
         this.dataCentre = null;
-        this.title = title;
         this.coverageRadiusDegrees = Double.NaN;
         this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = true;
@@ -85,13 +81,13 @@ public final class SceneAssembler {
      * @param objectExtentMarginDegrees the pack's declared maximum object
      *     semi-extent, from its manifest
      */
-    public static SceneAssembler allSky(Catalogue catalogue, String title,
+    public static SceneAssembler allSky(Catalogue catalogue,
                                         double objectExtentMarginDegrees) {
-        if (catalogue == null || title == null) {
-            throw new IllegalArgumentException("catalogue and title are required");
+        if (catalogue == null) {
+            throw new IllegalArgumentException("catalogue is required");
         }
         requireValidMargin(objectExtentMarginDegrees);
-        return new SceneAssembler(catalogue, title, objectExtentMarginDegrees);
+        return new SceneAssembler(catalogue, objectExtentMarginDegrees);
     }
 
     private static void requireValidMargin(double objectExtentMarginDegrees) {
@@ -141,7 +137,19 @@ public final class SceneAssembler {
         return new ChartScene(viewport,
                 catalogue.starsIn(query),
                 catalogue.deepSkyObjectsIn(query),
-                title, state.limitingMagnitude());
+                titleFor(state), state.limitingMagnitude());
+    }
+
+    /**
+     * The title policy: a named target titles the chart; an anonymous
+     * view titles itself by its coordinates in the chart's notation.
+     */
+    static String titleFor(ChartViewState state) {
+        if (state.targetLabel() != null) {
+            return state.targetLabel();
+        }
+        return juranometria.chart.SkyFormat.formatRa(state.centre().raDegrees())
+                + ", " + juranometria.chart.SkyFormat.formatDec(state.centre().decDegrees());
     }
 
     /**

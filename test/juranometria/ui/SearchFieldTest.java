@@ -31,7 +31,7 @@ class SearchFieldTest {
         final SceneAssemblerTest.CountingCatalogue catalogue =
                 new SceneAssemblerTest.CountingCatalogue();
         final SceneAssembler assembler =
-                new SceneAssembler(catalogue, DATA_CENTRE, "Test chart", 10.0, 1.5);
+                new SceneAssembler(catalogue, DATA_CENTRE, 10.0, 1.5);
         final ChartViewController controller = new ChartViewController(this::valid);
         final SearchField field;
 
@@ -170,6 +170,35 @@ class SearchFieldTest {
             }
         }
         throw new AssertionError("no toolbar button named " + name);
+    }
+
+    @Test
+    void titlesFollowTheTargetThroughSearchZoomAndReset() throws Exception {
+        // Codex review, Sprint 5 release finding 2: the chart must never
+        // claim to be the M31 region over another sky.
+        Fixture fixture = new Fixture();
+
+        fixture.handle("m 31");
+        assertEquals("M 31 · Andromeda Galaxy region",
+                fixture.controller.state().targetLabel(),
+                "an object search titles the chart by its target");
+
+        SwingUtilities.invokeAndWait(() -> fixture.controller.zoomIn());
+        assertEquals("M 31 · Andromeda Galaxy region",
+                fixture.controller.state().targetLabel(),
+                "zooming after a search keeps the target title");
+
+        fixture.handle("12.45 41.08");
+        assertEquals(null, fixture.controller.state().targetLabel(),
+                "a coordinate recenter is anonymous; the title becomes the position");
+        assertEquals("0h 49.8m, +41° 05′",
+                SceneAssembler.titleFor(fixture.controller.state()));
+
+        SwingUtilities.invokeAndWait(() -> fixture.controller.reset());
+        assertEquals(ChartViewState.DEFAULT, fixture.controller.state());
+        assertEquals("M31 · Andromeda Galaxy region",
+                SceneAssembler.titleFor(ChartViewState.DEFAULT),
+                "reset restores the exact default title");
     }
 
     @Test
