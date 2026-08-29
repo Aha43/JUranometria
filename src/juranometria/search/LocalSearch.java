@@ -149,9 +149,21 @@ public final class LocalSearch {
         if (parts.length != 3) {
             throw new NumberFormatException("expected three colon-separated parts: " + token);
         }
-        double value = Integer.parseInt(parts[0])
-                + Integer.parseInt(parts[1]) / 60.0
-                + Double.parseDouble(parts[2]) / 3600.0;
+        // Only the whole token may carry a sign, and minutes and seconds
+        // must lie in [0, 60) — otherwise 1:-30:00 or 0:99:00 would be
+        // silently normalized into a different valid position.
+        for (String part : parts) {
+            if (part.startsWith("+") || part.startsWith("-")) {
+                throw new NumberFormatException("signed component in: " + token);
+            }
+        }
+        int whole = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        double seconds = Double.parseDouble(parts[2]);
+        if (minutes >= 60 || seconds >= 60.0) {
+            throw new NumberFormatException("minutes and seconds must be below 60: " + token);
+        }
+        double value = whole + minutes / 60.0 + seconds / 3600.0;
         return negative ? -value : value;
     }
 }

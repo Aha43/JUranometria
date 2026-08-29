@@ -59,14 +59,17 @@ public final class AtlasToolbar extends JToolBar {
         add(readout);
         readout.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 8));
 
-        controller.onChange(this::sync);
+        // Enablement asks the controller, whose can-queries include the
+        // coverage predicate, so a zoom that would leave the bundled data
+        // is disabled rather than refused after the click.
+        controller.onChange(state -> sync(controller, state));
     }
 
-    private void sync(ChartViewState state) {
-        zoomIn.setEnabled(state.canZoomIn());
-        zoomOut.setEnabled(state.canZoomOut());
-        fewerStars.setEnabled(state.canDecreaseMagnitudeLimit());
-        moreStars.setEnabled(state.canIncreaseMagnitudeLimit());
+    private void sync(ChartViewController controller, ChartViewState state) {
+        zoomIn.setEnabled(controller.canZoomIn());
+        zoomOut.setEnabled(controller.canZoomOut());
+        fewerStars.setEnabled(controller.canDecreaseMagnitudeLimit());
+        moreStars.setEnabled(controller.canIncreaseMagnitudeLimit());
         readout.setText(String.format(Locale.ROOT,
                 "Field %.0f° · Stars to V %.1f",
                 state.fieldWidthDegrees(), state.limitingMagnitude()));

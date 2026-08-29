@@ -29,7 +29,8 @@ public final class JUranometriaMain {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         ChartComponent chart = new ChartComponent(M31Chart.assembler());
-        ChartViewController controller = new ChartViewController();
+        ChartViewController controller =
+                new ChartViewController(M31Chart.assembler()::fits);
         controller.onChange(chart::setViewState);
         juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
                 M31Chart.search(), M31Chart.assembler(), controller);

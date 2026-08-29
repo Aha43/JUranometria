@@ -85,15 +85,31 @@ public final class SceneAssembler {
     }
 
     /**
-     * Whether a centre/field combination can be drawn completely: the
-     * centre's offset plus the field's half width plus the object margin
-     * stay inside the coverage cone. Geometry-independent — the page
-     * height letterboxes separately via {@link #maxPageHeightPx}.
+     * At exact horizontal equality the letterboxed page height is zero, so
+     * fitting demands this much slack beyond the half field — enough for a
+     * small but genuinely drawable page (Codex review, Sprint 4).
+     */
+    static final double MINIMUM_PAGE_ALLOWANCE_DEGREES = 0.05;
+
+    /**
+     * Whether a centre/field combination can be drawn completely as a
+     * positive page: the centre's offset plus the field's half width plus
+     * the object margin stay strictly inside the coverage cone with the
+     * minimum page allowance. Geometry-independent — the page height
+     * letterboxes separately via {@link #maxPageHeightPx}. This is the one
+     * validity predicate shared by search, navigation transitions, and
+     * scene assembly.
      */
     public boolean fits(SkyPosition centre, double fieldWidthDegrees) {
         return centre.separationDegrees(dataCentre)
                 + fieldWidthDegrees / 2.0
-                + OBJECT_EXTENT_MARGIN_DEGREES <= coverageRadiusDegrees;
+                + OBJECT_EXTENT_MARGIN_DEGREES
+                + MINIMUM_PAGE_ALLOWANCE_DEGREES <= coverageRadiusDegrees;
+    }
+
+    /** The shared predicate over a complete view state. */
+    public boolean fits(juranometria.chart.ChartViewState state) {
+        return fits(state.centre(), state.fieldWidthDegrees());
     }
 
     /**

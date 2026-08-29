@@ -32,8 +32,12 @@ class SearchFieldTest {
                 new SceneAssemblerTest.CountingCatalogue();
         final SceneAssembler assembler =
                 new SceneAssembler(catalogue, DATA_CENTRE, "Test chart", 10.0);
-        final ChartViewController controller = new ChartViewController();
+        final ChartViewController controller = new ChartViewController(this::valid);
         final SearchField field;
+
+        private boolean valid(ChartViewState state) {
+            return assembler.fits(state);
+        }
 
         Fixture() throws Exception {
             LocalSearch search = new LocalSearch(List.of(), List.of(
@@ -124,6 +128,48 @@ class SearchFieldTest {
         });
         assertEquals(FIVE_DEGREES_OUT, fixture.controller.state().centre());
         assertEquals(6.0, fixture.controller.state().fieldWidthDegrees());
+    }
+
+    @Test
+    void zoomingOutOfCoverageAfterRecentringIsDisabledAndRefused() throws Exception {
+        // Codex review P1: search opens a 5-degree offset at the fitting
+        // 6-degree field; zoom out to 8 degrees would leave coverage. The
+        // real button must be disabled, and the transition refused with no
+        // notification even if forced.
+        Fixture fixture = new Fixture();
+        AtlasToolbar[] toolbar = new AtlasToolbar[1];
+        SwingUtilities.invokeAndWait(() ->
+                toolbar[0] = new AtlasToolbar(fixture.controller, fixture.field));
+
+        assertEquals(Outcome.RECENTERED_NARROWER, fixture.handle("far 1"));
+        assertEquals(6.0, fixture.controller.state().fieldWidthDegrees());
+
+        List<ChartViewState> seen = new java.util.ArrayList<>();
+        fixture.controller.onChange(seen::add);
+
+        javax.swing.JButton zoomOut = findButton(toolbar[0], "Zoom out");
+        SwingUtilities.invokeAndWait(() -> {
+            org.junit.jupiter.api.Assertions.assertFalse(zoomOut.isEnabled(),
+                    "zoom out must be disabled when the wider field leaves coverage");
+            fixture.controller.zoomOut();
+        });
+        assertEquals(6.0, fixture.controller.state().fieldWidthDegrees(),
+                "a forced zoom out is refused before notification");
+        assertEquals(1, seen.size(), "only the registration callback fired");
+        SwingUtilities.invokeAndWait(() ->
+                org.junit.jupiter.api.Assertions.assertTrue(
+                        findButton(toolbar[0], "Zoom in").isEnabled(),
+                        "narrowing always stays inside coverage"));
+    }
+
+    private static javax.swing.JButton findButton(AtlasToolbar toolbar, String name) {
+        for (java.awt.Component component : toolbar.getComponents()) {
+            if (component instanceof javax.swing.JButton button && name.equals(
+                    button.getAccessibleContext().getAccessibleName())) {
+                return button;
+            }
+        }
+        throw new AssertionError("no toolbar button named " + name);
     }
 
     @Test

@@ -3,19 +3,39 @@ package juranometria.ui;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import juranometria.chart.ChartViewState;
 
 /**
  * Holds the current chart-view state and applies its transitions,
  * notifying listeners after every change. Swing-free, so the wiring
- * between controls and state stays testable below the UI; transitions at
- * their bounds are no-ops in the state model and notify nobody.
+ * between controls and state stays testable below the UI.
+ *
+ * The controller is the navigation boundary where coverage governs every
+ * transition: a proposed state failing the validity predicate is refused
+ * before any notification, exactly like a bounds no-op, and the
+ * {@code can*} queries consult the same predicate so controls disable
+ * instead of offering a transition that would be refused.
  */
 public final class ChartViewController {
 
+    private final Predicate<ChartViewState> isViewValid;
     private ChartViewState state = ChartViewState.DEFAULT;
     private final List<Consumer<ChartViewState>> listeners = new ArrayList<>();
+
+    /** A controller that accepts every state; for tests without coverage. */
+    public ChartViewController() {
+        this(anyState -> true);
+    }
+
+    /** @param isViewValid the shared coverage predicate, e.g. assembler::fits */
+    public ChartViewController(Predicate<ChartViewState> isViewValid) {
+        if (isViewValid == null) {
+            throw new IllegalArgumentException("validity predicate must not be null");
+        }
+        this.isViewValid = isViewValid;
+    }
 
     public ChartViewState state() {
         return state;
@@ -25,6 +45,24 @@ public final class ChartViewController {
     public void onChange(Consumer<ChartViewState> listener) {
         listeners.add(listener);
         listener.accept(state);
+    }
+
+    public boolean canZoomIn() {
+        return state.canZoomIn() && isViewValid.test(state.zoomIn());
+    }
+
+    public boolean canZoomOut() {
+        return state.canZoomOut() && isViewValid.test(state.zoomOut());
+    }
+
+    public boolean canDecreaseMagnitudeLimit() {
+        return state.canDecreaseMagnitudeLimit()
+                && isViewValid.test(state.decreaseMagnitudeLimit());
+    }
+
+    public boolean canIncreaseMagnitudeLimit() {
+        return state.canIncreaseMagnitudeLimit()
+                && isViewValid.test(state.increaseMagnitudeLimit());
     }
 
     public void zoomIn() {
@@ -58,7 +96,7 @@ public final class ChartViewController {
     }
 
     private void update(ChartViewState next) {
-        if (next.equals(state)) {
+        if (next.equals(state) || !isViewValid.test(next)) {
             return;
         }
         state = next;
