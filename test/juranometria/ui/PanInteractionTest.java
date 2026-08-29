@@ -253,12 +253,12 @@ class PanInteractionTest {
                         new PixelPoint(200, 550)));
 
         fixture.press(200, 550);
-        fixture.drag(400, 550);
-        fixture.release(400, 550);
+        fixture.drag(400, 470); // a genuine diagonal polar drag
+        fixture.release(400, 470);
 
         PixelPoint now = pixelOf(fixture.chart, grabbed);
-        assertTrue(Math.hypot(now.x() - 400, now.y() - 550) < 1e-3,
-                "an off-centre polar grab tracks the pointer exactly");
+        assertTrue(Math.hypot(now.x() - 400, now.y() - 470) < 1e-3,
+                "an off-centre diagonal polar drag tracks the pointer exactly");
     }
 
     @Test
@@ -273,9 +273,11 @@ class PanInteractionTest {
         SkyPosition grabbed = PanSolver.skyFromPlane(before,
                 PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
 
-        // A horizontal pull on the near-polar grab: constrained follow.
+        // A diagonal pull on the near-polar grab: the horizontal
+        // component clamps to the feasibility boundary while the nonzero
+        // vertical component tracks exactly - a real two-axis event.
         fixture.press(450, 350);
-        fixture.drag(650, 350);
+        fixture.drag(650, 310);
         assertTrue(fixture.controller.state().centre()
                         .separationDegrees(before) > 0.0,
                 "the sky follows the hand partway - never frozen");
@@ -283,28 +285,51 @@ class PanInteractionTest {
                 fixture.controller.state().centre())
                 .project(grabbed).orElseThrow();
         var requested = PanSolver.planeFromPixel(viewport,
-                new PixelPoint(650, 350));
+                new PixelPoint(650, 310));
+        assertTrue(Math.abs(requested.etaNorth()) > 0.0,
+                "premise: the drag has a nonzero vertical component");
         assertEquals(requested.etaNorth(), achieved.etaNorth(), 1e-6,
                 "the vertical component tracks exactly");
         assertTrue(Math.abs(achieved.xiEast())
                         < Math.abs(requested.xiEast()),
                 "the horizontal component stops at the feasibility boundary");
+        // The solver itself classifies the event as a constrained follow.
+        assertTrue(PanSolver.solveCentre(grabbed, requested, before)
+                        .constrained(),
+                "the solver classifies the diagonal event as constrained");
 
-        // For a grab this close to the pole the feasibility boundary is
-        // the pole itself: the constrained follow centres the chart there.
-        assertTrue(fixture.controller.state().centre().decDegrees() > 89.9,
-                "the boundary centre for an extreme polar grab is the pole");
+        // For a grab this close to the pole the feasibility boundary
+        // runs hard against the pole: the constrained follow carries the
+        // centre deep into the polar cap (exactly to the pole when the
+        // vertical component is zero).
+        assertTrue(fixture.controller.state().centre().decDegrees() > 89.0,
+                "the boundary centre presses against the polar cap: "
+                        + fixture.controller.state().centre());
 
-        // Pulling further along the pinned axis is saturated: the solve
-        // lands on the same boundary centre, so the controller refuses
-        // the no-op and nothing reassembles.
+        // Pulling further along the pinned axis is saturated: the solver
+        // returns the identical boundary centre (present, not past-pole),
+        // so the controller refuses the no-op and nothing reassembles.
         int queries = fixture.catalogue.starQueries;
-        fixture.drag(850, 350);
+        SkyPosition saturatedFrom = fixture.controller.state().centre();
+        var saturatedTarget = PanSolver.planeFromPixel(viewport,
+                new PixelPoint(850, 310));
+        var saturated = PanSolver.solveCentre(grabbed, saturatedTarget,
+                saturatedFrom);
+        assertFalse(saturated.pastPole(),
+                "saturation is not a past-pole hold");
+        assertEquals(saturatedFrom, saturated.centre().orElseThrow(),
+                "the saturated solve lands on the identical centre");
+        fixture.drag(850, 310);
         assertEquals(queries, fixture.catalogue.starQueries,
                 "a saturated event assembles no new scene");
 
-        // From the pole, pulling the grab downward would cross it - a
-        // held event - while pulling upward resumes the follow.
+        // From the pole, pulling the grab downward would cross it - the
+        // solver classifies past-pole - while upward resumes the follow.
+        var heldTarget = PanSolver.planeFromPixel(viewport,
+                new PixelPoint(850, 420));
+        assertTrue(PanSolver.solveCentre(grabbed, heldTarget,
+                        fixture.controller.state().centre()).pastPole(),
+                "the solver classifies the downward pull as past-pole");
         fixture.drag(850, 420);
         assertEquals(queries, fixture.catalogue.starQueries,
                 "a past-pole event within the gesture holds");
@@ -329,10 +354,21 @@ class PanInteractionTest {
         });
         Fixture.flush();
 
+        var viewport = fixture.chart.scene().viewport();
+        SkyPosition grabbed = PanSolver.skyFromPlane(
+                fixture.controller.state().centre(),
+                PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
         fixture.press(450, 350);
         fixture.drag(450, 340); // arm the gesture past the threshold
         ChartViewState afterArm = fixture.controller.state();
         int armedQueries = fixture.catalogue.starQueries;
+        // The solver itself classifies this exact event as past-pole -
+        // the no-op is a hold, not saturation or a coverage refusal.
+        assertTrue(PanSolver.solveCentre(grabbed,
+                        PanSolver.planeFromPixel(viewport,
+                                new PixelPoint(450, 170)),
+                        afterArm.centre()).pastPole(),
+                "the held event carries the solver's past-pole evidence");
         fixture.drag(450, 170);
         assertSame(afterArm, fixture.controller.state(),
                 "a past-pole event holds the previous centre");
