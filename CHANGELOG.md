@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-29
+
+Sprint 5 — Build the local sky. Reviewed by Codex before release; the
+review trail lives in `docs/reviews/`.
+
 ### Added
 
 - Every deep-sky type now draws its chart symbol from the chart
