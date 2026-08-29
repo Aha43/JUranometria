@@ -111,6 +111,55 @@ class ChartRendererTest {
     }
 
     @Test
+    void everyDsoTypeMapsToItsConventionSymbol() {
+        assertEquals(ChartRenderer.Symbol.ELLIPSE, symbolOf(DsoType.GALAXY));
+        assertEquals(ChartRenderer.Symbol.ELLIPSE, symbolOf(DsoType.GALAXY_PAIR));
+        assertEquals(ChartRenderer.Symbol.DOTTED_CIRCLE, symbolOf(DsoType.OPEN_CLUSTER));
+        assertEquals(ChartRenderer.Symbol.CROSSED_CIRCLE,
+                symbolOf(DsoType.GLOBULAR_CLUSTER));
+        assertEquals(ChartRenderer.Symbol.BOX, symbolOf(DsoType.CLUSTER_WITH_NEBULA));
+        assertEquals(ChartRenderer.Symbol.BOX, symbolOf(DsoType.EMISSION_NEBULA));
+        assertEquals(ChartRenderer.Symbol.PLANETARY, symbolOf(DsoType.PLANETARY_NEBULA));
+        assertEquals(ChartRenderer.Symbol.NONE, symbolOf(DsoType.STAR));
+        assertEquals(ChartRenderer.Symbol.NONE, symbolOf(DsoType.STELLAR_ASSOCIATION));
+    }
+
+    private static ChartRenderer.Symbol symbolOf(DsoType type) {
+        return ChartRenderer.symbolFor(new DeepSkyObject("T", List.of(), type,
+                M31_CENTRE, 30.0, 20.0, 0.0, 5.0, 2));
+    }
+
+    @Test
+    void eachSymbolFamilyLeavesItsCharacteristicInk() {
+        // 30x20 arcmin at the centre of the 8-degree viewport: about
+        // 56 x 37 px, PA 0 so the major axis is vertical, unrotated.
+        assertTrue(inkAt(DsoType.GLOBULAR_CLUSTER, 450, 350),
+                "the globular cross passes through the centre");
+        assertTrue(inkAt(DsoType.CLUSTER_WITH_NEBULA, 450 + 18, 350 - 28),
+                "the nebula box has a corner where the ellipse would not reach");
+        assertTrue(inkAt(DsoType.PLANETARY_NEBULA, 450, 350),
+                "the planetary cross passes through the centre");
+        boolean dottedInk = false;
+        for (int dy = -29; dy <= -26 && !dottedInk; dy++) {
+            for (int dx = -2; dx <= 2 && !dottedInk; dx++) {
+                dottedInk = inkAt(DsoType.OPEN_CLUSTER, 450 + dx, 350 + dy);
+            }
+        }
+        assertTrue(dottedInk, "the dotted circle leaves ink near its top arc");
+        assertTrue(!inkAt(DsoType.STELLAR_ASSOCIATION, 450, 350)
+                        && !inkAt(DsoType.STAR, 450, 350),
+                "undrawn types leave no ink");
+    }
+
+    private static boolean inkAt(DsoType type, int x, int y) {
+        DeepSkyObject dso = new DeepSkyObject("T", List.of(), type,
+                M31_CENTRE, 30.0, 20.0, 0.0, 5.0, 2);
+        ChartScene scene = new ChartScene(VIEWPORT, List.of(), List.of(dso),
+                "Test chart", 8.0);
+        return RENDERER.renderToImage(scene).getRGB(x, y) != 0xFFFFFFFF;
+    }
+
+    @Test
     void tinyGalaxiesGetThePracticalMinimumSymbol() {
         DeepSkyObject speck = new DeepSkyObject("SPECK", List.of(), DsoType.GALAXY,
                 M31_CENTRE, 0.2, 0.1, 0.0, 9.0, 2);

@@ -36,10 +36,20 @@ public final class ChartRenderer {
     private static final Color FRAME = new Color(51, 51, 51);
     private static final Color GALAXY_FILL = new Color(232, 232, 232);
     private static final Color GALAXY_OUTLINE = new Color(102, 102, 102);
+    /** Nebulae are faint; their boxes recede so the page stays restrained. */
+    private static final Color NEBULA_OUTLINE = new Color(150, 150, 150);
     private static final Color TEXT_INK = new Color(34, 34, 34);
 
     /** Practical minimum drawn major axis; the true axis ratio is kept. */
-    private static final double MIN_GALAXY_MAJOR_PX = 6.0;
+    private static final double MIN_SYMBOL_MAJOR_PX = 6.0;
+
+    /** The symbol families of docs/chart-conventions.md. */
+    enum Symbol { ELLIPSE, DOTTED_CIRCLE, CROSSED_CIRCLE, BOX, PLANETARY, NONE }
+
+    private static final java.awt.Stroke OUTLINE_STROKE = new BasicStroke(1.0f);
+    private static final java.awt.Stroke DOTTED_STROKE = new BasicStroke(
+            1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
+            new float[] {2.5f, 2.5f}, 0.0f);
 
     /**
      * Restrained labelling at the fixed Sprint chart: only the most
@@ -86,7 +96,7 @@ public final class ChartRenderer {
                 continue;
             }
             projection.project(dso.position()).ifPresent(plane ->
-                    drawGalaxy(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
+                    drawSymbol(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
         }
         g.setColor(INK);
         for (Star star : scene.stars()) {
@@ -132,12 +142,12 @@ public final class ChartRenderer {
         return image;
     }
 
-    private static void drawGalaxy(Graphics2D g, DeepSkyObject dso,
+    private static void drawSymbol(Graphics2D g, DeepSkyObject dso,
                                    PixelPoint centre, double pixelsPerPlaneUnit) {
         double majorPx = arcminToPx(dso.majorAxisArcmin(), pixelsPerPlaneUnit);
         double minorPx = arcminToPx(dso.minorAxisArcmin(), pixelsPerPlaneUnit);
-        if (majorPx < MIN_GALAXY_MAJOR_PX) {
-            double enlarge = MIN_GALAXY_MAJOR_PX / majorPx;
+        if (majorPx < MIN_SYMBOL_MAJOR_PX) {
+            double enlarge = MIN_SYMBOL_MAJOR_PX / majorPx;
             majorPx *= enlarge;
             minorPx *= enlarge;
         }
@@ -147,13 +157,52 @@ public final class ChartRenderer {
             // Position angle is east of north; east is left on the chart,
             // which is a clockwise-negative rotation in pixel space.
             g2.rotate(-Math.toRadians(dso.positionAngleDegrees()));
-            Shape ellipse = new Ellipse2D.Double(
-                    -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
-            g2.setColor(GALAXY_FILL);
-            g2.fill(ellipse);
-            g2.setColor(GALAXY_OUTLINE);
-            g2.setStroke(new BasicStroke(1.0f));
-            g2.draw(ellipse);
+            switch (symbolFor(dso)) {
+                case ELLIPSE -> {
+                    Shape ellipse = new Ellipse2D.Double(
+                            -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
+                    g2.setColor(GALAXY_FILL);
+                    g2.fill(ellipse);
+                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setStroke(OUTLINE_STROKE);
+                    g2.draw(ellipse);
+                }
+                case DOTTED_CIRCLE -> {
+                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setStroke(DOTTED_STROKE);
+                    g2.draw(new Ellipse2D.Double(
+                            -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx));
+                }
+                case CROSSED_CIRCLE -> {
+                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setStroke(OUTLINE_STROKE);
+                    g2.draw(new Ellipse2D.Double(
+                            -majorPx / 2.0, -majorPx / 2.0, majorPx, majorPx));
+                    g2.draw(new java.awt.geom.Line2D.Double(
+                            -majorPx / 2.0, 0.0, majorPx / 2.0, 0.0));
+                    g2.draw(new java.awt.geom.Line2D.Double(
+                            0.0, -majorPx / 2.0, 0.0, majorPx / 2.0));
+                }
+                case BOX -> {
+                    g2.setColor(NEBULA_OUTLINE);
+                    g2.setStroke(OUTLINE_STROKE);
+                    g2.draw(new Rectangle2D.Double(
+                            -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx));
+                }
+                case PLANETARY -> {
+                    // A small crossed circle: four spokes reaching beyond it.
+                    double r = Math.max(MIN_SYMBOL_MAJOR_PX, majorPx) / 2.0;
+                    double spoke = r * 1.7;
+                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setStroke(OUTLINE_STROKE);
+                    g2.draw(new Ellipse2D.Double(-r / 1.7, -r / 1.7,
+                            2.0 * r / 1.7, 2.0 * r / 1.7));
+                    g2.draw(new java.awt.geom.Line2D.Double(-spoke, 0.0, spoke, 0.0));
+                    g2.draw(new java.awt.geom.Line2D.Double(0.0, -spoke, 0.0, spoke));
+                }
+                case NONE -> {
+                }
+            }
         } finally {
             g2.dispose();
         }
@@ -166,7 +215,7 @@ public final class ChartRenderer {
      */
     private static void drawLabel(Graphics2D g, DeepSkyObject dso,
                                   PixelPoint centre, double pixelsPerPlaneUnit) {
-        double majorPx = Math.max(MIN_GALAXY_MAJOR_PX,
+        double majorPx = Math.max(MIN_SYMBOL_MAJOR_PX,
                 arcminToPx(dso.majorAxisArcmin(), pixelsPerPlaneUnit));
         double minorPx = arcminToPx(dso.minorAxisArcmin(), pixelsPerPlaneUnit);
         double paRadians = Math.toRadians(dso.positionAngleDegrees());
@@ -182,13 +231,30 @@ public final class ChartRenderer {
     }
 
     /**
-     * The chart draws (and labels) only types that have a symbol; today
-     * that is the galaxy ellipse. Other catalogued types load, search,
-     * and recenter, and receive their docs/chart-conventions.md symbols
-     * in a later issue.
+     * The symbol language of docs/chart-conventions.md: galaxies (and
+     * galaxy pairs, triplets, and groups) as oriented ellipses; open
+     * clusters as dotted circles; globular clusters as circles with a
+     * central cross; nebulae of every kind as restrained outlined boxes;
+     * planetary nebulae as small crossed circles. Stellar-type NGC
+     * entries, associations, novae, and unclassified objects stay
+     * undrawn - stellar entries would duplicate the star layer, and
+     * associations such as NGC 206 inside M31 await their own judgement -
+     * though all remain searchable.
      */
+    static Symbol symbolFor(DeepSkyObject dso) {
+        return switch (dso.type()) {
+            case GALAXY, GALAXY_PAIR, GALAXY_TRIPLET, GALAXY_GROUP -> Symbol.ELLIPSE;
+            case OPEN_CLUSTER -> Symbol.DOTTED_CIRCLE;
+            case GLOBULAR_CLUSTER -> Symbol.CROSSED_CIRCLE;
+            case NEBULA, EMISSION_NEBULA, REFLECTION_NEBULA, HII_REGION,
+                    SUPERNOVA_REMNANT, DARK_NEBULA, CLUSTER_WITH_NEBULA -> Symbol.BOX;
+            case PLANETARY_NEBULA -> Symbol.PLANETARY;
+            case STAR, DOUBLE_STAR, STELLAR_ASSOCIATION, NOVA, OTHER -> Symbol.NONE;
+        };
+    }
+
     static boolean hasSymbol(DeepSkyObject dso) {
-        return dso.type() == juranometria.chart.DsoType.GALAXY;
+        return symbolFor(dso) != Symbol.NONE;
     }
 
     /** The atlas labels Messier objects by their Messier name. */

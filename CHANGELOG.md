@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Every deep-sky type now draws its chart symbol from the chart
+  conventions: open clusters as dotted circles, globular clusters as
+  circles with a central cross, nebulae of every kind as restrained
+  light-grey outlined boxes, planetary nebulae as small crossed circles,
+  and galaxy pairs and groups as oriented ellipses - so M42, the
+  Pleiades, M13, and M57 appear on their charts with their Messier
+  labels. Stellar-type NGC entries and associations remain searchable
+  but undrawn. The M31 reference chart gains two honest marks (a small
+  globular symbol and the NGC 317 pair) and was regenerated and
+  visually reviewed.
+
 ### Fixed
 
 - The chart title follows the current view instead of always claiming
