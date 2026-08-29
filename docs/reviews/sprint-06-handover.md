@@ -83,17 +83,27 @@ matches the title block. (Screenshots were reviewed, not committed —
 | Manifest parse + first M31 scene | 33 ms | 35–42 ms |
 | Complete pack load (59,001 objects, for search) | 67 ms | 107–135 ms |
 | First whole-sky search | 60 ms | 69–78 ms |
-| Warm scene assemble + render, 8° (604 stars) | ~0.4 + 3 ms | 0.4 + 3 ms |
-| Warm scene assemble + render, 36° (3,439 stars, 446 DSOs) | — | 0.6 + 5 ms |
+| Warm `SceneAssembler.assemble` end to end (query + scene construction), 8° | — | 0.5 ms |
+| Warm `SceneAssembler.assemble` end to end, 36° (3,439 stars, 446 DSOs) | — | 0.5–0.8 ms |
+| Warm catalogue query alone, 36° | — | 0.4–4.4 ms |
+| Warm render, 36° | — | 2–5 ms |
 | Heap with full pack + search resident | 27 MiB | 23 MiB |
 | Packaged jar | 1.18 MiB | 1.19 MiB |
 
-The pack-load and first-search rows are noisier than Sprint 5's
-single-run numbers (ranges over three runs); no loader code changed
-this sprint, and the totals remain imperceptible at startup. The new
-regional numbers are the point: the widest page assembles in under a
-millisecond warm and renders in ~5 ms, and the widest tile touch (17
-tiles, LMC at 36°) queries in 1–3 ms.
+**Method** (Codex review, Sprint 6 finding 1): the regional rows come
+from `make regional-study`, which since this sprint times the real
+`SceneAssembler.assemble` end to end (`e2e` column) alongside its own
+catalogue-query (`qry`), scene-construction (`scn`), and render
+(`rnd`) components — one warm run per row, ranges reported over three
+tool runs across the M42, M31, and LMC pages. The end-to-end figure
+is faster than some standalone `qry` values because it runs last in
+each row, fully warm — the honest statement is: **with tiles cached,
+query plus scene construction stays under a millisecond; a
+cache-cold regional query costs single-digit milliseconds**. The
+startup rows come from a fresh-JVM harness as in Sprint 5; those two
+rows are noisier than Sprint 5's single-run numbers (ranges over
+three runs), no loader code changed this sprint, and the totals
+remain imperceptible at startup.
 
 ## Worth extra scrutiny
 
@@ -145,10 +155,13 @@ tiles, LMC at 36°) queries in 1–3 ms.
   avoidance, panning, constellation geography, and the NGC 206-style
   objects-inside-objects judgement remain deliberately deferred.
 - **Do the measurements support the tiled pack and synchronous
-  assembly at regional scale?** Comfortably: sub-millisecond warm
-  assembly and ~5 ms rendering at the widest field, 17-tile worst
-  case in single-digit milliseconds, heap flat at 23 MiB. Nothing in
-  the regional range motivates asynchrony or a different tiling.
+  assembly at regional scale?** Comfortably: the real
+  `SceneAssembler.assemble` completes in 0.5–0.8 ms warm at the
+  widest field (cache-cold queries single-digit milliseconds, the
+  17-tile LMC worst case included), rendering in 2–5 ms, heap flat
+  at 23 MiB. The whole warm query-to-pixels path is under 6 ms.
+  Nothing in the regional range motivates asynchrony or a different
+  tiling.
 - **Is constellation geography now the highest-value next layer?**
   Yes, and regional use sharpened the case: the 36° pages are
   constellation-scale by the chart conventions' own table, and the
