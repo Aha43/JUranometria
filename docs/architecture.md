@@ -33,7 +33,8 @@ src/juranometria/app/       entry point and application wiring
 src/juranometria/chart/     chart model, styling, and layout
 src/juranometria/catalog/   catalogue interfaces and local implementations
 src/juranometria/geo/       bundled constellation geography and its queries
-src/juranometria/project/   celestial projections and transforms
+src/juranometria/project/   celestial projections, transforms, and the
+                            exact grab-to-pan solver
 src/juranometria/ui/        Swing components and input handling
 src/resources/              bundled catalogue fixtures and other resources
 test/juranometria/          tests mirroring the source packages
