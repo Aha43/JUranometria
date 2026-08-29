@@ -41,9 +41,12 @@ issues. Keep a sprint small enough that its completed result can be judged as a
 whole. Close the milestone only after the integrated application has been run
 and reviewed.
 
-The Markdown sprint document explains the product arc. GitHub issues are the
-live execution record. If they diverge, update the document or explicitly note
-the changed decision.
+Sprint 1 has a Markdown sprint document (`docs/sprint-01.md`); from
+Sprint 2 onward the sprint record is the GitHub milestone with its
+ordered issues, plus the handover and independent-review pair
+committed under `docs/reviews/` before each release. GitHub issues are
+the live execution record; decision documents under `docs/decisions/`
+hold the measured design gates.
 
 ## Branches, commits, and pull requests
 
