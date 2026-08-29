@@ -128,7 +128,7 @@ public final class PanStudyMain {
                     PanGeometry.planeFromPixel(viewport, release), centre);
             if (solved.isEmpty()) {
                 System.out.printf(Locale.ROOT,
-                        "  (no solution: drag %s at %.0f deg - explicit no-op)%n",
+                        "  (past-pole hold: drag %s at %.0f deg)%n",
                         java.util.Arrays.toString(drag), field);
                 continue;
             }
@@ -137,9 +137,18 @@ public final class PanStudyMain {
             PixelPoint reprojected = new ViewportMapping(moved).toPixel(
                     new GnomonicProjection(solved.get())
                             .project(grabbed).orElseThrow());
-            worst = Math.max(worst, Math.hypot(
-                    reprojected.x() - release.x(),
-                    reprojected.y() - release.y()));
+            double error = Math.hypot(reprojected.x() - release.x(),
+                    reprojected.y() - release.y());
+            if (error > 1e-3) {
+                // Constrained follow: the requested point was infeasible
+                // for this grab; the sky followed to the boundary.
+                System.out.printf(Locale.ROOT,
+                        "  (constrained follow: drag %s at %.0f deg,"
+                                + " shortfall %.1f px along the pinned axis)%n",
+                        java.util.Arrays.toString(drag), field, error);
+                continue;
+            }
+            worst = Math.max(worst, error);
         }
         return worst;
     }
@@ -174,9 +183,9 @@ public final class PanStudyMain {
 
     /**
      * A simulated drag burst through the real seam: 120 consecutive
-     * 4-pixel drag steps, each solving the centre, assembling the
-     * scene, and rendering the page - the full per-event cost direct
-     * synchronous handling would pay.
+     * events, the pointer advancing 5 pixels per event, each solving
+     * the centre, assembling the scene, and rendering the page - the
+     * full per-event cost direct synchronous handling would pay.
      */
     private static void dragBurst() {
         TiledCatalogue catalogue = TiledCatalogue.load();
@@ -184,8 +193,9 @@ public final class PanStudyMain {
                 catalogue.manifest().maxObjectSemiExtentDegrees(),
                 ConstellationGeography.load());
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
-        System.out.println("drag burst: 120 x 4 px steps, solve + assemble"
-                + " + render per step (warm):");
+        System.out.println("drag burst: 120 events, the pointer advancing"
+                + " 5 px per event (4 right, 3 down), solve + assemble"
+                + " + render per event (warm):");
         for (double field : FIELDS) {
             SkyPosition centre = new SkyPosition(83.818667, -5.389667);
             ChartViewState state = new ChartViewState(
@@ -202,7 +212,7 @@ public final class PanStudyMain {
             for (int i = 0; i < times.length; i++) {
                 long t0 = System.nanoTime();
                 PixelPoint pointer = new PixelPoint(
-                        450 + 2 * (i + 1), 350 + (i + 1));
+                        450 + 4 * (i + 1), 350 + 3 * (i + 1));
                 SkyPosition moved = PanGeometry.solveCentre(grabbed,
                                 PanGeometry.planeFromPixel(viewport, pointer),
                                 state.centre())

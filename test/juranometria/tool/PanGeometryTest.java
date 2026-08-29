@@ -71,11 +71,25 @@ class PanGeometryTest {
                     solved++;
                     ChartViewport moved = new ChartViewport(
                             newCentre.get(), field, 900, 700);
-                    PixelPoint reprojected = new ViewportMapping(moved)
-                            .toPixel(new GnomonicProjection(newCentre.get())
-                                    .project(grabbed).orElseThrow());
-                    assertTrue(Math.hypot(reprojected.x() - release.x(),
-                                    reprojected.y() - release.y()) < 1e-3,
+                    PlanePoint requested =
+                            PanGeometry.planeFromPixel(viewport, release);
+                    PlanePoint achieved = new GnomonicProjection(newCentre.get())
+                            .project(grabbed).orElseThrow();
+                    PixelPoint reprojected =
+                            new ViewportMapping(moved).toPixel(achieved);
+                    double error = Math.hypot(reprojected.x() - release.x(),
+                            reprojected.y() - release.y());
+                    if (error >= 1e-3) {
+                        // Constrained polar follow: the vertical component
+                        // must still track exactly; the horizontal stopped
+                        // at the feasibility boundary.
+                        assertEquals(requested.etaNorth(),
+                                achieved.etaNorth(), 1e-6,
+                                "constrained follow tracks the vertical at "
+                                        + centre + " field " + field);
+                        continue;
+                    }
+                    assertTrue(error < 1e-3,
                             "closure at " + centre + " field " + field);
                 }
             }
@@ -118,20 +132,28 @@ class PanGeometryTest {
     }
 
     @Test
-    void theNorthUpChartPinsPolarGrabsHonestly() {
-        // A grab on the near-polar point cannot move horizontally: the
-        // celestial pole only ever projects onto the vertical axis of a
-        // north-up chart. The solver reports no solution - an explicit
-        // no-op, never NaN state.
+    void polarGrabsFollowTheHandAsFarAsNorthUpGeometryAllows() {
+        // A north-up chart pins a near-polar grab close to the page's
+        // vertical axis. A horizontal pull follows to the feasibility
+        // boundary - the honest partial follow of PR #76's review -
+        // tracking the vertical component exactly.
         ChartViewport viewport = new ChartViewport(POLAR_N, 18.0, 900, 700);
+        PlanePoint requested = PanGeometry.planeFromPixel(viewport,
+                new PixelPoint(650, 350));
         SkyPosition grabbed = PanGeometry.skyFromPlane(POLAR_N,
                 PanGeometry.planeFromPixel(viewport, new PixelPoint(450, 350)));
-        assertTrue(PanGeometry.solveCentre(grabbed,
-                        PanGeometry.planeFromPixel(viewport,
-                                new PixelPoint(650, 350)), POLAR_N)
-                .isEmpty(), "horizontal polar grabs are impossible");
+        SkyPosition solved = PanGeometry.solveCentre(grabbed, requested,
+                POLAR_N).orElseThrow();
+        PlanePoint achieved = new GnomonicProjection(solved)
+                .project(grabbed).orElseThrow();
+        assertEquals(requested.etaNorth(), achieved.etaNorth(), 1e-6,
+                "the vertical component tracks exactly");
+        assertTrue(Math.abs(achieved.xiEast()) < Math.abs(requested.xiEast()),
+                "the horizontal component stops at the feasibility boundary");
+        assertTrue(Math.abs(achieved.xiEast()) > 0.0,
+                "the follow is partial, not frozen");
 
-        // But grabbing any less extreme point pans the polar page freely.
+        // Grabbing any less extreme point pans the polar page freely.
         SkyPosition offCentre = PanGeometry.skyFromPlane(POLAR_N,
                 PanGeometry.planeFromPixel(viewport, new PixelPoint(200, 550)));
         assertTrue(PanGeometry.solveCentre(offCentre,

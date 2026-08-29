@@ -48,10 +48,11 @@ approximation anywhere.
 - Measured closure over the acceptance grid (8°/18°/36° × ordinary,
   RA-wrap, both polar centres × straight, diagonal, near-corner, and
   edge-crossing drags): worst **9.6e-5 px**, typically 1e-10 px.
-- **No solution is an explicit per-event no-op** — the state keeps its
-  previous centre; nothing NaN or clamped ever reaches
-  `ChartViewState` (`SkyPosition` validation plus `Optional` make the
-  illegal states unrepresentable).
+- **Failure is explicit, never silent**: an infeasible horizontal
+  request follows to the feasibility boundary (below); only a
+  past-the-pole request holds the previous centre, per event. Nothing
+  NaN or out-of-range ever reaches `ChartViewState` (`SkyPosition`
+  validation plus `Optional` make illegal states unrepresentable).
 
 ## Gesture semantics: the press-time grab is the reference
 
@@ -66,18 +67,28 @@ panning (measured, e.g. ~2.2 kpx at the wrap/36° case). Incremental
 per-event grabbing was rejected precisely because it would leak that
 holonomy *into* a single gesture as apparent drift.
 
-## Polar behaviour, derived and accepted
+## Polar behaviour: constrained follow, derived and measured
 
 A north-up gnomonic chart pins the celestial pole to the page's
-vertical axis (`ξ_pole = 0` for every centre). Therefore:
+vertical axis (`ξ_pole = 0` for every centre); a grab at declination
+δ_s can only occupy plane points with `|ξ| ≤ cot|δ_s|·√(1+η²)`.
+The decided contract (revised for the PR #76 review's P1):
 
-- grabbing the near-polar point itself and pulling horizontally has
-  **no solution** — the solver no-ops, honestly;
-- panning "past" the pole has no solution either — the centre cannot
-  cross it;
-- grabbing **any less extreme point** of a polar page pans freely
-  (worked test). This is the physically correct feel for a chart that
-  refuses to rotate; no special polar mode exists.
+- **The sky follows the hand as far as the geometry allows.** When
+  the pointer leaves the grab's feasible set, the solver clamps the
+  horizontal component onto the feasibility boundary and solves
+  exactly there — the vertical component keeps tracking exactly, the
+  horizontal follow stops at the boundary. The study reports each
+  constrained event with its shortfall (e.g. a 200 px horizontal pull
+  on the near-polar grab follows all but 117–182 px depending on
+  field). Polar pages never freeze under the hand.
+- **Panning past the pole holds**: when even the clamped target has no
+  centre inside the valid declination range — the drag would carry
+  the centre across the pole — the event holds the previous centre
+  explicitly. The drag has pulled the sky as far as it goes.
+- Grabbing **any less extreme point** of a polar page pans freely
+  (worked test). No special polar mode exists; both behaviours fall
+  out of the same solver.
 
 ## Interaction semantics for #73/#74
 
@@ -98,14 +109,15 @@ vertical axis (`ξ_pole = 0` for every centre). Therefore:
 
 ## Event handling: direct and synchronous, with evidence
 
-A simulated gesture of 120 consecutive 4 px drag events, each paying
-the full solve + assemble + render cost through the real seam, warm:
+A simulated gesture of 120 consecutive events, the pointer advancing
+5 px per event, each paying the full solve + assemble + render cost
+through the real seam, warm:
 
 | Field | median | p95 | max | 60 Hz budget |
 |---:|---:|---:|---:|---:|
-| 8° | 1.1 ms | 2.4 ms | 4.2 ms | 16.7 ms |
-| 18° | 2.6 ms | 4.7 ms | 6.9 ms | 16.7 ms |
-| 36° | 3.7 ms | 4.2 ms | 5.6 ms | 16.7 ms |
+| 8° | 1.3 ms | 3.0 ms | 4.5 ms | 16.7 ms |
+| 18° | 2.5 ms | 5.0 ms | 5.8 ms | 16.7 ms |
+| 36° | 3.8 ms | 4.6 ms | 5.9 ms | 16.7 ms |
 
 Every percentile sits far inside one frame, so **each MOUSE_DRAGGED
 event is handled synchronously on the EDT: solve, assemble once

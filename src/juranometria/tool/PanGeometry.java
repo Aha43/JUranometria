@@ -83,17 +83,22 @@ public final class PanGeometry {
      * reprojection and the valid candidate nearest the previous
      * centre is returned, keeping a continuous drag continuous.
      *
-     * Returns empty when no candidate reprojects within tolerance -
-     * geometrically impossible grabs (the pointer dragged further
-     * from the grabbed position than its whole visible hemisphere
-     * allows) are an explicit no-op, never NaN state.
+     * When the requested plane point is infeasible for this grabbed
+     * position - a north-up chart pins a near-polar point close to the
+     * page's vertical axis, the feasible set being
+     * |xi| <= cot|dec_s| * sqrt(1 + eta^2) - the horizontal component
+     * is clamped to the feasibility boundary and solved exactly there:
+     * the sky follows the hand as far as the chart's geometry allows,
+     * tracking the vertical component fully (PR #76 review, P1).
+     * Returns empty only when even the clamped target has no centre
+     * inside the valid declination range - panning past the pole -
+     * which is an explicit hold, never NaN state.
      */
     public static Optional<SkyPosition> solveCentre(SkyPosition grabbed,
                                                     PlanePoint target,
                                                     SkyPosition previousCentre) {
         double xi = target.xiEast();
         double eta = target.etaNorth();
-        double n = Math.sqrt(1.0 + xi * xi + eta * eta);
 
         double raS = Math.toRadians(grabbed.raDegrees());
         double decS = Math.toRadians(grabbed.decDegrees());
@@ -101,6 +106,19 @@ public final class PanGeometry {
         double sy = Math.cos(decS) * Math.sin(raS);
         double sz = Math.sin(decS);
         double cosDecS = Math.cos(decS);
+
+        // Feasibility: |s . e| <= cos(decS) with e depending on RA alone
+        // requires |xi| <= cot|decS| * sqrt(1 + eta^2). Clamp an
+        // infeasible request onto the boundary (with a margin keeping
+        // the declination equation strictly solvable) and solve there.
+        double margin = 1.0 - 1e-9;
+        double bound = margin * (cosDecS / Math.abs(sz))
+                * Math.sqrt(1.0 + eta * eta);
+        boolean constrained = Math.abs(sz) > 1e-15 && Math.abs(xi) > bound;
+        if (constrained) {
+            xi = Math.copySign(bound, xi);
+        }
+        double n = Math.sqrt(1.0 + xi * xi + eta * eta);
 
         // s . e = xi/N with e = (-sin a, cos a, 0):
         // cos(decS) * sin(raS - a) = xi/N.
@@ -140,6 +158,7 @@ public final class PanGeometry {
                 if (!reprojects(candidate, grabbed, xi, eta)) {
                     continue;
                 }
+
                 double separation =
                         candidate.separationDegrees(previousCentre);
                 if (separation < bestSeparation) {
