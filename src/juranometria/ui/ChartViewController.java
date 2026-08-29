@@ -43,6 +43,16 @@ public final class ChartViewController {
         update(state.increaseMagnitudeLimit());
     }
 
+    /** Moves the chart centre, keeping field width and limiting magnitude. */
+    public void recenter(juranometria.chart.SkyPosition centre) {
+        update(state.recenteredAt(centre));
+    }
+
+    /** Recentres and changes field width in one notification. */
+    public void recenter(juranometria.chart.SkyPosition centre, double fieldWidthDegrees) {
+        update(state.recenteredAt(centre).withFieldWidth(fieldWidthDegrees));
+    }
+
     public void reset() {
         update(state.reset());
     }

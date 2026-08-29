@@ -73,8 +73,8 @@ public final class ChartComponent extends JComponent {
         if (getWidth() <= 0 || getHeight() <= 0) {
             return;
         }
-        int pageHeight = Math.min(getHeight(),
-                assembler.maxPageHeightPx(viewState.fieldWidthDegrees(), getWidth()));
+        int pageHeight = Math.min(getHeight(), assembler.maxPageHeightPx(
+                viewState.centre(), viewState.fieldWidthDegrees(), getWidth()));
         scene = assembler.assemble(viewState, getWidth(), pageHeight);
         repaint();
     }
@@ -102,7 +102,8 @@ public final class ChartComponent extends JComponent {
     protected void paintComponent(Graphics g) {
         if (scene == null || scene.viewport().widthPx() != getWidth()
                 || scene.viewport().heightPx() != Math.min(getHeight(),
-                        assembler.maxPageHeightPx(viewState.fieldWidthDegrees(), getWidth()))) {
+                        assembler.maxPageHeightPx(viewState.centre(),
+                                viewState.fieldWidthDegrees(), getWidth()))) {
             // A resize event is already on its way for this geometry; skip
             // the stale frame rather than querying inside painting.
             return;

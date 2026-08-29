@@ -48,6 +48,22 @@ class ChartViewControllerTest {
     }
 
     @Test
+    void recentringNotifiesAndResetRestoresM31() {
+        ChartViewController controller = new ChartViewController();
+        List<ChartViewState> seen = new ArrayList<>();
+        controller.onChange(seen::add);
+
+        juranometria.chart.SkyPosition offset = new juranometria.chart.SkyPosition(12.0, 43.0);
+        controller.recenter(offset);
+        assertEquals(offset, controller.state().centre());
+        controller.recenter(offset, 4.0);
+        assertEquals(4.0, controller.state().fieldWidthDegrees());
+        controller.reset();
+        assertEquals(ChartViewState.DEFAULT, controller.state());
+        assertEquals(4, seen.size(), "registration, two recenters, and reset notify");
+    }
+
+    @Test
     void magnitudeTransitionsFlowThrough() {
         ChartViewController controller = new ChartViewController();
         controller.decreaseMagnitudeLimit();

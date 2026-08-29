@@ -19,4 +19,18 @@ public record SkyPosition(double raDegrees, double decDegrees) {
                     "declination must be in [-90, 90] degrees: " + decDegrees);
         }
     }
+
+    /** Great-circle separation to another position, in degrees. */
+    public double separationDegrees(SkyPosition other) {
+        double dec1 = Math.toRadians(decDegrees);
+        double dec2 = Math.toRadians(other.decDegrees);
+        double halfDeltaDec = (dec2 - dec1) / 2.0;
+        double halfDeltaRa = Math.toRadians(other.raDegrees - raDegrees) / 2.0;
+
+        // Haversine; robust across the RA 0/360 wrap.
+        double h = Math.sin(halfDeltaDec) * Math.sin(halfDeltaDec)
+                + Math.cos(dec1) * Math.cos(dec2)
+                * Math.sin(halfDeltaRa) * Math.sin(halfDeltaRa);
+        return Math.toDegrees(2.0 * Math.asin(Math.min(1.0, Math.sqrt(h))));
+    }
 }
