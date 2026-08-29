@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-29
+
+Sprint 6 — Reveal the wider sky. Reviewed by Codex before release; the
+review trail lives in `docs/reviews/`.
+
 ### Added
 
 - Regional zoom: the field width now extends through 12, 18, 24, and 36
