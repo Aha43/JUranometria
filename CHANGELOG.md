@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-30
+
+Sprint 8 — Pan across the local sky. Reviewed by Codex before release;
+the review trail lives in `docs/reviews/`.
+
 ### Added
 
 - The chart is now directly draggable: press on the paper and the sky
