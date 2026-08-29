@@ -10,7 +10,16 @@ import java.util.List;
 public record ChartScene(ChartViewport viewport, List<Star> stars,
                          List<DeepSkyObject> deepSkyObjects,
                          String title, double limitingMagnitude,
-                         String targetIdentity) {
+                         String targetIdentity, SceneGeography geography) {
+
+    /** A scene without constellation geography. */
+    public ChartScene(ChartViewport viewport, List<Star> stars,
+                      List<DeepSkyObject> deepSkyObjects,
+                      String title, double limitingMagnitude,
+                      String targetIdentity) {
+        this(viewport, stars, deepSkyObjects, title, limitingMagnitude,
+                targetIdentity, SceneGeography.EMPTY);
+    }
 
     /** A scene without a named target. */
     public ChartScene(ChartViewport viewport, List<Star> stars,
@@ -33,6 +42,10 @@ public record ChartScene(ChartViewport viewport, List<Star> stars,
         if (targetIdentity != null && targetIdentity.isBlank()) {
             throw new IllegalArgumentException(
                     "target identity must be null (no target) or non-blank");
+        }
+        if (geography == null) {
+            throw new IllegalArgumentException(
+                    "scene geography must not be null; use SceneGeography.EMPTY");
         }
         stars = List.copyOf(stars);
         deepSkyObjects = List.copyOf(deepSkyObjects);

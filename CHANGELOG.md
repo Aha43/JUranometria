@@ -9,6 +9,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Regional charts now teach constellation geography: at 12 degrees and
+  wider, traditional line figures draw in quiet grey with constellation
+  names (Latin, by the atlas convention) placed on each figure's
+  visible ink; at 18 degrees and wider, the official IAU boundaries
+  join as faint dotted lines - reconstructed true arcs that curve
+  smoothly around the poles and across RA 0. Searching M42 and zooming
+  out now ends with the whole of Orion named around the still-centred
+  nebula. Geography sits under stars, symbols, labels, and the title
+  block; the released 1-8 degree pages keep exactly their shipped ink,
+  and the M31 reference chart is unchanged.
 - The application now bundles reproducible constellation geography:
   the 88 IAU constellation identities (Latin names, genitives,
   abbreviations), traditional line-figure segments, and the official

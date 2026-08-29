@@ -22,6 +22,8 @@ public final class Atlas {
 
     private static final class Holder {
         static final TiledCatalogue CATALOGUE = TiledCatalogue.load();
+        static final juranometria.geo.ConstellationGeography GEOGRAPHY =
+                juranometria.geo.ConstellationGeography.load();
         static final SceneAssembler ASSEMBLER = assembler(CATALOGUE);
         static final LocalSearch SEARCH = new LocalSearch(
                 CATALOGUE.starsIn(wholeSky()), CATALOGUE.deepSkyObjectsIn(wholeSky()));
@@ -33,7 +35,7 @@ public final class Atlas {
                         + "; regional packs need a data centre this wiring does not define");
             }
             return SceneAssembler.allSky(catalogue,
-                    catalogue.manifest().maxObjectSemiExtentDegrees());
+                    catalogue.manifest().maxObjectSemiExtentDegrees(), GEOGRAPHY);
         }
 
         private static SkyRegion wholeSky() {
