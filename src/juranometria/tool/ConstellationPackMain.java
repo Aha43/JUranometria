@@ -175,8 +175,14 @@ public final class ConstellationPackMain {
                 throw new java.io.UncheckedIOException(e);
             }
         });
+        // The real widest page: a 36-degree field at 900x700 reaches
+        // atan(hypot(tan 18, tan 18 * 700/900)) = 22.37 degrees at the
+        // corners - the radius scene assembly will actually ask for.
+        double halfWidth = Math.tan(Math.toRadians(18.0));
+        double corner = Math.toDegrees(Math.atan(
+                Math.hypot(halfWidth, halfWidth * 700.0 / 900.0)));
         SkyRegion widest = new SkyRegion(
-                new SkyPosition(83.818667, -5.389667), 15.0);
+                new SkyPosition(83.818667, -5.389667), corner);
         geography.figureSegmentsIn(widest);
         geography.boundarySegmentsIn(widest);
         long t0 = System.nanoTime();
@@ -185,10 +191,11 @@ public final class ConstellationPackMain {
         List<GeoSegment> boundaries = geography.boundarySegmentsIn(widest);
         long t2 = System.nanoTime();
         System.out.printf(Locale.ROOT,
-                "verified reload; warm 36-degree query (15-degree radius):"
-                        + " %d figure segments in %.2f ms, %d boundary pieces"
-                        + " in %.2f ms - linear scan, no index needed%n",
-                figures.size(), (t1 - t0) / 1e6,
+                "verified reload; warm widest-page query (36-degree field,"
+                        + " %.2f-degree corner radius): %d figure segments in"
+                        + " %.2f ms, %d boundary pieces in %.2f ms - linear"
+                        + " scan, no index needed%n",
+                corner, figures.size(), (t1 - t0) / 1e6,
                 boundaries.size(), (t2 - t1) / 1e6);
     }
 

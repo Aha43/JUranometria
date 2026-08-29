@@ -37,6 +37,7 @@ public final class ConstellationGeography {
     static final String RESOURCE_ROOT = "/resources/geo/constellations/";
     static final int SUPPORTED_FORMAT_VERSION = 1;
     static final String PACK_NAME = "constellation-geography";
+    static final String SUPPORTED_FRAME = "ICRS-J2000";
 
     private final List<Constellation> constellations;
     private final List<GeoSegment> figureSegments;
@@ -78,6 +79,15 @@ public final class ConstellationGeography {
         if (!PACK_NAME.equals(packName)) {
             throw new IllegalStateException(
                     "unexpected geography pack name: " + packName);
+        }
+        // The declared frame is enforced, not merely recorded: a pack in
+        // any other frame would place geography wrongly (PR #68 review).
+        String frame = required(manifest, "coordinate.frame");
+        if (!SUPPORTED_FRAME.equals(frame)) {
+            throw new IllegalStateException(
+                    "unsupported geography coordinate frame: " + frame
+                            + "; this build renders " + SUPPORTED_FRAME
+                            + " only");
         }
 
         Map<String, Constellation> byId = new HashMap<>();

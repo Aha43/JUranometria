@@ -143,6 +143,34 @@ class ConstellationGeographyTest {
     }
 
     @Test
+    void aForeignCoordinateFrameIsRejectedNotMisplaced() {
+        // PR #68 review: the declared frame must be enforced - a B1950
+        // pack interpreted as J2000 would place geography wrongly.
+        Function<String, InputStream> foreign = name -> {
+            InputStream real = ConstellationGeography.class.getResourceAsStream(
+                    ConstellationGeography.RESOURCE_ROOT + name);
+            if (!"manifest.properties".equals(name)) {
+                return real;
+            }
+            try (real) {
+                String manifest = new String(real.readAllBytes(),
+                        StandardCharsets.UTF_8).replace(
+                        "coordinate.frame=ICRS-J2000",
+                        "coordinate.frame=FK4-B1950");
+                return new ByteArrayInputStream(
+                        manifest.getBytes(StandardCharsets.UTF_8));
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        };
+        IllegalStateException failure = assertThrows(IllegalStateException.class,
+                () -> ConstellationGeography.load(foreign));
+        assertTrue(failure.getMessage().contains("FK4-B1950"),
+                "the diagnostic names the rejected frame: "
+                        + failure.getMessage());
+    }
+
+    @Test
     void aMissingResourceIsADiagnosticNotANullSky() {
         Function<String, InputStream> missing = name ->
                 "boundaries.csv".equals(name) ? null
@@ -155,8 +183,13 @@ class ConstellationGeographyTest {
 
     @Test
     void theWidestRegionalQueryStaysWellInsideSceneAssemblyBudgets() {
+        // The true widest page: a 36-degree field at 900x700 reaches
+        // 22.37 degrees at its corners (PR #68 review).
+        double halfWidth = Math.tan(Math.toRadians(18.0));
         SkyRegion widest = new SkyRegion(
-                new SkyPosition(83.818667, -5.389667), 15.0);
+                new SkyPosition(83.818667, -5.389667),
+                Math.toDegrees(Math.atan(
+                        Math.hypot(halfWidth, halfWidth * 700.0 / 900.0))));
         GEOGRAPHY.figureSegmentsIn(widest);
         long start = System.nanoTime();
         GEOGRAPHY.figureSegmentsIn(widest);
