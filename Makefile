@@ -30,6 +30,7 @@ help:
 	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
 	@echo "  regional-study    Render the Sprint 6 regional-zoom candidate charts"
 	@echo "  constellation-study  Render the Sprint 7 constellation-geography study"
+	@echo "  import-constellations  Regenerate the bundled constellation-geography pack"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -69,6 +70,9 @@ chart-image: classes
 
 import-allsky: classes
 	java -cp "$(CLASSES_DIR)" juranometria.tool.AllSkyPackMain
+
+import-constellations: classes
+	java -cp "$(CLASSES_DIR)" juranometria.tool.ConstellationPackMain
 
 regional-study: classes
 	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.RegionalStudyMain

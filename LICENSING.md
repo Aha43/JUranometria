@@ -13,6 +13,7 @@ the application.
 |---|---|---|
 | Tabler icons (`src/resources/icons/*.svg`) | MIT | [`src/resources/icons/LICENSE`](src/resources/icons/LICENSE), listed in [`ICONS.md`](src/resources/icons/ICONS.md) |
 | Bright-sky pack star tiles (`src/resources/catalog/bright-sky/tiles/*/stars.csv`) | **CC BY-NC 3.0 IGO** — may not be used commercially | [`src/resources/catalog/bright-sky/NOTICE-tycho2.md`](src/resources/catalog/bright-sky/NOTICE-tycho2.md) |
+| Constellation-geography pack (`src/resources/geo/constellations/*.csv`) | BSD-3-Clause | [`src/resources/geo/constellations/NOTICE-constellations.md`](src/resources/geo/constellations/NOTICE-constellations.md), full licence text beside it |
 | Bright-sky pack DSO tiles (`src/resources/catalog/bright-sky/tiles/*/dsos.csv`) | CC-BY-SA-4.0 | [`src/resources/catalog/bright-sky/NOTICE-openngc.md`](src/resources/catalog/bright-sky/NOTICE-openngc.md), full text beside it |
 
 The generated catalogue resources are reproduced from pinned upstream
