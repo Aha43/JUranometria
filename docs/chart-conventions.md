@@ -69,6 +69,13 @@ From Sprint 7 the regional charts carry constellation geography, per
 Geography draws beneath stars, deep-sky symbols, labels, and the
 title block; the 8° and narrower pages carry none of it.
 
+From Sprint 12 the reader may hide layers (deep-sky symbols and
+labels, figures, boundaries, names) through View > Chart Options;
+an enabled layer still obeys every rule above, and a searched target
+with an established symbol is always drawn and labelled whatever the
+choices - the chart never titles itself by an object it hides
+([the chart-options decision](decisions/chart-options.md)).
+
 ## Detail by scale
 
 Zooming does not simply enlarge identical content. Each scale selects useful
