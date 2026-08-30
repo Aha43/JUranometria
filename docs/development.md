@@ -145,3 +145,15 @@ Measured on JDK 26.0.1 with FlatLaf 3.4.1 (issue #82): the flag
 silences the warning, and the manifest attribute keeps a plain
 `java -jar` launch silent even under the stricter default.
 
+## Packaging
+
+`make dist` builds the unpack-and-run release archive
+(`build/dist/JUranometria-X.Y.Z.zip`) deterministically from checked
+source - application JAR (with normalized entry dates), the pinned
+`lib/` dependencies, launch helpers, and every licence and notice -
+and immediately verifies it with `scripts/verify-dist.sh`: exact
+contents against the contract, the non-commercial notice present,
+and a packaged headless smoke render from a directory whose path
+contains a space. The `dist` GitHub workflow rebuilds the artifact
+and verifies that exact zip on macOS, Linux, and Windows runners,
+including real GUI launches (xvfb on Linux) in light and `--dark`.

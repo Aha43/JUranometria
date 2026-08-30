@@ -1,0 +1,20 @@
+#!/bin/sh
+# JUranometria launcher: resolves its own directory (spaces are
+# fine), checks for Java 21+, and hands over to java -jar - which
+# remains the authoritative launch path if this helper is unsuitable.
+dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+if ! command -v java >/dev/null 2>&1; then
+    echo "JUranometria needs a Java runtime, version 21 or later."
+    echo "None was found on the PATH. Install one (for example from"
+    echo "https://adoptium.net) and try again."
+    exit 1
+fi
+version=$(java -version 2>&1 | sed -nE 's/.*version "([0-9]+).*/\1/p' | head -n 1)
+case "$version" in ''|*[!0-9]*) version=0 ;; esac
+if [ "$version" -lt 21 ]; then
+    echo "JUranometria needs Java 21 or later."
+    echo "  Found: $(java -version 2>&1 | head -n 1)"
+    echo "Install Java 21+ (for example from https://adoptium.net)."
+    exit 1
+fi
+exec java --enable-native-access=ALL-UNNAMED -jar "$dir/JUranometria.jar" "$@"
