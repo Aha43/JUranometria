@@ -31,6 +31,8 @@ public final class ChartComponent extends JComponent {
     private final ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
     private final SceneAssembler assembler;
     private ChartViewState viewState = ChartViewState.DEFAULT;
+    private juranometria.render.ChartOptions chartOptions =
+            juranometria.render.ChartOptions.DEFAULTS;
     private ChartScene scene;
 
     public ChartComponent(SceneAssembler assembler) {
@@ -63,6 +65,24 @@ public final class ChartComponent extends JComponent {
 
     public ChartViewState viewState() {
         return viewState;
+    }
+
+    /**
+     * Adopts the reader's chart options and repaints. Options are
+     * presentation state consumed by the renderer: no scene assembly,
+     * no catalogue or geography query, no navigation change
+     * (docs/decisions/chart-options.md).
+     */
+    public void setChartOptions(juranometria.render.ChartOptions options) {
+        if (options == null) {
+            throw new IllegalArgumentException("chart options must not be null");
+        }
+        this.chartOptions = options;
+        repaint();
+    }
+
+    public juranometria.render.ChartOptions chartOptions() {
+        return chartOptions;
     }
 
     ChartScene scene() {
@@ -126,7 +146,7 @@ public final class ChartComponent extends JComponent {
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.translate(0, pageOffsetY());
-            renderer.render(g2, scene);
+            renderer.render(g2, scene, chartOptions);
         } finally {
             g2.dispose();
         }
