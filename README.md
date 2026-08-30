@@ -5,10 +5,13 @@ the sky. It presents the fixed sky as a working celestial map: white paper,
 black ink, restrained labels, and continuous movement between a local finder
 chart and a broad regional atlas.
 
-The project is planned as a Java desktop application with a Swing interface
-and a Java2D chart renderer. The first milestone is deliberately smaller than
-a usable astronomy application: render a convincing, deterministic chart of
-the M31 region from bundled sample data.
+It is a Java desktop application (Swing interface, Java2D renderer)
+carrying the whole sky to V 8.0 fully offline: 45,630 stars with
+traditional names and designations, 13,371 deep-sky objects, the 88
+constellations' names, figures, and true boundaries, and an
+equatorial coordinate grid - searchable, grab-to-pan, and
+zoom-where-you-point. The 1.0 promise is recorded in
+[the 1.0 contract](docs/decisions/one-point-zero-contract.md).
 
 ## Project documents
 
@@ -24,14 +27,26 @@ the M31 region from bundled sample data.
 
 ## Requirements
 
-- JDK 21 or later (Java 21 is the recorded minimum; sources compile with
-  `--release 21`)
+**Running the released application** (verified on macOS 14+, Apple
+silicon and Intel; Ubuntu 24.04 LTS x86-64; and Windows 11 x86-64): a Java
+runtime of version 21 or later, and nothing else - download the
+release archive, unpack, and launch with the bundled helper or
+`java -jar JUranometria.jar`. Everything works offline; the
+application never touches the network. Note the licensing
+consequence: the bundled Tycho-2-derived star data is CC BY-NC 3.0
+IGO, so the packaged application is for non-commercial use only.
+
+**Building from source** (contributors):
+
+- JDK 21 or later (sources compile with `--release 21`; the build
+  selects its own JDK 21+ toolchain, `JAVA_HOME` overrides)
 - GNU Make
 - `curl` (present on macOS and most Linux systems)
 
 The supported contributor environments are macOS and Linux; on
-Windows, use WSL. (A native Windows workflow may return later as a
-complete, tested path if there is real demand.)
+Windows, use WSL. A native Windows development workflow is not part
+of 1.0 - Windows is supported as a runtime through the release
+archive.
 
 ## Build and run
 

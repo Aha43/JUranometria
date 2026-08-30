@@ -17,6 +17,20 @@ the application.
 | Bright-sky pack DSO tiles (`src/resources/catalog/bright-sky/tiles/*/dsos.csv`) | CC-BY-SA-4.0 | [`src/resources/catalog/bright-sky/NOTICE-openngc.md`](src/resources/catalog/bright-sky/NOTICE-openngc.md), full text beside it |
 | Star-identity pack (`src/resources/catalog/star-identities/star-identities.csv`) | BSD-3-Clause | [`src/resources/catalog/star-identities/NOTICE-star-identities.md`](src/resources/catalog/star-identities/NOTICE-star-identities.md), full licence text beside it |
 
+## Redistributed runtime libraries
+
+The release archive redistributes the pinned runtime libraries
+beside the application JAR; each keeps its own licence:
+
+| Library | License |
+|---|---|
+| FlatLaf and FlatLaf Extras (look and feel) | Apache License 2.0 |
+| JSVG (SVG icon rendering) | MIT |
+
+The JUnit console runner is a test-only dependency and is never
+redistributed. Licence texts for the redistributed libraries ship in
+the release archive beside the `lib/` directory.
+
 The generated catalogue resources are reproduced from pinned upstream
 inputs; see
 [`docs/decisions/catalogue-sources.md`](docs/decisions/catalogue-sources.md)
