@@ -178,7 +178,7 @@ public final class AppMenuBar {
      * The platform menu shortcut mask; the Ctrl fallback keeps
      * headless tests running where no toolkit mask exists.
      */
-    static int menuShortcutMask() {
+    public static int menuShortcutMask() {
         try {
             return java.awt.Toolkit.getDefaultToolkit()
                     .getMenuShortcutKeyMaskEx();

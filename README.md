@@ -75,7 +75,12 @@ make import-star-identities
 
 - **Zoom in / Zoom out** step the field width through 36°, 24°, 18°,
   12°, 8°, 6°, 4°, 3°, 2°, and 1°, always centred on the current
-  target - zooming out from a searched object progressively reveals
+  target. The **mouse wheel zooms where you point**: the sky beneath
+  the pointer stays beneath the pointer, exactly, as the scale steps
+  (trackpad scrolling accumulates to whole steps; near a celestial
+  pole the chart honestly refuses a step it cannot anchor rather
+  than drift). **⌘/Ctrl +** and **⌘/Ctrl −** (keypad forms too) zoom
+  about the centre from the keyboard, even while Search has focus - zooming out from a searched object progressively reveals
   its celestial neighbourhood. Beyond 18°, deep-sky symbols draw only
   at their true projected size, so the wide pages stay readable;
   Messier objects remain, and a searched target with an established
@@ -117,7 +122,8 @@ make import-star-identities
 - The readout on the right and the chart's title block always state the
   active field width and magnitude limit.
 
-The menu bar stays out of the way: **View → Chart Options…** lets the
+The menu bar stays out of the way: **View** carries Zoom In/Zoom Out
+with their platform shortcuts, and **View → Chart Options…** lets the
 reader choose the chart's content and labels — deep-sky objects and
 their labels, constellation figures, boundaries, and names, and star
 names and identifiers — with a

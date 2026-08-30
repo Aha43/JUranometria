@@ -7,6 +7,21 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Zoom where you point: the mouse wheel steps the field width with
+  the sky beneath the pointer held exactly beneath the pointer -
+  projection-correct through the pan solver's closed-form geometry,
+  never a screen-space approximation. One notch is one step;
+  trackpad rotations accumulate to whole steps; each accepted step
+  is exact and preflight-reversible (a step the chart cannot anchor
+  or reverse - near a celestial pole - honestly refuses rather than
+  drift), and a pointer step that moves the centre clears the
+  searched target like a pan. Platform zoom shortcuts (Cmd/Ctrl
+  with +, -, =, and the keypad forms) and View-menu Zoom In/Out
+  zoom about the centre, keeping the target, even while Search has
+  focus - unmodified typing is never intercepted.
+
 ## [0.13.0] - 2026-08-30
 
 Sprint 13 — Name the stars. Reviewed by Codex at the design gate, at
