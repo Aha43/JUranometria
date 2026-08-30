@@ -216,22 +216,28 @@ class ZoomInteractionTest {
                 "at 18 degrees the tall window is still full-bleed");
         int x = 450;
         int y = fixture.chart.getHeight() / 2 + 40;
+        // The invariant, end to end: the sky beneath the pointer
+        // BEFORE the burst - captured against the pre-burst paper -
+        // is still beneath the same window pixel afterwards, measured
+        // against the post-burst letterboxed paper. Stale geometry in
+        // either step would break this; nothing here is derived from
+        // the final view.
+        var before = fixture.chart.scene().viewport();
+        SkyPosition anchorBefore = anchorAt(fixture.controller.state(),
+                x, y - fixture.chart.pageOffsetY(),
+                before.widthPx(), before.heightPx());
         fixture.wheel(x, y, 2.0);
         assertEquals(36.0, fixture.controller.state().fieldWidthDegrees(),
                 "both notches applied");
         assertTrue(fixture.chart.pageOffsetY() > 0,
                 "the second step crossed into a letterboxed paper");
-        // The pointer's sky after the burst sits where the pointer is,
-        // measured against the CURRENT paper geometry.
-        var viewport = fixture.chart.scene().viewport();
-        SkyPosition anchorNow = anchorAt(fixture.controller.state(),
-                x, y - fixture.chart.pageOffsetY(),
-                viewport.widthPx(), viewport.heightPx());
-        assertTrue(driftPx(fixture.controller.state(), anchorNow,
+        var after = fixture.chart.scene().viewport();
+        assertTrue(driftPx(fixture.controller.state(), anchorBefore,
                         x, y - fixture.chart.pageOffsetY(),
-                        viewport.widthPx(), viewport.heightPx())
+                        after.widthPx(), after.heightPx())
                         < DRIFT_TOLERANCE_PX,
-                "the final step anchored against fresh geometry");
+                "the pre-burst sky is still beneath the pointer after"
+                        + " the re-cap");
 
         // And the stranding case cannot arise at all: a pointer close
         // enough to the window edge to be letterboxed by the 24-degree
