@@ -26,16 +26,19 @@ include scripts/lib-versions.env
 REQUIRED_JDK := 21
 
 ifneq ($(origin JAVA_HOME), undefined)
-  JDK_HOME := $(JAVA_HOME)
+  # An explicit JAVA_HOME is authoritative: its tools are used as
+  # given, and a missing or unusable JDK there stops the build with a
+  # readable message - never a silent fallback to whatever leads the
+  # PATH (PR #138 review).
+  JDK_BIN := $(JAVA_HOME)/bin/
 else
   BREW_JDK := $(shell brew --prefix openjdk@$(REQUIRED_JDK) 2>/dev/null)
   ifneq ($(BREW_JDK),)
-    JDK_HOME := $(BREW_JDK)/libexec/openjdk.jdk/Contents/Home
+    BREW_JDK_HOME := $(BREW_JDK)/libexec/openjdk.jdk/Contents/Home
+    ifneq ($(wildcard $(BREW_JDK_HOME)/bin/javac),)
+      JDK_BIN := $(BREW_JDK_HOME)/bin/
+    endif
   endif
-endif
-
-ifneq ($(wildcard $(JDK_HOME)/bin/javac),)
-  JDK_BIN := $(JDK_HOME)/bin/
 endif
 
 JAVAC := $(JDK_BIN)javac
@@ -92,7 +95,7 @@ check-jdk:
 		echo "Install JDK $(REQUIRED_JDK) or later, or set JAVA_HOME."; \
 		exit 1; \
 	fi; \
-	found=$$($(JAVAC) -version 2>&1 | sed -E 's/^javac ([0-9]+).*/\1/'); \
+	found=$$($(JAVAC) -version 2>&1 | sed -nE 's/^javac ([0-9]+).*/\1/p' | head -n 1); \
 	case "$$found" in \
 		''|*[!0-9]*) found=0 ;; \
 	esac; \
