@@ -100,7 +100,13 @@ make import-allsky                      # verifies checksums, regenerates the pa
 - The readout on the right and the chart's title block always state the
   active field width and magnitude limit.
 
-The menu bar stays out of the way: **Help → About JUranometria** shows
+The menu bar stays out of the way: **View → Chart Options…** lets the
+reader choose the chart's content and labels — deep-sky objects and
+their labels, constellation figures, boundaries, and names — with a
+live preview, safe Cancel, a Restore Defaults returning the released
+chart exactly, and choices remembered across restarts (a searched
+target always stays drawn and labelled, whatever the toggles);
+**Help → About JUranometria** shows
 the version, a short description, and the licensing of the code and
 every bundled resource — including the full notices, offline — and
 **File → Settings…** holds the persistent Light/Dark

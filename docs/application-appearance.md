@@ -74,7 +74,8 @@ not downloaded as a speculative icon set.
 ## Menus, About, and the appearance setting
 
 The menu bar is deliberately restrained: a File menu carrying
-Settings and a Help menu carrying About - no placeholder items. (File
+Settings, a View menu carrying Chart Options, and a Help menu
+carrying About - no placeholder items. (File
 rather than an app-named menu: the macOS screen menu bar already
 provides the application menu, and a duplicate name reads wrongly.) The
 About dialog identifies the application from the packaged version,
