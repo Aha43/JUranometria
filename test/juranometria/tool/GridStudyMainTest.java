@@ -158,6 +158,46 @@ class GridStudyMainTest {
     }
 
     @Test
+    void oneExactBoundsCalculationGovernsPlacementContainmentAndSuppression() {
+        // PR #137 review (P1): label geometry is the real font's, not
+        // a guessed width, and a label that would clip the paper edge
+        // after ordinary panning is suppressed by the same shared
+        // calculation that governs title collisions and drawing.
+        var metrics = GridStudyMain.labelMetrics();
+        boolean sawEdgeSuppression = false;
+        for (int shift = 0; shift < 24; shift++) {
+            ChartViewport viewport = new ChartViewport(
+                    new SkyPosition(83.0 + shift * 0.11, -5.389667),
+                    12.0, 900, 700);
+            var grid = GridStudyMain.gridFor(viewport, null);
+            for (var label : grid.labels()) {
+                assertTrue(GridStudyMain.fitsPaper(label, metrics, viewport),
+                        "every emitted label's exact box lies on the paper:"
+                                + " " + label);
+            }
+            // A meridian whose bottom crossing sits within one label
+            // width of the right paper edge cannot carry a contained
+            // label - the sweep must hit at least one such pan.
+            long bottomRaLabels = grid.labels().stream()
+                    .filter(label -> label.text().contains("h")).count();
+            if (bottomRaLabels < grid.meridians().size()
+                    && grid.suppressedLabels() > 0) {
+                sawEdgeSuppression = true;
+            }
+        }
+        assertTrue(sawEdgeSuppression,
+                "the panning sweep exercised the paper-containment"
+                        + " suppression, not just the happy path");
+
+        // The shared calculation is the drawing geometry too: the box
+        // of a known label is exactly the metrics' string bounds.
+        var label = new GridStudyMain.Label("5h 40m", 100.0, 690.0);
+        var box = GridStudyMain.labelBounds(label, metrics);
+        assertEquals(metrics.stringWidth("5h 40m") + 2.0, box.getWidth());
+        assertEquals(metrics.getHeight(), box.getHeight());
+    }
+
+    @Test
     void gridLabelsYieldToTheTitleBlockOnly() {
         ChartViewport viewport = page(10.684708, 41.268750, 8.0);
         var open = GridStudyMain.gridFor(viewport, null);

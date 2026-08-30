@@ -31,8 +31,10 @@ Candidate curves and sample ranges come from the **page's own sky
 bounds**, measured through the exact inverse projection along the
 page border (with the full RA circle when a celestial pole lies on
 the page) — so the pass touches only visible sky. Mean computation:
-**1.8 ms per page** (9.6k samples on the polar page, 3–6k
-elsewhere) — comfortably synchronous repaint, and by construction a
+**2.0 ms per page** — 3–6k subdivision samples on ordinary pages,
+9.6k on the polar page, and **24.8k on the tall letterboxed page**
+(whose paper is nearly seven ordinary pages of sky) — comfortably
+synchronous repaint in every case, and by construction a
 pure function of the viewport: **no catalogue or geography query can
 occur** (the seam sees only `ChartViewport`).
 
@@ -86,9 +88,16 @@ docs/studies/coordinate-grid/):
   belong to the **paper**, not the window: on letterboxed and
   minimum-size pages they sit at the paper's edges (measured pages
   included).
-- **The title block wins**: a grid label whose box would intersect
+- **One exact bounds calculation governs everything** (PR #137
+  review): the label's box comes from the real font metrics — never
+  a guessed width — and that single calculation decides placement,
+  **paper containment** (a label whose box would clip the paper edge
+  after ordinary panning is suppressed, not clipped), title
+  suppression, and drawing.
+- **The title block wins**: a grid label whose exact box intersects
   the shared production `ChartRenderer.titleBlockBounds` is
-  suppressed (measured: 0–3 per page, counted in the study report).
+  suppressed (measured: 0–3 per page, counted with the containment
+  suppressions in the study report).
 
 ## Visual hierarchy
 

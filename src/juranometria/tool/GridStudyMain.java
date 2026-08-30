@@ -81,6 +81,38 @@ public final class GridStudyMain {
     record Label(String text, double x, double y) {
     }
 
+    /**
+     * The ONE label-bounds calculation (PR #137 review, P1): exact
+     * font geometry, shared by placement, paper containment, title
+     * suppression, and drawing - never a guessed per-character width.
+     * {@code x}/{@code y} anchor the drawn baseline.
+     */
+    static java.awt.geom.Rectangle2D labelBounds(
+            Label label, java.awt.FontMetrics metrics) {
+        return new java.awt.geom.Rectangle2D.Double(
+                label.x() - 1.0, label.y() - metrics.getAscent(),
+                metrics.stringWidth(label.text()) + 2.0,
+                metrics.getHeight());
+    }
+
+    /** Metrics for the grid label face, headless-safe and shared. */
+    static java.awt.FontMetrics labelMetrics() {
+        Graphics2D g = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_RGB).createGraphics();
+        java.awt.FontMetrics metrics = g.getFontMetrics(GRID_LABEL_FONT);
+        g.dispose();
+        return metrics;
+    }
+
+    /** Whether a label's exact box lies fully on the paper. */
+    static boolean fitsPaper(Label label, java.awt.FontMetrics metrics,
+                             ChartViewport viewport) {
+        var box = labelBounds(label, metrics);
+        return box.getMinX() >= 0 && box.getMinY() >= 0
+                && box.getMaxX() <= viewport.widthPx()
+                && box.getMaxY() <= viewport.heightPx();
+    }
+
     static GridSpec spec(ChartViewport viewport) {
         double pxPerDegree = viewport.widthPx()
                 / viewport.fieldWidthDegrees();
@@ -117,6 +149,7 @@ public final class GridStudyMain {
         ViewportMapping mapping = new ViewportMapping(viewport);
         double sampleStep = viewport.fieldWidthDegrees() / 180.0;
         SkyBounds bounds = boundsFor(viewport);
+        java.awt.FontMetrics metrics = labelMetrics();
 
         List<List<PixelPoint>> meridians = new ArrayList<>();
         List<Label> labels = new ArrayList<>();
@@ -145,7 +178,8 @@ public final class GridStudyMain {
             if (!pieces.isEmpty()) {
                 Label label = edgeLabel(pieces, raLabel(ra), viewport, true);
                 if (label != null) {
-                    if (intersectsTitle(label, titleBlock, viewport)) {
+                    if (!fitsPaper(label, metrics, viewport)
+                            || intersectsTitle(label, metrics, titleBlock)) {
                         suppressed++;
                     } else {
                         labels.add(label);
@@ -175,7 +209,8 @@ public final class GridStudyMain {
                         decLabel(parallelDec, spec.decStepDegrees()),
                         viewport, false);
                 if (label != null) {
-                    if (intersectsTitle(label, titleBlock, viewport)) {
+                    if (!fitsPaper(label, metrics, viewport)
+                            || intersectsTitle(label, metrics, titleBlock)) {
                         suppressed++;
                     } else {
                         labels.add(label);
@@ -398,16 +433,10 @@ public final class GridStudyMain {
     }
 
     private static boolean intersectsTitle(Label label,
-                                           java.awt.Rectangle titleBlock,
-                                           ChartViewport viewport) {
-        if (titleBlock == null) {
-            return false;
-        }
-        // A conservative text box for the 10pt label.
-        var box = new java.awt.geom.Rectangle2D.Double(
-                label.x() - 2, label.y() - 10,
-                label.text().length() * 6.5 + 4, 13);
-        return titleBlock.intersects(box.getBounds());
+                                           java.awt.FontMetrics metrics,
+                                           java.awt.Rectangle titleBlock) {
+        return titleBlock != null
+                && labelBounds(label, metrics).intersects(titleBlock);
     }
 
     /** Draws a computed grid onto a graphics context, quietest ink. */
