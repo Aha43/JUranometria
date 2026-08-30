@@ -23,9 +23,13 @@ public final class AppMenuBar {
     /**
      * @param openSettings runs on the Settings... item (may be null
      *     while no settings exist, omitting the item)
+     * @param openChartOptions runs on the View menu's Chart Options...
+     *     item (may be null, omitting the View menu)
      * @param openAbout runs on the About item
      */
-    public static JMenuBar create(Runnable openSettings, Runnable openAbout) {
+    public static JMenuBar create(Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout) {
         if (openAbout == null) {
             throw new IllegalArgumentException("about action is required");
         }
@@ -42,6 +46,20 @@ public final class AppMenuBar {
             settings.addActionListener(event -> openSettings.run());
             application.add(settings);
             bar.add(application);
+        }
+
+        if (openChartOptions != null) {
+            JMenu view = new JMenu("View");
+            view.getAccessibleContext().setAccessibleName("View menu");
+            JMenuItem chartOptions = new JMenuItem("Chart Options...");
+            chartOptions.setMnemonic('C');
+            chartOptions.getAccessibleContext().setAccessibleName(
+                    "Chart Options");
+            chartOptions.getAccessibleContext().setAccessibleDescription(
+                    "Choose which chart content and labels draw");
+            chartOptions.addActionListener(event -> openChartOptions.run());
+            view.add(chartOptions);
+            bar.add(view);
         }
 
         JMenu help = new JMenu("Help");

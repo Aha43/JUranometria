@@ -21,18 +21,22 @@ class AppSurfaceTest {
     // ------------------------------------------------------------ menu
 
     @Test
-    void theMenuBarIsRestrainedAndWiresItsTwoActions() {
+    void theMenuBarIsRestrainedAndWiresItsThreeActions() {
         int[] settings = new int[1];
+        int[] chartOptions = new int[1];
         int[] about = new int[1];
-        JMenuBar bar = AppMenuBar.create(
-                () -> settings[0]++, () -> about[0]++);
-        assertEquals(2, bar.getMenuCount(),
-                "File and Help - nothing else");
+        JMenuBar bar = AppMenuBar.create(() -> settings[0]++,
+                () -> chartOptions[0]++, () -> about[0]++);
+        assertEquals(3, bar.getMenuCount(),
+                "File, View, and Help - nothing else");
         assertEquals("File", bar.getMenu(0).getText());
         assertEquals(1, bar.getMenu(0).getItemCount(),
                 "no placeholder items beside Settings");
-        assertEquals("Help", bar.getMenu(1).getText());
+        assertEquals("View", bar.getMenu(1).getText());
         assertEquals(1, bar.getMenu(1).getItemCount(),
+                "no placeholder items beside Chart Options");
+        assertEquals("Help", bar.getMenu(2).getText());
+        assertEquals(1, bar.getMenu(2).getItemCount(),
                 "no placeholder items beside About");
 
         JMenuItem settingsItem = bar.getMenu(0).getItem(0);
@@ -40,7 +44,14 @@ class AppSurfaceTest {
         settingsItem.doClick();
         assertEquals(1, settings[0]);
 
-        JMenuItem aboutItem = bar.getMenu(1).getItem(0);
+        JMenuItem chartOptionsItem = bar.getMenu(1).getItem(0);
+        assertEquals("Chart Options...", chartOptionsItem.getText());
+        assertEquals("Chart Options", chartOptionsItem
+                .getAccessibleContext().getAccessibleName());
+        chartOptionsItem.doClick();
+        assertEquals(1, chartOptions[0]);
+
+        JMenuItem aboutItem = bar.getMenu(2).getItem(0);
         assertEquals("About " + AppInfo.NAME, aboutItem.getText());
         assertTrue(aboutItem.getAccessibleContext().getAccessibleName()
                 .contains("About"));
@@ -49,8 +60,8 @@ class AppSurfaceTest {
     }
 
     @Test
-    void withoutSettingsTheMenuBarCarriesHelpAlone() {
-        JMenuBar bar = AppMenuBar.create(null, () -> { });
+    void withoutOptionalActionsTheMenuBarCarriesHelpAlone() {
+        JMenuBar bar = AppMenuBar.create(null, null, () -> { });
         assertEquals(1, bar.getMenuCount());
         assertEquals("Help", bar.getMenu(0).getText());
     }

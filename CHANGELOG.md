@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The reader chooses the chart: View > Chart Options... offers five
+  content and label toggles - deep-sky objects, deep-sky labels,
+  constellation figures, boundaries, and names - previewing live on
+  the chart as they change, confirmed with OK, abandoned safely with
+  Cancel or Escape, and remembered across restarts. Restore Defaults
+  brings back the released chart exactly. Every scale rule stays
+  automatic inside an enabled layer, and a searched target with an
+  established symbol is always drawn and labelled whatever the
+  toggles - the chart never titles itself by an object it hides.
+  Labels follow their symbols and names follow their figures; Home
+  still resets navigation only.
+
 ## [0.11.0] - 2026-08-30
 
 Sprint 11 — Give the application a public face. Reviewed by Codex
