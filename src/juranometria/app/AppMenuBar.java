@@ -5,11 +5,15 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 /**
- * The application's restrained conventional menu bar: an app-named
- * menu carrying Settings and a Help menu carrying About - nothing
- * else, and deliberately no placeholder items for future features.
- * Actions are injected so the wiring is testable headless and the
- * menu never reaches into chart state.
+ * The application's restrained conventional menu bar: a File menu
+ * carrying Settings and a Help menu carrying About - nothing else,
+ * and deliberately no placeholder items for future features. File
+ * rather than an app-named menu: on macOS the screen menu bar already
+ * provides the application menu, and a second menu with the same name
+ * reads as a duplicate (owner review of Sprint 11); File is the
+ * conventional cross-platform home and leaves room for future items
+ * that genuinely belong there. Actions are injected so the wiring is
+ * testable headless and the menu never reaches into chart state.
  */
 public final class AppMenuBar {
 
@@ -28,9 +32,9 @@ public final class AppMenuBar {
         JMenuBar bar = new JMenuBar();
 
         if (openSettings != null) {
-            JMenu application = new JMenu(AppInfo.NAME);
+            JMenu application = new JMenu("File");
             application.getAccessibleContext().setAccessibleName(
-                    AppInfo.NAME + " menu");
+                    "File menu");
             JMenuItem settings = new JMenuItem("Settings...");
             settings.getAccessibleContext().setAccessibleName("Settings");
             settings.getAccessibleContext().setAccessibleDescription(

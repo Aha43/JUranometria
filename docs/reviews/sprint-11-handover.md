@@ -8,7 +8,7 @@ handover in one pass per the sprint instruction, for one review.
 
 ## What Sprint 11 delivered
 
-- **A restrained conventional menu bar**: an application menu carrying
+- **A restrained conventional menu bar**: a File menu carrying
   Settings… and a Help menu carrying About JUranometria — nothing
   else, no placeholder Chart Options, no toolbar changes. Actions are
   injected, so the wiring is headless-testable and the menus cannot
@@ -69,11 +69,16 @@ compact viewport rather than growing the dialog).
 ## Platform behaviour, stated honestly
 
 - macOS runs with the screen menu bar
-  (`apple.laf.useScreenMenuBar=true`), so the JUranometria and Help
-  menus appear in the system bar; on Linux and in the visual-check
-  harness they appear in-window. Same Swing menus either way; native
-  macOS application-menu integration (About/Settings under the Apple
-  app menu) remains explicitly out of scope this sprint.
+  (`apple.laf.useScreenMenuBar=true`), so the File and Help menus
+  appear in the system bar beside the macOS-provided application
+  menu; on Linux and in the visual-check harness they appear
+  in-window. The Settings menu was renamed from an app-named menu to
+  File during the owner's review: macOS already shows an application
+  menu with the product's name, and the duplicate read wrongly. The
+  fuller macOS answer — `java.awt.Desktop` about/preferences handlers
+  placing both items into the native application menu — remains
+  explicitly out of scope this sprint and is the natural follow-up
+  when native integration is wanted.
 - The journey test requires a display and is **skipped, not silently
   passed, on headless runners** (the CI check remains green with the
   headless-safe layer still enforced there; the journey runs on the

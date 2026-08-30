@@ -27,8 +27,8 @@ class AppSurfaceTest {
         JMenuBar bar = AppMenuBar.create(
                 () -> settings[0]++, () -> about[0]++);
         assertEquals(2, bar.getMenuCount(),
-                "the app menu and Help - nothing else");
-        assertEquals(AppInfo.NAME, bar.getMenu(0).getText());
+                "File and Help - nothing else");
+        assertEquals("File", bar.getMenu(0).getText());
         assertEquals(1, bar.getMenu(0).getItemCount(),
                 "no placeholder items beside Settings");
         assertEquals("Help", bar.getMenu(1).getText());

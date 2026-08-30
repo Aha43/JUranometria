@@ -12,7 +12,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - A restrained menu bar: Help > About JUranometria shows the packaged
   version, the product description, and the licensing of the code and
   every bundled resource - with the complete notices readable offline -
-  and JUranometria > Settings... holds a persistent Light/Dark
+  and File > Settings... holds a persistent Light/Dark
   appearance choice, applied live on OK and remembered across
   restarts. The --dark launch flag remains a session-only override
   that never rewrites the saved setting; the chart page keeps its own

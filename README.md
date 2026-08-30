@@ -103,7 +103,7 @@ make import-allsky                      # verifies checksums, regenerates the pa
 The menu bar stays out of the way: **Help → About JUranometria** shows
 the version, a short description, and the licensing of the code and
 every bundled resource — including the full notices, offline — and
-**JUranometria → Settings…** holds the persistent Light/Dark
+**File → Settings…** holds the persistent Light/Dark
 appearance choice (the `--dark` launch flag remains a session-only
 override that never rewrites the saved setting).
 
