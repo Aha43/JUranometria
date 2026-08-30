@@ -38,3 +38,12 @@ is not described as unrestricted open source. A commercial use of the
 complete package requires re-importing the star data from a source
 with compatible terms; the import contract isolates the source
 adapter so only it would change.
+
+## The in-application About surface
+
+The running application presents this licensing to end users via
+Help - About JUranometria: a compact packaged summary
+(`src/resources/about/licensing-summary.txt`) plus the full bundled
+notice and licence texts, all offline. A test
+(`AboutDialogTest.theSummaryAgreesWithTheRepositoryLicensingDocument`)
+keeps the summary and this document in agreement.

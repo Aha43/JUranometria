@@ -1,0 +1,15 @@
+Code and documentation: MIT license, copyright JUranometria
+Contributors.
+
+This packaged application includes star catalogue data derived from
+the Tycho-2 Catalogue, licensed CC BY-NC 3.0 IGO. The complete
+package may therefore be used and redistributed non-commercially
+only, for as long as that data is included.
+
+Deep-sky object data derived from OpenNGC: CC BY-SA 4.0.
+
+Constellation geography derived from d3-celestial (boundaries after
+Delporte 1930; figures after the IAU/Sky & Telescope chart
+convention): BSD-3-Clause.
+
+Toolbar icons from the Tabler icon set: MIT license.
