@@ -62,6 +62,7 @@ class PublicFaceJourneyTest {
                                     UiTheme.apply(effectiveDark);
                                     com.formdev.flatlaf.FlatLaf.updateUI();
                                 }),
+                        null,
                         () -> AboutDialog.open(frame[0]));
                 frame[0].setJMenuBar(bar);
                 frame[0].pack();

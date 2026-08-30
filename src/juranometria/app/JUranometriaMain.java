@@ -31,6 +31,8 @@ public final class JUranometriaMain {
         AppearanceSession appearance = new AppearanceSession(
                 AppearanceStore.user(), darkOverride);
         UiTheme.apply(appearance.startupDark());
+        ChartOptionsController chartOptions =
+                new ChartOptionsController(ChartOptionsStore.user());
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(AppMenuBar.create(
@@ -39,14 +41,13 @@ public final class JUranometriaMain {
                             UiTheme.apply(effectiveDark);
                             com.formdev.flatlaf.FlatLaf.updateUI();
                         }),
+                () -> ChartOptionsDialog.open(frame, chartOptions),
                 () -> AboutDialog.open(frame)));
 
         ChartComponent chart = new ChartComponent(Atlas.assembler());
         ChartViewController controller =
                 new ChartViewController(Atlas.assembler()::fits);
         controller.onChange(chart::setViewState);
-        ChartOptionsController chartOptions =
-                new ChartOptionsController(ChartOptionsStore.user());
         chartOptions.onChange(chart::setChartOptions);
         juranometria.ui.PanInteraction.install(chart, controller);
         juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(

@@ -12,6 +12,7 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # === Java build output ===
+/javac.*.args
 *.class
 *.jar
 *.war
