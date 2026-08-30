@@ -61,6 +61,33 @@ public final class ZoomStudyMain {
                 anchor, target);
     }
 
+    /** The step geometry on a letterboxed paper of the given height. */
+    static Step solveOn(SkyPosition centre, double fieldDegrees,
+                        double newFieldDegrees, PixelPoint pointer,
+                        int heightPx) {
+        ChartViewport current = new ChartViewport(
+                centre, fieldDegrees, WIDTH, heightPx);
+        SkyPosition anchor = PanSolver.skyFromPlane(centre,
+                PanSolver.planeFromPixel(current, pointer));
+        ChartViewport zoomed = new ChartViewport(
+                centre, newFieldDegrees, WIDTH, heightPx);
+        PlanePoint target = PanSolver.planeFromPixel(zoomed, pointer);
+        return new Step(PanSolver.solveCentre(anchor, target, centre),
+                anchor, target);
+    }
+
+    static double pointerDriftOn(Step step, double newFieldDegrees,
+                                 PixelPoint pointer, int heightPx) {
+        SkyPosition newCentre = step.solution().centre().orElseThrow();
+        ChartViewport viewport = new ChartViewport(
+                newCentre, newFieldDegrees, WIDTH, heightPx);
+        PixelPoint landed = new ViewportMapping(viewport).toPixel(
+                new GnomonicProjection(newCentre)
+                        .project(step.anchor()).orElseThrow());
+        return Math.hypot(landed.x() - pointer.x(),
+                landed.y() - pointer.y());
+    }
+
     /** Whether a centre places the anchor at the plane point exactly. */
     static boolean solvesExactly(SkyPosition centre, SkyPosition anchor,
                                  PlanePoint target) {
@@ -110,10 +137,12 @@ public final class ZoomStudyMain {
         int exact = 0;
         int constrained = 0;
         int pastPole = 0;
+        int ambiguousRefused = 0;
         int reverseConstrained = 0;
-        int poleStraddling = 0;
-        double worstPoleStraddlingError = 0.0;
+        int reverseAmbiguousRefused = 0;
         double worstStepDrift = 0.0;
+        double worstConstrainedShortfallPx = 0.0;
+        double constrainedShortfallSumPx = 0.0;
         double worstRoundTripCentreError = 0.0;
         double worstRoundTripDrift = 0.0;
         String worstCase = "";
@@ -135,12 +164,28 @@ public final class ZoomStudyMain {
                             pastPole++;
                             continue;
                         }
+                        if (out.solution().ambiguous()) {
+                            // The decision's rule (PR #127 review, P1):
+                            // a step with a second exact centre REFUSES
+                            // rather than letting the continuity
+                            // tie-break silently switch branches on a
+                            // large jump.
+                            ambiguousRefused++;
+                            continue;
+                        }
                         if (out.solution().constrained()) {
                             constrained++;
-                            // A constrained follow is a clamped, exact
-                            // solve at the feasibility boundary; the
-                            // pointer honestly cannot be honoured, so
-                            // drift is not scored against the invariant.
+                            // A constrained follow is clamped to the
+                            // north-up feasibility boundary; the
+                            // pointer's visible shortfall - how far the
+                            // anchor lands from the pointer - is
+                            // measured, never just counted.
+                            double shortfall = pointerDriftPx(out,
+                                    pair[1], pointer);
+                            constrainedShortfallSumPx += shortfall;
+                            if (shortfall > worstConstrainedShortfallPx) {
+                                worstConstrainedShortfallPx = shortfall;
+                            }
                             continue;
                         }
                         exact++;
@@ -150,12 +195,18 @@ public final class ZoomStudyMain {
                         }
                         SkyPosition mid = out.solution().centre().orElseThrow();
                         Step back = solve(mid, pair[1], pair[0], pointer);
+                        if (back.solution().ambiguous()) {
+                            // The reverse of an accepted step can be
+                            // the ambiguous one: production refuses it
+                            // there too, so the wheel simply does
+                            // nothing at that pointer - counted, and
+                            // excluded from the reversal guarantee,
+                            // which covers accepted-both-ways pairs.
+                            reverseAmbiguousRefused++;
+                            continue;
+                        }
                         if (back.solution().pastPole()
                                 || back.solution().constrained()) {
-                            // The reverse of an exact step can itself be
-                            // constrained near a pole; the reversal
-                            // guarantee applies to exact-both-ways pairs
-                            // and the exception is counted, not hidden.
                             reverseConstrained++;
                             continue;
                         }
@@ -163,25 +214,6 @@ public final class ZoomStudyMain {
                                 .orElseThrow().separationDegrees(centre);
                         double backDrift = pointerDriftPx(back, pair[0],
                                 pointer);
-                        // The reverse step's declination equation can
-                        // have TWO exact roots (a near-polar page whose
-                        // pointer anchors sky beyond the pole); the
-                        // continuity tie-break picks the branch nearer
-                        // the mid centre, which need not be the
-                        // original. Detected, never predicted: the case
-                        // counts as branch ambiguity only if the
-                        // ORIGINAL centre still solves the reverse
-                        // problem exactly - otherwise it would be a real
-                        // invariant violation.
-                        if (centreError > 1e-6
-                                && solvesExactly(centre, out.anchor(),
-                                        back.target())) {
-                            poleStraddling++;
-                            if (centreError > worstPoleStraddlingError) {
-                                worstPoleStraddlingError = centreError;
-                            }
-                            continue;
-                        }
                         if (centreError > worstRoundTripCentreError) {
                             worstRoundTripCentreError = centreError;
                             worstCase = String.format(Locale.ROOT,
@@ -203,36 +235,75 @@ public final class ZoomStudyMain {
                         + " positions:%n", solves, pages.size(),
                 pointers.size());
         System.out.printf(Locale.ROOT,
-                "  exact %d, constrained (polar clamp, classified) %d,"
-                        + " past-pole (classified) %d - no other empties%n",
-                exact, constrained, pastPole);
+                "  exact %d, constrained (polar clamp) %d, past-pole"
+                        + " (refused) %d, ambiguous (second exact branch,"
+                        + " REFUSED by decision) %d - no other empties%n",
+                exact, constrained, pastPole, ambiguousRefused);
+        System.out.printf(Locale.ROOT,
+                "  constrained pointer shortfall: worst %.1f px, mean"
+                        + " %.1f px (the sky follows as far as north-up"
+                        + " allows; measured, not just counted)%n",
+                worstConstrainedShortfallPx,
+                constrained == 0 ? 0.0
+                        : constrainedShortfallSumPx / constrained);
         System.out.printf(Locale.ROOT,
                 "  worst pointer drift after an exact step: %.2e px%n",
                 worstStepDrift);
         System.out.printf(Locale.ROOT,
-                "  worst exact-both-ways round trip: centre error %.2e deg,"
-                        + " pointer drift %.2e px (%s); %d reversals"
-                        + " constrained near a pole (classified, counted)%n",
+                "  reversal guarantee over accepted-both-ways pairs: worst"
+                        + " centre error %.2e deg, worst pointer drift"
+                        + " %.2e px (%s); %d reversals refused as ambiguous,"
+                        + " %d constrained near a pole - each counted,"
+                        + " none silently wrong%n",
                 worstRoundTripCentreError, worstRoundTripDrift, worstCase,
-                reverseConstrained);
-        System.out.printf(Locale.ROOT,
-                "  %d round trips took a second exact branch (near-polar"
-                        + " pages anchoring sky beyond the pole; worst"
-                        + " centre difference %.1f deg; the original centre"
-                        + " verified still exact) - the pan decision's"
-                        + " alternate-meridian physics, both steps"
-                        + " anchor-exact%n",
-                poleStraddling, worstPoleStraddlingError);
+                reverseAmbiguousRefused, reverseConstrained);
         System.out.printf(Locale.ROOT,
                 "  mean pure-geometry solve: %.1f us%n",
                 solveNanos / 1e3 / solves);
+
+        // Letterbox: a window taller than the projection-sanity page
+        // cap letterboxes; the paper is the viewport, the chrome bands
+        // anchor no sky. Pointers in chrome are refused by decision
+        // (and the event left unconsumed); pointers on the paper of a
+        // letterboxed window solve exactly like any page.
+        SkyPosition lbCentre = new SkyPosition(37.946619, 85.0);
+        int paperHeight = Atlas.assembler().maxPageHeightPx(
+                lbCentre, 36.0, WIDTH);
+        int windowHeight = paperHeight + 400;
+        int chromeRefused = 0;
+        int paperExact = 0;
+        double worstLetterboxDrift = 0.0;
+        for (double y : new double[] {50, windowHeight - 50,
+                windowHeight / 2.0, 210, windowHeight - 210}) {
+            double paperTop = (windowHeight - paperHeight) / 2.0;
+            if (y < paperTop || y >= paperTop + paperHeight) {
+                chromeRefused++;
+                continue;
+            }
+            PixelPoint onPaper = new PixelPoint(300.0, y - paperTop);
+            Step step = solveOn(lbCentre, 36.0, 24.0, onPaper,
+                    paperHeight);
+            if (step.solution().centre().isPresent()
+                    && !step.solution().constrained()
+                    && !step.solution().ambiguous()) {
+                paperExact++;
+                worstLetterboxDrift = Math.max(worstLetterboxDrift,
+                        pointerDriftOn(step, 24.0, onPaper, paperHeight));
+            }
+        }
+        System.out.printf(Locale.ROOT,
+                "letterbox (window %dx%d, paper height %d): %d chrome"
+                        + " pointers refused by decision, %d paper pointers"
+                        + " solved exactly (worst drift %.2e px)%n",
+                WIDTH, windowHeight, paperHeight, chromeRefused, paperExact,
+                worstLetterboxDrift);
 
         // Realistic burst: five notches outward from the searched-star
         // page, each notch a full accepted transition through
         // query-to-pixels - state, assembly, render.
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         ChartViewState state = new ChartViewState(
-                new SkyPosition(83.818667, -5.389667), 8.0, 8.0, null, null);
+                new SkyPosition(83.818667, -5.389667), 6.0, 8.0, null, null);
         // Warm the tiles and the renderer once.
         renderer.renderToImage(Atlas.assembler().assemble(state, WIDTH, HEIGHT));
         System.out.println("burst: five outward notches, pointer at"

@@ -25,10 +25,30 @@ public final class PanSolver {
      * component was clamped to the feasibility boundary. Any empty
      * without past-pole evidence is a solver invariant violation and
      * throws rather than passing as a quiet no-op (PR #76 follow-up).
+     *
+     * {@code ambiguous} reports that a SECOND verified centre, more
+     * than {@link #AMBIGUITY_SEPARATION_DEGREES} from the returned
+     * one, also solves the request exactly - a near-polar page whose
+     * grabbed sky lies beyond the pole. The returned centre is still
+     * the one nearest the previous centre: for a drag's small
+     * increments that continuity tie-break is the right answer and
+     * panning keeps it (docs/decisions/pan-navigation.md); a
+     * pointer-anchored zoom step is a large jump for which the
+     * tie-break can silently switch branches, so the zoom decision
+     * REFUSES ambiguous transitions outright
+     * (docs/decisions/pointer-zoom.md, PR #127 review).
      */
     public record PanSolution(Optional<SkyPosition> centre,
-                              boolean constrained, boolean pastPole) {
+                              boolean constrained, boolean pastPole,
+                              boolean ambiguous) {
     }
+
+    /**
+     * Two verified centres further apart than this are a genuine
+     * branch ambiguity, not the declination equation's double root
+     * resolving to numerical twins (those agree to ~1e-8 degrees).
+     */
+    public static final double AMBIGUITY_SEPARATION_DEGREES = 1e-3;
 
     /**
      * Solver acceptance: a candidate centre must reproject the grabbed
@@ -151,6 +171,7 @@ public final class PanSolver {
         SkyPosition best = null;
         double bestSeparation = Double.MAX_VALUE;
         boolean sawOutOfRangeDeclination = false;
+        java.util.List<SkyPosition> verified = new java.util.ArrayList<>(4);
         for (double alpha : alphaCandidates) {
             // s . c = 1/N: p cos d + sz sin d = 1/N with
             // p = sx cos a + sy sin a.
@@ -176,6 +197,7 @@ public final class PanSolver {
                 if (!reprojects(candidate, grabbed, xi, eta)) {
                     continue;
                 }
+                verified.add(candidate);
 
                 double separation =
                         candidate.separationDegrees(previousCentre);
@@ -193,9 +215,19 @@ public final class PanSolver {
                                 + " %s at plane (%.9f, %.9f) and no past-pole"
                                 + " evidence", grabbed, xi, eta));
             }
-            return new PanSolution(Optional.empty(), constrained, true);
+            return new PanSolution(Optional.empty(), constrained, true,
+                    false);
         }
-        return new PanSolution(Optional.of(best), constrained, false);
+        boolean ambiguous = false;
+        for (SkyPosition candidate : verified) {
+            if (candidate.separationDegrees(best)
+                    > AMBIGUITY_SEPARATION_DEGREES) {
+                ambiguous = true;
+                break;
+            }
+        }
+        return new PanSolution(Optional.of(best), constrained, false,
+                ambiguous);
     }
 
     /** Full-projection verification of a candidate centre. */

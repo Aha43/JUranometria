@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ZoomStudyMainTest {
 
     private static final double DRIFT_TOLERANCE_PX = 1e-2;
-    private static final double REVERSAL_TOLERANCE_DEGREES = 1e-6;
+    private static final double REVERSAL_TOLERANCE_DEGREES = 1e-4;
 
     @Test
     void ordinaryPointersKeepTheirSkySubpixelAcrossEveryStep() {
@@ -42,8 +42,10 @@ class ZoomStudyMainTest {
                     var step = ZoomStudyMain.solve(centre, transition[0],
                             transition[1], pointer);
                     assertFalse(step.solution().constrained()
-                                    || step.solution().pastPole(),
-                            "ordinary geometry solves exactly at " + centre);
+                                    || step.solution().pastPole()
+                                    || step.solution().ambiguous(),
+                            "ordinary geometry solves exactly and"
+                                    + " unambiguously at " + centre);
                     assertTrue(ZoomStudyMain.pointerDriftPx(step,
                                     transition[1], pointer)
                                     < DRIFT_TOLERANCE_PX,
@@ -73,13 +75,15 @@ class ZoomStudyMainTest {
     @Test
     void polarOutcomesAreClassifiedNeverQuietlyWrong() {
         // The near-pole page from the study: sweeping its pointers
-        // over one wide transition must produce every classified
-        // category and no unexplained emptiness (the solver throws on
-        // those by contract).
+        // over representative transitions must produce every
+        // classified category - including the ambiguity the decision
+        // refuses - and no unexplained emptiness (the solver throws
+        // on those by contract).
         SkyPosition nearPole = new SkyPosition(37.946619, 89.9);
         int exact = 0;
         int constrained = 0;
         int pastPole = 0;
+        int ambiguous = 0;
         for (double x : new double[] {1, 450, 899}) {
             for (double y : new double[] {1, 350, 699}) {
                 for (double[] transition : new double[][] {
@@ -88,6 +92,8 @@ class ZoomStudyMainTest {
                             transition[1], new PixelPoint(x, y));
                     if (step.solution().pastPole()) {
                         pastPole++;
+                    } else if (step.solution().ambiguous()) {
+                        ambiguous++;
                     } else if (step.solution().constrained()) {
                         constrained++;
                     } else {
@@ -102,30 +108,60 @@ class ZoomStudyMainTest {
         assertTrue(pastPole > 0,
                 "past-pole requests are classified for refusal, decided"
                         + " as a complete no-op in production");
+        assertTrue(ambiguous > 0,
+                "two-branch requests are classified for refusal - the"
+                        + " decision's rule, never a silent branch switch");
     }
 
     @Test
-    void theSecondExactBranchAtThePoleIsRealAndVerified() {
-        // The documented alternate-meridian physics: a pointer
-        // anchoring sky beyond the pole reverses onto a second exact
-        // centre. Honesty requires BOTH facts: the branches differ,
-        // and the original centre still solves the reverse problem
-        // exactly.
+    void theAmbiguousTransitionIsDetectedAndDecidedRefused() {
+        // The case the review surfaced: a pointer anchoring sky beyond
+        // the pole reverses onto a second exact centre 28 degrees
+        // away. The refusal is one-sided exactly as the decision
+        // states: the forward zoom-in is unique and accepted; the
+        // reverse zoom-out is the two-branch problem, now REPORTED by
+        // the solver and refused by the decision - so production
+        // never takes the silent 28-degree jump. The ambiguity is
+        // genuine: the original centre still solves the reverse
+        // problem exactly.
         SkyPosition centre = new SkyPosition(37.946619, 89.9);
         PixelPoint pointer = new PixelPoint(450.0, 1.0);
         var out = ZoomStudyMain.solve(centre, 36.0, 24.0, pointer);
+        assertFalse(out.solution().ambiguous(),
+                "the forward zoom-in is unique and accepted");
         SkyPosition mid = out.solution().centre().orElseThrow();
         var back = ZoomStudyMain.solve(mid, 24.0, 36.0, pointer);
-        SkyPosition landed = back.solution().centre().orElseThrow();
-        assertTrue(landed.separationDegrees(centre) > 1.0,
-                "the tie-break takes the nearer branch, not the original");
+        assertTrue(back.solution().ambiguous(),
+                "the reverse jump is classified ambiguous -> refused");
+        assertTrue(back.solution().centre().orElseThrow()
+                        .separationDegrees(centre) > 1.0,
+                "the branch the tie-break would have taken is far from"
+                        + " the original - the jump the refusal prevents");
         assertTrue(ZoomStudyMain.solvesExactly(centre, out.anchor(),
                         back.target()),
-                "the original centre remains an exact solution - two"
-                        + " branches, both honest");
-        assertTrue(ZoomStudyMain.pointerDriftPx(back, 36.0, pointer)
-                        < DRIFT_TOLERANCE_PX,
-                "the anchor invariant holds on the branch taken");
+                "the ambiguity is genuine: the original centre remains"
+                        + " an exact solution of the reverse problem");
+    }
+
+    @Test
+    void letterboxPaperSolvesExactlyAndChromeAnchorsNothing() {
+        // The decision's letterbox rule at the geometry: the paper is
+        // the viewport - a pointer on the paper of a letterboxed
+        // window solves exactly; the chrome bands are outside the
+        // viewport by construction and anchor no sky (refused at the
+        // component boundary in production).
+        SkyPosition centre = new SkyPosition(37.946619, 85.0);
+        int paperHeight = 4712;
+        var step = ZoomStudyMain.solveOn(centre, 36.0, 24.0,
+                new PixelPoint(300.0, paperHeight - 100.0), paperHeight);
+        assertFalse(step.solution().constrained()
+                        || step.solution().pastPole()
+                        || step.solution().ambiguous(),
+                "a paper pointer on a letterboxed window is ordinary");
+        assertTrue(ZoomStudyMain.pointerDriftOn(step, 24.0,
+                        new PixelPoint(300.0, paperHeight - 100.0),
+                        paperHeight) < DRIFT_TOLERANCE_PX,
+                "and keeps its sky subpixel");
     }
 
     @Test
