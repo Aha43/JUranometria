@@ -7,8 +7,31 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-08-30
+
+Sprint 16, in progress — the distribution work of the reviewed 1.0
+contract, released early so the atlas can be installed and used
+while the remaining stabilization issues close. Reviewed by Codex
+at the distribution gate, the contract amendment, and each
+implementation step.
+
 ### Added
 
+- **Self-contained application images: users no longer install
+  Java.** Each platform download - macOS Apple silicon, macOS
+  Intel, Windows x86-64, Linux x86-64 - carries its own pinned
+  Temurin 21 runtime, trimmed by `jlink` to the six modules the
+  atlas actually uses (about 80 MB unpacked, 25 MB compressed).
+  Built natively on each platform, never cross-packaged, and
+  verified there: launch with no system Java at all, light and
+  `--dark`, from paths containing spaces, with the About surface
+  and a real preference change-and-reload exercised through the
+  bundled runtime, the complete licensing inventory and the
+  runtime's own legal notices asserted mechanically, and the images
+  byte-reproducible across repeated builds - the two macOS
+  architectures even render identical charts to each other. The
+  applications are unsigned; the packaged README explains
+  Gatekeeper and SmartScreen plainly.
 - The unpack-and-run release archive: `make dist` deterministically
   builds `JUranometria-X.Y.Z.zip` - the application JAR, its pinned
   libraries, POSIX and Windows launch helpers with readable
