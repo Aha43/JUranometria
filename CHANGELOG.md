@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-08-30
+
+Sprint 10 — Refresh the foundations. A maintenance release; reviewed
+by Codex before release, the trail lives in `docs/reviews/`.
+
 ### Changed
 
 - Dependencies refreshed to current releases: FlatLaf and FlatLaf
