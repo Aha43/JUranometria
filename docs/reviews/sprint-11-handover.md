@@ -94,10 +94,13 @@ compact viewport rather than growing the dialog).
    change**; with only the atlas frame and modeless dialogs open this
    is the whole story today, but any future long-lived window joins
    that contract implicitly.
-3. **The summary/LICENSING agreement test is lexical** (normalized
-   identifiers and the NC statement), deliberately not a prose diff —
-   the two documents serve different readers and may word things
-   differently while agreeing on the facts.
+3. **The summary/LICENSING agreement test is semantic but not a
+   prose diff** (strengthened after the Codex review's P2): each
+   licence must appear in the same paragraph as its resource in both
+   documents — code/MIT, Tycho-2/CC BY-NC with its consequence,
+   OpenNGC/CC BY-SA, constellation geography/BSD-3-Clause,
+   Tabler/MIT — so a swapped assignment can never pass, while the two
+   documents keep prose appropriate to their audiences.
 
 ## Sprint review answers
 

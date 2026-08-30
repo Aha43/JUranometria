@@ -46,20 +46,20 @@ class PublicFaceJourneyTest {
         JFrame[] frame = new JFrame[1];
         try {
             AppearanceStore store = AppearanceStore.forNode(node);
+            AppearanceSession session = new AppearanceSession(store, false);
             ChartViewController controller = new ChartViewController();
             ChartViewState chartBefore = controller.state();
 
-            boolean[] dark = {AppearanceStore.sessionDark(false, store)};
-            assertFalse(dark[0], "a clean preference state starts light");
+            assertFalse(session.startupDark(),
+                    "a clean preference state starts light");
 
             SwingUtilities.invokeAndWait(() -> {
                 com.formdev.flatlaf.FlatLightLaf.setup();
                 frame[0] = new JFrame("test-atlas");
                 JMenuBar bar = AppMenuBar.create(
-                        () -> SettingsDialog.open(frame[0], dark[0], store,
-                                choseDark -> {
-                                    dark[0] = choseDark;
-                                    UiTheme.apply(choseDark);
+                        () -> SettingsDialog.open(frame[0], session,
+                                effectiveDark -> {
+                                    UiTheme.apply(effectiveDark);
                                     com.formdev.flatlaf.FlatLaf.updateUI();
                                 }),
                         () -> AboutDialog.open(frame[0]));
@@ -98,14 +98,14 @@ class PublicFaceJourneyTest {
             assertEquals(Optional.of("dark"), store.load(),
                     "the accepted choice persisted");
 
-            // The session boundary: a fresh store over the same node
-            // decides the next launch; --dark stays a non-writing
-            // override in either direction.
-            AppearanceStore nextSession = AppearanceStore.forNode(node);
-            assertTrue(AppearanceStore.sessionDark(false, nextSession),
+            // The session boundary: a fresh session over the same node
+            // decides the next launch; the override stays a non-writing
+            // per-session pin in either direction.
+            AppearanceStore nextStore = AppearanceStore.forNode(node);
+            assertTrue(new AppearanceSession(nextStore, false).startupDark(),
                     "the persisted appearance returns after restart");
-            assertTrue(AppearanceStore.sessionDark(true, nextSession));
-            assertEquals(Optional.of("dark"), nextSession.load());
+            assertTrue(new AppearanceSession(nextStore, true).startupDark());
+            assertEquals(Optional.of("dark"), nextStore.load());
 
             // Chart and navigation state never entered the exchange.
             assertSame(chartBefore, controller.state(),

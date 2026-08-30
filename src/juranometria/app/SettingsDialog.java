@@ -27,36 +27,38 @@ import javax.swing.JRadioButton;
  */
 public final class SettingsDialog extends JDialog {
 
-    SettingsDialog(Frame owner, boolean currentlyDark,
-                   AppearanceStore store, Consumer<Boolean> applyTheme) {
+    SettingsDialog(Frame owner, AppearanceSession session,
+                   Consumer<Boolean> applyTheme) {
         super(owner, "Settings", false);
         getAccessibleContext().setAccessibleName("Settings");
         getAccessibleContext().setAccessibleDescription(
                 "Application appearance settings");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setContentPane(content(currentlyDark, choseDark -> {
-            applyTheme.accept(choseDark);
-            store.save(choseDark ? AppearanceStore.DARK : AppearanceStore.LIGHT);
-            dispose();
-        }));
+        setContentPane(content(session.savedDark(), session.overrideActive(),
+                choseDark -> {
+                    applyTheme.accept(session.confirmChoice(choseDark));
+                    dispose();
+                }));
         AboutDialog.installEscapeToClose(this);
         pack();
         setLocationRelativeTo(owner);
     }
 
     /** Opens the dialog owned by and centred on the atlas window. */
-    public static void open(Frame owner, boolean currentlyDark,
-                            AppearanceStore store, Consumer<Boolean> applyTheme) {
-        new SettingsDialog(owner, currentlyDark, store, applyTheme)
-                .setVisible(true);
+    public static void open(Frame owner, AppearanceSession session,
+                            Consumer<Boolean> applyTheme) {
+        new SettingsDialog(owner, session, applyTheme).setVisible(true);
     }
 
     /**
-     * The dialog content; headless-constructible for tests. The
+     * The dialog content; headless-constructible for tests. The saved
+     * preference is preselected - never a session override's effect -
+     * and when an override is active a note says so. The
      * {@code confirm} callback receives the chosen darkness only when
      * OK is pressed - the only path that applies or persists anything.
      */
-    static JComponent content(boolean currentlyDark, Consumer<Boolean> confirm) {
+    static JComponent content(boolean savedDark, boolean overrideActive,
+                              Consumer<Boolean> confirm) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
@@ -67,9 +69,9 @@ public final class SettingsDialog extends JDialog {
         panel.add(heading);
         panel.add(Box.createVerticalStrut(8));
 
-        JRadioButton light = new JRadioButton("Light", !currentlyDark);
+        JRadioButton light = new JRadioButton("Light", !savedDark);
         light.getAccessibleContext().setAccessibleName("Light appearance");
-        JRadioButton dark = new JRadioButton("Dark", currentlyDark);
+        JRadioButton dark = new JRadioButton("Dark", savedDark);
         dark.getAccessibleContext().setAccessibleName("Dark appearance");
         ButtonGroup group = new ButtonGroup();
         group.add(light);
@@ -78,6 +80,17 @@ public final class SettingsDialog extends JDialog {
         dark.setAlignmentX(0.0f);
         panel.add(light);
         panel.add(dark);
+        if (overrideActive) {
+            panel.add(Box.createVerticalStrut(8));
+            JLabel note = new JLabel(
+                    "This session was started with --dark; the chosen"
+                            + " appearance applies from the next launch.");
+            note.getAccessibleContext().setAccessibleName(
+                    "Dark override note");
+            note.putClientProperty("FlatLaf.styleClass", "small");
+            note.setAlignmentX(0.0f);
+            panel.add(note);
+        }
         panel.add(Box.createVerticalStrut(16));
 
         JButton cancel = new JButton("Cancel");

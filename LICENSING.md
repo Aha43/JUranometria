@@ -47,4 +47,3 @@ Help - About JUranometria: a compact packaged summary
 notice and licence texts, all offline. A test
 (`AboutDialogTest.theSummaryAgreesWithTheRepositoryLicensingDocument`)
 keeps the summary and this document in agreement.
-

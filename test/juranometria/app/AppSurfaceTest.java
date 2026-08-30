@@ -87,21 +87,47 @@ class AppSurfaceTest {
     }
 
     @Test
-    void theDarkFlagWinsForTheSessionWithoutRewritingTheStore() throws Exception {
+    void theDarkOverrideStaysAuthoritativeThroughTheSettingsPath() throws Exception {
+        // Sprint 11 Codex review, P1: the override must survive the
+        // production Settings-confirmation path, not just startup.
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-" + System.nanoTime());
         try {
             AppearanceStore store = AppearanceStore.forNode(node);
             store.save(AppearanceStore.LIGHT);
+            AppearanceSession overridden = new AppearanceSession(store, true);
 
-            assertTrue(AppearanceStore.sessionDark(true, store),
-                    "--dark wins for the launch");
+            assertTrue(overridden.startupDark(), "--dark wins for the launch");
+            assertFalse(overridden.savedDark(),
+                    "the dialog preselects the saved preference, never the"
+                            + " override's effect");
+
+            // Merely confirming the preselected (saved) choice cannot
+            // convert the override into a stored Dark preference.
+            assertTrue(overridden.confirmChoice(overridden.savedDark()),
+                    "the overridden session stays dark");
             assertEquals(Optional.of("light"), store.load(),
-                    "the override never rewrites the stored choice");
+                    "confirming the preselection rewrote nothing");
 
-            store.save(AppearanceStore.DARK);
-            assertTrue(AppearanceStore.sessionDark(false, store),
-                    "without the flag the stored choice decides");
+            // An explicit Light choice persists for the next ordinary
+            // launch but cannot turn this overridden session light.
+            assertTrue(overridden.confirmChoice(false),
+                    "the session remains pinned dark by the override");
+            assertEquals(Optional.of("light"), store.load());
+
+            // An explicit Dark choice is a real preference change.
+            assertTrue(overridden.confirmChoice(true));
+            assertEquals(Optional.of("dark"), store.load(),
+                    "an explicit choice persists for future launches");
+
+            // Without the override, the choice governs the live session.
+            AppearanceSession ordinary = new AppearanceSession(store, false);
+            assertTrue(ordinary.startupDark(),
+                    "an ordinary launch follows the stored choice");
+            assertFalse(ordinary.confirmChoice(false),
+                    "without the override, choosing Light turns the"
+                            + " session light");
+            assertEquals(Optional.of("light"), store.load());
         } finally {
             node.removeNode();
         }
@@ -112,7 +138,8 @@ class AppSurfaceTest {
     @Test
     void onlyOkConfirmsAndItReportsTheSelectedAppearance() {
         java.util.List<Boolean> confirmed = new java.util.ArrayList<>();
-        JComponent content = SettingsDialog.content(false, confirmed::add);
+        JComponent content = SettingsDialog.content(false, false,
+                confirmed::add);
 
         JRadioButton dark = radio(content, "Dark appearance");
         JRadioButton light = radio(content, "Light appearance");
@@ -128,12 +155,41 @@ class AppSurfaceTest {
 
         // Cancel on a fresh panel confirms nothing.
         java.util.List<Boolean> cancelled = new java.util.ArrayList<>();
-        JComponent second = SettingsDialog.content(true, cancelled::add);
+        JComponent second = SettingsDialog.content(true, false,
+                cancelled::add);
         assertTrue(radio(second, "Dark appearance").isSelected(),
-                "a dark session preselects Dark");
+                "a saved dark preference preselects Dark");
         AboutDialogTest.button(second, "Cancel").doClick();
         assertTrue(cancelled.isEmpty(),
                 "Cancel leaves setting and appearance untouched");
+    }
+
+    @Test
+    void anActiveOverrideIsExplainedInsideTheDialog() {
+        JComponent overridden = SettingsDialog.content(false, true, b -> { });
+        assertTrue(hasLabelContaining(overridden, "--dark"),
+                "the dialog says the session is overridden and when the"
+                        + " choice applies");
+        JComponent ordinary = SettingsDialog.content(false, false, b -> { });
+        assertFalse(hasLabelContaining(ordinary, "--dark"),
+                "no note without an override");
+    }
+
+    private static boolean hasLabelContaining(java.awt.Component component,
+                                              String text) {
+        if (component instanceof javax.swing.JLabel label
+                && label.getText() != null
+                && label.getText().contains(text)) {
+            return true;
+        }
+        if (component instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                if (hasLabelContaining(child, text)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static JRadioButton radio(java.awt.Component component,

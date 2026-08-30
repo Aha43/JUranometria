@@ -46,22 +46,59 @@ class AboutDialogTest {
         assertTrue(summary.contains("Tabler"));
     }
 
+    /** The resource/licence pairings both documents must agree on. */
+    private static final String[][] PAIRINGS = {
+            {"code", "MIT"},
+            {"tycho", "CC BY-NC 3.0 IGO"},
+            {"openngc", "CC BY-SA 4.0"},
+            {"constellation", "BSD-3-Clause"},
+            {"tabler|icons", "MIT"},
+    };
+
     @Test
-    void theSummaryAgreesWithTheRepositoryLicensingDocument() throws Exception {
-        // The source-of-truth rule: the end-user summary and
-        // LICENSING.md must never contradict each other. Every licence
-        // identifier the summary states must appear in LICENSING.md
-        // (normalized for hyphenation), and the non-commercial
-        // consequence must be present in both.
-        String licensing = normalize(Files.readString(Path.of("LICENSING.md")));
-        for (String licence : new String[] {
-                "CC BY-NC 3.0 IGO", "CC BY-SA 4.0", "BSD-3-Clause", "MIT"}) {
-            assertTrue(licensing.contains(normalize(licence)),
-                    "LICENSING.md names " + licence);
+    void eachLicenceStaysAttachedToItsResourceInBothDocuments() throws Exception {
+        // The source-of-truth rule, semantically (Sprint 11 Codex
+        // review, P2): it is not enough that the licence names occur -
+        // each licence must appear in the same paragraph as its
+        // resource, in the packaged summary and in LICENSING.md alike,
+        // so a swapped assignment can never pass.
+        assertPairings("the packaged summary", AboutDialog.summaryText());
+        assertPairings("LICENSING.md",
+                Files.readString(Path.of("LICENSING.md")));
+        // The practical consequence rides with the Tycho-2 pairing.
+        assertTrue(paragraphWith(AboutDialog.summaryText(), "tycho")
+                        .contains(normalize("non-commercially")),
+                "the summary's Tycho paragraph states the consequence");
+        assertTrue(paragraphWith(Files.readString(Path.of("LICENSING.md")),
+                        "tycho")
+                        .contains(normalize("may not be used commercially")),
+                "LICENSING.md's Tycho entry states the consequence");
+    }
+
+    private static void assertPairings(String document, String text) {
+        for (String[] pairing : PAIRINGS) {
+            String paragraph = paragraphWith(text, pairing[0]);
+            assertTrue(paragraph.contains(normalize(pairing[1])),
+                    document + ": the paragraph naming '" + pairing[0]
+                            + "' must carry " + pairing[1]);
         }
-        assertTrue(licensing.contains(normalize("may not be used commercially"))
-                        || licensing.contains(normalize("non-commercially")),
-                "both documents state the non-commercial consequence");
+    }
+
+    /**
+     * The first normalized paragraph (blank-line block or table row)
+     * mentioning any of the |-separated keywords; empty if none does,
+     * which fails the containing assertion.
+     */
+    private static String paragraphWith(String text, String keywords) {
+        for (String paragraph : text.split("\\n\\s*\\n|\\n(?=\\|)")) {
+            String normalized = normalize(paragraph);
+            for (String keyword : keywords.split("\\|")) {
+                if (normalized.contains(normalize(keyword))) {
+                    return normalized;
+                }
+            }
+        }
+        return "";
     }
 
     private static String normalize(String text) {

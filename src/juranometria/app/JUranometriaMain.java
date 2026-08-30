@@ -24,19 +24,19 @@ public final class JUranometriaMain {
     }
 
     private static void start(boolean darkOverride) {
-        // The stored appearance decides the startup theme; --dark wins
-        // for this session only and never rewrites the stored choice
-        // (the precedence rule recorded on AppearanceStore).
-        AppearanceStore appearance = AppearanceStore.user();
-        boolean[] dark = {AppearanceStore.sessionDark(darkOverride, appearance)};
-        UiTheme.apply(dark[0]);
+        // The appearance session policy: the saved preference decides an
+        // ordinary launch; an active --dark override keeps this whole
+        // session dark and can never be converted into a stored choice
+        // by merely confirming Settings (contract on AppearanceSession).
+        AppearanceSession appearance = new AppearanceSession(
+                AppearanceStore.user(), darkOverride);
+        UiTheme.apply(appearance.startupDark());
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(AppMenuBar.create(
-                () -> SettingsDialog.open(frame, dark[0], appearance,
-                        choseDark -> {
-                            dark[0] = choseDark;
-                            UiTheme.apply(choseDark);
+                () -> SettingsDialog.open(frame, appearance,
+                        effectiveDark -> {
+                            UiTheme.apply(effectiveDark);
                             com.formdev.flatlaf.FlatLaf.updateUI();
                         }),
                 () -> AboutDialog.open(frame)));
