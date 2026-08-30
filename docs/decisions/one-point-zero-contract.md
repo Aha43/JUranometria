@@ -16,17 +16,17 @@ not below is implementation detail or explicitly deferred.
 
 ## Java baseline
 
-- **Running the released application requires a Java runtime of
-  version 21 or later** (any vendor's JDK/JRE distribution; the
-  application uses only the Java SE platform plus its bundled
-  libraries).
+- **The primary downloads include their Java 21 runtime** (the
+  amendment below): users of the four platform application images
+  install nothing.
+- **The portable fallback ZIP requires an installed Java runtime of
+  version 21 or later** (any vendor's JDK/JRE distribution); its
+  launch helpers must produce a readable diagnostic for a missing or
+  too-old Java, not a stack trace collage (#144).
 - **Building from source requires a JDK of version 21 or later**;
   sources compile with `--release 21`, so newer JDKs build the same
   bytecode. The build selects its own JDK 21+ toolchain rather than
   trusting `PATH` (#136), with `JAVA_HOME` as the override.
-- No JRE is bundled; pointing users at a Java install is part of the
-  documented launch path, and a missing or too-old Java must produce
-  a readable diagnostic, not a stack trace collage (#144).
 
 ## Platform support — runtime versus contributor, stated separately
 
@@ -45,12 +45,13 @@ with the honest wider expectation stated as exactly that: a pure
 Java SE 21 desktop application is *expected* to run on other Linux
 distributions, but 1.0's verification evidence covers the named
 matrix and no claim is made beyond it. Support is
-in every case **unpack-and-run**: extract the release archive,
-launch with the bundled helper or `java -jar JUranometria.jar` — no
-Make, Git, Bash, PowerShell, or source checkout, and paths
-containing spaces must work. `java -jar` is the authoritative launch
-path on all three systems; helpers (POSIX shell, Windows batch) are
-conveniences.
+in every case **unpack-and-run** with no Make, Git, Bash,
+PowerShell, or source checkout, and paths containing spaces must
+work. **The primary artifact on each platform is the self-contained
+application image** (the amendment below) launched by its native
+launcher; the **portable fallback ZIP** launches with its bundled
+helper or `java -jar JUranometria.jar`, which remains that
+artifact's authoritative path.
 
 **Building from source** is supported on **macOS and Linux**, and on
 **Windows via WSL** — the contributor path needs POSIX sh, GNU Make,
@@ -61,9 +62,9 @@ support claim); Windows *runtime* support is delivered by the
 archive, not by a build path.
 
 Not in 1.0, recorded as post-1.0 candidates rather than silent
-omissions: native installers (`.app`/`.dmg`/`.msi`/`.exe`), code
-signing/notarization, bundled runtimes, app stores, package
-registries, and update checking.
+omissions: native installers (`.dmg`/`.msi`/installer `.exe`), code
+signing/notarization, app stores, package registries, and update
+checking. (Bundled runtimes moved INTO 1.0 by the amendment below.)
 
 ## Fully local operation
 
@@ -164,9 +165,96 @@ deliberately updated when reviews accept a change), solver
 tolerances, tile layout, label collision outcomes on any particular
 page, and class/package structure.
 
-## The release artifact, at contract level
+## Amendment (issue #150): self-contained application images
 
-One deterministic **archive per release** (shape finalized by #144):
+**The primary 1.0 downloads are platform-specific application
+images with the Java runtime included — users do not install
+Java.** Measured prototypes (this gate, `make`-driven
+`scripts/build-app-image.sh` + the `app-image` workflow) settle the
+shape:
+
+- **Four artifacts**, each built natively on its own platform,
+  never cross-packaged: macOS Apple silicon and macOS Intel
+  (`JUranometria.app`), Windows x86-64 (`JUranometria.exe` in an
+  unpacked directory), Linux x86-64 (native launcher in an unpacked
+  directory). The Intel image builds on the `macos-15-intel` runner
+  and is additionally exercised on the maintainer's physical Intel
+  Mac.
+- **The mechanism**: JDK 21 `jpackage --type app-image` over the
+  built JAR and its three libraries (non-modular, `--input` +
+  `--main-jar`), with an explicit measured module list —
+  `java.base, java.desktop, java.logging, java.prefs` by jdeps,
+  resolving with its transitive closure to exactly six modules
+  (`+ java.datatransfer, java.xml`), asserted from the runtime's
+  `release` file. The launcher carries
+  `--enable-native-access=ALL-UNNAMED`, passes `--dark` through,
+  and is working-directory independent. Measured on Apple silicon:
+  **76 MB unpacked, 25 MB compressed** — the trimmed runtime is
+  appropriately restrained.
+- **The runtime is pinned Temurin 21** (exact version recorded in
+  the workflow pin and asserted against each image's `release`
+  file), and each artifact carries a `build-info.txt` recording
+  version, modules, packager, and runtime.
+- **Runtime licensing travels**: OpenJDK/Temurin is GPLv2 with the
+  Classpath Exception; the jlink runtime's complete generated
+  `legal/` notice tree ships inside every image (asserted), and the
+  distribution licensing map names it.
+- **The packaged headless smoke path** is a second, inner launcher
+  (`juranometria-smoke`) that renders the reference chart through
+  the bundled runtime alone with no system Java on the PATH.
+  **Enforcement is per-platform-honest**: on every cell the two
+  same-runner builds' renders must be byte-identical to each other,
+  and the two macOS architectures (arm64 and Intel) must render
+  byte-identical smokes to each other under the same pinned runtime
+  — a cross-architecture determinism claim. Equality with the
+  committed M31 reference is recorded per environment but not
+  required across environments: text rasterization varies between
+  JDK builds and OS font stacks, and the contract already excludes
+  exact pixels from its promises (it holds on the maintainer's
+  machines, where it is verified).
+- **Reproducibility, measured honestly**: the macOS image is
+  byte-identical across two same-machine builds; every CI cell
+  builds twice and records identical-or-not in the run summary. The
+  release contract is the narrower honest one — asserted contents,
+  pinned inputs and tool versions, one-build/many-consumer
+  verification, and published SHA-256 — with byte-identity reported
+  where it holds rather than promised universally.
+- **The icon** is the Tabler `north-star` glyph (MIT, the pinned
+  v3.46.0 the toolbar already uses), drawn in chart ink on the
+  atlas's paper inside a quiet rounded square — a restrained
+  identity, not a branding project. Generator and assets live under
+  `packaging/icon/`.
+- **Unsigned, stated plainly**: the images are not signed or
+  notarized. macOS Gatekeeper will warn on first launch
+  (right-click → Open, or approve under System Settings > Privacy &
+  Security); Windows SmartScreen may interpose (More info → Run
+  anyway). The launch documentation says exactly this and never
+  implies trusted distribution. Installers, signing, notarization,
+  update services, and app stores remain post-1.0.
+- **The portable Java-dependent ZIP remains published as the
+  fallback** for users who prefer their own Java 21+; it keeps its
+  `java -jar` verification. The platform matrix, launch-diagnostics
+  and offline promises above apply to the images; the ZIP's Java
+  baseline section continues to apply to the fallback.
+
+## The release artifacts, at contract level
+
+**Five artifacts per release** (shapes finalized by #144):
+
+1–4. **The four platform application images** — `JUranometria.app`
+(macOS Apple silicon; macOS Intel), and the unpacked
+`JUranometria/` directory with its native launcher (Windows x86-64;
+Linux x86-64) — each zipped **with `build-info.txt` and the
+unsigned-launch `README.txt` beside the image**. Inside every
+image: the application JAR and its libraries under `app/`, the
+pinned six-module Temurin runtime with its complete generated
+`legal/` notice tree, the inner `juranometria-smoke` launcher, and
+the application icon. The complete packaged licensing inventory —
+the About summary, every data notice and licence text, and the icon
+licence inside the JAR; a `legal/` directory per runtime module —
+is **mechanically asserted at build time on every platform**.
+
+5. **The portable fallback ZIP**:
 
 ```
 JUranometria-X.Y.Z/
@@ -174,18 +262,24 @@ JUranometria-X.Y.Z/
   lib/…                   the pinned runtime dependencies
   juranometria / .bat     restrained launch helpers (POSIX sh, Windows batch)
   LICENSE  LICENSING.md   MIT code licence and the full licensing map
-  NOTICE…                 every bundled data notice, including the
-                          non-commercial statement
-  lib licences            Apache-2.0 (FlatLaf, FlatLaf Extras) and
-                          MIT (JSVG) texts for the redistributed
-                          runtime libraries
+  licenses/…              every data notice and licence text, plus the
+                          runtime-library texts (Apache-2.0, MIT)
   README (launch note)    download → unpack → run, Java requirement,
                           troubleshooting for absent/old Java
 ```
 
-Built by one command from a clean checkout; contents asserted
-against the manifest (stale or undeclared files fail); verified by
-CI on macOS, Linux, and Windows before any release.
+All five are built by one command each from a clean checkout,
+contents asserted (stale or undeclared files fail), and verified by
+CI on their platforms before any release. Every image also carries a
+second inner launcher, `juranometria-acceptance`, that exercises the
+About surface (the packaged licensing summary and the complete
+notice texts through their real code paths) and a **genuine
+preference change-and-reload** against the application's own node
+through the bundled runtime's preference backend — run on every
+platform cell with no system Java. CI additionally proves full
+startup (which itself verifies every bundled pack's checksums on
+load) and relaunch; the interactive on-screen journeys remain the
+closing packaged journey's work (#146) on real machines.
 
 ## Classifying Sprint 16 discoveries
 

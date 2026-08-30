@@ -1,0 +1,212 @@
+# The self-contained application-image prototypes of issue #150: the
+# platform-neutral JAR builds once; each target cell then builds its
+# native image ON its own OS/architecture (never cross-packaged) with
+# the pinned Temurin 21 runtime, and verifies: launcher alive with NO
+# system Java on PATH, light and --dark, a path containing spaces,
+# the bundled-runtime module inventory and legal notices, the native
+# headless smoke render, and same-runner reproducibility (build twice,
+# compare). Sizes and runtime versions land in the job summary.
+name: app-image
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # setup-java takes the SemVer spec; Adoptium resolves it to the
+  # exact build below, which every image's runtime release file must
+  # match - both halves of the pin, recorded together.
+  TEMURIN_SETUP: '21.0.12'
+  TEMURIN_PIN: '21.0.12.1'
+
+jobs:
+  jar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.TEMURIN_SETUP }}
+      - uses: actions/cache@v6
+        with:
+          path: lib
+          key: libs-${{ hashFiles('scripts/lib-versions.env') }}
+      - run: scripts/download-libs.sh
+      - run: make app
+      - uses: actions/upload-artifact@v6
+        with:
+          name: app-jar
+          path: build/app/
+          if-no-files-found: error
+
+  image:
+    needs: jar
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            cell: macos-arm64
+          - os: macos-15-intel
+            cell: macos-x64
+          - os: ubuntu-24.04
+            cell: linux-x64
+          - os: windows-latest
+            cell: windows-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.TEMURIN_SETUP }}
+      - uses: actions/download-artifact@v7
+        with:
+          name: app-jar
+          path: build/app
+      - name: Build the native image (twice; require identical)
+        shell: bash
+        run: |
+          set -eu
+          scripts/build-app-image.sh build/app-image
+          scripts/build-app-image.sh build/app-image-2
+          # Native smoke enforcement (PR #151 review, honest form):
+          # the two same-runner builds must render identical bytes
+          # everywhere; the committed-reference comparison is recorded
+          # per cell (text rasterization varies across JDK builds and
+          # OS font stacks - the contract promises no exact pixels);
+          # and a follow-up job requires the TWO macOS architectures
+          # to have rendered identical bytes to each other.
+          if cmp -s build/app-image/native-smoke.png docs/reference/m31-stars.png; then
+            echo "smoke-vs-reference=identical" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "smoke-vs-reference=differs (recorded; JDK/font rasterization)" \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
+          cmp build/app-image/native-smoke.png \
+              build/app-image-2/native-smoke.png \
+            || { echo "the two builds rendered different smokes"; exit 1; }
+          if diff -r build/app-image build/app-image-2 >/dev/null 2>&1; then
+            echo "reproducible=identical" >> "$GITHUB_STEP_SUMMARY"
+            echo "same-runner reproducibility: byte-identical"
+          else
+            n=$(diff -rq build/app-image build/app-image-2 | wc -l)
+            echo "reproducible=$n differing entries (recorded honestly)" \
+              >> "$GITHUB_STEP_SUMMARY"
+            diff -rq build/app-image build/app-image-2 | head -10
+          fi
+      - name: Verify the runtime pin
+        shell: bash
+        run: |
+          grep "JAVA_VERSION=\"${TEMURIN_PIN}\"" build/app-image/build-info.txt \
+            || { echo "runtime is not the pinned Temurin ${TEMURIN_PIN}"; \
+                 cat build/app-image/build-info.txt; exit 1; }
+      - name: Launch with no system Java, light and --dark, space path (POSIX)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/native with space"
+          mkdir -p "$work"
+          cp -R build/app-image/* "$work/"
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            launcher="$work/JUranometria.app/Contents/MacOS/JUranometria"
+          else
+            launcher="$work/JUranometria/bin/JUranometria"
+          fi
+          run_one() {
+            if [ "$RUNNER_OS" = "Linux" ]; then
+              env PATH=/usr/bin:/bin xvfb-run -a "$launcher" "$@" &
+            else
+              env PATH=/nonexistent "$launcher" "$@" &
+            fi
+            pid=$!
+            sleep 8
+            kill -0 "$pid" 2>/dev/null || { echo "native launch died ($*)"; exit 1; }
+            kill "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          run_one
+          run_one --dark
+          run_one   # relaunch: restart against whatever state persisted
+          echo "native launches OK with no system Java: light, --dark, and relaunch, space path"
+      - name: Launch with no system Java, light and --dark, space path (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $work = Join-Path $env:RUNNER_TEMP "native with space"
+          New-Item -ItemType Directory -Force -Path $work | Out-Null
+          Copy-Item -Recurse -Force build/app-image/* $work
+          $launcher = Join-Path $work "JUranometria/JUranometria.exe"
+          # No system Java reachable: an empty PATH for the child.
+          $env:PATH = ""
+          foreach ($extra in @(@(), @("--dark"), @())) {
+            if ($extra.Count -gt 0) {
+              $p = Start-Process -FilePath $launcher -ArgumentList $extra -PassThru
+            } else {
+              $p = Start-Process -FilePath $launcher -PassThru
+            }
+            Start-Sleep -Seconds 8
+            if ($p.HasExited) {
+              Write-Error "native launch died (args: $extra), exit $($p.ExitCode)"
+              exit 1
+            }
+            Stop-Process -Id $p.Id -Force
+          }
+          Write-Output "native launches OK with no system Java, light and --dark, space path"
+      - name: Report sizes and inventory
+        shell: bash
+        run: |
+          set -eu
+          case "$RUNNER_OS" in
+            macOS) image=build/app-image/JUranometria.app ;;
+            *)     image=build/app-image/JUranometria ;;
+          esac
+          # The artifact carries what the contract promises beside
+          # the image: build-info.txt and the unsigned-launch README.
+          (cd build/app-image && \
+            if [ "$RUNNER_OS" = "Windows" ]; then
+              7z a -tzip -mx=9 image.zip "$(basename "$image")" \
+                build-info.txt README.txt >/dev/null
+            else
+              zip -q -r -9 image.zip "$(basename "$image")" \
+                build-info.txt README.txt
+            fi)
+          {
+            echo "### ${{ matrix.cell }}"
+            echo '```'
+            cat build/app-image/build-info.txt
+            echo "unpacked: $(du -sh "$image" | cut -f1)"
+            echo "compressed: $(du -sh build/app-image/image.zip | cut -f1)"
+            echo "native smoke render: $(wc -c < build/app-image/native-smoke.png) bytes"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: app-image-${{ matrix.cell }}
+          path: build/app-image/image.zip
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        with:
+          name: smoke-${{ matrix.cell }}
+          path: build/app-image/native-smoke.png
+          if-no-files-found: error
+
+  smoke-cross-architecture:
+    needs: image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: smoke-macos-arm64
+          path: arm64
+      - uses: actions/download-artifact@v7
+        with:
+          name: smoke-macos-x64
+          path: x64
+      - name: The two macOS architectures render identical bytes
+        run: |
+          cmp arm64/native-smoke.png x64/native-smoke.png
+          echo "macOS arm64 and Intel native smokes are byte-identical"
