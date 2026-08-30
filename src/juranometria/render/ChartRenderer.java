@@ -393,6 +393,28 @@ public final class ChartRenderer {
      */
     private static void drawLabel(Graphics2D g, DeepSkyObject dso,
                                   PixelPoint centre, double pixelsPerPlaneUnit) {
+        g.setFont(LABEL_FONT);
+        g.setColor(TEXT_INK);
+        Rectangle2D bounds = labelBounds(g.getFontMetrics(), dso, centre,
+                pixelsPerPlaneUnit);
+        g.drawString(labelTextFor(dso), (float) bounds.getX(),
+                (float) (bounds.getY() + g.getFontMetrics().getAscent()));
+    }
+
+    /** The label text the atlas draws for a deep-sky object. */
+    public static String labelTextFor(DeepSkyObject dso) {
+        return labelFor(dso);
+    }
+
+    /**
+     * The exact bounds of a deep-sky label as this renderer draws it -
+     * shared with studies so prototype passes collide against the real
+     * geometry, never an approximation. The x/y origin is the top-left
+     * of the text; drawing adds the ascent for the baseline.
+     */
+    public static Rectangle2D labelBounds(java.awt.FontMetrics metrics,
+                                          DeepSkyObject dso, PixelPoint centre,
+                                          double pixelsPerPlaneUnit) {
         double majorPx = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
                 arcminToPx(dso.majorAxisArcmin(), pixelsPerPlaneUnit));
         double minorPx = arcminToPx(dso.minorAxisArcmin(), pixelsPerPlaneUnit);
@@ -400,12 +422,10 @@ public final class ChartRenderer {
         double halfExtentX = Math.hypot(
                 majorPx / 2.0 * Math.sin(paRadians),
                 minorPx / 2.0 * Math.cos(paRadians));
-
-        g.setFont(LABEL_FONT);
-        g.setColor(TEXT_INK);
-        float x = (float) (centre.x() + halfExtentX + 5.0);
-        float y = (float) (centre.y() + g.getFontMetrics().getAscent() / 2.0 - 1.0);
-        g.drawString(labelFor(dso), x, y);
+        double x = centre.x() + halfExtentX + 5.0;
+        double baseline = centre.y() + metrics.getAscent() / 2.0 - 1.0;
+        return new Rectangle2D.Double(x, baseline - metrics.getAscent(),
+                metrics.stringWidth(labelFor(dso)), metrics.getHeight());
     }
 
     /**
@@ -443,8 +463,8 @@ public final class ChartRenderer {
                 .orElse(dso.id());
     }
 
-    private void drawTitleBlock(Graphics2D g, ChartScene scene) {
-        String[] lines = {
+    private static String[] titleLines(ChartScene scene) {
+        return new String[] {
                 scene.title(),
                 "Centre " + formatRa(scene.viewport().centre().raDegrees())
                         + ", " + formatDec(scene.viewport().centre().decDegrees())
@@ -453,40 +473,60 @@ public final class ChartRenderer {
                         "Field %.1f° · Stars to V %.1f · North up, east left",
                         scene.viewport().fieldWidthDegrees(), scene.limitingMagnitude()),
         };
+    }
 
-        g.setFont(LABEL_FONT);
-        FontMetrics metrics = g.getFontMetrics();
+    /**
+     * The exact bounds of the title block as this renderer draws it, or
+     * null when the viewport is too small to hold it - shared with
+     * studies so prototype passes yield to the real block, never an
+     * approximation.
+     */
+    public static java.awt.Rectangle titleBlockBounds(Graphics2D g,
+                                                      ChartScene scene) {
+        String[] lines = titleLines(scene);
+        FontMetrics metrics = g.getFontMetrics(LABEL_FONT);
         int lineHeight = metrics.getHeight();
         int textWidth = 0;
         for (String line : lines) {
             textWidth = Math.max(textWidth, metrics.stringWidth(line));
         }
-        g.setFont(TITLE_FONT);
-        textWidth = Math.max(textWidth, g.getFontMetrics().stringWidth(lines[0]));
-
+        textWidth = Math.max(textWidth,
+                g.getFontMetrics(TITLE_FONT).stringWidth(lines[0]));
         int boxWidth = textWidth + 2 * TITLE_PADDING_PX;
         int boxHeight = lines.length * lineHeight + 2 * TITLE_PADDING_PX;
         int boxX = TITLE_MARGIN_PX;
         int boxY = scene.viewport().heightPx() - TITLE_MARGIN_PX - boxHeight;
-
-        // A viewport too small to hold the block with its margins omits it
-        // rather than clipping formal notation (Codex review, PR #12).
         if (boxWidth + 2 * TITLE_MARGIN_PX > scene.viewport().widthPx()
                 || boxHeight + 2 * TITLE_MARGIN_PX > scene.viewport().heightPx()) {
+            return null;
+        }
+        return new java.awt.Rectangle(boxX, boxY, boxWidth, boxHeight);
+    }
+
+    private void drawTitleBlock(Graphics2D g, ChartScene scene) {
+        // A viewport too small to hold the block with its margins omits it
+        // rather than clipping formal notation (Codex review, PR #12).
+        java.awt.Rectangle box = titleBlockBounds(g, scene);
+        if (box == null) {
             return;
         }
+        String[] lines = titleLines(scene);
+        g.setFont(LABEL_FONT);
+        FontMetrics metrics = g.getFontMetrics();
+        int lineHeight = metrics.getHeight();
 
         g.setColor(PAPER);
-        g.fillRect(boxX, boxY, boxWidth, boxHeight);
+        g.fillRect(box.x, box.y, box.width, box.height);
         g.setColor(FRAME);
         g.setStroke(new BasicStroke(1.0f));
-        g.drawRect(boxX, boxY, boxWidth, boxHeight);
+        g.drawRect(box.x, box.y, box.width, box.height);
 
         g.setColor(TEXT_INK);
-        int baseline = boxY + TITLE_PADDING_PX + metrics.getAscent();
+        int baseline = box.y + TITLE_PADDING_PX + metrics.getAscent();
         for (int i = 0; i < lines.length; i++) {
             g.setFont(i == 0 ? TITLE_FONT : LABEL_FONT);
-            g.drawString(lines[i], boxX + TITLE_PADDING_PX, baseline + i * lineHeight);
+            g.drawString(lines[i], box.x + TITLE_PADDING_PX,
+                    baseline + i * lineHeight);
         }
     }
 

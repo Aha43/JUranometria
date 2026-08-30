@@ -38,6 +38,7 @@ help:
 	@echo "  import-constellations  Regenerate the bundled constellation-geography pack"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
+	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -112,6 +113,9 @@ pan-study: classes
 
 chart-options-study: classes
 	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartOptionsStudyMain
+
+star-identity-study: classes
+	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.StarIdentityStudyMain
 
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)
