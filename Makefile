@@ -41,6 +41,7 @@ help:
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
 	@echo "  zoom-study        Measure the Sprint 14 pointer-centred zoom geometry"
+	@echo "  grid-study        Measure and render the Sprint 15 coordinate-grid candidates"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -124,6 +125,9 @@ star-identity-study: classes
 
 zoom-study: classes
 	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ZoomStudyMain
+
+grid-study: classes
+	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GridStudyMain
 
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)
