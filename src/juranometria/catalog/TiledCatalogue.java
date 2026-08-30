@@ -45,30 +45,41 @@ public final class TiledCatalogue implements Catalogue {
 
     private final Function<String, InputStream> resources;
     private final PackManifest manifest;
+    private final StarIdentities identities;
     private final Map<String, Tile> loadedTiles = new HashMap<>();
 
     private record Tile(List<Star> stars, List<DeepSkyObject> deepSkyObjects) {
     }
 
-    private TiledCatalogue(Function<String, InputStream> resources, PackManifest manifest) {
+    private TiledCatalogue(Function<String, InputStream> resources,
+                           PackManifest manifest, StarIdentities identities) {
         this.resources = resources;
         this.manifest = manifest;
+        this.identities = identities;
     }
 
-    /** Loads the bundled bright-sky pack from the classpath. */
+    /** Loads the bundled bright-sky pack and star identities from the
+     *  classpath; identities attach to their stars at tile load. */
     public static TiledCatalogue load() {
-        return load(name -> TiledCatalogue.class.getResourceAsStream(DEFAULT_ROOT + name));
+        return load(name -> TiledCatalogue.class.getResourceAsStream(DEFAULT_ROOT + name),
+                StarIdentities.load());
     }
 
     /** Loads a pack through any resource source; for tests and futures. */
     static TiledCatalogue load(Function<String, InputStream> resources) {
+        return load(resources, null);
+    }
+
+    /** Loads a pack with an identity layer (null = no identities). */
+    static TiledCatalogue load(Function<String, InputStream> resources,
+                               StarIdentities identities) {
         InputStream stream = resources.apply("manifest.properties");
         if (stream == null) {
             throw new IllegalStateException("catalogue pack manifest is missing");
         }
         PackManifest manifest = PackManifest.parse(
                 new InputStreamReader(stream, StandardCharsets.UTF_8), "bright-sky");
-        return new TiledCatalogue(resources, manifest);
+        return new TiledCatalogue(resources, manifest, identities);
     }
 
     public PackManifest manifest() {
@@ -119,7 +130,9 @@ public final class TiledCatalogue implements Catalogue {
                 stars.add(new Star(fields[0],
                         new SkyPosition(Double.parseDouble(fields[1]),
                                 Double.parseDouble(fields[2])),
-                        Double.parseDouble(fields[3])));
+                        Double.parseDouble(fields[3]),
+                        identities == null ? null
+                                : identities.identityOf(fields[0])));
             }
         }
         byte[] dsoBytes = verifiedTileFile(tileId, "dsos.csv");

@@ -45,8 +45,31 @@ class AtlasTest {
         assertEquals("NGC 104",
                 Atlas.search().search("47 Tuc Cluster").get(0).identity());
         assertEquals("NGC 5457", Atlas.search().search("m101").get(0).identity());
-        assertTrue(Atlas.search().search("TYC 4628-237-1").get(0).label()
-                .equals("TYC 4628-237-1"), "Polaris by TYC id");
+        SearchResult polaris = Atlas.search().search("TYC 4628-237-1").get(0);
+        assertEquals("TYC 4628-237-1", polaris.identity(),
+                "the TYC search still resolves to its exact star");
+        assertEquals("Polaris · α UMi · V 2.0", polaris.label(),
+                "the display line now carries the star's full identity");
+    }
+
+    @Test
+    void assembledScenesCarryTheirStarsStructuredIdentities() {
+        // The identity attaches at catalogue load, so it reaches every
+        // assembled scene as data - option-free, ready for #115's
+        // label pass and never a renderer-ready string.
+        ChartScene orion = Atlas.assembler().assemble(
+                ChartViewState.DEFAULT.recenteredAt(
+                        new SkyPosition(88.792939, 7.407064)), 900, 700);
+        var betelgeuse = orion.stars().stream()
+                .filter(star -> star.id().equals("TYC 129-1873-1"))
+                .findFirst().orElseThrow();
+        assertEquals("Betelgeuse", betelgeuse.identity().name());
+        assertEquals("α", betelgeuse.identity().bayer());
+        assertEquals("58", betelgeuse.identity().flamsteed());
+        assertEquals("Ori", betelgeuse.identity().constellation());
+        assertTrue(orion.stars().stream()
+                        .anyMatch(star -> star.identity() == null),
+                "stars the pack does not know honestly have none");
     }
 
     @Test

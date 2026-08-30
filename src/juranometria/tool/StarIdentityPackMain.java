@@ -49,12 +49,6 @@ public final class StarIdentityPackMain {
     static final int UNMATCHED = 64;
     static final int MULTI_COMPONENT = 201;
 
-    /** Manifest keys every valid pack must carry. */
-    static final String[] REQUIRED_MANIFEST_KEYS = {
-            "format.version", "pack.name", "join.contract", "rows",
-            "source", "source.commit", "license",
-            "checksum." + CSV_NAME,
-    };
 
     private StarIdentityPackMain() {
     }
@@ -209,26 +203,13 @@ public final class StarIdentityPackMain {
     }
 
     /**
-     * Validates a pack manifest; #114's loader shares this check so
-     * an unsupported format or foreign pack fails loudly on both the
-     * generating and the loading side.
+     * Validates a pack manifest - the loader's own contract
+     * (juranometria.catalog.StarIdentities), shared so an unsupported
+     * format or foreign pack fails loudly on both the generating and
+     * the loading side.
      */
     static void validateManifest(Properties manifest) {
-        for (String key : REQUIRED_MANIFEST_KEYS) {
-            if (manifest.getProperty(key) == null) {
-                throw new IllegalStateException(
-                        "star-identity manifest is missing " + key);
-            }
-        }
-        if (!"1".equals(manifest.getProperty("format.version"))) {
-            throw new IllegalStateException("unsupported star-identity pack"
-                    + " format.version " + manifest.getProperty("format.version")
-                    + "; this build supports 1");
-        }
-        if (!PACK_NAME.equals(manifest.getProperty("pack.name"))) {
-            throw new IllegalStateException("manifest belongs to pack "
-                    + manifest.getProperty("pack.name") + ", not " + PACK_NAME);
-        }
+        juranometria.catalog.StarIdentities.validateManifest(manifest);
     }
 
     private static String manifest(int rows, int names, int bayers,

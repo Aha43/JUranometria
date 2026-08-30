@@ -1,11 +1,19 @@
 package juranometria.chart;
 
 /**
- * An immutable catalogue star: an identifier, an ICRS position, and a
- * brightness value. The fixture supplies V magnitudes; the field is a
- * generic brightness, not a photometric claim.
+ * An immutable catalogue star: an identifier, an ICRS position, a
+ * brightness value, and - when the bundled identity pack knows it -
+ * a structured {@link StarIdentity}. The fixture supplies V
+ * magnitudes; the field is a generic brightness, not a photometric
+ * claim. A null identity is honestly unknown.
  */
-public record Star(String id, SkyPosition position, double magnitude) {
+public record Star(String id, SkyPosition position, double magnitude,
+                   StarIdentity identity) {
+
+    /** A star the identity pack does not know. */
+    public Star(String id, SkyPosition position, double magnitude) {
+        this(id, position, magnitude, null);
+    }
 
     public Star {
         if (id == null || id.isBlank()) {

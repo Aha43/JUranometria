@@ -26,7 +26,8 @@ public final class Atlas {
                 juranometria.geo.ConstellationGeography.load();
         static final SceneAssembler ASSEMBLER = assembler(CATALOGUE);
         static final LocalSearch SEARCH = new LocalSearch(
-                CATALOGUE.starsIn(wholeSky()), CATALOGUE.deepSkyObjectsIn(wholeSky()));
+                CATALOGUE.starsIn(wholeSky()), CATALOGUE.deepSkyObjectsIn(wholeSky()),
+                GEOGRAPHY.constellations());
 
         private static SceneAssembler assembler(TiledCatalogue catalogue) {
             if (!"all-sky".equals(catalogue.manifest().coverage())) {
