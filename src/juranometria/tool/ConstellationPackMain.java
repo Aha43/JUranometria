@@ -37,6 +37,18 @@ public final class ConstellationPackMain {
     static final String PACK_NAME = "constellation-geography";
     static final String SOURCE_COMMIT = "7e720a3de062059d4c5400a379146a601d9010e0";
 
+    /**
+     * Recorded source errata (Codex review, PR #119): the pinned
+     * source carries a factually wrong value; the pack corrects it,
+     * records the correction in the manifest and notice, and refuses
+     * to run if the source stops matching the recorded wrong value -
+     * an erratum is never a silent patch and never survives source
+     * drift unexamined. Crux's Latin genitive is Crucis; the source's
+     * "gen" field repeats the nominative.
+     */
+    static final Map<String, String[]> GENITIVE_ERRATA = Map.of(
+            "Cru", new String[] {"Crux", "Crucis"});
+
     /** The pinned raw inputs this pack is generated from. */
     static final Map<String, String> PINNED = Map.of(
             "constellations.json",
@@ -87,7 +99,18 @@ public final class ConstellationPackMain {
             if (!seen.add(id)) {
                 continue;
             }
-            String[] row = {id, (String) p.get("name"), (String) p.get("gen"),
+            String genitive = (String) p.get("gen");
+            String[] erratum = GENITIVE_ERRATA.get(id);
+            if (erratum != null) {
+                if (!erratum[0].equals(genitive)) {
+                    throw new IllegalStateException("recorded genitive"
+                            + " erratum for " + id + " expects the source to"
+                            + " carry '" + erratum[0] + "' but it carries '"
+                            + genitive + "'; re-examine the erratum");
+                }
+                genitive = erratum[1];
+            }
+            String[] row = {id, (String) p.get("name"), genitive,
                     (String) p.get("rank")};
             requireNoCommas(row);
             identities.add(row);
@@ -267,6 +290,12 @@ public final class ConstellationPackMain {
         entries.put("boundary.worst.deviation.arcmin", String.format(Locale.ROOT,
                 "%.4f", report.worstReconstructionDeviationDegrees() * 60.0));
         entries.put("source", "d3-celestial (Olaf Frohn)");
+        for (Map.Entry<String, String[]> erratum
+                : new TreeMap<>(GENITIVE_ERRATA).entrySet()) {
+            entries.put("erratum.genitive." + erratum.getKey(),
+                    erratum.getValue()[1] + " (source carries "
+                            + erratum.getValue()[0] + ")");
+        }
         entries.put("source.commit", SOURCE_COMMIT);
         entries.put("license", "BSD-3-Clause");
         entries.put("audit.date", "2026-08-29");
@@ -304,7 +333,11 @@ public final class ConstellationPackMain {
                   CC BY 4.0), with Olaf Frohn's modifications. Stick figures
                   are an editorial convention, not an IAU standard.
                 - **Names and abbreviations** are the IAU's standard Latin
-                  names for the 88 constellations.
+                  names for the 88 constellations. One recorded erratum:
+                  the source's genitive for Crux repeats the nominative
+                  ("Crux"); this pack carries the correct Latin genitive
+                  **Crucis**, with the correction declared in the
+                  manifest.
                 """.formatted(SOURCE_COMMIT);
     }
 

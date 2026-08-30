@@ -289,9 +289,19 @@ public final class LocalSearch {
                 .orElse(dso.id());
     }
 
-    /** Lowercase, whitespace removed, "messier" folded to its "m" form. */
+    /** Lowercase, whitespace removed, superscript component digits
+     *  folded to plain digits, "messier" folded to its "m" form. */
     static String normalize(String raw) {
         String key = raw.toLowerCase(java.util.Locale.ROOT).replaceAll("\\s+", "");
+        StringBuilder folded = new StringBuilder(key.length());
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
+            int superscript = "\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079"
+                    .indexOf(c);
+            folded.append(superscript < 0 ? c
+                    : (char) ('1' + superscript));
+        }
+        key = folded.toString();
         if (key.startsWith("messier")) {
             key = "m" + key.substring("messier".length());
         }

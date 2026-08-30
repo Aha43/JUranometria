@@ -19,4 +19,8 @@ Provenance, per docs/decisions/constellation-geography.md:
   CC BY 4.0), with Olaf Frohn's modifications. Stick figures
   are an editorial convention, not an IAU standard.
 - **Names and abbreviations** are the IAU's standard Latin
-  names for the 88 constellations.
+  names for the 88 constellations. One recorded erratum:
+  the source's genitive for Crux repeats the nominative
+  ("Crux"); this pack carries the correct Latin genitive
+  **Crucis**, with the correction declared in the
+  manifest.

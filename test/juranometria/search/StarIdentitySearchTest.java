@@ -31,12 +31,11 @@ class StarIdentitySearchTest {
         assertResolves("TYC 5949-2777-1", "sirius", "alpha cma",
                 "9 canis majoris");
         assertResolves("TYC 3105-2070-1", "vega", "alpha lyrae", "3 lyr");
-        // The bundled geography carries the source's genitive for
-        // Crux verbatim ("Crux", a source error for "Crucis"); the
-        // search accepts the carried forms and never invents one -
-        // recorded as a data-quality finding, not silently patched.
+        // Canonical Crux forms work because the constellation pack
+        // records the source's wrong genitive ("Crux") as an erratum
+        // and carries the correct "Crucis" (Codex review, PR #119).
         assertResolves("TYC 8979-3464-1", "acrux", "alpha1 cru",
-                "α1 cru", "alpha crux");
+                "α1 Crucis", "α¹ Crucis", "Alpha Crucis", "alpha1 crucis");
     }
 
     @Test
@@ -47,7 +46,7 @@ class StarIdentitySearchTest {
         assertEquals("Betelgeuse · α Ori region", betelgeuse.regionTitle(),
                 "the chart title is the star's honest identity");
 
-        SearchResult flamsteedOnly = Atlas.search().search("35 cru").get(0);
+        SearchResult flamsteedOnly = Atlas.search().search("35 crucis").get(0);
         assertEquals("TYC 8658-751-1", flamsteedOnly.identity());
         assertTrue(flamsteedOnly.label().startsWith("35 Cru · V "),
                 "a Flamsteed-only star is its designation: "
@@ -64,14 +63,14 @@ class StarIdentitySearchTest {
     void splitComponentsListTogetherRatherThanHidingBehindOne() {
         // Crux carries μ1 and μ2 as separate packed stars; the
         // componentless query lists both, never silently picking one.
-        List<SearchResult> mu = Atlas.search().search("mu cru");
+        List<SearchResult> mu = Atlas.search().search("mu crucis");
         assertTrue(mu.stream().anyMatch(result ->
                         result.identity().equals("TYC 8656-3488-1")),
                 "μ1 Cru is listed");
         assertTrue(mu.stream().anyMatch(result ->
                         result.identity().equals("TYC 8656-3487-1")),
                 "μ2 Cru is listed");
-        assertResolves("TYC 8656-3488-1", "mu1 cru", "μ1 cru");
+        assertResolves("TYC 8656-3488-1", "mu1 cru", "μ1 crucis");
     }
 
     @Test
