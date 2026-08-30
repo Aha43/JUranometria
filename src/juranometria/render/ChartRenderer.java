@@ -110,6 +110,13 @@ public final class ChartRenderer {
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
 
         g.setClip(1, 1, width - 2, height - 2);
+        // The equatorial graticule draws first - the quietest ink on
+        // the chart, beneath geography, stars, and every label, per
+        // docs/decisions/coordinate-grid.md. Its labels yield to the
+        // title block through the shared bounds; everything else
+        // simply paints over grid ink.
+        EquatorialGrid.draw(g, EquatorialGrid.gridFor(
+                scene.viewport(), titleBlockBounds(g, scene)));
         drawGeography(g, scene, options, projection, mapping);
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
             if (!options.deepSkyObjects() && !isTarget(scene, dso)) {
