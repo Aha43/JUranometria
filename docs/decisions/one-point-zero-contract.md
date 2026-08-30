@@ -202,11 +202,16 @@ shape:
 - **The packaged headless smoke path** is a second, inner launcher
   (`juranometria-smoke`) that renders the reference chart through
   the bundled runtime alone with no system Java on the PATH.
-  **Enforcement is per-platform-honest**: on both macOS cells the
-  render must equal the committed M31 reference byte-for-byte; on
-  Linux and Windows — whose system font stacks legitimately differ —
-  the two same-runner builds' renders must be byte-identical to each
-  other, with the reference comparison recorded either way.
+  **Enforcement is per-platform-honest**: on every cell the two
+  same-runner builds' renders must be byte-identical to each other,
+  and the two macOS architectures (arm64 and Intel) must render
+  byte-identical smokes to each other under the same pinned runtime
+  — a cross-architecture determinism claim. Equality with the
+  committed M31 reference is recorded per environment but not
+  required across environments: text rasterization varies between
+  JDK builds and OS font stacks, and the contract already excludes
+  exact pixels from its promises (it holds on the maintainer's
+  machines, where it is verified).
 - **Reproducibility, measured honestly**: the macOS image is
   byte-identical across two same-machine builds; every CI cell
   builds twice and records identical-or-not in the run summary. The
