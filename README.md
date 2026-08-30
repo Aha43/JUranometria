@@ -100,6 +100,13 @@ make import-allsky                      # verifies checksums, regenerates the pa
 - The readout on the right and the chart's title block always state the
   active field width and magnitude limit.
 
+The menu bar stays out of the way: **Help → About JUranometria** shows
+the version, a short description, and the licensing of the code and
+every bundled resource — including the full notices, offline — and
+**JUranometria → Settings…** holds the persistent Light/Dark
+appearance choice (the `--dark` launch flag remains a session-only
+override that never rewrites the saved setting).
+
 Controls disable at their bounds: the bundled bright-sky pack carries
 the complete sky to stars of V 8.0 (45,630 Tycho-2 stars and 13,371
 OpenNGC objects in about 2.5 MiB), and the atlas never claims deeper

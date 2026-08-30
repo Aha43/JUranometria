@@ -71,3 +71,17 @@ not downloaded as a speculative icon set.
 - Use the macOS screen menu bar when running on macOS, following NamDesktop's
   established application setup.
 
+## Menus, About, and the appearance setting
+
+The menu bar is deliberately restrained: an application menu carrying
+Settings and a Help menu carrying About - no placeholder items. The
+About dialog identifies the application from the packaged version,
+describes it in the product language, and presents licensing from the
+packaged summary and notice resources (never duplicated legal prose);
+the full notices are readable offline. The appearance setting is
+Light or Dark, persisted through a tiny JDK-preferences boundary,
+applied live on OK and only on OK - Cancel and Escape change nothing.
+`--dark` remains a session-only override that never rewrites the
+saved choice. Appearance is application state: the chart's own paper
+and ink never follow the theme.
+
