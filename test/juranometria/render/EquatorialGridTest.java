@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.render;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The coordinate-grid contract of docs/decisions/coordinate-grid.md,
- * locked before production implementation (#133): east-left RA
+ * now locked against the production seam itself (issue #133): east-left RA
  * ordering, RA-wrap continuity, signed declination and 0h notation,
  * polar convergence without runaway density, honest clipping, the
  * adaptive spacing rule across every released field, deterministic
  * output, and the stated 0.05 px approximation tolerance.
  */
-class GridStudyMainTest {
+class EquatorialGridTest {
 
     private static final double TOLERANCE_PX = 0.05;
 
@@ -30,7 +30,7 @@ class GridStudyMainTest {
     @Test
     void raRunsEastLeftAndZeroHoursWraps() {
         ChartViewport viewport = page(0.3, 45.0, 24.0);
-        var grid = GridStudyMain.gridFor(viewport, null);
+        var grid = EquatorialGrid.gridFor(viewport, null);
         // Bottom-edge RA labels: for any two, the greater RA (mod the
         // wrap around this page's centre) sits further LEFT.
         var raLabels = grid.labels().stream()
@@ -67,7 +67,7 @@ class GridStudyMainTest {
         // On the RA-0h page every visible parallel is one continuous
         // polyline: the sampling walks the sky, so RA 0 is nothing
         // special and no seam splits the curve there.
-        var grid = GridStudyMain.gridFor(page(0.3, 45.0, 24.0), null);
+        var grid = EquatorialGrid.gridFor(page(0.3, 45.0, 24.0), null);
         for (List<PixelPoint> piece : grid.parallels()) {
             for (int i = 1; i < piece.size(); i++) {
                 double jump = Math.hypot(
@@ -82,19 +82,19 @@ class GridStudyMainTest {
 
     @Test
     void notationIsSignedAndCompact() {
-        assertEquals("0h", GridStudyMain.raLabel(0.0));
-        assertEquals("6h", GridStudyMain.raLabel(90.0));
-        assertEquals("5h 40m", GridStudyMain.raLabel(85.0));
-        assertEquals("0h 30m", GridStudyMain.raLabel(7.5));
-        assertEquals("+41°", GridStudyMain.decLabel(41.0, 1.0));
-        assertEquals("−5°", GridStudyMain.decLabel(-5.0, 5.0));
-        assertEquals("+41° 30′", GridStudyMain.decLabel(41.5, 0.5));
-        assertEquals("−0° 30′", GridStudyMain.decLabel(-0.5, 0.5));
+        assertEquals("0h", EquatorialGrid.raLabel(0.0));
+        assertEquals("6h", EquatorialGrid.raLabel(90.0));
+        assertEquals("5h 40m", EquatorialGrid.raLabel(85.0));
+        assertEquals("0h 30m", EquatorialGrid.raLabel(7.5));
+        assertEquals("+41°", EquatorialGrid.decLabel(41.0, 1.0));
+        assertEquals("−5°", EquatorialGrid.decLabel(-5.0, 5.0));
+        assertEquals("+41° 30′", EquatorialGrid.decLabel(41.5, 0.5));
+        assertEquals("−0° 30′", EquatorialGrid.decLabel(-0.5, 0.5));
     }
 
     @Test
     void thePoleConvergesWithoutSeamsOrRunawayDensity() {
-        var grid = GridStudyMain.gridFor(page(37.946619, 89.9, 36.0), null);
+        var grid = EquatorialGrid.gridFor(page(37.946619, 89.9, 36.0), null);
         assertEquals(90.0, grid.spec().raStepDegrees(),
                 "the RA step reaches its 6h cap at the pole");
         assertTrue(grid.meridians().size() <= 8,
@@ -109,7 +109,7 @@ class GridStudyMainTest {
     @Test
     void clippingIsHonestAndOutputDeterministic() {
         ChartViewport viewport = page(83.818667, -5.389667, 12.0);
-        var grid = GridStudyMain.gridFor(viewport, null);
+        var grid = EquatorialGrid.gridFor(viewport, null);
         for (var family : List.of(grid.meridians(), grid.parallels())) {
             for (List<PixelPoint> piece : family) {
                 assertTrue(piece.size() >= 2);
@@ -126,7 +126,7 @@ class GridStudyMainTest {
                 assertTrue(touches, "every kept piece touches the page");
             }
         }
-        var again = GridStudyMain.gridFor(viewport, null);
+        var again = EquatorialGrid.gridFor(viewport, null);
         assertEquals(grid.meridians().size(), again.meridians().size());
         assertEquals(grid.parallels().size(), again.parallels().size());
         assertEquals(grid.labels(), again.labels(),
@@ -137,7 +137,7 @@ class GridStudyMainTest {
     void everyReleasedFieldStaysWithinToleranceAndPleasantDensity() {
         for (double field : new double[] {1, 2, 3, 4, 6, 8, 12, 18, 24, 36}) {
             ChartViewport viewport = page(83.818667, -5.389667, field);
-            var grid = GridStudyMain.gridFor(viewport, null);
+            var grid = EquatorialGrid.gridFor(viewport, null);
             assertTrue(grid.maxChordErrorPx() < TOLERANCE_PX,
                     "tolerance holds at " + field + " degrees: "
                             + grid.maxChordErrorPx());
@@ -146,13 +146,13 @@ class GridStudyMainTest {
                     * viewport.widthPx() / field;
             double decSpacing = grid.spec().decStepDegrees()
                     * viewport.widthPx() / field;
-            assertTrue(raSpacing >= GridStudyMain.MINIMUM_SPACING_PX,
+            assertTrue(raSpacing >= EquatorialGrid.MINIMUM_SPACING_PX,
                     "RA spacing respects the floor at " + field);
-            assertTrue(decSpacing >= GridStudyMain.MINIMUM_SPACING_PX,
+            assertTrue(decSpacing >= EquatorialGrid.MINIMUM_SPACING_PX,
                     "Dec spacing respects the floor at " + field);
-            assertTrue(raSpacing < 2.6 * GridStudyMain.MINIMUM_SPACING_PX,
+            assertTrue(raSpacing < 2.6 * EquatorialGrid.MINIMUM_SPACING_PX,
                     "RA spacing stays pleasant at " + field);
-            assertTrue(decSpacing < 2.6 * GridStudyMain.MINIMUM_SPACING_PX,
+            assertTrue(decSpacing < 2.6 * EquatorialGrid.MINIMUM_SPACING_PX,
                     "Dec spacing stays pleasant at " + field);
         }
     }
@@ -163,15 +163,15 @@ class GridStudyMainTest {
         // a guessed width, and a label that would clip the paper edge
         // after ordinary panning is suppressed by the same shared
         // calculation that governs title collisions and drawing.
-        var metrics = GridStudyMain.labelMetrics();
+        var metrics = EquatorialGrid.labelMetrics();
         boolean sawEdgeSuppression = false;
         for (int shift = 0; shift < 24; shift++) {
             ChartViewport viewport = new ChartViewport(
                     new SkyPosition(83.0 + shift * 0.11, -5.389667),
                     12.0, 900, 700);
-            var grid = GridStudyMain.gridFor(viewport, null);
+            var grid = EquatorialGrid.gridFor(viewport, null);
             for (var label : grid.labels()) {
-                assertTrue(GridStudyMain.fitsPaper(label, metrics, viewport),
+                assertTrue(EquatorialGrid.fitsPaper(label, metrics, viewport),
                         "every emitted label's exact box lies on the paper:"
                                 + " " + label);
             }
@@ -191,8 +191,8 @@ class GridStudyMainTest {
 
         // The shared calculation is the drawing geometry too: the box
         // of a known label is exactly the metrics' string bounds.
-        var label = new GridStudyMain.Label("5h 40m", 100.0, 690.0);
-        var box = GridStudyMain.labelBounds(label, metrics);
+        var label = new EquatorialGrid.Label("5h 40m", 100.0, 690.0);
+        var box = EquatorialGrid.labelBounds(label, metrics);
         assertEquals(metrics.stringWidth("5h 40m") + 2.0, box.getWidth());
         assertEquals(metrics.getHeight(), box.getHeight());
     }
@@ -200,8 +200,8 @@ class GridStudyMainTest {
     @Test
     void gridLabelsYieldToTheTitleBlockOnly() {
         ChartViewport viewport = page(10.684708, 41.268750, 8.0);
-        var open = GridStudyMain.gridFor(viewport, null);
-        var titled = GridStudyMain.gridFor(viewport,
+        var open = EquatorialGrid.gridFor(viewport, null);
+        var titled = EquatorialGrid.gridFor(viewport,
                 new java.awt.Rectangle(12, 560, 320, 128));
         assertTrue(titled.suppressedLabels() > 0,
                 "labels under the title block are suppressed");

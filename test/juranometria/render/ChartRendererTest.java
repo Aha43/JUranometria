@@ -286,11 +286,17 @@ class ChartRendererTest {
                 "a viewport too small for the title block omits it instead of clipping");
     }
 
+    /**
+     * Counts CONTENT ink: pixels meaningfully darker than the
+     * equatorial grid's quiet band (lines 216, labels 150), so the
+     * always-on graticule of docs/decisions/coordinate-grid.md never
+     * counts as symbols, labels, or title ink in these assertions.
+     */
     private static int countInk(BufferedImage image, int x, int y, int w, int h) {
         int ink = 0;
         for (int px = x; px < x + w; px++) {
             for (int py = y; py < y + h; py++) {
-                if (image.getRGB(px, py) != 0xFFFFFFFF) {
+                if (((image.getRGB(px, py) >> 16) & 0xFF) < 140) {
                     ink++;
                 }
             }
