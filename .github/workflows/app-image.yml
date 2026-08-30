@@ -14,6 +14,10 @@ on:
   workflow_dispatch:
 
 env:
+  # setup-java takes the SemVer spec; Adoptium resolves it to the
+  # exact build below, which every image's runtime release file must
+  # match - both halves of the pin, recorded together.
+  TEMURIN_SETUP: '21.0.12'
   TEMURIN_PIN: '21.0.12.1'
 
 jobs:
@@ -24,7 +28,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: ${{ env.TEMURIN_PIN }}
+          java-version: ${{ env.TEMURIN_SETUP }}
       - uses: actions/cache@v6
         with:
           path: lib
@@ -57,7 +61,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: ${{ env.TEMURIN_PIN }}
+          java-version: ${{ env.TEMURIN_SETUP }}
       - uses: actions/download-artifact@v7
         with:
           name: app-jar
