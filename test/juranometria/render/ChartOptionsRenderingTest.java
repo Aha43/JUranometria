@@ -142,6 +142,23 @@ class ChartOptionsRenderingTest {
         assertFalse(java.util.Arrays.equals(
                         pixels(noBoundaries), pixels(noGeography)),
                 "the three geography gates are independent");
+
+        // The direct names toggle: with figures on, disabling names
+        // removes exactly the name text (PR #108 review, P2) - proven
+        // by equality with a scene that has no names to draw.
+        BufferedImage namesOff = RENDERER.renderToImage(scene,
+                options(true, true, true, true, false));
+        assertFalse(java.util.Arrays.equals(pixels(all), pixels(namesOff)),
+                "disabling names with figures on removes the name ink");
+        BufferedImage nameless = RENDERER.renderToImage(new ChartScene(
+                        scene.viewport(), scene.stars(),
+                        scene.deepSkyObjects(), scene.title(),
+                        scene.limitingMagnitude(), scene.targetIdentity(),
+                        new SceneGeography(List.of(FIGURE), List.of(BOUNDARY),
+                                Map.of())),
+                ChartOptions.DEFAULTS);
+        assertArrayEquals(pixels(nameless), pixels(namesOff),
+                "names off is exactly the chart with no names");
     }
 
     @Test
