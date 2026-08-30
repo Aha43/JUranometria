@@ -85,14 +85,26 @@ class ChartOptionsJourneyTest {
             assertEquals("NGC 1976", wideOrion.targetIdentity());
 
             // Open Chart Options through the real View menu action and
-            // hide the deep-sky layer: the chart must not move, the
-            // title must stay the target's, and nothing may query.
-            int queriesBefore = queryCount(chart[0]);
+            // hide labels, then the deep-sky layer: the chart must not
+            // move, the title must stay the target's, and nothing may
+            // reassemble or query.
             SwingUtilities.invokeAndWait(() ->
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog dialog = optionsDialog();
             assertNotNull(dialog, "the View menu opened the dialog");
+            juranometria.chart.ChartScene sceneBefore = chart[0].scene();
+            // A label toggle first: the crowd's labels hide while the
+            // target's rides its always-drawn symbol (PR #110 review).
+            SwingUtilities.invokeAndWait(() ->
+                    box(dialog.getContentPane(), "Deep-sky labels")
+                            .doClick());
+            flush();
+            assertFalse(options.options().effectiveDeepSkyLabels(),
+                    "the label choice previews live");
+            assertSame(sceneBefore, chart[0].scene(),
+                    "a label toggle re-renders the identical scene object");
+            // Then the content toggle.
             SwingUtilities.invokeAndWait(() ->
                     box(dialog.getContentPane(), "Deep-sky objects")
                             .doClick());
@@ -106,8 +118,9 @@ class ChartOptionsJourneyTest {
                             + " the renderer keeps drawn and labelled");
             assertTrue(chart[0].scene().title().startsWith("M 42"),
                     "the title honestly remains the shown target's");
-            assertEquals(queriesBefore, queryCount(chart[0]),
-                    "option interaction is repaint-only: no queries");
+            assertSame(sceneBefore, chart[0].scene(),
+                    "option interaction is repaint-only: the very same"
+                            + " scene object, so no reassembly and no query");
 
             // Home while options remain chosen: navigation resets,
             // the reader's choices stay.
@@ -148,13 +161,6 @@ class ChartOptionsJourneyTest {
             });
             node.removeNode();
         }
-    }
-
-    /** The catalogue query count is not directly visible through the
-     *  real Atlas; scene identity stands in - an unchanged scene object
-     *  proves no reassembly and therefore no query occurred. */
-    private static int queryCount(ChartComponent chart) {
-        return System.identityHashCode(chart.scene());
     }
 
     private static JDialog optionsDialog() {
