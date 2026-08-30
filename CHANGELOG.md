@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-30
+
+Sprint 11 — Give the application a public face. Reviewed by Codex
+before release; the review trail lives in `docs/reviews/`.
+
 ### Added
 
 - A restrained menu bar: Help > About JUranometria shows the packaged
