@@ -17,8 +17,6 @@ import juranometria.app.ChartOptionsController;
 import juranometria.app.ChartOptionsDialog;
 import juranometria.app.ChartOptionsStore;
 import juranometria.chart.ChartViewState;
-import juranometria.chart.SkyPosition;
-import juranometria.project.PlanePoint;
 import juranometria.render.ChartOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,6 +58,7 @@ class NamedStarJourneyTest {
 
             SwingUtilities.invokeAndWait(() -> {
                 chart[0] = new ChartComponent(Atlas.assembler());
+                PanInteraction.install(chart[0], navigation);
                 navigation.onChange(chart[0]::setViewState);
                 options.onChange(chart[0]::setChartOptions);
                 search[0] = new SearchField(Atlas.search(),
@@ -73,6 +72,8 @@ class NamedStarJourneyTest {
                         java.awt.BorderLayout.NORTH);
                 frame[0].add(chart[0], java.awt.BorderLayout.CENTER);
                 frame[0].pack();
+                frame[0].setSize(900, 700);
+                frame[0].validate();
             });
             flush();
 
@@ -163,9 +164,30 @@ class NamedStarJourneyTest {
             assertSame(wideCrux, navigation.state(),
                     "choosing the chart never moves it");
             assertEquals("TYC 8658-751-1", chart[0].scene().targetIdentity(),
-                    "the searched star keeps its identity - and the"
-                            + " renderer keeps its guaranteed label -"
-                            + " across the toggle");
+                    "the searched star keeps its identity across the toggle");
+            // The last mile, at the pixels (sprint review): render the
+            // journey's ACTUAL assembled scene with the journey's
+            // actual options (star labels off), against the identical
+            // scene stripped only of its target identity - same title,
+            // same stars, same everything else - so any differing
+            // pixel IS the guaranteed 35 Cru label.
+            var actual = chart[0].scene();
+            var untargeted = new juranometria.chart.ChartScene(
+                    actual.viewport(), actual.stars(),
+                    actual.deepSkyObjects(), actual.title(),
+                    actual.limitingMagnitude(), null, actual.geography());
+            var renderer = new juranometria.render.ChartRenderer(
+                    juranometria.chart.StarSizePolicy.DEFAULT);
+            int w = actual.viewport().widthPx();
+            int h = actual.viewport().heightPx();
+            assertFalse(java.util.Arrays.equals(
+                            renderer.renderToImage(actual, options.options())
+                                    .getRGB(0, 0, w, h, null, 0, w),
+                            renderer.renderToImage(untargeted,
+                                            options.options())
+                                    .getRGB(0, 0, w, h, null, 0, w)),
+                    "the guaranteed label is really on the page while"
+                            + " ordinary star labels are off");
 
             // OK persists the choice; a restarted session reads it.
             SwingUtilities.invokeAndWait(() ->
@@ -176,14 +198,20 @@ class NamedStarJourneyTest {
                             .starLabels(),
                     "a restart honours exactly what was confirmed");
 
-            // Panning clears the target atomically: the chart titles
-            // honestly by coordinates, never by a star it left behind.
-            SwingUtilities.invokeAndWait(() -> {
-                SkyPosition grabbed = navigation.state().centre();
-                assertTrue(navigation.pan(grabbed,
-                        new PlanePoint(0.05, 0.02)), "the pan is accepted");
-            });
-            flush();
+            // A real mouse drag through the installed pan interaction
+            // clears the target atomically: the chart titles honestly
+            // by coordinates, never by a star it left behind.
+            ChartViewState beforePan = navigation.state();
+            int cx = chart[0].getWidth() / 2;
+            int cy = chart[0].getHeight() / 2;
+            mouse(chart[0], java.awt.event.MouseEvent.MOUSE_PRESSED,
+                    cx, cy);
+            mouse(chart[0], java.awt.event.MouseEvent.MOUSE_DRAGGED,
+                    cx + 40, cy + 25);
+            mouse(chart[0], java.awt.event.MouseEvent.MOUSE_RELEASED,
+                    cx + 40, cy + 25);
+            assertFalse(beforePan.equals(navigation.state()),
+                    "the drag really panned the chart");
             assertNull(navigation.state().targetIdentity(),
                     "the first real pan clears the target atomically");
             assertFalse(chart[0].scene().title().contains("Cru"),
@@ -201,7 +229,9 @@ class NamedStarJourneyTest {
                 button(reopened.getContentPane(), "OK").doClick();
             });
             flush();
-            SwingUtilities.invokeAndWait(navigation::reset);
+            SwingUtilities.invokeAndWait(() ->
+                    button(frame[0].getContentPane(), "Reset view")
+                            .doClick());
             flush();
             assertEquals(ChartOptions.DEFAULTS, store.load());
             assertEquals(ChartViewState.DEFAULT, navigation.state());
@@ -276,6 +306,16 @@ class NamedStarJourneyTest {
             }
         }
         return null;
+    }
+
+    private static void mouse(java.awt.Component chart, int id, int x,
+                              int y) throws Exception {
+        SwingUtilities.invokeAndWait(() -> chart.dispatchEvent(
+                new java.awt.event.MouseEvent(chart, id,
+                        System.nanoTime() / 1_000_000,
+                        java.awt.event.MouseEvent.BUTTON1_DOWN_MASK, x, y, 1,
+                        false, java.awt.event.MouseEvent.BUTTON1)));
+        flush();
     }
 
     private static void flush() throws Exception {

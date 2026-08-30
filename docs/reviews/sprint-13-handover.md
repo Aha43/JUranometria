@@ -71,9 +71,11 @@ before 0.13.0.
 
 ## Verification
 
-- 268 tests, 0 failures; required GitHub `test` check green on every
-  sprint PR (the three display-requiring journeys abort visibly by
-  assumption on headless CI).
+- 268 tests, 0 failures on a display; headless CI discovers 268,
+  passes 264, and aborts the four display-dependent tests visibly by
+  assumption (the three acceptance journeys and the dialog
+  single-instance test); the required GitHub `test` check is green
+  on every sprint PR.
 - Clean bootstrap re-verified this session: `lib/` deleted,
   `scripts/download-libs.sh`, full suite green.
 - `make chart-image` byte-identical to the deliberately updated M31
