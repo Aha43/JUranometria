@@ -345,20 +345,8 @@ public final class StarIdentityStudyMain {
             }
         }
 
-        Map<String, Double> pack = new HashMap<>();
-        for (Path tile : Files.walk(Path.of(
-                "src/resources/catalog/bright-sky/tiles")).toList()) {
-            if (!tile.getFileName().toString().equals("stars.csv")) {
-                continue;
-            }
-            for (String line : Files.readAllLines(tile)) {
-                if (line.startsWith("#") || line.isBlank()) {
-                    continue;
-                }
-                String[] parts = line.split(",");
-                pack.put(parts[0], Double.parseDouble(parts[3]));
-            }
-        }
+        Map<String, Double> pack = packMagnitudes(
+                Path.of("src/resources/catalog/bright-sky"));
 
         Map<String, Object> names = MiniJson.object(MiniJson.parse(
                 Files.readString(Path.of(
@@ -397,22 +385,74 @@ public final class StarIdentityStudyMain {
         return new Join(byTyc, names.size(), joined, multi, unmatchedNames);
     }
 
-    /** How an unmatched source entry is listed in the honest report. */
+    /**
+     * How an unmatched source entry is listed in the honest report:
+     * always with its Hipparcos key, so duplicate proper names in the
+     * source stay distinguishable (Codex review, PR #118).
+     */
     private static String unmatchedLabel(String hip, Map<String, Object> value) {
         String name = blankToNull(value.get("name"));
         if (name != null) {
-            return name;
+            return name + " (HIP " + hip + ")";
         }
         String constellation = blankToNull(value.get("c"));
         String bayer = blankToNull(value.get("bayer"));
         if (bayer != null && constellation != null) {
-            return bayer + " " + constellation;
+            return bayer + " " + constellation + " (HIP " + hip + ")";
         }
         String flamsteed = blankToNull(value.get("flam"));
         if (flamsteed != null && constellation != null) {
-            return flamsteed + " " + constellation;
+            return flamsteed + " " + constellation + " (HIP " + hip + ")";
         }
         return "HIP " + hip;
+    }
+
+    /**
+     * The bright-sky pack's star magnitudes - the fact that selects a
+     * multi-component system's winning component. Every tile is
+     * verified against the pack manifest's checksum before its
+     * magnitudes are trusted (Codex review, PR #118: a tampered tile
+     * must fail loudly, never silently re-attach an identity while
+     * every locked count still passes).
+     */
+    static Map<String, Double> packMagnitudes(Path packDir) throws Exception {
+        java.util.Properties manifest = new java.util.Properties();
+        try (var stream = Files.newInputStream(
+                packDir.resolve("manifest.properties"))) {
+            manifest.load(stream);
+        }
+        Map<String, Double> pack = new HashMap<>();
+        for (Path tile : Files.walk(packDir.resolve("tiles")).sorted()
+                .toList()) {
+            if (!tile.getFileName().toString().equals("stars.csv")) {
+                continue;
+            }
+            String key = "checksum." + packDir.relativize(tile).toString()
+                    .replace(java.io.File.separatorChar, '/');
+            String expected = manifest.getProperty(key);
+            byte[] bytes = Files.readAllBytes(tile);
+            if (expected == null) {
+                throw new IllegalStateException(tile + " has no checksum in"
+                        + " the bright-sky manifest; refusing to trust its"
+                        + " magnitudes");
+            }
+            String actual = PinnedInputs.sha256Hex(bytes);
+            if (!expected.equals(actual)) {
+                throw new IllegalStateException(tile + " fails its"
+                        + " bright-sky manifest checksum (" + actual + ");"
+                        + " the component-selecting magnitudes cannot be"
+                        + " trusted - regenerate with make import-allsky");
+            }
+            for (String line : new String(bytes, StandardCharsets.UTF_8)
+                    .split("\n")) {
+                if (line.startsWith("#") || line.isBlank()) {
+                    continue;
+                }
+                String[] parts = line.split(",");
+                pack.put(parts[0], Double.parseDouble(parts[3]));
+            }
+        }
+        return pack;
     }
 
     private static String blankToNull(Object value) {
