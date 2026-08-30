@@ -87,18 +87,19 @@ jobs:
           grep "JAVA_VERSION=\"${TEMURIN_PIN}\"" build/app-image/build-info.txt \
             || { echo "runtime is not the pinned Temurin ${TEMURIN_PIN}"; \
                  cat build/app-image/build-info.txt; exit 1; }
-      - name: Launch with no system Java, light and --dark, space path
+      - name: Launch with no system Java, light and --dark, space path (POSIX)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           set -eu
           work="$RUNNER_TEMP/native with space"
           mkdir -p "$work"
           cp -R build/app-image/* "$work/"
-          case "$RUNNER_OS" in
-            macOS)   launcher="$work/JUranometria.app/Contents/MacOS/JUranometria" ;;
-            Linux)   launcher="$work/JUranometria/bin/JUranometria" ;;
-            Windows) launcher="$work/JUranometria/JUranometria.exe" ;;
-          esac
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            launcher="$work/JUranometria.app/Contents/MacOS/JUranometria"
+          else
+            launcher="$work/JUranometria/bin/JUranometria"
+          fi
           run_one() {
             if [ "$RUNNER_OS" = "Linux" ]; then
               env PATH=/usr/bin:/bin xvfb-run -a "$launcher" "$@" &
@@ -109,19 +110,35 @@ jobs:
             sleep 8
             kill -0 "$pid" 2>/dev/null || { echo "native launch died ($*)"; exit 1; }
             kill "$pid" 2>/dev/null || true
-            if [ "$RUNNER_OS" = "Windows" ]; then
-              taskkill //IM JUranometria.exe //F >/dev/null 2>&1 || true
-            fi
             wait "$pid" 2>/dev/null || true
           }
-          # Prove no java leaks in from the environment at all.
-          if [ "$RUNNER_OS" != "Linux" ]; then
-            env PATH=/nonexistent java -version 2>/dev/null \
-              && { echo "test environment still resolves java"; exit 1; } || true
-          fi
           run_one
           run_one --dark
           echo "native launches OK with no system Java, light and --dark, space path"
+      - name: Launch with no system Java, light and --dark, space path (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $work = Join-Path $env:RUNNER_TEMP "native with space"
+          New-Item -ItemType Directory -Force -Path $work | Out-Null
+          Copy-Item -Recurse -Force build/app-image/* $work
+          $launcher = Join-Path $work "JUranometria/JUranometria.exe"
+          # No system Java reachable: an empty PATH for the child.
+          $env:PATH = ""
+          foreach ($extra in @(@(), @("--dark"))) {
+            if ($extra.Count -gt 0) {
+              $p = Start-Process -FilePath $launcher -ArgumentList $extra -PassThru
+            } else {
+              $p = Start-Process -FilePath $launcher -PassThru
+            }
+            Start-Sleep -Seconds 8
+            if ($p.HasExited) {
+              Write-Error "native launch died (args: $extra), exit $($p.ExitCode)"
+              exit 1
+            }
+            Stop-Process -Id $p.Id -Force
+          }
+          Write-Output "native launches OK with no system Java, light and --dark, space path"
       - name: Report sizes and inventory
         shell: bash
         run: |
