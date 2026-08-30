@@ -14,8 +14,8 @@ APP_DIR      := $(BUILD_DIR)/app
 SOURCES      := $(shell find $(SRC_DIR) -name "*.java")
 TEST_SOURCES := $(shell find $(TEST_DIR) -name "*.java" 2>/dev/null)
 
-# The single authoritative dependency pin set, shared with both
-# download scripts.
+# The single authoritative dependency pin set, shared with the
+# bootstrap script.
 include scripts/lib-versions.env
 
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar

@@ -118,7 +118,7 @@ redistributable non-commercially only. See
 
 ## Status
 
-Eight releases in (v0.1.0 through v0.8.0; see `CHANGELOG.md`), the
+Nine releases in (v0.1.0 through v0.9.0; see `CHANGELOG.md`), the
 atlas is a working instrument: it bundles the complete bright sky
 offline (45,630 Tycho-2 stars to V 8.0 and 13,371 OpenNGC objects),
 searches it by name, identifier, or coordinates, zooms from 1 to 36
