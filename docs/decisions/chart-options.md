@@ -19,10 +19,13 @@ renderer-only composition seam)
 | Constellation boundaries | `GeographyDetailPolicy.boundariesDrawn` (≥18°) | renderer geography pass |
 | Constellation names | `GeographyDetailPolicy.namesDrawn` + visible-figure-ink centroids | renderer geography pass |
 
-**The single seam that should consume options is the renderer's two
-policy objects.** Everything a candidate option affects is already
-decided there; nothing lives in assembly or painting order that an
-option would need to reach.
+**The single seam that should consume options is the renderer's pass
+structure, composed in front of its two policy objects — which
+themselves stay option-free.** Everything a candidate option affects
+is already decided at those passes; nothing lives in assembly or
+painting order that an option would need to reach, and
+`GeographyDetailPolicy` (also consulted by assembly) must never
+learn about options at all (see the render/query contract below).
 
 ## The first-release options and defaults
 
