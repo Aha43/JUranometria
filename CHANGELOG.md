@@ -9,6 +9,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Stars are findable by identity, fully offline: traditional names by
+  prefix ("betel", "Polaris"), Bayer designations as the Greek letter
+  or its spelled-out name plus the constellation ("α Ori",
+  "alpha orionis" - IAU abbreviation and genitive both accepted, with
+  and without a component digit), and Flamsteed numbers the same way
+  ("58 Ori"). A bare letter or number lists its candidates rather
+  than guessing, and every star result shows its full identity
+  ("Betelgeuse · α Ori · V 0.6"). Star records carry a structured
+  identity loaded from the checksummed pack; existing object,
+  coordinate, and TYC searches are unchanged.
 - Bundled star-identity pack (`star-identities.csv`, 4,805 rows):
   traditional star names, Bayer designations, Flamsteed numbers, and
   constellation memberships from the pinned d3-celestial

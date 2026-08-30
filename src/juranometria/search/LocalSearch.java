@@ -11,6 +11,8 @@ import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyFormat;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
+import juranometria.chart.StarIdentity;
+import juranometria.geo.Constellation;
 
 /**
  * Deterministic local search over the bundled catalogue's identifiers,
@@ -28,6 +30,16 @@ import juranometria.chart.Star;
  * Supported coordinate forms (RA then Dec, separated by whitespace or a
  * comma): decimal degrees ("10.68 41.27") and colon sexagesimal
  * ("0:42:44.3 +41:16:09", RA in hours).
+ *
+ * Star identities follow the reviewed grammar
+ * (docs/decisions/star-identity.md): traditional names by prefix;
+ * Bayer as the Greek letter or its spelled-out name plus the
+ * constellation (genitive and IAU abbreviation both accepted, with
+ * and without a component digit); Flamsteed as the number plus the
+ * constellation. A bare letter or bare number never silently
+ * resolves - it lists its matches like any prefix search, and every
+ * star display line carries the full identity so the reader picks
+ * knowingly.
  */
 public final class LocalSearch {
 
@@ -39,6 +51,16 @@ public final class LocalSearch {
     private final List<Entry> entries;
 
     public LocalSearch(List<Star> stars, List<DeepSkyObject> deepSkyObjects) {
+        this(stars, deepSkyObjects, List.of());
+    }
+
+    public LocalSearch(List<Star> stars, List<DeepSkyObject> deepSkyObjects,
+                       List<Constellation> constellations) {
+        java.util.Map<String, Constellation> byAbbreviation =
+                new java.util.HashMap<>();
+        for (Constellation constellation : constellations) {
+            byAbbreviation.put(constellation.id(), constellation);
+        }
         List<Entry> built = new ArrayList<>();
         for (DeepSkyObject dso : deepSkyObjects) {
             List<String> keys = new ArrayList<>();
@@ -51,10 +73,12 @@ public final class LocalSearch {
                     regionTitle(dso)), keys));
         }
         for (Star star : stars) {
-            built.add(new Entry(new SearchResult(star.id(), star.id(),
+            List<String> keys = new ArrayList<>();
+            keys.add(normalize(star.id()));
+            identityKeys(star.identity(), byAbbreviation, keys);
+            built.add(new Entry(new SearchResult(starLabel(star), star.id(),
                     SearchResult.Kind.STAR, star.position(),
-                    star.id() + " region"),
-                    List.of(normalize(star.id()))));
+                    starRegionTitle(star)), List.copyOf(keys)));
         }
         this.entries = List.copyOf(built);
     }
@@ -115,6 +139,148 @@ public final class LocalSearch {
                 .orElse(label + " region");
     }
 
+    /** The Greek letters, spelled out for typed Bayer queries. */
+    private static final java.util.Map<Character, String> GREEK_NAMES =
+            java.util.Map.ofEntries(
+                    java.util.Map.entry('\u03b1', "alpha"),
+                    java.util.Map.entry('\u03b2', "beta"),
+                    java.util.Map.entry('\u03b3', "gamma"),
+                    java.util.Map.entry('\u03b4', "delta"),
+                    java.util.Map.entry('\u03b5', "epsilon"),
+                    java.util.Map.entry('\u03b6', "zeta"),
+                    java.util.Map.entry('\u03b7', "eta"),
+                    java.util.Map.entry('\u03b8', "theta"),
+                    java.util.Map.entry('\u03b9', "iota"),
+                    java.util.Map.entry('\u03ba', "kappa"),
+                    java.util.Map.entry('\u03bb', "lambda"),
+                    java.util.Map.entry('\u03bc', "mu"),
+                    java.util.Map.entry('\u03bd', "nu"),
+                    java.util.Map.entry('\u03be', "xi"),
+                    java.util.Map.entry('\u03bf', "omicron"),
+                    java.util.Map.entry('\u03c0', "pi"),
+                    java.util.Map.entry('\u03c1', "rho"),
+                    java.util.Map.entry('\u03c3', "sigma"),
+                    java.util.Map.entry('\u03c4', "tau"),
+                    java.util.Map.entry('\u03c5', "upsilon"),
+                    java.util.Map.entry('\u03c6', "phi"),
+                    java.util.Map.entry('\u03c7', "chi"),
+                    java.util.Map.entry('\u03c8', "psi"),
+                    java.util.Map.entry('\u03c9', "omega"));
+
+    /**
+     * The reviewed identity grammar as normalized keys. Every Bayer
+     * and Flamsteed key carries a constellation form, so a bare
+     * letter or number can only ever prefix-list, never resolve
+     * exactly; componentless variants make "alpha cru" list both
+     * components of a split designation rather than hiding them.
+     */
+    private static void identityKeys(StarIdentity identity,
+                                     java.util.Map<String, Constellation> byAbbreviation,
+                                     List<String> keys) {
+        if (identity == null) {
+            return;
+        }
+        if (identity.name() != null) {
+            keys.add(normalize(identity.name()));
+        }
+        if (identity.constellation() == null) {
+            return;
+        }
+        List<String> constellationForms = new ArrayList<>();
+        constellationForms.add(normalize(identity.constellation()));
+        Constellation constellation =
+                byAbbreviation.get(identity.constellation());
+        if (constellation != null) {
+            constellationForms.add(normalize(constellation.genitive()));
+        }
+        if (identity.bayer() != null) {
+            for (String letter : letterForms(identity.bayer())) {
+                for (String form : constellationForms) {
+                    keys.add(letter + form);
+                }
+            }
+        }
+        if (identity.flamsteed() != null) {
+            for (String form : constellationForms) {
+                keys.add(normalize(identity.flamsteed()) + form);
+            }
+        }
+    }
+
+    /** Verbatim, spelled-out, and componentless forms of a Bayer letter. */
+    private static List<String> letterForms(String bayer) {
+        String verbatim = normalize(bayer);
+        LinkedHashSet<String> forms = new LinkedHashSet<>();
+        forms.add(verbatim);
+        forms.add(spellGreek(verbatim));
+        String componentless = verbatim.replaceAll("\\d+$", "");
+        if (!componentless.isEmpty() && !componentless.equals(verbatim)) {
+            forms.add(componentless);
+            forms.add(spellGreek(componentless));
+        }
+        return List.copyOf(forms);
+    }
+
+    private static String spellGreek(String letter) {
+        String name = letter.isEmpty() ? null
+                : GREEK_NAMES.get(letter.charAt(0));
+        return name == null ? letter : name + letter.substring(1);
+    }
+
+    /**
+     * The display line for a star, per the decision: the full
+     * identity ("Betelgeuse \u00b7 \u03b1 Ori \u00b7 V 0.6") so ambiguous
+     * queries resolve by an informed choice; duplicate proper names
+     * disambiguate by designation. An identityless star stays its
+     * catalogue identifier.
+     */
+    private static String starLabel(Star star) {
+        String designation = designation(star.identity());
+        if (star.identity() == null
+                || (star.identity().name() == null && designation == null)) {
+            return star.id();
+        }
+        List<String> parts = new ArrayList<>();
+        if (star.identity().name() != null) {
+            parts.add(star.identity().name());
+        }
+        if (designation != null) {
+            parts.add(designation);
+        }
+        parts.add(String.format(java.util.Locale.ROOT, "V %.1f",
+                star.magnitude()));
+        return String.join(" \u00b7 ", parts);
+    }
+
+    /** The chart title for a star: its best human identity, honestly. */
+    private static String starRegionTitle(Star star) {
+        String designation = designation(star.identity());
+        if (star.identity() == null
+                || (star.identity().name() == null && designation == null)) {
+            return star.id() + " region";
+        }
+        if (star.identity().name() == null) {
+            return designation + " region";
+        }
+        return designation == null
+                ? star.identity().name() + " region"
+                : star.identity().name() + " \u00b7 " + designation + " region";
+    }
+
+    /** The star's designation, Bayer before Flamsteed, or null. */
+    private static String designation(StarIdentity identity) {
+        if (identity == null) {
+            return null;
+        }
+        if (identity.bayer() != null) {
+            return identity.bayer() + " " + identity.constellation();
+        }
+        if (identity.flamsteed() != null) {
+            return identity.flamsteed() + " " + identity.constellation();
+        }
+        return null;
+    }
+
     /** The atlas names Messier objects by their Messier name. */
     private static String displayLabel(DeepSkyObject dso) {
         return dso.aliases().stream()
@@ -123,9 +289,19 @@ public final class LocalSearch {
                 .orElse(dso.id());
     }
 
-    /** Lowercase, whitespace removed, "messier" folded to its "m" form. */
+    /** Lowercase, whitespace removed, superscript component digits
+     *  folded to plain digits, "messier" folded to its "m" form. */
     static String normalize(String raw) {
         String key = raw.toLowerCase(java.util.Locale.ROOT).replaceAll("\\s+", "");
+        StringBuilder folded = new StringBuilder(key.length());
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
+            int superscript = "\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079"
+                    .indexOf(c);
+            folded.append(superscript < 0 ? c
+                    : (char) ('1' + superscript));
+        }
+        key = folded.toString();
         if (key.startsWith("messier")) {
             key = "m" + key.substring("messier".length());
         }

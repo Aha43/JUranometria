@@ -188,6 +188,16 @@ edges and dotted boundaries separating them. The study pages
 assert figure ink, the ORION label, and untouched 8° pages against
 this policy.
 
+## Recorded source erratum
+
+Found while wiring genitive search (#114, Codex review PR #119): the
+source's `gen` field for **Crux** repeats the nominative ("Crux");
+the Latin genitive is **Crucis**. The pack generator records this as
+an explicit erratum - the corrected value is carried, declared in
+the manifest (`erratum.genitive.Cru`) and the notice, and the
+generator refuses to run if the source stops matching the recorded
+wrong value, so the erratum can never silently outlive its cause.
+
 ## Consequences
 
 - #64 productionizes the study's proven reconstruction

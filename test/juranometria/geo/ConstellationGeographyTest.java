@@ -33,6 +33,14 @@ class ConstellationGeographyTest {
         assertEquals("Orion", orion.latinName());
         assertEquals("Orionis", orion.genitive());
         assertEquals(1, orion.rank());
+
+        // The recorded source erratum (Codex review, PR #119): the
+        // source's genitive for Crux repeats the nominative; the pack
+        // carries the correct Latin genitive, declared in the manifest.
+        Constellation crux = GEOGRAPHY.constellations().stream()
+                .filter(c -> c.id().equals("Cru")).findFirst().orElseThrow();
+        assertEquals("Crux", crux.latinName());
+        assertEquals("Crucis", crux.genitive());
     }
 
     @Test

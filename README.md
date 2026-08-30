@@ -104,6 +104,12 @@ make import-star-identities
   `Messier 31`, `NGC 224`, `Orion Nebula`, `Pleiades`,
   `TYC 4628-237-1`), and coordinates in decimal degrees
   (`83.82 -5.39`) or sexagesimal (`0:42:44 +41:16:09`, RA in hours).
+  Stars answer to their traditional names by prefix (`betel`,
+  `Polaris`), to Bayer designations as the Greek letter or its
+  spelled-out name plus the constellation (`α Ori`, `alpha orionis`),
+  and to Flamsteed numbers the same way (`58 Ori`) — abbreviation and
+  genitive both accepted. A bare letter or number lists its
+  candidates with each star's full identity rather than guessing.
   Selecting a result recentres the chart anywhere under the bundled
   all-sky coverage, keeping the current field width.
 - **Reset view** returns to the default M31 centre, 8° field, and
