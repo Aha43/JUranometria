@@ -89,9 +89,15 @@ jobs:
           }
           launch
           launch --dark
-          # java -jar stays the authoritative fallback: prove it too.
-          java --enable-native-access=ALL-UNNAMED \
-            -jar "$appdir/JUranometria.jar" &
+          # java -jar stays the authoritative fallback: prove it too
+          # (under xvfb on the headless Linux runner, like the helper).
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a java --enable-native-access=ALL-UNNAMED \
+              -jar "$appdir/JUranometria.jar" &
+          else
+            java --enable-native-access=ALL-UNNAMED \
+              -jar "$appdir/JUranometria.jar" &
+          fi
           pid=$!; sleep 8
           kill -0 "$pid" 2>/dev/null || { echo "java -jar died"; exit 1; }
           kill "$pid" 2>/dev/null || true
@@ -107,8 +113,12 @@ jobs:
           appdir=$(echo "$RUNNER_TEMP"/"gui with space"/JUranometria-*)
           if [ "$RUNNER_OS" = "Windows" ]; then
             # Restrict PATH to System32 (cmd builtins + where.exe, no
-            # java): the batch helper must refuse readably.
-            out=$(cmd //c "set PATH=C:\\Windows\\System32&& \"$(cygpath -w "$appdir")\\juranometria.bat\"" 2>&1) && {
+            # java) via a wrapper script - the quoting-proof way to
+            # run the batch helper under a doctored environment.
+            wrap="$RUNNER_TEMP/nojava.cmd"
+            printf 'set "PATH=C:\\Windows\\System32"\r\ncall "%s"\r\n' \
+              "$(cygpath -w "$appdir")\\juranometria.bat" > "$wrap"
+            out=$(cmd //c "$(cygpath -w "$wrap")" 2>&1) && {
               echo "batch helper did not fail without java"; exit 1; }
             echo "$out" | grep -q "Java runtime" || {
               echo "batch helper diagnostic missing: $out"; exit 1; }
