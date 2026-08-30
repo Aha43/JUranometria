@@ -93,6 +93,7 @@ public final class PanInteraction extends MouseAdapter {
                 });
         chart.getAccessibleContext().setAccessibleDescription(
                 "Press and drag the chart to pan across the sky;"
+                        + " scroll to zoom where you point;"
                         + " Reset view returns home.");
         return interaction;
     }
