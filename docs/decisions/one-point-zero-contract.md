@@ -30,13 +30,19 @@ not below is implementation detail or explicitly deferred.
 
 ## Platform support — runtime versus contributor, stated separately
 
-**Running the packaged release** is supported on:
+**Running the packaged release** is verified on a finite matrix:
 
-- **macOS** (Apple silicon and Intel),
-- **Linux** (x86-64 desktop distributions with a display),
-- **Windows 11**,
+- **macOS 14 or later on Apple silicon** (CI `macos-latest` arm64
+  plus the maintainer's machine),
+- **Ubuntu 24.04 LTS on x86-64** as the named Linux reference
+  (CI `ubuntu-latest`),
+- **Windows 11 on x86-64** (CI `windows-latest`),
 
-in every case as **unpack-and-run**: extract the release archive,
+with the honest wider expectation stated as exactly that: a pure
+Java SE 21 desktop application is *expected* to run on Intel macOS
+and other Linux distributions, but 1.0's verification evidence
+covers the named matrix and no claim is made beyond it. Support is
+in every case **unpack-and-run**: extract the release archive,
 launch with the bundled helper or `java -jar JUranometria.jar` — no
 Make, Git, Bash, PowerShell, or source checkout, and paths
 containing spaces must work. `java -jar` is the authoritative launch
@@ -60,11 +66,13 @@ registries, and update checking.
 
 After unpacking, **everything works offline, permanently**: search,
 charts, star identities, geography, the grid, About and its complete
-licensing text. The application makes **no network requests at any
-time** — there is no telemetry, no update check, no remote lookup.
-The only network activity in the whole project is the contributor
-bootstrap (`download-libs.sh`) and the maintainer-only catalogue
-regeneration scripts, neither of which ships in the archive.
+licensing text. **The application makes no network requests at any
+time** — no telemetry, no update check, no remote lookup; nothing in
+the shipped archive opens a connection. (Development tooling — the
+contributor bootstrap, catalogue regeneration, CI, and release
+automation — uses the network as tooling does; none of it ships in
+or runs from the archive, and the offline promise is about the
+application the reader runs.)
 
 ## The data contract
 
@@ -88,6 +96,13 @@ redistributable and usable non-commercially only** for as long as
 that data is bundled. This statement travels with the archive, the
 release notes, About, and `LICENSING.md`. The identity and geography
 layers are BSD-3-Clause; OpenNGC is CC-BY-SA-4.0.
+
+**The archive also redistributes its runtime libraries**, and their
+licences are part of the 1.0 licensing map: **FlatLaf and FlatLaf
+Extras (Apache License 2.0)** and **JSVG (MIT)**, each shipped with
+its licence text beside the `lib/` directory and listed in
+`LICENSING.md`. The JUnit console runner is test-only and never
+ships.
 
 ## Preferences and upgrade from 0.15
 
@@ -150,9 +165,12 @@ JUranometria-X.Y.Z/
   JUranometria.jar        launchable via java -jar (Class-Path manifest)
   lib/…                   the pinned runtime dependencies
   juranometria / .bat     restrained launch helpers (POSIX sh, Windows batch)
-  LICENSE  LICENSING.md   MIT code licence and the full data licensing map
+  LICENSE  LICENSING.md   MIT code licence and the full licensing map
   NOTICE…                 every bundled data notice, including the
                           non-commercial statement
+  lib licences            Apache-2.0 (FlatLaf, FlatLaf Extras) and
+                          MIT (JSVG) texts for the redistributed
+                          runtime libraries
   README (launch note)    download → unpack → run, Java requirement,
                           troubleshooting for absent/old Java
 ```
