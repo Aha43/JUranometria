@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Bundled star-identity pack (`star-identities.csv`, 4,805 rows):
+  traditional star names, Bayer designations, Flamsteed numbers, and
+  constellation memberships from the pinned d3-celestial
+  `starnames.json` (BSD-3-Clause), joined to the bright-sky pack by
+  Hipparcos number through the raw Tycho-2 catalogue - the reviewed
+  decision's join, reproduced by `make import-star-identities` with
+  every exception category counted and a checksummed manifest. The
+  application does not read the new fields yet.
+
 ## [0.12.0] - 2026-08-30
 
 Sprint 12 — Let the reader choose the chart. Reviewed by Codex before

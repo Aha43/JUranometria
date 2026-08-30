@@ -48,6 +48,7 @@ public final class AboutDialog extends JDialog {
             {"OpenNGC deep-sky data", "/resources/catalog/bright-sky/NOTICE-openngc.md"},
             {"CC BY-SA 4.0 licence text", "/resources/catalog/bright-sky/LICENSE-CC-BY-SA-4.0.txt"},
             {"Constellation geography", "/resources/geo/constellations/NOTICE-constellations.md"},
+            {"Star identities", "/resources/catalog/star-identities/NOTICE-star-identities.md"},
             {"BSD-3-Clause licence text", "/resources/geo/constellations/LICENSE-BSD-3-Clause.txt"},
             {"Tabler icons licence", "/resources/icons/LICENSE"},
     };

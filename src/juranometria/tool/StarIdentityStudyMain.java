@@ -286,8 +286,29 @@ public final class StarIdentityStudyMain {
                 + " Tycho-2 raw files (SHA-256)");
     }
 
+    /** The join's full measurement report, shared with the pack
+     *  generator so the decision's numbers are reproduced from one
+     *  implementation: the identities by TYC id, the source entry
+     *  count, and every exception category with the unmatched entries
+     *  listed by name. */
+    record Join(Map<String, Identity> byTyc, int sourceEntries, int joined,
+                int multiComponent, List<String> unmatched) {
+    }
+
     /** The reproducible join: names by HIP through raw Tycho-2. */
     static Map<String, Identity> joinIdentities() throws Exception {
+        Join join = join();
+        System.out.printf(Locale.ROOT,
+                "join: %d/%d identities matched to the pack (%d unmatched -"
+                        + " fainter than V 8 or outside Tycho-2; %d"
+                        + " multi-component systems attached to their"
+                        + " brightest packed component)%n%n",
+                join.joined(), join.sourceEntries(), join.unmatched().size(),
+                join.multiComponent());
+        return join.byTyc();
+    }
+
+    static Join join() throws Exception {
         Map<String, List<String>> hipToTyc = new HashMap<>();
         for (Path path : Files.list(Path.of("imports/raw")).sorted().toList()) {
             String file = path.getFileName().toString();
@@ -324,28 +345,16 @@ public final class StarIdentityStudyMain {
             }
         }
 
-        Map<String, Double> pack = new HashMap<>();
-        for (Path tile : Files.walk(Path.of(
-                "src/resources/catalog/bright-sky/tiles")).toList()) {
-            if (!tile.getFileName().toString().equals("stars.csv")) {
-                continue;
-            }
-            for (String line : Files.readAllLines(tile)) {
-                if (line.startsWith("#") || line.isBlank()) {
-                    continue;
-                }
-                String[] parts = line.split(",");
-                pack.put(parts[0], Double.parseDouble(parts[3]));
-            }
-        }
+        Map<String, Double> pack = packMagnitudes(
+                Path.of("src/resources/catalog/bright-sky"));
 
         Map<String, Object> names = MiniJson.object(MiniJson.parse(
                 Files.readString(Path.of(
                         "imports/raw/star-identities/starnames.json"))));
         Map<String, Identity> byTyc = new HashMap<>();
         int joined = 0;
-        int unmatched = 0;
         int multi = 0;
+        List<String> unmatchedNames = new ArrayList<>();
         for (Map.Entry<String, Object> entry : names.entrySet()) {
             Map<String, Object> value = MiniJson.object(entry.getValue());
             List<String> tycs = new ArrayList<>();
@@ -355,7 +364,7 @@ public final class StarIdentityStudyMain {
                 }
             }
             if (tycs.isEmpty()) {
-                unmatched++;
+                unmatchedNames.add(unmatchedLabel(entry.getKey(), value));
                 continue;
             }
             joined++;
@@ -372,13 +381,103 @@ public final class StarIdentityStudyMain {
                     blankToNull(value.get("flam")),
                     blankToNull(value.get("c"))));
         }
-        System.out.printf(Locale.ROOT,
-                "join: %d/%d identities matched to the pack (%d unmatched -"
-                        + " fainter than V 8 or outside Tycho-2; %d"
-                        + " multi-component systems attached to their"
-                        + " brightest packed component)%n%n",
-                joined, names.size(), unmatched, multi);
-        return byTyc;
+        unmatchedNames.sort(null);
+        return new Join(byTyc, names.size(), joined, multi, unmatchedNames);
+    }
+
+    /**
+     * How an unmatched source entry is listed in the honest report:
+     * always with its Hipparcos key, so duplicate proper names in the
+     * source stay distinguishable (Codex review, PR #118).
+     */
+    static String unmatchedLabel(String hip, Map<String, Object> value) {
+        String name = blankToNull(value.get("name"));
+        if (name != null) {
+            return name + " (HIP " + hip + ")";
+        }
+        String constellation = blankToNull(value.get("c"));
+        String bayer = blankToNull(value.get("bayer"));
+        if (bayer != null && constellation != null) {
+            return bayer + " " + constellation + " (HIP " + hip + ")";
+        }
+        String flamsteed = blankToNull(value.get("flam"));
+        if (flamsteed != null && constellation != null) {
+            return flamsteed + " " + constellation + " (HIP " + hip + ")";
+        }
+        return "HIP " + hip;
+    }
+
+    /**
+     * The bright-sky pack's star magnitudes - the fact that selects a
+     * multi-component system's winning component - verified completely
+     * before a single value is trusted (Codex review, PR #118): the
+     * manifest itself must be the bright-sky pack at a supported
+     * format version (the production {@link PackManifest} contract),
+     * every star tile the manifest declares must exist and match its
+     * checksum, and no undeclared star tile may be present. A
+     * tampered, missing, or stray tile fails loudly, never silently
+     * re-attaching an identity while every locked count still passes.
+     */
+    static Map<String, Double> packMagnitudes(Path packDir) throws Exception {
+        juranometria.catalog.PackManifest manifest;
+        try (var reader = Files.newBufferedReader(
+                packDir.resolve("manifest.properties"))) {
+            manifest = juranometria.catalog.PackManifest.parse(reader,
+                    packDir + "/manifest.properties");
+        }
+        if (!"bright-sky".equals(manifest.packName())) {
+            throw new IllegalStateException("manifest at " + packDir
+                    + " belongs to pack " + manifest.packName()
+                    + ", not bright-sky; refusing to trust its magnitudes");
+        }
+        java.util.Set<String> declared = new java.util.TreeSet<>();
+        for (String key : manifest.entries().keySet()) {
+            if (key.startsWith("checksum.tiles/")
+                    && key.endsWith("/stars.csv")) {
+                declared.add(key.substring("checksum.".length()));
+            }
+        }
+        Map<String, Double> pack = new HashMap<>();
+        for (String tileName : declared) {
+            Path tile = packDir.resolve(tileName);
+            if (!Files.exists(tile)) {
+                throw new IllegalStateException(tile + " is declared by the"
+                        + " bright-sky manifest but missing; the"
+                        + " component-selecting magnitudes would be"
+                        + " incomplete - regenerate with make import-allsky");
+            }
+            byte[] bytes = Files.readAllBytes(tile);
+            String expected = manifest.entries().get("checksum." + tileName);
+            String actual = PinnedInputs.sha256Hex(bytes);
+            if (!expected.equals(actual)) {
+                throw new IllegalStateException(tile + " fails its"
+                        + " bright-sky manifest checksum (" + actual + ");"
+                        + " the component-selecting magnitudes cannot be"
+                        + " trusted - regenerate with make import-allsky");
+            }
+            for (String line : new String(bytes, StandardCharsets.UTF_8)
+                    .split("\n")) {
+                if (line.startsWith("#") || line.isBlank()) {
+                    continue;
+                }
+                String[] parts = line.split(",");
+                pack.put(parts[0], Double.parseDouble(parts[3]));
+            }
+        }
+        for (Path tile : Files.walk(packDir.resolve("tiles")).sorted()
+                .toList()) {
+            if (!tile.getFileName().toString().equals("stars.csv")) {
+                continue;
+            }
+            String tileName = packDir.relativize(tile).toString()
+                    .replace(java.io.File.separatorChar, '/');
+            if (!declared.contains(tileName)) {
+                throw new IllegalStateException(tile + " has no checksum in"
+                        + " the bright-sky manifest; refusing to trust its"
+                        + " magnitudes");
+            }
+        }
+        return pack;
     }
 
     private static String blankToNull(Object value) {
