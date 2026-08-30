@@ -70,6 +70,17 @@ about 33 ms to the first chart, 67 ms to load the complete pack for
 search, 0.2 ms warm scene queries, 27 MiB of heap. Deeper packs remain
 future options the same shape can carry.
 
+From Sprint 13 a companion **star-identity pack** rides beside the
+bright pack ([the star-identity decision](decisions/star-identity.md)):
+4,805 rows of traditional names, Bayer designations, Flamsteed
+numbers, and constellation memberships (d3-celestial, BSD-3-Clause),
+joined to the pack's stars by Hipparcos number through the raw
+Tycho-2 catalogue at import time and attached to star records at
+load - so scenes carry structured identities as data, local search
+answers to names and designations fully offline, and no remote
+name-resolution service is needed for the bundled sky. Measured:
+27 ms to load the identities, ~25 MiB total heap unchanged in order.
+
 ## Minimum data fields
 
 Stars initially need an identifier, right ascension, declination, and a
