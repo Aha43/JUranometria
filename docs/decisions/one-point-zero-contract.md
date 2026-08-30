@@ -16,17 +16,17 @@ not below is implementation detail or explicitly deferred.
 
 ## Java baseline
 
-- **Running the released application requires a Java runtime of
-  version 21 or later** (any vendor's JDK/JRE distribution; the
-  application uses only the Java SE platform plus its bundled
-  libraries).
+- **The primary downloads include their Java 21 runtime** (the
+  amendment below): users of the four platform application images
+  install nothing.
+- **The portable fallback ZIP requires an installed Java runtime of
+  version 21 or later** (any vendor's JDK/JRE distribution); its
+  launch helpers must produce a readable diagnostic for a missing or
+  too-old Java, not a stack trace collage (#144).
 - **Building from source requires a JDK of version 21 or later**;
   sources compile with `--release 21`, so newer JDKs build the same
   bytecode. The build selects its own JDK 21+ toolchain rather than
   trusting `PATH` (#136), with `JAVA_HOME` as the override.
-- No JRE is bundled; pointing users at a Java install is part of the
-  documented launch path, and a missing or too-old Java must produce
-  a readable diagnostic, not a stack trace collage (#144).
 
 ## Platform support — runtime versus contributor, stated separately
 
@@ -45,12 +45,13 @@ with the honest wider expectation stated as exactly that: a pure
 Java SE 21 desktop application is *expected* to run on other Linux
 distributions, but 1.0's verification evidence covers the named
 matrix and no claim is made beyond it. Support is
-in every case **unpack-and-run**: extract the release archive,
-launch with the bundled helper or `java -jar JUranometria.jar` — no
-Make, Git, Bash, PowerShell, or source checkout, and paths
-containing spaces must work. `java -jar` is the authoritative launch
-path on all three systems; helpers (POSIX shell, Windows batch) are
-conveniences.
+in every case **unpack-and-run** with no Make, Git, Bash,
+PowerShell, or source checkout, and paths containing spaces must
+work. **The primary artifact on each platform is the self-contained
+application image** (the amendment below) launched by its native
+launcher; the **portable fallback ZIP** launches with its bundled
+helper or `java -jar JUranometria.jar`, which remains that
+artifact's authoritative path.
 
 **Building from source** is supported on **macOS and Linux**, and on
 **Windows via WSL** — the contributor path needs POSIX sh, GNU Make,
@@ -61,9 +62,9 @@ support claim); Windows *runtime* support is delivered by the
 archive, not by a build path.
 
 Not in 1.0, recorded as post-1.0 candidates rather than silent
-omissions: native installers (`.app`/`.dmg`/`.msi`/`.exe`), code
-signing/notarization, bundled runtimes, app stores, package
-registries, and update checking.
+omissions: native installers (`.dmg`/`.msi`/installer `.exe`), code
+signing/notarization, app stores, package registries, and update
+checking. (Bundled runtimes moved INTO 1.0 by the amendment below.)
 
 ## Fully local operation
 
@@ -200,8 +201,12 @@ shape:
   distribution licensing map names it.
 - **The packaged headless smoke path** is a second, inner launcher
   (`juranometria-smoke`) that renders the reference chart through
-  the bundled runtime alone — proven with no system Java on the
-  PATH, byte-identical to the classpath smoke render.
+  the bundled runtime alone with no system Java on the PATH.
+  **Enforcement is per-platform-honest**: on both macOS cells the
+  render must equal the committed M31 reference byte-for-byte; on
+  Linux and Windows — whose system font stacks legitimately differ —
+  the two same-runner builds' renders must be byte-identical to each
+  other, with the reference comparison recorded either way.
 - **Reproducibility, measured honestly**: the macOS image is
   byte-identical across two same-machine builds; every CI cell
   builds twice and records identical-or-not in the run summary. The

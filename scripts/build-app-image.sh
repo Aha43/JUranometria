@@ -91,6 +91,7 @@ esac
     echo "runtime release:"
     sed -e 's/^/  /' "$release"
 } > "$dest/build-info.txt"
+cp "$root/packaging/README-app-image.txt" "$dest/README.txt"
 
 # Assertions: the runtime is the trimmed module set and its legal
 # notices travel with the image.
