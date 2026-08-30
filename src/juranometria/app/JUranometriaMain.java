@@ -19,14 +19,27 @@ public final class JUranometriaMain {
         // macOS integration properties must be set before any AWT class loads.
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("apple.awt.application.name", AppInfo.NAME);
-        boolean dark = java.util.Arrays.asList(args).contains("--dark");
-        SwingUtilities.invokeLater(() -> start(dark));
+        boolean darkOverride = java.util.Arrays.asList(args).contains("--dark");
+        SwingUtilities.invokeLater(() -> start(darkOverride));
     }
 
-    private static void start(boolean dark) {
-        UiTheme.apply(dark);
+    private static void start(boolean darkOverride) {
+        // The stored appearance decides the startup theme; --dark wins
+        // for this session only and never rewrites the stored choice
+        // (the precedence rule recorded on AppearanceStore).
+        AppearanceStore appearance = AppearanceStore.user();
+        boolean[] dark = {AppearanceStore.sessionDark(darkOverride, appearance)};
+        UiTheme.apply(dark[0]);
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setJMenuBar(AppMenuBar.create(
+                () -> SettingsDialog.open(frame, dark[0], appearance,
+                        choseDark -> {
+                            dark[0] = choseDark;
+                            UiTheme.apply(choseDark);
+                            com.formdev.flatlaf.FlatLaf.updateUI();
+                        }),
+                () -> AboutDialog.open(frame)));
 
         ChartComponent chart = new ChartComponent(Atlas.assembler());
         ChartViewController controller =
