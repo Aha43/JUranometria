@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- The build selects its own JDK instead of trusting whichever one
+  leads the shell `PATH`: `make` resolves an explicit `JAVA_HOME`
+  first, then a local Homebrew `openjdk@21`, then the `PATH` tools, so
+  a shell whose `PATH` still leads with an older release builds and
+  runs the atlas with no manual environment setup. A toolchain older
+  than the recorded JDK 21 minimum stops the build with a message
+  naming the required and detected versions instead of compiler
+  errors.
+
 ## [0.15.0] - 2026-08-30
 
 Sprint 15 — Read the coordinates. Reviewed by Codex at the design
