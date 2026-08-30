@@ -63,10 +63,21 @@ case "$(uname -s)" in
         ;;
     *)
         image="$dest/JUranometria"
-        release="$image/runtime/release"
-        [ -f "$release" ] || release="$image/runtime/lib/release"
-        legal="$image/runtime/legal"
-        [ -d "$legal" ] || legal="$image/runtime/lib/legal"
+        # Layouts differ: Linux keeps the runtime under lib/runtime,
+        # Windows under runtime/. Probe rather than assume.
+        release=""
+        for candidate in "$image/runtime/release" \
+                "$image/lib/runtime/release" \
+                "$image/runtime/lib/release"; do
+            [ -f "$candidate" ] && release=$candidate && break
+        done
+        [ -n "$release" ] || {
+            echo "build-app-image: no runtime release file under $image" >&2
+            find "$image" -maxdepth 3 -name release >&2 || true
+            exit 1
+        }
+        legal=$(dirname "$release")/legal
+        [ -d "$legal" ] || legal=$(dirname "$release")/lib/legal
         launcher="$image/bin/JUranometria"
         [ -f "$launcher" ] || launcher="$image/JUranometria.exe"
         ;;
@@ -106,7 +117,7 @@ grep -q 'MODULES="java.base java.datatransfer java.xml java.prefs java.desktop j
 case "$(uname -s)" in
     Darwin) smoke="$image/Contents/MacOS/juranometria-smoke" ;;
     *) smoke="$image/bin/juranometria-smoke"
-       [ -x "$smoke" ] || smoke="$image/juranometria-smoke.exe" ;;
+       [ -e "$smoke" ] || smoke="$image/juranometria-smoke.exe" ;;
 esac
 out="$dest/native-smoke.png"
 env PATH=/nonexistent "$smoke" "$out" >/dev/null 2>&1 \

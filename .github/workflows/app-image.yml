@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  TEMURIN_PIN: '21.0.12'
+  TEMURIN_PIN: '21.0.12.1'
 
 jobs:
   jar:
