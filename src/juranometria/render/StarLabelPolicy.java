@@ -10,7 +10,7 @@ import juranometria.chart.StarIdentity;
  * star is proper name, then Bayer, then Flamsteed; Greek letters and
  * component digits render as themselves; magnitude limits per band:
  *
- *   24-36 degrees: names V <= 2.0 only;
+ *   24-36 degrees: names V <= 2.5 only;
  *   12-18 degrees: names and Bayer V <= 3.0;
  *   <= 8 degrees:  names and Bayer V <= 4.5, Flamsteed V <= 5.0.
  */
@@ -62,7 +62,11 @@ public final class StarLabelPolicy {
     }
 
     double nameLimit() {
-        return fieldWidthDegrees >= 24.0 ? 2.0
+        // 2.5, not 2.0: the reviewed adjustment (PR #120) - the
+        // 2.0-2.5 magnitude band holds the sky's asterism anchors
+        // (Alpheratz, Mirach, Dubhe, Mizar...), and a figure whose
+        // principal stars stay anonymous is less useful cartography.
+        return fieldWidthDegrees >= 24.0 ? 2.5
                 : fieldWidthDegrees >= 12.0 ? 3.0 : 4.5;
     }
 

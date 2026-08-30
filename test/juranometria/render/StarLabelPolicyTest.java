@@ -32,16 +32,18 @@ class StarLabelPolicyTest {
     @Test
     void wideFieldsCarryOnlyBrightProperNames() {
         StarLabelPolicy at36 = new StarLabelPolicy(36.0);
-        assertEquals("Name", at36.labelFor(star(2.0, FULL)),
-                "V 2.0 is exactly inside the wide-field name limit");
-        assertNull(at36.labelFor(star(2.01, FULL)),
-                "V 2.01 is exactly outside");
+        assertEquals("Name", at36.labelFor(star(2.5, FULL)),
+                "V 2.5 is exactly inside the wide-field name limit"
+                        + " (the reviewed PR #120 adjustment: the"
+                        + " 2.0-2.5 band holds the asterism anchors)");
+        assertNull(at36.labelFor(star(2.51, FULL)),
+                "V 2.51 is exactly outside");
         assertNull(at36.labelFor(star(0.0, BAYER_ONLY)),
                 "no Bayer at wide fields, however bright");
         assertNull(at36.labelFor(star(0.0, FLAMSTEED_ONLY)),
                 "no Flamsteed at wide fields");
         assertEquals("Name", new StarLabelPolicy(24.0)
-                        .labelFor(star(2.0, FULL)),
+                        .labelFor(star(2.5, FULL)),
                 "the 24-degree page belongs to the wide band");
     }
 

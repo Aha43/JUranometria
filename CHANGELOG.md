@@ -11,7 +11,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - The charts name their stars: a restrained, scale-sensitive label
   pass renders traditional names, Bayer letters, and Flamsteed
-  numbers per the reviewed policy - names V ≤ 2.0 on the widest
+  numbers per the reviewed policy - names V ≤ 2.5 on the widest
   pages, names and Bayer V ≤ 3.0 from 12-18°, all three forms on
   regional pages (Flamsteed to V 5.0) - brightest first,
   deterministic, yielding to deep-sky labels and the title block
