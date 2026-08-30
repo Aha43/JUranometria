@@ -2,7 +2,9 @@
 
 Decided 2026-08-30 for Sprint 12, "Let the reader choose the chart"
 (issue #103), from an inventory of the render pipeline's policy seams
-and rendered evidence over the real catalogue and geography
+and rendered evidence over the real catalogue and geography, revised
+for the gate review's two findings (the Labels dependency and the
+renderer-only composition seam)
 (`make chart-options-study`; representative pages committed under
 `docs/studies/chart-options/`).
 
@@ -31,7 +33,7 @@ first render being byte-identical to the released M31 reference:
 | Option | Default | Governs |
 |---|---|---|
 | Deep-sky objects | on | the DSO symbol pass |
-| Deep-sky labels | on | the DSO label pass |
+| Deep-sky labels | on | the DSO label pass; **effective only while deep-sky objects are on** (below) |
 | Constellation figures | on | the figure pass |
 | Constellation boundaries | on | the boundary pass |
 | Constellation names | on | the name pass; **effective only while figures are on** (below) |
@@ -53,6 +55,15 @@ first render being byte-identical to the released M31 reference:
   disabled (its state remembered) while figures are off. The genuine
   alternative — boundary-region-centroid naming for a boundary-only
   chart style — is a real future feature, not a toggle side-effect.
+- **Labels without symbols** — the same reasoning, and it is already
+  the atlas's standing invariant: since Sprint 6 the label policy
+  labels only *drawn* objects (`labelled ⊆ drawn` — true-size drawn
+  Messiers plus the drawn target). A label-only chart would detach
+  "M 42" from any mark, exactly the floating-text failure the Names
+  dependency rejects. Therefore **Deep-sky labels depends on
+  Deep-sky objects**: the control stays visible but disabled (state
+  remembered) while symbols are off (Sprint 12 gate review, P1). No
+  label-only chart exists to render, by construction.
 
 ## Enabled means permission; the scale policy stays automatic
 
@@ -68,13 +79,16 @@ gate in front of each policy question, nothing else.
 The existing honesty rule — the chart never titles itself by a
 symbol-capable target it does not show — **extends across the
 toggles**: a searched target with an established symbol is always
-drawn and always labelled, even when the deep-sky symbol or label
-layer is disabled. Evidence: `m57-36-dsos-off-target-kept.png` — the
-reader hides the deep-sky crowd and keeps exactly their target, M57's
-clamped ring alone between Lyra's stars. This is the same exemption
-the regional detail policy already applies at wide fields, now
-uniform across user choice; symbol-less types still recenter and
-title only, unchanged.
+drawn and always labelled, even when the deep-sky symbol layer (and
+with it, by dependency, the label layer) is disabled. Evidence, both
+rendered with the decided semantics: `m57-36-dsos-off-target-kept.png`
+(the reader hides the deep-sky crowd and keeps exactly their target,
+M57's clamped ring alone between Lyra's stars) and
+`m42-36-dsos-off.png` (Orion's geography over a pure star field with
+one deep-sky mark: the titled M42's box and label in the Sword). This
+is the same exemption the regional detail policy already applies at
+wide fields, now uniform across user choice; symbol-less types still
+recenter and title only, unchanged.
 
 ## Model, persistence, Home, and Restore Defaults
 
@@ -122,21 +136,29 @@ title only, unchanged.
 - `ChartComponent` holds the current `ChartOptions` and passes them to
   the renderer; changing options triggers repaint of the existing
   scene, never `assembleScene`.
-- `RegionalDetailPolicy` and `GeographyDetailPolicy` each gain the
-  option gate in front of their existing answers; the target
-  exemption is decided inside `RegionalDetailPolicy` where the
-  identity already lives.
-- Assembly continues to query geography by scale policy alone, so a
-  layer toggled back on is already in the scene — the price is the
-  already-measured ~2 ms of geography in wide-field assembly, paid
-  today regardless.
+- **The option gates live in a renderer-only composition seam, and
+  both policy classes stay option-free** (Sprint 12 gate review, P2):
+  `GeographyDetailPolicy` is also consulted by scene assembly, so
+  putting gates inside it would let options reach assembly and break
+  the repaint-only promise structurally. Instead the renderer
+  composes: each render pass first asks the options whether its layer
+  is enabled at all, then asks the unchanged policy where and how to
+  draw. The deep-sky pass with symbols disabled iterates only the
+  scene's target (by the identity the scene already carries) through
+  the unchanged `RegionalDetailPolicy`, which is how the target
+  exemption needs no policy change either.
+- Assembly continues to query geography by scale policy alone —
+  option-free by type, not just by promise — so a layer toggled back
+  on is already in the scene; the price is the already-measured ~2 ms
+  of geography in wide-field assembly, paid today regardless.
 
 ## Test matrix (chosen, not exhaustive)
 
 The state space is 2⁵ = 32; the matrix that carries the meaning:
 defaults byte-identical to the released charts; each single option
-off; all off; symbols-off and labels-off each with a searched target
-(the exemption); the Names-requires-Figures dependency; persistence
+off; all off; symbols-off with a searched target (the exemption, with
+the label riding on the target); the two dependency rules
+(Labels-requires-Symbols, Names-requires-Figures); persistence
 round-trip with corrupt-value fallback; Home leaving options alone;
 live preview applying without queries and Cancel reverting. Blind
 combination snapshots are rejected — the options are independent
@@ -148,7 +170,7 @@ interactions genuinely live.
 | Page | Shows |
 |---|---|
 | `m42-36-defaults.png` | every layer, the released look |
-| `m42-36-dsos-off.png` | Orion's figure and names over a pure star field — the "learn the constellations" chart the toggle exists for |
+| `m42-36-dsos-off.png` | Orion's figure and names over a pure star field with exactly one deep-sky mark — the titled target M42, kept by the exemption; the "learn the constellations" chart the toggle exists for |
 | `m42-36-geography-off.png` | the pre-Sprint-7 regional chart, recoverable by choice |
 | `m42-36-figures-off-names-on.png` | why Names depends on Figures: no ink, no honest anchors, no names |
 | `m57-36-defaults.png` / `m57-36-dsos-off-target-kept.png` | the target exemption across a toggle |

@@ -57,7 +57,9 @@ public final class ChartOptionsStudyMain {
         write(renderer, full, outDir, "m42-36-defaults");
         write(renderer, withGeography(full, SceneGeography.EMPTY),
                 outDir, "m42-36-geography-off");
-        write(renderer, withDsos(full, List.of()),
+        // The decided semantics of the deep-sky toggle: the searched
+        // target keeps its symbol and label while the crowd hides.
+        write(renderer, withDsos(full, targetOnly(full)),
                 outDir, "m42-36-dsos-off");
         write(renderer, withGeography(full, new SceneGeography(
                         full.geography().figureSegments(),
@@ -83,10 +85,7 @@ public final class ChartOptionsStudyMain {
         }
         ChartScene ringScene = Atlas.assembler().assemble(ring, WIDTH, HEIGHT);
         write(renderer, ringScene, outDir, "m57-36-defaults");
-        List<DeepSkyObject> targetOnly = ringScene.deepSkyObjects().stream()
-                .filter(dso -> dso.id().equals(ringScene.targetIdentity()))
-                .toList();
-        write(renderer, withDsos(ringScene, targetOnly),
+        write(renderer, withDsos(ringScene, targetOnly(ringScene)),
                 outDir, "m57-36-dsos-off-target-kept");
 
         // Repaint-only timing: the same assembled scene, one layer
@@ -103,6 +102,13 @@ public final class ChartOptionsStudyMain {
                         + " %d ms without geography, %d ms with%n",
                 (t1 - t0) / 1_000_000, (t2 - t1) / 1_000_000);
         System.out.println("Charts written to " + outDir);
+    }
+
+    /** The decided deep-sky-off content: only the searched target. */
+    private static List<DeepSkyObject> targetOnly(ChartScene scene) {
+        return scene.deepSkyObjects().stream()
+                .filter(dso -> dso.id().equals(scene.targetIdentity()))
+                .toList();
     }
 
     private static ChartScene withGeography(ChartScene scene,
