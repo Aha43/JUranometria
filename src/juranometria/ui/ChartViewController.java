@@ -137,6 +137,119 @@ public final class ChartViewController {
         return true;
     }
 
+    /**
+     * A classified pointer-zoom outcome, sufficient for the
+     * interaction layer and tests without message parsing: the step
+     * was applied; the field sequence has no next step; the pointer's
+     * geometry refuses the acceptance contract (constrained,
+     * past-pole, ambiguous, or a preflighted reverse that is not
+     * exact); or the candidate state failed the coverage predicate.
+     */
+    public enum PointerZoomOutcome {
+        ACCEPTED, AT_BOUND, INFEASIBLE_POINTER, REFUSED_COVERAGE
+    }
+
+    /**
+     * The reviewed reversal tolerance for the preflight
+     * (docs/decisions/pointer-zoom.md): the reverse of an accepted
+     * step must restore the origin this closely.
+     */
+    static final double POINTER_ZOOM_REVERSAL_TOLERANCE_DEGREES = 1e-4;
+
+    /**
+     * One atomic pointer-anchored zoom step per
+     * docs/decisions/pointer-zoom.md: the sky beneath the pointer
+     * stays beneath the pointer as the field takes one discrete step.
+     * The caller supplies the pointer's tangent-plane point at the
+     * CURRENT field (the paper is the viewport; letterbox chrome
+     * never reaches this transition), exactly as pan does.
+     *
+     * The acceptance contract: the forward solve must be exact - not
+     * constrained, not past-pole, not ambiguous - and the reverse at
+     * the same pointer is preflighted to be equally exact and to
+     * restore this centre within the stated tolerance, so an
+     * accepted step can never enter a view the opposite movement
+     * refuses. Anything else changes nothing and notifies nobody.
+     *
+     * Target honesty: the target survives exactly when the centre
+     * survives - a step that moves the centre is an anonymous
+     * recenter under the atomic pan rule; a pointer on the exact
+     * page centre degenerates to the toolbar's centre-preserving
+     * transition and keeps the target. Applied as one state change,
+     * one notification.
+     */
+    public PointerZoomOutcome zoomAt(juranometria.project.PlanePoint pointer,
+                                     boolean zoomIn) {
+        if (zoomIn ? !state.canZoomIn() : !state.canZoomOut()) {
+            return PointerZoomOutcome.AT_BOUND;
+        }
+        ChartViewState centred = zoomIn ? state.zoomIn() : state.zoomOut();
+        if (pointer.xiEast() == 0.0 && pointer.etaNorth() == 0.0) {
+            // The exact page centre: the anchor IS the centre and the
+            // solve degenerates to the toolbar's centre-preserving
+            // transition (keeping the target), free of the radian
+            // round-trip's last-bit noise.
+            if (!isViewValid.test(centred)) {
+                return PointerZoomOutcome.REFUSED_COVERAGE;
+            }
+            update(centred);
+            return PointerZoomOutcome.ACCEPTED;
+        }
+        java.util.Optional<juranometria.chart.SkyPosition> solved =
+                solveExactReversible(state.centre(),
+                        state.fieldWidthDegrees(),
+                        centred.fieldWidthDegrees(), pointer);
+        if (solved.isEmpty()) {
+            return PointerZoomOutcome.INFEASIBLE_POINTER;
+        }
+        ChartViewState candidate = solved.get().equals(state.centre())
+                ? centred
+                : state.recenteredAt(solved.get())
+                        .withFieldWidth(centred.fieldWidthDegrees());
+        if (!isViewValid.test(candidate)) {
+            return PointerZoomOutcome.REFUSED_COVERAGE;
+        }
+        update(candidate);
+        return PointerZoomOutcome.ACCEPTED;
+    }
+
+    /**
+     * The gate's acceptance geometry (the reference implementation
+     * measured by make zoom-study): recover the anchor, scale the
+     * pointer's plane point to the new field (the plane offset of a
+     * fixed pixel scales by tan(f'/2)/tan(f/2)), solve the centre
+     * exactly, and preflight the exact reverse.
+     */
+    private static java.util.Optional<juranometria.chart.SkyPosition>
+            solveExactReversible(juranometria.chart.SkyPosition centre,
+                                 double fieldDegrees, double newFieldDegrees,
+                                 juranometria.project.PlanePoint pointer) {
+        juranometria.chart.SkyPosition anchor =
+                juranometria.project.PanSolver.skyFromPlane(centre, pointer);
+        double scale = Math.tan(Math.toRadians(newFieldDegrees) / 2.0)
+                / Math.tan(Math.toRadians(fieldDegrees) / 2.0);
+        juranometria.project.PlanePoint target =
+                new juranometria.project.PlanePoint(
+                        pointer.xiEast() * scale, pointer.etaNorth() * scale);
+        var out = juranometria.project.PanSolver.solveCentre(
+                anchor, target, centre);
+        if (out.centre().isEmpty() || out.constrained() || out.ambiguous()) {
+            return java.util.Optional.empty();
+        }
+        juranometria.chart.SkyPosition mid = out.centre().get();
+        juranometria.chart.SkyPosition anchorAgain =
+                juranometria.project.PanSolver.skyFromPlane(mid, target);
+        var back = juranometria.project.PanSolver.solveCentre(
+                anchorAgain, pointer, mid);
+        if (back.centre().isEmpty() || back.constrained()
+                || back.ambiguous()
+                || back.centre().get().separationDegrees(centre)
+                        > POINTER_ZOOM_REVERSAL_TOLERANCE_DEGREES) {
+            return java.util.Optional.empty();
+        }
+        return java.util.Optional.of(mid);
+    }
+
     public void reset() {
         update(state.reset());
     }
