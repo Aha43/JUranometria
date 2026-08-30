@@ -1,0 +1,148 @@
+# The self-contained application-image prototypes of issue #150: the
+# platform-neutral JAR builds once; each target cell then builds its
+# native image ON its own OS/architecture (never cross-packaged) with
+# the pinned Temurin 21 runtime, and verifies: launcher alive with NO
+# system Java on PATH, light and --dark, a path containing spaces,
+# the bundled-runtime module inventory and legal notices, the native
+# headless smoke render, and same-runner reproducibility (build twice,
+# compare). Sizes and runtime versions land in the job summary.
+name: app-image
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  TEMURIN_PIN: '21.0.12'
+
+jobs:
+  jar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.TEMURIN_PIN }}
+      - uses: actions/cache@v6
+        with:
+          path: lib
+          key: libs-${{ hashFiles('scripts/lib-versions.env') }}
+      - run: scripts/download-libs.sh
+      - run: make app
+      - uses: actions/upload-artifact@v6
+        with:
+          name: app-jar
+          path: build/app/
+          if-no-files-found: error
+
+  image:
+    needs: jar
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            cell: macos-arm64
+          - os: macos-15-intel
+            cell: macos-x64
+          - os: ubuntu-24.04
+            cell: linux-x64
+          - os: windows-latest
+            cell: windows-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.TEMURIN_PIN }}
+      - uses: actions/download-artifact@v7
+        with:
+          name: app-jar
+          path: build/app
+      - name: Build the native image (twice; require identical)
+        shell: bash
+        run: |
+          set -eu
+          scripts/build-app-image.sh build/app-image
+          scripts/build-app-image.sh build/app-image-2
+          if diff -r build/app-image build/app-image-2 >/dev/null 2>&1; then
+            echo "reproducible=identical" >> "$GITHUB_STEP_SUMMARY"
+            echo "same-runner reproducibility: byte-identical"
+          else
+            n=$(diff -rq build/app-image build/app-image-2 | wc -l)
+            echo "reproducible=$n differing entries (recorded honestly)" \
+              >> "$GITHUB_STEP_SUMMARY"
+            diff -rq build/app-image build/app-image-2 | head -10
+          fi
+      - name: Verify the runtime pin
+        shell: bash
+        run: |
+          grep "JAVA_VERSION=\"${TEMURIN_PIN}\"" build/app-image/build-info.txt \
+            || { echo "runtime is not the pinned Temurin ${TEMURIN_PIN}"; \
+                 cat build/app-image/build-info.txt; exit 1; }
+      - name: Launch with no system Java, light and --dark, space path
+        shell: bash
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/native with space"
+          mkdir -p "$work"
+          cp -R build/app-image/* "$work/"
+          case "$RUNNER_OS" in
+            macOS)   launcher="$work/JUranometria.app/Contents/MacOS/JUranometria" ;;
+            Linux)   launcher="$work/JUranometria/bin/JUranometria" ;;
+            Windows) launcher="$work/JUranometria/JUranometria.exe" ;;
+          esac
+          run_one() {
+            if [ "$RUNNER_OS" = "Linux" ]; then
+              env PATH=/usr/bin:/bin xvfb-run -a "$launcher" "$@" &
+            else
+              env PATH=/nonexistent "$launcher" "$@" &
+            fi
+            pid=$!
+            sleep 8
+            kill -0 "$pid" 2>/dev/null || { echo "native launch died ($*)"; exit 1; }
+            kill "$pid" 2>/dev/null || true
+            if [ "$RUNNER_OS" = "Windows" ]; then
+              taskkill //IM JUranometria.exe //F >/dev/null 2>&1 || true
+            fi
+            wait "$pid" 2>/dev/null || true
+          }
+          # Prove no java leaks in from the environment at all.
+          if [ "$RUNNER_OS" != "Linux" ]; then
+            env PATH=/nonexistent java -version 2>/dev/null \
+              && { echo "test environment still resolves java"; exit 1; } || true
+          fi
+          run_one
+          run_one --dark
+          echo "native launches OK with no system Java, light and --dark, space path"
+      - name: Report sizes and inventory
+        shell: bash
+        run: |
+          set -eu
+          case "$RUNNER_OS" in
+            macOS) image=build/app-image/JUranometria.app ;;
+            *)     image=build/app-image/JUranometria ;;
+          esac
+          (cd build/app-image && \
+            if [ "$RUNNER_OS" = "Windows" ]; then
+              7z a -tzip -mx=9 image.zip "$(basename "$image")" >/dev/null
+            else
+              zip -q -r -9 image.zip "$(basename "$image")"
+            fi)
+          {
+            echo "### ${{ matrix.cell }}"
+            echo '```'
+            cat build/app-image/build-info.txt
+            echo "unpacked: $(du -sh "$image" | cut -f1)"
+            echo "compressed: $(du -sh build/app-image/image.zip | cut -f1)"
+            echo "native smoke render: $(wc -c < build/app-image/native-smoke.png) bytes"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: app-image-${{ matrix.cell }}
+          path: build/app-image/image.zip
+          if-no-files-found: error

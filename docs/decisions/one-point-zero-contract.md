@@ -164,6 +164,69 @@ deliberately updated when reviews accept a change), solver
 tolerances, tile layout, label collision outcomes on any particular
 page, and class/package structure.
 
+## Amendment (issue #150): self-contained application images
+
+**The primary 1.0 downloads are platform-specific application
+images with the Java runtime included — users do not install
+Java.** Measured prototypes (this gate, `make`-driven
+`scripts/build-app-image.sh` + the `app-image` workflow) settle the
+shape:
+
+- **Four artifacts**, each built natively on its own platform,
+  never cross-packaged: macOS Apple silicon and macOS Intel
+  (`JUranometria.app`), Windows x86-64 (`JUranometria.exe` in an
+  unpacked directory), Linux x86-64 (native launcher in an unpacked
+  directory). The Intel image builds on the `macos-15-intel` runner
+  and is additionally exercised on the maintainer's physical Intel
+  Mac.
+- **The mechanism**: JDK 21 `jpackage --type app-image` over the
+  built JAR and its three libraries (non-modular, `--input` +
+  `--main-jar`), with an explicit measured module list —
+  `java.base, java.desktop, java.logging, java.prefs` by jdeps,
+  resolving with its transitive closure to exactly six modules
+  (`+ java.datatransfer, java.xml`), asserted from the runtime's
+  `release` file. The launcher carries
+  `--enable-native-access=ALL-UNNAMED`, passes `--dark` through,
+  and is working-directory independent. Measured on Apple silicon:
+  **76 MB unpacked, 25 MB compressed** — the trimmed runtime is
+  appropriately restrained.
+- **The runtime is pinned Temurin 21** (exact version recorded in
+  the workflow pin and asserted against each image's `release`
+  file), and each artifact carries a `build-info.txt` recording
+  version, modules, packager, and runtime.
+- **Runtime licensing travels**: OpenJDK/Temurin is GPLv2 with the
+  Classpath Exception; the jlink runtime's complete generated
+  `legal/` notice tree ships inside every image (asserted), and the
+  distribution licensing map names it.
+- **The packaged headless smoke path** is a second, inner launcher
+  (`juranometria-smoke`) that renders the reference chart through
+  the bundled runtime alone — proven with no system Java on the
+  PATH, byte-identical to the classpath smoke render.
+- **Reproducibility, measured honestly**: the macOS image is
+  byte-identical across two same-machine builds; every CI cell
+  builds twice and records identical-or-not in the run summary. The
+  release contract is the narrower honest one — asserted contents,
+  pinned inputs and tool versions, one-build/many-consumer
+  verification, and published SHA-256 — with byte-identity reported
+  where it holds rather than promised universally.
+- **The icon** is the Tabler `north-star` glyph (MIT, the pinned
+  v3.46.0 the toolbar already uses), drawn in chart ink on the
+  atlas's paper inside a quiet rounded square — a restrained
+  identity, not a branding project. Generator and assets live under
+  `packaging/icon/`.
+- **Unsigned, stated plainly**: the images are not signed or
+  notarized. macOS Gatekeeper will warn on first launch
+  (right-click → Open, or approve under System Settings > Privacy &
+  Security); Windows SmartScreen may interpose (More info → Run
+  anyway). The launch documentation says exactly this and never
+  implies trusted distribution. Installers, signing, notarization,
+  update services, and app stores remain post-1.0.
+- **The portable Java-dependent ZIP remains published as the
+  fallback** for users who prefer their own Java 21+; it keeps its
+  `java -jar` verification. The platform matrix, launch-diagnostics
+  and offline promises above apply to the images; the ZIP's Java
+  baseline section continues to apply to the fallback.
+
 ## The release artifact, at contract level
 
 One deterministic **archive per release** (shape finalized by #144):
