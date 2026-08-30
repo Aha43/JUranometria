@@ -135,4 +135,67 @@ class ChartOptionsControllerTest {
             node.removeNode();
         }
     }
+
+    @Test
+    void gridOffRidesTheWholeProtocolFromStoreToRestartToDefaults()
+            throws Exception {
+        // PR #140 review (P2): the grid-off choice through every stop
+        // of the user protocol - explicit store round trip, restart,
+        // Cancel back to the opening value, Home independence, and
+        // Restore Defaults turning it back on.
+        java.util.prefs.Preferences node = java.util.prefs.Preferences
+                .userRoot().node("juranometria-test-" + System.nanoTime());
+        try {
+            ChartOptionsStore store = ChartOptionsStore.forNode(node);
+            ChartOptions gridOff = new ChartOptions(
+                    true, true, true, true, true, true, false);
+
+            // Explicit grid-off store round trip.
+            store.save(gridOff);
+            assertEquals(gridOff, store.load(),
+                    "grid off round-trips through the store");
+            assertTrue(!store.load().equatorialGrid());
+
+            // Restart: a fresh controller reads the confirmed choice.
+            ChartOptionsController controller =
+                    new ChartOptionsController(store);
+            assertTrue(!controller.options().equatorialGrid(),
+                    "a restart honours the persisted grid-off");
+
+            // Cancel: preview the grid on, then revert to the opening
+            // snapshot - the grid is off again, nothing persisted.
+            ChartOptions snapshot = controller.options();
+            controller.apply(ChartOptions.DEFAULTS);
+            assertTrue(controller.options().equatorialGrid(),
+                    "the preview turned the grid on");
+            controller.revertTo(snapshot);
+            assertTrue(!controller.options().equatorialGrid(),
+                    "Cancel restores the opening grid value");
+            assertTrue(!store.load().equatorialGrid(),
+                    "previewing persisted nothing");
+
+            // Home resets navigation only: the real navigation
+            // controller beside the real options controller.
+            juranometria.ui.ChartViewController navigation =
+                    new juranometria.ui.ChartViewController();
+            navigation.recenter(new juranometria.chart.SkyPosition(
+                    83.818667, -5.389667), 18.0);
+            navigation.reset();
+            assertEquals(juranometria.chart.ChartViewState.DEFAULT,
+                    navigation.state(), "Home reset the navigation");
+            assertTrue(!controller.options().equatorialGrid(),
+                    "Home leaves the grid choice alone");
+
+            // Restore Defaults turns the grid on; OK persists it.
+            controller.restoreDefaults();
+            assertTrue(controller.options().equatorialGrid(),
+                    "Restore Defaults turns the grid back on");
+            controller.confirm();
+            assertTrue(new ChartOptionsController(store).options()
+                            .equatorialGrid(),
+                    "the restored default survives a restart");
+        } finally {
+            node.removeNode();
+        }
+    }
 }
