@@ -137,6 +137,7 @@ public final class ChartRenderer {
                         2.0 * radius, 2.0 * radius));
             });
         }
+        drawStarLabels(g, scene, options, policy, projection, mapping);
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
             if (options.effectiveDeepSkyLabels()) {
                 if (!policy.labelled(dso)) {
@@ -311,6 +312,119 @@ public final class ChartRenderer {
             g.dispose();
         }
         return image;
+    }
+
+    /**
+     * The star-label pass (docs/decisions/star-identity.md): one
+     * deterministic placement, brightest star first with a stable TYC
+     * tie-break, collision-rejecting against the labels that sit
+     * above it in the layer order - the deep-sky labels this render
+     * will draw and the title block - and against already-accepted
+     * star labels; prefer omission, the house rule. Drawn between the
+     * star dots and the deep-sky labels, honouring stars < star
+     * labels < deep-sky labels < title block. The searched star's
+     * best identity draws first, exempt from thresholds and
+     * collisions and surviving the option toggle, with no new symbol.
+     */
+    private void drawStarLabels(Graphics2D g, ChartScene scene,
+                                ChartOptions options,
+                                RegionalDetailPolicy detailPolicy,
+                                GnomonicProjection projection,
+                                ViewportMapping mapping) {
+        StarLabelPolicy policy = new StarLabelPolicy(
+                scene.viewport().fieldWidthDegrees());
+        g.setFont(LABEL_FONT);
+        g.setColor(TEXT_INK);
+        FontMetrics metrics = g.getFontMetrics();
+
+        java.util.List<Rectangle2D> occupied = new java.util.ArrayList<>();
+        java.awt.Rectangle titleBlock = titleBlockBounds(g, scene);
+        if (titleBlock != null) {
+            occupied.add(titleBlock);
+        }
+        for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            // Exactly the labels the deep-sky pass will draw above.
+            if (options.effectiveDeepSkyLabels()
+                    ? !detailPolicy.labelled(dso)
+                    : (!isTarget(scene, dso) || !hasSymbol(dso))) {
+                continue;
+            }
+            var plane = projection.project(dso.position());
+            if (plane.isPresent()) {
+                occupied.add(labelBounds(metrics, dso,
+                        mapping.toPixel(plane.get()),
+                        mapping.pixelsPerPlaneUnit()));
+            }
+        }
+
+        // The searched star draws first, exempt from thresholds and
+        // collisions and surviving the option toggle; its box seeds
+        // the collision set so every ordinary label yields to it.
+        for (Star star : scene.stars()) {
+            if (scene.targetIdentity() == null
+                    || !scene.targetIdentity().equals(star.id())
+                    || star.magnitude() > scene.limitingMagnitude()) {
+                continue;
+            }
+            String text = StarLabelPolicy.guaranteedLabelFor(star);
+            if (text != null) {
+                placeStarLabel(g, scene, metrics, projection, mapping,
+                        star, text, occupied, true);
+            }
+        }
+        if (!options.starLabels()) {
+            return;
+        }
+        java.util.List<Star> stars = new java.util.ArrayList<>(scene.stars());
+        stars.sort(java.util.Comparator.comparingDouble(Star::magnitude)
+                .thenComparing(Star::id));
+        for (Star star : stars) {
+            if (star.magnitude() > scene.limitingMagnitude()
+                    || (scene.targetIdentity() != null
+                            && scene.targetIdentity().equals(star.id()))) {
+                continue;
+            }
+            String text = policy.labelFor(star);
+            if (text != null) {
+                placeStarLabel(g, scene, metrics, projection, mapping,
+                        star, text, occupied, false);
+            }
+        }
+    }
+
+    /** Places one star label; exempt labels skip collision rejection. */
+    private void placeStarLabel(Graphics2D g, ChartScene scene,
+                                FontMetrics metrics,
+                                GnomonicProjection projection,
+                                ViewportMapping mapping, Star star,
+                                String text,
+                                java.util.List<Rectangle2D> occupied,
+                                boolean exempt) {
+        var plane = projection.project(star.position());
+        if (plane.isEmpty()) {
+            return;
+        }
+        PixelPoint pixel = mapping.toPixel(plane.get());
+        if (pixel.x() < 0 || pixel.x() >= scene.viewport().widthPx()
+                || pixel.y() < 0
+                || pixel.y() >= scene.viewport().heightPx()) {
+            return;
+        }
+        double radius = starSizePolicy.radiusFor(star.magnitude());
+        double x = pixel.x() + radius + 3.0;
+        double y = pixel.y() + metrics.getAscent() / 2.0 - 1.0;
+        Rectangle2D box = new Rectangle2D.Double(x - 2.0,
+                y - metrics.getAscent(),
+                metrics.stringWidth(text) + 4.0, metrics.getHeight());
+        if (!exempt) {
+            for (Rectangle2D other : occupied) {
+                if (other.intersects(box)) {
+                    return;
+                }
+            }
+        }
+        occupied.add(box);
+        g.drawString(text, (float) x, (float) y);
     }
 
     private static boolean isTarget(ChartScene scene, DeepSkyObject dso) {

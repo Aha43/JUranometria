@@ -96,12 +96,19 @@ public final class StarIdentityStudyMain {
                 new Page("crux-18", 186.649563, -63.099093, 18.0),
                 new Page("m31-08", 10.684708, 41.268750, 8.0));
 
+        // The chosen-policy pages render through the PRODUCTION pass
+        // (issue #115): the committed study pages are the renderer's
+        // own output, proving the shipped pass reproduces the
+        // reviewed look exactly.
+        for (Page page : pages) {
+            ChartViewState state = new ChartViewState(new SkyPosition(
+                    page.ra(), page.dec()), page.field(), 8.0, null, null);
+            ChartScene scene = Atlas.assembler().assemble(state, WIDTH, HEIGHT);
+            ImageIO.write(renderer.renderToImage(scene),
+                    "png", new File(outDir, page.name() + ".png"));
+        }
         System.out.printf(Locale.ROOT, "%-12s %6s | %6s %6s %6s | %8s%n",
                 "page", "field", "named", "greek", "flams", "rejected");
-        for (Page page : pages) {
-            study(renderer, identities, page.name(), new SkyPosition(
-                    page.ra(), page.dec()), page.field(), CHOSEN, outDir);
-        }
         // The bad alternative, rendered for the decision: everything
         // labelled at 36 degrees.
         study(renderer, identities, "orion-36-everything",
@@ -123,7 +130,7 @@ public final class StarIdentityStudyMain {
         // drawn above the star labels, matching the decided layer
         // order: stars < star labels < DSO labels < title block.
         var image = renderer.renderToImage(scene, new ChartOptions(
-                true, false, true, true, true));
+                true, false, true, true, true, false));
         GnomonicProjection projection = new GnomonicProjection(centre);
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         StarSizePolicy sizes = StarSizePolicy.DEFAULT;

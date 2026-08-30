@@ -34,7 +34,8 @@ public interface ChartOptionsStore {
                         flag(node, "chart.deepSkyLabels"),
                         flag(node, "chart.constellationFigures"),
                         flag(node, "chart.constellationBoundaries"),
-                        flag(node, "chart.constellationNames"));
+                        flag(node, "chart.constellationNames"),
+                        flag(node, "chart.starLabels"));
             }
 
             @Override
@@ -49,6 +50,8 @@ public interface ChartOptionsStore {
                         Boolean.toString(options.constellationBoundaries()));
                 node.put("chart.constellationNames",
                         Boolean.toString(options.constellationNames()));
+                node.put("chart.starLabels",
+                        Boolean.toString(options.starLabels()));
             }
         };
     }

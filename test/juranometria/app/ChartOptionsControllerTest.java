@@ -20,7 +20,7 @@ class ChartOptionsControllerTest {
                 .node("juranometria-test-" + System.nanoTime());
         try {
             ChartOptionsStore store = ChartOptionsStore.forNode(node);
-            store.save(new ChartOptions(true, true, false, true, true));
+            store.save(new ChartOptions(true, true, false, true, true, false));
             ChartOptionsController controller =
                     new ChartOptionsController(store);
             assertEquals(store.load(), controller.options(),
@@ -42,9 +42,12 @@ class ChartOptionsControllerTest {
             assertEquals(snapshot, store.load(),
                     "previewing persists nothing");
 
-            // Restore Defaults is an ordinary previewed transition.
+            // Restore Defaults is an ordinary previewed transition and
+            // includes the star-label option exactly.
             controller.restoreDefaults();
             assertEquals(ChartOptions.DEFAULTS, controller.options());
+            assertTrue(controller.options().starLabels(),
+                    "Restore Defaults turns star labels back on");
             assertEquals(snapshot, store.load(),
                     "Restore Defaults previews; it does not persist");
 

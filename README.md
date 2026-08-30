@@ -119,7 +119,8 @@ make import-star-identities
 
 The menu bar stays out of the way: **View → Chart Options…** lets the
 reader choose the chart's content and labels — deep-sky objects and
-their labels, constellation figures, boundaries, and names — with a
+their labels, constellation figures, boundaries, and names, and star
+names and identifiers — with a
 live preview, safe Cancel, a Restore Defaults returning the released
 chart exactly, and choices remembered across restarts (a searched
 target always stays drawn and labelled, whatever the toggles);

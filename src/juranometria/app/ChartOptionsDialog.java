@@ -102,18 +102,21 @@ public final class ChartOptionsDialog extends JDialog {
                 initial.deepSkyLabels(), "Deep-sky labels");
         JCheckBox names = checkBox("Constellation names", 'n',
                 initial.constellationNames(), "Constellation names");
+        JCheckBox starLabels = checkBox("Star names and identifiers", 'S',
+                initial.starLabels(), "Star names and identifiers");
 
         Runnable sync = () -> {
             labels.setEnabled(dsos.isSelected());
             names.setEnabled(figures.isSelected());
             controller.apply(new ChartOptions(dsos.isSelected(),
                     labels.isSelected(), figures.isSelected(),
-                    boundaries.isSelected(), names.isSelected()));
+                    boundaries.isSelected(), names.isSelected(),
+                    starLabels.isSelected()));
         };
         labels.setEnabled(initial.deepSkyObjects());
         names.setEnabled(initial.constellationFigures());
         for (JCheckBox box : new JCheckBox[] {
-                dsos, figures, boundaries, labels, names}) {
+                dsos, figures, boundaries, labels, names, starLabels}) {
             box.addActionListener(event -> sync.run());
         }
 
@@ -125,6 +128,7 @@ public final class ChartOptionsDialog extends JDialog {
         panel.add(groupHeading("Labels"));
         panel.add(labels);
         panel.add(names);
+        panel.add(starLabels);
         panel.add(Box.createVerticalStrut(16));
 
         JButton restore = new JButton("Restore Defaults");
@@ -140,6 +144,7 @@ public final class ChartOptionsDialog extends JDialog {
             figures.setSelected(defaults.constellationFigures());
             boundaries.setSelected(defaults.constellationBoundaries());
             names.setSelected(defaults.constellationNames());
+            starLabels.setSelected(defaults.starLabels());
             labels.setEnabled(true);
             names.setEnabled(true);
         });
