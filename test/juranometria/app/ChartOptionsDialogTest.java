@@ -118,6 +118,62 @@ class ChartOptionsDialogTest {
             assertEquals(ChartOptions.DEFAULTS, store.load(),
                     "Escape persists nothing");
             assertFalse(dialog.isDisplayable(), "Escape closes the dialog");
+
+            // The production OK wiring: preview a change, press the real
+            // OK button - the previewed value persists and the dialog
+            // closes (a swapped constructor callback would fail here).
+            SwingUtilities.invokeAndWait(() ->
+                    ChartOptionsDialog.open(frame[0], controller));
+            flush();
+            JDialog okDialog = findDialog();
+            SwingUtilities.invokeAndWait(() -> {
+                box(okDialog.getContentPane(), "Constellation boundaries")
+                        .doClick();
+                AboutDialogTest.button(okDialog.getContentPane(), "OK")
+                        .doClick();
+            });
+            flush();
+            assertFalse(okDialog.isDisplayable(), "OK closes the dialog");
+            assertFalse(store.load().constellationBoundaries(),
+                    "OK persists exactly the previewed options");
+            assertFalse(controller.options().constellationBoundaries());
+
+            // The production Cancel wiring: preview, press the real
+            // Cancel - reverted, nothing persisted, dialog closed.
+            SwingUtilities.invokeAndWait(() ->
+                    ChartOptionsDialog.open(frame[0], controller));
+            flush();
+            JDialog cancelDialog = findDialog();
+            SwingUtilities.invokeAndWait(() -> {
+                box(cancelDialog.getContentPane(), "Constellation figures")
+                        .doClick();
+                AboutDialogTest.button(cancelDialog.getContentPane(), "Cancel")
+                        .doClick();
+            });
+            flush();
+            assertFalse(cancelDialog.isDisplayable(), "Cancel closes");
+            assertTrue(controller.options().constellationFigures(),
+                    "Cancel reverts the preview");
+            assertFalse(store.load().constellationBoundaries(),
+                    "Cancel leaves the previously confirmed store alone");
+
+            // The production window-close wiring: same revert protocol.
+            SwingUtilities.invokeAndWait(() ->
+                    ChartOptionsDialog.open(frame[0], controller));
+            flush();
+            JDialog closeDialog = findDialog();
+            SwingUtilities.invokeAndWait(() -> {
+                box(closeDialog.getContentPane(), "Deep-sky objects")
+                        .doClick();
+                closeDialog.dispatchEvent(new java.awt.event.WindowEvent(
+                        closeDialog,
+                        java.awt.event.WindowEvent.WINDOW_CLOSING));
+            });
+            flush();
+            assertFalse(closeDialog.isDisplayable(),
+                    "the window close button closes the dialog");
+            assertTrue(controller.options().deepSkyObjects(),
+                    "window close reverts the preview like Cancel");
         } finally {
             SwingUtilities.invokeAndWait(() -> {
                 for (Window window : Window.getWindows()) {
