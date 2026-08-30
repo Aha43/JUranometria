@@ -45,6 +45,9 @@ public final class JUranometriaMain {
         ChartViewController controller =
                 new ChartViewController(Atlas.assembler()::fits);
         controller.onChange(chart::setViewState);
+        ChartOptionsController chartOptions =
+                new ChartOptionsController(ChartOptionsStore.user());
+        chartOptions.onChange(chart::setChartOptions);
         juranometria.ui.PanInteraction.install(chart, controller);
         juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
                 Atlas.search(), Atlas.assembler(), controller);

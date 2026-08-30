@@ -75,8 +75,22 @@ public final class ChartRenderer {
         this.starSizePolicy = starSizePolicy;
     }
 
-    /** Renders the scene onto the graphics target. */
+    /** Renders the scene with the released default options. */
     public void render(Graphics2D g, ChartScene scene) {
+        render(g, scene, ChartOptions.DEFAULTS);
+    }
+
+    /**
+     * Renders the scene under the reader's chart options. The options
+     * compose at this pass structure, in front of the unchanged
+     * policies (docs/decisions/chart-options.md): each pass first asks
+     * whether its layer is enabled at all, then asks the policy where
+     * and how to draw. With a general layer disabled, the deep-sky
+     * passes iterate only the scene's searched target - the honesty
+     * rule that a chart never titles itself by a symbol-capable target
+     * it does not show survives every toggle.
+     */
+    public void render(Graphics2D g, ChartScene scene, ChartOptions options) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
 
@@ -96,8 +110,11 @@ public final class ChartRenderer {
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
 
         g.setClip(1, 1, width - 2, height - 2);
-        drawGeography(g, scene, projection, mapping);
+        drawGeography(g, scene, options, projection, mapping);
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            if (!options.deepSkyObjects() && !isTarget(scene, dso)) {
+                continue;
+            }
             if (!policy.drawn(dso)) {
                 continue;
             }
@@ -121,7 +138,13 @@ public final class ChartRenderer {
             });
         }
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (!policy.labelled(dso)) {
+            if (options.effectiveDeepSkyLabels()) {
+                if (!policy.labelled(dso)) {
+                    continue;
+                }
+            } else if (!isTarget(scene, dso) || !hasSymbol(dso)) {
+                // Labels disabled: only the searched target keeps its
+                // label, riding its always-drawn symbol.
                 continue;
             }
             projection.project(dso.position()).ifPresent(plane ->
@@ -145,18 +168,19 @@ public final class ChartRenderer {
      * straight jumps across the page.
      */
     private static void drawGeography(Graphics2D g, ChartScene scene,
+                                      ChartOptions options,
                                       GnomonicProjection projection,
                                       ViewportMapping mapping) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
-        if (policy.boundariesDrawn()) {
+        if (options.constellationBoundaries() && policy.boundariesDrawn()) {
             g.setColor(BOUNDARY_INK);
             g.setStroke(BOUNDARY_STROKE);
             for (GeoSegment segment : scene.geography().boundarySegments()) {
                 drawGeographySegment(g, segment, scene, projection, mapping, null);
             }
         }
-        if (policy.figuresDrawn()) {
+        if (options.constellationFigures() && policy.figuresDrawn()) {
             g.setColor(FIGURE_INK);
             g.setStroke(OUTLINE_STROKE);
             java.util.Map<String, double[]> visibleInk =
@@ -165,7 +189,9 @@ public final class ChartRenderer {
                 drawGeographySegment(g, segment, scene, projection, mapping,
                         visibleInk);
             }
-            if (policy.namesDrawn()) {
+            // Names depend on figures by decision, which is also why
+            // their visible-ink anchors exist exactly when they draw.
+            if (options.effectiveConstellationNames() && policy.namesDrawn()) {
                 drawConstellationNames(g, scene, visibleInk);
             }
         }
@@ -270,16 +296,26 @@ public final class ChartRenderer {
 
     /** Renders the scene into a fresh raster image, for export and tests. */
     public BufferedImage renderToImage(ChartScene scene) {
+        return renderToImage(scene, ChartOptions.DEFAULTS);
+    }
+
+    /** Renders under the reader's options into a fresh raster image. */
+    public BufferedImage renderToImage(ChartScene scene, ChartOptions options) {
         BufferedImage image = new BufferedImage(
                 scene.viewport().widthPx(), scene.viewport().heightPx(),
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            render(g, scene);
+            render(g, scene, options);
         } finally {
             g.dispose();
         }
         return image;
+    }
+
+    private static boolean isTarget(ChartScene scene, DeepSkyObject dso) {
+        return scene.targetIdentity() != null
+                && scene.targetIdentity().equals(dso.id());
     }
 
     private static void drawSymbol(Graphics2D g, DeepSkyObject dso,

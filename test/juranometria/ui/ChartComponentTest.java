@@ -45,6 +45,27 @@ class ChartComponentTest {
         component.paintComponent(image.createGraphics());
     }
 
+    @Test
+    void chartOptionsAreRepaintOnlyAndNeverTouchNavigation() throws Exception {
+        SceneAssemblerTest.CountingCatalogue catalogue =
+                new SceneAssemblerTest.CountingCatalogue();
+        ChartComponent component = sizedComponent(catalogue);
+        int queries = catalogue.starQueries;
+        juranometria.chart.ChartViewState navigation = component.viewState();
+
+        SwingUtilities.invokeAndWait(() -> component.setChartOptions(
+                new juranometria.render.ChartOptions(
+                        false, false, false, false, false)));
+        SwingUtilities.invokeAndWait(() -> { });
+        paint(component);
+
+        assertEquals(queries, catalogue.starQueries,
+                "an options change assembles no scene and queries nothing");
+        assertEquals(navigation, component.viewState(),
+                "options never mutate centre, field, magnitude, or target");
+        assertEquals(false, component.chartOptions().deepSkyObjects());
+    }
+
     // Regression guard: a plain JComponent subclass has no accessible
     // context by default, and setting the accessible name during
     // construction crashed the application at startup.
