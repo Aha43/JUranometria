@@ -7,6 +7,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-08-30
+
+Sprint 15 — Read the coordinates. Reviewed by Codex at the design
+gate, at each implementation step, and at the sprint close; the
+review trail lives in `docs/reviews/`.
+
 ### Added
 
 - The charts read their coordinates: a quiet equatorial (ICRS/J2000)
