@@ -77,3 +77,16 @@ combination testing to disguise a simple composition model.
 Strengthen the production journey with one real label choice and a direct
 scene-identity assertion, then merge PR #110, close milestone 12, and cut
 0.12.0. No production-code or visual-design change is requested.
+
+## Follow-up — findings resolved
+
+Reviewed the fixes at `9073eb9`. The production journey now operates the real
+Deep-sky labels checkbox independently before suppressing deep-sky content,
+and proves that both live previews retain the exact same `ChartScene` object.
+The misleading identity-hash helper is gone; the existing counting-catalogue
+component test remains the direct query-budget guard.
+
+The required test and GitGuardian checks are green, and the complete diff
+passes the whitespace check.
+
+**Final recommendation: approve and merge.**
