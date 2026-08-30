@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The charts read their coordinates: a quiet equatorial (ICRS/J2000)
+  grid - projection-correct meridians and parallels drawn beneath
+  everything, with right-ascension labels along the bottom edge and
+  signed declination labels along the left, adapting its intervals
+  to every field width and converging cleanly at the poles. One new
+  Chart Options control, "Equatorial coordinate grid" (default on,
+  Content group), gates it repaint-only; the M31 reference
+  deliberately gains the reviewed graticule.
+
 ## [0.14.0] - 2026-08-30
 
 Sprint 14 — Zoom where you point. Reviewed by Codex at the design

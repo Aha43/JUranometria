@@ -42,6 +42,18 @@ class ChartOptionsStoreTest {
             node.put("chart.starLabels", "false");
             assertFalse(store.load().starLabels(),
                     "the star-label option persists under its own key");
+
+            // Migration: a store written before the grid existed has
+            // no chart.equatorialGrid key - it loads as the gate's
+            // default (on), never a launch failure.
+            assertTrue(store.load().equatorialGrid(),
+                    "a missing grid key migrates to the decided default");
+            node.put("chart.equatorialGrid", "false");
+            assertFalse(store.load().equatorialGrid(),
+                    "only the explicit string false disables the grid");
+            node.put("chart.equatorialGrid", "banana");
+            assertTrue(store.load().equatorialGrid(),
+                    "a corrupt grid value means the default, on");
             assertFalse(loaded.effectiveConstellationNames(),
                     "the dependency applies to loaded values too");
         } finally {

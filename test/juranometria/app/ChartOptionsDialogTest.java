@@ -62,6 +62,15 @@ class ChartOptionsDialogTest {
             assertFalse(box(content, "Constellation names").isEnabled(),
                     "names are effective only while figures are on");
 
+            // The equatorial grid: fourth Content control, no
+            // dependency (pure view geometry), live preview.
+            assertTrue(box(content, "Equatorial coordinate grid")
+                            .isEnabled(),
+                    "the grid control depends on nothing");
+            box(content, "Equatorial coordinate grid").doClick();
+            assertFalse(controller.options().equatorialGrid(),
+                    "the grid toggle previews immediately");
+
             // Star names and identifiers: third Labels control, no
             // dependency (star dots are never optional), live preview.
             assertTrue(box(content, "Star names and identifiers").isEnabled(),
@@ -79,6 +88,9 @@ class ChartOptionsDialogTest {
             assertTrue(box(content, "Constellation boundaries").isSelected());
             assertTrue(box(content, "Star names and identifiers").isSelected(),
                     "Restore Defaults includes the star-label option");
+            assertTrue(box(content, "Equatorial coordinate grid")
+                            .isSelected(),
+                    "Restore Defaults includes the grid option");
 
             // OK and Cancel run exactly their wired protocol actions.
             AboutDialogTest.button(content, "OK").doClick();

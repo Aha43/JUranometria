@@ -15,17 +15,31 @@ package juranometria.render;
  * attach to drawn ink; detached text is not a chart). Star labels
  * have no dependency: they attach to star dots, which are never
  * optional - and the searched star's guaranteed label survives the
- * toggle exactly as the deep-sky target's does.
+ * toggle exactly as the deep-sky target's does. The equatorial grid
+ * (ICRS/J2000) likewise has no dependency: pure view geometry with
+ * no target of its own.
  */
 public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            boolean constellationFigures,
                            boolean constellationBoundaries,
                            boolean constellationNames,
-                           boolean starLabels) {
+                           boolean starLabels,
+                           boolean equatorialGrid) {
 
     /** The released chart: everything on. */
     public static final ChartOptions DEFAULTS =
-            new ChartOptions(true, true, true, true, true, true);
+            new ChartOptions(true, true, true, true, true, true, true);
+
+    /** The chart before the equatorial grid existed (through 0.14.0). */
+    public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
+                        boolean constellationFigures,
+                        boolean constellationBoundaries,
+                        boolean constellationNames,
+                        boolean starLabels) {
+        this(deepSkyObjects, deepSkyLabels, constellationFigures,
+                constellationBoundaries, constellationNames, starLabels,
+                true);
+    }
 
     /** The chart before star labels existed (through 0.12.0). */
     public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
@@ -33,7 +47,7 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                         boolean constellationBoundaries,
                         boolean constellationNames) {
         this(deepSkyObjects, deepSkyLabels, constellationFigures,
-                constellationBoundaries, constellationNames, true);
+                constellationBoundaries, constellationNames, true, true);
     }
 
     /** Labels depend on symbols: {@code labelled} stays inside {@code drawn}. */
