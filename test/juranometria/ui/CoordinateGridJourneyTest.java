@@ -147,6 +147,26 @@ class CoordinateGridJourneyTest {
             assertEquals(raStepAt8, specNow().raStepDegrees(),
                     "zooming back in restores the narrower interval");
 
+            // The KEYBOARD steps the same intervals (PR #141 review):
+            // two real masked root-pane shortcuts out to 18 degrees
+            // widen the RA interval, and the plus form brings both
+            // field and interval back.
+            key(java.awt.event.KeyEvent.VK_MINUS,
+                    AppMenuBar.menuShortcutMask());
+            key(java.awt.event.KeyEvent.VK_MINUS,
+                    AppMenuBar.menuShortcutMask());
+            assertEquals(18.0, navigation.state().fieldWidthDegrees(),
+                    "the masked minus shortcuts really zoom");
+            assertTrue(specNow().raStepDegrees() > raStepAt8,
+                    "the keyboard reaches the wider grid interval too");
+            key(java.awt.event.KeyEvent.VK_EQUALS,
+                    AppMenuBar.menuShortcutMask());
+            key(java.awt.event.KeyEvent.VK_EQUALS,
+                    AppMenuBar.menuShortcutMask());
+            assertEquals(8.0, navigation.state().fieldWidthDegrees());
+            assertEquals(raStepAt8, specNow().raStepDegrees(),
+                    "the keyboard round trip restores the interval");
+
             // The northern pole: the RA step caps at 6h - four
             // radiating meridians, the classical polar chart.
             // "polaris" honestly lists its three name-mates, so the
@@ -296,6 +316,17 @@ class CoordinateGridJourneyTest {
         int h = scene.viewport().heightPx();
         return RENDERER.renderToImage(scene, options.options())
                 .getRGB(0, 0, w, h, null, 0, w);
+    }
+
+    /** A masked key press dispatched to the Search field itself:
+     *  the root pane's focused-window binding must catch it. */
+    private void key(int keyCode, int mask) throws Exception {
+        SwingUtilities.invokeAndWait(() -> searchField.dispatchEvent(
+                new java.awt.event.KeyEvent(searchField,
+                        java.awt.event.KeyEvent.KEY_PRESSED,
+                        System.nanoTime() / 1_000_000, mask, keyCode,
+                        java.awt.event.KeyEvent.CHAR_UNDEFINED)));
+        flush();
     }
 
     private void searchFor(String query) throws Exception {
