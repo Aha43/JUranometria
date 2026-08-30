@@ -75,3 +75,20 @@ duplicating the macOS-provided application menu would have been worse.
 Fix the session-override contract and strengthen the licensing agreement test,
 then merge PR #101, close milestone 11, and cut 0.11.0. No change to the visual
 design or licensing prose is otherwise requested.
+
+## Follow-up — findings resolved
+
+Reviewed the fixes at `c3ae12f`. `AppearanceSession` now carries the
+command-line override for the whole session, keeps the saved preference
+distinct from the effective appearance, and routes the production Settings
+confirmation through that policy. An overridden session remains Dark; the
+dialog preselects and may update the saved choice for a later ordinary launch,
+and explains that timing in the UI.
+
+The licensing test now checks every resource/licence relationship in both the
+packaged summary and `LICENSING.md`, including the Tycho-2 non-commercial
+consequence, so swapped assignments cannot pass. The trailing whitespace is
+also removed. Required tests and GitGuardian are green, and the complete diff
+passes the whitespace check.
+
+**Final recommendation: approve and merge.**
