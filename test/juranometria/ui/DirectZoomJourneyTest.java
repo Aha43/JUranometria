@@ -96,10 +96,13 @@ class DirectZoomJourneyTest {
             assertEquals("TYC 129-1873-1",
                     navigation.state().targetIdentity());
 
-            // An off-centre pointer: capture the sky beneath it, wheel
-            // out three fields, and hold it to the pixel each step.
+            // An off-centre pointer: capture the sky beneath it AND
+            // the pre-burst centre, wheel out four fields holding the
+            // sky to the pixel each step, then reverse and require
+            // the original centre back.
             int px = 250;
             int py = 180;
+            SkyPosition originCentre = navigation.state().centre();
             SkyPosition anchor = anchorAtPointer(px, py);
             for (int notch = 0; notch < 3; notch++) {
                 wheel(px, py, 1.0);
@@ -128,14 +131,18 @@ class DirectZoomJourneyTest {
             assertSame(sceneAtBound, chart.scene(),
                     "a refused notch assembles nothing");
 
-            // Reverse the three steps at the same pointer: the sky
-            // stays put and the original view returns within the
-            // reviewed tolerance.
-            SkyPosition beforeReverse = navigation.state().centre();
+            // Reverse the four steps at the same pointer: the sky
+            // stays put and the pre-burst view returns within the
+            // reviewed tolerance - compared against the centre
+            // captured BEFORE zooming out, never the final view.
             wheel(px, py, -4.0);
             assertEquals(8.0, navigation.state().fieldWidthDegrees());
             assertTrue(pointerDrift(anchor, px, py) < DRIFT_TOLERANCE_PX,
                     "the anchor survives the reverse burst");
+            assertTrue(navigation.state().centre()
+                            .separationDegrees(originCentre) < 1e-4,
+                    "the reverse burst restores the pre-burst centre"
+                            + " within the reviewed tolerance");
 
             // Platform shortcuts through the Search field's own key
             // events: the masked strokes zoom about the centre while
@@ -198,13 +205,99 @@ class DirectZoomJourneyTest {
             assertEquals(ChartViewState.DEFAULT, navigation.state());
             assertEquals("M31 · Andromeda Galaxy region",
                     chart.scene().title());
-            assertTrue(pointerDrift(anchor, px, py) >= 0.0
-                            || beforeReverse != null,
-                    "journey complete");
+
+            // A real coverage-predicate refusal through the real
+            // components: the bundled all-sky pack never refuses, so
+            // this leg fences the same predicate seam the assembler
+            // supplies and drives the wheel, shortcut, and toolbar
+            // against it - refused everywhere, nothing moves, nothing
+            // assembles.
+            coverageRefusalLeg();
         } finally {
             SwingUtilities.invokeAndWait(() -> {
                 if (frame[0] != null) {
                     frame[0].dispose();
+                }
+            });
+        }
+    }
+
+    /**
+     * Coverage refusal through production components: a chart, wheel
+     * interaction, toolbar, and shortcuts wired to a controller whose
+     * coverage predicate refuses any field narrower than 12 degrees -
+     * the same seam `Atlas.assembler()::fits` supplies, fenced because
+     * the bundled all-sky pack genuinely never refuses. The wheel
+     * consumes and moves nothing (assertSame scene - no assembly),
+     * the shortcut is a guarded no-op, and the toolbar button
+     * disables, all against the same predicate.
+     */
+    private void coverageRefusalLeg() throws Exception {
+        ChartViewController fenced = new ChartViewController(state ->
+                Atlas.assembler().fits(state.centre(),
+                        state.fieldWidthDegrees())
+                        && state.fieldWidthDegrees() >= 12.0);
+        ChartComponent[] fencedChart = new ChartComponent[1];
+        JFrame[] fencedFrame = new JFrame[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                fencedChart[0] = new ChartComponent(Atlas.assembler());
+                ZoomInteraction.install(fencedChart[0], fenced);
+                fenced.onChange(fencedChart[0]::setViewState);
+                fencedFrame[0] = new JFrame("coverage-refusal");
+                AppMenuBar.installZoomShortcuts(
+                        fencedFrame[0].getRootPane(), fenced);
+                fencedFrame[0].setLayout(new java.awt.BorderLayout());
+                fencedFrame[0].add(new AtlasToolbar(fenced,
+                                new SearchField(Atlas.search(),
+                                        Atlas.assembler(), fenced)),
+                        java.awt.BorderLayout.NORTH);
+                fencedFrame[0].add(fencedChart[0],
+                        java.awt.BorderLayout.CENTER);
+                fencedFrame[0].pack();
+                fencedFrame[0].setSize(900, 760);
+                fencedFrame[0].validate();
+                fencedFrame[0].setVisible(true);
+                fenced.recenter(new SkyPosition(10.684708, 41.268750), 12.0,
+                        "M31 · Andromeda Galaxy region", "NGC 224");
+            });
+            flush();
+            ChartViewState before = fenced.state();
+            var sceneBefore = fencedChart[0].scene();
+
+            MouseWheelEvent refused = new MouseWheelEvent(fencedChart[0],
+                    MouseEvent.MOUSE_WHEEL, System.nanoTime() / 1_000_000,
+                    0, 300, 300, 300, 300, 0, false,
+                    MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, -1, -1.0);
+            SwingUtilities.invokeAndWait(() ->
+                    fencedChart[0].dispatchEvent(refused));
+            flush();
+            assertTrue(refused.isConsumed(),
+                    "the coverage-refused wheel is consumed");
+            assertEquals(before, fenced.state(),
+                    "and moves nothing");
+            assertSame(sceneBefore, fencedChart[0].scene(),
+                    "and assembles nothing");
+            assertEquals("NGC 224", fenced.state().targetIdentity(),
+                    "and keeps the target untouched");
+
+            SwingUtilities.invokeAndWait(() -> fencedChart[0].dispatchEvent(
+                    new KeyEvent(fencedChart[0], KeyEvent.KEY_PRESSED,
+                            System.nanoTime() / 1_000_000,
+                            AppMenuBar.menuShortcutMask(),
+                            KeyEvent.VK_EQUALS, KeyEvent.CHAR_UNDEFINED)));
+            flush();
+            assertEquals(before, fenced.state(),
+                    "the coverage-refused shortcut is a guarded no-op");
+
+            JButton zoomIn = button(fencedFrame[0].getContentPane(),
+                    "Zoom in");
+            assertTrue(!zoomIn.isEnabled(),
+                    "the toolbar disables against the same predicate");
+        } finally {
+            SwingUtilities.invokeAndWait(() -> {
+                if (fencedFrame[0] != null) {
+                    fencedFrame[0].dispose();
                 }
             });
         }
