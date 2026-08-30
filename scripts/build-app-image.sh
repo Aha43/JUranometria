@@ -112,6 +112,49 @@ grep -q 'MODULES="java.base java.datatransfer java.xml java.prefs java.desktop j
     exit 1
 }
 
+# Mechanical licensing inventory (issue #150): the packaged JAR
+# inside the image must carry the complete About inventory - the
+# licensing summary, every data notice and licence text, and the
+# icon licence - and the trimmed runtime must carry a legal/
+# directory for every module it contains.
+appjar=""
+for candidate in "$image/Contents/app/JUranometria.jar" \
+        "$image/app/JUranometria.jar" \
+        "$image/lib/app/JUranometria.jar"; do
+    [ -f "$candidate" ] && appjar=$candidate && break
+done
+[ -n "$appjar" ] || {
+    echo "build-app-image: packaged JAR not found in image" >&2
+    exit 1
+}
+jarlist=$(unzip -l "$appjar")
+for resource in \
+        resources/about/licensing-summary.txt \
+        resources/catalog/bright-sky/NOTICE-tycho2.md \
+        resources/catalog/bright-sky/NOTICE-openngc.md \
+        resources/catalog/bright-sky/LICENSE-CC-BY-SA-4.0.txt \
+        resources/geo/constellations/NOTICE-constellations.md \
+        resources/geo/constellations/LICENSE-BSD-3-Clause.txt \
+        resources/catalog/star-identities/NOTICE-star-identities.md \
+        resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
+        resources/icons/LICENSE; do
+    echo "$jarlist" | grep -q " $resource\$" || {
+        echo "build-app-image: packaged licensing inventory missing" \
+             "$resource" >&2
+        exit 1
+    }
+done
+for module in java.base java.datatransfer java.xml java.prefs \
+        java.desktop java.logging; do
+    [ -d "$legal/$module" ] || {
+        echo "build-app-image: runtime legal notices missing for" \
+             "$module" >&2
+        exit 1
+    }
+done
+echo "packaged licensing inventory: complete (9 resources, 6 module"
+echo "legal directories)"
+
 # The packaged headless smoke path through the NATIVE image: the
 # additional juranometria-smoke launcher renders the reference chart
 # with the bundled runtime alone.

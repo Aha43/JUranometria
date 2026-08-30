@@ -237,9 +237,24 @@ shape:
   and offline promises above apply to the images; the ZIP's Java
   baseline section continues to apply to the fallback.
 
-## The release artifact, at contract level
+## The release artifacts, at contract level
 
-One deterministic **archive per release** (shape finalized by #144):
+**Five artifacts per release** (shapes finalized by #144):
+
+1–4. **The four platform application images** — `JUranometria.app`
+(macOS Apple silicon; macOS Intel), and the unpacked
+`JUranometria/` directory with its native launcher (Windows x86-64;
+Linux x86-64) — each zipped **with `build-info.txt` and the
+unsigned-launch `README.txt` beside the image**. Inside every
+image: the application JAR and its libraries under `app/`, the
+pinned six-module Temurin runtime with its complete generated
+`legal/` notice tree, the inner `juranometria-smoke` launcher, and
+the application icon. The complete packaged licensing inventory —
+the About summary, every data notice and licence text, and the icon
+licence inside the JAR; a `legal/` directory per runtime module —
+is **mechanically asserted at build time on every platform**.
+
+5. **The portable fallback ZIP**:
 
 ```
 JUranometria-X.Y.Z/
@@ -247,18 +262,20 @@ JUranometria-X.Y.Z/
   lib/…                   the pinned runtime dependencies
   juranometria / .bat     restrained launch helpers (POSIX sh, Windows batch)
   LICENSE  LICENSING.md   MIT code licence and the full licensing map
-  NOTICE…                 every bundled data notice, including the
-                          non-commercial statement
-  lib licences            Apache-2.0 (FlatLaf, FlatLaf Extras) and
-                          MIT (JSVG) texts for the redistributed
-                          runtime libraries
+  licenses/…              every data notice and licence text, plus the
+                          runtime-library texts (Apache-2.0, MIT)
   README (launch note)    download → unpack → run, Java requirement,
                           troubleshooting for absent/old Java
 ```
 
-Built by one command from a clean checkout; contents asserted
-against the manifest (stale or undeclared files fail); verified by
-CI on macOS, Linux, and Windows before any release.
+All five are built by one command each from a clean checkout,
+contents asserted (stale or undeclared files fail), and verified by
+CI on their platforms before any release. Interactive
+About/preferences journeys through the native images are the
+closing packaged journey's work (#146) on real machines; CI proves
+the images' full startup — which itself verifies every bundled
+pack's checksums on load — plus relaunch, and the mechanical
+inventory above.
 
 ## Classifying Sprint 16 discoveries
 

@@ -130,7 +130,8 @@ jobs:
           }
           run_one
           run_one --dark
-          echo "native launches OK with no system Java, light and --dark, space path"
+          run_one   # relaunch: restart against whatever state persisted
+          echo "native launches OK with no system Java: light, --dark, and relaunch, space path"
       - name: Launch with no system Java, light and --dark, space path (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -141,7 +142,7 @@ jobs:
           $launcher = Join-Path $work "JUranometria/JUranometria.exe"
           # No system Java reachable: an empty PATH for the child.
           $env:PATH = ""
-          foreach ($extra in @(@(), @("--dark"))) {
+          foreach ($extra in @(@(), @("--dark"), @())) {
             if ($extra.Count -gt 0) {
               $p = Start-Process -FilePath $launcher -ArgumentList $extra -PassThru
             } else {
