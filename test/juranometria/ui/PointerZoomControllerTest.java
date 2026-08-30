@@ -134,20 +134,30 @@ class PointerZoomControllerTest {
         ChartViewController polar = controllerAt(
                 new SkyPosition(37.946619, 85.0), 24.0);
         ChartViewState polarBefore = polar.state();
+        int[] polarNotified = {0};
+        polar.onChange(state -> polarNotified[0]++);
+        polarNotified[0] = 0;
         assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
                 polar.zoomAt(plane(polarBefore, new PixelPoint(1, 350)),
                         false));
         assertEquals(polarBefore, polar.state());
+        assertEquals(0, polarNotified[0],
+                "a constrained refusal notifies nobody");
 
         // Infeasible pointer: exact forward, two-branch reverse - the
         // preflight refuses before the state can change.
         ChartViewController nearPole = controllerAt(
                 new SkyPosition(37.946619, 89.9), 36.0);
         ChartViewState nearPoleBefore = nearPole.state();
+        int[] nearPoleNotified = {0};
+        nearPole.onChange(state -> nearPoleNotified[0]++);
+        nearPoleNotified[0] = 0;
         assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
                 nearPole.zoomAt(plane(nearPoleBefore,
                         new PixelPoint(450, 1)), true));
         assertEquals(nearPoleBefore, nearPole.state());
+        assertEquals(0, nearPoleNotified[0],
+                "a preflight refusal notifies nobody");
 
         // Coverage: a predicate that refuses the candidate leaves the
         // exact same state, target, and field behind.
@@ -156,12 +166,17 @@ class PointerZoomControllerTest {
         fenced.recenter(new SkyPosition(83.818667, -5.389667), 12.0,
                 "M 42 region", "NGC 1976");
         ChartViewState fencedBefore = fenced.state();
+        int[] fencedNotified = {0};
+        fenced.onChange(state -> fencedNotified[0]++);
+        fencedNotified[0] = 0;
         assertEquals(PointerZoomOutcome.REFUSED_COVERAGE,
                 fenced.zoomAt(plane(fencedBefore, new PixelPoint(300, 200)),
                         true));
         assertEquals(fencedBefore, fenced.state());
         assertEquals("NGC 1976", fenced.state().targetIdentity(),
                 "a refused transition keeps the target untouched");
+        assertEquals(0, fencedNotified[0],
+                "a coverage refusal notifies nobody");
     }
 
     @Test
