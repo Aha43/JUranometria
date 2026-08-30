@@ -50,6 +50,7 @@ jpackage \
     --java-options "--enable-native-access=ALL-UNNAMED" \
     --add-modules "$modules" \
     --add-launcher juranometria-smoke="$root/packaging/smoke-launcher.properties" \
+    --add-launcher juranometria-acceptance="$root/packaging/acceptance-launcher.properties" \
     $icon_arg \
     --dest "$dest"
 
@@ -171,6 +172,27 @@ size=$(wc -c < "$out")
     echo "build-app-image: native smoke render failed ($size bytes)" >&2
     exit 1
 }
+
+# The packaged acceptance surface (issue #150): About content and a
+# genuine preference change-and-reload, through the bundled runtime
+# alone, no system Java.
+case "$(uname -s)" in
+    Darwin) acceptance="$image/Contents/MacOS/juranometria-acceptance" ;;
+    *) acceptance="$image/bin/juranometria-acceptance"
+       [ -e "$acceptance" ] || acceptance="$image/juranometria-acceptance.exe" ;;
+esac
+accept_out=$(env PATH=/nonexistent "$acceptance" 2>&1) \
+    || accept_out=$("$acceptance" 2>&1) || {
+    echo "build-app-image: packaged acceptance failed:" >&2
+    echo "$accept_out" >&2
+    exit 1
+}
+echo "$accept_out" | grep -q "PACKAGED ACCEPTANCE OK" || {
+    echo "build-app-image: packaged acceptance did not conclude:" >&2
+    echo "$accept_out" >&2
+    exit 1
+}
+echo "$accept_out" | sed 's/^/  /'
 
 echo "app-image: $image"
 echo "unpacked size: $(du -sh "$image" | cut -f1)"

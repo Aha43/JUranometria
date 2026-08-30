@@ -270,12 +270,16 @@ JUranometria-X.Y.Z/
 
 All five are built by one command each from a clean checkout,
 contents asserted (stale or undeclared files fail), and verified by
-CI on their platforms before any release. Interactive
-About/preferences journeys through the native images are the
-closing packaged journey's work (#146) on real machines; CI proves
-the images' full startup — which itself verifies every bundled
-pack's checksums on load — plus relaunch, and the mechanical
-inventory above.
+CI on their platforms before any release. Every image also carries a
+second inner launcher, `juranometria-acceptance`, that exercises the
+About surface (the packaged licensing summary and the complete
+notice texts through their real code paths) and a **genuine
+preference change-and-reload** against the application's own node
+through the bundled runtime's preference backend — run on every
+platform cell with no system Java. CI additionally proves full
+startup (which itself verifies every bundled pack's checksums on
+load) and relaunch; the interactive on-screen journeys remain the
+closing packaged journey's work (#146) on real machines.
 
 ## Classifying Sprint 16 discoveries
 
