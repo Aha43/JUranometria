@@ -25,10 +25,13 @@ import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
+import juranometria.chart.DeepSkyObject;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
+import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
+import juranometria.render.RegionalDetailPolicy;
 
 /**
  * The Sprint 13 star-identity study (issue #112): joins the pinned
@@ -77,6 +80,7 @@ public final class StarIdentityStudyMain {
         File outDir = new File("build/star-identity-study");
         outDir.mkdirs();
 
+        verifyPinnedInputs();
         Map<String, Identity> identities = joinIdentities();
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
 
@@ -111,20 +115,36 @@ public final class StarIdentityStudyMain {
                               File outDir) throws Exception {
         ChartViewState state = new ChartViewState(centre, field, 8.0, null, null);
         ChartScene scene = Atlas.assembler().assemble(state, WIDTH, HEIGHT);
-        var image = renderer.renderToImage(scene);
+        // The proposed production order, honoured by the prototype: the
+        // base page renders WITHOUT deep-sky labels (via the existing
+        // chart option), star labels go on next - yielding to the
+        // deep-sky label boxes and the title block, which are seeded
+        // into the collision set - and the deep-sky labels are then
+        // drawn above the star labels, matching the decided layer
+        // order: stars < star labels < DSO labels < title block.
+        var image = renderer.renderToImage(scene, new ChartOptions(
+                true, false, true, true, true));
         GnomonicProjection projection = new GnomonicProjection(centre);
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         StarSizePolicy sizes = StarSizePolicy.DEFAULT;
 
-        // Deterministic label pass: brightest first, collision-rejecting.
+        // Deterministic label pass: brightest first with a stable TYC
+        // tie-break for equal magnitudes, collision-rejecting.
         List<Star> stars = new ArrayList<>(scene.stars());
-        stars.sort(java.util.Comparator.comparingDouble(Star::magnitude));
+        stars.sort(java.util.Comparator
+                .comparingDouble(Star::magnitude)
+                .thenComparing(Star::id));
         Graphics2D g = image.createGraphics();
         g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g.setFont(LABEL_FONT);
         g.setColor(NAME_INK);
         List<Rectangle2D> occupied = new ArrayList<>();
+        occupied.add(titleBlockRect(g, scene));
+        List<Object[]> dsoLabels = dsoLabelBoxes(g, scene, projection, mapping);
+        for (Object[] dsoLabel : dsoLabels) {
+            occupied.add((Rectangle2D) dsoLabel[1]);
+        }
         int named = 0;
         int greek = 0;
         int flams = 0;
@@ -192,10 +212,83 @@ public final class StarIdentityStudyMain {
                 flams++;
             }
         }
+        // Deep-sky labels above the star labels, per the decided order.
+        for (Object[] dsoLabel : dsoLabels) {
+            Rectangle2D box = (Rectangle2D) dsoLabel[1];
+            g.drawString((String) dsoLabel[0], (float) (box.getX() + 2),
+                    (float) (box.getY() + g.getFontMetrics().getAscent()));
+        }
         g.dispose();
         System.out.printf(Locale.ROOT, "%-12s %5.0f° | %6d %6d %6d | %8d%n",
                 name, field, named, greek, flams, rejected);
         ImageIO.write(image, "png", new File(outDir, name + ".png"));
+    }
+
+    /** The renderer's title-block rectangle, replicated for seeding. */
+    private static Rectangle2D titleBlockRect(Graphics2D g, ChartScene scene) {
+        var metrics = g.getFontMetrics(LABEL_FONT);
+        // The block's height is three lines plus padding; its width is
+        // bounded by the longest line - a page-width overestimate of the
+        // left corner region is a safe, simple seed for the study.
+        int height = 3 * metrics.getHeight() + 16 + 24;
+        return new Rectangle2D.Double(0, HEIGHT - height, 320, height);
+    }
+
+    /** The deep-sky labels the released policy draws, with their boxes. */
+    private static List<Object[]> dsoLabelBoxes(Graphics2D g, ChartScene scene,
+                                                GnomonicProjection projection,
+                                                ViewportMapping mapping) {
+        var policy = new RegionalDetailPolicy(scene,
+                mapping.pixelsPerPlaneUnit());
+        var metrics = g.getFontMetrics(LABEL_FONT);
+        List<Object[]> labels = new ArrayList<>();
+        for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            if (!policy.labelled(dso)) {
+                continue;
+            }
+            var plane = projection.project(dso.position());
+            if (plane.isEmpty()) {
+                continue;
+            }
+            PixelPoint pixel = mapping.toPixel(plane.get());
+            String text = dso.aliases().stream()
+                    .filter(alias -> alias.startsWith("M "))
+                    .findFirst().orElse(dso.id());
+            double majorPx = Math.max(6.0, Math.toRadians(
+                    dso.majorAxisArcmin() / 60.0) * mapping.pixelsPerPlaneUnit());
+            double x = pixel.x() + majorPx / 2.0 + 5.0;
+            double y = pixel.y() - metrics.getAscent() / 2.0;
+            labels.add(new Object[] {text, new Rectangle2D.Double(x - 2, y,
+                    metrics.stringWidth(text) + 4, metrics.getHeight())});
+        }
+        return labels;
+    }
+
+    /** Every raw input this study measures from must verify first. */
+    static void verifyPinnedInputs() throws Exception {
+        String starnames = PinnedInputs.sha256Hex(Files.readAllBytes(
+                Path.of("imports/raw/star-identities/starnames.json")));
+        String expected =
+                "19c84bc885f8a97c3b8e1f6a380084c575a9758dedfe35256e911a823ec3a695";
+        if (!expected.equals(starnames)) {
+            throw new IllegalStateException(
+                    "starnames.json fails its pinned SHA-256: " + starnames);
+        }
+        for (Map.Entry<String, String> pinned
+                : PinnedInputs.SHA256.entrySet()) {
+            if (!pinned.getKey().startsWith("tyc2.dat.")
+                    && !pinned.getKey().startsWith("suppl_1")) {
+                continue;
+            }
+            Path file = Path.of("imports/raw", pinned.getKey());
+            String actual = PinnedInputs.sha256Hex(Files.readAllBytes(file));
+            if (!pinned.getValue().equals(actual)) {
+                throw new IllegalStateException(pinned.getKey()
+                        + " fails its pinned SHA-256: " + actual);
+            }
+        }
+        System.out.println("pinned inputs verified: starnames.json and all"
+                + " Tycho-2 raw files (SHA-256)");
     }
 
     /** The reproducible join: names by HIP through raw Tycho-2. */

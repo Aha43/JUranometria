@@ -93,12 +93,23 @@ across components); display lines disambiguate by designation.
 
 ## Scale and density policy (measured, rendered)
 
-One deterministic label pass: **brightest star first,
-collision-rejecting** (a label whose box intersects an accepted
-star-label box is omitted — prefer omission, the house rule), drawn
-after star ink and before DSO labels; the title block still wins.
-Identity priority per star: **proper name, else Bayer, else
-Flamsteed**; Greek letters render as themselves.
+One deterministic label pass: **brightest star first, with a stable
+TYC-identifier tie-break for equal magnitudes, collision-rejecting**
+(a label whose box intersects an accepted star-label box, a deep-sky
+label box, or the title block is omitted — prefer omission, the house
+rule). The layer order is: stars, then star labels, then deep-sky
+labels, then the title block — star labels **yield** to the deep-sky
+labels and the title by seeding, and sit above geography. The study
+renders through exactly this composition (the base page is produced
+with deep-sky labels suppressed via the existing chart option, star
+labels placed against the seeded collision set, deep-sky labels drawn
+above), and every measurement below is from that corrected path with
+**all pinned inputs SHA-256-verified before measuring**. Identity
+priority per star: **proper name, else Bayer, else Flamsteed**; Greek
+letters render as themselves. A label may still touch a neighbouring
+star's dot in tight pairs (labels avoid labels, not dots) — accepted
+as the initial policy, with alternate-side placement recorded as the
+known refinement if #115's review wants it.
 
 | Field | Proper names | Bayer | Flamsteed |
 |---:|---|---|---|
@@ -112,18 +123,20 @@ stars named, nothing else; the Pleiades at 8° name their five
 brightest sisters with one collision correctly rejected in the
 densest field; Crux at 18° names its four bright stars (Acrux via its
 brightest component); Polaris is named at every field. **The bad
-alternative is committed too**: `orion-36-everything.png` (95 labels,
-20 rejections, numerals everywhere) is the page the thresholds
+alternative is committed too**: `orion-36-everything.png` (91 labels,
+24 rejections, numerals everywhere) is the page the thresholds
 exist to prevent.
 
 ## The M31 8° reference — an explicit owner decision
 
-With the ≤ 8° thresholds above, the released M31 page gains exactly
-two small labels: **ν** (And, V 4.5) and **35** (And, V 4.5) beside
-their stars — committed as `m31-08.png` for review. The
-recommendation is to **accept this deliberate reference change**: an
-8° finder chart that names its guide stars is a better finder chart,
-and the change is exactly two quiet glyphs. The alternative
+With the ≤ 8° thresholds above and the corrected composition, the
+released M31 page gains exactly **one** small label: **35** (And,
+V 4.51, placed first as the brighter of the close pair; ν And's label
+is then correctly collision-rejected against it) — committed as
+`m31-08.png` for review. The recommendation is to **accept this
+deliberate reference change**: an 8° finder chart that names its
+guide stars is a better finder chart, and the change is one quiet
+numeral. The alternative
 (restricting Bayer/Flamsteed to ≤ 6° so the reference stays
 byte-identical) is recorded and rejected as optimizing for the test
 anchor over the reader. **If the owner prefers the reference
