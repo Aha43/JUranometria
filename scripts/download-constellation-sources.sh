@@ -27,6 +27,16 @@ fetch constellations.json
 fetch constellations.lines.json
 fetch constellations.bounds.json
 
+# Star identities (Sprint 13): the same pinned commit supplies the
+# HIP-keyed star names and designations.
+mkdir -p "$RAW_DIR/../star-identities"
+if [ -f "$RAW_DIR/../star-identities/starnames.json" ]; then
+  echo "Already exists: starnames.json"
+else
+  echo "Downloading starnames.json..."
+  curl -fsSL "$D3C_BASE/starnames.json" -o "$RAW_DIR/../star-identities/starnames.json"
+fi
+
 # The upstream licence text ships verbatim inside the generated pack.
 dest="$RAW_DIR/LICENSE"
 if [ -f "$dest" ]; then
