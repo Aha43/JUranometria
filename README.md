@@ -48,7 +48,20 @@ Windows, use WSL. A native Windows development workflow is not part
 of 1.0 - Windows is supported as a runtime through the release
 archive.
 
-## Build and run
+## Download and run (users)
+
+Grab the latest `JUranometria-X.Y.Z.zip` from the
+[releases page](https://github.com/Aha43/JUranometria/releases),
+unpack it anywhere (paths with spaces are fine), and launch:
+
+- macOS / Linux: `./juranometria`
+- Windows: `juranometria.bat`
+- everywhere: `java -jar JUranometria.jar`
+
+The archive's `README.txt` covers troubleshooting for a missing or
+too-old Java.
+
+## Build and run (contributors)
 
 From the repository root:
 

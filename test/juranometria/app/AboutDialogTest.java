@@ -66,6 +66,8 @@ class AboutDialogTest {
         assertPairings("the packaged summary", AboutDialog.summaryText());
         assertPairings("LICENSING.md",
                 Files.readString(Path.of("LICENSING.md")));
+        assertPairings("the archive's packaging/LICENSING.md",
+                Files.readString(Path.of("packaging/LICENSING.md")));
         // The practical consequence rides with the Tycho-2 pairing.
         assertTrue(paragraphWith(AboutDialog.summaryText(), "tycho")
                         .contains(normalize("non-commercially")),

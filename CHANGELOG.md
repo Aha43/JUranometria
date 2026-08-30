@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The unpack-and-run release archive: `make dist` deterministically
+  builds `JUranometria-X.Y.Z.zip` - the application JAR, its pinned
+  libraries, POSIX and Windows launch helpers with readable
+  missing/old-Java diagnostics, and every licence and notice
+  including the runtime libraries' - verified for exact contents and
+  a packaged headless smoke render, then exercised on macOS, Linux,
+  and Windows CI with real GUI launches from paths containing
+  spaces.
+
 ### Fixed
 
 - The build selects its own JDK instead of trusting whichever one

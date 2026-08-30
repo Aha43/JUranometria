@@ -145,3 +145,23 @@ Measured on JDK 26.0.1 with FlatLaf 3.4.1 (issue #82): the flag
 silences the warning, and the manifest attribute keeps a plain
 `java -jar` launch silent even under the stricter default.
 
+## Packaging
+
+`make app-image` builds this platform's self-contained native
+application image (jpackage over the built JAR with the pinned
+six-module runtime; `scripts/build-app-image.sh` asserts the module
+inventory, runtime legal notices, the packaged licensing inventory,
+and runs the inner smoke and acceptance launchers). The `app-image`
+GitHub workflow builds and verifies all four platform images. The
+portable fallback:
+
+`make dist` builds the unpack-and-run release archive
+(`build/dist/JUranometria-X.Y.Z.zip`) deterministically from checked
+source - application JAR (with normalized entry dates), the pinned
+`lib/` dependencies, launch helpers, and every licence and notice -
+and immediately verifies it with `scripts/verify-dist.sh`: exact
+contents against the contract, the non-commercial notice present,
+and a packaged headless smoke render from a directory whose path
+contains a space. The `dist` GitHub workflow rebuilds the artifact
+and verifies that exact zip on macOS, Linux, and Windows runners,
+including real GUI launches (xvfb on Linux) in light and `--dark`.

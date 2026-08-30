@@ -37,8 +37,10 @@ public final class PackagedAcceptanceMain {
                         && notices.contains("Redistribution and use in"
                                 + " source and binary forms"),
                 "About notices load every packaged resource");
-        require(!AppInfo.version().isBlank(),
-                "the packaged version is readable: " + AppInfo.version());
+        require(!AppInfo.version().isBlank()
+                        && !"unknown".equals(AppInfo.version()),
+                "the packaged version is a real version, not the"
+                        + " 'unknown' fallback: " + AppInfo.version());
         System.out.println("about surface OK (summary, "
                 + notices.length() + " chars of notices, version "
                 + AppInfo.version() + ")");

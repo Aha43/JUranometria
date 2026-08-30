@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study check-libs check-jdk
+.PHONY: all help clean classes jar app run test chart-image constellation-study check-libs check-jdk dist app-image
 
 all: app
 
@@ -69,6 +69,8 @@ help:
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
 	@echo "  zoom-study        Measure the Sprint 14 pointer-centred zoom geometry"
 	@echo "  grid-study        Measure and render the Sprint 15 coordinate-grid candidates"
+	@echo "  dist              Build and verify the portable fallback ZIP"
+	@echo "  app-image         Build and verify this platform's native application image"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -128,6 +130,7 @@ jar: classes
 	printf 'Enable-Native-Access: ALL-UNNAMED\nClass-Path: lib/flatlaf-$(FLATLAF_VERSION).jar \n lib/flatlaf-extras-$(FLATLAF_VERSION).jar \n lib/jsvg-$(JSVG_VERSION).jar\n' > $(BUILD_DIR)/manifest-extra.mf
 	$(JAR) \
 		--create \
+		--date=2026-01-01T00:00:00Z \
 		--file $(APP_DIR)/$(MAIN_JAR) \
 		--manifest $(BUILD_DIR)/manifest-extra.mf \
 		--main-class $(MAIN_CLASS) \
@@ -176,6 +179,46 @@ zoom-study: classes
 
 grid-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GridStudyMain
+
+# The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
+# issue #144): one deterministic unpack-and-run zip built from checked
+# source - application JAR, the manifest-referenced lib/ dependencies,
+# launch helpers, and every licence and notice. Timestamps are
+# normalized and entries sorted, so identical inputs produce an
+# identical archive; scripts/verify-dist.sh asserts the exact contents.
+DIST_NAME := JUranometria-$(shell cat VERSION)
+DIST_DIR := $(BUILD_DIR)/dist
+DIST_STAGE := $(DIST_DIR)/$(DIST_NAME)
+DIST_ZIP := $(DIST_DIR)/$(DIST_NAME).zip
+
+# The native application image for THIS platform (one of the four
+# primary 1.0 artifacts; scripts/build-app-image.sh, issue #150).
+app-image: app
+	scripts/build-app-image.sh
+
+dist: app
+	rm -rf $(DIST_DIR)
+	mkdir -p $(DIST_STAGE)/lib $(DIST_STAGE)/licenses
+	cp $(APP_DIR)/$(MAIN_JAR) $(DIST_STAGE)/
+	cp $(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	   $(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	   $(LIB_DIR)/jsvg-$(JSVG_VERSION).jar $(DIST_STAGE)/lib/
+	cp packaging/juranometria packaging/juranometria.bat 	   packaging/README.txt $(DIST_STAGE)/
+	cp LICENSE $(DIST_STAGE)/
+	cp packaging/LICENSING.md $(DIST_STAGE)/
+	cp $(CLASSES_DIR)/resources/catalog/bright-sky/NOTICE-tycho2.md \
+	   $(CLASSES_DIR)/resources/catalog/bright-sky/NOTICE-openngc.md \
+	   $(CLASSES_DIR)/resources/catalog/bright-sky/LICENSE-CC-BY-SA-4.0.txt \
+	   $(CLASSES_DIR)/resources/geo/constellations/NOTICE-constellations.md \
+	   $(CLASSES_DIR)/resources/catalog/star-identities/NOTICE-star-identities.md \
+	   $(CLASSES_DIR)/resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
+	   $(DIST_STAGE)/licenses/
+	cp $(CLASSES_DIR)/resources/icons/LICENSE \
+	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt
+	cp packaging/licenses/LICENSE-Apache-2.0.txt 	   packaging/licenses/LICENSE-JSVG-MIT.txt 	   packaging/licenses/NOTICE-runtime-libraries.md 	   $(DIST_STAGE)/licenses/
+	chmod +x $(DIST_STAGE)/juranometria
+	find $(DIST_STAGE) -exec touch -t 202601010000 {} +
+	cd $(DIST_DIR) && find $(DIST_NAME) | LC_ALL=C sort 		| zip -X -q $(DIST_NAME).zip -@
+	@echo "dist: $(DIST_ZIP)"
+	scripts/verify-dist.sh $(DIST_ZIP)
 
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)
