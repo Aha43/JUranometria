@@ -31,8 +31,15 @@ $name/lib/flatlaf-extras-$FLATLAF_VERSION.jar
 $name/lib/jsvg-$JSVG_VERSION.jar
 $name/licenses
 $name/licenses/LICENSE-Apache-2.0.txt
+$name/licenses/LICENSE-BSD-3-Clause.txt
+$name/licenses/LICENSE-CC-BY-SA-4.0.txt
 $name/licenses/LICENSE-JSVG-MIT.txt
+$name/licenses/LICENSE-Tabler-MIT.txt
+$name/licenses/NOTICE-constellations.md
+$name/licenses/NOTICE-openngc.md
 $name/licenses/NOTICE-runtime-libraries.md
+$name/licenses/NOTICE-star-identities.md
+$name/licenses/NOTICE-tycho2.md
 LIST
 actual="$work/actual"
 (cd "$target" && find "$name" | LC_ALL=C sort) > "$actual"
@@ -41,6 +48,22 @@ if ! diff -u "$expected" "$actual"; then
     exit 1
 fi
 
+# Every relative markdown link in the archive's licensing map must
+# resolve inside the archive - no dead source-tree links (PR #149).
+links=$(grep -oE '\]\(([^)#]+)\)' "$target/$name/LICENSING.md" \
+        | sed -E 's/^\]\(//; s/\)$//' | sort -u)
+for link in $links; do
+    case "$link" in http*|mailto*) continue ;; esac
+    if [ ! -e "$target/$name/$link" ]; then
+        echo "verify-dist: LICENSING.md links to a missing file: $link" >&2
+        exit 1
+    fi
+done
+
+grep -q "non-commercially only" "$target/$name/LICENSING.md" || {
+    echo "verify-dist: LICENSING.md lacks the non-commercial statement" >&2
+    exit 1
+}
 grep -q "NON-COMMERCIAL" "$target/$name/README.txt" || {
     echo "verify-dist: the non-commercial statement is missing" >&2
     exit 1

@@ -196,7 +196,17 @@ dist: app
 	cp $(APP_DIR)/$(MAIN_JAR) $(DIST_STAGE)/
 	cp $(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	   $(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	   $(LIB_DIR)/jsvg-$(JSVG_VERSION).jar $(DIST_STAGE)/lib/
 	cp packaging/juranometria packaging/juranometria.bat 	   packaging/README.txt $(DIST_STAGE)/
-	cp LICENSE LICENSING.md $(DIST_STAGE)/
+	cp LICENSE $(DIST_STAGE)/
+	cp packaging/LICENSING.md $(DIST_STAGE)/
+	cp $(CLASSES_DIR)/resources/catalog/bright-sky/NOTICE-tycho2.md \
+	   $(CLASSES_DIR)/resources/catalog/bright-sky/NOTICE-openngc.md \
+	   $(CLASSES_DIR)/resources/catalog/bright-sky/LICENSE-CC-BY-SA-4.0.txt \
+	   $(CLASSES_DIR)/resources/geo/constellations/NOTICE-constellations.md \
+	   $(CLASSES_DIR)/resources/catalog/star-identities/NOTICE-star-identities.md \
+	   $(CLASSES_DIR)/resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
+	   $(DIST_STAGE)/licenses/
+	cp $(CLASSES_DIR)/resources/icons/LICENSE \
+	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt
 	cp packaging/licenses/LICENSE-Apache-2.0.txt 	   packaging/licenses/LICENSE-JSVG-MIT.txt 	   packaging/licenses/NOTICE-runtime-libraries.md 	   $(DIST_STAGE)/licenses/
 	chmod +x $(DIST_STAGE)/juranometria
 	find $(DIST_STAGE) -exec touch -t 202601010000 {} +
