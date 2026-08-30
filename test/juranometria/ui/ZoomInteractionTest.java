@@ -201,6 +201,62 @@ class ZoomInteractionTest {
     }
 
     @Test
+    void aBurstReAnchorsAgainstTheFreshPaperAfterEachStep() throws Exception {
+        // PR #129 review (P1): zooming out on a very tall window
+        // re-caps the paper height (the projection-sanity bound
+        // tightens as the field widens), so a burst must re-read the
+        // page geometry per step. Two notches out from 18 degrees
+        // cross the re-cap; the second notch anchors against the
+        // fresh paper - and its sky stays beneath the pointer.
+        Fixture fixture = new Fixture(900, 4800);
+        SwingUtilities.invokeAndWait(() -> fixture.controller.recenter(
+                fixture.controller.state().centre(), 18.0));
+        Fixture.flush();
+        assertEquals(0, fixture.chart.pageOffsetY(),
+                "at 18 degrees the tall window is still full-bleed");
+        int x = 450;
+        int y = fixture.chart.getHeight() / 2 + 40;
+        fixture.wheel(x, y, 2.0);
+        assertEquals(36.0, fixture.controller.state().fieldWidthDegrees(),
+                "both notches applied");
+        assertTrue(fixture.chart.pageOffsetY() > 0,
+                "the second step crossed into a letterboxed paper");
+        // The pointer's sky after the burst sits where the pointer is,
+        // measured against the CURRENT paper geometry.
+        var viewport = fixture.chart.scene().viewport();
+        SkyPosition anchorNow = anchorAt(fixture.controller.state(),
+                x, y - fixture.chart.pageOffsetY(),
+                viewport.widthPx(), viewport.heightPx());
+        assertTrue(driftPx(fixture.controller.state(), anchorNow,
+                        x, y - fixture.chart.pageOffsetY(),
+                        viewport.widthPx(), viewport.heightPx())
+                        < DRIFT_TOLERANCE_PX,
+                "the final step anchored against fresh geometry");
+
+        // And the stranding case cannot arise at all: a pointer close
+        // enough to the window edge to be letterboxed by the 24-degree
+        // re-cap anchors sky at plane offsets whose reverse has a
+        // second exact root, so the acceptance contract refuses the
+        // very first step - the state never moves and no notch can
+        // anchor into chrome. (The in-loop paper check remains as
+        // defence in depth for that reason, not because it is
+        // reachable.)
+        Fixture edge = new Fixture(900, 8000);
+        SwingUtilities.invokeAndWait(() -> edge.controller.recenter(
+                new SkyPosition(10.684708, 0.0), 12.0));
+        Fixture.flush();
+        int edgeY = 300;
+        assertTrue(edge.chart.isOnPaper(new java.awt.Point(450, edgeY)),
+                "the pointer starts on the full-bleed paper");
+        ChartViewState edgeBefore = edge.controller.state();
+        MouseWheelEvent strand = edge.wheel(450, edgeY, 3.0);
+        assertTrue(strand.isConsumed(), "the paper wheel is consumed");
+        assertEquals(edgeBefore, edge.controller.state(),
+                "every notch refuses (ambiguous anchor) before any step"
+                        + " could strand the pointer in chrome");
+    }
+
+    @Test
     void raWrapPagesZoomLikeAnyOther() throws Exception {
         Fixture fixture = new Fixture();
         SwingUtilities.invokeAndWait(() -> fixture.controller.recenter(

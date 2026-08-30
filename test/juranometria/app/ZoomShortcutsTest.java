@@ -104,6 +104,27 @@ class ZoomShortcutsTest {
         assertEquals(36.0, navigation.state().fieldWidthDegrees(),
                 "zoom out at the widest page is a guarded no-op");
         assertEquals(0, notified[0], "and notifies nobody");
+
+        // A coverage predicate that rejects the candidate: the guarded
+        // action consults canZoom* - the same predicate path as the
+        // toolbar - so the refused shortcut changes nothing and
+        // notifies nobody either.
+        ChartViewController fenced = new ChartViewController(
+                state -> state.fieldWidthDegrees() >= 12.0);
+        fenced.recenter(new SkyPosition(10.684708, 41.268750), 12.0,
+                "M31 · Andromeda Galaxy region", "NGC 224");
+        JRootPane fencedRoot = new JRootPane();
+        AppMenuBar.installZoomShortcuts(fencedRoot, fenced);
+        int[] fencedNotified = {0};
+        fenced.onChange(state -> fencedNotified[0]++);
+        fencedNotified[0] = 0;
+        fire(boundAction(fencedRoot,
+                KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, MASK)));
+        assertEquals(12.0, fenced.state().fieldWidthDegrees(),
+                "a coverage-refused shortcut changes nothing");
+        assertEquals("NGC 224", fenced.state().targetIdentity(),
+                "and keeps the target untouched");
+        assertEquals(0, fencedNotified[0], "and notifies nobody");
     }
 
     @Test
