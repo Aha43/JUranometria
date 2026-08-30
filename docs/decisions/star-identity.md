@@ -17,6 +17,12 @@ story. SHA-256:
 19c84bc885f8a97c3b8e1f6a380084c575a9758dedfe35256e911a823ec3a695  starnames.json
 ```
 
+The download script fetches it atomically against this pin (temp
+file, verify, move — a partial or corrupt local copy is detected and
+re-downloaded; a mismatch after download is an error, never a kept
+file), and the study independently refuses to measure from a file
+that fails the pin, with a regression test on the refusal.
+
 4,869 entries keyed by **Hipparcos number**, carrying per star: the
 traditional proper name (602), Bayer designation (1,969), Flamsteed
 number (2,651), constellation membership, and variable/HD/Gliese
@@ -103,8 +109,14 @@ labels and the title by seeding, and sit above geography. The study
 renders through exactly this composition (the base page is produced
 with deep-sky labels suppressed via the existing chart option, star
 labels placed against the seeded collision set, deep-sky labels drawn
-above), and every measurement below is from that corrected path with
-**all pinned inputs SHA-256-verified before measuring**. Identity
+above). The seeded deep-sky label boxes and the title-block rectangle
+are the renderer's own — `ChartRenderer.labelBounds` and
+`ChartRenderer.titleBlockBounds`, shared with the study rather than
+approximated, so collisions are measured against the exact geometry
+the atlas draws (rotated-galaxy label anchors, baselines, and
+metric-computed title bounds included). Every measurement below is
+from that corrected path with **all pinned inputs SHA-256-verified
+before measuring**. Identity
 priority per star: **proper name, else Bayer, else Flamsteed**; Greek
 letters render as themselves. A label may still touch a neighbouring
 star's dot in tight pairs (labels avoid labels, not dots) — accepted
@@ -123,8 +135,8 @@ stars named, nothing else; the Pleiades at 8° name their five
 brightest sisters with one collision correctly rejected in the
 densest field; Crux at 18° names its four bright stars (Acrux via its
 brightest component); Polaris is named at every field. **The bad
-alternative is committed too**: `orion-36-everything.png` (91 labels,
-24 rejections, numerals everywhere) is the page the thresholds
+alternative is committed too**: `orion-36-everything.png` (93 labels,
+22 rejections, numerals everywhere) is the page the thresholds
 exist to prevent.
 
 ## The M31 8° reference — an explicit owner decision

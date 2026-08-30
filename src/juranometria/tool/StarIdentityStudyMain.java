@@ -140,7 +140,11 @@ public final class StarIdentityStudyMain {
         g.setFont(LABEL_FONT);
         g.setColor(NAME_INK);
         List<Rectangle2D> occupied = new ArrayList<>();
-        occupied.add(titleBlockRect(g, scene));
+        java.awt.Rectangle titleBlock =
+                ChartRenderer.titleBlockBounds(g, scene);
+        if (titleBlock != null) {
+            occupied.add(titleBlock);
+        }
         List<Object[]> dsoLabels = dsoLabelBoxes(g, scene, projection, mapping);
         for (Object[] dsoLabel : dsoLabels) {
             occupied.add((Rectangle2D) dsoLabel[1]);
@@ -224,17 +228,8 @@ public final class StarIdentityStudyMain {
         ImageIO.write(image, "png", new File(outDir, name + ".png"));
     }
 
-    /** The renderer's title-block rectangle, replicated for seeding. */
-    private static Rectangle2D titleBlockRect(Graphics2D g, ChartScene scene) {
-        var metrics = g.getFontMetrics(LABEL_FONT);
-        // The block's height is three lines plus padding; its width is
-        // bounded by the longest line - a page-width overestimate of the
-        // left corner region is a safe, simple seed for the study.
-        int height = 3 * metrics.getHeight() + 16 + 24;
-        return new Rectangle2D.Double(0, HEIGHT - height, 320, height);
-    }
-
-    /** The deep-sky labels the released policy draws, with their boxes. */
+    /** The deep-sky labels the released policy draws, with the exact
+     *  bounds the production renderer computes for them. */
     private static List<Object[]> dsoLabelBoxes(Graphics2D g, ChartScene scene,
                                                 GnomonicProjection projection,
                                                 ViewportMapping mapping) {
@@ -251,29 +246,29 @@ public final class StarIdentityStudyMain {
                 continue;
             }
             PixelPoint pixel = mapping.toPixel(plane.get());
-            String text = dso.aliases().stream()
-                    .filter(alias -> alias.startsWith("M "))
-                    .findFirst().orElse(dso.id());
-            double majorPx = Math.max(6.0, Math.toRadians(
-                    dso.majorAxisArcmin() / 60.0) * mapping.pixelsPerPlaneUnit());
-            double x = pixel.x() + majorPx / 2.0 + 5.0;
-            double y = pixel.y() - metrics.getAscent() / 2.0;
-            labels.add(new Object[] {text, new Rectangle2D.Double(x - 2, y,
-                    metrics.stringWidth(text) + 4, metrics.getHeight())});
+            labels.add(new Object[] {ChartRenderer.labelTextFor(dso),
+                    ChartRenderer.labelBounds(metrics, dso, pixel,
+                            mapping.pixelsPerPlaneUnit())});
         }
         return labels;
     }
 
+    static final String STARNAMES_SHA256 =
+            "19c84bc885f8a97c3b8e1f6a380084c575a9758dedfe35256e911a823ec3a695";
+
+    /** Rejects a star-names file that fails its pinned SHA-256. */
+    static void verifyStarnames(Path file) throws Exception {
+        String actual = PinnedInputs.sha256Hex(Files.readAllBytes(file));
+        if (!STARNAMES_SHA256.equals(actual)) {
+            throw new IllegalStateException(
+                    "starnames.json fails its pinned SHA-256: " + actual
+                            + "; re-run scripts/download-constellation-sources.sh");
+        }
+    }
+
     /** Every raw input this study measures from must verify first. */
     static void verifyPinnedInputs() throws Exception {
-        String starnames = PinnedInputs.sha256Hex(Files.readAllBytes(
-                Path.of("imports/raw/star-identities/starnames.json")));
-        String expected =
-                "19c84bc885f8a97c3b8e1f6a380084c575a9758dedfe35256e911a823ec3a695";
-        if (!expected.equals(starnames)) {
-            throw new IllegalStateException(
-                    "starnames.json fails its pinned SHA-256: " + starnames);
-        }
+        verifyStarnames(Path.of("imports/raw/star-identities/starnames.json"));
         for (Map.Entry<String, String> pinned
                 : PinnedInputs.SHA256.entrySet()) {
             if (!pinned.getKey().startsWith("tyc2.dat.")

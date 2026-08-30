@@ -28,13 +28,35 @@ fetch constellations.lines.json
 fetch constellations.bounds.json
 
 # Star identities (Sprint 13): the same pinned commit supplies the
-# HIP-keyed star names and designations.
-mkdir -p "$RAW_DIR/../star-identities"
-if [ -f "$RAW_DIR/../star-identities/starnames.json" ]; then
+# HIP-keyed star names and designations, verified against a pinned
+# SHA-256 and downloaded atomically like the dependency bootstrap.
+STARNAMES_SHA256=19c84bc885f8a97c3b8e1f6a380084c575a9758dedfe35256e911a823ec3a695
+STAR_DIR="$RAW_DIR/../star-identities"
+mkdir -p "$STAR_DIR"
+sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | cut -d' ' -f1
+  else
+    shasum -a 256 "$1" | cut -d' ' -f1
+  fi
+}
+target="$STAR_DIR/starnames.json"
+if [ -f "$target" ] && [ "$(sha256 "$target")" = "$STARNAMES_SHA256" ]; then
   echo "Already exists: starnames.json"
 else
+  if [ -f "$target" ]; then
+    echo "Checksum mismatch for existing starnames.json (partial or corrupt); re-downloading..."
+    rm -f "$target"
+  fi
   echo "Downloading starnames.json..."
-  curl -fsSL "$D3C_BASE/starnames.json" -o "$RAW_DIR/../star-identities/starnames.json"
+  curl -fsSL "$D3C_BASE/starnames.json" -o "$target.download"
+  actual="$(sha256 "$target.download")"
+  if [ "$actual" != "$STARNAMES_SHA256" ]; then
+    rm -f "$target.download"
+    echo "ERROR: starnames.json failed its pinned SHA-256 (expected $STARNAMES_SHA256, got $actual)." >&2
+    exit 1
+  fi
+  mv "$target.download" "$target"
 fi
 
 # The upstream licence text ships verbatim inside the generated pack.
