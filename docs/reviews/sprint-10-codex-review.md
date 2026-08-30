@@ -68,3 +68,12 @@ workflow.
 Fix the two small documentation inconsistencies, then merge PR #95, close
 milestone 10, and cut 0.10.0. No dependency or application-code changes are
 requested.
+
+## Follow-up — findings resolved
+
+Reviewed the fixes at `47e3883`. The Makefile and pin-file comments now
+describe the single bootstrap script, and the README status advances through
+the released 0.9.0. The required `test` check is green, GitGuardian is green,
+and the complete diff remains free of whitespace errors.
+
+**Final recommendation: approve and merge.**
