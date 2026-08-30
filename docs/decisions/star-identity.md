@@ -67,6 +67,12 @@ measured before being fixed). Measured over the real data:
   exception category is counted in the report.
 - Unknowns stay unknown: a star without an entry simply has no
   identity; no field is invented.
+- Found while generating the pack (#113): **nine designation-less
+  variable-star entries carry NSV catalogue-number fragments in the
+  source's constellation field**. They fail the cross-check against
+  our own 88 identities, so the pack carries their membership as
+  unknown - counted in the manifest, never invented; a *designated*
+  star with an unknown constellation remains a loud failure.
 
 ## Data model (for #113/#114)
 

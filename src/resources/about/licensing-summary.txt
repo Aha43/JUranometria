@@ -12,4 +12,7 @@ Constellation geography derived from d3-celestial (boundaries after
 Delporte 1930; figures after the IAU/Sky & Telescope chart
 convention): BSD-3-Clause.
 
+Traditional star names and Bayer and Flamsteed designations derived
+from d3-celestial: BSD-3-Clause.
+
 Toolbar icons from the Tabler icon set: MIT license.

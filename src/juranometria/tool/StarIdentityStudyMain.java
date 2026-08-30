@@ -286,8 +286,29 @@ public final class StarIdentityStudyMain {
                 + " Tycho-2 raw files (SHA-256)");
     }
 
+    /** The join's full measurement report, shared with the pack
+     *  generator so the decision's numbers are reproduced from one
+     *  implementation: the identities by TYC id, the source entry
+     *  count, and every exception category with the unmatched entries
+     *  listed by name. */
+    record Join(Map<String, Identity> byTyc, int sourceEntries, int joined,
+                int multiComponent, List<String> unmatched) {
+    }
+
     /** The reproducible join: names by HIP through raw Tycho-2. */
     static Map<String, Identity> joinIdentities() throws Exception {
+        Join join = join();
+        System.out.printf(Locale.ROOT,
+                "join: %d/%d identities matched to the pack (%d unmatched -"
+                        + " fainter than V 8 or outside Tycho-2; %d"
+                        + " multi-component systems attached to their"
+                        + " brightest packed component)%n%n",
+                join.joined(), join.sourceEntries(), join.unmatched().size(),
+                join.multiComponent());
+        return join.byTyc();
+    }
+
+    static Join join() throws Exception {
         Map<String, List<String>> hipToTyc = new HashMap<>();
         for (Path path : Files.list(Path.of("imports/raw")).sorted().toList()) {
             String file = path.getFileName().toString();
@@ -344,8 +365,8 @@ public final class StarIdentityStudyMain {
                         "imports/raw/star-identities/starnames.json"))));
         Map<String, Identity> byTyc = new HashMap<>();
         int joined = 0;
-        int unmatched = 0;
         int multi = 0;
+        List<String> unmatchedNames = new ArrayList<>();
         for (Map.Entry<String, Object> entry : names.entrySet()) {
             Map<String, Object> value = MiniJson.object(entry.getValue());
             List<String> tycs = new ArrayList<>();
@@ -355,7 +376,7 @@ public final class StarIdentityStudyMain {
                 }
             }
             if (tycs.isEmpty()) {
-                unmatched++;
+                unmatchedNames.add(unmatchedLabel(entry.getKey(), value));
                 continue;
             }
             joined++;
@@ -372,13 +393,26 @@ public final class StarIdentityStudyMain {
                     blankToNull(value.get("flam")),
                     blankToNull(value.get("c"))));
         }
-        System.out.printf(Locale.ROOT,
-                "join: %d/%d identities matched to the pack (%d unmatched -"
-                        + " fainter than V 8 or outside Tycho-2; %d"
-                        + " multi-component systems attached to their"
-                        + " brightest packed component)%n%n",
-                joined, names.size(), unmatched, multi);
-        return byTyc;
+        unmatchedNames.sort(null);
+        return new Join(byTyc, names.size(), joined, multi, unmatchedNames);
+    }
+
+    /** How an unmatched source entry is listed in the honest report. */
+    private static String unmatchedLabel(String hip, Map<String, Object> value) {
+        String name = blankToNull(value.get("name"));
+        if (name != null) {
+            return name;
+        }
+        String constellation = blankToNull(value.get("c"));
+        String bayer = blankToNull(value.get("bayer"));
+        if (bayer != null && constellation != null) {
+            return bayer + " " + constellation;
+        }
+        String flamsteed = blankToNull(value.get("flam"));
+        if (flamsteed != null && constellation != null) {
+            return flamsteed + " " + constellation;
+        }
+        return "HIP " + hip;
     }
 
     private static String blankToNull(Object value) {

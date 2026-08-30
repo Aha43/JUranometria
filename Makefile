@@ -36,6 +36,7 @@ help:
 	@echo "  regional-study    Render the Sprint 6 regional-zoom candidate charts"
 	@echo "  constellation-study  Render the Sprint 7 constellation-geography study"
 	@echo "  import-constellations  Regenerate the bundled constellation-geography pack"
+	@echo "  import-star-identities  Regenerate the bundled star-identity pack"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -101,6 +102,9 @@ import-allsky: classes
 
 import-constellations: classes
 	java -cp "$(CLASSES_DIR)" juranometria.tool.ConstellationPackMain
+
+import-star-identities: classes
+	java -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
 
 regional-study: classes
 	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.RegionalStudyMain

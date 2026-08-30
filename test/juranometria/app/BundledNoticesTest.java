@@ -56,6 +56,40 @@ class BundledNoticesTest {
     }
 
     @Test
+    void theStarIdentityPackShipsWithItsLicenceAndNotice() {
+        String license = resourceText(
+                "/resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt");
+        assertTrue(license.contains("Copyright (c) 2015, Olaf Frohn"),
+                "the upstream copyright line must be present");
+        assertTrue(license.contains(
+                        "Redistribution and use in source and binary forms"),
+                "the complete BSD licence text must be present");
+
+        String notice = resourceText(
+                "/resources/catalog/star-identities/NOTICE-star-identities.md");
+        assertTrue(notice.contains("d3-celestial"));
+        assertTrue(notice.contains("BSD-3-Clause"));
+        assertTrue(notice.contains("traditional star names"),
+                "the names are described as traditional");
+        assertTrue(notice.replaceAll("\\s+", " ")
+                        .contains("does not claim per-name IAU certification"),
+                "the fact-versus-convention honesty travels to the end user");
+        assertTrue(notice.contains("not IAU standards"),
+                "designation systems are never described as IAU standards");
+    }
+
+    @Test
+    void everyStarIdentityResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties", "star-identities.csv",
+                "NOTICE-star-identities.md", "LICENSE-BSD-3-Clause.txt"}) {
+            assertNotNull(BundledNoticesTest.class.getResource(
+                            "/resources/catalog/star-identities/" + resource),
+                    resource + " must ship as a resource");
+        }
+    }
+
+    @Test
     void everyConstellationGeographyResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties", "constellations.csv", "figures.csv",

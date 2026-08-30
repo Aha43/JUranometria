@@ -52,6 +52,7 @@ class AboutDialogTest {
             {"tycho", "CC BY-NC 3.0 IGO"},
             {"openngc", "CC BY-SA 4.0"},
             {"constellation", "BSD-3-Clause"},
+            {"star names|star-identity", "BSD-3-Clause"},
             {"tabler|icons", "MIT"},
     };
 

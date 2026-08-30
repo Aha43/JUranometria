@@ -58,6 +58,17 @@ scripts/download-catalogue-sources.sh   # ~170 MB into gitignored imports/raw/
 make import-allsky                      # verifies checksums, regenerates the pack
 ```
 
+The constellation geography under `src/resources/geo/constellations/`
+and the star identities under `src/resources/catalog/star-identities/`
+are generated the same way from the pinned d3-celestial sources (the
+identity join also reads the raw Tycho-2 files above):
+
+```sh
+scripts/download-constellation-sources.sh   # pinned d3-celestial inputs
+make import-constellations
+make import-star-identities
+```
+
 ## Using the atlas
 
 `make run` opens the M31 region chart. The toolbar above the page:
