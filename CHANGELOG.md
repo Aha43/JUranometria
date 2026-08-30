@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Dependencies refreshed to current releases: FlatLaf and FlatLaf
+  Extras 3.4.1 -> 3.7.2 and JSVG 1.7.2 -> 2.1.0 (moved together -
+  FlatLaf Extras 3.7.2 requires JSVG 2), and the JUnit console runner
+  1.10.2 -> 6.1.3. The application's chrome, icons, themes, and the
+  chart itself are unchanged; the M31 reference remains
+  byte-identical.
+- The PowerShell bootstrap script is retired: the supported
+  contributor environments are macOS and Linux (Windows via WSL), and
+  scripts/lib-versions.env with scripts/download-libs.sh is the one
+  bootstrap authority.
+
 ## [0.9.0] - 2026-08-30
 
 Sprint 9 — Make a clean checkout dependable. A maintenance release;

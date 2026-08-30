@@ -14,8 +14,8 @@ APP_DIR      := $(BUILD_DIR)/app
 SOURCES      := $(shell find $(SRC_DIR) -name "*.java")
 TEST_SOURCES := $(shell find $(TEST_DIR) -name "*.java" 2>/dev/null)
 
-# The single authoritative dependency pin set, shared with both
-# download scripts.
+# The single authoritative dependency pin set, shared with the
+# bootstrap script.
 include scripts/lib-versions.env
 
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
@@ -50,7 +50,7 @@ check-libs:
 		if [ ! -f "$$jar" ]; then echo "Missing dependency: $$jar"; missing=1; fi; \
 	done; \
 	if [ "$$missing" != "0" ]; then \
-		echo "Run scripts/download-libs.sh (or scripts/download-libs.ps1 on Windows) to fetch the pinned dependencies."; \
+		echo "Run scripts/download-libs.sh to fetch the pinned dependencies."; \
 		exit 1; \
 	fi
 
