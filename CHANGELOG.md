@@ -7,6 +7,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-08-30
+
+Sprint 14 — Zoom where you point. Reviewed by Codex at the design
+gate, at each implementation step, and at the sprint close; the
+review trail lives in `docs/reviews/`.
+
 ### Added
 
 - Zoom where you point: the mouse wheel steps the field width with
