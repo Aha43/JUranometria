@@ -44,10 +44,10 @@ public final class EquatorialGrid {
     public static final Font GRID_LABEL_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
 
     /** Pleasant right-ascension steps, in degrees (1m ... 6h of time). */
-    public static final double[] RA_STEPS_DEGREES = {
+    private static final double[] RA_STEPS_DEGREES = {
             0.25, 0.5, 1.25, 2.5, 5.0, 7.5, 15.0, 30.0, 45.0, 90.0};
     /** Pleasant declination steps, in degrees (15' ... 15°). */
-    public static final double[] DEC_STEPS_DEGREES = {
+    private static final double[] DEC_STEPS_DEGREES = {
             0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 15.0};
 
     /**

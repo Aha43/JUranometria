@@ -24,20 +24,16 @@ import juranometria.render.EquatorialGrid;
  * subdivided in the sky like the geography pass, clipped per piece,
  * with page-edge labels that yield to the production title block
  * (shared {@code ChartRenderer.titleBlockBounds}). Renders
- * representative pages at every released field width, reports chosen
+ * representative pages at every released field width THROUGH the
+ * production renderer - the grid draws beneath everything natively
+ * since #133, and the geometry measured here is
+ * {@link juranometria.render.EquatorialGrid}, the same implementation
+ * the renderer uses, never a second predictive copy. Reports chosen
  * intervals, curve and label counts, suppressed collisions,
  * subdivision counts, the measured maximum curve-approximation error,
  * and warm cost. Run via "make grid-study"; pages land in
- * build/grid-study/.
- *
- * Composition note, stated honestly: the grid belongs BENEATH every
- * other ink. The study emulates that exactly by rendering the grid on
- * white and compositing the finished chart over it, replacing the
- * chart's pure-paper pixels with grid pixels - identical to true
- * under-drawing except at antialiased ink fringes that cross a grid
- * line, where production (#133) blends against the grid instead of
- * the paper. Production parity is verified when #133 regenerates
- * these pages through the real pass, the Sprint 13 pattern.
+ * build/grid-study/. The gate's absent/lines-only/labelled comparison
+ * pages remain committed unchanged as the decision's evidence.
  */
 public final class GridStudyMain {
 
@@ -115,4 +111,3 @@ public final class GridStudyMain {
         System.out.println("Pages written to " + outDir);
     }
 }
-
