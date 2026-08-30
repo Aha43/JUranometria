@@ -58,6 +58,17 @@ make test                        # compile and run the test suite
 make run                         # build and launch the application
 ```
 
+The build selects its own JDK rather than trusting whichever one leads
+your `PATH`: it prefers an explicit `JAVA_HOME`, then a local Homebrew
+`openjdk@21`, then the `PATH` tools. A shell that still leads with an
+older JDK therefore needs no setup, and a toolchain below the JDK 21
+minimum stops the build with a message rather than compiler errors. To
+build against a specific JDK:
+
+```sh
+make JAVA_HOME=/path/to/jdk21 test
+```
+
 Dependencies are pinned (versions and SHA-256) in
 `scripts/lib-versions.env`: FlatLaf and FlatLaf
 Extras for the look and feel, JSVG for SVG icon rendering, and the standalone

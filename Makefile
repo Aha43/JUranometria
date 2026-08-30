@@ -18,10 +18,37 @@ TEST_SOURCES := $(shell find $(TEST_DIR) -name "*.java" 2>/dev/null)
 # bootstrap script.
 include scripts/lib-versions.env
 
+# Java toolchain. The build selects its own JDK rather than trusting
+# whichever one leads the shell PATH, which is commonly an older
+# release (issue #136). Precedence: an explicit JAVA_HOME, then a
+# local Homebrew openjdk@21, then the PATH tools.
+#   make JAVA_HOME=/path/to/jdk21 test
+REQUIRED_JDK := 21
+
+ifneq ($(origin JAVA_HOME), undefined)
+  # An explicit JAVA_HOME is authoritative: its tools are used as
+  # given, and a missing or unusable JDK there stops the build with a
+  # readable message - never a silent fallback to whatever leads the
+  # PATH (PR #138 review).
+  JDK_BIN := $(JAVA_HOME)/bin/
+else
+  BREW_JDK := $(shell brew --prefix openjdk@$(REQUIRED_JDK) 2>/dev/null)
+  ifneq ($(BREW_JDK),)
+    BREW_JDK_HOME := $(BREW_JDK)/libexec/openjdk.jdk/Contents/Home
+    ifneq ($(wildcard $(BREW_JDK_HOME)/bin/javac),)
+      JDK_BIN := $(BREW_JDK_HOME)/bin/
+    endif
+  endif
+endif
+
+JAVAC := $(JDK_BIN)javac
+JAVA  := $(JDK_BIN)java
+JAR   := $(JDK_BIN)jar
+
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study check-libs
+.PHONY: all help clean classes jar app run test chart-image constellation-study check-libs check-jdk
 
 all: app
 
@@ -59,10 +86,31 @@ check-libs:
 		exit 1; \
 	fi
 
-classes: check-libs
+# Stop with a readable message naming the required and detected
+# versions instead of confusing compiler errors when the resolved
+# toolchain is older than the recorded minimum (issue #136).
+check-jdk:
+	@if ! command -v $(JAVAC) >/dev/null 2>&1; then \
+		echo "No javac found at: $(JAVAC)"; \
+		echo "Install JDK $(REQUIRED_JDK) or later, or set JAVA_HOME."; \
+		exit 1; \
+	fi; \
+	found=$$($(JAVAC) -version 2>&1 | sed -nE 's/^javac ([0-9]+).*/\1/p' | head -n 1); \
+	case "$$found" in \
+		''|*[!0-9]*) found=0 ;; \
+	esac; \
+	if [ "$$found" -lt $(REQUIRED_JDK) ]; then \
+		echo "JUranometria needs JDK $(REQUIRED_JDK) or later."; \
+		echo "  Using: $(JAVAC)"; \
+		echo "  Found: $$($(JAVAC) -version 2>&1)"; \
+		echo "Install it (brew install openjdk@$(REQUIRED_JDK)) or set JAVA_HOME."; \
+		exit 1; \
+	fi
+
+classes: check-jdk check-libs
 	rm -rf $(CLASSES_DIR)
 	mkdir -p $(CLASSES_DIR)
-	javac \
+	$(JAVAC) \
 		--release 21 \
 		-cp "$(LIB_DIR)/*" \
 		-d $(CLASSES_DIR) \
@@ -78,7 +126,7 @@ classes: check-libs
 jar: classes
 	mkdir -p $(APP_DIR)
 	printf 'Enable-Native-Access: ALL-UNNAMED\nClass-Path: lib/flatlaf-$(FLATLAF_VERSION).jar \n lib/flatlaf-extras-$(FLATLAF_VERSION).jar \n lib/jsvg-$(JSVG_VERSION).jar\n' > $(BUILD_DIR)/manifest-extra.mf
-	jar \
+	$(JAR) \
 		--create \
 		--file $(APP_DIR)/$(MAIN_JAR) \
 		--manifest $(BUILD_DIR)/manifest-extra.mf \
@@ -91,52 +139,52 @@ app: jar
 	cp $(LIB_DIR)/*.jar $(APP_DIR)/lib/
 
 run: app
-	java \
+	$(JAVA) \
 		--enable-native-access=ALL-UNNAMED \
 		-cp "$(APP_DIR)/$(MAIN_JAR):$(APP_DIR)/lib/*" \
 		$(MAIN_CLASS)
 
 chart-image: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.app.ChartImageMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.app.ChartImageMain
 
 import-allsky: classes
-	java -cp "$(CLASSES_DIR)" juranometria.tool.AllSkyPackMain
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.AllSkyPackMain
 
 import-constellations: classes
-	java -cp "$(CLASSES_DIR)" juranometria.tool.ConstellationPackMain
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.ConstellationPackMain
 
 import-star-identities: classes
-	java -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
 
 regional-study: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.RegionalStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.RegionalStudyMain
 
 constellation-study: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ConstellationStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ConstellationStudyMain
 
 pan-study: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PanStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PanStudyMain
 
 chart-options-study: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartOptionsStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartOptionsStudyMain
 
 star-identity-study: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.StarIdentityStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.StarIdentityStudyMain
 
 zoom-study: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ZoomStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ZoomStudyMain
 
 grid-study: classes
-	java -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GridStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GridStudyMain
 
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)
 	mkdir -p $(TEST_CLASSES)
-	javac \
+	$(JAVAC) \
 		--release 21 \
 		-cp "$(LIB_DIR)/*:$(JUNIT_JAR):$(CLASSES_DIR)" \
 		-d $(TEST_CLASSES) \
 		$(TEST_SOURCES)
-	java -cp "$(CLASSES_DIR):$(TEST_CLASSES):$(LIB_DIR)/*:$(JUNIT_JAR)" \
+	$(JAVA) -cp "$(CLASSES_DIR):$(TEST_CLASSES):$(LIB_DIR)/*:$(JUNIT_JAR)" \
 		org.junit.platform.console.ConsoleLauncher execute \
 		--scan-class-path "$(TEST_CLASSES)"
