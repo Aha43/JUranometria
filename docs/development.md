@@ -147,6 +147,14 @@ silences the warning, and the manifest attribute keeps a plain
 
 ## Packaging
 
+`make app-image` builds this platform's self-contained native
+application image (jpackage over the built JAR with the pinned
+six-module runtime; `scripts/build-app-image.sh` asserts the module
+inventory, runtime legal notices, the packaged licensing inventory,
+and runs the inner smoke and acceptance launchers). The `app-image`
+GitHub workflow builds and verifies all four platform images. The
+portable fallback:
+
 `make dist` builds the unpack-and-run release archive
 (`build/dist/JUranometria-X.Y.Z.zip`) deterministically from checked
 source - application JAR (with normalized entry dates), the pinned

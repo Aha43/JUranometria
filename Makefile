@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study check-libs check-jdk dist
+.PHONY: all help clean classes jar app run test chart-image constellation-study check-libs check-jdk dist app-image
 
 all: app
 
@@ -69,7 +69,8 @@ help:
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
 	@echo "  zoom-study        Measure the Sprint 14 pointer-centred zoom geometry"
 	@echo "  grid-study        Measure and render the Sprint 15 coordinate-grid candidates"
-	@echo "  dist              Build and verify the unpack-and-run release archive"
+	@echo "  dist              Build and verify the portable fallback ZIP"
+	@echo "  app-image         Build and verify this platform's native application image"
 	@echo "  clean        Delete build output"
 
 clean:
@@ -189,6 +190,11 @@ DIST_NAME := JUranometria-$(shell cat VERSION)
 DIST_DIR := $(BUILD_DIR)/dist
 DIST_STAGE := $(DIST_DIR)/$(DIST_NAME)
 DIST_ZIP := $(DIST_DIR)/$(DIST_NAME).zip
+
+# The native application image for THIS platform (one of the four
+# primary 1.0 artifacts; scripts/build-app-image.sh, issue #150).
+app-image: app
+	scripts/build-app-image.sh
 
 dist: app
 	rm -rf $(DIST_DIR)
