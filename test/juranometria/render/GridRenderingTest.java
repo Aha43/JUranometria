@@ -104,6 +104,52 @@ class GridRenderingTest {
     }
 
     @Test
+    void offMeansNoGridInkAndTheTargetGuaranteesSurviveTheToggle() {
+        // Off: the starless page carries no ink at all outside the
+        // frame and title - the option removes exactly the reviewed
+        // grid layer.
+        ChartScene empty = scene(List.of());
+        ChartOptions gridOff = new ChartOptions(
+                true, true, true, true, true, true, false);
+        BufferedImage off = RENDERER.renderToImage(empty, gridOff);
+        Graphics2D probe = off.createGraphics();
+        java.awt.Rectangle title =
+                ChartRenderer.titleBlockBounds(probe, empty);
+        probe.dispose();
+        if (title != null) {
+            title.grow(2, 2);
+        }
+        for (int y = 2; y < off.getHeight() - 2; y++) {
+            for (int x = 2; x < off.getWidth() - 2; x++) {
+                if (title == null || !title.contains(x, y)) {
+                    assertEquals(0xFFFFFFFF, off.getRGB(x, y),
+                            "grid off means no grid ink at ("
+                                    + x + "," + y + ")");
+                }
+            }
+        }
+
+        // The searched star's guaranteed label survives the grid
+        // toggle exactly as it survives every other option.
+        Star faint = new Star("TYC 2-1-1",
+                new SkyPosition(85.0, -4.0), 6.5,
+                new juranometria.chart.StarIdentity(
+                        "Faintstar", null, null, "Ori"));
+        ChartScene targeted = new ChartScene(
+                new ChartViewport(CENTRE, 12.0, 900, 700),
+                List.of(faint), List.of(), "Grid test", 8.0,
+                "TYC 2-1-1", SceneGeography.EMPTY);
+        ChartScene untargeted = new ChartScene(
+                new ChartViewport(CENTRE, 12.0, 900, 700),
+                List.of(faint), List.of(), "Grid test", 8.0,
+                null, SceneGeography.EMPTY);
+        assertTrue(!java.util.Arrays.equals(
+                        pixels(RENDERER.renderToImage(targeted, gridOff)),
+                        pixels(RENDERER.renderToImage(untargeted, gridOff))),
+                "the guaranteed star label draws with the grid off");
+    }
+
+    @Test
     void gridOutputIsDeterministicAcrossRepetitionLocaleAndTheme()
             throws Exception {
         ChartScene page = scene(List.of(

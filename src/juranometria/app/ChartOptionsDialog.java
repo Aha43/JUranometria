@@ -104,6 +104,11 @@ public final class ChartOptionsDialog extends JDialog {
                 initial.constellationNames(), "Constellation names");
         JCheckBox starLabels = checkBox("Star names and identifiers", 'S',
                 initial.starLabels(), "Star names and identifiers");
+        JCheckBox grid = checkBox("Equatorial coordinate grid", 'E',
+                initial.equatorialGrid(), "Equatorial coordinate grid");
+        grid.getAccessibleContext().setAccessibleDescription(
+                "ICRS/J2000 right-ascension and declination grid lines"
+                        + " with coordinate labels");
 
         Runnable sync = () -> {
             labels.setEnabled(dsos.isSelected());
@@ -111,12 +116,12 @@ public final class ChartOptionsDialog extends JDialog {
             controller.apply(new ChartOptions(dsos.isSelected(),
                     labels.isSelected(), figures.isSelected(),
                     boundaries.isSelected(), names.isSelected(),
-                    starLabels.isSelected()));
+                    starLabels.isSelected(), grid.isSelected()));
         };
         labels.setEnabled(initial.deepSkyObjects());
         names.setEnabled(initial.constellationFigures());
         for (JCheckBox box : new JCheckBox[] {
-                dsos, figures, boundaries, labels, names, starLabels}) {
+                dsos, figures, boundaries, grid, labels, names, starLabels}) {
             box.addActionListener(event -> sync.run());
         }
 
@@ -124,6 +129,7 @@ public final class ChartOptionsDialog extends JDialog {
         panel.add(dsos);
         panel.add(figures);
         panel.add(boundaries);
+        panel.add(grid);
         panel.add(Box.createVerticalStrut(12));
         panel.add(groupHeading("Labels"));
         panel.add(labels);
@@ -145,6 +151,7 @@ public final class ChartOptionsDialog extends JDialog {
             boundaries.setSelected(defaults.constellationBoundaries());
             names.setSelected(defaults.constellationNames());
             starLabels.setSelected(defaults.starLabels());
+            grid.setSelected(defaults.equatorialGrid());
             labels.setEnabled(true);
             names.setEnabled(true);
         });

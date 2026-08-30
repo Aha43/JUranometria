@@ -35,7 +35,8 @@ public interface ChartOptionsStore {
                         flag(node, "chart.constellationFigures"),
                         flag(node, "chart.constellationBoundaries"),
                         flag(node, "chart.constellationNames"),
-                        flag(node, "chart.starLabels"));
+                        flag(node, "chart.starLabels"),
+                        flag(node, "chart.equatorialGrid"));
             }
 
             @Override
@@ -52,6 +53,8 @@ public interface ChartOptionsStore {
                         Boolean.toString(options.constellationNames()));
                 node.put("chart.starLabels",
                         Boolean.toString(options.starLabels()));
+                node.put("chart.equatorialGrid",
+                        Boolean.toString(options.equatorialGrid()));
             }
         };
     }

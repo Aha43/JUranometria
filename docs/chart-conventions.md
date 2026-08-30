@@ -23,7 +23,11 @@ projection; this is outside the first milestone.
   do not dominate the page.
 - Labels use a restrained sans-serif face initially; typography remains a
   design decision to test rather than encode in the domain model.
-- Grid lines remain subordinate to objects and labels.
+- Grid lines remain subordinate to objects and labels. From
+  Sprint 15 the equatorial ICRS/J2000 graticule delivers this: the
+  quietest ink on the chart, drawn beneath everything, with
+  edge-anchored coordinate labels that yield to the title block
+  ([the coordinate-grid decision](decisions/coordinate-grid.md)).
 
 A candidate star-radius function for experimentation is:
 
@@ -82,7 +86,8 @@ place for it). A searched star always keeps its best identity label,
 exempt from thresholds and collisions, with no new symbol.
 
 From Sprint 12 the reader may hide layers (deep-sky symbols and
-labels, figures, boundaries, names, and star names and identifiers)
+labels, figures, boundaries, names, star names and identifiers, and
+the equatorial coordinate grid)
 through View > Chart Options; an enabled layer still obeys every
 rule above, and a searched target
 with an established symbol is always drawn and labelled whatever the
