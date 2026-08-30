@@ -60,16 +60,41 @@ class ZoomStudyMainTest {
     void reversingAnAcceptedStepRestoresTheOriginalViewWithinTolerance() {
         SkyPosition centre = new SkyPosition(0.0, -85.0);
         PixelPoint pointer = new PixelPoint(899.0, 350.0);
-        var out = ZoomStudyMain.solve(centre, 8.0, 6.0, pointer);
-        SkyPosition mid = out.solution().centre().orElseThrow();
-        var back = ZoomStudyMain.solve(mid, 6.0, 8.0, pointer);
-        assertTrue(back.solution().centre().orElseThrow()
-                        .separationDegrees(centre)
+        SkyPosition mid = ZoomStudyMain.acceptStep(centre, 8.0, 6.0,
+                pointer).orElseThrow();
+        SkyPosition landed = ZoomStudyMain.acceptStep(mid, 6.0, 8.0,
+                pointer).orElseThrow();
+        assertTrue(landed.separationDegrees(centre)
                         < REVERSAL_TOLERANCE_DEGREES,
-                "one step and its reverse restore the centre");
-        assertTrue(ZoomStudyMain.pointerDriftPx(back, 8.0, pointer)
-                        < DRIFT_TOLERANCE_PX,
-                "and the pointer's sky lands back at the pointer");
+                "an accepted step's accepted reverse restores the centre");
+    }
+
+    @Test
+    void theAcceptanceContractIsExactAndPreflightReversible() {
+        // The decided contract (PR #127 follow-up), at its edges: an
+        // ordinary step accepts and its reverse accepts; a
+        // constrained polar step refuses (its anchor miss would be
+        // visible); the near-pole step whose forward solve is exact
+        // but whose reverse is two-branch refuses at the preflight -
+        // so the wheel can never enter a view the opposite movement
+        // refuses.
+        assertTrue(ZoomStudyMain.acceptStep(
+                        new SkyPosition(83.818667, -5.389667), 18.0, 12.0,
+                        new PixelPoint(300.0, 200.0)).isPresent(),
+                "ordinary steps accept");
+        assertTrue(ZoomStudyMain.acceptStep(
+                        new SkyPosition(37.946619, 85.0), 24.0, 36.0,
+                        new PixelPoint(1.0, 350.0)).isEmpty(),
+                "a constrained polar step refuses");
+        SkyPosition nearPole = new SkyPosition(37.946619, 89.9);
+        PixelPoint overPole = new PixelPoint(450.0, 1.0);
+        var forward = ZoomStudyMain.solve(nearPole, 36.0, 24.0, overPole);
+        assertFalse(forward.solution().ambiguous(),
+                "the forward solve alone is exact...");
+        assertTrue(ZoomStudyMain.acceptStep(nearPole, 36.0, 24.0,
+                        overPole).isEmpty(),
+                "...but the preflight sees the two-branch reverse and"
+                        + " refuses the acceptance");
     }
 
     @Test

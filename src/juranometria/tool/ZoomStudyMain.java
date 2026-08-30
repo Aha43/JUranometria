@@ -61,6 +61,41 @@ public final class ZoomStudyMain {
                 anchor, target);
     }
 
+    /** The decision's stated reversal tolerance (degrees). */
+    static final double REVERSAL_TOLERANCE_DEGREES = 1e-4;
+
+    /**
+     * The decided acceptance contract (PR #127 follow-up): a
+     * pointer-zoom step is accepted only when it is EXACT - not
+     * constrained (a measured 220-px anchor miss is not
+     * pointer-centred zoom), not past-pole, not ambiguous - AND its
+     * reverse at the same pointer is preflighted to be equally exact
+     * and to restore the origin within tolerance, so an accepted
+     * step can never enter a view the opposite wheel movement
+     * refuses. One extra 2-microsecond solve buys the symmetry.
+     * Empty means refused: chart unchanged, centre zoom available.
+     */
+    static java.util.Optional<SkyPosition> acceptStep(
+            SkyPosition centre, double fieldDegrees,
+            double newFieldDegrees, PixelPoint pointer) {
+        Step out = solve(centre, fieldDegrees, newFieldDegrees, pointer);
+        if (out.solution().centre().isEmpty()
+                || out.solution().constrained()
+                || out.solution().ambiguous()) {
+            return java.util.Optional.empty();
+        }
+        SkyPosition mid = out.solution().centre().get();
+        Step back = solve(mid, newFieldDegrees, fieldDegrees, pointer);
+        if (back.solution().centre().isEmpty()
+                || back.solution().constrained()
+                || back.solution().ambiguous()
+                || back.solution().centre().get().separationDegrees(centre)
+                        > REVERSAL_TOLERANCE_DEGREES) {
+            return java.util.Optional.empty();
+        }
+        return java.util.Optional.of(mid);
+    }
+
     /** The step geometry on a letterboxed paper of the given height. */
     static Step solveOn(SkyPosition centre, double fieldDegrees,
                         double newFieldDegrees, PixelPoint pointer,
@@ -134,12 +169,11 @@ public final class ZoomStudyMain {
                 new PixelPoint(WIDTH - 1.0, HEIGHT - 1.0));
         List<Double> fields = ChartViewState.fieldWidthSteps();
 
-        int exact = 0;
-        int constrained = 0;
-        int pastPole = 0;
-        int ambiguousRefused = 0;
-        int reverseConstrained = 0;
-        int reverseAmbiguousRefused = 0;
+        int accepted = 0;
+        int refusedConstrained = 0;
+        int refusedPastPole = 0;
+        int refusedAmbiguous = 0;
+        int refusedPreflight = 0;
         double worstStepDrift = 0.0;
         double worstConstrainedShortfallPx = 0.0;
         double constrainedShortfallSumPx = 0.0;
@@ -160,26 +194,23 @@ public final class ZoomStudyMain {
                         Step out = solve(centre, pair[0], pair[1], pointer);
                         solveNanos += System.nanoTime() - t0;
                         solves++;
+                        // The acceptance contract, applied exactly as
+                        // production will: only exact, preflight-
+                        // reversible steps pass; every refusal is
+                        // attributed to its cause.
                         if (out.solution().pastPole()) {
-                            pastPole++;
+                            refusedPastPole++;
                             continue;
                         }
                         if (out.solution().ambiguous()) {
-                            // The decision's rule (PR #127 review, P1):
-                            // a step with a second exact centre REFUSES
-                            // rather than letting the continuity
-                            // tie-break silently switch branches on a
-                            // large jump.
-                            ambiguousRefused++;
+                            refusedAmbiguous++;
                             continue;
                         }
                         if (out.solution().constrained()) {
-                            constrained++;
-                            // A constrained follow is clamped to the
-                            // north-up feasibility boundary; the
-                            // pointer's visible shortfall - how far the
-                            // anchor lands from the pointer - is
-                            // measured, never just counted.
+                            refusedConstrained++;
+                            // Refused BECAUSE the shortfall is visible:
+                            // measured to justify the refusal, not to
+                            // excuse an acceptance.
                             double shortfall = pointerDriftPx(out,
                                     pair[1], pointer);
                             constrainedShortfallSumPx += shortfall;
@@ -188,30 +219,44 @@ public final class ZoomStudyMain {
                             }
                             continue;
                         }
-                        exact++;
+                        SkyPosition mid = out.solution().centre().orElseThrow();
+                        Step back = solve(mid, pair[1], pair[0], pointer);
+                        boolean reverseExact = back.solution().centre()
+                                .isPresent()
+                                && !back.solution().constrained()
+                                && !back.solution().ambiguous();
+                        double centreError = reverseExact
+                                ? back.solution().centre().get()
+                                        .separationDegrees(centre)
+                                : Double.NaN;
+                        if (!reverseExact
+                                || centreError > REVERSAL_TOLERANCE_DEGREES) {
+                            // The preflight: an accepted step must be
+                            // immediately reversible at the same
+                            // pointer, so the wheel can never enter a
+                            // view it cannot leave the same way.
+                            refusedPreflight++;
+                            continue;
+                        }
+                        if (acceptStep(centre, pair[0], pair[1], pointer)
+                                .isEmpty()) {
+                            throw new IllegalStateException(
+                                    "acceptance contract disagrees with"
+                                            + " the study's own scoring");
+                        }
+                        if (acceptStep(mid, pair[1], pair[0], pointer)
+                                .isEmpty()) {
+                            throw new IllegalStateException(
+                                    "an accepted step's reverse failed the"
+                                            + " acceptance contract - the"
+                                            + " symmetry claim would be"
+                                            + " false");
+                        }
+                        accepted++;
                         double drift = pointerDriftPx(out, pair[1], pointer);
                         if (drift > worstStepDrift) {
                             worstStepDrift = drift;
                         }
-                        SkyPosition mid = out.solution().centre().orElseThrow();
-                        Step back = solve(mid, pair[1], pair[0], pointer);
-                        if (back.solution().ambiguous()) {
-                            // The reverse of an accepted step can be
-                            // the ambiguous one: production refuses it
-                            // there too, so the wheel simply does
-                            // nothing at that pointer - counted, and
-                            // excluded from the reversal guarantee,
-                            // which covers accepted-both-ways pairs.
-                            reverseAmbiguousRefused++;
-                            continue;
-                        }
-                        if (back.solution().pastPole()
-                                || back.solution().constrained()) {
-                            reverseConstrained++;
-                            continue;
-                        }
-                        double centreError = back.solution().centre()
-                                .orElseThrow().separationDegrees(centre);
                         double backDrift = pointerDriftPx(back, pair[0],
                                 pointer);
                         if (centreError > worstRoundTripCentreError) {
@@ -235,28 +280,26 @@ public final class ZoomStudyMain {
                         + " positions:%n", solves, pages.size(),
                 pointers.size());
         System.out.printf(Locale.ROOT,
-                "  exact %d, constrained (polar clamp) %d, past-pole"
-                        + " (refused) %d, ambiguous (second exact branch,"
-                        + " REFUSED by decision) %d - no other empties%n",
-                exact, constrained, pastPole, ambiguousRefused);
+                "  ACCEPTED (exact, preflight-reversible) %d; refused:"
+                        + " constrained %d, past-pole %d, ambiguous %d,"
+                        + " preflight (reverse not exact) %d - no other"
+                        + " empties%n",
+                accepted, refusedConstrained, refusedPastPole,
+                refusedAmbiguous, refusedPreflight);
         System.out.printf(Locale.ROOT,
-                "  constrained pointer shortfall: worst %.1f px, mean"
-                        + " %.1f px (the sky follows as far as north-up"
-                        + " allows; measured, not just counted)%n",
+                "  constrained anchor shortfall, the reason for its"
+                        + " refusal: worst %.1f px, mean %.1f px%n",
                 worstConstrainedShortfallPx,
-                constrained == 0 ? 0.0
-                        : constrainedShortfallSumPx / constrained);
+                refusedConstrained == 0 ? 0.0
+                        : constrainedShortfallSumPx / refusedConstrained);
         System.out.printf(Locale.ROOT,
                 "  worst pointer drift after an exact step: %.2e px%n",
                 worstStepDrift);
         System.out.printf(Locale.ROOT,
-                "  reversal guarantee over accepted-both-ways pairs: worst"
-                        + " centre error %.2e deg, worst pointer drift"
-                        + " %.2e px (%s); %d reversals refused as ambiguous,"
-                        + " %d constrained near a pole - each counted,"
-                        + " none silently wrong%n",
-                worstRoundTripCentreError, worstRoundTripDrift, worstCase,
-                reverseAmbiguousRefused, reverseConstrained);
+                "  reversal guarantee, by construction over every accepted"
+                        + " step: worst centre error %.2e deg, worst"
+                        + " pointer drift %.2e px (%s)%n",
+                worstRoundTripCentreError, worstRoundTripDrift, worstCase);
         System.out.printf(Locale.ROOT,
                 "  mean pure-geometry solve: %.1f us%n",
                 solveNanos / 1e3 / solves);

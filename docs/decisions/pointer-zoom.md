@@ -37,6 +37,25 @@ The accepted transition is **one atomic `ChartViewState` change** —
 recenter and field width together — through the existing controller,
 exactly as pan applies its recenters.
 
+## The acceptance contract
+
+A pointer-zoom step is accepted **only when it is exact and
+immediately reversible at the same pointer** (PR #127 review):
+
+1. the forward solve must be **exact** — not constrained, not
+   past-pole, not ambiguous;
+2. the **reverse is preflighted**: the opposite step at the same
+   pixel must be equally exact and must restore the original centre
+   within the stated tolerance (one extra ~2 µs solve);
+3. the candidate state must pass the same coverage predicate as
+   every navigation.
+
+Anything else **refuses**: chart unchanged, wheel inert at that
+pointer, and toolbar/keyboard centre zoom always available. The
+study verifies the symmetry claim outright: **every accepted step's
+reverse itself passes the acceptance contract**, so the wheel can
+never carry the reader into a view the opposite movement refuses.
+
 A dedicated zoom solver was considered and rejected: it would
 re-derive the identical equations the pan decision already proved,
 measured, and reviewed, and split one geometric truth across two
@@ -49,22 +68,23 @@ its reverse, nine pointer positions (centre, edge midpoints,
 corners), eight pages (equatorial, mid-northern, RA-wrap, dec 60/85,
 dec 89.9, southern, dec −85):
 
-- **1,162 exact, 52 constrained, 35 past-pole, 47 ambiguous — no
-  other empties.**
-- **Worst pointer drift after an exact step: 5.4e-4 px** (the
+- **1,112 accepted** (exact and preflight-reversible); refused with
+  attributed causes: **52 constrained, 35 past-pole, 47 ambiguous,
+  50 preflight** (the reverse would not be exact) — no other
+  empties, and every accepted step's reverse verified to pass the
+  contract itself.
+- **Worst pointer drift after an accepted step: 5.4e-4 px** (the
   solver's plane tolerance expressed in pixels; subpixel by three
   orders of magnitude).
-- **The reversal guarantee, universal over accepted steps**: one
-  accepted step and its accepted reverse restore the centre within
-  **5.8e-5 degrees** and the pointer within **5.4e-4 px** — stated
-  tolerance **1e-4 degrees, 1e-2 px**. Fifty reversals were refused
-  as ambiguous (see below) — each counted, none silently wrong.
-- **Constrained shortfall, measured**: where north-up geometry
-  clamps the anchor (52 steps on dec ≥ 85 pages), the sky follows
-  the pointer as far as the feasibility boundary allows and the
-  visible shortfall is **112 px mean, 220 px worst** on a 900-px
-  page — the same honest polar behavior panning shows, measured
-  rather than merely counted.
+- **The reversal guarantee, by construction over every accepted
+  step**: centre restored within **5.8e-5 degrees**, pointer within
+  **5.4e-4 px** — stated tolerance **1e-4 degrees, 1e-2 px**.
+- **Constrained shortfall — the reason constrained steps refuse**:
+  where north-up geometry clamps the anchor (52 steps on dec ≥ 85
+  pages), the visible anchor miss would be **112 px mean, 220 px
+  worst** on a 900-px page. A gesture named pointer-centred zoom
+  must not miss its pointer by a fifth of the page, so these refuse
+  (measured to justify the refusal, not to excuse an acceptance).
 - **Letterbox, exercised**: a window taller than the projection-
   sanity cap (900×5112 over a 4,712-px paper) refuses its chrome
   pointers by decision and solves paper pointers exactly
@@ -82,30 +102,30 @@ dec 89.9, southern, dec −85):
 
 - **RA wrap**: the solver works in the projection's own frame; wrap
   pages are in the sweep and behave identically to equatorial ones.
-- **High declination (constrained, 52 classified)**: a north-up page
+- **High declination (constrained, 52 refused)**: a north-up page
   cannot put arbitrary sky at an arbitrary pixel near a pole. The
-  clamped solve follows the pointer as far as the feasibility
-  boundary |ξ| ≤ cot|δ|·√(1+η²) allows — the same physics, the same
-  classification, and the same honest behavior as panning there.
+  clamp at the feasibility boundary |ξ| ≤ cot|δ|·√(1+η²) is right
+  for a drag — the sky visibly follows the hand as far as geometry
+  allows — but for a wheel step it would silently miss the pointer
+  by up to 220 px, so **pointer zoom refuses constrained steps**
+  while panning keeps its reviewed clamp unchanged.
 - **Past-pole (35 classified)**: no centre can honour the anchor.
   **The step is refused: chart unchanged, nobody notified** — the
   pan hold's rule. Centre-preserving zoom (toolbar, keyboard)
   remains available at the same pointer; the wheel resumes the
   moment the pointer anchors feasible sky.
-- **Ambiguous (47 classified): the step is refused.** On a
-  near-polar page whose pointer anchors sky beyond the pole, the
-  centre equation has two exact roots up to 28.3° apart. A drag's
-  small increments make the pan solver's nearest-centre tie-break
-  the right continuity rule there — and panning keeps it unchanged —
-  but a zoom step is a large jump on which that tie-break can
-  silently switch branches, so **zoom refuses the transition
-  outright** (PR #127 review): chart unchanged, wheel inert at that
-  pointer, centre zoom available. The refusal can be one-sided — an
-  accepted step's reverse may itself be the ambiguous one (50
-  measured), in which case the wheel simply will not reverse at that
-  exact pointer; any other pointer, or centre zoom, still moves.
-  With ambiguity refused, the reversal guarantee above holds
-  universally over accepted steps.
+- **Ambiguous (47 refused)**: on a near-polar page whose pointer
+  anchors sky beyond the pole, the centre equation has two exact
+  roots up to 28.3° apart. A drag's small increments make the pan
+  solver's nearest-centre tie-break the right continuity rule there
+  — and panning keeps it unchanged — but a zoom step is a large jump
+  on which that tie-break can silently switch branches, so zoom
+  refuses.
+- **Preflight (50 refused)**: a forward solve can be exact while its
+  reverse at the same pixel is the two-branch (or constrained)
+  problem. The preflight catches these before acceptance, so the
+  wheel never enters a view from which the opposite movement is
+  refused — reversibility is part of the contract, not a statistic.
 - **Sequence ends**: at 36° zooming out and 1° zooming in the wheel
   does nothing (the discrete sequence is the reviewed scale
   contract; no overshoot, no easing).
@@ -196,10 +216,11 @@ paper 4,712 px): chrome pointers refuse, paper pointers solve to
   study's classifications as its contract; #125 wires the wheel
   (accumulator, consumption, letterbox refusal) and the platform
   shortcuts; #126 walks the journey and hands over.
-- The geometry tests lock the invariant, the reversal tolerance, the
-  constrained and past-pole classifications, and the verified
-  second-branch physics, so the production implementation has its
-  acceptance written before it exists.
+- The geometry tests lock the invariant, the acceptance contract
+  (`ZoomStudyMain.acceptStep`, the reference implementation #124
+  ports), the reversal tolerance, every refusal category, and the
+  verified second-branch physics, so the production implementation
+  has its acceptance written before it exists.
 - The gate's only production change is the solver's new `ambiguous`
   report on `PanSolution` — additive, exercised by pan unchanged
   (drags keep their reviewed continuity tie-break) — so no renderer,
