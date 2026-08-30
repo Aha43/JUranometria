@@ -12,16 +12,29 @@ package juranometria.render;
  * drawn and labelled across every toggle. Two options are dependent:
  * deep-sky labels are effective only while deep-sky objects are on,
  * and constellation names only while figures are on (labels and names
- * attach to drawn ink; detached text is not a chart).
+ * attach to drawn ink; detached text is not a chart). Star labels
+ * have no dependency: they attach to star dots, which are never
+ * optional - and the searched star's guaranteed label survives the
+ * toggle exactly as the deep-sky target's does.
  */
 public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            boolean constellationFigures,
                            boolean constellationBoundaries,
-                           boolean constellationNames) {
+                           boolean constellationNames,
+                           boolean starLabels) {
 
-    /** The released chart: everything on, byte-identical to 0.11.0. */
+    /** The released chart: everything on. */
     public static final ChartOptions DEFAULTS =
-            new ChartOptions(true, true, true, true, true);
+            new ChartOptions(true, true, true, true, true, true);
+
+    /** The chart before star labels existed (through 0.12.0). */
+    public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
+                        boolean constellationFigures,
+                        boolean constellationBoundaries,
+                        boolean constellationNames) {
+        this(deepSkyObjects, deepSkyLabels, constellationFigures,
+                constellationBoundaries, constellationNames, true);
+    }
 
     /** Labels depend on symbols: {@code labelled} stays inside {@code drawn}. */
     public boolean effectiveDeepSkyLabels() {

@@ -9,6 +9,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- The charts name their stars: a restrained, scale-sensitive label
+  pass renders traditional names, Bayer letters, and Flamsteed
+  numbers per the reviewed policy - names V ≤ 2.5 on the widest
+  pages, names and Bayer V ≤ 3.0 from 12-18°, all three forms on
+  regional pages (Flamsteed to V 5.0) - brightest first,
+  deterministic, yielding to deep-sky labels and the title block
+  (prefer omission). A searched star always keeps its best identity
+  label, exempt from thresholds and collisions, with no new symbol.
+  One new Chart Options control, "Star names and identifiers"
+  (default on), gates the pass; the M31 reference deliberately gains
+  its one accepted label (35 And).
 - Stars are findable by identity, fully offline: traditional names by
   prefix ("betel", "Polaris"), Bayer designations as the Greek letter
   or its spelled-out name plus the constellation ("α Ori",

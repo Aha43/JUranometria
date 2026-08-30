@@ -131,19 +131,31 @@ known refinement if #115's review wants it.
 
 | Field | Proper names | Bayer | Flamsteed |
 |---:|---|---|---|
-| 24–36° | V ≤ 2.0 | — | — |
+| 24–36° | V ≤ 2.5 | — | — |
 | 12–18° | V ≤ 3.0 | V ≤ 3.0 | — |
 | ≤ 8° | V ≤ 4.5 | V ≤ 4.5 | V ≤ 5.0 |
 
 Measured on the committed pages: Orion at 36° carries exactly
-Betelgeuse, Bellatrix, Rigel, Alnilam, Alnitak — the figure's anchor
-stars named, nothing else; the Pleiades at 8° name their five
+Betelgeuse, Bellatrix, Rigel, Alnilam, Alnitak, Saiph, and Mintaka —
+the figure's anchor stars named, nothing else; the Pleiades at 8° name their five
 brightest sisters with one collision correctly rejected in the
 densest field; Crux at 18° names its four bright stars (Acrux via its
 brightest component); Polaris is named at every field. **The bad
 alternative is committed too**: `orion-36-everything.png` (93 labels,
 22 rejections, numerals everywhere) is the page the thresholds
 exist to prevent.
+
+**Adjusted during #115 review (PR #120):** the wide-field name limit
+was raised from V ≤ 2.0 to **V ≤ 2.5**. The owner's own reading of
+the atlas exposed the weakness: the 2.0–2.5 band holds 43 of the
+sky's named stars — the asterism anchors (Alpheratz, Mirach, Almach;
+Dubhe, Merak, Phecda, Mizar; Markab, Scheat; Algol, Denebola…) — so
+the 2.0 cut left figures like Andromeda drawn but wholly anonymous
+at 36°, and famous names popped in and out across zoom. At 2.5 the
+Andromeda page gains exactly its three anchors, Orion gains Saiph
+and Mintaka, and collision rejection still keeps wide pages quiet.
+The 12–18° and ≤ 8° rows — and therefore the M31 reference — are
+untouched.
 
 ## The M31 8° reference — an explicit owner decision
 

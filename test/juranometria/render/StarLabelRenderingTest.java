@@ -1,0 +1,154 @@
+package juranometria.render;
+
+import org.junit.jupiter.api.Test;
+
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import juranometria.chart.ChartScene;
+import juranometria.chart.ChartViewport;
+import juranometria.chart.SceneGeography;
+import juranometria.chart.SkyPosition;
+import juranometria.chart.Star;
+import juranometria.chart.StarIdentity;
+import juranometria.chart.StarSizePolicy;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+/**
+ * The star-label pass at the renderer (issue #115): deterministic
+ * collision outcomes, determinism across input iteration order,
+ * locale, and theme, the searched-star guarantee across the option
+ * toggle with no invented symbol, and the option's repaint-only
+ * nature.
+ */
+class StarLabelRenderingTest {
+
+    static final SkyPosition CENTRE = new SkyPosition(83.818667, -5.389667);
+    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT);
+
+    static final Star BRIGHT = new Star("TYC 1-1-1", CENTRE, 1.0,
+            new StarIdentity("Brightstar", "α", null, "Ori"));
+    /** Close beside BRIGHT: their label boxes overlap. */
+    static final Star DIM = new Star("TYC 1-2-1",
+            new SkyPosition(83.75, -5.45), 1.5,
+            new StarIdentity("Dimstar", "β", null, "Ori"));
+    static final Star DIM_ANONYMOUS = new Star("TYC 1-2-1",
+            new SkyPosition(83.75, -5.45), 1.5);
+    /** Far corner, fainter than every label threshold. */
+    static final Star FAINT = new Star("TYC 2-1-1",
+            new SkyPosition(85.5, -3.5), 6.5,
+            new StarIdentity("Faintstar", null, "99", "Ori"));
+    static final Star FAINT_ANONYMOUS = new Star("TYC 2-1-1",
+            new SkyPosition(85.5, -3.5), 6.5);
+
+    private static ChartScene scene(List<Star> stars, String targetIdentity) {
+        return new ChartScene(new ChartViewport(CENTRE, 18.0, 900, 700),
+                List.copyOf(stars), List.of(), "Star label test", 8.0,
+                targetIdentity, SceneGeography.EMPTY);
+    }
+
+    private static int[] pixels(ChartScene scene, ChartOptions options) {
+        BufferedImage image = RENDERER.renderToImage(scene, options);
+        return image.getRGB(0, 0, image.getWidth(), image.getHeight(),
+                null, 0, image.getWidth());
+    }
+
+    @Test
+    void collisionsResolveDeterministicallyBrightestFirst() {
+        // The dimmer neighbour's label box overlaps the brighter's and
+        // is omitted - so the page with the colliding identity renders
+        // exactly as if the dim star had no identity at all.
+        int[] withIdentity = pixels(
+                scene(List.of(BRIGHT, DIM), null), ChartOptions.DEFAULTS);
+        int[] withoutIdentity = pixels(
+                scene(List.of(BRIGHT, DIM_ANONYMOUS), null),
+                ChartOptions.DEFAULTS);
+        assertArrayEquals(withIdentity, withoutIdentity,
+                "the losing label is omitted, deterministically");
+        // Sanity: the winning label does draw.
+        int[] bothAnonymous = pixels(scene(List.of(
+                        new Star("TYC 1-1-1", CENTRE, 1.0), DIM_ANONYMOUS),
+                null), ChartOptions.DEFAULTS);
+        assertFalse(java.util.Arrays.equals(withIdentity, bothAnonymous),
+                "the brighter star's label is on the page");
+    }
+
+    @Test
+    void labelOutputIsIndependentOfInputIterationOrder() {
+        List<Star> forward = List.of(BRIGHT, DIM, FAINT);
+        List<Star> backward = new ArrayList<>(forward);
+        Collections.reverse(backward);
+        assertArrayEquals(
+                pixels(scene(forward, null), ChartOptions.DEFAULTS),
+                pixels(scene(backward, null), ChartOptions.DEFAULTS),
+                "the pass sorts; scene order must not matter");
+    }
+
+    @Test
+    void labelOutputIsIndependentOfLocaleThemeAndRepetition() throws Exception {
+        ChartScene scene = scene(List.of(BRIGHT, DIM, FAINT), "TYC 2-1-1");
+        int[] reference = pixels(scene, ChartOptions.DEFAULTS);
+        assertArrayEquals(reference, pixels(scene, ChartOptions.DEFAULTS),
+                "repeated renders are identical");
+
+        Locale locale = Locale.getDefault();
+        javax.swing.LookAndFeel laf =
+                javax.swing.UIManager.getLookAndFeel();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            javax.swing.UIManager.setLookAndFeel(
+                    new com.formdev.flatlaf.FlatDarkLaf());
+            assertArrayEquals(reference,
+                    pixels(scene, ChartOptions.DEFAULTS),
+                    "the chart is paper and ink in every locale and theme");
+        } finally {
+            Locale.setDefault(locale);
+            javax.swing.UIManager.setLookAndFeel(laf);
+        }
+    }
+
+    @Test
+    void theSearchedStarKeepsItsBestLabelAcrossTheToggleWithNoNewSymbol() {
+        ChartOptions labelsOff = new ChartOptions(
+                true, true, true, true, true, false);
+        // Off + searched: the faint star, past every threshold, still
+        // carries its best identity - and the render is identical to
+        // the option-on page where the ordinary pass would say nothing
+        // about it either way.
+        int[] offSearched = pixels(
+                scene(List.of(BRIGHT, FAINT), "TYC 2-1-1"), labelsOff);
+        int[] offUnsearched = pixels(
+                scene(List.of(BRIGHT, FAINT), null), labelsOff);
+        assertFalse(java.util.Arrays.equals(offSearched, offUnsearched),
+                "the guaranteed label survives the toggle");
+
+        // No invented anything: a searched star with no identity
+        // renders exactly as unsearched - no label, no new symbol.
+        assertArrayEquals(
+                pixels(scene(List.of(BRIGHT, FAINT_ANONYMOUS), "TYC 2-1-1"),
+                        labelsOff),
+                pixels(scene(List.of(BRIGHT, FAINT_ANONYMOUS), null),
+                        labelsOff),
+                "an identityless searched star gains nothing");
+    }
+
+    @Test
+    void theToggleChangesPixelsOnly() {
+        ChartScene scene = scene(List.of(BRIGHT, DIM, FAINT), null);
+        int[] on = pixels(scene, ChartOptions.DEFAULTS);
+        int[] off = pixels(scene, new ChartOptions(
+                true, true, true, true, true, false));
+        assertFalse(java.util.Arrays.equals(on, off),
+                "the option changes the page");
+        // The same immutable scene renders both ways - the option is
+        // consumed at the renderer alone, so scene identity, queries,
+        // and navigation state cannot be involved.
+        assertArrayEquals(on, pixels(scene, ChartOptions.DEFAULTS));
+    }
+}

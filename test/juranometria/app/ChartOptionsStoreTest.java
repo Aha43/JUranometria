@@ -38,6 +38,10 @@ class ChartOptionsStoreTest {
             ChartOptions loaded = store.load();
             assertFalse(loaded.constellationFigures(),
                     "only the explicit string false disables a layer");
+
+            node.put("chart.starLabels", "false");
+            assertFalse(store.load().starLabels(),
+                    "the star-label option persists under its own key");
             assertFalse(loaded.effectiveConstellationNames(),
                     "the dependency applies to loaded values too");
         } finally {

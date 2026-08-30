@@ -62,12 +62,23 @@ class ChartOptionsDialogTest {
             assertFalse(box(content, "Constellation names").isEnabled(),
                     "names are effective only while figures are on");
 
+            // Star names and identifiers: third Labels control, no
+            // dependency (star dots are never optional), live preview.
+            assertTrue(box(content, "Star names and identifiers").isEnabled(),
+                    "the star-label control depends on nothing");
+            box(content, "Star names and identifiers").doClick();
+            assertFalse(controller.options().starLabels(),
+                    "the toggle previews immediately");
+            assertTrue(box(content, "Star names and identifiers").isEnabled());
+
             // Restore Defaults previews the released chart and re-enables
             // every dependent control.
             AboutDialogTest.button(content, "Restore Defaults").doClick();
             assertEquals(ChartOptions.DEFAULTS, controller.options());
             assertTrue(box(content, "Constellation names").isEnabled());
             assertTrue(box(content, "Constellation boundaries").isSelected());
+            assertTrue(box(content, "Star names and identifiers").isSelected(),
+                    "Restore Defaults includes the star-label option");
 
             // OK and Cancel run exactly their wired protocol actions.
             AboutDialogTest.button(content, "OK").doClick();
