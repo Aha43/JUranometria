@@ -390,7 +390,7 @@ public final class StarIdentityStudyMain {
      * always with its Hipparcos key, so duplicate proper names in the
      * source stay distinguishable (Codex review, PR #118).
      */
-    private static String unmatchedLabel(String hip, Map<String, Object> value) {
+    static String unmatchedLabel(String hip, Map<String, Object> value) {
         String name = blankToNull(value.get("name"));
         if (name != null) {
             return name + " (HIP " + hip + ")";
@@ -409,33 +409,45 @@ public final class StarIdentityStudyMain {
 
     /**
      * The bright-sky pack's star magnitudes - the fact that selects a
-     * multi-component system's winning component. Every tile is
-     * verified against the pack manifest's checksum before its
-     * magnitudes are trusted (Codex review, PR #118: a tampered tile
-     * must fail loudly, never silently re-attach an identity while
-     * every locked count still passes).
+     * multi-component system's winning component - verified completely
+     * before a single value is trusted (Codex review, PR #118): the
+     * manifest itself must be the bright-sky pack at a supported
+     * format version (the production {@link PackManifest} contract),
+     * every star tile the manifest declares must exist and match its
+     * checksum, and no undeclared star tile may be present. A
+     * tampered, missing, or stray tile fails loudly, never silently
+     * re-attaching an identity while every locked count still passes.
      */
     static Map<String, Double> packMagnitudes(Path packDir) throws Exception {
-        java.util.Properties manifest = new java.util.Properties();
-        try (var stream = Files.newInputStream(
+        juranometria.catalog.PackManifest manifest;
+        try (var reader = Files.newBufferedReader(
                 packDir.resolve("manifest.properties"))) {
-            manifest.load(stream);
+            manifest = juranometria.catalog.PackManifest.parse(reader,
+                    packDir + "/manifest.properties");
+        }
+        if (!"bright-sky".equals(manifest.packName())) {
+            throw new IllegalStateException("manifest at " + packDir
+                    + " belongs to pack " + manifest.packName()
+                    + ", not bright-sky; refusing to trust its magnitudes");
+        }
+        java.util.Set<String> declared = new java.util.TreeSet<>();
+        for (String key : manifest.entries().keySet()) {
+            if (key.startsWith("checksum.tiles/")
+                    && key.endsWith("/stars.csv")) {
+                declared.add(key.substring("checksum.".length()));
+            }
         }
         Map<String, Double> pack = new HashMap<>();
-        for (Path tile : Files.walk(packDir.resolve("tiles")).sorted()
-                .toList()) {
-            if (!tile.getFileName().toString().equals("stars.csv")) {
-                continue;
+        for (String tileName : declared) {
+            Path tile = packDir.resolve(tileName);
+            if (!Files.exists(tile)) {
+                throw new IllegalStateException(tile + " is declared by the"
+                        + " bright-sky manifest but missing; the"
+                        + " component-selecting magnitudes would be"
+                        + " incomplete - regenerate with make import-allsky");
             }
-            String key = "checksum." + packDir.relativize(tile).toString()
-                    .replace(java.io.File.separatorChar, '/');
-            String expected = manifest.getProperty(key);
             byte[] bytes = Files.readAllBytes(tile);
-            if (expected == null) {
-                throw new IllegalStateException(tile + " has no checksum in"
-                        + " the bright-sky manifest; refusing to trust its"
-                        + " magnitudes");
-            }
+            String expected = manifest.entries().get("checksum." + tileName);
             String actual = PinnedInputs.sha256Hex(bytes);
             if (!expected.equals(actual)) {
                 throw new IllegalStateException(tile + " fails its"
@@ -450,6 +462,19 @@ public final class StarIdentityStudyMain {
                 }
                 String[] parts = line.split(",");
                 pack.put(parts[0], Double.parseDouble(parts[3]));
+            }
+        }
+        for (Path tile : Files.walk(packDir.resolve("tiles")).sorted()
+                .toList()) {
+            if (!tile.getFileName().toString().equals("stars.csv")) {
+                continue;
+            }
+            String tileName = packDir.relativize(tile).toString()
+                    .replace(java.io.File.separatorChar, '/');
+            if (!declared.contains(tileName)) {
+                throw new IllegalStateException(tile + " has no checksum in"
+                        + " the bright-sky manifest; refusing to trust its"
+                        + " magnitudes");
             }
         }
         return pack;
