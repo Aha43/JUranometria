@@ -27,8 +27,8 @@ zoom-where-you-point. The 1.0 promise is recorded in
 
 ## Requirements
 
-**Running the released application** (verified on macOS 14+ Apple
-silicon, Ubuntu 24.04 LTS x86-64, and Windows 11 x86-64): a Java
+**Running the released application** (verified on macOS 14+, Apple
+silicon and Intel; Ubuntu 24.04 LTS x86-64; and Windows 11 x86-64): a Java
 runtime of version 21 or later, and nothing else - download the
 release archive, unpack, and launch with the bundled helper or
 `java -jar JUranometria.jar`. Everything works offline; the

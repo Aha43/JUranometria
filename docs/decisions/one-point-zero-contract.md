@@ -32,16 +32,19 @@ not below is implementation detail or explicitly deferred.
 
 **Running the packaged release** is verified on a finite matrix:
 
-- **macOS 14 or later on Apple silicon** (CI `macos-latest` arm64
-  plus the maintainer's machine),
+- **macOS 14 or later, Apple silicon and Intel** — Apple silicon
+  verified by CI (`macos-latest`, arm64) and the maintainer's
+  primary machine; **Intel verified by a recorded run on the
+  maintainer's Intel Mac** (the machine that produced PR #138's
+  toolchain evidence), re-recorded for the 1.0 artifact at #144;
 - **Ubuntu 24.04 LTS on x86-64** as the named Linux reference
   (CI `ubuntu-latest`),
 - **Windows 11 on x86-64** (CI `windows-latest`),
 
 with the honest wider expectation stated as exactly that: a pure
-Java SE 21 desktop application is *expected* to run on Intel macOS
-and other Linux distributions, but 1.0's verification evidence
-covers the named matrix and no claim is made beyond it. Support is
+Java SE 21 desktop application is *expected* to run on other Linux
+distributions, but 1.0's verification evidence covers the named
+matrix and no claim is made beyond it. Support is
 in every case **unpack-and-run**: extract the release archive,
 launch with the bundled helper or `java -jar JUranometria.jar` — no
 Make, Git, Bash, PowerShell, or source checkout, and paths
@@ -65,8 +68,8 @@ registries, and update checking.
 ## Fully local operation
 
 After unpacking, **everything works offline, permanently**: search,
-charts, star identities, geography, the grid, About and its complete
-licensing text. **The application makes no network requests at any
+charts, star identities, geography, the grid, and About with the
+complete bundled-data and resource licensing. **The application makes no network requests at any
 time** — no telemetry, no update check, no remote lookup; nothing in
 the shipped archive opens a connection. (Development tooling — the
 contributor bootstrap, catalogue regeneration, CI, and release
@@ -102,7 +105,12 @@ licences are part of the 1.0 licensing map: **FlatLaf and FlatLaf
 Extras (Apache License 2.0)** and **JSVG (MIT)**, each shipped with
 its licence text beside the `lib/` directory and listed in
 `LICENSING.md`. The JUnit console runner is test-only and never
-ships.
+ships. **The division of licensing surfaces is deliberate**: the
+About dialog carries the complete licensing of everything packaged
+*inside* the application (code statement, data notices, icon
+licence); the runtime-library licences live with the libraries
+themselves, in the archive beside `lib/` and in `LICENSING.md` —
+About does not restate them.
 
 ## Preferences and upgrade from 0.15
 
