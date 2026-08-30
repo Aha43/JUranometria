@@ -69,9 +69,22 @@ From Sprint 7 the regional charts carry constellation geography, per
 Geography draws beneath stars, deep-sky symbols, labels, and the
 title block; the 8° and narrower pages carry none of it.
 
+From Sprint 13 the stars themselves are named
+([the star-identity decision](decisions/star-identity.md)): one
+deterministic label pass, brightest star first, drawing traditional
+names, Bayer letters, and Flamsteed numbers as restrained notation -
+names to V 2.5 on the widest pages, names and Bayer to V 3.0 from
+12-18°, all three forms on regional pages (Flamsteed to V 5.0).
+Star labels sit above geography and below deep-sky labels and the
+title block, and yield to both (prefer omission - a suppressed label
+never means the star is absent, only that the page had no quiet
+place for it). A searched star always keeps its best identity label,
+exempt from thresholds and collisions, with no new symbol.
+
 From Sprint 12 the reader may hide layers (deep-sky symbols and
-labels, figures, boundaries, names) through View > Chart Options;
-an enabled layer still obeys every rule above, and a searched target
+labels, figures, boundaries, names, and star names and identifiers)
+through View > Chart Options; an enabled layer still obeys every
+rule above, and a searched target
 with an established symbol is always drawn and labelled whatever the
 choices - the chart never titles itself by an object it hides
 ([the chart-options decision](decisions/chart-options.md)).

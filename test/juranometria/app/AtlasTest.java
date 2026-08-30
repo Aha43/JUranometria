@@ -73,6 +73,36 @@ class AtlasTest {
     }
 
     @Test
+    void namedStarsRenderDeterministicallyAcrossRepresentativeSkies() {
+        // Wraparound, polar, dense, and southern pages: the star-label
+        // pass draws (toggling it changes pixels) and repeated renders
+        // are identical - a suppressed label is a collision outcome,
+        // never nondeterminism.
+        record Page(double ra, double dec, double field) { }
+        for (Page page : new Page[] {
+                new Page(0.3, 45.0, 36.0),
+                new Page(37.946619, 89.264135, 36.0),
+                new Page(56.869167, 24.105278, 8.0),
+                new Page(186.649563, -63.099093, 18.0)}) {
+            ChartScene scene = Atlas.assembler().assemble(
+                    new ChartViewState(new SkyPosition(page.ra(), page.dec()),
+                            page.field(), 8.0, null, null), 900, 700);
+            var on = RENDERER.renderToImage(scene);
+            var off = RENDERER.renderToImage(scene,
+                    new juranometria.render.ChartOptions(
+                            true, true, true, true, true, false));
+            assertTrue(!java.util.Arrays.equals(
+                            on.getRGB(0, 0, 900, 700, null, 0, 900),
+                            off.getRGB(0, 0, 900, 700, null, 0, 900)),
+                    "star labels draw at " + page);
+            assertArrayEquals(on.getRGB(0, 0, 900, 700, null, 0, 900),
+                    RENDERER.renderToImage(scene)
+                            .getRGB(0, 0, 900, 700, null, 0, 900),
+                    "label output repeats identically at " + page);
+        }
+    }
+
+    @Test
     void representativeChartsOutsideM31AreDeterministic() {
         // Orion, an RA-wrap field, and a far-southern field render twice
         // identically and are visibly populated.
