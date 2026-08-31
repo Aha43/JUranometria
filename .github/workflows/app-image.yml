@@ -88,15 +88,11 @@ jobs:
           cmp build/app-image/native-smoke.png \
               build/app-image-2/native-smoke.png \
             || { echo "the two builds rendered different smokes"; exit 1; }
-          if diff -r build/app-image build/app-image-2 >/dev/null 2>&1; then
-            echo "reproducible=identical" >> "$GITHUB_STEP_SUMMARY"
-            echo "same-runner reproducibility: byte-identical"
-          else
-            n=$(diff -rq build/app-image build/app-image-2 | wc -l)
-            echo "reproducible=$n differing entries (recorded honestly)" \
-              >> "$GITHUB_STEP_SUMMARY"
-            diff -rq build/app-image build/app-image-2 | head -10
-          fi
+          # Reporting differences must not itself fail the step
+          # (issue #158): the script distinguishes identical,
+          # different-but-recorded, and a real diff error.
+          scripts/compare-app-images.sh build/app-image build/app-image-2 \
+            "$GITHUB_STEP_SUMMARY"
       - name: Verify the runtime pin
         shell: bash
         run: |
