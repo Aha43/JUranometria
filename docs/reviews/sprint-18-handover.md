@@ -56,11 +56,17 @@ history into this sprint.
     Flamsteed number, Messier and NGC objects, and coordinates in
     decimal and sexagesimal — each recentred and rendered;
   - the field sequence walked to both bounds with the target
-    surviving, and a pointer zoom that keeps the sky under the
-    pointer to within 10⁻³ degrees;
-  - grab-to-pan **across RA 0**, landing near the wrap rather than
-    drifting, and clearing the target atomically; a pan near the
-    pole that stays on the sky;
+    surviving, and a pointer zoom **required to be accepted** in
+    open sky, stepping 18°→12° and keeping the sky under the
+    pointer to **1.5 × 10⁻¹³ degrees**;
+  - grab-to-pan **across RA 0 from a live searched target** —
+    Alpheratz at RA 2.1°, dragged west to RA 350.6°, with the
+    target identity and label clearing together and the page
+    retitling itself by coordinates;
+  - near the pole, **both halves** of the honest contract: a modest
+    grab follows the hand from dec 85° to 86.6°, and a grab that
+    would carry past the pole is **refused with the view byte-for-byte
+    unchanged**;
   - the magnitude limit stopping at V 4.0 and V 8.0;
   - layers off drawing less ink than layers on, and the identifier
     layers separable;
@@ -70,6 +76,13 @@ history into this sprint.
     backend, on scratch nodes so the reader's settings are never
     touched;
   - **Home returning to the reviewed default page, pixel for pixel.**
+
+  Each leg states a premise that must hold before it asserts an
+  outcome (sprint review, final round): the zoom must be accepted
+  rather than merely not-contradicted, the pan must begin with a
+  target that exists and end west of RA 340° having started east of
+  RA 20°, and the polar refusal must leave the centre identical —
+  so no leg can pass by not happening.
 
   What it does not do is press keys on a screen: a release cell has
   no display. The on-screen journey remains the maintainer's, run on

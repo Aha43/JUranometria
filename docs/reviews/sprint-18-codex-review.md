@@ -82,3 +82,38 @@ the review document with the fixes, and run the full release rehearsal
 again. After the follow-up review, merge, compare the reviewed and
 merged **Git tree IDs**, push the annotated `v1.0.0` tag, and verify the
 public release produced by that tag.
+
+## Follow-up review — commit 2b5917d
+
+The Git-tree procedure resolves the second P1, and the magnitude
+diagnostic resolves the P2. The packaged launcher now covers the right
+production composition and is a large improvement over the original
+probe. One blocking evidence gap remains inside that new journey.
+
+### P1 — Three navigation claims can pass without the claimed transition
+
+The packaged journey must make its navigation premises and outcomes
+observable rather than accepting a no-op:
+
+- Pointer zoom checks the anchor only inside `if (outcome == ACCEPTED)`.
+  `AT_BOUND`, `INFEASIBLE_POINTER`, or `REFUSED_COVERAGE` therefore all
+  pass, even though the journey reports pointer zoom as covered.
+  Require `ACCEPTED`, then check the anchor.
+- The RA-wrap leg calls the anonymous `recenter(position, field)` before
+  panning. Its `targetIdentity() == null` assertion is already true
+  before the pan, so it cannot prove that panning clears a searched
+  target atomically. Begin that leg with a real named target (or assert
+  a non-null identity immediately before the drag), then require the
+  accepted pan to clear both identity and target title.
+- The polar leg ignores the boolean returned by `pan`, then merely
+  checks that the resulting declination is within ±90°. A refused/no-op
+  pan passes because `SkyPosition` already enforces that range. Record
+  the centre before the call, require the intended accepted/constrained
+  result, and assert the centre changed in the expected direction. If
+  the intended case is a classified polar hold, inspect the solver's
+  classification and assert the unchanged state explicitly instead.
+
+Until those premises and outcomes are asserted, regressions in exactly
+the pointer and polar paths named by #146 can leave all twelve checks
+green. Fix these three assertions and rerun the matrix; no redesign of
+the packaged journey is requested.
