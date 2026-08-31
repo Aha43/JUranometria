@@ -170,6 +170,16 @@ make import-star-identities
   candidates with each star's full identity rather than guessing.
   Selecting a result recentres the chart anywhere under the bundled
   all-sky coverage, keeping the current field width.
+- **Point at anything to ask what it is.** Click a star or a
+  deep-sky symbol and the **Inspector** (View → Inspector) names it:
+  designations, magnitude with its band, size and orientation where
+  the catalogue records them - and plainly *"not recorded"* where it
+  does not, which for deep-sky objects is often. Where several marks
+  overlap you are offered the choice rather than given a guess, and
+  clicking empty sky answers with its coordinates. **Selecting never
+  moves the chart**; `Center here` is the one action that does, and
+  only when you press it. Searching for an object selects it too, so
+  the inspector is reachable without a pointer.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the

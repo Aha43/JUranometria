@@ -5,11 +5,16 @@ import java.util.prefs.Preferences;
 
 import juranometria.chart.ChartViewport;
 import juranometria.chart.ChartViewState;
+import juranometria.chart.ChartScene;
+import juranometria.chart.Selection;
+import juranometria.chart.SelectionDetails;
+import juranometria.chart.SelectionModel;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.StarSizePolicy;
 import juranometria.project.PanSolver;
 import juranometria.project.PixelPoint;
 import juranometria.render.ChartOptions;
+import juranometria.render.ChartHitTest;
 import juranometria.render.ChartRenderer;
 import juranometria.ui.ChartViewController;
 
@@ -348,6 +353,47 @@ public final class PackagedAcceptanceMain {
         }
         System.out.println("persistence and upgrade journey OK"
                 + " (through the bundled preference backend)");
+
+        // Point and identify, inside the packaged application
+        // (Sprint 19): the reader asks the page what a mark is, and
+        // is answered from the catalogue the image carries - no
+        // network, no query beyond the page already assembled.
+        navigation.reset();
+        ChartScene homeScene = Atlas.assembler()
+                .assemble(navigation.state(), 900, 700);
+        ChartHitTest hitTest = new ChartHitTest(renderer);
+        ChartRenderer.DrawnMark aMark = renderer
+                .drawnMarks(homeScene, ChartOptions.DEFAULTS).stream()
+                .filter(mark -> mark.star() != null)
+                .filter(mark -> mark.centre().x() > 100
+                        && mark.centre().x() < 800
+                        && mark.centre().y() > 100
+                        && mark.centre().y() < 600)
+                .findFirst().orElseThrow(() -> new IllegalStateException(
+                        "the default page draws no reachable star"));
+        ChartHitTest.Hit hit = hitTest.at(homeScene, ChartOptions.DEFAULTS,
+                aMark.centre().x(), aMark.centre().y());
+        require(hit != null && !hit.isEmptySky(),
+                "pointing at a drawn star finds it");
+        SelectionModel selectionModel = new SelectionModel();
+        java.util.List<String> heard = new java.util.ArrayList<>();
+        selectionModel.onChange(change -> heard.add(
+                change.selection() instanceof Selection.Object object
+                        ? object.catalogueId() : "none"));
+        selectionModel.select(hit.candidates().get(0));
+        require(SelectionDetails.star(homeScene, selectionModel.selection())
+                        .isPresent(),
+                "and the page can say what it is without a catalogue"
+                        + " query");
+        require(heard.size() == 2 && heard.get(1).equals(
+                        aMark.star().id()),
+                "with the shared selection telling its consumers"
+                        + " exactly once: " + heard);
+        ChartHitTest.Hit chrome = hitTest.at(homeScene,
+                ChartOptions.DEFAULTS, -5, 300);
+        require(chrome == null, "and the surround is not sky");
+        System.out.println("point-and-identify OK (" + aMark.star().id()
+                + " identified from the packaged catalogue)");
 
         // Home: the journey ends on the page it started from,
         // rendered identically.
