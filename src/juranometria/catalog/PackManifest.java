@@ -39,7 +39,7 @@ public record PackManifest(int formatVersion, String packName, String coverage,
         try {
             properties.load(reader);
         } catch (IOException e) {
-            throw new IllegalStateException("failed to read pack manifest " + name, e);
+            throw new PackIntegrityException("failed to read pack manifest " + name, e);
         }
         Map<String, String> entries = new TreeMap<>();
         for (String key : properties.stringPropertyNames()) {

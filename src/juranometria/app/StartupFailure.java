@@ -3,6 +3,8 @@ package juranometria.app;
 import java.awt.GraphicsEnvironment;
 import java.util.prefs.BackingStoreException;
 
+import juranometria.catalog.PackIntegrityException;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -41,27 +43,33 @@ final class StartupFailure {
     }
 
     /**
-     * Classified by the frames the failure actually came through,
-     * not by matching words in its message: the loaders that verify
-     * bundled packs live in {@code juranometria.catalog} and
-     * {@code juranometria.geo}, and the preferences store is the
-     * JDK's own {@code java.util.prefs}. Both can throw plain
-     * {@link IllegalStateException}, which is exactly why the type
-     * alone cannot decide this.
+     * Classified by closed signals only (audit review, P1).
+     *
+     * <p>Damaged data is recognised by {@link PackIntegrityException},
+     * which only the verification paths throw. An earlier version
+     * asked which package the stack frames came from, which was not
+     * closed at all: a programming defect anywhere in
+     * {@code juranometria.catalog} or {@code juranometria.geo} would
+     * have told the reader their download was damaged and sent them
+     * to fetch a perfectly good file again.
+     *
+     * <p>A settings failure is recognised by the JDK's own
+     * {@link BackingStoreException}, or by frames inside
+     * {@code java.util.prefs} - a package that contains no
+     * JUranometria code, so a defect of ours cannot be mistaken for
+     * one of its failures.
      */
     static Kind classify(Throwable failure) {
         for (Throwable t = failure; t != null; t = t.getCause()) {
+            if (t instanceof PackIntegrityException) {
+                return Kind.BUNDLED_DATA;
+            }
             if (t instanceof BackingStoreException) {
                 return Kind.SETTINGS;
             }
             for (StackTraceElement frame : t.getStackTrace()) {
-                String className = frame.getClassName();
-                if (className.startsWith("java.util.prefs.")) {
+                if (frame.getClassName().startsWith("java.util.prefs.")) {
                     return Kind.SETTINGS;
-                }
-                if (className.startsWith("juranometria.catalog.")
-                        || className.startsWith("juranometria.geo.")) {
-                    return Kind.BUNDLED_DATA;
                 }
             }
         }
@@ -95,12 +103,19 @@ final class StartupFailure {
             case SETTINGS -> """
                     This is the store of your own saved settings - \
                     appearance and chart options - not the atlas itself. \
-                    Removing it makes JUranometria start again with its \
-                    defaults; nothing else is lost.
+                    Removing JUranometria's own settings makes it start \
+                    again with its defaults; nothing else is lost.
 
-                    macOS:   ~/Library/Preferences/com.apple.java.util.prefs.plist
-                    Linux:   ~/.java/.userPrefs/juranometria
-                    Windows: HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\juranometria
+                    Linux:   delete the directory
+                             ~/.java/.userPrefs/juranometria
+                    Windows: delete the registry key
+                             HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\juranometria
+                    macOS:   Java preferences share ONE file with every \
+                    other Java application, so do not delete it. Remove \
+                    only this application's entry, with the atlas closed:
+
+                      /usr/libexec/PlistBuddy -c 'Delete ":/:juranometria/"' \\
+                        ~/Library/Preferences/com.apple.java.util.prefs.plist
 
                     If the store cannot be written at all, check that \
                     your user account's home directory is present and \
@@ -117,15 +132,35 @@ final class StartupFailure {
         };
     }
 
-    /** The most specific cause available, never an empty line. */
+    /**
+     * Everything the chain has to say, never an empty line.
+     *
+     * <p>Stopping at the first wrapper carrying a message hid the
+     * useful one beneath it (audit review, P1): "failed to read
+     * catalogue tile X" is a worse sentence than the checksum
+     * mismatch it wraps, and the reader needs the second. So every
+     * distinct message in the chain is kept, outermost first, and
+     * only a chain with nothing to say at all falls back to naming
+     * its type.
+     */
     private static String describe(Throwable failure) {
-        Throwable cause = failure;
-        while (cause.getMessage() == null && cause.getCause() != null) {
-            cause = cause.getCause();
+        java.util.List<String> said = new java.util.ArrayList<>();
+        for (Throwable t = failure; t != null && said.size() < 4;
+                t = t.getCause()) {
+            String detail = t.getMessage();
+            if (detail != null && !detail.isBlank()
+                    && !said.contains(detail)) {
+                said.add(detail);
+            }
         }
-        String detail = cause.getMessage();
-        return detail == null || detail.isBlank()
-                ? cause.getClass().getName() : detail;
+        if (said.isEmpty()) {
+            Throwable deepest = failure;
+            while (deepest.getCause() != null) {
+                deepest = deepest.getCause();
+            }
+            return deepest.getClass().getName();
+        }
+        return String.join("\n\n", said);
     }
 
     /**

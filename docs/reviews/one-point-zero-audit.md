@@ -11,10 +11,11 @@ contradiction of the contract**, record everything else as post-1.0.
 Six contradictions were found and fixed; one robustness defect was
 found by experiment and fixed; the rest of the contract was
 confirmed by evidence, and that evidence is now executed by tests
-rather than asserted in prose. The suite went from 324 to 341, including the corrections the
-audit's own review required (recorded below where they apply:
-remedy classification, the runtime-licensing guard, and the
-narrowed offline claim).
+rather than asserted in prose. The suite went from 324 to 344, including the corrections the
+audit's own two review rounds required (recorded below where they
+apply: remedy classification and its closed signal, the settings
+remedy's safety, the chained failure description, the
+runtime-licensing guard, and the narrowed offline claim).
 
 ## Blockers found and fixed
 
@@ -95,16 +96,39 @@ and the process exits non-zero instead of lingering invisibly.
 The first version of this fix told every failure it was a damaged
 download (audit review, P1) - useless advice for an unreadable
 settings store, and a confident lie for an application defect. The
-failure is now classified by **where it actually came through**,
-since the exception types overlap: a plain `IllegalStateException`
-is thrown both by the verifying loaders and by a removed preferences
-node, so only the frames distinguish them.
+second version classified by which package the stack frames came
+from, which was **not a closed signal** (audit review, second round):
+a programming defect anywhere in the catalogue or geography packages
+would still have sent a reader to re-download a perfectly good file.
 
-| Origin | Recognised by | What the reader is told |
+Classification is now by signals that cannot be produced by
+accident. The 34 verification sites in those packages throw
+`PackIntegrityException` - a type only they throw - and the
+preferences store is recognised by the JDK's own
+`BackingStoreException` or by frames inside `java.util.prefs`, a
+package containing no code of ours.
+
+| Failure | Recognised by | What the reader is told |
 |---|---|---|
-| `juranometria.catalog.*`, `juranometria.geo.*` | the verifying loaders' own frames | the file that failed, and to re-download and check the SHA-256 |
-| `java.util.prefs.*`, `BackingStoreException` | the JDK's preferences store | that these are their own saved settings, that removing them costs only the defaults, and where they live on each platform |
-| anything else | nothing matched | that the atlas does not recognise this, that it is likelier a defect than a bad download, and where to report it |
+| bundled data is not what was published | `PackIntegrityException` | the file that failed, and to re-download and check the SHA-256 |
+| the saved-settings store | `BackingStoreException`, or `java.util.prefs` frames | that these are their own settings, that removing them costs only the defaults, and how - per platform |
+| anything else, including a defect in the loaders themselves | nothing matched | that the atlas does not recognise this, that it is likelier a defect than a bad download, and where to report it |
+
+The description shown is now **every distinct message in the chain**,
+outermost first. Stopping at the first wrapper that had a message
+hid the one that mattered: "failed to load the bright-sky pack" is a
+worse sentence than the checksum mismatch it wraps, and the reader
+needs the file name and the two digests.
+
+The settings remedy is **application-specific on every platform**.
+Its first version told macOS readers to delete
+`~/Library/Preferences/com.apple.java.util.prefs.plist` while
+promising "nothing else is lost" - but every Java application on the
+machine shares that one file, so the instruction was destructive.
+Verified on a scratch copy of a real store: the message now says
+plainly not to delete it, and gives the surgical command that
+removes only JUranometria's own entry, leaving the other
+applications' preferences intact.
 
 What a reader with a damaged download now sees:
 

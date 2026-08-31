@@ -30,13 +30,10 @@ class StartupFailureTest {
         // throws inside a static initializer, so the exception that
         // reaches the launch handler carries no message of its own
         // and the useful sentence is one cause down.
-        IllegalStateException verification = new IllegalStateException(
-                "star tile r10-d1/stars.csv does not match its"
-                        + " manifest checksum");
-        verification.setStackTrace(new StackTraceElement[] {
-                new StackTraceElement("juranometria.catalog.TiledCatalogue",
-                        "load", "TiledCatalogue.java", 120)});
-        Throwable observed = new ExceptionInInitializerError(verification);
+        Throwable observed = new ExceptionInInitializerError(
+                new juranometria.catalog.PackIntegrityException(
+                        "star tile r10-d1/stars.csv does not match its"
+                                + " manifest checksum"));
 
         assertEquals(StartupFailure.Kind.BUNDLED_DATA,
                 StartupFailure.classify(observed));
@@ -119,6 +116,82 @@ class StartupFailureTest {
                 "with somewhere to report it: " + message);
         assertTrue(message.contains("\"title\" is null"),
                 "keeping the detail that makes a report useful");
+    }
+
+
+    @Test
+    void aDefectInsideTheLoadersIsNotCalledADamagedDownload() {
+        // The signal must be closed (audit review, P1). A programming
+        // defect thrown from the very packages that verify the data
+        // used to be reported as damaged data, sending the reader to
+        // re-download a file that was never at fault.
+        NullPointerException defect = new NullPointerException(
+                "Cannot read field \"tiles\" because \"pack\" is null");
+        defect.setStackTrace(new StackTraceElement[] {
+                new StackTraceElement("juranometria.catalog.TiledCatalogue",
+                        "starsIn", "TiledCatalogue.java", 140),
+                new StackTraceElement("juranometria.geo.ConstellationGeography",
+                        "load", "ConstellationGeography.java", 40)});
+
+        assertEquals(StartupFailure.Kind.UNRECOGNISED,
+                StartupFailure.classify(defect),
+                "frames inside the catalogue packages prove nothing;"
+                        + " only the verification type does");
+        String message = StartupFailure.message(defect);
+        assertFalse(message.contains("Download the release again"),
+                "a defect of ours must never be blamed on the"
+                        + " reader's download: " + message);
+        assertTrue(message.contains("more likely a defect"));
+    }
+
+    @Test
+    void aWrappedIntegrityFailureKeepsTheDetailThatIdentifiesTheFile() {
+        // describe() used to stop at the first wrapper carrying a
+        // message, which hid the filename and checksum underneath it
+        // (audit review, P1).
+        Throwable wrapped = new juranometria.catalog.PackIntegrityException(
+                "failed to load the bright-sky pack",
+                new juranometria.catalog.PackIntegrityException(
+                        "catalogue tile tiles/r10-d1/stars.csv does not"
+                                + " match its manifest checksum\n"
+                                + "  expected 9e503ae2\n"
+                                + "  actual   a22c6ed8"));
+
+        String message = StartupFailure.message(wrapped);
+
+        assertTrue(message.contains("failed to load the bright-sky pack"),
+                "the outer sentence is kept: " + message);
+        assertTrue(message.contains("tiles/r10-d1/stars.csv")
+                        && message.contains("9e503ae2")
+                        && message.contains("a22c6ed8"),
+                "and never at the cost of the detail that identifies"
+                        + " the file: " + message);
+        assertEquals(StartupFailure.Kind.BUNDLED_DATA,
+                StartupFailure.classify(wrapped));
+    }
+
+    @Test
+    void theSettingsRemedyTouchesOnlyThisApplicationsOwnSettings() {
+        // On macOS every Java application shares ONE preferences
+        // file; the first version of this message told the reader to
+        // delete it, which would have destroyed other applications'
+        // settings while promising nothing else was lost (audit
+        // review, P1).
+        String message = StartupFailure.message(settingsFailure());
+
+        assertTrue(message.contains("do not delete it"),
+                "the shared file is protected explicitly: " + message);
+        assertTrue(message.contains("PlistBuddy")
+                        && message.contains("Delete \":/:juranometria/\""),
+                "with a command that removes only this application's"
+                        + " own entry: " + message);
+        assertTrue(message.contains(".java/.userPrefs/juranometria")
+                        && message.contains("Prefs\\juranometria"),
+                "and application-specific paths elsewhere: " + message);
+        assertFalse(message.matches("(?s).*delete[^\\n]*"
+                        + "com\\.apple\\.java\\.util\\.prefs\\.plist.*"),
+                "never an instruction to delete the shared file: "
+                        + message);
     }
 
     @Test
@@ -228,11 +301,7 @@ class StartupFailureTest {
     }
 
     private static Throwable bundledDataFailure() {
-        IllegalStateException failure = new IllegalStateException("bad tile");
-        failure.setStackTrace(new StackTraceElement[] {
-                new StackTraceElement("juranometria.geo.ConstellationGeography",
-                        "load", "ConstellationGeography.java", 40)});
-        return failure;
+        return new juranometria.catalog.PackIntegrityException("bad tile");
     }
 
     private static Throwable settingsFailure() {
