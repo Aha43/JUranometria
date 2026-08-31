@@ -93,10 +93,45 @@ observer beside the inspector and requires it to hear exactly what
 the inspector hears, so the seam is demonstrated rather than
 asserted.
 
+## The journey drives the controls, not the classes
+
+The first draft of the journey reached its destinations by calling
+the controller, applying search results directly, setting the
+panel's visibility, choosing candidates through the model, and
+resetting the view in code. It passed, and it proved much less than
+it claimed (sprint review). It now goes through the surfaces a
+reader actually touches:
+
+| step | driven by |
+|---|---|
+| open and close the inspector | the **View → Inspector** menu item, whose checkbox must then agree |
+| search | typing into the field and pressing Enter |
+| zoom | real mouse-wheel events on the paper |
+| pan | real press-drag-release |
+| choose a candidate | the panel's own list |
+| Home | the toolbar's **Reset view** button |
+| hide a layer | the chart-options controller the dialog drives |
+
+and it adds the cases the issue named and the first draft skipped: a
+**hidden layer cannot be pointed at**, a click on real **letterbox
+chrome** asks nothing, the **narrow window** closes the panel while
+the chart still answers, **both themes** describe the same object,
+chart options and magnitude **end as they began**, and the final
+page is compared **pixel for pixel with the released reference**.
+
+Two premises were tightened as well. The star the reader points at
+is now proven **unlabelled** against the renderer's own label
+placements — which is the whole reason a reader must ask — and a
+deep-sky object the catalogue records poorly is sought deliberately
+rather than taken by luck, so the silences are exercised on purpose.
+The second observer must hear **exactly one** event per action,
+carrying the same candidates and current index as the model.
+
 ## Verification
 
-- **423 tests**; the display-dependent journeys abort visibly
-  without a screen.
+- **423 tests** on a display; headless, the display-dependent
+  journeys abort visibly rather than fail (verified: the inspector
+  and exploration classes report 17 passed, 1 aborted, 0 failed).
 - The M31 reference and every study page reproduce **byte-for-byte**:
   the highlight is a separate pass after the chart, so the chart is
   what it always was.
