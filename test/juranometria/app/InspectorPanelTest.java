@@ -315,13 +315,9 @@ class InspectorPanelTest {
     void theChartReallyKeepsItsWidthInARealLayout() throws Exception {
         // The formula is one thing; what BorderLayout actually gives
         // the chart is another, and the review's finding was about
-        // the second. Measured in a real frame - which needs a
-        // display, so this joins the suite's other display-dependent
-        // checks and aborts visibly without one. The arithmetic is
-        // covered headlessly by widthBeside above.
-        org.junit.jupiter.api.Assumptions.assumeFalse(
-                java.awt.GraphicsEnvironment.isHeadless(),
-                "a real layout needs a display");
+        // the second. Measured on a real container laid out at exact
+        // widths - not a JFrame, whose decorations differ by platform
+        // and theme and would measure something other than the rule.
         SelectionModel model = new SelectionModel();
         java.awt.Container[] parts = new java.awt.Container[2];
         SwingUtilities.invokeAndWait(() -> {
@@ -330,18 +326,17 @@ class InspectorPanelTest {
                             juranometria.app.Atlas.assembler());
             InspectorPanel panel = new InspectorPanel(model,
                     chart::currentScene, selection -> { });
-            javax.swing.JFrame frame = new javax.swing.JFrame();
-            frame.setLayout(new java.awt.BorderLayout());
-            frame.add(chart, java.awt.BorderLayout.CENTER);
-            frame.add(panel, java.awt.BorderLayout.EAST);
-            frame.pack();
+            javax.swing.JPanel window = new javax.swing.JPanel(
+                    new java.awt.BorderLayout());
+            window.add(chart, java.awt.BorderLayout.CENTER);
+            window.add(panel, java.awt.BorderLayout.EAST);
             parts[0] = chart;
             parts[1] = panel;
             for (int width : new int[] {640, 700, 720, 900, 1400}) {
-                frame.setSize(width, 700);
                 panel.setAvailableWidth(width);
                 panel.setRequestedVisible(true);
-                frame.validate();
+                window.setSize(width, 700);
+                window.doLayout();
                 if (chart.getWidth() < InspectorPanel.MINIMUM_CHART_WIDTH) {
                     throw new AssertionError("at window width " + width
                             + " the chart got only " + chart.getWidth()
@@ -349,10 +344,9 @@ class InspectorPanelTest {
                             + " px taken by the inspector");
                 }
             }
-            frame.setSize(640, 700);
             panel.setAvailableWidth(640);
-            frame.validate();
-            frame.dispose();
+            window.setSize(640, 700);
+            window.doLayout();
         });
 
         assertEquals(400, parts[0].getWidth(),

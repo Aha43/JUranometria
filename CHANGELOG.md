@@ -7,6 +7,21 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Point at the chart and ask what it is.** Clicking a star or a
+  deep-sky symbol names it in a new Inspector panel
+  (View → Inspector): designations, magnitude with its band, size
+  and orientation where the catalogue records them, and "not
+  recorded" where it does not. Overlapping marks are offered as a
+  choice rather than resolved silently; empty sky answers with its
+  coordinates. Selecting never moves the chart - `Center here` is
+  the only action that does - and searching for an object selects
+  it, so the inspector is reachable from the keyboard.
+- Deep-sky records now keep what the source actually measured beside
+  the values the chart draws, so a substituted size or a blue
+  magnitude is never presented as a recorded visual one.
+
 ## [1.0.0] - 2026-08-31
 
 **JUranometria 1.0.** A quiet, fully offline desktop star atlas:

@@ -146,7 +146,13 @@ class SelectInteractionTest {
 
     @Test
     void aClickOnLetterboxChromeAsksNothing() throws Exception {
-        // A tall window letterboxes the page; the surround is not sky.
+        // The page's height is capped by the coverage rule, so a
+        // component taller than the cap is letterboxed. The cap is
+        // about 4,800 px at 36 degrees, which no ordinary window
+        // reaches - so the geometry is built here rather than hoped
+        // for. This test used to assume its way past the case when
+        // the offset came out zero, which meant it could pass
+        // without ever clicking chrome (sprint review).
         ChartComponent[] chart = new ChartComponent[1];
         ChartViewController navigation =
                 new ChartViewController(Atlas.assembler()::fits);
@@ -155,18 +161,36 @@ class SelectInteractionTest {
             chart[0] = new ChartComponent(Atlas.assembler());
             navigation.onChange(chart[0]::setViewState);
             SelectInteraction.install(chart[0], selection);
-            chart[0].setSize(900, 1100);
-            navigation.recenter(new SkyPosition(10.68, 41.27), 8.0);
+            chart[0].setSize(900, 6000);
+            navigation.recenter(new SkyPosition(83.8, 0.0), 36.0);
         });
         flush();
+
         int offset = chart[0].pageOffsetY();
-        org.junit.jupiter.api.Assumptions.assumeTrue(offset > 10,
-                "this window really is letterboxed: " + offset);
+        assertTrue(offset > 100,
+                "the page really is letterboxed here, so the case"
+                        + " cannot silently skip: offset " + offset);
 
         click(chart[0], 450, offset / 2);
-
         assertInstanceOf(Selection.None.class, selection.selection(),
-                "chrome is not sky, and a click on it means nothing");
+                "chrome above the paper is not sky");
+
+        click(chart[0], 450, 6000 - offset / 2);
+        assertInstanceOf(Selection.None.class, selection.selection(),
+                "nor is chrome below it");
+
+        // And the paper between them still answers, so the geometry
+        // is sane rather than merely unreachable.
+        ChartRenderer.DrawnMark onPaper = marks(chart[0].currentScene())
+                .stream()
+                .filter(mark -> mark.star() != null)
+                .filter(mark -> mark.centre().x() > 100
+                        && mark.centre().x() < 800)
+                .findFirst().orElseThrow();
+        click(chart[0], (int) onPaper.centre().x(),
+                (int) onPaper.centre().y() + offset);
+        assertInstanceOf(Selection.Object.class, selection.selection(),
+                "while the paper between the bands does answer");
     }
 
     @Test
