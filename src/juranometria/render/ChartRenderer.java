@@ -335,24 +335,31 @@ public final class ChartRenderer {
      * best identity draws first, exempt from thresholds and
      * collisions and surviving the option toggle, with no new symbol.
      */
-    private void drawStarLabels(Graphics2D g, ChartScene scene,
-                                ChartOptions options,
-                                RegionalDetailPolicy detailPolicy,
-                                GnomonicProjection projection,
-                                ViewportMapping mapping) {
+    /** One placed star label: the text drawn and the box it occupies. */
+    public record StarLabelPlacement(String text, Rectangle2D box,
+                                     Star star, boolean guaranteed) {
+    }
+
+    /**
+     * The star-label pass's DECISION, shared so studies can report
+     * exactly what the chart draws instead of re-implementing the
+     * selection and collision loop (issue #154). Returns the
+     * placements in drawing order; {@link #drawStarLabels} draws
+     * precisely this list.
+     */
+    public java.util.List<StarLabelPlacement> starLabelPlacements(
+            FontMetrics metrics, ChartScene scene, ChartOptions options,
+            RegionalDetailPolicy detailPolicy,
+            GnomonicProjection projection, ViewportMapping mapping) {
         StarLabelPolicy policy = new StarLabelPolicy(
                 scene.viewport().fieldWidthDegrees());
-        g.setFont(LABEL_FONT);
-        g.setColor(TEXT_INK);
-        FontMetrics metrics = g.getFontMetrics();
-
+        java.util.List<StarLabelPlacement> placed = new java.util.ArrayList<>();
         java.util.List<Rectangle2D> occupied = new java.util.ArrayList<>();
-        java.awt.Rectangle titleBlock = titleBlockBounds(g, scene);
+        java.awt.Rectangle titleBlock = titleBlockBounds(metrics, scene);
         if (titleBlock != null) {
             occupied.add(titleBlock);
         }
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            // Exactly the labels the deep-sky pass will draw above.
             if (options.effectiveDeepSkyLabels()
                     ? !detailPolicy.labelled(dso)
                     : (!isTarget(scene, dso) || !hasSymbol(dso))) {
@@ -365,10 +372,8 @@ public final class ChartRenderer {
                         mapping.pixelsPerPlaneUnit()));
             }
         }
-
         // The searched star draws first, exempt from thresholds and
-        // collisions and surviving the option toggle; its box seeds
-        // the collision set so every ordinary label yields to it.
+        // collisions; its box seeds the set so ordinary labels yield.
         for (Star star : scene.stars()) {
             if (scene.targetIdentity() == null
                     || !scene.targetIdentity().equals(star.id())
@@ -377,12 +382,12 @@ public final class ChartRenderer {
             }
             String text = StarLabelPolicy.guaranteedLabelFor(star);
             if (text != null) {
-                placeStarLabel(g, scene, metrics, projection, mapping,
-                        star, text, occupied, true);
+                consider(placed, occupied, metrics, scene, projection,
+                        mapping, star, text, true);
             }
         }
         if (!options.starLabels()) {
-            return;
+            return java.util.List.copyOf(placed);
         }
         java.util.List<Star> stars = new java.util.ArrayList<>(scene.stars());
         stars.sort(java.util.Comparator.comparingDouble(Star::magnitude)
@@ -395,20 +400,20 @@ public final class ChartRenderer {
             }
             String text = policy.labelFor(star);
             if (text != null) {
-                placeStarLabel(g, scene, metrics, projection, mapping,
-                        star, text, occupied, false);
+                consider(placed, occupied, metrics, scene, projection,
+                        mapping, star, text, false);
             }
         }
+        return java.util.List.copyOf(placed);
     }
 
-    /** Places one star label; exempt labels skip collision rejection. */
-    private void placeStarLabel(Graphics2D g, ChartScene scene,
-                                FontMetrics metrics,
-                                GnomonicProjection projection,
-                                ViewportMapping mapping, Star star,
-                                String text,
-                                java.util.List<Rectangle2D> occupied,
-                                boolean exempt) {
+    /** Places one label unless the page or an accepted box refuses it. */
+    private void consider(java.util.List<StarLabelPlacement> placed,
+                          java.util.List<Rectangle2D> occupied,
+                          FontMetrics metrics,
+                          ChartScene scene, GnomonicProjection projection,
+                          ViewportMapping mapping, Star star, String text,
+                          boolean guaranteed) {
         var plane = projection.project(star.position());
         if (plane.isEmpty()) {
             return;
@@ -421,9 +426,7 @@ public final class ChartRenderer {
         }
         Rectangle2D box = starLabelBounds(metrics, text, pixel,
                 starSizePolicy.radiusFor(star.magnitude()));
-        double x = box.getX() + 2.0;
-        double y = box.getY() + metrics.getAscent();
-        if (!exempt) {
+        if (!guaranteed) {
             for (Rectangle2D other : occupied) {
                 if (other.intersects(box)) {
                     return;
@@ -431,7 +434,23 @@ public final class ChartRenderer {
             }
         }
         occupied.add(box);
-        g.drawString(text, (float) x, (float) y);
+        placed.add(new StarLabelPlacement(text, box, star, guaranteed));
+    }
+
+    private void drawStarLabels(Graphics2D g, ChartScene scene,
+                                ChartOptions options,
+                                RegionalDetailPolicy detailPolicy,
+                                GnomonicProjection projection,
+                                ViewportMapping mapping) {
+        g.setFont(LABEL_FONT);
+        g.setColor(TEXT_INK);
+        FontMetrics metrics = g.getFontMetrics();
+        for (StarLabelPlacement placement : starLabelPlacements(metrics,
+                scene, options, detailPolicy, projection, mapping)) {
+            g.drawString(placement.text(),
+                    (float) (placement.box().getX() + 2.0),
+                    (float) (placement.box().getY() + metrics.getAscent()));
+        }
     }
 
     /**
@@ -629,15 +648,32 @@ public final class ChartRenderer {
      */
     public static java.awt.Rectangle titleBlockBounds(Graphics2D g,
                                                       ChartScene scene) {
+        return titleBlockBounds(g.getFontMetrics(LABEL_FONT), scene);
+    }
+
+    /** Title-face metrics derived without a live graphics context. */
+    private static FontMetrics titleFontMetrics(FontMetrics labelMetrics) {
+        var image = new java.awt.image.BufferedImage(1, 1,
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        Graphics2D probe = image.createGraphics();
+        try {
+            return probe.getFontMetrics(TITLE_FONT);
+        } finally {
+            probe.dispose();
+        }
+    }
+
+    /** The title block's bounds from label metrics alone. */
+    public static java.awt.Rectangle titleBlockBounds(FontMetrics metrics,
+                                                      ChartScene scene) {
         String[] lines = titleLines(scene);
-        FontMetrics metrics = g.getFontMetrics(LABEL_FONT);
         int lineHeight = metrics.getHeight();
         int textWidth = 0;
         for (String line : lines) {
             textWidth = Math.max(textWidth, metrics.stringWidth(line));
         }
-        textWidth = Math.max(textWidth,
-                g.getFontMetrics(TITLE_FONT).stringWidth(lines[0]));
+        textWidth = Math.max(textWidth, titleFontMetrics(metrics)
+                .stringWidth(lines[0]));
         int boxWidth = textWidth + 2 * TITLE_PADDING_PX;
         int boxHeight = lines.length * lineHeight + 2 * TITLE_PADDING_PX;
         int boxX = TITLE_MARGIN_PX;

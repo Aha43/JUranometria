@@ -107,33 +107,16 @@ public final class BayerStudyMain {
     static final Policy EVERYTHING = new Policy("everything",
             9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, false, true, false);
 
-    private static final char[] SUPERSCRIPTS = {
-            '⁰', '¹', '²', '³', '⁴',
-            '⁵', '⁶', '⁷', '⁸', '⁹'};
-
     private BayerStudyMain() {
     }
 
     /**
-     * Conventional Bayer notation from the STRUCTURED identity: the
-     * letter verbatim (Greek or post-omega Latin, as the pack
-     * carries it) with its component digits raised, never inferred
-     * from a display string.
+     * Conventional notation, delegated to the production policy
+     * (issue #154): the study measures the same implementation the
+     * renderer draws, never a second copy.
      */
     static String bayerNotation(StarIdentity identity) {
-        String bayer = identity.bayer();
-        if (bayer == null) {
-            return null;
-        }
-        int split = bayer.length();
-        while (split > 0 && Character.isDigit(bayer.charAt(split - 1))) {
-            split--;
-        }
-        StringBuilder out = new StringBuilder(bayer.substring(0, split));
-        for (int i = split; i < bayer.length(); i++) {
-            out.append(SUPERSCRIPTS[bayer.charAt(i) - '0']);
-        }
-        return out.toString();
+        return juranometria.render.StarLabelPolicy.bayerNotation(identity);
     }
 
     /** The text a policy gives a star, and which form it is. */
@@ -202,9 +185,12 @@ public final class BayerStudyMain {
                         + " %8s %9s %8s%n",
                 "page (policy)", "field", "names", "lettr", "both", "flams",
                 "rejected", "ambiguous", "render");
+        // The sweep pages ARE production output since #154: the
+        // renderer draws its own decided labels; the study only
+        // reports what the production policy selected.
         for (Page page : pages) {
-            study(renderer, page.name(), new SkyPosition(page.ra(),
-                    page.dec()), page.field(), PROPOSED, outDir);
+            production(renderer, page.name(), new SkyPosition(page.ra(),
+                    page.dec()), page.field(), outDir);
         }
         // Paired comparisons on one page: what changes, and the two
         // alternatives the decision must weigh.
@@ -323,6 +309,91 @@ public final class BayerStudyMain {
                 flamsteed, names, nameAndLetter, letterOnly,
                 constellationsPerLetter.size(), sharedLetters, worstLetter,
                 worstSpread);
+    }
+
+    /**
+     * A page drawn by the PRODUCTION renderer with its released
+     * options, measured by asking the production policy what it
+     * selected - no candidate pass, no second implementation.
+     */
+    private static void production(ChartRenderer renderer, String name,
+                                   SkyPosition centre, double field,
+                                   File outDir) throws Exception {
+        ChartViewState state = new ChartViewState(centre, field, 8.0, null, null);
+        ChartScene scene = Atlas.assembler().assemble(state, WIDTH, HEIGHT);
+        for (int warm = 0; warm < 3; warm++) {
+            renderer.renderToImage(scene);
+        }
+        long best = Long.MAX_VALUE;
+        for (int round = 0; round < 5; round++) {
+            long t0 = System.nanoTime();
+            renderer.renderToImage(scene);
+            best = Math.min(best, System.nanoTime() - t0);
+        }
+        ImageIO.write(renderer.renderToImage(scene), "png",
+                new File(outDir, name + ".png"));
+
+        // Count exactly what the renderer DREW, by asking it for its
+        // own placements - no re-implemented selection or collision
+        // loop in the study (issue #154).
+        var probe = new java.awt.image.BufferedImage(1, 1,
+                java.awt.image.BufferedImage.TYPE_INT_RGB).createGraphics();
+        var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
+        probe.dispose();
+        var placements = renderer.starLabelPlacements(metrics, scene,
+                ChartOptions.DEFAULTS,
+                new RegionalDetailPolicy(scene,
+                        new ViewportMapping(scene.viewport())
+                                .pixelsPerPlaneUnit()),
+                new GnomonicProjection(scene.viewport().centre()),
+                new ViewportMapping(scene.viewport()));
+        int names = 0;
+        int letters = 0;
+        int latin = 0;
+        int both = 0;
+        int flams = 0;
+        int ambiguous = 0;
+        Map<String, String> owners = new HashMap<>();
+        for (var placement : placements) {
+            var identity = placement.star().identity();
+            String letter = bayerNotation(identity);
+            boolean hasName = identity.name() != null
+                    && placement.text().startsWith(identity.name());
+            boolean hasLetter = letter != null
+                    && placement.text().endsWith(letter);
+            if (hasName && hasLetter) {
+                both++;
+            } else if (hasName) {
+                names++;
+            } else if (hasLetter) {
+                if (juranometria.render.StarLabelPolicy
+                        .isGreek(identity.bayer())) {
+                    letters++;
+                } else {
+                    latin++;
+                }
+            } else {
+                flams++;
+            }
+            if (hasLetter) {
+                String bare = identity.bayer().replaceAll("\\d+$", "");
+                String owner = owners.putIfAbsent(bare,
+                        identity.constellation());
+                if (owner != null
+                        && !owner.equals(identity.constellation())) {
+                    ambiguous++;
+                }
+            }
+        }
+        System.out.printf(Locale.ROOT, "%-24s %5.0f\u00b0 | %5d %5d %5d %5d"
+                        + " | %8s %9d %6.1fms%n",
+                name + " (production)", field, names, letters + latin, both,
+                flams, "-", ambiguous, best / 1e6);
+        if (latin > 0) {
+            System.out.printf(Locale.ROOT,
+                    "    (of the %d letters, %d are post-omega Latin)%n",
+                    letters + latin, latin);
+        }
     }
 
     /** Per-page counts the candidate pass produced. */
