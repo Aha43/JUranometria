@@ -41,6 +41,21 @@ public final class PackagedAcceptanceMain {
                         && !"unknown".equals(AppInfo.version()),
                 "the packaged version is a real version, not the"
                         + " 'unknown' fallback: " + AppInfo.version());
+        // The 1.0 acceptance binding (issue #146): the application
+        // running inside this image must report the version the
+        // image was built for and named after. An archive that
+        // claims one version while its application reports another
+        // is exactly the artifact a release must never publish, and
+        // only the packaged runtime can answer this.
+        if (args.length > 0 && !args[0].isBlank()) {
+            require(args[0].equals(AppInfo.version()),
+                    "the packaged application reports the version"
+                            + " this image was built for: expected "
+                            + args[0] + ", running "
+                            + AppInfo.version());
+            System.out.println("version binding OK (image and"
+                    + " application both " + args[0] + ")");
+        }
         System.out.println("about surface OK (summary, "
                 + notices.length() + " chars of notices, version "
                 + AppInfo.version() + ")");
