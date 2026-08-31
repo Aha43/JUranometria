@@ -43,10 +43,14 @@ public final class JUranometriaMain {
         UiTheme.apply(appearance.startupDark());
         ChartOptionsController chartOptions =
                 new ChartOptionsController(ChartOptionsStore.user());
-        JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // The catalogues verify themselves as they load, so they are
+        // loaded before any window exists: a damaged download should
+        // be explained, not half-drawn behind a frame that will never
+        // be usable.
         ChartViewController controller =
                 new ChartViewController(Atlas.assembler()::fits);
+        JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(AppMenuBar.create(controller,
                 () -> SettingsDialog.open(frame, appearance,
                         effectiveDark -> {

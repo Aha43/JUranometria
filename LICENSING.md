@@ -35,7 +35,8 @@ the release archive beside the `lib/` directory.
 
 The four self-contained platform downloads (macOS Apple silicon,
 macOS Intel, Windows x86-64, Linux x86-64) include a trimmed
-**Eclipse Temurin 21** runtime so that readers install no Java:
+**Eclipse Temurin 21** runtime, licensed **GPLv2 with the Classpath
+Exception**, so that readers install no Java:
 
 | Component | License |
 |---|---|

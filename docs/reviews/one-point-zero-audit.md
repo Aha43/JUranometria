@@ -11,7 +11,10 @@ contradiction of the contract**, record everything else as post-1.0.
 Six contradictions were found and fixed; one robustness defect was
 found by experiment and fixed; the rest of the contract was
 confirmed by evidence, and that evidence is now executed by tests
-rather than asserted in prose. The suite went from 324 to 334.
+rather than asserted in prose. The suite went from 324 to 341, including the corrections the
+audit's own review required (recorded below where they apply:
+remedy classification, the runtime-licensing guard, and the
+narrowed offline claim).
 
 ## Blockers found and fixed
 
@@ -86,9 +89,24 @@ at all** — on macOS, an icon in the dock that never opens anything,
 with nothing to indicate what was wrong.
 
 Fixed with `StartupFailure`: launch is wrapped, the failure is
-reported in the loader's own words with the remedy, and the process
-exits non-zero instead of lingering invisibly. What a reader with a
-damaged download now sees:
+reported in the loader's own words with **the remedy that fits it**,
+and the process exits non-zero instead of lingering invisibly.
+
+The first version of this fix told every failure it was a damaged
+download (audit review, P1) - useless advice for an unreadable
+settings store, and a confident lie for an application defect. The
+failure is now classified by **where it actually came through**,
+since the exception types overlap: a plain `IllegalStateException`
+is thrown both by the verifying loaders and by a removed preferences
+node, so only the frames distinguish them.
+
+| Origin | Recognised by | What the reader is told |
+|---|---|---|
+| `juranometria.catalog.*`, `juranometria.geo.*` | the verifying loaders' own frames | the file that failed, and to re-download and check the SHA-256 |
+| `java.util.prefs.*`, `BackingStoreException` | the JDK's preferences store | that these are their own saved settings, that removing them costs only the defaults, and where they live on each platform |
+| anything else | nothing matched | that the atlas does not recognise this, that it is likelier a defect than a bad download, and where to report it |
+
+What a reader with a damaged download now sees:
 
 ```
 JUranometria could not start.
@@ -108,9 +126,21 @@ checksum, and unpack it fresh into an empty folder.
 ```
 
 The same surface covers the one preference failure the store cannot
-absorb — a preferences node that has been removed underneath a
-running application — which is now a sentence rather than a silent
-death.
+absorb — a preferences node removed underneath a running
+application — which is now a sentence rather than a silent death,
+and correctly a *settings* sentence rather than a download one.
+
+The exit itself is proved on real processes, not simulated: two
+tests spawn an actual JVM — one with a deliberately damaged tile
+shadowing the good one on the class path, one failing a different
+way entirely — and assert that each **ends by itself with status 1**,
+says so, and offers only the remedy that fits. The lingering
+window-less process, which is the defect this surface exists to end,
+cannot come back unnoticed.
+
+The atlas is now also loaded *before* the window is built, so a
+damaged download is explained instead of half-drawn behind a frame
+that would never become usable.
 
 ## Confirmed by evidence, and now executed by tests
 
@@ -120,11 +150,12 @@ death.
 | No stored value can fail a launch | every key damaged a different real way (`FALSE`, `0`, empty, whitespace, `null`, `yes`, trailing space, foreign value) | all nine load as released defaults |
 | Every control carries an accessible name | `AccessibleSurfaceTest` walks the toolbar, search, all three dialogs, and the menu bar | no gaps; the only unnamed components anywhere are FlatLaf's internal scroll-bar buttons, which are the look and feel's, skipped by focus traversal |
 | Dialogs are owned and close on Escape | asserted for all three dialogs | held (Settings reaches it through the shared helper) |
-| "Makes no network requests at any time" | `OfflinePromiseTest` scans every compiled class for the constant-pool references a connection requires | zero, across 300+ classes — offline by construction, not by policy |
+| "Makes no network requests at any time" | `OfflinePromiseTest` scans every compiled class for the references the **listed** connection mechanisms require — sockets and channels, URL connections, the HTTP client, name resolution, SSL, RMI, JNDI, and starting a subprocess — with a positive control proving the scan can see a reference that is really there | zero across all 121 classes; a **guard against reintroduction, not a proof of impossibility** (reflection, method handles, or native code would evade it), narrowed after the audit review |
 | Both themes, chart theme-independent | existing appearance tests and the packaged acceptance in light and `--dark` | held |
 | The five artifact shapes | the four native cells, `smoke-cross-architecture`, and three portable `verify` cells, all green on the release commit | held |
 | The packaged application is the published one | the **actual downloaded** 0.17.0 macOS arm64 archive, run with `PATH=/nonexistent` | About reports 0.17.0 with 26,048 characters of notices, a real preference change-and-reload succeeds, and its smoke render is **byte-identical** to the committed reference |
-| About, `LICENSING.md`, `packaging/LICENSING.md` agree | the existing pairing test, still green after the runtime section was added | held |
+| About, `LICENSING.md`, `packaging/LICENSING.md` agree | the existing semantic pairing test | held |
+| The bundled runtime's licence travels | a new pairing guard: `LICENSING.md` names Temurin **with** GPLv2 + Classpath Exception and the images-versus-portable distinction, the image `README.txt` repeats it, and About still does **not** restate it | held; without this guard the drift the audit fixed could return with the suite green |
 | Version agreement | About shows the packaged `VERSION`, never a second copy | held |
 
 Robustness checks that found nothing, recorded so they are not

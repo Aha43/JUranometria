@@ -158,8 +158,12 @@ class PreferenceUpgradeTest {
 
         IllegalStateException thrown = org.junit.jupiter.api.Assertions
                 .assertThrows(IllegalStateException.class, store::load);
-        assertTrue(StartupFailure.message(thrown).contains(
-                        "Download the release again"),
-                "and the launch surface turns it into an instruction");
+        String message = StartupFailure.message(thrown);
+        assertTrue(message.contains("saved settings"),
+                "and the launch surface explains it as what it is - the"
+                        + " reader's settings, not the atlas: " + message);
+        assertFalse(message.contains("Download the release again"),
+                "never as a damaged download, which re-downloading"
+                        + " could not repair anyway");
     }
 }
