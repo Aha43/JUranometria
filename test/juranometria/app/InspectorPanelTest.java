@@ -315,7 +315,13 @@ class InspectorPanelTest {
     void theChartReallyKeepsItsWidthInARealLayout() throws Exception {
         // The formula is one thing; what BorderLayout actually gives
         // the chart is another, and the review's finding was about
-        // the second. Measured in a real frame.
+        // the second. Measured in a real frame - which needs a
+        // display, so this joins the suite's other display-dependent
+        // checks and aborts visibly without one. The arithmetic is
+        // covered headlessly by widthBeside above.
+        org.junit.jupiter.api.Assumptions.assumeFalse(
+                java.awt.GraphicsEnvironment.isHeadless(),
+                "a real layout needs a display");
         SelectionModel model = new SelectionModel();
         java.awt.Container[] parts = new java.awt.Container[2];
         SwingUtilities.invokeAndWait(() -> {
