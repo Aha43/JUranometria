@@ -7,6 +7,21 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The stars are lettered: Bayer designations now reach the wide
+  constellation pages in conventional notation - the letter with
+  its component digits raised (π³, α¹) - and travel beside a
+  traditional name where a star has both ("Betelgeuse α",
+  "Gacrux γ"). Greek letters draw at every field; the post-omega
+  Latin letters wait for the regional charts, where Flamsteed
+  numbers keep their released limit.
+- Three independent Chart Options controls replace the single star
+  label toggle: **Star names**, **Bayer letters**, and **Flamsteed
+  numbers**. A preference store from an earlier release carries its
+  single choice into all three, and from the first confirmation
+  each layer answers to its own setting.
+
 ## [0.16.0] - 2026-08-30
 
 Sprint 16, in progress — the distribution work of the reviewed 1.0

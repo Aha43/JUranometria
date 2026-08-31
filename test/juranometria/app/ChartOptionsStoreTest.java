@@ -13,6 +13,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ChartOptionsStoreTest {
 
     @Test
+    void aPreSplitStoreMigratesThenYieldsToEveryNewerChoice()
+            throws Exception {
+        // The Sprint 17 migration precedence, end to end: a store
+        // written before the split carries only chart.starLabels, so
+        // it governs all three identifier layers; the moment a layer
+        // is confirmed on its own key, that key decides forever -
+        // so a reader who once switched everything off can
+        // re-enable Bayer letters alone and have it stick.
+        Preferences node = Preferences.userRoot()
+                .node("juranometria-test-" + System.nanoTime());
+        try {
+            node.put("chart.starLabels", "false");
+            ChartOptionsStore store = ChartOptionsStore.forNode(node);
+            ChartOptions migrated = store.load();
+            assertFalse(migrated.starNames(),
+                    "the legacy control governs every identifier layer");
+            assertFalse(migrated.bayerLetters());
+            assertFalse(migrated.flamsteedNumbers());
+            assertTrue(migrated.deepSkyObjects(),
+                    "and nothing else is affected");
+
+            store.save(new ChartOptions(true, true, true, true, true,
+                    false, true, false, true));
+            ChartOptions reloaded = store.load();
+            assertTrue(reloaded.bayerLetters(),
+                    "the re-enabled layer sticks despite the legacy key");
+            assertFalse(reloaded.starNames());
+            assertFalse(reloaded.flamsteedNumbers());
+            assertEquals("false", node.get("chart.starLabels", null),
+                    "the legacy key is left in place for older builds");
+        } finally {
+            node.removeNode();
+        }
+    }
+
+    @Test
     void optionsRoundTripAndToleratesTheUnknownWithoutRealPreferences()
             throws Exception {
         Preferences node = Preferences.userRoot()
@@ -39,9 +75,14 @@ class ChartOptionsStoreTest {
             assertFalse(loaded.constellationFigures(),
                     "only the explicit string false disables a layer");
 
+            // The legacy key cannot override this store: saving has
+            // already written all three identifier keys, and a
+            // present new key always decides (the Sprint 17
+            // precedence). Migration is exercised on a store that
+            // predates the split, below.
             node.put("chart.starLabels", "false");
-            assertFalse(store.load().starLabels(),
-                    "the star-label option persists under its own key");
+            assertTrue(store.load().starNames(),
+                    "a present new key outranks the legacy control");
 
             // Migration: a store written before the grid existed has
             // no chart.equatorialGrid key - it loads as the gate's

@@ -86,8 +86,9 @@ place for it). A searched star always keeps its best identity label,
 exempt from thresholds and collisions, with no new symbol.
 
 From Sprint 12 the reader may hide layers (deep-sky symbols and
-labels, figures, boundaries, names, star names and identifiers, and
-the equatorial coordinate grid)
+labels, figures, boundaries, names, star names, Bayer letters and
+Flamsteed numbers each on their own, and the equatorial coordinate
+grid)
 through View > Chart Options; an enabled layer still obeys every
 rule above, and a searched target
 with an established symbol is always drawn and labelled whatever the

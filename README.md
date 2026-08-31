@@ -165,8 +165,8 @@ The menu bar stays out of the way: **View** carries Zoom In/Zoom Out
 with their platform shortcuts, and **View → Chart Options…** lets the
 reader choose the chart's content and labels — deep-sky objects and
 their labels, constellation figures, boundaries, and names, star
-names and identifiers, and the equatorial (ICRS/J2000) coordinate
-grid — with a
+names, Bayer letters and Flamsteed numbers separately, and the
+equatorial (ICRS/J2000) coordinate grid — with a
 live preview, safe Cancel, a Restore Defaults returning the released
 chart exactly, and choices remembered across restarts (a searched
 target always stays drawn and labelled, whatever the toggles);

@@ -54,7 +54,8 @@ public final class PackagedAcceptanceMain {
         ChartOptions flipped = new ChartOptions(before.deepSkyObjects(),
                 before.deepSkyLabels(), before.constellationFigures(),
                 before.constellationBoundaries(),
-                before.constellationNames(), before.starLabels(),
+                before.constellationNames(), before.starNames(),
+                before.bayerLetters(), before.flamsteedNumbers(),
                 !before.equatorialGrid());
         store.save(flipped);
         Preferences.userRoot().node("juranometria").flush();

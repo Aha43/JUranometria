@@ -14,8 +14,11 @@ package juranometria.render;
  * and constellation names only while figures are on (labels and names
  * attach to drawn ink; detached text is not a chart). Star labels
  * have no dependency: they attach to star dots, which are never
- * optional - and the searched star's guaranteed label survives the
- * toggle exactly as the deep-sky target's does. The equatorial grid
+ * optional - and the searched star's guaranteed label survives every
+ * identifier toggle exactly as the deep-sky target's does. The three
+ * identifier layers (names, Bayer letters, Flamsteed numbers) are
+ * independent by the Sprint 17 decision: letters and numbers have
+ * measurably different value density. The equatorial grid
  * (ICRS/J2000) likewise has no dependency: pure view geometry with
  * no target of its own.
  */
@@ -23,12 +26,29 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            boolean constellationFigures,
                            boolean constellationBoundaries,
                            boolean constellationNames,
-                           boolean starLabels,
+                           boolean starNames, boolean bayerLetters,
+                           boolean flamsteedNumbers,
                            boolean equatorialGrid) {
 
     /** The released chart: everything on. */
-    public static final ChartOptions DEFAULTS =
-            new ChartOptions(true, true, true, true, true, true, true);
+    public static final ChartOptions DEFAULTS = new ChartOptions(
+            true, true, true, true, true, true, true, true, true);
+
+    /**
+     * The chart when one control governed every star label (through
+     * 0.16.0): that single choice becomes all three identifier
+     * layers, the migration the Sprint 17 decision records.
+     */
+    public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
+                        boolean constellationFigures,
+                        boolean constellationBoundaries,
+                        boolean constellationNames,
+                        boolean starLabels,
+                        boolean equatorialGrid) {
+        this(deepSkyObjects, deepSkyLabels, constellationFigures,
+                constellationBoundaries, constellationNames, starLabels,
+                starLabels, starLabels, equatorialGrid);
+    }
 
     /** The chart before the equatorial grid existed (through 0.14.0). */
     public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
@@ -48,6 +68,11 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                         boolean constellationNames) {
         this(deepSkyObjects, deepSkyLabels, constellationFigures,
                 constellationBoundaries, constellationNames, true, true);
+    }
+
+    /** Whether any star-identifier layer may draw at all. */
+    public boolean anyStarLabels() {
+        return starNames || bayerLetters || flamsteedNumbers;
     }
 
     /** Labels depend on symbols: {@code labelled} stays inside {@code drawn}. */

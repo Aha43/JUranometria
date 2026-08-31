@@ -55,7 +55,8 @@ class ChartComponentTest {
 
         SwingUtilities.invokeAndWait(() -> component.setChartOptions(
                 new juranometria.render.ChartOptions(
-                        false, false, false, false, false, false, false)));
+                        false, false, false, false, false, false, false,
+                        false, false)));
         SwingUtilities.invokeAndWait(() -> { });
         paint(component);
 

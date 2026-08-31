@@ -71,14 +71,20 @@ class ChartOptionsDialogTest {
             assertFalse(controller.options().equatorialGrid(),
                     "the grid toggle previews immediately");
 
-            // Star names and identifiers: third Labels control, no
-            // dependency (star dots are never optional), live preview.
-            assertTrue(box(content, "Star names and identifiers").isEnabled(),
-                    "the star-label control depends on nothing");
-            box(content, "Star names and identifiers").doClick();
-            assertFalse(controller.options().starLabels(),
-                    "the toggle previews immediately");
-            assertTrue(box(content, "Star names and identifiers").isEnabled());
+            // The three identifier controls: independent by the
+            // Sprint 17 decision, no dependency (star dots are never
+            // optional), each previewing live and separately.
+            for (String control : new String[] {"Star names",
+                    "Bayer letters", "Flamsteed numbers"}) {
+                assertTrue(box(content, control).isEnabled(),
+                        control + " depends on nothing");
+            }
+            box(content, "Bayer letters").doClick();
+            assertFalse(controller.options().bayerLetters(),
+                    "the letter toggle previews immediately");
+            assertTrue(controller.options().starNames(),
+                    "and leaves the other identifier layers alone");
+            assertTrue(controller.options().flamsteedNumbers());
 
             // Restore Defaults previews the released chart and re-enables
             // every dependent control.
@@ -86,8 +92,11 @@ class ChartOptionsDialogTest {
             assertEquals(ChartOptions.DEFAULTS, controller.options());
             assertTrue(box(content, "Constellation names").isEnabled());
             assertTrue(box(content, "Constellation boundaries").isSelected());
-            assertTrue(box(content, "Star names and identifiers").isSelected(),
-                    "Restore Defaults includes the star-label option");
+            for (String control : new String[] {"Star names",
+                    "Bayer letters", "Flamsteed numbers"}) {
+                assertTrue(box(content, control).isSelected(),
+                        "Restore Defaults includes " + control);
+            }
             assertTrue(box(content, "Equatorial coordinate grid")
                             .isSelected(),
                     "Restore Defaults includes the grid option");

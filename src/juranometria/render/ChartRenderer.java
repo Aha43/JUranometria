@@ -386,7 +386,7 @@ public final class ChartRenderer {
                         mapping, star, text, true);
             }
         }
-        if (!options.starLabels()) {
+        if (!options.anyStarLabels()) {
             return java.util.List.copyOf(placed);
         }
         java.util.List<Star> stars = new java.util.ArrayList<>(scene.stars());
@@ -398,7 +398,10 @@ public final class ChartRenderer {
                             && scene.targetIdentity().equals(star.id()))) {
                 continue;
             }
-            String text = policy.labelFor(star);
+            // The pass composes what the reader permits from what
+            // the option-free policy says qualifies.
+            String text = policy.qualifying(star).text(options.starNames(),
+                    options.bayerLetters(), options.flamsteedNumbers());
             if (text != null) {
                 consider(placed, occupied, metrics, scene, projection,
                         mapping, star, text, false);
