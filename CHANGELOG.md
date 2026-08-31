@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-01
+
+Sprint 19 — Explore the map. The atlas could always find Betelgeuse;
+now it can answer the opposite question. Point at any mark and it
+tells you what it is, states plainly what the catalogue does not
+record, and offers the choice where marks overlap — without moving
+the chart or adding a line of permanent ink to it. Decided at a
+measured gate
+([docs/decisions/point-and-identify.md](docs/decisions/point-and-identify.md))
+and reviewed by Codex at every step.
+
 ### Added
 
 - **Point at the chart and ask what it is.** Clicking a star or a
