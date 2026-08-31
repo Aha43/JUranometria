@@ -5,24 +5,19 @@ Reviewed PRs #172–#175 against milestone 19, issues #168–#171, the
 
 ## Result
 
-**One final P2 remains on PR #175.** The feature itself and the
-closing journey are otherwise suitable for a 1.1.0 release.
+**Approved.** All findings are resolved. Sprint 19 and its closing
+journey are suitable for a 1.1.0 release.
 
-## Final finding
+## Final correction verified
 
-### P2 — restore the look-and-feel that the journey inherited
+### Look-and-feel cleanup restores the inherited state
 
-`MapExplorationJourneyTest.leaveNoTrace()` does not restore the
-previous process-wide Swing look-and-feel. It unconditionally calls
-`UiTheme.apply(false)`, leaving light mode behind even when the test
-started in dark mode or under another installed look-and-feel. That
-makes later Swing tests depend on execution order and contradicts
-the handover's statement that the journey restores the look-and-feel.
-
-Capture `UIManager.getLookAndFeel()` before the journey changes the
-theme and restore that exact instance in `@AfterEach`, in the same
-guarded pattern used by the existing rendering and public-face
-tests. Keep the scratch preference-node removal in the same cleanup.
+`MapExplorationJourneyTest` now captures the process-wide Swing
+look-and-feel in `@BeforeEach` and restores that exact instance in
+`@AfterEach`, failing loudly if restoration is impossible. It no
+longer substitutes the test's preferred light theme for the state
+the JVM handed it. The scratch preference node is removed in the
+same cleanup, including after a failed journey.
 
 ## Review findings resolved during the sprint
 
@@ -85,9 +80,9 @@ tests. Keep the scratch preference-node removal in the same cleanup.
 ## Release assessment
 
 Sprint 19 adds backward-compatible reader-facing behavior and does
-not change the 1.0 contract. The correct release is **1.1.0** once
-the final look-and-feel cleanup finding is resolved and the required
-matrix remains green.
+not change the 1.0 contract. With 424 tests and the required
+12-check matrix green on the approved head, the correct release is
+**1.1.0**.
 
 The default M31 chart remains byte-identical. The residual risks in
 the handover are stated appropriately: no constellation containment
