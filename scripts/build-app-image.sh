@@ -181,9 +181,15 @@ case "$(uname -s)" in
     *) acceptance="$image/bin/juranometria-acceptance"
        [ -e "$acceptance" ] || acceptance="$image/juranometria-acceptance.exe" ;;
 esac
-accept_out=$(env PATH=/nonexistent "$acceptance" 2>&1) \
-    || accept_out=$("$acceptance" 2>&1) || {
+accept_out=$(env PATH=/nonexistent "$acceptance" "$version" 2>&1) \
+    || accept_out=$("$acceptance" "$version" 2>&1) || {
     echo "build-app-image: packaged acceptance failed:" >&2
+    echo "$accept_out" >&2
+    exit 1
+}
+echo "$accept_out" | grep -q "version binding OK" || {
+    echo "build-app-image: the packaged application did not confirm" >&2
+    echo "version $version:" >&2
     echo "$accept_out" >&2
     exit 1
 }

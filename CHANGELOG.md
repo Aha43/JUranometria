@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-31
+
+**JUranometria 1.0.** A quiet, fully offline desktop star atlas:
+white paper, black ink, north up and east left, the whole sky to
+V 8.0. Search it by name, designation, identifier, or coordinates;
+grab the paper and pan; zoom where you point; read the
+constellations by their own Bayer and Flamsteed notation under an
+equatorial grid.
+
+Everything 1.0 promises is written down in
+[the 1.0 contract](docs/decisions/one-point-zero-contract.md), and
+the audit that held the application to it is in
+[docs/reviews/one-point-zero-audit.md](docs/reviews/one-point-zero-audit.md).
+This release changes no chart behaviour: it is 0.17.0, audited,
+with its distribution and release path proven.
+
 ### Added
 
 - Releases are published by pushing an annotated `vX.Y.Z` tag. The

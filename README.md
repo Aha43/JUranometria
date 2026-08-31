@@ -215,18 +215,28 @@ redistributable non-commercially only. See
 
 ## Status
 
-Eighteen releases in (v0.1.0 through v0.17.0; see `CHANGELOG.md`),
-the atlas is a working instrument, distributed as four
-self-contained platform applications plus a portable archive. It
-bundles the complete bright sky offline (45,630 Tycho-2 stars to
-V 8.0 and 13,371 OpenNGC objects), searches it by name,
-designation, identifier, or coordinates, letters the constellations
-with their Bayer and Flamsteed notation, draws the IAU boundaries
-and an equatorial grid, zooms from 1 to 36 degree fields where you
-point, and pans by grabbing the paper with an exact
-projection-correct drag. What 1.0 promises is recorded in
-[the 1.0 contract](docs/decisions/one-point-zero-contract.md).
-Every release is preceded by an independent review whose trail
-lives in `docs/reviews/`. The deliberately simple plain-Java/Make
-organization proven in NamDesktop, and the issue-driven sprint
-rhythm proven in NamWeb, both still hold.
+**1.0.** The atlas is a finished instrument, distributed as four
+self-contained platform applications — macOS Apple silicon, macOS
+Intel, Windows x86-64, Linux x86-64 — plus a portable archive for
+readers who bring their own Java 21+. It bundles the complete
+bright sky offline (45,630 Tycho-2 stars to V 8.0 and 13,371
+OpenNGC objects), searches it by name, designation, identifier, or
+coordinates, letters the constellations with their Bayer and
+Flamsteed notation, draws the IAU boundaries and an equatorial
+grid, zooms from 1 to 36 degree fields where you point, and pans by
+grabbing the paper with an exact projection-correct drag.
+
+What 1.0 promises — platforms, data, preferences, stable behaviour,
+licensing — is written down in
+[the 1.0 contract](docs/decisions/one-point-zero-contract.md), and
+[the audit](docs/reviews/one-point-zero-audit.md) records how the
+application was held to it. Every release is preceded by an
+independent review whose trail lives in `docs/reviews/`, and is
+published from an annotated tag by
+[the release workflow](.github/workflows/release.yml).
+
+Beyond 1.0: installers, code signing and notarization, and update
+checking remain deliberately out of scope, recorded as candidates
+rather than silent omissions. The deliberately simple
+plain-Java/Make organization proven in NamDesktop, and the
+issue-driven sprint rhythm proven in NamWeb, both still hold.
