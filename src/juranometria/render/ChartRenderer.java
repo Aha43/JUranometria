@@ -124,6 +124,33 @@ public final class ChartRenderer {
             return subject instanceof DeepSkyObject dso ? dso : null;
         }
 
+        /**
+         * Two marks are the same mark when they draw the same object
+         * at the same place and size.
+         *
+         * <p>The outline is deliberately excluded. A star's outline
+         * is an {@code Ellipse2D}, which compares by value, but a
+         * rotated symbol's is a {@code Path2D}, which compares by
+         * identity - so the generated record equality held for stars
+         * and silently failed for every deep-sky symbol. A consumer
+         * asking whether a list of marks contains the one it is
+         * holding would have got the right answer for half the chart
+         * and the wrong answer for the other half.
+         */
+        @Override
+        public boolean equals(java.lang.Object other) {
+            return other instanceof DrawnMark mark
+                    && kind == mark.kind
+                    && subject.equals(mark.subject)
+                    && centre.equals(mark.centre)
+                    && Double.compare(reach, mark.reach) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(kind, subject, centre, reach);
+        }
+
         /** Distance in page pixels from this mark's centre. */
         public double distanceFrom(double x, double y) {
             return Math.hypot(centre.x() - x, centre.y() - y);

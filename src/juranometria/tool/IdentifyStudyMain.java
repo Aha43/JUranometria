@@ -1,7 +1,6 @@
 package juranometria.tool;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -11,6 +10,7 @@ import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.StarSizePolicy;
 import juranometria.render.ChartOptions;
+import juranometria.render.ChartHitTest;
 import juranometria.render.ChartRenderer;
 
 /**
@@ -402,45 +402,16 @@ public final class IdentifyStudyMain {
      * symbol), then a stable catalogue identity so the order can
      * never depend on iteration or locale.
      */
+    /**
+     * The candidates a click produces - delegated to production
+     * (issue #169). The study measured this rule before it existed;
+     * now that it does, the study must measure THE rule rather than
+     * a copy of it that could drift.
+     */
     public static List<ChartRenderer.DrawnMark> candidatesAt(
             List<ChartRenderer.DrawnMark> marks, double x, double y,
             double tolerance) {
-        List<ChartRenderer.DrawnMark> hits = new ArrayList<>();
-        for (ChartRenderer.DrawnMark mark : marks) {
-            // The renderer's own hit rule: the mark's footprint
-            // expanded by the tolerance, never a circle around its
-            // centre (gate review).
-            if (mark.hitBy(x, y, tolerance)) {
-                hits.add(mark);
-            }
-        }
-        // The reviewed order (gate review, P2). An earlier version
-        // ranked by "prominence", comparing star magnitudes against
-        // negative symbol radii - two different quantities in one
-        // comparator, which is not an order anyone could reason
-        // about. These three keys are all kind-independent:
-        //   1. ink beats nearness: a click INSIDE a mark outranks one
-        //      merely within tolerance of a closer centre, so
-        //      clicking a galaxy's disc never yields the star beside
-        //      it;
-        //   2. then distance, rounded to 0.1 px so sub-pixel noise
-        //      cannot reorder equals;
-        //   3. then the SMALLER reach, because the tighter mark is
-        //      the more specific answer - a dot on top of a wide
-        //      nebula means the dot;
-        //   4. then catalogue identity, unique and stable.
-        hits.sort(Comparator
-                .comparing((ChartRenderer.DrawnMark mark) ->
-                        mark.outline().contains(x, y) ? 0 : 1)
-                .thenComparingDouble(mark ->
-                        Math.round(mark.distanceFrom(x, y) * 10.0) / 10.0)
-                .thenComparingDouble(ChartRenderer.DrawnMark::reach)
-                .thenComparing(IdentifyStudyMain::identityOf));
-        return hits;
+        return ChartHitTest.orderedHits(marks, x, y, tolerance);
     }
 
-    /** A stable key, so ties never depend on iteration order. */
-    private static String identityOf(ChartRenderer.DrawnMark mark) {
-        return mark.star() != null ? mark.star().id() : mark.deepSky().id();
-    }
 }
