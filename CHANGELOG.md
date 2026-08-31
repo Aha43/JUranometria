@@ -7,6 +7,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-08-31
+
+Sprint 17 — Letter the stars. The Bayer and Flamsteed identities
+that Sprint 13 bundled and made searchable become restrained chart
+notation, so a constellation page now names the pattern it draws.
+Reviewed by Codex at the design gate and at every implementation
+step, including the closing journey.
+
 ### Added
 
 - The stars are lettered: Bayer designations now reach the wide
