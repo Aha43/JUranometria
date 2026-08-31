@@ -71,6 +71,7 @@ class MapExplorationJourneyTest {
     private ChartOptionsController options;
     private JFrame window;
     private Preferences optionsNode;
+    private javax.swing.LookAndFeel inheritedLookAndFeel;
     /** The second consumer: proof the seam is not the inspector's alone. */
     private final List<SelectionModel.Change> witness = new ArrayList<>();
 
@@ -647,12 +648,29 @@ class MapExplorationJourneyTest {
      * (sprint review). The look and feel is global to the JVM, and
      * the journey's preferences are its own.
      */
+    @org.junit.jupiter.api.BeforeEach
+    void rememberTheLookAndFeel() {
+        inheritedLookAndFeel = javax.swing.UIManager.getLookAndFeel();
+    }
+
     @org.junit.jupiter.api.AfterEach
     void leaveNoTrace() throws Exception {
-        if (!GraphicsEnvironment.isHeadless()) {
+        if (!GraphicsEnvironment.isHeadless()
+                && inheritedLookAndFeel != null) {
+            // Restored, not assumed (sprint review): applying the
+            // light theme would leave the JVM in whatever state this
+            // test prefers rather than the one it was handed, which
+            // is a different kind of trace, not the absence of one.
             SwingUtilities.invokeAndWait(() -> {
-                juranometria.app.UiTheme.apply(false);
-                com.formdev.flatlaf.FlatLaf.updateUI();
+                try {
+                    javax.swing.UIManager.setLookAndFeel(
+                            inheritedLookAndFeel);
+                    com.formdev.flatlaf.FlatLaf.updateUI();
+                } catch (javax.swing.UnsupportedLookAndFeelException e) {
+                    throw new IllegalStateException(
+                            "cannot restore the look and feel this test"
+                                    + " was given", e);
+                }
             });
         }
         if (optionsNode != null) {
