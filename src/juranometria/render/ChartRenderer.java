@@ -33,6 +33,11 @@ import juranometria.project.ViewportMapping;
  */
 public final class ChartRenderer {
 
+    /** The selection ring: the graticule's grey, quieter than ink. */
+    private static final Color SELECTION_INK = new Color(0x88, 0x88, 0x88);
+    private static final java.awt.BasicStroke SELECTION_STROKE =
+            new java.awt.BasicStroke(1.2f);
+
     private static final Color PAPER = Color.WHITE;
     private static final Color INK = Color.BLACK;
     private static final Color FRAME = new Color(51, 51, 51);
@@ -302,6 +307,48 @@ public final class ChartRenderer {
             });
         }
         return java.util.List.copyOf(marks);
+    }
+
+    /**
+     * Marks the selected object on the page (Sprint 19, issue #170):
+     * a thin ring in the grid's grey, outside the mark's own ink at
+     * {@code reach + 5} pixels.
+     *
+     * <p>Drawn as a separate pass, after the chart, so the chart
+     * itself is byte-for-byte what it always was - a highlight is
+     * something the reader is doing, not something the sky is doing.
+     * The ring never touches the mark it names, so a selected galaxy
+     * still looks exactly like a galaxy, and the atlas draws a bare
+     * ring nowhere else, so it can be mistaken for nothing.
+     *
+     * <p>Does nothing when the identified object is not on this page.
+     */
+    public void drawSelectionHighlight(Graphics2D g, ChartScene scene,
+                                       ChartOptions options,
+                                       String catalogueId) {
+        if (catalogueId == null) {
+            return;
+        }
+        for (DrawnMark mark : drawnMarks(scene, options)) {
+            String id = mark.star() != null ? mark.star().id()
+                    : mark.deepSky().id();
+            if (!catalogueId.equals(id)) {
+                continue;
+            }
+            Graphics2D g2 = (Graphics2D) g.create();
+            try {
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(SELECTION_INK);
+                g2.setStroke(SELECTION_STROKE);
+                double r = Math.max(mark.reach() + 5.0, 7.0);
+                g2.draw(new Ellipse2D.Double(mark.centre().x() - r,
+                        mark.centre().y() - r, 2.0 * r, 2.0 * r));
+            } finally {
+                g2.dispose();
+            }
+            return;
+        }
     }
 
     public void render(Graphics2D g, ChartScene scene, ChartOptions options) {

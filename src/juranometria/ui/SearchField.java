@@ -9,6 +9,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
 import juranometria.search.LocalSearch;
+import juranometria.chart.Selection;
 import juranometria.search.SearchResult;
 
 /**
@@ -24,6 +25,9 @@ import juranometria.search.SearchResult;
  * Escape dismisses and returns focus to the field).
  */
 public final class SearchField extends JTextField {
+
+    /** Optional: the shared selection, when the application has one. */
+    private juranometria.chart.SelectionModel selection;
 
     /** What a search interaction did, for tests and popup decisions. */
     enum Outcome {
@@ -47,6 +51,11 @@ public final class SearchField extends JTextField {
     private final SceneAssembler assembler;
     private final ChartViewController controller;
     private JPopupMenu popup;
+
+    /** Told what the reader found, when anything is listening. */
+    public void setSelectionModel(juranometria.chart.SelectionModel model) {
+        this.selection = model;
+    }
 
     public SearchField(LocalSearch search, SceneAssembler assembler,
                        ChartViewController controller) {
@@ -90,6 +99,32 @@ public final class SearchField extends JTextField {
         return Outcome.CHOICES;
     }
 
+    /**
+     * The reviewed relationship between search and selection (issue
+     * #170): finding an object by name selects it, so the inspector
+     * can describe what the reader just looked up. This is also the
+     * keyboard-only route into the inspector - there is no cursor
+     * that walks from star to star, so a reader without a pointer
+     * arrives by searching.
+     *
+     * <p>Coordinates select nothing: the reader asked for a place,
+     * not for an object, and no object was found there.
+     */
+    private void establishSelection(SearchResult result) {
+        if (selection == null) {
+            return;
+        }
+        switch (result.kind()) {
+            case STAR -> selection.select(new Selection.Object(
+                    Selection.Object.Kind.STAR, result.identity(),
+                    result.position()));
+            case DEEP_SKY_OBJECT -> selection.select(new Selection.Object(
+                    Selection.Object.Kind.DEEP_SKY, result.identity(),
+                    result.position()));
+            default -> selection.clear();
+        }
+    }
+
     /** Recentres under the coverage policy; the chart never moves on NO_FIT. */
     Outcome apply(SearchResult result) {
         // A named object titles the chart; coordinates leave it anonymous
@@ -100,12 +135,14 @@ public final class SearchField extends JTextField {
         double currentField = controller.state().fieldWidthDegrees();
         if (assembler.fits(result.position(), currentField)) {
             controller.recenter(result.position(), targetLabel, targetIdentity);
+            establishSelection(result);
             return Outcome.RECENTERED;
         }
         OptionalDouble widest = assembler.widestFittingFieldDegrees(result.position());
         if (widest.isPresent()) {
             controller.recenter(result.position(), widest.getAsDouble(),
                     targetLabel, targetIdentity);
+            establishSelection(result);
             return Outcome.RECENTERED_NARROWER;
         }
         return Outcome.NO_FIT;

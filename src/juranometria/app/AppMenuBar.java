@@ -24,6 +24,25 @@ import juranometria.ui.ChartViewController;
  */
 public final class AppMenuBar {
 
+    /** The inspector item's name, so callers can keep it in step. */
+    public static final String INSPECTOR_ITEM = "inspectorItem";
+
+    /** The inspector's menu item within a bar, or null. */
+    public static javax.swing.JCheckBoxMenuItem inspectorItem(
+            javax.swing.JMenuBar bar) {
+        for (int i = 0; i < bar.getMenuCount(); i++) {
+            JMenu menu = bar.getMenu(i);
+            for (int j = 0; j < menu.getItemCount(); j++) {
+                JMenuItem item = menu.getItem(j);
+                if (item instanceof javax.swing.JCheckBoxMenuItem box
+                        && INSPECTOR_ITEM.equals(box.getName())) {
+                    return box;
+                }
+            }
+        }
+        return null;
+    }
+
     private AppMenuBar() {
     }
 
@@ -48,6 +67,20 @@ public final class AppMenuBar {
                                   Runnable openSettings,
                                   Runnable openChartOptions,
                                   Runnable openAbout) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                null);
+    }
+
+    /**
+     * The menu bar with the inspector toggle (issue #170). Opening
+     * and closing the inspector lives here rather than in the
+     * toolbar, which stays the essential controls only.
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector) {
         if (openAbout == null) {
             throw new IllegalArgumentException("about action is required");
         }
@@ -77,6 +110,24 @@ public final class AppMenuBar {
                     "Choose which chart content and labels draw");
             chartOptions.addActionListener(event -> openChartOptions.run());
             view.add(chartOptions);
+            if (toggleInspector != null) {
+                // A checkbox, because the reader must be able to see
+                // whether the inspector is showing - especially when
+                // a narrow window has closed it for them (review).
+                javax.swing.JCheckBoxMenuItem inspector =
+                        new javax.swing.JCheckBoxMenuItem("Inspector");
+                inspector.setName(INSPECTOR_ITEM);
+                inspector.setMnemonic('I');
+                inspector.setAccelerator(KeyStroke.getKeyStroke(
+                        java.awt.event.KeyEvent.VK_I, menuShortcutMask()));
+                inspector.getAccessibleContext().setAccessibleName(
+                        "Inspector");
+                inspector.getAccessibleContext().setAccessibleDescription(
+                        "Show or hide the panel describing the selected"
+                                + " chart mark");
+                inspector.addActionListener(event -> toggleInspector.run());
+                view.add(inspector);
+            }
             if (navigation != null) {
                 // Centre-preserving zoom, exactly the toolbar's
                 // transition (docs/decisions/pointer-zoom.md): same
