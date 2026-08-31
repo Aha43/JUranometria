@@ -64,6 +64,10 @@ public final class InspectorPanel extends JPanel {
     private final Runnable unsubscribe;
     /** True while the panel is writing the list, so echoes are ignored. */
     private boolean updating;
+    private boolean requested;
+    private boolean fitsHere = true;
+    private java.util.function.Consumer<Boolean> onVisibilityChange;
+    private Runnable returnFocus = () -> { };
 
     public InspectorPanel(SelectionModel selection,
                           Supplier<ChartScene> currentScene,
@@ -137,11 +141,104 @@ public final class InspectorPanel extends JPanel {
         getActionMap().put("close", new javax.swing.AbstractAction() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent event) {
-                setVisible(false);
+                // Escape closes the inspector and hands the reader
+                // back to the chart, rather than leaving focus in a
+                // panel that is no longer there.
+                setRequestedVisible(false);
+                returnFocus.run();
             }
         });
 
+        // Enter settles on the candidate the reader walked to with
+        // the arrow keys and moves focus into the facts, which is
+        // where the answer they were after is written.
+        candidates.getInputMap(WHEN_FOCUSED).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "settle");
+        candidates.getActionMap().put("settle",
+                new javax.swing.AbstractAction() {
+                    @Override
+                    public void actionPerformed(
+                            java.awt.event.ActionEvent event) {
+                        centreHere.requestFocusInWindow();
+                    }
+                });
+
+        // Closed until the reader asks for it, and its own state
+        // says so from the start: a panel that is visible by Swing's
+        // default while reporting that nobody asked for it would
+        // announce its first appearance to nobody.
+        setVisible(false);
         this.unsubscribe = selection.onChange(this::show);
+    }
+
+    /**
+     * The width the reviewed layout needs beside the panel: the
+     * chart keeps at least 400 px of page, the panel at least 240.
+     * Below that the panel yields - the chart never becomes a sliver
+     * so that a panel can keep its width.
+     */
+    public static final int MINIMUM_CHART_WIDTH = 400;
+    public static final int MINIMUM_PANEL_WIDTH = 240;
+
+    /** Whether a window this wide can show both (issue #170). */
+    public static boolean fitsBeside(int windowWidth) {
+        return windowWidth >= MINIMUM_CHART_WIDTH + MINIMUM_PANEL_WIDTH;
+    }
+
+    /**
+     * What the reader asked for, which is not always what fits.
+     * Toggling records the wish; the window's width decides whether
+     * it can be honoured, and a window that widens again restores
+     * what the reader wanted rather than making them ask twice.
+     */
+    public void setRequestedVisible(boolean wanted) {
+        this.requested = wanted;
+        applyVisibility();
+    }
+
+    /** Whether the reader currently wants the inspector. */
+    public boolean isRequestedVisible() {
+        return requested;
+    }
+
+    /** Tells the panel how much room the window has. */
+    public void setAvailableWidth(int windowWidth) {
+        boolean fits = fitsBeside(windowWidth);
+        if (fits != fitsHere) {
+            this.fitsHere = fits;
+            applyVisibility();
+        }
+    }
+
+    private void applyVisibility() {
+        boolean shown = requested && fitsHere;
+        if (shown != isVisible()) {
+            setVisible(shown);
+            if (onVisibilityChange != null) {
+                onVisibilityChange.accept(shown);
+            }
+        }
+    }
+
+    /** Told whenever the panel appears or disappears, for the menu. */
+    public void onVisibilityChange(java.util.function.Consumer<Boolean> sink) {
+        this.onVisibilityChange = sink;
+    }
+
+    /**
+     * Re-reads the page. Called when the chart has been navigated:
+     * the selection has not changed, but what the page can say about
+     * it has - an object the reader panned away from is no longer
+     * described as though it were still in front of them.
+     */
+    public void refresh() {
+        show(new SelectionModel.Change(selection.selection(),
+                selection.candidates(), selection.currentIndex()));
+    }
+
+    /** Where focus goes when the inspector closes: the chart. */
+    public void onClose(Runnable focusChart) {
+        this.returnFocus = focusChart == null ? () -> { } : focusChart;
     }
 
     /** Stops observing - the panel can be discarded safely. */

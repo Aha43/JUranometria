@@ -35,6 +35,8 @@ public final class ChartComponent extends JComponent {
             juranometria.render.ChartOptions.DEFAULTS;
     private ChartScene scene;
     private String highlighted;
+    private final java.util.List<Runnable> sceneListeners =
+            new java.util.ArrayList<>();
 
     public ChartComponent(SceneAssembler assembler) {
         if (assembler == null) {
@@ -90,6 +92,13 @@ public final class ChartComponent extends JComponent {
         return scene;
     }
 
+    /** Told whenever a new page has been assembled. */
+    public void onSceneChange(Runnable listener) {
+        if (listener != null) {
+            sceneListeners.add(listener);
+        }
+    }
+
     /** The page as assembled, for consumers outside this package. */
     public ChartScene currentScene() {
         return scene;
@@ -115,6 +124,12 @@ public final class ChartComponent extends JComponent {
         int pageHeight = Math.min(getHeight(), assembler.maxPageHeightPx(
                 viewState.centre(), viewState.fieldWidthDegrees(), getWidth()));
         scene = assembler.assemble(viewState, getWidth(), pageHeight);
+        // Consumers that describe the page - the inspector - need to
+        // know it changed, because what the page can say about the
+        // selection changes with it (issue #170).
+        for (Runnable listener : java.util.List.copyOf(sceneListeners)) {
+            listener.run();
+        }
         repaint();
     }
 

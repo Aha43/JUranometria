@@ -12,6 +12,7 @@ import javax.swing.JRadioButton;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -57,6 +58,30 @@ class AppSurfaceTest {
                 .contains("About"));
         aboutItem.doClick();
         assertEquals(1, about[0]);
+    }
+
+
+    @Test
+    void theInspectorItemShowsWhetherThePanelIsActuallyThere() {
+        // Review, P2: a plain menu item cannot say whether the panel
+        // is showing - and a narrow window can close it without the
+        // reader asking.
+        javax.swing.JMenuBar bar = AppMenuBar.create(null, () -> { },
+                () -> { }, () -> { }, () -> { });
+        javax.swing.JCheckBoxMenuItem item = AppMenuBar.inspectorItem(bar);
+
+        assertNotNull(item, "View carries an Inspector item");
+        assertEquals("Inspector",
+                item.getAccessibleContext().getAccessibleName());
+        assertNotNull(item.getAccelerator(),
+                "with a platform shortcut, so it is reachable without"
+                        + " the mouse");
+        assertFalse(item.isSelected(), "and it starts unchecked");
+
+        item.setSelected(true);
+        assertTrue(item.isSelected(),
+                "the panel drives this, including when the window's"
+                        + " width closes it rather than the reader");
     }
 
     @Test

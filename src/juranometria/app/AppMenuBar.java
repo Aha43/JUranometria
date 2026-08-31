@@ -24,6 +24,25 @@ import juranometria.ui.ChartViewController;
  */
 public final class AppMenuBar {
 
+    /** The inspector item's name, so callers can keep it in step. */
+    public static final String INSPECTOR_ITEM = "inspectorItem";
+
+    /** The inspector's menu item within a bar, or null. */
+    public static javax.swing.JCheckBoxMenuItem inspectorItem(
+            javax.swing.JMenuBar bar) {
+        for (int i = 0; i < bar.getMenuCount(); i++) {
+            JMenu menu = bar.getMenu(i);
+            for (int j = 0; j < menu.getItemCount(); j++) {
+                JMenuItem item = menu.getItem(j);
+                if (item instanceof javax.swing.JCheckBoxMenuItem box
+                        && INSPECTOR_ITEM.equals(box.getName())) {
+                    return box;
+                }
+            }
+        }
+        return null;
+    }
+
     private AppMenuBar() {
     }
 
@@ -92,7 +111,12 @@ public final class AppMenuBar {
             chartOptions.addActionListener(event -> openChartOptions.run());
             view.add(chartOptions);
             if (toggleInspector != null) {
-                JMenuItem inspector = new JMenuItem("Inspector");
+                // A checkbox, because the reader must be able to see
+                // whether the inspector is showing - especially when
+                // a narrow window has closed it for them (review).
+                javax.swing.JCheckBoxMenuItem inspector =
+                        new javax.swing.JCheckBoxMenuItem("Inspector");
+                inspector.setName(INSPECTOR_ITEM);
                 inspector.setMnemonic('I');
                 inspector.setAccelerator(KeyStroke.getKeyStroke(
                         java.awt.event.KeyEvent.VK_I, menuShortcutMask()));

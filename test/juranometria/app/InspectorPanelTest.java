@@ -252,6 +252,138 @@ class InspectorPanelTest {
                 "Escape closes the inspector, as it closes every dialog");
     }
 
+
+    @Test
+    void aNarrowWindowClosesThePanelAndAWideOneGivesItBack()
+            throws Exception {
+        // The reviewed layout rule (review, P1): the chart keeps at
+        // least 400 px of page beside a 240 px panel, and below that
+        // the panel is what yields.
+        Fixture fixture = fixture();
+        List<Boolean> announced = new ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> {
+            fixture.panel().onVisibilityChange(announced::add);
+            fixture.panel().setRequestedVisible(true);
+        });
+        assertTrue(fixture.panel().isVisible(), "the reader asked for it");
+
+        SwingUtilities.invokeAndWait(() ->
+                fixture.panel().setAvailableWidth(600));
+        assertFalse(fixture.panel().isVisible(),
+                "600 px cannot hold both, so the panel yields");
+        assertTrue(fixture.panel().isRequestedVisible(),
+                "but the reader's wish is remembered, not cancelled");
+
+        SwingUtilities.invokeAndWait(() ->
+                fixture.panel().setAvailableWidth(1200));
+        assertTrue(fixture.panel().isVisible(),
+                "and a window that widens gives it back without being"
+                        + " asked twice");
+        assertEquals(List.of(true, false, true), announced,
+                "every appearance and disappearance is announced, so"
+                        + " the menu can show what is actually there");
+
+        assertFalse(InspectorPanel.fitsBeside(639));
+        assertTrue(InspectorPanel.fitsBeside(640));
+    }
+
+    @Test
+    void afterNavigationItStopsDescribingWhatIsNoLongerDrawn()
+            throws Exception {
+        // Review, P1: the panel used to go on describing an object
+        // the reader had panned away from, because only selection
+        // changes reached it.
+        ChartScene first = page();
+        ChartScene[] current = {first};
+        SelectionModel model = new SelectionModel();
+        InspectorPanel[] panel = new InspectorPanel[1];
+        SwingUtilities.invokeAndWait(() -> panel[0] = new InspectorPanel(
+                model, () -> current[0], selection -> { }));
+
+        ChartRenderer.DrawnMark mark = firstStar(first);
+        model.select(ChartHitTest.selectionFor(mark));
+        assertTrue(String.join(" ", panel[0].lines())
+                        .contains(mark.star().id()),
+                "described while it is on the page");
+
+        // The reader pans to another part of the sky.
+        current[0] = juranometria.app.Atlas.assembler().assemble(
+                new ChartViewState(new SkyPosition(200.0, -40.0), 8.0, 8.0,
+                        null, null), 900, 700);
+        SwingUtilities.invokeAndWait(panel[0]::refresh);
+
+        String all = String.join(" | ", panel[0].lines());
+        assertTrue(all.contains("Not on this page any more"),
+                "and afterwards it says so plainly: " + all);
+        assertFalse(all.contains("visual magnitude"),
+                "rather than repeating facts it can no longer read: "
+                        + all);
+    }
+
+    @Test
+    void escapeClosesItAndHandsTheReaderBackToTheChart() throws Exception {
+        Fixture fixture = fixture();
+        List<String> focused = new ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> {
+            fixture.panel().onClose(() -> focused.add("chart"));
+            fixture.panel().setRequestedVisible(true);
+            fixture.panel().getActionMap().get("close").actionPerformed(
+                    new java.awt.event.ActionEvent(fixture.panel(), 0,
+                            "close"));
+        });
+
+        assertFalse(fixture.panel().isVisible(), "Escape closes it");
+        assertFalse(fixture.panel().isRequestedVisible(),
+                "and it stays closed until asked for again");
+        assertEquals(List.of("chart"), focused,
+                "focus goes back to the chart, not into a panel that"
+                        + " is no longer there");
+    }
+
+    @Test
+    void theCandidateListIsWalkableAndSettles() throws Exception {
+        Fixture fixture = fixture();
+        Selection.Object star = ChartHitTest.selectionFor(
+                firstStar(fixture.scene()));
+        Selection.Object dso = ChartHitTest.selectionFor(
+                firstDeepSky(fixture.scene()));
+        fixture.model().selectAmong(List.of(star, dso));
+
+        javax.swing.JList<?> list = candidateList(fixture.panel());
+        assertNotNull(list, "the choice is a list a reader can walk");
+        assertTrue(list.isFocusable(), "and it takes focus");
+        assertNotNull(list.getInputMap(javax.swing.JComponent.WHEN_FOCUSED)
+                        .get(javax.swing.KeyStroke.getKeyStroke(
+                                java.awt.event.KeyEvent.VK_ENTER, 0)),
+                "Enter settles on the walked-to candidate");
+
+        // Walking the list is what changes the answer.
+        SwingUtilities.invokeAndWait(() -> list.setSelectedIndex(1));
+        assertEquals(1, fixture.model().currentIndex(),
+                "arrowing to a candidate selects it");
+        assertTrue(String.join(" ", fixture.panel().lines())
+                        .contains(dso.catalogueId()),
+                "and the panel follows");
+        assertTrue(fixture.centred().isEmpty(),
+                "while the chart stays exactly where it was");
+    }
+
+    private static javax.swing.JList<?> candidateList(
+            java.awt.Container container) {
+        for (java.awt.Component component : container.getComponents()) {
+            if (component instanceof javax.swing.JList<?> list) {
+                return list;
+            }
+            if (component instanceof java.awt.Container inner) {
+                javax.swing.JList<?> found = candidateList(inner);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
     private static javax.swing.JButton centreButton(
             java.awt.Container container) {
         for (java.awt.Component component : container.getComponents()) {

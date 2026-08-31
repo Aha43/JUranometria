@@ -87,7 +87,11 @@ public final class JUranometriaMain {
                 change.selection()
                         instanceof juranometria.chart.Selection.Object object
                         ? object.catalogueId() : null));
-        inspector.setVisible(false);
+        // A page the reader navigated to may no longer draw what they
+        // selected; the panel re-reads it rather than going on
+        // describing something that has gone.
+        chart.onSceneChange(inspector::refresh);
+        inspector.onClose(chart::requestFocusInWindow);
 
         frame.setJMenuBar(AppMenuBar.create(controller,
                 () -> SettingsDialog.open(frame, appearance,
@@ -98,13 +102,35 @@ public final class JUranometriaMain {
                 () -> ChartOptionsDialog.open(frame, chartOptions),
                 () -> AboutDialog.open(frame),
                 () -> {
-                    inspector.setVisible(!inspector.isVisible());
+                    inspector.setRequestedVisible(
+                            !inspector.isRequestedVisible());
                     frame.revalidate();
                     frame.repaint();
                 }));
+        javax.swing.JCheckBoxMenuItem inspectorItem =
+                AppMenuBar.inspectorItem(frame.getJMenuBar());
+        if (inspectorItem != null) {
+            // The item shows what is actually on screen, including
+            // when a narrow window has closed the panel for the
+            // reader rather than at their asking.
+            inspector.onVisibilityChange(inspectorItem::setSelected);
+        }
+        // The reviewed layout rule: below 640 px of window the
+        // inspector yields, and a window that widens again restores
+        // what the reader asked for.
+        frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                inspector.setAvailableWidth(frame.getWidth());
+                frame.revalidate();
+            }
+        });
         AppMenuBar.installZoomShortcuts(frame.getRootPane(), controller);
         juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
                 Atlas.search(), Atlas.assembler(), controller);
+        // Finding an object by name selects it, so a reader with no
+        // pointer can reach the inspector at all.
+        searchField.setSelectionModel(selection);
 
         frame.setLayout(new BorderLayout());
         frame.add(new AtlasToolbar(controller, searchField), BorderLayout.NORTH);
