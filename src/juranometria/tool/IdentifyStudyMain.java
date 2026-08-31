@@ -407,8 +407,10 @@ public final class IdentifyStudyMain {
             double tolerance) {
         List<ChartRenderer.DrawnMark> hits = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark : marks) {
-            if (mark.outline().contains(x, y)
-                    || mark.distanceFrom(x, y) <= mark.reach() + tolerance) {
+            // The renderer's own hit rule: the mark's footprint
+            // expanded by the tolerance, never a circle around its
+            // centre (gate review).
+            if (mark.hitBy(x, y, tolerance)) {
                 hits.add(mark);
             }
         }

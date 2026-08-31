@@ -40,8 +40,8 @@ ink": at zero tolerance only **29–51%** of aimed clicks find the mark
 they aimed at.
 
 **Most of the paper is empty.** At 4 px tolerance a grid of unaimed
-clicks finds an object on **1.1%** of the quiet page and 3.9–24% of
-the busier ones. Clicking nothing is the common case, so "empty sky"
+clicks finds an object on **1.1%** of the quiet page, **7.0%** of the
+default page, and 23.6% of Orion at 36°. Clicking nothing is the common case, so "empty sky"
 must be a real answer rather than silence.
 
 **Tolerance, measured.** Clicks were placed at each mark's centre and
@@ -50,17 +50,17 @@ swept tolerances, because an earlier run jittered by exactly ±3 px
 and made "listed@3 = 100%" true by construction rather than by
 measurement.
 
-| tolerance | intended mark listed | ranked first | single-candidate rate, worst page |
+| tolerance | intended mark listed | ranked first | single-candidate rate, worst full page |
 |---:|---:|---:|---:|
 | 0 px | 30–51% | 29–51% | — |
-| 2 px | 62–76% | 57–76% | — |
-| 3 px | 73–83% | 66–92% | 73.8% |
-| **4 px** | **93–100%** | **81–100%** | **68.7%** |
-| 6 px | 100% | 86–99% | 55.2% |
+| 2 px | 62–76% | 56–76% | — |
+| 3 px | 73–84% | 66–92% | 74.5% |
+| **4 px** | **93–100%** | **80–100%** | **69.0%** |
+| 6 px | 100% | 85–99% | 55.8% |
 
 **4 px is the decision.** It brings the intended mark into the answer
 for at least 93% of hand-wobbled clicks on every page measured, while
-leaving a single unambiguous candidate for 69–78% of them. Six pixels
+leaving a single unambiguous candidate for 69–98% of them. Six pixels
 adds nothing to "listed" (the rings stop at 5.5 px, so 100% there is
 expected, not earned) and costs another eighth of the unambiguous
 answers on a wide page. The tolerance is a constant in page pixels,
@@ -68,11 +68,11 @@ answers on a wide page. The tolerance is a constant in page pixels,
 device, which do not change when the sky does.
 
 **Ambiguity is real and must be shown.** At 4 px, aimed clicks return
-more than one candidate on **24% of the default page** and **31% of
+more than one candidate on **12.7% of the default page** and **31% of
 the 36° page**, worst case **10 candidates** in Orion. Silently taking
-the nearest would mislead a reader on roughly one wide-field click in
+the nearest would mislead a reader on nearly one wide-field click in
 three. (The 1° page carries only ten drawn marks, so its rates come
-from a small sample and are quoted here only as a caution, not as
+from a small sample and are quoted here as a caution, not as
 evidence.)
 
 ## What the pack knows, and what the application forgets
@@ -144,16 +144,38 @@ reader can see.** That is why hit testing is defined against
    and zoom gestures already use. **A click on letterbox chrome is
    not on the paper and selects nothing.**
 2. A mark is a candidate when the pointer is **inside its drawn
-   outline** or within **`reach + 4 px`** of its centre.
+   outline, or within 4 px of that outline's edge**.
 
-   **`reach` is defined exactly** (gate review, P2): a star's dot
-   radius, or **half a symbol's larger drawn axis** — after the
-   clamp that keeps a tiny object visible, and *independent of
-   rotation*. It is deliberately not half the rotated bounding box,
-   which would make a 40′×10′ galaxy's reach grow and shrink as it
-   turns: at position angle 45° its box is wider than its own major
-   axis. A planetary nebula's reach is the extent of its spokes,
-   which are its outermost ink.
+   **The tolerance expands the mark's footprint, never a radius
+   around its centre** (gate review). An earlier draft asked whether
+   the pointer was within `reach + 4 px` of the centre, which is a
+   *disc*: M31 on the default page has a half-major axis of
+   **166 px**, so it would have been selectable from 170 px away in
+   every direction — including far off its narrow side, where there
+   is no ink at all, and where it would have swallowed every
+   neighbouring star. Measured after the correction, M31's hit region
+   reaches **167 px along its major axis and 69–81 px across the
+   narrow sides**: the shape of the galaxy, not a circle around it.
+   The default page's ambiguity fell from 24% to **12.7%** on this
+   correction alone.
+
+   Distance to the edge is measured over the flattened outline.
+   Stroking the outline by twice the tolerance — the obvious trick —
+   collapses through the centre of a small mark (a V 8 dot is 1.32 px
+   across; an 8 px tolerance strokes 16 px through it), after which
+   its containment test disagrees with itself and the measured hit
+   rate *falls* as tolerance rises. That is not something tolerance
+   can do, and it is why the rule measures rather than strokes.
+
+   **`reach`** — a star's dot radius, or **half a symbol's larger
+   drawn axis** after clamping — survives as what it always was: a
+   cheap upper bound for rejecting distant marks before the exact
+   test, and the tie-break that prefers the tighter mark. It is
+   defined from the axes and not from the rotated bounding box,
+   because that box changes with orientation: a 40×10 px ellipse
+   bounds 40×10 when aligned but about **29×29** at 45°, so a
+   box-derived reach would describe how an object lies rather than
+   how large it is.
 3. Candidates are ordered by four kind-independent keys:
    1. **ink before nearness** — a click *inside* a mark outranks one
       merely within tolerance of a nearer centre, so clicking a

@@ -15,6 +15,7 @@ import juranometria.chart.StarSizePolicy;
 import juranometria.tool.IdentifyStudyMain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -135,7 +136,7 @@ class DrawnMarkTest {
             worst = Math.max(worst, candidates);
         }
         double singleRate = (double) single / marks.size();
-        assertTrue(singleRate > 0.66 && singleRate < 0.72,
+        assertTrue(singleRate > 0.67 && singleRate < 0.71,
                 "the measured single-candidate rate at 4 px: "
                         + singleRate);
         assertEquals(10, worst,
@@ -275,6 +276,136 @@ class DrawnMarkTest {
         assertSame(wide, ranked.get(0),
                 "the mark whose ink the reader is standing on comes"
                         + " first: " + ranked.size() + " candidates");
+    }
+
+
+    @Test
+    void toleranceExpandsTheFootprintNotARadius() {
+        // The gate review's last finding, on the object that exposed
+        // it: M31's half-major axis is about 166 px on the default
+        // page. A radius rule would have made it selectable that far
+        // out in EVERY direction, including across its narrow side
+        // where there is no ink.
+        ChartRenderer.DrawnMark m31 = marks(scene(10.68, 41.27, 8.0))
+                .stream()
+                .filter(mark -> mark.deepSky() != null)
+                .filter(mark -> mark.deepSky().aliases().contains("M 31"))
+                .findFirst().orElseThrow();
+        assertTrue(m31.reach() > 100.0,
+                "the check needs a large elongated symbol: "
+                        + m31.reach());
+
+        double cx = m31.centre().x();
+        double cy = m31.centre().y();
+        double majorReach = furthestHit(m31, cx, cy, Math.toRadians(60));
+        double minorReach = furthestHit(m31, cx, cy, Math.toRadians(150));
+
+        assertTrue(majorReach > 150.0,
+                "the long way, the galaxy really does reach far: "
+                        + majorReach);
+        assertTrue(minorReach < majorReach / 1.5,
+                "but across the narrow side it reaches far less - the"
+                        + " hit region is the galaxy's shape, not a"
+                        + " circle: " + minorReach + " vs " + majorReach);
+        assertFalse(m31.hitBy(cx, cy + m31.reach() - 10, 4.0)
+                        && m31.hitBy(cx + m31.reach() - 10, cy, 4.0),
+                "a point near the radius but off the ink is not a hit");
+    }
+
+    @Test
+    void bothEdgesOfAThinTurnedSymbolAnswerWithinFourPixels() {
+        // Around the major AND minor edges, as the review asked: the
+        // tolerance must mean four pixels everywhere along the
+        // outline, not four pixels in one direction and ninety in
+        // another.
+        // Virgo: hundreds of drawn galaxies, so there is a genuinely
+        // elongated, turned one to walk around.
+        ChartRenderer.DrawnMark thin = marks(scene(187.7, 12.4, 8.0))
+                .stream()
+                .filter(mark -> mark.deepSky() != null)
+                .filter(mark -> mark.deepSky().majorAxisArcmin()
+                        > 3.0 * mark.deepSky().minorAxisArcmin())
+                .filter(mark -> mark.deepSky().positionAngleDegrees() > 10.0
+                        && mark.deepSky().positionAngleDegrees() < 170.0)
+                .max(java.util.Comparator.comparingDouble(
+                        ChartRenderer.DrawnMark::reach))
+                .orElseThrow();
+
+        // Walk outward in many directions; wherever the edge is, the
+        // hit must stop between it and four pixels beyond it.
+        List<Double> gains = new ArrayList<>();
+        for (int degrees = 0; degrees < 360; degrees += 15) {
+            double angle = Math.toRadians(degrees);
+            double edge = furthestHit(thin, thin.centre().x(),
+                    thin.centre().y(), angle);
+            double justOutside = edge + 1.0;
+            assertFalse(thin.hitBy(
+                            thin.centre().x() + justOutside * Math.cos(angle),
+                            thin.centre().y() + justOutside * Math.sin(angle),
+                            4.0),
+                    "the hit region ends where it ends, at " + degrees
+                            + "°: " + edge);
+
+            // The tolerance only ever grows the region, and never
+            // runs away: walking OUTWARD from the centre, the extra
+            // distance is 4 px divided by the cosine of the angle
+            // between the radius and the edge's normal, so it exceeds
+            // four on a slanted edge - but it stays bounded, which is
+            // exactly what the old radius rule did not.
+            double bare = furthestHit(thin, thin.centre().x(),
+                    thin.centre().y(), angle, 0.0);
+            assertTrue(edge >= bare,
+                    "tolerance never shrinks the region at " + degrees
+                            + "°: " + bare + " -> " + edge);
+            assertTrue(edge <= bare + 25.0,
+                    "and never runs away from the ink at " + degrees
+                            + "°: " + bare + " -> " + edge);
+            gains.add(edge - bare);
+        }
+
+        // Where the radius does meet the edge square on, the gain is
+        // the tolerance itself - the four pixels, measured.
+        double tightest = gains.stream().mapToDouble(Double::doubleValue)
+                .min().orElseThrow();
+        assertTrue(tightest > 3.4 && tightest < 4.6,
+                "somewhere around the outline the pointer meets the"
+                        + " edge squarely, and there the tolerance is"
+                        + " exactly four pixels: " + tightest);
+    }
+
+    private static double furthestHit(ChartRenderer.DrawnMark mark,
+                                      double cx, double cy, double angle) {
+        return furthestHit(mark, cx, cy, angle, 4.0);
+    }
+
+    private static double furthestHit(ChartRenderer.DrawnMark mark,
+                                      double cx, double cy, double angle,
+                                      double tolerance) {
+        double last = 0.0;
+        for (double d = 0.0; d < 500.0; d += 0.25) {
+            if (mark.hitBy(cx + d * Math.cos(angle),
+                    cy + d * Math.sin(angle), tolerance)) {
+                last = d;
+            }
+        }
+        return last;
+    }
+
+    @Test
+    void aWiderToleranceNeverFindsFewerMarks() {
+        // Monotonicity, which the stroked-shape version broke: the
+        // measured hit rate fell as tolerance rose, because a wide
+        // stroke collapses through a small dot.
+        List<ChartRenderer.DrawnMark> marks = marks(scene(10.68, 41.27, 8.0));
+        double previous = -1.0;
+        for (double tolerance : new double[] {0.0, 2.0, 4.0, 6.0, 8.0, 12.0}) {
+            double listed = listedRate(marks, tolerance);
+            assertTrue(listed >= previous,
+                    "hit rate must not fall as tolerance rises: "
+                            + listed + " at " + tolerance
+                            + " after " + previous);
+            previous = listed;
+        }
     }
 
     /** The share of hand-wobbled clicks that list the intended mark. */

@@ -128,6 +128,86 @@ public final class ChartRenderer {
         public double distanceFrom(double x, double y) {
             return Math.hypot(centre.x() - x, centre.y() - y);
         }
+
+        /**
+         * Whether a pointer at (x, y) reaches this mark within the
+         * given tolerance: inside its ink, or within {@code
+         * tolerance} pixels of the ink's edge.
+         *
+         * <p>The tolerance expands the mark's <strong>actual
+         * footprint</strong>, not a circle around its centre (gate
+         * review). Growing a radius instead would make M31 - a thin
+         * ellipse whose major axis spans hundreds of pixels on the
+         * default page - selectable from anywhere within about 166 px
+         * of its centre, including far off the narrow side where
+         * there is no ink at all. A reader may only reach what a
+         * reader can see, and a four-pixel tolerance must mean four
+         * pixels everywhere along the edge.
+         *
+         * <p>{@link #reach} survives as what it always was: a cheap
+         * upper bound for rejecting distant marks, and the tie-break
+         * that prefers the tighter mark.
+         */
+        public boolean hitBy(double x, double y, double tolerance) {
+            if (outline.contains(x, y)) {
+                return true;
+            }
+            if (distanceFrom(x, y) > reach + tolerance) {
+                return false;
+            }
+            return distanceToEdge(x, y) <= tolerance;
+        }
+
+        /**
+         * The distance from a point to this mark's drawn edge, in
+         * page pixels, over a flattened outline.
+         *
+         * <p>Measured rather than approximated by a stroked shape: a
+         * stroke twice the tolerance wide collapses through the
+         * centre of a small mark - a V 8 dot is 1.32 px across, and
+         * an 8 px tolerance strokes 16 px through it - after which
+         * its own containment test disagrees with itself. That made
+         * the measured hit rate FALL as tolerance rose, which is not
+         * something tolerance can do.
+         */
+        private double distanceToEdge(double x, double y) {
+            java.awt.geom.PathIterator path =
+                    outline.getPathIterator(null, 0.25);
+            double[] segment = new double[6];
+            double best = Double.MAX_VALUE;
+            double startX = 0;
+            double startY = 0;
+            double fromX = 0;
+            double fromY = 0;
+            while (!path.isDone()) {
+                switch (path.currentSegment(segment)) {
+                    case java.awt.geom.PathIterator.SEG_MOVETO -> {
+                        startX = segment[0];
+                        startY = segment[1];
+                        fromX = startX;
+                        fromY = startY;
+                    }
+                    case java.awt.geom.PathIterator.SEG_LINETO -> {
+                        best = Math.min(best,
+                                java.awt.geom.Line2D.ptSegDist(fromX, fromY,
+                                        segment[0], segment[1], x, y));
+                        fromX = segment[0];
+                        fromY = segment[1];
+                    }
+                    case java.awt.geom.PathIterator.SEG_CLOSE -> {
+                        best = Math.min(best,
+                                java.awt.geom.Line2D.ptSegDist(fromX, fromY,
+                                        startX, startY, x, y));
+                        fromX = startX;
+                        fromY = startY;
+                    }
+                    default -> {
+                    }
+                }
+                path.next();
+            }
+            return best;
+        }
     }
 
     /**
