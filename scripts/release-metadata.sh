@@ -63,10 +63,28 @@ if [ "$declared" != "$version" ]; then
     exit 3
 fi
 
-# The changelog section for exactly this version: from its heading to
-# the next top-level heading, heading line excluded.
-section="$(awk -v want="## [$version]" '
-    index($0, want) == 1 { collecting = 1; next }
+# The heading must be the dated one the changelog format promises -
+# "## [X.Y.Z] - YYYY-MM-DD" and nothing else. An undated heading is
+# an unfinished release note, and matching it loosely would also
+# accept "## [1.2.30]" when releasing 1.2.3.
+escaped="$(printf '%s' "$version" | sed 's/\./\\./g')"
+heading="$(grep -E "^## \[$escaped\] - [0-9]{4}-[0-9]{2}-[0-9]{2}\$" \
+    "$tree/CHANGELOG.md" | head -1 || true)"
+if [ -z "$heading" ]; then
+    if grep -qE "^## \[$escaped\]" "$tree/CHANGELOG.md"; then
+        echo "CHANGELOG.md's section for $version is not dated" >&2
+        echo "the heading must read '## [$version] - YYYY-MM-DD'" >&2
+    else
+        echo "CHANGELOG.md has no section '## [$version]'" >&2
+        echo "add the section, dated, before tagging" >&2
+    fi
+    exit 4
+fi
+
+# Its entries: from that exact heading line to the next top-level
+# heading, the heading itself excluded.
+section="$(awk -v want="$heading" '
+    $0 == want { collecting = 1; next }
     collecting && /^## / { exit }
     collecting { print }
 ' "$tree/CHANGELOG.md")"
@@ -74,8 +92,7 @@ section="$(awk -v want="## [$version]" '
 # Blank lines only is the same as absent: a release must say what
 # changed.
 if [ -z "$(printf '%s' "$section" | tr -d ' \t\r\n')" ]; then
-    echo "CHANGELOG.md has no entries under '## [$version]'" >&2
-    echo "add the section, dated, before tagging" >&2
+    echo "CHANGELOG.md has no entries under '$heading'" >&2
     exit 4
 fi
 

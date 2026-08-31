@@ -131,7 +131,16 @@ Pushing `vX.Y.Z` runs `.github/workflows/release.yml`, which does the rest
   emits the download table, the unsigned Gatekeeper/SmartScreen reality, the
   offline statement, this version's changelog section, and the licensing map
   including the non-commercial consequence.
-- **Least privilege.** Only the publishing job holds `contents: write`.
+- **Publication is never assembled in public.** The release is created as a
+  draft, all six files are uploaded, the asset list is read back from GitHub
+  and compared with the expected set, and only then is the release made
+  public. A failed upload leaves an invisible draft, never a public release
+  missing a platform.
+- **Only a tag push can publish.** A manual run is always a rehearsal, whatever
+  ref it is started from.
+- **Least privilege.** Only the publishing job holds `contents: write`, and it
+  runs only for a tag push; every other job, including the rehearsal, is
+  `contents: read`.
 
 ### When a release run fails
 
@@ -142,7 +151,12 @@ release to clean up.
 - **Failed before publishing** (agreement, a build cell, artifact verification):
   fix the cause on `main`, then move the tag to the corrected commit
   (`git tag -f -a vX.Y.Z`, `git push -f origin vX.Y.Z`) and let it run again.
-  Force-moving a tag is acceptable only while no release exists for it.
+  Force-moving a tag is acceptable only while no release exists for it. The tag
+  must stay annotated and must point at the commit being built; the workflow
+  checks both before it builds anything.
+- **Failed during upload**: the release is still a draft and nothing is public.
+  Delete the draft and re-run, or upload the missing file to it by hand and
+  publish it deliberately.
 - **A release already exists for the tag**: the run stops rather than replacing
   it, because a silently rewritten release is worse than a failed one. The
   verified artifacts are attached to the run, so publish them by hand if the
@@ -154,9 +168,11 @@ release to clean up.
 
 ### Rehearsing without publishing
 
-Run the `release` workflow manually with `publish: false` (the default). It
+Run the `release` workflow manually (optionally naming a tag; it defaults to
+`v` + `VERSION`). A manual run **cannot publish** — the publishing job exists
+only for a tag push, and the rehearsal job holds no write access — so it simply
 builds and verifies everything and writes the artifacts, the checksums, and the
-notes it *would* publish into the run summary, publishing nothing. The same
+notes it *would* publish into the run summary. The same
 scripts are exercised by `ReleaseAutomationTest` over fixtures, including every
 way the agreement can fail.
 
