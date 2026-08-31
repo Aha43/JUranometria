@@ -126,6 +126,37 @@ class SelectionModelTest {
     }
 
     @Test
+    void anEventAlwaysDescribesTheModelAsItIsWhileItIsDelivered() {
+        // The narrower half of the same fault (review): the model
+        // used to move on as soon as a reentrant change was queued,
+        // so a consumer hearing about A could read the model and be
+        // told B. An event and the model it arrives with must agree.
+        SelectionModel model = new SelectionModel();
+        Selection.Object a = star("A", 1.0, 1.0);
+        Selection.Object b = star("B", 2.0, 2.0);
+        List<String> seen = new ArrayList<>();
+
+        model.onChange(change -> {
+            if (change.selection() instanceof Selection.Object object
+                    && object.catalogueId().equals("A")) {
+                model.select(b);
+            }
+        });
+        model.onChange(change -> seen.add(
+                name(change.selection()) + "/" + name(model.selection())));
+
+        model.select(a);
+
+        assertEquals(List.of("none/none", "A/A", "B/B"), seen,
+                "each event names the state the model is actually in");
+    }
+
+    private static String name(Selection selection) {
+        return selection instanceof Selection.Object object
+                ? object.catalogueId() : "none";
+    }
+
+    @Test
     void aChangeCannotDescribeAStateThatMakesNoSense() {
         // The public record is a contract of its own (review).
         Selection.Object one = star("A", 1.0, 1.0);
@@ -142,6 +173,17 @@ class SelectionModelTest {
                 () -> new SelectionModel.Change(star("B", 2.0, 2.0),
                         List.of(one), 0),
                 "a current candidate that is not the selection");
+        assertThrows(IllegalArgumentException.class,
+                () -> new SelectionModel.Change(null, List.of(), -1),
+                "no selection at all - Selection.NOTHING says none");
+        assertThrows(IllegalArgumentException.class,
+                () -> new SelectionModel.Change(one, List.of(), -1),
+                "a selected object that is not among its own candidates");
+        assertThrows(IllegalArgumentException.class,
+                () -> new SelectionModel.Change(
+                        new Selection.EmptySky(new SkyPosition(1.0, 1.0)),
+                        List.of(one), 0),
+                "empty sky offering candidates");
     }
 
     @Test

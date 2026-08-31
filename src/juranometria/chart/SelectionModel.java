@@ -30,10 +30,26 @@ public final class SelectionModel {
                          int currentIndex) {
 
         public Change {
+            if (selection == null) {
+                throw new IllegalArgumentException(
+                        "a change always states a selection;"
+                                + " use Selection.NOTHING for none");
+            }
             candidates = List.copyOf(candidates);
-            // A state nobody can misread (review): the index either
-            // points at the current selection or says there is no
-            // candidate list at all.
+            // A state nobody can misread (review): candidates exist
+            // exactly when an object is selected, and the index
+            // points at that object.
+            if (selection instanceof Selection.Object && candidates.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "a selected object is always one of its own"
+                                + " candidates: " + selection);
+            }
+            if (!(selection instanceof Selection.Object)
+                    && !candidates.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "nothing and empty sky offer no candidates: "
+                                + candidates.size() + " given");
+            }
             if (candidates.isEmpty()) {
                 if (currentIndex != -1) {
                     throw new IllegalArgumentException(
@@ -144,26 +160,25 @@ public final class SelectionModel {
 
     private void set(Selection next, List<Selection.Object> nextCandidates,
                      int nextIndex) {
-        this.selection = next;
-        this.candidates = List.copyOf(nextCandidates);
-        this.currentIndex = nextIndex;
-        pending.add(change());
+        // The transition is queued WHOLE and applied immediately
+        // before its own event is delivered (review, P1). Applying it
+        // here instead would let a consumer hearing about A read the
+        // model and be told B, because a reentrant change had already
+        // moved the state on while its event was still waiting - a
+        // consumer that trusts the model it is given cannot be handed
+        // an event describing one state and a model describing
+        // another.
+        pending.add(new Change(next, nextCandidates, nextIndex));
         if (delivering) {
-            // A consumer changed the selection while being told about
-            // one. Queue it: the change in flight finishes reaching
-            // everybody first, and this one follows (review, P1).
-            //
-            // Delivering it immediately would nest, and the outer
-            // loop would then carry on handing the OLDER change to
-            // the consumers it had not reached yet - which was
-            // reproducible: a model resting at B while an observer's
-            // last word was A, leaving it permanently stale.
             return;
         }
         delivering = true;
         try {
             Change change;
             while ((change = pending.poll()) != null) {
+                this.selection = change.selection();
+                this.candidates = change.candidates();
+                this.currentIndex = change.currentIndex();
                 // A copy, so a listener that unsubscribes while being
                 // told cannot disturb the notification in progress.
                 for (Consumer<Change> listener : List.copyOf(listeners)) {
