@@ -93,6 +93,57 @@ class SelectionModelTest {
                 "the other consumer heard its arrival and both changes");
     }
 
+
+    @Test
+    void aChangeMadeWhileTellingSomeoneArrivesAfterIt() {
+        // Reproduced in review (P1): a consumer that selects B on
+        // hearing A used to leave a second consumer holding A as its
+        // last word while the model rested at B - permanently stale.
+        SelectionModel model = new SelectionModel();
+        Selection.Object a = star("A", 1.0, 1.0);
+        Selection.Object b = star("B", 2.0, 2.0);
+        List<String> second = new ArrayList<>();
+
+        model.onChange(change -> {
+            if (change.selection() instanceof Selection.Object object
+                    && object.catalogueId().equals("A")) {
+                model.select(b);
+            }
+        });
+        model.onChange(change -> second.add(
+                change.selection() instanceof Selection.Object object
+                        ? object.catalogueId() : "none"));
+
+        model.select(a);
+
+        assertEquals(List.of("none", "A", "B"), second,
+                "every consumer sees one order, and it is the order"
+                        + " the changes happened in");
+        assertEquals("B", ((Selection.Object) model.selection())
+                        .catalogueId(),
+                "and the last thing each consumer heard is where the"
+                        + " model actually rests");
+    }
+
+    @Test
+    void aChangeCannotDescribeAStateThatMakesNoSense() {
+        // The public record is a contract of its own (review).
+        Selection.Object one = star("A", 1.0, 1.0);
+        assertThrows(IllegalArgumentException.class,
+                () -> new SelectionModel.Change(one, List.of(), 0),
+                "an index with no candidates");
+        assertThrows(IllegalArgumentException.class,
+                () -> new SelectionModel.Change(one, List.of(one), -1),
+                "candidates with no index");
+        assertThrows(IllegalArgumentException.class,
+                () -> new SelectionModel.Change(one, List.of(one), 1),
+                "an index past the end");
+        assertThrows(IllegalArgumentException.class,
+                () -> new SelectionModel.Change(star("B", 2.0, 2.0),
+                        List.of(one), 0),
+                "a current candidate that is not the selection");
+    }
+
     @Test
     void anAmbiguousClickOffersEveryCandidateAndResolvesNothing() {
         SelectionModel model = new SelectionModel();

@@ -42,38 +42,48 @@ class DeepSkyHonestyTest {
     }
 
     @Test
-    void theSilenceOfTheCatalogueSurvivesLoading() {
+    void theSilenceOfTheCatalogueSurvivesLoadingExactly() {
+        // Exact counts, not ranges (review, P2). Percentage bands
+        // wide enough to be safe are also wide enough to hide a data
+        // regression: a pack that lost a thousand position angles
+        // would still have passed "between 10% and 30%". These are
+        // the pinned pack's own numbers, and they agree row for row
+        // with the gate's measurement of the raw CSV.
         List<DeepSkyObject> objects = everything();
-        assertTrue(objects.size() > 5000,
-                "the sweep must cover most of the pack: "
-                        + objects.size());
 
-        long noPositionAngle = objects.stream()
-                .filter(dso -> !dso.recorded().hasPositionAngle()).count();
-        long noSize = objects.stream()
-                .filter(dso -> !dso.recorded().hasSize()).count();
-        long noVisual = objects.stream()
-                .filter(dso -> dso.recorded().band()
-                        != DeepSkyObject.Recorded.Band.VISUAL).count();
-        long blueStandingIn = objects.stream()
-                .filter(dso -> dso.recorded().band()
-                        == DeepSkyObject.Recorded.Band.BLUE).count();
+        assertEquals(13371, objects.size(),
+                "the sweep reaches the whole bundled pack");
+        assertEquals(2596, objects.stream()
+                        .filter(dso -> !dso.recorded().hasPositionAngle())
+                        .count(),
+                "rows recording no position angle (19.4%)");
+        assertEquals(1300, objects.stream()
+                        .filter(dso -> !dso.recorded().hasSize()).count(),
+                "rows recording no extent (9.7%)");
+        assertEquals(2279, objects.stream()
+                        .filter(dso -> dso.recorded().minorAxisArcmin() == null)
+                        .count(),
+                "rows recording no minor axis (17.0%)");
+        assertEquals(4268, byBand(objects,
+                        DeepSkyObject.Recorded.Band.VISUAL),
+                "rows with a visual magnitude");
+        assertEquals(7276, byBand(objects,
+                        DeepSkyObject.Recorded.Band.BLUE),
+                "rows where a blue magnitude stands in (54.4%)");
+        assertEquals(1827, byBand(objects,
+                        DeepSkyObject.Recorded.Band.NONE),
+                "rows with no photometry at all (13.7%)");
+        assertEquals(objects.size(),
+                byBand(objects, DeepSkyObject.Recorded.Band.VISUAL)
+                        + byBand(objects, DeepSkyObject.Recorded.Band.BLUE)
+                        + byBand(objects, DeepSkyObject.Recorded.Band.NONE),
+                "and every object has exactly one band");
+    }
 
-        double paShare = 100.0 * noPositionAngle / objects.size();
-        double sizeShare = 100.0 * noSize / objects.size();
-        double visualShare = 100.0 * noVisual / objects.size();
-        double blueShare = 100.0 * blueStandingIn / objects.size();
-
-        assertTrue(paShare > 10.0 && paShare < 30.0,
-                "the gate measured 19.4% with no position angle: "
-                        + paShare);
-        assertTrue(sizeShare > 4.0 && sizeShare < 16.0,
-                "and 9.7% with no recorded extent: " + sizeShare);
-        assertTrue(visualShare > 58.0 && visualShare < 78.0,
-                "and 68.1% with no V magnitude: " + visualShare);
-        assertTrue(blueShare > 44.0 && blueShare < 64.0,
-                "of which 54.4% carry a B magnitude instead: "
-                        + blueShare);
+    private static long byBand(List<DeepSkyObject> objects,
+                               DeepSkyObject.Recorded.Band band) {
+        return objects.stream()
+                .filter(dso -> dso.recorded().band() == band).count();
     }
 
     @Test

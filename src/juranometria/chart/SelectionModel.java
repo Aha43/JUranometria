@@ -31,6 +31,28 @@ public final class SelectionModel {
 
         public Change {
             candidates = List.copyOf(candidates);
+            // A state nobody can misread (review): the index either
+            // points at the current selection or says there is no
+            // candidate list at all.
+            if (candidates.isEmpty()) {
+                if (currentIndex != -1) {
+                    throw new IllegalArgumentException(
+                            "no candidates, so no current index: "
+                                    + currentIndex);
+                }
+            } else {
+                if (currentIndex < 0 || currentIndex >= candidates.size()) {
+                    throw new IllegalArgumentException(
+                            "current index " + currentIndex + " is outside "
+                                    + candidates.size() + " candidates");
+                }
+                if (!candidates.get(currentIndex).equals(selection)) {
+                    throw new IllegalArgumentException(
+                            "the current candidate must be the selection: "
+                                    + selection + " vs "
+                                    + candidates.get(currentIndex));
+                }
+            }
         }
 
         /** Whether the reader is being offered a choice. */
@@ -40,6 +62,9 @@ public final class SelectionModel {
     }
 
     private final List<Consumer<Change>> listeners = new ArrayList<>();
+    /** Changes awaiting delivery, so every consumer sees one order. */
+    private final java.util.Deque<Change> pending = new java.util.ArrayDeque<>();
+    private boolean delivering;
     private Selection selection = Selection.NOTHING;
     private List<Selection.Object> candidates = List.of();
     private int currentIndex = -1;
@@ -122,11 +147,32 @@ public final class SelectionModel {
         this.selection = next;
         this.candidates = List.copyOf(nextCandidates);
         this.currentIndex = nextIndex;
-        Change change = change();
-        // A copy, so a listener that unsubscribes while being told
-        // cannot disturb the notification in progress.
-        for (Consumer<Change> listener : List.copyOf(listeners)) {
-            listener.accept(change);
+        pending.add(change());
+        if (delivering) {
+            // A consumer changed the selection while being told about
+            // one. Queue it: the change in flight finishes reaching
+            // everybody first, and this one follows (review, P1).
+            //
+            // Delivering it immediately would nest, and the outer
+            // loop would then carry on handing the OLDER change to
+            // the consumers it had not reached yet - which was
+            // reproducible: a model resting at B while an observer's
+            // last word was A, leaving it permanently stale.
+            return;
+        }
+        delivering = true;
+        try {
+            Change change;
+            while ((change = pending.poll()) != null) {
+                // A copy, so a listener that unsubscribes while being
+                // told cannot disturb the notification in progress.
+                for (Consumer<Change> listener : List.copyOf(listeners)) {
+                    listener.accept(change);
+                }
+            }
+        } finally {
+            delivering = false;
+            pending.clear();
         }
     }
 
