@@ -17,17 +17,32 @@ Nine pages, measured through `ChartRenderer.drawnMarks` — the
 placements the renderer paints from, so the numbers describe the
 atlas as drawn rather than a model of it.
 
+**Only what the page shows counts.** The first version of this gate
+measured every mark the scene held, including objects clipped
+entirely off the paper — **466** of them on the default page, **1,916**
+on Orion at 36°, **650** in Virgo (gate review, P1). A reader can
+neither see nor point at those, and counting them inflated every
+figure below. `drawnMarks` now returns only marks whose ink meets the
+paper, and every number here was regenerated.
+
+| page | field | drawn stars | drawn symbols |
+|---|---:|---:|---:|
+| M31 | 8° | 48 | 7 |
+| Orion | 36° | 1,567 | 12 |
+| Sagittarius | 8° | 82 | 21 |
+| Virgo | 8° | 26 | 348 |
+| quiet sky | 8° | 45 | 10 |
+
 **The ink is small.** A V 8 star, the faintest the pack carries and
 the one a reader most often wants named, is a dot of radius
-**1.32 px**. A V 0 star is 5.00 px. Pointing cannot mean "inside the
-ink": at zero tolerance, only **29–51%** of aimed clicks find the
-mark they aimed at.
+**1.32 px**; a V 0 star is 5.00 px. Pointing cannot mean "inside the
+ink": at zero tolerance only **29–51%** of aimed clicks find the mark
+they aimed at.
 
-**Most of the paper is empty.** With a 4 px tolerance, a grid of
-unaimed clicks finds an object on **1.1%** of the quiet page and
-**35%** of the densest, with 3–12% typical. Clicking nothing is the
-common case, not the edge case, so "empty sky" must be a real answer
-rather than silence.
+**Most of the paper is empty.** At 4 px tolerance a grid of unaimed
+clicks finds an object on **1.1%** of the quiet page and 3.9–24% of
+the busier ones. Clicking nothing is the common case, so "empty sky"
+must be a real answer rather than silence.
 
 **Tolerance, measured.** Clicks were placed at each mark's centre and
 on rings of 1.5, 3.5 and 5.5 px — radii chosen to match none of the
@@ -35,28 +50,68 @@ swept tolerances, because an earlier run jittered by exactly ±3 px
 and made "listed@3 = 100%" true by construction rather than by
 measurement.
 
-| tolerance | intended mark listed | ranked first | worst-page single-candidate rate |
+| tolerance | intended mark listed | ranked first | single-candidate rate, worst page |
 |---:|---:|---:|---:|
 | 0 px | 30–51% | 29–51% | — |
-| 2 px | 62–77% | 57–77% | — |
-| 3 px | 73–83% | 66–90% | 77.1% |
-| **4 px** | **93–100%** | **81–100%** | **71.7%** |
-| 6 px | 100% | 86–99% | 59.1% |
+| 2 px | 62–76% | 57–76% | — |
+| 3 px | 73–83% | 66–92% | 73.8% |
+| **4 px** | **93–100%** | **81–100%** | **68.7%** |
+| 6 px | 100% | 86–99% | 55.2% |
 
 **4 px is the decision.** It brings the intended mark into the answer
 for at least 93% of hand-wobbled clicks on every page measured, while
-keeping a single unambiguous candidate for 72–91% of them. Six pixels
-buys almost nothing in "listed" (the rings stop at 5.5 px, so 100% there
-is expected) and costs a fifth of the unambiguous answers on a wide
-page. The tolerance is a constant in page pixels, **not scaled with
-field width**: it models a hand and a pointing device, which do not
-change when the sky does.
+leaving a single unambiguous candidate for 69–78% of them. Six pixels
+adds nothing to "listed" (the rings stop at 5.5 px, so 100% there is
+expected, not earned) and costs another eighth of the unambiguous
+answers on a wide page. The tolerance is a constant in page pixels,
+**not scaled with field width**: it models a hand and a pointing
+device, which do not change when the sky does.
 
 **Ambiguity is real and must be shown.** At 4 px, aimed clicks return
-more than one candidate on 9% of the default page and **28% of the
-36° page**, with a worst case of **10 candidates** in Orion. Silently
-taking the nearest would mislead a reader on roughly one wide-field
-click in four.
+more than one candidate on **24% of the default page** and **31% of
+the 36° page**, worst case **10 candidates** in Orion. Silently taking
+the nearest would mislead a reader on roughly one wide-field click in
+three. (The 1° page carries only ten drawn marks, so its rates come
+from a small sample and are quoted here only as a caution, not as
+evidence.)
+
+## What the pack knows, and what the application forgets
+
+The inspector may only promise facts the application can still tell
+apart from silence — and today it cannot (gate review, P1). Of the
+**13,371** deep-sky rows bundled:
+
+| fact | rows recording nothing | share |
+|---|---:|---:|
+| major axis | 1,300 | 9.7% |
+| minor axis | 2,279 | 17.0% |
+| position angle | 2,596 | **19.4%** |
+| V magnitude | 9,103 | **68.1%** |
+| …of which a B magnitude exists | 7,276 | 54.4% |
+| …no photometry at all | 1,827 | 13.7% |
+
+`TiledCatalogue` substitutes a nominal extent for an absent size,
+`minor = major` for an absent minor axis, **`0.0` for an absent
+position angle**, and stores V-or-B in a single unlabelled
+`magnitude`. An inspector built on today's model would state a size
+nobody measured, a position angle of exactly zero for a fifth of the
+catalogue, and a **blue magnitude labelled visual for the majority of
+it**.
+
+**So #169 must extend the runtime model before #170 can be honest**:
+`DeepSkyObject` keeps its concrete display values — the renderer's
+contract does not change — and gains the source truth beside them:
+recorded-or-absent major axis, minor axis and position angle, and the
+**band** of the magnitude it carries (visual, blue, or none). The
+loader stops discarding what the pack took care to record.
+
+The mock-ups show the result on real rows:
+[a well-recorded object](../studies/point-and-identify/inspector-deep-sky-light.png)
+and
+[one the pack knows least about](../studies/point-and-identify/inspector-deep-sky-unknowns-light.png)
+— "magnitude not recorded", "size not recorded", never a fabricated
+zero. The type must also read as catalogue terminology rather than an
+enum constant.
 
 ## What is selectable
 
@@ -89,17 +144,33 @@ reader can see.** That is why hit testing is defined against
    and zoom gestures already use. **A click on letterbox chrome is
    not on the paper and selects nothing.**
 2. A mark is a candidate when the pointer is **inside its drawn
-   outline** or within **`reach + 4 px`** of its centre, where
-   `reach` is the star's dot radius or half the symbol's larger
-   drawn axis — the symbol's real, rotated, clamp-corrected geometry.
-3. Candidates are ordered:
-   1. **by distance** from the click, rounded to 0.1 px so that
-      sub-pixel noise cannot reorder equals;
-   2. then by **prominence** — brighter star first, larger symbol
-      first;
-   3. then by **catalogue identity** (TYC or NGC id), which is
-      unique and stable, so the order can never depend on iteration
-      order, hash order, or locale.
+   outline** or within **`reach + 4 px`** of its centre.
+
+   **`reach` is defined exactly** (gate review, P2): a star's dot
+   radius, or **half a symbol's larger drawn axis** — after the
+   clamp that keeps a tiny object visible, and *independent of
+   rotation*. It is deliberately not half the rotated bounding box,
+   which would make a 40′×10′ galaxy's reach grow and shrink as it
+   turns: at position angle 45° its box is wider than its own major
+   axis. A planetary nebula's reach is the extent of its spokes,
+   which are its outermost ink.
+3. Candidates are ordered by four kind-independent keys:
+   1. **ink before nearness** — a click *inside* a mark outranks one
+      merely within tolerance of a nearer centre, so clicking a
+      galaxy's disc never answers with the star beside it;
+   2. then **distance**, rounded to 0.1 px so sub-pixel noise cannot
+      reorder equals;
+   3. then the **smaller reach**, because the tighter mark is the
+      more specific answer: a dot on top of a wide nebula means the
+      dot;
+   4. then **catalogue identity** (TYC or NGC id), unique and
+      stable, so order never depends on iteration, hashing, or
+      locale.
+
+   An earlier draft ranked by "prominence", comparing star
+   magnitudes against negative symbol radii — two different
+   quantities in one comparator, which is not an order anyone could
+   reason about (gate review, P2).
 4. **One candidate is a selection. More than one is a choice offered
    to the reader.** The atlas never silently resolves it.
 
@@ -162,16 +233,42 @@ a tooltip appears without being asked, covers the chart, and vanishes
 before it can be read. Not a floating window: one more thing to
 manage.
 
-- Opened and closed from **View → Inspector** with its platform
-  shortcut, and closed by **Escape** when focused. The toolbar gains
-  no new control.
-- At the minimum window size the panel gives way: the chart keeps its
-  page, and the inspector is a panel the reader closes, never a
-  reason the chart cannot be read.
-- **Keyboard**: the panel is in the focus order, its candidate list
-  is a list a reader can walk with the arrow keys, and every control
-  carries an accessible name. Selecting a candidate updates the
-  panel; it never moves the chart.
+**Opening and closing.** `View → Inspector` toggles it, with the
+platform menu shortcut and a mnemonic; the toolbar gains no control.
+**Escape closes it** when focus is inside it, returning focus to the
+chart. Closing it does not clear the selection, and reopening shows
+what is still selected — a reader who closes the panel to see the
+chart has not thereby forgotten what they were looking at.
+
+**Keyboard, exactly** (gate review, P2):
+
+| key | where | does |
+|---|---|---|
+| menu shortcut | anywhere | opens or closes the inspector |
+| `Tab` / `Shift+Tab` | chart ↔ panel | moves focus; the panel is one stop in the window's order |
+| `↑` / `↓` | candidate list | moves through candidates, updating the panel and the chart highlight |
+| `Enter` | candidate list | keeps that candidate as the selection and moves focus to the panel's body |
+| `Enter` / `Space` | `Center here` | navigates — the only key that moves the chart |
+| `Escape` | panel | closes the inspector, focus returns to the chart |
+
+**Selecting a mark needs a pointer or a search.** There is no
+keyboard cursor that walks from star to star: inventing one would
+mean deciding what "next star" means across a projected page, which
+is a design of its own and not this sprint's. A keyboard-only reader
+reaches an object by searching for it — which sets the selection —
+and then works the panel entirely by keyboard. This is a stated
+limit, not an oversight, and it is written into the sprint's
+accessibility notes rather than left for a reader to discover.
+
+**At small window sizes.** The panel has a preferred width of 320 px
+and a floor of 240 px, and it is the part that yields: when the
+window is too narrow to give the chart at least 400 px of page
+beside a 240 px panel, the inspector **hides itself** and the menu
+item reflects that it is closed. The chart never becomes a sliver so
+that a panel can keep its width. (The application still sets no
+minimum window size; the 1.0 audit verified that the chart renders
+and pans without failure down to 1×1 px, so this rule is about
+usefulness, not about avoiding a crash.)
 
 ## Selection, target, and navigation
 

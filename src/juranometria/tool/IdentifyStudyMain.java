@@ -9,7 +9,6 @@ import juranometria.app.Atlas;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
-import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
 import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
@@ -68,6 +67,7 @@ public final class IdentifyStudyMain {
                 + PAGE_HEIGHT + ".");
         System.out.println();
         markInventory();
+        catalogueHonesty();
         starDotSizes();
         blindClicks();
         aimedClicks();
@@ -84,6 +84,103 @@ public final class IdentifyStudyMain {
     private static List<ChartRenderer.DrawnMark> marks(Page page) {
         return new ChartRenderer(StarSizePolicy.DEFAULT)
                 .drawnMarks(scene(page), ChartOptions.DEFAULTS);
+    }
+
+
+    /**
+     * What the pack records, and what the runtime model currently
+     * keeps of it (gate review, P1). The inspector may only promise
+     * facts the application can still tell apart from silence.
+     */
+    private static void catalogueHonesty() {
+        int rows = 0;
+        int noMajor = 0;
+        int noMinor = 0;
+        int noPa = 0;
+        int noV = 0;
+        int noVButB = 0;
+        int noPhotometry = 0;
+        for (int ra = 0; ra < 12; ra++) {
+            for (int dec = 0; dec < 6; dec++) {
+                String tile = String.format(Locale.ROOT,
+                        "/resources/catalog/bright-sky/tiles/r%02d-d%d/dsos.csv",
+                        ra, dec);
+                java.io.InputStream in =
+                        IdentifyStudyMain.class.getResourceAsStream(tile);
+                if (in == null) {
+                    continue;
+                }
+                try (java.io.BufferedReader reader =
+                        new java.io.BufferedReader(
+                                new java.io.InputStreamReader(in,
+                                        java.nio.charset.StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("#") || line.isBlank()) {
+                            continue;
+                        }
+                        String[] f = line.split(",", -1);
+                        if (f.length < 11) {
+                            continue;
+                        }
+                        rows++;
+                        if (f[5].isEmpty()) {
+                            noMajor++;
+                        }
+                        if (f[6].isEmpty()) {
+                            noMinor++;
+                        }
+                        if (f[7].isEmpty()) {
+                            noPa++;
+                        }
+                        if (f[8].isEmpty()) {
+                            noV++;
+                            if (!f[9].isEmpty()) {
+                                noVButB++;
+                            } else {
+                                noPhotometry++;
+                            }
+                        }
+                    }
+                } catch (java.io.IOException e) {
+                    throw new IllegalStateException(tile, e);
+                }
+            }
+        }
+        System.out.println("## What the pack knows, and what survives loading");
+        System.out.println();
+        System.out.printf(Locale.ROOT,
+                "Of **%,d** deep-sky rows in the bundled pack:%n%n", rows);
+        System.out.println("| fact | rows where the source records nothing | share |");
+        System.out.println("|---|---:|---:|");
+        System.out.printf(Locale.ROOT,
+                "| major axis | %,d | %.1f%% |%n", noMajor, pct(noMajor, rows));
+        System.out.printf(Locale.ROOT,
+                "| minor axis | %,d | %.1f%% |%n", noMinor, pct(noMinor, rows));
+        System.out.printf(Locale.ROOT,
+                "| position angle | %,d | %.1f%% |%n", noPa, pct(noPa, rows));
+        System.out.printf(Locale.ROOT,
+                "| V magnitude | %,d | %.1f%% |%n", noV, pct(noV, rows));
+        System.out.printf(Locale.ROOT,
+                "| ...of which a B magnitude exists | %,d | %.1f%% |%n",
+                noVButB, pct(noVButB, rows));
+        System.out.printf(Locale.ROOT,
+                "| ...no photometry at all | %,d | %.1f%% |%n",
+                noPhotometry, pct(noPhotometry, rows));
+        System.out.println();
+        System.out.println("The runtime `DeepSkyObject` keeps none of these"
+                + " distinctions: the loader substitutes a nominal extent"
+                + " for an absent size, `minor = major` for an absent"
+                + " minor axis, `0.0` for an absent position angle, and"
+                + " stores V-or-B in one unlabelled `magnitude` field."
+                + " An inspector built on today's model would state a"
+                + " size no one measured, a position angle of exactly"
+                + " zero, and a B magnitude labelled V.");
+        System.out.println();
+    }
+
+    private static double pct(int part, int whole) {
+        return whole == 0 ? 0.0 : 100.0 * part / whole;
     }
 
     /** What is actually on each page. */
@@ -315,23 +412,33 @@ public final class IdentifyStudyMain {
                 hits.add(mark);
             }
         }
+        // The reviewed order (gate review, P2). An earlier version
+        // ranked by "prominence", comparing star magnitudes against
+        // negative symbol radii - two different quantities in one
+        // comparator, which is not an order anyone could reason
+        // about. These three keys are all kind-independent:
+        //   1. ink beats nearness: a click INSIDE a mark outranks one
+        //      merely within tolerance of a closer centre, so
+        //      clicking a galaxy's disc never yields the star beside
+        //      it;
+        //   2. then distance, rounded to 0.1 px so sub-pixel noise
+        //      cannot reorder equals;
+        //   3. then the SMALLER reach, because the tighter mark is
+        //      the more specific answer - a dot on top of a wide
+        //      nebula means the dot;
+        //   4. then catalogue identity, unique and stable.
         hits.sort(Comparator
-                .comparingDouble((ChartRenderer.DrawnMark mark) ->
+                .comparing((ChartRenderer.DrawnMark mark) ->
+                        mark.outline().contains(x, y) ? 0 : 1)
+                .thenComparingDouble(mark ->
                         Math.round(mark.distanceFrom(x, y) * 10.0) / 10.0)
-                .thenComparingDouble(IdentifyStudyMain::prominence)
+                .thenComparingDouble(ChartRenderer.DrawnMark::reach)
                 .thenComparing(IdentifyStudyMain::identityOf));
         return hits;
     }
 
-    /** Lower sorts first: a brighter star, a larger symbol. */
-    private static double prominence(ChartRenderer.DrawnMark mark) {
-        Star star = mark.star();
-        return star != null ? star.magnitude() : -mark.reach();
-    }
-
     /** A stable key, so ties never depend on iteration order. */
     private static String identityOf(ChartRenderer.DrawnMark mark) {
-        Star star = mark.star();
-        return star != null ? star.id() : mark.deepSky().id();
+        return mark.star() != null ? mark.star().id() : mark.deepSky().id();
     }
 }

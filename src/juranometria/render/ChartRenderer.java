@@ -150,6 +150,15 @@ public final class ChartRenderer {
             ChartScene scene, ChartOptions options,
             RegionalDetailPolicy policy, GnomonicProjection projection,
             ViewportMapping mapping) {
+        // Only what the page actually shows (gate review, P1). The
+        // renderer clips to the paper, so a mark whose ink falls
+        // entirely outside it is drawn as nothing - and a reader can
+        // neither see nor point at nothing. Including those would
+        // have let a click near an edge select an object off the
+        // page, and would have inflated every count measured here.
+        java.awt.geom.Rectangle2D paper = new java.awt.geom.Rectangle2D.Double(
+                1, 1, scene.viewport().widthPx() - 2,
+                scene.viewport().heightPx() - 2);
         java.util.List<DrawnMark> marks = new java.util.ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
             if (!options.deepSkyObjects() && !isTarget(scene, dso)) {
@@ -162,12 +171,11 @@ public final class ChartRenderer {
                 PixelPoint centre = mapping.toPixel(plane);
                 Shape outline = symbolOutline(dso, policy, centre,
                         mapping.pixelsPerPlaneUnit());
-                if (outline != null) {
-                    java.awt.geom.Rectangle2D box =
-                            outline.getBounds2D();
+                if (outline != null && outline.intersects(paper)) {
                     marks.add(new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso,
                             centre, outline,
-                            Math.max(box.getWidth(), box.getHeight()) / 2.0));
+                            symbolReach(dso, policy,
+                                    mapping.pixelsPerPlaneUnit())));
                 }
             });
         }
@@ -178,11 +186,12 @@ public final class ChartRenderer {
             projection.project(star.position()).ifPresent(plane -> {
                 PixelPoint pixel = mapping.toPixel(plane);
                 double radius = starSizePolicy.radiusFor(star.magnitude());
-                marks.add(new DrawnMark(DrawnMark.Kind.STAR, star, pixel,
-                        new Ellipse2D.Double(pixel.x() - radius,
-                                pixel.y() - radius,
-                                2.0 * radius, 2.0 * radius),
-                        radius));
+                Ellipse2D dot = new Ellipse2D.Double(pixel.x() - radius,
+                        pixel.y() - radius, 2.0 * radius, 2.0 * radius);
+                if (dot.intersects(paper)) {
+                    marks.add(new DrawnMark(DrawnMark.Kind.STAR, star, pixel,
+                            dot, radius));
+                }
             });
         }
         return java.util.List.copyOf(marks);
@@ -575,6 +584,31 @@ public final class ChartRenderer {
     private static boolean isTarget(ChartScene scene, DeepSkyObject dso) {
         return scene.targetIdentity() != null
                 && scene.targetIdentity().equals(dso.id());
+    }
+
+
+    /**
+     * A symbol's reach: half its LARGER DRAWN AXIS, in page pixels.
+     *
+     * <p>Defined from the axes rather than from the rotated outline's
+     * bounding box (gate review, P2). A bounding box grows and
+     * shrinks as an ellipse turns - a 40x10 galaxy at position angle
+     * 45 degrees would bound a square larger than its own major axis
+     * - which would make a mark's reach depend on its orientation
+     * rather than its size. Half the major axis is the same distance
+     * whichever way the object lies.
+     */
+    private static double symbolReach(DeepSkyObject dso,
+                                      RegionalDetailPolicy policy,
+                                      double pixelsPerPlaneUnit) {
+        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+        if (symbolFor(dso) == Symbol.PLANETARY) {
+            // The planetary's spokes are its outermost ink.
+            double r = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
+                    axes[0]) / 2.0;
+            return r * 1.7;
+        }
+        return axes[0] / 2.0;
     }
 
     /**

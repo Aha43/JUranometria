@@ -135,7 +135,7 @@ class DrawnMarkTest {
             worst = Math.max(worst, candidates);
         }
         double singleRate = (double) single / marks.size();
-        assertTrue(singleRate > 0.69 && singleRate < 0.75,
+        assertTrue(singleRate > 0.66 && singleRate < 0.72,
                 "the measured single-candidate rate at 4 px: "
                         + singleRate);
         assertEquals(10, worst,
@@ -190,6 +190,91 @@ class DrawnMarkTest {
         assertTrue(compared > 100,
                 "the check must actually meet ambiguous clicks: "
                         + compared);
+    }
+
+
+    @Test
+    void nothingOffThePaperIsPublishedAsAMark() {
+        // The gate review's first finding: the scene holds far more
+        // objects than the page shows, and a reader can neither see
+        // nor point at ink that was clipped away.
+        ChartScene page = scene(10.68, 41.27, 8.0);
+        List<ChartRenderer.DrawnMark> marks = marks(page);
+
+        java.awt.geom.Rectangle2D paper = new java.awt.geom.Rectangle2D.Double(
+                1, 1, page.viewport().widthPx() - 2,
+                page.viewport().heightPx() - 2);
+        for (ChartRenderer.DrawnMark mark : marks) {
+            assertTrue(mark.outline().intersects(paper),
+                    "every published mark meets the paper: "
+                            + mark.centre());
+        }
+
+        long inScene = page.stars().size() + page.deepSkyObjects().size();
+        assertTrue(inScene > marks.size() * 5,
+                "and the scene really does hold far more than the page"
+                        + " shows, so this is not a vacuous check: "
+                        + inScene + " in scene, " + marks.size()
+                        + " drawn");
+    }
+
+    @Test
+    void aSymbolsReachDescribesItsSizeNotItsOrientation() {
+        // The reach must describe an object, not how it happens to
+        // lie (gate review, P2). A rotated ellipse's bounding box is
+        // SMALLER than its major axis - at 45 degrees a 3x1 ellipse
+        // bounds only 2.24 - so a box-derived reach would shrink and
+        // grow as an object turns. Half the major axis does not.
+        List<ChartRenderer.DrawnMark> symbols =
+                marks(scene(187.7, 12.4, 8.0)).stream()
+                        .filter(mark -> mark.deepSky() != null)
+                        .filter(mark -> mark.deepSky().majorAxisArcmin()
+                                > 2.0 * mark.deepSky().minorAxisArcmin())
+                        .toList();
+        assertTrue(symbols.size() >= 3,
+                "the check needs elongated symbols: " + symbols.size());
+
+        int diverged = 0;
+        for (ChartRenderer.DrawnMark mark : symbols) {
+            java.awt.geom.Rectangle2D box = mark.outline().getBounds2D();
+            double boxReach = Math.max(box.getWidth(), box.getHeight()) / 2.0;
+            assertTrue(mark.reach() >= boxReach - 1e-9,
+                    "the object's half-major axis is never smaller than"
+                            + " its turned bounding box: " + mark.reach()
+                            + " vs " + boxReach);
+            if (mark.reach() > boxReach + 0.05) {
+                diverged++;
+            }
+        }
+        assertTrue(diverged >= 3,
+                "and the two definitions really do differ on turned"
+                        + " symbols, which is why the choice matters: "
+                        + diverged + " of " + symbols.size());
+    }
+
+    @Test
+    void aClickInsideAMarkOutranksANearerCentreOutsideIt() {
+        // The ordering rule's first key, on real geometry: standing
+        // inside a galaxy's disc must not answer with a star whose
+        // centre happens to be marginally closer.
+        List<ChartRenderer.DrawnMark> marks = marks(scene(187.7, 12.4, 8.0));
+        ChartRenderer.DrawnMark wide = marks.stream()
+                .filter(mark -> mark.deepSky() != null)
+                .max(java.util.Comparator.comparingDouble(
+                        ChartRenderer.DrawnMark::reach))
+                .orElseThrow();
+
+        // A point inside the symbol but off its centre.
+        double x = wide.centre().x() + wide.reach() * 0.5;
+        double y = wide.centre().y();
+        org.junit.jupiter.api.Assumptions.assumeTrue(
+                wide.outline().contains(x, y),
+                "the probe point must be inside the symbol");
+
+        var ranked = IdentifyStudyMain.candidatesAt(marks, x, y, 4.0);
+        assertSame(wide, ranked.get(0),
+                "the mark whose ink the reader is standing on comes"
+                        + " first: " + ranked.size() + " candidates");
     }
 
     /** The share of hand-wobbled clicks that list the intended mark. */

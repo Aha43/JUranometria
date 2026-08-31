@@ -170,9 +170,25 @@ public final class IdentifyMockupMain {
                         .anyMatch(a -> a.startsWith("M ")))
                 .findFirst().orElse(null);
 
+        // The honest-unknowns case, which 68% of the pack's rows
+        // need: no V magnitude, no position angle.
+        DeepSkyObject unknown = scene(new SkyPosition(187.7, 12.4), 8.0)
+                .deepSkyObjects().stream()
+                .filter(d -> {
+                    String[] row = packRow(d.id());
+                    return row != null && row[8].isEmpty()
+                            && row[7].isEmpty();
+                })
+                .findFirst().orElse(null);
+
         for (boolean dark : new boolean[] {false, true}) {
             write("inspector-star", dark, starLines(star));
             write("inspector-deep-sky", dark, deepSkyLines(dso));
+            write("inspector-deep-sky-unknowns", dark,
+                    unknown == null
+                            ? List.of("Deep-sky object", "",
+                                    "  (no unknown-rich example found)")
+                            : deepSkyLines(unknown));
             write("inspector-ambiguous", dark, List.of(
                     "3 objects here", "",
                     "  Mirach  β And        V 2.1",
@@ -212,15 +228,76 @@ public final class IdentifyMockupMain {
                 "  [ Center here ]");
     }
 
+    /**
+     * The pack's own row for an object, so a mock-up shows what the
+     * catalogue actually records - including what it does not
+     * (gate review, P1). The runtime model cannot answer this today;
+     * that is precisely the change #169 must make.
+     */
+    private static String[] packRow(String id) {
+        for (int ra = 0; ra < 12; ra++) {
+            for (int dec = 0; dec < 6; dec++) {
+                String tile = String.format(Locale.ROOT,
+                        "/resources/catalog/bright-sky/tiles/r%02d-d%d/dsos.csv",
+                        ra, dec);
+                java.io.InputStream in =
+                        IdentifyMockupMain.class.getResourceAsStream(tile);
+                if (in == null) {
+                    continue;
+                }
+                try (java.io.BufferedReader reader =
+                        new java.io.BufferedReader(
+                                new java.io.InputStreamReader(in,
+                                        java.nio.charset.StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("#")) {
+                            continue;
+                        }
+                        String[] fields = line.split(",", -1);
+                        if (fields.length > 10 && fields[0].equals(id)) {
+                            return fields;
+                        }
+                    }
+                } catch (java.io.IOException e) {
+                    throw new IllegalStateException(tile, e);
+                }
+            }
+        }
+        return null;
+    }
+
+    /** The honest size line: what was measured, or that nothing was. */
+    private static String sizeLine(String[] row) {
+        if (row == null || row[5].isEmpty()) {
+            return "  size not recorded";
+        }
+        String minor = row[6].isEmpty() ? row[5] : row[6];
+        String angle = row[7].isEmpty()
+                ? "position angle not recorded"
+                : "at PA " + row[7] + "°";
+        return "  " + row[5] + "′ × " + minor + "′  " + angle;
+    }
+
+    /** The honest magnitude line, with its band named. */
+    private static String magnitudeLine(String[] row) {
+        if (row == null) {
+            return "  magnitude not recorded";
+        }
+        if (!row[8].isEmpty()) {
+            return "  V " + row[8] + "  (visual magnitude)";
+        }
+        if (!row[9].isEmpty()) {
+            return "  B " + row[9] + "  (blue magnitude; no V recorded)";
+        }
+        return "  magnitude not recorded";
+    }
+
     private static List<String> deepSkyLines(DeepSkyObject dso) {
         if (dso == null) {
             return List.of("Deep-sky object", "", "  (none found)");
         }
-        String size = dso.majorAxisArcmin() > 0.0
-                ? String.format(Locale.ROOT, "  %.1f′ × %.1f′  at PA %.0f°",
-                        dso.majorAxisArcmin(), dso.minorAxisArcmin(),
-                        dso.positionAngleDegrees())
-                : "  size not recorded";
+        String[] row = packRow(dso.id());
         return List.of(
                 dso.aliases().stream().filter(a -> a.startsWith("M "))
                         .findFirst().orElse(dso.id()),
@@ -228,7 +305,8 @@ public final class IdentifyMockupMain {
                 "  " + dso.id() + "   " + String.join(", ", dso.aliases()),
                 "  " + dso.type(),
                 "",
-                size,
+                magnitudeLine(row),
+                sizeLine(row),
                 String.format(Locale.ROOT, "  %s  %s",
                         formatRa(dso.position().raDegrees()),
                         formatDec(dso.position().decDegrees())),
