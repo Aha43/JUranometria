@@ -35,7 +35,9 @@ public interface ChartOptionsStore {
                         flag(node, "chart.constellationFigures"),
                         flag(node, "chart.constellationBoundaries"),
                         flag(node, "chart.constellationNames"),
-                        flag(node, "chart.starLabels"),
+                        identifierFlag(node, "chart.starNames"),
+                        identifierFlag(node, "chart.bayerLetters"),
+                        identifierFlag(node, "chart.flamsteedNumbers"),
                         flag(node, "chart.equatorialGrid"));
             }
 
@@ -51,12 +53,38 @@ public interface ChartOptionsStore {
                         Boolean.toString(options.constellationBoundaries()));
                 node.put("chart.constellationNames",
                         Boolean.toString(options.constellationNames()));
-                node.put("chart.starLabels",
-                        Boolean.toString(options.starLabels()));
+                node.put("chart.starNames",
+                        Boolean.toString(options.starNames()));
+                node.put("chart.bayerLetters",
+                        Boolean.toString(options.bayerLetters()));
+                node.put("chart.flamsteedNumbers",
+                        Boolean.toString(options.flamsteedNumbers()));
                 node.put("chart.equatorialGrid",
                         Boolean.toString(options.equatorialGrid()));
             }
         };
+    }
+
+    /**
+     * A star-identifier flag with the Sprint 17 migration precedence
+     * (docs/decisions/bayer-notation.md): its own key decides
+     * whenever present; otherwise the legacy single control
+     * {@code chart.starLabels} decides that layer, so a reader who
+     * switched all star text off keeps it off; otherwise the
+     * released default, on. Confirming the dialog writes all three
+     * keys, so from the first confirmation the legacy key can never
+     * override a newer choice - and it is left in place rather than
+     * deleted, so an older build reading the same store keeps
+     * working.
+     */
+    private static boolean identifierFlag(Preferences node, String key) {
+        if (node.get(key, null) != null) {
+            return flag(node, key);
+        }
+        if (node.get("chart.starLabels", null) != null) {
+            return flag(node, "chart.starLabels");
+        }
+        return true;
     }
 
     /**

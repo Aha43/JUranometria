@@ -46,8 +46,10 @@ class ChartOptionsControllerTest {
             // includes the star-label option exactly.
             controller.restoreDefaults();
             assertEquals(ChartOptions.DEFAULTS, controller.options());
-            assertTrue(controller.options().starLabels(),
-                    "Restore Defaults turns star labels back on");
+            assertTrue(controller.options().starNames()
+                            && controller.options().bayerLetters()
+                            && controller.options().flamsteedNumbers(),
+                    "Restore Defaults turns every identifier layer on");
             assertEquals(snapshot, store.load(),
                     "Restore Defaults previews; it does not persist");
 

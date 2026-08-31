@@ -18,6 +18,7 @@ import juranometria.chart.StarIdentity;
 import juranometria.chart.StarSizePolicy;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -78,6 +79,88 @@ class StarLabelRenderingTest {
                 null), ChartOptions.DEFAULTS);
         assertFalse(java.util.Arrays.equals(withIdentity, bothAnonymous),
                 "the brighter star's label is on the page");
+    }
+
+    @Test
+    void eachIdentifierLayerTogglesIndependently() {
+        // Three layers, three separate effects: a named+lettered
+        // star, a letter-only star, and a number-only star on one
+        // page, each disappearing with its own control and no other.
+        Star named = new Star("TYC 9-1-1", CENTRE, 1.0,
+                new StarIdentity("Namedstar", "α", null, "Ori"));
+        Star lettered = new Star("TYC 9-2-1", new SkyPosition(84.6, -4.4),
+                3.0, new StarIdentity(null, "β", null, "Ori"));
+        Star numbered = new Star("TYC 9-3-1", new SkyPosition(83.0, -6.4),
+                4.0, new StarIdentity(null, null, "58", "Ori"));
+        ChartScene page = new ChartScene(
+                new ChartViewport(CENTRE, 8.0, 900, 700),
+                List.of(named, lettered, numbered), List.of(),
+                "Identifier options", 8.0, null, SceneGeography.EMPTY);
+        var probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
+                .createGraphics();
+        var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
+        probe.dispose();
+        var mapping = new juranometria.project.ViewportMapping(
+                page.viewport());
+        var projection = new juranometria.project.GnomonicProjection(CENTRE);
+
+        record Case(String label, ChartOptions options,
+                    List<String> expected) {
+        }
+        for (Case sample : List.of(
+                new Case("all on", ChartOptions.DEFAULTS,
+                        List.of("Namedstar α", "β", "58")),
+                new Case("names off", new ChartOptions(true, true, true,
+                        true, true, false, true, true, true),
+                        List.of("α", "β", "58")),
+                new Case("letters off", new ChartOptions(true, true, true,
+                        true, true, true, false, true, true),
+                        List.of("Namedstar", "58")),
+                new Case("numbers off", new ChartOptions(true, true, true,
+                        true, true, true, true, false, true),
+                        List.of("Namedstar α", "β")),
+                new Case("all identifiers off", new ChartOptions(true, true,
+                        true, true, true, false, false, false, true),
+                        List.of()))) {
+            var texts = RENDERER.starLabelPlacements(metrics, page,
+                            sample.options(),
+                            new RegionalDetailPolicy(page,
+                                    mapping.pixelsPerPlaneUnit()),
+                            projection, mapping).stream()
+                    .map(ChartRenderer.StarLabelPlacement::text).sorted()
+                    .toList();
+            assertEquals(sample.expected().stream().sorted().toList(), texts,
+                    sample.label());
+        }
+    }
+
+    @Test
+    void theSearchedStarSurvivesEveryIdentifierToggle() {
+        // The exemption is unchanged by the split: with all three
+        // layers off the searched star still names itself, in the
+        // decided notation.
+        Star target = new Star("TYC 9-4-1", new SkyPosition(84.2, -5.0),
+                6.5, new StarIdentity("Faintstar", "χ", null, "Ori"));
+        ChartScene page = new ChartScene(
+                new ChartViewport(CENTRE, 8.0, 900, 700),
+                List.of(target), List.of(), "Target exemption", 8.0,
+                "TYC 9-4-1", SceneGeography.EMPTY);
+        var probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
+                .createGraphics();
+        var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
+        probe.dispose();
+        var mapping = new juranometria.project.ViewportMapping(
+                page.viewport());
+        var texts = RENDERER.starLabelPlacements(metrics, page,
+                        new ChartOptions(true, true, true, true, true,
+                                false, false, false, true),
+                        new RegionalDetailPolicy(page,
+                                mapping.pixelsPerPlaneUnit()),
+                        new juranometria.project.GnomonicProjection(CENTRE),
+                        mapping).stream()
+                .map(ChartRenderer.StarLabelPlacement::text).toList();
+        assertEquals(List.of("Faintstar χ"), texts,
+                "the searched star keeps its full identity");
     }
 
     @Test

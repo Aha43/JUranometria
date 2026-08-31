@@ -102,8 +102,18 @@ public final class ChartOptionsDialog extends JDialog {
                 initial.deepSkyLabels(), "Deep-sky labels");
         JCheckBox names = checkBox("Constellation names", 'n',
                 initial.constellationNames(), "Constellation names");
-        JCheckBox starLabels = checkBox("Star names and identifiers", 'S',
-                initial.starLabels(), "Star names and identifiers");
+        JCheckBox starNames = checkBox("Star names", 'S',
+                initial.starNames(), "Star names");
+        starNames.getAccessibleContext().setAccessibleDescription(
+                "Traditional proper names such as Betelgeuse");
+        JCheckBox bayerLetters = checkBox("Bayer letters", 'y',
+                initial.bayerLetters(), "Bayer letters");
+        bayerLetters.getAccessibleContext().setAccessibleDescription(
+                "Greek and Latin Bayer designations such as alpha Orionis");
+        JCheckBox flamsteedNumbers = checkBox("Flamsteed numbers", 'F',
+                initial.flamsteedNumbers(), "Flamsteed numbers");
+        flamsteedNumbers.getAccessibleContext().setAccessibleDescription(
+                "Flamsteed catalogue numbers on the regional charts");
         JCheckBox grid = checkBox("Equatorial coordinate grid", 'E',
                 initial.equatorialGrid(), "Equatorial coordinate grid");
         grid.getAccessibleContext().setAccessibleDescription(
@@ -116,12 +126,14 @@ public final class ChartOptionsDialog extends JDialog {
             controller.apply(new ChartOptions(dsos.isSelected(),
                     labels.isSelected(), figures.isSelected(),
                     boundaries.isSelected(), names.isSelected(),
-                    starLabels.isSelected(), grid.isSelected()));
+                    starNames.isSelected(), bayerLetters.isSelected(),
+                    flamsteedNumbers.isSelected(), grid.isSelected()));
         };
         labels.setEnabled(initial.deepSkyObjects());
         names.setEnabled(initial.constellationFigures());
         for (JCheckBox box : new JCheckBox[] {
-                dsos, figures, boundaries, grid, labels, names, starLabels}) {
+                dsos, figures, boundaries, grid, labels, names,
+                starNames, bayerLetters, flamsteedNumbers}) {
             box.addActionListener(event -> sync.run());
         }
 
@@ -134,7 +146,9 @@ public final class ChartOptionsDialog extends JDialog {
         panel.add(groupHeading("Labels"));
         panel.add(labels);
         panel.add(names);
-        panel.add(starLabels);
+        panel.add(starNames);
+        panel.add(bayerLetters);
+        panel.add(flamsteedNumbers);
         panel.add(Box.createVerticalStrut(16));
 
         JButton restore = new JButton("Restore Defaults");
@@ -150,7 +164,9 @@ public final class ChartOptionsDialog extends JDialog {
             figures.setSelected(defaults.constellationFigures());
             boundaries.setSelected(defaults.constellationBoundaries());
             names.setSelected(defaults.constellationNames());
-            starLabels.setSelected(defaults.starLabels());
+            starNames.setSelected(defaults.starNames());
+            bayerLetters.setSelected(defaults.bayerLetters());
+            flamsteedNumbers.setSelected(defaults.flamsteedNumbers());
             grid.setSelected(defaults.equatorialGrid());
             labels.setEnabled(true);
             names.setEnabled(true);

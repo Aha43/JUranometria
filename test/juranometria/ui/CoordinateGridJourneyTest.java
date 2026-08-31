@@ -300,7 +300,8 @@ class CoordinateGridJourneyTest {
         ChartOptions gridless = new ChartOptions(current.deepSkyObjects(),
                 current.deepSkyLabels(), current.constellationFigures(),
                 current.constellationBoundaries(),
-                current.constellationNames(), current.starLabels(), false);
+                current.constellationNames(), current.starNames(),
+                current.bayerLetters(), current.flamsteedNumbers(), false);
         var with = RENDERER.renderToImage(scene, current);
         var without = RENDERER.renderToImage(scene, gridless);
         int w = scene.viewport().widthPx();

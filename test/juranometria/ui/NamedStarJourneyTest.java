@@ -154,10 +154,9 @@ class NamedStarJourneyTest {
             assertNotNull(dialog, "the View menu opened the dialog");
             juranometria.chart.ChartScene sceneBefore = chart[0].scene();
             SwingUtilities.invokeAndWait(() ->
-                    box(dialog.getContentPane(),
-                            "Star names and identifiers").doClick());
+                    box(dialog.getContentPane(), "Star names").doClick());
             flush();
-            assertFalse(options.options().starLabels(),
+            assertFalse(options.options().starNames(),
                     "the toggle previews live");
             assertSame(sceneBefore, chart[0].scene(),
                     "the star-label toggle is repaint-only");
@@ -193,9 +192,10 @@ class NamedStarJourneyTest {
             SwingUtilities.invokeAndWait(() ->
                     button(dialog.getContentPane(), "OK").doClick());
             flush();
-            assertFalse(store.load().starLabels(), "OK persisted the choice");
+            assertFalse(store.load().starNames(),
+                    "OK persisted the choice");
             assertFalse(new ChartOptionsController(store).options()
-                            .starLabels(),
+                            .starNames(),
                     "a restart honours exactly what was confirmed");
 
             // A real mouse drag through the installed pan interaction

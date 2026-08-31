@@ -77,30 +77,52 @@ public final class StarLabelPolicy {
         return first >= 'α' && first <= 'ω';
     }
 
-    /** The text the policy labels this star with, or null: none. */
-    public String labelFor(Star star) {
+    /**
+     * The identity forms that QUALIFY for this star at this field -
+     * each null when it does not. The policy stays option-free: it
+     * says what the cartography allows, and the renderer's pass
+     * composes what the reader's chart options permit.
+     */
+    public record Forms(String name, String letter, String flamsteed) {
+
+        /** The text these forms compose under the given permissions. */
+        public String text(boolean namesAllowed, boolean lettersAllowed,
+                           boolean numbersAllowed) {
+            String shownName = namesAllowed ? name : null;
+            String shownLetter = lettersAllowed ? letter : null;
+            if (shownName != null && shownLetter != null) {
+                return shownName + " " + shownLetter;
+            }
+            if (shownName != null) {
+                return shownName;
+            }
+            if (shownLetter != null) {
+                return shownLetter;
+            }
+            return numbersAllowed ? flamsteed : null;
+        }
+    }
+
+    /** The forms this star qualifies for; never null. */
+    public Forms qualifying(Star star) {
         StarIdentity identity = star.identity();
         if (identity == null) {
-            return null;
+            return new Forms(null, null, null);
         }
         double magnitude = star.magnitude();
-        String name = identity.name() != null && magnitude <= nameLimit()
-                ? identity.name() : null;
-        String letter = lettersDrawn(identity) && magnitude <= bayerLimit()
-                ? bayerNotation(identity) : null;
-        if (name != null && letter != null) {
-            return name + " " + letter;
-        }
-        if (name != null) {
-            return name;
-        }
-        if (letter != null) {
-            return letter;
-        }
-        if (identity.flamsteed() != null && magnitude <= flamsteedLimit()) {
-            return identity.flamsteed();
-        }
-        return null;
+        return new Forms(
+                identity.name() != null && magnitude <= nameLimit()
+                        ? identity.name() : null,
+                lettersDrawn(identity) && magnitude <= bayerLimit()
+                        ? bayerNotation(identity) : null,
+                identity.flamsteed() != null
+                        && magnitude <= flamsteedLimit()
+                        ? identity.flamsteed() : null);
+    }
+
+    /** The text the policy labels this star with, or null: none. */
+    public String labelFor(Star star) {
+        return qualifying(star).text(true, true, true);
     }
 
     /**
