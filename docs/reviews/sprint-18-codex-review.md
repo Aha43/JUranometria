@@ -117,3 +117,22 @@ Until those premises and outcomes are asserted, regressions in exactly
 the pointer and polar paths named by #146 can leave all twelve checks
 green. Fix these three assertions and rerun the matrix; no redesign of
 the packaged journey is requested.
+
+## Final follow-up — commit f40b19f
+
+All findings are resolved. Pointer zoom is required to be accepted and
+to take the stated 18°→12° step before its anchor is measured. The RA
+wrap begins with Alpheratz's live identity, proves an actual 2.1°→350.6°
+crossing, and observes identity and label clearing together. The polar
+leg separately proves an accepted poleward move and a refused
+past-pole move whose centre remains exactly unchanged.
+
+The reviewed commit is `f40b19f0ee61aa874dd2030781d9e5891d11762b`;
+its Git tree is `337485704729fad8ea106086e5efc9ad3a84ba91`.
+PR #166 is clean and mergeable with all twelve checks successful.
+
+**Approved for merge and the 1.0.0 release sequence.** After the squash
+merge, compare `main^{tree}` with the reviewed tree above before
+creating the annotated tag. Then let the tag workflow publish and
+verify the six public files, their checksums and notes, with no draft
+left behind.
