@@ -28,13 +28,15 @@ zoom-where-you-point. The 1.0 promise is recorded in
 ## Requirements
 
 **Running the released application** (verified on macOS 14+, Apple
-silicon and Intel; Ubuntu 24.04 LTS x86-64; and Windows 11 x86-64): a Java
-runtime of version 21 or later, and nothing else - download the
-release archive, unpack, and launch with the bundled helper or
-`java -jar JUranometria.jar`. Everything works offline; the
-application never touches the network. Note the licensing
-consequence: the bundled Tycho-2-derived star data is CC BY-NC 3.0
-IGO, so the packaged application is for non-commercial use only.
+silicon and Intel; Ubuntu 24.04 LTS x86-64; and Windows 11 x86-64):
+**nothing at all** - each platform download carries its own Java
+runtime, so there is no Java to install. Unpack it anywhere and
+launch. A portable archive is published beside them for readers who
+would rather use a Java runtime of version 21 or later that they
+already have. Everything works offline; the application never
+touches the network. Note the licensing consequence: the bundled
+Tycho-2-derived star data is CC BY-NC 3.0 IGO, so the packaged
+application is for non-commercial use only.
 
 **Building from source** (contributors):
 
@@ -50,16 +52,28 @@ archive.
 
 ## Download and run (users)
 
-Grab the latest `JUranometria-X.Y.Z.zip` from the
-[releases page](https://github.com/Aha43/JUranometria/releases),
-unpack it anywhere (paths with spaces are fine), and launch:
+Take the download for your machine from the
+[releases page](https://github.com/Aha43/JUranometria/releases) and
+unpack it anywhere (paths with spaces are fine):
 
-- macOS / Linux: `./juranometria`
-- Windows: `juranometria.bat`
-- everywhere: `java -jar JUranometria.jar`
+| Your machine | File | Launch |
+|---|---|---|
+| Mac, Apple silicon | `...-macos-arm64.zip` | open `JUranometria.app` |
+| Mac, Intel | `...-macos-x64.zip` | open `JUranometria.app` |
+| Windows 11 (x86-64) | `...-windows-x64.zip` | `JUranometria\JUranometria.exe` |
+| Linux (x86-64) | `...-linux-x64.zip` | `JUranometria/bin/JUranometria` |
+| Bring your own Java 21+ | `...-portable.zip` | `./juranometria`, `juranometria.bat`, or `java -jar JUranometria.jar` |
 
-The archive's `README.txt` covers troubleshooting for a missing or
-too-old Java.
+The first four include their own Java runtime - install nothing.
+Each archive carries a `README.txt`; the portable one also covers
+troubleshooting for a missing or too-old Java, and `SHA256SUMS.txt`
+beside the downloads lets you verify what you got.
+
+**These builds are unsigned.** On macOS, Gatekeeper may block the
+first launch: right-click the app and choose Open, or approve it
+under System Settings > Privacy & Security. On Windows, SmartScreen
+may show "Windows protected your PC": choose More info, then Run
+anyway. Installers, signing, and notarization are post-1.0 work.
 
 ## Build and run (contributors)
 
@@ -180,9 +194,15 @@ override that never rewrites the saved setting).
 Controls disable at their bounds: the bundled bright-sky pack carries
 the complete sky to stars of V 8.0 (45,630 Tycho-2 stars and 13,371
 OpenNGC objects in about 2.5 MiB), and the atlas never claims deeper
-coverage than it holds. Non-galaxy deep-sky types are searchable and
-recentre the chart but await their chart symbols. A `--dark` argument runs the dark application
-theme; the chart page itself stays white paper in both themes.
+coverage than it holds. Deep-sky objects draw in the atlas's symbol
+language: galaxies as oriented ellipses, open clusters as dotted
+circles, globular clusters as crossed circles, nebulae as outlined
+boxes, planetary nebulae as small crossed circles. Stellar-type
+entries, associations, and novae stay undrawn - a stellar entry
+would only duplicate the star layer - though they remain searchable
+and recentre the chart. A `--dark` argument runs the dark
+application theme; the chart page itself stays white paper in both
+themes.
 
 ## Licensing
 
@@ -195,13 +215,18 @@ redistributable non-commercially only. See
 
 ## Status
 
-Nine releases in (v0.1.0 through v0.9.0; see `CHANGELOG.md`), the
-atlas is a working instrument: it bundles the complete bright sky
-offline (45,630 Tycho-2 stars to V 8.0 and 13,371 OpenNGC objects),
-searches it by name, identifier, or coordinates, zooms from 1 to 36
-degree fields with scale-honest deep-sky and constellation-geography
-policies, and pans by grabbing the paper with an exact
-projection-correct drag. Every release is preceded by an independent
-review whose trail lives in `docs/reviews/`. The deliberately simple
-plain-Java/Make organization proven in NamDesktop, and the
-issue-driven sprint rhythm proven in NamWeb, both still hold.
+Eighteen releases in (v0.1.0 through v0.17.0; see `CHANGELOG.md`),
+the atlas is a working instrument, distributed as four
+self-contained platform applications plus a portable archive. It
+bundles the complete bright sky offline (45,630 Tycho-2 stars to
+V 8.0 and 13,371 OpenNGC objects), searches it by name,
+designation, identifier, or coordinates, letters the constellations
+with their Bayer and Flamsteed notation, draws the IAU boundaries
+and an equatorial grid, zooms from 1 to 36 degree fields where you
+point, and pans by grabbing the paper with an exact
+projection-correct drag. What 1.0 promises is recorded in
+[the 1.0 contract](docs/decisions/one-point-zero-contract.md).
+Every release is preceded by an independent review whose trail
+lives in `docs/reviews/`. The deliberately simple plain-Java/Make
+organization proven in NamDesktop, and the issue-driven sprint
+rhythm proven in NamWeb, both still hold.
