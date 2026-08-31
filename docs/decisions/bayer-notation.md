@@ -13,23 +13,31 @@ identities on stars the atlas draws):
 - **1,967 Bayer designations** — 1,519 Greek letters and **448
   post-omega Latin letters** (`A`…`Q`, `a`…`z`, the classical
   continuation after ω);
-- **389 of them carry component digits** (`α1`, `π1`…`π6`, `θ1`) —
-  the structured field, not a display convention;
+- **389 of them carry component digits** (`α1`, `π1`…`π6`, `θ1`),
+  recorded inside the catalogue's own `bayer` value;
 - **2,649 Flamsteed numbers**;
 - **539 proper names, of which 462 also carry a letter** — the
   overlap that makes the name-versus-letter question real, and only
   1,505 lettered stars have no name at all;
 - **68 distinct bare letters, 67 of them used in more than one
-  constellation** — a bare letter is unique only in context.
+  constellation** — counted by distinct constellations, not by
+  stars; the worst case, `α`, appears in **84 constellations**. A
+  bare letter is unique only in context.
 
 ## The notation
 
 **The letter alone, as the structured identity carries it, with its
-component digits raised**: `α`, `β`, `π³`, `μ¹`, `θ¹`, `α¹`. The
-Greek character comes from the identity field verbatim; the
-superscript is produced by lifting the *structured* trailing digits,
-never by parsing a display string. Post-omega Latin letters keep
-their case exactly as recorded (`b`, `A`, `d¹`).
+component digits raised**: `α`, `β`, `π³`, `μ¹`, `θ¹`, `α¹`.
+
+Stated precisely: the pack's `bayer` field is a single catalogue
+value such as `π1` — the component digits are **part of that
+structured string, not a separate field**. The notation lifts the
+trailing digit run of that catalogue value; what it never does is
+parse a *rendered label* or re-derive the designation from display
+text. Post-omega Latin letters keep their case exactly as recorded
+(`b`, `A`, `d¹`). Should a future pack split the component into its
+own field, this rule reads it directly and the notation is
+unchanged.
 
 Flamsteed numbers keep their released form: the bare number.
 
@@ -94,10 +102,15 @@ name+letter pairs / letters alone / collision rejections:
 | andromeda-36 | 36° | 3 | 3 | 1 | 2 |
 | ursa-major-36 | 36° | 4 | 6 | 0 | 0 |
 | crux-18 | 18° | 4 | 10 | 0 | 4 |
-| pleiades-08 | 8° | 1 | 0 | 2 | 0 |
+| pleiades-08 | 8° | 1 | 1 (Latin) | 1 | 0 |
 | polaris-36 | 36° | 1 | 1 | 0 | 0 |
 | boundary-crossing-18 | 18° | 0 | 1 | 0 | 0 |
 | m31-08 | 8° | 0 | 1 | 1 | 0 |
+
+Cost, measured warm and covering **both** the page render and the
+candidate label pass (three warm-up rounds, best of five): **1.1–6.4
+ms per page**, the widest pages at the top of that range — well
+inside the interactive budget the navigation sprints established.
 
 **The bad alternative is committed too**: `orion-36-everything.png`
 (42 letters, 16 pairs, 9 rejections, 16 ambiguities) is the text
@@ -122,18 +135,38 @@ Labels group, all default on:
 - **Bayer letters** (`chart.bayerLetters`)
 - **Flamsteed numbers** (`chart.flamsteedNumbers`)
 
-Migration is explicit and honest: a store that carries
-`chart.starLabels=false` (a reader who switched the layer off)
-maps to **all three off**; anything else, including a store with no
-star-label key at all, takes the defaults. No other option changes.
+Migration has **exact per-key precedence**, so a reader who once
+switched the whole layer off can later re-enable any single layer
+and have it stick:
+
+1. if the new key (`chart.starNames`, `chart.bayerLetters`,
+   `chart.flamsteedNumbers`) is present, it decides — always;
+2. otherwise, if the legacy `chart.starLabels` is present, its value
+   decides that layer (so a stored `false` starts all three off);
+3. otherwise the default, on.
+
+Confirming the dialog writes **all three new keys**, so from the
+first confirmation the legacy key can no longer override anything —
+the migration applies once, never re-applies over a newer choice,
+and the legacy key is left in place rather than deleted (an older
+build reading the same store keeps working). No other option
+changes.
 
 ## Interaction with everything else
 
 Unchanged from the reviewed label pass: identifiers draw in the
 star-label pass, beneath deep-sky labels and the title block and
 above the grid and geography, brightest star first with the stable
-TYC tie-break, collision-rejecting against accepted labels, deep-sky
-labels, grid labels, and the title block — prefer omission. The
+TYC tie-break, collision-rejecting against accepted star labels,
+deep-sky labels, and the title block — prefer omission.
+
+**Grid labels are deliberately not protected**, and the study
+mirrors that rather than improving on it: the coordinate-grid
+decision makes grid ink subordinate, so content may overpaint a
+coordinate label. (An earlier draft of this study seeded the grid
+labels into the collision set and measured one fewer label on the
+Pleiades page than production would actually draw — corrected here,
+PR #157 review.) The
 **searched star keeps its guaranteed label** exempt from thresholds
 and collisions; with both a name and a letter available it shows the
 pair. Star dots, navigation, projection, catalogue queries, and

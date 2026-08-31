@@ -229,7 +229,8 @@ public final class BayerStudyMain {
     /** The released identity layer, counted by rendering category. */
     static void inventory() throws Exception {
         var identities = juranometria.catalog.StarIdentities.load();
-        Map<String, Integer> greekPerLetter = new TreeMap<>();
+        Map<String, java.util.Set<String>> constellationsPerLetter =
+                new TreeMap<>();
         int greek = 0;
         int latin = 0;
         int components = 0;
@@ -256,7 +257,9 @@ public final class BayerStudyMain {
                     latin++;
                 }
                 String bare = identity.bayer().replaceAll("\\d+$", "");
-                greekPerLetter.merge(bare, 1, Integer::sum);
+                constellationsPerLetter
+                        .computeIfAbsent(bare, key -> new java.util.TreeSet<>())
+                        .add(identity.constellation());
                 if (!bare.equals(identity.bayer())) {
                     components++;
                 }
@@ -270,10 +273,20 @@ public final class BayerStudyMain {
                 flamsteed++;
             }
         }
+        // Shared means used in more than one CONSTELLATION - the
+        // ambiguity that matters for an unqualified label - not
+        // merely carried by more than one star (PR #157 review).
         int sharedLetters = 0;
-        for (var entry : greekPerLetter.entrySet()) {
-            if (entry.getValue() > 1) {
+        int worstSpread = 0;
+        String worstLetter = "";
+        for (var entry : constellationsPerLetter.entrySet()) {
+            int spread = entry.getValue().size();
+            if (spread > 1) {
                 sharedLetters++;
+            }
+            if (spread > worstSpread) {
+                worstSpread = spread;
+                worstLetter = entry.getKey();
             }
         }
         System.out.printf(Locale.ROOT,
@@ -283,11 +296,13 @@ public final class BayerStudyMain {
                         + "  Flamsteed %d; proper names %d"
                         + " (%d also lettered, %d lettered without a name)%n"
                         + "  %d distinct bare letters, %d of them used in"
-                        + " more than one constellation - a bare letter is"
-                        + " unique only in context%n",
+                        + " more than one constellation (worst: '%s' in %d"
+                        + " constellations) - a bare letter is unique only"
+                        + " in context%n",
                 identities.size(), greek + latin, greek, latin, components,
                 flamsteed, names, nameAndLetter, letterOnly,
-                greekPerLetter.size(), sharedLetters);
+                constellationsPerLetter.size(), sharedLetters, worstLetter,
+                worstSpread);
         System.out.println("  conventional notation from structured"
                 + " identity: pi + '1' -> "
                 + bayerNotation(new StarIdentity(null, "π1", null, "Ori"))
@@ -295,29 +310,33 @@ public final class BayerStudyMain {
                 + bayerNotation(new StarIdentity(null, "α2", null, "Cru")));
     }
 
-    private static void study(ChartRenderer renderer, String name,
-                              SkyPosition centre, double field,
-                              Policy policy, File outDir) throws Exception {
-        ChartViewState state = new ChartViewState(centre, field, 8.0, null, null);
-        ChartScene scene = Atlas.assembler().assemble(state, WIDTH, HEIGHT);
-        long t0 = System.nanoTime();
-        // The base page: everything released EXCEPT the star labels,
-        // which the candidate pass replaces.
-        var image = renderer.renderToImage(scene, new ChartOptions(
-                true, true, true, true, true, false, true));
-        long renderNanos = System.nanoTime() - t0;
+    /** Per-page counts the candidate pass produced. */
+    record Counts(int names, int letters, int latin, int both, int flams,
+                  int rejected, int ambiguous) {
+    }
 
-        GnomonicProjection projection = new GnomonicProjection(centre);
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
-        StarSizePolicy sizes = StarSizePolicy.DEFAULT;
-        Graphics2D g = image.createGraphics();
+    /**
+     * The candidate label pass, composed exactly as production
+     * composes its own: boxes from the renderer's shared geometry,
+     * the collision set seeded with the deep-sky labels and title
+     * block production seeds (and NOT the grid labels production
+     * ignores), brightest star first with the stable TYC tie-break.
+     * Draws when {@code g} is present; measures either way.
+     */
+    static Counts candidatePass(java.awt.image.BufferedImage image,
+                                ChartScene scene, double field,
+                                Policy policy, Graphics2D drawInto) {
+        Graphics2D g = drawInto != null ? drawInto : image.createGraphics();
         g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g.setFont(ChartRenderer.labelFont());
         g.setColor(new java.awt.Color(34, 34, 34));
         var metrics = g.getFontMetrics();
+        var centre = scene.viewport().centre();
+        var projection = new GnomonicProjection(centre);
+        var mapping = new ViewportMapping(scene.viewport());
+        StarSizePolicy sizes = StarSizePolicy.DEFAULT;
 
-        // Collision set seeded exactly as production seeds it.
         List<Rectangle2D> occupied = new ArrayList<>();
         var title = ChartRenderer.titleBlockBounds(g, scene);
         if (title != null) {
@@ -336,23 +355,18 @@ public final class BayerStudyMain {
                         mapping.pixelsPerPlaneUnit()));
             }
         }
-        for (var label : EquatorialGrid.gridFor(scene.viewport(), title)
-                .labels()) {
-            occupied.add(EquatorialGrid.labelBounds(label,
-                    EquatorialGrid.labelMetrics()));
-        }
 
         List<Star> stars = new ArrayList<>(scene.stars());
         stars.sort(java.util.Comparator.comparingDouble(Star::magnitude)
                 .thenComparing(Star::id));
         int names = 0;
         int letters = 0;
+        int latin = 0;
         int both = 0;
         int flams = 0;
-        int latinLetters = 0;
         int rejected = 0;
-        Map<String, String> letterOwners = new HashMap<>();
         int ambiguous = 0;
+        Map<String, String> letterOwners = new HashMap<>();
         for (Star star : stars) {
             if (star.magnitude() > scene.limitingMagnitude()) {
                 continue;
@@ -366,8 +380,9 @@ public final class BayerStudyMain {
                 continue;
             }
             PixelPoint pixel = mapping.toPixel(plane.get());
-            if (pixel.x() < 0 || pixel.x() >= WIDTH
-                    || pixel.y() < 0 || pixel.y() >= HEIGHT) {
+            if (pixel.x() < 0 || pixel.x() >= scene.viewport().widthPx()
+                    || pixel.y() < 0
+                    || pixel.y() >= scene.viewport().heightPx()) {
                 continue;
             }
             Rectangle2D box = ChartRenderer.starLabelBounds(metrics,
@@ -389,12 +404,10 @@ public final class BayerStudyMain {
             switch (Form.valueOf(label[1])) {
                 case NAME -> names++;
                 case LETTER -> letters++;
-                case LATIN -> latinLetters++;
+                case LATIN -> latin++;
                 case NAME_AND_LETTER -> both++;
                 default -> flams++;
             }
-            // Ambiguity: the same bare letter drawn for stars of two
-            // different constellations on one page.
             if (star.identity().bayer() != null) {
                 String bare = star.identity().bayer().replaceAll("\\d+$", "");
                 String owner = letterOwners.putIfAbsent(bare,
@@ -405,17 +418,50 @@ public final class BayerStudyMain {
                 }
             }
         }
+        if (drawInto == null) {
+            g.dispose();
+        }
+        return new Counts(names, letters, latin, both, flams, rejected,
+                ambiguous);
+    }
+
+    private static void study(ChartRenderer renderer, String name,
+                              SkyPosition centre, double field,
+                              Policy policy, File outDir) throws Exception {
+        ChartViewState state = new ChartViewState(centre, field, 8.0, null, null);
+        ChartScene scene = Atlas.assembler().assemble(state, WIDTH, HEIGHT);
+        ChartOptions base = new ChartOptions(
+                true, true, true, true, true, false, true);
+        // Warm timing covering BOTH the base page and the candidate
+        // label pass - the whole cost a reader would pay (PR #157
+        // review): three warm-up rounds, then the best of five.
+        for (int warm = 0; warm < 3; warm++) {
+            candidatePass(renderer.renderToImage(scene, base), scene,
+                    field, policy, null);
+        }
+        long best = Long.MAX_VALUE;
+        for (int round = 0; round < 5; round++) {
+            long t0 = System.nanoTime();
+            candidatePass(renderer.renderToImage(scene, base), scene,
+                    field, policy, null);
+            best = Math.min(best, System.nanoTime() - t0);
+        }
+
+        var image = renderer.renderToImage(scene, base);
+        Graphics2D g = image.createGraphics();
+        Counts counts = candidatePass(image, scene, field, policy, g);
         g.dispose();
         ImageIO.write(image, "png", new File(outDir, name + ".png"));
-        System.out.printf(Locale.ROOT, "%-24s %5.0f° | %5d %5d %5d %5d"
+        System.out.printf(Locale.ROOT, "%-24s %5.0f\u00b0 | %5d %5d %5d %5d"
                         + " | %8d %9d %6.1fms%n",
-                name + " (" + policy.label() + ")", field, names,
-                letters + latinLetters, both, flams, rejected, ambiguous,
-                renderNanos / 1e6);
-        if (latinLetters > 0) {
+                name + " (" + policy.label() + ")", field, counts.names(),
+                counts.letters() + counts.latin(), counts.both(),
+                counts.flams(), counts.rejected(), counts.ambiguous(),
+                best / 1e6);
+        if (counts.latin() > 0) {
             System.out.printf(Locale.ROOT,
                     "    (of the %d letters, %d are post-omega Latin)%n",
-                    letters + latinLetters, latinLetters);
+                    counts.letters() + counts.latin(), counts.latin());
         }
     }
 }

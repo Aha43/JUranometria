@@ -29,8 +29,10 @@ class BayerStudyMainTest {
 
     @Test
     void componentDigitsRiseFromTheStructuredIdentity() {
-        // Never parsed from a display string: the digits are the
-        // identity's own component field, lifted to superscripts.
+        // The digits are part of the identity's structured bayer
+        // value (the catalogue string "π1", not a separate field);
+        // the notation lifts that value's trailing digit run, and
+        // never re-derives a designation from rendered label text.
         assertEquals("π³", notation("π3"));
         assertEquals("α¹", notation("α1"));
         assertEquals("θ¹", notation("θ1"));
