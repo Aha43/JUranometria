@@ -31,6 +31,8 @@ import juranometria.render.RegionalDetailPolicy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -196,17 +198,73 @@ class LetteredStarJourneyTest {
                             .bayerLetters(),
                     "and only that layer - letters stay on");
 
-            // A real drag across a constellation boundary: the page
-            // stays deterministic and the target clears atomically.
-            goTo(120.0, 20.0, 18.0);
-            ChartViewState beforePan = navigation.state();
+            // A real drag across a constellation boundary, with a
+            // LIVE target so the atomic clearing is actually tested.
+            searchFor("pollux");
+            assertEquals("TYC 1920-2194-1",
+                    navigation.state().targetIdentity());
+            SwingUtilities.invokeAndWait(() -> {
+                while (navigation.state().fieldWidthDegrees() > 18.0) {
+                    navigation.zoomIn();
+                }
+                while (navigation.state().fieldWidthDegrees() < 18.0) {
+                    navigation.zoomOut();
+                }
+            });
+            flush();
+            // State the leg's premise rather than assuming it: the
+            // page is the 18-degree band, and zooming kept the target.
+            assertEquals(18.0, navigation.state().fieldWidthDegrees(),
+                    "the drag is measured on the 18-degree page");
+            assertEquals("TYC 1920-2194-1",
+                    navigation.state().targetIdentity(),
+                    "zooming keeps the target; only panning clears it");
+            assertTrue(chart.scene().title().startsWith("Pollux · β Gem"),
+                    "the target titles the page: " + chart.scene().title());
+            assertTrue(labels().contains("Pollux β"),
+                    "and draws in the decided notation: " + labels());
+
+            SkyPosition beforeCentre = navigation.state().centre();
             mouse(MouseEvent.MOUSE_PRESSED, 450, 380);
             mouse(MouseEvent.MOUSE_DRAGGED, 700, 400);
             mouse(MouseEvent.MOUSE_RELEASED, 700, 400);
-            assertFalse(beforePan.equals(navigation.state()),
-                    "the drag crossed the boundary region");
-            assertEquals(labels(), labels(),
-                    "the boundary-crossing page is deterministic");
+            SkyPosition afterCentre = navigation.state().centre();
+            assertTrue(beforeCentre.separationDegrees(afterCentre) > 3.0,
+                    "the drag moved the chart substantially: "
+                            + beforeCentre.separationDegrees(afterCentre));
+            // The atomic rule, with a target that really existed.
+            assertNull(navigation.state().targetIdentity(),
+                    "the first real pan clears the target identity");
+            assertFalse(chart.scene().title().contains("Pollux"),
+                    "and its title together: " + chart.scene().title());
+
+            // The crossing itself, proven against the page's own
+            // boundary segments rather than assumed from coordinates.
+            var crossed = constellationsCrossed(beforeCentre, afterCentre);
+            assertTrue(crossed.contains("Gem") && crossed.contains("Cnc"),
+                    "leaving Gemini across into Cancer: " + crossed);
+
+            // Determinism as a genuine replay: rewound to the same
+            // state, the SAME gesture through the SAME wiring lands
+            // on the same centre and draws the same notation - a
+            // recorded result compared against a re-run, not a value
+            // compared with itself.
+            List<String> afterLabels = labels();
+            SwingUtilities.invokeAndWait(() ->
+                    navigation.recenter(beforeCentre, 18.0));
+            flush();
+            assertEquals(beforeCentre, navigation.state().centre(),
+                    "the page rewinds to where the drag began");
+            assertNotEquals(afterLabels, labels(),
+                    "the rewound page is genuinely a different page,"
+                            + " so the replay comparison can fail");
+            mouse(MouseEvent.MOUSE_PRESSED, 450, 380);
+            mouse(MouseEvent.MOUSE_DRAGGED, 700, 400);
+            mouse(MouseEvent.MOUSE_RELEASED, 700, 400);
+            assertEquals(afterCentre, navigation.state().centre(),
+                    "the same drag replays to the same centre");
+            assertEquals(afterLabels, labels(),
+                    "and the same page of notation");
 
             // Restore Defaults and Home: the exact reviewed default.
             SwingUtilities.invokeAndWait(() ->
@@ -243,9 +301,44 @@ class LetteredStarJourneyTest {
         }
     }
 
+    /**
+     * The constellations whose drawn boundaries the pan path
+     * crosses, computed from the page's OWN boundary segments -
+     * evidence of the crossing rather than an assumption from
+     * coordinates.
+     */
+    private java.util.Set<String> constellationsCrossed(SkyPosition from,
+                                                        SkyPosition to) {
+        ChartScene scene = chart.scene();
+        var projection = new GnomonicProjection(scene.viewport().centre());
+        var mapping = new ViewportMapping(scene.viewport());
+        var start = mapping.toPixel(projection.project(from).orElseThrow());
+        var end = mapping.toPixel(projection.project(to).orElseThrow());
+        var path = new java.awt.geom.Line2D.Double(start.x(), start.y(),
+                end.x(), end.y());
+        var crossed = new java.util.TreeSet<String>();
+        for (var segment : scene.geography().boundarySegments()) {
+            var a = projection.project(segment.from());
+            var b = projection.project(segment.to());
+            if (a.isEmpty() || b.isEmpty()) {
+                continue;
+            }
+            var pa = mapping.toPixel(a.get());
+            var pb = mapping.toPixel(b.get());
+            if (path.intersectsLine(pa.x(), pa.y(), pb.x(), pb.y())) {
+                crossed.add(segment.constellationId());
+            }
+        }
+        return crossed;
+    }
+
     /** The notation the renderer actually places on the current page. */
     private List<String> labels() {
-        ChartScene scene = chart.scene();
+        return labelsOf(chart.scene());
+    }
+
+    /** The notation the renderer places on any given scene. */
+    private List<String> labelsOf(ChartScene scene) {
         var probe = new java.awt.image.BufferedImage(1, 1,
                 java.awt.image.BufferedImage.TYPE_INT_RGB).createGraphics();
         var metrics = probe.getFontMetrics(ChartRenderer.labelFont());

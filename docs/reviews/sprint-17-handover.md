@@ -47,8 +47,8 @@ installable while that finishes.
   absent at 36°, present at 8°); proving search, title, catalogue
   identity, and drawn notation agree about Dubhe; separating names
   from identifiers through the real dialog (repaint-only, the
-  searched star keeping `Dubhe α`); dragging across a boundary
-  region; a restart honouring exactly the confirmed layer; and
+  searched star keeping `Dubhe α`); dragging across the Gemini/Cancer
+  boundary with a live target; a restart honouring exactly the confirmed layer; and
   Restore Defaults + Home ending on the reviewed default page.
 
 ## Findings and corrections, recorded honestly
@@ -70,6 +70,24 @@ installable while that finishes.
   it put a bare `32` beside `M 32` — numbers read as Messier
   numbers. That measurement is also why the controls are three, not
   one.
+- **The boundary-pan leg proved none of its three claims** (sprint
+  review, P1): its determinism check compared `labels()` with
+  `labels()` — the same page against itself; the "atomic target
+  clearing" ran with the target already cleared by an earlier
+  coordinate recentre, so nothing was cleared; and the crossing was
+  assumed from coordinates rather than shown. Repaired with a live
+  target (searched Pollux, `TYC 1920-2194-1`, still held through
+  zoom), a crossing **proven against the page's own drawn boundary
+  segments** — the projected pan path intersects both `Gem` and
+  `Cnc` segments — and a genuine replay: the recorded post-drag
+  result, then the page rewound and the *same* gesture re-run
+  through the same wiring, with a guard that the rewound page
+  really differs so the comparison can fail. Measured: Pollux
+  (116.331°, +28.026°) to (121.984°, +28.543°), **5.00° east**, the
+  target and its title clearing together. The leg had also been
+  silently running on the 36° page, not the 18° one it described,
+  because it inherited the previous leg's field; the premise is now
+  driven from either side and asserted.
 - **A workflow defect surfaced en route** (#158, PR #159): the
   app-image comparison aborted while counting differences, because
   `diff` exits 1 under `set -e`. Fixed with a script that separates
