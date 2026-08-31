@@ -150,6 +150,20 @@ public final class TiledCatalogue implements Catalogue {
         double pa = optional(fields[7]);
         double vmag = optional(fields[8]);
         double bmag = optional(fields[9]);
+        // What the source actually said, before any substitution
+        // (issue #169): the display values below keep the renderer
+        // working, and these keep the application honest.
+        Double recordedMajor = Double.isNaN(major) || major <= 0
+                ? null : major;
+        Double recordedMinor = Double.isNaN(minor) || minor <= 0
+                || minor > major ? null : minor;
+        Double recordedPa = Double.isNaN(pa) ? null : pa;
+        DeepSkyObject.Recorded.Band band =
+                !Double.isNaN(vmag) ? DeepSkyObject.Recorded.Band.VISUAL
+                        : !Double.isNaN(bmag)
+                                ? DeepSkyObject.Recorded.Band.BLUE
+                                : DeepSkyObject.Recorded.Band.NONE;
+
         if (Double.isNaN(major) || major <= 0) {
             major = NOMINAL_EXTENT_ARCMIN;
         }
@@ -166,7 +180,9 @@ public final class TiledCatalogue implements Catalogue {
                 DsoType.fromOpenNgcToken(fields[2]),
                 new SkyPosition(Double.parseDouble(fields[3]), Double.parseDouble(fields[4])),
                 major, minor, pa, magnitude,
-                Integer.parseInt(fields[10]));
+                Integer.parseInt(fields[10]),
+                new DeepSkyObject.Recorded(recordedMajor, recordedMinor,
+                        recordedPa, band));
     }
 
     private static double optional(String field) {
