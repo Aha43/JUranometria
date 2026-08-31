@@ -1,0 +1,172 @@
+# Publication of a release from an annotated vX.Y.Z tag (issue #88),
+# replacing the manual procedure used through 0.17.0.
+#
+# The shape is deliberate:
+#
+#   agree -> build (the SAME workflows that gate every pull request)
+#         -> verify the five artifacts -> publish once
+#
+# Agreement is checked before anything is built, so a mis-tagged or
+# unlogged release fails in seconds and publishes nothing. The
+# artifacts come from `app-image.yml` and `dist.yml` through
+# `workflow_call`: there is no second packaging path that could
+# drift from the one the pull-request checks prove. Publication is a
+# single call carrying every file at once, so there is no window in
+# which a half-populated release exists.
+#
+# Rehearsal: run this workflow manually with `publish: false` (the
+# default). Everything runs; nothing is published. That is how #146
+# rehearses the 1.0 release before the real tag.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag to rehearse (default: v + VERSION)'
+        required: false
+        type: string
+      publish:
+        description: 'Actually create the GitHub Release'
+        required: false
+        default: false
+        type: boolean
+
+# Least privilege: only the job that publishes may write, and it is
+# the only place a token with write access is used at all.
+permissions:
+  contents: read
+
+jobs:
+  agreement:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Resolve the tag under release
+        id: resolve
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            tag='${{ github.event.inputs.tag }}'
+          elif [ "${{ github.ref_type }}" = tag ]; then
+            tag='${{ github.ref_name }}'
+          else
+            tag="v$(tr -d ' \t\r\n' < VERSION)"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "releasing $tag"
+      - name: Tag, VERSION and CHANGELOG must agree
+        run: scripts/release-metadata.sh check "${{ steps.resolve.outputs.tag }}"
+      - name: Assemble the release notes
+        run: |
+          scripts/release-metadata.sh notes \
+            "${{ steps.resolve.outputs.tag }}" . release-notes.md
+          echo "--- notes ---"
+          cat release-notes.md
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-notes
+          path: release-notes.md
+          if-no-files-found: error
+
+  # The application images and the portable archive, built and
+  # verified by the workflows that already gate every change: native
+  # per-platform builds, packaged acceptance, licensing inventory,
+  # determinism, and the cross-architecture smoke comparison. A
+  # failure in any of them means nothing reaches the publish job.
+  images:
+    needs: agreement
+    uses: ./.github/workflows/app-image.yml
+    permissions:
+      contents: read
+
+  portable:
+    needs: agreement
+    uses: ./.github/workflows/dist.yml
+    permissions:
+      contents: read
+
+  publish:
+    needs: [agreement, images, portable]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.agreement.outputs.tag }}
+      VERSION: ${{ needs.agreement.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v6
+        with:
+          path: incoming
+      - name: Name the five artifacts as the contract publishes them
+        run: |
+          mkdir -p staging
+          for cell in macos-arm64 macos-x64 windows-x64 linux-x64; do
+            cp "incoming/app-image-$cell/image.zip" \
+               "staging/JUranometria-$VERSION-$cell.zip"
+          done
+          cp "incoming/dist-archive/JUranometria-$VERSION.zip" \
+             "staging/JUranometria-$VERSION-portable.zip"
+          cp incoming/release-notes/release-notes.md .
+      - name: Verify the set and write its checksums
+        run: scripts/release-artifacts.sh "$VERSION" staging
+      - name: Refuse to publish over an existing release
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "::error::a release already exists for $TAG."
+            echo "Re-running cannot silently replace it. Delete the"
+            echo "release deliberately and re-run, or release a new"
+            echo "version. The verified artifacts of this run are"
+            echo "attached to it as workflow artifacts."
+            exit 1
+          fi
+      - name: Publish
+        if: >-
+          github.ref_type == 'tag'
+          || github.event.inputs.publish == 'true'
+        run: |
+          gh release create "$TAG" \
+            --title "JUranometria $VERSION" \
+            --notes-file release-notes.md \
+            --verify-tag \
+            staging/JUranometria-"$VERSION"-macos-arm64.zip \
+            staging/JUranometria-"$VERSION"-macos-x64.zip \
+            staging/JUranometria-"$VERSION"-windows-x64.zip \
+            staging/JUranometria-"$VERSION"-linux-x64.zip \
+            staging/JUranometria-"$VERSION"-portable.zip \
+            staging/SHA256SUMS.txt
+          echo "published $TAG"
+      - name: Rehearsal summary
+        if: >-
+          github.ref_type != 'tag'
+          && github.event.inputs.publish != 'true'
+        run: |
+          {
+            echo "## Rehearsal for $TAG — nothing published"
+            echo
+            echo "The five artifacts were built by the same workflows"
+            echo "that gate every pull request, verified, and summed:"
+            echo
+            echo '```'
+            cat staging/SHA256SUMS.txt
+            echo '```'
+            echo
+            echo "### The notes this tag would publish"
+            echo
+            cat release-notes.md
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-${{ needs.agreement.outputs.version }}
+          path: |
+            staging/*.zip
+            staging/SHA256SUMS.txt
+            release-notes.md
+          if-no-files-found: error

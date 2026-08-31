@@ -7,6 +7,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Releases are published by pushing an annotated `vX.Y.Z` tag. The
+  tag, `VERSION`, and the changelog section must agree before
+  anything is built; the five artifacts are produced by the same
+  workflows that gate every pull request, verified as a set, and
+  published once with their checksums.
+
 ### Fixed
 
 - A damaged or incomplete download now says so. Previously a

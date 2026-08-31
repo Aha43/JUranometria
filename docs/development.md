@@ -98,19 +98,67 @@ Use semantic versions:
 - `0.MINOR.PATCH` for an off-cycle fix worth releasing independently;
 - `1.0.0` only when the atlas is useful and its core behaviour is stable.
 
-To release:
+### The human part
 
 1. Review the complete change since the previous release.
 2. Run all tests and exercise the packaged application.
 3. Move the accumulated changelog entries into a dated version section.
-4. Update `VERSION` in a release pull request.
-5. Merge the release PR.
-6. Create and push an annotated `vX.Y.Z` tag.
-7. Publish a GitHub Release using the matching changelog section.
-8. Close the sprint milestone if it is not already closed.
+4. Update `VERSION` in a release pull request, and merge it.
+5. Create and push an annotated tag on the merged commit:
+   `git tag -a v1.2.3 -m "JUranometria 1.2.3" && git push origin v1.2.3`
+6. Watch the `release` workflow, then check the published downloads.
+7. Close the sprint milestone if it is not already closed.
 
-Automate GitHub Release creation from tags once the first release makes the
-exact package artifact and release notes format concrete.
+### What the tag sets off
+
+Pushing `vX.Y.Z` runs `.github/workflows/release.yml`, which does the rest
+(issue #88):
+
+- **Agreement first.** `scripts/release-metadata.sh check` requires the tag,
+  `VERSION`, and a non-empty dated `## [X.Y.Z]` changelog section to agree.
+  A malformed tag, a mis-tagged commit, or a missing section fails in seconds,
+  before anything is built — so a bad release never half-exists.
+- **One packaging path.** The four application images and the portable archive
+  are built by `app-image.yml` and `dist.yml` through `workflow_call` — the
+  same jobs that gate every pull request, with their native verification,
+  packaged acceptance, licensing inventory, determinism, and cross-architecture
+  smoke comparison. Nothing reaches publication that those checks did not pass.
+- **The set is verified before it is published.** `scripts/release-artifacts.sh`
+  requires exactly the contract's five archives, refuses a stray file, checks
+  that each archive carries the version it is named for, and only then writes
+  `SHA256SUMS.txt`.
+- **Notes are assembled, not written.** `scripts/release-metadata.sh notes`
+  emits the download table, the unsigned Gatekeeper/SmartScreen reality, the
+  offline statement, this version's changelog section, and the licensing map
+  including the non-commercial consequence.
+- **Least privilege.** Only the publishing job holds `contents: write`.
+
+### When a release run fails
+
+The workflow is safe to re-run: everything before publication is a check, and
+publication is one call carrying all six files, so there is no half-populated
+release to clean up.
+
+- **Failed before publishing** (agreement, a build cell, artifact verification):
+  fix the cause on `main`, then move the tag to the corrected commit
+  (`git tag -f -a vX.Y.Z`, `git push -f origin vX.Y.Z`) and let it run again.
+  Force-moving a tag is acceptable only while no release exists for it.
+- **A release already exists for the tag**: the run stops rather than replacing
+  it, because a silently rewritten release is worse than a failed one. The
+  verified artifacts are attached to the run, so publish them by hand if the
+  existing release is merely incomplete, or delete that release deliberately
+  and re-run.
+- **Never reuse a version to fix a published release.** Release the next patch
+  version; the published checksums of a version must keep meaning what they
+  said.
+
+### Rehearsing without publishing
+
+Run the `release` workflow manually with `publish: false` (the default). It
+builds and verifies everything and writes the artifacts, the checksums, and the
+notes it *would* publish into the run summary, publishing nothing. The same
+scripts are exercised by `ReleaseAutomationTest` over fixtures, including every
+way the agreement can fail.
 
 ## Working with AI coding agents
 
