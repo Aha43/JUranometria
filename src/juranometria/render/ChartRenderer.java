@@ -90,6 +90,104 @@ public final class ChartRenderer {
      * rule that a chart never titles itself by a symbol-capable target
      * it does not show survives every toggle.
      */
+
+    /**
+     * A mark the renderer draws on the page, with the geometry it
+     * draws it at (Sprint 19, issue #168).
+     *
+     * <p>This exists so that pointing at chart ink can be answered
+     * by the ink itself. A hit test that recomputed star radii or
+     * symbol ellipses would be a second implementation of the
+     * drawing rules, free to drift from them silently - the mistake
+     * the star-label pass taught us to stop making. Instead the
+     * renderer publishes its placements and then draws from them,
+     * so what a reader can point at is by construction what the
+     * reader can see.
+     *
+     * <p>{@code outline} is in page pixels, already rotated for a
+     * deep-sky object's position angle. {@code reach} is the radius
+     * within which the mark is unambiguously "the thing here": a
+     * star's dot radius, or half a symbol's larger axis.
+     */
+    public record DrawnMark(Kind kind, Object subject, PixelPoint centre,
+                            Shape outline, double reach) {
+
+        public enum Kind { STAR, DEEP_SKY }
+
+        /** The star this mark draws, or null when it is not a star. */
+        public Star star() {
+            return subject instanceof Star star ? star : null;
+        }
+
+        /** The deep-sky object this mark draws, or null. */
+        public DeepSkyObject deepSky() {
+            return subject instanceof DeepSkyObject dso ? dso : null;
+        }
+
+        /** Distance in page pixels from this mark's centre. */
+        public double distanceFrom(double x, double y) {
+            return Math.hypot(centre.x() - x, centre.y() - y);
+        }
+    }
+
+    /**
+     * Every mark this scene draws, in drawing order: deep-sky
+     * symbols first, then stars over them. The same list the
+     * renderer paints from, so a caller asking what is at a pixel
+     * asks the drawing itself.
+     */
+    public java.util.List<DrawnMark> drawnMarks(ChartScene scene,
+                                                ChartOptions options) {
+        GnomonicProjection projection =
+                new GnomonicProjection(scene.viewport().centre());
+        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        RegionalDetailPolicy policy =
+                new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
+        return drawnMarks(scene, options, policy, projection, mapping);
+    }
+
+    private java.util.List<DrawnMark> drawnMarks(
+            ChartScene scene, ChartOptions options,
+            RegionalDetailPolicy policy, GnomonicProjection projection,
+            ViewportMapping mapping) {
+        java.util.List<DrawnMark> marks = new java.util.ArrayList<>();
+        for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            if (!options.deepSkyObjects() && !isTarget(scene, dso)) {
+                continue;
+            }
+            if (!policy.drawn(dso)) {
+                continue;
+            }
+            projection.project(dso.position()).ifPresent(plane -> {
+                PixelPoint centre = mapping.toPixel(plane);
+                Shape outline = symbolOutline(dso, policy, centre,
+                        mapping.pixelsPerPlaneUnit());
+                if (outline != null) {
+                    java.awt.geom.Rectangle2D box =
+                            outline.getBounds2D();
+                    marks.add(new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso,
+                            centre, outline,
+                            Math.max(box.getWidth(), box.getHeight()) / 2.0));
+                }
+            });
+        }
+        for (Star star : scene.stars()) {
+            if (star.magnitude() > scene.limitingMagnitude()) {
+                continue;
+            }
+            projection.project(star.position()).ifPresent(plane -> {
+                PixelPoint pixel = mapping.toPixel(plane);
+                double radius = starSizePolicy.radiusFor(star.magnitude());
+                marks.add(new DrawnMark(DrawnMark.Kind.STAR, star, pixel,
+                        new Ellipse2D.Double(pixel.x() - radius,
+                                pixel.y() - radius,
+                                2.0 * radius, 2.0 * radius),
+                        radius));
+            });
+        }
+        return java.util.List.copyOf(marks);
+    }
+
     public void render(Graphics2D g, ChartScene scene, ChartOptions options) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
@@ -120,31 +218,24 @@ public final class ChartRenderer {
                     scene.viewport(), titleBlockBounds(g, scene)));
         }
         drawGeography(g, scene, options, projection, mapping);
-        for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (!options.deepSkyObjects() && !isTarget(scene, dso)) {
-                continue;
+        // Symbols and stars are drawn from the published placements
+        // (issue #168), so what a reader can point at is exactly
+        // what the reader can see - there is no second geometry.
+        java.util.List<DrawnMark> marks =
+                drawnMarks(scene, options, policy, projection, mapping);
+        for (DrawnMark mark : marks) {
+            if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
+                drawSymbol(g, mark.deepSky(), policy, mark.centre(),
+                        mapping.pixelsPerPlaneUnit());
             }
-            if (!policy.drawn(dso)) {
-                continue;
-            }
-            projection.project(dso.position()).ifPresent(plane ->
-                    drawSymbol(g, dso, policy, mapping.toPixel(plane),
-                            mapping.pixelsPerPlaneUnit()));
         }
         g.setColor(INK);
-        for (Star star : scene.stars()) {
+        for (DrawnMark mark : marks) {
             // The scene's stated limit governs what is drawn; the size
             // policy only decides mark sizes (Codex review, issue #13).
-            if (star.magnitude() > scene.limitingMagnitude()) {
-                continue;
+            if (mark.kind() == DrawnMark.Kind.STAR) {
+                g.fill(mark.outline());
             }
-            projection.project(star.position()).ifPresent(plane -> {
-                PixelPoint pixel = mapping.toPixel(plane);
-                double radius = starSizePolicy.radiusFor(star.magnitude());
-                g.fill(new Ellipse2D.Double(
-                        pixel.x() - radius, pixel.y() - radius,
-                        2.0 * radius, 2.0 * radius));
-            });
         }
         drawStarLabels(g, scene, options, policy, projection, mapping);
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
@@ -486,9 +577,14 @@ public final class ChartRenderer {
                 && scene.targetIdentity().equals(dso.id());
     }
 
-    private static void drawSymbol(Graphics2D g, DeepSkyObject dso,
-                                   RegionalDetailPolicy policy,
-                                   PixelPoint centre, double pixelsPerPlaneUnit) {
+    /**
+     * A symbol's drawn axes in page pixels, including the clamp that
+     * keeps a tiny object visible. One rule, so the drawing and the
+     * published outline can never disagree about how big a symbol is.
+     */
+    private static double[] symbolAxesPx(DeepSkyObject dso,
+                                         RegionalDetailPolicy policy,
+                                         double pixelsPerPlaneUnit) {
         double majorPx = arcminToPx(dso.majorAxisArcmin(), pixelsPerPlaneUnit);
         double minorPx = arcminToPx(dso.minorAxisArcmin(), pixelsPerPlaneUnit);
         if (majorPx < RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX
@@ -497,6 +593,59 @@ public final class ChartRenderer {
             majorPx *= enlarge;
             minorPx *= enlarge;
         }
+        return new double[] {majorPx, minorPx};
+    }
+
+    /**
+     * The outline of the symbol this object draws, in page pixels,
+     * rotated for its position angle - or null when the atlas draws
+     * no symbol for it. This is the shape a reader sees, and so the
+     * shape a reader points at.
+     */
+    private static Shape symbolOutline(DeepSkyObject dso,
+                                       RegionalDetailPolicy policy,
+                                       PixelPoint centre,
+                                       double pixelsPerPlaneUnit) {
+        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+        double majorPx = axes[0];
+        double minorPx = axes[1];
+        Shape local = switch (symbolFor(dso)) {
+            case ELLIPSE, DOTTED_CIRCLE -> new Ellipse2D.Double(
+                    -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
+            case CROSSED_CIRCLE -> new Ellipse2D.Double(
+                    -majorPx / 2.0, -majorPx / 2.0, majorPx, majorPx);
+            case BOX -> new Rectangle2D.Double(
+                    -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
+            case PLANETARY -> {
+                // The spokes reach beyond the circle, and they are
+                // part of the mark a reader sees and aims at.
+                double r = Math.max(
+                        RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
+                        majorPx) / 2.0;
+                double spoke = r * 1.7;
+                yield new Rectangle2D.Double(-spoke, -spoke,
+                        2.0 * spoke, 2.0 * spoke);
+            }
+            case NONE -> null;
+        };
+        if (local == null) {
+            return null;
+        }
+        java.awt.geom.AffineTransform place =
+                java.awt.geom.AffineTransform.getTranslateInstance(
+                        centre.x(), centre.y());
+        // Position angle is east of north; east is left on the chart,
+        // which is a clockwise-negative rotation in pixel space.
+        place.rotate(-Math.toRadians(dso.positionAngleDegrees()));
+        return place.createTransformedShape(local);
+    }
+
+    private static void drawSymbol(Graphics2D g, DeepSkyObject dso,
+                                   RegionalDetailPolicy policy,
+                                   PixelPoint centre, double pixelsPerPlaneUnit) {
+        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+        double majorPx = axes[0];
+        double minorPx = axes[1];
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.translate(centre.x(), centre.y());
