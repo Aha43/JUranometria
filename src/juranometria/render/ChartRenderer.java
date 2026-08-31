@@ -419,12 +419,10 @@ public final class ChartRenderer {
                 || pixel.y() >= scene.viewport().heightPx()) {
             return;
         }
-        double radius = starSizePolicy.radiusFor(star.magnitude());
-        double x = pixel.x() + radius + 3.0;
-        double y = pixel.y() + metrics.getAscent() / 2.0 - 1.0;
-        Rectangle2D box = new Rectangle2D.Double(x - 2.0,
-                y - metrics.getAscent(),
-                metrics.stringWidth(text) + 4.0, metrics.getHeight());
+        Rectangle2D box = starLabelBounds(metrics, text, pixel,
+                starSizePolicy.radiusFor(star.magnitude()));
+        double x = box.getX() + 2.0;
+        double y = box.getY() + metrics.getAscent();
         if (!exempt) {
             for (Rectangle2D other : occupied) {
                 if (other.intersects(box)) {
@@ -434,6 +432,31 @@ public final class ChartRenderer {
         }
         occupied.add(box);
         g.drawString(text, (float) x, (float) y);
+    }
+
+    /**
+     * The exact bounds of a star label as this renderer draws it -
+     * beside the star's dot at its magnitude radius, baseline at
+     * ascent/2 - 1 below the centre - shared with studies so
+     * candidate label passes collide against the real geometry,
+     * never an approximation (the Sprint 13 sharing rule). The x/y
+     * origin is the top-left of the box; drawing places the string
+     * at x + 2 with the baseline at y + ascent.
+     */
+    public static Rectangle2D starLabelBounds(FontMetrics metrics,
+                                              String text,
+                                              PixelPoint pixel,
+                                              double dotRadius) {
+        double x = pixel.x() + dotRadius + 3.0;
+        double baseline = pixel.y() + metrics.getAscent() / 2.0 - 1.0;
+        return new Rectangle2D.Double(x - 2.0,
+                baseline - metrics.getAscent(),
+                metrics.stringWidth(text) + 4.0, metrics.getHeight());
+    }
+
+    /** The label font, shared with studies measuring this geometry. */
+    public static java.awt.Font labelFont() {
+        return LABEL_FONT;
     }
 
     private static boolean isTarget(ChartScene scene, DeepSkyObject dso) {

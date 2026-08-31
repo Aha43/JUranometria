@@ -69,6 +69,7 @@ help:
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
 	@echo "  zoom-study        Measure the Sprint 14 pointer-centred zoom geometry"
 	@echo "  grid-study        Measure and render the Sprint 15 coordinate-grid candidates"
+	@echo "  bayer-study       Measure and render the Sprint 17 Bayer-Flamsteed candidates"
 	@echo "  dist              Build and verify the portable fallback ZIP"
 	@echo "  app-image         Build and verify this platform's native application image"
 	@echo "  clean        Delete build output"
@@ -179,6 +180,9 @@ zoom-study: classes
 
 grid-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GridStudyMain
+
+bayer-study: classes
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BayerStudyMain
 
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked
