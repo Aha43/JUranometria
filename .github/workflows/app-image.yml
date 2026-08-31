@@ -12,6 +12,10 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # Called by the release workflow (issue #88) so a release is built
+  # by exactly the jobs that gate every pull request - one packaging
+  # path, never a second one that could drift from it.
+  workflow_call:
 
 env:
   # setup-java takes the SemVer spec; Adoptium resolves it to the

@@ -1,0 +1,258 @@
+# Publication of a release from an annotated vX.Y.Z tag (issue #88),
+# replacing the manual procedure used through 0.17.0.
+#
+#   agree -> build (the SAME workflows that gate every pull request)
+#         -> stage and verify the five -> publish once, as a draft
+#            made public only when all six assets are present
+#
+# Three rules decide the shape (automation review):
+#
+#  1. ONLY a tag push can publish. A manual run is always a
+#     rehearsal, whatever it is asked for and whatever ref it is
+#     started from, and its jobs never hold write access at all.
+#  2. The tag must be ANNOTATED, must point at the commit being
+#     built, and that commit must already be ON origin/main - a
+#     release is published from reviewed, merged work or not at all.
+#     Checked before anything is built, and checked AGAIN
+#     immediately before the draft is created, because a tag can be
+#     force-moved while a build runs.
+#  3. A public release is never assembled in stages. The release is
+#     created as a draft, every asset is uploaded and then read back
+#     from GitHub, and only a complete set is made public - so a
+#     failed upload leaves an invisible draft, not a public release
+#     missing a platform.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag to rehearse (default: v + VERSION)'
+        required: false
+        type: string
+
+# Least privilege: read for everything, and write only in the one
+# job that can publish - which itself runs only on a tag push.
+permissions:
+  contents: read
+
+# One release run per tag at a time, and never cancelled: two runs
+# for the same tag must not race to publish it, and a run that is
+# mid-upload must be allowed to finish or fail on its own terms.
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  agreement:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Resolve the tag under release
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = push ]; then
+            tag='${{ github.ref_name }}'
+          elif [ -n "${{ github.event.inputs.tag }}" ]; then
+            tag='${{ github.event.inputs.tag }}'
+          else
+            tag="v$(tr -d ' \t\r\n' < VERSION)"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "releasing $tag"
+      # Provenance, before anything is built. Rehearsals skip it:
+      # they cannot publish, so an unmerged branch is exactly what
+      # one is for.
+      - name: The tag must be annotated, ours, and on main
+        if: github.event_name == 'push'
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
+        run: |
+          git fetch --force --no-tags origin \
+            "refs/tags/$TAG:refs/tags/$TAG" \
+            "refs/heads/main:refs/remotes/origin/main"
+          scripts/release-provenance.sh "$TAG" "$GITHUB_SHA"
+      - name: Tag, VERSION and CHANGELOG must agree
+        run: scripts/release-metadata.sh check "${{ steps.resolve.outputs.tag }}"
+      - name: Assemble the release notes
+        run: |
+          scripts/release-metadata.sh notes \
+            "${{ steps.resolve.outputs.tag }}" . release-notes.md
+          echo "--- notes ---"
+          cat release-notes.md
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-notes
+          path: release-notes.md
+          if-no-files-found: error
+
+  # The application images and the portable archive, built and
+  # verified by the workflows that already gate every change: native
+  # per-platform builds, packaged acceptance, licensing inventory,
+  # determinism, and the cross-architecture smoke comparison. A
+  # failure in any of them means nothing reaches publication.
+  images:
+    needs: agreement
+    uses: ./.github/workflows/app-image.yml
+    permissions:
+      contents: read
+
+  portable:
+    needs: agreement
+    uses: ./.github/workflows/dist.yml
+    permissions:
+      contents: read
+
+  # Naming and verification happen with no write access, whatever
+  # started the run, so the publishing job receives a set that has
+  # already passed the gate.
+  stage:
+    needs: [agreement, images, portable]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ needs.agreement.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v6
+        with:
+          path: incoming
+      - name: Name the five artifacts as the contract publishes them
+        run: |
+          mkdir -p staging
+          for cell in macos-arm64 macos-x64 windows-x64 linux-x64; do
+            cp "incoming/app-image-$cell/image.zip" \
+               "staging/JUranometria-$VERSION-$cell.zip"
+          done
+          cp "incoming/dist-archive/JUranometria-$VERSION.zip" \
+             "staging/JUranometria-$VERSION-portable.zip"
+          cp incoming/release-notes/release-notes.md staging/
+      - name: Verify the set and write its checksums
+        run: scripts/release-artifacts.sh "$VERSION" staging
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-${{ needs.agreement.outputs.version }}
+          path: staging/
+          if-no-files-found: error
+
+  # The only job that can write, and it exists only for a tag push.
+  publish:
+    needs: [agreement, stage]
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.agreement.outputs.tag }}
+      VERSION: ${{ needs.agreement.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v6
+        with:
+          name: release-${{ needs.agreement.outputs.version }}
+          path: staging
+      # Again, now: the build took minutes, and a tag can be
+      # force-moved in minutes. This is the check that stops an
+      # older run from publishing artifacts the tag no longer names.
+      - name: Re-verify provenance immediately before publishing
+        run: |
+          git fetch --force --no-tags origin \
+            "refs/tags/$TAG:refs/tags/$TAG" \
+            "refs/heads/main:refs/remotes/origin/main"
+          scripts/release-provenance.sh "$TAG" "$GITHUB_SHA"
+      - name: Refuse to publish over an existing release
+        run: |
+          if gh release view "$TAG" \
+              --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "::error::a release already exists for $TAG."
+            echo "Re-running cannot silently replace it. Delete that"
+            echo "release deliberately and re-run, or release a new"
+            echo "version. This run's verified artifacts are attached"
+            echo "to it as workflow artifacts."
+            exit 1
+          fi
+      - name: Create the release as a draft
+        run: |
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --draft --verify-tag \
+            --title "JUranometria $VERSION" \
+            --notes-file staging/release-notes.md
+      - name: Upload every asset
+        run: |
+          cd staging
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" \
+            JUranometria-"$VERSION"-macos-arm64.zip \
+            JUranometria-"$VERSION"-macos-x64.zip \
+            JUranometria-"$VERSION"-windows-x64.zip \
+            JUranometria-"$VERSION"-linux-x64.zip \
+            JUranometria-"$VERSION"-portable.zip \
+            SHA256SUMS.txt
+      - name: Read the assets back before making anything public
+        run: |
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --json assets --jq '.assets[].name' | sort > uploaded.txt
+          for cell in macos-arm64 macos-x64 windows-x64 linux-x64 \
+                      portable; do
+            echo "JUranometria-$VERSION-$cell.zip"
+          done > wanted.txt
+          echo "SHA256SUMS.txt" >> wanted.txt
+          sort -o wanted.txt wanted.txt
+          if ! diff wanted.txt uploaded.txt; then
+            echo "::error::the draft does not hold exactly the six"
+            echo "published files; it stays a draft. Nothing public"
+            echo "was created."
+            exit 1
+          fi
+          echo "all six assets present on the draft"
+      - name: Make it public
+        run: |
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --draft=false
+          echo "published $TAG"
+
+  # A manual run ends here: everything was built and verified, and
+  # this job cannot publish even if it wanted to - it holds read
+  # access only.
+  rehearsal:
+    needs: [agreement, stage]
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ needs.agreement.outputs.tag }}
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          name: release-${{ needs.agreement.outputs.version }}
+          path: staging
+      - name: Report what a real tag would publish
+        run: |
+          {
+            echo "## Rehearsal for $TAG — nothing published"
+            echo
+            echo "Built by the same workflows that gate every pull"
+            echo "request, verified as a set, and summed:"
+            echo
+            echo '```'
+            cat staging/SHA256SUMS.txt
+            echo '```'
+            echo
+            echo "### The notes this tag would publish"
+            echo
+            cat staging/release-notes.md
+          } >> "$GITHUB_STEP_SUMMARY"
