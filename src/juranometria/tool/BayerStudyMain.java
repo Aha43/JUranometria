@@ -226,8 +226,19 @@ public final class BayerStudyMain {
         System.out.println("Pages written to " + outDir);
     }
 
-    /** The released identity layer, counted by rendering category. */
-    static void inventory() throws Exception {
+    /**
+     * The released identity layer counted by rendering category -
+     * returned, not merely printed, so the gate's tests execute the
+     * same census the decision quotes (PR #157 review).
+     */
+    record Inventory(int identities, int greek, int latin, int components,
+                     int flamsteed, int names, int nameAndLetter,
+                     int letterOnly, int distinctLetters,
+                     int sharedLetters, String widestLetter,
+                     int widestSpread) {
+    }
+
+    static Inventory inventory() throws Exception {
         var identities = juranometria.catalog.StarIdentities.load();
         Map<String, java.util.Set<String>> constellationsPerLetter =
                 new TreeMap<>();
@@ -308,6 +319,10 @@ public final class BayerStudyMain {
                 + bayerNotation(new StarIdentity(null, "π1", null, "Ori"))
                 + ", alpha + '2' -> "
                 + bayerNotation(new StarIdentity(null, "α2", null, "Cru")));
+        return new Inventory(identities.size(), greek, latin, components,
+                flamsteed, names, nameAndLetter, letterOnly,
+                constellationsPerLetter.size(), sharedLetters, worstLetter,
+                worstSpread);
     }
 
     /** Per-page counts the candidate pass produced. */

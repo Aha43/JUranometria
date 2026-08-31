@@ -177,8 +177,9 @@ name search are untouched.
 The existing star-label pass is reused: the study drives its
 candidate labels through the renderer's own shared geometry
 (`ChartRenderer.starLabelBounds`, extracted at this gate as a pure
-refactor, plus `labelBounds`, `titleBlockBounds`,
-`EquatorialGrid.labelBounds`) rather than a mirrored approximation.
+refactor, plus `labelBounds` and `titleBlockBounds` — exactly the
+boxes production's own star-label pass consults, and no others)
+rather than a mirrored approximation.
 Compact notation needs no distinct seam — only a richer
 `StarLabelPolicy` returning the decided text, and the study's
 `bayerNotation` moved to production.

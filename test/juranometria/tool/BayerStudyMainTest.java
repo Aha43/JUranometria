@@ -28,6 +28,37 @@ class BayerStudyMainTest {
     }
 
     @Test
+    void theCensusTheDecisionQuotesIsExecutedAgainstTheRealPack()
+            throws Exception {
+        // The decision's inventory numbers are evidence, so the gate
+        // executes them rather than trusting a printed line
+        // (PR #157 review). These are the released pack's real
+        // counts; a pack change that moved them would fail here and
+        // send the decision back for re-measurement.
+        var inventory = BayerStudyMain.inventory();
+        assertEquals(4531, inventory.identities());
+        assertEquals(1519, inventory.greek(), "Greek Bayer letters");
+        assertEquals(448, inventory.latin(), "post-omega Latin letters");
+        assertEquals(389, inventory.components(),
+                "designations carrying component digits");
+        assertEquals(2649, inventory.flamsteed());
+        assertEquals(539, inventory.names());
+        assertEquals(462, inventory.nameAndLetter(),
+                "stars carrying BOTH a name and a letter - the overlap"
+                        + " the pairing rule exists for");
+        assertEquals(1505, inventory.letterOnly());
+        // The corrected cross-constellation census: distinct
+        // constellations per bare letter, not stars per letter.
+        assertEquals(68, inventory.distinctLetters());
+        assertEquals(67, inventory.sharedLetters(),
+                "letters used in more than one constellation");
+        assertEquals("α", inventory.widestLetter());
+        assertEquals(84, inventory.widestSpread(),
+                "alpha spans this many constellations - the measured"
+                        + " basis for the unqualified-letter decision");
+    }
+
+    @Test
     void componentDigitsRiseFromTheStructuredIdentity() {
         // The digits are part of the identity's structured bayer
         // value (the catalogue string "π1", not a separate field);
