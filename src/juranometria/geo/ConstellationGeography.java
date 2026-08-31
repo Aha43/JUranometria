@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +31,7 @@ import juranometria.chart.SkyRegion;
  * both poles because the geometry is evaluated in vector space.
  */
 import juranometria.catalog.PackIntegrityException;
+import juranometria.catalog.Sha256;
 
 public final class ConstellationGeography {
 
@@ -199,7 +198,7 @@ public final class ConstellationGeography {
             throw new UncheckedIOException("cannot read geography " + name, e);
         }
         String expected = required(manifest, "checksum." + name);
-        String actual = sha256Hex(bytes);
+        String actual = Sha256.hex(bytes);
         if (!expected.equals(actual)) {
             throw new PackIntegrityException(String.format(Locale.ROOT,
                     "geography resource %s fails its checksum: expected %s,"
@@ -238,16 +237,4 @@ public final class ConstellationGeography {
         }
     }
 
-    private static String sha256Hex(byte[] bytes) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            StringBuilder hex = new StringBuilder();
-            for (byte b : digest.digest(bytes)) {
-                hex.append(String.format(Locale.ROOT, "%02x", b));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new PackIntegrityException("SHA-256 unavailable", e);
-        }
-    }
 }

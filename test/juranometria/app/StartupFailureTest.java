@@ -145,6 +145,26 @@ class StartupFailureTest {
     }
 
     @Test
+    void aJavaRuntimeWithoutSha256IsNotADamagedDownloadEither() {
+        // The digest helpers' policy, seen from the reader's end
+        // (audit review, P2): one pack's copy used to report an
+        // absent SHA-256 as a pack integrity failure. This is the
+        // exact exception the single shared helper now throws.
+        Throwable brokenRuntime = new IllegalStateException(
+                "SHA-256 is unavailable in this Java runtime",
+                new java.security.NoSuchAlgorithmException("SHA-256"));
+
+        assertEquals(StartupFailure.Kind.UNRECOGNISED,
+                StartupFailure.classify(brokenRuntime),
+                "a runtime missing a guaranteed algorithm says nothing"
+                        + " about the data");
+        assertFalse(StartupFailure.message(brokenRuntime)
+                        .contains("Download the release again"),
+                "so the reader is not sent to re-download files that"
+                        + " are perfectly good");
+    }
+
+    @Test
     void aWrappedIntegrityFailureKeepsTheDetailThatIdentifiesTheFile() {
         // describe() used to stop at the first wrapper carrying a
         // message, which hid the filename and checksum underneath it

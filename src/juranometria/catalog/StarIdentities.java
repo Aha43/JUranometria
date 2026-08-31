@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -129,7 +128,7 @@ public final class StarIdentities {
             throw new PackIntegrityException(
                     "failed to read " + CSV_NAME, e);
         }
-        String actual = sha256Hex(bytes);
+        String actual = Sha256.hex(bytes);
         if (!actual.equals(expected)) {
             throw new PackIntegrityException(CSV_NAME
                     + " does not match its manifest checksum"
@@ -197,17 +196,4 @@ public final class StarIdentities {
         return field.isEmpty() ? null : field;
     }
 
-    private static String sha256Hex(byte[] bytes) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(bytes);
-            StringBuilder hex = new StringBuilder();
-            for (byte b : digest.digest()) {
-                hex.append(String.format(Locale.ROOT, "%02x", b));
-            }
-            return hex.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-    }
 }

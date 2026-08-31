@@ -11,11 +11,12 @@ contradiction of the contract**, record everything else as post-1.0.
 Six contradictions were found and fixed; one robustness defect was
 found by experiment and fixed; the rest of the contract was
 confirmed by evidence, and that evidence is now executed by tests
-rather than asserted in prose. The suite went from 324 to 344, including the corrections the
-audit's own two review rounds required (recorded below where they
+rather than asserted in prose. The suite went from 324 to 348, including the corrections the
+audit's own three review rounds required (recorded below where they
 apply: remedy classification and its closed signal, the settings
 remedy's safety, the chained failure description, the
-runtime-licensing guard, and the narrowed offline claim).
+runtime-licensing guard, the single shared digest, and the
+narrowed offline claim).
 
 ## Blockers found and fixed
 
@@ -102,7 +103,7 @@ a programming defect anywhere in the catalogue or geography packages
 would still have sent a reader to re-download a perfectly good file.
 
 Classification is now by signals that cannot be produced by
-accident. The 34 verification sites in those packages throw
+accident. The verification sites in those packages throw
 `PackIntegrityException` - a type only they throw - and the
 preferences store is recognised by the JDK's own
 `BackingStoreException` or by frames inside `java.util.prefs`, a
@@ -113,6 +114,16 @@ package containing no code of ours.
 | bundled data is not what was published | `PackIntegrityException` | the file that failed, and to re-download and check the SHA-256 |
 | the saved-settings store | `BackingStoreException`, or `java.util.prefs` frames | that these are their own settings, that removing them costs only the defaults, and how - per platform |
 | anything else, including a defect in the loaders themselves | nothing matched | that the atlas does not recognise this, that it is likelier a defect than a bad download, and where to report it |
+
+One site slipped through that conversion and was caught in review:
+the geography pack's private copy of the SHA-256 helper reported an
+*unavailable digest algorithm* as an integrity failure, so a broken
+Java runtime would have been blamed on the reader's download. The
+cause was duplication - three packs each carried their own copy of
+the same helper, and only copies can diverge - so the three are now
+one `Sha256`, with a test that fails if a fourth appears and a test
+that the reader's message for a runtime without SHA-256 is not a
+download instruction.
 
 The description shown is now **every distinct message in the chain**,
 outermost first. Stopping at the first wrapper that had a message
