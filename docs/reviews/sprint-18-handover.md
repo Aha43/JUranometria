@@ -43,6 +43,37 @@ history into this sprint.
   built for and requires the running application to report it;
   `build-app-image.sh` fails the build if it does not. On this
   machine: `version binding OK (image and application both 1.0.0)`.
+- **The reader's journey runs inside the packaged application**
+  (sprint review, P1). The image's acceptance launcher previously
+  proved only that the image could answer questions about itself —
+  About, licensing, version, one preference round trip. It now walks
+  the atlas through the production classes the window drives, on the
+  bundled runtime with no system Java, on every platform cell:
+
+  - the default page is M31 at 8°, V 8.0, and it draws;
+  - **seven search forms across both hemispheres** — a traditional
+    name, a Bayer designation (`alpha crucis` → Acrux, dec −63°), a
+    Flamsteed number, Messier and NGC objects, and coordinates in
+    decimal and sexagesimal — each recentred and rendered;
+  - the field sequence walked to both bounds with the target
+    surviving, and a pointer zoom that keeps the sky under the
+    pointer to within 10⁻³ degrees;
+  - grab-to-pan **across RA 0**, landing near the wrap rather than
+    drifting, and clearing the target atomically; a pan near the
+    pole that stays on the sky;
+  - the magnitude limit stopping at V 4.0 and V 8.0;
+  - layers off drawing less ink than layers on, and the identifier
+    layers separable;
+  - preferences saved and read back, and **the documented upgrade** —
+    a pre-split store's single star-text choice governing all three
+    identifier layers — through the bundled runtime's own preference
+    backend, on scratch nodes so the reader's settings are never
+    touched;
+  - **Home returning to the reviewed default page, pixel for pixel.**
+
+  What it does not do is press keys on a screen: a release cell has
+  no display. The on-screen journey remains the maintainer's, run on
+  real machines, and this sprint ran it on macOS Apple silicon.
 - **The audit closed every open issue's disposition**; no blocker
   was left for this issue to absorb, and no post-1.0 improvement was
   quietly folded in.
@@ -132,14 +163,27 @@ aafbb30b89703971d8ecb3b05f40f8f9cc0fefcbe4cae61ababea479894e1051  JUranometria-1
 ```
 
 **Only the real annotated-tag run builds and publishes from the
-exact tagged commit.** These digests are the expectation, not the
-release: the reviewed commit is squash-merged before tagging, so the
-published artifacts come from a different commit carrying (barring
-review changes) the same tree. If the tree is unchanged the digests
-should match, and step 8 of the release sequence is where that is
-checked rather than assumed — a difference would mean the merged
-tree is not the reviewed one, which is exactly what should stop a
-release.
+exact tagged commit**, so those digests are an informational record
+of a rehearsal, nothing more.
+
+They are explicitly **not** the check that the released tree is the
+reviewed one (sprint review, P1). Native archives can legitimately
+differ between CI runs — a refreshed runner image, a different
+packager build, any input outside our pins — so comparing published
+digests against rehearsal digests would raise false alarms and, worse,
+could pass while the tree differed. The correct comparison is the
+tree itself:
+
+```sh
+git rev-parse <reviewed-commit>^{tree}
+git rev-parse main^{tree}          # after the squash merge
+```
+
+Two identical tree IDs prove the merged tree is byte-for-byte the
+reviewed content, whatever commit carries it. That comparison is
+step 6.5 of the release sequence below: if the trees differ, the tag
+does not get pushed, because the thing reviewed is not the thing
+about to be published.
 
 Reproducibility is claimed at the honest level the contract settled:
 asserted contents, pinned inputs and tool versions, same-runner
@@ -184,8 +228,10 @@ its six assets are read back from GitHub. Only that job holds
   **byte-for-byte**.
 - Native image built at 1.0.0: licensing inventory complete (9
   resources, 6 module legal directories), version binding, About
-  surface, and preference change-and-reload all green through the
-  bundled runtime; 76 MB unpacked.
+  surface, preference change-and-reload, and **the complete reader
+  journey** all green through the bundled runtime; 76 MB unpacked.
+  The journey runs in every image build, so CI proves it on all four
+  platforms on every pull request.
 - The packaged application launched from a path containing a space,
   with `PATH=/nonexistent`, in light and `--dark`.
 - Portable archive built and verified: contents exact,
@@ -228,6 +274,11 @@ are judgements better made by a reader than by a plan.
 This handover accompanies the open sprint PR; the independent review
 lands as `docs/reviews/sprint-18-codex-review.md`; findings are
 fixed here; both documents are committed with the fixes. Then:
-merge, close milestone 18, create and push the annotated `v1.0.0`
-tag, and verify the public release — six files, their checksums, the
-notes, and no leftover draft.
+
+1. merge the reviewed commit;
+2. **compare tree IDs** — `git rev-parse <reviewed>^{tree}` against
+   `git rev-parse main^{tree}` — and stop if they differ;
+3. close milestone 18;
+4. create and push the annotated `v1.0.0` tag;
+5. verify the public release: six files, their checksums matching
+   `SHA256SUMS.txt`, the notes, and no leftover draft.

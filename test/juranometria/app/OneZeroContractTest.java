@@ -63,6 +63,9 @@ class OneZeroContractTest {
     void theMagnitudeRangeIsTheOnePromised() {
         // "magnitude limit 4.0-8.0 in whole steps", and the controls
         // stop at both bounds rather than wrapping or drifting.
+        // V 4.0 is the bright end: fewer, brighter stars. Walking up
+        // to V 8.0 admits the fainter ones (sprint review, P2 - the
+        // diagnostic here had the two ends the wrong way round).
         ChartViewController navigation =
                 new ChartViewController(Atlas.assembler()::fits);
         List<Double> limits = new ArrayList<>();
@@ -81,7 +84,10 @@ class OneZeroContractTest {
         }
 
         assertEquals(List.of(4.0, 5.0, 6.0, 7.0, 8.0), limits,
-                "whole steps from the faintest bound to the brightest");
+                "whole steps from the bright-stars-only bound at"
+                        + " V 4.0 to the faintest the pack carries,"
+                        + " V 8.0 (a larger limiting magnitude admits"
+                        + " fainter stars)");
     }
 
     @Test
