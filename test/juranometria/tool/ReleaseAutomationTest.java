@@ -301,6 +301,119 @@ class ReleaseAutomationTest {
         }
     }
 
+    @Test
+    void aReleaseIsPublishedOnlyFromAnAnnotatedTagOnMergedWork()
+            throws Exception {
+        // Provenance, on real repositories (automation review):
+        // version agreement says nothing about where a commit came
+        // from, and an annotated tag on an unmerged branch would
+        // otherwise publish work no review ever saw.
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-provenance.sh")));
+        Path repo = Files.createTempDirectory("release-provenance");
+        try {
+            git(repo, "init", "-q", "-b", "main");
+            git(repo, "config", "user.email", "test@example.invalid");
+            git(repo, "config", "user.name", "Release Test");
+            Files.writeString(repo.resolve("VERSION"), "1.2.3\n");
+            git(repo, "add", "-A");
+            git(repo, "commit", "-q", "-m", "release 1.2.3");
+            String merged = capture(repo, "rev-parse", "HEAD");
+
+            // The good case: annotated, pointing here, on main.
+            git(repo, "tag", "-a", "v1.2.3", "-m", "JUranometria 1.2.3");
+            assertEquals(0, provenance(repo, "v1.2.3", merged).status());
+
+            // A lightweight tag is not a release tag.
+            git(repo, "tag", "v1.2.4-light");
+            Run light = provenance(repo, "v1.2.4-light", merged);
+            assertEquals(8, light.status(), light.output());
+            assertTrue(light.output().contains("annotated"),
+                    light.output());
+
+            // An annotated tag on work that never reached main: the
+            // blocker this test exists for.
+            git(repo, "checkout", "-q", "-b", "side");
+            Files.writeString(repo.resolve("VERSION"), "1.2.4\n");
+            git(repo, "commit", "-qam", "unmerged work");
+            String unmerged = capture(repo, "rev-parse", "HEAD");
+            git(repo, "tag", "-a", "v1.2.4", "-m", "JUranometria 1.2.4");
+            Run unreviewed = provenance(repo, "v1.2.4", unmerged);
+            assertEquals(10, unreviewed.status(),
+                    "an unmerged commit must never be published: "
+                            + unreviewed.output());
+            assertTrue(unreviewed.output().contains("not on main"),
+                    unreviewed.output());
+
+            // A tag force-moved after the build started: the same
+            // check, run again before publishing, must refuse.
+            git(repo, "checkout", "-q", "main");
+            Files.writeString(repo.resolve("VERSION"), "1.2.5\n");
+            git(repo, "commit", "-qam", "later work on main");
+            git(repo, "tag", "-f", "-a", "v1.2.3", "-m", "moved");
+            Run moved = provenance(repo, "v1.2.3", merged);
+            assertEquals(9, moved.status(),
+                    "artifacts built for one commit are never"
+                            + " published under a tag that now names"
+                            + " another: " + moved.output());
+            assertTrue(moved.output().contains("the tag moved"),
+                    moved.output());
+
+            Run absent = provenance(repo, "v9.9.9", merged);
+            assertEquals(8, absent.status(), absent.output());
+        } finally {
+            cleanUp(repo);
+        }
+    }
+
+    private static Run provenance(Path repo, String tag, String sha)
+            throws Exception {
+        return run(Path.of("scripts/release-provenance.sh").toAbsolutePath()
+                        .toString(), tag, sha, repo.toString(), "main");
+    }
+
+    private static void git(Path repo, String... arguments)
+            throws Exception {
+        String[] command = new String[arguments.length + 3];
+        command[0] = "git";
+        command[1] = "-C";
+        command[2] = repo.toString();
+        System.arraycopy(arguments, 0, command, 3, arguments.length);
+        Run run = run(command);
+        assertEquals(0, run.status(),
+                String.join(" ", command) + ": " + run.output());
+    }
+
+    private static String capture(Path repo, String... arguments)
+            throws Exception {
+        String[] command = new String[arguments.length + 3];
+        command[0] = "git";
+        command[1] = "-C";
+        command[2] = repo.toString();
+        System.arraycopy(arguments, 0, command, 3, arguments.length);
+        return run(command).output().trim();
+    }
+
+    @Test
+    void aVersionHasExactlyOneChangelogSection() throws Exception {
+        // Two dated sections for one version used to be silently
+        // combined, publishing notes nobody wrote (automation
+        // review).
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-metadata.sh")));
+        Path tree = tree("1.2.3",
+                "# Changelog\n\n## [1.2.3] - 2026-09-01\n\n- First.\n\n"
+                        + "## [1.2.3] - 2026-09-02\n\n- Second.\n");
+        try {
+            Run duplicated = metadata("check", "v1.2.3", tree.toString());
+            assertEquals(4, duplicated.status(), duplicated.output());
+            assertTrue(duplicated.output().contains("2 sections"),
+                    "counted and named: " + duplicated.output());
+        } finally {
+            cleanUp(tree);
+        }
+    }
+
     /** An application image: a build-info.txt is what states its version. */
     private static void image(Path zip, String version) throws IOException {
         try (OutputStream out = Files.newOutputStream(zip);

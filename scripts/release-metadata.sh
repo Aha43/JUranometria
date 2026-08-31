@@ -15,7 +15,8 @@
 #   0  agreement holds
 #   2  the tag is not a vX.Y.Z version
 #   3  the tag and VERSION disagree
-#   4  CHANGELOG.md has no section for this version, or it is empty
+#   4  CHANGELOG.md has no dated section for this version, more
+#      than one, or an empty one
 #   5  the tree is not a JUranometria checkout
 set -eu
 
@@ -68,8 +69,19 @@ fi
 # an unfinished release note, and matching it loosely would also
 # accept "## [1.2.30]" when releasing 1.2.3.
 escaped="$(printf '%s' "$version" | sed 's/\./\\./g')"
-heading="$(grep -E "^## \[$escaped\] - [0-9]{4}-[0-9]{2}-[0-9]{2}\$" \
-    "$tree/CHANGELOG.md" | head -1 || true)"
+headings="$(grep -E "^## \[$escaped\] - [0-9]{4}-[0-9]{2}-[0-9]{2}\$" \
+    "$tree/CHANGELOG.md" || true)"
+found="$(printf '%s' "$headings" | grep -c . || true)"
+if [ "$found" -gt 1 ]; then
+    # Two sections for one version is an editing accident, and
+    # concatenating them would publish notes nobody wrote
+    # (automation review).
+    echo "CHANGELOG.md has $found sections for $version:" >&2
+    printf '%s\n' "$headings" >&2
+    echo "a version has exactly one section" >&2
+    exit 4
+fi
+heading="$headings"
 if [ -z "$heading" ]; then
     if grep -qE "^## \[$escaped\]" "$tree/CHANGELOG.md"; then
         echo "CHANGELOG.md's section for $version is not dated" >&2

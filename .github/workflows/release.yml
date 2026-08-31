@@ -10,8 +10,12 @@
 #  1. ONLY a tag push can publish. A manual run is always a
 #     rehearsal, whatever it is asked for and whatever ref it is
 #     started from, and its jobs never hold write access at all.
-#  2. The tag must be ANNOTATED and must point at the commit being
-#     built, checked before anything is built.
+#  2. The tag must be ANNOTATED, must point at the commit being
+#     built, and that commit must already be ON origin/main - a
+#     release is published from reviewed, merged work or not at all.
+#     Checked before anything is built, and checked AGAIN
+#     immediately before the draft is created, because a tag can be
+#     force-moved while a build runs.
 #  3. A public release is never assembled in stages. The release is
 #     created as a draft, every asset is uploaded and then read back
 #     from GitHub, and only a complete set is made public - so a
@@ -33,6 +37,13 @@ on:
 # job that can publish - which itself runs only on a tag push.
 permissions:
   contents: read
+
+# One release run per tag at a time, and never cancelled: two runs
+# for the same tag must not race to publish it, and a run that is
+# mid-upload must be allowed to finish or fail on its own terms.
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   agreement:
@@ -59,27 +70,18 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
           echo "releasing $tag"
-      - name: The tag must be annotated and point at this commit
+      # Provenance, before anything is built. Rehearsals skip it:
+      # they cannot publish, so an unmerged branch is exactly what
+      # one is for.
+      - name: The tag must be annotated, ours, and on main
         if: github.event_name == 'push'
         env:
           TAG: ${{ steps.resolve.outputs.tag }}
         run: |
           git fetch --force --no-tags origin \
-            "refs/tags/$TAG:refs/tags/$TAG"
-          kind="$(git cat-file -t "$TAG")"
-          if [ "$kind" != tag ]; then
-            echo "::error::$TAG is a $kind, not an annotated tag."
-            echo "Release tags carry their own message and author:"
-            echo "  git tag -a $TAG -m 'JUranometria ${TAG#v}'"
-            exit 1
-          fi
-          target="$(git rev-list -n 1 "$TAG")"
-          if [ "$target" != "$GITHUB_SHA" ]; then
-            echo "::error::$TAG points at $target, not the commit"
-            echo "being built ($GITHUB_SHA)."
-            exit 1
-          fi
-          echo "$TAG is annotated and points at $target"
+            "refs/tags/$TAG:refs/tags/$TAG" \
+            "refs/heads/main:refs/remotes/origin/main"
+          scripts/release-provenance.sh "$TAG" "$GITHUB_SHA"
       - name: Tag, VERSION and CHANGELOG must agree
         run: scripts/release-metadata.sh check "${{ steps.resolve.outputs.tag }}"
       - name: Assemble the release notes
@@ -156,10 +158,22 @@ jobs:
       VERSION: ${{ needs.agreement.outputs.version }}
       GH_TOKEN: ${{ github.token }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v6
         with:
           name: release-${{ needs.agreement.outputs.version }}
           path: staging
+      # Again, now: the build took minutes, and a tag can be
+      # force-moved in minutes. This is the check that stops an
+      # older run from publishing artifacts the tag no longer names.
+      - name: Re-verify provenance immediately before publishing
+        run: |
+          git fetch --force --no-tags origin \
+            "refs/tags/$TAG:refs/tags/$TAG" \
+            "refs/heads/main:refs/remotes/origin/main"
+          scripts/release-provenance.sh "$TAG" "$GITHUB_SHA"
       - name: Refuse to publish over an existing release
         run: |
           if gh release view "$TAG" \
