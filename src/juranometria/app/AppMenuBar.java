@@ -48,6 +48,20 @@ public final class AppMenuBar {
                                   Runnable openSettings,
                                   Runnable openChartOptions,
                                   Runnable openAbout) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                null);
+    }
+
+    /**
+     * The menu bar with the inspector toggle (issue #170). Opening
+     * and closing the inspector lives here rather than in the
+     * toolbar, which stays the essential controls only.
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector) {
         if (openAbout == null) {
             throw new IllegalArgumentException("about action is required");
         }
@@ -77,6 +91,19 @@ public final class AppMenuBar {
                     "Choose which chart content and labels draw");
             chartOptions.addActionListener(event -> openChartOptions.run());
             view.add(chartOptions);
+            if (toggleInspector != null) {
+                JMenuItem inspector = new JMenuItem("Inspector");
+                inspector.setMnemonic('I');
+                inspector.setAccelerator(KeyStroke.getKeyStroke(
+                        java.awt.event.KeyEvent.VK_I, menuShortcutMask()));
+                inspector.getAccessibleContext().setAccessibleName(
+                        "Inspector");
+                inspector.getAccessibleContext().setAccessibleDescription(
+                        "Show or hide the panel describing the selected"
+                                + " chart mark");
+                inspector.addActionListener(event -> toggleInspector.run());
+                view.add(inspector);
+            }
             if (navigation != null) {
                 // Centre-preserving zoom, exactly the toolbar's
                 // transition (docs/decisions/pointer-zoom.md): same

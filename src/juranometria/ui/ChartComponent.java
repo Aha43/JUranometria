@@ -34,6 +34,7 @@ public final class ChartComponent extends JComponent {
     private juranometria.render.ChartOptions chartOptions =
             juranometria.render.ChartOptions.DEFAULTS;
     private ChartScene scene;
+    private String highlighted;
 
     public ChartComponent(SceneAssembler assembler) {
         if (assembler == null) {
@@ -89,6 +90,24 @@ public final class ChartComponent extends JComponent {
         return scene;
     }
 
+    /** The page as assembled, for consumers outside this package. */
+    public ChartScene currentScene() {
+        return scene;
+    }
+
+    /**
+     * The object the reader has selected, marked on the page (issue
+     * #170). Presentation only: it changes no view state, assembles
+     * no scene, and asks the catalogue nothing.
+     */
+    public void setHighlightedObject(String catalogueId) {
+        if (java.util.Objects.equals(highlighted, catalogueId)) {
+            return;
+        }
+        this.highlighted = catalogueId;
+        repaint();
+    }
+
     private void assembleScene() {
         if (getWidth() <= 0 || getHeight() <= 0) {
             return;
@@ -100,7 +119,7 @@ public final class ChartComponent extends JComponent {
     }
 
     /** Top of the paper page inside the (possibly letterboxed) canvas. */
-    int pageOffsetY() {
+    public int pageOffsetY() {
         return scene == null ? 0
                 : (getHeight() - scene.viewport().heightPx()) / 2;
     }
@@ -147,6 +166,8 @@ public final class ChartComponent extends JComponent {
         try {
             g2.translate(0, pageOffsetY());
             renderer.render(g2, scene, chartOptions);
+            renderer.drawSelectionHighlight(g2, scene, chartOptions,
+                    highlighted);
         } finally {
             g2.dispose();
         }
