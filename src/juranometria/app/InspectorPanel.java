@@ -83,7 +83,7 @@ public final class InspectorPanel extends JPanel {
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
-        setPreferredSize(new Dimension(320, 400));
+        setPreferredSize(new Dimension(PREFERRED_PANEL_WIDTH, 400));
         setMinimumSize(new Dimension(240, 200));
         getAccessibleContext().setAccessibleName("Inspector");
         getAccessibleContext().setAccessibleDescription(
@@ -95,6 +95,9 @@ public final class InspectorPanel extends JPanel {
 
         facts.setLayout(new BoxLayout(facts, BoxLayout.Y_AXIS));
         facts.setAlignmentX(0.0f);
+        facts.setFocusable(true);
+        facts.getAccessibleContext().setAccessibleName(
+                "Details of the selected object");
 
         candidates.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION);
@@ -159,7 +162,7 @@ public final class InspectorPanel extends JPanel {
                     @Override
                     public void actionPerformed(
                             java.awt.event.ActionEvent event) {
-                        centreHere.requestFocusInWindow();
+                        focusTarget().requestFocusInWindow();
                     }
                 });
 
@@ -179,6 +182,7 @@ public final class InspectorPanel extends JPanel {
      */
     public static final int MINIMUM_CHART_WIDTH = 400;
     public static final int MINIMUM_PANEL_WIDTH = 240;
+    public static final int PREFERRED_PANEL_WIDTH = 320;
 
     /** Whether a window this wide can show both (issue #170). */
     public static boolean fitsBeside(int windowWidth) {
@@ -201,22 +205,50 @@ public final class InspectorPanel extends JPanel {
         return requested;
     }
 
+    /**
+     * The width the panel may take beside a window this wide: what
+     * is left once the chart has its 400 px, never more than the
+     * preferred 320 and never less than the floor of 240.
+     *
+     * <p>Without this the rule was only half kept (review): 640 px
+     * passed {@link #fitsBeside}, and then the panel took its full
+     * preferred 320, leaving the chart 320 - the very squeeze the
+     * decision said the panel would absorb.
+     */
+    public static int widthBeside(int windowWidth) {
+        int spare = windowWidth - MINIMUM_CHART_WIDTH;
+        return Math.max(MINIMUM_PANEL_WIDTH,
+                Math.min(PREFERRED_PANEL_WIDTH, spare));
+    }
+
     /** Tells the panel how much room the window has. */
     public void setAvailableWidth(int windowWidth) {
         boolean fits = fitsBeside(windowWidth);
+        if (fits) {
+            // Take the leftovers, not the preference: the chart's
+            // 400 px comes first.
+            int width = widthBeside(windowWidth);
+            setPreferredSize(new Dimension(width, getPreferredSize().height));
+            setMaximumSize(new Dimension(width, Integer.MAX_VALUE));
+        }
         if (fits != fitsHere) {
             this.fitsHere = fits;
-            applyVisibility();
         }
+        applyVisibility();
     }
 
     private void applyVisibility() {
         boolean shown = requested && fitsHere;
         if (shown != isVisible()) {
             setVisible(shown);
-            if (onVisibilityChange != null) {
-                onVisibilityChange.accept(shown);
-            }
+        }
+        // Announced whenever it might have changed, not only when it
+        // did (review): a checkbox menu item flips itself when it is
+        // clicked, so a toggle that a narrow window refuses must
+        // still be told what actually happened - otherwise the menu
+        // shows a panel that is not there.
+        if (onVisibilityChange != null) {
+            onVisibilityChange.accept(shown);
         }
     }
 
@@ -234,6 +266,16 @@ public final class InspectorPanel extends JPanel {
     public void refresh() {
         show(new SelectionModel.Change(selection.selection(),
                 selection.candidates(), selection.currentIndex()));
+    }
+
+    /**
+     * Where Enter takes the reader from the candidate list: into the
+     * facts, which is where the answer they were walking towards is
+     * written - not onward to the button that would move the chart
+     * (review).
+     */
+    public JComponent focusTarget() {
+        return facts;
     }
 
     /** Where focus goes when the inspector closes: the chart. */

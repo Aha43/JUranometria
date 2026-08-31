@@ -288,6 +288,116 @@ class InspectorPanelTest {
     }
 
     @Test
+    void thePanelTakesOnlyWhatIsLeftAboveTheChartsFloor() {
+        // Review, P1: 640 px passed the fits test and then the panel
+        // took its full preferred 320, leaving the chart 320 - the
+        // exact squeeze the decision said the panel would absorb.
+        assertEquals(240, InspectorPanel.widthBeside(640),
+                "at the boundary the panel takes its floor, so the"
+                        + " chart keeps the 400 px it was promised");
+        assertEquals(300, InspectorPanel.widthBeside(700));
+        assertEquals(320, InspectorPanel.widthBeside(720),
+                "and only at 720 does it reach its preference");
+        assertEquals(320, InspectorPanel.widthBeside(1600),
+                "beyond which the extra room goes to the chart");
+        assertEquals(240, InspectorPanel.widthBeside(500),
+                "never below its own floor");
+
+        for (int width = 640; width <= 2000; width += 7) {
+            assertTrue(width - InspectorPanel.widthBeside(width)
+                            >= InspectorPanel.MINIMUM_CHART_WIDTH,
+                    "the chart never drops below 400 px at width "
+                            + width);
+        }
+    }
+
+    @Test
+    void theChartReallyKeepsItsWidthInARealLayout() throws Exception {
+        // The formula is one thing; what BorderLayout actually gives
+        // the chart is another, and the review's finding was about
+        // the second. Measured in a real frame.
+        SelectionModel model = new SelectionModel();
+        java.awt.Container[] parts = new java.awt.Container[2];
+        SwingUtilities.invokeAndWait(() -> {
+            juranometria.ui.ChartComponent chart =
+                    new juranometria.ui.ChartComponent(
+                            juranometria.app.Atlas.assembler());
+            InspectorPanel panel = new InspectorPanel(model,
+                    chart::currentScene, selection -> { });
+            javax.swing.JFrame frame = new javax.swing.JFrame();
+            frame.setLayout(new java.awt.BorderLayout());
+            frame.add(chart, java.awt.BorderLayout.CENTER);
+            frame.add(panel, java.awt.BorderLayout.EAST);
+            frame.pack();
+            parts[0] = chart;
+            parts[1] = panel;
+            for (int width : new int[] {640, 700, 720, 900, 1400}) {
+                frame.setSize(width, 700);
+                panel.setAvailableWidth(width);
+                panel.setRequestedVisible(true);
+                frame.validate();
+                if (chart.getWidth() < InspectorPanel.MINIMUM_CHART_WIDTH) {
+                    throw new AssertionError("at window width " + width
+                            + " the chart got only " + chart.getWidth()
+                            + " px, with " + panel.getWidth()
+                            + " px taken by the inspector");
+                }
+            }
+            frame.setSize(640, 700);
+            panel.setAvailableWidth(640);
+            frame.validate();
+            frame.dispose();
+        });
+
+        assertEquals(400, parts[0].getWidth(),
+                "at the accepted boundary the chart gets exactly its"
+                        + " promised 400 px");
+        assertEquals(240, parts[1].getWidth(),
+                "and the inspector takes only its floor");
+    }
+
+    @Test
+    void aToggleTheWindowRefusesIsReportedAsRefused() throws Exception {
+        // Review, P2: a checkbox menu item flips itself when clicked.
+        // If the panel stays silent because nothing changed, the menu
+        // ends up checked while the inspector is not there.
+        Fixture fixture = fixture();
+        List<Boolean> announced = new ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> {
+            fixture.panel().onVisibilityChange(announced::add);
+            fixture.panel().setAvailableWidth(600);
+            announced.clear();
+            fixture.panel().setRequestedVisible(true);
+        });
+
+        assertFalse(fixture.panel().isVisible(),
+                "the window is too narrow to honour it");
+        assertEquals(List.of(false), announced,
+                "and the panel says so, so the menu can uncheck itself"
+                        + " rather than claim a panel that is not there");
+    }
+
+    @Test
+    void enterFromTheListMovesIntoTheFactsNotOntoTheButton()
+            throws Exception {
+        // Review: the decision moves focus to the panel's body -
+        // where the answer is written - not onward to the control
+        // that would move the chart.
+        Fixture fixture = fixture();
+        assertNotNull(fixture.panel().focusTarget());
+        assertTrue(fixture.panel().focusTarget().isFocusable(),
+                "and the facts can actually take focus");
+        assertFalse(fixture.panel().focusTarget()
+                        instanceof javax.swing.JButton,
+                "Enter must not land the reader on Center here, which"
+                        + " is the one control that moves the chart");
+        assertEquals("Details of the selected object",
+                fixture.panel().focusTarget().getAccessibleContext()
+                        .getAccessibleName(),
+                "and it names itself, since focus can now rest there");
+    }
+
+    @Test
     void afterNavigationItStopsDescribingWhatIsNoLongerDrawn()
             throws Exception {
         // Review, P1: the panel used to go on describing an object
