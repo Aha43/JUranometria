@@ -19,6 +19,7 @@ import juranometria.chart.StarSizePolicy;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The star-label pass at the renderer (issue #115): deterministic
@@ -88,6 +89,52 @@ class StarLabelRenderingTest {
                 pixels(scene(forward, null), ChartOptions.DEFAULTS),
                 pixels(scene(backward, null), ChartOptions.DEFAULTS),
                 "the pass sorts; scene order must not matter");
+    }
+
+    @Test
+    void notationRendersThroughTheProductionPassAndIsDeterministic()
+            throws Exception {
+        // The Sprint 17 notation at the renderer: a component letter
+        // draws raised, a named star draws its pair, and the page is
+        // identical across locales and themes (a Turkish locale is
+        // the classic case-folding trap for Greek text).
+        Star acrux = new Star("TYC 9-9-1", CENTRE, 1.3,
+                new StarIdentity("Acrux", "α1", null, "Cru"));
+        Star pi3 = new Star("TYC 9-9-2", new SkyPosition(84.5, -4.6), 3.2,
+                new StarIdentity(null, "π3", null, "Ori"));
+        ChartScene page = scene(List.of(acrux, pi3), null);
+        var probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
+                .createGraphics();
+        var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
+        probe.dispose();
+        var mapping = new juranometria.project.ViewportMapping(
+                page.viewport());
+        var texts = RENDERER.starLabelPlacements(metrics, page,
+                        ChartOptions.DEFAULTS,
+                        new RegionalDetailPolicy(page,
+                                mapping.pixelsPerPlaneUnit()),
+                        new juranometria.project.GnomonicProjection(CENTRE),
+                        mapping).stream()
+                .map(ChartRenderer.StarLabelPlacement::text).toList();
+        assertTrue(texts.contains("Acrux α¹"),
+                "the pair with its raised component: " + texts);
+        assertTrue(texts.contains("π³"),
+                "the raised component alone: " + texts);
+
+        int[] reference = pixels(page, ChartOptions.DEFAULTS);
+        assertArrayEquals(reference, pixels(page, ChartOptions.DEFAULTS));
+        Locale locale = Locale.getDefault();
+        javax.swing.LookAndFeel laf = javax.swing.UIManager.getLookAndFeel();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            javax.swing.UIManager.setLookAndFeel(
+                    new com.formdev.flatlaf.FlatDarkLaf());
+            assertArrayEquals(reference, pixels(page, ChartOptions.DEFAULTS),
+                    "Greek notation is identical in every locale and theme");
+        } finally {
+            Locale.setDefault(locale);
+            javax.swing.UIManager.setLookAndFeel(laf);
+        }
     }
 
     @Test
