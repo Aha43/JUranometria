@@ -113,19 +113,41 @@ reader actually touches:
 | hide a layer | the chart-options controller the dialog drives |
 
 and it adds the cases the issue named and the first draft skipped: a
-**hidden layer cannot be pointed at**, a click on real **letterbox
-chrome** asks nothing, the **narrow window** closes the panel while
-the chart still answers, **both themes** describe the same object,
-chart options and magnitude **end as they began**, and the final
-page is compared **pixel for pixel with the released reference**.
+**hidden layer cannot be pointed at**, the **narrow window** closes
+the panel while the chart still answers, **both themes** describe the
+same object, chart options and magnitude **end as they began**, and
+the final page is compared **pixel for pixel with the released
+reference**.
+
+**The letterbox case is deliberately not in the journey**, and the
+reason is worth recording: the page's height is capped by the
+coverage rule at about **4,800 px even at 36°**, so no window a
+reader can open is letterboxed vertically. An assertion there could
+only ever skip - which is exactly what it had been doing, silently,
+including in the component test that assumed its way past a
+zero offset. That case now lives in `SelectInteractionTest` on a
+component built 6,000 px tall, where the offset is asserted to
+exist, both bands are clicked, and the paper between them is clicked
+too so the geometry is shown to be sane rather than merely
+unreachable.
+
+Candidate choice is walked with the **arrow key** and settled with
+**Enter**, and the focus destination is checked - Enter must land in
+the facts, not on `Center here`. The journey also leaves no trace:
+the look and feel is restored and its preference node removed in an
+`@AfterEach`, so a failure during setup cannot leak either.
 
 Two premises were tightened as well. The star the reader points at
 is now proven **unlabelled** against the renderer's own label
-placements — which is the whole reason a reader must ask — and a
-deep-sky object the catalogue records poorly is sought deliberately
-rather than taken by luck, so the silences are exercised on purpose.
-The second observer must hear **exactly one** event per action,
-carrying the same candidates and current index as the model.
+placements — which is the whole reason a reader must ask — and each
+catalogue silence is proved on an object that really has it: the
+Virgo page carries 5 objects with no position angle, 159 with only a
+blue magnitude, and 6 with no photometry at all, and one of each is
+sought out and asked about. It carries none lacking an extent, so
+"size not recorded" is proved by the unit test that builds such an
+object rather than claimed here. The second observer must hear
+**exactly one** event per action, carrying the same candidates and
+current index as the model.
 
 ## Verification
 

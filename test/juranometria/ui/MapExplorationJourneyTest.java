@@ -70,6 +70,7 @@ class MapExplorationJourneyTest {
     private SearchField searchField;
     private ChartOptionsController options;
     private JFrame window;
+    private Preferences optionsNode;
     /** The second consumer: proof the seam is not the inspector's alone. */
     private final List<SelectionModel.Change> witness = new ArrayList<>();
 
@@ -97,10 +98,10 @@ class MapExplorationJourneyTest {
             searchField = new SearchField(Atlas.search(), Atlas.assembler(),
                     navigation);
             searchField.setSelectionModel(selection);
+            optionsNode = Preferences.userRoot().node(
+                    "juranometria-journey-" + System.nanoTime());
             options = new ChartOptionsController(
-                    ChartOptionsStore.forNode(Preferences.userRoot()
-                            .node("juranometria-journey-"
-                                    + System.nanoTime())));
+                    ChartOptionsStore.forNode(optionsNode));
             options.onChange(chart::setChartOptions);
 
             frame[0] = new JFrame("exploration journey");
@@ -163,8 +164,9 @@ class MapExplorationJourneyTest {
                     "asking moved nothing");
             assertSame(sceneBeforeAsking, chart.currentScene(),
                     "and assembled nothing: the page is the same page");
-            assertTrue(witness.size() > witnessedAtStart,
-                    "the second observer heard it too");
+            assertEquals(witnessedAtStart + 1, witness.size(),
+                    "the second observer heard it exactly once - one"
+                            + " click, one coherent transition");
             assertEquals(selection.selection(),
                     witness.get(witness.size() - 1).selection(),
                     "and heard exactly what the inspector heard");
@@ -195,20 +197,41 @@ class MapExplorationJourneyTest {
             searchFor("virgo cluster");
             navigation.recenter(new SkyPosition(187.7, 12.4), 8.0);
             flush();
-            ChartRenderer.DrawnMark sparse = poorlyRecordedDeepSky();
-            clickOn(sparse);
-            String silences = String.join(" | ", inspector.lines());
-            if (!sparse.deepSky().recorded().hasPositionAngle()) {
-                assertTrue(silences.contains("orientation not recorded"),
-                        silences);
-            }
-            if (sparse.deepSky().recorded().band()
-                    != juranometria.chart.DeepSkyObject.Recorded.Band
-                            .VISUAL) {
-                assertFalse(silences.contains("visual magnitude"),
-                        "no visual magnitude is claimed where none was"
-                                + " recorded: " + silences);
-            }
+            // Each silence proved on an object that really has it,
+            // rather than on whichever object happened to be handy
+            // (sprint review). This page carries 5 with no position
+            // angle, 159 with only a blue magnitude, and 6 with no
+            // photometry at all; it carries none lacking an extent,
+            // so "size not recorded" is covered by the unit test that
+            // builds such an object, not claimed here.
+            ChartRenderer.DrawnMark noAngle = deepSkyLacking(
+                    mark -> !mark.deepSky().recorded().hasPositionAngle());
+            inspect(noAngle);
+            assertTrue(String.join(" | ", inspector.lines())
+                            .contains("orientation not recorded"),
+                    "an unrecorded orientation is stated, never drawn"
+                            + " as PA 0: " + inspector.lines());
+
+            ChartRenderer.DrawnMark blueOnly = deepSkyLacking(
+                    mark -> mark.deepSky().recorded().band()
+                            == juranometria.chart.DeepSkyObject.Recorded
+                                    .Band.BLUE);
+            inspect(blueOnly);
+            String blueSaid = String.join(" | ", inspector.lines());
+            assertTrue(blueSaid.contains("blue magnitude")
+                            && blueSaid.contains("no V recorded"),
+                    "a blue magnitude names itself: " + blueSaid);
+            assertFalse(blueSaid.contains("visual magnitude"),
+                    "and is never labelled visual: " + blueSaid);
+
+            ChartRenderer.DrawnMark unphotometered = deepSkyLacking(
+                    mark -> mark.deepSky().recorded().band()
+                            == juranometria.chart.DeepSkyObject.Recorded
+                                    .Band.NONE);
+            inspect(unphotometered);
+            assertTrue(String.join(" | ", inspector.lines())
+                            .contains("magnitude not recorded"),
+                    "and an unmeasured one says so: " + inspector.lines());
 
             // 3. An overlap: offered, never resolved for the reader.
             // Reached by real wheel zoom and a real drag, not by
@@ -233,8 +256,17 @@ class MapExplorationJourneyTest {
             ChartScene beforeChoosing = chart.currentScene();
             int witnessedBeforeChoice = witness.size();
             javax.swing.JList<?> list = candidateList(inspector);
-            SwingUtilities.invokeAndWait(() -> list.setSelectedIndex(1));
+            // Walked with the arrow key and settled with Enter, as a
+            // reader without a pointer does (sprint review).
+            SwingUtilities.invokeAndWait(list::requestFocusInWindow);
             flush();
+            key(list, KeyEvent.VK_DOWN);
+            assertEquals(1, list.getSelectedIndex(),
+                    "the arrow key walked to the next candidate");
+            key(list, KeyEvent.VK_ENTER);
+            assertTrue(settlesOn(inspector.focusTarget()),
+                    "and Enter settled into the facts, not onto the"
+                            + " control that would move the chart");
             assertEquals(witnessedBeforeChoice + 1, witness.size(),
                     "choosing told the second observer exactly once");
             SelectionModel.Change heard = witness.get(witness.size() - 1);
@@ -371,19 +403,13 @@ class MapExplorationJourneyTest {
             SwingUtilities.invokeAndWait(() -> options.apply(all));
             flush();
 
-            // 11. The letterbox surround, on a real tall window.
-            SwingUtilities.invokeAndWait(() -> {
-                window.setSize(1240, 1180);
-                window.validate();
-            });
-            flush();
-            int offset = chart.pageOffsetY();
-            if (offset > 8) {
-                Selection beforeChrome = selection.selection();
-                click(500, offset / 2);
-                assertEquals(beforeChrome, selection.selection(),
-                        "clicking the chrome asked nothing");
-            }
+            // 11. The letterbox surround is NOT exercised here, and
+            // deliberately so: the page's height cap is about 4,800
+            // px at 36 degrees, so no window a reader can open is
+            // letterboxed vertically. Asserting it here could only
+            // ever skip. The case is proved in
+            // SelectInteractionTest, on a component built tall
+            // enough to letterbox, where it is unconditional.
 
             // 12. The narrow window: the panel yields, the chart
             // keeps its page, and pointing still works.
@@ -565,19 +591,6 @@ class MapExplorationJourneyTest {
         return labelled;
     }
 
-    /** A deep-sky object the catalogue records poorly, if any. */
-    private ChartRenderer.DrawnMark poorlyRecordedDeepSky() {
-        return marks().stream()
-                .filter(mark -> mark.deepSky() != null)
-                .filter(this::wellInside)
-                .filter(mark -> !mark.deepSky().recorded()
-                                .hasPositionAngle()
-                        || mark.deepSky().recorded().band()
-                                != juranometria.chart.DeepSkyObject
-                                        .Recorded.Band.VISUAL)
-                .findFirst().orElseThrow();
-    }
-
     private static javax.swing.JList<?> candidateList(
             java.awt.Container container) {
         for (java.awt.Component component : container.getComponents()) {
@@ -623,6 +636,101 @@ class MapExplorationJourneyTest {
                 RENDERER.renderToImage(scene, ChartOptions.DEFAULTS),
                 "png", out);
         return out.toByteArray();
+    }
+
+
+
+
+    /**
+     * Leave nothing behind, whatever happened - including a failure
+     * during setup, which a try block inside the test would miss
+     * (sprint review). The look and feel is global to the JVM, and
+     * the journey's preferences are its own.
+     */
+    @org.junit.jupiter.api.AfterEach
+    void leaveNoTrace() throws Exception {
+        if (!GraphicsEnvironment.isHeadless()) {
+            SwingUtilities.invokeAndWait(() -> {
+                juranometria.app.UiTheme.apply(false);
+                com.formdev.flatlaf.FlatLaf.updateUI();
+            });
+        }
+        if (optionsNode != null) {
+            optionsNode.removeNode();
+            optionsNode = null;
+        }
+    }
+
+    /**
+     * Clicks a mark and makes it the current candidate, walking the
+     * panel's list with the arrow key when the click reached more
+     * than one thing. Returns with the inspector describing exactly
+     * the object asked about.
+     */
+    private void inspect(ChartRenderer.DrawnMark mark) throws Exception {
+        clickOn(mark);
+        String wanted = mark.deepSky() != null ? mark.deepSky().id()
+                : mark.star().id();
+        List<String> offered = selection.candidates().stream()
+                .map(Selection.Object::catalogueId).toList();
+        assertTrue(offered.contains(wanted),
+                "the object asked about is among the candidates: "
+                        + offered);
+        int index = offered.indexOf(wanted);
+        if (index > 0) {
+            javax.swing.JList<?> list = candidateList(inspector);
+            SwingUtilities.invokeAndWait(list::requestFocusInWindow);
+            flush();
+            for (int step = 0; step < index; step++) {
+                key(list, KeyEvent.VK_DOWN);
+            }
+        }
+        assertEquals(wanted, ((Selection.Object) selection.selection())
+                        .catalogueId(),
+                "and the reader can reach it with the arrow key");
+    }
+
+    /** A key press delivered to a component, as a keyboard does. */
+    private void key(java.awt.Component target, int keyCode)
+            throws Exception {
+        SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
+                new KeyEvent(target, KeyEvent.KEY_PRESSED,
+                        System.nanoTime() / 1_000_000, 0, keyCode,
+                        KeyEvent.CHAR_UNDEFINED)));
+        flush();
+    }
+
+    /** Whether focus comes to rest on this component. */
+    private boolean settlesOn(java.awt.Component expected)
+            throws Exception {
+        for (int attempt = 0; attempt < 20; attempt++) {
+            flush();
+            java.awt.Component owner = java.awt.KeyboardFocusManager
+                    .getCurrentKeyboardFocusManager().getFocusOwner();
+            if (owner == expected) {
+                return true;
+            }
+            Thread.sleep(25);
+        }
+        return false;
+    }
+
+    /**
+     * A drawn deep-sky object with a particular silence. The Virgo
+     * cluster is crowded enough that few can be reached alone, so
+     * {@link #inspect} walks the candidate list to the intended one
+     * rather than assuming a click lands on it.
+     */
+    private ChartRenderer.DrawnMark deepSkyLacking(
+            java.util.function.Predicate<ChartRenderer.DrawnMark> lacking) {
+        List<ChartRenderer.DrawnMark> all = marks();
+        return all.stream()
+                .filter(mark -> mark.deepSky() != null)
+                .filter(this::wellInside)
+                .filter(lacking)
+                .findFirst().orElseThrow(() -> new AssertionError(
+                        "this page carries no such object, so the"
+                                + " silence cannot be proved here"));
     }
 
     private void flush() throws Exception {
