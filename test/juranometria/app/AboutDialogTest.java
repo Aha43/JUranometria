@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -76,6 +77,51 @@ class AboutDialogTest {
                         "tycho")
                         .contains(normalize("may not be used commercially")),
                 "LICENSING.md's Tycho entry states the consequence");
+    }
+
+    @Test
+    void theBundledJavaRuntimeIsPairedWithItsLicenceAndItsArtifacts()
+            throws Exception {
+        // The audit added the runtime to the licensing map (issue
+        // #145); without a guard the same drift returns with the
+        // suite green (audit review, P2). Four of the five artifacts
+        // ship a runtime, the portable archive ships none, and the
+        // difference is part of the licensing statement.
+        String map = Files.readString(Path.of("LICENSING.md"));
+        String runtimeParagraph = paragraphWith(map, "temurin|openjdk");
+
+        assertTrue(runtimeParagraph.contains(normalize(
+                        "GPLv2 with the Classpath Exception")),
+                "LICENSING.md must pair the bundled runtime with its"
+                        + " licence: " + runtimeParagraph);
+        assertTrue(map.toLowerCase(java.util.Locale.ROOT)
+                        .contains("classpath exception is what keeps")
+                        || map.contains("Classpath Exception"),
+                "and say what that exception does for the MIT code");
+        assertTrue(normalize(map).contains(normalize(
+                        "The portable archive contains no runtime")),
+                "and distinguish the self-contained images from the"
+                        + " portable archive, which ships none");
+
+        // The same statement travels with the artifact that actually
+        // carries the runtime.
+        String imageReadme = Files.readString(
+                Path.of("packaging/README-app-image.txt"));
+        assertTrue(imageReadme.contains("Temurin")
+                        && imageReadme.contains("Classpath Exception"),
+                "the application image's own README names the runtime"
+                        + " licence it ships");
+
+        // And the contract's deliberate division of surfaces holds:
+        // runtime licences live with the runtime, never restated in
+        // About's packaged summary.
+        String summary = AboutDialog.summaryText().toLowerCase(
+                java.util.Locale.ROOT);
+        assertFalse(summary.contains("temurin")
+                        || summary.contains("classpath exception"),
+                "About carries what is packaged inside the"
+                        + " application; the runtime's licence travels"
+                        + " with the runtime");
     }
 
     private static void assertPairings(String document, String text) {

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -56,14 +55,14 @@ public final class StarIdentities {
         Properties manifest = new Properties();
         InputStream manifestStream = resources.apply("manifest.properties");
         if (manifestStream == null) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "star-identity pack manifest is missing");
         }
         try (manifestStream) {
             manifest.load(new InputStreamReader(manifestStream,
                     StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "failed to read the star-identity manifest", e);
         }
         validateManifest(manifest);
@@ -73,7 +72,7 @@ public final class StarIdentities {
         Parsed parsed = parse(bytes);
         int declaredRows = Integer.parseInt(manifest.getProperty("rows"));
         if (parsed.rows() != declaredRows) {
-            throw new IllegalStateException(String.format(Locale.ROOT,
+            throw new PackIntegrityException(String.format(Locale.ROOT,
                     "star-identity pack declares %d rows but carries %d",
                     declaredRows, parsed.rows()));
         }
@@ -88,19 +87,19 @@ public final class StarIdentities {
     public static void validateManifest(Properties manifest) {
         for (String key : REQUIRED_MANIFEST_KEYS) {
             if (manifest.getProperty(key) == null) {
-                throw new IllegalStateException(
+                throw new PackIntegrityException(
                         "star-identity manifest is missing " + key);
             }
         }
         if (!SUPPORTED_FORMAT_VERSION.equals(
                 manifest.getProperty("format.version"))) {
-            throw new IllegalStateException("unsupported star-identity pack"
+            throw new PackIntegrityException("unsupported star-identity pack"
                     + " format.version "
                     + manifest.getProperty("format.version")
                     + "; this build supports " + SUPPORTED_FORMAT_VERSION);
         }
         if (!PACK_NAME.equals(manifest.getProperty("pack.name"))) {
-            throw new IllegalStateException("manifest belongs to pack "
+            throw new PackIntegrityException("manifest belongs to pack "
                     + manifest.getProperty("pack.name") + ", not " + PACK_NAME);
         }
     }
@@ -119,19 +118,19 @@ public final class StarIdentities {
                                       String expected) {
         InputStream stream = resources.apply(CSV_NAME);
         if (stream == null) {
-            throw new IllegalStateException("star-identity data listed in"
+            throw new PackIntegrityException("star-identity data listed in"
                     + " the manifest is missing: " + CSV_NAME);
         }
         byte[] bytes;
         try (stream) {
             bytes = stream.readAllBytes();
         } catch (IOException e) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "failed to read " + CSV_NAME, e);
         }
-        String actual = sha256Hex(bytes);
+        String actual = Sha256.hex(bytes);
         if (!actual.equals(expected)) {
-            throw new IllegalStateException(CSV_NAME
+            throw new PackIntegrityException(CSV_NAME
                     + " does not match its manifest checksum"
                     + "\n  expected " + expected + "\n  actual   " + actual);
         }
@@ -149,7 +148,7 @@ public final class StarIdentities {
                 new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
             String header = reader.readLine();
             if (!"tyc,name,bayer,flamsteed,constellation".equals(header)) {
-                throw new IllegalStateException(
+                throw new PackIntegrityException(
                         "unexpected star-identity header: " + header);
             }
             String line;
@@ -159,15 +158,15 @@ public final class StarIdentities {
                 }
                 String[] fields = line.split(",", -1);
                 if (fields.length != 5) {
-                    throw new IllegalStateException(
+                    throw new PackIntegrityException(
                             "malformed star-identity line: " + line);
                 }
                 if (fields[0].isBlank()) {
-                    throw new IllegalStateException(
+                    throw new PackIntegrityException(
                             "star-identity line without a TYC id: " + line);
                 }
                 if (!tycs.add(fields[0])) {
-                    throw new IllegalStateException(
+                    throw new PackIntegrityException(
                             "duplicate star-identity id: " + fields[0]);
                 }
                 rows++;
@@ -183,12 +182,12 @@ public final class StarIdentities {
                             nullIfEmpty(fields[1]), nullIfEmpty(fields[2]),
                             nullIfEmpty(fields[3]), nullIfEmpty(fields[4])));
                 } catch (IllegalArgumentException e) {
-                    throw new IllegalStateException(
+                    throw new PackIntegrityException(
                             "dishonest star-identity line: " + line, e);
                 }
             }
         } catch (IOException e) {
-            throw new IllegalStateException("failed to read " + CSV_NAME, e);
+            throw new PackIntegrityException("failed to read " + CSV_NAME, e);
         }
         return new Parsed(byTyc, rows);
     }
@@ -197,17 +196,4 @@ public final class StarIdentities {
         return field.isEmpty() ? null : field;
     }
 
-    private static String sha256Hex(byte[] bytes) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(bytes);
-            StringBuilder hex = new StringBuilder();
-            for (byte b : digest.digest()) {
-                hex.append(String.format(Locale.ROOT, "%02x", b));
-            }
-            return hex.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-    }
 }

@@ -85,8 +85,9 @@ window and one custom chart component, with no general UI framework.
 
 ## Decisions deliberately deferred
 
-- The minimum supported Java release (start from the installed current LTS or
-  later release and record the decision in the first implementation issue).
+- ~~The minimum supported Java release~~ — decided in issue #1 and
+  settled by [the 1.0 contract](decisions/one-point-zero-contract.md):
+  **Java 21**, with sources compiled `--release 21`.
 - Catalogue binary format and sky-index scheme.
 - SVG/PDF export libraries.
 - Network client and caching policy.

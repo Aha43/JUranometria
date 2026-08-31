@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -75,7 +73,7 @@ public final class TiledCatalogue implements Catalogue {
                                StarIdentities identities) {
         InputStream stream = resources.apply("manifest.properties");
         if (stream == null) {
-            throw new IllegalStateException("catalogue pack manifest is missing");
+            throw new PackIntegrityException("catalogue pack manifest is missing");
         }
         PackManifest manifest = PackManifest.parse(
                 new InputStreamReader(stream, StandardCharsets.UTF_8), "bright-sky");
@@ -185,18 +183,18 @@ public final class TiledCatalogue implements Catalogue {
         String resource = "tiles/" + tileId + "/" + fileName;
         InputStream stream = resources.apply(resource);
         if (stream == null) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "catalogue tile listed in the manifest is missing: " + resource);
         }
         byte[] bytes;
         try (stream) {
             bytes = stream.readAllBytes();
         } catch (IOException e) {
-            throw new IllegalStateException("failed to read catalogue tile " + resource, e);
+            throw new PackIntegrityException("failed to read catalogue tile " + resource, e);
         }
-        String actual = sha256Hex(bytes);
+        String actual = Sha256.hex(bytes);
         if (!actual.equals(expected)) {
-            throw new IllegalStateException("catalogue tile " + resource
+            throw new PackIntegrityException("catalogue tile " + resource
                     + " does not match its manifest checksum"
                     + "\n  expected " + expected + "\n  actual   " + actual);
         }
@@ -215,28 +213,15 @@ public final class TiledCatalogue implements Catalogue {
                 }
                 String[] fields = line.split(",", -1);
                 if (fields.length != fieldCount) {
-                    throw new IllegalStateException(
+                    throw new PackIntegrityException(
                             "malformed catalogue line in " + name + ": " + line);
                 }
                 records.add(fields);
             }
         } catch (IOException e) {
-            throw new IllegalStateException("failed to read catalogue tile " + name, e);
+            throw new PackIntegrityException("failed to read catalogue tile " + name, e);
         }
         return records;
     }
 
-    private static String sha256Hex(byte[] bytes) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(bytes);
-            StringBuilder hex = new StringBuilder();
-            for (byte b : digest.digest()) {
-                hex.append(String.format(Locale.ROOT, "%02x", b));
-            }
-            return hex.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-    }
 }

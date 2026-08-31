@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- A damaged or incomplete download now says so. Previously a
+  corrupt bundled file threw before the window existed, printing a
+  stack trace to a console a packaged reader does not have and
+  leaving the application running with nothing on screen; it now
+  names the file that failed to verify, gives the remedy (download
+  again, check the published SHA-256, unpack fresh), and exits.
+
 ## [0.17.0] - 2026-08-31
 
 Sprint 17 — Letter the stars. The Bayer and Flamsteed identities

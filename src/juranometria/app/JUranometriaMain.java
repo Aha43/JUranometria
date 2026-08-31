@@ -20,7 +20,17 @@ public final class JUranometriaMain {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("apple.awt.application.name", AppInfo.NAME);
         boolean darkOverride = java.util.Arrays.asList(args).contains("--dark");
-        SwingUtilities.invokeLater(() -> start(darkOverride));
+        SwingUtilities.invokeLater(() -> {
+            // Launch is the one place a failure has no reader-visible
+            // consequence of its own: the packaged application has no
+            // console, and an exception here would otherwise leave a
+            // live process with no window (issue #145).
+            try {
+                start(darkOverride);
+            } catch (Throwable failure) {
+                StartupFailure.reportAndExit(failure);
+            }
+        });
     }
 
     private static void start(boolean darkOverride) {
@@ -33,10 +43,14 @@ public final class JUranometriaMain {
         UiTheme.apply(appearance.startupDark());
         ChartOptionsController chartOptions =
                 new ChartOptionsController(ChartOptionsStore.user());
-        JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // The catalogues verify themselves as they load, so they are
+        // loaded before any window exists: a damaged download should
+        // be explained, not half-drawn behind a frame that will never
+        // be usable.
         ChartViewController controller =
                 new ChartViewController(Atlas.assembler()::fits);
+        JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(AppMenuBar.create(controller,
                 () -> SettingsDialog.open(frame, appearance,
                         effectiveDark -> {

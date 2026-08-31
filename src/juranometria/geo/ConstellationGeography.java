@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +30,9 @@ import juranometria.chart.SkyRegion;
  * endpoint inside it, and behave correctly across the RA wrap and at
  * both poles because the geometry is evaluated in vector space.
  */
+import juranometria.catalog.PackIntegrityException;
+import juranometria.catalog.Sha256;
+
 public final class ConstellationGeography {
 
     static final String RESOURCE_ROOT = "/resources/geo/constellations/";
@@ -70,21 +71,21 @@ public final class ConstellationGeography {
         int version = Integer.parseInt(
                 required(manifest, "format.version"));
         if (version != SUPPORTED_FORMAT_VERSION) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "unsupported constellation-geography format version "
                             + version + "; this build supports "
                             + SUPPORTED_FORMAT_VERSION);
         }
         String packName = required(manifest, "pack.name");
         if (!PACK_NAME.equals(packName)) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "unexpected geography pack name: " + packName);
         }
         // The declared frame is enforced, not merely recorded: a pack in
         // any other frame would place geography wrongly (PR #68 review).
         String frame = required(manifest, "coordinate.frame");
         if (!SUPPORTED_FRAME.equals(frame)) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "unsupported geography coordinate frame: " + frame
                             + "; this build renders " + SUPPORTED_FRAME
                             + " only");
@@ -97,7 +98,7 @@ public final class ConstellationGeography {
             Constellation constellation = new Constellation(
                     row[0], row[1], row[2], Integer.parseInt(row[3]));
             if (byId.put(constellation.id(), constellation) != null) {
-                throw new IllegalStateException(
+                throw new PackIntegrityException(
                         "duplicate constellation id: " + constellation.id());
             }
             constellations.add(constellation);
@@ -146,7 +147,7 @@ public final class ConstellationGeography {
         List<GeoSegment> segments = new ArrayList<>();
         for (String[] row : parse(content, 5)) {
             if (!byId.containsKey(row[0])) {
-                throw new IllegalStateException(
+                throw new PackIntegrityException(
                         "segment references unknown constellation: " + row[0]);
             }
             segments.add(new GeoSegment(row[0],
@@ -167,7 +168,7 @@ public final class ConstellationGeography {
         try (BufferedReader reader = new BufferedReader(new StringReader(content))) {
             String header = reader.readLine();
             if (header == null) {
-                throw new IllegalStateException("empty geography resource");
+                throw new PackIntegrityException("empty geography resource");
             }
             String line;
             while ((line = reader.readLine()) != null) {
@@ -176,7 +177,7 @@ public final class ConstellationGeography {
                 }
                 String[] row = line.split(",", -1);
                 if (row.length != columns) {
-                    throw new IllegalStateException(
+                    throw new PackIntegrityException(
                             "malformed geography row: " + line);
                 }
                 rows.add(row);
@@ -197,9 +198,9 @@ public final class ConstellationGeography {
             throw new UncheckedIOException("cannot read geography " + name, e);
         }
         String expected = required(manifest, "checksum." + name);
-        String actual = sha256Hex(bytes);
+        String actual = Sha256.hex(bytes);
         if (!expected.equals(actual)) {
-            throw new IllegalStateException(String.format(Locale.ROOT,
+            throw new PackIntegrityException(String.format(Locale.ROOT,
                     "geography resource %s fails its checksum: expected %s,"
                             + " found %s - the pack is corrupt or stale;"
                             + " regenerate with make import-constellations",
@@ -212,7 +213,7 @@ public final class ConstellationGeography {
                                        String name) {
         InputStream stream = resources.apply(name);
         if (stream == null) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "missing constellation-geography resource: " + name);
         }
         return stream;
@@ -221,7 +222,7 @@ public final class ConstellationGeography {
     private static String required(Properties manifest, String key) {
         String value = manifest.getProperty(key);
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException(
+            throw new PackIntegrityException(
                     "geography manifest is missing " + key);
         }
         return value;
@@ -230,22 +231,10 @@ public final class ConstellationGeography {
     private static void check(int actual, Properties manifest, String key) {
         int declared = Integer.parseInt(required(manifest, key));
         if (declared != actual) {
-            throw new IllegalStateException(String.format(Locale.ROOT,
+            throw new PackIntegrityException(String.format(Locale.ROOT,
                     "geography manifest declares %s=%d but %d were loaded",
                     key, declared, actual));
         }
     }
 
-    private static String sha256Hex(byte[] bytes) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            StringBuilder hex = new StringBuilder();
-            for (byte b : digest.digest(bytes)) {
-                hex.append(String.format(Locale.ROOT, "%02x", b));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
-    }
 }

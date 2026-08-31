@@ -1,6 +1,9 @@
 # Decision: the JUranometria 1.0 product and platform contract
 
-**Sprint 16, issue #143.** Status: proposed for review. This gate
+**Sprint 16, issue #143.** Status: settled; amended by #150
+(self-contained application images) and corrected by the #145 audit
+where the product had moved past the wording — those corrections are
+marked where they appear. This gate
 changes no product behavior; it states, in one place, exactly what
 1.0 promises — so packaging (#144), the audit (#145), release
 automation (#88), and the closing journey (#146) verify a settled
@@ -116,14 +119,25 @@ About does not restate them.
 ## Preferences and upgrade from 0.15
 
 - Preferences live in the JDK preferences node `juranometria`:
-  `appearance` and the seven `chart.*` option keys.
-- **Every 0.15 preference loads into 1.0 unchanged.** A key that a
-  newer version added is absent in an older store and loads as its
-  documented default; a missing, corrupt, or unknown value always
-  means the default — **never a launch failure**. Only the literal
-  string `"false"` disables a chart layer; only a confirmed Settings
-  dialog persists appearance; `--dark` stays a session-only override
-  that never rewrites the stored choice.
+  `appearance` and the **nine** `chart.*` option keys (corrected by
+  the #145 audit: the count was written when there were seven, before
+  the grid and the star-identifier split), plus the legacy
+  `chart.starLabels` key that older releases wrote.
+- **Every preference written by 0.13 through 0.17 loads into 1.0
+  unchanged.** A key that a newer version added is absent in an older
+  store and loads as its documented default; a missing, corrupt, or
+  unknown value always means the default — **never a launch
+  failure**. Only the literal string `"false"` disables a chart layer;
+  only a confirmed Settings dialog persists appearance; `--dark` stays
+  a session-only override that never rewrites the stored choice.
+- **The star-identifier migration**, exactly (Sprint 17): each of
+  `chart.starNames`, `chart.bayerLetters`, and `chart.flamsteedNumbers`
+  decides its own layer whenever its key is present; otherwise the
+  legacy `chart.starLabels` decides, so a reader who switched all star
+  text off keeps it off; otherwise the default, on. Confirming the
+  dialog writes all three, after which the legacy key can never
+  override a newer choice, and it is left in place so an older build
+  sharing the node keeps working.
 - 1.0 makes no schema change: an upgrade is unpack-and-run over the
   same preference node.
 
@@ -141,8 +155,8 @@ The following are **promised behavior** — changing any of them after
   preserving toolbar/keyboard zoom on the platform menu mask; Home
   restoring the exact default view.
 - **The default view**: the M31 region, 8° field, stars to V 8.0,
-  all chart layers on (including star labels and the equatorial
-  grid).
+  all chart layers on (including all three star-identifier layers and
+  the equatorial grid).
 - **Target semantics**: a searched object titles the chart and
   survives centre-preserving zoom; the first pan or centre-moving
   pointer-zoom clears label and identity together, atomically.
@@ -151,8 +165,11 @@ The following are **promised behavior** — changing any of them after
   prefix, Bayer (Greek or spelled, abbreviation or genitive), and
   Flamsteed forms; ambiguity lists candidates and never silently
   resolves.
-- **Chart options**: the seven toggles with their dependency,
-  target-exemption, repaint-only, and Restore Defaults contracts.
+- **Chart options**: the nine toggles — deep-sky objects and their
+  labels, constellation figures, boundaries, and names, star names,
+  Bayer letters, and Flamsteed numbers separately, and the equatorial
+  grid — with their dependency, target-exemption, repaint-only, and
+  Restore Defaults contracts.
 - **Accessibility surface**: every control and dialog carries an
   accessible name; dialogs are owned, single-instance where
   documented, and close on Escape; the full journeys are operable by

@@ -31,6 +31,24 @@ The JUnit console runner is a test-only dependency and is never
 redistributed. Licence texts for the redistributed libraries ship in
 the release archive beside the `lib/` directory.
 
+## The bundled Java runtime
+
+The four self-contained platform downloads (macOS Apple silicon,
+macOS Intel, Windows x86-64, Linux x86-64) include a trimmed
+**Eclipse Temurin 21** runtime, licensed **GPLv2 with the Classpath
+Exception**, so that readers install no Java:
+
+| Component | License |
+|---|---|
+| Eclipse Temurin / OpenJDK runtime, `jlink`-trimmed | **GPLv2 with the Classpath Exception** |
+
+The Classpath Exception is what keeps JUranometria's own MIT code
+MIT while it travels with that runtime. The runtime's complete
+generated `legal/` notice tree - one directory per included module -
+ships inside every application image and is asserted at build time.
+The portable archive contains no runtime and is unaffected: it runs
+on the Java the reader already has.
+
 The generated catalogue resources are reproduced from pinned upstream
 inputs; see
 [`docs/decisions/catalogue-sources.md`](docs/decisions/catalogue-sources.md)
