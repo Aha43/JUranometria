@@ -521,6 +521,46 @@ public final class PackagedAcceptanceMain {
         } finally {
             familyNode.removeNode();
         }
+        // A hidden family really changes the page the packaged
+        // renderer draws, not merely a list it publishes.
+        juranometria.render.SymbolFamily hiddenFamily =
+                juranometria.render.SymbolFamily.NEBULAE;
+        ChartScene nebulous = pages.get(0);
+        byte[] withNebulae = bytes(renderer.renderToImage(nebulous,
+                released));
+        byte[] withoutNebulae = bytes(renderer.renderToImage(nebulous,
+                released.withFamily(hiddenFamily, false)));
+        require(!java.util.Arrays.equals(withNebulae, withoutNebulae),
+                "hiding a family changes the packaged page's pixels");
+        require(ink(renderer.renderToImage(nebulous,
+                        released.withFamily(hiddenFamily, false)))
+                        < ink(renderer.renderToImage(nebulous, released)),
+                "and takes ink away rather than adding it");
+
+        // The searched symbol-less type, through the packaged search:
+        // found, recentred, titled, and given no invented mark.
+        juranometria.chart.DeepSkyObject symbolless =
+                nebulous.deepSkyObjects().stream()
+                .filter(dso -> !ChartRenderer.hasSymbol(dso))
+                .findFirst().orElseThrow(() -> new IllegalStateException(
+                        "no symbol-less object on the study page"));
+        java.util.List<juranometria.search.SearchResult> found =
+                Atlas.search().search(symbolless.id());
+        require(!found.isEmpty()
+                        && found.get(0).identity().equals(symbolless.id()),
+                "the packaged search finds a symbol-less object: "
+                        + symbolless.id());
+        ChartScene centred = Atlas.assembler().assemble(
+                new ChartViewState(symbolless.position(), 8.0, 8.0,
+                        symbolless.id(), symbolless.id()), 900, 700);
+        require(renderer.drawnMarks(centred, released).stream()
+                        .noneMatch(mark -> mark.deepSky() != null
+                                && mark.deepSky().id()
+                                        .equals(symbolless.id())),
+                "and the packaged renderer invents no mark for it");
+        require(symbolless.id().equals(centred.targetIdentity()),
+                "though the page is titled by it honestly");
+
         // And the exemption, on the page that names a target: the
         // home page's own galaxy stays drawn with galaxies hidden.
         int exemptAtHome = targetOf(renderer, furnished,
@@ -530,9 +570,11 @@ public final class PackagedAcceptanceMain {
         require(exemptAtHome == 1,
                 "the searched target survives its family being hidden");
         System.out.println("deep-sky families OK (" + String.join(", ",
-                hidden) + ", each leaving the others untouched; the"
-                + " named target still drawn with its own family"
-                + " hidden)");
+                hidden) + ", each leaving the others untouched; a"
+                + " hidden family changes the drawn page; the named"
+                + " target still drawn with its own family hidden;"
+                + " symbol-less " + symbolless.id() + " found,"
+                + " centred and titled with no invented mark)");
 
         // Home: the journey ends on the page it started from,
         // rendered identically.
