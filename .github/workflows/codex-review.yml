@@ -1,0 +1,148 @@
+# Opt-in automated handoff between the coding agent and Codex (issue #177).
+# Nothing here merges or publishes. The Codex job has no GitHub write token;
+# a separate job posts its final message against the exact reviewed head.
+name: codex-review
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codex-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  MAX_REVIEW_ROUNDS: '6'
+
+jobs:
+  guard:
+    if: >-
+      vars.CODEX_AUTOREVIEW_ENABLED == 'true' &&
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    outputs:
+      run: ${{ steps.round.outputs.run }}
+      round: ${{ steps.round.outputs.round }}
+      post_limit: ${{ steps.round.outputs.post_limit }}
+    steps:
+      - name: Bound the agent review loop
+        id: round
+        uses: actions/github-script@v7
+        env:
+          MAX_REVIEW_ROUNDS: ${{ env.MAX_REVIEW_ROUNDS }}
+        with:
+          script: |
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100,
+              }
+            );
+            const reviews = comments.filter(comment =>
+              comment.body?.includes('<!-- codex-auto-review -->'));
+            const limitAlreadyPosted = comments.some(comment =>
+              comment.body?.includes('<!-- codex-auto-review-limit -->'));
+            const maximum = Number(process.env.MAX_REVIEW_ROUNDS);
+            const round = reviews.length + 1;
+            core.setOutput('round', String(round));
+            core.setOutput('run', String(round <= maximum));
+            core.setOutput('post_limit', String(
+              round > maximum && !limitAlreadyPosted));
+
+  review:
+    needs: guard
+    if: needs.guard.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      final_message: ${{ steps.codex.outputs.final-message }}
+    steps:
+      - name: Check out the exact pull-request head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Run the independent Codex review
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: .github/codex/prompts/review.md
+          output-file: codex-review.md
+          sandbox: workspace-write
+          safety-strategy: drop-sudo
+          codex-args: '["--ephemeral"]'
+
+  post:
+    needs: [guard, review]
+    if: needs.review.result == 'success' && needs.review.outputs.final_message != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Post the SHA-bound review
+        uses: actions/github-script@v7
+        env:
+          REVIEW: ${{ needs.review.outputs.final_message }}
+          REVIEW_ROUND: ${{ needs.guard.outputs.round }}
+          REVIEWED_HEAD: ${{ github.event.pull_request.head.sha }}
+        with:
+          script: |
+            const body = [
+              '<!-- codex-auto-review -->',
+              `## Automated Codex review — round ${process.env.REVIEW_ROUND}`,
+              '',
+              `Workflow head: \`${process.env.REVIEWED_HEAD}\``,
+              '',
+              process.env.REVIEW,
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+  limit:
+    needs: guard
+    if: needs.guard.outputs.post_limit == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Hand the unresolved loop back to the owner
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                '<!-- codex-auto-review-limit -->',
+                '## Automated review paused',
+                '',
+                'Six Codex review rounds have run on this pull request.',
+                'The coding agent must stop here for the owner rather than',
+                'continuing an unbounded review/fix loop.',
+              ].join('\n'),
+            });

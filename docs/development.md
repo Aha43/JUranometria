@@ -196,6 +196,49 @@ An agent should not silently begin the next sprint issue. Finishing one issue
 is a review point for the human owner, especially while the atlas's visual
 language is being discovered.
 
+### Automated Claude–Codex review handoff
+
+Issue #177 provides an opt-in review loop for owner-authored pull requests.
+GitHub is the handoff boundary: opening a ready pull request or pushing a new
+head starts `.github/workflows/codex-review.yml`; the independent reviewer
+posts a result tied to that exact commit; the coding agent follows
+`CLAUDE.md`, fixes reviewed findings, and pushes the next head.
+
+The loop is deliberately bounded at six Codex reviews per pull request. It
+stops earlier on approval or whenever product judgment, disagreement,
+credentials, or external state require the owner. It never merges, closes a
+milestone, changes a version, creates a tag, publishes a release, or begins the
+next issue.
+
+#### One-time repository setup
+
+1. Create an OpenAI API key for this repository's review usage and store it as
+   the Actions secret `OPENAI_API_KEY`. This is API usage and is billed
+   separately from a ChatGPT/Codex desktop subscription. Give its API project
+   a conservative spend limit while the experiment is new.
+2. Create repository variable `CODEX_AUTOREVIEW_ENABLED` with value `true`.
+   Until this variable is exactly `true`, the workflow's guard job is skipped
+   and ordinary pull requests are unaffected.
+3. Open a small owner-authored test pull request and inspect the first
+   `Automated Codex review` comment before relying on the loop for a sprint.
+
+The workflow accepts only ready, same-repository pull requests authored by the
+repository owner. The Codex job checks out the exact PR head without persisted
+GitHub credentials. It may write only inside its disposable runner workspace
+to run focused checks; a separate job with `pull-requests: write` posts the
+final message. Stale runs are cancelled when a newer head arrives.
+
+To pause the experiment without editing code, set
+`CODEX_AUTOREVIEW_ENABLED=false` or delete the variable. Removing the
+`OPENAI_API_KEY` alone is not a safe pause after enabling: it turns reviews
+red rather than skipping them.
+
+The implementation follows OpenAI's documented
+[Codex GitHub Action](https://learn.chatgpt.com/docs/github-action). The
+workflow's owner-only guard, non-persisted checkout credentials, separate
+posting job, and disabled-by-default switch are part of its security boundary
+and should not be weakened merely to support untrusted fork pull requests.
+
 ## Native access
 
 FlatLaf loads a small native library for platform window integration
