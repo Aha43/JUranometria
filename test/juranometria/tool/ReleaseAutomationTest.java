@@ -205,7 +205,7 @@ class ReleaseAutomationTest {
                     "1.2.3");
 
             Run good = run("scripts/release-artifacts.sh", "1.2.3",
-                    staging.toString());
+                    staging.toString(), COMMIT);
             assertEquals(0, good.status(), good.output());
 
             Path sums = staging.resolve("SHA256SUMS.txt");
@@ -222,7 +222,7 @@ class ReleaseAutomationTest {
             Files.delete(staging.resolve(
                     "JUranometria-1.2.3-windows-x64.zip"));
             Run incomplete = run("scripts/release-artifacts.sh", "1.2.3",
-                    staging.toString());
+                    staging.toString(), COMMIT);
             assertEquals(6, incomplete.status(),
                     "a partial set is never published: "
                             + incomplete.output());
@@ -235,7 +235,7 @@ class ReleaseAutomationTest {
                     "1.2.3");
             Files.writeString(staging.resolve("extra.zip"), "not ours");
             Run stray = run("scripts/release-artifacts.sh", "1.2.3",
-                    staging.toString());
+                    staging.toString(), COMMIT);
             assertEquals(6, stray.status(), stray.output());
             Files.delete(staging.resolve("extra.zip"));
 
@@ -245,7 +245,7 @@ class ReleaseAutomationTest {
             Files.copy(staging.resolve("JUranometria-1.2.3-portable.zip"),
                     staging.resolve("ia-1.2.3-portable.zip"));
             Run substring = run("scripts/release-artifacts.sh", "1.2.3",
-                    staging.toString());
+                    staging.toString(), COMMIT);
             assertEquals(6, substring.status(),
                     "a name that is merely part of an expected name is"
                             + " still a stray: " + substring.output());
@@ -256,7 +256,7 @@ class ReleaseAutomationTest {
             image(staging.resolve("JUranometria-1.2.3-linux-x64.zip"),
                     "1.2.2");
             Run mismatched = run("scripts/release-artifacts.sh", "1.2.3",
-                    staging.toString());
+                    staging.toString(), COMMIT);
             assertEquals(7, mismatched.status(),
                     "an artifact must carry the version it is named"
                             + " for: " + mismatched.output());
@@ -268,7 +268,7 @@ class ReleaseAutomationTest {
             image(staging.resolve("JUranometria-1.2.3-linux-x64.zip"),
                     "1.2.30");
             Run prefix = run("scripts/release-artifacts.sh", "1.2.3",
-                    staging.toString());
+                    staging.toString(), COMMIT);
             assertEquals(7, prefix.status(),
                     "a longer version must not satisfy a shorter one: "
                             + prefix.output());
@@ -280,7 +280,7 @@ class ReleaseAutomationTest {
             decoyed(staging.resolve("JUranometria-1.2.3-linux-x64.zip"),
                     "1.2.2", "1.2.3");
             Run decoy = run("scripts/release-artifacts.sh", "1.2.3",
-                    staging.toString());
+                    staging.toString(), COMMIT);
             assertEquals(7, decoy.status(),
                     "two build-info.txt files are an archive that"
                             + " cannot identify itself: " + decoy.output());
@@ -292,7 +292,7 @@ class ReleaseAutomationTest {
             portable(staging.resolve("JUranometria-1.2.3-portable.zip"),
                     "1.2.30");
             Run portablePrefix = run("scripts/release-artifacts.sh",
-                    "1.2.3", staging.toString());
+                    "1.2.3", staging.toString(), COMMIT);
             assertEquals(7, portablePrefix.status(),
                     "JUranometria-1.2.30/ is not JUranometria-1.2.3/: "
                             + portablePrefix.output());
@@ -422,6 +422,7 @@ class ReleaseAutomationTest {
                     "JUranometria.app/Contents/app/build-info.txt"));
             zos.write(("JUranometria " + version
                     + " (app-image; jpackage version label 1.0.0)\n"
+                    + "source: " + COMMIT + "\n"
                     + "packager: 21.0.12.1\n")
                     .getBytes(StandardCharsets.UTF_8));
             zos.closeEntry();
@@ -442,7 +443,7 @@ class ReleaseAutomationTest {
     // So three things stand in for a byte comparison, and each of
     // them is proved here to be load-bearing: every published
     // archive is hashed against the published manifest, every image
-    // must record this run's own source tree, and the portable
+    // must record this run's own source commit, and the portable
     // archive - which `make dist` does build reproducibly - must
     // match exactly.
 
@@ -470,7 +471,7 @@ class ReleaseAutomationTest {
     }
 
     /**
-     * An application image that records the source tree it was
+     * An application image that records the source commit it was
      * packaged from. The filler makes two builds of the same commit
      * differ in bytes, which is what the real images do.
      */
@@ -543,7 +544,7 @@ class ReleaseAutomationTest {
     }
 
     @Test
-    void theStagedSetMustRecordTheSourceTreeItWasBuiltFrom()
+    void theStagedSetMustRecordTheSourceCommitItWasBuiltFrom()
             throws Exception {
         Assumptions.assumeTrue(Files.isExecutable(
                 Path.of("scripts/release-artifacts.sh")));
@@ -564,6 +565,20 @@ class ReleaseAutomationTest {
                     "images recording this commit must pass: "
                             + agreed.output());
 
+            // The commit is REQUIRED, not merely honoured when
+            // supplied (#195 follow-up review). A verifier that
+            // skips the check when an argument is omitted is a
+            // verifier whose check will eventually be skipped, so
+            // omitting it must be refused outright rather than
+            // quietly verifying less.
+            Run omitted = run("scripts/release-artifacts.sh", CELLS_V,
+                    staged.toString());
+            assertEquals(64, omitted.status(),
+                    "omitting the commit must be a usage error, never"
+                            + " a silent pass: " + omitted.output());
+            assertTrue(omitted.output().contains("<commit>"),
+                    omitted.output());
+
             // One image rebuilt from another tree, everything else
             // untouched.
             imageFrom(staged.resolve(archive("windows-x64")),
@@ -572,7 +587,7 @@ class ReleaseAutomationTest {
             Run refused = run("scripts/release-artifacts.sh", CELLS_V,
                     staged.toString(), COMMIT);
             assertEquals(7, refused.status(),
-                    "a foreign source tree must stop the release: "
+                    "a foreign source commit must stop the release: "
                             + refused.output());
             assertTrue(refused.output().contains(archive("windows-x64")),
                     refused.output());
@@ -637,7 +652,7 @@ class ReleaseAutomationTest {
                 Path.of("scripts/release-duplicate.sh")));
         // The case the review named: an archive substituted under
         // its own name, still a perfectly valid image recording the
-        // right source tree, with the published manifest untouched.
+        // right source commit, with the published manifest untouched.
         // Nothing but its bytes gives it away - so every archive is
         // fetched and hashed, not just the portable one.
         for (String damaged : List.of("macos-arm64", "windows-x64",
@@ -681,7 +696,7 @@ class ReleaseAutomationTest {
     }
 
     @Test
-    void aReleasePackagedFromAnotherSourceTreeIsAConflict()
+    void aReleasePackagedFromAnotherSourceCommitIsAConflict()
             throws Exception {
         Assumptions.assumeTrue(Files.isExecutable(
                 Path.of("scripts/release-duplicate.sh")));
@@ -706,7 +721,7 @@ class ReleaseAutomationTest {
                 Run verdict = duplicate(root);
 
                 assertEquals(8, verdict.status(),
-                        "a different source tree must be caught even when"
+                        "a different source commit must be caught even when"
                                 + " the portable archive matches: "
                                 + verdict.output());
                 assertTrue(verdict.output().contains("different source"),
@@ -846,7 +861,8 @@ class ReleaseAutomationTest {
                 ZipOutputStream zos = new ZipOutputStream(out)) {
             zos.putNextEntry(new ZipEntry(
                     "JUranometria/app/build-info.txt"));
-            zos.write(("JUranometria " + real + " (app-image)\n")
+            zos.write(("JUranometria " + real + " (app-image)\n"
+                    + "source: " + COMMIT + "\n")
                     .getBytes(StandardCharsets.UTF_8));
             zos.closeEntry();
             zos.putNextEntry(new ZipEntry(

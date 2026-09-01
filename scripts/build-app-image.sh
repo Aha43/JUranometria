@@ -84,7 +84,8 @@ case "$(uname -s)" in
         ;;
 esac
 
-# The exact source tree this image was packaged from (#195 review).
+# The exact source commit this image was packaged from (#195
+# review): the release contract's source-commit identity.
 # An identical portable archive proves the application code and its
 # bundled libraries match; it says nothing about the packaging
 # scripts or the runtime jlink trimmed, which can both change while

@@ -40,8 +40,8 @@
 #     archive keeps its name and its manifest line; it cannot keep
 #     its bytes (#195 review).
 #  2. Every application image must state THIS COMMIT in its own
-#     build-info.txt. That is the immutable source-tree identity: it
-#     moves when the packaging scripts or the bundled runtime move,
+#     build-info.txt. That is the immutable source-commit identity:
+#     it moves when the packaging scripts or the bundled runtime move,
 #     neither of which an identical portable archive would notice
 #     (#195 review).
 #  3. The portable archive must hash to exactly what this run built.
@@ -190,12 +190,12 @@ SHA256SUMS.txt: the file hashes to %s, the manifest says %s.' \
     fi
 done
 
-# 2. The source-tree identity, stated by each image about itself.
+# 2. The source-commit identity, stated by each image about itself.
 for cell in $natives; do
     stated=$(source_commit_of "$published/$(name_for "$cell")")
     if [ "$stated" != "$commit" ]; then
         conflict "$(printf 'its %s was built from a different source
-tree: build-info.txt says %s, this run is publishing %s.' \
+commit: build-info.txt says %s, this run is publishing %s.' \
             "$(name_for "$cell")" "$stated" "$commit")"
     fi
 done
@@ -216,14 +216,14 @@ echo
 echo "  it holds exactly the six contract assets"
 echo "  all five archives were downloaded and hash to what its own"
 echo "    SHA256SUMS.txt states"
-echo "  all four application images record this exact source tree"
+echo "  all four application images record this exact source commit"
 echo "    source: $commit"
 echo "  the reproducible portable archive matches this run exactly"
 echo "    $their_portable"
 echo
 echo "The application images are NOT compared byte for byte: jpackage"
 echo "does not build them identically across runners, so a difference"
-echo "there would prove nothing. Their recorded source tree and their"
+echo "there would prove nothing. Their recorded source commit and its"
 echo "own published checksums carry the claim instead."
 echo
 echo "Nothing is uploaded, replaced or deleted. There is nothing to"

@@ -226,7 +226,7 @@ shape:
   the workflow pin and asserted against each image's `release`
   file), and each artifact carries a `build-info.txt` recording the
   **source commit**, version, modules, packager, and runtime. The
-  commit is the release's immutable source-tree identity: an
+  commit is the release's immutable source-commit identity: an
   identical portable archive proves the application code and its
   bundled libraries match, but says nothing about the packaging
   scripts or the runtime jlink trimmed, and the commit moves when
