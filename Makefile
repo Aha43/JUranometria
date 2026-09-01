@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study milky-way-study check-libs check-jdk dist app-image
 
 all: app
 
@@ -204,6 +204,13 @@ identify-study: classes
 deep-sky-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.DeepSkyVocabularyStudyMain \
 		> docs/studies/deep-sky-vocabulary/measurements.md
+
+# The Milky Way gate (docs/decisions/milky-way-layer.md, issue #189).
+# Needs the candidate source, which is not redistributed with the
+# repository: run scripts/download-milky-way-sources.sh first.
+milky-way-study: classes
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MilkyWayStudyMain \
+		> docs/studies/milky-way/measurements.md
 
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked
