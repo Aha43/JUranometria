@@ -34,8 +34,8 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
     /**
      * The released chart: every layer on, the title block on, and
      * the stellar-magnitude key OFF - the Sprint 20 decision, which
-     * measured the key covering up to 290 px of star ink on a wide
-     * page and left it for the reader to ask for.
+     * measured the key covering up to 436 px of star and symbol ink
+     * on a wide page and left it for the reader to ask for.
      */
     public static final ChartOptions DEFAULTS = new ChartOptions(
             true, true, true, true, true, true, true, true, true,

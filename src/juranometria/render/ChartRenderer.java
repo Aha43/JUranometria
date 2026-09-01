@@ -14,6 +14,7 @@ import java.util.Locale;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.DeepSkyObject;
+import juranometria.chart.DsoType;
 import juranometria.chart.SkyPosition;
 import juranometria.geo.GeoSegment;
 import juranometria.chart.Star;
@@ -868,15 +869,33 @@ public final class ChartRenderer {
                                    RegionalDetailPolicy policy,
                                    PixelPoint centre, double pixelsPerPlaneUnit) {
         double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
-        double majorPx = axes[0];
-        double minorPx = axes[1];
+        paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
+                axes[0], axes[1], dso.positionAngleDegrees());
+    }
+
+    /**
+     * Draws one symbol at a given size and orientation - the atlas's
+     * whole symbol vocabulary, in one place (Sprint 21, issue #184).
+     *
+     * <p>The chart pass reaches it through {@link #drawSymbol} with
+     * the object's projected axes; a legend reaches it through
+     * {@link #drawLegendSymbol} with a size of its own. Neither draws
+     * its own shapes, so a legend cannot come to teach a vocabulary
+     * the chart has stopped using.
+     */
+    private static void paintSymbol(Graphics2D g, Symbol symbol,
+                                    double centreX, double centreY,
+                                    double majorPx, double minorPx,
+                                    double positionAngleDegrees) {
         Graphics2D g2 = (Graphics2D) g.create();
         try {
-            g2.translate(centre.x(), centre.y());
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.translate(centreX, centreY);
             // Position angle is east of north; east is left on the chart,
             // which is a clockwise-negative rotation in pixel space.
-            g2.rotate(-Math.toRadians(dso.positionAngleDegrees()));
-            switch (symbolFor(dso)) {
+            g2.rotate(-Math.toRadians(positionAngleDegrees));
+            switch (symbol) {
                 case ELLIPSE -> {
                     Shape ellipse = new Ellipse2D.Double(
                             -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
@@ -981,14 +1000,50 @@ public final class ChartRenderer {
      * though all remain searchable.
      */
     public static Symbol symbolFor(DeepSkyObject dso) {
-        return switch (dso.type()) {
-            case GALAXY, GALAXY_PAIR, GALAXY_TRIPLET, GALAXY_GROUP -> Symbol.ELLIPSE;
+        return symbolForType(dso.type());
+    }
+
+    /**
+     * Draws the symbol a catalogue type receives, at a chosen size,
+     * for a legend (issue #184).
+     *
+     * <p>The same {@link #paintSymbol} the chart uses, so what a
+     * reader is taught is what the page will draw. Types the atlas
+     * deliberately leaves undrawn draw nothing here either - a legend
+     * that invented a mark for them would be teaching a symbol the
+     * chart does not have.
+     *
+     * <p>{@code sizePx} is the symbol's larger axis; the shape is
+     * drawn unrotated and round, since a legend describes a family
+     * rather than any one object's orientation.
+     */
+    public static void drawLegendSymbol(Graphics2D g, DsoType type,
+                                        double centreX, double centreY,
+                                        double sizePx) {
+        Symbol symbol = symbolForType(type);
+        if (symbol == Symbol.NONE) {
+            return;
+        }
+        paintSymbol(g, symbol, centreX, centreY, sizePx, sizePx, 0.0);
+    }
+
+    /**
+     * The symbol a catalogue type receives, independent of any one
+     * object - the mapping a legend and a family filter both need.
+     * {@link #symbolFor} answers the same question for an object.
+     */
+    public static Symbol symbolForType(DsoType type) {
+        return switch (type) {
+            case GALAXY, GALAXY_PAIR, GALAXY_TRIPLET, GALAXY_GROUP ->
+                    Symbol.ELLIPSE;
             case OPEN_CLUSTER -> Symbol.DOTTED_CIRCLE;
             case GLOBULAR_CLUSTER -> Symbol.CROSSED_CIRCLE;
             case NEBULA, EMISSION_NEBULA, REFLECTION_NEBULA, HII_REGION,
-                    SUPERNOVA_REMNANT, DARK_NEBULA, CLUSTER_WITH_NEBULA -> Symbol.BOX;
+                    SUPERNOVA_REMNANT, DARK_NEBULA, CLUSTER_WITH_NEBULA ->
+                    Symbol.BOX;
             case PLANETARY_NEBULA -> Symbol.PLANETARY;
-            case STAR, DOUBLE_STAR, STELLAR_ASSOCIATION, NOVA, OTHER -> Symbol.NONE;
+            case STAR, DOUBLE_STAR, STELLAR_ASSOCIATION, NOVA, OTHER ->
+                    Symbol.NONE;
         };
     }
 

@@ -259,6 +259,35 @@ class ChartOptionsDialogTest {
         return null;
     }
 
+    @Test
+    void twoControlsInThisOnePanelAlreadyShareAMnemonic()
+            throws Exception {
+        // Recorded by the Sprint 21 gate rather than left to be
+        // discovered: "Constellation figures" and "Flamsteed numbers"
+        // both answer to Alt-F, and Swing mnemonics are not
+        // case-sensitive, so in this single panel one of the two is
+        // unreachable by its own letter. The gate's tabbed proposal
+        // separates them, which is why this is evidence rather than a
+        // fix in flight - #185 is where the surface changes.
+        Preferences node = Preferences.userRoot()
+                .node("juranometria-test-" + System.nanoTime());
+        try {
+            ChartOptionsController controller = new ChartOptionsController(
+                    ChartOptionsStore.forNode(node));
+            JComponent content = ChartOptionsDialog.content(controller,
+                    () -> { }, () -> { });
+
+            assertEquals(box(content, "Constellation figures")
+                            .getMnemonic(),
+                    box(content, "Flamsteed numbers").getMnemonic(),
+                    "the collision the gate reports");
+            assertEquals('F', (char) box(content, "Flamsteed numbers")
+                    .getMnemonic());
+        } finally {
+            node.removeNode();
+        }
+    }
+
     private static void flush() throws Exception {
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> { });
