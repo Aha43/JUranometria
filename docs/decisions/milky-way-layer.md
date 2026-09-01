@@ -92,6 +92,18 @@ data.
   hygiene rule that rejected the IAU data files and VizieR's
   `bound_20.dat` in Sprint 7. A paper describing how data was made is
   not permission to redistribute it.
+- **PP3 (*Parvum Planetarium*) `milkyway.dat`** — the third candidate
+  the gate went looking for, and the most promising by licence: PP3
+  is distributed under an **MIT-based licence**, which this project
+  could carry. It fails one layer up. Its manual states the file was
+  *"created using the All-Sky Milky Way Panorama by Axel Mellinger"*,
+  greyscaled and smoothed in GIMP and converted by a hand-written
+  program — so it is a **derivative of the source already rejected
+  here for having no redistribution licence**, and PP3's own MIT
+  grant cannot convey rights to input its author did not hold.
+  Rejected on the same hygiene rule, at one remove; a permissive
+  wrapper around unlicensed data is still unlicensed data. (PP3 is
+  also unmaintained.)
 - **KStars `milkyway.dat`** — 135 contours, equatorial, explicit
   licence: **GPL-2.0-or-later**. Rejected on compatibility, not
   hygiene: bundling copyleft data into an MIT-licensed application
