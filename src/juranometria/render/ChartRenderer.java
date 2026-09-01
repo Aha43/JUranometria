@@ -1004,18 +1004,73 @@ public final class ChartRenderer {
     }
 
     /**
+     * The shape a legend draws to stand for a whole family: the
+     * fraction of the major axis its minor axis takes, and the tilt
+     * it is drawn at (issue #184).
+     *
+     * <p>A representative shape is part of the vocabulary, not a
+     * detail of how a legend happens to be laid out. Drawing a galaxy
+     * round teaches a circle for a family the chart draws as tilted
+     * ellipses, however faithfully the painter is shared - so the
+     * exemplars live here, in one seam, where a dialog and a study
+     * cannot drift apart or drift away from the page.
+     */
+    public record LegendShape(double minorFraction,
+                              double positionAngleDegrees) {
+    }
+
+    /**
+     * The exemplar for each symbol. {@code minorFraction} is the
+     * pack's own median axis ratio for the family, measured over
+     * every bundled row recording both axes and rounded to a
+     * twentieth (docs/studies/deep-sky-vocabulary/measurements.md);
+     * {@code DeepSkyVocabularyTest} re-measures it and fails if the
+     * two part company.
+     *
+     * <p>The tilt is presentational and carries no meaning: a family
+     * has no orientation of its own, and only an object does. It is
+     * there so that an ellipse is not taught as a circle, and it is
+     * given to the ellipse alone - a tilted ellipse still reads as an
+     * ellipse, where a tilted rectangle reads as a diamond, which is
+     * a shape the chart's vocabulary does not contain. The box shows
+     * that it is not a square by being longer than it is wide.
+     * Measured: tilting the box moves it from 64% to 59% of ink
+     * unshared with its nearest neighbour.
+     */
+    public static LegendShape legendShapeFor(Symbol symbol) {
+        return switch (symbol) {
+            // Galaxies: median 0.644 over 10,550 recorded rows.
+            case ELLIPSE -> new LegendShape(0.65, LEGEND_TILT_DEGREES);
+            // Nebulae: median 0.778 over 223 recorded rows.
+            case BOX -> new LegendShape(0.80, 0.0);
+            // Open clusters: median 0.933, which at legend size is
+            // half a pixel - the chart draws them round and so does
+            // the legend.
+            case DOTTED_CIRCLE -> new LegendShape(0.95, 0.0);
+            // Globular and planetary nebulae are round by
+            // construction: their painter takes one axis only.
+            case CROSSED_CIRCLE, PLANETARY, NONE -> new LegendShape(1.0, 0.0);
+        };
+    }
+
+    /**
+     * The tilt an elongated exemplar is drawn at - enough that both
+     * axes read at legend size, restrained enough not to look like a
+     * measurement.
+     */
+    public static final double LEGEND_TILT_DEGREES = 35.0;
+
+    /**
      * Draws the symbol a catalogue type receives, at a chosen size,
      * for a legend (issue #184).
      *
-     * <p>The same {@link #paintSymbol} the chart uses, so what a
-     * reader is taught is what the page will draw. Types the atlas
-     * deliberately leaves undrawn draw nothing here either - a legend
-     * that invented a mark for them would be teaching a symbol the
-     * chart does not have.
+     * <p>The same {@link #paintSymbol} the chart uses, at the family's
+     * own exemplar shape, so what a reader is taught is what the page
+     * will draw. Types the atlas deliberately leaves undrawn draw
+     * nothing here either - a legend that invented a mark for them
+     * would be teaching a symbol the chart does not have.
      *
-     * <p>{@code sizePx} is the symbol's larger axis; the shape is
-     * drawn unrotated and round, since a legend describes a family
-     * rather than any one object's orientation.
+     * <p>{@code sizePx} is the symbol's larger axis.
      */
     public static void drawLegendSymbol(Graphics2D g, DsoType type,
                                         double centreX, double centreY,
@@ -1024,7 +1079,10 @@ public final class ChartRenderer {
         if (symbol == Symbol.NONE) {
             return;
         }
-        paintSymbol(g, symbol, centreX, centreY, sizePx, sizePx, 0.0);
+        LegendShape shape = legendShapeFor(symbol);
+        paintSymbol(g, symbol, centreX, centreY, sizePx,
+                sizePx * shape.minorFraction(),
+                shape.positionAngleDegrees());
     }
 
     /**

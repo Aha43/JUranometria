@@ -179,11 +179,125 @@ class DeepSkyVocabularyTest {
     void aFamilyIsExactlyWhatTheChartDrawsTheSameWay() {
         // What makes the grouping honest: two types in one family are
         // not merely related, they are indistinguishable on the page.
+        // All four galaxy types, since they are the family a reader
+        // is most likely to doubt.
+        assertImage(DsoType.GALAXY, DsoType.GALAXY_PAIR, true);
         assertImage(DsoType.GALAXY, DsoType.GALAXY_TRIPLET, true);
+        assertImage(DsoType.GALAXY, DsoType.GALAXY_GROUP, true);
         assertImage(DsoType.NEBULA, DsoType.SUPERNOVA_REMNANT, true);
         // And two families really do draw differently.
         assertImage(DsoType.NEBULA, DsoType.PLANETARY_NEBULA, false);
         assertImage(DsoType.OPEN_CLUSTER, DsoType.GLOBULAR_CLUSTER, false);
+    }
+
+    @Test
+    void theGalaxyExemplarIsAnEllipseAndItIsTilted() {
+        // The gate review's P1: sharing the painter is not enough if
+        // the parameters handed to it remove the symbol's defining
+        // geometry. Measured from the pixels that were actually
+        // drawn, not from the numbers that were asked for.
+        BufferedImage drawn = swatch(DsoType.GALAXY);
+        double[] shape = principalAxes(drawn);
+        double elongation = shape[1] / shape[0];
+        double tilt = shape[2];
+
+        assertTrue(elongation < 0.85,
+                "the galaxy exemplar must not read as a circle;"
+                        + " measured minor/major " + round(elongation));
+        assertTrue(tilt > 15.0 && tilt < 75.0,
+                "and it must be visibly tilted; measured "
+                        + Math.round(tilt) + "°");
+
+        // The round families are round, and that is not an accident
+        // of these numbers either.
+        assertTrue(principalAxes(swatch(DsoType.GLOBULAR_CLUSTER))[1]
+                        / principalAxes(swatch(DsoType.GLOBULAR_CLUSTER))[0]
+                        > 0.9,
+                "a globular cluster is a circle in the chart and in"
+                        + " the legend alike");
+    }
+
+    @Test
+    void theExemplarsAreThePacksOwnMedianProportions() {
+        // The constants in ChartRenderer.legendShapeFor claim to be
+        // the pack's median axis ratios. This is where that claim is
+        // re-measured against the catalogue rather than trusted.
+        List<DeepSkyObject> pack = wholePack();
+        for (ChartRenderer.Symbol symbol : new ChartRenderer.Symbol[] {
+                ChartRenderer.Symbol.ELLIPSE,
+                ChartRenderer.Symbol.DOTTED_CIRCLE,
+                ChartRenderer.Symbol.BOX}) {
+            List<Double> ratios = new ArrayList<>();
+            for (DeepSkyObject dso : pack) {
+                if (ChartRenderer.symbolFor(dso) != symbol) {
+                    continue;
+                }
+                Double major = dso.recorded().majorAxisArcmin();
+                Double minor = dso.recorded().minorAxisArcmin();
+                if (major != null && minor != null && major > 0.0) {
+                    ratios.add(minor / major);
+                }
+            }
+            java.util.Collections.sort(ratios);
+            double median = ratios.get(ratios.size() / 2);
+            double exemplar =
+                    ChartRenderer.legendShapeFor(symbol).minorFraction();
+            assertEquals(Math.round(median * 20.0) / 20.0, exemplar, 1e-9,
+                    symbol + ": the exemplar is the pack's median"
+                            + " (" + round(median) + ") to a twentieth");
+        }
+
+        // The two the painter draws round whatever the pack says.
+        assertEquals(1.0, ChartRenderer.legendShapeFor(
+                ChartRenderer.Symbol.CROSSED_CIRCLE).minorFraction());
+        assertEquals(1.0, ChartRenderer.legendShapeFor(
+                ChartRenderer.Symbol.PLANETARY).minorFraction());
+    }
+
+    private static double round(double value) {
+        return Math.round(value * 1000.0) / 1000.0;
+    }
+
+    /**
+     * The major axis, minor axis and tilt of whatever a swatch drew,
+     * from the second moments of its ink. A circle returns a ratio of
+     * one; the tilt of a circle means nothing and is not asserted.
+     */
+    private static double[] principalAxes(BufferedImage image) {
+        double sumX = 0;
+        double sumY = 0;
+        int n = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if ((image.getRGB(x, y) & 0xff) < 250) {
+                    sumX += x;
+                    sumY += y;
+                    n++;
+                }
+            }
+        }
+        double meanX = sumX / n;
+        double meanY = sumY / n;
+        double xx = 0;
+        double yy = 0;
+        double xy = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if ((image.getRGB(x, y) & 0xff) < 250) {
+                    xx += (x - meanX) * (x - meanX);
+                    yy += (y - meanY) * (y - meanY);
+                    xy += (x - meanX) * (y - meanY);
+                }
+            }
+        }
+        xx /= n;
+        yy /= n;
+        xy /= n;
+        double half = Math.sqrt(Math.pow((xx - yy) / 2.0, 2) + xy * xy);
+        double major = Math.sqrt(Math.max(1e-9, (xx + yy) / 2.0 + half));
+        double minor = Math.sqrt(Math.max(1e-9, (xx + yy) / 2.0 - half));
+        double tilt = Math.toDegrees(0.5 * Math.atan2(2 * xy, xx - yy));
+        return new double[] {major, minor, Math.abs(tilt)};
     }
 
     @Test

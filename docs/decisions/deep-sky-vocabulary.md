@@ -32,6 +32,42 @@ something the page does not draw.
 
 ![the five symbols at 11 px](../studies/deep-sky-vocabulary/symbols-11px.png)
 
+### A family is taught by its own proportions
+
+A symbol is a shape *and* the proportions it is drawn at. Sharing the
+chart's painter is necessary and not sufficient: handed one axis and
+no angle, that same painter draws the galaxy family as a plain circle
+and teaches a mark the chart never makes. So each family's exemplar
+lives in the renderer — `ChartRenderer.legendShapeFor` — where the
+dialog, the study and the page all read it from one place.
+
+| family | rows recording both axes | pack's median minor/major | exemplar | tilt |
+|---|---:|---:|---:|---:|
+| Galaxies | 10,550 | 0.644 | 0.65 | 35° |
+| Open clusters | 192 | 0.933 | 0.95 | 0° |
+| Globular clusters | 97 | 1.000 | 1.00 | 0° |
+| Nebulae | 223 | 0.778 | 0.80 | 0° |
+| Planetary nebulae | 2 | 0.743 | 1.00 | 0° |
+
+The proportions are **the pack's own median**, rounded to a twentieth,
+and a test re-measures the catalogue and fails if the two part
+company. Two families are round because the chart draws them round
+whatever the catalogue recorded: the globular cluster's and the
+planetary nebula's painters take one axis.
+
+**Only the galaxy is tilted.** The tilt is presentational and says
+nothing — a family has no orientation, only an object does — and
+exists so an ellipse is not taught as a circle. A tilted ellipse still
+reads as an ellipse; a tilted box reads as a *diamond*, which is a
+shape this vocabulary does not contain, and the box already shows it
+is not a square by being longer than it is wide. Measured: tilting the
+box takes it from 64% to 59% of ink unshared with its nearest
+neighbour.
+
+The exemplar is asserted from the drawn pixels, not from the numbers
+asked for: the galaxy's second moments must come back elongated and
+tilted, and all four galaxy types must draw the identical image.
+
 **The proposal in the issue is supported by the evidence, with one
 correction.** The issue listed the nebula family as "nebula, emission,
 reflection, H II region, dark nebula, supernova remnant, cluster with
@@ -95,10 +131,11 @@ the study.
 measurements decided this.
 
 **They stay apart.** Drawn at 11 px and compared pixel by pixel, the
-nearest pair — galaxies against globular clusters, both circles at
-that size — differ over **34%** of their combined ink, and every other
-pair differs more. Below that, at 9 px, the same pair falls to 24%,
-which is why the row is not made smaller.
+nearest pair — open against globular clusters, two circles told apart
+by a dotted edge and a cross — differ over **51%** of their combined
+ink, and every other pair differs more. (Before the galaxy was given
+its own proportions, the nearest pair was galaxies against globulars
+at 34%: two circles that had no business looking alike.)
 
 **The planetary nebula is bigger than it says.** Its four spokes reach
 1.7× its nominal radius, so at a nominal 11 px it inks **20×20 px**
@@ -113,16 +150,53 @@ on the chart's own white it scores **5.74:1**. So each row carries a
 small white chip with a hairline edge, which is not decoration but the
 only honest way to show a reader what the page will draw.
 
-Two consequences follow from that, and both are decided here:
+### One contrast rule
+
+**Every mark in the legend clears 3:1 against the ground it is drawn
+on, as rendered.** One threshold, applied to every state — including
+the ones the atlas already ships. Three things follow, and the third
+is the one that costs something:
 
 - **A switched-off family does not fade its symbol.** Fading the chip
-  to 45% takes it to 1.97:1 and 1.56:1 — below the 3:1 floor for a
-  graphical object, in precisely the state where a reader is consulting
-  the legend to decide what to switch back on. The checkbox and its
-  text take the platform's disabled styling; the symbol stays fully
-  drawn, because it is information rather than a control.
+  to 45% takes it to 1.97:1 and 1.56:1, in precisely the state where a
+  reader is consulting the legend to decide what to switch back on.
+  The checkbox and its text take the platform's disabled styling; the
+  symbol stays fully drawn, because it is information rather than a
+  control.
 - **The chip scales with the dialog's text.** A reader who enlarged
   the type did not ask for a smaller symbol.
+- **The nebula box fails the rule, so the ink changes.** At **2.96:1**
+  it does not clear the same threshold that rejected the fade, and the
+  Sprint 21 legend depends on that box being visible to teach and
+  control a whole family. Rounding 2.96 up to 3 would be marking our
+  own homework, and calling it an inherited chart risk would be
+  applying the rule only where it is convenient.
+
+Contrast is measured **as rendered**, which is why the margin matters:
+a one-pixel stroke on a curve is antialiased, and the galaxy ellipse's
+darkest drawn pixel is `#717171` rather than the `#666666` it was
+drawn in — 4.88:1 against a nominal 5.74:1. A mark that clears the
+floor on paper can fail it on a screen.
+
+**The correction, assigned to #185:** nebula outline grey **150 → 132**
+(2.96:1 → 3.74:1, a quarter clear of the floor). Not 148, which
+crosses the line by one part in a hundred — the margin a different
+rasteriser or a fractional scale factor would eat. 132 stays visibly
+lighter than the 102 the other four symbols use, so the box keeps the
+restraint it was given.
+
+Its cost was measured rather than estimated — the ink was changed,
+every image regenerated, and the difference recorded:
+
+| | effect |
+|---|---|
+| `docs/reference/m31-stars.png` | **byte-identical** — the released default page draws no nebula box |
+| `docs/studies/chart-furniture/` | **six images change** (Crux, Orion, Sagittarius, with and without the key); its `measurements.md` does not |
+| `docs/studies/point-and-identify/` | no change |
+
+**This gate does not make that change**, so the gate itself leaves
+rendering untouched. #185 makes it, regenerating those six images in
+the same commit that makes the legend depend on the box.
 
 ## The dialog earns its tabs
 
@@ -163,8 +237,33 @@ enough:
   failure that would matter, because a clipped control is unreadable
   rather than merely out of sight.
 - **The dialog is as tall as its tallest tab**, so moving between tabs
-  never resizes the window under the reader, up to a 780 px ceiling
-  beyond which it scrolls.
+  never resizes the window under the reader — up to a ceiling that is
+  **the reader's own screen**, not a number.
+
+### The height is the screen's, not a constant
+
+A dialog capped at a number chosen on the display it was designed on
+puts its own OK button under someone else's taskbar, and **a reader
+cannot resize what they cannot reach**. So the ceiling is derived:
+
+> the screen's *usable* height — what the toolkit reports is left
+> after the menu bar, dock or taskbar — less 60 px for the window's
+> own decoration, and never below 320 px.
+
+A scroll bar is the answer to a tab that is too tall. Nothing is the
+answer to an action button off the screen, which is why the ceiling is
+applied to the *frame* and the scrolling happens inside it, below the
+tab strip and above the buttons.
+
+On the machine this study ran on, 884 px of usable screen gives an
+824 px ceiling. Reviewing that proves nothing about a short display,
+so the mock-ups include a dialog told to believe in **a 768 px screen
+with a 40 px taskbar** — 728 px usable, a 668 px ceiling — at ordinary
+and at enlarged text. In both, OK, Cancel and Restore Defaults are
+**on screen and reachable by Tab**, and the four rows that no longer
+fit are reached by scrolling. `DeepSkyDialogHeightTest` holds that
+same short screen, through the same code the study uses, and fails if
+the dialog outgrows it or the buttons leave it.
 
 ### Keyboard, and one inherited collision
 
@@ -242,18 +341,19 @@ keys once the tab strip has focus.
 
 ## Residual risks
 
-- **The nebula box is the chart's weakest mark**, at 2.96:1 even on
-  white — under the 3:1 floor for a graphical object. That is the
-  existing chart palette, not the legend's doing, and correcting it
-  would change the released rendering. The legend shows what the page
-  draws; the ink itself is left for a sprint that can pay for a
-  reference-image change.
 - **`Cl+N` is filed under Nebulae**, so a reader hiding nebulae also
   hides 67 clusters. Stated in the family's own description, but a
   reader who does not read it will be surprised.
-- **Galaxies and globular clusters are the nearest pair** at 34% — two
-  circles, distinguished by fill and by a cross. At 9 px they fall to
-  24%, so the row height is not a free parameter.
+- **Open and globular clusters are the nearest pair** at 51% — two
+  circles told apart by a dotted edge against a cross. Both are round
+  in the chart itself, so no exemplar can separate them further; only
+  redrawing one of the marks could, and that is a chart change, not a
+  legend one.
+- **The tilt is a fiction a reader could over-read.** A galaxy in the
+  legend leans at 35°; a galaxy on the page leans at whatever the
+  catalogue recorded. The description says the ellipse shows
+  catalogued orientation, which is the mitigation, but the exemplar
+  itself cannot say "any angle".
 - **The Inspector says "hii region"**, lowercased from the enum name.
   Harmless today and invisible until now; #185 touches accessibility
   text and can spell it "H II region" there.
@@ -266,6 +366,10 @@ keys once the tab strip has focus.
 - #185 implements the five family flags, the tabbed dialog, the store
   migration and the target exemption, and updates README, chart
   conventions and the options inventory.
+- **#185 also makes the one palette change this gate assigns it**:
+  nebula outline grey 150 → 132, with the six chart-furniture study
+  images regenerated in that commit and the reference page proved
+  byte-identical.
 - #186 walks the production-control journey, proves the packaged
   behaviour, and closes the sprint.
 - **No reference image changes in this sprint's gate**, and

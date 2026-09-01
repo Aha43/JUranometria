@@ -102,6 +102,7 @@ public final class DeepSkyVocabularyStudyMain {
         census(pack);
         reconciliation(pack);
         exclusivity();
+        exemplars(pack);
         geometry();
         distinguishability();
         contrast();
@@ -292,6 +293,69 @@ public final class DeepSkyVocabularyStudyMain {
     }
 
     /**
+     * The shape each family is taught by, and the pack's own median
+     * axis ratio it comes from.
+     *
+     * <p>The gate review's P1: a legend that shares the chart's
+     * painter but hands it a circle for an oriented ellipse teaches
+     * the wrong mark. The exemplars now live in the renderer
+     * ({@code ChartRenderer.legendShapeFor}), and this is where the
+     * numbers in them are checked against the catalogue.
+     */
+    private static void exemplars(List<DeepSkyObject> pack) {
+        System.out.println("## The shape each family is taught by");
+        System.out.println();
+        System.out.println("A family's exemplar is the chart's own"
+                + " painter given the family's own median proportions."
+                + " The median is over every bundled row of that family"
+                + " recording both axes; the exemplar is that median"
+                + " rounded to a twentieth, and"
+                + " `DeepSkyVocabularyTest` re-measures the pack and"
+                + " fails if the two part company.");
+        System.out.println();
+        System.out.println("| family | rows recording both axes |"
+                + " median minor/major | exemplar | tilt |");
+        System.out.println("|---|---:|---:|---:|---:|");
+        for (Family family : FAMILIES) {
+            List<Double> ratios = new ArrayList<>();
+            for (DeepSkyObject dso : pack) {
+                if (ChartRenderer.symbolFor(dso) != family.symbol()) {
+                    continue;
+                }
+                Double major = dso.recorded().majorAxisArcmin();
+                Double minor = dso.recorded().minorAxisArcmin();
+                if (major != null && minor != null && major > 0.0) {
+                    ratios.add(minor / major);
+                }
+            }
+            ChartRenderer.LegendShape shape =
+                    ChartRenderer.legendShapeFor(family.symbol());
+            java.util.Collections.sort(ratios);
+            System.out.printf(Locale.ROOT,
+                    "| %s | %,d | %s | %.2f | %.0f° |%n", family.name(),
+                    ratios.size(),
+                    ratios.isEmpty() ? "-"
+                            : String.format(Locale.ROOT, "%.3f",
+                                    ratios.get(ratios.size() / 2)),
+                    shape.minorFraction(),
+                    shape.positionAngleDegrees());
+        }
+        System.out.println();
+        System.out.println("Two of the five are round in the chart"
+                + " itself: the globular cluster's and the planetary"
+                + " nebula's painters take one axis and draw a circle,"
+                + " whatever the catalogue recorded. Open clusters"
+                + " measure 0.933, which at legend size is half a"
+                + " pixel. Only the galaxy is tilted - a tilted"
+                + " ellipse still reads as an ellipse, where a tilted"
+                + " box reads as a diamond, a shape the chart does not"
+                + " draw. Measured: tilting the box takes it from 64%"
+                + " to 59% of ink unshared with its nearest"
+                + " neighbour.");
+        System.out.println();
+    }
+
+    /**
      * What a symbol actually occupies at legend sizes. This is not
      * decoration: the planetary nebula's spokes reach well past its
      * nominal size, and small sizes hit the renderer's practical
@@ -330,9 +394,12 @@ public final class DeepSkyVocabularyStudyMain {
                 + " reach 1.7 times its nominal radius, so it draws"
                 + " almost twice the box every other family draws. A"
                 + " legend row that reserved the size it asked for"
-                + " would clip the chart's own symbol. The other four"
-                + " overrun the asked-for size by a pixel, which is the"
-                + " one-pixel outline stroke.");
+                + " would clip the chart's own symbol. The round"
+                + " families overrun the asked-for size by the one"
+                + " pixel of their outline stroke; the galaxy and the"
+                + " nebula are narrower than they are tall, which is"
+                + " the whole point of giving them the family's own"
+                + " proportions.");
         System.out.println();
         int widest = 0;
         for (Family family : FAMILIES) {
@@ -466,28 +533,24 @@ public final class DeepSkyVocabularyStudyMain {
             }
         }
         System.out.println();
-        System.out.println("Three things follow, and only the third is"
-                + " a choice this gate is free to make:");
+        rendered();
+        System.out.println("### The rule, stated once");
+        System.out.println();
+        System.out.println("**Every mark in the legend clears 3:1"
+                + " against the ground it is drawn on, as rendered.**"
+                + " One threshold, applied to every state - not to the"
+                + " rejected design only. Three things follow.");
         System.out.println();
         System.out.printf(Locale.ROOT,
-                "1. **The symbol must sit on paper.** In the dark theme"
-                        + " the chart's outline grey scores %.2f:1"
-                        + " straight onto the panel - invisible - and"
-                        + " %.2f:1 on the chart's own white. The chip"
-                        + " is not decoration; it is the only way a"
-                        + " dark dialog can show the chart's ink at"
-                        + " all.%n", darkDirect, onPaper);
+                "1. **The symbol sits on paper.** In the dark theme the"
+                        + " chart's outline grey scores %.2f:1 straight"
+                        + " onto the panel - invisible - and %.2f:1 on"
+                        + " the chart's own white. The chip is not"
+                        + " decoration; it is the only way a dark"
+                        + " dialog can show the chart's ink at all.%n",
+                darkDirect, onPaper);
         System.out.printf(Locale.ROOT,
-                "2. **The nebula box is the chart's weakest mark**, at"
-                        + " %.2f:1 even on paper. That is the chart's"
-                        + " existing palette, not the legend's: the"
-                        + " legend shows what the page draws, and"
-                        + " changing the chart's ink would change the"
-                        + " released rendering. It is recorded as a"
-                        + " residual risk rather than quietly"
-                        + " corrected in the legend.%n", nebulaOnPaper);
-        System.out.printf(Locale.ROOT,
-                "3. **A switched-off family does not fade its symbol.**"
+                "2. **A switched-off family does not fade its symbol.**"
                         + " Fading the chip to %.0f%% drops it to"
                         + " %.2f:1 and %.2f:1 - below the floor, in the"
                         + " very state where a reader consults the"
@@ -497,6 +560,115 @@ public final class DeepSkyVocabularyStudyMain {
                         + " stays fully drawn, because it is"
                         + " information rather than a control.%n",
                 alpha * 100.0, fadedOutline, fadedNebula);
+        System.out.printf(Locale.ROOT,
+                "3. **The nebula box does not clear the rule, so the"
+                        + " ink changes.** At %.2f:1 nominal - and"
+                        + " lower still as drawn - it fails the same"
+                        + " threshold that rejected the fade, and the"
+                        + " legend depends on it to teach and control"
+                        + " a family. Rounding %.2f up to 3 would be"
+                        + " marking our own homework. The correction"
+                        + " is costed below and assigned to #185.%n",
+                nebulaOnPaper, nebulaOnPaper);
+        System.out.println();
+        correction();
+    }
+
+    /**
+     * Contrast as drawn, not as declared. A one-pixel stroke on a
+     * curve is antialiased, so the ink that reaches the screen is
+     * lighter than the colour asked for - which is exactly what makes
+     * a nominal 2.96:1 brittle rather than merely short.
+     */
+    private static void rendered() {
+        System.out.println("### As rendered, not as declared");
+        System.out.println();
+        System.out.println("The colour a symbol is drawn in is not the"
+                + " colour that reaches the screen: a one-pixel stroke"
+                + " on a curve is antialiased across two, and both are"
+                + " paler than the ink. Measured on the chip the"
+                + " mock-up draws, at the size it draws it.");
+        System.out.println();
+        System.out.println("| family | ink asked for | darkest pixel"
+                + " drawn | contrast, as drawn |");
+        System.out.println("|---|---|---|---:|");
+        for (Family family : FAMILIES) {
+            BufferedImage swatch = swatch(family,
+                    (int) DeepSkyVocabularyMockupMain.SYMBOL_PX, 60);
+            Color darkest = darkest(swatch);
+            Color asked = family.symbol() == ChartRenderer.Symbol.BOX
+                    ? new Color(150, 150, 150) : new Color(102, 102, 102);
+            System.out.printf(Locale.ROOT,
+                    "| %s | %s | %s | %.2f:1 |%n", family.name(),
+                    hex(asked), hex(darkest),
+                    ratio(darkest, Color.WHITE));
+        }
+        System.out.println();
+    }
+
+    /** The darkest pixel a swatch actually put on the paper. */
+    private static Color darkest(BufferedImage image) {
+        int found = 0xffffff;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int rgb = image.getRGB(x, y) & 0xffffff;
+                if ((rgb & 0xff) < (found & 0xff)) {
+                    found = rgb;
+                }
+            }
+        }
+        return new Color(found);
+    }
+
+    /**
+     * The nebula ink the rule requires, and exactly what changing it
+     * costs. Costed here so the decision can assign it rather than
+     * either shipping under the threshold or quietly repainting the
+     * chart inside a design gate.
+     */
+    private static void correction() {
+        System.out.println("### The correction, costed");
+        System.out.println();
+        System.out.println("| nebula grey | contrast on white |"
+                + " margin over 3:1 |");
+        System.out.println("|---:|---:|---:|");
+        for (int grey : new int[] {150, 148, 140, 132, 128}) {
+            double contrast = ratio(new Color(grey, grey, grey),
+                    Color.WHITE);
+            System.out.printf(Locale.ROOT,
+                    "| %d%s | %.2f:1 | %+.0f%% |%n", grey,
+                    grey == 150 ? " (today)"
+                            : grey == 132 ? " **(proposed)**" : "",
+                    contrast, 100.0 * (contrast - 3.0) / 3.0);
+        }
+        System.out.println();
+        System.out.println("**Grey 132**, not the 148 that merely"
+                + " crosses the line. 148 clears 3:1 by one part in a"
+                + " hundred, which a different rasteriser, a fractional"
+                + " scale factor or a paler antialiased edge would eat;"
+                + " 132 clears it by a quarter, and stays visibly"
+                + " lighter than the 102 the other four symbols use, so"
+                + " the nebula box keeps the restraint it was given.");
+        System.out.println();
+        System.out.println("The cost was measured rather than"
+                + " estimated: the ink was changed, every image"
+                + " regenerated, and the difference recorded.");
+        System.out.println();
+        System.out.println("- `docs/reference/m31-stars.png` — **byte-"
+                + "identical**. The released default page draws no"
+                + " nebula box.");
+        System.out.println("- `docs/studies/chart-furniture/` — **six"
+                + " images change**: Crux, Orion and Sagittarius, with"
+                + " and without the magnitude key. Its"
+                + " `measurements.md` does not change; both greys count"
+                + " as ink.");
+        System.out.println("- `docs/studies/point-and-identify/` — no"
+                + " change.");
+        System.out.println();
+        System.out.println("**This gate does not make that change.** It"
+                + " assigns it to #185, where the six study images are"
+                + " regenerated in the same commit that makes the"
+                + " legend depend on the box being visible.");
         System.out.println();
     }
 

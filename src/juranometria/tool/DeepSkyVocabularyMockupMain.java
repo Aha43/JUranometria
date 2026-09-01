@@ -73,33 +73,54 @@ public final class DeepSkyVocabularyMockupMain {
      */
     static final int MINIMUM_WIDTH = 320;
 
-    /** One rendered mock-up, and the question it exists to answer. */
+    /**
+     * One rendered mock-up, and the question it exists to answer.
+     *
+     * <p>{@code usableHeight} is the screen area the dialog believes
+     * it has: 0 means this machine's own, and any other value stands
+     * in for a screen this machine does not have - which is the only
+     * way a short display can be reviewed from a tall one.
+     */
     record Shot(String name, boolean dark, int width, double textScale,
-                boolean masterOn, int focusRow, String why) {
+                boolean masterOn, int focusRow, int usableHeight,
+                String why) {
     }
 
+    /**
+     * A 768 px display with a 40 px taskbar - the shortest screen
+     * still in ordinary use, and the one a cap chosen on this machine
+     * would have failed.
+     */
+    static final int SHORT_SCREEN = 728;
+
     static final List<Shot> SHOTS = List.of(
-            new Shot("deep-sky-tab", false, ORDINARY_WIDTH, 1.0, true, -1,
+            new Shot("deep-sky-tab", false, ORDINARY_WIDTH, 1.0, true, -1, 0,
                     "the tab as a reader first meets it"),
             new Shot("deep-sky-tab-dark", true, ORDINARY_WIDTH, 1.0, true, -1,
-                    "the same tab in the dark theme"),
+                    0, "the same tab in the dark theme"),
             new Shot("deep-sky-tab-narrow", false, MINIMUM_WIDTH, 1.0, true,
-                    -1, "at the dialog's narrowest useful width"),
+                    -1, 0, "at the dialog's narrowest useful width"),
             new Shot("deep-sky-tab-narrow-dark", true, MINIMUM_WIDTH, 1.0,
-                    true, -1, "narrow, dark"),
+                    true, -1, 0, "narrow, dark"),
             new Shot("deep-sky-tab-large-text", false, ORDINARY_WIDTH, 1.5,
-                    true, -1, "with text enlarged by half"),
+                    true, -1, 0, "with text enlarged by half"),
             new Shot("deep-sky-tab-large-text-dark", true, ORDINARY_WIDTH,
-                    1.5, true, -1, "enlarged text, dark"),
+                    1.5, true, -1, 0, "enlarged text, dark"),
             new Shot("deep-sky-tab-master-off", false, ORDINARY_WIDTH, 1.0,
-                    false, -1,
+                    false, -1, 0,
                     "master off: the families are remembered, not erased"),
             new Shot("deep-sky-tab-master-off-dark", true, ORDINARY_WIDTH,
-                    1.0, false, -1, "master off, dark"),
+                    1.0, false, -1, 0, "master off, dark"),
             new Shot("deep-sky-tab-focus", false, ORDINARY_WIDTH, 1.0, true,
-                    2, "keyboard focus on the third family"),
+                    2, 0, "keyboard focus on the third family"),
             new Shot("deep-sky-tab-focus-dark", true, ORDINARY_WIDTH, 1.0,
-                    true, 2, "keyboard focus, dark"));
+                    true, 2, 0, "keyboard focus, dark"),
+            new Shot("deep-sky-tab-short-screen", false, ORDINARY_WIDTH, 1.0,
+                    true, -1, SHORT_SCREEN,
+                    "on a 768 px display: does the reader still reach OK?"),
+            new Shot("deep-sky-tab-short-screen-large-text", false,
+                    ORDINARY_WIDTH, 1.5, true, -1, SHORT_SCREEN,
+                    "the worst case: a short screen and enlarged text"));
 
     /** The other three tabs, rendered once each in the light theme. */
     static final List<String> OTHER_TABS =
@@ -120,10 +141,11 @@ public final class DeepSkyVocabularyMockupMain {
                     + " a headless imitation.");
             return report;
         }
-        report.add("| mock-up | theme | width | text | dialog |"
-                + " controls on the tab | cut off across | needs"
-                + " scrolling | focus ring |");
-        report.add("|---|---|---:|---:|---|---:|---:|---|---|");
+        report.add("| mock-up | theme | width | text | usable screen |"
+                + " dialog | controls on the tab | cut off across |"
+                + " needs scrolling | OK, Cancel, Restore |"
+                + " focus ring |");
+        report.add("|---|---|---:|---:|---|---|---:|---:|---|---|---|");
         for (Shot shot : SHOTS) {
             report.add(render(shot));
         }
@@ -209,12 +231,12 @@ public final class DeepSkyVocabularyMockupMain {
     private static String render(Shot shot) throws IOException {
         return paint(shot.name(), shot.dark(), shot.width(),
                 shot.textScale(), shot.masterOn(), shot.focusRow(),
-                "Deep sky");
+                "Deep sky", shot.usableHeight());
     }
 
     private static String renderTab(String tab) throws IOException {
         return paint("tab-" + tab.toLowerCase(Locale.ROOT), false,
-                ORDINARY_WIDTH, 1.0, true, -1, tab);
+                ORDINARY_WIDTH, 1.0, true, -1, tab, 0);
     }
 
     /**
@@ -225,14 +247,15 @@ public final class DeepSkyVocabularyMockupMain {
      */
     private static String paint(String name, boolean dark, int width,
                                 double textScale, boolean masterOn,
-                                int focusRow, String tab)
+                                int focusRow, String tab, int usableHeight)
             throws IOException {
-        Object[] measured = new Object[6];
+        Object[] measured = new Object[8];
         BufferedImage[] image = new BufferedImage[1];
         JFrame[] window = new JFrame[1];
         JTabbedPane[] pane = new JTabbedPane[1];
         JCheckBox[] wanted = new JCheckBox[1];
         int[] size = new int[2];
+        int[] ceilings = new int[1];
         try {
             // Laid out at its real width first, then re-wrapped and
             // re-measured around the taller text, and only then
@@ -242,31 +265,9 @@ public final class DeepSkyVocabularyMockupMain {
             // measured. Sleeping on the event thread would prevent
             // exactly those events from arriving.
             SwingUtilities.invokeAndWait(() -> {
-                theme(dark, textScale);
-                JTabbedPane tabs = tabbedOptions(masterOn);
-                JComponent content = frameContent(tabs);
-                JFrame frame = new JFrame("Chart Options");
-                frame.setContentPane(content);
-                frame.pack();
-                frame.setSize(width, frame.getHeight());
-                frame.validate();
-                rewrap(content);
-                int height = tallestTab(frame, tabs, width);
-                select(tabs, tab);
-                frame.setSize(width, height);
-                frame.validate();
-                // A second pass, because the first one can bring a
-                // scroll bar into being and take its width away from
-                // the very text that summoned it.
-                rewrap(content);
-                frame.setSize(width, tallestTab(frame, tabs, width));
-                select(tabs, tab);
-                height = frame.getHeight();
-                frame.validate();
-                frame.setLocation(60, 60);
-                frame.setVisible(true);
-                frame.toFront();
-                frame.requestFocus();
+                JFrame frame = open(dark, width, textScale, masterOn, tab,
+                        usableHeight);
+                JTabbedPane tabs = tabsOf(frame);
                 if (focusRow >= 0) {
                     wanted[0] = familyBoxes(tabs).get(focusRow);
                     wanted[0].requestFocusInWindow();
@@ -274,7 +275,10 @@ public final class DeepSkyVocabularyMockupMain {
                 window[0] = frame;
                 pane[0] = tabs;
                 size[0] = width;
-                size[1] = height;
+                size[1] = frame.getHeight();
+                ceilings[0] = usableHeight > 0
+                        ? ceilingForUsableHeight(usableHeight)
+                        : ceilingFor(frame.getGraphicsConfiguration());
             });
             settle(window[0], wanted[0]);
             SwingUtilities.invokeAndWait(() -> {
@@ -307,6 +311,11 @@ public final class DeepSkyVocabularyMockupMain {
                 measured[5] = below.isEmpty() ? "no"
                         : below.size() + " row"
                                 + (below.size() == 1 ? "" : "s");
+                measured[6] = actionButtons(frame);
+                measured[7] = usableHeight > 0
+                        ? usableHeight + " px (stood in for)"
+                        : usableBounds(frame.getGraphicsConfiguration())
+                                .height + " px";
                 image[0] = shot;
                 frame.dispose();
             });
@@ -315,13 +324,67 @@ public final class DeepSkyVocabularyMockupMain {
         }
         ImageIO.write(image[0], "png", new File(DIR, name + ".png"));
         return String.format(Locale.ROOT,
-                "| [%s](%s.png) | %s | %d px | %.1fx | %s | %d | %d%s |"
-                        + " %s | %s |",
+                "| [%s](%s.png) | %s | %d px | %.1fx | %s | %s | %d |"
+                        + " %d%s | %s | %s | %s |",
                 name, name, dark ? "dark" : "light", width, textScale,
-                measured[0], (Integer) measured[1], (Integer) measured[2],
+                measured[7], measured[0], (Integer) measured[1],
+                (Integer) measured[2],
                 measured[4].toString().isEmpty() ? ""
                         : " (" + measured[4] + ")",
-                measured[5], measured[3]);
+                measured[5], measured[6], measured[3]);
+    }
+
+    /**
+     * Builds and shows the proposed dialog, sized the way it would
+     * size itself on a given screen. Call on the event thread.
+     *
+     * <p>{@code usableHeight} is the screen area to believe in: 0 for
+     * the machine's own, or a stated height standing in for a screen
+     * this machine does not have. The study and the height regression
+     * both come through here, so what is measured is what is
+     * proposed.
+     */
+    static JFrame open(boolean dark, int width, double textScale,
+                       boolean masterOn, String tab, int usableHeight) {
+        theme(dark, textScale);
+        JTabbedPane tabs = tabbedOptions(masterOn);
+        JComponent content = frameContent(tabs);
+        JFrame frame = new JFrame("Chart Options");
+        frame.setContentPane(content);
+        frame.pack();
+        frame.setSize(width, frame.getHeight());
+        frame.validate();
+        rewrap(content);
+        // The ceiling this dialog would take on the screen it is
+        // opening on - or on the screen a review needs to see it on.
+        int ceiling = usableHeight > 0
+                ? ceilingForUsableHeight(usableHeight)
+                : ceilingFor(frame.getGraphicsConfiguration());
+        frame.setSize(width, tallestTab(frame, tabs, width, ceiling));
+        select(tabs, tab);
+        frame.validate();
+        // A second pass, because the first one can bring a scroll bar
+        // into being and take its width away from the very text that
+        // summoned it.
+        rewrap(content);
+        frame.setSize(width, tallestTab(frame, tabs, width, ceiling));
+        select(tabs, tab);
+        frame.validate();
+        frame.setLocation(60, 60);
+        frame.setVisible(true);
+        frame.toFront();
+        frame.requestFocus();
+        return frame;
+    }
+
+    /** The tabbed pane inside a dialog {@link #open} built. */
+    static JTabbedPane tabsOf(JFrame frame) {
+        for (Component child : frame.getContentPane().getComponents()) {
+            if (child instanceof JTabbedPane tabs) {
+                return tabs;
+            }
+        }
+        throw new IllegalStateException("no tabbed pane");
     }
 
     /**
@@ -801,6 +864,81 @@ public final class DeepSkyVocabularyMockupMain {
         root.revalidate();
     }
 
+    /**
+     * Whether the dialog's three action buttons are still where a
+     * reader can use them: inside the window, inside the screen's
+     * usable area, and reachable by Tab.
+     *
+     * <p>This is the check a fixed height ceiling would have failed.
+     * A scroll bar answers a tab that is too tall; nothing answers an
+     * OK button under the taskbar.
+     */
+    static String actionButtons(JFrame frame) {
+        java.awt.Rectangle usable =
+                usableBounds(frame.getGraphicsConfiguration());
+        List<String> lost = new ArrayList<>();
+        List<String> unreachable = new ArrayList<>();
+        for (String name : List.of("OK", "Cancel", "Restore Defaults")) {
+            AbstractButton button = button(frame.getContentPane(), name);
+            if (button == null || !button.isShowing()) {
+                lost.add(name);
+                continue;
+            }
+            java.awt.Rectangle onScreen = new java.awt.Rectangle(
+                    button.getLocationOnScreen(), button.getSize());
+            if (!frame.getBounds().contains(onScreen)
+                    || !usable.contains(onScreen)) {
+                lost.add(name);
+            }
+            if (!reachableByTab(frame, button)) {
+                unreachable.add(name);
+            }
+        }
+        if (lost.isEmpty() && unreachable.isEmpty()) {
+            return "on screen, tab-reachable";
+        }
+        return "**"
+                + (lost.isEmpty() ? "" : "off screen: " + String.join(", ",
+                        lost))
+                + (lost.isEmpty() || unreachable.isEmpty() ? "" : "; ")
+                + (unreachable.isEmpty() ? "" : "no keyboard route: "
+                        + String.join(", ", unreachable))
+                + "**";
+    }
+
+    /** Whether Tab from the first control ever arrives at a button. */
+    private static boolean reachableByTab(JFrame frame, Component target) {
+        java.awt.FocusTraversalPolicy policy =
+                frame.getFocusTraversalPolicy();
+        if (policy == null) {
+            return false;
+        }
+        Component at = policy.getFirstComponent(frame);
+        for (int step = 0; at != null && step < 200; step++) {
+            if (at == target) {
+                return true;
+            }
+            at = policy.getComponentAfter(frame, at);
+        }
+        return false;
+    }
+
+    private static AbstractButton button(Container container, String text) {
+        for (Component child : container.getComponents()) {
+            if (child instanceof AbstractButton button
+                    && text.equals(button.getText())) {
+                return button;
+            }
+            if (child instanceof Container inner) {
+                AbstractButton found = button(inner, text);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
     /** The viewport of the selected tab's scroll pane. */
     static javax.swing.JViewport viewport(JTabbedPane tabs) {
         return ((javax.swing.JScrollPane) tabs.getSelectedComponent())
@@ -809,11 +947,12 @@ public final class DeepSkyVocabularyMockupMain {
 
     /**
      * The height that holds the tallest of the four tabs, so moving
-     * between tabs never resizes the dialog under the reader. Capped,
-     * because a tall dialog on a short screen is worse than a scroll
-     * bar.
+     * between tabs never resizes the dialog under the reader - never
+     * taller than the ceiling the reader's own screen allows, beyond
+     * which the tab scrolls inside it.
      */
-    static int tallestTab(JFrame frame, JTabbedPane tabs, int width) {
+    static int tallestTab(JFrame frame, JTabbedPane tabs, int width,
+                          int ceiling) {
         int tallest = 0;
         int selected = tabs.getSelectedIndex();
         for (int i = 0; i < tabs.getTabCount(); i++) {
@@ -828,11 +967,54 @@ public final class DeepSkyVocabularyMockupMain {
             tallest = Math.max(tallest, frame.getHeight() + overflow);
         }
         tabs.setSelectedIndex(selected);
-        return Math.min(tallest, MAXIMUM_HEIGHT);
+        return Math.min(tallest, ceiling);
     }
 
-    /** As tall as the dialog may grow before it starts scrolling. */
-    static final int MAXIMUM_HEIGHT = 780;
+    /**
+     * How tall this dialog may be on the screen it is opening on.
+     *
+     * <p>Not a constant. A dialog capped at a number chosen on a tall
+     * display puts its own OK button under the taskbar of a short
+     * one, and the reader cannot resize what they cannot reach. The
+     * ceiling is the screen's <em>usable</em> area - what is left
+     * after the menu bar, dock or taskbar the toolkit reports - less
+     * room for the window's own decoration, and never less than the
+     * floor below.
+     */
+    static int ceilingFor(java.awt.GraphicsConfiguration screen) {
+        return ceilingForUsableHeight(usableBounds(screen).height);
+    }
+
+    /** The same rule, against a stated usable height. */
+    static int ceilingForUsableHeight(int usableHeight) {
+        return Math.max(MINIMUM_CEILING, usableHeight - WINDOW_CHROME);
+    }
+
+    /** The screen area left over once the desktop has taken its share. */
+    static java.awt.Rectangle usableBounds(
+            java.awt.GraphicsConfiguration screen) {
+        java.awt.Rectangle bounds = screen.getBounds();
+        java.awt.Insets insets = java.awt.Toolkit.getDefaultToolkit()
+                .getScreenInsets(screen);
+        return new java.awt.Rectangle(bounds.x + insets.left,
+                bounds.y + insets.top,
+                bounds.width - insets.left - insets.right,
+                bounds.height - insets.top - insets.bottom);
+    }
+
+    /**
+     * Room left for the title bar and a margin, so the dialog sits
+     * inside the usable area rather than exactly filling it.
+     */
+    static final int WINDOW_CHROME = 60;
+
+    /**
+     * The shortest the dialog is ever made. Below this the tab body
+     * is a slit, and the answer on such a screen is a scroll bar
+     * rather than a dialog that has given up: the tab strip and the
+     * action buttons still fit, which is what must never be lost.
+     */
+    static final int MINIMUM_CEILING = 320;
 
     private static String names(List<Component> components) {
         List<String> names = new ArrayList<>();

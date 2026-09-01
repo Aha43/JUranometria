@@ -58,19 +58,33 @@ A family is defined as one production symbol, so the mapping is a function by co
 | planetary | 1 (Planetary nebulae) | PN |
 | none | 0 | Nova, *, **, *Ass, Other |
 
+## The shape each family is taught by
+
+A family's exemplar is the chart's own painter given the family's own median proportions. The median is over every bundled row of that family recording both axes; the exemplar is that median rounded to a twentieth, and `DeepSkyVocabularyTest` re-measures the pack and fails if the two part company.
+
+| family | rows recording both axes | median minor/major | exemplar | tilt |
+|---|---:|---:|---:|---:|
+| Galaxies | 10,550 | 0.644 | 0.65 | 35° |
+| Open clusters | 192 | 0.933 | 0.95 | 0° |
+| Globular clusters | 97 | 1.000 | 1.00 | 0° |
+| Nebulae | 223 | 0.778 | 0.80 | 0° |
+| Planetary nebulae | 2 | 0.743 | 1.00 | 0° |
+
+Two of the five are round in the chart itself: the globular cluster's and the planetary nebula's painters take one axis and draw a circle, whatever the catalogue recorded. Open clusters measure 0.933, which at legend size is half a pixel. Only the galaxy is tilted - a tilted ellipse still reads as an ellipse, where a tilted box reads as a diamond, a shape the chart does not draw. Measured: tilting the box takes it from 64% to 59% of ink unshared with its nearest neighbour.
+
 ## What each symbol occupies at legend sizes
 
 Measured from the drawn pixels, not from the size asked for. `size` is the larger axis passed to `drawLegendSymbol`.
 
 | size | Galaxies | Open clusters | Globular clusters | Nebulae | Planetary nebulae |
 |---:|---|---|---|---|---|
-| 9 px | 10x10 px | 10x10 px | 10x10 px | 10x10 px | 16x16 px |
-| 11 px | 12x12 px | 12x12 px | 12x12 px | 12x12 px | 20x20 px |
-| 14 px | 15x15 px | 15x15 px | 15x15 px | 15x15 px | 24x24 px |
-| 18 px | 19x19 px | 19x19 px | 19x19 px | 19x19 px | 32x32 px |
-| 24 px | 25x25 px | 25x25 px | 25x25 px | 25x25 px | 42x42 px |
+| 9 px | 8x10 px | 10x10 px | 10x10 px | 8x10 px | 16x16 px |
+| 11 px | 10x12 px | 12x12 px | 12x12 px | 10x12 px | 20x20 px |
+| 14 px | 14x14 px | 14x15 px | 15x15 px | 12x15 px | 24x24 px |
+| 18 px | 16x18 px | 18x19 px | 19x19 px | 16x19 px | 32x32 px |
+| 24 px | 20x22 px | 24x25 px | 25x25 px | 20x25 px | 42x42 px |
 
-**The planetary nebula is the exception**, and it is the renderer's own doing: its four spokes reach 1.7 times its nominal radius, so it draws almost twice the box every other family draws. A legend row that reserved the size it asked for would clip the chart's own symbol. The other four overrun the asked-for size by a pixel, which is the one-pixel outline stroke.
+**The planetary nebula is the exception**, and it is the renderer's own doing: its four spokes reach 1.7 times its nominal radius, so it draws almost twice the box every other family draws. A legend row that reserved the size it asked for would clip the chart's own symbol. The round families overrun the asked-for size by the one pixel of their outline stroke; the galaxy and the nebula are narrower than they are tall, which is the whole point of giving them the family's own proportions.
 
 The mock-up draws its symbols at 11 px on a 22 px chip. The widest ink at that size is 20 px (the planetary nebula), so the chip holds every family with 2 px to spare.
 
@@ -80,11 +94,11 @@ Each family is drawn at a size and compared pixel by pixel against every other: 
 
 | size | Galaxies | Open clusters | Globular clusters | Nebulae | Planetary nebulae | nearest pair |
 |---:|---:|---:|---:|---:|---:|---:|
-| 9 px | 24% | 50% | 24% | 67% | 59% | 24% (Galaxies / Globular clusters) |
-| 11 px | 34% | 52% | 34% | 72% | 59% | 34% (Galaxies / Globular clusters) |
-| 14 px | 46% | 52% | 46% | 79% | 65% | 46% (Galaxies / Globular clusters) |
-| 18 px | 54% | 52% | 52% | 80% | 71% | 52% (Open clusters / Globular clusters) |
-| 24 px | 64% | 51% | 51% | 84% | 76% | 51% (Open clusters / Globular clusters) |
+| 9 px | 51% | 47% | 47% | 59% | 51% | 47% (Open clusters / Globular clusters) |
+| 11 px | 51% | 51% | 51% | 64% | 51% | 51% (Open clusters / Globular clusters) |
+| 14 px | 57% | 60% | 60% | 73% | 57% | 57% (Galaxies / Planetary nebulae) |
+| 18 px | 63% | 60% | 60% | 76% | 63% | 60% (Open clusters / Globular clusters) |
+| 24 px | 68% | 58% | 58% | 86% | 68% | 58% (Open clusters / Globular clusters) |
 
 ## The chart's ink on a dialog's ground
 
@@ -97,11 +111,45 @@ WCAG contrast ratios for the chart's own ink. **Direct** paints the symbol onto 
 | dark | #3c3f41 | outline grey 102 (all but nebulae) | 1.85:1 | 5.74:1 | 2.66:1 |
 | dark | #3c3f41 | nebula grey 150 | 3.59:1 | 2.96:1 | 1.92:1 |
 
-Three things follow, and only the third is a choice this gate is free to make:
+### As rendered, not as declared
 
-1. **The symbol must sit on paper.** In the dark theme the chart's outline grey scores 1.85:1 straight onto the panel - invisible - and 5.74:1 on the chart's own white. The chip is not decoration; it is the only way a dark dialog can show the chart's ink at all.
-2. **The nebula box is the chart's weakest mark**, at 2.96:1 even on paper. That is the chart's existing palette, not the legend's: the legend shows what the page draws, and changing the chart's ink would change the released rendering. It is recorded as a residual risk rather than quietly corrected in the legend.
-3. **A switched-off family does not fade its symbol.** Fading the chip to 45% drops it to 1.97:1 and 1.56:1 - below the floor, in the very state where a reader consults the legend to decide what to switch back on. The checkbox and its text take the platform's disabled styling; the symbol stays fully drawn, because it is information rather than a control.
+The colour a symbol is drawn in is not the colour that reaches the screen: a one-pixel stroke on a curve is antialiased across two, and both are paler than the ink. Measured on the chip the mock-up draws, at the size it draws it.
+
+| family | ink asked for | darkest pixel drawn | contrast, as drawn |
+|---|---|---|---:|
+| Galaxies | #666666 | #717171 | 4.88:1 |
+| Open clusters | #666666 | #666666 | 5.74:1 |
+| Globular clusters | #666666 | #666666 | 5.74:1 |
+| Nebulae | #969696 | #969696 | 2.96:1 |
+| Planetary nebulae | #666666 | #666666 | 5.74:1 |
+
+### The rule, stated once
+
+**Every mark in the legend clears 3:1 against the ground it is drawn on, as rendered.** One threshold, applied to every state - not to the rejected design only. Three things follow.
+
+1. **The symbol sits on paper.** In the dark theme the chart's outline grey scores 1.85:1 straight onto the panel - invisible - and 5.74:1 on the chart's own white. The chip is not decoration; it is the only way a dark dialog can show the chart's ink at all.
+2. **A switched-off family does not fade its symbol.** Fading the chip to 45% drops it to 1.97:1 and 1.56:1 - below the floor, in the very state where a reader consults the legend to decide what to switch back on. The checkbox and its text take the platform's disabled styling; the symbol stays fully drawn, because it is information rather than a control.
+3. **The nebula box does not clear the rule, so the ink changes.** At 2.96:1 nominal - and lower still as drawn - it fails the same threshold that rejected the fade, and the legend depends on it to teach and control a family. Rounding 2.96 up to 3 would be marking our own homework. The correction is costed below and assigned to #185.
+
+### The correction, costed
+
+| nebula grey | contrast on white | margin over 3:1 |
+|---:|---:|---:|
+| 150 (today) | 2.96:1 | -1% |
+| 148 | 3.03:1 | +1% |
+| 140 | 3.36:1 | +12% |
+| 132 **(proposed)** | 3.74:1 | +25% |
+| 128 | 3.95:1 | +32% |
+
+**Grey 132**, not the 148 that merely crosses the line. 148 clears 3:1 by one part in a hundred, which a different rasteriser, a fractional scale factor or a paler antialiased edge would eat; 132 clears it by a quarter, and stays visibly lighter than the 102 the other four symbols use, so the nebula box keeps the restraint it was given.
+
+The cost was measured rather than estimated: the ink was changed, every image regenerated, and the difference recorded.
+
+- `docs/reference/m31-stars.png` — **byte-identical**. The released default page draws no nebula box.
+- `docs/studies/chart-furniture/` — **six images change**: Crux, Orion and Sagittarius, with and without the magnitude key. Its `measurements.md` does not change; both greys count as ink.
+- `docs/studies/point-and-identify/` — no change.
+
+**This gate does not make that change.** It assigns it to #185, where the six study images are regenerated in the same commit that makes the legend depend on the box being visible.
 
 ## The source type survives the grouping
 
@@ -142,21 +190,23 @@ Left to right: galaxies, open clusters, globular clusters, nebulae, planetary ne
 
 Real Swing controls under the real application themes, shown in a real window - so keyboard focus is genuine focus and clipping is genuine clipping. Production options and the production dialog are untouched by this issue.
 
-| mock-up | theme | width | text | dialog | controls on the tab | cut off across | needs scrolling | focus ring |
-|---|---|---:|---:|---|---:|---:|---|---|
-| [deep-sky-tab](deep-sky-tab.png) | light | 420 px | 1.0x | 420x547 px | 12 | 0 | no | - |
-| [deep-sky-tab-dark](deep-sky-tab-dark.png) | dark | 420 px | 1.0x | 420x547 px | 12 | 0 | no | - |
-| [deep-sky-tab-narrow](deep-sky-tab-narrow.png) | light | 320 px | 1.0x | 320x603 px | 12 | 0 | no | - |
-| [deep-sky-tab-narrow-dark](deep-sky-tab-narrow-dark.png) | dark | 320 px | 1.0x | 320x603 px | 12 | 0 | no | - |
-| [deep-sky-tab-large-text](deep-sky-tab-large-text.png) | light | 420 px | 1.5x | 420x780 px | 12 | 0 | 2 rows | - |
-| [deep-sky-tab-large-text-dark](deep-sky-tab-large-text-dark.png) | dark | 420 px | 1.5x | 420x780 px | 12 | 0 | 2 rows | - |
-| [deep-sky-tab-master-off](deep-sky-tab-master-off.png) | light | 420 px | 1.0x | 420x547 px | 12 | 0 | no | - |
-| [deep-sky-tab-master-off-dark](deep-sky-tab-master-off-dark.png) | dark | 420 px | 1.0x | 420x547 px | 12 | 0 | no | - |
-| [deep-sky-tab-focus](deep-sky-tab-focus.png) | light | 420 px | 1.0x | 420x547 px | 12 | 0 | no | yes, on Globular clusters |
-| [deep-sky-tab-focus-dark](deep-sky-tab-focus-dark.png) | dark | 420 px | 1.0x | 420x547 px | 12 | 0 | no | yes, on Globular clusters |
-| [tab-stars](tab-stars.png) | light | 420 px | 1.0x | 420x547 px | 3 | 0 | no | - |
-| [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 420x547 px | 3 | 0 | no | - |
-| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 420x547 px | 3 | 0 | no | - |
+| mock-up | theme | width | text | usable screen | dialog | controls on the tab | cut off across | needs scrolling | OK, Cancel, Restore | focus ring |
+|---|---|---:|---:|---|---|---:|---:|---|---|---|
+| [deep-sky-tab](deep-sky-tab.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-dark](deep-sky-tab-dark.png) | dark | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-narrow](deep-sky-tab-narrow.png) | light | 320 px | 1.0x | 884 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-narrow-dark](deep-sky-tab-narrow-dark.png) | dark | 320 px | 1.0x | 884 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-large-text](deep-sky-tab-large-text.png) | light | 420 px | 1.5x | 884 px | 420x824 px | 12 | 0 | 2 rows | on screen, tab-reachable | - |
+| [deep-sky-tab-large-text-dark](deep-sky-tab-large-text-dark.png) | dark | 420 px | 1.5x | 884 px | 420x824 px | 12 | 0 | 2 rows | on screen, tab-reachable | - |
+| [deep-sky-tab-master-off](deep-sky-tab-master-off.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-master-off-dark](deep-sky-tab-master-off-dark.png) | dark | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-focus](deep-sky-tab-focus.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
+| [deep-sky-tab-focus-dark](deep-sky-tab-focus-dark.png) | dark | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
+| [deep-sky-tab-short-screen](deep-sky-tab-short-screen.png) | light | 420 px | 1.0x | 728 px (stood in for) | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-short-screen-large-text](deep-sky-tab-short-screen-large-text.png) | light | 420 px | 1.5x | 728 px (stood in for) | 420x668 px | 12 | 0 | 4 rows | on screen, tab-reachable | - |
+| [tab-stars](tab-stars.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
 
 The longest explanation is **Nebulae**, at 172 characters, and it is in every mock-up above rather than in one of its own: the row that wraps worst is the row the narrow and the enlarged layouts have to survive.
 
@@ -172,6 +222,8 @@ Why each one exists:
 - `deep-sky-tab-master-off-dark` — master off, dark
 - `deep-sky-tab-focus` — keyboard focus on the third family
 - `deep-sky-tab-focus-dark` — keyboard focus, dark
+- `deep-sky-tab-short-screen` — on a 768 px display: does the reader still reach OK?
+- `deep-sky-tab-short-screen-large-text` — the worst case: a short screen and enlarged text
 
 ### Keyboard
 
