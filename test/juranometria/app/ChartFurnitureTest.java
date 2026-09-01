@@ -199,28 +199,67 @@ class ChartFurnitureTest {
     }
 
     @Test
-    void theKeySuppressesGridNotationOnlyWhileItDraws() {
-        // The same rule for the second piece of furniture: it draws
-        // opaque and last, so notation beneath it is omitted rather
-        // than half-covered - but only when it is actually drawn.
-        ChartScene scene = page();
-        java.awt.Rectangle key;
-        BufferedImage probe = new BufferedImage(1, 1,
-                BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = probe.createGraphics();
-        try {
-            key = RENDERER.magnitudeKeyBounds(
-                    g.getFontMetrics(ChartRenderer.labelFont()), scene);
-        } finally {
-            g.dispose();
+    void theKeyStandsClearOfTheGridsOwnLabels() {
+        // The claim worth making about the key and the grid, and the
+        // one an earlier version of this test did not make: they do
+        // not compete. Right-ascension labels run along the bottom
+        // and declination labels down the left, so the upper-right
+        // key covers none of them - which is why the placement was
+        // chosen. This fails if either the key or the labels move.
+        for (double[] where : new double[][] {{10.68, 41.27, 8.0},
+                {83.8, 0.0, 36.0}, {37.9, 89.26, 18.0},
+                {186.6, -60.0, 18.0}}) {
+            ChartScene scene = Atlas.assembler().assemble(
+                    new ChartViewState(new SkyPosition(where[0], where[1]),
+                            where[2], 8.0, null, null), 900, 700);
+            java.awt.Rectangle key;
+            BufferedImage probe = new BufferedImage(1, 1,
+                    BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = probe.createGraphics();
+            try {
+                key = RENDERER.magnitudeKeyBounds(
+                        g.getFontMetrics(ChartRenderer.labelFont()), scene);
+            } finally {
+                g.dispose();
+            }
+            var unreserved = juranometria.render.EquatorialGrid.gridFor(
+                    scene.viewport(), (java.awt.Rectangle) null);
+            var reserved = juranometria.render.EquatorialGrid.gridFor(
+                    scene.viewport(), null, key);
+            assertEquals(unreserved.labels().size(),
+                    reserved.labels().size(),
+                    "the key suppresses no grid label, because it stands"
+                            + " clear of them - at " + where[0] + ", "
+                            + where[1]);
         }
+    }
 
-        var withKey = juranometria.render.EquatorialGrid.gridFor(
-                scene.viewport(), null, key);
-        var withoutKey = juranometria.render.EquatorialGrid.gridFor(
-                scene.viewport(), null, null);
-        assertTrue(withoutKey.labels().size() >= withKey.labels().size(),
-                "the key can only ever suppress, never add");
+    @Test
+    void furnitureAnywhereOnThePageSuppressesTheLabelsBeneathIt() {
+        // The reservation itself, proved where it can actually bite:
+        // a box laid over the bottom edge, where the right-ascension
+        // labels run. The key's own slot in the reservation list is
+        // the one used, so what is tested is the path the key takes -
+        // not a claim that the key happens to overlap something,
+        // which on a real page it never does (sprint review).
+        ChartScene scene = page();
+        var unreserved = juranometria.render.EquatorialGrid.gridFor(
+                scene.viewport(), (java.awt.Rectangle) null);
+        java.awt.Rectangle overTheBottomEdge = new java.awt.Rectangle(
+                0, scene.viewport().heightPx() - 40,
+                scene.viewport().widthPx(), 40);
+
+        var reserved = juranometria.render.EquatorialGrid.gridFor(
+                scene.viewport(), null, overTheBottomEdge);
+
+        assertTrue(reserved.labels().size() < unreserved.labels().size(),
+                "furniture over the labels suppresses them: "
+                        + unreserved.labels().size() + " unreserved, "
+                        + reserved.labels().size() + " reserved");
+        assertEquals(unreserved.labels().size(),
+                juranometria.render.EquatorialGrid.gridFor(
+                        scene.viewport(), null, null).labels().size(),
+                "and reserving nothing suppresses nothing");
     }
 
     @Test

@@ -110,6 +110,19 @@ Three findings, all narrow and all real:
   calculation now serves both, and a regression builds a renderer
   with a larger-star policy and requires the published box to grow
   and the drawn circle to match that policy rather than the default.
+- **A test that could not fail** (the approval's non-blocking note,
+  acted on rather than filed). The key-versus-grid check asserted
+  that reserving the key suppresses no more labels than reserving
+  nothing - two numbers that are always equal, because the key sits
+  in the upper right while right-ascension labels run along the
+  bottom and declination labels down the left. Measured: the key
+  suppresses **0** grid labels on every page tried, while the title
+  block suppresses 1-3. It is replaced by two claims that can fail:
+  that the key *stands clear* of the grid's labels, which is why the
+  placement was chosen and which breaks if either moves, and that
+  furniture laid over the bottom edge really does suppress the
+  labels beneath it, exercising the key's own slot in the
+  reservation list.
 - **The study called grey ink "star or symbol ink."** It now renders
   a stars-and-symbols-only page and measures that, which raised the
   Orion figure from 290 px to 436 px; the decision and this handover
@@ -117,7 +130,7 @@ Three findings, all narrow and all real:
 
 ## Verification
 
-- **446 tests** on a display; headless, the display-dependent
+- **447 tests** on a display; headless, the display-dependent
   journeys abort visibly rather than fail.
 - **The M31 reference is byte-identical** and no study image changed,
   because the released default page did not change.
