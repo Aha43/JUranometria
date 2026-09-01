@@ -33,6 +33,7 @@ import juranometria.render.ChartRenderer;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -386,7 +387,18 @@ class MapExplorationJourneyTest {
             // only reach what a reader can see.
             searchFor("M31");
             zoomTo(8.0);
-            ChartRenderer.DrawnMark visibleSymbol = someDeepSky();
+            // Not the searched target: target honesty keeps a
+            // symbol-capable target drawn even with its layer off,
+            // so the target could never establish this premise. The
+            // stacking rule (#201) paints the largest symbol first,
+            // and on this page the largest is M 31 - which is the
+            // target - so the choice is made explicit rather than
+            // left to whichever mark happens to come first.
+            ChartRenderer.DrawnMark visibleSymbol = someDeepSkyOtherThanTarget();
+            assertNotEquals(chart.currentScene().targetIdentity(),
+                    visibleSymbol.deepSky().id(),
+                    "the premise: an ordinary symbol, not the target"
+                            + " the chart is obliged to keep drawing");
             ChartOptions all = options.options();
             SwingUtilities.invokeAndWait(() -> options.apply(
                     new ChartOptions(false, false, all.constellationFigures(),
@@ -779,6 +791,19 @@ class MapExplorationJourneyTest {
     private ChartRenderer.DrawnMark someDeepSky() {
         return marks().stream()
                 .filter(mark -> mark.deepSky() != null)
+                .filter(this::wellInside)
+                .findFirst().orElseThrow();
+    }
+
+    /**
+     * A deep-sky symbol that is not the chart's searched target, so
+     * hiding its family really does remove it.
+     */
+    private ChartRenderer.DrawnMark someDeepSkyOtherThanTarget() {
+        String target = chart.currentScene().targetIdentity();
+        return marks().stream()
+                .filter(mark -> mark.deepSky() != null)
+                .filter(mark -> !mark.deepSky().id().equals(target))
                 .filter(this::wellInside)
                 .findFirst().orElseThrow();
     }

@@ -9,6 +9,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Large deep-sky symbols no longer hide their smaller companions**
+  ([#201](https://github.com/Aha43/JUranometria/issues/201)). The
+  default Andromeda page named three galaxies and showed two: the
+  bundled rows arrive as NGC 205, NGC 221, NGC 224, and the galaxy
+  symbol fills opaquely, so M 31's 178-arcminute disc was painted last
+  and covered M 32 completely. Its label still drew, leaving a name
+  with no mark to attach it to. The renderer now paints deep-sky
+  symbols by one cartographic rule - the larger painted footprint goes
+  behind, ties broken by catalogue identity - measured from the drawn
+  axes so it neither turns with a rotated ellipse nor ignores the
+  practical-minimum clamp. Across 18 measured pages, storage order
+  fully buried 60 symbols; the rule leaves none. Decided at
+  [docs/decisions/deep-sky-stacking.md](docs/decisions/deep-sky-stacking.md).
+  `docs/reference/m31-stars.png` changes by 201 pixels, all of them
+  M 31's companions becoming visible.
+
 - A duplicate delivery of one tag push no longer leaves a red release
   run beside a correct release ([#195](https://github.com/Aha43/JUranometria/issues/195)).
   Releasing 1.3.0 produced two runs from a single `git push origin
