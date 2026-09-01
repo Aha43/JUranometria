@@ -227,6 +227,7 @@ public final class ChartOptionsDialog extends JDialog {
         // a dialog that rearranges itself under the reader.
         tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabs.getAccessibleContext().setAccessibleName("Chart options");
+        nameTabStripControls(tabs);
         tabs.addTab("Deep sky", scrolling(deepSkyTab(dsos, families, labels)));
         tabs.addTab("Stars", scrolling(column(starNames, bayerLetters,
                 flamsteedNumbers)));
@@ -286,6 +287,54 @@ public final class ChartOptionsDialog extends JDialog {
         panel.add(tabs, BorderLayout.CENTER);
         panel.add(buttons, BorderLayout.SOUTH);
         return panel;
+    }
+
+    /**
+     * Names the controls the scrolling tab layout adds for itself.
+     *
+     * <p>When the four titles do not fit - a narrow dialog, a larger
+     * font, a platform whose text is wider - the layout adds arrow
+     * buttons and a hidden-tabs button of its own, and they arrive
+     * with no accessible name at all. They are controls a reader can
+     * operate, so they must say what they do; and they come and go as
+     * the strip is resized, so the naming follows them rather than
+     * happening once.
+     *
+     * <p>Found by the accessibility surface test on Linux, where the
+     * titles need scrolling at a width that fits them on macOS.
+     */
+    private static void nameTabStripControls(JTabbedPane tabs) {
+        for (Component child : tabs.getComponents()) {
+            nameTabStripControl(child);
+        }
+        tabs.addContainerListener(new java.awt.event.ContainerAdapter() {
+            @Override
+            public void componentAdded(java.awt.event.ContainerEvent event) {
+                nameTabStripControl(event.getChild());
+            }
+        });
+    }
+
+    private static void nameTabStripControl(Component child) {
+        if (!(child instanceof javax.swing.AbstractButton button)) {
+            return;
+        }
+        String name;
+        if (child instanceof javax.swing.plaf.basic.BasicArrowButton arrow) {
+            int direction = arrow.getDirection();
+            name = direction == javax.swing.SwingConstants.WEST
+                    || direction == javax.swing.SwingConstants.NORTH
+                    ? "Show earlier tabs" : "Show later tabs";
+        } else {
+            name = "Show hidden tabs";
+        }
+        button.getAccessibleContext().setAccessibleName(name);
+        button.getAccessibleContext().setAccessibleDescription(
+                "The tab titles do not all fit; this brings the rest"
+                        + " into view");
+        if (button.getToolTipText() == null) {
+            button.setToolTipText(name);
+        }
     }
 
     /** The Deep sky tab: master, five families as legend and control. */
