@@ -3,7 +3,7 @@
 # the 1.0 contract publishes, each carrying the version it claims,
 # with their checksums written last.
 #
-#   scripts/release-artifacts.sh <version> <directory>
+#   scripts/release-artifacts.sh <version> <directory> <commit>
 #
 # Nothing is published unless this passes, so a missing cell, a
 # stray file, or an archive built from the wrong tree stops the
@@ -13,15 +13,23 @@
 # a check that accepts "1.2.30" for 1.2.3, or a stray file because
 # its name happens to be a substring of a real one, is not a check.
 #
+# Each image must also record THAT SOURCE COMMIT in its own
+# build-info.txt (#195 review). The duplicate-delivery guard compares
+# published releases by that commit, so it is part of the release
+# contract - and the argument is REQUIRED rather than optional,
+# because a check that can be skipped by omitting an argument is a
+# check that will eventually be skipped (#195 follow-up review).
+#
 #   0  the five artifacts are present, correctly named, and agree
 #   6  an artifact is missing, unexpected, or empty
-#   7  an artifact's contents do not carry this version
+#   7  an artifact's contents do not carry this version or commit
 set -eu
 
 version="${1:-}"
 directory="${2:-}"
-if [ -z "$version" ] || [ -z "$directory" ]; then
-    echo "usage: $0 <version> <directory>" >&2
+commit="${3:-}"
+if [ -z "$version" ] || [ -z "$directory" ] || [ -z "$commit" ]; then
+    echo "usage: $0 <version> <directory> <commit>" >&2
     exit 64
 fi
 cd "$directory"
@@ -84,6 +92,15 @@ for cell in macos-arm64 macos-x64 windows-x64 linux-x64; do
     stated="$(unzip -p "$artifact" "$entries" | head -1 | awk '{print $2}')"
     if [ "$stated" != "$version" ]; then
         echo "$artifact states version '$stated', not '$version'" >&2
+        exit 7
+    fi
+    # Read from the same single entry, for the same reason.
+    built="$(unzip -p "$artifact" "$entries" \
+        | awk '$1 == "source:" { print $2; found = 1; exit }
+               END { if (!found) print "absent"; }')"
+    if [ "$built" != "$commit" ]; then
+        echo "$artifact was built from source '$built'," \
+             "not '$commit'" >&2
         exit 7
     fi
 done

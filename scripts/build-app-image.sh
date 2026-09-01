@@ -84,9 +84,29 @@ case "$(uname -s)" in
         ;;
 esac
 
+# The exact source commit this image was packaged from (#195
+# review): the release contract's source-commit identity.
+# An identical portable archive proves the application code and its
+# bundled libraries match; it says nothing about the packaging
+# scripts or the runtime jlink trimmed, which can both change while
+# that archive stays byte-identical. The commit moves when any of
+# them does, so it - not a hash of one artifact - is what ties a
+# published release to a tree. Unknown when built outside a
+# checkout, which fails the release comparison closed.
+#
+# On a TAG PUSH - the only event that publishes - GITHUB_SHA is the
+# tag's own commit, the same value release-provenance.sh checks
+# against the annotated tag and origin/main. On a pull request it is
+# the ephemeral merge commit instead, so an image built by PR CI
+# names a commit that is on no branch. That is correct for what it
+# is: the tree that was actually packaged.
+commit="${GITHUB_SHA:-$(git -C "$root" rev-parse HEAD 2>/dev/null \
+    || echo unknown)}"
+
 # Record the pinned runtime and inputs beside the image.
 {
     echo "JUranometria $version (app-image; jpackage version label $appversion)"
+    echo "source: $commit"
     echo "built: from checked source, modules: $modules"
     echo "packager: $(jpackage --version) ($(uname -s) $(uname -m))"
     echo "runtime release:"

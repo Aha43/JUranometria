@@ -132,8 +132,12 @@ Pushing `vX.Y.Z` runs `.github/workflows/release.yml`, which does the rest
   smoke comparison. Nothing reaches publication that those checks did not pass.
 - **The set is verified before it is published.** `scripts/release-artifacts.sh`
   requires exactly the contract's five archives, refuses a stray file, checks
-  that each archive carries the version it is named for, and only then writes
-  `SHA256SUMS.txt`.
+  that each archive carries the version it is named for and that each
+  application image records the **source commit** it was packaged from, and
+  only then writes `SHA256SUMS.txt`. The commit argument is required, not
+  optional: the duplicate-delivery guard compares published releases by it, and
+  a check that can be skipped by omitting an argument will eventually be
+  skipped.
 - **Notes are assembled, not written.** `scripts/release-metadata.sh notes`
   emits the download table, the unsigned Gatekeeper/SmartScreen reality, the
   offline statement, this version's changelog section, and the licensing map

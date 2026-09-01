@@ -16,7 +16,11 @@
 #     Checked before anything is built, and checked AGAIN
 #     immediately before the draft is created, because a tag can be
 #     force-moved while a build runs.
-#  3. A public release is never assembled in stages. The release is
+#  3. An existing release for the tag is examined, not assumed
+#     (#195). One tag push can be DELIVERED twice; the loser of that
+#     race must finish green having done nothing, while a release
+#     this run did not build must still fail loudly.
+#  4. A public release is never assembled in stages. The release is
 #     created as a draft, every asset is uploaded and then read back
 #     from GitHub, and only a complete set is made public - so a
 #     failed upload leaves an invisible draft, not a public release
@@ -139,7 +143,7 @@ jobs:
              "staging/JUranometria-$VERSION-portable.zip"
           cp incoming/release-notes/release-notes.md staging/
       - name: Verify the set and write its checksums
-        run: scripts/release-artifacts.sh "$VERSION" staging
+        run: scripts/release-artifacts.sh "$VERSION" staging "$GITHUB_SHA"
       - uses: actions/upload-artifact@v6
         with:
           name: release-${{ needs.agreement.outputs.version }}
@@ -174,24 +178,55 @@ jobs:
             "refs/tags/$TAG:refs/tags/$TAG" \
             "refs/heads/main:refs/remotes/origin/main"
           scripts/release-provenance.sh "$TAG" "$GITHUB_SHA"
-      - name: Refuse to publish over an existing release
+      # An existing release for this tag is two different situations
+      # and only one of them is wrong (#195). GitHub delivered the
+      # v1.3.0 push twice; the second run refused, rightly, and left
+      # a red X on a correct release. Read the release back and let
+      # it say which case this is.
+      - name: Read back any release that already holds this tag
+        id: existing
         run: |
-          if gh release view "$TAG" \
-              --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            echo "::error::a release already exists for $TAG."
-            echo "Re-running cannot silently replace it. Delete that"
-            echo "release deliberately and re-run, or release a new"
-            echo "version. This run's verified artifacts are attached"
-            echo "to it as workflow artifacts."
+          mkdir -p published
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --json isDraft,assets > published/release.json 2>/dev/null
+          then
+            echo "no release holds $TAG; this run publishes it"
+            echo "benign=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # A draft is never adopted. It is unfinished work someone
+          # left behind - possibly a failed run of this very
+          # workflow - and completing it silently is precisely the
+          # surprise the draft-then-publish shape exists to prevent.
+          if [ "$(jq -r .isDraft published/release.json)" = true ]; then
+            echo "::error::a DRAFT release already exists for $TAG."
+            echo "A draft is unfinished work, not another delivery"
+            echo "of this push. Inspect it and delete it"
+            echo "deliberately, then re-run."
             exit 1
           fi
+          jq -r '.assets[].name' published/release.json \
+            > published/assets.txt
+          # Every asset, not a sample: a truncated or substituted
+          # archive keeps its name and its manifest line, so the
+          # only way to catch it is to fetch the bytes and hash
+          # them (#195 review). Best effort - what cannot be
+          # downloaded is diagnosed by the script, with the name of
+          # what is missing, rather than as an opaque failure here.
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --dir published || true
+          scripts/release-duplicate.sh "$VERSION" staging published \
+            "$GITHUB_SHA"
+          echo "benign=true" >> "$GITHUB_OUTPUT"
       - name: Create the release as a draft
+        if: steps.existing.outputs.benign != 'true'
         run: |
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
             --draft --verify-tag \
             --title "JUranometria $VERSION" \
             --notes-file staging/release-notes.md
       - name: Upload every asset
+        if: steps.existing.outputs.benign != 'true'
         run: |
           cd staging
           gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" \
@@ -202,6 +237,7 @@ jobs:
             JUranometria-"$VERSION"-portable.zip \
             SHA256SUMS.txt
       - name: Read the assets back before making anything public
+        if: steps.existing.outputs.benign != 'true'
         run: |
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" \
             --json assets --jq '.assets[].name' | sort > uploaded.txt
@@ -219,10 +255,29 @@ jobs:
           fi
           echo "all six assets present on the draft"
       - name: Make it public
+        if: steps.existing.outputs.benign != 'true'
         run: |
           gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" \
             --draft=false
           echo "published $TAG"
+      # The whole point of #195: a duplicate delivery finishes green
+      # and says why, so that a red run in this list always means
+      # something is actually wrong.
+      - name: Record the duplicate delivery
+        if: steps.existing.outputs.benign == 'true'
+        run: |
+          echo "::notice::$TAG was already published by another delivery of the same push; nothing to do, nothing changed."
+          {
+            echo "## $TAG was already published"
+            echo
+            echo "Another delivery of this same tag push published"
+            echo "it first. This run built and verified the same"
+            echo "release, read the published one back, and confirmed"
+            echo "the reproducible portable archive matches its own"
+            echo "byte for byte."
+            echo
+            echo "Nothing was uploaded, replaced or deleted."
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # A manual run ends here: everything was built and verified, and
   # this job cannot publish even if it wanted to - it holds read

@@ -7,6 +7,28 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- A duplicate delivery of one tag push no longer leaves a red release
+  run beside a correct release ([#195](https://github.com/Aha43/JUranometria/issues/195)).
+  Releasing 1.3.0 produced two runs from a single `git push origin
+  v1.3.0`; the guard serialised them, the first published, and the
+  second refused - correctly, since a release people may already have
+  downloaded is never silently replaced. The refusal is now two
+  answers rather than one. The publishing job reads the existing
+  release back and finishes green, having changed nothing, when that
+  release is this same delivery; a release it did not build still
+  fails, loudly, naming what differs. The identity is carried by the
+  portable archive, which `make dist` builds reproducibly from source
+  - the four native images cannot carry it, because jpackage does not
+  build them byte-identically across runners, as the two 1.3.0 runs
+  themselves demonstrated. Every published archive is downloaded and
+  hashed against the published checksums, so an archive substituted
+  under its own name is caught; and each application image now
+  records the **source commit** it was packaged from, which is what
+  notices a change in the packaging scripts or the bundled runtime
+  that an identical portable archive would not.
+
 ## [1.3.0] - 2026-09-01
 
 Sprint 21 — Read the deep sky. The chart has drawn five different
