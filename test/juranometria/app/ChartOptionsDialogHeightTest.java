@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The proposed Chart Options dialog fits the screen it opens on
- * (Sprint 21, issue #184; gate review P1).
+ * The Chart Options dialog fits the screen it opens on (Sprint 21,
+ * issues #184 and #185; gate review P1).
  *
  * <p>The first version of the gate capped the dialog at a constant
  * 780 px, measured on a tall display. On a 768 px screen with a
@@ -28,6 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * <p>So the ceiling is derived from the screen's usable bounds, and
  * these tests hold it to that on a screen this machine may not have.
+ * The theme these tests install is borrowed through
+ * {@link SwingSession}, which is held to giving it back by
+ * {@link SwingSessionTest}.
  */
 class ChartOptionsDialogHeightTest {
 
@@ -66,188 +69,7 @@ class ChartOptionsDialogHeightTest {
     void onAShortScreenTheActionButtonsStayReachable() throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "the dialog's height is a question about a real window");
-        restoringTheme(this::onAShortScreen);
-    }
-
-    @Test
-    void andItLeavesTheThemeAsItFoundIt() throws Exception {
-        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
-                "installing a look and feel needs a toolkit");
-        // The proof that the cleanup above is a restoration and not a
-        // preference. The trap is to end by applying the light theme,
-        // which passes every run that happened to start light and
-        // quietly hands the next test a session state nobody chose
-        // (Sprint 19 review). So this stands in for a session that was
-        // using the dark theme, and requires it back afterwards.
-        restoringTheme(() -> {
-            SwingUtilities.invokeAndWait(
-                    () -> juranometria.app.UiTheme.apply(true));
-            String stoodIn = UIManager.getLookAndFeel().getName();
-            float stoodInText = UIManager.getFont("Label.font").getSize2D();
-
-            restoringTheme(this::onAShortScreen);
-
-            assertEquals(stoodIn, UIManager.getLookAndFeel().getName(),
-                    "the dialog put back the theme it found");
-            assertEquals(stoodInText,
-                    UIManager.getFont("Label.font").getSize2D(), 0.01f,
-                    "and left no enlarged font behind");
-        });
-    }
-
-    @Test
-    void andAFontSomeoneElseChoseComesBackExactly() throws Exception {
-        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
-                "installing a look and feel needs a toolkit");
-        // The other half of restoring: the dialog clears the
-        // `defaultFont` override on its way in, so a session that had
-        // set one would have had it deleted rather than given back.
-        // A font nobody would choose by accident, so passing cannot
-        // mean the look and feel happened to supply the same one.
-        javax.swing.plaf.FontUIResource distinctive =
-                new javax.swing.plaf.FontUIResource("Serif",
-                        java.awt.Font.BOLD, 21);
-        restoringTheme(() -> {
-            SwingUtilities.invokeAndWait(
-                    () -> UIManager.put("defaultFont", distinctive));
-
-            restoringTheme(this::onAShortScreen);
-
-            assertEquals(distinctive, UIManager.get("defaultFont"),
-                    "the override this session had chosen is back,"
-                            + " exactly");
-        });
-
-        // And the other direction: where nothing was chosen, nothing
-        // is invented. A freshly installed theme publishes a default
-        // font of its own, and reading the key cannot tell that apart
-        // from an override - both answer the same. What tells them
-        // apart is a change of theme: an override survives one and
-        // pins the font against it, and a theme's own value does not.
-        // Metal declares no default font, so it is the question put
-        // plainly.
-        restoringTheme(() -> {
-            SwingUtilities.invokeAndWait(
-                    () -> juranometria.app.UiTheme.apply(false));
-            assertNotNull(UIManager.get("defaultFont"),
-                    "the theme publishes a font of its own, which is"
-                            + " what makes this worth checking");
-
-            restoringTheme(this::onAShortScreen);
-
-            SwingUtilities.invokeAndWait(() -> {
-                try {
-                    UIManager.setLookAndFeel(
-                            new javax.swing.plaf.metal.MetalLookAndFeel());
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            });
-            assertNull(UIManager.get("defaultFont"),
-                    "an override invented by the cleanup would have"
-                            + " survived this change of theme");
-        });
-    }
-
-    @Test
-    void andSoDoesAChosenFontThatMatchesTheThemeAnyway() throws Exception {
-        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
-                "installing a look and feel needs a toolkit");
-        // The case a value comparison cannot see: a session that
-        // chose the font the theme was already using. It reads back
-        // identically to no choice at all - and it is still a choice,
-        // because it outlives the theme it was made under, which is
-        // exactly what choosing it was for.
-        restoringTheme(() -> {
-            SwingUtilities.invokeAndWait(
-                    () -> juranometria.app.UiTheme.apply(false));
-            java.awt.Font themes =
-                    (java.awt.Font) UIManager.get("defaultFont");
-            javax.swing.plaf.FontUIResource sameButChosen =
-                    new javax.swing.plaf.FontUIResource(themes.getFamily(),
-                            themes.getStyle(), themes.getSize());
-            assertEquals(themes, sameButChosen,
-                    "the point of this test: the chosen font and the"
-                            + " theme's are equal");
-            SwingUtilities.invokeAndWait(
-                    () -> UIManager.put("defaultFont", sameButChosen));
-
-            restoringTheme(this::onAShortScreen);
-
-            SwingUtilities.invokeAndWait(() -> {
-                try {
-                    UIManager.setLookAndFeel(
-                            new javax.swing.plaf.metal.MetalLookAndFeel());
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            });
-            assertEquals(sameButChosen, UIManager.get("defaultFont"),
-                    "a chosen font that matched the theme is still a"
-                            + " choice, and must survive a change of"
-                            + " theme");
-        });
-    }
-
-    /** Something a test does that disturbs the global look and feel. */
-    private interface Body {
-        void run() throws Exception;
-    }
-
-    /**
-     * Runs a body and puts the look and feel and default font back the
-     * way they were - whatever they were.
-     *
-     * <p>Opening the dialog installs both, and both are global to the
-     * JVM the whole suite shares. The state is captured before the
-     * body can fail, so a failure inside it cannot leak a theme into
-     * whatever runs next.
-     */
-    private static void restoringTheme(Body body) throws Exception {
-        javax.swing.LookAndFeel inherited = UIManager.getLookAndFeel();
-        Object inheritedFont = fontOverride();
-        try {
-            body.run();
-        } finally {
-            SwingUtilities.invokeAndWait(() -> {
-                // The look and feel first, then the exact override
-                // that was found - a font somebody chose, or nothing
-                // at all. Clearing it unconditionally, which is what
-                // this did at first, deletes a choice the session had
-                // made rather than restoring it.
-                if (inherited != null) {
-                    try {
-                        UIManager.setLookAndFeel(inherited);
-                    } catch (Exception e) {
-                        throw new IllegalStateException(
-                                "could not restore " + inherited.getName(),
-                                e);
-                    }
-                }
-                UIManager.put("defaultFont", inheritedFont);
-            });
-        }
-    }
-
-    /**
-     * The `defaultFont` somebody has chosen, or null when nobody has.
-     *
-     * <p>Reading the value cannot answer this: a look and feel
-     * publishes a default font of its own, and an override laid over
-     * it reads back the same way. Comparing values cannot answer it
-     * either, because a session is entitled to choose the font the
-     * theme already uses - that is still a choice, and it still
-     * outlives the theme it was made under.
-     *
-     * <p>What answers it is presence. {@code UIManager}'s own table
-     * holds overrides only; the look and feel's values live in tables
-     * behind it, and {@code containsKey} does not consult them.
-     * Nothing here is written, so asking costs nothing.
-     */
-    private static Object fontOverride() {
-        return UIManager.getDefaults().containsKey("defaultFont")
-                ? UIManager.get("defaultFont")
-                : null;
+        SwingSession.restoring(this::onAShortScreen);
     }
 
     /**

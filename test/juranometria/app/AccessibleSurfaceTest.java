@@ -92,13 +92,15 @@ class AccessibleSurfaceTest {
         List<String> unnamed = new ArrayList<>();
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-a11y-" + System.nanoTime());
-        javax.swing.LookAndFeel inherited =
-                javax.swing.UIManager.getLookAndFeel();
         try {
-            SwingUtilities.invokeAndWait(() -> {
-                // The application's own look and feel: the tab strip's
-                // controls are the look and feel's, so asking any
-                // other one proves nothing.
+            SwingSession.restoring(() -> SwingUtilities.invokeAndWait(() -> {
+                // The application's own look and feel: the tab
+                // strip's controls are the look and feel's, so asking
+                // any other one proves nothing. Installing it is a
+                // loan - SwingSession gives back both the theme and
+                // any default-font override the session had chosen,
+                // so this cannot hand the next test someone else's
+                // state (PR #188 review).
                 UiTheme.apply(false);
                 JComponent content = ChartOptionsDialog.content(
                         new ChartOptionsController(
@@ -123,18 +125,9 @@ class AccessibleSurfaceTest {
                 assertTrue(buttons > 0,
                         "the strip must actually need scrolling for"
                                 + " this to prove anything");
-            });
+            }));
         } finally {
             node.removeNode();
-            if (inherited != null) {
-                SwingUtilities.invokeAndWait(() -> {
-                    try {
-                        javax.swing.UIManager.setLookAndFeel(inherited);
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                });
-            }
         }
         assertEquals(List.of(), unnamed,
                 "the tab strip's own controls name themselves too");
