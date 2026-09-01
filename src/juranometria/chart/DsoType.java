@@ -2,9 +2,15 @@ package juranometria.chart;
 
 /**
  * Deep-sky object types the catalogue can carry, mapped from the OpenNGC
- * type tokens. The renderer currently draws a symbol only for
- * {@link #GALAXY}; other types load, search, and recenter, and receive
- * their chart symbols from docs/chart-conventions.md in a later issue.
+ * type tokens.
+ *
+ * <p>Fourteen of them draw one of the renderer's five symbols, in the
+ * five reader-facing families of
+ * docs/decisions/deep-sky-vocabulary.md; the other five - novae,
+ * stellar and double-star entries, associations, and OpenNGC's own
+ * unclassified rows - are deliberately drawn nothing, and still load,
+ * search and recenter. {@code ChartRenderer.symbolForType} is the one
+ * place that mapping lives.
  */
 public enum DsoType {
     GALAXY("G"),

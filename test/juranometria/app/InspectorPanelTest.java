@@ -158,6 +158,34 @@ class InspectorPanelTest {
     }
 
     @Test
+    void theInspectorNamesTheTypeEvenWhenTheChartGroupsIt() {
+        // Sprint 21, issue #184: the chart draws a lone galaxy, a
+        // pair, a triplet and a group with one and the same ellipse.
+        // Grouping them for the reader's controls must not cost the
+        // Inspector the catalogue's own word for the object in front
+        // of them.
+        List<String> said = new java.util.ArrayList<>();
+        for (juranometria.chart.DsoType type : new juranometria.chart
+                .DsoType[] {juranometria.chart.DsoType.GALAXY,
+                juranometria.chart.DsoType.GALAXY_PAIR,
+                juranometria.chart.DsoType.GALAXY_TRIPLET,
+                juranometria.chart.DsoType.GALAXY_GROUP}) {
+            DeepSkyObject dso = new DeepSkyObject("NGC 0004", List.of(),
+                    type, new SkyPosition(1.0, 1.0), 2.0, 1.0, 0.0,
+                    9.0, 3, new DeepSkyObject.Recorded(2.0, 1.0, 0.0,
+                            DeepSkyObject.Recorded.Band.VISUAL));
+            assertEquals(juranometria.render.ChartRenderer.Symbol.ELLIPSE,
+                    juranometria.render.ChartRenderer.symbolFor(dso),
+                    "one family on the page");
+            said.add(InspectorPanel.readableType(dso));
+        }
+
+        assertEquals(List.of("galaxy", "galaxy pair", "galaxy triplet",
+                        "galaxy group"), said,
+                "and four distinct answers in the panel");
+    }
+
+    @Test
     void emptySkyIsAnAnswerWithCoordinates() throws Exception {
         Fixture fixture = fixture();
         fixture.model().selectEmptySky(new SkyPosition(11.0, 40.0));
