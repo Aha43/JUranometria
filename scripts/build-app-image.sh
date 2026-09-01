@@ -92,6 +92,13 @@ esac
 # them does, so it - not a hash of one artifact - is what ties a
 # published release to a tree. Unknown when built outside a
 # checkout, which fails the release comparison closed.
+#
+# On a TAG PUSH - the only event that publishes - GITHUB_SHA is the
+# tag's own commit, the same value release-provenance.sh checks
+# against the annotated tag and origin/main. On a pull request it is
+# the ephemeral merge commit instead, so an image built by PR CI
+# names a commit that is on no branch. That is correct for what it
+# is: the tree that was actually packaged.
 commit="${GITHUB_SHA:-$(git -C "$root" rev-parse HEAD 2>/dev/null \
     || echo unknown)}"
 
