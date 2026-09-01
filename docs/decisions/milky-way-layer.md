@@ -38,10 +38,28 @@ The chain, as far as it can be established:
 - d3-celestial is released under **BSD-3-Clause**. The licence names
   Olaf Frohn and speaks of "software".
 - The catalogue's own page (`skymap.com/milkyway_cat.htm`) is gone.
-  The Internet Archive's copy shows a **user-contributed catalogue,
-  submitted 16 March 2000**, whose instructions were in a
-  `ReadMe.txt` inside the download. That archive does not appear to be
-  preserved, so **what Vieira granted cannot be read**.
+  The Internet Archive's copy (captured 11 May 2000) shows a
+  **user-contributed catalogue**: *"Milky Way Outline Catalogs
+  (555kb)"*, contributor **Jose R. Vieira**, submitted **16 March
+  2000**, with the note that *"for full instructions, refer to the
+  `ReadMe.txt` file contained in the archive."* The page links the
+  download at `files/data_catalogs/milkyway.zip`.
+- **That archive is not preserved, and this was checked rather than
+  assumed.** The Wayback Machine's index holds **158 archived `.zip`
+  files from skymap.com**, and `milkyway.zip` is not among them —
+  no capture of that URL exists under any host spelling. The one
+  Milky Way archive that *is* preserved,
+  `files/overlays/milky.zip`, is a different contribution entirely:
+  a SkyMap Pro overlay by **Jarmo Moilanen**, dated August 2002,
+  tracing a single edge rather than five levels, and carrying no
+  licence of its own. No mirror of the Vieira archive was found
+  elsewhere; outside d3-celestial, the catalogue leaves no trace.
+
+  So **what Vieira granted cannot be read**, and on present evidence
+  it cannot be recovered from the record. The remaining routes are
+  people, not archives: the d3-celestial maintainer, and Vieira
+  himself — the contributor page preserves a contact address, 26
+  years old.
 
 So the honest description is: **conditionally acceptable as the
 d3-celestial distributed outline dataset.** The repository's explicit
