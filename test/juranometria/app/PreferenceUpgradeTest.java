@@ -114,6 +114,102 @@ class PreferenceUpgradeTest {
     }
 
     @Test
+    void aCompleteOneTwoStoreKeepsEveryChoiceAndGainsEveryFamily()
+            throws Exception {
+        // The upgrade that matters this sprint: a reader arriving
+        // from 1.2.0 has eleven keys and none of the five families,
+        // and must come back to the chart they left - which is every
+        // family drawn (Sprint 21, issue #185).
+        Preferences node = node();
+        try {
+            ChartOptionsStore store = ChartOptionsStore.forNode(node);
+            // Written the way 1.2.0 wrote it: the eleven keys it knew,
+            // and not one key more.
+            node.put("chart.deepSkyObjects", "true");
+            node.put("chart.deepSkyLabels", "false");
+            node.put("chart.constellationFigures", "false");
+            node.put("chart.constellationBoundaries", "true");
+            node.put("chart.constellationNames", "false");
+            node.put("chart.starNames", "true");
+            node.put("chart.bayerLetters", "false");
+            node.put("chart.flamsteedNumbers", "true");
+            node.put("chart.equatorialGrid", "false");
+            node.put("chart.titleBlock", "false");
+            node.put("chart.magnitudeKey", "true");
+
+            ChartOptions upgraded = store.load();
+
+            assertEquals(new ChartOptions(true, false, false, true, false,
+                            true, false, true, false, false, true),
+                    upgraded,
+                    "every 1.2.0 choice survives, and the families"
+                            + " arrive switched on");
+            assertTrue(upgraded.galaxies() && upgraded.openClusters()
+                            && upgraded.globularClusters()
+                            && upgraded.nebulae()
+                            && upgraded.planetaryNebulae(),
+                    "all five, so the upgraded chart is the chart"
+                            + " they had: " + upgraded);
+        } finally {
+            node.removeNode();
+        }
+    }
+
+    @Test
+    void eachFamilyRoundTripsOnItsOwn() throws Exception {
+        // Five independent choices, not one grouped setting: each is
+        // written, read back, and leaves the other four alone.
+        for (juranometria.render.SymbolFamily family
+                : juranometria.render.SymbolFamily.values()) {
+            Preferences node = node();
+            try {
+                ChartOptionsStore store = ChartOptionsStore.forNode(node);
+                ChartOptions chosen =
+                        ChartOptions.DEFAULTS.withFamily(family, false);
+                store.save(chosen);
+
+                ChartOptions loaded =
+                        ChartOptionsStore.forNode(node).load();
+                assertEquals(chosen, loaded,
+                        family + " round-trips on its own");
+                assertFalse(loaded.family(family),
+                        family + " came back switched off");
+                for (juranometria.render.SymbolFamily other
+                        : juranometria.render.SymbolFamily.values()) {
+                    if (other != family) {
+                        assertTrue(loaded.family(other),
+                                other + " was left alone");
+                    }
+                }
+            } finally {
+                node.removeNode();
+            }
+        }
+    }
+
+    @Test
+    void aDamagedFamilyKeyTakesItsReleasedDefault() throws Exception {
+        // The families are ordinary on-by-default flags, so anything
+        // but the literal "false" is the released chart.
+        Preferences node = node();
+        try {
+            node.put("chart.galaxies", "FALSE");
+            node.put("chart.openClusters", "0");
+            node.put("chart.globularClusters", "");
+            node.put("chart.nebulae", "  ");
+            node.put("chart.planetaryNebulae", "banana");
+
+            ChartOptions loaded = ChartOptionsStore.forNode(node).load();
+
+            assertEquals(ChartOptions.DEFAULTS, loaded,
+                    "a damaged family key draws its family, never a"
+                            + " launch failure: " + loaded);
+        } finally {
+            node.removeNode();
+        }
+    }
+
+    @Test
     void noStoredValueHoweverDamagedCanFailALaunch() throws Exception {
         Preferences node = node();
         try {

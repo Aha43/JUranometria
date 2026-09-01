@@ -1,6 +1,7 @@
 # Decision: the deep-sky symbol vocabulary, and tabbed Chart Options
 
-**Sprint 21, issue #184.** Status: proposed for review. Measured with
+**Sprint 21, issue #184.** Status: **accepted**, and implemented by
+#185. Measured with
 `make deep-sky-study` →
 [`docs/studies/deep-sky-vocabulary/`](../studies/deep-sky-vocabulary/).
 
@@ -194,9 +195,10 @@ every image regenerated, and the difference recorded:
 | `docs/studies/chart-furniture/` | **six images change** (Crux, Orion, Sagittarius, with and without the key); its `measurements.md` does not |
 | `docs/studies/point-and-identify/` | no change |
 
-**This gate does not make that change**, so the gate itself leaves
-rendering untouched. #185 makes it, regenerating those six images in
-the same commit that makes the legend depend on the box.
+**The gate did not make that change**, so the gate itself left
+rendering untouched. **#185 made it**, regenerating those six images
+in the same commit that made the legend depend on the box, with the
+reference page proved byte-identical.
 
 ## The dialog earns its tabs
 
@@ -255,15 +257,18 @@ answer to an action button off the screen, which is why the ceiling is
 applied to the *frame* and the scrolling happens inside it, below the
 tab strip and above the buttons.
 
-On the machine this study ran on, 886 px of usable screen gives an
-826 px ceiling. Reviewing that proves nothing about a short display,
-so the mock-ups include a dialog told to believe in **a 768 px screen
-with a 40 px taskbar** — 728 px usable, a 668 px ceiling — at ordinary
-and at enlarged text. In both, OK, Cancel and Restore Defaults are
-**on screen and reachable by Tab**, and the four rows that no longer
-fit are reached by scrolling. `DeepSkyDialogHeightTest` holds that
-same short screen, through the same code the study uses, and fails if
-the dialog outgrows it or the buttons leave it.
+Every picture in the study names the screen it assumes rather than
+reading this machine's: a number that changes when a dock hides
+itself is a study that cannot be reproduced. The ordinary pictures
+assume **900 px of usable screen**, giving an 840 px ceiling, and two
+more are told to believe in **a 768 px display with a 40 px taskbar**
+— 728 px usable, a 668 px ceiling — at ordinary and at enlarged text.
+In both of those, OK, Cancel and Restore Defaults are **on screen and
+reachable by Tab**, and the rows that no longer fit are reached by
+scrolling. The real screen's path is production's own, taken whenever
+the dialog opens; `ChartOptionsDialogHeightTest` drives that same code
+against the short screen and fails if the dialog outgrows it or the
+buttons leave it.
 
 ### Keyboard, and one inherited collision
 

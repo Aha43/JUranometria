@@ -40,18 +40,37 @@ cartographic judgement, not a photometric claim.
 
 ## Deep-sky symbols
 
-The first prototype needs only the types present around M31:
+Five marks, and every drawn object carries one of them:
 
-| Object | Initial symbol |
-|---|---|
-| Galaxy | Ellipse using apparent dimensions and position angle |
-| Open cluster | Broken or dotted circle |
-| Globular cluster | Circle with a central cross |
-| Nebula | Restrained outlined region or box |
-| Planetary nebula | Small crossed circle |
+| Symbol | Catalogue types it draws | Family a reader sees |
+|---|---|---|
+| Ellipse using apparent dimensions and position angle | galaxy, pair, triplet, group | **Galaxies** |
+| Broken or dotted circle | open cluster | **Open clusters** |
+| Circle with a central cross | globular cluster | **Globular clusters** |
+| Restrained outlined region or box | nebula, emission, reflection, dark, H II region, supernova remnant, cluster with nebulosity | **Nebulae** |
+| Small crossed circle | planetary nebula | **Planetary nebulae** |
 
 Symbols must remain legible when an object's true apparent size would be
 smaller than a practical minimum. That minimum is part of chart styling.
+
+From Sprint 21 the five symbols are also the reader's five
+**families**: one control each, in Chart Options → Deep sky, where
+each row carries the mark itself, drawn by the chart's own painter
+([the deep-sky vocabulary decision](decisions/deep-sky-vocabulary.md)).
+A family is defined as exactly one symbol, so grouping costs a reader
+nothing: the catalogue's own type survives untouched on every object
+and the Inspector still names it, saying "galaxy triplet" about a
+mark drawn as a plain ellipse.
+
+Types with no established symbol - stellar and double-star entries,
+associations, novae, and OpenNGC's unclassified rows - are drawn
+nothing, belong to no family, and have no control. They remain
+searchable, recentre the chart, and are titled honestly; the atlas
+never invents a mark to have something to switch off.
+
+The nebula box is drawn in grey 132 (raised from 150 in Sprint 21):
+still the quietest mark on the page, but clear of the 3:1 contrast
+floor that a mark a reader is asked to recognise has to meet.
 
 ## Constellation geography
 
@@ -88,12 +107,15 @@ exempt from thresholds and collisions, with no new symbol.
 From Sprint 12 the reader may hide layers (deep-sky symbols and
 labels, figures, boundaries, names, star names, Bayer letters and
 Flamsteed numbers each on their own, and the equatorial coordinate
-grid)
-through View > Chart Options; an enabled layer still obeys every
-rule above, and a searched target
-with an established symbol is always drawn and labelled whatever the
-choices - the chart never titles itself by an object it hides
-([the chart-options decision](decisions/chart-options.md)).
+grid) through View > Chart Options; from Sprint 20 the title block
+and the stellar-magnitude key; and from Sprint 21 each of the five
+deep-sky families on its own, beneath the deep-sky master. An
+enabled layer still obeys every rule above, a label never outlives
+the symbol it names, and a searched target with an established symbol
+is always drawn and labelled whatever the choices - the chart never
+titles itself by an object it hides
+([the chart-options decision](decisions/chart-options.md),
+[the deep-sky vocabulary decision](decisions/deep-sky-vocabulary.md)).
 
 ## Detail by scale
 

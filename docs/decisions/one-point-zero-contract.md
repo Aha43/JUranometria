@@ -122,11 +122,19 @@ About does not restate them.
   `appearance` and the `chart.*` option keys, plus the legacy
   `chart.starLabels` key that older releases wrote. **The count is
   deliberately no longer stated here**: it was written as seven,
-  corrected to nine by the #145 audit, and reached eleven when Sprint
-  20 made the chart furniture optional. What 1.0 promises is that
+  corrected to nine by the #145 audit, reached eleven when Sprint 20
+  made the chart furniture optional, and sixteen when Sprint 21 gave
+  each deep-sky family its own control. What 1.0 promises is that
   every key an earlier release wrote keeps its meaning and that a key
   a newer release adds takes its documented default - not that the
   set never grows.
+- **The deep-sky family keys** (Sprint 21): `chart.galaxies`,
+  `chart.openClusters`, `chart.globularClusters`, `chart.nebulae` and
+  `chart.planetaryNebulae` are ordinary on-by-default flags. A 1.2.0
+  store has none of them and upgrades into the chart it already had -
+  every family drawn - so an upgrade never hides anything a reader
+  was looking at. They are independent of each other and are
+  remembered while the deep-sky master is off.
 - **Every preference written by 0.13 through 0.17 loads into 1.0
   unchanged.** A key that a newer version added is absent in an older
   store and loads as its documented default; a missing, corrupt, or

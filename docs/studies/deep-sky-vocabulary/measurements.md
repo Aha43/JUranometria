@@ -107,49 +107,49 @@ WCAG contrast ratios for the chart's own ink. **Direct** paints the symbol onto 
 | theme | panel | ink | direct | on paper | faded to 45% |
 |---|---|---|---:|---:|---:|
 | light | #f2f2f2 | outline grey 102 (all but nebulae) | 5.13:1 | 5.74:1 | 1.97:1 |
-| light | #f2f2f2 | nebula grey 150 | 2.64:1 | 2.96:1 | 1.56:1 |
+| light | #f2f2f2 | nebula grey 132 | 3.34:1 | 3.74:1 | 1.70:1 |
 | dark | #3c3f41 | outline grey 102 (all but nebulae) | 1.85:1 | 5.74:1 | 2.66:1 |
-| dark | #3c3f41 | nebula grey 150 | 3.59:1 | 2.96:1 | 1.92:1 |
+| dark | #3c3f41 | nebula grey 132 | 2.84:1 | 3.74:1 | 2.17:1 |
 
 ### As rendered, not as declared
 
-The colour a symbol is drawn in is not the colour that reaches the screen: a one-pixel stroke on a curve is antialiased across two, and both are paler than the ink. Measured on the chip the mock-up draws, at the size it draws it.
+The colour a symbol is drawn in is not the colour that reaches the screen: a one-pixel stroke on a curve is antialiased across two, and both are paler than the ink. Measured on the chip the dialog draws, at the size it draws it - so the galaxy's curve comes back paler than the grey it was drawn in, while the nebula's straight edges do not.
 
-| family | ink asked for | darkest pixel drawn | contrast, as drawn |
-|---|---|---|---:|
-| Galaxies | #666666 | #717171 | 4.88:1 |
-| Open clusters | #666666 | #666666 | 5.74:1 |
-| Globular clusters | #666666 | #666666 | 5.74:1 |
-| Nebulae | #969696 | #969696 | 2.96:1 |
-| Planetary nebulae | #666666 | #666666 | 5.74:1 |
+| family | darkest pixel drawn | contrast, as drawn |
+|---|---|---:|
+| Galaxies | #717171 | 4.88:1 |
+| Open clusters | #666666 | 5.74:1 |
+| Globular clusters | #666666 | 5.74:1 |
+| Nebulae | #848484 | 3.74:1 |
+| Planetary nebulae | #666666 | 5.74:1 |
 
 ### The rule, stated once
 
 **Every mark in the legend clears 3:1 against the ground it is drawn on, as rendered.** One threshold, applied to every state - not to the rejected design only. Three things follow.
 
 1. **The symbol sits on paper.** In the dark theme the chart's outline grey scores 1.85:1 straight onto the panel - invisible - and 5.74:1 on the chart's own white. The chip is not decoration; it is the only way a dark dialog can show the chart's ink at all.
-2. **A switched-off family does not fade its symbol.** Fading the chip to 45% drops it to 1.97:1 and 1.56:1 - below the floor, in the very state where a reader consults the legend to decide what to switch back on. The checkbox and its text take the platform's disabled styling; the symbol stays fully drawn, because it is information rather than a control.
-3. **The nebula box does not clear the rule, so the ink changes.** At 2.96:1 nominal - and lower still as drawn - it fails the same threshold that rejected the fade, and the legend depends on it to teach and control a family. Rounding 2.96 up to 3 would be marking our own homework. The correction is costed below and assigned to #185.
+2. **A switched-off family does not fade its symbol.** Fading the chip to 45% drops it to 1.97:1 and 1.70:1 - below the floor, in the very state where a reader consults the legend to decide what to switch back on. The checkbox and its text take the platform's disabled styling; the symbol stays fully drawn, because it is information rather than a control.
+3. **The nebula box was the one mark that failed the rule, and its ink changed.** At grey 150 it scored 2.96:1 - under the same threshold that rejected the fade, in a mark the legend depends on to teach and control a family. Rounding 2.96 up to 3 would have been marking our own homework. #185 raised it to grey 132, measured here at 3.74:1.
 
-### The correction, costed
+### The correction, applied
 
 | nebula grey | contrast on white | margin over 3:1 |
 |---:|---:|---:|
-| 150 (today) | 2.96:1 | -1% |
+| 150 (before Sprint 21) | 2.96:1 | -1% |
 | 148 | 3.03:1 | +1% |
 | 140 | 3.36:1 | +12% |
-| 132 **(proposed)** | 3.74:1 | +25% |
+| 132 **(current)** | 3.74:1 | +25% |
 | 128 | 3.95:1 | +32% |
 
-**Grey 132**, not the 148 that merely crosses the line. 148 clears 3:1 by one part in a hundred, which a different rasteriser, a fractional scale factor or a paler antialiased edge would eat; 132 clears it by a quarter, and stays visibly lighter than the 102 the other four symbols use, so the nebula box keeps the restraint it was given.
+**Grey 132** was chosen, not the 148 that merely crosses the line. 148 clears 3:1 by one part in a hundred, which a different rasteriser, a fractional scale factor or a paler antialiased edge would eat; 132 clears it by a quarter, and stays visibly lighter than the 102 the other four symbols use, so the nebula box keeps the restraint it was given. `LegendContrastTest` holds the chart to it, and fails on either 150 or 148.
 
-The cost was measured rather than estimated: the ink was changed, every image regenerated, and the difference recorded.
+The cost was measured rather than estimated - the ink was changed, every image regenerated, and the difference recorded - and then paid in #185:
 
 - `docs/reference/m31-stars.png` — **byte-identical**. The released default page draws no nebula box.
-- `docs/studies/chart-furniture/` — **six images change**: Crux, Orion and Sagittarius, with and without the magnitude key. Its `measurements.md` does not change; both greys count as ink.
-- `docs/studies/point-and-identify/` — no change.
+- `docs/studies/chart-furniture/` — **six images changed**: Crux, Orion and Sagittarius, with and without the magnitude key. Its `measurements.md` did not; both greys count as ink.
+- `docs/studies/point-and-identify/` — no change at all.
 
-**This gate does not make that change.** It assigns it to #185, where the six study images are regenerated in the same commit that makes the legend depend on the box being visible.
+Those six images were regenerated in the commit that changed the ink, and the reference page was proved byte-identical.
 
 ## The source type survives the grouping
 
@@ -190,23 +190,23 @@ Left to right: galaxies, open clusters, globular clusters, nebulae, planetary ne
 
 Real Swing controls under the real application themes, shown in a real window - so keyboard focus is genuine focus and clipping is genuine clipping. Production options and the production dialog are untouched by this issue.
 
-| mock-up | theme | width | text | usable screen | dialog | controls on the tab | cut off across | needs scrolling | OK, Cancel, Restore | focus ring |
+| picture | theme | width | text | usable screen | dialog | controls on the tab | cut off across | needs scrolling | OK, Cancel, Restore | focus ring |
 |---|---|---:|---:|---|---|---:|---:|---|---|---|
-| [deep-sky-tab](deep-sky-tab.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-dark](deep-sky-tab-dark.png) | dark | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-narrow](deep-sky-tab-narrow.png) | light | 320 px | 1.0x | 886 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-narrow-dark](deep-sky-tab-narrow-dark.png) | dark | 320 px | 1.0x | 886 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-large-text](deep-sky-tab-large-text.png) | light | 420 px | 1.5x | 886 px | 420x826 px | 12 | 0 | 1 row | on screen, tab-reachable | - |
-| [deep-sky-tab-large-text-dark](deep-sky-tab-large-text-dark.png) | dark | 420 px | 1.5x | 886 px | 420x826 px | 12 | 0 | 1 row | on screen, tab-reachable | - |
-| [deep-sky-tab-master-off](deep-sky-tab-master-off.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-master-off-dark](deep-sky-tab-master-off-dark.png) | dark | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-focus](deep-sky-tab-focus.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
-| [deep-sky-tab-focus-dark](deep-sky-tab-focus-dark.png) | dark | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
-| [deep-sky-tab-short-screen](deep-sky-tab-short-screen.png) | light | 420 px | 1.0x | 728 px (stood in for) | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-short-screen-large-text](deep-sky-tab-short-screen-large-text.png) | light | 420 px | 1.5x | 728 px (stood in for) | 420x668 px | 12 | 0 | 4 rows | on screen, tab-reachable | - |
-| [tab-stars](tab-stars.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
-| [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
-| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab](deep-sky-tab.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-dark](deep-sky-tab-dark.png) | dark | 420 px | 1.0x | 900 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-narrow](deep-sky-tab-narrow.png) | light | 320 px | 1.0x | 900 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-narrow-dark](deep-sky-tab-narrow-dark.png) | dark | 320 px | 1.0x | 900 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-large-text](deep-sky-tab-large-text.png) | light | 420 px | 1.5x | 900 px | 420x840 px | 12 | 0 | 1 row | on screen, tab-reachable | - |
+| [deep-sky-tab-large-text-dark](deep-sky-tab-large-text-dark.png) | dark | 420 px | 1.5x | 900 px | 420x840 px | 12 | 0 | 1 row | on screen, tab-reachable | - |
+| [deep-sky-tab-master-off](deep-sky-tab-master-off.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-master-off-dark](deep-sky-tab-master-off-dark.png) | dark | 420 px | 1.0x | 900 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-focus](deep-sky-tab-focus.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
+| [deep-sky-tab-focus-dark](deep-sky-tab-focus-dark.png) | dark | 420 px | 1.0x | 900 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
+| [deep-sky-tab-short-screen](deep-sky-tab-short-screen.png) | light | 420 px | 1.0x | 728 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-short-screen-large-text](deep-sky-tab-short-screen-large-text.png) | light | 420 px | 1.5x | 728 px | 420x668 px | 12 | 0 | 4 rows | on screen, tab-reachable | - |
+| [tab-stars](tab-stars.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
 
 The longest explanation is **Nebulae**, at 172 characters, and it is in every mock-up above rather than in one of its own: the row that wraps worst is the row the narrow and the enlarged layouts have to survive.
 
@@ -249,7 +249,7 @@ Why each one exists:
 
 **No two controls on one tab share a letter**, which is the collision that would matter: a mnemonic only reaches the tab in front.
 
-Shared across tabs, harmlessly: F: Flamsteed numbers and Constellation figures. This pair collides **today**, in the single panel of the 1.2.0 dialog, where both controls are visible at once. Separating them onto different tabs is what makes each letter unambiguous - an inherited defect the tabs happen to fix, recorded here rather than left to be discovered.
+Shared across tabs, harmlessly: F: Flamsteed numbers and Constellation figures. This pair collided in the single panel of the 1.2.0 dialog, where both controls were visible at once and one of the two was unreachable by its own letter. Separating them onto different tabs is what makes each letter unambiguous.
 
 A mnemonic reaches only the controls on the tab in front, which is a property of tabs rather than of this design: pressing a family's letter while the Stars tab shows does nothing. Tabs are therefore reached the way tabs are reached - Control-Page Up and Control-Page Down, or the arrow keys once a tab has focus - and no meaning anywhere depends on the pointer.
 

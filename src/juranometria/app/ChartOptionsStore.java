@@ -44,7 +44,18 @@ public interface ChartOptionsStore {
                         // default is OFF, so a store that predates it
                         // - every 1.1.0 store - must not read as on
                         // (Sprint 20).
-                        offByDefaultFlag(node, "chart.magnitudeKey"));
+                        offByDefaultFlag(node, "chart.magnitudeKey"),
+                        // The five deep-sky families (Sprint 21).
+                        // Ordinary on-by-default flags: a 1.2.0 store
+                        // has none of these keys and must upgrade
+                        // into the chart it already had, which is
+                        // every family drawn
+                        // (docs/decisions/deep-sky-vocabulary.md).
+                        flag(node, "chart.galaxies"),
+                        flag(node, "chart.openClusters"),
+                        flag(node, "chart.globularClusters"),
+                        flag(node, "chart.nebulae"),
+                        flag(node, "chart.planetaryNebulae"));
             }
 
             @Override
@@ -71,6 +82,16 @@ public interface ChartOptionsStore {
                         Boolean.toString(options.titleBlock()));
                 node.put("chart.magnitudeKey",
                         Boolean.toString(options.magnitudeKey()));
+                node.put("chart.galaxies",
+                        Boolean.toString(options.galaxies()));
+                node.put("chart.openClusters",
+                        Boolean.toString(options.openClusters()));
+                node.put("chart.globularClusters",
+                        Boolean.toString(options.globularClusters()));
+                node.put("chart.nebulae",
+                        Boolean.toString(options.nebulae()));
+                node.put("chart.planetaryNebulae",
+                        Boolean.toString(options.planetaryNebulae()));
             }
         };
     }

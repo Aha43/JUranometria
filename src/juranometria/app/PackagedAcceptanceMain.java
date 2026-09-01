@@ -434,6 +434,106 @@ public final class PackagedAcceptanceMain {
                 + " key samples " + java.util.Arrays.toString(keySamples)
                 + ")");
 
+        // The five deep-sky families, inside the packaged image: each
+        // one hides its own marks and nobody else's, the master
+        // governs all five, and the family flags round-trip through
+        // the packaged preference store (Sprint 21, issue #185).
+        // No one page draws all five, so two do: Sagittarius carries
+        // the clusters, nebulae and planetaries, Orion the galaxies.
+        // Each family is then hidden on the page that actually draws
+        // it, because hiding what was not there proves nothing.
+        java.util.List<ChartScene> pages = java.util.List.of(
+                Atlas.assembler().assemble(new ChartViewState(
+                        new SkyPosition(271.0, -24.0), 18.0, 8.0, null,
+                        null), 900, 700),
+                Atlas.assembler().assemble(new ChartViewState(
+                        new SkyPosition(83.8, 0.0), 18.0, 8.0, null, null),
+                        900, 700));
+        java.util.List<String> hidden = new java.util.ArrayList<>();
+        for (juranometria.render.SymbolFamily family
+                : juranometria.render.SymbolFamily.values()) {
+            ChartScene crowded = pages.get(0);
+            for (ChartScene page : pages) {
+                if (marksByFamily(renderer, page, released)
+                        .getOrDefault(family.name(), 0)
+                        > marksByFamily(renderer, crowded, released)
+                                .getOrDefault(family.name(), 0)) {
+                    crowded = page;
+                }
+            }
+            java.util.Map<String, Integer> withAll =
+                    marksByFamily(renderer, crowded, released);
+            java.util.Map<String, Integer> without = marksByFamily(renderer,
+                    crowded, released.withFamily(family, false));
+            // The searched target is exempt and stays drawn, so what
+            // must go is every OTHER mark of that family. The home
+            // page names M 31, which is exactly the exemption at work
+            // rather than a leak.
+            int survivors = without.getOrDefault(family.name(), 0);
+            int exempt = targetOf(renderer, crowded,
+                    released.withFamily(family, false), family);
+            require(survivors == exempt,
+                    family + " switched off left " + survivors
+                            + " marks where only " + exempt
+                            + " target was exempt");
+            for (juranometria.render.SymbolFamily other
+                    : juranometria.render.SymbolFamily.values()) {
+                if (other != family) {
+                    require(withAll.getOrDefault(other.name(), 0)
+                                    == without.getOrDefault(other.name(), 0),
+                            "switching off " + family + " changed "
+                                    + other);
+                }
+            }
+            require(withAll.getOrDefault(family.name(), 0) > 0,
+                    "the page must draw " + family + " before hiding"
+                            + " it can prove anything");
+            hidden.add(family.label() + " "
+                    + withAll.getOrDefault(family.name(), 0) + "\u2192"
+                    + survivors);
+        }
+        Preferences familyNode = Preferences.userRoot()
+                .node("juranometria-acceptance-families");
+        try {
+            ChartOptionsStore familyStore =
+                    ChartOptionsStore.forNode(familyNode);
+            ChartOptions chosen = released.withFamily(
+                    juranometria.render.SymbolFamily.NEBULAE, false);
+            familyStore.save(chosen);
+            require(ChartOptionsStore.forNode(familyNode).load()
+                            .equals(chosen),
+                    "a family choice round-trips through the packaged"
+                            + " preference store");
+            // A store from before the families existed upgrades into
+            // the chart it already had.
+            familyNode.remove("chart.galaxies");
+            familyNode.remove("chart.openClusters");
+            familyNode.remove("chart.globularClusters");
+            familyNode.remove("chart.nebulae");
+            familyNode.remove("chart.planetaryNebulae");
+            ChartOptions upgraded =
+                    ChartOptionsStore.forNode(familyNode).load();
+            for (juranometria.render.SymbolFamily family
+                    : juranometria.render.SymbolFamily.values()) {
+                require(upgraded.family(family),
+                        "a 1.2.0 store upgrades with " + family + " on");
+            }
+        } finally {
+            familyNode.removeNode();
+        }
+        // And the exemption, on the page that names a target: the
+        // home page's own galaxy stays drawn with galaxies hidden.
+        int exemptAtHome = targetOf(renderer, furnished,
+                released.withFamily(
+                        juranometria.render.SymbolFamily.GALAXIES, false),
+                juranometria.render.SymbolFamily.GALAXIES);
+        require(exemptAtHome == 1,
+                "the searched target survives its family being hidden");
+        System.out.println("deep-sky families OK (" + String.join(", ",
+                hidden) + ", each leaving the others untouched; the"
+                + " named target still drawn with its own family"
+                + " hidden)");
+
         // Home: the journey ends on the page it started from,
         // rendered identically.
         navigation.reset();
@@ -445,6 +545,46 @@ public final class PackagedAcceptanceMain {
                         + " pixel");
         System.out.println("reader journey OK (ends on the reviewed"
                 + " default page)");
+    }
+
+    /** Whether the page's named target is a mark of this family. */
+    private static int targetOf(ChartRenderer renderer, ChartScene scene,
+                                ChartOptions options,
+                                juranometria.render.SymbolFamily family) {
+        if (scene.targetIdentity() == null) {
+            return 0;
+        }
+        for (ChartRenderer.DrawnMark mark
+                : renderer.drawnMarks(scene, options)) {
+            if (mark.deepSky() != null
+                    && scene.targetIdentity().equals(mark.deepSky().id())
+                    && juranometria.render.SymbolFamily.of(mark.deepSky())
+                            == family) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    /** The packaged renderer's own marks, counted by family. */
+    private static java.util.Map<String, Integer> marksByFamily(
+            ChartRenderer renderer, ChartScene scene,
+            ChartOptions options) {
+        java.util.Map<String, Integer> counts =
+                new java.util.HashMap<>();
+        for (ChartRenderer.DrawnMark mark
+                : renderer.drawnMarks(scene, options)) {
+            if (mark.deepSky() == null) {
+                continue;
+            }
+            juranometria.render.SymbolFamily family =
+                    juranometria.render.SymbolFamily.of(mark.deepSky());
+            require(family != null,
+                    "a drawn mark belongs to a family: "
+                            + mark.deepSky().id());
+            counts.merge(family.name(), 1, Integer::sum);
+        }
+        return counts;
     }
 
     /** A page rendered exactly as the window would draw it. */

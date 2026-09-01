@@ -81,6 +81,59 @@ class AccessibleSurfaceTest {
     }
 
     @Test
+    void theTabStripsOwnControlsNameThemselvesWhenTheyAppear()
+            throws Exception {
+        // The scrolling tab layout adds arrow buttons and a
+        // hidden-tabs button for itself when the four titles do not
+        // fit, and they arrive unnamed. On Linux they appear at the
+        // dialog's ordinary width; on macOS the titles fit and they
+        // do not - which is how this reached CI green locally. Laying
+        // the dialog out narrow forces them on any platform.
+        List<String> unnamed = new ArrayList<>();
+        Preferences node = Preferences.userRoot()
+                .node("juranometria-test-a11y-" + System.nanoTime());
+        try {
+            SwingSession.restoring(() -> SwingUtilities.invokeAndWait(() -> {
+                // The application's own look and feel: the tab
+                // strip's controls are the look and feel's, so asking
+                // any other one proves nothing. Installing it is a
+                // loan - SwingSession gives back both the theme and
+                // any default-font override the session had chosen,
+                // so this cannot hand the next test someone else's
+                // state (PR #188 review).
+                UiTheme.apply(false);
+                JComponent content = ChartOptionsDialog.content(
+                        new ChartOptionsController(
+                                ChartOptionsStore.forNode(node)),
+                        () -> { }, () -> { });
+                content.setSize(240, 500);
+                content.doLayout();
+                content.validate();
+                javax.swing.JTabbedPane tabs =
+                        ChartOptionsDialog.tabsOf(content);
+                int buttons = 0;
+                for (java.awt.Component child : tabs.getComponents()) {
+                    if (child instanceof javax.swing.AbstractButton button) {
+                        buttons++;
+                        String name = button.getAccessibleContext()
+                                .getAccessibleName();
+                        if (name == null || name.isBlank()) {
+                            unnamed.add(button.getClass().getSimpleName());
+                        }
+                    }
+                }
+                assertTrue(buttons > 0,
+                        "the strip must actually need scrolling for"
+                                + " this to prove anything");
+            }));
+        } finally {
+            node.removeNode();
+        }
+        assertEquals(List.of(), unnamed,
+                "the tab strip's own controls name themselves too");
+    }
+
+    @Test
     void everyControlTheReaderCanOperateCarriesAnAccessibleName()
             throws Exception {
         List<String> unnamed = new ArrayList<>();

@@ -22,6 +22,8 @@ import juranometria.chart.DsoType;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.SkyRegion;
 import juranometria.render.ChartRenderer;
+import juranometria.render.SymbolFamily;
+import juranometria.ui.SymbolChip;
 
 /**
  * The deep-sky vocabulary gate's evidence (Sprint 21, issue #184):
@@ -45,48 +47,14 @@ public final class DeepSkyVocabularyStudyMain {
             new File("docs/studies/deep-sky-vocabulary");
 
     /**
-     * A reader-facing family: the chart symbol it is, the name a
-     * reader sees, what it means, and objects they may know.
+     * The five families, read from production. The gate proposed
+     * them; #185 moved the words into {@link SymbolFamily} beside the
+     * symbols, so the dialog a reader sees, the chart that draws them
+     * and this study cannot come to differ.
      */
-    public record Family(ChartRenderer.Symbol symbol, String name,
-                         char mnemonic, String description,
-                         String examples) {
-    }
+    static final java.util.List<SymbolFamily> FAMILIES =
+            java.util.List.of(SymbolFamily.values());
 
-    /**
-     * The five proposed families. Each is named by <em>one</em>
-     * production symbol, which is what makes the proposal checkable:
-     * a family is exactly the set of catalogue types the renderer
-     * already draws the same way.
-     */
-    public static final List<Family> FAMILIES = List.of(
-            new Family(ChartRenderer.Symbol.ELLIPSE, "Galaxies", 'G',
-                    "Galaxies, drawn at their catalogued size and"
-                            + " orientation, including close pairs,"
-                            + " triplets and groups.",
-                    "M 31, M 51, NGC 3628"),
-            new Family(ChartRenderer.Symbol.DOTTED_CIRCLE,
-                    "Open clusters", 'O',
-                    "Loose clusters of young stars in the plane of the"
-                            + " Milky Way.",
-                    "M 45, M 44, NGC 869"),
-            new Family(ChartRenderer.Symbol.CROSSED_CIRCLE,
-                    "Globular clusters", 'C',
-                    "Dense, ancient balls of stars in the galactic"
-                            + " halo.",
-                    "M 13, M 22, NGC 5139"),
-            new Family(ChartRenderer.Symbol.BOX, "Nebulae", 'u',
-                    "Clouds of gas and dust: emission, reflection and"
-                            + " dark nebulae, H II regions, supernova"
-                            + " remnants, and clusters still wrapped in"
-                            + " nebulosity.",
-                    "M 42, M 1, NGC 7000"),
-            new Family(ChartRenderer.Symbol.PLANETARY,
-                    "Planetary nebulae", 'P',
-                    "Shells thrown off by dying stars, drawn small and"
-                            + " crossed so they read apart from the"
-                            + " other nebulae.",
-                    "M 57, M 27, NGC 7009"));
 
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
@@ -124,27 +92,6 @@ public final class DeepSkyVocabularyStudyMain {
         return all.stream().distinct().toList();
     }
 
-    /**
-     * A family's visible explanation: one sentence and its examples,
-     * which is also the control's accessible description, so the two
-     * cannot say different things.
-     */
-    public static String prose(Family family) {
-        return family.description() + " For example: "
-                + family.examples() + ".";
-    }
-
-    /** The family a type draws as, or null when it draws nothing. */
-    public static Family familyOf(DsoType type) {
-        ChartRenderer.Symbol symbol = ChartRenderer.symbolForType(type);
-        for (Family family : FAMILIES) {
-            if (family.symbol() == symbol) {
-                return family;
-            }
-        }
-        return null;
-    }
-
     /** Every source type, counted, with the family it draws as. */
     private static void census(List<DeepSkyObject> pack) {
         Map<DsoType, Integer> counts = new EnumMap<>(DsoType.class);
@@ -164,14 +111,14 @@ public final class DeepSkyVocabularyStudyMain {
                 + " chart symbol | reader-facing family |");
         System.out.println("|---|---|---:|---|---|");
         for (DsoType type : DsoType.values()) {
-            Family family = familyOf(type);
+            SymbolFamily family = SymbolFamily.of(type);
             System.out.printf(Locale.ROOT, "| `%s` | %s | %,d | %s | %s |%n",
                     type.openNgcToken(), readable(type), counts.get(type),
                     ChartRenderer.symbolForType(type)
                             .name().toLowerCase(Locale.ROOT)
                             .replace('_', ' '),
                     family == null ? "**none — deliberately undrawn**"
-                            : family.name());
+                            : family.label());
         }
         System.out.println();
         System.out.println("`Other` is OpenNGC's own word for a row it"
@@ -190,26 +137,26 @@ public final class DeepSkyVocabularyStudyMain {
     private static void reconciliation(List<DeepSkyObject> pack) {
         Map<String, Integer> rows = new LinkedHashMap<>();
         Map<String, Integer> types = new LinkedHashMap<>();
-        for (Family family : FAMILIES) {
-            rows.put(family.name(), 0);
-            types.put(family.name(), 0);
+        for (SymbolFamily family : FAMILIES) {
+            rows.put(family.label(), 0);
+            types.put(family.label(), 0);
         }
         int undrawn = 0;
         int undrawnTypes = 0;
         for (DeepSkyObject dso : pack) {
-            Family family = familyOf(dso.type());
+            SymbolFamily family = SymbolFamily.of(dso.type());
             if (family == null) {
                 undrawn++;
             } else {
-                rows.merge(family.name(), 1, Integer::sum);
+                rows.merge(family.label(), 1, Integer::sum);
             }
         }
         for (DsoType type : DsoType.values()) {
-            Family family = familyOf(type);
+            SymbolFamily family = SymbolFamily.of(type);
             if (family == null) {
                 undrawnTypes++;
             } else {
-                types.merge(family.name(), 1, Integer::sum);
+                types.merge(family.label(), 1, Integer::sum);
             }
         }
 
@@ -219,12 +166,12 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println("|---|---:|---:|");
         int drawable = 0;
         int drawableTypes = 0;
-        for (Family family : FAMILIES) {
+        for (SymbolFamily family : FAMILIES) {
             System.out.printf(Locale.ROOT, "| %s | %d | %,d |%n",
-                    family.name(), types.get(family.name()),
-                    rows.get(family.name()));
-            drawable += rows.get(family.name());
-            drawableTypes += types.get(family.name());
+                    family.label(), types.get(family.label()),
+                    rows.get(family.label()));
+            drawable += rows.get(family.label());
+            drawableTypes += types.get(family.label());
         }
         System.out.printf(Locale.ROOT,
                 "| **drawable** | **%d** | **%,d** |%n",
@@ -264,9 +211,9 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println("|---|---:|---|");
         for (ChartRenderer.Symbol symbol : ChartRenderer.Symbol.values()) {
             List<String> claiming = new ArrayList<>();
-            for (Family family : FAMILIES) {
+            for (SymbolFamily family : FAMILIES) {
                 if (family.symbol() == symbol) {
-                    claiming.add(family.name());
+                    claiming.add(family.label());
                 }
             }
             List<String> drawn = new ArrayList<>();
@@ -316,7 +263,7 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println("| family | rows recording both axes |"
                 + " median minor/major | exemplar | tilt |");
         System.out.println("|---|---:|---:|---:|---:|");
-        for (Family family : FAMILIES) {
+        for (SymbolFamily family : FAMILIES) {
             List<Double> ratios = new ArrayList<>();
             for (DeepSkyObject dso : pack) {
                 if (ChartRenderer.symbolFor(dso) != family.symbol()) {
@@ -332,7 +279,7 @@ public final class DeepSkyVocabularyStudyMain {
                     ChartRenderer.legendShapeFor(family.symbol());
             java.util.Collections.sort(ratios);
             System.out.printf(Locale.ROOT,
-                    "| %s | %,d | %s | %.2f | %.0f° |%n", family.name(),
+                    "| %s | %,d | %s | %.2f | %.0f° |%n", family.label(),
                     ratios.size(),
                     ratios.isEmpty() ? "-"
                             : String.format(Locale.ROOT, "%.3f",
@@ -370,8 +317,8 @@ public final class DeepSkyVocabularyStudyMain {
                 + " `drawLegendSymbol`.");
         System.out.println();
         System.out.print("| size |");
-        for (Family family : FAMILIES) {
-            System.out.printf(" %s |", family.name());
+        for (SymbolFamily family : FAMILIES) {
+            System.out.printf(" %s |", family.label());
         }
         System.out.println();
         System.out.print("|---:|");
@@ -381,7 +328,7 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println();
         for (int size : SIZES) {
             System.out.printf("| %d px |", size);
-            for (Family family : FAMILIES) {
+            for (SymbolFamily family : FAMILIES) {
                 java.awt.Rectangle ink = inkBounds(swatch(family, size, 60));
                 System.out.printf(Locale.ROOT, " %dx%d px |",
                         ink.width, ink.height);
@@ -402,9 +349,9 @@ public final class DeepSkyVocabularyStudyMain {
                 + " proportions.");
         System.out.println();
         int widest = 0;
-        for (Family family : FAMILIES) {
+        for (SymbolFamily family : FAMILIES) {
             java.awt.Rectangle ink = inkBounds(swatch(family,
-                    (int) DeepSkyVocabularyMockupMain.SYMBOL_PX, 60));
+                    (int) SymbolChip.SYMBOL_PX, 60));
             widest = Math.max(widest, Math.max(ink.width, ink.height));
         }
         System.out.printf(Locale.ROOT,
@@ -412,10 +359,10 @@ public final class DeepSkyVocabularyStudyMain {
                         + " chip. The widest ink at that size is %d px"
                         + " (the planetary nebula), so the chip holds"
                         + " every family with %d px to spare.%n%n",
-                DeepSkyVocabularyMockupMain.SYMBOL_PX,
-                DeepSkyVocabularyMockupMain.CHIP_PX, widest,
-                DeepSkyVocabularyMockupMain.CHIP_PX - widest);
-        if (widest > DeepSkyVocabularyMockupMain.CHIP_PX) {
+                SymbolChip.SYMBOL_PX,
+                SymbolChip.CHIP_PX, widest,
+                SymbolChip.CHIP_PX - widest);
+        if (widest > SymbolChip.CHIP_PX) {
             throw new IllegalStateException(
                     "the chip clips the chart's own symbol");
         }
@@ -434,8 +381,8 @@ public final class DeepSkyVocabularyStudyMain {
                 + " drawing the same shape would score 0%.");
         System.out.println();
         System.out.print("| size |");
-        for (Family family : FAMILIES) {
-            System.out.printf(" %s |", family.name());
+        for (SymbolFamily family : FAMILIES) {
+            System.out.printf(" %s |", family.label());
         }
         System.out.println(" nearest pair |");
         System.out.print("|---:|");
@@ -445,7 +392,7 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println();
         for (int size : SIZES) {
             List<BufferedImage> drawn = new ArrayList<>();
-            for (Family family : FAMILIES) {
+            for (SymbolFamily family : FAMILIES) {
                 drawn.add(swatch(family, size, 60));
             }
             System.out.printf("| %d px |", size);
@@ -464,8 +411,8 @@ public final class DeepSkyVocabularyStudyMain {
                     }
                     if (difference < worst) {
                         worst = difference;
-                        worstPair = FAMILIES.get(i).name() + " / "
-                                + FAMILIES.get(j).name();
+                        worstPair = FAMILIES.get(i).label() + " / "
+                                + FAMILIES.get(j).label();
                     }
                 }
                 System.out.printf(Locale.ROOT, " %.0f%% |", nearest);
@@ -496,10 +443,20 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println("| theme | panel | ink | direct | on paper |"
                 + " faded to 45% |");
         System.out.println("|---|---|---|---:|---:|---:|");
-        Color[] inks = {new Color(102, 102, 102), new Color(150, 150, 150)};
-        String[] inkNames = {"outline grey 102 (all but nebulae)",
-                "nebula grey 150"};
-        float alpha = DeepSkyVocabularyMockupMain.REJECTED_DISABLED_ALPHA;
+        // The inks are read from what the renderer actually drew, so
+        // this table cannot come to quote a palette the chart has
+        // stopped using.
+        Color outlineInk = darkest(swatch(SymbolFamily.GLOBULAR_CLUSTERS,
+                24, 60));
+        Color nebulaInk = darkest(swatch(SymbolFamily.NEBULAE, 24, 60));
+        Color[] inks = {outlineInk, nebulaInk};
+        String[] inkNames = {
+                "outline grey " + outlineInk.getRed()
+                        + " (all but nebulae)",
+                "nebula grey " + nebulaInk.getRed()};
+        // The fade the gate rejected, kept only so the study can
+        // keep pricing the alternative.
+        float alpha = 0.45f;
         // Kept so the conclusions below quote the figures this run
         // actually measured, rather than figures typed beside them.
         double darkDirect = 0.0;
@@ -561,17 +518,17 @@ public final class DeepSkyVocabularyStudyMain {
                         + " information rather than a control.%n",
                 alpha * 100.0, fadedOutline, fadedNebula);
         System.out.printf(Locale.ROOT,
-                "3. **The nebula box does not clear the rule, so the"
-                        + " ink changes.** At %.2f:1 nominal - and"
-                        + " lower still as drawn - it fails the same"
-                        + " threshold that rejected the fade, and the"
-                        + " legend depends on it to teach and control"
-                        + " a family. Rounding %.2f up to 3 would be"
-                        + " marking our own homework. The correction"
-                        + " is costed below and assigned to #185.%n",
-                nebulaOnPaper, nebulaOnPaper);
+                "3. **The nebula box was the one mark that failed the"
+                        + " rule, and its ink changed.** At grey 150 it"
+                        + " scored 2.96:1 - under the same threshold"
+                        + " that rejected the fade, in a mark the"
+                        + " legend depends on to teach and control a"
+                        + " family. Rounding 2.96 up to 3 would have"
+                        + " been marking our own homework. #185 raised"
+                        + " it to grey %d, measured here at %.2f:1.%n",
+                nebulaInk.getRed(), nebulaOnPaper);
         System.out.println();
-        correction();
+        correction(nebulaInk);
     }
 
     /**
@@ -586,21 +543,19 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println("The colour a symbol is drawn in is not the"
                 + " colour that reaches the screen: a one-pixel stroke"
                 + " on a curve is antialiased across two, and both are"
-                + " paler than the ink. Measured on the chip the"
-                + " mock-up draws, at the size it draws it.");
+                + " paler than the ink. Measured on the chip the dialog"
+                + " draws, at the size it draws it - so the galaxy's"
+                + " curve comes back paler than the grey it was drawn"
+                + " in, while the nebula's straight edges do not.");
         System.out.println();
-        System.out.println("| family | ink asked for | darkest pixel"
-                + " drawn | contrast, as drawn |");
-        System.out.println("|---|---|---|---:|");
-        for (Family family : FAMILIES) {
-            BufferedImage swatch = swatch(family,
-                    (int) DeepSkyVocabularyMockupMain.SYMBOL_PX, 60);
-            Color darkest = darkest(swatch);
-            Color asked = family.symbol() == ChartRenderer.Symbol.BOX
-                    ? new Color(150, 150, 150) : new Color(102, 102, 102);
-            System.out.printf(Locale.ROOT,
-                    "| %s | %s | %s | %.2f:1 |%n", family.name(),
-                    hex(asked), hex(darkest),
+        System.out.println("| family | darkest pixel drawn |"
+                + " contrast, as drawn |");
+        System.out.println("|---|---|---:|");
+        for (SymbolFamily family : FAMILIES) {
+            Color darkest = darkest(swatch(family,
+                    (int) SymbolChip.SYMBOL_PX, 60));
+            System.out.printf(Locale.ROOT, "| %s | %s | %.2f:1 |%n",
+                    family.label(), hex(darkest),
                     ratio(darkest, Color.WHITE));
         }
         System.out.println();
@@ -622,53 +577,65 @@ public final class DeepSkyVocabularyStudyMain {
 
     /**
      * The nebula ink the rule requires, and exactly what changing it
-     * costs. Costed here so the decision can assign it rather than
-     * either shipping under the threshold or quietly repainting the
-     * chart inside a design gate.
+     * cost. The gate costed it and assigned it; #185 paid it, rather
+     * than either shipping under the threshold or quietly repainting
+     * the chart inside a design gate.
+     *
+     * <p>Which row is the current ink is read from what the renderer
+     * drew, not written here: a label saying "proposed" outlived the
+     * proposal once already (PR #188 review).
      */
-    private static void correction() {
-        System.out.println("### The correction, costed");
+    private static void correction(Color nebulaInk) {
+        System.out.println("### The correction, applied");
         System.out.println();
         System.out.println("| nebula grey | contrast on white |"
                 + " margin over 3:1 |");
         System.out.println("|---:|---:|---:|");
-        for (int grey : new int[] {150, 148, 140, 132, 128}) {
+        java.util.TreeSet<Integer> greys = new java.util.TreeSet<>(
+                java.util.List.of(150, 148, 140, 132, 128));
+        greys.add(nebulaInk.getRed());
+        for (int grey : greys.descendingSet()) {
             double contrast = ratio(new Color(grey, grey, grey),
                     Color.WHITE);
             System.out.printf(Locale.ROOT,
                     "| %d%s | %.2f:1 | %+.0f%% |%n", grey,
-                    grey == 150 ? " (today)"
-                            : grey == 132 ? " **(proposed)**" : "",
+                    grey == nebulaInk.getRed() ? " **(current)**"
+                            : grey == 150 ? " (before Sprint 21)" : "",
                     contrast, 100.0 * (contrast - 3.0) / 3.0);
         }
         System.out.println();
-        System.out.println("**Grey 132**, not the 148 that merely"
-                + " crosses the line. 148 clears 3:1 by one part in a"
-                + " hundred, which a different rasteriser, a fractional"
-                + " scale factor or a paler antialiased edge would eat;"
-                + " 132 clears it by a quarter, and stays visibly"
-                + " lighter than the 102 the other four symbols use, so"
-                + " the nebula box keeps the restraint it was given.");
+        System.out.printf(Locale.ROOT,
+                "**Grey %d** was chosen, not the 148 that merely"
+                        + " crosses the line. 148 clears 3:1 by one"
+                        + " part in a hundred, which a different"
+                        + " rasteriser, a fractional scale factor or a"
+                        + " paler antialiased edge would eat; %d clears"
+                        + " it by a quarter, and stays visibly lighter"
+                        + " than the 102 the other four symbols use, so"
+                        + " the nebula box keeps the restraint it was"
+                        + " given. `LegendContrastTest` holds the chart"
+                        + " to it, and fails on either 150 or 148.%n",
+                nebulaInk.getRed(), nebulaInk.getRed());
         System.out.println();
         System.out.println("The cost was measured rather than"
-                + " estimated: the ink was changed, every image"
-                + " regenerated, and the difference recorded.");
+                + " estimated - the ink was changed, every image"
+                + " regenerated, and the difference recorded - and then"
+                + " paid in #185:");
         System.out.println();
         System.out.println("- `docs/reference/m31-stars.png` — **byte-"
                 + "identical**. The released default page draws no"
                 + " nebula box.");
         System.out.println("- `docs/studies/chart-furniture/` — **six"
-                + " images change**: Crux, Orion and Sagittarius, with"
+                + " images changed**: Crux, Orion and Sagittarius, with"
                 + " and without the magnitude key. Its"
-                + " `measurements.md` does not change; both greys count"
-                + " as ink.");
+                + " `measurements.md` did not; both greys count as"
+                + " ink.");
         System.out.println("- `docs/studies/point-and-identify/` — no"
-                + " change.");
+                + " change at all.");
         System.out.println();
-        System.out.println("**This gate does not make that change.** It"
-                + " assigns it to #185, where the six study images are"
-                + " regenerated in the same commit that makes the"
-                + " legend depend on the box being visible.");
+        System.out.println("Those six images were regenerated in the"
+                + " commit that changed the ink, and the reference page"
+                + " was proved byte-identical.");
         System.out.println();
     }
 
@@ -735,10 +702,10 @@ public final class DeepSkyVocabularyStudyMain {
             if (example == null) {
                 continue;
             }
-            Family family = familyOf(type);
+            SymbolFamily family = SymbolFamily.of(type);
             System.out.printf(Locale.ROOT, "| %s | `%s` | %s | %s |%n",
                     example.id(), type.openNgcToken(),
-                    family == null ? "nothing" : family.name(),
+                    family == null ? "nothing" : family.label(),
                     type == DsoType.OTHER ? "type not classified"
                             : readable(type));
         }
@@ -752,7 +719,7 @@ public final class DeepSkyVocabularyStudyMain {
     }
 
     /** One family's symbol on a square of the chart's paper. */
-    static BufferedImage swatch(Family family, int sizePx, int boxPx) {
+    static BufferedImage swatch(SymbolFamily family, int sizePx, int boxPx) {
         BufferedImage image = new BufferedImage(boxPx, boxPx,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
@@ -761,22 +728,12 @@ public final class DeepSkyVocabularyStudyMain {
             g.fillRect(0, 0, boxPx, boxPx);
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            ChartRenderer.drawLegendSymbol(g, typeFor(family),
+            ChartRenderer.drawLegendSymbol(g, SymbolChip.exampleType(family),
                     boxPx / 2.0, boxPx / 2.0, sizePx);
         } finally {
             g.dispose();
         }
         return image;
-    }
-
-    /** A catalogue type that draws this family's symbol. */
-    public static DsoType typeFor(Family family) {
-        for (DsoType type : DsoType.values()) {
-            if (ChartRenderer.symbolForType(type) == family.symbol()) {
-                return type;
-            }
-        }
-        throw new IllegalStateException("no type draws " + family.symbol());
     }
 
     /** The share of inked pixels two swatches do not share. */
@@ -837,7 +794,7 @@ public final class DeepSkyVocabularyStudyMain {
                         RenderingHints.VALUE_ANTIALIAS_ON);
                 for (int i = 0; i < FAMILIES.size(); i++) {
                     ChartRenderer.drawLegendSymbol(g,
-                            typeFor(FAMILIES.get(i)),
+                            SymbolChip.exampleType(FAMILIES.get(i)),
                             cell / 2.0 + cell * i, cell / 2.0, size);
                 }
             } finally {
@@ -872,9 +829,9 @@ public final class DeepSkyVocabularyStudyMain {
             System.out.println(line);
         }
         System.out.println();
-        Family longest = FAMILIES.get(0);
-        for (Family family : FAMILIES) {
-            if (prose(family).length() > prose(longest).length()) {
+        SymbolFamily longest = FAMILIES.get(0);
+        for (SymbolFamily family : FAMILIES) {
+            if (family.prose().length() > longest.prose().length()) {
                 longest = family;
             }
         }
@@ -884,7 +841,7 @@ public final class DeepSkyVocabularyStudyMain {
                         + " than in one of its own: the row that wraps"
                         + " worst is the row the narrow and the"
                         + " enlarged layouts have to survive.%n%n",
-                longest.name(), prose(longest).length());
+                longest.label(), longest.prose().length());
         System.out.println("Why each one exists:");
         System.out.println();
         for (DeepSkyVocabularyMockupMain.Shot shot
