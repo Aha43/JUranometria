@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-01
+
+Sprint 21 — Read the deep sky. The chart has drawn five different
+deep-sky symbols since Sprint 6 and never said what any of them
+meant. Now each one is a family you can switch on and off, and the
+dialog that switches them is where you learn them. Decided at a
+measured gate
+([docs/decisions/deep-sky-vocabulary.md](docs/decisions/deep-sky-vocabulary.md))
+over all 13,371 bundled deep-sky rows, and reviewed at every step.
+
 ### Added
 
 - **The five deep-sky families are yours to choose.** Galaxies, open
