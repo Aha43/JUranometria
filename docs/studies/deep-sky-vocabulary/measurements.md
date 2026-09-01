@@ -135,19 +135,19 @@ The colour a symbol is drawn in is not the colour that reaches the screen: a one
 
 | nebula grey | contrast on white | margin over 3:1 |
 |---:|---:|---:|
-| 150 (today) | 2.96:1 | -1% |
+| 150 (before Sprint 21) | 2.96:1 | -1% |
 | 148 | 3.03:1 | +1% |
 | 140 | 3.36:1 | +12% |
-| 132 **(proposed)** | 3.74:1 | +25% |
+| 132 **(current)** | 3.74:1 | +25% |
 | 128 | 3.95:1 | +32% |
 
-**Grey 132**, not the 148 that merely crosses the line. 148 clears 3:1 by one part in a hundred, which a different rasteriser, a fractional scale factor or a paler antialiased edge would eat; 132 clears it by a quarter, and stays visibly lighter than the 102 the other four symbols use, so the nebula box keeps the restraint it was given.
+**Grey 132** was chosen, not the 148 that merely crosses the line. 148 clears 3:1 by one part in a hundred, which a different rasteriser, a fractional scale factor or a paler antialiased edge would eat; 132 clears it by a quarter, and stays visibly lighter than the 102 the other four symbols use, so the nebula box keeps the restraint it was given. `LegendContrastTest` holds the chart to it, and fails on either 150 or 148.
 
 The cost was measured rather than estimated - the ink was changed, every image regenerated, and the difference recorded - and then paid in #185:
 
 - `docs/reference/m31-stars.png` — **byte-identical**. The released default page draws no nebula box.
-- `docs/studies/chart-furniture/` — **six images change**: Crux, Orion and Sagittarius, with and without the magnitude key. Its `measurements.md` does not change; both greys count as ink.
-- `docs/studies/point-and-identify/` — no change.
+- `docs/studies/chart-furniture/` — **six images changed**: Crux, Orion and Sagittarius, with and without the magnitude key. Its `measurements.md` did not; both greys count as ink.
+- `docs/studies/point-and-identify/` — no change at all.
 
 Those six images were regenerated in the commit that changed the ink, and the reference page was proved byte-identical.
 

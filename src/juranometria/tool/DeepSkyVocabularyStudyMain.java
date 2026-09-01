@@ -528,7 +528,7 @@ public final class DeepSkyVocabularyStudyMain {
                         + " it to grey %d, measured here at %.2f:1.%n",
                 nebulaInk.getRed(), nebulaOnPaper);
         System.out.println();
-        correction();
+        correction(nebulaInk);
     }
 
     /**
@@ -577,33 +577,45 @@ public final class DeepSkyVocabularyStudyMain {
 
     /**
      * The nebula ink the rule requires, and exactly what changing it
-     * costs. Costed here so the decision can assign it rather than
-     * either shipping under the threshold or quietly repainting the
-     * chart inside a design gate.
+     * cost. The gate costed it and assigned it; #185 paid it, rather
+     * than either shipping under the threshold or quietly repainting
+     * the chart inside a design gate.
+     *
+     * <p>Which row is the current ink is read from what the renderer
+     * drew, not written here: a label saying "proposed" outlived the
+     * proposal once already (PR #188 review).
      */
-    private static void correction() {
+    private static void correction(Color nebulaInk) {
         System.out.println("### The correction, applied");
         System.out.println();
         System.out.println("| nebula grey | contrast on white |"
                 + " margin over 3:1 |");
         System.out.println("|---:|---:|---:|");
-        for (int grey : new int[] {150, 148, 140, 132, 128}) {
+        java.util.TreeSet<Integer> greys = new java.util.TreeSet<>(
+                java.util.List.of(150, 148, 140, 132, 128));
+        greys.add(nebulaInk.getRed());
+        for (int grey : greys.descendingSet()) {
             double contrast = ratio(new Color(grey, grey, grey),
                     Color.WHITE);
             System.out.printf(Locale.ROOT,
                     "| %d%s | %.2f:1 | %+.0f%% |%n", grey,
-                    grey == 150 ? " (today)"
-                            : grey == 132 ? " **(proposed)**" : "",
+                    grey == nebulaInk.getRed() ? " **(current)**"
+                            : grey == 150 ? " (before Sprint 21)" : "",
                     contrast, 100.0 * (contrast - 3.0) / 3.0);
         }
         System.out.println();
-        System.out.println("**Grey 132**, not the 148 that merely"
-                + " crosses the line. 148 clears 3:1 by one part in a"
-                + " hundred, which a different rasteriser, a fractional"
-                + " scale factor or a paler antialiased edge would eat;"
-                + " 132 clears it by a quarter, and stays visibly"
-                + " lighter than the 102 the other four symbols use, so"
-                + " the nebula box keeps the restraint it was given.");
+        System.out.printf(Locale.ROOT,
+                "**Grey %d** was chosen, not the 148 that merely"
+                        + " crosses the line. 148 clears 3:1 by one"
+                        + " part in a hundred, which a different"
+                        + " rasteriser, a fractional scale factor or a"
+                        + " paler antialiased edge would eat; %d clears"
+                        + " it by a quarter, and stays visibly lighter"
+                        + " than the 102 the other four symbols use, so"
+                        + " the nebula box keeps the restraint it was"
+                        + " given. `LegendContrastTest` holds the chart"
+                        + " to it, and fails on either 150 or 148.%n",
+                nebulaInk.getRed(), nebulaInk.getRed());
         System.out.println();
         System.out.println("The cost was measured rather than"
                 + " estimated - the ink was changed, every image"
@@ -614,12 +626,12 @@ public final class DeepSkyVocabularyStudyMain {
                 + "identical**. The released default page draws no"
                 + " nebula box.");
         System.out.println("- `docs/studies/chart-furniture/` — **six"
-                + " images change**: Crux, Orion and Sagittarius, with"
+                + " images changed**: Crux, Orion and Sagittarius, with"
                 + " and without the magnitude key. Its"
-                + " `measurements.md` does not change; both greys count"
-                + " as ink.");
+                + " `measurements.md` did not; both greys count as"
+                + " ink.");
         System.out.println("- `docs/studies/point-and-identify/` — no"
-                + " change.");
+                + " change at all.");
         System.out.println();
         System.out.println("Those six images were regenerated in the"
                 + " commit that changed the ink, and the reference page"
