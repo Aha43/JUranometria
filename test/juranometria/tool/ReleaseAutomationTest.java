@@ -429,6 +429,229 @@ class ReleaseAutomationTest {
     }
 
 
+
+    // ------------------------------------------------------------------
+    // The duplicate delivery of issue #195. GitHub delivered the
+    // v1.3.0 tag push twice, a second apart; the loser refused to
+    // publish and left a red X on a release that was entirely
+    // correct. These fixtures are that incident: the four native
+    // checksums below are the REAL ones the two runs produced, and
+    // they differ, because jpackage does not build byte-identically
+    // across runners. Only the portable archive - built by `make
+    // dist` with one fixed timestamp, sorted entries and zip -X -
+    // came out identical, which is why it and not the set carries
+    // the identity claim.
+
+    /** What run 33548294309 staged, and could not publish. */
+    private static final String[] MINE_NATIVE = {
+            "26624cffd34e7cea65b4b0e8ac6f7efaa792b1fb37d34691e4f9b7cec4b2910d",
+            "2335d53a12b5b48106b6740ac947ba88eed4260150adc75c70051f7d4164fed6",
+            "2ca329b0542d7d7298b349b8b845e61a0719e000eda7bcea462f1a80aecae16e",
+            "1678b265b643b55dc3c71f4c1ef5ee67688589cfd17ceb276bc39f8a6a108c17"};
+
+    /** What run 33548293832 published one second earlier. */
+    private static final String[] THEIRS_NATIVE = {
+            "205508c9c5d99af3ad8ca6b1eff3e41efb6b5390a7353ad04c67ebfacb23c5af",
+            "66ffd48d8e35918c516cddcfda2c8a554215154caf5b89235487daa2d6a79aa2",
+            "b05e58bef507aa9eb829dd7e3b9040fe05ce03e25a9ccbd44a87534ef1a9edb3",
+            "9e1abfe96698e1df4cc997670c351561e840f1b42797afb1a10e9eda39000d6b"};
+
+    private static final String[] CELLS = {
+            "macos-arm64", "macos-x64", "windows-x64", "linux-x64"};
+
+    private static final String V = "1.3.0";
+
+    private static String archive(String cell) {
+        return "JUranometria-" + V + "-" + cell + ".zip";
+    }
+
+    private static String sha256(Path file) throws Exception {
+        byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                .digest(Files.readAllBytes(file));
+        StringBuilder hex = new StringBuilder();
+        for (byte b : digest) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex.toString();
+    }
+
+    private static String manifest(String[] natives, String portableSum) {
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < CELLS.length; i++) {
+            text.append(natives[i]).append("  ")
+                    .append(archive(CELLS[i])).append("\n");
+        }
+        return text.append(portableSum).append("  ")
+                .append(archive("portable")).append("\n").toString();
+    }
+
+    /**
+     * The whole situation on disk: what this run staged, and what
+     * the workflow read back from the release that beat it. Returns
+     * the root; staging and published sit inside it.
+     */
+    private static Path delivery(String[] theirNatives,
+                                 boolean sameSource) throws Exception {
+        Path root = Files.createTempDirectory("duplicate");
+        Path staging = Files.createDirectory(root.resolve("staging"));
+        Path published = Files.createDirectory(root.resolve("published"));
+
+        // The one archive that is reproducible by construction. The
+        // published copy is a real file, hashed from its bytes.
+        portable(published.resolve(archive("portable")), V);
+        String theirs = sha256(published.resolve(archive("portable")));
+        String mine = sameSource ? theirs
+                : "0000000000000000000000000000000000000000000000000000000000000000";
+
+        Files.writeString(staging.resolve("SHA256SUMS.txt"),
+                manifest(MINE_NATIVE, mine));
+        Files.writeString(published.resolve("SHA256SUMS.txt"),
+                manifest(theirNatives, theirs));
+
+        StringBuilder assets = new StringBuilder();
+        for (String cell : CELLS) {
+            assets.append(archive(cell)).append("\n");
+        }
+        assets.append(archive("portable")).append("\n")
+                .append("SHA256SUMS.txt\n");
+        Files.writeString(published.resolve("assets.txt"), assets.toString());
+        return root;
+    }
+
+    private static Run duplicate(Path root) throws Exception {
+        return run("scripts/release-duplicate.sh", V,
+                root.resolve("staging").toString(),
+                root.resolve("published").toString());
+    }
+
+    @Test
+    void aDuplicateDeliveryOfOneTagPushFinishesWithNothingToDo()
+            throws Exception {
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-duplicate.sh")));
+        Path root = delivery(THEIRS_NATIVE, true);
+        try {
+            // The premise, and the reason the obvious check fails:
+            // this is a correct release whose four native archives
+            // genuinely do not match what this run built.
+            for (int i = 0; i < CELLS.length; i++) {
+                assertFalse(MINE_NATIVE[i].equals(THEIRS_NATIVE[i]),
+                        CELLS[i] + " must differ between the two runs,"
+                                + " or this fixture is not the incident");
+            }
+
+            Run verdict = duplicate(root);
+
+            assertEquals(0, verdict.status(),
+                    "a duplicate delivery must finish green: "
+                            + verdict.output());
+            assertTrue(verdict.output().contains("already released"),
+                    verdict.output());
+            assertTrue(verdict.output().contains("Nothing is uploaded"),
+                    "it must say it changed nothing: " + verdict.output());
+            assertTrue(verdict.output().contains("NOT compared"),
+                    "it must state what it did not compare: "
+                            + verdict.output());
+        } finally {
+            cleanUp(root);
+        }
+    }
+
+    @Test
+    void aReleaseBuiltFromOtherSourceStillFailsLoudly() throws Exception {
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-duplicate.sh")));
+        // Everything else identical to the benign case; only the
+        // reproducible archive disagrees. If this passed, the guard
+        // would have been traded away rather than sharpened.
+        Path root = delivery(THEIRS_NATIVE, false);
+        try {
+            Run verdict = duplicate(root);
+
+            assertEquals(8, verdict.status(),
+                    "a release this run did not build must fail: "
+                            + verdict.output());
+            assertTrue(verdict.output().contains("different source"),
+                    verdict.output());
+            assertTrue(verdict.output().contains("portable"),
+                    "it must name what differs: " + verdict.output());
+            assertTrue(verdict.output().contains("Nothing was uploaded"),
+                    "even failing, it must say nothing was touched: "
+                            + verdict.output());
+        } finally {
+            cleanUp(root);
+        }
+    }
+
+    @Test
+    void everyBrokenPublishedReleaseIsAConflictRatherThanADuplicate()
+            throws Exception {
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-duplicate.sh")));
+        // Each of these starts from the benign fixture and breaks
+        // exactly one thing, so the failure is attributable.
+        for (String what : List.of("missing-asset", "extra-asset",
+                "manifest-omits-an-archive", "manifest-lies",
+                "portable-not-downloaded", "no-manifest")) {
+            Path root = delivery(THEIRS_NATIVE, true);
+            try {
+                Path published = root.resolve("published");
+                Path assets = published.resolve("assets.txt");
+                Path theirs = published.resolve("SHA256SUMS.txt");
+                switch (what) {
+                    case "missing-asset" -> Files.writeString(assets,
+                            Files.readString(assets)
+                                    .replace(archive("linux-x64") + "\n", ""));
+                    case "extra-asset" -> Files.writeString(assets,
+                            Files.readString(assets) + "JUranometria.exe\n");
+                    case "manifest-omits-an-archive" -> Files.writeString(
+                            theirs, Files.readString(theirs)
+                                    .replace(archive("windows-x64"),
+                                            "something-else.zip"));
+                    case "manifest-lies" -> Files.writeString(theirs,
+                            manifest(THEIRS_NATIVE, "dead"
+                                    + "beef".repeat(14)));
+                    case "portable-not-downloaded" -> Files.delete(
+                            published.resolve(archive("portable")));
+                    case "no-manifest" -> Files.delete(theirs);
+                    default -> throw new IllegalStateException(what);
+                }
+
+                Run verdict = duplicate(root);
+
+                assertEquals(8, verdict.status(),
+                        what + " must be reported as a conflict: "
+                                + verdict.output());
+                assertTrue(verdict.output().contains("DIFFERENT release"),
+                        what + ": " + verdict.output());
+            } finally {
+                cleanUp(root);
+            }
+        }
+    }
+
+    @Test
+    void aRunThatStagedNothingIsItsOwnBugRatherThanAConflict()
+            throws Exception {
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-duplicate.sh")));
+        Path root = delivery(THEIRS_NATIVE, true);
+        try {
+            Files.delete(root.resolve("staging/SHA256SUMS.txt"));
+
+            Run verdict = duplicate(root);
+
+            // Distinguished deliberately: 9 says this run is broken,
+            // 8 says the published release is. Reporting a local bug
+            // as a conflict would send a reader to the wrong place.
+            assertEquals(9, verdict.status(), verdict.output());
+            assertFalse(verdict.output().contains("DIFFERENT release"),
+                    verdict.output());
+        } finally {
+            cleanUp(root);
+        }
+    }
+
     /**
      * An image carrying the real build-info.txt plus a decoy
      * elsewhere: reading every match at once would let the decoy
