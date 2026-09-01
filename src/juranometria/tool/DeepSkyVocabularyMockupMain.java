@@ -478,8 +478,7 @@ public final class DeepSkyVocabularyMockupMain {
         head.setLayout(new BoxLayout(head, BoxLayout.X_AXIS));
         head.setAlignmentX(0.0f);
         JCheckBox check = box(family.name(), family.mnemonic(), true,
-                family.description() + " For example: " + family.examples()
-                        + ".");
+                DeepSkyVocabularyStudyMain.prose(family));
         check.setEnabled(enabled);
         head.add(check);
         head.add(Box.createHorizontalStrut(6));
@@ -490,8 +489,7 @@ public final class DeepSkyVocabularyMockupMain {
         // The explanation wraps to the width it is actually given
         // (see rewrap), rather than to a fixed column that would
         // overflow a narrow dialog and waste a wide one.
-        String prose = family.description() + " For example: "
-                + family.examples() + ".";
+        String prose = DeepSkyVocabularyStudyMain.prose(family);
         JLabel explains = new JLabel(prose);
         explains.putClientProperty(WRAPPED_TEXT, prose);
         explains.setAlignmentX(0.0f);

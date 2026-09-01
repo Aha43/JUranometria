@@ -158,6 +158,8 @@ Real Swing controls under the real application themes, shown in a real window - 
 | [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 420x547 px | 3 | 0 | no | - |
 | [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 420x547 px | 3 | 0 | no | - |
 
+The longest explanation is **Nebulae**, at 172 characters, and it is in every mock-up above rather than in one of its own: the row that wraps worst is the row the narrow and the enlarged layouts have to survive.
+
 Why each one exists:
 
 - `deep-sky-tab` — the tab as a reader first meets it

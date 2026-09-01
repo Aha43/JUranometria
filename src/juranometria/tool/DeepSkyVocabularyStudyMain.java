@@ -123,6 +123,16 @@ public final class DeepSkyVocabularyStudyMain {
         return all.stream().distinct().toList();
     }
 
+    /**
+     * A family's visible explanation: one sentence and its examples,
+     * which is also the control's accessible description, so the two
+     * cannot say different things.
+     */
+    public static String prose(Family family) {
+        return family.description() + " For example: "
+                + family.examples() + ".";
+    }
+
     /** The family a type draws as, or null when it draws nothing. */
     public static Family familyOf(DsoType type) {
         ChartRenderer.Symbol symbol = ChartRenderer.symbolForType(type);
@@ -690,6 +700,19 @@ public final class DeepSkyVocabularyStudyMain {
             System.out.println(line);
         }
         System.out.println();
+        Family longest = FAMILIES.get(0);
+        for (Family family : FAMILIES) {
+            if (prose(family).length() > prose(longest).length()) {
+                longest = family;
+            }
+        }
+        System.out.printf(Locale.ROOT,
+                "The longest explanation is **%s**, at %d characters,"
+                        + " and it is in every mock-up above rather"
+                        + " than in one of its own: the row that wraps"
+                        + " worst is the row the narrow and the"
+                        + " enlarged layouts have to survive.%n%n",
+                longest.name(), prose(longest).length());
         System.out.println("Why each one exists:");
         System.out.println();
         for (DeepSkyVocabularyMockupMain.Shot shot
