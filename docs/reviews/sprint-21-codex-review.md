@@ -2,7 +2,8 @@
 
 **Reviewed:** PR #193 at `e02db41720a24991001c37a230a193470a25b3ad`  
 **Scope:** Sprint 21, issues #184–#186  
-**Verdict:** changes requested
+**Verdict:** changes requested — **resolved and approved** at
+`741c2d6` (see the follow-up at the end)
 
 Sprint 21's product design is strong. The gate derived five reader-facing families from the production symbols and exact catalogue counts; the implementation keeps filtering at one renderer composition seam; source types remain intact for the Inspector; old stores migrate to the chart they already had; the tabbed dialog teaches the same marks the chart draws; and the target exemption preserves the standing rule that a named, symbol-capable target remains visible. The gate and implementation reviews also converted several assumptions into durable evidence: production exemplar geometry, screen-relative sizing, as-rendered contrast, exact Swing-state restoration, and accessible tab-strip controls.
 
@@ -41,3 +42,34 @@ Create a fresh `ChartOptionsController` over a fresh store instance for the same
 ## Release recommendation
 
 The proposed minor release is appropriate once these closing-evidence gaps are fixed. Sprint 21 adds reader-visible controls and a documented palette adjustment without changing a 1.0 promise or the released default page. Do not merge PR #193, close milestone 21, or tag the release before the follow-up review.
+
+## Follow-up — approved
+
+**Reviewed:** PR #193 at `741c2d6`  
+**Verdict:** approved
+
+All three closing findings are properly resolved, all 12 checks are
+green, 485 tests pass, and the reference remains byte-identical. PR
+#193 may merge, milestone 21 may close, and a minor release is
+appropriate.
+
+What each finding cost, for the record:
+
+- **The label leg** now establishes its premises before acting — a
+  symbol-capable target and ordinary names actually on the page —
+  then requires every ordinary name to go and the target's to stay,
+  requires them all back, and hides the target's own family so one
+  action proves both halves. A label pass ignoring the family gate,
+  and a dropped target-label guarantee, each fail it.
+- **The packaged search** drives its returned `SearchResult` through
+  the production policy, which moved out of `SearchField` into
+  `SearchNavigation` so a headless run can take the same path a
+  reader's Enter takes. Losing the target identity, or recentring on
+  the wrong place, each fail the packaged run.
+- **The restart** crosses a real session boundary: a fresh
+  controller over a fresh store instance, feeding a fresh chart
+  component, with the answer asked of that component's own page.
+  Following that thread also showed the journey had been measuring
+  the controller's options rather than the chart's, so a consumer
+  that dropped the family flags would have gone unnoticed; it is
+  caught now.
