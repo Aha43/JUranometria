@@ -26,8 +26,22 @@ public final class AtlasToolbar extends JToolBar {
     private final JButton moreStars;
     private final JButton resetView;
     private final JLabel readout = new JLabel();
+    private javax.swing.JToggleButton inspectorButton;
 
-    public AtlasToolbar(ChartViewController controller, SearchField searchField) {
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField) {
+        this(controller, searchField, null);
+    }
+
+    /**
+     * The toolbar with the Inspector toggle (issue #180). The toggle
+     * is a shared switch, not a panel: the toolbar asks it to flip
+     * and is told what happened, so it never learns anything about
+     * windows, widths, or the inspector's lifecycle.
+     */
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField,
+                        InspectorToggle inspector) {
         setFloatable(false);
 
         zoomIn = iconButton("zoom-in", "Zoom in",
@@ -54,6 +68,22 @@ public final class AtlasToolbar extends JToolBar {
         addSeparator();
         add(resetView);
         addSeparator();
+        if (inspector != null) {
+            inspectorButton = new javax.swing.JToggleButton(
+                    new FlatSVGIcon("resources/icons/list-details.svg", 16, 16));
+            inspectorButton.setFocusable(true);
+            inspectorButton.getAccessibleContext().setAccessibleName(
+                    "Inspector");
+            inspectorButton.addActionListener(event -> {
+                // Ask, then let the answer come back through the
+                // shared switch: pressing does not decide the state.
+                inspector.toggle();
+                syncInspector(inspector.state());
+            });
+            inspector.onChange(this::syncInspector);
+            add(inspectorButton);
+            addSeparator();
+        }
         add(searchField);
         add(Box.createHorizontalGlue());
         add(readout);
@@ -63,6 +93,26 @@ public final class AtlasToolbar extends JToolBar {
         // coverage predicate, so a zoom that would leave the bundled data
         // is disabled rather than refused after the click.
         controller.onChange(state -> sync(controller, state));
+    }
+
+    /**
+     * The button says what is true: selected when the panel is
+     * showing, and disabled - never selected - when the window is too
+     * narrow to show it, so it cannot claim a panel that is not
+     * there.
+     */
+    private void syncInspector(InspectorToggle.State state) {
+        if (inspectorButton == null) {
+            return;
+        }
+        inspectorButton.setSelected(state.showing());
+        inspectorButton.setEnabled(state.available());
+        inspectorButton.setToolTipText(state.available()
+                ? (state.showing() ? "Hide the Inspector"
+                        : "Show the Inspector: what the selected mark is")
+                : "The window is too narrow to show the Inspector");
+        inspectorButton.getAccessibleContext().setAccessibleDescription(
+                inspectorButton.getToolTipText());
     }
 
     private void sync(ChartViewController controller, ChartViewState state) {

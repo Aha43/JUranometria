@@ -419,7 +419,16 @@ public final class ChartRenderer {
             projection.project(dso.position()).ifPresent(plane ->
                     drawLabel(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
         }
-        drawTitleBlock(g, scene);
+        // Furniture last and opaque, in the decided order (Sprint 20,
+        // docs/decisions/chart-furniture.md): neither block is ever
+        // half-covered by chart ink, and each is the reader's to
+        // switch off.
+        if (options.titleBlock()) {
+            drawTitleBlock(g, scene);
+        }
+        if (options.magnitudeKey()) {
+            drawMagnitudeKey(g, scene);
+        }
         g.setClip(null);
 
         g.setColor(FRAME);
@@ -614,9 +623,21 @@ public final class ChartRenderer {
                 scene.viewport().fieldWidthDegrees());
         java.util.List<StarLabelPlacement> placed = new java.util.ArrayList<>();
         java.util.List<Rectangle2D> occupied = new java.util.ArrayList<>();
-        java.awt.Rectangle titleBlock = titleBlockBounds(metrics, scene);
-        if (titleBlock != null) {
-            occupied.add(titleBlock);
+        // Labels yield to the furniture that will actually draw - to
+        // the title block as they always have, and now to the
+        // magnitude key on the same terms. Furniture the reader has
+        // switched off reserves nothing.
+        if (options.titleBlock()) {
+            java.awt.Rectangle titleBlock = titleBlockBounds(metrics, scene);
+            if (titleBlock != null) {
+                occupied.add(titleBlock);
+            }
+        }
+        if (options.magnitudeKey()) {
+            java.awt.Rectangle key = magnitudeKeyBounds(metrics, scene);
+            if (key != null) {
+                occupied.add(key);
+            }
         }
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
             if (options.effectiveDeepSkyLabels()

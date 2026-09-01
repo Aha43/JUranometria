@@ -92,6 +92,15 @@ public final class JUranometriaMain {
         // describing something that has gone.
         chart.onSceneChange(inspector::refresh);
         inspector.onClose(chart::requestFocusInWindow);
+        // One switch, three ways to reach it: the toolbar button, the
+        // View menu, and the window's own width (issue #180).
+        juranometria.ui.InspectorToggle inspectorToggle =
+                new juranometria.ui.InspectorToggle();
+        inspectorToggle.bind(
+                () -> inspector.setRequestedVisible(
+                        !inspector.isRequestedVisible()),
+                inspector::canShow);
+        inspector.onVisibilityChange(inspectorToggle::report);
 
         frame.setJMenuBar(AppMenuBar.create(controller,
                 () -> SettingsDialog.open(frame, appearance,
@@ -102,8 +111,7 @@ public final class JUranometriaMain {
                 () -> ChartOptionsDialog.open(frame, chartOptions),
                 () -> AboutDialog.open(frame),
                 () -> {
-                    inspector.setRequestedVisible(
-                            !inspector.isRequestedVisible());
+                    inspectorToggle.toggle();
                     frame.revalidate();
                     frame.repaint();
                 }));
@@ -112,8 +120,12 @@ public final class JUranometriaMain {
         if (inspectorItem != null) {
             // The item shows what is actually on screen, including
             // when a narrow window has closed the panel for the
-            // reader rather than at their asking.
-            inspector.onVisibilityChange(inspectorItem::setSelected);
+            // reader rather than at their asking - the same state the
+            // toolbar button shows, from the same switch.
+            inspectorToggle.onChange(state -> {
+                inspectorItem.setSelected(state.showing());
+                inspectorItem.setEnabled(state.available());
+            });
         }
         // The reviewed layout rule: below 640 px of window the
         // inspector yields, and a window that widens again restores
@@ -133,7 +145,8 @@ public final class JUranometriaMain {
         searchField.setSelectionModel(selection);
 
         frame.setLayout(new BorderLayout());
-        frame.add(new AtlasToolbar(controller, searchField), BorderLayout.NORTH);
+        frame.add(new AtlasToolbar(controller, searchField, inspectorToggle),
+                BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);
         frame.add(inspector, BorderLayout.EAST);
         frame.pack();

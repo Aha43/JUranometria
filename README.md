@@ -171,7 +171,8 @@ make import-star-identities
   Selecting a result recentres the chart anywhere under the bundled
   all-sky coverage, keeping the current field width.
 - **Point at anything to ask what it is.** Click a star or a
-  deep-sky symbol and the **Inspector** (View → Inspector) names it:
+  deep-sky symbol and the **Inspector** - the toolbar's list button,
+  or View → Inspector - names it:
   designations, magnitude with its band, size and orientation where
   the catalogue records them - and plainly *"not recorded"* where it
   does not, which for deep-sky objects is often. Where several marks
@@ -190,7 +191,12 @@ with their platform shortcuts, and **View → Chart Options…** lets the
 reader choose the chart's content and labels — deep-sky objects and
 their labels, constellation figures, boundaries, and names, star
 names, Bayer letters and Flamsteed numbers separately, and the
-equatorial (ICRS/J2000) coordinate grid — with a
+equatorial (ICRS/J2000) coordinate grid, and the chart's own
+furniture: the **title block** in the lower left and a
+**stellar-magnitude key** in the upper right, which shows the circle
+size the chart draws for three visual magnitudes including the
+page's own limit (the key stays off until you ask for it, because on
+a crowded page it covers stars) — with a
 live preview, safe Cancel, a Restore Defaults returning the released
 chart exactly, and choices remembered across restarts (a searched
 target always stays drawn and labelled, whatever the toggles);

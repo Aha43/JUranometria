@@ -28,11 +28,35 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            boolean constellationNames,
                            boolean starNames, boolean bayerLetters,
                            boolean flamsteedNumbers,
-                           boolean equatorialGrid) {
+                           boolean equatorialGrid,
+                           boolean titleBlock, boolean magnitudeKey) {
 
-    /** The released chart: everything on. */
+    /**
+     * The released chart: every layer on, the title block on, and
+     * the stellar-magnitude key OFF - the Sprint 20 decision, which
+     * measured the key covering up to 290 px of star ink on a wide
+     * page and left it for the reader to ask for.
+     */
     public static final ChartOptions DEFAULTS = new ChartOptions(
-            true, true, true, true, true, true, true, true, true);
+            true, true, true, true, true, true, true, true, true,
+            true, false);
+
+    /**
+     * The chart before the furniture became optional (through
+     * 1.1.0): the title block drew always, and there was no key.
+     */
+    public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
+                        boolean constellationFigures,
+                        boolean constellationBoundaries,
+                        boolean constellationNames,
+                        boolean starNames, boolean bayerLetters,
+                        boolean flamsteedNumbers,
+                        boolean equatorialGrid) {
+        this(deepSkyObjects, deepSkyLabels, constellationFigures,
+                constellationBoundaries, constellationNames, starNames,
+                bayerLetters, flamsteedNumbers, equatorialGrid,
+                true, false);
+    }
 
     /**
      * The chart when one control governed every star label (through
