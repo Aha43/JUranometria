@@ -11,6 +11,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -94,6 +96,60 @@ class DeepSkyDialogHeightTest {
         });
     }
 
+    @Test
+    void andAFontSomeoneElseChoseComesBackExactly() throws Exception {
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "installing a look and feel needs a toolkit");
+        // The other half of restoring: the dialog clears the
+        // `defaultFont` override on its way in, so a session that had
+        // set one would have had it deleted rather than given back.
+        // A font nobody would choose by accident, so passing cannot
+        // mean the look and feel happened to supply the same one.
+        javax.swing.plaf.FontUIResource distinctive =
+                new javax.swing.plaf.FontUIResource("Serif",
+                        java.awt.Font.BOLD, 21);
+        restoringTheme(() -> {
+            SwingUtilities.invokeAndWait(
+                    () -> UIManager.put("defaultFont", distinctive));
+
+            restoringTheme(this::onAShortScreen);
+
+            assertEquals(distinctive, UIManager.get("defaultFont"),
+                    "the override this session had chosen is back,"
+                            + " exactly");
+        });
+
+        // And the other direction: where nothing was chosen, nothing
+        // is invented. A freshly installed theme publishes a default
+        // font of its own, and reading the key cannot tell that apart
+        // from an override - both answer the same. What tells them
+        // apart is a change of theme: an override survives one and
+        // pins the font against it, and a theme's own value does not.
+        // Metal declares no default font, so it is the question put
+        // plainly.
+        restoringTheme(() -> {
+            SwingUtilities.invokeAndWait(
+                    () -> juranometria.app.UiTheme.apply(false));
+            assertNotNull(UIManager.get("defaultFont"),
+                    "the theme publishes a font of its own, which is"
+                            + " what makes this worth checking");
+
+            restoringTheme(this::onAShortScreen);
+
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    UIManager.setLookAndFeel(
+                            new javax.swing.plaf.metal.MetalLookAndFeel());
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+            assertNull(UIManager.get("defaultFont"),
+                    "an override invented by the cleanup would have"
+                            + " survived this change of theme");
+        });
+    }
+
     /** Something a test does that disturbs the global look and feel. */
     private interface Body {
         void run() throws Exception;
@@ -110,15 +166,16 @@ class DeepSkyDialogHeightTest {
      */
     private static void restoringTheme(Body body) throws Exception {
         javax.swing.LookAndFeel inherited = UIManager.getLookAndFeel();
+        Object inheritedFont = fontOverride();
         try {
             body.run();
         } finally {
             SwingUtilities.invokeAndWait(() -> {
-                // Cleared rather than put back: the enlarged font is
-                // an override laid over the look and feel's own, and
-                // reinstalling the look and feel restores what it
-                // wanted. Nothing else in the suite writes this key.
-                UIManager.put("defaultFont", null);
+                // The look and feel first, then the exact override
+                // that was found - a font somebody chose, or nothing
+                // at all. Clearing it unconditionally, which is what
+                // this did at first, deletes a choice the session had
+                // made rather than restoring it.
                 if (inherited != null) {
                     try {
                         UIManager.setLookAndFeel(inherited);
@@ -128,8 +185,36 @@ class DeepSkyDialogHeightTest {
                                 e);
                     }
                 }
+                UIManager.put("defaultFont", inheritedFont);
             });
         }
+    }
+
+    /**
+     * The `defaultFont` somebody has chosen, or null when nobody has.
+     *
+     * <p>Reading the key cannot answer this on its own: a look and
+     * feel publishes a default font of its own, and an override laid
+     * over it reads back exactly the same way. Removing the override
+     * separates them - what remains is the theme's, and if that is
+     * what was there, there was no override to restore. The override
+     * is put straight back, so this is a question rather than a
+     * change.
+     */
+    private static Object fontOverride() throws Exception {
+        Object[] found = new Object[1];
+        SwingUtilities.invokeAndWait(() -> {
+            Object effective = UIManager.get("defaultFont");
+            UIManager.put("defaultFont", null);
+            Object themes = UIManager.get("defaultFont");
+            if (java.util.Objects.equals(effective, themes)) {
+                found[0] = null;
+                return;
+            }
+            UIManager.put("defaultFont", effective);
+            found[0] = effective;
+        });
+        return found[0];
     }
 
     private void onAShortScreen() throws Exception {
