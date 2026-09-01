@@ -143,7 +143,7 @@ jobs:
              "staging/JUranometria-$VERSION-portable.zip"
           cp incoming/release-notes/release-notes.md staging/
       - name: Verify the set and write its checksums
-        run: scripts/release-artifacts.sh "$VERSION" staging
+        run: scripts/release-artifacts.sh "$VERSION" staging "$GITHUB_SHA"
       - uses: actions/upload-artifact@v6
         with:
           name: release-${{ needs.agreement.outputs.version }}
@@ -207,14 +207,16 @@ jobs:
           fi
           jq -r '.assets[].name' published/release.json \
             > published/assets.txt
-          # Best effort: what cannot be downloaded is diagnosed by
-          # the script as a conflict, with the name of what is
-          # missing, rather than as an opaque step failure here.
+          # Every asset, not a sample: a truncated or substituted
+          # archive keeps its name and its manifest line, so the
+          # only way to catch it is to fetch the bytes and hash
+          # them (#195 review). Best effort - what cannot be
+          # downloaded is diagnosed by the script, with the name of
+          # what is missing, rather than as an opaque failure here.
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
-            --pattern SHA256SUMS.txt \
-            --pattern "JUranometria-$VERSION-portable.zip" \
             --dir published || true
-          scripts/release-duplicate.sh "$VERSION" staging published
+          scripts/release-duplicate.sh "$VERSION" staging published \
+            "$GITHUB_SHA"
           echo "benign=true" >> "$GITHUB_OUTPUT"
       - name: Create the release as a draft
         if: steps.existing.outputs.benign != 'true'

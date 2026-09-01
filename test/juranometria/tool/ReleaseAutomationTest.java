@@ -431,38 +431,32 @@ class ReleaseAutomationTest {
 
 
     // ------------------------------------------------------------------
+    // ------------------------------------------------------------------
     // The duplicate delivery of issue #195. GitHub delivered the
     // v1.3.0 tag push twice, a second apart; the loser refused to
     // publish and left a red X on a release that was entirely
     // correct. These fixtures are that incident: the four native
-    // checksums below are the REAL ones the two runs produced, and
-    // they differ, because jpackage does not build byte-identically
-    // across runners. Only the portable archive - built by `make
-    // dist` with one fixed timestamp, sorted entries and zip -X -
-    // came out identical, which is why it and not the set carries
-    // the identity claim.
+    // archives genuinely differ between the two runs, because
+    // jpackage does not build byte-identically across runners.
+    //
+    // So three things stand in for a byte comparison, and each of
+    // them is proved here to be load-bearing: every published
+    // archive is hashed against the published manifest, every image
+    // must record this run's own source tree, and the portable
+    // archive - which `make dist` does build reproducibly - must
+    // match exactly.
 
-    /** What run 33548294309 staged, and could not publish. */
-    private static final String[] MINE_NATIVE = {
-            "26624cffd34e7cea65b4b0e8ac6f7efaa792b1fb37d34691e4f9b7cec4b2910d",
-            "2335d53a12b5b48106b6740ac947ba88eed4260150adc75c70051f7d4164fed6",
-            "2ca329b0542d7d7298b349b8b845e61a0719e000eda7bcea462f1a80aecae16e",
-            "1678b265b643b55dc3c71f4c1ef5ee67688589cfd17ceb276bc39f8a6a108c17"};
-
-    /** What run 33548293832 published one second earlier. */
-    private static final String[] THEIRS_NATIVE = {
-            "205508c9c5d99af3ad8ca6b1eff3e41efb6b5390a7353ad04c67ebfacb23c5af",
-            "66ffd48d8e35918c516cddcfda2c8a554215154caf5b89235487daa2d6a79aa2",
-            "b05e58bef507aa9eb829dd7e3b9040fe05ce03e25a9ccbd44a87534ef1a9edb3",
-            "9e1abfe96698e1df4cc997670c351561e840f1b42797afb1a10e9eda39000d6b"};
+    private static final String CELLS_V = "1.3.0";
 
     private static final String[] CELLS = {
             "macos-arm64", "macos-x64", "windows-x64", "linux-x64"};
 
-    private static final String V = "1.3.0";
+    /** The commit this run believes it is publishing. */
+    private static final String COMMIT =
+            "9f2c1ab4d5e6708192a3b4c5d6e7f8091a2b3c4d";
 
     private static String archive(String cell) {
-        return "JUranometria-" + V + "-" + cell + ".zip";
+        return "JUranometria-" + CELLS_V + "-" + cell + ".zip";
     }
 
     private static String sha256(Path file) throws Exception {
@@ -475,53 +469,125 @@ class ReleaseAutomationTest {
         return hex.toString();
     }
 
-    private static String manifest(String[] natives, String portableSum) {
-        StringBuilder text = new StringBuilder();
-        for (int i = 0; i < CELLS.length; i++) {
-            text.append(natives[i]).append("  ")
-                    .append(archive(CELLS[i])).append("\n");
+    /**
+     * An application image that records the source tree it was
+     * packaged from. The filler makes two builds of the same commit
+     * differ in bytes, which is what the real images do.
+     */
+    private static void imageFrom(Path zip, String commit, String filler)
+            throws IOException {
+        try (OutputStream out = Files.newOutputStream(zip);
+                ZipOutputStream zos = new ZipOutputStream(out)) {
+            zos.putNextEntry(new ZipEntry(
+                    "JUranometria.app/Contents/app/build-info.txt"));
+            zos.write(("JUranometria " + CELLS_V + " (app-image)\n"
+                    + (commit.isEmpty() ? "" : "source: " + commit + "\n")
+                    + "packager: 21.0.12.1\n")
+                    .getBytes(StandardCharsets.UTF_8));
+            zos.closeEntry();
+            zos.putNextEntry(new ZipEntry(
+                    "JUranometria.app/Contents/runtime/release"));
+            zos.write(filler.getBytes(StandardCharsets.UTF_8));
+            zos.closeEntry();
         }
-        return text.append(portableSum).append("  ")
-                .append(archive("portable")).append("\n").toString();
+    }
+
+    /** The checksums a release publishes over an actual directory. */
+    private static void writeManifest(Path directory) throws Exception {
+        StringBuilder text = new StringBuilder();
+        for (String cell : CELLS) {
+            text.append(sha256(directory.resolve(archive(cell))))
+                    .append("  ").append(archive(cell)).append("\n");
+        }
+        text.append(sha256(directory.resolve(archive("portable"))))
+                .append("  ").append(archive("portable")).append("\n");
+        Files.writeString(directory.resolve("SHA256SUMS.txt"),
+                text.toString());
     }
 
     /**
      * The whole situation on disk: what this run staged, and what
-     * the workflow read back from the release that beat it. Returns
-     * the root; staging and published sit inside it.
+     * the workflow downloaded from the release that beat it to the
+     * tag. The two sides carry genuinely different image bytes, as
+     * two runs of one commit really do.
      */
-    private static Path delivery(String[] theirNatives,
-                                 boolean sameSource) throws Exception {
+    private static Path delivery() throws Exception {
         Path root = Files.createTempDirectory("duplicate");
         Path staging = Files.createDirectory(root.resolve("staging"));
         Path published = Files.createDirectory(root.resolve("published"));
-
-        // The one archive that is reproducible by construction. The
-        // published copy is a real file, hashed from its bytes.
-        portable(published.resolve(archive("portable")), V);
-        String theirs = sha256(published.resolve(archive("portable")));
-        String mine = sameSource ? theirs
-                : "0000000000000000000000000000000000000000000000000000000000000000";
-
-        Files.writeString(staging.resolve("SHA256SUMS.txt"),
-                manifest(MINE_NATIVE, mine));
-        Files.writeString(published.resolve("SHA256SUMS.txt"),
-                manifest(theirNatives, theirs));
-
+        for (Path side : List.of(staging, published)) {
+            String filler = side == staging ? "runner A" : "runner B";
+            for (String cell : CELLS) {
+                imageFrom(side.resolve(archive(cell)), COMMIT,
+                        filler + " " + cell);
+            }
+            // Reproducible by construction, so both sides are equal.
+            portable(side.resolve(archive("portable")), CELLS_V);
+            writeManifest(side);
+        }
         StringBuilder assets = new StringBuilder();
         for (String cell : CELLS) {
             assets.append(archive(cell)).append("\n");
         }
         assets.append(archive("portable")).append("\n")
                 .append("SHA256SUMS.txt\n");
-        Files.writeString(published.resolve("assets.txt"), assets.toString());
+        Files.writeString(published.resolve("assets.txt"),
+                assets.toString());
         return root;
     }
 
     private static Run duplicate(Path root) throws Exception {
-        return run("scripts/release-duplicate.sh", V,
+        return run("scripts/release-duplicate.sh", CELLS_V,
                 root.resolve("staging").toString(),
-                root.resolve("published").toString());
+                root.resolve("published").toString(), COMMIT);
+    }
+
+    @Test
+    void theStagedSetMustRecordTheSourceTreeItWasBuiltFrom()
+            throws Exception {
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-artifacts.sh")));
+        // The duplicate guard compares published releases by the
+        // commit each image records. A field nothing asserts is a
+        // field that quietly stops being written, so the publishing
+        // side requires it too.
+        Path staged = Files.createTempDirectory("staged");
+        try {
+            for (String cell : CELLS) {
+                imageFrom(staged.resolve(archive(cell)), COMMIT, cell);
+            }
+            portable(staged.resolve(archive("portable")), CELLS_V);
+
+            Run agreed = run("scripts/release-artifacts.sh", CELLS_V,
+                    staged.toString(), COMMIT);
+            assertEquals(0, agreed.status(),
+                    "images recording this commit must pass: "
+                            + agreed.output());
+
+            // One image rebuilt from another tree, everything else
+            // untouched.
+            imageFrom(staged.resolve(archive("windows-x64")),
+                    "0000000000000000000000000000000000000000",
+                    "windows-x64");
+            Run refused = run("scripts/release-artifacts.sh", CELLS_V,
+                    staged.toString(), COMMIT);
+            assertEquals(7, refused.status(),
+                    "a foreign source tree must stop the release: "
+                            + refused.output());
+            assertTrue(refused.output().contains(archive("windows-x64")),
+                    refused.output());
+
+            // And an image predating the field at all.
+            imageFrom(staged.resolve(archive("windows-x64")), "",
+                    "windows-x64");
+            Run absent = run("scripts/release-artifacts.sh", CELLS_V,
+                    staged.toString(), COMMIT);
+            assertEquals(7, absent.status(),
+                    "a missing source line must fail closed: "
+                            + absent.output());
+        } finally {
+            cleanUp(staged);
+        }
     }
 
     @Test
@@ -529,16 +595,23 @@ class ReleaseAutomationTest {
             throws Exception {
         Assumptions.assumeTrue(Files.isExecutable(
                 Path.of("scripts/release-duplicate.sh")));
-        Path root = delivery(THEIRS_NATIVE, true);
+        Path root = delivery();
         try {
-            // The premise, and the reason the obvious check fails:
-            // this is a correct release whose four native archives
-            // genuinely do not match what this run built.
-            for (int i = 0; i < CELLS.length; i++) {
-                assertFalse(MINE_NATIVE[i].equals(THEIRS_NATIVE[i]),
-                        CELLS[i] + " must differ between the two runs,"
-                                + " or this fixture is not the incident");
+            // The premise, and the reason a byte comparison of the
+            // set would be the wrong check: the images genuinely
+            // differ between the two runs of one commit.
+            for (String cell : CELLS) {
+                assertFalse(sha256(root.resolve("staging/" + archive(cell)))
+                                .equals(sha256(root.resolve(
+                                        "published/" + archive(cell)))),
+                        cell + " must differ between the two runs, or"
+                                + " this fixture is not the incident");
             }
+            assertEquals(sha256(root.resolve("staging/"
+                            + archive("portable"))),
+                    sha256(root.resolve("published/"
+                            + archive("portable"))),
+                    "the portable archive is the reproducible one");
 
             Run verdict = duplicate(root);
 
@@ -549,7 +622,7 @@ class ReleaseAutomationTest {
                     verdict.output());
             assertTrue(verdict.output().contains("Nothing is uploaded"),
                     "it must say it changed nothing: " + verdict.output());
-            assertTrue(verdict.output().contains("NOT compared"),
+            assertTrue(verdict.output().contains("NOT compared byte"),
                     "it must state what it did not compare: "
                             + verdict.output());
         } finally {
@@ -558,14 +631,104 @@ class ReleaseAutomationTest {
     }
 
     @Test
+    void aPublishedArchiveThatIsNotItsOwnBytesIsAConflict()
+            throws Exception {
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-duplicate.sh")));
+        // The case the review named: an archive substituted under
+        // its own name, still a perfectly valid image recording the
+        // right source tree, with the published manifest untouched.
+        // Nothing but its bytes gives it away - so every archive is
+        // fetched and hashed, not just the portable one.
+        for (String damaged : List.of("macos-arm64", "windows-x64",
+                "linux-x64", "macos-x64")) {
+            Path root = delivery();
+            try {
+                Path file = root.resolve("published/" + archive(damaged));
+                String before = sha256(file);
+                imageFrom(file, COMMIT, "substituted after publication");
+                assertFalse(before.equals(sha256(file)),
+                        "the premise: the bytes must actually differ");
+
+                Run verdict = duplicate(root);
+
+                assertEquals(8, verdict.status(),
+                        "a substituted " + damaged + " must be caught: "
+                                + verdict.output());
+                assertTrue(verdict.output().contains(archive(damaged)),
+                        "it must name what differs: " + verdict.output());
+                assertTrue(verdict.output().contains("hashes to"),
+                        "it must report the bytes, not the name: "
+                                + verdict.output());
+            } finally {
+                cleanUp(root);
+            }
+        }
+
+        // And a truncated one, which is the same defect arriving by
+        // accident rather than by hand.
+        Path root = delivery();
+        try {
+            Files.write(root.resolve("published/" + archive("portable")),
+                    "truncated".getBytes(StandardCharsets.UTF_8));
+
+            Run verdict = duplicate(root);
+
+            assertEquals(8, verdict.status(), verdict.output());
+        } finally {
+            cleanUp(root);
+        }
+    }
+
+    @Test
+    void aReleasePackagedFromAnotherSourceTreeIsAConflict()
+            throws Exception {
+        Assumptions.assumeTrue(Files.isExecutable(
+                Path.of("scripts/release-duplicate.sh")));
+        // The portable archive can be identical while the packaging
+        // scripts or the bundled runtime have moved underneath it.
+        // The commit each image records is what notices.
+        // A wrong commit, and an image that records none at all -
+        // an older build predating this line. Both fail closed.
+        for (String stated : List.of(
+                "0000000000000000000000000000000000000000", "")) {
+            Path root = delivery();
+            try {
+                Path published = root.resolve("published");
+                imageFrom(published.resolve(archive("linux-x64")), stated,
+                        "runner B linux-x64");
+                writeManifest(published);
+                assertEquals(
+                        sha256(root.resolve("staging/" + archive("portable"))),
+                        sha256(published.resolve(archive("portable"))),
+                        "the premise: the portable archive still matches");
+
+                Run verdict = duplicate(root);
+
+                assertEquals(8, verdict.status(),
+                        "a different source tree must be caught even when"
+                                + " the portable archive matches: "
+                                + verdict.output());
+                assertTrue(verdict.output().contains("different source"),
+                        verdict.output());
+                assertTrue(verdict.output().contains(archive("linux-x64")),
+                        "it must name the image: " + verdict.output());
+            } finally {
+                cleanUp(root);
+            }
+        }
+    }
+
+    @Test
     void aReleaseBuiltFromOtherSourceStillFailsLoudly() throws Exception {
         Assumptions.assumeTrue(Files.isExecutable(
                 Path.of("scripts/release-duplicate.sh")));
-        // Everything else identical to the benign case; only the
-        // reproducible archive disagrees. If this passed, the guard
-        // would have been traded away rather than sharpened.
-        Path root = delivery(THEIRS_NATIVE, false);
+        Path root = delivery();
         try {
+            Path published = root.resolve("published");
+            portable(published.resolve(archive("portable")), "9.9.9");
+            writeManifest(published);
+
             Run verdict = duplicate(root);
 
             assertEquals(8, verdict.status(),
@@ -573,8 +736,6 @@ class ReleaseAutomationTest {
                             + verdict.output());
             assertTrue(verdict.output().contains("different source"),
                     verdict.output());
-            assertTrue(verdict.output().contains("portable"),
-                    "it must name what differs: " + verdict.output());
             assertTrue(verdict.output().contains("Nothing was uploaded"),
                     "even failing, it must say nothing was touched: "
                             + verdict.output());
@@ -588,12 +749,12 @@ class ReleaseAutomationTest {
             throws Exception {
         Assumptions.assumeTrue(Files.isExecutable(
                 Path.of("scripts/release-duplicate.sh")));
-        // Each of these starts from the benign fixture and breaks
-        // exactly one thing, so the failure is attributable.
+        // Each starts from the benign fixture and breaks exactly one
+        // thing, so the failure is attributable.
         for (String what : List.of("missing-asset", "extra-asset",
                 "manifest-omits-an-archive", "manifest-lies",
-                "portable-not-downloaded", "no-manifest")) {
-            Path root = delivery(THEIRS_NATIVE, true);
+                "archive-not-downloaded", "no-manifest")) {
+            Path root = delivery();
             try {
                 Path published = root.resolve("published");
                 Path assets = published.resolve("assets.txt");
@@ -609,10 +770,12 @@ class ReleaseAutomationTest {
                                     .replace(archive("windows-x64"),
                                             "something-else.zip"));
                     case "manifest-lies" -> Files.writeString(theirs,
-                            manifest(THEIRS_NATIVE, "dead"
-                                    + "beef".repeat(14)));
-                    case "portable-not-downloaded" -> Files.delete(
-                            published.resolve(archive("portable")));
+                            Files.readString(theirs).replace(
+                                    sha256(published.resolve(
+                                            archive("macos-x64"))),
+                                    "dead" + "beef".repeat(14)));
+                    case "archive-not-downloaded" -> Files.delete(
+                            published.resolve(archive("macos-arm64")));
                     case "no-manifest" -> Files.delete(theirs);
                     default -> throw new IllegalStateException(what);
                 }
@@ -631,26 +794,46 @@ class ReleaseAutomationTest {
     }
 
     @Test
-    void aRunThatStagedNothingIsItsOwnBugRatherThanAConflict()
+    void aRunWhoseOwnStagingIsWrongSaysSoRatherThanBlamingTheRelease()
             throws Exception {
         Assumptions.assumeTrue(Files.isExecutable(
                 Path.of("scripts/release-duplicate.sh")));
-        Path root = delivery(THEIRS_NATIVE, true);
-        try {
-            Files.delete(root.resolve("staging/SHA256SUMS.txt"));
+        // Exit 9 says this run is broken, 8 says the published
+        // release is. Reporting a local fault as a conflict would
+        // send a reader to inspect a healthy release.
+        for (String what : List.of("no-manifest", "missing-archive",
+                "manifest-disagrees-with-its-own-bytes")) {
+            Path root = delivery();
+            try {
+                Path staging = root.resolve("staging");
+                switch (what) {
+                    case "no-manifest" -> Files.delete(
+                            staging.resolve("SHA256SUMS.txt"));
+                    case "missing-archive" -> Files.delete(
+                            staging.resolve(archive("macos-x64")));
+                    // The manifest is intact and internally plausible;
+                    // only the bytes it names have moved. Trusting the
+                    // manifest would miss this entirely.
+                    case "manifest-disagrees-with-its-own-bytes" ->
+                            Files.write(staging.resolve(archive("linux-x64")),
+                                    "rebuilt after the sums were written"
+                                            .getBytes(StandardCharsets.UTF_8));
+                    default -> throw new IllegalStateException(what);
+                }
 
-            Run verdict = duplicate(root);
+                Run verdict = duplicate(root);
 
-            // Distinguished deliberately: 9 says this run is broken,
-            // 8 says the published release is. Reporting a local bug
-            // as a conflict would send a reader to the wrong place.
-            assertEquals(9, verdict.status(), verdict.output());
-            assertFalse(verdict.output().contains("DIFFERENT release"),
-                    verdict.output());
-        } finally {
-            cleanUp(root);
+                assertEquals(9, verdict.status(),
+                        what + " is this run's own fault: "
+                                + verdict.output());
+                assertFalse(verdict.output().contains("DIFFERENT release"),
+                        what + ": " + verdict.output());
+            } finally {
+                cleanUp(root);
+            }
         }
     }
+
 
     /**
      * An image carrying the real build-info.txt plus a decoy

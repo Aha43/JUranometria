@@ -224,8 +224,14 @@ shape:
   appropriately restrained.
 - **The runtime is pinned Temurin 21** (exact version recorded in
   the workflow pin and asserted against each image's `release`
-  file), and each artifact carries a `build-info.txt` recording
-  version, modules, packager, and runtime.
+  file), and each artifact carries a `build-info.txt` recording the
+  **source commit**, version, modules, packager, and runtime. The
+  commit is the release's immutable source-tree identity: an
+  identical portable archive proves the application code and its
+  bundled libraries match, but says nothing about the packaging
+  scripts or the runtime jlink trimmed, and the commit moves when
+  either does (#195). It is asserted when the release set is staged,
+  so the field cannot quietly stop being written.
 - **Runtime licensing travels**: OpenJDK/Temurin is GPLv2 with the
   Classpath Exception; the jlink runtime's complete generated
   `legal/` notice tree ships inside every image (asserted), and the

@@ -22,7 +22,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   portable archive, which `make dist` builds reproducibly from source
   - the four native images cannot carry it, because jpackage does not
   build them byte-identically across runners, as the two 1.3.0 runs
-  themselves demonstrated.
+  themselves demonstrated. Every published archive is downloaded and
+  hashed against the published checksums, so an archive substituted
+  under its own name is caught; and each application image now
+  records the **source commit** it was packaged from, which is what
+  notices a change in the packaging scripts or the bundled runtime
+  that an identical portable archive would not.
 
 ## [1.3.0] - 2026-09-01
 

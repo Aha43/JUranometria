@@ -2,7 +2,8 @@
 # Is an existing release for this tag another delivery of the same
 # push, or a genuine conflict? (issue #195)
 #
-#   scripts/release-duplicate.sh <version> <staging> <published>
+#   scripts/release-duplicate.sh <version> <staging> <published> \
+#                                <commit>
 #
 # GitHub delivered the v1.3.0 tag push twice, one second apart. The
 # concurrency guard serialised the two runs, the first published, and
@@ -23,38 +24,52 @@
 #      not a conflict there)
 #  64  usage
 #
-# WHAT CAN AND CANNOT BE COMPARED, and why it is not the obvious
-# thing. The four native application images are NOT byte-reproducible
-# across runners - jpackage does not promise it, and the two v1.3.0
-# runs proved it: same tag, same commit, four different checksums
-# (macos-arm64 26624cff... against the published 205508c9...).
-# Requiring the whole set to match would therefore condemn every
-# benign duplicate as a conflict, which is the bug this fixes.
+# WHAT IS COMPARED, and why it is not the obvious thing. The four
+# native application images are NOT byte-reproducible across runners
+# - jpackage does not promise it, and the two v1.3.0 runs proved it:
+# same tag, same commit, four different checksums (macos-arm64
+# 26624cff... against the published 205508c9...). Requiring the whole
+# set to match byte for byte would condemn every benign duplicate as
+# a conflict, which is the bug this fixes.
 #
-# The portable archive is different, and deliberately so: `make dist`
-# stamps one fixed modification time, sorts the entries, and zips
-# with -X, so it IS reproducible from the same source on any machine
-# - and the same two runs produced the identical 473fcbb1... for it.
-# A third run confirmed it independently: the #195 rehearsal, on
-# another branch on another day, built that same 473fcbb1... again.
-# That makes it the identity check. A published release whose
-# portable archive hashes to what this run built was built from this
-# run's source; one that does not, was not.
+# Three checks stand in its place, and together they cover what a
+# byte comparison would have:
 #
-# This is the narrower honest claim the 1.0 contract already makes:
-# byte-identity reported where it holds rather than promised
-# universally. What was compared is printed, and so is what was not.
+#  1. EVERY published archive is downloaded and hashed here, and must
+#     match the published SHA256SUMS.txt. A truncated or substituted
+#     archive keeps its name and its manifest line; it cannot keep
+#     its bytes (#195 review).
+#  2. Every application image must state THIS COMMIT in its own
+#     build-info.txt. That is the immutable source-tree identity: it
+#     moves when the packaging scripts or the bundled runtime move,
+#     neither of which an identical portable archive would notice
+#     (#195 review).
+#  3. The portable archive must hash to exactly what this run built.
+#     `make dist` stamps one fixed modification time, sorts the
+#     entries and zips with -X, so it IS reproducible from the same
+#     source on any machine - the two v1.3.0 runs produced the
+#     identical 473fcbb1... for it, and the #195 rehearsal built that
+#     same archive again on another branch on another day.
+#
+# This run's own staged bytes are hashed too, rather than its
+# manifest being taken at its word, so exit 9 means the local set is
+# genuinely broken rather than merely inconsistent on paper.
+#
+# What is compared is printed, and so is what is not.
 set -eu
 
 version="${1:-}"
 staging="${2:-}"
 published="${3:-}"
-if [ -z "$version" ] || [ -z "$staging" ] || [ -z "$published" ]; then
-    echo "usage: $0 <version> <staging> <published>" >&2
+commit="${4:-}"
+if [ -z "$version" ] || [ -z "$staging" ] || [ -z "$published" ] \
+        || [ -z "$commit" ]; then
+    echo "usage: $0 <version> <staging> <published> <commit>" >&2
     exit 64
 fi
 
-archives="macos-arm64 macos-x64 windows-x64 linux-x64 portable"
+natives="macos-arm64 macos-x64 windows-x64 linux-x64"
+archives="$natives portable"
 
 name_for() {
     echo "JUranometria-$version-$1.zip"
@@ -69,16 +84,29 @@ sha256_of() {
 }
 
 # The checksum a SHA256SUMS.txt states for one exact name. Anchored
-# at both ends: a line for "...-portable.zip" must never answer for
-# "...-portable.zip.sig", and a manifest naming a file twice is a
+# on the whole field: a line for "...-portable.zip" must never answer
+# for "...-portable.zip.sig", and a manifest naming a file twice is a
 # malformed manifest rather than a match.
 stated_in() {
-    manifest="$1"
-    wanted="$2"
-    found="$(awk -v want="$wanted" \
+    awk -v want="$2" \
         '$2 == want { print $1; n++ } END { if (n != 1) exit 1 }' \
-        "$manifest" 2>/dev/null || true)"
-    echo "$found"
+        "$1" 2>/dev/null || true
+}
+
+# The commit an application image records for itself. Listing the
+# entries first is deliberate, exactly as release-artifacts.sh does
+# it: reading every match at once would let a decoy build-info.txt
+# anywhere in the archive answer on behalf of the real one.
+source_commit_of() {
+    entries=$(unzip -Z1 "$1" 2>/dev/null \
+        | grep -E '(^|/)build-info\.txt$' || true)
+    if [ "$(printf '%s' "$entries" | grep -c . || true)" != "1" ]; then
+        echo "multiple-or-missing-build-info"
+        return 0
+    fi
+    unzip -p "$1" "$entries" 2>/dev/null \
+        | awk '$1 == "source:" { print $2; found = 1; exit }
+               END { if (!found) print "no-source-line"; }'
 }
 
 conflict() {
@@ -92,31 +120,39 @@ conflict() {
     exit 8
 }
 
-# --- this run's own side, which must be sound before anything is
-# --- compared against it
+broken() {
+    echo "release-duplicate: this run's own staging is wrong:" >&2
+    echo "  $1" >&2
+    echo "Nothing was compared against the published release." >&2
+    exit 9
+}
+
+# --- this run's own side, hashed rather than believed. Deciding
+# --- whether a published release matches a manifest whose own files
+# --- have moved would be answering the wrong question.
 mine="$staging/SHA256SUMS.txt"
-if [ ! -s "$mine" ]; then
-    echo "release-duplicate: this run staged no $mine" >&2
-    exit 9
-fi
-portable_name="$(name_for portable)"
-mine_portable="$(stated_in "$mine" "$portable_name")"
-if [ -z "$mine_portable" ]; then
-    echo "release-duplicate: this run's checksums do not name" \
-         "$portable_name exactly once" >&2
-    exit 9
-fi
+[ -s "$mine" ] || broken "no checksums at $mine"
+for cell in $archives; do
+    file="$staging/$(name_for "$cell")"
+    [ -s "$file" ] || broken "staged no $(name_for "$cell")"
+    stated=$(stated_in "$mine" "$(name_for "$cell")")
+    [ -n "$stated" ] \
+        || broken "its checksums do not name $(name_for "$cell") once"
+    actual=$(sha256_of "$file")
+    if [ "$actual" != "$stated" ]; then
+        broken "$(printf '%s hashes to %s, its own manifest says %s' \
+            "$(name_for "$cell")" "$actual" "$stated")"
+    fi
+done
+mine_portable=$(stated_in "$mine" "$(name_for portable)")
 
 # --- the published side, read back rather than assumed
 assets="$published/assets.txt"
-if [ ! -f "$assets" ]; then
-    echo "release-duplicate: no published asset list at $assets" >&2
-    exit 9
-fi
+[ -f "$assets" ] || broken "no published asset list at $assets"
 
 # Exactly the six the contract publishes - no more, no fewer. An
 # extra asset means someone attached something this run did not
-# build, and a missing one means the published release is incomplete.
+# build; a missing one means the published release is incomplete.
 # Both are for a person to look at.
 {
     for cell in $archives; do name_for "$cell"; done
@@ -131,55 +167,64 @@ if ! cmp -s "$published/expected-assets.txt" \
 fi
 
 theirs="$published/SHA256SUMS.txt"
-if [ ! -s "$theirs" ]; then
-    conflict "its SHA256SUMS.txt could not be read back."
-fi
+[ -s "$theirs" ] || conflict "its SHA256SUMS.txt could not be read back."
 
-# The published manifest must account for the same five archives.
-# Comparing the names before the checksums means a manifest for a
-# different version is reported as what it is.
+# 1. Every published archive, hashed from the bytes GitHub served,
+#    so truncation and substitution are caught rather than assumed
+#    away by a matching name.
 for cell in $archives; do
-    if [ -z "$(stated_in "$theirs" "$(name_for "$cell")")" ]; then
-        conflict "its SHA256SUMS.txt does not name" \
-            "$(name_for "$cell") exactly once."
+    file="$published/$(name_for "$cell")"
+    if [ ! -s "$file" ]; then
+        conflict "its $(name_for "$cell") could not be downloaded."
+    fi
+    stated=$(stated_in "$theirs" "$(name_for "$cell")")
+    if [ -z "$stated" ]; then
+        conflict "its SHA256SUMS.txt does not name $(name_for "$cell")
+exactly once."
+    fi
+    actual=$(sha256_of "$file")
+    if [ "$actual" != "$stated" ]; then
+        conflict "$(printf 'the published %s does not match the published
+SHA256SUMS.txt: the file hashes to %s, the manifest says %s.' \
+            "$(name_for "$cell")" "$actual" "$stated")"
     fi
 done
 
-# The identity check, on the one archive that is reproducible by
-# construction. Hashed here from the bytes GitHub served, so a
-# published manifest that disagrees with its own published archive
-# is caught too - the release is checked, not merely quoted.
-their_file="$published/$portable_name"
-if [ ! -s "$their_file" ]; then
-    conflict "its $portable_name could not be downloaded."
-fi
-their_portable="$(sha256_of "$their_file")"
-their_stated="$(stated_in "$theirs" "$portable_name")"
-if [ "$their_portable" != "$their_stated" ]; then
-    conflict "$(printf 'the published %s does not match the published
-SHA256SUMS.txt: the file hashes to %s, the manifest says %s.' \
-        "$portable_name" "$their_portable" "$their_stated")"
-fi
+# 2. The source-tree identity, stated by each image about itself.
+for cell in $natives; do
+    stated=$(source_commit_of "$published/$(name_for "$cell")")
+    if [ "$stated" != "$commit" ]; then
+        conflict "$(printf 'its %s was built from a different source
+tree: build-info.txt says %s, this run is publishing %s.' \
+            "$(name_for "$cell")" "$stated" "$commit")"
+    fi
+done
+
+# 3. The archive that is reproducible by construction must be this
+#    run's own bytes.
+their_portable=$(sha256_of "$published/$(name_for portable)")
 if [ "$their_portable" != "$mine_portable" ]; then
     conflict "$(printf 'it was built from different source. The
 reproducible %s hashes to %s there and %s here.' \
-        "$portable_name" "$their_portable" "$mine_portable")"
+        "$(name_for portable)" "$their_portable" "$mine_portable")"
 fi
 
 # Benign. Say exactly what that rests on, including its limit.
 echo "This tag is already released, by another delivery of the same"
 echo "push, and that release is this run's own work:"
 echo
-echo "  the published release holds exactly the six contract assets"
-echo "  its SHA256SUMS.txt names all five archives"
+echo "  it holds exactly the six contract assets"
+echo "  all five archives were downloaded and hash to what its own"
+echo "    SHA256SUMS.txt states"
+echo "  all four application images record this exact source tree"
+echo "    source: $commit"
 echo "  the reproducible portable archive matches this run exactly"
-echo "    $portable_name"
 echo "    $their_portable"
 echo
-echo "The four native application images are NOT compared: jpackage"
-echo "does not build them byte-identically across runners, so a"
-echo "difference there would prove nothing. The portable archive is"
-echo "reproducible by construction and carries the identity claim."
+echo "The application images are NOT compared byte for byte: jpackage"
+echo "does not build them identically across runners, so a difference"
+echo "there would prove nothing. Their recorded source tree and their"
+echo "own published checksums carry the claim instead."
 echo
 echo "Nothing is uploaded, replaced or deleted. There is nothing to"
 echo "do, and that is not a failure."
