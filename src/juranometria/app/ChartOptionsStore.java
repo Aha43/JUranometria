@@ -38,7 +38,13 @@ public interface ChartOptionsStore {
                         identifierFlag(node, "chart.starNames"),
                         identifierFlag(node, "chart.bayerLetters"),
                         identifierFlag(node, "chart.flamsteedNumbers"),
-                        flag(node, "chart.equatorialGrid"));
+                        flag(node, "chart.equatorialGrid"),
+                        flag(node, "chart.titleBlock"),
+                        // The key is the one option whose released
+                        // default is OFF, so a store that predates it
+                        // - every 1.1.0 store - must not read as on
+                        // (Sprint 20).
+                        offByDefaultFlag(node, "chart.magnitudeKey"));
             }
 
             @Override
@@ -61,6 +67,10 @@ public interface ChartOptionsStore {
                         Boolean.toString(options.flamsteedNumbers()));
                 node.put("chart.equatorialGrid",
                         Boolean.toString(options.equatorialGrid()));
+                node.put("chart.titleBlock",
+                        Boolean.toString(options.titleBlock()));
+                node.put("chart.magnitudeKey",
+                        Boolean.toString(options.magnitudeKey()));
             }
         };
     }
@@ -85,6 +95,19 @@ public interface ChartOptionsStore {
             return flag(node, "chart.starLabels");
         }
         return true;
+    }
+
+    /**
+     * A stored flag whose released default is OFF: only the explicit
+     * string "true" enables it; anything missing, corrupt, or unknown
+     * means off. The mirror image of {@link #flag}, and needed
+     * because the stellar-magnitude key is the first option the
+     * atlas ships switched off - a 1.1.0 store has no key at all, and
+     * an upgrade must not turn one on that the reader never asked
+     * for.
+     */
+    private static boolean offByDefaultFlag(Preferences node, String key) {
+        return "true".equals(node.get(key, null));
     }
 
     /**

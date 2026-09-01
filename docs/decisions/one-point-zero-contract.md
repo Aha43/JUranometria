@@ -119,10 +119,14 @@ About does not restate them.
 ## Preferences and upgrade from 0.15
 
 - Preferences live in the JDK preferences node `juranometria`:
-  `appearance` and the **nine** `chart.*` option keys (corrected by
-  the #145 audit: the count was written when there were seven, before
-  the grid and the star-identifier split), plus the legacy
-  `chart.starLabels` key that older releases wrote.
+  `appearance` and the `chart.*` option keys, plus the legacy
+  `chart.starLabels` key that older releases wrote. **The count is
+  deliberately no longer stated here**: it was written as seven,
+  corrected to nine by the #145 audit, and reached eleven when Sprint
+  20 made the chart furniture optional. What 1.0 promises is that
+  every key an earlier release wrote keeps its meaning and that a key
+  a newer release adds takes its documented default - not that the
+  set never grows.
 - **Every preference written by 0.13 through 0.17 loads into 1.0
   unchanged.** A key that a newer version added is absent in an older
   store and loads as its documented default; a missing, corrupt, or
@@ -165,11 +169,13 @@ The following are **promised behavior** — changing any of them after
   prefix, Bayer (Greek or spelled, abbreviation or genitive), and
   Flamsteed forms; ambiguity lists candidates and never silently
   resolves.
-- **Chart options**: the nine toggles — deep-sky objects and their
-  labels, constellation figures, boundaries, and names, star names,
-  Bayer letters, and Flamsteed numbers separately, and the equatorial
-  grid — with their dependency, target-exemption, repaint-only, and
-  Restore Defaults contracts.
+- **Chart options**: the toggles for what the chart draws — deep-sky
+  objects and their labels, constellation figures, boundaries, and
+  names, star names, Bayer letters, and Flamsteed numbers separately,
+  the equatorial grid, and the title block and stellar-magnitude key
+  — with their dependency, target-exemption, repaint-only, and
+  Restore Defaults contracts. Every toggle that existed in a release
+  keeps its behaviour; the set may grow.
 - **Accessibility surface**: every control and dialog carries an
   accessible name; dialogs are owned, single-instance where
   documented, and close on Escape; the full journeys are operable by

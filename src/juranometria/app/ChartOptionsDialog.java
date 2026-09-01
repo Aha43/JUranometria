@@ -120,6 +120,19 @@ public final class ChartOptionsDialog extends JDialog {
                 "ICRS/J2000 right-ascension and declination grid lines"
                         + " with coordinate labels");
 
+        JCheckBox titleBlock = checkBox("Title block", 'T',
+                initial.titleBlock(), "Title block");
+        titleBlock.getAccessibleContext().setAccessibleDescription(
+                "The panel in the lower left stating the target,"
+                        + " centre, frame, field width, limiting"
+                        + " magnitude and orientation");
+        JCheckBox magnitudeKey = checkBox("Stellar-magnitude key", 'k',
+                initial.magnitudeKey(), "Stellar-magnitude key");
+        magnitudeKey.getAccessibleContext().setAccessibleDescription(
+                "A key in the upper right showing the circle size the"
+                        + " chart draws for three visual magnitudes,"
+                        + " including this page's limit");
+
         Runnable sync = () -> {
             labels.setEnabled(dsos.isSelected());
             names.setEnabled(figures.isSelected());
@@ -127,13 +140,14 @@ public final class ChartOptionsDialog extends JDialog {
                     labels.isSelected(), figures.isSelected(),
                     boundaries.isSelected(), names.isSelected(),
                     starNames.isSelected(), bayerLetters.isSelected(),
-                    flamsteedNumbers.isSelected(), grid.isSelected()));
+                    flamsteedNumbers.isSelected(), grid.isSelected(),
+                    titleBlock.isSelected(), magnitudeKey.isSelected()));
         };
         labels.setEnabled(initial.deepSkyObjects());
         names.setEnabled(initial.constellationFigures());
         for (JCheckBox box : new JCheckBox[] {
-                dsos, figures, boundaries, grid, labels, names,
-                starNames, bayerLetters, flamsteedNumbers}) {
+                dsos, figures, boundaries, grid, titleBlock, magnitudeKey,
+                labels, names, starNames, bayerLetters, flamsteedNumbers}) {
             box.addActionListener(event -> sync.run());
         }
 
@@ -142,6 +156,11 @@ public final class ChartOptionsDialog extends JDialog {
         panel.add(figures);
         panel.add(boundaries);
         panel.add(grid);
+        // Furniture joins Content rather than earning a heading of
+        // its own: two checkboxes do not pay for a third group
+        // (docs/decisions/chart-furniture.md).
+        panel.add(titleBlock);
+        panel.add(magnitudeKey);
         panel.add(Box.createVerticalStrut(12));
         panel.add(groupHeading("Labels"));
         panel.add(labels);
@@ -155,7 +174,8 @@ public final class ChartOptionsDialog extends JDialog {
         restore.setMnemonic('R');
         restore.getAccessibleContext().setAccessibleName("Restore Defaults");
         restore.getAccessibleContext().setAccessibleDescription(
-                "Preview the released chart: every layer on");
+                "Preview the released chart: every layer and the title"
+                        + " block on, the magnitude key off");
         restore.addActionListener(event -> {
             controller.restoreDefaults();
             ChartOptions defaults = controller.options();
@@ -163,6 +183,8 @@ public final class ChartOptionsDialog extends JDialog {
             labels.setSelected(defaults.deepSkyLabels());
             figures.setSelected(defaults.constellationFigures());
             boundaries.setSelected(defaults.constellationBoundaries());
+            titleBlock.setSelected(defaults.titleBlock());
+            magnitudeKey.setSelected(defaults.magnitudeKey());
             names.setSelected(defaults.constellationNames());
             starNames.setSelected(defaults.starNames());
             bayerLetters.setSelected(defaults.bayerLetters());

@@ -206,6 +206,15 @@ public final class InspectorPanel extends JPanel {
     }
 
     /**
+     * Whether the window is wide enough to show the panel at all -
+     * what a control must know before claiming the panel is there
+     * (issue #180).
+     */
+    public boolean canShow() {
+        return fitsHere;
+    }
+
+    /**
      * The width the panel may take beside a window this wide: what
      * is left once the chart has its 400 px, never more than the
      * preferred 320 and never less than the floor of 240.

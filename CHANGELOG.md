@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- A **stellar-magnitude key**: the chart draws brightness as circle
+  size, and now it can say so. Three circles in the upper right at
+  exactly the sizes the chart uses, including the page's own limiting
+  magnitude. Off until you ask for it in Chart Options, because on a
+  crowded page it covers stars.
+- The **title block** in the lower left is now a Chart Option too,
+  for a reader who wants the bare page.
+- The **Inspector** has a toolbar button beside the other essential
+  controls. It, the View menu item, and the window's width always
+  agree about whether the panel is showing - and a window too narrow
+  to show it says so rather than claiming otherwise.
+
 ## [1.1.0] - 2026-09-01
 
 Sprint 19 — Explore the map. The atlas could always find Betelgeuse;

@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study check-libs check-jdk dist app-image
 
 all: app
 
@@ -187,6 +187,11 @@ bayer-study: classes
 # Point-and-identify (docs/decisions/point-and-identify.md, issue
 # #168): the measurements go to the committed study document, the
 # pictures beside them.
+# Chart furniture (docs/decisions/chart-furniture.md, issue #179).
+furniture-study: classes
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.FurnitureStudyMain \
+		> docs/studies/chart-furniture/measurements.md
+
 identify-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.IdentifyStudyMain \
 		> docs/studies/point-and-identify/measurements.md
