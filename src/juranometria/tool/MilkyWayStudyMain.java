@@ -202,26 +202,32 @@ public final class MilkyWayStudyMain {
             }
         }
         System.out.println();
-        // The cost is decision-relevant and machine-dependent, so it
-        // is stated as a bound the run checks rather than tabulated
-        // as milliseconds that differ between two runs of the same
-        // study.
-        if (quickest < 50 || slowest > 500) {
-            throw new IllegalStateException("the oracle's cost has"
-                    + " moved outside the stated bound: " + quickest
-                    + "-" + slowest + " ms per page");
-        }
-        System.out.println("**Every page cost between 0.05 and 0.5"
-                + " seconds** to sample, checked by this run rather"
-                + " than tabulated - exact milliseconds differ between"
-                + " machines and between two runs on one machine, and"
-                + " a study whose output moves cannot be reproduced."
-                + " The interactive budget is a repaint, so the oracle"
-                + " is two to three orders of magnitude too slow to"
-                + " be the implementation. That is what it is for.");
+        System.out.println("The oracle's cost is **not in this report**."
+                + " Wall-clock timing is not reproducible evidence: it"
+                + " differs between machines and between two runs on"
+                + " one machine, and a study whose output moves cannot"
+                + " be reproduced. What this run observed is written"
+                + " to standard error instead, with the machine that"
+                + " produced it named, and"
+                + " [the decision](../../decisions/milky-way-layer.md)"
+                + " records an observation rather than a bound.");
         System.out.println();
         System.out.println("Pages written to `" + DIR.getPath() + "`.");
         System.out.println();
+        // Observed, named, and kept out of the reproducible report.
+        // No threshold is enforced here: a faster machine must never
+        // fail a study, and a slower one is not a defect in the data.
+        // #191 is where an interaction budget is enforced, on the
+        // supported CI path.
+        System.err.printf(Locale.ROOT,
+                "performance note (observed, NOT reproducible"
+                        + " evidence): %d pages sampled in %d-%d ms"
+                        + " each on %s %s, %s %s%n",
+                MilkyWayPages.pages().size() * 3, quickest, slowest,
+                System.getProperty("os.name"),
+                System.getProperty("os.arch"),
+                System.getProperty("java.vm.name"),
+                System.getProperty("java.version"));
     }
 
     /** What the file is, before any opinion about it. */

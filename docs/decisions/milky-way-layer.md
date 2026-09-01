@@ -141,11 +141,21 @@ outlines. No horizon, no seam, no parity to lose. The poles came back
 sensible.
 
 **That sampler is the correctness oracle, not the implementation.**
-Every page costs between **0.05 and 0.5 seconds** to sample - a bound
-the study checks on each run rather than tabulating milliseconds that
-differ between machines. The interactive budget is a repaint, so the
-oracle is two to three orders of magnitude too slow to be the
-implementation. That is what it is for.
+
+Its cost is an **observation, not reproducible evidence**, and is kept
+out of the study's report for that reason - a study whose output moves
+between runs cannot be reproduced, and a faster machine must never
+make one fail. Observed while writing this decision:
+
+> 36 pages sampled in **116-382 ms each** on Mac OS X aarch64,
+> OpenJDK 64-Bit Server VM 21.0.11.
+
+That is hundreds of milliseconds for one page, against an interactive
+budget of a repaint. **Per-pixel sampling is therefore rejected for
+interactive rendering** - the conclusion needs only the order of
+magnitude, which no plausible machine changes. #191 enforces an
+actual interaction budget, on the supported CI path, against its own
+implementation.
 
 ## The palette, and why three washes
 

@@ -123,7 +123,7 @@ Every page is the production renderer's own output, with the candidate layer pro
 | m31-default | 18° | 1 | 0.3% | 0.0% | 0.4% |
 | m31-default | 36° | 1 | 16.4% | 0.0% | 17.4% |
 
-**Every page cost between 0.05 and 0.5 seconds** to sample, checked by this run rather than tabulated - exact milliseconds differ between machines and between two runs on one machine, and a study whose output moves cannot be reproduced. The interactive budget is a repaint, so the oracle is two to three orders of magnitude too slow to be the implementation. That is what it is for.
+The oracle's cost is **not in this report**. Wall-clock timing is not reproducible evidence: it differs between machines and between two runs on one machine, and a study whose output moves cannot be reproduced. What this run observed is written to standard error instead, with the machine that produced it named, and [the decision](../../decisions/milky-way-layer.md) records an observation rather than a bound.
 
 Pages written to `docs/studies/milky-way`.
 
