@@ -7,6 +7,27 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The five deep-sky families are yours to choose.** Galaxies, open
+  clusters, globular clusters, nebulae and planetary nebulae each have
+  their own switch, beneath the deep-sky master that still governs
+  them all. A family you switch off is remembered while the master is
+  off, and comes back exactly as you left it.
+- **Chart Options now has four tabs** — Deep sky, Stars,
+  Constellations, Chart. The Deep sky tab is a legend as much as a
+  control: every family shows the mark the chart actually draws for
+  it, with a sentence saying what the family holds and objects you
+  may know.
+
+### Changed
+
+- **Nebula boxes are drawn a little darker** (grey 150 to 132). They
+  are still the quietest mark on the page, but a mark you are asked
+  to recognise has to be visible: the old grey fell just under the
+  contrast floor for a graphical object.
+- The Inspector now writes **H II region** rather than "hii region".
+
 ## [1.2.0] - 2026-09-01
 
 Sprint 20 — Chart furniture. The chart has always drawn brightness as

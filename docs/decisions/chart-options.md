@@ -49,6 +49,10 @@ first render being byte-identical to the released M31 reference:
 - **Per-family DSO splits** (nebulae/galaxies/clusters separately) —
   over-granular for a first release; the single deep-sky toggle
   matches how the studied pages read. Open for later evidence.
+  *(Sprint 21 supplied that evidence and took the split:
+  [the deep-sky vocabulary decision](deep-sky-vocabulary.md) added
+  five family controls beneath the master, one per drawn symbol.
+  The master and the dependency rules below are unchanged.)*
 - **Names without figures** — rendered
   (`m42-36-figures-off-names-on.png`): the naming policy anchors on
   visible figure ink, so without figures there is nothing honest to
@@ -126,6 +130,12 @@ recenter and title only, unchanged.
   boundaries) and **Labels** (Deep-sky labels, Constellation names) —
   which fit one compact panel; tabs are not earned by five
   checkboxes, and no empty future tab exists.
+  *(Superseded in Sprint 21. Five checkboxes did not earn tabs;
+  sixteen did. The dialog now carries four tabs by subject — Deep
+  sky, Stars, Constellations, Chart — with the same live-preview
+  transaction, the same dependencies, and every existing control
+  keeping its label and its mnemonic:
+  [the deep-sky vocabulary decision](deep-sky-vocabulary.md).)*
 - Keyboard order runs Content top-to-bottom, then Labels, then
   Restore Defaults, Cancel, OK; every control carries an accessible
   name; the packed dialog is its own minimum size; FlatLaf styles it

@@ -49,8 +49,18 @@ public final class ChartRenderer {
     private static final Color FRAME = new Color(51, 51, 51);
     private static final Color GALAXY_FILL = new Color(232, 232, 232);
     private static final Color GALAXY_OUTLINE = new Color(102, 102, 102);
-    /** Nebulae are faint; their boxes recede so the page stays restrained. */
-    private static final Color NEBULA_OUTLINE = new Color(150, 150, 150);
+    /**
+     * Nebulae are faint; their boxes recede so the page stays
+     * restrained - but not below the point of being seen. Grey 150
+     * scored 2.96:1 against the paper, under the 3:1 floor for a
+     * graphical object, and Sprint 21 makes the box carry a family a
+     * reader switches on and off: a mark that teaches has to be
+     * visible. Grey 132 scores 3.74:1, a quarter clear of the floor
+     * rather than the one part in a hundred that 148 would give, and
+     * stays visibly lighter than the 102 the other symbols use
+     * (docs/decisions/deep-sky-vocabulary.md).
+     */
+    private static final Color NEBULA_OUTLINE = new Color(132, 132, 132);
     private static final Color TEXT_INK = new Color(34, 34, 34);
     /** Geography sits under everything: quiet greys, dotted boundaries. */
     private static final Color FIGURE_INK = new Color(120, 120, 120);
@@ -279,7 +289,7 @@ public final class ChartRenderer {
                 scene.viewport().heightPx() - 2);
         java.util.List<DrawnMark> marks = new java.util.ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (!options.deepSkyObjects() && !isTarget(scene, dso)) {
+            if (!permitted(scene, dso, options)) {
                 continue;
             }
             if (!policy.drawn(dso)) {
@@ -416,16 +426,7 @@ public final class ChartRenderer {
             }
         }
         drawStarLabels(g, scene, options, policy, projection, mapping);
-        for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (options.effectiveDeepSkyLabels()) {
-                if (!policy.labelled(dso)) {
-                    continue;
-                }
-            } else if (!isTarget(scene, dso) || !hasSymbol(dso)) {
-                // Labels disabled: only the searched target keeps its
-                // label, riding its always-drawn symbol.
-                continue;
-            }
+        for (DeepSkyObject dso : labelledDeepSky(scene, options, policy)) {
             projection.project(dso.position()).ifPresent(plane ->
                     drawLabel(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
         }
@@ -650,12 +651,11 @@ public final class ChartRenderer {
                 occupied.add(key);
             }
         }
-        for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (options.effectiveDeepSkyLabels()
-                    ? !detailPolicy.labelled(dso)
-                    : (!isTarget(scene, dso) || !hasSymbol(dso))) {
-                continue;
-            }
+        // Star labels yield to the deep-sky labels that will actually
+        // draw. A family the reader has switched off reserves
+        // nothing, exactly as furniture does (issue #185).
+        for (DeepSkyObject dso
+                : labelledDeepSky(scene, options, detailPolicy)) {
             var plane = projection.project(dso.position());
             if (plane.isPresent()) {
                 occupied.add(labelBounds(metrics, dso,
@@ -1083,6 +1083,92 @@ public final class ChartRenderer {
         paintSymbol(g, symbol, centreX, centreY, sizePx,
                 sizePx * shape.minorFraction(),
                 shape.positionAngleDegrees());
+    }
+
+    /**
+     * The deep-sky objects whose labels the page draws, in scene
+     * order - the label pass's DECISION, published so that hit
+     * testing, studies and tests read the same answer the drawing
+     * reads (issue #185, following the star pass of issue #154).
+     */
+    public java.util.List<DeepSkyObject> labelledDeepSky(
+            ChartScene scene, ChartOptions options) {
+        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        return labelledDeepSky(scene, options,
+                new RegionalDetailPolicy(scene,
+                        mapping.pixelsPerPlaneUnit()));
+    }
+
+    private static java.util.List<DeepSkyObject> labelledDeepSky(
+            ChartScene scene, ChartOptions options,
+            RegionalDetailPolicy policy) {
+        java.util.List<DeepSkyObject> labelled =
+                new java.util.ArrayList<>();
+        for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            // A label rides a symbol: whatever hides the mark hides
+            // its name with it, so a family switched off leaves no
+            // orphaned text where its objects were.
+            if (!permitted(scene, dso, options)) {
+                continue;
+            }
+            if (options.effectiveDeepSkyLabels()) {
+                if (!policy.labelled(dso)) {
+                    continue;
+                }
+            } else if (!isTarget(scene, dso) || !hasSymbol(dso)) {
+                // Labels disabled: only the searched target keeps its
+                // label, riding its always-drawn symbol.
+                continue;
+            }
+            labelled.add(dso);
+        }
+        return java.util.List.copyOf(labelled);
+    }
+
+    /**
+     * The deep-sky objects whose symbols the page draws, before the
+     * paper clips them - the symbol pass's decision, and the set a
+     * label must stay inside.
+     */
+    public java.util.List<DeepSkyObject> drawnDeepSky(ChartScene scene,
+                                                      ChartOptions options) {
+        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        RegionalDetailPolicy policy = new RegionalDetailPolicy(scene,
+                mapping.pixelsPerPlaneUnit());
+        java.util.List<DeepSkyObject> drawn = new java.util.ArrayList<>();
+        for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            if (permitted(scene, dso, options) && policy.drawn(dso)) {
+                drawn.add(dso);
+            }
+        }
+        return java.util.List.copyOf(drawn);
+    }
+
+    /**
+     * Whether the reader's options permit this object's own mark
+     * (Sprint 21, issue #185).
+     *
+     * <p>This is the composition seam the whole family filter lives
+     * at: in front of the option-free {@link RegionalDetailPolicy},
+     * which goes on answering what the chart <em>would</em> draw
+     * without ever being told what the reader asked for. Every pass
+     * that draws or reserves space for a deep-sky object asks here
+     * first, so {@code drawnMarks} publishes exactly the marks the
+     * page carries and a label can never outlive its symbol.
+     *
+     * <p>The searched target is exempt, as it has been since Sprint
+     * 12: a chart that names a target in its title block draws that
+     * target, whatever the reader has switched off. The exemption
+     * grants no mark to a type the atlas draws nothing for - it has
+     * no symbol to be exempt with, and inventing one would be
+     * inventing a fact.
+     */
+    public static boolean permitted(ChartScene scene, DeepSkyObject dso,
+                                    ChartOptions options) {
+        if (isTarget(scene, dso)) {
+            return true;
+        }
+        return options.effectiveFamily(symbolFor(dso));
     }
 
     /**

@@ -29,7 +29,10 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            boolean starNames, boolean bayerLetters,
                            boolean flamsteedNumbers,
                            boolean equatorialGrid,
-                           boolean titleBlock, boolean magnitudeKey) {
+                           boolean titleBlock, boolean magnitudeKey,
+                           boolean galaxies, boolean openClusters,
+                           boolean globularClusters, boolean nebulae,
+                           boolean planetaryNebulae) {
 
     /**
      * The released chart: every layer on, the title block on, and
@@ -39,7 +42,28 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
      */
     public static final ChartOptions DEFAULTS = new ChartOptions(
             true, true, true, true, true, true, true, true, true,
-            true, false);
+            true, false, true, true, true, true, true);
+
+    /**
+     * The chart before the deep-sky families became the reader's
+     * (through 1.2.0): every family drew whenever deep-sky objects
+     * did. An upgrading store therefore gains all five switched on,
+     * and the chart a 1.2.0 reader left behind is the chart they
+     * come back to (docs/decisions/deep-sky-vocabulary.md).
+     */
+    public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
+                        boolean constellationFigures,
+                        boolean constellationBoundaries,
+                        boolean constellationNames,
+                        boolean starNames, boolean bayerLetters,
+                        boolean flamsteedNumbers,
+                        boolean equatorialGrid,
+                        boolean titleBlock, boolean magnitudeKey) {
+        this(deepSkyObjects, deepSkyLabels, constellationFigures,
+                constellationBoundaries, constellationNames, starNames,
+                bayerLetters, flamsteedNumbers, equatorialGrid,
+                titleBlock, magnitudeKey, true, true, true, true, true);
+    }
 
     /**
      * The chart before the furniture became optional (through
@@ -102,6 +126,54 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
     /** Labels depend on symbols: {@code labelled} stays inside {@code drawn}. */
     public boolean effectiveDeepSkyLabels() {
         return deepSkyObjects && deepSkyLabels;
+    }
+
+    /**
+     * Whether the reader has asked for this family, ignoring the
+     * master (Sprint 21, issue #185).
+     *
+     * <p>A family is one drawn symbol, which is what makes the
+     * question answerable at all: the five flags are the renderer's
+     * five marks, and every catalogue type reaches its flag through
+     * {@link SymbolFamily}. A type the atlas draws nothing for has no
+     * family and so no flag - not because it is switched off, but
+     * because there is nothing to switch.
+     */
+    public boolean family(SymbolFamily family) {
+        return switch (family) {
+            case GALAXIES -> galaxies;
+            case OPEN_CLUSTERS -> openClusters;
+            case GLOBULAR_CLUSTERS -> globularClusters;
+            case NEBULAE -> nebulae;
+            case PLANETARY_NEBULAE -> planetaryNebulae;
+        };
+    }
+
+    /**
+     * Whether this family draws: the master and the family together.
+     * A family switched off while the master is off stays off when
+     * the master comes back - the flags remember, and the master
+     * governs (issue #185).
+     */
+    public boolean effectiveFamily(ChartRenderer.Symbol symbol) {
+        SymbolFamily family = SymbolFamily.of(symbol);
+        return deepSkyObjects && family != null && family(family);
+    }
+
+    /** This chart with one family's flag replaced. */
+    public ChartOptions withFamily(SymbolFamily family, boolean enabled) {
+        return new ChartOptions(deepSkyObjects, deepSkyLabels,
+                constellationFigures, constellationBoundaries,
+                constellationNames, starNames, bayerLetters,
+                flamsteedNumbers, equatorialGrid, titleBlock, magnitudeKey,
+                family == SymbolFamily.GALAXIES ? enabled : galaxies,
+                family == SymbolFamily.OPEN_CLUSTERS ? enabled
+                        : openClusters,
+                family == SymbolFamily.GLOBULAR_CLUSTERS ? enabled
+                        : globularClusters,
+                family == SymbolFamily.NEBULAE ? enabled : nebulae,
+                family == SymbolFamily.PLANETARY_NEBULAE ? enabled
+                        : planetaryNebulae);
     }
 
     /** Names depend on figures: names anchor on visible figure ink. */

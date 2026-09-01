@@ -456,7 +456,13 @@ public final class InspectorPanel extends JPanel {
     static String readableType(DeepSkyObject dso) {
         String name = dso.type().name().toLowerCase(Locale.ROOT)
                 .replace('_', ' ');
-        return name.equals("other") ? "type not classified" : name;
+        if (name.equals("other")) {
+            return "type not classified";
+        }
+        // One type does not survive lowercasing: an H II region is
+        // named after a spectroscopic notation, not a word, and
+        // "hii region" reads as a typo (Sprint 21 gate, #184).
+        return name.equals("hii region") ? "H II region" : name;
     }
 
     /** The most telling name a star has, never less than its id. */

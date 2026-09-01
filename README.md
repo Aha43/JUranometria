@@ -188,18 +188,26 @@ make import-star-identities
 
 The menu bar stays out of the way: **View** carries Zoom In/Zoom Out
 with their platform shortcuts, and **View → Chart Options…** lets the
-reader choose the chart's content and labels — deep-sky objects and
-their labels, constellation figures, boundaries, and names, star
-names, Bayer letters and Flamsteed numbers separately, and the
-equatorial (ICRS/J2000) coordinate grid, and the chart's own
-furniture: the **title block** in the lower left and a
-**stellar-magnitude key** in the upper right, which shows the circle
-size the chart draws for three visual magnitudes including the
-page's own limit (the key stays off until you ask for it, because on
-a crowded page it covers stars) — with a
-live preview, safe Cancel, a Restore Defaults returning the released
-chart exactly, and choices remembered across restarts (a searched
-target always stays drawn and labelled, whatever the toggles);
+reader choose the chart's content and labels, in four tabs:
+
+- **Deep sky** — deep-sky objects as a whole, then each of the five
+  symbol families on its own (galaxies, open clusters, globular
+  clusters, nebulae, planetary nebulae), each row carrying the mark
+  the chart actually draws for it, and deep-sky labels;
+- **Stars** — star names, Bayer letters and Flamsteed numbers,
+  separately;
+- **Constellations** — figures, boundaries and names;
+- **Chart** — the equatorial (ICRS/J2000) coordinate grid, the
+  **title block** in the lower left, and a **stellar-magnitude key**
+  in the upper right, which shows the circle size the chart draws for
+  three visual magnitudes including the page's own limit (the key
+  stays off until you ask for it, because on a crowded page it covers
+  stars).
+
+All of it with a live preview, safe Cancel, a Restore Defaults
+returning the released chart exactly, and choices remembered across
+restarts (a searched target always stays drawn and labelled, whatever
+the toggles);
 **Help → About JUranometria** shows
 the version, a short description, and the licensing of the code and
 every bundled resource — including the full notices, offline — and
@@ -210,13 +218,26 @@ override that never rewrites the saved setting).
 Controls disable at their bounds: the bundled bright-sky pack carries
 the complete sky to stars of V 8.0 (45,630 Tycho-2 stars and 13,371
 OpenNGC objects in about 2.5 MiB), and the atlas never claims deeper
-coverage than it holds. Deep-sky objects draw in the atlas's symbol
-language: galaxies as oriented ellipses, open clusters as dotted
-circles, globular clusters as crossed circles, nebulae as outlined
-boxes, planetary nebulae as small crossed circles. Stellar-type
-entries, associations, and novae stay undrawn - a stellar entry
-would only duplicate the star layer - though they remain searchable
-and recentre the chart. A `--dark` argument runs the dark
+coverage than it holds.
+
+**Reading the deep sky.** Every deep-sky object the chart draws
+carries one of five marks, and each mark is a family you can switch
+on and off in Chart Options → Deep sky, where the marks themselves
+are shown beside their names:
+
+| mark | family | what it holds |
+|---|---|---|
+| oriented ellipse | **Galaxies** | galaxies, and close pairs, triplets and groups |
+| dotted circle | **Open clusters** | loose clusters of young stars in the Milky Way's plane |
+| crossed circle | **Globular clusters** | dense, ancient balls of stars in the galactic halo |
+| outlined box | **Nebulae** | emission, reflection and dark nebulae, H II regions, supernova remnants, and clusters still wrapped in nebulosity |
+| small crossed circle | **Planetary nebulae** | shells thrown off by dying stars |
+
+A galaxy is drawn at its catalogued size and orientation, so the
+ellipses lean the way the galaxies do. Stellar-type entries,
+associations, and novae stay undrawn - a stellar entry would only
+duplicate the star layer - though they remain searchable and
+recentre the chart. A `--dark` argument runs the dark
 application theme; the chart page itself stays white paper in both
 themes.
 
