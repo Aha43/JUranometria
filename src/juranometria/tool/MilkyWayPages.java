@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.SkyPosition;
@@ -13,18 +14,21 @@ import juranometria.chart.SkyPosition;
  * Drawing the candidate Milky Way layer onto a real chart page
  * (Sprint 22, issue #189).
  *
- * <p>Study code. The geometry is projected through the atlas's own
- * {@link GnomonicProjection} and {@link ViewportMapping} - the same
- * classes the renderer uses - so what is measured here is what the
- * page would carry. The composition is deliberately the arrangement
- * the gate proposes: <strong>the layer under every existing mark</strong>,
- * which is the only way to see whether the grid, the figures, the
- * stars, their labels and the furniture stay legible over it.
+ * <p>Study code, and the renderer is untouched. The layer is built on
+ * its own canvas by asking the sky through the atlas's own inverse
+ * projection, so <strong>where the layer falls and how much of a page
+ * it covers are measured exactly</strong> - those numbers come from
+ * the layer itself, before any page is involved.
  *
- * <p>Nothing here is production. The renderer is untouched; this
- * paints the layer on its own canvas and puts the rendered page on
- * top, keeping every existing pixel of chart ink exactly as the
- * renderer drew it.
+ * <p>Putting the two together is a different matter. The renderer
+ * fills its paper before it draws anything, so a study cannot paint
+ * beneath it without changing production, which this issue forbids.
+ * {@link #previewOver} therefore lays the drawn page over the wash,
+ * which is a <strong>preview and not the production drawing
+ * order</strong>; what it costs is documented there and measured by
+ * {@link #haloPercent}. <strong>How a mark reads over a wash is
+ * consequently not settled here</strong> - that waits for #191 and a
+ * real background seam.
  */
 final class MilkyWayPages {
 
@@ -133,8 +137,32 @@ final class MilkyWayPages {
                 (System.nanoTime() - started) / 1_000_000);
     }
 
-    /** Puts the page over the layer, keeping every drawn pixel. */
-    static BufferedImage compose(BufferedImage layer, BufferedImage page) {
+    /**
+     * A <strong>preview</strong> of the layer beneath a page - not the
+     * production drawing order, and the difference is recorded rather
+     * than glossed (PR #199 review).
+     *
+     * <p>The renderer fills its paper before it draws anything, so
+     * there is no seam a study can paint underneath without changing
+     * production - which this issue forbids. What this does instead is
+     * put an already-drawn page over the wash and let the wash show
+     * through wherever the page left pure paper.
+     *
+     * <p><strong>What that gets wrong:</strong> ink is antialiased
+     * against white, so the palest edge pixels of every mark are
+     * near-white but not white. They stay white here and would carry
+     * the wash in production, leaving a faint halo around chart ink
+     * that the real order would not have. {@link #haloPercent}
+     * measures it on every page this study renders, and the study's
+     * report carries the worst of them.
+     *
+     * <p>So these images show where the layer falls - which is what
+     * the gate needs - and they do not settle how a mark reads over a
+     * wash. That is deferred to #191, where the real background seam
+     * exists.
+     */
+    static BufferedImage previewOver(BufferedImage layer,
+                                     BufferedImage page) {
         BufferedImage out = new BufferedImage(page.getWidth(),
                 page.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < page.getHeight(); y++) {
@@ -146,6 +174,45 @@ final class MilkyWayPages {
             }
         }
         return out;
+    }
+
+    /**
+     * The antialiased edge pixels the preview cannot place: near-white
+     * but not paper, so they keep their white here and would take the
+     * wash in production.
+     */
+    static double haloPercent(BufferedImage page) {
+        long ink = 0;
+        long nearWhite = 0;
+        for (int y = 0; y < page.getHeight(); y++) {
+            for (int x = 0; x < page.getWidth(); x++) {
+                int rgb = page.getRGB(x, y) & 0xffffff;
+                if (rgb == 0xffffff) {
+                    continue;
+                }
+                ink++;
+                if ((rgb & 0xff) >= 250) {
+                    nearWhite++;
+                }
+            }
+        }
+        return ink == 0 ? 0.0 : 100.0 * nearWhite / ink;
+    }
+
+    /**
+     * Every colour a layer canvas contains. The palette permits four -
+     * paper and three washes - and this is how the report says so
+     * having looked, rather than by trusting {@link #paint} to have
+     * used nothing else. It is also the evidence that no translucency
+     * or cumulative alpha is at work: those would leave intermediate
+     * greys behind.
+     */
+    static void collectColours(BufferedImage layer, Set<Integer> into) {
+        for (int y = 0; y < layer.getHeight(); y++) {
+            for (int x = 0; x < layer.getWidth(); x++) {
+                into.add(layer.getRGB(x, y) & 0xffffff);
+            }
+        }
     }
 
     /** The share of the page's own ink that ends up over the layer. */

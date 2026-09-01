@@ -181,16 +181,36 @@ fill step by about 1 L\*, which is where two washes stop being two.
 **Three washes fit; five do not.** The source's five levels merge
 **1–2 / 3 / 4–5** in rendering only.
 
-Over the darkest wash every mark keeps its separation — grid lines
-8.11 L\*, boundaries 17.47 L\*, text 81.22 L\*. The thinnest is the
-**galaxy fill at 2.45 L\***, whose grey-132 outline carries the
-symbol regardless. That is the tightest part of the palette and a
-**named regression case**.
+Against the darkest wash the palette leaves every mark a separation
+— grid lines 8.11 L\*, boundaries 17.47 L\*, text 81.22 L\*. The
+thinnest is the **galaxy fill at 2.45 L\***, whose grey-132 outline
+carries the symbol regardless. That is the tightest part of the
+palette and a **named regression case**.
 
-Measured on the rendered page rather than in theory: a Sagittarius
-page contains **exactly four colours** — `#ffffff`, `#f9f9f9`,
-`#f4f4f4`, `#efefef`. No translucency, no compositing, no antialiased
-intermediates, so the L\* numbers above describe real pixels.
+Those are distances between colours, **not a verdict on legibility**,
+and the difference matters. A mark meets its background through its
+antialiased edge, and this study cannot render one over a wash: the
+renderer fills its paper before it draws, so there is no seam to
+paint beneath without changing production, which this issue forbids.
+What the study does instead is lay a drawn page over the wash and let
+the wash through where the page left pure paper — a **preview, not
+the production drawing order**. It leaves the palest edge pixel of
+every mark white where production would tint it, on up to **10.4% of
+a page's inked pixels**.
+
+So **whether the marks stay legible over the layer is deferred to
+#191**, measured on composited pixels through the real background
+seam. What is settled here is that the palette leaves each mark a
+separation to measure, and the tightest of them is named.
+
+What the preview does establish exactly is the layer itself, which is
+built before any page is involved. Across all 36 pages the study
+renders, the layer canvases contain **four colours in total** —
+`#ffffff`, `#f9f9f9`, `#f4f4f4`, `#efefef` — counted rather than
+assumed. Paper and three washes, nothing between them: **no
+translucency, no cumulative alpha, no intermediate greys**. Coverage
+percentages are likewise measured on the layer, so they too are
+exact.
 
 **The layer is theme-independent, verified**: light and dark produce
 the same bytes, because the chart owns its palette.
@@ -229,7 +249,10 @@ non-nested places measured above:
   exactly that: 100% covered).
 - **Compare coverage numbers, not only screenshots.**
 - **Measure the final rendered pixel colours**, including anything
-  Java2D compositing or antialiasing does to them.
+  Java2D compositing or antialiasing does to them — this is where the
+  gate's colour-separation figures become a legibility result, and
+  the antialiased edges of grid lines, labels, star discs and the
+  galaxy fill are the pixels that decide it.
 - **Benchmark during pan and zoom** against the existing synchronous
   interaction budget.
 

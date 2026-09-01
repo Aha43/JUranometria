@@ -64,7 +64,9 @@ Near-white washes are compared by lightness (CIE L*), not by contrast ratio: at 
 
 The first attempt ends **darker than a galaxy**. Squeezing five levels above the galaxy fill steps by about 1 L*, which is where two washes stop being two. Three washes clear every test with room left.
 
-### The chart's marks over the darkest wash
+### Colour separation between the marks and the darkest wash
+
+**A calculation on the palette, not a measurement of rendered pages.** These are the lightness distances between each ink's own colour and the darkest wash, which is what a wash costs a mark at its solid core. It is not a legibility verdict: a mark meets its background through antialiased edge pixels, and this study cannot render those over a wash without changing production. **Whether the marks stay legible over the layer is settled in #191**, on composited pixels.
 
 | chart ink | over paper | over the darkest wash |
 |---|---:|---:|
@@ -78,11 +80,13 @@ The first attempt ends **darker than a galaxy**. Squeezing five levels above the
 | text | 86.77 | 81.22 |
 | stars | 100.00 | 94.45 |
 
-Every mark keeps its separation; the galaxy fill is the thinnest at 2.45 L*, and its outline at grey 132 carries the symbol regardless. Nothing the chart draws is lost under the layer.
+The thinnest is the **galaxy fill at 2.45 L***, whose grey-132 outline carries the symbol regardless - the named regression case #191 inherits. What this table establishes is that the palette **leaves each mark a separation to be measured**, and none of it collapses to nothing; what it does not establish is how each mark then reads.
 
 ## On the page
 
-Every page is the production renderer's own output, with the candidate layer projected through the atlas's `GnomonicProjection` and `ViewportMapping` and composed **underneath every mark the renderer drew**. No chart pixel is replaced; the layer only fills paper.
+Every page is the production renderer's own output with the candidate layer beneath it. The coverage figures are exact - they are measured on the layer itself, before any page is laid over it.
+
+**The images are a preview, not the production drawing order.** The renderer fills its paper before drawing, so a study cannot paint underneath it without changing production, which this issue forbids. The page is therefore laid over the wash and the wash shows through wherever the page left pure paper - which leaves the antialiased edge of every mark white, where production would tint it. That is a faint halo around chart ink, and it is why **how a mark reads over a wash is not settled here** but in #191, through the real background seam.
 
 | page | field | washes seen | layer covers | brightest wash | chart ink over layer |
 |---|---:|---:|---:|---:|---:|
@@ -122,6 +126,9 @@ Every page is the production renderer's own output, with the candidate layer pro
 | m31-default | 8° | 0 | 0.0% | 0.0% | 0.0% |
 | m31-default | 18° | 1 | 0.3% | 0.0% | 0.4% |
 | m31-default | 36° | 1 | 16.4% | 0.0% | 17.4% |
+Across every page above, the layer canvases contain **4 colours in total**: `#efefef`, `#f4f4f4`, `#f9f9f9`, `#ffffff`. Paper and the three washes, and nothing between them - no translucency, no cumulative alpha, no intermediate greys. The lightness figures in the palette section therefore describe colours the layer really has.
+
+At most **10.4% of a page's inked pixels** are the antialiased edges the preview leaves white. In production they would carry the wash; here they do not, and no claim in this report rests on them.
 
 The oracle's cost is **not in this report**. Wall-clock timing is not reproducible evidence: it differs between machines and between two runs on one machine, and a study whose output moves cannot be reproduced. What this run observed is written to standard error instead, with the machine that produced it named, and [the decision](../../decisions/milky-way-layer.md) records an observation rather than a bound.
 

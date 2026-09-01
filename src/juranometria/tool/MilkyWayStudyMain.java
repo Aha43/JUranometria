@@ -120,7 +120,20 @@ public final class MilkyWayStudyMain {
                 + " test with room left.");
         System.out.println();
 
-        System.out.println("### The chart's marks over the darkest wash");
+        System.out.println("### Colour separation between the marks and"
+                + " the darkest wash");
+        System.out.println();
+        System.out.println("**A calculation on the palette, not a"
+                + " measurement of rendered pages.** These are the"
+                + " lightness distances between each ink's own colour"
+                + " and the darkest wash, which is what a wash costs a"
+                + " mark at its solid core. It is not a legibility"
+                + " verdict: a mark meets its background through"
+                + " antialiased edge pixels, and this study cannot"
+                + " render those over a wash without changing"
+                + " production. **Whether the marks stay legible over"
+                + " the layer is settled in #191**, on composited"
+                + " pixels.");
         System.out.println();
         System.out.println("| chart ink | over paper | over the darkest"
                 + " wash |");
@@ -131,10 +144,14 @@ public final class MilkyWayStudyMain {
                     lightness(239) - lightness(inks[i]));
         }
         System.out.println();
-        System.out.println("Every mark keeps its separation; the galaxy"
-                + " fill is the thinnest at 2.45 L*, and its outline"
-                + " at grey 132 carries the symbol regardless. Nothing"
-                + " the chart draws is lost under the layer.");
+        System.out.println("The thinnest is the **galaxy fill at 2.45"
+                + " L***, whose grey-132 outline carries the symbol"
+                + " regardless - the named regression case #191"
+                + " inherits. What this table establishes is that the"
+                + " palette **leaves each mark a separation to be"
+                + " measured**, and none of it collapses to nothing;"
+                + " what it does not establish is how each mark then"
+                + " reads.");
         System.out.println();
     }
 
@@ -164,11 +181,23 @@ public final class MilkyWayStudyMain {
         System.out.println("## On the page");
         System.out.println();
         System.out.println("Every page is the production renderer's own"
-                + " output, with the candidate layer projected through"
-                + " the atlas's `GnomonicProjection` and"
-                + " `ViewportMapping` and composed **underneath every"
-                + " mark the renderer drew**. No chart pixel is"
-                + " replaced; the layer only fills paper.");
+                + " output with the candidate layer beneath it. The"
+                + " coverage figures are exact - they are measured on"
+                + " the layer itself, before any page is laid over"
+                + " it.");
+        System.out.println();
+        System.out.println("**The images are a preview, not the"
+                + " production drawing order.** The renderer fills its"
+                + " paper before drawing, so a study cannot paint"
+                + " underneath it without changing production, which"
+                + " this issue forbids. The page is therefore laid"
+                + " over the wash and the wash shows through wherever"
+                + " the page left pure paper - which leaves the"
+                + " antialiased edge of every mark white, where"
+                + " production would tint it. That is a faint halo"
+                + " around chart ink, and it is why **how a mark reads"
+                + " over a wash is not settled here** but in #191,"
+                + " through the real background seam.");
         System.out.println();
         System.out.println("| page | field | washes seen | layer covers"
                 + " | brightest wash | chart ink over layer |");
@@ -176,6 +205,8 @@ public final class MilkyWayStudyMain {
         MilkyWaySky sky = new MilkyWaySky(levels);
         long slowest = 0;
         long quickest = Long.MAX_VALUE;
+        double halo = 0.0;
+        java.util.Set<Integer> layerColours = new java.util.TreeSet<>();
         for (MilkyWayPages.Page page : MilkyWayPages.pages()) {
             for (double field : new double[] {8.0, 18.0, 36.0}) {
                 ChartScene scene = Atlas.assembler().assemble(
@@ -189,9 +220,11 @@ public final class MilkyWayStudyMain {
                         ChartOptions.DEFAULTS);
                 double inkOver =
                         MilkyWayPages.inkOverLayer(layer, chart);
-                ImageIO.write(MilkyWayPages.compose(layer, chart), "png",
+                halo = Math.max(halo, MilkyWayPages.haloPercent(chart));
+                MilkyWayPages.collectColours(layer, layerColours);
+                ImageIO.write(MilkyWayPages.previewOver(layer, chart), "png",
                         new File(DIR, String.format(Locale.ROOT,
-                                "%s-%02.0f.png", page.name(), field)));
+                                "%s-%02.0f-preview.png", page.name(), field)));
                 System.out.printf(Locale.ROOT,
                         "| %s | %.0f° | %d | %.1f%% | %.1f%% | %.1f%% |%n",
                         page.name(), field, measured.levelsSeen(),
@@ -201,7 +234,26 @@ public final class MilkyWayStudyMain {
                 quickest = Math.min(quickest, measured.buildMillis());
             }
         }
-        System.out.println();
+        StringBuilder colours = new StringBuilder();
+        for (int rgb : layerColours) {
+            colours.append(colours.isEmpty() ? "" : ", ")
+                    .append(String.format(Locale.ROOT, "`#%06x`", rgb));
+        }
+        System.out.printf(Locale.ROOT,
+                "Across every page above, the layer canvases contain"
+                        + " **%d colours in total**: %s. Paper and the"
+                        + " three washes, and nothing between them -"
+                        + " no translucency, no cumulative alpha, no"
+                        + " intermediate greys. The lightness figures"
+                        + " in the palette section therefore describe"
+                        + " colours the layer really has.%n%n",
+                layerColours.size(), colours);
+        System.out.printf(Locale.ROOT,
+                "At most **%.1f%% of a page's inked pixels** are the"
+                        + " antialiased edges the preview leaves white."
+                        + " In production they would carry the wash;"
+                        + " here they do not, and no claim in this"
+                        + " report rests on them.%n%n", halo);
         System.out.println("The oracle's cost is **not in this report**."
                 + " Wall-clock timing is not reproducible evidence: it"
                 + " differs between machines and between two runs on"
