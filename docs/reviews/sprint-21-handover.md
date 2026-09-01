@@ -141,6 +141,29 @@ Every finding across four rounds, and what each cost:
   `SwingSession`, which detects an override by presence rather than
   value.
 - **P2, the contrast rule documented but unenforced** — now a test.
+- **P1, a label leg that could pass with nothing labelled** — it
+  asserted only that at most one name survived, which an empty page
+  satisfies. It now establishes its premises first (a symbol-capable
+  target, and ordinary names on the page), then requires the ordinary
+  names to go and the target's to stay, requires them all back, and
+  hides the target's *own* family so that one action proves both
+  halves: the companions lose mark and name together while the named
+  target keeps both.
+- **P1, packaged search that ignored its own result** — it called the
+  search and then rebuilt the expected page from the object already
+  in hand, so it would have passed if choosing a result recentred on
+  the wrong place or lost the identity. The result-to-navigation
+  policy moved out of `SearchField` into `SearchNavigation`, with no
+  Swing around it, and the packaged evidence now drives the returned
+  result through the same policy a reader's Enter takes.
+- **P2, a "restart" that only re-read the store** — now a fresh
+  controller over a fresh store instance, feeding a fresh chart
+  component, with the answer asked of that component's own page.
+  Following that thread found something the review had not asked
+  about: most of the journey measured the *controller's* options
+  rather than the chart's, so a consumer that took the options and
+  dropped the families would have gone unnoticed. The journey now
+  asks the component.
 - **CI, not review:** the scrolling tab layout adds arrow buttons that
   arrive **unnamed**, and on Linux they appear at a width where macOS
   fits the titles. `AccessibleSurfaceTest` failed exactly as it
@@ -157,6 +180,11 @@ guess did not.
 
 - **485 tests** on a display; headless, the display-dependent
   journeys abort visibly rather than disappear.
+- The journey's legs are mutation-checked rather than assumed: a
+  label pass that ignores the family gate, a dropped target-label
+  guarantee, a search that loses its target identity, a search that
+  recentres on the wrong place, and a chart consumer that quietly
+  drops the family flags each fail it.
 - **The M31 reference is byte-identical.** The released default page
   draws no nebula box, so even the palette change left it untouched —
   which the gate predicted before making it.

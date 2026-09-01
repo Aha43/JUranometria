@@ -100,52 +100,21 @@ public final class SearchField extends JTextField {
     }
 
     /**
-     * The reviewed relationship between search and selection (issue
-     * #170): finding an object by name selects it, so the inspector
-     * can describe what the reader just looked up. This is also the
-     * keyboard-only route into the inspector - there is no cursor
-     * that walks from star to star, so a reader without a pointer
-     * arrives by searching.
+     * Recentres under the coverage policy; the chart never moves on
+     * NO_FIT.
      *
-     * <p>Coordinates select nothing: the reader asked for a place,
-     * not for an object, and no object was found there.
+     * <p>The policy itself lives in {@link SearchNavigation}, with no
+     * Swing around it, so the packaged acceptance can take the same
+     * path a reader's Enter takes rather than reconstructing where
+     * the chart ought to have gone (Sprint 21 review, P1).
      */
-    private void establishSelection(SearchResult result) {
-        if (selection == null) {
-            return;
-        }
-        switch (result.kind()) {
-            case STAR -> selection.select(new Selection.Object(
-                    Selection.Object.Kind.STAR, result.identity(),
-                    result.position()));
-            case DEEP_SKY_OBJECT -> selection.select(new Selection.Object(
-                    Selection.Object.Kind.DEEP_SKY, result.identity(),
-                    result.position()));
-            default -> selection.clear();
-        }
-    }
-
-    /** Recentres under the coverage policy; the chart never moves on NO_FIT. */
     Outcome apply(SearchResult result) {
-        // A named object titles the chart; coordinates leave it anonymous
-        // so the title falls back to the position itself.
-        boolean coordinates = result.kind() == SearchResult.Kind.COORDINATES;
-        String targetLabel = coordinates ? null : result.regionTitle();
-        String targetIdentity = coordinates ? null : result.identity();
-        double currentField = controller.state().fieldWidthDegrees();
-        if (assembler.fits(result.position(), currentField)) {
-            controller.recenter(result.position(), targetLabel, targetIdentity);
-            establishSelection(result);
-            return Outcome.RECENTERED;
-        }
-        OptionalDouble widest = assembler.widestFittingFieldDegrees(result.position());
-        if (widest.isPresent()) {
-            controller.recenter(result.position(), widest.getAsDouble(),
-                    targetLabel, targetIdentity);
-            establishSelection(result);
-            return Outcome.RECENTERED_NARROWER;
-        }
-        return Outcome.NO_FIT;
+        return switch (SearchNavigation.apply(result, assembler,
+                controller, selection)) {
+            case RECENTERED -> Outcome.RECENTERED;
+            case RECENTERED_NARROWER -> Outcome.RECENTERED_NARROWER;
+            case NO_FIT -> Outcome.NO_FIT;
+        };
     }
 
     /** A keyboard-navigable list; every item runs the same apply policy. */

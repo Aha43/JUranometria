@@ -159,6 +159,9 @@ class DeepSkyFamilyJourneyTest {
                 assertTrue(options.options().family(family),
                         family + " arrives drawn, so the upgrade hides"
                                 + " nothing they were looking at");
+                assertTrue(chart.chartOptions().family(family),
+                        family + " reaches the chart the reader sees,"
+                                + " not only the controller behind it");
             }
             assertEquals(ChartViewState.DEFAULT, navigation.state(),
                     "on the released default page");
@@ -295,32 +298,78 @@ class DeepSkyFamilyJourneyTest {
                     familyBox(SymbolFamily.OPEN_CLUSTERS)::doClick);
             flush();
 
-            // 8. Labels ride symbols.
+            // 8. Labels ride symbols, and the target's name outlives
+            // both switches. Every claim here needs the page to be
+            // naming things first, so the premises come before the
+            // action rather than after it.
+            String named = navigation.state().targetIdentity();
+            assertNotNull(named, "the page names a target");
+            assertTrue(ChartRenderer.hasSymbol(objectFor(named)),
+                    named + " has a symbol to carry a label");
+            List<String> ordinary = ordinaryLabels();
+            assertFalse(ordinary.isEmpty(),
+                    "the page names ordinary objects too, which is what"
+                            + " makes their removal observable");
+            assertTrue(labelledIds().contains(named),
+                    "and names the target among them");
+
             SwingUtilities.invokeAndWait(labelsBox()::doClick);
             flush();
-            List<String> withLabelsOff = labelledIds();
-            assertTrue(withLabelsOff.size() <= 1,
-                    "with labels off at most one name is left: "
-                            + withLabelsOff);
-            for (String kept : withLabelsOff) {
-                assertEquals(navigation.state().targetIdentity(), kept,
-                        "and it is the searched target's, the one"
-                                + " guarantee that survives the"
-                                + " switch");
+            assertEquals(List.of(named), labelledIds(),
+                    "labels off leaves exactly one name - the searched"
+                            + " target's, the guarantee that survives"
+                            + " the switch");
+
+            SwingUtilities.invokeAndWait(labelsBox()::doClick);
+            flush();
+            assertEquals(ordinary, ordinaryLabels(),
+                    "and switching them back on returns every ordinary"
+                            + " name, not merely some");
+
+            // Hide the target's own family: its ordinary companions
+            // lose their marks and their names together, and the
+            // target keeps both. One action, both halves of the rule.
+            SymbolFamily targetFamily = SymbolFamily.of(objectFor(named));
+            List<String> companions = ordinary.stream()
+                    .filter(id -> SymbolFamily.of(objectFor(id))
+                            == targetFamily)
+                    .toList();
+            assertFalse(companions.isEmpty(),
+                    targetFamily + " has ordinary named members on this"
+                            + " page besides the target: " + ordinary);
+            SwingUtilities.invokeAndWait(familyBox(targetFamily)::doClick);
+            flush();
+            for (String companion : companions) {
+                assertFalse(labelledIds().contains(companion),
+                        companion + " lost its name with its family");
+                assertFalse(drawnDecisionIds().contains(companion),
+                        "and its symbol");
             }
-            SwingUtilities.invokeAndWait(labelsBox()::doClick);
-            flush();
-            SwingUtilities.invokeAndWait(
-                    familyBox(SymbolFamily.NEBULAE)::doClick);
-            flush();
-            // Against the symbol pass's own decision, not against the
-            // marks: the marks are what survives the paper's clip, and
-            // an object whose symbol falls off the page takes its
-            // label off the page with it.
+            assertTrue(labelledIds().contains(named),
+                    "while the named target kept its label");
+            assertTrue(drawnDecisionIds().contains(named),
+                    "and its symbol");
             for (String labelled : labelledIds()) {
+                // Against the symbol pass's own decision, not against
+                // the marks: the marks are what survives the paper's
+                // clip, and an object whose symbol falls off the page
+                // takes its label off the page with it.
                 assertTrue(drawnDecisionIds().contains(labelled),
                         labelled + " is labelled, so it is drawn");
             }
+
+            // Leave nebulae hidden for the next step, whichever family
+            // the target happened to belong to.
+            if (targetFamily != SymbolFamily.NEBULAE) {
+                SwingUtilities.invokeAndWait(
+                        familyBox(targetFamily)::doClick);
+                flush();
+                SwingUtilities.invokeAndWait(
+                        familyBox(SymbolFamily.NEBULAE)::doClick);
+                flush();
+            }
+            assertFalse(familyBox(SymbolFamily.NEBULAE).isSelected(),
+                    "nebulae hidden, for what the search must do next");
             closeDialogWithOk();
 
             // 9. Search still finds what the chart is hiding.
@@ -372,16 +421,46 @@ class DeepSkyFamilyJourneyTest {
             closeDialogWithOk();
             assertEquals("false", store.get("chart.galaxies", null),
                     "OK wrote the choice down");
-            ChartOptions reloaded = ChartOptionsStore.forNode(store).load();
-            assertFalse(reloaded.galaxies(),
-                    "a restart reads it back");
-            assertFalse(reloaded.nebulae(),
-                    "with the other choice they made");
-            assertTrue(reloaded.globularClusters(),
-                    "and the families they left alone");
-            assertFalse(reloaded.flamsteedNumbers(),
-                    "and the choice they made in 1.2.0 is still"
-                            + " theirs, eleven steps later");
+
+            // A restart, across the session boundary the claim is
+            // about: a new controller over a new store instance for
+            // the same node, feeding a new chart component. Reading
+            // the store again would only have proved the bytes
+            // round-trip, which the store's own tests already cover -
+            // a controller that ignored its store could have
+            // regressed while this journey still said restart worked
+            // (sprint review, P2).
+            ChartComponent restartedChart = new ChartComponent(assembler);
+            ChartOptionsController restarted = new ChartOptionsController(
+                    ChartOptionsStore.forNode(store));
+            restarted.onChange(restartedChart::setChartOptions);
+            SwingUtilities.invokeAndWait(() -> {
+                restartedChart.setViewState(navigation.state());
+                restartedChart.setSize(900, 700);
+            });
+            flush();
+
+            ChartOptions afterRestart = restartedChart.chartOptions();
+            assertFalse(afterRestart.galaxies(),
+                    "the restarted session's chart hides galaxies");
+            assertFalse(afterRestart.nebulae(),
+                    "and the nebulae they hid earlier");
+            assertTrue(afterRestart.globularClusters(),
+                    "and draws the families they left alone");
+            assertFalse(afterRestart.flamsteedNumbers(),
+                    "with the choice they made in 1.2.0 still theirs,"
+                            + " eleven steps later");
+            // Asked of the new chart's own page, not of the old
+            // controller: what a restarted reader would see.
+            assertEquals(List.of(), RENDERER.drawnMarks(
+                            restartedChart.currentScene(), afterRestart)
+                    .stream().filter(mark -> mark.deepSky() != null)
+                    .map(mark -> mark.deepSky().id())
+                    .filter(id -> SymbolFamily.of(objectFor(id))
+                            == SymbolFamily.GALAXIES)
+                    .toList(),
+                    "and its page draws no galaxy");
+            SwingUtilities.invokeAndWait(restartedChart::removeNotify);
 
             // 12. Restore Defaults, and Home.
             assertEquals("false", store.get("chart.flamsteedNumbers", null),
@@ -642,11 +721,17 @@ class DeepSkyFamilyJourneyTest {
 
     // ---- what the page is showing ----------------------------------
 
+    /**
+     * What the page shows is asked of the chart component, not of the
+     * controller behind it: the component is the consumer, and a
+     * consumer that took the options but dropped the families would
+     * otherwise go unnoticed here.
+     */
     private java.util.Map<SymbolFamily, Integer> marksByFamily() {
         java.util.Map<SymbolFamily, Integer> counts =
                 new java.util.EnumMap<>(SymbolFamily.class);
         for (ChartRenderer.DrawnMark mark : RENDERER.drawnMarks(
-                chart.currentScene(), options.options())) {
+                chart.currentScene(), chart.chartOptions())) {
             if (mark.deepSky() != null) {
                 counts.merge(SymbolFamily.of(mark.deepSky()), 1,
                         Integer::sum);
@@ -662,7 +747,8 @@ class DeepSkyFamilyJourneyTest {
     }
 
     private List<String> drawnIds() {
-        return RENDERER.drawnMarks(chart.currentScene(), options.options())
+        return RENDERER.drawnMarks(chart.currentScene(),
+                        chart.chartOptions())
                 .stream().filter(mark -> mark.deepSky() != null)
                 .map(mark -> mark.deepSky().id()).toList();
     }
@@ -670,13 +756,20 @@ class DeepSkyFamilyJourneyTest {
     /** What the symbol pass decided to draw, before the paper clips. */
     private List<String> drawnDecisionIds() {
         return RENDERER.drawnDeepSky(chart.currentScene(),
-                        options.options()).stream()
+                        chart.chartOptions()).stream()
                 .map(DeepSkyObject::id).toList();
+    }
+
+    /** The names the page draws that are not the target's guarantee. */
+    private List<String> ordinaryLabels() {
+        String target = navigation.state().targetIdentity();
+        return labelledIds().stream()
+                .filter(id -> !id.equals(target)).toList();
     }
 
     private List<String> labelledIds() {
         return RENDERER.labelledDeepSky(chart.currentScene(),
-                        options.options()).stream()
+                        chart.chartOptions()).stream()
                 .map(DeepSkyObject::id).toList();
     }
 
@@ -689,8 +782,9 @@ class DeepSkyFamilyJourneyTest {
 
     /** Any star mark well inside the page: every page has one. */
     private ChartRenderer.DrawnMark someStar() {
-        return RENDERER.drawnMarks(chart.currentScene(), options.options())
-                .stream().filter(mark -> mark.star() != null)
+        return RENDERER.drawnMarks(chart.currentScene(),
+                        chart.chartOptions()).stream()
+                .filter(mark -> mark.star() != null)
                 .filter(mark -> mark.centre().x() > 120
                         && mark.centre().x() < chart.getWidth() - 120
                         && mark.centre().y() > 120
@@ -699,8 +793,8 @@ class DeepSkyFamilyJourneyTest {
     }
 
     private ChartRenderer.DrawnMark someMark(SymbolFamily family) {
-        return RENDERER.drawnMarks(chart.currentScene(), options.options())
-                .stream()
+        return RENDERER.drawnMarks(chart.currentScene(),
+                        chart.chartOptions()).stream()
                 .filter(mark -> mark.deepSky() != null
                         && SymbolFamily.of(mark.deepSky()) == family)
                 .filter(mark -> mark.centre().x() > 60
@@ -839,7 +933,7 @@ class DeepSkyFamilyJourneyTest {
         var out = new java.io.ByteArrayOutputStream();
         javax.imageio.ImageIO.write(RENDERER.renderToImage(
                         assembler.assemble(navigation.state(), 900, 700),
-                        options.options()), "png", out);
+                        chart.chartOptions()), "png", out);
         return out.toByteArray();
     }
 

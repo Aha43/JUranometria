@@ -546,20 +546,41 @@ public final class PackagedAcceptanceMain {
                         "no symbol-less object on the study page"));
         java.util.List<juranometria.search.SearchResult> found =
                 Atlas.search().search(symbolless.id());
-        require(!found.isEmpty()
-                        && found.get(0).identity().equals(symbolless.id()),
-                "the packaged search finds a symbol-less object: "
-                        + symbolless.id());
-        ChartScene centred = Atlas.assembler().assemble(
-                new ChartViewState(symbolless.position(), 8.0, 8.0,
-                        symbolless.id(), symbolless.id()), 900, 700);
+        require(found.size() == 1,
+                "the packaged search finds a symbol-less object"
+                        + " unambiguously: " + symbolless.id() + " gave "
+                        + found.size() + " results");
+        // The result is driven into navigation through the production
+        // policy the search field itself uses, rather than the
+        // expected page being rebuilt here from the object already in
+        // hand - which would have passed even if choosing a result
+        // recentred on the wrong place or lost the identity between
+        // search and navigation (sprint review, P1).
+        juranometria.ui.ChartViewController searched =
+                new juranometria.ui.ChartViewController(
+                        Atlas.assembler()::fits);
+        require(juranometria.ui.SearchNavigation.apply(found.get(0),
+                        Atlas.assembler(), searched, null)
+                        != juranometria.ui.SearchNavigation.Outcome.NO_FIT,
+                "and the packaged coverage reaches it");
+        ChartViewState reached = searched.state();
+        require(Math.abs(reached.centre().raDegrees()
+                        - symbolless.position().raDegrees()) < 1e-6
+                        && Math.abs(reached.centre().decDegrees()
+                                - symbolless.position().decDegrees()) < 1e-6,
+                "the search recentred on it: " + reached.centre());
+        require(symbolless.id().equals(reached.targetIdentity()),
+                "carrying its identity from search into navigation: "
+                        + reached.targetIdentity());
+        require(found.get(0).regionTitle().equals(reached.targetLabel()),
+                "and titling the page by the name the search gave: "
+                        + reached.targetLabel());
+        ChartScene centred = Atlas.assembler().assemble(reached, 900, 700);
         require(renderer.drawnMarks(centred, released).stream()
                         .noneMatch(mark -> mark.deepSky() != null
                                 && mark.deepSky().id()
                                         .equals(symbolless.id())),
                 "and the packaged renderer invents no mark for it");
-        require(symbolless.id().equals(centred.targetIdentity()),
-                "though the page is titled by it honestly");
 
         // And the exemption, on the page that names a target: the
         // home page's own galaxy stays drawn with galaxies hidden.
