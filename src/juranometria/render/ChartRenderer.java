@@ -34,6 +34,11 @@ import juranometria.project.ViewportMapping;
 public final class ChartRenderer {
 
     /** The selection ring: the graticule's grey, quieter than ink. */
+    /** The key's heading: visual magnitude, said plainly. */
+    private static final String KEY_HEADING = "Stars, visual magnitude";
+    /** Room for the widest sample circle, plus breathing space. */
+    private static final int KEY_CIRCLE_COLUMN_PX = 20;
+
     private static final Color SELECTION_INK = new Color(0x88, 0x88, 0x88);
     private static final java.awt.BasicStroke SELECTION_STROKE =
             new java.awt.BasicStroke(1.2f);
@@ -986,6 +991,123 @@ public final class ChartRenderer {
      * studies so prototype passes yield to the real block, never an
      * approximation.
      */
+
+    /**
+     * The magnitudes a key shows for a page limited at {@code limit}
+     * (Sprint 20, issue #179).
+     *
+     * <p>Three samples, always whole magnitudes: the top of the
+     * scale, its middle, and <strong>the limit itself</strong> - the
+     * faintest star the page actually draws. Measured, the radius
+     * ladder is why there are three and not more: one magnitude
+     * changes a dot's diameter by 0.4 px at the faint end and 0.2 px
+     * at the bright end, so a key stepping by one would show circles
+     * a reader cannot tell apart and would imply a precision the
+     * drawing does not have. At V 8 the three differ by 2.9 and
+     * 4.5 px, which reads at a glance.
+     *
+     * <p>The middle is rounded away from zero so a page limited at
+     * V 5 shows 0, 3, 5 rather than a half magnitude nobody uses.
+     */
+    public static double[] magnitudeKeySamples(double limit) {
+        double middle = Math.floor(limit / 2.0 + 0.5);
+        if (middle <= 0.0 || middle >= limit) {
+            return new double[] {0.0, limit};
+        }
+        return new double[] {0.0, middle, limit};
+    }
+
+    /**
+     * Where the stellar-magnitude key sits, or null when the page is
+     * too small to hold it beside its margins - the same refusal the
+     * title block makes rather than clipping.
+     *
+     * <p>The <strong>upper right</strong>, by elimination and then by
+     * inspection: the title block owns the lower left, right-ascension
+     * labels run along the bottom, and declination labels down the
+     * left. The upper right is the one corner of the page carrying no
+     * furniture of its own.
+     */
+    public static java.awt.Rectangle magnitudeKeyBounds(FontMetrics metrics,
+                                                        ChartScene scene) {
+        double[] samples = magnitudeKeySamples(scene.limitingMagnitude());
+        int lineHeight = Math.max(metrics.getHeight(),
+                (int) Math.ceil(2.0 * StarSizePolicy.DEFAULT.radiusFor(0.0))
+                        + 4);
+        int widest = metrics.stringWidth(KEY_HEADING);
+        for (double sample : samples) {
+            widest = Math.max(widest, metrics.stringWidth(
+                    sampleLabel(sample)));
+        }
+        int boxWidth = KEY_CIRCLE_COLUMN_PX + widest + 2 * TITLE_PADDING_PX;
+        int boxHeight = (samples.length + 1) * lineHeight
+                + 2 * TITLE_PADDING_PX;
+        if (boxWidth + 2 * TITLE_MARGIN_PX > scene.viewport().widthPx()
+                || boxHeight + 2 * TITLE_MARGIN_PX
+                        > scene.viewport().heightPx()) {
+            return null;
+        }
+        return new java.awt.Rectangle(
+                scene.viewport().widthPx() - TITLE_MARGIN_PX - boxWidth,
+                TITLE_MARGIN_PX, boxWidth, boxHeight);
+    }
+
+    /** How a sample magnitude reads: "V 4", never a bare number. */
+    private static String sampleLabel(double magnitude) {
+        return magnitude == Math.rint(magnitude)
+                ? String.format(Locale.ROOT, "V %.0f", magnitude)
+                : String.format(Locale.ROOT, "V %.1f", magnitude);
+    }
+
+    /**
+     * Draws the stellar-magnitude key: a circle per sample, at
+     * <strong>exactly the radius the chart draws that star with</strong>,
+     * taken from the same {@link StarSizePolicy} the star pass uses.
+     * Nothing here recomputes the mapping, so the key cannot come to
+     * describe a chart the atlas no longer draws.
+     */
+    public void drawMagnitudeKey(Graphics2D g, ChartScene scene) {
+        FontMetrics metrics = g.getFontMetrics(LABEL_FONT);
+        java.awt.Rectangle box = magnitudeKeyBounds(metrics, scene);
+        if (box == null) {
+            return;
+        }
+        double[] samples = magnitudeKeySamples(scene.limitingMagnitude());
+        int lineHeight = Math.max(metrics.getHeight(),
+                (int) Math.ceil(2.0 * starSizePolicy.radiusFor(0.0)) + 4);
+
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(PAPER);
+            g2.fillRect(box.x, box.y, box.width, box.height);
+            g2.setColor(FRAME);
+            g2.setStroke(new BasicStroke(1.0f));
+            g2.drawRect(box.x, box.y, box.width, box.height);
+
+            g2.setFont(LABEL_FONT);
+            g2.setColor(INK);
+            int baseline = box.y + TITLE_PADDING_PX + metrics.getAscent();
+            g2.drawString(KEY_HEADING, box.x + TITLE_PADDING_PX, baseline);
+
+            for (double sample : samples) {
+                baseline += lineHeight;
+                double radius = starSizePolicy.radiusFor(sample);
+                double centreX = box.x + TITLE_PADDING_PX
+                        + KEY_CIRCLE_COLUMN_PX / 2.0;
+                double centreY = baseline - metrics.getAscent() / 2.0;
+                g2.fill(new Ellipse2D.Double(centreX - radius,
+                        centreY - radius, 2.0 * radius, 2.0 * radius));
+                g2.drawString(sampleLabel(sample),
+                        box.x + TITLE_PADDING_PX + KEY_CIRCLE_COLUMN_PX,
+                        baseline);
+            }
+        } finally {
+            g2.dispose();
+        }
+    }
+
     public static java.awt.Rectangle titleBlockBounds(Graphics2D g,
                                                       ChartScene scene) {
         return titleBlockBounds(g.getFontMetrics(LABEL_FONT), scene);
