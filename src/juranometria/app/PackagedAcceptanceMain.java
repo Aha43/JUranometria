@@ -395,6 +395,45 @@ public final class PackagedAcceptanceMain {
         System.out.println("point-and-identify OK (" + aMark.star().id()
                 + " identified from the packaged catalogue)");
 
+        // Chart furniture, inside the packaged application (Sprint
+        // 20): both options draw through the packaged renderer, and
+        // the key's circles come from the same size policy the
+        // packaged star pass uses.
+        navigation.reset();
+        ChartScene furnished = Atlas.assembler()
+                .assemble(navigation.state(), 900, 700);
+        ChartOptions released = ChartOptions.DEFAULTS;
+        require(released.titleBlock() && !released.magnitudeKey(),
+                "the packaged release ships the title block on and the"
+                        + " magnitude key off");
+        int withTitle = ink(page(renderer, navigation, released));
+        ChartOptions bareChart = new ChartOptions(released.deepSkyObjects(),
+                released.deepSkyLabels(), released.constellationFigures(),
+                released.constellationBoundaries(),
+                released.constellationNames(), released.starNames(),
+                released.bayerLetters(), released.flamsteedNumbers(),
+                released.equatorialGrid(), false, false);
+        require(ink(page(renderer, navigation, bareChart)) < withTitle,
+                "switching the title block off removes ink");
+        ChartOptions keyed = new ChartOptions(released.deepSkyObjects(),
+                released.deepSkyLabels(), released.constellationFigures(),
+                released.constellationBoundaries(),
+                released.constellationNames(), released.starNames(),
+                released.bayerLetters(), released.flamsteedNumbers(),
+                released.equatorialGrid(), true, true);
+        require(ink(page(renderer, navigation, keyed)) > withTitle,
+                "and switching the magnitude key on adds it");
+        double[] keySamples = ChartRenderer.magnitudeKeySamples(
+                furnished.limitingMagnitude());
+        require(keySamples.length == 3
+                        && keySamples[2] == furnished.limitingMagnitude(),
+                "the packaged key names this page's own limit: "
+                        + java.util.Arrays.toString(keySamples));
+        System.out.println("chart furniture OK (title block and"
+                + " magnitude key drawn by the packaged renderer,"
+                + " key samples " + java.util.Arrays.toString(keySamples)
+                + ")");
+
         // Home: the journey ends on the page it started from,
         // rendered identically.
         navigation.reset();
