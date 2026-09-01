@@ -351,30 +351,48 @@ public final class DeepSkyVocabularyMockupMain {
         JComponent content = frameContent(tabs);
         JFrame frame = new JFrame("Chart Options");
         frame.setContentPane(content);
-        frame.pack();
-        frame.setSize(width, frame.getHeight());
-        frame.validate();
-        rewrap(content);
+        // The peer, without a size. Packing here would ask the
+        // window manager for the content's full preferred height -
+        // which at enlarged text is taller than the screen, and a
+        // request the desktop refuses comes back as a resize the
+        // toolkit delivers later, after this method has set the size
+        // it wanted. The window is asked for exactly one size, and
+        // that size is measured first.
+        frame.addNotify();
+        java.awt.Insets chrome = frame.getInsets();
+        int inner = width - chrome.left - chrome.right;
         // The ceiling this dialog would take on the screen it is
         // opening on - or on the screen a review needs to see it on.
         int ceiling = usableHeight > 0
                 ? ceilingForUsableHeight(usableHeight)
                 : ceilingFor(frame.getGraphicsConfiguration());
-        frame.setSize(width, tallestTab(frame, tabs, width, ceiling));
-        select(tabs, tab);
-        frame.validate();
+
+        layOut(content, inner, ceiling);
+        rewrap(content);
         // A second pass, because the first one can bring a scroll bar
         // into being and take its width away from the very text that
         // summoned it.
+        layOut(content, inner, ceiling);
         rewrap(content);
-        frame.setSize(width, tallestTab(frame, tabs, width, ceiling));
+        int height = Math.min(ceiling,
+                tallestTab(tabs, content, inner, ceiling)
+                        + chrome.top + chrome.bottom);
+
         select(tabs, tab);
+        frame.setSize(width, height);
         frame.validate();
         frame.setLocation(60, 60);
         frame.setVisible(true);
         frame.toFront();
         frame.requestFocus();
         return frame;
+    }
+
+    /** Lays the content out at a given size, without a window. */
+    private static void layOut(JComponent content, int width, int height) {
+        content.setSize(width, height);
+        content.doLayout();
+        content.validate();
     }
 
     /** The tabbed pane inside a dialog {@link #open} built. */
@@ -946,28 +964,26 @@ public final class DeepSkyVocabularyMockupMain {
     }
 
     /**
-     * The height that holds the tallest of the four tabs, so moving
-     * between tabs never resizes the dialog under the reader - never
-     * taller than the ceiling the reader's own screen allows, beyond
-     * which the tab scrolls inside it.
+     * The content height that holds the tallest of the four tabs, so
+     * moving between tabs never resizes the dialog under the reader.
+     *
+     * <p>Measured by laying the content out, never by resizing a
+     * window: a window is the one participant here that can answer
+     * back, and it answers late.
      */
-    static int tallestTab(JFrame frame, JTabbedPane tabs, int width,
-                          int ceiling) {
+    static int tallestTab(JTabbedPane tabs, JComponent content,
+                          int innerWidth, int ceiling) {
         int tallest = 0;
         int selected = tabs.getSelectedIndex();
         for (int i = 0; i < tabs.getTabCount(); i++) {
             tabs.setSelectedIndex(i);
-            frame.pack();
-            frame.setSize(width, frame.getHeight());
-            frame.validate();
-            javax.swing.JViewport port = viewport(tabs);
-            int overflow = Math.max(0,
-                    port.getView().getPreferredSize().height
-                            - port.getHeight());
-            tallest = Math.max(tallest, frame.getHeight() + overflow);
+            layOut(content, innerWidth, ceiling);
+            tallest = Math.max(tallest,
+                    content.getPreferredSize().height);
         }
         tabs.setSelectedIndex(selected);
-        return Math.min(tallest, ceiling);
+        layOut(content, innerWidth, ceiling);
+        return tallest;
     }
 
     /**

@@ -192,21 +192,21 @@ Real Swing controls under the real application themes, shown in a real window - 
 
 | mock-up | theme | width | text | usable screen | dialog | controls on the tab | cut off across | needs scrolling | OK, Cancel, Restore | focus ring |
 |---|---|---:|---:|---|---|---:|---:|---|---|---|
-| [deep-sky-tab](deep-sky-tab.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-dark](deep-sky-tab-dark.png) | dark | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-narrow](deep-sky-tab-narrow.png) | light | 320 px | 1.0x | 884 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-narrow-dark](deep-sky-tab-narrow-dark.png) | dark | 320 px | 1.0x | 884 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-large-text](deep-sky-tab-large-text.png) | light | 420 px | 1.5x | 884 px | 420x824 px | 12 | 0 | 2 rows | on screen, tab-reachable | - |
-| [deep-sky-tab-large-text-dark](deep-sky-tab-large-text-dark.png) | dark | 420 px | 1.5x | 884 px | 420x824 px | 12 | 0 | 2 rows | on screen, tab-reachable | - |
-| [deep-sky-tab-master-off](deep-sky-tab-master-off.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-master-off-dark](deep-sky-tab-master-off-dark.png) | dark | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
-| [deep-sky-tab-focus](deep-sky-tab-focus.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
-| [deep-sky-tab-focus-dark](deep-sky-tab-focus-dark.png) | dark | 420 px | 1.0x | 884 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
+| [deep-sky-tab](deep-sky-tab.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-dark](deep-sky-tab-dark.png) | dark | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-narrow](deep-sky-tab-narrow.png) | light | 320 px | 1.0x | 886 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-narrow-dark](deep-sky-tab-narrow-dark.png) | dark | 320 px | 1.0x | 886 px | 320x603 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-large-text](deep-sky-tab-large-text.png) | light | 420 px | 1.5x | 886 px | 420x826 px | 12 | 0 | 1 row | on screen, tab-reachable | - |
+| [deep-sky-tab-large-text-dark](deep-sky-tab-large-text-dark.png) | dark | 420 px | 1.5x | 886 px | 420x826 px | 12 | 0 | 1 row | on screen, tab-reachable | - |
+| [deep-sky-tab-master-off](deep-sky-tab-master-off.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-master-off-dark](deep-sky-tab-master-off-dark.png) | dark | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
+| [deep-sky-tab-focus](deep-sky-tab-focus.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
+| [deep-sky-tab-focus-dark](deep-sky-tab-focus-dark.png) | dark | 420 px | 1.0x | 886 px | 420x547 px | 12 | 0 | no | on screen, tab-reachable | yes, on Globular clusters |
 | [deep-sky-tab-short-screen](deep-sky-tab-short-screen.png) | light | 420 px | 1.0x | 728 px (stood in for) | 420x547 px | 12 | 0 | no | on screen, tab-reachable | - |
 | [deep-sky-tab-short-screen-large-text](deep-sky-tab-short-screen-large-text.png) | light | 420 px | 1.5x | 728 px (stood in for) | 420x668 px | 12 | 0 | 4 rows | on screen, tab-reachable | - |
-| [tab-stars](tab-stars.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
-| [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
-| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 884 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-stars](tab-stars.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 886 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
 
 The longest explanation is **Nebulae**, at 172 characters, and it is in every mock-up above rather than in one of its own: the row that wraps worst is the row the narrow and the enlarged layouts have to survive.
 

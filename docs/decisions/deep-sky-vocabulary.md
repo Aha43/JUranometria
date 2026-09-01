@@ -230,8 +230,8 @@ enough:
   put *Deep sky* below *Constellations* and *Chart* — a dialog that
   rearranges itself under the reader. The scrolling tab layout keeps
   one row and offers arrows instead.
-- **Each tab scrolls; nothing clips.** At 1.5× text two rows fall
-  below the fold, and they are reached by scrolling — with the
+- **Each tab scrolls; nothing clips.** At 1.5× text the last row
+  falls below the fold, and it is reached by scrolling — with the
   keyboard as much as the pointer. Measured across every mock-up:
   **no control is ever cut off across the dialog**, which is the
   failure that would matter, because a clipped control is unreadable
@@ -255,8 +255,8 @@ answer to an action button off the screen, which is why the ceiling is
 applied to the *frame* and the scrolling happens inside it, below the
 tab strip and above the buttons.
 
-On the machine this study ran on, 884 px of usable screen gives an
-824 px ceiling. Reviewing that proves nothing about a short display,
+On the machine this study ran on, 886 px of usable screen gives an
+826 px ceiling. Reviewing that proves nothing about a short display,
 so the mock-ups include a dialog told to believe in **a 768 px screen
 with a 40 px taskbar** — 728 px usable, a 668 px ceiling — at ordinary
 and at enlarged text. In both, OK, Cancel and Restore Defaults are

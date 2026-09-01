@@ -65,6 +65,74 @@ class DeepSkyDialogHeightTest {
     void onAShortScreenTheActionButtonsStayReachable() throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "the dialog's height is a question about a real window");
+        restoringTheme(this::onAShortScreen);
+    }
+
+    @Test
+    void andItLeavesTheThemeAsItFoundIt() throws Exception {
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "installing a look and feel needs a toolkit");
+        // The proof that the cleanup above is a restoration and not a
+        // preference. The trap is to end by applying the light theme,
+        // which passes every run that happened to start light and
+        // quietly hands the next test a session state nobody chose
+        // (Sprint 19 review). So this stands in for a session that was
+        // using the dark theme, and requires it back afterwards.
+        restoringTheme(() -> {
+            SwingUtilities.invokeAndWait(
+                    () -> juranometria.app.UiTheme.apply(true));
+            String stoodIn = UIManager.getLookAndFeel().getName();
+            float stoodInText = UIManager.getFont("Label.font").getSize2D();
+
+            restoringTheme(this::onAShortScreen);
+
+            assertEquals(stoodIn, UIManager.getLookAndFeel().getName(),
+                    "the dialog put back the theme it found");
+            assertEquals(stoodInText,
+                    UIManager.getFont("Label.font").getSize2D(), 0.01f,
+                    "and left no enlarged font behind");
+        });
+    }
+
+    /** Something a test does that disturbs the global look and feel. */
+    private interface Body {
+        void run() throws Exception;
+    }
+
+    /**
+     * Runs a body and puts the look and feel and default font back the
+     * way they were - whatever they were.
+     *
+     * <p>Opening the dialog installs both, and both are global to the
+     * JVM the whole suite shares. The state is captured before the
+     * body can fail, so a failure inside it cannot leak a theme into
+     * whatever runs next.
+     */
+    private static void restoringTheme(Body body) throws Exception {
+        javax.swing.LookAndFeel inherited = UIManager.getLookAndFeel();
+        try {
+            body.run();
+        } finally {
+            SwingUtilities.invokeAndWait(() -> {
+                // Cleared rather than put back: the enlarged font is
+                // an override laid over the look and feel's own, and
+                // reinstalling the look and feel restores what it
+                // wanted. Nothing else in the suite writes this key.
+                UIManager.put("defaultFont", null);
+                if (inherited != null) {
+                    try {
+                        UIManager.setLookAndFeel(inherited);
+                    } catch (Exception e) {
+                        throw new IllegalStateException(
+                                "could not restore " + inherited.getName(),
+                                e);
+                    }
+                }
+            });
+        }
+    }
+
+    private void onAShortScreen() throws Exception {
         // The dialog is built exactly as the study builds it, told to
         // believe in a screen shorter than this machine's.
         for (double textScale : new double[] {1.0, 1.5}) {
@@ -112,10 +180,6 @@ class DeepSkyDialogHeightTest {
                 if (frame != null) {
                     SwingUtilities.invokeAndWait(frame::dispose);
                 }
-                SwingUtilities.invokeAndWait(() -> {
-                    UIManager.put("defaultFont", null);
-                    juranometria.app.UiTheme.apply(false);
-                });
             }
         }
     }
