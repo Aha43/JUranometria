@@ -521,6 +521,67 @@ public final class PackagedAcceptanceMain {
         } finally {
             familyNode.removeNode();
         }
+        // A hidden family really changes the page the packaged
+        // renderer draws, not merely a list it publishes.
+        juranometria.render.SymbolFamily hiddenFamily =
+                juranometria.render.SymbolFamily.NEBULAE;
+        ChartScene nebulous = pages.get(0);
+        byte[] withNebulae = bytes(renderer.renderToImage(nebulous,
+                released));
+        byte[] withoutNebulae = bytes(renderer.renderToImage(nebulous,
+                released.withFamily(hiddenFamily, false)));
+        require(!java.util.Arrays.equals(withNebulae, withoutNebulae),
+                "hiding a family changes the packaged page's pixels");
+        require(ink(renderer.renderToImage(nebulous,
+                        released.withFamily(hiddenFamily, false)))
+                        < ink(renderer.renderToImage(nebulous, released)),
+                "and takes ink away rather than adding it");
+
+        // The searched symbol-less type, through the packaged search:
+        // found, recentred, titled, and given no invented mark.
+        juranometria.chart.DeepSkyObject symbolless =
+                nebulous.deepSkyObjects().stream()
+                .filter(dso -> !ChartRenderer.hasSymbol(dso))
+                .findFirst().orElseThrow(() -> new IllegalStateException(
+                        "no symbol-less object on the study page"));
+        java.util.List<juranometria.search.SearchResult> found =
+                Atlas.search().search(symbolless.id());
+        require(found.size() == 1,
+                "the packaged search finds a symbol-less object"
+                        + " unambiguously: " + symbolless.id() + " gave "
+                        + found.size() + " results");
+        // The result is driven into navigation through the production
+        // policy the search field itself uses, rather than the
+        // expected page being rebuilt here from the object already in
+        // hand - which would have passed even if choosing a result
+        // recentred on the wrong place or lost the identity between
+        // search and navigation (sprint review, P1).
+        juranometria.ui.ChartViewController searched =
+                new juranometria.ui.ChartViewController(
+                        Atlas.assembler()::fits);
+        require(juranometria.ui.SearchNavigation.apply(found.get(0),
+                        Atlas.assembler(), searched, null)
+                        != juranometria.ui.SearchNavigation.Outcome.NO_FIT,
+                "and the packaged coverage reaches it");
+        ChartViewState reached = searched.state();
+        require(Math.abs(reached.centre().raDegrees()
+                        - symbolless.position().raDegrees()) < 1e-6
+                        && Math.abs(reached.centre().decDegrees()
+                                - symbolless.position().decDegrees()) < 1e-6,
+                "the search recentred on it: " + reached.centre());
+        require(symbolless.id().equals(reached.targetIdentity()),
+                "carrying its identity from search into navigation: "
+                        + reached.targetIdentity());
+        require(found.get(0).regionTitle().equals(reached.targetLabel()),
+                "and titling the page by the name the search gave: "
+                        + reached.targetLabel());
+        ChartScene centred = Atlas.assembler().assemble(reached, 900, 700);
+        require(renderer.drawnMarks(centred, released).stream()
+                        .noneMatch(mark -> mark.deepSky() != null
+                                && mark.deepSky().id()
+                                        .equals(symbolless.id())),
+                "and the packaged renderer invents no mark for it");
+
         // And the exemption, on the page that names a target: the
         // home page's own galaxy stays drawn with galaxies hidden.
         int exemptAtHome = targetOf(renderer, furnished,
@@ -530,9 +591,11 @@ public final class PackagedAcceptanceMain {
         require(exemptAtHome == 1,
                 "the searched target survives its family being hidden");
         System.out.println("deep-sky families OK (" + String.join(", ",
-                hidden) + ", each leaving the others untouched; the"
-                + " named target still drawn with its own family"
-                + " hidden)");
+                hidden) + ", each leaving the others untouched; a"
+                + " hidden family changes the drawn page; the named"
+                + " target still drawn with its own family hidden;"
+                + " symbol-less " + symbolless.id() + " found,"
+                + " centred and titled with no invented mark)");
 
         // Home: the journey ends on the page it started from,
         // rendered identically.
