@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-01
+
+Sprint 20 — Chart furniture. The chart has always drawn brightness as
+circle size without saying so; now it can. The Inspector moves to the
+toolbar, and the page's own furniture becomes the reader's to choose.
+Decided at a measured gate
+([docs/decisions/chart-furniture.md](docs/decisions/chart-furniture.md)),
+reviewed at every step, and deliberately small.
+
 ### Added
 
 - A **stellar-magnitude key**: the chart draws brightness as circle
