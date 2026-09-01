@@ -371,7 +371,7 @@ class ChartFurnitureJourneyTest {
         java.awt.Rectangle box;
         java.awt.Graphics2D g = page.createGraphics();
         try {
-            box = ChartRenderer.magnitudeKeyBounds(
+            box = RENDERER.magnitudeKeyBounds(
                     g.getFontMetrics(ChartRenderer.labelFont()), scene);
         } finally {
             g.dispose();

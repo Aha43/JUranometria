@@ -36,8 +36,13 @@ left, right-ascension labels the bottom, declination labels the left —
 and then by inspection.
 
 **Off by default, measured rather than inherited.** The box covers
-288–635 px of chart ink depending on the page, including **290 px of
-star ink on Orion at 36°**, where it blanks a patch of dense sky. A
+288–635 px of chart ink depending on the page, including **436 px of
+star and symbol ink on Orion at 36°**, where it blanks a patch of
+dense sky. That second figure is derived from the layers - the box
+measured on a page drawn with stars and symbols alone - after review
+found the first version inferring layer identity from grey values,
+which counted labels and figures as stars while missing the pale
+edges of the dots it meant to count. A
 reader who wants the scale explained accepts that knowingly; one who
 does not should never pay it. Two consequences follow: **the released
 default page is unchanged, so no reference or study image churns this
@@ -91,9 +96,28 @@ meaning and that a key a newer release adds takes its documented
 default — not that the set never grows. That is a documentation
 correction, not a contract change.
 
+## Corrections from review
+
+Three findings, all narrow and all real:
+
+- **Switching the title block off left its collision reservation
+  behind**, so grid notation stayed suppressed around a block that
+  was no longer drawn. Furniture now reserves space from grid labels
+  only while it draws - and the magnitude key reserves on the same
+  terms, which closes the symmetric gap the finding implied.
+- **The key's bounds were computed from the default star-size policy
+  while its circles were drawn through the injected one.** One
+  calculation now serves both, and a regression builds a renderer
+  with a larger-star policy and requires the published box to grow
+  and the drawn circle to match that policy rather than the default.
+- **The study called grey ink "star or symbol ink."** It now renders
+  a stars-and-symbols-only page and measures that, which raised the
+  Orion figure from 290 px to 436 px; the decision and this handover
+  quote the corrected numbers.
+
 ## Verification
 
-- **443 tests** on a display; headless, the display-dependent
+- **446 tests** on a display; headless, the display-dependent
   journeys abort visibly rather than fail.
 - **The M31 reference is byte-identical** and no study image changed,
   because the released default page did not change.

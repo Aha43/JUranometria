@@ -27,15 +27,15 @@ For contrast, a key stepping by ONE magnitude would place circles this close tog
 
 ## What the furniture costs the page
 
-Ink is any pixel darker than the paper's threshold inside the key's box, on the page as it draws WITHOUT the key.
+Two measurements, and the difference matters. **Chart ink** is any pixel darker than the paper inside the key's box, on the page as it draws WITHOUT the key. **Star and symbol ink** is that same box measured on a page rendered with only those two layers switched on - derived from the layers themselves, not guessed from how dark a pixel is, which would count labels, figures and constellation names as stars (Sprint 20 review).
 
-| page | key box | share of page | chart ink it would cover | of which star or symbol ink |
+| page | key box | share of page | chart ink it would cover | star and symbol ink |
 |---|---|---:|---:|---:|
 | m31-08 | 160x72 px | 1.83% | 288 px | 0 px |
 | sagittarius-08 | 160x72 px | 1.83% | 400 px | 0 px |
-| orion-36 | 160x72 px | 1.83% | 635 px | 290 px |
-| polaris-18 | 160x72 px | 1.83% | 445 px | 15 px |
-| crux-18 | 160x72 px | 1.83% | 487 px | 112 px |
+| orion-36 | 160x72 px | 1.83% | 635 px | 436 px |
+| polaris-18 | 160x72 px | 1.83% | 445 px | 33 px |
+| crux-18 | 160x72 px | 1.83% | 487 px | 118 px |
 | quiet-08 | 160x72 px | 1.83% | 405 px | 0 px |
 | m31-08-mag4 | 160x72 px | 1.83% | 288 px | 0 px |
 | m31-08-mag6 | 160x72 px | 1.83% | 288 px | 0 px |

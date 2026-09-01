@@ -134,7 +134,8 @@ public final class EquatorialGrid {
      * pieces; edge labels; and the measured worst chord error against
      * the true projected curve midpoint.
      */
-    public static Grid gridFor(ChartViewport viewport, java.awt.Rectangle titleBlock) {
+    public static Grid gridFor(ChartViewport viewport,
+                               java.awt.Rectangle... furniture) {
         GridSpec spec = spec(viewport);
         GnomonicProjection projection =
                 new GnomonicProjection(viewport.centre());
@@ -171,7 +172,7 @@ public final class EquatorialGrid {
                 Label label = edgeLabel(pieces, raLabel(ra), viewport, true);
                 if (label != null) {
                     if (!fitsPaper(label, metrics, viewport)
-                            || intersectsTitle(label, metrics, titleBlock)) {
+                            || intersectsFurniture(label, metrics, furniture)) {
                         suppressed++;
                     } else {
                         labels.add(label);
@@ -202,7 +203,7 @@ public final class EquatorialGrid {
                         viewport, false);
                 if (label != null) {
                     if (!fitsPaper(label, metrics, viewport)
-                            || intersectsTitle(label, metrics, titleBlock)) {
+                            || intersectsFurniture(label, metrics, furniture)) {
                         suppressed++;
                     } else {
                         labels.add(label);
@@ -424,11 +425,25 @@ public final class EquatorialGrid {
         return null;
     }
 
-    private static boolean intersectsTitle(Label label,
+    private static boolean intersectsFurniture(Label label,
                                            java.awt.FontMetrics metrics,
-                                           java.awt.Rectangle titleBlock) {
-        return titleBlock != null
-                && labelBounds(label, metrics).intersects(titleBlock);
+                                           java.awt.Rectangle... furniture) {
+        // Grid notation yields to the furniture that will actually
+        // draw over it - the title block as it always has, and the
+        // magnitude key on the same terms. Furniture the reader has
+        // switched off reserves nothing, so switching a block off
+        // gives back the labels it was suppressing (Sprint 20
+        // review).
+        if (furniture == null) {
+            return false;
+        }
+        java.awt.geom.Rectangle2D bounds = labelBounds(label, metrics);
+        for (java.awt.Rectangle reserved : furniture) {
+            if (reserved != null && bounds.intersects(reserved)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Draws a computed grid onto a graphics context, quietest ink. */

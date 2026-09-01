@@ -195,12 +195,97 @@ class MagnitudeKeyTest {
                 "and the two never meet");
     }
 
+
+    @Test
+    void aRendererWithItsOwnStarSizePolicyGovernsBothBoxAndCircles() {
+        // Review, P2: the bounds were computed from the DEFAULT
+        // policy while the circles were drawn through the injected
+        // one, so a renderer built with larger stars would have drawn
+        // rows that outgrew the box it published.
+        StarSizePolicy larger = new StarSizePolicy(1.4, 10.0, 1.0, 0.7, 8.5);
+        assertTrue(larger.radiusFor(0.0)
+                        > StarSizePolicy.DEFAULT.radiusFor(0.0),
+                "the check needs a genuinely different policy");
+        ChartRenderer renderer = new ChartRenderer(larger);
+        ChartScene scene = scene(8.0);
+
+        BufferedImage page = new BufferedImage(900, 700,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = page.createGraphics();
+        Rectangle box;
+        try {
+            g.setColor(java.awt.Color.WHITE);
+            g.fillRect(0, 0, 900, 700);
+            box = renderer.magnitudeKeyBounds(
+                    g.getFontMetrics(ChartRenderer.labelFont()), scene);
+            renderer.drawMagnitudeKey(g, scene);
+        } finally {
+            g.dispose();
+        }
+        assertNotNull(box);
+
+        // The box the renderer publishes is sized for ITS policy...
+        Rectangle byDefault = ChartRenderer.magnitudeKeyBounds(
+                page.createGraphics().getFontMetrics(
+                        ChartRenderer.labelFont()), scene,
+                StarSizePolicy.DEFAULT);
+        assertTrue(box.height > byDefault.height,
+                "a larger-star policy needs a taller box: " + box
+                        + " against " + byDefault);
+
+        // ...and the largest circle it drew is that policy's own V 0
+        // dot. Measured as the widest contiguous run of ink anywhere
+        // in the box: a 20 px circle dominates any glyph stroke, and
+        // measuring the whole box avoids assuming where the circle
+        // column ends.
+        int widest = widestRun(page, box);
+        double expected = 2.0 * larger.radiusFor(0.0);
+        assertTrue(Math.abs(widest - expected) <= 1.5,
+                "the drawn circle follows the injected policy: " + widest
+                        + " px against " + expected + " px");
+        assertTrue(widest <= box.width && widest <= box.height,
+                "and fits the box it was given: " + widest + " in " + box);
+
+        // The same measurement under the default policy gives the
+        // default diameter, so the two really are governed apart.
+        BufferedImage byDefaultPage = new BufferedImage(900, 700,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D dg = byDefaultPage.createGraphics();
+        try {
+            dg.setColor(java.awt.Color.WHITE);
+            dg.fillRect(0, 0, 900, 700);
+            RENDERER.drawMagnitudeKey(dg, scene);
+        } finally {
+            dg.dispose();
+        }
+        assertTrue(Math.abs(widestRun(byDefaultPage, byDefault)
+                        - 2.0 * StarSizePolicy.DEFAULT.radiusFor(0.0)) <= 1.5,
+                "and the default renderer still draws its own");
+    }
+
+    /** The widest contiguous run of ink inside a box. */
+    private static int widestRun(BufferedImage page, Rectangle box) {
+        int widest = 0;
+        for (int y = box.y + 1; y < box.y + box.height - 1; y++) {
+            int run = 0;
+            for (int x = box.x + 2; x < box.x + box.width - 2; x++) {
+                if ((page.getRGB(x, y) & 0xff) < 140) {
+                    run++;
+                    widest = Math.max(widest, run);
+                } else {
+                    run = 0;
+                }
+            }
+        }
+        return widest;
+    }
+
     private static Rectangle bounds(ChartScene scene) {
         BufferedImage probe = new BufferedImage(1, 1,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = probe.createGraphics();
         try {
-            return ChartRenderer.magnitudeKeyBounds(
+            return RENDERER.magnitudeKeyBounds(
                     g.getFontMetrics(ChartRenderer.labelFont()), scene);
         } finally {
             g.dispose();

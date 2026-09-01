@@ -382,8 +382,17 @@ public final class ChartRenderer {
         // title block through the shared bounds; everything else
         // simply paints over grid ink.
         if (options.equatorialGrid()) {
+            // Only furniture that will actually draw suppresses grid
+            // notation: a reader who switches the title block off
+            // gets back the labels it was hiding, and the key
+            // suppresses on the same terms (Sprint 20 review).
             EquatorialGrid.draw(g, EquatorialGrid.gridFor(
-                    scene.viewport(), titleBlockBounds(g, scene)));
+                    scene.viewport(),
+                    options.titleBlock() ? titleBlockBounds(g, scene) : null,
+                    options.magnitudeKey()
+                            ? magnitudeKeyBounds(
+                                    g.getFontMetrics(LABEL_FONT), scene)
+                            : null));
         }
         drawGeography(g, scene, options, projection, mapping);
         // Symbols and stars are drawn from the published placements
@@ -634,7 +643,8 @@ public final class ChartRenderer {
             }
         }
         if (options.magnitudeKey()) {
-            java.awt.Rectangle key = magnitudeKeyBounds(metrics, scene);
+            java.awt.Rectangle key =
+                    magnitudeKeyBounds(metrics, scene, starSizePolicy);
             if (key != null) {
                 occupied.add(key);
             }
@@ -1049,12 +1059,27 @@ public final class ChartRenderer {
      * left. The upper right is the one corner of the page carrying no
      * furniture of its own.
      */
+    public java.awt.Rectangle magnitudeKeyBounds(FontMetrics metrics,
+                                                ChartScene scene) {
+        return magnitudeKeyBounds(metrics, scene, starSizePolicy);
+    }
+
+    /**
+     * The key's bounds under a given star-size policy - the one
+     * calculation, so the box a caller is told about is the box the
+     * circles are drawn into (Sprint 20 review).
+     *
+     * <p>The renderer takes its policy by injection, and an earlier
+     * version computed these bounds from {@code StarSizePolicy.DEFAULT}
+     * while drawing the circles through the injected one. A renderer
+     * built with a larger maximum radius would then have drawn rows
+     * that outgrew the box it published.
+     */
     public static java.awt.Rectangle magnitudeKeyBounds(FontMetrics metrics,
-                                                        ChartScene scene) {
+                                                        ChartScene scene,
+                                                        StarSizePolicy policy) {
         double[] samples = magnitudeKeySamples(scene.limitingMagnitude());
-        int lineHeight = Math.max(metrics.getHeight(),
-                (int) Math.ceil(2.0 * StarSizePolicy.DEFAULT.radiusFor(0.0))
-                        + 4);
+        int lineHeight = keyLineHeight(metrics, policy);
         int widest = metrics.stringWidth(KEY_HEADING);
         for (double sample : samples) {
             widest = Math.max(widest, metrics.stringWidth(
@@ -1073,6 +1098,17 @@ public final class ChartRenderer {
                 TITLE_MARGIN_PX, boxWidth, boxHeight);
     }
 
+    /**
+     * A key row's height: the text, or the widest circle the policy
+     * can draw, whichever needs more room. Shared by the bounds and
+     * the drawing so the two cannot disagree.
+     */
+    private static int keyLineHeight(FontMetrics metrics,
+                                     StarSizePolicy policy) {
+        return Math.max(metrics.getHeight(),
+                (int) Math.ceil(2.0 * policy.radiusFor(0.0)) + 4);
+    }
+
     /** How a sample magnitude reads: "V 4", never a bare number. */
     private static String sampleLabel(double magnitude) {
         return magnitude == Math.rint(magnitude)
@@ -1089,13 +1125,13 @@ public final class ChartRenderer {
      */
     public void drawMagnitudeKey(Graphics2D g, ChartScene scene) {
         FontMetrics metrics = g.getFontMetrics(LABEL_FONT);
-        java.awt.Rectangle box = magnitudeKeyBounds(metrics, scene);
+        java.awt.Rectangle box =
+                magnitudeKeyBounds(metrics, scene, starSizePolicy);
         if (box == null) {
             return;
         }
         double[] samples = magnitudeKeySamples(scene.limitingMagnitude());
-        int lineHeight = Math.max(metrics.getHeight(),
-                (int) Math.ceil(2.0 * starSizePolicy.radiusFor(0.0)) + 4);
+        int lineHeight = keyLineHeight(metrics, starSizePolicy);
 
         Graphics2D g2 = (Graphics2D) g.create();
         try {

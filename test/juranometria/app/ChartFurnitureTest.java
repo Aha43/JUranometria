@@ -132,7 +132,7 @@ class ChartFurnitureTest {
         try {
             var metrics = g.getFontMetrics(ChartRenderer.labelFont());
             java.awt.Rectangle key =
-                    ChartRenderer.magnitudeKeyBounds(metrics, scene);
+                    RENDERER.magnitudeKeyBounds(metrics, scene);
             var withKey = RENDERER.starLabelPlacements(metrics, scene,
                     with(true, true),
                     new juranometria.render.RegionalDetailPolicy(scene,
@@ -151,6 +151,76 @@ class ChartFurnitureTest {
         } finally {
             g.dispose();
         }
+    }
+
+
+    @Test
+    void switchingTheTitleBlockOffGivesBackTheGridLabelsItWasHiding() {
+        // Review, P2: the renderer always reserved the title
+        // rectangle from grid notation, so switching the block off
+        // left a hole in the labels where it used to be - the block
+        // vanished but its collision reservation did not.
+        ChartScene scene = page();
+        java.awt.Rectangle title;
+        BufferedImage probe = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = probe.createGraphics();
+        try {
+            title = ChartRenderer.titleBlockBounds(g, scene);
+        } finally {
+            g.dispose();
+        }
+        assertTrue(title != null, "the page has a title block to hide");
+
+        var withBlock = juranometria.render.EquatorialGrid.gridFor(
+                scene.viewport(), title);
+        var withoutBlock = juranometria.render.EquatorialGrid.gridFor(
+                scene.viewport(), (java.awt.Rectangle) null);
+
+        assertTrue(withoutBlock.labels().size() > withBlock.labels().size(),
+                "the block really was suppressing labels: "
+                        + withBlock.labels().size() + " with it, "
+                        + withoutBlock.labels().size() + " without");
+
+        // And the rendered page agrees: with the block off, ink
+        // appears where the block used to suppress it.
+        long inkWithBlock = inkIn(RENDERER.renderToImage(scene,
+                        with(true, false)),
+                title.x, title.y, title.width, title.height);
+        long inkWithout = inkIn(RENDERER.renderToImage(scene,
+                        with(false, false)),
+                title.x, title.y, title.width, title.height);
+        assertTrue(inkWithout > 0,
+                "the freed area carries grid notation again: "
+                        + inkWithout + " px");
+        assertTrue(inkWithBlock > inkWithout,
+                "while the block itself is the heavier ink: "
+                        + inkWithBlock + " against " + inkWithout);
+    }
+
+    @Test
+    void theKeySuppressesGridNotationOnlyWhileItDraws() {
+        // The same rule for the second piece of furniture: it draws
+        // opaque and last, so notation beneath it is omitted rather
+        // than half-covered - but only when it is actually drawn.
+        ChartScene scene = page();
+        java.awt.Rectangle key;
+        BufferedImage probe = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = probe.createGraphics();
+        try {
+            key = RENDERER.magnitudeKeyBounds(
+                    g.getFontMetrics(ChartRenderer.labelFont()), scene);
+        } finally {
+            g.dispose();
+        }
+
+        var withKey = juranometria.render.EquatorialGrid.gridFor(
+                scene.viewport(), null, key);
+        var withoutKey = juranometria.render.EquatorialGrid.gridFor(
+                scene.viewport(), null, null);
+        assertTrue(withoutKey.labels().size() >= withKey.labels().size(),
+                "the key can only ever suppress, never add");
     }
 
     @Test

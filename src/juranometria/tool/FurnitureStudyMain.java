@@ -130,42 +130,32 @@ public final class FurnitureStudyMain {
     private static void cost() {
         System.out.println("## What the furniture costs the page");
         System.out.println();
-        System.out.println("Ink is any pixel darker than the paper's"
-                + " threshold inside the key's box, on the page as it"
-                + " draws WITHOUT the key.");
+        System.out.println("Two measurements, and the difference"
+                + " matters. **Chart ink** is any pixel darker than the"
+                + " paper inside the key's box, on the page as it draws"
+                + " WITHOUT the key. **Star and symbol ink** is that"
+                + " same box measured on a page rendered with only"
+                + " those two layers switched on - derived from the"
+                + " layers themselves, not guessed from how dark a"
+                + " pixel is, which would count labels, figures and"
+                + " constellation names as stars (Sprint 20 review).");
         System.out.println();
-        System.out.println("| page | key box | share of page | chart ink it"
-                + " would cover | of which star or symbol ink |");
+        System.out.println("| page | key box | share of page | chart ink"
+                + " it would cover | star and symbol ink |");
         System.out.println("|---|---|---:|---:|---:|");
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        // Stars and deep-sky symbols alone: every other layer off, so
+        // what remains in the box is what those two layers drew.
+        ChartOptions marksOnly = new ChartOptions(true, false, false, false,
+                false, false, false, false, false, false, false);
         for (Page page : PAGES) {
             ChartScene scene = scene(page);
             BufferedImage bare = renderer.renderToImage(scene,
                     ChartOptions.DEFAULTS);
-            Graphics2D probe = bare.createGraphics();
-            java.awt.Rectangle box;
-            try {
-                box = ChartRenderer.magnitudeKeyBounds(
-                        probe.getFontMetrics(ChartRenderer.labelFont()),
-                        scene);
-            } finally {
-                probe.dispose();
-            }
-            long inked = 0;
-            long marks = 0;
-            if (box != null) {
-                for (int y = box.y; y < box.y + box.height; y++) {
-                    for (int x = box.x; x < box.x + box.width; x++) {
-                        int grey = bare.getRGB(x, y) & 0xff;
-                        if (grey < 250) {
-                            inked++;
-                        }
-                        if (grey < 140) {
-                            marks++;
-                        }
-                    }
-                }
-            }
+            BufferedImage marks = renderer.renderToImage(scene, marksOnly);
+            java.awt.Rectangle box = renderer.magnitudeKeyBounds(
+                    bare.createGraphics().getFontMetrics(
+                            ChartRenderer.labelFont()), scene);
             System.out.printf(Locale.ROOT,
                     "| %s | %s | %.2f%% | %d px | %d px |%n", page.name(),
                     box == null ? "omitted"
@@ -173,9 +163,23 @@ public final class FurnitureStudyMain {
                     box == null ? 0.0
                             : 100.0 * box.width * box.height
                                     / (WIDTH * HEIGHT),
-                    inked, marks);
+                    box == null ? 0 : inkIn(bare, box),
+                    box == null ? 0 : inkIn(marks, box));
         }
         System.out.println();
+    }
+
+    /** Pixels darker than the paper inside a box. */
+    private static long inkIn(BufferedImage page, java.awt.Rectangle box) {
+        long inked = 0;
+        for (int y = box.y; y < box.y + box.height; y++) {
+            for (int x = box.x; x < box.x + box.width; x++) {
+                if ((page.getRGB(x, y) & 0xff) < 250) {
+                    inked++;
+                }
+            }
+        }
+        return inked;
     }
 
     /** The pages themselves, with and without the key, in both themes. */

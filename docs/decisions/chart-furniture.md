@@ -70,9 +70,13 @@ to hold the box inside its margins omits it rather than clipping it.
 2. stars and symbols draw over it;
 3. **furniture draws last and opaque** — the title block, then the
    key — so neither is ever half-covered by chart ink;
-4. **star labels yield to furniture**: the key's box joins the title
-   block in the occupied set the label pass already honours, so a
-   label is never placed where the key will cover it.
+4. **labels yield to the furniture that will actually draw**: the
+   key's box joins the title block in the occupied set the star-label
+   pass honours, and in the reservation the grid's edge labels
+   honour, so no label is placed where furniture will cover it.
+   Furniture the reader has switched off reserves nothing — switching
+   the title block off gives back the grid notation it was
+   suppressing, which an earlier implementation did not.
 
 ## Default: offered, and initially hidden
 
@@ -82,14 +86,22 @@ This is measured, not inherited. The key's box is 160×72 px — 1.83%
 of a 900×700 page — and on the pages a reader explores it covers
 real ink:
 
-| page | chart ink covered | of which star or symbol ink |
+| page | chart ink covered | star and symbol ink |
 |---|---:|---:|
 | M31, 8° (the released default) | 288 px | **0 px** |
 | quiet sky, 8° | 405 px | 0 px |
 | Sagittarius, 8° | 400 px | 0 px |
-| Polaris, 18° | 445 px | 15 px |
-| Crux, 18° | 487 px | 112 px |
-| **Orion, 36°** | 635 px | **290 px** |
+| Polaris, 18° | 445 px | 33 px |
+| Crux, 18° | 487 px | 118 px |
+| **Orion, 36°** | 635 px | **436 px** |
+
+The second column is **derived from the layers**, not from how dark a
+pixel is: it measures the key's box on a page rendered with stars and
+deep-sky symbols alone. An earlier version counted every pixel darker
+than a grey threshold and called the result star ink, which also
+counted labels, figures and constellation names — and, by missing the
+paler edges of antialiased dots, *understated* the real figure (290 px
+on Orion against the 436 px the layers actually draw).
 
 On the wide and crowded pages the key blanks a patch of sky
 containing stars — visible in
@@ -145,8 +157,8 @@ since Sprint 12.
   page rather than the scale.
 - **The lower right.** Right-ascension labels already run along the
   bottom edge.
-- **Drawing the key by default.** It costs up to 290 px of star ink
-  on a wide page, and the reader has not asked for it.
+- **Drawing the key by default.** It covers up to 436 px of star and
+  symbol ink on a wide page, and the reader has not asked for it.
 - **A third options group.** Two checkboxes do not earn a heading.
 
 ## Consequences
