@@ -35,6 +35,8 @@
 # stamps one fixed modification time, sorts the entries, and zips
 # with -X, so it IS reproducible from the same source on any machine
 # - and the same two runs produced the identical 473fcbb1... for it.
+# A third run confirmed it independently: the #195 rehearsal, on
+# another branch on another day, built that same 473fcbb1... again.
 # That makes it the identity check. A published release whose
 # portable archive hashes to what this run built was built from this
 # run's source; one that does not, was not.
