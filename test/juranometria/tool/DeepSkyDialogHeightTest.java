@@ -150,6 +150,46 @@ class DeepSkyDialogHeightTest {
         });
     }
 
+    @Test
+    void andSoDoesAChosenFontThatMatchesTheThemeAnyway() throws Exception {
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "installing a look and feel needs a toolkit");
+        // The case a value comparison cannot see: a session that
+        // chose the font the theme was already using. It reads back
+        // identically to no choice at all - and it is still a choice,
+        // because it outlives the theme it was made under, which is
+        // exactly what choosing it was for.
+        restoringTheme(() -> {
+            SwingUtilities.invokeAndWait(
+                    () -> juranometria.app.UiTheme.apply(false));
+            java.awt.Font themes =
+                    (java.awt.Font) UIManager.get("defaultFont");
+            javax.swing.plaf.FontUIResource sameButChosen =
+                    new javax.swing.plaf.FontUIResource(themes.getFamily(),
+                            themes.getStyle(), themes.getSize());
+            assertEquals(themes, sameButChosen,
+                    "the point of this test: the chosen font and the"
+                            + " theme's are equal");
+            SwingUtilities.invokeAndWait(
+                    () -> UIManager.put("defaultFont", sameButChosen));
+
+            restoringTheme(this::onAShortScreen);
+
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    UIManager.setLookAndFeel(
+                            new javax.swing.plaf.metal.MetalLookAndFeel());
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+            assertEquals(sameButChosen, UIManager.get("defaultFont"),
+                    "a chosen font that matched the theme is still a"
+                            + " choice, and must survive a change of"
+                            + " theme");
+        });
+    }
+
     /** Something a test does that disturbs the global look and feel. */
     private interface Body {
         void run() throws Exception;
@@ -193,28 +233,22 @@ class DeepSkyDialogHeightTest {
     /**
      * The `defaultFont` somebody has chosen, or null when nobody has.
      *
-     * <p>Reading the key cannot answer this on its own: a look and
-     * feel publishes a default font of its own, and an override laid
-     * over it reads back exactly the same way. Removing the override
-     * separates them - what remains is the theme's, and if that is
-     * what was there, there was no override to restore. The override
-     * is put straight back, so this is a question rather than a
-     * change.
+     * <p>Reading the value cannot answer this: a look and feel
+     * publishes a default font of its own, and an override laid over
+     * it reads back the same way. Comparing values cannot answer it
+     * either, because a session is entitled to choose the font the
+     * theme already uses - that is still a choice, and it still
+     * outlives the theme it was made under.
+     *
+     * <p>What answers it is presence. {@code UIManager}'s own table
+     * holds overrides only; the look and feel's values live in tables
+     * behind it, and {@code containsKey} does not consult them.
+     * Nothing here is written, so asking costs nothing.
      */
-    private static Object fontOverride() throws Exception {
-        Object[] found = new Object[1];
-        SwingUtilities.invokeAndWait(() -> {
-            Object effective = UIManager.get("defaultFont");
-            UIManager.put("defaultFont", null);
-            Object themes = UIManager.get("defaultFont");
-            if (java.util.Objects.equals(effective, themes)) {
-                found[0] = null;
-                return;
-            }
-            UIManager.put("defaultFont", effective);
-            found[0] = effective;
-        });
-        return found[0];
+    private static Object fontOverride() {
+        return UIManager.getDefaults().containsKey("defaultFont")
+                ? UIManager.get("defaultFont")
+                : null;
     }
 
     private void onAShortScreen() throws Exception {
