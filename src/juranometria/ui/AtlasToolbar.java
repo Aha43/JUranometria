@@ -27,6 +27,16 @@ public final class AtlasToolbar extends JToolBar {
     private final JButton resetView;
     private final JLabel readout = new JLabel();
     private javax.swing.JToggleButton inspectorButton;
+    /**
+     * The running version, as status text (issue #198). The toolbar
+     * is handed the string rather than looking it up, so it holds no
+     * second copy and no second way to format one. Never focusable -
+     * it is something the toolbar says, not something a reader
+     * operates.
+     */
+    private JLabel version;
+    private JButton exit;
+    private javax.swing.JComponent versionGap;
 
     public AtlasToolbar(ChartViewController controller,
                         SearchField searchField) {
@@ -42,6 +52,28 @@ public final class AtlasToolbar extends JToolBar {
     public AtlasToolbar(ChartViewController controller,
                         SearchField searchField,
                         InspectorToggle inspector) {
+        this(controller, searchField, inspector, null, null);
+    }
+
+    /**
+     * The toolbar with the version and the way out (issue #198).
+     * Exit is the rightmost control, the version immediately before
+     * it, and both are separated from the chart's own controls: a
+     * reader reaching for the door should not find zoom.
+     *
+     * <p>The toolbar is <strong>told</strong> the version and
+     * <strong>told</strong> how to ask for the exit; it looks neither
+     * up. That is the same seam the Inspector toggle uses, and it is
+     * what keeps the toolbar from growing application knowledge - it
+     * cannot format a version of its own, nor terminate anything, so
+     * it cannot come to disagree with About or with the window's
+     * close box.
+     */
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField,
+                        InspectorToggle inspector,
+                        String versionText,
+                        Runnable requestExit) {
         setFloatable(false);
 
         zoomIn = iconButton("zoom-in", "Zoom in",
@@ -89,10 +121,115 @@ public final class AtlasToolbar extends JToolBar {
         add(readout);
         readout.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 8));
 
+        if (versionText != null) {
+            versionGap = (javax.swing.JComponent)
+                    Box.createHorizontalStrut(12);
+            add(versionGap);
+            version = new JLabel("v" + versionText);
+            // Quiet, and beneath the controls in the hierarchy: an
+            // identifier the reader can find when they need it, not
+            // something competing with the chart's own readout.
+            version.putClientProperty("FlatLaf.styleClass", "small");
+            version.setEnabled(false);
+            version.setFocusable(false);
+            version.getAccessibleContext().setAccessibleName(
+                    "JUranometria version " + versionText);
+            version.setBorder(javax.swing.BorderFactory
+                    .createEmptyBorder(0, 0, 0, 8));
+            add(version);
+
+        }
+        if (requestExit != null) {
+            exit = iconButton("door-exit", "Exit JUranometria",
+                    "Exit JUranometria", requestExit);
+            add(exit);
+        }
+
+        keepButtonsReachableByKeyboard();
+
         // Enablement asks the controller, whose can-queries include the
         // coverage predicate, so a zoom that would leave the bundled data
         // is disabled rather than refused after the click.
         controller.onChange(state -> sync(controller, state));
+    }
+
+    /**
+     * Every button here is built asking to be focusable, and the look
+     * and feel takes it away again: FlatLaf's toolbars make their
+     * buttons unfocusable by convention, which it applies when a
+     * button is added. The effect was that <em>no</em> control on
+     * this bar could be reached by keyboard, though the code had
+     * said it should be since the toolbar was written.
+     *
+     * <p>Re-asserted here, after everything is added, so the order of
+     * construction cannot decide it. Local to this toolbar rather
+     * than a change to the look and feel's defaults: what is claimed
+     * is that the atlas's own controls are reachable, not that every
+     * toolbar everywhere should be.
+     */
+    private void keepButtonsReachableByKeyboard() {
+        for (java.awt.Component child : getComponents()) {
+            if (child instanceof javax.swing.AbstractButton) {
+                child.setFocusable(true);
+            }
+        }
+    }
+
+    /**
+     * How much room the toolbar has, told the way the Inspector pane
+     * is told (issue #198), so the rule can be driven in a test
+     * without a window manager.
+     *
+     * <p>When the toolbar is squeezed, <strong>the version copy
+     * yields first</strong>: it is the one thing here a reader can
+     * still find elsewhere, in Help - About. It is hidden whole
+     * rather than truncated, because "v1.3" that is really 1.3.0 is
+     * worse than no version at all. Every control stays; nothing that
+     * does something is given up for something that says something.
+     */
+    public void setAvailableWidth(int width) {
+        if (version == null) {
+            return;
+        }
+        boolean fits = width >= requiredWidthWithVersion();
+        if (fits != version.isVisible()) {
+            version.setVisible(fits);
+            versionGap.setVisible(fits);
+            revalidate();
+            repaint();
+        }
+    }
+
+    /** Whether the toolbar is currently showing the version. */
+    public boolean isVersionShowing() {
+        return version != null && version.isVisible();
+    }
+
+    /** The version the toolbar displays, or null when it shows none. */
+    public String versionText() {
+        return version == null ? null : version.getText();
+    }
+
+    /** The way out, for tests that drive it as a reader would. */
+    public JButton exitButton() {
+        return exit;
+    }
+
+    /**
+     * What the toolbar needs to show everything, version included:
+     * every component's own preferred width, with the glue counted
+     * at nothing because it is what gives way first.
+     */
+    private int requiredWidthWithVersion() {
+        int needed = 0;
+        for (java.awt.Component component : getComponents()) {
+            if (component == version || component == versionGap) {
+                needed += component.getPreferredSize().width;
+            } else if (!(component instanceof Box.Filler)) {
+                needed += component.getPreferredSize().width;
+            }
+        }
+        return needed;
     }
 
     /**

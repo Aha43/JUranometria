@@ -9,6 +9,32 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The running version and a way out, at the end of the toolbar**
+  ([#198](https://github.com/Aha43/JUranometria/issues/198)). The
+  version is quiet status text - `v1.3.0`, not focusable, handed to
+  the toolbar from the same `AppInfo.version()` About prints, so
+  there is no second copy and no second way to format one. When the
+  bar is squeezed the version is the first thing to go, hidden whole
+  rather than truncated into an ambiguous number, and every control
+  stays. **Exit JUranometria** sits after it, at the far right.
+- **One shutdown path** ([#198](https://github.com/Aha43/JUranometria/issues/198)).
+  The toolbar button, the window's close box and the platform's Quit
+  all take the same route: detach, flush preferences, dispose every
+  window, terminate - in that order, once, however many times it is
+  asked. Nothing terminates on its own any more.
+
+### Fixed
+
+- **Every toolbar control is reachable by keyboard again**
+  (found while building [#198](https://github.com/Aha43/JUranometria/issues/198)).
+  Each button is built asking to be focusable and FlatLaf's toolbars
+  take it away when the button is added, by their own convention -
+  so in practice no control on the bar could be reached without a
+  pointer, though the code had said otherwise since the toolbar was
+  written. The intent is now re-asserted after the bar is built, and
+  a regression checks it under the look and feel the application
+  actually runs.
+
 - **A close button in the Inspector's own heading**
   ([#197](https://github.com/Aha43/JUranometria/issues/197)). The
   toolbar toggle remains the obvious way to reopen the pane, but once
