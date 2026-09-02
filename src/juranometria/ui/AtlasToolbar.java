@@ -147,6 +147,20 @@ public final class AtlasToolbar extends JToolBar {
 
         keepButtonsReachableByKeyboard();
 
+        // The bar watches its own width. The rule used to be wired
+        // by the application, which meant every other window that
+        // built a toolbar - a journey, a harness - silently had no
+        // responsive behaviour at all, and a test could assert the
+        // rule by calling it directly and never notice (#203
+        // review). A component that knows when it is resized does
+        // not need anyone to remember.
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                setAvailableWidth(getWidth());
+            }
+        });
+
         // Enablement asks the controller, whose can-queries include the
         // coverage predicate, so a zoom that would leave the bundled data
         // is disabled rather than refused after the click.

@@ -142,15 +142,29 @@ class SprintTwentyThreeJourneyTest {
         // package. Widening production visibility to repeat it here
         // would be paying for the same fact twice.
 
-        // Constrained, the copy a reader can find elsewhere yields
-        // first; the controls do not.
-        SwingUtilities.invokeAndWait(() -> toolbar.setAvailableWidth(320));
-        flush();
-        assertFalse(toolbar.isVersionShowing(), "the version yields");
-        assertTrue(toolbar.exitButton().isVisible(), "the way out stays");
-        SwingUtilities.invokeAndWait(() -> toolbar.setAvailableWidth(2000));
-        flush();
+        // Constrained by narrowing the WINDOW, so the toolbar is
+        // really laid out at that width and clipping is a thing that
+        // can be observed rather than a rule that is asserted about
+        // itself.
+        int wide = toolbar.getWidth();
+        assertTrue(wide > 0, "the premise: the bar has been laid out");
+        // 640 still fits everything; 560 does not. The threshold is
+        // the bar's own arithmetic rather than a number chosen here,
+        // so both sides of it are walked.
+        resizeWindowTo(640);
+        assertTrue(toolbar.isVersionShowing(),
+                "a bar with room keeps the version");
+        assertNoControlIsClipped();
+
+        resizeWindowTo(560);
+        assertFalse(toolbar.isVersionShowing(),
+                "squeezed, the copy a reader can find in About yields"
+                        + " first");
+        assertNoControlIsClipped();
+
+        resizeWindowTo(1300);
         assertTrue(toolbar.isVersionShowing(), "and comes back");
+        assertNoControlIsClipped();
 
         // 4. The Inspector opens from the toolbar and closes from its
         // own heading, and every surface agrees (#197).
@@ -218,47 +232,112 @@ class SprintTwentyThreeJourneyTest {
         // (#196), and hiding an unrelated family does not.
         searchFor("M33");
         assertEquals(M33, navigation.state().targetIdentity(), "found");
+        openOptionsDialog();
         ChartScene beforeUnrelated = chart.currentScene();
-        apply(options.options().withFamily(SymbolFamily.NEBULAE, false));
+        clickFamily(SymbolFamily.NEBULAE);
         assertEquals(M33, navigation.state().targetIdentity(),
                 "hiding nebulae is not about a galaxy");
         assertSame(beforeUnrelated, chart.currentScene(),
                 "and is still repaint-only");
 
-        apply(options.options().withFamily(SymbolFamily.GALAXIES, false));
+        // Select M 33 itself, so the Inspector has something to be
+        // honest about when it goes.
+        awaitSettled();
+        clickOn(markFor(M33));
+        assertEquals(M33, selectedId(), "the reader chose M 33");
+
+        clickFamily(SymbolFamily.GALAXIES);
         assertNull(navigation.state().targetIdentity(),
                 "hiding its own family retires it");
         assertNull(navigation.state().targetLabel(), "label and all");
         assertFalse(drawnIds().contains(M33), "and it leaves the page");
-        assertTrue(String.join(" | ", inspector.lines()) != null,
-                "the Inspector still answers");
+        assertEquals(M33, selectedId(),
+                "the selection survives - it is not a property of a"
+                        + " symbol being on the paper");
+        assertTrue(String.join(" | ", inspector.lines())
+                        .contains("Not on this page any more"),
+                "and the Inspector says so plainly rather than"
+                        + " reciting the facts of a mark nobody can"
+                        + " see: " + inspector.lines());
 
-        // 8. Restore Defaults brings the families back without
-        // resurrecting the target; Home returns the released page.
-        SwingUtilities.invokeAndWait(options::restoreDefaults);
-        flush();
-        assertTrue(drawnIds().contains(M33), "galaxies are back");
+        // 8. Cancel, through the dialog's own button: it restores
+        // the options it was opened with, and does not reach across
+        // into navigation to undo a transition it never made.
+        ChartOptions atOpen = options.options();
+        clickDialogButton("Cancel");
+        assertTrue(drawnIds().contains(M33),
+                "Cancel put the families back: " + drawnIds());
         assertNull(navigation.state().targetIdentity(),
-                "the target is not guessed back");
-        SwingUtilities.invokeAndWait(navigation::reset);
+                "and left the target retired, as decided");
+
+        // Restore Defaults previews the released chart - and Cancel
+        // undoes even that, which is the reader's protection against
+        // a button that would otherwise discard the settings they
+        // arrived with.
+        ChartOptions theirs = options.options();
+        assertFalse(theirs.flamsteedNumbers(),
+                "the premise: the reader's store differs from the"
+                        + " released defaults");
+        openOptionsDialog();
+        clickDialogButton("Restore Defaults");
+        assertEquals(ChartOptions.DEFAULTS, options.options(),
+                "Restore Defaults is the released chart");
+        assertNull(navigation.state().targetIdentity(),
+                "and does not resurrect a retired target");
+        clickDialogButton("Cancel");
+        assertEquals(theirs, options.options(),
+                "Cancel gave the reader their own chart back,"
+                        + " Restore Defaults included");
+
+        // And OK persists a deliberate choice.
+        openOptionsDialog();
+        clickFamily(SymbolFamily.GLOBULAR_CLUSTERS);
+        assertFalse(options.options().globularClusters(),
+                "the premise: a deliberate change to keep");
+        clickDialogButton("OK");
+        assertNull(optionsDialog(), "OK closed the dialog");
+
+        // Home, from the toolbar control a reader presses.
+        SwingUtilities.invokeAndWait(
+                () -> toolbarButton("Reset view").doClick());
         flush();
+        awaitSettled();
         assertEquals(ChartViewState.DEFAULT, navigation.state(),
                 "Home is the released chart");
 
-        // 9. The way out is one path, whichever surface asks (#198).
-        // Termination itself is proved by a JVM of its own in
-        // ToolbarVersionAndExitTest; here the surfaces are proved to
-        // reach the same path rather than three of their own.
-        SwingUtilities.invokeAndWait(toolbar.exitButton()::doClick);
-        flush();
-        assertEquals(List.of("detach", "flush", "dispose", "terminate"),
-                shutdownSteps,
-                "the toolbar's Exit takes the application's one way"
-                        + " out, in order: " + shutdownSteps);
+        // 9. And a restarted session opens on those same defaults,
+        // from the store this journey has been writing to - the
+        // reader's settings survive the application, which is the
+        // only place they are ever tested.
+        ChartOptions afterRestart = new ChartOptionsController(
+                ChartOptionsStore.forNode(store)).options();
+        assertFalse(afterRestart.globularClusters(),
+                "a fresh session reads back what OK persisted");
+        assertFalse(afterRestart.flamsteedNumbers(),
+                "and still has the choice the reader arrived with,"
+                        + " which nothing in this journey was"
+                        + " entitled to discard");
 
-        // 10. And the settings the reader arrived with are still
-        // theirs - nothing in this journey rewrote them behind their
-        // back.
+        // 10. The way out is one path, whichever surface asks
+        // (#198). Termination itself is proved by a JVM of its own
+        // in ToolbarVersionAndExitTest; what is proved here is that
+        // the surfaces reach the same path rather than three of
+        // their own.
+        assertEquals(List.of("detach", "flush", "dispose", "terminate"),
+                leavesBy(Surface.POINTER),
+                "a real pointer press on Exit");
+        assertEquals(List.of("detach", "flush", "dispose", "terminate"),
+                leavesBy(Surface.KEYBOARD),
+                "the same button, reached and pressed by keyboard");
+        assertEquals(List.of("detach", "flush", "dispose", "terminate"),
+                leavesBy(Surface.WINDOW_CLOSE),
+                "the window's own close box");
+        assertEquals(List.of("detach", "flush", "dispose", "terminate"),
+                leavesBy(Surface.QUIT_HANDLER),
+                "and the platform's Quit");
+
+        // 11. And the one non-default choice the reader arrived
+        // with is still theirs.
         assertEquals("false", store.get("chart.flamsteedNumbers", "?"),
                 "the one non-default choice they had is untouched");
     }
@@ -318,17 +397,255 @@ class SprintTwentyThreeJourneyTest {
             window.add(chart, BorderLayout.CENTER);
             window.add(inspector, BorderLayout.EAST);
             window.setJMenuBar(AppMenuBar.create(navigation, () -> { },
-                    () -> { }, () -> { }, toggle::toggle));
+                    () -> juranometria.app.ChartOptionsDialog.open(
+                            window, options),
+                    () -> { }, toggle::toggle));
             inspectorItem = AppMenuBar.inspectorItem(window.getJMenuBar());
             toggle.onChange(state -> {
                 inspectorItem.setSelected(state.showing());
                 inspectorItem.setEnabled(state.available());
             });
             inspector.setAvailableWidth(1300);
-            toolbar.setAvailableWidth(1300);
             window.setSize(1300, 820);
             window.setVisible(true);
         });
+        flush();
+    }
+
+
+    // ---- the reader's own controls ---------------------------------
+
+    /** Narrows or widens the window and lets the layout happen. */
+    private void resizeWindowTo(int width) throws Exception {
+        SwingUtilities.invokeAndWait(() -> window.setSize(width, 820));
+        SwingUtilities.invokeAndWait(window::validate);
+        flush();
+        for (int i = 0; i < 200 && toolbar.getWidth() != width; i++) {
+            flush();
+            Thread.sleep(10);
+        }
+        awaitSettled();
+    }
+
+    /**
+     * Every control on the bar is inside the bar. A rule that hides
+     * the version is only worth having if what stays fits, and that
+     * cannot be asserted without a real layout at a real width.
+     */
+    private void assertNoControlIsClipped() {
+        List<String> clipped = new ArrayList<>();
+        for (Component child : toolbar.getComponents()) {
+            if (!child.isVisible() || child.getWidth() == 0) {
+                continue;
+            }
+            if (child.getX() < 0
+                    || child.getX() + child.getWidth() > toolbar.getWidth()) {
+                clipped.add(name(child) + " at " + child.getX() + "+"
+                        + child.getWidth() + " of " + toolbar.getWidth());
+            }
+        }
+        assertEquals(List.of(), clipped,
+                "no control runs off the end of the bar: " + clipped);
+        assertTrue(toolbar.exitButton().getWidth() > 0,
+                "the way out is still drawn");
+        assertTrue(chart.getWidth() >= 400,
+                "and the chart keeps its minimum width: "
+                        + chart.getWidth());
+    }
+
+    private static String name(Component child) {
+        String accessible = child instanceof javax.swing.JComponent c
+                ? c.getAccessibleContext().getAccessibleName() : null;
+        return accessible != null ? accessible
+                : child.getClass().getSimpleName();
+    }
+
+    private javax.swing.JButton toolbarButton(String accessibleName) {
+        javax.swing.JButton found =
+                find(toolbar, javax.swing.JButton.class, accessibleName);
+        assertNotNull(found, accessibleName + " is on the toolbar");
+        return found;
+    }
+
+    // ---- Chart Options, through the dialog a reader opens ----------
+
+    private java.awt.Container dialogPane;
+
+    private void openOptionsDialog() throws Exception {
+        javax.swing.JDialog already = optionsDialog();
+        if (already == null) {
+            SwingUtilities.invokeAndWait(
+                    () -> menuItem("Chart Options").doClick());
+            flush();
+            already = optionsDialog();
+        }
+        assertNotNull(already, "the View menu opened Chart Options");
+        dialogPane = already.getContentPane();
+    }
+
+    private javax.swing.JDialog optionsDialog() {
+        for (java.awt.Window open : java.awt.Window.getWindows()) {
+            if (open instanceof javax.swing.JDialog dialog
+                    && dialog.isVisible()
+                    && "Chart Options".equals(dialog.getTitle())) {
+                return dialog;
+            }
+        }
+        return null;
+    }
+
+    private void clickFamily(SymbolFamily family) throws Exception {
+        if (optionsDialog() == null) {
+            openOptionsDialog();
+        }
+        javax.swing.JCheckBox box =
+                find(dialogPane, javax.swing.JCheckBox.class, family.label());
+        assertNotNull(box, family.label() + " is a control in the dialog");
+        SwingUtilities.invokeAndWait(box::doClick);
+        flush();
+        awaitSettled();
+    }
+
+    private void clickDialogButton(String label) throws Exception {
+        javax.swing.JButton button =
+                find(dialogPane, javax.swing.JButton.class, label);
+        assertNotNull(button, label + " is a button in the dialog");
+        SwingUtilities.invokeAndWait(button::doClick);
+        flush();
+        awaitSettled();
+    }
+
+    private javax.swing.JMenuItem menuItem(String label) {
+        javax.swing.JMenuBar bar = window.getJMenuBar();
+        for (int i = 0; i < bar.getMenuCount(); i++) {
+            javax.swing.JMenu menu = bar.getMenu(i);
+            for (int j = 0; j < menu.getItemCount(); j++) {
+                javax.swing.JMenuItem item = menu.getItem(j);
+                // By accessible name: the text carries an ellipsis
+                // ("Chart Options..."), and the name is what the
+                // application states deliberately.
+                if (item != null && label.equals(item.getAccessibleContext()
+                        .getAccessibleName())) {
+                    return item;
+                }
+            }
+        }
+        throw new AssertionError(label + " is not in the menus");
+    }
+
+    private static <T extends javax.swing.JComponent> T find(
+            java.awt.Container container, Class<T> type, String name) {
+        for (Component child : container.getComponents()) {
+            if (type.isInstance(child) && name.equals(
+                    ((javax.swing.JComponent) child)
+                            .getAccessibleContext().getAccessibleName())) {
+                return type.cast(child);
+            }
+            if (child instanceof java.awt.Container inner) {
+                T found = find(inner, type, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    // ---- the four ways out -----------------------------------------
+
+    private enum Surface { POINTER, KEYBOARD, WINDOW_CLOSE, QUIT_HANDLER }
+
+    /**
+     * Builds a window of its own, leaves it through one surface, and
+     * reports the steps that ran. A window of its own because
+     * leaving is not repeatable: the second request is deliberately
+     * a no-op, so four surfaces need four applications.
+     *
+     * <p>The platform's Quit is the one that cannot be pressed from
+     * a test - no API fires a desktop's quit handler - so what is
+     * exercised there is the handler the application installs,
+     * invoked directly. That proves it reaches the same path, which
+     * is the claim; that macOS calls it is the platform's part.
+     */
+    private List<String> leavesBy(Surface surface) throws Exception {
+        List<String> steps = new ArrayList<>();
+        AppShutdown shutdown = new AppShutdown(
+                () -> steps.add("flush"),
+                () -> steps.add("dispose"),
+                () -> steps.add("terminate"));
+        shutdown.onShutdown(() -> steps.add("detach"));
+
+        JFrame[] frame = new JFrame[1];
+        AtlasToolbar[] bar = new AtlasToolbar[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                ChartViewController nav =
+                        new ChartViewController(Atlas.assembler()::fits);
+                bar[0] = new AtlasToolbar(nav,
+                        new SearchField(Atlas.search(), Atlas.assembler(),
+                                nav),
+                        null, AppInfo.version(), shutdown::request);
+                JFrame made = new JFrame("exit by " + surface);
+                made.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                made.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(
+                            java.awt.event.WindowEvent event) {
+                        shutdown.request();
+                    }
+                });
+                made.setLayout(new BorderLayout());
+                made.add(bar[0], BorderLayout.NORTH);
+                made.setSize(900, 200);
+                made.setVisible(true);
+                frame[0] = made;
+            });
+            flush();
+            awaitLaidOut(bar[0].exitButton());
+
+            switch (surface) {
+                case POINTER -> click(bar[0].exitButton(),
+                        bar[0].exitButton().getWidth() / 2,
+                        bar[0].exitButton().getHeight() / 2);
+                case KEYBOARD -> {
+                    SwingUtilities.invokeAndWait(
+                            bar[0].exitButton()::requestFocusInWindow);
+                    flush();
+                    assertTrue(bar[0].exitButton().isFocusable(),
+                            "the premise: it can be reached at all");
+                    pressSpace(bar[0].exitButton());
+                }
+                case WINDOW_CLOSE -> SwingUtilities.invokeAndWait(
+                        () -> frame[0].dispatchEvent(
+                                new java.awt.event.WindowEvent(frame[0],
+                                        java.awt.event.WindowEvent
+                                                .WINDOW_CLOSING)));
+                case QUIT_HANDLER -> SwingUtilities.invokeAndWait(
+                        () -> quitHandlerFor(shutdown).run());
+            }
+            flush();
+        } finally {
+            if (frame[0] != null) {
+                JFrame doomed = frame[0];
+                SwingUtilities.invokeAndWait(doomed::dispose);
+            }
+        }
+        return steps;
+    }
+
+    /** What JUranometriaMain hands the desktop's quit handler. */
+    private static Runnable quitHandlerFor(AppShutdown shutdown) {
+        return shutdown::request;
+    }
+
+    private void pressSpace(Component target) throws Exception {
+        for (int id : new int[] {KeyEvent.KEY_PRESSED,
+                KeyEvent.KEY_RELEASED}) {
+            SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
+                    new KeyEvent(target, id,
+                            System.nanoTime() / 1_000_000, 0,
+                            KeyEvent.VK_SPACE, ' ')));
+        }
         flush();
     }
 

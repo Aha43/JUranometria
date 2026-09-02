@@ -120,7 +120,8 @@ containers to compensate.
 
 ## Verification
 
-- **533 tests pass**, none aborted locally.
+- **533 tests pass**, none aborted locally, and stable over
+  three consecutive runs after the journey was reworked.
 - **Studies reproduce byte-for-byte**: the deep-sky occlusion study
   and the application-mark study, images included (39 of them).
 - **`docs/reference/m31-stars.png` changed once**, deliberately, by
@@ -149,6 +150,45 @@ real tag supplies it: if the delivery is single, the release publishes
 as before and nothing is proved either way; if it is duplicated, the
 second run should finish **green** with a notice naming the
 duplication. Either way the run should be read rather than assumed.
+
+## What the sprint review changed in this journey
+
+The closing journey was reviewed and found weaker than it looked.
+Five findings, all correct, and the first is the one that matters
+most:
+
+- **A vacuous assertion.** `assertTrue(String.join(…) != null)`
+  cannot fail. It stood where the Inspector's honesty about a
+  retired target should have been asserted, and now the journey
+  selects M 33, hides Galaxies, and requires the panel to say
+  *"Not on this page any more"* while the selection survives.
+- **The controls were bypassed.** Chart Options, Cancel, OK, Restore
+  Defaults and Home were called on their controllers. They are now
+  driven through the View menu's own item, the dialog's own
+  checkboxes and buttons, and the toolbar's own Home control.
+- **No restart was tested.** A fresh `ChartOptionsController` now
+  reads the store back after OK, and the reader's own choice - the
+  one non-default setting they arrived with - is asserted to have
+  survived the whole journey.
+- **Exit had one surface, not four.** Pointer, keyboard, the
+  window's close box and the platform's Quit handler each leave
+  through a window of their own and must produce the same ordered
+  steps. (Leaving is deliberately not repeatable, so four surfaces
+  need four applications.)
+- **The constrained toolbar was never laid out.** The rule was
+  called directly, so nothing was ever squeezed. The journey now
+  narrows the *window*, walks both sides of the bar's own threshold
+  - 640 px still fits, 560 px does not - and asserts that no control
+  runs off the end and the chart keeps its minimum width.
+
+Two of those exposed real defects rather than weak tests. The
+responsive rule was **wired only by `JUranometriaMain`**, so every
+other window that built a toolbar silently had no responsive
+behaviour at all - the bar now watches its own width. And the
+sequence *Restore Defaults → OK* would have **discarded the
+reader's settings** while the journey went on claiming they were
+untouched; the journey now proves Cancel undoes Restore Defaults,
+and keeps OK for a change the reader actually made.
 
 ## Visual inspection actually performed
 

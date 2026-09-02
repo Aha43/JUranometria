@@ -190,12 +190,6 @@ public final class JUranometriaMain {
         frame.add(toolbar, BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);
         frame.add(inspector, BorderLayout.EAST);
-        toolbar.addComponentListener(new java.awt.event.ComponentAdapter() {
-            @Override
-            public void componentResized(java.awt.event.ComponentEvent event) {
-                toolbar.setAvailableWidth(toolbar.getWidth());
-            }
-        });
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
