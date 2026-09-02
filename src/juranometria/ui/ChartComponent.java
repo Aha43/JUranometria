@@ -134,6 +134,19 @@ public final class ChartComponent extends JComponent {
     }
 
     /** Top of the paper page inside the (possibly letterboxed) canvas. */
+    /**
+     * What the modules are offering to ink. Empty until one attaches,
+     * which is how the chart draws its ordinary page with every
+     * module absent.
+     */
+    private final juranometria.module.OverlayRegistry overlays =
+            new juranometria.module.OverlayRegistry();
+
+    /** The registry a module contributes its geometry to. */
+    public juranometria.module.OverlayRegistry overlays() {
+        return overlays;
+    }
+
     public int pageOffsetY() {
         return scene == null ? 0
                 : (getHeight() - scene.viewport().heightPx()) / 2;
@@ -183,6 +196,12 @@ public final class ChartComponent extends JComponent {
             renderer.render(g2, scene, chartOptions);
             renderer.drawSelectionHighlight(g2, scene, chartOptions,
                     highlighted);
+            // After the chart, never inside it: working crosses are
+            // an interaction overlay and not catalogue symbols, so
+            // ordinary and reference rendering are untouched by them
+            // - and identical when nothing is marked, because a
+            // module with nothing to say contributes nothing.
+            WorkingCrossInk.paint(g2, scene, overlays.collect(), highlighted);
         } finally {
             g2.dispose();
         }

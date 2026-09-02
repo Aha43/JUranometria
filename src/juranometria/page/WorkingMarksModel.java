@@ -164,6 +164,26 @@ public final class WorkingMarksModel {
         queue(new Change(base.marks(), identity));
     }
 
+    /**
+     * Replaces the whole marked set in <strong>one</strong>
+     * transition.
+     *
+     * <p>What a reader's shift-click means: five rows chosen by one
+     * gesture is one change of mind, not five. Reconciling it as a
+     * run of marks and unmarks would publish four states nobody
+     * asked about, and a subscriber redrawing on each would flicker
+     * through sets the reader never chose (issue #216).
+     */
+    public void replaceWith(List<String> identities, String lead) {
+        List<String> next = List.copyOf(identities);
+        Change base = intended();
+        if (base.marks().equals(next)
+                && java.util.Objects.equals(base.lead(), lead)) {
+            return;
+        }
+        queue(new Change(next, lead));
+    }
+
     /** Nothing is marked. */
     public void clear() {
         if (intended().isEmpty()) {

@@ -1,0 +1,117 @@
+package juranometria.ui.onthispage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import juranometria.module.ChartModule;
+import juranometria.module.ChartServices;
+import juranometria.module.InkRole;
+import juranometria.module.OverlayContribution;
+import juranometria.page.PageContents;
+import juranometria.page.PageEntry;
+import juranometria.page.PageVisibility;
+
+/**
+ * The <strong>On this page</strong> module (Sprint 24, issue #216).
+ *
+ * <p>The first module built on the seam #215 opened: it reads the
+ * page inventory, keeps the reader's working marks, shows them as a
+ * table, and offers a cross for each marked object the page does not
+ * already draw. It owns its own panel, its own state and its own
+ * lifecycle, and removing it removes the feature and nothing else.
+ *
+ * <p>What it deliberately does not do: move the chart on its own,
+ * paint anything, invent a symbol, or remember anything between
+ * sessions.
+ */
+public final class OnThisPageModule implements ChartModule {
+
+    /** The name its contributed geometry is owned under. */
+    public static final String ID = "on-this-page";
+
+    private ChartServices services;
+    private OnThisPageTable table;
+    private final List<Runnable> released = new ArrayList<>();
+
+    @Override
+    public String name() {
+        return ID;
+    }
+
+    @Override
+    public void attach(ChartServices services) {
+        if (this.services != null) {
+            throw new IllegalStateException("already attached");
+        }
+        this.services = services;
+        this.table = new OnThisPageTable(services);
+        released.add(services.contribute(ID, this::crosses));
+        released.add(services.onPageChange(this::pageChanged));
+    }
+
+    @Override
+    public void detach() {
+        for (Runnable release : released) {
+            release.run();
+        }
+        released.clear();
+        if (table != null) {
+            table.release();
+        }
+        table = null;
+        services = null;
+    }
+
+    /** The panel a window puts beside the chart. */
+    public OnThisPageTable panel() {
+        return table;
+    }
+
+    /**
+     * A cross for every marked object the page does not draw.
+     *
+     * <p>Only those. A visible object already carries its own
+     * symbol, and adding a cross over it would say the reader had
+     * marked something other than the thing they can see - two marks
+     * for one object, in a vocabulary the atlas has not decided.
+     * Marking a visible object still marks it; it simply adds no
+     * ink.
+     *
+     * <p>The identity is the catalogue's own, so the chart can
+     * recognise the lead and give it the selection treatment without
+     * being told what a lead is.
+     */
+    List<OverlayContribution> crosses() {
+        if (services == null) {
+            return List.of();
+        }
+        PageContents page = services.inventory();
+        List<OverlayContribution> geometry = new ArrayList<>();
+        for (String identity : services.workingMarks().marks()) {
+            PageEntry entry = page.find(identity).orElse(null);
+            if (entry == null || entry.visibility() == PageVisibility.DRAWN) {
+                continue;
+            }
+            geometry.add(new OverlayContribution.Point(entry.identity(),
+                    "working mark on " + entry.identity() + ", "
+                            + entry.visibility().prose(),
+                    entry.position(), InkRole.INTERACTION));
+        }
+        return geometry;
+    }
+
+    /**
+     * A new page: the marks that are no longer on it go, in one
+     * transition, and the table follows.
+     *
+     * <p>Searching elsewhere does not carry a cloud of crosses to
+     * another region, and panning does not leave rows describing sky
+     * the reader can no longer see.
+     */
+    private void pageChanged(PageContents page) {
+        services.workingMarks().pruneTo(page);
+        if (table != null) {
+            table.pageChanged(page);
+        }
+    }
+}
