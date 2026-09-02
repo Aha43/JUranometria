@@ -176,6 +176,7 @@ public final class OnThisPageStudyMain {
      */
     private static boolean reachesPaper(GnomonicProjection projection,
                                         ViewportMapping mapping,
+                                        ChartScene scene,
                                         DeepSkyObject dso) {
         PixelPoint centre = projection.project(dso.position())
                 .map(mapping::toPixel).orElse(null);
@@ -198,11 +199,12 @@ public final class OnThisPageStudyMain {
             // the circle of the semi-major, so the circle is asked -
             // on the sphere, at every bearing, not as a radius in
             // pixels.
-            return sphericalReaches(projection, mapping, dso.position(),
-                    semiMajorDeg, semiMajorDeg, 0.0);
+            return sphericalReaches(projection, mapping, scene,
+                    dso.position(), semiMajorDeg, semiMajorDeg, 0.0);
         }
-        return sphericalReaches(projection, mapping, dso.position(),
-                semiMajorDeg, recorded.minorAxisArcmin() / 120.0,
+        return sphericalReaches(projection, mapping, scene,
+                dso.position(), semiMajorDeg,
+                recorded.minorAxisArcmin() / 120.0,
                 recorded.positionAngleDegrees());
     }
 
@@ -234,20 +236,27 @@ public final class OnThisPageStudyMain {
                                 double positionAngleDeg) {
         return sphericalReaches(
                 new GnomonicProjection(scene.viewport().centre()),
-                new ViewportMapping(scene.viewport()), centre,
+                new ViewportMapping(scene.viewport()), scene, centre,
                 semiMajorDeg, semiMinorDeg, positionAngleDeg);
     }
 
     private static boolean sphericalReaches(GnomonicProjection projection,
                                             ViewportMapping mapping,
+                                            ChartScene scene,
                                             SkyPosition centre,
                                             double semiMajorDeg,
                                             double semiMinorDeg,
                                             double positionAngleDeg) {
+        // The boundary as a closed path, not as a bag of points.
+        // Sampled points prove nothing between themselves: a sliver
+        // can cross a corner of the paper between two of them and be
+        // missed (gate review). Joining them makes the edges part of
+        // the test, so a crossing anywhere along one counts.
+        java.awt.geom.Path2D.Double outline = new java.awt.geom.Path2D.Double();
+        boolean started = false;
+        boolean anyRefused = false;
         for (int i = 0; i < BOUNDARY_SAMPLES; i++) {
             double t = 2 * Math.PI * i / BOUNDARY_SAMPLES;
-            // Offsets in the tangent frame: along the major axis,
-            // which points at the position angle, and across it.
             double along = semiMajorDeg * Math.cos(t);
             double across = semiMinorDeg * Math.sin(t);
             double distance = Math.hypot(along, across);
@@ -256,11 +265,70 @@ public final class OnThisPageStudyMain {
             PixelPoint pixel = projection
                     .project(offsetOf(centre, distance, bearing))
                     .map(mapping::toPixel).orElse(null);
-            if (pixel != null && insidePaper(pixel)) {
-                return true;
+            if (pixel == null) {
+                // Past the projection's horizon: the outline is not a
+                // closed curve on this page any more.
+                anyRefused = true;
+                continue;
+            }
+            if (started) {
+                outline.lineTo(pixel.x(), pixel.y());
+            } else {
+                outline.moveTo(pixel.x(), pixel.y());
+                started = true;
             }
         }
-        return false;
+        if (!started) {
+            return false;          // nothing of it is on this sky
+        }
+        outline.closePath();
+        // Closed, this answers both things a bag of points cannot.
+        // A crossing anywhere along an edge counts, not only at a
+        // sample. And a rectangle lying inside the path intersects
+        // it - which is the object holding the whole page: nothing
+        // of its outline is on the paper and its centre is off it,
+        // yet every pixel in front of the reader is inside it.
+        //
+        // Where part of the boundary is past the projection's
+        // horizon, what is left is closed by a chord rather than by
+        // the true curve. Only objects far larger than any the
+        // catalogue holds get there, and the oracle is asked about
+        // that case in both directions rather than trusted.
+        return outline.intersects(PAPER);
+    }
+
+    /**
+     * Membership in an angular ellipse, by true separation and
+     * bearing east of north - the convention the catalogue records
+     * its position angles in.
+     */
+    static boolean insideAngularEllipse(SkyPosition centre,
+                                        SkyPosition point,
+                                        double semiMajorDeg,
+                                        double semiMinorDeg,
+                                        double positionAngleDeg) {
+        double r = centre.separationDegrees(point);
+        if (r > semiMajorDeg) {
+            return false;
+        }
+        double offset = Math.toRadians(
+                bearingDegrees(centre, point) - positionAngleDeg);
+        double along = r * Math.cos(offset);
+        double across = r * Math.sin(offset);
+        return (along * along) / (semiMajorDeg * semiMajorDeg)
+                + (across * across) / (semiMinorDeg * semiMinorDeg) <= 1.0;
+    }
+
+    /** Bearing east of north, on the sphere. */
+    static double bearingDegrees(SkyPosition from, SkyPosition to) {
+        double dec1 = Math.toRadians(from.decDegrees());
+        double dec2 = Math.toRadians(to.decDegrees());
+        double dRa = Math.toRadians(to.raDegrees() - from.raDegrees());
+        double y = Math.sin(dRa) * Math.cos(dec2);
+        double x = Math.cos(dec1) * Math.sin(dec2)
+                - Math.sin(dec1) * Math.cos(dec2) * Math.cos(dRa);
+        double degrees = Math.toDegrees(Math.atan2(y, x)) % 360.0;
+        return degrees < 0 ? degrees + 360.0 : degrees;
     }
 
     /** How finely the angular boundary is walked. */
@@ -339,7 +407,7 @@ public final class OnThisPageStudyMain {
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         List<DeepSkyObject> deepSky = new ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (reachesPaper(projection, mapping, dso)) {
+            if (reachesPaper(projection, mapping, scene, dso)) {
                 deepSky.add(dso);
             }
         }
@@ -430,7 +498,7 @@ public final class OnThisPageStudyMain {
                     if (onPage(projection, mapping, dso.position()) != null) {
                         centres++;
                     }
-                    if (reachesPaper(projection, mapping, dso)) {
+                    if (reachesPaper(projection, mapping, scene, dso)) {
                         extents++;
                     }
                 }

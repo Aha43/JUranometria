@@ -207,14 +207,7 @@ class MapExplorationJourneyTest {
 
             // Taken by keyboard, as a reader without a pointer does.
             javax.swing.JList<?> overlap = candidateList(inspector);
-            assertTrue(FocusedWindow.tryToFocus(window),
-                    "the premise: the window is focused before any"
-                            + " keyboard step. "
-                            + FocusedWindow.state(window));
-            assertTrue(FocusedWindow.awaitFocusOwner(overlap),
-                    "the premise: the candidate list holds the"
-                            + " keyboard focus before it is sent any."
-                            + " " + FocusedWindow.state(window));
+        FocusedWindow.insistOnFocus(window, overlap);
             flush();
             key(overlap, KeyEvent.VK_DOWN);
             key(overlap, KeyEvent.VK_ENTER);
@@ -319,22 +312,14 @@ class MapExplorationJourneyTest {
             // outside the focused window that call does nothing at
             // all. This is the step that has to happen before Down
             // and Enter, not the assertion after them.
-            assertTrue(FocusedWindow.tryToFocus(window),
-                    "the premise: this window holds the keyboard"
-                            + " focus, so the application's own focus"
-                            + " requests can be granted. "
-                            + FocusedWindow.state(window));
-            // And the list itself must hold the focus, not merely
-            // the window (#209 review). The events below are
-            // dispatched straight at it, which works whether or not
-            // a reader's keyboard could ever have reached it - so
-            // the thing that makes it a keyboard journey is asserted
-            // here rather than assumed.
-            assertTrue(FocusedWindow.awaitFocusOwner(list),
-                    "the premise: the candidate list has the keyboard"
-                            + " focus, so Down and Enter are what a"
-                            + " reader's would be. "
-                            + FocusedWindow.state(window));
+            //
+            // And the list itself, not merely the window (#209
+            // review). The events below are dispatched straight at
+            // it, which works whether or not a reader's keyboard
+            // could ever have reached it - so the thing that makes
+            // this a keyboard journey is established here rather
+            // than assumed.
+            FocusedWindow.insistOnFocus(window, list);
             flush();
             key(list, KeyEvent.VK_DOWN);
             assertEquals(1, list.getSelectedIndex(),

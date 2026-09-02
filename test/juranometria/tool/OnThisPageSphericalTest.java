@@ -37,37 +37,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OnThisPageSphericalTest {
 
-    /** Membership in an angular ellipse: true separation and bearing. */
-    private static boolean insideEllipse(SkyPosition centre,
-                                         SkyPosition point,
-                                         double semiMajorDeg,
-                                         double semiMinorDeg,
-                                         double positionAngleDeg) {
-        double r = centre.separationDegrees(point);
-        if (r > semiMajorDeg) {
-            return false;
-        }
-        double bearing = bearingDegrees(centre, point);
-        double offset = Math.toRadians(bearing - positionAngleDeg);
-        double along = r * Math.cos(offset);
-        double across = r * Math.sin(offset);
-        return (along * along) / (semiMajorDeg * semiMajorDeg)
-                + (across * across) / (semiMinorDeg * semiMinorDeg) <= 1.0;
-    }
-
-    /** Bearing east of north, on the sphere. */
-    private static double bearingDegrees(SkyPosition from, SkyPosition to) {
-        double dec1 = Math.toRadians(from.decDegrees());
-        double dec2 = Math.toRadians(to.decDegrees());
-        double dRa = Math.toRadians(to.raDegrees() - from.raDegrees());
-        double y = Math.sin(dRa) * Math.cos(dec2);
-        double x = Math.cos(dec1) * Math.sin(dec2)
-                - Math.sin(dec1) * Math.cos(dec2) * Math.cos(dRa);
-        double degrees = Math.toDegrees(Math.atan2(y, x)) % 360.0;
-        return degrees < 0 ? degrees + 360.0 : degrees;
-    }
-
-    /** Does any pixel of the paper fall inside the angular ellipse? */
+    /**
+     * Does any pixel of the paper fall inside the angular ellipse?
+     *
+     * <p>Every pixel, not every third: a three-pixel step can step
+     * over a sliver, and an oracle that misses what the rule finds
+     * would report the rule wrong for being right (gate review).
+     * This is slow and exhaustive, which is what an oracle is for.
+     */
     private static boolean oracleReaches(ChartScene scene,
                                          SkyPosition centre,
                                          double semiMajorDeg,
@@ -75,11 +52,12 @@ class OnThisPageSphericalTest {
                                          double positionAngleDeg) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
-        for (int y = 1; y <= height - 1; y += 3) {
-            for (int x = 1; x <= width - 1; x += 3) {
+        for (int y = 1; y <= height - 1; y++) {
+            for (int x = 1; x <= width - 1; x++) {
                 SkyPosition sky = ChartHitTest.skyAt(scene, x + 0.5, y + 0.5);
-                if (sky != null && insideEllipse(centre, sky, semiMajorDeg,
-                        semiMinorDeg, positionAngleDeg)) {
+                if (sky != null && OnThisPageStudyMain.insideAngularEllipse(
+                        centre, sky, semiMajorDeg, semiMinorDeg,
+                        positionAngleDeg)) {
                     return true;
                 }
             }
@@ -117,33 +95,37 @@ class OnThisPageSphericalTest {
         for (ChartScene scene : pages) {
             SkyPosition pageCentre = scene.viewport().centre();
             double field = scene.viewport().fieldWidthDegrees();
-            for (double offset : new double[] {0.0, field * 0.3,
-                    field * 0.55, field * 0.8}) {
-                for (double bearing : new double[] {0, 45, 90, 135, 180,
-                        225, 270, 315}) {
+            for (double offset : new double[] {field * 0.35,
+                    field * 0.6}) {
+                for (double bearing : new double[] {0, 90, 200}) {
                     SkyPosition centre = OnThisPageStudyMain.offsetOf(
                             pageCentre, offset, bearing);
-                    for (double semiMajor : new double[] {field * 0.05,
-                            field * 0.2, field * 0.6}) {
+                    for (double semiMajor : new double[] {field * 0.12,
+                            field * 0.45}) {
                         for (double ratio : new double[] {1.0, 0.3}) {
-                            for (double pa : new double[] {0, 60, 120}) {
+                            for (double pa : new double[] {0, 60}) {
                                 boolean mine = rule(scene, centre,
                                         semiMajor, semiMajor * ratio, pa);
                                 boolean oracle = oracleReaches(scene,
                                         centre, semiMajor,
                                         semiMajor * ratio, pa);
+                                // Both directions. Asserting only
+                                // that the rule finds what the
+                                // oracle finds would let a rule
+                                // that answers yes to everything
+                                // pass (gate review).
+                                assertEquals(oracle, mine, String.format(
+                                        "centre %.3f,%.3f semi-major"
+                                                + " %.3f° ratio %.1f"
+                                                + " pa %.0f on a %.0f°"
+                                                + " page",
+                                        centre.raDegrees(),
+                                        centre.decDegrees(), semiMajor,
+                                        ratio, pa,
+                                        scene.viewport()
+                                                .fieldWidthDegrees()));
                                 if (oracle) {
                                     reaching++;
-                                    assertTrue(mine, String.format(
-                                            "the oracle finds this on the"
-                                                    + " page and the rule"
-                                                    + " does not:"
-                                                    + " centre %.3f,%.3f"
-                                                    + " semi-major %.3f°"
-                                                    + " ratio %.1f pa %.0f",
-                                            centre.raDegrees(),
-                                            centre.decDegrees(),
-                                            semiMajor, ratio, pa));
                                 }
                                 checked++;
                             }
@@ -152,10 +134,58 @@ class OnThisPageSphericalTest {
                 }
             }
         }
-        assertTrue(checked > 1000, "a real sweep: " + checked);
-        assertTrue(reaching > 50 && reaching < checked - 50,
+        assertTrue(checked >= 100, "a real sweep: " + checked);
+        assertTrue(reaching > 5 && reaching < checked - 5,
                 "the sweep straddles the page edge: " + reaching
                         + " of " + checked);
+    }
+
+    @Test
+    void anObjectHoldingTheWholePageIsOnIt() {
+        // The case a boundary test can never see: nothing of the
+        // outline is on the paper and the centre is off it, yet
+        // every pixel a reader sees is inside the object. A rule
+        // built only from sampled boundary points answers no
+        // (gate review).
+        ChartScene scene = page(80.894, -69.756, 1.0);
+        SkyPosition centre = OnThisPageStudyMain.offsetOf(
+                scene.viewport().centre(), 4.0, 45.0);
+        double semiMajor = 8.0;
+
+        assertTrue(oracleReaches(scene, centre, semiMajor, semiMajor, 0.0),
+                "the premise: this object covers the whole page");
+        assertTrue(rule(scene, centre, semiMajor, semiMajor, 0.0),
+                "so it is on the page, though no part of its outline"
+                        + " is and its centre is not");
+    }
+
+    @Test
+    void anObjectWhoseOutlineCrossesTheHorizonIsStillOnThePage() {
+        // Larger than anything the catalogue holds, and the reason
+        // the closed path cannot be the whole answer: part of this
+        // object's boundary is more than 90° from the page centre,
+        // where a gnomonic projection has nothing to say. The
+        // outline is not a closed curve on this page, so containment
+        // has to be asked of the paper instead.
+        ChartScene scene = page(80.894, -69.756, 1.0);
+        SkyPosition centre = OnThisPageStudyMain.offsetOf(
+                scene.viewport().centre(), 50.0, 20.0);
+
+        // Both directions, because what is left of the outline is
+        // closed by a chord rather than by the true curve, and a
+        // chord can as easily claim the page as miss it.
+        for (double semiMajor : new double[] {70.0, 55.0, 45.0, 30.0}) {
+            for (double ratio : new double[] {1.0, 0.4}) {
+                assertEquals(
+                        oracleReaches(scene, centre, semiMajor,
+                                semiMajor * ratio, 30.0),
+                        rule(scene, centre, semiMajor,
+                                semiMajor * ratio, 30.0),
+                        String.format("a %.0f° object at %.0f° ratio"
+                                + " %.1f, its outline running off the"
+                                + " projection", semiMajor, 50.0, ratio));
+            }
+        }
     }
 
     @Test

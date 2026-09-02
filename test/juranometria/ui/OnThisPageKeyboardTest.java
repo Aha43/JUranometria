@@ -69,13 +69,7 @@ class OnThisPageKeyboardTest {
         // The premise the off-screen version could not establish:
         // the table itself holds the focus, so a key event has
         // somewhere to arrive.
-        assertTrue(FocusedWindow.tryToFocus(window),
-                "the window holds the keyboard focus. "
-                        + FocusedWindow.state(window));
-        assertTrue(FocusedWindow.awaitFocusOwner(table),
-                "and the table itself owns it, so these are a"
-                        + " reader's keys and not a method call. "
-                        + FocusedWindow.state(window));
+        FocusedWindow.insistOnFocus(window, table);
 
         // Walking.
         press(KeyEvent.VK_DOWN, 0);
@@ -106,10 +100,7 @@ class OnThisPageKeyboardTest {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "a key has nowhere to arrive without a display");
         openTable();
-        assertTrue(FocusedWindow.tryToFocus(window),
-                FocusedWindow.state(window));
-        assertTrue(FocusedWindow.awaitFocusOwner(table),
-                FocusedWindow.state(window));
+        FocusedWindow.insistOnFocus(window, table);
 
         press(KeyEvent.VK_DOWN, 0);
         press(KeyEvent.VK_DOWN, 0);

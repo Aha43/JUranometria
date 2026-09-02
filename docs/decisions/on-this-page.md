@@ -40,7 +40,7 @@ measured in charge of the answer. **An object of unknown size is a
 point** — and that is not a corner case: **9.7% of the bundled pack
 records no size at all**.
 
-**The ellipse, and on the sphere.** This rule took three drafts to
+**The ellipse, and on the sphere.** This rule took four drafts to
 say what it means, and each was wrong in a way worth recording.
 
 A **square** of the half-major reaches further at its corners than
@@ -60,6 +60,30 @@ which is exactly where this question gets asked.
 So the boundary is walked **on the sphere**, at the recorded
 semi-axes and position angle east of north, and each point is
 projected through the atlas's own projection and viewport mapping.
+
+The fourth draft was about what a walk can prove. **Sampled points
+are not an intersection.** Seven hundred and twenty of them around a
+large ellipse are pixels apart at the page edge, and a sliver can
+cross a corner of the paper between two of them and be missed. So
+the projected points are joined into a closed path and the paper is
+tested against *that* — the edges between samples are part of the
+test, not gaps in it.
+
+Closing it also answers the one case a boundary can never show:
+**the object holding the whole page.** Nothing of its outline is on
+the paper and its centre is off it, yet every pixel in front of the
+reader is inside it — and a rectangle lying inside a closed path
+intersects it. A rule built from sampled points answers that such an
+object is not there; the test for it fails on exactly that mutation,
+which is how we know the path is doing the work.
+
+Where part of the boundary is past the projection's horizon, what is
+left is closed by a chord rather than by the true curve. Only
+objects far larger than any the catalogue holds reach that, and the
+oracle is asked about it in both directions rather than trusted. A
+corner-containment fallback was written for this case and then
+removed: no mutation could make it matter, and code no test can kill
+is not evidence.
 
 Where the source is silent the fallback is explicit, because each
 silence is a different kind of ignorance:
@@ -81,6 +105,19 @@ grab-to-pan uses — and asks whether that position lies inside the
 object's angular ellipse, by true separation and bearing. Forward
 and inverse are independent enough to disagree if the geometry is
 wrong.
+
+Two things about it are deliberate. It reads **every pixel**, not
+every third: a coarser step walks over a sliver, and an oracle that
+misses what the rule finds reports the rule wrong for being right.
+And it asserts **both directions** — the rule finds everything the
+oracle finds, *and* nothing it does not. Only the first was asserted
+at first, which a rule answering *yes* to everything would have
+passed. The sweep is smaller because each case now reads the whole
+paper; that is the trade an exhaustive oracle asks for, and it is
+the right way round.
+
+Neither change moved a single measured number. The stricter rule
+confirms the inventory the report already carried.
 
 It is held to the cases where a flat ellipse would have been worst:
 a 36° field, a pole, the RA seam, and **the Magellanic Cloud placed
@@ -277,6 +314,14 @@ events — so a key is proved to **arrive**, not merely to have
 somewhere to arrive. It runs in the display job on every pull
 request, which is how the platform difference above came to light.
 
+A desktop that refuses to hand over the focus is not evidence about
+this module, so the journey ends unmet rather than failing — which
+it may do only because the display job forbids a single aborted
+test, so a journey that quietly stopped running would take the build
+with it. Asserting it instead made these journeys fail about one run
+in three on a developer's machine, for the one reason #209 taught us
+to read carefully.
+
 It asserts what holds wherever it runs — the rows walk, shift-Down
 builds a marked set, shift-Up narrows it, the lead follows, and
 after `HOME` the table is still coherent — and deliberately does not
@@ -398,6 +443,10 @@ behind.
   gnomonic page has no single scale, and the objects this matters
   for — the Magellanic Clouds — are degrees across. The boundary is
   walked on the sphere and projected.
+- **The walk alone, as a set of sampled points.** Rejected: points
+  prove nothing between themselves, and no boundary point at all
+  lies on a page the object entirely contains. The samples are
+  joined into a closed path, which answers both.
 - **A bounding square, then a bounding circle, as the page rule.**
   Both reject nothing the ellipse would have accepted, and both
   accept objects the ellipse rejects — a thin galaxy lying along the
