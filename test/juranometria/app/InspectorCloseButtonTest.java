@@ -23,6 +23,7 @@ import juranometria.ui.SearchField;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -145,6 +146,34 @@ class InspectorCloseButtonTest {
                         + inspector.lines());
     }
 
+    @Test
+    void theChartAssemblesAPageWheneverItIsResized() throws Exception {
+        // Why closing the pane is not free, proved at the mechanism
+        // rather than through a window: the chart assembles for the
+        // size it is given, so taking the pane's width back assembles
+        // a page. This is what the documentation and the changelog
+        // say happens, and it is why they do not promise that closing
+        // changes nothing at all. No display, no window manager, no
+        // race - so CI holds the claim.
+        ChartComponent chart = new ChartComponent(Atlas.assembler());
+        SwingUtilities.invokeAndWait(() -> chart.setSize(900, 700));
+        flush();
+        ChartScene narrow = chart.currentScene();
+        assertNotNull(narrow, "the premise: a page at the first size");
+
+        SwingUtilities.invokeAndWait(() -> chart.setSize(1200, 700));
+        flush();
+
+        assertFalse(narrow == chart.currentScene(),
+                "a wider chart is a new page - which is what the pane"
+                        + " leaving causes, from either surface");
+        assertEquals(narrow.viewport().centre(),
+                chart.currentScene().viewport().centre(),
+                "of the same sky");
+        assertEquals(1200, chart.currentScene().viewport().widthPx(),
+                "at the new width");
+    }
+
     // ---- what needs a real window -----------------------------------
 
     @Test
@@ -210,7 +239,16 @@ class InspectorCloseButtonTest {
             ChartScene sceneBefore = chart.currentScene();
             var stateBefore = navigation.state();
 
-            // A real press and release on the button itself.
+            // A real press and release on the button itself - once
+            // it has actually been laid out. A button still sized
+            // zero takes the press and then decides the release fell
+            // outside itself, so nothing happens and the failure
+            // reads as "the pointer did not close the pane" when the
+            // truth is that the window had not finished appearing.
+            // That made this test intermittent when it was written
+            // (#198 review found it failing beside unrelated
+            // failures, and passing beside the same ones later).
+            awaitLaidOut(inspector.closeButton());
             click(inspector.closeButton());
 
             assertFalse(inspector.isVisible(),
@@ -245,20 +283,15 @@ class InspectorCloseButtonTest {
             assertTrue(inspector.isVisible(), "the toolbar brings it back");
             assertTrue(item.isSelected(), "and the menu agrees again");
 
-            // And the button costs no more than the control it sits
-            // beside: closing from the toolbar relays the chart out
-            // in exactly the same way, so the new surface introduces
-            // nothing the old one did not already do.
-            ChartScene beforeToolbarClose = chart.currentScene();
+            // Closing from the toolbar again, to show both surfaces
+            // leave navigation alone. That the chart relays itself
+            // out is asserted where it can be asserted deterministically
+            // - see theChartAssemblesAPageWheneverItIsResized - rather
+            // than by racing a window manager here, which is what made
+            // this test intermittent.
             SwingUtilities.invokeAndWait(toggle::toggle);
             flush();
             assertFalse(inspector.isVisible(), "the toolbar closes it");
-            ChartScene afterToolbarClose = chart.currentScene();
-            assertFalse(beforeToolbarClose == afterToolbarClose,
-                    "the toolbar toggle also relays the chart out -"
-                            + " the widening is the chart taking the"
-                            + " space back, not the button doing"
-                            + " something of its own");
             assertEquals(stateBefore, navigation.state(),
                     "and neither surface navigates");
         } finally {
@@ -267,6 +300,22 @@ class InspectorCloseButtonTest {
                 SwingUtilities.invokeAndWait(doomed::dispose);
             }
         }
+    }
+
+    /**
+     * Waits until a control has a size, and says so as a premise if
+     * it never gets one - rather than letting a click land nowhere
+     * and blaming the feature.
+     */
+    private static void awaitLaidOut(java.awt.Component target)
+            throws Exception {
+        for (int i = 0; i < 200 && target.getWidth() == 0; i++) {
+            flush();
+            Thread.sleep(10);
+        }
+        assertTrue(target.getWidth() > 0 && target.getHeight() > 0,
+                "the premise: the control is laid out, so a click at"
+                        + " its centre lands on it");
     }
 
     private static void click(java.awt.Component target) throws Exception {

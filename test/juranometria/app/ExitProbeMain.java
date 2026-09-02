@@ -35,8 +35,10 @@ public final class ExitProbeMain {
     public static void main(String[] args) throws Exception {
         Preferences scratch = Preferences.userRoot()
                 .node("juranometria-exit-probe-" + System.nanoTime());
-        AppShutdown shutdown =
-                new AppShutdown(() -> System.exit(0), scratch);
+        AppShutdown shutdown = new AppShutdown(
+                () -> AppShutdown.flushPreferences(scratch),
+                AppShutdown::disposeEveryWindow,
+                () -> System.exit(0));
         boolean[] detached = {false};
         shutdown.onShutdown(() -> detached[0] = true);
 

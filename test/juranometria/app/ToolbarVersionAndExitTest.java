@@ -211,57 +211,119 @@ class ToolbarVersionAndExitTest {
 
     @Test
     void everySurfaceLeavesInTheSameOrderAndOnlyOnce() throws Exception {
+        // Every step recorded, not just the two that were easy to
+        // observe (review): a promised order nothing watches is a
+        // comment, and this class's whole claim is the order.
         List<String> order = new ArrayList<>();
-        Preferences scratch = Preferences.userRoot()
-                .node("juranometria-shutdown-" + System.nanoTime());
-        try {
+        AppShutdown shutdown = new AppShutdown(
+                () -> order.add("flush"),
+                () -> order.add("dispose"),
+                () -> order.add("terminate"));
+        shutdown.onShutdown(() -> order.add("detach-first"));
+        shutdown.onShutdown(() -> order.add("detach-second"));
+
+        shutdown.request();
+
+        assertEquals(List.of("detach-second", "detach-first", "flush",
+                        "dispose", "terminate"), order,
+                "detachments newest first, then the reader's choices"
+                        + " reach disk, then the windows go, then the"
+                        + " application ends");
+        // And the class's own statement of that order agrees with
+        // what it just did, so the documentation cannot drift from
+        // the behaviour without this failing.
+        assertEquals(AppShutdown.STEPS,
+                List.of("detach", "flush", "dispose", "terminate"),
+                "the published order is the order that ran");
+        assertTrue(shutdown.isRequested(), "and it says so");
+
+        // A reader who presses the button and then reaches for the
+        // close box is making one request, not two.
+        shutdown.request();
+        assertEquals(5, order.size(),
+                "asking twice does nothing the second time: " + order);
+    }
+
+    @Test
+    void noStepThatFailsCanKeepTheReaderInTheApplication()
+            throws Exception {
+        // Each step is guarded on its own, so a failure does not
+        // skip the steps after it, and termination is unconditional.
+        // The preference backend is the real risk here: flush()
+        // declares a checked exception and can also fail at runtime,
+        // and the first version guarded only the checked one - so a
+        // backing store that threw would strand the application
+        // half-closed, windows still up, never terminating (review).
+        for (String failing : List.of("detach", "flush", "dispose")) {
+            List<String> order = new ArrayList<>();
+            Runnable boom = () -> {
+                throw new IllegalStateException(
+                        "the " + failing + " step misbehaving");
+            };
             AppShutdown shutdown = new AppShutdown(
-                    () -> order.add("terminate"), scratch);
-            shutdown.onShutdown(() -> order.add("detach-first"));
-            shutdown.onShutdown(() -> order.add("detach-second"));
+                    "flush".equals(failing) ? boom
+                            : () -> order.add("flush"),
+                    "dispose".equals(failing) ? boom
+                            : () -> order.add("dispose"),
+                    () -> order.add("terminate"));
+            shutdown.onShutdown("detach".equals(failing) ? boom
+                    : () -> order.add("detach"));
 
             shutdown.request();
 
-            assertEquals(List.of("detach-second", "detach-first",
-                            "terminate"), order,
-                    "detachments run newest first, then the"
-                            + " application ends");
-            assertTrue(shutdown.isRequested(), "and it says so");
-
-            // A reader who presses the button and then reaches for
-            // the close box is making one request, not two.
-            shutdown.request();
-            assertEquals(3, order.size(),
-                    "asking twice does nothing the second time: "
-                            + order);
-        } finally {
-            scratch.removeNode();
+            assertTrue(order.contains("terminate"),
+                    "a failing " + failing + " step must still let the"
+                            + " application end: " + order);
+            for (String later : List.of("flush", "dispose")) {
+                if (!later.equals(failing)) {
+                    assertTrue(order.contains(later),
+                            "and must not skip " + later + ": " + order);
+                }
+            }
         }
     }
 
     @Test
-    void oneDetachmentThatThrowsDoesNotKeepTheReaderInTheApplication()
+    void evenAnErrorOnTheWayOutStillLetsTheApplicationEnd()
             throws Exception {
+        // The guard around each step deliberately does not catch
+        // Error - an OutOfMemoryError is not something to swallow.
+        // Termination sits in a finally for exactly that case, so the
+        // application still ends rather than hanging with its windows
+        // up.
         List<String> order = new ArrayList<>();
-        Preferences scratch = Preferences.userRoot()
-                .node("juranometria-shutdown-throw-" + System.nanoTime());
+        AppShutdown shutdown = new AppShutdown(
+                () -> {
+                    throw new StackOverflowError("out of room");
+                },
+                () -> order.add("dispose"),
+                () -> order.add("terminate"));
+
         try {
-            AppShutdown shutdown = new AppShutdown(
-                    () -> order.add("terminate"), scratch);
-            shutdown.onShutdown(() -> order.add("quiet"));
-            shutdown.onShutdown(() -> {
-                throw new IllegalStateException("a listener misbehaving");
-            });
-
             shutdown.request();
-
-            assertEquals(List.of("quiet", "terminate"), order,
-                    "leaving is not the moment to argue: the rest of"
-                            + " the shutdown still runs, and the"
-                            + " application still ends");
-        } finally {
-            scratch.removeNode();
+        } catch (Error expected) {
+            // Propagates, as it should; production has already gone.
         }
+
+        assertTrue(order.contains("terminate"),
+                "termination is unconditional: " + order);
+    }
+
+    @Test
+    void thePreferenceFlushSurvivesAStoreThatIsNoLongerThere()
+            throws Exception {
+        // The real flush, against the real failure mode: a node
+        // removed underneath it. Preferences.flush() throws
+        // IllegalStateException for a removed node, which is exactly
+        // the runtime failure the guard now covers.
+        Preferences doomed = Preferences.userRoot()
+                .node("juranometria-removed-" + System.nanoTime());
+        doomed.put("chart.deepSkyObjects", "true");
+        doomed.removeNode();
+
+        AppShutdown.flushPreferences(doomed);
+        assertFalse(doomed.nodeExists(""),
+                "the premise: the node really is gone");
     }
 
     @Test

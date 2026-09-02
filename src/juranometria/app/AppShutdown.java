@@ -48,23 +48,33 @@ public final class AppShutdown {
             List.of("detach", "flush", "dispose", "terminate");
 
     private final List<Runnable> detachments = new ArrayList<>();
+    private final Runnable flush;
+    private final Runnable dispose;
     private final Runnable terminate;
-    private final Preferences preferences;
     private boolean requested;
 
-    /** The production path: the real preferences, and a real exit. */
+    /** The production path: real preferences, real windows, real exit. */
     public static AppShutdown real() {
-        return new AppShutdown(() -> System.exit(0),
-                Preferences.userRoot().node("juranometria"));
+        Preferences node = Preferences.userRoot().node("juranometria");
+        return new AppShutdown(() -> flushPreferences(node),
+                AppShutdown::disposeEveryWindow, () -> System.exit(0));
     }
 
-    public AppShutdown(Runnable terminate, Preferences preferences) {
-        if (terminate == null) {
+    /**
+     * Each step as its own action, so the order this class promises
+     * can be <em>observed</em> rather than described (review). A test
+     * passes a recorder for every one and reads back what happened;
+     * production passes the real three.
+     */
+    public AppShutdown(Runnable flush, Runnable dispose,
+                       Runnable terminate) {
+        if (flush == null || dispose == null || terminate == null) {
             throw new IllegalArgumentException(
-                    "a shutdown must end somewhere");
+                    "a shutdown flushes, disposes and ends");
         }
+        this.flush = flush;
+        this.dispose = dispose;
         this.terminate = terminate;
-        this.preferences = preferences;
     }
 
     /**
@@ -86,44 +96,74 @@ public final class AppShutdown {
      * Leaves, once. Every surface calls this and none of them calls
      * {@code System.exit} itself, so there is one behaviour to reason
      * about and one place to change it.
+     *
+     * <p><strong>Nothing may keep a reader in an application they
+     * asked to leave</strong> (review). Each step is guarded on its
+     * own, so a failure in one does not skip the ones after it - a
+     * preference backend that throws must still let the windows close
+     * - and termination is in a {@code finally}, so it happens
+     * whatever any of them did. The earlier version guarded only the
+     * checked exception the flush declares, which left every runtime
+     * failure from the backing store able to strand the application
+     * half-closed.
      */
     public void request() {
         if (requested) {
             return;
         }
         requested = true;
-        for (int i = detachments.size() - 1; i >= 0; i--) {
-            // One detachment that throws must not strand the rest,
-            // nor keep the reader in an application they asked to
-            // leave.
-            try {
-                detachments.get(i).run();
-            } catch (RuntimeException ignored) {
-                // Leaving is not the moment to argue about it.
+        try {
+            for (int i = detachments.size() - 1; i >= 0; i--) {
+                quietly(detachments.get(i));
             }
+            quietly(flush);
+            quietly(dispose);
+        } finally {
+            terminate.run();
         }
-        flushPreferences();
+    }
+
+    /**
+     * Runs a step and swallows whatever it throws. Leaving is not the
+     * moment to argue, and there is nowhere left to report it to.
+     */
+    private static void quietly(Runnable step) {
+        try {
+            step.run();
+        } catch (RuntimeException | LinkageError ignored) {
+            // Deliberate. A step that fails on the way out has
+            // nothing the reader can do about it, and refusing to
+            // close is not an improvement.
+        }
+    }
+
+    /**
+     * What the reader chose, on disk before anything can stop the
+     * process. The platform flushes on a clean exit anyway; doing it
+     * deliberately means the promise does not depend on that.
+     */
+    public static void flushPreferences(Preferences node) {
+        if (node == null) {
+            return;
+        }
+        try {
+            node.flush();
+        } catch (BackingStoreException | IllegalStateException ignored) {
+            // A preference store that cannot be written is a problem
+            // the reader already has; refusing to quit does not
+            // improve it.
+        }
+    }
+
+    /** Every window, dialogs included, so none holds native resources. */
+    public static void disposeEveryWindow() {
         for (Window window : Window.getWindows()) {
             try {
                 window.dispose();
             } catch (RuntimeException ignored) {
-                // As above: a window that will not close must not
-                // keep the application open.
+                // A window that will not close must not keep the
+                // application open.
             }
-        }
-        terminate.run();
-    }
-
-    private void flushPreferences() {
-        if (preferences == null) {
-            return;
-        }
-        try {
-            preferences.flush();
-        } catch (BackingStoreException ignored) {
-            // A preference store that cannot be written is a problem
-            // the reader already has; refusing to quit does not
-            // improve it, and nothing here was theirs to lose.
         }
     }
 }
