@@ -16,10 +16,13 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   for the way to dismiss it, as they would in any other side pane.
   The button writes the same requested visibility the toggle writes,
   so there is one wish and one switch: the toolbar and the View menu
-  follow immediately, a pane closed deliberately does not reappear
-  when the window widens, and closing hides the pane and nothing
-  else. Escape and the button share one dismissal, which hands the
-  reader back to the chart. The mark is the pinned Tabler `x`, added
+  follow immediately, and a pane closed deliberately does not
+  reappear when the window widens. Closing leaves navigation, the
+  searched target, the chart options and the selection exactly as
+  they were, and the chart relays itself out for the width it gets
+  back - as it always has when the pane is toggled from the toolbar.
+  Escape and the button share one dismissal, which hands the reader
+  back to the chart. The mark is the pinned Tabler `x`, added
   through the existing icon and notice workflow.
 
 ### Fixed

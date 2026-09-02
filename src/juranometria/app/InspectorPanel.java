@@ -144,8 +144,9 @@ public final class InspectorPanel extends JPanel {
         close.setToolTipText("Close Inspector");
         close.getAccessibleContext().setAccessibleName("Close Inspector");
         close.getAccessibleContext().setAccessibleDescription(
-                "Hide the Inspector pane. The chart, the selection and"
-                        + " the page are unchanged.");
+                "Hide the Inspector pane. The chart keeps its place,"
+                        + " its target and your selection, and widens"
+                        + " to use the space.");
         // Quiet: an icon and its hover, not a bordered button
         // competing with the heading beside it.
         close.putClientProperty("JButton.buttonType", "toolBarButton");
@@ -331,9 +332,18 @@ public final class InspectorPanel extends JPanel {
      * to the chart rather than leaving focus in a panel that is no
      * longer there.
      *
-     * <p>The pane only stops being shown. Nothing here clears the
-     * selection, moves the chart, changes the target, queries the
-     * catalogue or assembles a page.
+     * <p>What this does not touch: navigation, the searched target,
+     * the chart options, and the selection - which survives with its
+     * candidate list, so reopening shows the same answer.
+     *
+     * <p>What it does cause, and is not hidden here (review): the
+     * chart takes the pane's width back, and
+     * {@code ChartComponent} assembles a page whenever it is
+     * resized. So a scene is assembled and the catalogue is asked -
+     * for the same centre, field width, limiting magnitude and
+     * target, at a new size. That is the chart filling the paper,
+     * not this control navigating, and the toolbar toggle has always
+     * done exactly the same.
      */
     private void dismiss() {
         setRequestedVisible(false);
