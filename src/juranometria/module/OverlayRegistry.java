@@ -105,7 +105,22 @@ public final class OverlayRegistry {
             if (offered == null) {
                 continue;
             }
+            java.util.Set<String> seen = new java.util.HashSet<>();
             for (OverlayContribution geometry : offered) {
+                if (!seen.add(geometry.identity())) {
+                    // A stable key that is not unique is not a key
+                    // (review). Two pieces of ink a reader cannot
+                    // tell apart, and a hit test that cannot say
+                    // which was pointed at, is a defect in the
+                    // module - reported as one rather than drawn.
+                    throw new IllegalStateException(String.format(
+                            "%s contributes the identity \"%s\" more"
+                                    + " than once; contributed"
+                                    + " identities are unique within"
+                                    + " a module, because the chart"
+                                    + " hit-tests by them",
+                            entry.getKey(), geometry.identity()));
+                }
                 all.add(new Owned(entry.getKey(), geometry));
             }
         }

@@ -3,9 +3,7 @@ package juranometria.page;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -58,61 +56,56 @@ public final class WorkingMarksModel {
     }
 
     private final List<Consumer<Change>> listeners = new ArrayList<>();
-    /** Changes awaiting delivery, so every consumer sees one order. */
-    private final Deque<Change> pending = new ArrayDeque<>();
-
-    /** Where the model has actually got to. */
-    private final Set<String> marks = new LinkedHashSet<>();
-    private String lead;
 
     /**
-     * The state consumers are being told about, or null when nothing
-     * is being delivered.
+     * Transitions awaiting delivery, each a whole state.
      *
-     * <p>Queueing the events was not enough (review): a listener
-     * that marks something while being told about a mark moves the
-     * model at once, so the <em>next</em> listener was handed the
-     * older change and, if it asked, told a newer state. It would
-     * draw one page and read another.
+     * <p>Masking the accessors was not enough (review). The model
+     * moved the moment a mutator was called, so a listener that
+     * marked something while being told about a mark was computing
+     * its own change against a state nobody could see - and the
+     * fields disagreed with the event in flight underneath the mask.
      *
-     * <p>So while a change is in flight the model answers as that
-     * change. What has already happened is not lost - it is next in
-     * the queue - and once the queue drains the two agree again.
+     * <p>So this follows {@code SelectionModel} exactly: a
+     * transition is queued <strong>whole</strong> and applied
+     * immediately before its own event is delivered. The fields
+     * always describe the change being delivered, because they are
+     * set from it.
      */
-    private Change delivering;
+    private final Deque<Change> pending = new ArrayDeque<>();
+    private boolean delivering;
+
+    /** The state that has been delivered. */
+    private List<String> marks = List.of();
+    private String lead;
 
     /** The marked identities, in the order they were marked. */
     public List<String> marks() {
-        return delivering != null ? delivering.marks() : List.copyOf(marks);
+        return marks;
     }
 
     /** The lead identity, or null when nothing is marked. */
     public String lead() {
-        return delivering != null ? delivering.lead() : lead;
+        return lead;
     }
 
     public boolean isMarked(String identity) {
-        return marks().contains(identity);
+        return marks.contains(identity);
     }
 
     /**
      * Subscribes a consumer and returns the handle that unsubscribes
      * it. The consumer is told the current state immediately, so it
-     * never has to ask separately what it missed.
+     * never has to ask separately what it missed - and during a
+     * delivery that is the state being delivered, because the fields
+     * are it.
      */
     public Runnable onChange(Consumer<Change> listener) {
         if (listener == null) {
             throw new IllegalArgumentException("listener must not be null");
         }
         listeners.add(listener);
-        Change now = delivering != null ? delivering : state();
-        Change was = delivering;
-        delivering = now;
-        try {
-            listener.accept(now);
-        } finally {
-            delivering = was;
-        }
+        listener.accept(new Change(marks, lead));
         return () -> listeners.remove(listener);
     }
 
@@ -122,48 +115,51 @@ public final class WorkingMarksModel {
      */
     public void mark(String identity) {
         requireIdentity(identity);
-        if (marks.contains(identity) && identity.equals(lead)) {
+        Change base = intended();
+        if (base.marks().contains(identity)
+                && identity.equals(base.lead())) {
             return;                // nothing a consumer could observe
         }
-        marks.add(identity);
-        lead = identity;
-        publish();
+        List<String> next = new ArrayList<>(base.marks());
+        if (!next.contains(identity)) {
+            next.add(identity);
+        }
+        queue(new Change(next, identity));
     }
 
     /** Unmarks an identity, doing nothing if it was not marked. */
     public void unmark(String identity) {
         requireIdentity(identity);
-        if (!marks.remove(identity)) {
+        Change base = intended();
+        if (!base.marks().contains(identity)) {
             return;
         }
-        if (identity.equals(lead)) {
-            lead = lastOf(marks);
-        }
-        publish();
+        List<String> next = new ArrayList<>(base.marks());
+        next.remove(identity);
+        queue(new Change(next, identity.equals(base.lead())
+                ? lastOf(next) : base.lead()));
     }
 
     /** Makes an already-marked identity the lead. */
     public void lead(String identity) {
         requireIdentity(identity);
-        if (!marks.contains(identity)) {
+        Change base = intended();
+        if (!base.marks().contains(identity)) {
             throw new IllegalArgumentException(
                     "only a marked identity can lead: " + identity);
         }
-        if (identity.equals(lead)) {
+        if (identity.equals(base.lead())) {
             return;
         }
-        lead = identity;
-        publish();
+        queue(new Change(base.marks(), identity));
     }
 
     /** Nothing is marked. */
     public void clear() {
-        if (marks.isEmpty()) {
+        if (intended().isEmpty()) {
             return;
         }
-        marks.clear();
-        lead = null;
-        publish();
+        queue(new Change(List.of(), null));
     }
 
     /**
@@ -180,65 +176,72 @@ public final class WorkingMarksModel {
         if (page == null) {
             throw new IllegalArgumentException("a page to prune to");
         }
-        if (marks.isEmpty()) {
+        Change base = intended();
+        if (base.isEmpty()) {
             return;
         }
         List<String> survivors = new ArrayList<>();
-        for (String identity : marks) {
+        for (String identity : base.marks()) {
             if (page.holds(identity)) {
                 survivors.add(identity);
             }
         }
-        if (survivors.size() == marks.size()) {
+        if (survivors.size() == base.marks().size()) {
             return;                // nothing left the page
         }
-        marks.clear();
-        marks.addAll(survivors);
-        if (lead != null && !marks.contains(lead)) {
-            lead = lastOf(marks);
-        }
-        publish();
+        queue(new Change(survivors,
+                survivors.contains(base.lead()) ? base.lead()
+                        : lastOf(survivors)));
     }
 
     // ----------------------------------------------------------------
 
-    private Change state() {
-        return new Change(List.copyOf(marks), lead);
+    /**
+     * The state a new change is built on: the last one queued, or
+     * the delivered one when nothing is waiting.
+     *
+     * <p>Not the delivered state while a queue exists. Two reentrant
+     * changes built on the same base would each describe a whole
+     * state, and the second would silently undo the first - a mark
+     * made during a delivery would vanish when its event arrived.
+     * Every transition is built on the one before it, so the queue
+     * is a history rather than a set of competing guesses.
+     */
+    private Change intended() {
+        return pending.isEmpty() ? new Change(marks, lead)
+                : pending.peekLast();
     }
 
     /**
-     * Queues this state and drains the queue.
-     *
-     * <p>The state is captured now rather than at delivery, so a
-     * listener that changes the marks while being told about them
-     * cannot rewrite the change already in flight: consumers see
-     * every state, in the order it happened.
+     * Queues a whole transition and drains the queue, applying each
+     * state immediately before delivering its own event.
      */
-    private void publish() {
-        pending.addLast(state());
-        if (delivering != null) {
-            return;                // already draining; this joins the queue
+    private void queue(Change change) {
+        pending.addLast(change);
+        if (delivering) {
+            return;
         }
+        delivering = true;
         try {
-            while (!pending.isEmpty()) {
-                Change change = pending.removeFirst();
-                delivering = change;
+            Change next;
+            while ((next = pending.pollFirst()) != null) {
+                this.marks = next.marks();
+                this.lead = next.lead();
+                // A copy, so a listener that unsubscribes while being
+                // told cannot disturb the notification in progress.
                 for (Consumer<Change> listener : List.copyOf(listeners)) {
-                    listener.accept(change);
+                    listener.accept(next);
                 }
             }
         } finally {
-            delivering = null;
+            delivering = false;
             pending.clear();
         }
     }
 
-    private static String lastOf(Set<String> identities) {
-        String last = null;
-        for (String identity : identities) {
-            last = identity;
-        }
-        return last;
+    private static String lastOf(List<String> identities) {
+        return identities.isEmpty() ? null
+                : identities.get(identities.size() - 1);
     }
 
     private static void requireIdentity(String identity) {

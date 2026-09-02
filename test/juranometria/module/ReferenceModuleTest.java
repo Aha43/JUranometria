@@ -267,6 +267,45 @@ class ReferenceModuleTest {
     }
 
     @Test
+    void aModuleThatRepeatsAnIdentityIsRefusedRatherThanDrawnTwice() {
+        // Per-module ownership makes keys unique across modules; it
+        // does nothing about one module repeating itself (review),
+        // and two pieces of ink under one supposedly stable key
+        // leave a hit test unable to say which was pointed at.
+        Services services = new Services();
+        SkyPosition somewhere = new SkyPosition(10.7, 41.3);
+        services.contribute("careless", () -> List.of(
+                new OverlayContribution.Point("same", "the first",
+                        somewhere, InkRole.INTERACTION),
+                new OverlayContribution.Point("same", "the second",
+                        somewhere, InkRole.INTERACTION)));
+
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class, services.overlays::collect);
+        assertTrue(refused.getMessage().contains("careless")
+                        && refused.getMessage().contains("same"),
+                refused.getMessage());
+    }
+
+    @Test
+    void twoModulesMayRepeatEachOthersIdentitiesWithoutColliding() {
+        Services services = new Services();
+        SkyPosition somewhere = new SkyPosition(10.7, 41.3);
+        services.contribute("first", () -> List.of(
+                new OverlayContribution.Point("m31", "one module's m31",
+                        somewhere, InkRole.INTERACTION)));
+        services.contribute("second", () -> List.of(
+                new OverlayContribution.Point("m31", "another's m31",
+                        somewhere, InkRole.INTERACTION)));
+
+        List<String> keys = services.overlays.collect().stream()
+                .map(OverlayRegistry.Owned::key).toList();
+        assertEquals(List.of("first/m31", "second/m31"), keys,
+                "an identity is unique within its module, and neither"
+                        + " module has to know the other exists");
+    }
+
+    @Test
     void aDetachedModuleHearsNothingFurtherAndHoldsNothing() {
         Services services = new Services();
         MarkingModule module = new MarkingModule("reference");

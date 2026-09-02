@@ -189,6 +189,125 @@ class WorkingMarksModelTest {
     }
 
     @Test
+    void aChangeMadeDuringADeliveryIsNotUndoneByTheOneItInterrupted() {
+        // The failure masking the accessors could not have caught
+        // (review): each queued transition carries a whole state, so
+        // two of them built on the same base means the second
+        // silently undoes the first. A mark made during a delivery
+        // would vanish the moment its own event arrived.
+        WorkingMarksModel marks = new WorkingMarksModel();
+        List<List<String>> seen = new ArrayList<>();
+        boolean[] reacted = {false};
+
+        marks.onChange(change -> {
+            seen.add(change.marks());
+            if (!reacted[0] && change.marks().equals(List.of("A"))) {
+                reacted[0] = true;
+                marks.mark("B");
+                marks.mark("C");
+            }
+        });
+
+        marks.mark("A");
+
+        assertEquals(List.of(
+                        List.of(),
+                        List.of("A"),
+                        List.of("A", "B"),
+                        List.of("A", "B", "C")),
+                seen,
+                "each change builds on the one before it, so the queue"
+                        + " is a history rather than competing guesses");
+        assertEquals(List.of("A", "B", "C"), marks.marks());
+        assertEquals("C", marks.lead());
+    }
+
+    @Test
+    void clearingDuringADeliveryClearsAndStaysCleared() {
+        // The nested clear regression. Built on the delivered state
+        // rather than the queued one, this published an empty set and
+        // then quietly refilled it.
+        WorkingMarksModel marks = new WorkingMarksModel();
+        marks.mark("A");
+        List<List<String>> seen = new ArrayList<>();
+        boolean[] reacted = {false};
+
+        marks.onChange(change -> {
+            seen.add(change.marks());
+            if (!reacted[0] && change.marks().equals(List.of("A", "B"))) {
+                reacted[0] = true;
+                marks.clear();
+            }
+        });
+        marks.mark("B");
+
+        assertEquals(List.of(List.of("A"), List.of("A", "B"), List.of()),
+                seen, "and nothing arrives after the clear to undo it");
+        assertTrue(marks.marks().isEmpty());
+        assertNull(marks.lead());
+    }
+
+    @Test
+    void pruningDuringADeliveryPrunesWhatIsActuallyMarkedByThen() {
+        // The nested prune regression, and the one that matters to a
+        // reader: a page change arriving while a mark is still being
+        // delivered must prune the set as it will be, not as it was.
+        WorkingMarksModel marks = new WorkingMarksModel();
+        marks.mark("STAYS");
+        List<List<String>> seen = new ArrayList<>();
+        boolean[] reacted = {false};
+
+        marks.onChange(change -> {
+            seen.add(change.marks());
+            if (!reacted[0] && change.marks().contains("GOES")) {
+                reacted[0] = true;
+                marks.pruneTo(pageHolding("STAYS"));
+            }
+        });
+        marks.mark("GOES");
+
+        assertEquals(List.of(
+                        List.of("STAYS"),
+                        List.of("STAYS", "GOES"),
+                        List.of("STAYS")),
+                seen,
+                "the prune saw GOES, because by the time it applies"
+                        + " GOES is marked");
+        assertEquals(List.of("STAYS"), marks.marks());
+        assertEquals("STAYS", marks.lead(),
+                "and the lead came back to what is left, rather than"
+                        + " pointing off the page");
+    }
+
+    @Test
+    void theModelAlwaysDescribesTheChangeBeingDelivered() {
+        // Not masked - the fields are set from each change
+        // immediately before it is delivered, so there is nothing to
+        // mask.
+        WorkingMarksModel marks = new WorkingMarksModel();
+        List<String> disagreements = new ArrayList<>();
+        boolean[] reacted = {false};
+
+        marks.onChange(change -> {
+            if (!change.marks().equals(marks.marks())
+                    || !java.util.Objects.equals(change.lead(),
+                            marks.lead())) {
+                disagreements.add(change + " against " + marks.marks());
+            }
+            if (!reacted[0] && change.marks().equals(List.of("A"))) {
+                reacted[0] = true;
+                marks.mark("B");
+                marks.unmark("A");
+            }
+        });
+        marks.mark("A");
+
+        assertEquals(List.of(), disagreements,
+                "through a reentrant mark and unmark as well");
+        assertEquals(List.of("B"), marks.marks());
+    }
+
+    @Test
     void aPageChangeRemovesWhatLeftItOnceAndInOneTransition() {
         WorkingMarksModel marks = new WorkingMarksModel();
         marks.mark("STAYS");
