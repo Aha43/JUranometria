@@ -14,6 +14,11 @@ import juranometria.chart.ChartViewState;
 import juranometria.ui.SceneAssembler;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
+import juranometria.page.PageContents;
+import juranometria.page.PageEntry;
+import juranometria.page.PageExtent;
+import juranometria.page.PageInventory;
+import juranometria.page.PageVisibility;
 import juranometria.chart.Star;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
@@ -64,19 +69,6 @@ public final class OnThisPageStudyMain {
      * rather than guessed. The order is the order a reader meets
      * them: what they can see, then the three reasons they cannot.
      */
-    private enum Visibility {
-        DRAWN("drawn"),
-        FAMILY_HIDDEN("hidden by a chart option"),
-        BELOW_LIMIT("fainter than the magnitude limit"),
-        NO_SYMBOL("no chart symbol for its type"),
-        TOO_SMALL("below the detail policy at this field");
-
-        private final String prose;
-
-        Visibility(String prose) {
-            this.prose = prose;
-        }
-    }
 
     public static void main(String[] args) throws IOException {
         System.out.println("# What is on this page");
@@ -127,403 +119,18 @@ public final class OnThisPageStudyMain {
         System.out.println();
     }
 
-    /** Production's own answer to where a position lands. */
-    private static PixelPoint onPage(GnomonicProjection projection,
-                                     ViewportMapping mapping,
-                                     SkyPosition position) {
-        return projection.project(position)
-                .map(mapping::toPixel)
-                .filter(OnThisPageStudyMain::insidePaper)
-                .orElse(null);
-    }
 
-    /** The paper, as the renderer clips it. */
-    private static final java.awt.geom.Rectangle2D PAPER =
-            new java.awt.geom.Rectangle2D.Double(1, 1, WIDTH - 2, HEIGHT - 2);
 
-    /**
-     * Whether an object's <strong>recorded ellipse</strong> reaches
-     * the paper.
-     *
-     * <p>A centre-only rule omits an object a reader can plainly
-     * see: M 31 is 178 arcminutes long, so a page can be filled by
-     * its disc while its centre sits outside the paper.
-     *
-     * <p>The geometry is the <em>source's</em>, never the display
-     * values the loader substitutes so the renderer always has
-     * dimensions to draw with. Where the source is silent the
-     * fallback is explicit rather than invented, and each one is
-     * stated because each one is a different kind of ignorance:
-     *
-     * <ul>
-     *   <li><strong>no recorded size</strong> - the atlas knows of
-     *       no extent at all, so the object is a <strong>point</strong>;</li>
-     *   <li><strong>a major axis but no minor, or no position
-     *       angle</strong> - the catalogue permits a family of
-     *       ellipses, and every one of them fits inside the circle
-     *       of the recorded half-major, so that circle is used and
-     *       the answer is honestly conservative;</li>
-     *   <li><strong>the full ellipse</strong> - tested as the
-     *       ellipse it is, oriented as recorded, through the same
-     *       {@code Shape.intersects} the renderer's own
-     *       {@code drawnMarks} uses to decide what is on the
-     *       paper.</li>
-     * </ul>
-     *
-     * <p>The envelope was the whole rule until review pointed out
-     * that it is not what the decision says: a long thin galaxy
-     * lying away from the page can have its circle reach the paper
-     * while the ellipse never does.
-     */
-    private static boolean reachesPaper(GnomonicProjection projection,
-                                        ViewportMapping mapping,
-                                        ChartScene scene,
-                                        DeepSkyObject dso) {
-        PixelPoint centre = projection.project(dso.position())
-                .map(mapping::toPixel).orElse(null);
-        if (centre == null) {
-            // Behind the projection's horizon: no place on this page.
-            return false;
-        }
-        if (insidePaper(centre)) {
-            return true;
-        }
-        DeepSkyObject.Recorded recorded = dso.recorded();
-        if (!recorded.hasSize()) {
-            return false;
-        }
-        double semiMajorDeg = recorded.majorAxisArcmin() / 120.0;
-        if (recorded.minorAxisArcmin() == null
-                || recorded.positionAngleDegrees() == null) {
-            // Orientation or width unrecorded: the catalogue permits
-            // a family of ellipses and every one of them lies inside
-            // the circle of the semi-major, so the circle is asked -
-            // on the sphere, at every bearing, not as a radius in
-            // pixels.
-            return sphericalReaches(projection, mapping, scene,
-                    dso.position(), semiMajorDeg, semiMajorDeg, 0.0);
-        }
-        return sphericalReaches(projection, mapping, scene,
-                dso.position(), semiMajorDeg,
-                recorded.minorAxisArcmin() / 120.0,
-                recorded.positionAngleDegrees());
-    }
 
-    /**
-     * Whether an object's <strong>angular</strong> ellipse reaches
-     * the paper: built on the sphere and projected, never scaled in
-     * the plane (gate review).
-     *
-     * <p>The earlier rule turned arcminutes into pixels once, at the
-     * page centre's scale, and tested a plane ellipse. A gnomonic
-     * page does not have one scale: it stretches away from the
-     * centre, and the Large Magellanic Cloud is nearly eleven
-     * degrees across. A flat ellipse sized at the centre is the
-     * wrong shape by the time it reaches an edge, which is exactly
-     * where this question is asked.
-     *
-     * <p>So the boundary is walked on the sphere - at the recorded
-     * semi-axes and position angle, east of north as the catalogue
-     * records it - and each point is projected through the atlas's
-     * own projection and viewport mapping. If any of it lands on the
-     * paper, the object reaches the page.
-     */
-    /**
-     * The rule, for a test to reach: does this angular ellipse reach
-     * the page's paper?
-     */
-    static boolean reachesPaper(ChartScene scene, SkyPosition centre,
-                                double semiMajorDeg, double semiMinorDeg,
-                                double positionAngleDeg) {
-        return sphericalReaches(
-                new GnomonicProjection(scene.viewport().centre()),
-                new ViewportMapping(scene.viewport()), scene, centre,
-                semiMajorDeg, semiMinorDeg, positionAngleDeg);
-    }
 
-    private static boolean sphericalReaches(GnomonicProjection projection,
-                                            ViewportMapping mapping,
-                                            ChartScene scene,
-                                            SkyPosition centre,
-                                            double semiMajorDeg,
-                                            double semiMinorDeg,
-                                            double positionAngleDeg) {
-        // Nowhere near this page, and no walk needed to say so:
-        // nothing further from the page centre than the paper's own
-        // reach plus the object's own size can touch the paper.
-        // This is what keeps the refusal below rare - an object out
-        // by the projection's horizon is answered here rather than
-        // walked.
-        if (centre.separationDegrees(scene.viewport().centre())
-                > pageReachDegrees(scene) + semiMajorDeg) {
-            return false;
-        }
-        java.awt.geom.Path2D.Double outline = outlineOf(projection, mapping,
-                centre, semiMajorDeg, semiMinorDeg, positionAngleDeg);
-        if (outline.getCurrentPoint() == null) {
-            return false;          // nothing of it is on this sky
-        }
-        outline.closePath();
-        // Closed, this answers both things a bag of points cannot.
-        // A crossing anywhere along an edge counts, not only at a
-        // sample. And a rectangle lying inside the path intersects
-        // it - which is the object holding the whole page: nothing
-        // of its outline is on the paper and its centre is off it,
-        // yet every pixel in front of the reader is inside it.
-        return outline.intersects(PAPER);
-    }
 
-    /**
-     * How far this page's own corners reach from its centre, in
-     * degrees - asked of the page, at whatever size it was built.
-     */
-    static double pageReachDegrees(ChartScene scene) {
-        SkyPosition centre = scene.viewport().centre();
-        double width = scene.viewport().widthPx();
-        double height = scene.viewport().heightPx();
-        double furthest = 0;
-        for (double[] corner : new double[][] {
-                {1, 1}, {width - 1, 1},
-                {1, height - 1}, {width - 1, height - 1}}) {
-            SkyPosition sky = juranometria.render.ChartHitTest.skyAt(
-                    scene, corner[0], corner[1]);
-            if (sky != null) {
-                furthest = Math.max(furthest,
-                        centre.separationDegrees(sky));
-            }
-        }
-        return furthest;
-    }
 
-    /**
-     * The projected boundary, as a path that stays within
-     * {@link #FLATNESS_PX} of the true curve.
-     *
-     * <p>A fixed number of samples has no bound on how far its
-     * chords stray from the curve they stand for (gate review). The
-     * step is uniform in the parameter, and neither the ellipse nor
-     * the projection is: a thin ellipse turns hardest at the ends of
-     * its major axis, and a gnomonic projection stretches without
-     * limit towards its horizon. Wherever those meet, evenly spaced
-     * samples are furthest apart exactly where the curve bends most.
-     *
-     * <p>So each arc is halved until its midpoint lies within
-     * {@code FLATNESS_PX} of the chord that replaces it - the usual
-     * sagitta test, which spends subdivisions only where the curve
-     * actually needs them. The criterion is a criterion and not a
-     * proof, so the achieved distance is <em>measured</em> against a
-     * dense sample of the true curve in
-     * {@code OnThisPageSphericalTest}.
-     */
-    static java.awt.geom.Path2D.Double outlineOf(
-            GnomonicProjection projection, ViewportMapping mapping,
-            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
-            double positionAngleDeg) {
-        return outlineOf(projection, mapping, centre, semiMajorDeg,
-                semiMinorDeg, positionAngleDeg, MAX_DEPTH);
-    }
 
-    static java.awt.geom.Path2D.Double outlineOf(
-            GnomonicProjection projection, ViewportMapping mapping,
-            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
-            double positionAngleDeg, int maxDepth) {
-        java.awt.geom.Path2D.Double outline =
-                new java.awt.geom.Path2D.Double();
-        java.awt.geom.Point2D.Double previous = null;
-        double previousT = 0;
-        for (int i = 0; i <= INITIAL_ARCS; i++) {
-            double t = 2 * Math.PI * i / INITIAL_ARCS;
-            java.awt.geom.Point2D.Double here = boundaryPixel(projection,
-                    mapping, centre, semiMajorDeg, semiMinorDeg,
-                    positionAngleDeg, t);
-            if (here == null) {
-                // Part of this object lies past the projection's
-                // horizon, and this rule does not decide that case.
-                //
-                // It drew a chord across the gap once, which stood
-                // for sky the projection had refused. Breaking the
-                // path instead cost the containment a closed curve
-                // gives for free, and probing a handful of points of
-                // the paper cannot decide an arbitrary clipped
-                // region either (gate review). Nothing bundled with
-                // the atlas can reach here - the largest object it
-                // holds is a few degrees across - so the honest
-                // answer is to refuse, loudly, rather than to
-                // approximate a case that does not arise.
-                throw new IllegalStateException(String.format(
-                        Locale.ROOT,
-                        "this rule does not decide an object that runs"
-                                + " off the projection: %.3f x %.3f deg"
-                                + " at %.3f, %.3f",
-                        semiMajorDeg, semiMinorDeg, centre.raDegrees(),
-                        centre.decDegrees()));
-            }
-            if (previous == null) {
-                outline.moveTo(here.x, here.y);
-            } else {
-                subdivide(projection, mapping, centre, semiMajorDeg,
-                        semiMinorDeg, positionAngleDeg, previousT, previous,
-                        t, here, 0, maxDepth, outline);
-            }
-            previous = here;
-            previousT = t;
-        }
-        return outline;
-    }
 
-    private static void subdivide(GnomonicProjection projection,
-                                  ViewportMapping mapping,
-                                  SkyPosition centre, double semiMajorDeg,
-                                  double semiMinorDeg, double positionAngleDeg,
-                                  double t0, java.awt.geom.Point2D.Double p0,
-                                  double t1, java.awt.geom.Point2D.Double p1,
-                                  int depth, int maxDepth,
-                                  java.awt.geom.Path2D.Double outline) {
-        double tm = 0.5 * (t0 + t1);
-        java.awt.geom.Point2D.Double pm = boundaryPixel(projection, mapping,
-                centre, semiMajorDeg, semiMinorDeg, positionAngleDeg, tm);
-        if (pm == null || java.awt.geom.Line2D.ptSegDist(p0.x, p0.y,
-                p1.x, p1.y, pm.x, pm.y) <= FLATNESS_PX) {
-            outline.lineTo(p1.x, p1.y);
-            return;
-        }
-        if (depth >= maxDepth) {
-            // The guarantee has run out. Counting the lapse and
-            // drawing the chord anyway was still an unbounded chord
-            // wearing a tally (gate review): the bound either holds
-            // or the geometry does not answer. It does not answer.
-            throw new IllegalStateException(String.format(Locale.ROOT,
-                    "the boundary could not be followed to within"
-                            + " %.2f px at depth %d: %.3f x %.3f deg"
-                            + " at %.3f, %.3f", FLATNESS_PX, maxDepth,
-                    semiMajorDeg, semiMinorDeg, centre.raDegrees(),
-                    centre.decDegrees()));
-        }
-        subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
-                positionAngleDeg, t0, p0, tm, pm, depth + 1, maxDepth,
-                outline);
-        subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
-                positionAngleDeg, tm, pm, t1, p1, depth + 1, maxDepth,
-                outline);
-    }
 
-    /**
-     * The boundary point at parameter {@code t}, projected onto the
-     * page. Null where the projection has nothing to say.
-     */
-    static java.awt.geom.Point2D.Double boundaryPixel(
-            GnomonicProjection projection, ViewportMapping mapping,
-            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
-            double positionAngleDeg, double t) {
-        double along = semiMajorDeg * Math.cos(t);
-        double across = semiMinorDeg * Math.sin(t);
-        double distance = Math.hypot(along, across);
-        double bearing = positionAngleDeg
-                + Math.toDegrees(Math.atan2(across, along));
-        PixelPoint pixel = projection
-                .project(offsetOf(centre, distance, bearing))
-                .map(mapping::toPixel).orElse(null);
-        return pixel == null ? null
-                : new java.awt.geom.Point2D.Double(pixel.x(), pixel.y());
-    }
 
-    /** The same boundary, for a page rather than for a projection. */
-    static java.awt.geom.Path2D.Double outlineOn(ChartScene scene,
-            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
-            double positionAngleDeg) {
-        return outlineOn(scene, centre, semiMajorDeg, semiMinorDeg,
-                positionAngleDeg, MAX_DEPTH);
-    }
 
-    static java.awt.geom.Path2D.Double outlineOn(ChartScene scene,
-            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
-            double positionAngleDeg, int maxDepth) {
-        return outlineOf(new GnomonicProjection(scene.viewport().centre()),
-                new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
-                semiMinorDeg, positionAngleDeg, maxDepth);
-    }
 
-    /** The same boundary point, for a page rather than a projection. */
-    static java.awt.geom.Point2D.Double boundaryPixelOn(ChartScene scene,
-            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
-            double positionAngleDeg, double t) {
-        return boundaryPixel(new GnomonicProjection(scene.viewport().centre()),
-                new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
-                semiMinorDeg, positionAngleDeg, t);
-    }
-
-    /**
-     * Membership in an angular ellipse, by true separation and
-     * bearing east of north - the convention the catalogue records
-     * its position angles in.
-     */
-    static boolean insideAngularEllipse(SkyPosition centre,
-                                        SkyPosition point,
-                                        double semiMajorDeg,
-                                        double semiMinorDeg,
-                                        double positionAngleDeg) {
-        double r = centre.separationDegrees(point);
-        if (r > semiMajorDeg) {
-            return false;
-        }
-        double offset = Math.toRadians(
-                bearingDegrees(centre, point) - positionAngleDeg);
-        double along = r * Math.cos(offset);
-        double across = r * Math.sin(offset);
-        return (along * along) / (semiMajorDeg * semiMajorDeg)
-                + (across * across) / (semiMinorDeg * semiMinorDeg) <= 1.0;
-    }
-
-    /** Bearing east of north, on the sphere. */
-    static double bearingDegrees(SkyPosition from, SkyPosition to) {
-        double dec1 = Math.toRadians(from.decDegrees());
-        double dec2 = Math.toRadians(to.decDegrees());
-        double dRa = Math.toRadians(to.raDegrees() - from.raDegrees());
-        double y = Math.sin(dRa) * Math.cos(dec2);
-        double x = Math.cos(dec1) * Math.sin(dec2)
-                - Math.sin(dec1) * Math.cos(dec2) * Math.cos(dRa);
-        double degrees = Math.toDegrees(Math.atan2(y, x)) % 360.0;
-        return degrees < 0 ? degrees + 360.0 : degrees;
-    }
-
-    /**
-     * How far the drawn path may stray from the true curve, and how
-     * hard it may try. A twentieth of a pixel is far below anything
-     * a reader could see, and well below the width of the thinnest
-     * mark the atlas paints.
-     */
-    static final double FLATNESS_PX = 0.05;
-    private static final int INITIAL_ARCS = 48;
-    private static final int MAX_DEPTH = 18;
-
-    /**
-     * The point a given angular distance from a centre, at a given
-     * bearing east of north. Spherical, so it stays true for an
-     * object degrees across and near a pole.
-     */
-    static SkyPosition offsetOf(SkyPosition centre, double distanceDeg,
-                                double bearingDeg) {
-        double dec = Math.toRadians(centre.decDegrees());
-        double ra = Math.toRadians(centre.raDegrees());
-        double d = Math.toRadians(distanceDeg);
-        double theta = Math.toRadians(bearingDeg);
-        double sinDec = Math.sin(dec) * Math.cos(d)
-                + Math.cos(dec) * Math.sin(d) * Math.cos(theta);
-        double newDec = Math.asin(Math.max(-1.0, Math.min(1.0, sinDec)));
-        double newRa = ra + Math.atan2(
-                Math.sin(theta) * Math.sin(d) * Math.cos(dec),
-                Math.cos(d) - Math.sin(dec) * Math.sin(newDec));
-        // Normalised carefully: a tiny negative plus 360 lands on
-        // exactly 360.0, which is not a right ascension.
-        double degrees = Math.toDegrees(newRa) % 360.0;
-        if (degrees < 0) {
-            degrees += 360.0;
-        }
-        if (degrees >= 360.0) {
-            degrees = 0.0;
-        }
-        return new SkyPosition(degrees, Math.toDegrees(newDec));
-    }
 
     /** The recorded ellipse in page pixels, oriented as the chart draws. */
     static java.awt.Shape recordedEllipse(PixelPoint centre, double majorPx,
@@ -546,21 +153,25 @@ public final class OnThisPageStudyMain {
                 * Math.PI / 180.0;
     }
 
-    /** The conservative envelope, used only where orientation is unknown. */
-    private static boolean circleReaches(PixelPoint centre, double radiusPx) {
-        double dx = Math.max(0.0, Math.max(PAPER.getMinX() - centre.x(),
-                centre.x() - PAPER.getMaxX()));
-        double dy = Math.max(0.0, Math.max(PAPER.getMinY() - centre.y(),
-                centre.y() - PAPER.getMaxY()));
-        return Math.hypot(dx, dy) <= radiusPx;
-    }
 
-    private static boolean insidePaper(PixelPoint pixel) {
-        return pixel.x() >= 1 && pixel.y() >= 1
-                && pixel.x() <= WIDTH - 1 && pixel.y() <= HEIGHT - 1;
-    }
 
     private record Inventory(List<DeepSkyObject> deepSky, List<Star> stars) {
+    }
+
+    /**
+     * The pixel of a position when it lands on the paper, else null.
+     * The paper is the renderer's own rectangle rather than a second
+     * copy of its insets.
+     */
+    private static PixelPoint paperPixel(GnomonicProjection projection,
+                                         ViewportMapping mapping,
+                                         ChartScene scene,
+                                         SkyPosition position) {
+        PixelPoint pixel = projection.project(position)
+                .map(mapping::toPixel).orElse(null);
+        return pixel != null
+                && juranometria.render.ChartRenderer.paperOf(scene)
+                        .contains(pixel.x(), pixel.y()) ? pixel : null;
     }
 
     private static Inventory inventoryOf(ChartScene scene) {
@@ -569,13 +180,13 @@ public final class OnThisPageStudyMain {
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         List<DeepSkyObject> deepSky = new ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (reachesPaper(projection, mapping, scene, dso)) {
+            if (PageExtent.onPage(scene, dso)) {
                 deepSky.add(dso);
             }
         }
         List<Star> stars = new ArrayList<>();
         for (Star star : scene.stars()) {
-            if (onPage(projection, mapping, star.position()) != null) {
+            if (paperPixel(projection, mapping, scene, star.position()) != null) {
                 stars.add(star);
             }
         }
@@ -657,10 +268,10 @@ public final class OnThisPageStudyMain {
                 int centres = 0;
                 int extents = 0;
                 for (DeepSkyObject dso : scene.deepSkyObjects()) {
-                    if (onPage(projection, mapping, dso.position()) != null) {
+                    if (paperPixel(projection, mapping, scene, dso.position()) != null) {
                         centres++;
                     }
-                    if (reachesPaper(projection, mapping, scene, dso)) {
+                    if (PageExtent.onPage(scene, dso)) {
                         extents++;
                     }
                 }
@@ -845,7 +456,7 @@ public final class OnThisPageStudyMain {
         double widestField = ChartViewState.fieldWidthSteps().get(0);
         SkyPosition centre = Atlas.DEFAULT_CENTRE;
         int tallest = assembler.maxPageHeightPx(centre, widestField, WIDTH);
-        return pageReachDegrees(assembler.assemble(
+        return PageExtent.pageReachDegrees(assembler.assemble(
                 new ChartViewState(centre, widestField, 8.0),
                 WIDTH, tallest));
     }
@@ -895,24 +506,24 @@ public final class OnThisPageStudyMain {
         for (Page page : PAGES) {
             for (double field : new double[] {8.0, 36.0}) {
                 ChartScene scene = pageOf(page, field);
-                Map<Visibility, Integer> tally =
+                Map<PageVisibility, Integer> tally =
                         classify(scene, defaults, renderer);
                 System.out.printf(Locale.ROOT,
                         "| %s | %.0f° | %d | %d | %d | %d | %d |%n",
                         page.name(), field,
-                        tally.getOrDefault(Visibility.DRAWN, 0),
-                        tally.getOrDefault(Visibility.FAMILY_HIDDEN, 0),
-                        tally.getOrDefault(Visibility.BELOW_LIMIT, 0),
-                        tally.getOrDefault(Visibility.NO_SYMBOL, 0),
-                        tally.getOrDefault(Visibility.TOO_SMALL, 0));
+                        tally.getOrDefault(PageVisibility.DRAWN, 0),
+                        tally.getOrDefault(PageVisibility.FAMILY_HIDDEN, 0),
+                        tally.getOrDefault(PageVisibility.BELOW_LIMIT, 0),
+                        tally.getOrDefault(PageVisibility.NO_SYMBOL, 0),
+                        tally.getOrDefault(PageVisibility.TOO_SMALL, 0));
             }
         }
         System.out.println();
 
         ChartScene m31 = pageOf(PAGES.get(0), 8.0);
-        Map<Visibility, Integer> withGalaxies =
+        Map<PageVisibility, Integer> withGalaxies =
                 classify(m31, defaults, renderer);
-        Map<Visibility, Integer> without =
+        Map<PageVisibility, Integer> without =
                 classify(m31, galaxiesOff, renderer);
         System.out.printf(Locale.ROOT,
                 "Switching **Galaxies** off on the released page moves"
@@ -923,45 +534,22 @@ public final class OnThisPageStudyMain {
                         + " presence is a fact about the sky, and"
                         + " visibility is a fact about the reader's"
                         + " choices.%n%n",
-                withGalaxies.getOrDefault(Visibility.DRAWN, 0)
-                        - without.getOrDefault(Visibility.DRAWN, 0),
-                withGalaxies.getOrDefault(Visibility.DRAWN, 0),
-                without.getOrDefault(Visibility.DRAWN, 0));
+                withGalaxies.getOrDefault(PageVisibility.DRAWN, 0)
+                        - without.getOrDefault(PageVisibility.DRAWN, 0),
+                withGalaxies.getOrDefault(PageVisibility.DRAWN, 0),
+                without.getOrDefault(PageVisibility.DRAWN, 0));
     }
 
-    private static Map<Visibility, Integer> classify(
+    /**
+     * Production's own tally, asked once. The study used to walk the
+     * page and classify each object beside the renderer; #215 gave
+     * the atlas a page inventory, and a second classifier would be
+     * free to drift from it.
+     */
+    private static Map<PageVisibility, Integer> classify(
             ChartScene scene, ChartOptions options,
             ChartRenderer renderer) {
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
-        RegionalDetailPolicy policy =
-                new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
-        Inventory inventory = inventoryOf(scene);
-        Map<Visibility, Integer> tally = new LinkedHashMap<>();
-        for (DeepSkyObject dso : inventory.deepSky()) {
-            tally.merge(stateOf(scene, dso, options, policy), 1, Integer::sum);
-        }
-        for (Star star : inventory.stars()) {
-            tally.merge(star.magnitude() > scene.limitingMagnitude()
-                            ? Visibility.BELOW_LIMIT : Visibility.DRAWN,
-                    1, Integer::sum);
-        }
-        return tally;
-    }
-
-    private static Visibility stateOf(ChartScene scene, DeepSkyObject dso,
-                                      ChartOptions options,
-                                      RegionalDetailPolicy policy) {
-        if (ChartRenderer.symbolForType(dso.type())
-                == ChartRenderer.Symbol.NONE) {
-            return Visibility.NO_SYMBOL;
-        }
-        if (!ChartRenderer.permitted(scene, dso, options)) {
-            return Visibility.FAMILY_HIDDEN;
-        }
-        if (!policy.drawn(dso)) {
-            return Visibility.TOO_SMALL;
-        }
-        return Visibility.DRAWN;
+        return PageInventory.of(scene, options).tally();
     }
 
     // ------------------------------------------------------------------
@@ -1071,49 +659,28 @@ public final class OnThisPageStudyMain {
      * </ol>
      */
     static List<Row> rowsFor(ChartScene scene, ChartOptions options) {
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
-        RegionalDetailPolicy policy =
-                new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
         SkyPosition centre = scene.viewport().centre();
-        Inventory inventory = inventoryOf(scene);
-
-        List<DeepSkyObject> deepSky = new ArrayList<>(inventory.deepSky());
-        deepSky.sort(defaultOrder(centre));
+        PageContents page = PageInventory.of(scene, options);
         List<Row> rows = new ArrayList<>();
-        for (DeepSkyObject dso : deepSky) {
+        for (PageEntry.DeepSky entry : page.deepSky()) {
+            DeepSkyObject dso = entry.object();
             rows.add(new Row(nameOf(dso), kindOf(dso),
                     magnitudeOf(dso.magnitude(), dso.recorded().band()),
                     String.format(Locale.ROOT, "%.2f°",
-                            centre.separationDegrees(dso.position())),
-                    wordFor(stateOf(scene, dso, options, policy)), false));
+                            entry.separationDegrees()),
+                    wordFor(entry.visibility()), false));
         }
-
-        List<Star> named = new ArrayList<>();
-        int anonymous = 0;
-        for (Star star : inventory.stars()) {
-            if (isNamed(star)) {
-                named.add(star);
-            } else {
-                anonymous++;
-            }
-        }
-        named.sort(Comparator
-                .comparingDouble(Star::magnitude)
-                .thenComparingDouble(star ->
-                        centre.separationDegrees(star.position()))
-                .thenComparing(Star::id));
-        for (Star star : named) {
-            rows.add(new Row(bestName(star), "star",
-                    magnitudeOf(star.magnitude(), null),
+        for (PageEntry.StarEntry entry : page.namedStars()) {
+            rows.add(new Row(bestName(entry.star()), "star",
+                    magnitudeOf(entry.star().magnitude(), null),
                     String.format(Locale.ROOT, "%.2f°",
-                            centre.separationDegrees(star.position())),
-                    star.magnitude() > scene.limitingMagnitude()
-                            ? "too faint" : "drawn", false));
+                            entry.separationDegrees()),
+                    wordFor(entry.visibility()), false));
         }
-        if (anonymous > 0) {
+        if (page.anonymousStarCount() > 0) {
             rows.add(new Row(String.format(Locale.ROOT,
-                    "and %,d further stars", anonymous), "star", "", "",
-                    "none named", true));
+                    "and %,d further stars", page.anonymousStarCount()),
+                    "star", "", "", "none named", true));
         }
         return rows;
     }
@@ -1158,7 +725,7 @@ public final class OnThisPageStudyMain {
     }
 
     /** The short word the table shows for a state. */
-    static String wordFor(Visibility state) {
+    static String wordFor(PageVisibility state) {
         return switch (state) {
             case DRAWN -> "drawn";
             case FAMILY_HIDDEN -> "hidden";
