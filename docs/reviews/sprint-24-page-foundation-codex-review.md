@@ -156,3 +156,17 @@ ID and test reversed attachment. Do not promise order independence while
 testing order dependence.
 
 After these two contained corrections, PR #221 may merge and #216 may begin.
+
+## Final follow-up — `e3681cf`
+
+**Approved.** Public working-mark changes now enforce set uniqueness, and the
+overlay registry accurately promises registration order rather than attachment
+order independence. The tests pin both contracts, including detach and
+re-attach moving a module to the back.
+
+All reentrancy, contribution ownership, overlay identity, magnitude ordering,
+and public-state invariant findings are resolved. The second occurrence of
+issue #220 is useful evidence for that independent display-layout race, but it
+does not arise from this PR and does not block the page foundation.
+
+PR #221 may merge. Issue #216 may begin.
