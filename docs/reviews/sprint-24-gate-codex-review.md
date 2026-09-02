@@ -339,3 +339,45 @@ Correct the prose so the evidence can be audited.
 
 After these contained corrections, the gate is ready to merge and #215 may
 begin.
+
+## Follow-up — `658da1a`
+
+**Catalogue-range geometry remains approved, but the two P2s are not fully
+closed.** The path now breaks correctly and the 96-measurement wording is
+fixed. The replacement behavior still returns answers outside its evidence.
+
+### P2 — Five containment probes do not decide a clipped region
+
+After a horizon break, the code tests only the paper's four corners and
+centre for containment. That does not cover every way an open projected region
+can contain part of the paper. A long thin ellipse can cover a strip through
+the paper that contains none of those five points while its visible boundary
+pieces remain outside. The current synthetic test places the strip through the
+centre, so it proves only the one probe chosen to make it pass.
+
+The bundled catalogue cannot reach the projection horizon under supported
+page geometry. Use that fact directly: detect any refused boundary interval
+and return an explicit unsupported/failure result rather than manufacturing a
+partial-region answer. Remove the giant-object claim and retain a test proving
+all catalogue-range cases stay on the supported path. Full spherical clipping
+can be designed later if a data source ever requires it.
+
+### P2 — “Zero across the whole pack” is not what the counter measures
+
+The lapse counter is global and increments only when `outlineOf` is actually
+called. `geometryTally()` counts all 13,371 rows but does not build their
+outlines; the preceding study exercises objects appearing on the selected
+pages, with repeats, not every pack row over every supported viewport. The
+report therefore cannot infer that the bound held “across the whole pack.”
+
+More fundamentally, emitting an out-of-tolerance chord and incrementing a
+side-channel still lets the predicate return an unpromised answer. Make
+flatness exhaustion fail explicitly at the geometry seam. Then test that the
+full study and catalogue-range stress sweep never reach that failure, plus a
+forced shallow-depth case that does. This removes the mutable global counter
+and makes every caller safe rather than only callers that remember to inspect
+it later.
+
+These are contained failure-contract corrections; the accepted spherical
+membership rule and all reported inventory decisions stay intact. Once fixed,
+merge the gate and begin #215.
