@@ -80,3 +80,48 @@ displayed entry retains the original band rather than implying conversion.
   packages.
 
 Do not merge PR #221 or begin #216 until the three P1 findings are resolved.
+
+## Follow-up — `64dce4b`
+
+**Two findings remain.** The B/V ordering is resolved. Overlay ownership is
+substantially corrected and now composes across modules. Reentrant mark state
+still advances ahead internally, and the registry does not enforce the key
+uniqueness it publishes.
+
+### P1 — Accessor masking is not queued transition semantics
+
+`WorkingMarksModel` now makes `marks()`, `lead()`, and `isMarked()` return the
+currently delivered `Change`, which fixes what a passive listener reads. But
+the mutation methods still update the underlying `marks` and `lead` before
+their event is delivered. A listener reacting to A therefore computes its
+mutation against hidden future state B, even while every accessor tells it the
+model is A. With two listeners reacting to A—for example one marking B and the
+next clearing or pruning—the second operation acts on A+B rather than the A it
+was handed.
+
+This is not the `SelectionModel` discipline cited by the class. That model
+queues each whole requested transition and applies it immediately before its
+own event. Use the same shape here: derive/queue a complete next state without
+exposing it as current, then install that state just before notifying its
+listeners. Do not maintain two contradictory notions of current state and
+hide one through accessors.
+
+Extend the regression exactly as requested in the first review: during A, one
+listener queues B and another performs `clear()` or `pruneTo` based on A. For
+every callback assert event state, accessor state, and the subsequent event
+sequence. A mutation that restores eager field updates must fail.
+
+### P2 — Published overlay keys are not unique within one module
+
+`OverlayRegistry.Owned.key()` claims `moduleId/geometry.identity()` is the key
+used for hit testing, but `collect()` accepts two contributions from the same
+supplier with the same identity and returns two `Owned` values with an
+identical key. The current test proves only that two different module IDs do
+not collide.
+
+Reject duplicate contribution identities within each module at collection
+time with a diagnostic naming the module and identity, or define a different
+stable disambiguation contract. Add one module returning duplicate point/path
+identities and prove it cannot create an ambiguous supposedly stable key.
+
+After these corrections, PR #221 may merge and #216 may begin.
