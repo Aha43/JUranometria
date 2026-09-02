@@ -60,23 +60,39 @@ public final class WorkingMarksModel {
     private final List<Consumer<Change>> listeners = new ArrayList<>();
     /** Changes awaiting delivery, so every consumer sees one order. */
     private final Deque<Change> pending = new ArrayDeque<>();
-    private boolean delivering;
 
+    /** Where the model has actually got to. */
     private final Set<String> marks = new LinkedHashSet<>();
     private String lead;
 
+    /**
+     * The state consumers are being told about, or null when nothing
+     * is being delivered.
+     *
+     * <p>Queueing the events was not enough (review): a listener
+     * that marks something while being told about a mark moves the
+     * model at once, so the <em>next</em> listener was handed the
+     * older change and, if it asked, told a newer state. It would
+     * draw one page and read another.
+     *
+     * <p>So while a change is in flight the model answers as that
+     * change. What has already happened is not lost - it is next in
+     * the queue - and once the queue drains the two agree again.
+     */
+    private Change delivering;
+
     /** The marked identities, in the order they were marked. */
     public List<String> marks() {
-        return List.copyOf(marks);
+        return delivering != null ? delivering.marks() : List.copyOf(marks);
     }
 
     /** The lead identity, or null when nothing is marked. */
     public String lead() {
-        return lead;
+        return delivering != null ? delivering.lead() : lead;
     }
 
     public boolean isMarked(String identity) {
-        return marks.contains(identity);
+        return marks().contains(identity);
     }
 
     /**
@@ -89,7 +105,14 @@ public final class WorkingMarksModel {
             throw new IllegalArgumentException("listener must not be null");
         }
         listeners.add(listener);
-        listener.accept(state());
+        Change now = delivering != null ? delivering : state();
+        Change was = delivering;
+        delivering = now;
+        try {
+            listener.accept(now);
+        } finally {
+            delivering = was;
+        }
         return () -> listeners.remove(listener);
     }
 
@@ -193,19 +216,19 @@ public final class WorkingMarksModel {
      */
     private void publish() {
         pending.addLast(state());
-        if (delivering) {
-            return;
+        if (delivering != null) {
+            return;                // already draining; this joins the queue
         }
-        delivering = true;
         try {
             while (!pending.isEmpty()) {
                 Change change = pending.removeFirst();
+                delivering = change;
                 for (Consumer<Change> listener : List.copyOf(listeners)) {
                     listener.accept(change);
                 }
             }
         } finally {
-            delivering = false;
+            delivering = null;
             pending.clear();
         }
     }

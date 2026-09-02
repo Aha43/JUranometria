@@ -133,13 +133,34 @@ public final class PageInventory {
      * Brightest first, with objects whose magnitude the source never
      * recorded last - they are not bright, they are unrecorded, and
      * sorting them as though they were zero would say otherwise.
+     *
+     * <p>Blue and visual magnitudes sort together by their recorded
+     * number, never converted, and <strong>equal numbers put the
+     * visual one first</strong>. They are different measurements and
+     * the atlas does not convert between them - but 68.1% of the
+     * pack records no V magnitude, so an order that refused to place
+     * B rows would refuse most of the sky. The consequence is stated
+     * rather than hidden: a B 9.0 sorts beside a V 9.0 though it is
+     * not the same measurement, and the band travels in the cell so
+     * a reader can see which is which.
      */
     private static Comparator<DeepSkyObject> byRecordedBrightness() {
         return Comparator
                 .comparingInt((DeepSkyObject dso) ->
                         Double.isNaN(dso.magnitude()) ? 1 : 0)
                 .thenComparingDouble(dso -> Double.isNaN(dso.magnitude())
-                        ? 0.0 : dso.magnitude());
+                        ? 0.0 : dso.magnitude())
+                .thenComparingInt(PageInventory::bandRank);
+    }
+
+    /**
+     * Visual before blue at the same number. A band the source did
+     * not name is a visual magnitude as the atlas reads it, so it
+     * sorts with them rather than behind them.
+     */
+    private static int bandRank(DeepSkyObject dso) {
+        return dso.recorded().band() == DeepSkyObject.Recorded.Band.BLUE
+                ? 1 : 0;
     }
 
     /** The Messier number an object is also known by, or null. */

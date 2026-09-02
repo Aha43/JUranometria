@@ -56,11 +56,17 @@ public interface ChartServices {
     void request(NavigationRequest request);
 
     /**
-     * Offers geometry for the chart to ink. Called by the chart when
-     * it paints; a module returns what it has, and the chart decides
-     * how - and whether - to ink each role.
+     * Offers geometry for the chart to ink, under this module's own
+     * name, and returns the handle that withdraws it.
+     *
+     * <p>Owned, because a bare list let one module replace another's
+     * ink and left a detaching module no way to take back its own
+     * (review). Pulled rather than pushed: the chart asks when it
+     * paints, so a module never guesses when the page is next drawn.
      */
-    void contribute(List<OverlayContribution> geometry);
+    Runnable contribute(String moduleId,
+                        java.util.function.Supplier<List<OverlayContribution>>
+                                geometry);
 
     /** Sky to page and back, as a module is allowed to ask it. */
     interface Projection {

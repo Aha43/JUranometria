@@ -198,6 +198,50 @@ class PageInventoryTest {
     }
 
     @Test
+    void equalMagnitudesPutTheVisualOneBeforeTheBlueOne() {
+        // Blue and visual sort together by their recorded number and
+        // are never converted - but they are different measurements,
+        // so at the same number the visual one goes first. 68.1% of
+        // the pack records no V magnitude, which is why B rows are
+        // placed at all rather than refused.
+        ChartScene scene = page(10.684, 41.269, 8.0);
+        SkyPosition centre = scene.viewport().centre();
+        DeepSkyObject blue = sameSkyObject("TEST-B", 9.0,
+                DeepSkyObject.Recorded.Band.BLUE, centre);
+        DeepSkyObject visual = sameSkyObject("TEST-V", 9.0,
+                DeepSkyObject.Recorded.Band.VISUAL, centre);
+
+        List<DeepSkyObject> either = new ArrayList<>(List.of(blue, visual));
+        either.sort(PageInventory.defaultOrder(centre));
+        assertEquals(List.of("TEST-V", "TEST-B"),
+                either.stream().map(DeepSkyObject::id).toList(),
+                "the visual measurement first at the same number");
+
+        Collections.reverse(either);
+        either.sort(PageInventory.defaultOrder(centre));
+        assertEquals(List.of("TEST-V", "TEST-B"),
+                either.stream().map(DeepSkyObject::id).toList(),
+                "however they arrived");
+
+        // And it decides only ties: a brighter blue still leads.
+        List<DeepSkyObject> brighterBlue = new ArrayList<>(List.of(visual,
+                sameSkyObject("TEST-B-BRIGHT", 8.0,
+                        DeepSkyObject.Recorded.Band.BLUE, centre)));
+        brighterBlue.sort(PageInventory.defaultOrder(centre));
+        assertEquals("TEST-B-BRIGHT", brighterBlue.get(0).id(),
+                "the band breaks ties; it does not outrank the number");
+    }
+
+    private static DeepSkyObject sameSkyObject(String id, double magnitude,
+                                               DeepSkyObject.Recorded.Band band,
+                                               SkyPosition at) {
+        return new DeepSkyObject(id, List.of(),
+                juranometria.chart.DsoType.GALAXY, at, 2.0, 2.0, 0.0,
+                magnitude, 1,
+                new DeepSkyObject.Recorded(2.0, 2.0, 0.0, band));
+    }
+
+    @Test
     void theSamePageReportsTheSameThingHoweverTheCatalogueArrives() {
         // Reversed storage order must not change one row. An order
         // that depended on the catalogue's would make two runs of the

@@ -25,10 +25,13 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   publishes services; modules consume them. A module contributes
   typed geometry with an ink role - a point, a path, a region, each
   with an identity and an accessible name - and never a graphics
-  context, so the chart keeps its cartography. Asserted rather than
-  described: the core imports neither the services nor the seam, and
-  the atlas builds and draws its ordinary chart with every module
-  absent.
+  context, so the chart keeps its cartography. Every contribution is
+  owned: a module registers under its own name and holds the one
+  handle that withdraws it, so modules cannot overwrite each other
+  and a detaching module takes back its own ink and nothing else.
+  Asserted rather than described: the core imports neither the
+  services nor the seam, and the atlas builds and draws its ordinary
+  chart with every module absent.
 
 ### Changed
 

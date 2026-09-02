@@ -133,6 +133,39 @@ class WorkingMarksModelTest {
     }
 
     @Test
+    void theModelNeverReadsAheadOfTheEventBeingDelivered() {
+        // Queueing the events was not enough (review). A listener
+        // that marks something while being told about a mark moves
+        // the model at once, so the next listener was handed the
+        // older change and, if it asked the model, told a newer
+        // state - it would draw one page and read another.
+        WorkingMarksModel marks = new WorkingMarksModel();
+        List<String> readByTheSecond = new ArrayList<>();
+        boolean[] reacted = {false};
+
+        marks.onChange(change -> {
+            if (!reacted[0] && change.marks().equals(List.of("A"))) {
+                reacted[0] = true;
+                marks.mark("B");
+            }
+        });
+        marks.onChange(change ->
+                readByTheSecond.add(change.marks() + " reads as "
+                        + marks.marks() + ", lead " + marks.lead()));
+
+        marks.mark("A");
+
+        assertEquals(List.of(
+                        "[] reads as [], lead null",
+                        "[A] reads as [A], lead A",
+                        "[A, B] reads as [A, B], lead B"),
+                readByTheSecond,
+                "the model answers as the change being delivered, so a"
+                        + " consumer that asks during delivery is told"
+                        + " what it was just handed");
+    }
+
+    @Test
     void aModelStateAlwaysAgreesWithTheEventBeingDelivered() {
         WorkingMarksModel marks = new WorkingMarksModel();
         List<String> disagreements = new ArrayList<>();
