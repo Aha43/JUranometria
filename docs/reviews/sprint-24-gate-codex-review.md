@@ -297,3 +297,45 @@ enforces `aborted=0`; locally it now reports an unavailable desktop as unmet
 rather than misdiagnosing an application failure.
 
 Do not merge the gate or begin #215 yet.
+
+## Follow-up — `df9fd14`
+
+**P1 resolved.** The adaptive spherical boundary, independently measured
+0.05-pixel approximation, bidirectional oracle, and constructed subpixel
+edge/corner cases are sufficient evidence for the catalogue-range decision.
+The ZIP timestamp correction is also narrow and correct.
+
+Two P2 corrections remain before merging the gate.
+
+### P2 — A refused horizon interval is joined despite being documented broken
+
+In `outlineOf`, when a boundary sample is refused, `previous` becomes null.
+At the next accepted point, however, the existing path has a current point, so
+the code calls `lineTo`, joining the two visible pieces by a straight chord
+across the interval the projection refused. The comment says “the path breaks
+here,” but the implementation does the opposite. The later `closePath` adds a
+second implicit chord as well.
+
+This is outside the bundled catalogue's extent range, so it does not reopen
+the accepted production geometry. It does invalidate the claimed giant-object
+horizon safeguard. Either implement separate subpaths and a correct
+containment rule for clipped spherical regions, or explicitly reject/hard-stop
+geometry whose boundary crosses the projection horizon and remove the
+synthetic claim. Do not leave a chorded approximation described as verified.
+
+### P2 — Hitting the recursion ceiling silently waives the flatness contract
+
+`subdivide` emits the chord when `depth >= MAX_DEPTH` even if its midpoint is
+still farther than `FLATNESS_PX`. The current measurements show the ceiling is
+not reached in the tested catalogue-range cases, but no invariant makes a
+future caller or changed viewport preserve that. Fail loudly if the ceiling is
+reached without meeting flatness (and test the diagnostic), or return an
+explicit unsupported result. A method promising a bounded path must not
+silently return an unbounded one.
+
+The report says the achieved-distance measurement covers twenty-four shapes;
+the loops currently exercise 4 pages × 4 axes × 2 ratios × 3 angles = 96.
+Correct the prose so the evidence can be audited.
+
+After these contained corrections, the gate is ready to merge and #215 may
+begin.
