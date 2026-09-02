@@ -70,6 +70,7 @@ The foundation took three more, and the table two:
 | #216.1 | sorting was textual, so 10 preceded 2 and "not recorded" filed under N; the application disposed the Inspector without detaching the module |
 | #216.2 | descending sort reversed `nullsLast`, putting every unrecorded magnitude first |
 | #217.1 | the packaged acceptance rebuilt a list of expected cross identities with its own copy of the module's rule, never attaching the module and never drawing a pixel; the closing journey drove its central multi-selection by calling the marks model directly instead of using the table's own pointer and keyboard |
+| #217.2 | row clicks could land on cells no reader could reach; sorting still went through the sorter's API rather than the real header; keyboard extension was untested in the closing journey; and the packaged "restart" never built a second session |
 
 Two corrections are worth naming because they were mine to make and
 I got them wrong first:
@@ -185,7 +186,8 @@ Everything below was run on this machine at `<HEAD>`.
   passes inside the bundled runtime with no system Java:
   `on this page OK (56 entries, 12 rows, marked NGC 206 which the
   page does not draw, 48 pixels of cross drawn at its own position,
-  cleared to the byte, nothing persisted)`.
+  cleared to the byte, and a second session begins empty with the
+  reader's options intact)`.
 - **Portable distribution:** `make dist` builds and verifies —
   contents exact, non-commercial notice present, packaged headless
   render from a path containing a space.
