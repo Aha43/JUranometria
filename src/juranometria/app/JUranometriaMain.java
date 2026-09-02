@@ -102,6 +102,18 @@ public final class JUranometriaMain {
         // selected; the panel re-reads it rather than going on
         // describing something that has gone.
         chart.onSceneChange(inspector::refresh);
+
+        // The first module (issue #216). The chart offers services;
+        // this asks for them and gives back a table and some crosses.
+        // Nothing above this line knows it exists, and the atlas
+        // draws its ordinary page if these three lines are deleted.
+        juranometria.ui.ChartModuleHost modules =
+                new juranometria.ui.ChartModuleHost(chart, selection,
+                        request -> controller.recenter(request.centre()));
+        juranometria.ui.onthispage.OnThisPageModule onThisPage =
+                modules.attach(
+                        new juranometria.ui.onthispage.OnThisPageModule());
+        inspector.showPageView(onThisPage.panel());
         inspector.onClose(chart::requestFocusInWindow);
         // One switch, three ways to reach it: the toolbar button, the
         // View menu, and the window's own width (issue #180).
@@ -160,6 +172,13 @@ public final class JUranometriaMain {
         // Quit all reach the same path, so leaving means one thing.
         AppShutdown shutdown = AppShutdown.real();
         shutdown.onShutdown(inspector::dispose);
+        // And the modules, on the same path. Disposing the panel a
+        // module put its table in is not releasing the module: it
+        // would still hold its subscriptions and still be
+        // contributing geometry to a chart on its way out (review).
+        // Detached newest first, which is what the detach step is
+        // for.
+        shutdown.onShutdown(modules::detachAll);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override

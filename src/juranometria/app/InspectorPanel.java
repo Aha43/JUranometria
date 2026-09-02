@@ -71,6 +71,22 @@ public final class InspectorPanel extends JPanel {
             new com.formdev.flatlaf.extras.FlatSVGIcon(
                     "resources/icons/x.svg", 16, 16));
     private final Runnable unsubscribe;
+
+    /** The two modes, and the chooser that appears when there are two. */
+    static final String SELECTED_MODE = "selected";
+    static final String PAGE_MODE = "page";
+    private final java.awt.CardLayout deck = new java.awt.CardLayout();
+    private final JPanel modes = new JPanel(deck);
+    private final JPanel modeSwitch = new JPanel();
+    private final javax.swing.JToggleButton showSelected =
+            new javax.swing.JToggleButton("Selected");
+    private final javax.swing.JToggleButton showPage =
+            new javax.swing.JToggleButton("On this page");
+    private final javax.swing.ButtonGroup modeGroup =
+            new javax.swing.ButtonGroup();
+    private String mode = SELECTED_MODE;
+    /** What the heading says in the Selected mode, kept across a switch. */
+    private String headingText = "Nothing selected";
     /** True while the panel is writing the list, so echoes are ignored. */
     private boolean updating;
     private boolean requested;
@@ -169,15 +185,47 @@ public final class InspectorPanel extends JPanel {
         header.setMaximumSize(new Dimension(Integer.MAX_VALUE,
                 close.getPreferredSize().height));
 
+        // The two modes. "Selected" is what the Inspector has
+        // always been; "On this page" is a module's, handed in from
+        // outside so this panel never learns what a table is. The
+        // switch appears only when something has been handed in -
+        // one mode needs no chooser.
+        JPanel selectedMode = new JPanel();
+        selectedMode.setLayout(new BoxLayout(selectedMode, BoxLayout.Y_AXIS));
+        selectedMode.add(candidateScroll);
+        selectedMode.add(Box.createVerticalStrut(10));
+        selectedMode.add(facts);
+        selectedMode.add(Box.createVerticalGlue());
+        selectedMode.add(centreHere);
+        modes.add(selectedMode, SELECTED_MODE);
+
+        modeSwitch.setLayout(new BoxLayout(modeSwitch, BoxLayout.X_AXIS));
+        modeSwitch.setAlignmentX(0.0f);
+        modeSwitch.setVisible(false);
+        showSelected.setSelected(true);
+        modeGroup.add(showSelected);
+        modeGroup.add(showPage);
+        showSelected.getAccessibleContext().setAccessibleName("Selected");
+        showSelected.getAccessibleContext().setAccessibleDescription(
+                "Show the facts of the object you last chose");
+        showPage.getAccessibleContext().setAccessibleName("On this page");
+        showPage.getAccessibleContext().setAccessibleDescription(
+                "Show everything the atlas holds on the page you are"
+                        + " looking at, drawn or not");
+        showSelected.addActionListener(event -> showMode(SELECTED_MODE));
+        showPage.addActionListener(event -> showMode(PAGE_MODE));
+        modeSwitch.add(showSelected);
+        modeSwitch.add(Box.createHorizontalStrut(6));
+        modeSwitch.add(showPage);
+        modeSwitch.add(Box.createHorizontalGlue());
+
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.add(header);
         body.add(Box.createVerticalStrut(10));
-        body.add(candidateScroll);
+        body.add(modeSwitch);
         body.add(Box.createVerticalStrut(10));
-        body.add(facts);
-        body.add(Box.createVerticalGlue());
-        body.add(centreHere);
+        body.add(modes);
         add(body, BorderLayout.CENTER);
 
         // Escape closes the inspector, as it closes every dialog.
@@ -351,6 +399,76 @@ public final class InspectorPanel extends JPanel {
     }
 
     /** The pane's own close control; for tests. */
+    /**
+     * Puts a module's view in the second mode.
+     *
+     * <p>The panel is given the component and never asks what it is:
+     * the Inspector keeps its own mode, its close button, its
+     * Escape, its narrow-window behaviour and its accessible naming
+     * whether or not a module is installed.
+     */
+    public void showPageView(JComponent view) {
+        if (view == null) {
+            throw new IllegalArgumentException("a view to show");
+        }
+        modes.add(view, PAGE_MODE);
+        modeSwitch.setVisible(true);
+        revalidate();
+    }
+
+    /**
+     * The heading for the Selected mode. Remembered rather than
+     * written straight to the label, so a reader who looks at the
+     * page and comes back finds the object they were reading about
+     * still named above its facts.
+     */
+    private void setSelectedHeading(String text) {
+        headingText = text;
+        if (SELECTED_MODE.equals(mode)) {
+            heading.setText(text);
+        }
+    }
+
+    /**
+     * Whether the reader is being offered a choice of modes.
+     *
+     * <p>Asked of the panel rather than of the buttons: a Swing
+     * component reports itself visible even when the container
+     * holding it is not, so a test that asked the buttons would be
+     * told a chooser is on screen when nothing is.
+     */
+    public boolean modeChooserShown() {
+        return modeSwitch.isVisible();
+    }
+
+    /** Which mode the reader is in. */
+    public String mode() {
+        return mode;
+    }
+
+    /** Switches mode, as the chooser does. */
+    public void showMode(String which) {
+        if (!SELECTED_MODE.equals(which) && !PAGE_MODE.equals(which)) {
+            throw new IllegalArgumentException("no such mode: " + which);
+        }
+        mode = which;
+        deck.show(modes, which);
+        (SELECTED_MODE.equals(which) ? showSelected : showPage)
+                .setSelected(true);
+        heading.setText(SELECTED_MODE.equals(which) ? headingText
+                : "On this page");
+        revalidate();
+        repaint();
+    }
+
+    public javax.swing.JToggleButton selectedModeButton() {
+        return showSelected;
+    }
+
+    public javax.swing.JToggleButton pageModeButton() {
+        return showPage;
+    }
+
     public JButton closeButton() {
         return close;
     }
@@ -403,10 +521,10 @@ public final class InspectorPanel extends JPanel {
         Selection current = change.selection();
         centreHere.setEnabled(!(current instanceof Selection.None));
         if (current instanceof Selection.None) {
-            heading.setText("Nothing selected");
+            setSelectedHeading("Nothing selected");
             fact("Click a star or a deep-sky symbol to see what it is.");
         } else if (current instanceof Selection.EmptySky empty) {
-            heading.setText("Empty sky");
+            setSelectedHeading("Empty sky");
             fact(coordinates(empty.position()));
             fact("ICRS J2000");
             fact("");
@@ -414,7 +532,7 @@ public final class InspectorPanel extends JPanel {
         } else {
             Selection.Object object = (Selection.Object) current;
             if (change.isAmbiguous()) {
-                heading.setText(change.candidates().size()
+                setSelectedHeading(change.candidates().size()
                         + " objects here");
             }
             SelectionDetails.star(scene, current)
@@ -436,7 +554,7 @@ public final class InspectorPanel extends JPanel {
             // letter, then its Flamsteed number, then its catalogue
             // identifier. Heading a lettered star merely "Star"
             // withholds something the atlas knows.
-            heading.setText(bestName(identity, star.id()));
+            setSelectedHeading(bestName(identity, star.id()));
         }
         fact(identity != null && identity.bayer() != null
                 ? identity.bayer() : "no Bayer designation");
@@ -454,7 +572,7 @@ public final class InspectorPanel extends JPanel {
     private void describeDeepSky(DeepSkyObject dso,
                                  SelectionModel.Change change) {
         if (!change.isAmbiguous()) {
-            heading.setText(messierName(dso).orElse(dso.id()));
+            setSelectedHeading(messierName(dso).orElse(dso.id()));
         }
         // Say each name once: an object headed by its own catalogue
         // id should not then list that id as a fact about itself.
@@ -506,7 +624,7 @@ public final class InspectorPanel extends JPanel {
     }
 
     private void describeAbsent(Selection.Object object) {
-        heading.setText(object.catalogueId());
+        setSelectedHeading(object.catalogueId());
         fact(coordinates(object.position()));
         fact("ICRS J2000");
         fact("");

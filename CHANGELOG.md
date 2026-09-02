@@ -9,6 +9,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **On this page: a table and working crosses** (Sprint 24, issue
+  #216). The Inspector gains a second mode listing everything the
+  atlas holds on the page in front of the reader - object, magnitude
+  with its band, distance from centre, and what it is doing on the
+  chart - sortable by any column with the decided order beneath, and
+  worked entirely by the platform's own gestures. Marking rows draws
+  restrained crosses at the positions of the objects the page does
+  <em>not</em> already draw; a visible object keeps its own symbol
+  and gains nothing. The row a reader last reached leads, and its
+  facts appear where they always have. **Center here** and **Clear
+  marks** are explicit: reading a row never moves the page. Panning,
+  zooming or searching elsewhere prunes the marks and the rows
+  together, and nothing is remembered between sessions.
+
 - **A page inventory, and the reader's working marks** (Sprint 24,
   issue #215). The chart can now be asked what is on the page it is
   showing: every catalogue object whose recorded ellipse reaches the
