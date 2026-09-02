@@ -55,7 +55,7 @@ The measurements support it rather than decide it:
   today's north star** at 16 px — it will not be mistaken for the
   generic application shape, nor for what it replaces.
 
-## What is wrong with it, before anyone chooses it
+## What is wrong with it, and was known before it was chosen
 
 **At 16 px none of the four reads as Andromeda.** Rift's three stars
 merge into the ellipse — that is what "2 ink islands at 16 px" is
@@ -109,7 +109,7 @@ correctly attributed until it is replaced.
 
 `Candidate.RIFT`, unchanged - the same fractions of the side, drawn
 at each container's own size rather than resampled - and the
-requirements this gate did not attempt: the ICNS, ICO and PNG containers, the window icon set,
-About, and mechanical verification that a missing or substituted icon
-cannot pass packaging. The astronomical mark does not change per
+requirements this gate did not attempt: the ICNS, ICO and PNG
+containers, the window icon set, About, and mechanical verification
+that a missing or substituted icon cannot pass packaging. The astronomical mark does not change per
 platform; only the container does.
