@@ -62,11 +62,13 @@ The extent used is what the **source recorded**, never the display size the load
 
 Measured over the bundled pack, **9.7% of rows record no size at all** - about one in ten, so the rule decides real rows rather than a corner case.
 
-### The ellipse, not an envelope
+### The ellipse, on the sphere
 
-An earlier draft asked whether a circle of the recorded half-major reached the paper. That circle contains the ellipse whichever way it lies, so it never misses - but it is not what this decision says, and it says yes for thin objects whose known ellipse never comes near the page.
+Two earlier drafts were bounds rather than the thing: a square of the half-major, then a circle of it. A circle contains the ellipse whichever way it lies, so it never misses - and it says yes for a thin object lying along the page edge whose known shape never comes near it.
 
-So the recorded ellipse is tested as the ellipse it is, oriented as the source recorded it, through the same `Shape.intersects` the renderer's own `drawnMarks` uses to decide what is on the paper. Where the source is silent the fallback is explicit rather than invented:
+A third turned arcminutes into pixels once, at the page centre's scale, and tested a flat ellipse. **A gnomonic page has no single scale**: it stretches away from the centre, and the Large Magellanic Cloud is nearly eleven degrees across. An ellipse sized at the middle is the wrong shape by the time it reaches an edge - which is exactly where this question is asked.
+
+So the boundary is walked **on the sphere**, at the recorded semi-axes and position angle east of north, and each point is projected through the atlas's own projection and viewport mapping. Where the source is silent the fallback is explicit rather than invented:
 
 | what the source recorded | what is tested | rows in the pack |
 |---|---|---:|
@@ -76,7 +78,7 @@ So the recorded ellipse is tested as the ellipse it is, oriented as the source r
 
 The envelope therefore decides **1,296 rows** and the exact ellipse decides **10,775**, which is the honest split: the conservative answer is given exactly where the catalogue leaves no better one.
 
-Across the study's pages the exact test removes **1** object the envelope would have reported: a thin ellipse whose circle touches the paper and whose recorded shape does not. Few, and the point is that the rule says what it does rather than how many it moves.
+`OnThisPageSphericalTest` checks the rule from the opposite direction: it samples the **paper**, turns each pixel back into a sky position through the atlas's own inverse - what grab-to-pan uses - and asks whether that position lies inside the object's angular ellipse. Forward and inverse are independent enough to disagree if the geometry is wrong, and the Magellanic Cloud placed off-centre on a 36-degree page is one of the cases they are held to.
 
 
 ## Present, and why it cannot be seen

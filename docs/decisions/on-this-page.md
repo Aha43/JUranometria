@@ -40,16 +40,26 @@ measured in charge of the answer. **An object of unknown size is a
 point** — and that is not a corner case: **9.7% of the bundled pack
 records no size at all**.
 
-**The ellipse, not an envelope.** Two earlier drafts of this rule
-were bounds rather than the thing itself — first a square of the
-half-major, then a circle of it. A circle contains the ellipse
-whichever way it lies, so it never misses; but it is not what this
-decision says, and it answers *yes* for a thin object lying along
-the page edge whose known shape never comes near it.
+**The ellipse, and on the sphere.** This rule took three drafts to
+say what it means, and each was wrong in a way worth recording.
 
-So the recorded ellipse is tested as the ellipse it is, oriented as
-the source recorded it, through the same `Shape.intersects` the
-renderer's own `drawnMarks` uses to decide what is on the paper.
+A **square** of the half-major reaches further at its corners than
+the object ever does. A **circle** of it contains the ellipse
+whichever way it lies, so it never misses — but it answers *yes* for
+a thin object lying along the page edge whose known shape never
+comes near it. A bound is a fine thing to call a bound and a poor
+thing to call an extent.
+
+The third was subtler: a **flat** ellipse, arcminutes turned into
+pixels once at the page centre's scale. **A gnomonic page has no
+single scale** — it stretches away from its centre, and the Large
+Magellanic Cloud is nearly eleven degrees across. An ellipse sized
+at the middle is the wrong shape by the time it reaches an edge,
+which is exactly where this question gets asked.
+
+So the boundary is walked **on the sphere**, at the recorded
+semi-axes and position angle east of north, and each point is
+projected through the atlas's own projection and viewport mapping.
 
 Where the source is silent the fallback is explicit, because each
 silence is a different kind of ignorance:
@@ -57,17 +67,26 @@ silence is a different kind of ignorance:
 | the source recorded | what is tested | rows in the pack |
 |---|---|---:|
 | nothing | a **point** — the atlas knows of no extent | 1,300 |
-| a major axis only, or no position angle | the **circle** of the half-major, since every ellipse the catalogue permits fits inside it | 1,296 |
+| a major axis only, or no position angle | the **circle** of the semi-major on the sphere, since every ellipse the catalogue permits lies inside it | 1,296 |
 | major, minor and orientation | the **ellipse** itself | 10,775 |
 
 The conservative answer is given exactly where the catalogue leaves
 no better one, and nowhere else.
 
-`OnThisPageGeometryTest` checks the rule against an oracle that
-knows no Java2D — sampling the ellipse's own boundary and testing
-whether it holds a corner of the paper — over 5,400 combinations of
-position, size, axis ratio and orientation straddling the page edge,
-with the thin-ellipse case named so it cannot come back.
+**The oracle works the other way round.** One that walked the same
+boundary and projected it would only prove the code runs twice, so
+`OnThisPageSphericalTest` samples the **paper**, turns each pixel
+back into a sky position through the atlas's own inverse — what
+grab-to-pan uses — and asks whether that position lies inside the
+object's angular ellipse, by true separation and bearing. Forward
+and inverse are independent enough to disagree if the geometry is
+wrong.
+
+It is held to the cases where a flat ellipse would have been worst:
+a 36° field, a pole, the RA seam, and **the Magellanic Cloud placed
+off-centre on a wide page**. `OnThisPageGeometryTest` keeps the
+planar checks beneath it, including the thin-ellipse case, so the
+reason the envelope was wrong cannot quietly stop being true.
 
 The paper is the rectangle the renderer clips to — `1, 1, width-2,
 height-2` — which is the rectangle `drawnMarks` already tests
@@ -375,6 +394,10 @@ behind.
 - **The renderer's substituted dimensions as "extent".** Rejected:
   they exist so the renderer always has something to draw and are
   not catalogue facts. An unknown size is a point.
+- **A flat ellipse scaled at the page centre.** Rejected: a
+  gnomonic page has no single scale, and the objects this matters
+  for — the Magellanic Clouds — are degrees across. The boundary is
+  walked on the sphere and projected.
 - **A bounding square, then a bounding circle, as the page rule.**
   Both reject nothing the ellipse would have accepted, and both
   accept objects the ellipse rejects — a thin galaxy lying along the

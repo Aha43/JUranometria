@@ -190,14 +190,109 @@ public final class OnThisPageStudyMain {
         if (!recorded.hasSize()) {
             return false;
         }
-        double majorPx = arcminToPx(recorded.majorAxisArcmin(), mapping);
+        double semiMajorDeg = recorded.majorAxisArcmin() / 120.0;
         if (recorded.minorAxisArcmin() == null
                 || recorded.positionAngleDegrees() == null) {
-            return circleReaches(centre, majorPx / 2.0);
+            // Orientation or width unrecorded: the catalogue permits
+            // a family of ellipses and every one of them lies inside
+            // the circle of the semi-major, so the circle is asked -
+            // on the sphere, at every bearing, not as a radius in
+            // pixels.
+            return sphericalReaches(projection, mapping, dso.position(),
+                    semiMajorDeg, semiMajorDeg, 0.0);
         }
-        double minorPx = arcminToPx(recorded.minorAxisArcmin(), mapping);
-        return recordedEllipse(centre, majorPx, minorPx,
-                recorded.positionAngleDegrees()).intersects(PAPER);
+        return sphericalReaches(projection, mapping, dso.position(),
+                semiMajorDeg, recorded.minorAxisArcmin() / 120.0,
+                recorded.positionAngleDegrees());
+    }
+
+    /**
+     * Whether an object's <strong>angular</strong> ellipse reaches
+     * the paper: built on the sphere and projected, never scaled in
+     * the plane (gate review).
+     *
+     * <p>The earlier rule turned arcminutes into pixels once, at the
+     * page centre's scale, and tested a plane ellipse. A gnomonic
+     * page does not have one scale: it stretches away from the
+     * centre, and the Large Magellanic Cloud is nearly eleven
+     * degrees across. A flat ellipse sized at the centre is the
+     * wrong shape by the time it reaches an edge, which is exactly
+     * where this question is asked.
+     *
+     * <p>So the boundary is walked on the sphere - at the recorded
+     * semi-axes and position angle, east of north as the catalogue
+     * records it - and each point is projected through the atlas's
+     * own projection and viewport mapping. If any of it lands on the
+     * paper, the object reaches the page.
+     */
+    /**
+     * The rule, for a test to reach: does this angular ellipse reach
+     * the page's paper?
+     */
+    static boolean reachesPaper(ChartScene scene, SkyPosition centre,
+                                double semiMajorDeg, double semiMinorDeg,
+                                double positionAngleDeg) {
+        return sphericalReaches(
+                new GnomonicProjection(scene.viewport().centre()),
+                new ViewportMapping(scene.viewport()), centre,
+                semiMajorDeg, semiMinorDeg, positionAngleDeg);
+    }
+
+    private static boolean sphericalReaches(GnomonicProjection projection,
+                                            ViewportMapping mapping,
+                                            SkyPosition centre,
+                                            double semiMajorDeg,
+                                            double semiMinorDeg,
+                                            double positionAngleDeg) {
+        for (int i = 0; i < BOUNDARY_SAMPLES; i++) {
+            double t = 2 * Math.PI * i / BOUNDARY_SAMPLES;
+            // Offsets in the tangent frame: along the major axis,
+            // which points at the position angle, and across it.
+            double along = semiMajorDeg * Math.cos(t);
+            double across = semiMinorDeg * Math.sin(t);
+            double distance = Math.hypot(along, across);
+            double bearing = positionAngleDeg
+                    + Math.toDegrees(Math.atan2(across, along));
+            PixelPoint pixel = projection
+                    .project(offsetOf(centre, distance, bearing))
+                    .map(mapping::toPixel).orElse(null);
+            if (pixel != null && insidePaper(pixel)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** How finely the angular boundary is walked. */
+    private static final int BOUNDARY_SAMPLES = 720;
+
+    /**
+     * The point a given angular distance from a centre, at a given
+     * bearing east of north. Spherical, so it stays true for an
+     * object degrees across and near a pole.
+     */
+    static SkyPosition offsetOf(SkyPosition centre, double distanceDeg,
+                                double bearingDeg) {
+        double dec = Math.toRadians(centre.decDegrees());
+        double ra = Math.toRadians(centre.raDegrees());
+        double d = Math.toRadians(distanceDeg);
+        double theta = Math.toRadians(bearingDeg);
+        double sinDec = Math.sin(dec) * Math.cos(d)
+                + Math.cos(dec) * Math.sin(d) * Math.cos(theta);
+        double newDec = Math.asin(Math.max(-1.0, Math.min(1.0, sinDec)));
+        double newRa = ra + Math.atan2(
+                Math.sin(theta) * Math.sin(d) * Math.cos(dec),
+                Math.cos(d) - Math.sin(dec) * Math.sin(newDec));
+        // Normalised carefully: a tiny negative plus 360 lands on
+        // exactly 360.0, which is not a right ascension.
+        double degrees = Math.toDegrees(newRa) % 360.0;
+        if (degrees < 0) {
+            degrees += 360.0;
+        }
+        if (degrees >= 360.0) {
+            degrees = 0.0;
+        }
+        return new SkyPosition(degrees, Math.toDegrees(newDec));
     }
 
     /** The recorded ellipse in page pixels, oriented as the chart draws. */
@@ -372,22 +467,31 @@ public final class OnThisPageStudyMain {
                         + " ten, so the rule decides real rows rather"
                         + " than a corner case.%n%n",
                 100.0 * unsized() / packSize());
-        System.out.println("### The ellipse, not an envelope");
+        System.out.println("### The ellipse, on the sphere");
         System.out.println();
-        System.out.println("An earlier draft asked whether a circle"
-                + " of the recorded half-major reached the paper."
-                + " That circle contains the ellipse whichever way it"
-                + " lies, so it never misses - but it is not what"
-                + " this decision says, and it says yes for thin"
-                + " objects whose known ellipse never comes near the"
-                + " page.");
+        System.out.println("Two earlier drafts were bounds rather"
+                + " than the thing: a square of the half-major, then"
+                + " a circle of it. A circle contains the ellipse"
+                + " whichever way it lies, so it never misses - and"
+                + " it says yes for a thin object lying along the"
+                + " page edge whose known shape never comes near"
+                + " it.");
         System.out.println();
-        System.out.println("So the recorded ellipse is tested as the"
-                + " ellipse it is, oriented as the source recorded"
-                + " it, through the same `Shape.intersects` the"
-                + " renderer's own `drawnMarks` uses to decide what"
-                + " is on the paper. Where the source is silent the"
-                + " fallback is explicit rather than invented:");
+        System.out.println("A third turned arcminutes into pixels"
+                + " once, at the page centre's scale, and tested a"
+                + " flat ellipse. **A gnomonic page has no single"
+                + " scale**: it stretches away from the centre, and"
+                + " the Large Magellanic Cloud is nearly eleven"
+                + " degrees across. An ellipse sized at the middle is"
+                + " the wrong shape by the time it reaches an edge -"
+                + " which is exactly where this question is asked.");
+        System.out.println();
+        System.out.println("So the boundary is walked **on the"
+                + " sphere**, at the recorded semi-axes and position"
+                + " angle east of north, and each point is projected"
+                + " through the atlas's own projection and viewport"
+                + " mapping. Where the source is silent the fallback"
+                + " is explicit rather than invented:");
         System.out.println();
         System.out.println("| what the source recorded | what is"
                 + " tested | rows in the pack |");
@@ -412,15 +516,18 @@ public final class OnThisPageStudyMain {
                         + " is given exactly where the catalogue"
                         + " leaves no better one.%n%n",
                 tally[1], tally[2]);
-        System.out.printf(Locale.ROOT,
-                "Across the study's pages the exact test removes"
-                        + " **%d** object%s the envelope would have"
-                        + " reported: a thin ellipse whose circle"
-                        + " touches the paper and whose recorded"
-                        + " shape does not. Few, and the point is"
-                        + " that the rule says what it does rather"
-                        + " than how many it moves.%n%n",
-                envelopeExtras(), envelopeExtras() == 1 ? "" : "s");
+        System.out.println("`OnThisPageSphericalTest` checks the"
+                + " rule from the opposite direction: it samples the"
+                + " **paper**, turns each pixel back into a sky"
+                + " position through the atlas's own inverse - what"
+                + " grab-to-pan uses - and asks whether that"
+                + " position lies inside the object's angular"
+                + " ellipse. Forward and inverse are independent"
+                + " enough to disagree if the geometry is wrong, and"
+                + " the Magellanic Cloud placed off-centre on a"
+                + " 36-degree page is one of the cases they are held"
+                + " to.");
+        System.out.println();
         System.out.println();
     }
 
@@ -439,41 +546,6 @@ public final class OnThisPageStudyMain {
             }
         }
         return tally;
-    }
-
-    /** What the envelope would have added over the exact ellipse. */
-    private static int envelopeExtras() {
-        int extras = 0;
-        for (Page page : PAGES) {
-            for (double field : FIELDS) {
-                ChartScene scene = pageOf(page, field);
-                GnomonicProjection projection =
-                        new GnomonicProjection(scene.viewport().centre());
-                ViewportMapping mapping =
-                        new ViewportMapping(scene.viewport());
-                for (DeepSkyObject dso : scene.deepSkyObjects()) {
-                    DeepSkyObject.Recorded recorded = dso.recorded();
-                    if (!recorded.hasSize()
-                            || recorded.minorAxisArcmin() == null
-                            || recorded.positionAngleDegrees() == null) {
-                        continue;
-                    }
-                    PixelPoint centre = projection.project(dso.position())
-                            .map(mapping::toPixel).orElse(null);
-                    if (centre == null || insidePaper(centre)) {
-                        continue;
-                    }
-                    double majorPx = arcminToPx(
-                            recorded.majorAxisArcmin(), mapping);
-                    boolean envelope = circleReaches(centre, majorPx / 2.0);
-                    boolean exact = reachesPaper(projection, mapping, dso);
-                    if (envelope && !exact) {
-                        extras++;
-                    }
-                }
-            }
-        }
-        return extras;
     }
 
     private static int unsized() {
