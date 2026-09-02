@@ -78,7 +78,7 @@ So the boundary is walked **on the sphere**, at the recorded semi-axes and posit
 
 The envelope therefore decides **1,296 rows** and the exact ellipse decides **10,775**, which is the honest split: the conservative answer is given exactly where the catalogue leaves no better one.
 
-Every boundary in this report was drawn to within a twentieth of a pixel of the true curve. The subdivision ran out of depth before reaching that **0 times** across the whole pack - so the bound holds for every row above, rather than holding quietly until it does not.
+Every boundary above was drawn to within a twentieth of a pixel of the true curve, and the geometry **refuses** rather than approximates: an object that runs off the projection, or a boundary that cannot be followed to that distance, stops the study where it stands. This report therefore exists only because neither happened for any of the **13,371 objects** in the pack, on any page measured here. The largest object it records is **5.38°** from centre to rim, so nothing bundled with the atlas can come near the horizon in the first place.
 
 `OnThisPageSphericalTest` checks the rule from the opposite direction: it samples the **paper**, turns each pixel back into a sky position through the atlas's own inverse - what grab-to-pan uses - and asks whether that position lies inside the object's angular ellipse. Forward and inverse are independent enough to disagree if the geometry is wrong, and the Magellanic Cloud placed off-centre on a 36-degree page is one of the cases they are held to.
 

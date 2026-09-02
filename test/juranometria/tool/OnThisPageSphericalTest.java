@@ -11,6 +11,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.render.ChartHitTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -91,7 +92,6 @@ class OnThisPageSphericalTest {
         double worst = 0;
         int shapes = 0;
         String worstCase = "none";
-        OnThisPageStudyMain.forgetTheBoundLapses();
         for (ChartScene scene : List.of(
                 page(80.894, -69.756, 36.0),
                 page(80.894, -69.756, 1.0),
@@ -137,12 +137,6 @@ class OnThisPageSphericalTest {
         // be subdivided, so a measurement of zero would mean the
         // measurement is not looking.
         assertTrue(worst > 0, "the measurement finds a real distance");
-        // The bound is claimed here, so it must not have lapsed
-        // here: reaching the depth limit emits a chord no longer
-        // promised to be flat (gate review).
-        assertEquals(0L, OnThisPageStudyMain.timesTheBoundLapsed(),
-                "the subdivision never ran out of depth over these "
-                        + shapes + " measurements");
         System.out.printf("outline strays at most %.4f px over %d"
                 + " measurements (%s)%n", worst, shapes, worstCase);
     }
@@ -208,66 +202,52 @@ class OnThisPageSphericalTest {
     }
 
     @Test
-    void runningOutOfDepthIsCountedRatherThanPassedOverInSilence() {
-        // The counter has to be able to move, or asserting it is
-        // zero says nothing. Given a depth of one, a thin ellipse on
-        // a wide page cannot be followed to a twentieth of a pixel,
-        // and the lapse is recorded rather than absorbed.
+    void runningOutOfDepthIsRefusedRatherThanApproximated() {
+        // Counting the lapse and drawing the chord anyway was still
+        // an unbounded chord wearing a tally (gate review). The
+        // bound either holds or the geometry does not answer.
         ChartScene scene = page(80.894, -69.756, 36.0);
         SkyPosition centre = scene.viewport().centre();
 
-        OnThisPageStudyMain.forgetTheBoundLapses();
-        OnThisPageStudyMain.outlineOn(scene, centre, 12.0, 1.0, 40.0, 1);
-        long lapsed = OnThisPageStudyMain.timesTheBoundLapsed();
-        assertTrue(lapsed > 0,
-                "a depth of one cannot follow this curve, and saying"
-                        + " so is the whole point: " + lapsed);
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> OnThisPageStudyMain.outlineOn(scene, centre,
+                        12.0, 1.0, 40.0, 1),
+                "a depth of one cannot follow this curve");
+        assertTrue(refused.getMessage().contains("could not be followed"),
+                refused.getMessage());
 
-        OnThisPageStudyMain.forgetTheBoundLapses();
+        // And with the real depth the same curve is followed all the
+        // way, so the refusal is about the depth and not the curve.
         OnThisPageStudyMain.outlineOn(scene, centre, 12.0, 1.0, 40.0);
-        assertEquals(0L, OnThisPageStudyMain.timesTheBoundLapsed(),
-                "and with the real depth the same curve is followed"
-                        + " all the way");
     }
 
     @Test
-    void aCurveLeavingTheProjectionIsNotRejoinedByAChord() {
-        // An object big enough to run off the projection comes back
-        // on the other side, and the two ends were being joined by a
-        // straight line standing for sky the projection had refused
-        // (gate review). That line is not the object's edge. The
-        // path must break instead - so it is drawn in more than one
-        // piece, and no single piece spans the gap.
-        // A long thin ellipse laid across the page: both ends of
-        // its major axis run past the projection's horizon while its
-        // waist stays on the page, so the curve leaves and returns
-        // twice. A single refused stretch would not show this - the
-        // remaining points are still one run, and there is nothing
-        // to bridge.
-        ChartScene scene = page(80.894, -69.756, 1.0);
-        SkyPosition centre = scene.viewport().centre();
-        java.awt.geom.Path2D.Double outline =
-                OnThisPageStudyMain.outlineOn(scene, centre, 100.0, 3.0, 0.0);
+    void nothingTheAtlasBundlesCanReachTheProjectionsHorizon() {
+        // The refusal is only defensible if the bundled data cannot
+        // provoke it. So this asks the pack itself rather than the
+        // prose: the largest object it records, and then every
+        // object it holds, on the pages the study reports.
+        double largest = OnThisPageStudyMain.largestRecordedSemiMajorDegrees();
+        assertTrue(largest < 10.0, String.format(
+                "the largest object the pack records is %.3f° from"
+                        + " centre to rim; the refusal assumes tens of"
+                        + " degrees are needed to reach the horizon",
+                largest));
 
-        int pieces = 0;
-        double[] coords = new double[6];
-        for (java.awt.geom.PathIterator it = outline.getPathIterator(null);
-                !it.isDone(); it.next()) {
-            if (it.currentSegment(coords)
-                    == java.awt.geom.PathIterator.SEG_MOVETO) {
-                pieces++;
+        for (double field : new double[] {1.0, 8.0, 36.0}) {
+            for (double[] where : new double[][] {
+                    {80.894, -69.756}, {10.684, 41.269}, {0.0, 89.5},
+                    {359.7, 0.0}}) {
+                ChartScene scene = page(where[0], where[1], field);
+                org.junit.jupiter.api.Assertions.assertDoesNotThrow(
+                        () -> OnThisPageStudyMain.rowsFor(scene,
+                                juranometria.render.ChartOptions.DEFAULTS),
+                        String.format("every object in the pack is"
+                                + " decided on a %.0f° page at %.3f,"
+                                + " %.3f", field, where[0], where[1]));
             }
         }
-        assertTrue(pieces > 1,
-                "the curve leaves the projection and returns, so the"
-                        + " path is drawn in pieces rather than closed"
-                        + " across the gap: " + pieces + " piece(s)");
-        // And breaking it does not cost the right answer: the
-        // inverse oracle is asked about the same shape, both ways.
-        assertEquals(oracleReaches(scene, centre, 100.0, 3.0, 0.0),
-                rule(scene, centre, 100.0, 3.0, 0.0),
-                "a curve drawn in pieces still decides the page"
-                        + " correctly");
     }
 
     // ----------------------------------------------------------------
@@ -445,32 +425,67 @@ class OnThisPageSphericalTest {
     }
 
     @Test
-    void anObjectWhoseOutlineCrossesTheHorizonIsStillOnThePage() {
-        // Larger than anything the catalogue holds, and the reason
-        // the closed path cannot be the whole answer: part of this
-        // object's boundary is more than 90° from the page centre,
-        // where a gnomonic projection has nothing to say. The
-        // outline is not a closed curve on this page, so containment
-        // has to be asked of the paper instead.
+    void anObjectRunningOffTheProjectionIsRefusedRatherThanGuessedAt() {
+        // Larger than anything the catalogue holds, and undecidable
+        // here: part of the boundary is more than 90° from the page
+        // centre, where the projection has nothing to say. A chord
+        // across the gap stands for sky that was refused; breaking
+        // the path loses containment; and probing a few points of
+        // the paper cannot decide an arbitrary clipped region (gate
+        // review). So the rule refuses, and says which object.
         ChartScene scene = page(80.894, -69.756, 1.0);
         SkyPosition centre = OnThisPageStudyMain.offsetOf(
                 scene.viewport().centre(), 50.0, 20.0);
 
-        // Both directions, because what is left of the outline is
-        // closed by a chord rather than by the true curve, and a
-        // chord can as easily claim the page as miss it.
-        for (double semiMajor : new double[] {70.0, 55.0, 45.0, 30.0}) {
+        // Each of these is both near enough to matter - the early
+        // answer below cannot dismiss it - and large enough to run
+        // past the horizon. A 45° object at this distance is neither:
+        // it cannot touch the paper at all, and is answered rather
+        // than refused.
+        for (double semiMajor : new double[] {70.0, 60.0, 55.0}) {
             for (double ratio : new double[] {1.0, 0.4}) {
-                assertEquals(
-                        oracleReaches(scene, centre, semiMajor,
+                IllegalStateException refused = assertThrows(
+                        IllegalStateException.class,
+                        () -> rule(scene, centre, semiMajor,
                                 semiMajor * ratio, 30.0),
-                        rule(scene, centre, semiMajor,
-                                semiMajor * ratio, 30.0),
-                        String.format("a %.0f° object at %.0f° ratio"
-                                + " %.1f, its outline running off the"
-                                + " projection", semiMajor, 50.0, ratio));
+                        "a " + semiMajor + "° object running off the"
+                                + " projection must be refused");
+                assertTrue(refused.getMessage()
+                                .contains("runs off the projection"),
+                        refused.getMessage());
             }
         }
+    }
+
+    @Test
+    void anObjectLaidAcrossThePageWithBothEndsPastTheHorizonIsRefused() {
+        // The shape that showed a single refused stretch is not the
+        // whole story: this one leaves the projection and returns,
+        // its waist staying on the page. Whatever is drawn for it,
+        // no part of it is the object's edge.
+        ChartScene scene = page(80.894, -69.756, 1.0);
+        SkyPosition centre = scene.viewport().centre();
+
+        assertThrows(IllegalStateException.class,
+                () -> rule(scene, centre, 100.0, 3.0, 0.0),
+                "both ends of its major axis run past the horizon");
+    }
+
+    @Test
+    void anObjectOutByTheHorizonIsAnsweredWithoutBeingWalked() {
+        // And the refusal must stay rare, or it is not a failure
+        // contract but a failure. Nothing further from the page
+        // centre than the paper's reach plus the object's own size
+        // can touch the paper, so it is answered outright - which is
+        // where every object out near the projection's edge is
+        // decided, rather than in the walk.
+        ChartScene scene = page(80.894, -69.756, 8.0);
+        SkyPosition farAway = OnThisPageStudyMain.offsetOf(
+                scene.viewport().centre(), 88.0, 10.0);
+
+        assertTrue(!rule(scene, farAway, 5.0, 3.0, 45.0),
+                "an object 88° away is not on this page, and saying"
+                        + " so needs no walk");
     }
 
     @Test

@@ -247,46 +247,50 @@ public final class OnThisPageStudyMain {
                                             double semiMajorDeg,
                                             double semiMinorDeg,
                                             double positionAngleDeg) {
+        // Nowhere near this page, and no walk needed to say so:
+        // nothing further from the page centre than the paper's own
+        // reach plus the object's own size can touch the paper.
+        // This is what keeps the refusal below rare - an object out
+        // by the projection's horizon is answered here rather than
+        // walked.
+        if (centre.separationDegrees(scene.viewport().centre())
+                > pageRadiusDegrees(scene) + semiMajorDeg) {
+            return false;
+        }
         java.awt.geom.Path2D.Double outline = outlineOf(projection, mapping,
                 centre, semiMajorDeg, semiMinorDeg, positionAngleDeg);
         if (outline.getCurrentPoint() == null) {
             return false;          // nothing of it is on this sky
         }
         outline.closePath();
+        // Closed, this answers both things a bag of points cannot.
         // A crossing anywhere along an edge counts, not only at a
-        // sample. And where the whole curve is on the page, a
-        // rectangle lying inside the path intersects it - which is
-        // the object holding the whole page.
-        if (outline.intersects(PAPER)) {
-            return true;
-        }
-        // But a curve that ran off the projection is drawn in
-        // pieces, and a piece cannot be asked about containment: a
-        // long thin object laid across the page has both ends past
-        // the horizon and the paper lying *between* its two
-        // remaining arcs. So containment is asked of the paper
-        // itself, turned back into sky through the atlas's inverse
-        // and tested against the angular ellipse directly.
-        //
-        // This check was written once, found unkillable by any
-        // mutation, and removed as decoration. Breaking the path at
-        // the horizon - which stopped a straight line standing in
-        // for sky the projection had refused - is what made it load
-        // bearing, and there is now a test that fails without it.
-        for (double[] point : new double[][] {
+        // sample. And a rectangle lying inside the path intersects
+        // it - which is the object holding the whole page: nothing
+        // of its outline is on the paper and its centre is off it,
+        // yet every pixel in front of the reader is inside it.
+        return outline.intersects(PAPER);
+    }
+
+    /**
+     * How far the paper reaches from the page centre, in degrees.
+     */
+    private static double pageRadiusDegrees(ChartScene scene) {
+        SkyPosition centre = scene.viewport().centre();
+        double furthest = 0;
+        for (double[] corner : new double[][] {
                 {PAPER.getMinX(), PAPER.getMinY()},
                 {PAPER.getMaxX(), PAPER.getMinY()},
                 {PAPER.getMinX(), PAPER.getMaxY()},
-                {PAPER.getMaxX(), PAPER.getMaxY()},
-                {PAPER.getCenterX(), PAPER.getCenterY()}}) {
+                {PAPER.getMaxX(), PAPER.getMaxY()}}) {
             SkyPosition sky = juranometria.render.ChartHitTest.skyAt(
-                    scene, point[0], point[1]);
-            if (sky != null && insideAngularEllipse(centre, sky,
-                    semiMajorDeg, semiMinorDeg, positionAngleDeg)) {
-                return true;
+                    scene, corner[0], corner[1]);
+            if (sky != null) {
+                furthest = Math.max(furthest,
+                        centre.separationDegrees(sky));
             }
         }
-        return false;
+        return furthest;
     }
 
     /**
@@ -331,19 +335,28 @@ public final class OnThisPageStudyMain {
                     mapping, centre, semiMajorDeg, semiMinorDeg,
                     positionAngleDeg, t);
             if (here == null) {
-                // Past the projection's horizon; the curve leaves
-                // this page here.
-                previous = null;
-                continue;
+                // Part of this object lies past the projection's
+                // horizon, and this rule does not decide that case.
+                //
+                // It drew a chord across the gap once, which stood
+                // for sky the projection had refused. Breaking the
+                // path instead cost the containment a closed curve
+                // gives for free, and probing a handful of points of
+                // the paper cannot decide an arbitrary clipped
+                // region either (gate review). Nothing bundled with
+                // the atlas can reach here - the largest object it
+                // holds is a few degrees across - so the honest
+                // answer is to refuse, loudly, rather than to
+                // approximate a case that does not arise.
+                throw new IllegalStateException(String.format(
+                        Locale.ROOT,
+                        "this rule does not decide an object that runs"
+                                + " off the projection: %.3f x %.3f deg"
+                                + " at %.3f, %.3f",
+                        semiMajorDeg, semiMinorDeg, centre.raDegrees(),
+                        centre.decDegrees()));
             }
             if (previous == null) {
-                // A new subpath, never a chord across the gap. The
-                // first version drew one - the curve went off the
-                // projection and came back, and the two ends were
-                // quietly joined by a straight line standing for a
-                // stretch of sky the projection had refused (gate
-                // review). That line is not the object's edge and
-                // must not be tested as though it were.
                 outline.moveTo(here.x, here.y);
             } else {
                 subdivide(projection, mapping, centre, semiMajorDeg,
@@ -373,16 +386,16 @@ public final class OnThisPageStudyMain {
             return;
         }
         if (depth >= maxDepth) {
-            // The guarantee has run out. Emitting the chord anyway
-            // is the right thing to do - there is nothing better to
-            // draw - but doing it quietly is not: past here the
-            // twentieth of a pixel is no longer promised, and a
-            // promise that can lapse without saying so is not one
-            // (gate review). Counted, printed by the study, and
-            // asserted to be zero wherever the bound is claimed.
-            timesTheBoundLapsed++;
-            outline.lineTo(p1.x, p1.y);
-            return;
+            // The guarantee has run out. Counting the lapse and
+            // drawing the chord anyway was still an unbounded chord
+            // wearing a tally (gate review): the bound either holds
+            // or the geometry does not answer. It does not answer.
+            throw new IllegalStateException(String.format(Locale.ROOT,
+                    "the boundary could not be followed to within"
+                            + " %.2f px at depth %d: %.3f x %.3f deg"
+                            + " at %.3f, %.3f", FLATNESS_PX, maxDepth,
+                    semiMajorDeg, semiMinorDeg, centre.raDegrees(),
+                    centre.decDegrees()));
         }
         subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
                 positionAngleDeg, t0, p0, tm, pm, depth + 1, maxDepth,
@@ -390,17 +403,6 @@ public final class OnThisPageStudyMain {
         subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
                 positionAngleDeg, tm, pm, t1, p1, depth + 1, maxDepth,
                 outline);
-    }
-
-    /** How often the subdivision ran out of depth before flatness. */
-    private static long timesTheBoundLapsed;
-
-    static long timesTheBoundLapsed() {
-        return timesTheBoundLapsed;
-    }
-
-    static void forgetTheBoundLapses() {
-        timesTheBoundLapsed = 0;
     }
 
     /**
@@ -743,14 +745,21 @@ public final class OnThisPageStudyMain {
                         + " leaves no better one.%n%n",
                 tally[1], tally[2]);
         System.out.printf(Locale.ROOT,
-                "Every boundary in this report was drawn to within a"
-                        + " twentieth of a pixel of the true curve."
-                        + " The subdivision ran out of depth before"
-                        + " reaching that **%,d times** across the"
-                        + " whole pack - so the bound holds for every"
-                        + " row above, rather than holding quietly"
-                        + " until it does not.%n%n",
-                timesTheBoundLapsed());
+                "Every boundary above was drawn to within a twentieth"
+                        + " of a pixel of the true curve, and the"
+                        + " geometry **refuses** rather than"
+                        + " approximates: an object that runs off the"
+                        + " projection, or a boundary that cannot be"
+                        + " followed to that distance, stops the study"
+                        + " where it stands. This report therefore"
+                        + " exists only because neither happened for"
+                        + " any of the **%,d objects** in the pack, on"
+                        + " any page measured here. The largest object"
+                        + " it records is **%.2f°** from centre to"
+                        + " rim, so nothing bundled with the atlas can"
+                        + " come near the horizon in the first"
+                        + " place.%n%n",
+                packSize(), largestRecordedSemiMajorDegrees());
         System.out.println("`OnThisPageSphericalTest` checks the"
                 + " rule from the opposite direction: it samples the"
                 + " **paper**, turns each pixel back into a sky"
@@ -795,6 +804,23 @@ public final class OnThisPageStudyMain {
 
     private static int packSize() {
         return DeepSkyVocabularyStudyMain.wholePack().size();
+    }
+
+    /**
+     * The half-length of the longest object the pack records, in
+     * degrees. The refusal above is only defensible because this is
+     * small: an object has to be tens of degrees across before any
+     * page can put part of it past the projection's horizon.
+     */
+    static double largestRecordedSemiMajorDegrees() {
+        double largest = 0;
+        for (DeepSkyObject dso : DeepSkyVocabularyStudyMain.wholePack()) {
+            if (dso.recorded().hasSize()) {
+                largest = Math.max(largest,
+                        dso.recorded().majorAxisArcmin() / 120.0);
+            }
+        }
+        return largest;
     }
 
     private static void visibilityBreakdown() {
