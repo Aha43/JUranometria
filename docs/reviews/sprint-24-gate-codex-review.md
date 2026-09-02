@@ -260,3 +260,40 @@ vertex is inside but a segment crosses, and where the object contains the
 paper with its centre outside. Then recompute the gate measurements.
 
 Do not merge the gate or begin #215 yet.
+
+## Follow-up — `b8424ef`
+
+**One narrow P1 remains.** The spherical construction, bidirectional oracle
+comparison, explicit incomplete-data fallbacks, and containment logic are now
+accepted. The fixed-resolution polyline still lacks the error bound requested
+in the prior review.
+
+### P1 — Closing sampled vertices does not bound the projected curve
+
+The `Path2D` includes the straight chord between successive samples, but the
+true spherical ellipse projects to a curved segment between them. At a fixed
+720 samples, the implementation has not established a maximum deviation in
+page pixels across supported page geometry and the pack's 5.39° maximum
+semi-extent. A sufficiently narrow corner/edge intersection can still lie
+between the curve and its chord.
+
+The revised oracle is stronger but not continuous or exhaustive as described:
+it tests the sky at pixel centres. An intersection smaller than one pixel, or
+one touching an edge without containing a pixel centre, can be missed. Because
+the contract uses continuous `Shape.intersects` semantics, pixel-centre
+sampling is not an independent proof of that contract.
+
+Replace the fixed walk with adaptive subdivision under a stated projected
+pixel-error tolerance, or measure and prove a sufficient bound for 720 samples
+over the supported fields, declinations, axes, orientations, and object-size
+limit. Add analytic/high-resolution adversarial cases where no vertex and no
+pixel centre lies inside the paper but the true boundary crosses an edge or
+corner, and require the rule to find them. The horizon cases may remain a
+documented out-of-pack safeguard, but catalogue-range correctness should not
+depend on eight synthetic examples.
+
+The focus-refusal change is acceptable because the required display check
+enforces `aborted=0`; locally it now reports an unavailable desktop as unmet
+rather than misdiagnosing an application failure.
+
+Do not merge the gate or begin #215 yet.
