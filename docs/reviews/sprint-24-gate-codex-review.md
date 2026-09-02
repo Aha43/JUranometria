@@ -184,3 +184,41 @@ it. That is a different product decision and should not be hidden under the
 word “extent.”
 
 Do not merge the gate or begin #215 yet.
+
+## Follow-up — `57e830a`
+
+**One P1 remains.** The envelope defect is fixed in planar page geometry,
+and the explicit point/circle fallbacks are sound. The new test also proves
+the Java2D ellipse/rectangle intersection well. It does not yet prove the
+celestial geometry the review requested.
+
+### P1 — The oracle repeats the same flat, centre-scale approximation
+
+`reachesPaper` converts both angular axes with one `pixelsPerPlaneUnit` value,
+builds an affine ellipse around the projected centre, and rotates it in page
+pixels. `OnThisPageGeometryTest` then samples that same affine ellipse in page
+pixels and compares it with Java2D's intersection result. The oracle is
+independent of Java2D's shape/intersection implementation, but not independent
+of the geometry under review: neither side constructs points on the recorded
+angular ellipse on the celestial sphere and projects them through
+`GnomonicProjection`.
+
+Consequently, “through the production projection” and “the recorded ellipse”
+remain stronger claims than the evidence. Gnomonic scale and orientation vary
+across an extended object; an angular ellipse generally does not project to
+the centre-scaled affine ellipse used here. This is least important for tiny
+objects and most important for the several-degree Magellanic Clouds and for
+objects meeting a page edge—the exact cases membership must decide.
+
+Keep the Java2D sweep as a useful unit test of the final planar intersection,
+but add the requested independent spherical oracle: construct/sufficiently
+sample the recorded angular ellipse about the catalogue position (with
+position angle east of north), project those sky points through the production
+projection and mapping, and cover boundary crossings plus paper-contained-by-
+object cases. Compare the proposed fast rule against it across ordinary,
+RA-wrap, polar, rotated-thin, and large-object cases. If the affine page
+ellipse is retained as an approximation, measure its disagreements and state a
+tolerance/conservative rule rather than calling it exact. Then recompute the
+study count from the accepted rule.
+
+Do not merge the gate or begin #215 yet.
