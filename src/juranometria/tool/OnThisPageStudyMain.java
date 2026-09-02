@@ -91,9 +91,11 @@ public final class OnThisPageStudyMain {
 
         definition();
         sizes();
+        extentRule();
         visibilityBreakdown();
         theStarQuestion();
         ordering();
+        keyboard();
         cost();
     }
 
@@ -134,6 +136,43 @@ public final class OnThisPageStudyMain {
                 .orElse(null);
     }
 
+    /**
+     * Whether an object's <strong>recorded extent</strong> reaches
+     * the paper, not merely its centre (gate review).
+     *
+     * <p>A centre-only rule omits an object a reader can plainly
+     * see: M 31 is 178 arcminutes long, so a page can be filled by
+     * its disc while its centre sits outside the paper. The table
+     * would then say the page held nothing while the page showed a
+     * galaxy.
+     *
+     * <p>The extent used is the <em>catalogue's</em> size, not the
+     * drawn symbol's. That keeps the inventory a fact about the sky:
+     * it does not move when a family is switched off, when the
+     * detail policy refuses a symbol, or when the practical-minimum
+     * clamp enlarges a tiny one for legibility.
+     */
+    private static boolean reachesPaper(GnomonicProjection projection,
+                                        ViewportMapping mapping,
+                                        DeepSkyObject dso) {
+        PixelPoint centre = projection.project(dso.position())
+                .map(mapping::toPixel).orElse(null);
+        if (centre == null) {
+            // Behind the projection's horizon: it has no place on
+            // this page at all.
+            return false;
+        }
+        if (insidePaper(centre)) {
+            return true;
+        }
+        double halfMajorPx = dso.majorAxisArcmin() / 2.0 / 60.0
+                * mapping.pixelsPerPlaneUnit() * Math.PI / 180.0;
+        return centre.x() >= 1 - halfMajorPx
+                && centre.y() >= 1 - halfMajorPx
+                && centre.x() <= WIDTH - 1 + halfMajorPx
+                && centre.y() <= HEIGHT - 1 + halfMajorPx;
+    }
+
     private static boolean insidePaper(PixelPoint pixel) {
         return pixel.x() >= 1 && pixel.y() >= 1
                 && pixel.x() <= WIDTH - 1 && pixel.y() <= HEIGHT - 1;
@@ -148,7 +187,7 @@ public final class OnThisPageStudyMain {
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         List<DeepSkyObject> deepSky = new ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (onPage(projection, mapping, dso.position()) != null) {
+            if (reachesPaper(projection, mapping, dso)) {
                 deepSky.add(dso);
             }
         }
@@ -203,6 +242,73 @@ public final class OnThisPageStudyMain {
     }
 
     // ------------------------------------------------------------------
+
+    /**
+     * What the centre-only rule would have missed. The gate first
+     * proposed "the recorded position projects onto the paper", and
+     * review pointed out that a large symbol can cross the page edge
+     * with its centre outside it - so the table would report nothing
+     * while the page showed a galaxy.
+     */
+    private static void extentRule() {
+        System.out.println("## Centres are not enough");
+        System.out.println();
+        System.out.println("An object is on the page when its"
+                + " **recorded extent** reaches the paper, not merely"
+                + " its centre. M 31 is 178 arcminutes long: a page"
+                + " can be filled by its disc while its centre sits"
+                + " outside the paper, and a centre-only rule would"
+                + " report an empty page in front of a visible"
+                + " galaxy.");
+        System.out.println();
+        System.out.println("| page | field | centres only | with"
+                + " recorded extent | missed |");
+        System.out.println("|---|---:|---:|---:|---:|");
+        int missedTotal = 0;
+        for (Page page : PAGES) {
+            for (double field : FIELDS) {
+                ChartScene scene = pageOf(page, field);
+                GnomonicProjection projection =
+                        new GnomonicProjection(scene.viewport().centre());
+                ViewportMapping mapping =
+                        new ViewportMapping(scene.viewport());
+                int centres = 0;
+                int extents = 0;
+                for (DeepSkyObject dso : scene.deepSkyObjects()) {
+                    if (onPage(projection, mapping, dso.position()) != null) {
+                        centres++;
+                    }
+                    if (reachesPaper(projection, mapping, dso)) {
+                        extents++;
+                    }
+                }
+                if (extents == centres) {
+                    continue;
+                }
+                missedTotal += extents - centres;
+                System.out.printf(Locale.ROOT,
+                        "| %s | %.0f° | %d | %d | **%d** |%n",
+                        page.name(), field, centres, extents,
+                        extents - centres);
+            }
+        }
+        System.out.println();
+        System.out.printf(Locale.ROOT,
+                "**%d objects** across these pages would have been"
+                        + " left out of a table that asked only about"
+                        + " centres - among them M 32 and M 110 on a"
+                        + " 1° view of M 31, which is the closest look"
+                        + " the atlas offers at the page it opens"
+                        + " on.%n%n", missedTotal);
+        System.out.println("The extent used is the **catalogue's**"
+                + " size, never the drawn symbol's. That keeps the"
+                + " inventory a fact about the sky: it does not move"
+                + " when a family is switched off, when the detail"
+                + " policy refuses a symbol, or when the"
+                + " practical-minimum clamp enlarges a tiny one for"
+                + " legibility.");
+        System.out.println();
+    }
 
     private static void visibilityBreakdown() {
         ChartRenderer renderer =
@@ -370,6 +476,145 @@ public final class OnThisPageStudyMain {
                 || identity.flamsteed() != null);
     }
 
+    /**
+     * One row of the table: what a reader reads, built from the
+     * catalogue and from production's own visibility answer.
+     */
+    record Row(String identity, String kind, String magnitude,
+               String from, String visibility, boolean counted) {
+    }
+
+    /**
+     * The page's rows, in the decided total order.
+     *
+     * <p>The order is total <em>across kinds</em>, which the first
+     * draft left undefined (gate review): a table holding galaxies,
+     * named stars and counted lines has to say which comes first, or
+     * two runs can disagree.
+     *
+     * <ol>
+     *   <li><strong>deep-sky objects</strong>, then <strong>named
+     *       stars</strong>, then the <strong>counted lines</strong>.
+     *       A reader asking what is here is hunting objects; the
+     *       named stars are the landmarks they steer by; and a line
+     *       that counts what is not listed is a statement about the
+     *       page rather than a thing on it, so it never sorts into
+     *       the middle of its kind.</li>
+     *   <li>within a kind: a Messier number first, then recorded
+     *       brightness, then distance from the centre, then
+     *       catalogue identity - which makes it total, so the same
+     *       page always lists identically however the catalogue
+     *       arrives.</li>
+     * </ol>
+     */
+    static List<Row> rowsFor(ChartScene scene, ChartOptions options) {
+        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        RegionalDetailPolicy policy =
+                new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
+        SkyPosition centre = scene.viewport().centre();
+        Inventory inventory = inventoryOf(scene);
+
+        List<DeepSkyObject> deepSky = new ArrayList<>(inventory.deepSky());
+        deepSky.sort(defaultOrder(centre));
+        List<Row> rows = new ArrayList<>();
+        for (DeepSkyObject dso : deepSky) {
+            rows.add(new Row(nameOf(dso), kindOf(dso),
+                    magnitudeOf(dso.magnitude(), dso.recorded().band()),
+                    String.format(Locale.ROOT, "%.2f°",
+                            centre.separationDegrees(dso.position())),
+                    wordFor(stateOf(scene, dso, options, policy)), false));
+        }
+
+        List<Star> named = new ArrayList<>();
+        int anonymous = 0;
+        for (Star star : inventory.stars()) {
+            if (isNamed(star)) {
+                named.add(star);
+            } else {
+                anonymous++;
+            }
+        }
+        named.sort(Comparator
+                .comparingDouble(Star::magnitude)
+                .thenComparingDouble(star ->
+                        centre.separationDegrees(star.position()))
+                .thenComparing(Star::id));
+        for (Star star : named) {
+            rows.add(new Row(bestName(star), "star",
+                    magnitudeOf(star.magnitude(), null),
+                    String.format(Locale.ROOT, "%.2f°",
+                            centre.separationDegrees(star.position())),
+                    star.magnitude() > scene.limitingMagnitude()
+                            ? "too faint" : "drawn", false));
+        }
+        if (anonymous > 0) {
+            rows.add(new Row(String.format(Locale.ROOT,
+                    "and %,d further stars", anonymous), "star", "", "",
+                    "none named", true));
+        }
+        return rows;
+    }
+
+    private static String nameOf(DeepSkyObject dso) {
+        Integer messier = messierOf(dso);
+        return messier == null ? dso.id() : "M " + messier;
+    }
+
+    private static String kindOf(DeepSkyObject dso) {
+        juranometria.render.SymbolFamily family =
+                juranometria.render.SymbolFamily.of(dso);
+        return family == null
+                ? dso.type().name().toLowerCase(Locale.ROOT).replace('_', ' ')
+                : family.label().toLowerCase(Locale.ROOT);
+    }
+
+    private static String magnitudeOf(double magnitude,
+                                      DeepSkyObject.Recorded.Band band) {
+        if (Double.isNaN(magnitude)) {
+            return "not recorded";
+        }
+        String suffix = band == null
+                || band == DeepSkyObject.Recorded.Band.VISUAL ? " V"
+                : band == DeepSkyObject.Recorded.Band.BLUE ? " B" : "";
+        return String.format(Locale.ROOT, "%.1f%s", magnitude, suffix);
+    }
+
+    private static String bestName(Star star) {
+        juranometria.chart.StarIdentity identity = star.identity();
+        if (identity.name() != null) {
+            return identity.name();
+        }
+        if (identity.bayer() != null) {
+            return identity.bayer()
+                    + (identity.constellation() == null ? ""
+                            : " " + identity.constellation());
+        }
+        return identity.flamsteed()
+                + (identity.constellation() == null ? ""
+                        : " " + identity.constellation());
+    }
+
+    /** The short word the table shows for a state. */
+    static String wordFor(Visibility state) {
+        return switch (state) {
+            case DRAWN -> "drawn";
+            case FAMILY_HIDDEN -> "hidden";
+            case BELOW_LIMIT -> "too faint";
+            case NO_SYMBOL -> "no symbol";
+            case TOO_SMALL -> "too small here";
+        };
+    }
+
+    /** The released page, for the mock-ups to draw the real thing. */
+    static ChartScene scenePage(String name, double field) {
+        for (Page page : PAGES) {
+            if (page.name().equals(name)) {
+                return pageOf(page, field);
+            }
+        }
+        throw new IllegalArgumentException("no such study page: " + name);
+    }
+
     private static void ordering() {
         System.out.println("## The order a reader meets them");
         System.out.println();
@@ -436,6 +681,139 @@ public final class OnThisPageStudyMain {
     }
 
     // ------------------------------------------------------------------
+
+    /**
+     * Whether a reader without a pointer can work the table.
+     *
+     * <p>A picture cannot answer this (gate review): a static image
+     * of a sidebar shows what it looks like, not what a keyboard
+     * does to it. So the real table is built from the real rows and
+     * the platform's own key bindings are resolved and fired -
+     * exactly the actions Swing would run for those keystrokes -
+     * and the resulting selection is recorded.
+     */
+    private static void keyboard() {
+        javax.swing.table.DefaultTableModel model =
+                new javax.swing.table.DefaultTableModel(
+                        new Object[] {"Object", "Mag", "From",
+                                "On the chart"}, 0);
+        for (Row row : rowsFor(scenePage("m31", 8.0),
+                ChartOptions.DEFAULTS)) {
+            model.addRow(new Object[] {row.identity(), row.magnitude(),
+                    row.from(), row.visibility()});
+        }
+        javax.swing.JTable table = new javax.swing.JTable(model);
+        table.setSelectionMode(javax.swing.ListSelectionModel
+                .MULTIPLE_INTERVAL_SELECTION);
+
+        System.out.println("## Working it without a pointer");
+        System.out.println();
+        System.out.println("The platform's own bindings, resolved"
+                + " from the table's input map and fired - the same"
+                + " actions Swing runs for those keystrokes - on the"
+                + " released page's real rows. A picture of a sidebar"
+                + " cannot answer this; running it can.");
+        System.out.println();
+        System.out.println("| keystroke | Swing's action | rows"
+                + " selected | lead |");
+        System.out.println("|---|---|---|---|");
+        press(table, javax.swing.KeyStroke.getKeyStroke("DOWN"));
+        press(table, javax.swing.KeyStroke.getKeyStroke("DOWN"));
+        press(table, javax.swing.KeyStroke.getKeyStroke("shift DOWN"));
+        press(table, javax.swing.KeyStroke.getKeyStroke("shift DOWN"));
+        press(table, javax.swing.KeyStroke.getKeyStroke("ctrl A"));
+        press(table, javax.swing.KeyStroke.getKeyStroke("meta A"));
+        press(table, javax.swing.KeyStroke.getKeyStroke("HOME"));
+        press(table, javax.swing.KeyStroke.getKeyStroke("ctrl HOME"));
+        System.out.println();
+        System.out.println("**Walking and extending are free.**"
+                + " Down moves the lead one row; shift-Down builds a"
+                + " marked set out of consecutive rows. Those are the"
+                + " two gestures the surface is mostly made of, and"
+                + " the platform already has them.");
+        System.out.println();
+        System.out.println("**Select-all is there, under the"
+                + " platform's own modifier and not the other one.**"
+                + " `meta A` runs `selectAll` and takes all 13 rows;"
+                + " `ctrl A` is bound to nothing. Which modifier that"
+                + " is belongs to the look and feel, and the module"
+                + " has no business choosing it.");
+        System.out.println();
+        System.out.println("**And returning to the top is not"
+                + " bound.** `HOME` moves to the first *column*, and"
+                + " `ctrl HOME` is bound to nothing at all - so a"
+                + " reader pressing Home to get back to M 31 stays"
+                + " where they are. That is a real gap, found by"
+                + " running the bindings rather than by assuming"
+                + " them, and it is the sort of thing a picture of a"
+                + " sidebar could never have shown.");
+        System.out.println();
+        System.out.println("So the decision is narrow and stated:"
+                + " **the module adds no key bindings of its own.**"
+                + " Where the platform binds a gesture the module"
+                + " uses it and does not care which modifier the look"
+                + " and feel chose; where it binds nothing - getting"
+                + " back to the top - #216 offers an explicit"
+                + " control beside **Clear marks** rather than"
+                + " inventing a keystroke."
+                + " A module that taught the table new keys would be"
+                + " a module assistive technology has to be taught"
+                + " too.");
+        System.out.println();
+        System.out.println("What a reader needs beyond the platform's"
+                + " own is decided rather than invented: **Enter**"
+                + " takes the lead row into the Selected facts, and"
+                + " **Centre here** is an explicit action rather than"
+                + " a side effect of moving through rows. Selecting a"
+                + " row never moves the chart, so a reader can walk"
+                + " the whole page without losing their place - the"
+                + " promise point-and-identify has made since Sprint"
+                + " 19.");
+        System.out.println();
+    }
+
+    /** Fires the action the platform binds to a keystroke. */
+    private static void press(javax.swing.JTable table,
+                              javax.swing.KeyStroke stroke) {
+        // JTable installs its bindings in the ancestor map, not the
+        // focused one - looking in the wrong map reported "no
+        // binding" for every key and would have had this section
+        // claiming the opposite of its own table.
+        Object name = null;
+        for (int which : new int[] {
+                javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
+                javax.swing.JComponent.WHEN_FOCUSED,
+                javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW}) {
+            name = table.getInputMap(which).get(stroke);
+            if (name != null) {
+                break;
+            }
+        }
+        if (name == null) {
+            System.out.printf(Locale.ROOT,
+                    "| `%s` | *no binding* | — | — |%n", stroke);
+            return;
+        }
+        javax.swing.Action action = table.getActionMap().get(name);
+        action.actionPerformed(new java.awt.event.ActionEvent(
+                table, java.awt.event.ActionEvent.ACTION_PERFORMED,
+                String.valueOf(name)));
+        int[] selected = table.getSelectedRows();
+        StringBuilder rows = new StringBuilder();
+        for (int i = 0; i < selected.length && i < 4; i++) {
+            rows.append(rows.isEmpty() ? "" : ", ")
+                    .append(table.getValueAt(selected[i], 0));
+        }
+        if (selected.length > 4) {
+            rows.append(", … (").append(selected.length).append(" rows)");
+        }
+        int lead = table.getSelectionModel().getLeadSelectionIndex();
+        System.out.printf(Locale.ROOT, "| `%s` | `%s` | %s | %s |%n",
+                stroke.toString().replace("pressed ", ""), name,
+                rows.isEmpty() ? "none" : rows,
+                lead < 0 || lead >= table.getRowCount() ? "—"
+                        : table.getValueAt(lead, 0));
+    }
 
     private static void cost() {
         System.out.println("## What it costs to know");

@@ -41,89 +41,48 @@ public final class OnThisPageMockupMain {
 
     private static final File DIR = new File("docs/studies/on-this-page");
 
-    private record Row(String identity, String kind, String magnitude,
-                       String from, String visibility) {
-    }
-
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
-        com.formdev.flatlaf.FlatLightLaf.setup();
+        juranometria.render.ChartOptions defaults =
+                juranometria.render.ChartOptions.DEFAULTS;
+        juranometria.render.ChartOptions galaxiesOff = defaults.withFamily(
+                juranometria.render.SymbolFamily.GALAXIES, false);
 
-        write("released", releasedPage(), 320, 12, false);
-        write("released-enlarged", releasedPage(), 320, 18, false);
-        write("released-narrow", releasedPage(), 240, 12, false);
-        write("released-dark", releasedPage(), 320, 12, true);
-        write("dense", densePage(), 320, 12, false);
-        write("dense-enlarged", densePage(), 320, 18, false);
-        write("hidden-family", hiddenFamilyPage(), 320, 12, false);
+        List<OnThisPageStudyMain.Row> released =
+                rowsFor("m31", 8.0, defaults);
+        List<OnThisPageStudyMain.Row> dense =
+                rowsFor("virgo", 36.0, defaults);
+        List<OnThisPageStudyMain.Row> hidden =
+                rowsFor("m31", 8.0, galaxiesOff);
+
+        write("released", released, 320, 12, false);
+        write("released-enlarged", released, 320, 18, false);
+        write("released-narrow", released, 240, 12, false);
+        write("released-dark", released, 320, 12, true);
+        write("dense", dense, 320, 12, false);
+        write("dense-enlarged", dense, 320, 18, false);
+        write("hidden-family", hidden, 320, 12, false);
         write("empty", List.of(), 320, 12, false);
 
         System.out.println("mock-ups written to " + DIR.getPath());
     }
 
     /**
-     * The released M 31 page, as the study measured it: eight
-     * deep-sky rows in the decided order, four named stars, and the
-     * counted line for the rest.
+     * The real rows for a page, from the study's own inventory and
+     * its decided order.
+     *
+     * <p>The first draft of these mock-ups used hand-written rows,
+     * one of which named an object the catalogue does not hold (gate
+     * review). A picture claiming to show what a page contains, and
+     * showing something else, is worse than no picture: it is
+     * evidence of the wrong thing. These come from the same
+     * measurement the report prints.
      */
-    private static List<Row> releasedPage() {
-        List<Row> rows = new ArrayList<>();
-        rows.add(new Row("M 31", "galaxy", "3.4 V", "0.00°", "drawn"));
-        rows.add(new Row("M 32", "galaxy", "8.1 V", "0.40°", "drawn"));
-        rows.add(new Row("M 110", "galaxy", "8.2 V", "0.61°", "drawn"));
-        rows.add(new Row("NGC 317A", "galaxy", "13.6 B", "3.74°", "drawn"));
-        rows.add(new Row("NGC 317B", "galaxy", "13.9 B", "3.73°", "drawn"));
-        rows.add(new Row("IC 1550", "galaxy", "15.0 B", "4.67°", "drawn"));
-        rows.add(new Row("NGC 206", "star cloud", "not recorded",
-                "0.67°", "no chart symbol"));
-        rows.add(new Row("NGC 317", "galaxy", "not recorded",
-                "3.73°", "drawn"));
-        rows.add(new Row("ν And", "star", "4.5 V", "1.42°", "drawn"));
-        rows.add(new Row("μ And", "star", "3.9 V", "2.71°", "drawn"));
-        rows.add(new Row("32 And", "star", "5.3 V", "1.42°", "drawn"));
-        rows.add(new Row("π And", "star", "5.0 V", "5.77°", "drawn"));
-        rows.add(new Row("and 44 further stars", "star", "", "",
-                "none named"));
-        return rows;
-    }
-
-    /** Virgo at 36°, where the detail policy refuses most of it. */
-    private static List<Row> densePage() {
-        List<Row> rows = new ArrayList<>();
-        rows.add(new Row("M 49", "galaxy", "8.4 V", "2.11°", "drawn"));
-        rows.add(new Row("M 58", "galaxy", "9.7 V", "1.16°", "drawn"));
-        rows.add(new Row("M 59", "galaxy", "9.6 V", "1.72°", "drawn"));
-        rows.add(new Row("M 60", "galaxy", "8.8 V", "2.02°", "drawn"));
-        rows.add(new Row("M 61", "galaxy", "9.7 V", "5.34°", "drawn"));
-        rows.add(new Row("NGC 4438", "galaxy", "10.0 B", "1.09°", "drawn"));
-        rows.add(new Row("IC 3583", "galaxy", "13.3 B", "1.14°",
-                "too small at this field"));
-        rows.add(new Row("IC 3591", "galaxy", "14.9 B", "1.21°",
-                "too small at this field"));
-        rows.add(new Row("VCC 1030", "galaxy", "not recorded", "1.32°",
-                "too small at this field"));
-        rows.add(new Row("and 1,825 further deep-sky objects",
-                "", "", "", "1,524 too small here"));
-        rows.add(new Row("and 558 further stars", "star", "", "",
-                "none named"));
-        return rows;
-    }
-
-    /** The released page with Galaxies switched off. */
-    private static List<Row> hiddenFamilyPage() {
-        List<Row> rows = new ArrayList<>();
-        rows.add(new Row("M 31", "galaxy", "3.4 V", "0.00°",
-                "hidden by a chart option"));
-        rows.add(new Row("M 32", "galaxy", "8.1 V", "0.40°",
-                "hidden by a chart option"));
-        rows.add(new Row("M 110", "galaxy", "8.2 V", "0.61°",
-                "hidden by a chart option"));
-        rows.add(new Row("NGC 206", "star cloud", "not recorded",
-                "0.67°", "no chart symbol"));
-        rows.add(new Row("ν And", "star", "4.5 V", "1.42°", "drawn"));
-        rows.add(new Row("and 44 further stars", "star", "", "",
-                "none named"));
-        return rows;
+    private static List<OnThisPageStudyMain.Row> rowsFor(
+            String page, double field,
+            juranometria.render.ChartOptions options) {
+        return OnThisPageStudyMain.rowsFor(
+                OnThisPageStudyMain.scenePage(page, field), options);
     }
 
     /**
@@ -133,14 +92,19 @@ public final class OnThisPageMockupMain {
      */
     private static String glyphFor(String kind) {
         return switch (kind) {
-            case "galaxy" -> "\u25cf";
+            case "galaxies" -> "\u25cf";
             case "star" -> "\u2217";
-            case "star cloud" -> "\u25cb";
+            case "open clusters" -> "\u25cb";
+            case "globular clusters" -> "\u2295";
+            case "nebulae" -> "\u25a1";
+            case "planetary nebulae" -> "\u2296";
             default -> "\u00b7";
         };
     }
 
-    private static void write(String name, List<Row> rows, int width,
+    private static void write(String name,
+                              List<OnThisPageStudyMain.Row> rows,
+                              int width,
                               int textSize, boolean dark)
             throws IOException {
         if (dark) {
@@ -172,7 +136,7 @@ public final class OnThisPageMockupMain {
             DefaultTableModel model = new DefaultTableModel(
                     new Object[] {"Object", "Mag", "From", "On the chart"},
                     0);
-            for (Row row : rows) {
+            for (OnThisPageStudyMain.Row row : rows) {
                 // Kind travels with the name rather than in a column
                 // of its own: five text columns truncate to "gal..."
                 // and "no char..." at a 320 px sidebar, which the
@@ -189,10 +153,13 @@ public final class OnThisPageMockupMain {
             table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
             table.getColumnModel().getColumn(0)
                     .setPreferredWidth(textSize * 9);
+            // "not recorded" is a fact and must not truncate into
+            // "not re...", so the magnitude column gets the room to
+            // say it; distance is the column that yields.
             table.getColumnModel().getColumn(1)
-                    .setPreferredWidth(textSize * 4);
+                    .setPreferredWidth(textSize * 7);
             table.getColumnModel().getColumn(2)
-                    .setPreferredWidth(textSize * 3);
+                    .setPreferredWidth(textSize * 5);
             table.setSelectionMode(javax.swing.ListSelectionModel
                     .MULTIPLE_INTERVAL_SELECTION);
             // Two marked, one of them the lead: what a reader sees

@@ -14,22 +14,22 @@ An object behind the projection's horizon has no place on the page and is not on
 
 | page | why | field | deep-sky | stars | total |
 |---|---|---:|---:|---:|---:|
-| m31 | the released default | 1° | 1 | 0 | 1 |
+| m31 | the released default | 1° | 3 | 0 | 3 |
 | m31 | the released default | 8° | 8 | 48 | 56 |
-| m31 | the released default | 18° | 30 | 319 | 349 |
-| m31 | the released default | 36° | 351 | 1247 | 1598 |
+| m31 | the released default | 18° | 33 | 319 | 352 |
+| m31 | the released default | 36° | 352 | 1247 | 1599 |
 | orion | bright, familiar, equatorial | 1° | 1 | 3 | 4 |
 | orion | bright, familiar, equatorial | 8° | 16 | 144 | 160 |
-| orion | bright, familiar, equatorial | 18° | 55 | 474 | 529 |
-| orion | bright, familiar, equatorial | 36° | 244 | 1552 | 1796 |
+| orion | bright, familiar, equatorial | 18° | 57 | 474 | 531 |
+| orion | bright, familiar, equatorial | 36° | 245 | 1552 | 1797 |
 | virgo | the densest galaxies | 1° | 13 | 0 | 13 |
 | virgo | the densest galaxies | 8° | 389 | 26 | 415 |
-| virgo | the densest galaxies | 18° | 779 | 154 | 933 |
-| virgo | the densest galaxies | 36° | 1834 | 647 | 2481 |
+| virgo | the densest galaxies | 18° | 780 | 154 | 934 |
+| virgo | the densest galaxies | 36° | 1837 | 647 | 2484 |
 | lmc | the Large Magellanic Cloud | 1° | 17 | 0 | 17 |
-| lmc | the Large Magellanic Cloud | 8° | 274 | 37 | 311 |
+| lmc | the Large Magellanic Cloud | 8° | 275 | 37 | 312 |
 | lmc | the Large Magellanic Cloud | 18° | 374 | 239 | 613 |
-| lmc | the Large Magellanic Cloud | 36° | 532 | 1011 | 1543 |
+| lmc | the Large Magellanic Cloud | 36° | 533 | 1011 | 1544 |
 | ra-zero | the seam | 1° | 0 | 1 | 1 |
 | ra-zero | the seam | 8° | 17 | 41 | 58 |
 | ra-zero | the seam | 18° | 103 | 201 | 304 |
@@ -39,7 +39,27 @@ An object behind the projection's horizon has no place on the page and is not on
 | polar | near the pole | 18° | 10 | 276 | 286 |
 | polar | near the pole | 36° | 82 | 1112 | 1194 |
 
-The worst page here carries **1552 stars** and **1834 deep-sky objects**. That is the number a table has to survive, and it decides whether one undifferentiated list is honest.
+The worst page here carries **1552 stars** and **1837 deep-sky objects**. That is the number a table has to survive, and it decides whether one undifferentiated list is honest.
+
+## Centres are not enough
+
+An object is on the page when its **recorded extent** reaches the paper, not merely its centre. M 31 is 178 arcminutes long: a page can be filled by its disc while its centre sits outside the paper, and a centre-only rule would report an empty page in front of a visible galaxy.
+
+| page | field | centres only | with recorded extent | missed |
+|---|---:|---:|---:|---:|
+| m31 | 1° | 1 | 3 | **2** |
+| m31 | 18° | 30 | 33 | **3** |
+| m31 | 36° | 351 | 352 | **1** |
+| orion | 18° | 55 | 57 | **2** |
+| orion | 36° | 244 | 245 | **1** |
+| virgo | 18° | 779 | 780 | **1** |
+| virgo | 36° | 1834 | 1837 | **3** |
+| lmc | 8° | 274 | 275 | **1** |
+| lmc | 36° | 532 | 533 | **1** |
+
+**15 objects** across these pages would have been left out of a table that asked only about centres - among them M 32 and M 110 on a 1° view of M 31, which is the closest look the atlas offers at the page it opens on.
+
+The extent used is the **catalogue's** size, never the drawn symbol's. That keeps the inventory a fact about the sky: it does not move when a family is switched off, when the detail policy refuses a symbol, or when the practical-minimum clamp enlarges a tiny one for legibility.
 
 ## Present, and why it cannot be seen
 
@@ -48,13 +68,13 @@ Every state is production's own answer. `permitted` is the rule the family switc
 | page | field | drawn | hidden by an option | fainter than the limit | no symbol | too small at this field |
 |---|---:|---:|---:|---:|---:|---:|
 | m31 | 8° | 55 | 0 | 0 | 1 | 0 |
-| m31 | 36° | 1253 | 0 | 0 | 49 | 296 |
+| m31 | 36° | 1253 | 0 | 0 | 49 | 297 |
 | orion | 8° | 158 | 0 | 0 | 2 | 0 |
-| orion | 36° | 1563 | 0 | 0 | 26 | 207 |
+| orion | 36° | 1564 | 0 | 0 | 26 | 207 |
 | virgo | 8° | 369 | 0 | 0 | 46 | 0 |
-| virgo | 36° | 669 | 0 | 0 | 288 | 1524 |
-| lmc | 8° | 293 | 0 | 0 | 18 | 0 |
-| lmc | 36° | 1017 | 0 | 0 | 26 | 500 |
+| virgo | 36° | 669 | 0 | 0 | 289 | 1526 |
+| lmc | 8° | 293 | 0 | 0 | 19 | 0 |
+| lmc | 36° | 1017 | 0 | 0 | 26 | 501 |
 | ra-zero | 8° | 55 | 0 | 0 | 3 | 0 |
 | ra-zero | 36° | 848 | 0 | 0 | 52 | 472 |
 | polar | 8° | 69 | 0 | 0 | 0 | 0 |
@@ -101,6 +121,31 @@ The released page, in that order:
 | 8 | NGC 317 | — | not recorded | 3.73° |
 
 **8** deep-sky rows in all on that page.
+
+## Working it without a pointer
+
+The platform's own bindings, resolved from the table's input map and fired - the same actions Swing runs for those keystrokes - on the released page's real rows. A picture of a sidebar cannot answer this; running it can.
+
+| keystroke | Swing's action | rows selected | lead |
+|---|---|---|---|
+| `DOWN` | `selectNextRow` | M 31 | M 31 |
+| `DOWN` | `selectNextRow` | M 32 | M 32 |
+| `shift DOWN` | `selectNextRowExtendSelection` | M 32, M 110 | M 110 |
+| `shift DOWN` | `selectNextRowExtendSelection` | M 32, M 110, NGC 317A | NGC 317A |
+| `ctrl pressed A` | *no binding* | — | — |
+| `meta A` | `selectAll` | M 31, M 32, M 110, NGC 317A, … (13 rows) | NGC 317A |
+| `HOME` | `selectFirstColumn` | NGC 317A | NGC 317A |
+| `ctrl pressed HOME` | *no binding* | — | — |
+
+**Walking and extending are free.** Down moves the lead one row; shift-Down builds a marked set out of consecutive rows. Those are the two gestures the surface is mostly made of, and the platform already has them.
+
+**Select-all is there, under the platform's own modifier and not the other one.** `meta A` runs `selectAll` and takes all 13 rows; `ctrl A` is bound to nothing. Which modifier that is belongs to the look and feel, and the module has no business choosing it.
+
+**And returning to the top is not bound.** `HOME` moves to the first *column*, and `ctrl HOME` is bound to nothing at all - so a reader pressing Home to get back to M 31 stays where they are. That is a real gap, found by running the bindings rather than by assuming them, and it is the sort of thing a picture of a sidebar could never have shown.
+
+So the decision is narrow and stated: **the module adds no key bindings of its own.** Where the platform binds a gesture the module uses it and does not care which modifier the look and feel chose; where it binds nothing - getting back to the top - #216 offers an explicit control beside **Clear marks** rather than inventing a keystroke. A module that taught the table new keys would be a module assistive technology has to be taught too.
+
+What a reader needs beyond the platform's own is decided rather than invented: **Enter** takes the lead row into the Selected facts, and **Centre here** is an explicit action rather than a side effect of moving through rows. Selecting a row never moves the chart, so a reader can walk the whole page without losing their place - the promise point-and-identify has made since Sprint 19.
 
 ## What it costs to know
 

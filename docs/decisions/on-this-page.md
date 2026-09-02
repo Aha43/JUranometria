@@ -19,10 +19,23 @@ this answers the question beside it.
 
 ## What "on this page" means
 
-**An object is on the page when its recorded position projects onto
-the paper.** Not whether its symbol is drawn, its family switched
-on, its magnitude inside the limit, or the atlas has a symbol for
-its type at all.
+**An object is on the page when its recorded extent reaches the
+paper.** Not whether its symbol is drawn, its family switched on,
+its magnitude inside the limit, or the atlas has a symbol for its
+type at all.
+
+**Extent, not centre** — the gate first proposed centres, and review
+was right that a large symbol can cross the page edge with its
+centre outside it, leaving a table reporting an empty page in front
+of a visible galaxy. Measured, that rule would have missed **15
+objects** across the study's pages, **including M 32 and M 110 on a
+1° view of M 31** — the closest look the atlas offers at the page it
+opens on.
+
+The extent is the **catalogue's** recorded size, never the drawn
+symbol's, so the inventory stays a fact about the sky: it does not
+move when a family is switched off, when the detail policy refuses a
+symbol, or when the practical-minimum clamp enlarges a tiny one.
 
 The paper is the rectangle the renderer clips to — `1, 1, width-2,
 height-2` — which is the rectangle `drawnMarks` already tests
@@ -137,10 +150,20 @@ whole answer rather than an abbreviation of one:
 
 The Selected pane keeps the full sentence; the table keeps the word.
 
-**Default order: a Messier number first, then recorded brightness,
-then distance from centre, then catalogue identity.** Identity last
-makes the order total, so the same page always lists identically
-however the catalogue arrives — the lesson #201 paid for.
+**The order is total across kinds**, which the first draft left
+undefined: a table holding galaxies, named stars and counted lines
+must say which comes first or two runs can disagree.
+
+1. **Deep-sky objects, then named stars, then the counted lines.** A
+   reader asking what is here is hunting objects; the named stars
+   are the landmarks they steer by; and a line counting what is not
+   listed is a statement about the page rather than a thing on it,
+   so it never sorts into the middle of its kind.
+2. **Within a kind: a Messier number first, then recorded
+   brightness, then distance from centre, then catalogue identity.**
+   Identity last makes it total, so the same page always lists
+   identically however the catalogue arrives — the lesson #201 paid
+   for.
 
 On the released page that gives, in order: **M 31, M 32, M 110**,
 then NGC 317A, NGC 317B, IC 1550, then the two whose magnitude is
@@ -156,9 +179,47 @@ into the middle of it: a row saying *and 1,825 further deep-sky
 objects* is a statement about the page, not an object on it.
 
 **Mock-ups:** `sidebar-*.png` beside the measurements — the released
-page, a dense Virgo field, a page with Galaxies hidden, and an empty
-one, each at the sidebar's preferred 320 px and its 240 px floor, at
-ordinary and enlarged text, in both themes.
+page, a dense Virgo field (1,927 rows), a page with Galaxies hidden,
+and an empty one, at the sidebar's preferred 320 px and its 240 px
+floor, at ordinary and enlarged text, in both themes.
+
+Every row in them is **drawn from the measured inventory**, in the
+order above. The first draft used hand-written rows, one naming an
+object the catalogue does not hold — a picture claiming to show what
+a page contains and showing something else is worse than no picture,
+because it is evidence of the wrong thing.
+
+## Working it without a pointer
+
+A picture cannot answer this either, so the study builds the real
+table from the real rows, resolves the platform's own key bindings,
+and fires them. What that found:
+
+| keystroke | Swing's action | result |
+|---|---|---|
+| `DOWN` | `selectNextRow` | walks the lead, M 31 → M 32 |
+| `shift DOWN` | `selectNextRowExtendSelection` | builds M 32, M 110, NGC 317A |
+| `meta A` | `selectAll` | all 13 rows |
+| `ctrl A` | **no binding** | — |
+| `HOME` | `selectFirstColumn` | first *column*, not first row |
+| `ctrl HOME` | **no binding** | — |
+
+Walking and extending — the two gestures the surface is mostly made
+of — are free. Select-all exists under the platform's own modifier
+and not the other one, and **which modifier that is belongs to the
+look and feel, not to this module**. Returning to the top is bound
+to nothing at all, which is a real gap and was found by running the
+bindings rather than assuming them.
+
+**So the module adds no key bindings of its own.** Where the
+platform binds a gesture it is used as-is; where it binds nothing,
+#216 offers an explicit control beside **Clear marks** rather than
+inventing a keystroke. A module that taught the table new keys would
+be a module assistive technology has to be taught too.
+
+**Enter** takes the lead row into the Selected facts and **Centre
+here** is explicit — selecting a row never moves the chart, the
+promise point-and-identify has kept since Sprint 19.
 
 ## What it costs
 
@@ -257,6 +318,11 @@ behind.
 
 ## Rejected
 
+- **Centres alone as the page rule.** Rejected by measuring it: 15
+  objects missed, M 32 and M 110 among them.
+- **Hand-written mock-up rows.** Rejected after review caught one
+  naming an object the catalogue does not hold. The mock-ups are
+  generated from the measured inventory.
 - **Five columns.** Rejected by drawing it: at 320 px the kind and
   visibility columns truncated to `gal…` and `no char…`. The column
   count is what the sidebar's width allows, not what the data
