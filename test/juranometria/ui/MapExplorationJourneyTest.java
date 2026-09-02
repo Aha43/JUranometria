@@ -313,7 +313,12 @@ class MapExplorationJourneyTest {
             key(list, KeyEvent.VK_ENTER);
             assertTrue(settlesOn(inspector.focusTarget()),
                     "and Enter settled into the facts, not onto the"
-                            + " control that would move the chart");
+                            + " control that would move the chart."
+                            + " If this failed, read the focus state"
+                            + " first: a request is refused outside"
+                            + " the focused window, and then nothing"
+                            + " happened because nothing could (#209)."
+                            + " " + FocusedWindow.state(window));
             assertEquals(witnessedBeforeChoice + 1, witness.size(),
                     "choosing told the second observer exactly once");
             SelectionModel.Change heard = witness.get(witness.size() - 1);
@@ -776,8 +781,17 @@ class MapExplorationJourneyTest {
     }
 
     /** Whether focus comes to rest on this component. */
+    /**
+     * Whether focus settles where the application put it.
+     *
+     * <p>The window must hold the keyboard focus first, or the
+     * application's own {@code requestFocusInWindow()} is refused
+     * and this reports a feature failure for an environment problem
+     * (issue #209).
+     */
     private boolean settlesOn(java.awt.Component expected)
             throws Exception {
+        FocusedWindow.tryToFocus(window);
         for (int attempt = 0; attempt < 20; attempt++) {
             flush();
             java.awt.Component owner = java.awt.KeyboardFocusManager
