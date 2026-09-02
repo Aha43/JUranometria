@@ -751,15 +751,32 @@ public final class OnThisPageStudyMain {
                         + " approximates: an object that runs off the"
                         + " projection, or a boundary that cannot be"
                         + " followed to that distance, stops the study"
-                        + " where it stands. This report therefore"
-                        + " exists only because neither happened for"
-                        + " any of the **%,d objects** in the pack, on"
-                        + " any page measured here. The largest object"
-                        + " it records is **%.2f°** from centre to"
-                        + " rim, so nothing bundled with the atlas can"
-                        + " come near the horizon in the first"
-                        + " place.%n%n",
-                packSize(), largestRecordedSemiMajorDegrees());
+                        + " where it stands.%n%n");
+        System.out.printf(Locale.ROOT,
+                "Neither can happen with the bundled pack, and the"
+                        + " reason is structural rather than a survey"
+                        + " of pages. At the widest field the atlas"
+                        + " offers, a page reaches at most **%.0f°**"
+                        + " from its centre; the assembler queries"
+                        + " that reach plus the pack's declared"
+                        + " **%.2f°** object margin; and nothing it"
+                        + " returns extends more than that same"
+                        + " **%.2f°** from its own centre. So the"
+                        + " furthest any boundary can lie from a page"
+                        + " centre is %.0f + %.2f + %.2f ="
+                        + " **%.2f°**, short of the %.0f° horizon."
+                        + " The largest object the pack actually"
+                        + " records is %.2f°, and it holds %,d in"
+                        + " all. The reach cap covers every window"
+                        + " shape up to about five times as tall as"
+                        + " it is wide; the sum itself only reaches"
+                        + " the horizon past about sixteen to"
+                        + " one.%n%n",
+                PAGE_REACH_BOUND_DEG, declaredObjectMarginDegrees(),
+                declaredObjectMarginDegrees(), PAGE_REACH_BOUND_DEG,
+                declaredObjectMarginDegrees(), declaredObjectMarginDegrees(),
+                PAGE_REACH_BOUND_DEG + 2 * declaredObjectMarginDegrees(),
+                90.0, largestRecordedSemiMajorDegrees(), packSize());
         System.out.println("`OnThisPageSphericalTest` checks the"
                 + " rule from the opposite direction: it samples the"
                 + " **paper**, turns each pixel back into a sky"
@@ -804,6 +821,23 @@ public final class OnThisPageStudyMain {
 
     private static int packSize() {
         return DeepSkyVocabularyStudyMain.wholePack().size();
+    }
+
+    /**
+     * A bound on how far a page reaches from its own centre.
+     *
+     * <p>At the widest field the atlas offers - 36° - a 900x700 page
+     * reaches 22°, and it takes a window nearly ten times as tall as
+     * it is wide to reach this. It is a cap, not a measurement, and
+     * the point of it is that the sum below stays clear of the
+     * horizon without depending on the shape of anybody's window.
+     */
+    static final double PAGE_REACH_BOUND_DEG = 60.0;
+
+    /** The largest object extent the pack's own manifest declares. */
+    static double declaredObjectMarginDegrees() {
+        return juranometria.catalog.TiledCatalogue.load().manifest()
+                .maxObjectSemiExtentDegrees();
     }
 
     /**

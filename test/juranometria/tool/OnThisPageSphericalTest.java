@@ -225,29 +225,60 @@ class OnThisPageSphericalTest {
     @Test
     void nothingTheAtlasBundlesCanReachTheProjectionsHorizon() {
         // The refusal is only defensible if the bundled data cannot
-        // provoke it. So this asks the pack itself rather than the
-        // prose: the largest object it records, and then every
-        // object it holds, on the pages the study reports.
-        double largest = OnThisPageStudyMain.largestRecordedSemiMajorDegrees();
-        assertTrue(largest < 10.0, String.format(
-                "the largest object the pack records is %.3f° from"
-                        + " centre to rim; the refusal assumes tens of"
-                        + " degrees are needed to reach the horizon",
-                largest));
+        // provoke it, and the reason has to be structural. Deciding
+        // a handful of pages does not traverse the pack (gate
+        // review): the assembler answers each page from a bounded
+        // query, so twelve scenes visit twelve neighbourhoods, not
+        // 13,371 objects.
+        //
+        // What holds regardless of which page is opened is a sum:
+        // page reach + query margin + object radius, against the
+        // 90° horizon.
+        double margin = OnThisPageStudyMain.declaredObjectMarginDegrees();
+        double reach = OnThisPageStudyMain.PAGE_REACH_BOUND_DEG;
 
-        for (double field : new double[] {1.0, 8.0, 36.0}) {
-            for (double[] where : new double[][] {
-                    {80.894, -69.756}, {10.684, 41.269}, {0.0, 89.5},
-                    {359.7, 0.0}}) {
-                ChartScene scene = page(where[0], where[1], field);
-                org.junit.jupiter.api.Assertions.assertDoesNotThrow(
-                        () -> OnThisPageStudyMain.rowsFor(scene,
-                                juranometria.render.ChartOptions.DEFAULTS),
-                        String.format("every object in the pack is"
-                                + " decided on a %.0f° page at %.3f,"
-                                + " %.3f", field, where[0], where[1]));
-            }
-        }
+        assertTrue(OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
+                        <= margin,
+                "no object in the pack is larger than the margin its"
+                        + " own manifest declares: "
+                        + OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
+                        + " vs " + margin);
+        assertTrue(reach + margin + margin < 90.0, String.format(
+                "%.0f° of page reach, %.2f° of query margin and %.2f°"
+                        + " of object radius come to %.2f°, which must"
+                        + " stay short of the 90° horizon",
+                reach, margin, margin, reach + margin + margin));
+
+        // And the cap has to be honest about what it covers. A 36°
+        // field is the widest the atlas offers; at that field the
+        // cap holds for any window up to about five times as tall as
+        // it is wide, which is where a first draft of this test was
+        // wrong - it claimed ten, and a 400x4000 page reaches 73°.
+        assertTrue(cornerReachDegrees(36.0, 900, 700) < reach,
+                "the page this study measures reaches "
+                        + cornerReachDegrees(36.0, 900, 700) + "°");
+        assertTrue(cornerReachDegrees(36.0, 900, 4500) < reach,
+                "and so does a window five times taller than it is"
+                        + " wide: " + cornerReachDegrees(36.0, 900, 4500)
+                        + "°");
+
+        // Beyond the cap the sum is what matters, and it has room to
+        // spare: even a window ten times taller than it is wide
+        // stays short of the horizon.
+        assertTrue(cornerReachDegrees(36.0, 400, 4000) + 2 * margin < 90.0,
+                "a ten-to-one window reaches "
+                        + cornerReachDegrees(36.0, 400, 4000)
+                        + "°, and even then the sum is short of the"
+                        + " horizon");
+    }
+
+    /** How far a page's corner lies from its centre, in degrees. */
+    private static double cornerReachDegrees(double fieldWidthDegrees,
+                                             int widthPx, int heightPx) {
+        double halfWidth = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
+        double halfHeight = halfWidth * heightPx / (double) widthPx;
+        return Math.toDegrees(
+                Math.atan(Math.hypot(halfWidth, halfHeight)));
     }
 
     // ----------------------------------------------------------------

@@ -115,12 +115,25 @@ the horizon and the paper lying *between* its two remaining arcs.
 Probing the paper's corners and centre answers those two, and still
 cannot decide an arbitrary clipped region.
 
-There is no fourth try, because the case does not arise. **The
-largest object the pack records is 5.38° from centre to rim**, and
-an object must be tens of degrees across before any page can push
-part of it past the horizon. So the rule refuses, loudly, naming the
-object — and the study, which walks all 13,371 objects across every
-page it reports, exists only because none of them provoked it.
+There is no fourth try, because the case does not arise — and the
+reason is **structural**, not a survey of pages. Deciding a handful
+of pages would not establish it: the assembler answers each page
+from a bounded query, so twelve scenes visit twelve neighbourhoods
+rather than 13,371 objects.
+
+What holds whichever page is opened is a sum. At the widest field
+the atlas offers, a page reaches at most **60°** from its centre;
+the assembler queries that reach plus the pack's declared **5.39°**
+object margin; and nothing it returns extends more than that same
+5.39° from its own centre. So the furthest any boundary can lie from
+a page centre is **60 + 5.39 + 5.39 = 70.78°**, short of the 90°
+horizon. The largest object the pack actually records is 5.38°.
+
+The cap is honest about its scope: it covers any window up to about
+five times as tall as it is wide, and the sum itself only reaches
+the horizon past roughly sixteen to one. So the rule refuses,
+loudly, naming the object — and nothing the atlas bundles can make
+it.
 
 Refusing is only tolerable because it stays rare, so an object out
 near the horizon is answered *before* it is walked: nothing further
