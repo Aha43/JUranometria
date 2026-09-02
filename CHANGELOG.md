@@ -7,6 +7,38 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A page inventory, and the reader's working marks** (Sprint 24,
+  issue #215). The chart can now be asked what is on the page it is
+  showing: every catalogue object whose recorded ellipse reaches the
+  paper, each carrying production's own answer for why it can or
+  cannot be seen there - drawn, hidden by a chart option, fainter
+  than the magnitude limit, no symbol for its type, or too small at
+  this field. Presence is a fact about the sky and visibility is a
+  fact about the reader's choices, and the two are now separable.
+  Alongside it, a UI-independent model of the reader's *working
+  marks*: an ordered set with one lead, the lead feeding the chart's
+  existing singular selection, pruned in one transition when the
+  page moves, and never persisted.
+- **The chart's first module seam** (issue #215). The chart
+  publishes services; modules consume them. A module contributes
+  typed geometry with an ink role - a point, a path, a region, each
+  with an identity and an accessible name - and never a graphics
+  context, so the chart keeps its cartography. Asserted rather than
+  described: the core imports neither the services nor the seam, and
+  the atlas builds and draws its ordinary chart with every module
+  absent.
+
+### Changed
+
+- The renderer's paper rectangle is now published as
+  `ChartRenderer.paperOf` and shared, rather than copied wherever
+  "on the paper" is asked. The Sprint 24 study also gave up its own
+  copies of the page geometry, the visibility rules and the ordering
+  - it consumes the production services now, and its report
+  reproduces byte for byte through the change.
+
 ## [1.4.0] - 2026-09-02
 
 Sprint 23 — Polish the instrument. A maintenance sprint, and the

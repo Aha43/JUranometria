@@ -264,6 +264,21 @@ public final class ChartRenderer {
      * renderer paints from, so a caller asking what is at a pixel
      * asks the drawing itself.
      */
+    /**
+     * The rectangle the renderer clips a page's ink to.
+     *
+     * <p>One definition, because "on the paper" is asked in more
+     * than one place now - by {@link #drawnMarks} deciding what a
+     * reader can see and point at, and by the page inventory
+     * deciding what is on the page at all. A second copy of these
+     * two-pixel insets is a second copy to drift.
+     */
+    public static java.awt.geom.Rectangle2D paperOf(ChartScene scene) {
+        return new java.awt.geom.Rectangle2D.Double(
+                1, 1, scene.viewport().widthPx() - 2,
+                scene.viewport().heightPx() - 2);
+    }
+
     public java.util.List<DrawnMark> drawnMarks(ChartScene scene,
                                                 ChartOptions options) {
         GnomonicProjection projection =
@@ -284,9 +299,7 @@ public final class ChartRenderer {
         // neither see nor point at nothing. Including those would
         // have let a click near an edge select an object off the
         // page, and would have inflated every count measured here.
-        java.awt.geom.Rectangle2D paper = new java.awt.geom.Rectangle2D.Double(
-                1, 1, scene.viewport().widthPx() - 2,
-                scene.viewport().heightPx() - 2);
+        java.awt.geom.Rectangle2D paper = paperOf(scene);
         java.util.List<DrawnMark> marks = new java.util.ArrayList<>();
         java.util.List<DrawnMark> deepSky = new java.util.ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {

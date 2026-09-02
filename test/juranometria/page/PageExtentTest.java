@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.page;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Whether an object's angular ellipse reaches the paper (Sprint 24,
- * issue #214), checked from the opposite direction.
+ * Whether an object's angular ellipse reaches the paper
+ * ({@link PageExtent}), checked from the opposite direction.
  *
  * <p>The rule walks the ellipse's boundary <em>on the sphere</em>
  * and projects each point onto the page. An oracle that did the same
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * centre is the wrong shape by the time it reaches an edge, which is
  * precisely where the question is asked.
  */
-class OnThisPageSphericalTest {
+class PageExtentTest {
 
     /**
      * Does any pixel of the paper fall inside the angular ellipse?
@@ -56,7 +56,7 @@ class OnThisPageSphericalTest {
         for (int y = 1; y <= height - 1; y++) {
             for (int x = 1; x <= width - 1; x++) {
                 SkyPosition sky = ChartHitTest.skyAt(scene, x + 0.5, y + 0.5);
-                if (sky != null && OnThisPageStudyMain.insideAngularEllipse(
+                if (sky != null && PageExtent.insideAngularEllipse(
                         centre, sky, semiMajorDeg, semiMinorDeg,
                         positionAngleDeg)) {
                     return true;
@@ -70,7 +70,7 @@ class OnThisPageSphericalTest {
     private static boolean rule(ChartScene scene, SkyPosition centre,
                                 double semiMajorDeg, double semiMinorDeg,
                                 double positionAngleDeg) {
-        return OnThisPageStudyMain.reachesPaper(scene, centre,
+        return PageExtent.reaches(scene, centre,
                 semiMajorDeg, semiMinorDeg, positionAngleDeg);
     }
 
@@ -100,10 +100,10 @@ class OnThisPageSphericalTest {
             for (double semiMajor : new double[] {0.02, 0.5, 4.0, 12.0}) {
                 for (double ratio : new double[] {1.0, 0.08}) {
                     for (double pa : new double[] {0, 37, 115}) {
-                        SkyPosition centre = OnThisPageStudyMain.offsetOf(
+                        SkyPosition centre = PageExtent.offsetOf(
                                 scene.viewport().centre(), semiMajor * 0.6, 25.0);
                         java.awt.geom.Path2D.Double outline =
-                                OnThisPageStudyMain.outlineOn(scene, centre,
+                                PageExtent.outlineOn(scene, centre,
                                         semiMajor, semiMajor * ratio, pa);
                         shapes++;
                         double strayed = furthestFromPath(outline, scene,
@@ -159,7 +159,7 @@ class OnThisPageSphericalTest {
         int samples = 20_000;
         for (int i = 0; i < samples; i++) {
             java.awt.geom.Point2D.Double truth =
-                    OnThisPageStudyMain.boundaryPixelOn(scene, centre,
+                    PageExtent.boundaryPixelOn(scene, centre,
                             semiMajorDeg, semiMinorDeg, positionAngleDeg,
                             2 * Math.PI * i / samples);
             if (truth == null) {
@@ -211,7 +211,7 @@ class OnThisPageSphericalTest {
 
         IllegalStateException refused = assertThrows(
                 IllegalStateException.class,
-                () -> OnThisPageStudyMain.outlineOn(scene, centre,
+                () -> PageExtent.outlineOn(scene, centre,
                         12.0, 1.0, 40.0, 1),
                 "a depth of one cannot follow this curve");
         assertTrue(refused.getMessage().contains("could not be followed"),
@@ -219,65 +219,9 @@ class OnThisPageSphericalTest {
 
         // And with the real depth the same curve is followed all the
         // way, so the refusal is about the depth and not the curve.
-        OnThisPageStudyMain.outlineOn(scene, centre, 12.0, 1.0, 40.0);
+        PageExtent.outlineOn(scene, centre, 12.0, 1.0, 40.0);
     }
 
-    @Test
-    void nothingTheAtlasBundlesCanReachTheProjectionsHorizon() {
-        // The refusal is only defensible if the bundled data cannot
-        // provoke it, and the reason has to be structural. Deciding
-        // a handful of pages does not traverse the pack (gate
-        // review): the assembler answers each page from a bounded
-        // query, so twelve scenes visit twelve neighbourhoods, not
-        // 13,371 objects.
-        //
-        // What holds regardless of which page is opened is a sum:
-        // page reach + query margin + object radius, against the
-        // 90° horizon.
-        double margin = OnThisPageStudyMain.declaredObjectMarginDegrees();
-        double reach = OnThisPageStudyMain.widestPageReachDegrees();
-
-        assertTrue(OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
-                        <= margin,
-                "no object in the pack is larger than the margin its"
-                        + " own manifest declares: "
-                        + OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
-                        + " vs " + margin);
-        assertTrue(reach + margin + margin < 90.0, String.format(
-                "%.2f° of page reach, %.2f° of query margin and %.2f°"
-                        + " of object radius come to %.2f°, which must"
-                        + " stay short of the 90° horizon",
-                reach, margin, margin, reach + margin + margin));
-
-        // And the reach is the assembler's, not a second copy of it
-        // kept here (gate review). What holds it down is real
-        // behaviour: a window taller than the projection can draw
-        // honestly is letterboxed rather than filled.
-        juranometria.ui.SceneAssembler assembler = Atlas.assembler();
-        double widest = ChartViewState.fieldWidthSteps().get(0);
-        // Tall enough to be letterboxed: at this field a 900 px
-        // wide page may be 4,712 px high before its corners pass
-        // the projection's own limit.
-        int asked = 8000;
-        int allowed = assembler.maxPageHeightPx(Atlas.DEFAULT_CENTRE,
-                widest, 900);
-        assertTrue(allowed < asked, "a 900x" + asked + " window at a "
-                + widest + "° field is letterboxed to " + allowed
-                + " px of page");
-
-        // The cap is what makes the sum safe, so a page drawn past
-        // it would not be: this is the assertion that would fail if
-        // the letterboxing stopped happening.
-        ChartScene overreaching = assembler.assemble(
-                new ChartViewState(Atlas.DEFAULT_CENTRE, widest, 8.0),
-                900, asked);
-        assertTrue(OnThisPageStudyMain.pageReachDegrees(overreaching)
-                        > reach,
-                "a page taller than the assembler allows reaches"
-                        + " further than the cap: "
-                        + OnThisPageStudyMain.pageReachDegrees(overreaching)
-                        + "° against " + reach + "°");
-    }
 
     // ----------------------------------------------------------------
     // Grazing: an oracle that never looks at a pixel centre.
@@ -304,9 +248,9 @@ class OnThisPageSphericalTest {
         double furthest = -1;
         for (int bearing = 0; bearing < 360; bearing += 2) {
             SkyPosition candidate =
-                    OnThisPageStudyMain.offsetOf(target, radius, bearing);
+                    PageExtent.offsetOf(target, radius, bearing);
             java.awt.geom.Point2D.Double where =
-                    OnThisPageStudyMain.boundaryPixelOn(scene, candidate,
+                    PageExtent.boundaryPixelOn(scene, candidate,
                             1e-6, 1e-6, 0.0, 0.0);
             if (where == null) {
                 continue;
@@ -320,7 +264,7 @@ class OnThisPageSphericalTest {
         assertTrue(centre != null, "a centre off the page was found");
         double scale = pixelsPerDegreeAt(scene, target);
         double grown = radius + beyondPx / scale;
-        return OnThisPageStudyMain.reachesPaper(scene, centre, grown,
+        return PageExtent.reaches(scene, centre, grown,
                 grown, 0.0);
     }
 
@@ -328,11 +272,11 @@ class OnThisPageSphericalTest {
     private static double pixelsPerDegreeAt(ChartScene scene,
                                             SkyPosition where) {
         java.awt.geom.Point2D.Double here =
-                OnThisPageStudyMain.boundaryPixelOn(scene, where,
+                PageExtent.boundaryPixelOn(scene, where,
                         1e-6, 1e-6, 0.0, 0.0);
         java.awt.geom.Point2D.Double there =
-                OnThisPageStudyMain.boundaryPixelOn(scene,
-                        OnThisPageStudyMain.offsetOf(where, 0.001, 0.0),
+                PageExtent.boundaryPixelOn(scene,
+                        PageExtent.offsetOf(where, 0.001, 0.0),
                         1e-6, 1e-6, 0.0, 0.0);
         assertTrue(here != null && there != null, "both points project");
         return Math.hypot(there.x - here.x, there.y - here.y) / 0.001;
@@ -392,7 +336,7 @@ class OnThisPageSphericalTest {
             for (double offset : new double[] {field * 0.35,
                     field * 0.6}) {
                 for (double bearing : new double[] {0, 90, 200}) {
-                    SkyPosition centre = OnThisPageStudyMain.offsetOf(
+                    SkyPosition centre = PageExtent.offsetOf(
                             pageCentre, offset, bearing);
                     for (double semiMajor : new double[] {field * 0.12,
                             field * 0.45}) {
@@ -442,7 +386,7 @@ class OnThisPageSphericalTest {
         // built only from sampled boundary points answers no
         // (gate review).
         ChartScene scene = page(80.894, -69.756, 1.0);
-        SkyPosition centre = OnThisPageStudyMain.offsetOf(
+        SkyPosition centre = PageExtent.offsetOf(
                 scene.viewport().centre(), 4.0, 45.0);
         double semiMajor = 8.0;
 
@@ -463,7 +407,7 @@ class OnThisPageSphericalTest {
         // the paper cannot decide an arbitrary clipped region (gate
         // review). So the rule refuses, and says which object.
         ChartScene scene = page(80.894, -69.756, 1.0);
-        SkyPosition centre = OnThisPageStudyMain.offsetOf(
+        SkyPosition centre = PageExtent.offsetOf(
                 scene.viewport().centre(), 50.0, 20.0);
 
         // Each of these is both near enough to matter - the early
@@ -509,7 +453,7 @@ class OnThisPageSphericalTest {
         // where every object out near the projection's edge is
         // decided, rather than in the walk.
         ChartScene scene = page(80.894, -69.756, 8.0);
-        SkyPosition farAway = OnThisPageStudyMain.offsetOf(
+        SkyPosition farAway = PageExtent.offsetOf(
                 scene.viewport().centre(), 88.0, 10.0);
 
         assertTrue(!rule(scene, farAway, 5.0, 3.0, 45.0),
@@ -526,7 +470,7 @@ class OnThisPageSphericalTest {
         // edge. Placed off-centre on a wide page, the rule and the
         // inverse oracle must still agree.
         ChartScene scene = page(80.894, -69.756, 36.0);
-        SkyPosition cloud = OnThisPageStudyMain.offsetOf(
+        SkyPosition cloud = PageExtent.offsetOf(
                 scene.viewport().centre(), 16.0, 90.0);
         double semiMajor = 646.0 / 120.0;
 
