@@ -14,7 +14,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import juranometria.tool.ApplicationMark.Candidate;
+import juranometria.app.ApplicationMark;
+import juranometria.app.ApplicationMark.Candidate;
 
 /**
  * The coded visual gate for the JUranometria application mark
@@ -330,14 +331,14 @@ public final class ApplicationMarkStudyMain {
         System.out.println("## Told apart from what it replaces");
         System.out.println();
         System.out.println("At 16 px, against the mark the atlas"
-                + " ships today (the Tabler north-star in a rounded"
-                + " square) and against a bare card - the shape a"
+                + " carried through 1.3.0 (the Tabler north-star in a"
+                + " rounded square) and against a bare card - the shape a"
                 + " reader sees when an application has no identity"
                 + " at all. The figure is the share of the card's"
                 + " pixels that differ.");
         System.out.println();
         System.out.println("| mark | unlike a bare card | unlike"
-                + " today's north star |");
+                + " the old north star |");
         System.out.println("|---|---:|---:|");
         BufferedImage bare = bareCard(16);
         BufferedImage today = northStar(16);
@@ -388,7 +389,12 @@ public final class ApplicationMarkStudyMain {
         return image;
     }
 
-    /** Today's mark, drawn the way packaging/icon/IconGen draws it. */
+    /**
+     * The mark the atlas carried through 1.3.0, drawn here because
+     * the generator that made it was retired with it - a generator
+     * left lying about would overwrite the new mark if anyone ran
+     * it.
+     */
     private static BufferedImage northStar(int size) {
         BufferedImage image = bareCard(size);
         Graphics2D g = image.createGraphics();

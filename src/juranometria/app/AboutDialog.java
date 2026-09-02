@@ -86,10 +86,30 @@ public final class AboutDialog extends JDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
+        // The mark beside the name, not in place of anything (issue
+        // #202): the version, the licensing summary and the way to
+        // the notices all keep their room. It is branding, so it is
+        // decorative to assistive technology - a screen reader is
+        // told the application's name, not the position of three
+        // stars.
+        JPanel heading = new JPanel();
+        heading.setLayout(new BoxLayout(heading, BoxLayout.X_AXIS));
+        heading.setAlignmentX(0.0f);
+        JLabel mark = new JLabel(new javax.swing.ImageIcon(
+                ApplicationIcon.at(48)));
+        // Deliberately unnamed and undescribed. The application's
+        // name is beside it, in words; a screen reader gains nothing
+        // from being told where three stars sit.
+        mark.setFocusable(false);
+        mark.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 12));
+        heading.add(mark);
+
         JLabel title = new JLabel(AppInfo.NAME + " " + AppInfo.version());
         title.putClientProperty("FlatLaf.styleClass", "h2");
         title.setAlignmentX(0.0f);
-        panel.add(title);
+        heading.add(title);
+        heading.add(Box.createHorizontalGlue());
+        panel.add(heading);
         panel.add(Box.createVerticalStrut(6));
 
         JLabel description = new JLabel(DESCRIPTION);

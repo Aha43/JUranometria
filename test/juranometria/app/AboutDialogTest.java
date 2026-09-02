@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AboutDialogTest {
@@ -30,6 +31,48 @@ class AboutDialogTest {
         assertTrue(labels(content).stream().anyMatch(text ->
                         text.equals(AppInfo.NAME + " " + AppInfo.version())),
                 "the compact view titles itself from AppInfo");
+    }
+
+    @Test
+    void theMarkAppearsBesideTheNameWithoutDisplacingAnything()
+            throws Exception {
+        // Branding, added beside what About is for rather than in
+        // place of it (#202): the version, the licensing summary and
+        // the way to the notices all keep their room, and assistive
+        // technology is told the application's name rather than the
+        // position of three stars.
+        JComponent content = AboutDialog.compactContent(() -> { });
+        List<javax.swing.JLabel> marks = new ArrayList<>();
+        collectIcons(content, marks);
+        assertEquals(1, marks.size(),
+                "one mark, beside the title: " + marks.size());
+        assertEquals(48, marks.get(0).getIcon().getIconWidth(),
+                "at the size About shows it");
+        assertNull(marks.get(0).getAccessibleContext()
+                        .getAccessibleDescription(),
+                "decorative: assistive technology is not given a"
+                        + " description of where three stars sit");
+        assertFalse(marks.get(0).isFocusable(),
+                "and a reader tabbing through does not stop on it");
+
+        assertTrue(labels(content).stream().anyMatch(text ->
+                        text.equals(AppInfo.NAME + " " + AppInfo.version())),
+                "the version still titles the view");
+        assertTrue(AboutDialog.summaryText().contains("CC BY-NC 3.0 IGO"),
+                "and the licensing summary is untouched");
+    }
+
+    private static void collectIcons(Component component,
+                                     List<javax.swing.JLabel> found) {
+        if (component instanceof javax.swing.JLabel label
+                && label.getIcon() != null) {
+            found.add(label);
+        }
+        if (component instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                collectIcons(child, found);
+            }
+        }
     }
 
     @Test
@@ -196,7 +239,10 @@ class AboutDialogTest {
     }
 
     private static void collect(Component component, List<String> texts) {
-        if (component instanceof JLabel label) {
+        if (component instanceof JLabel label && label.getText() != null) {
+            // A label may carry an icon and no words - the
+            // application mark beside the title does (#202) - and a
+            // wordless label has nothing to contribute here.
             texts.add(label.getText());
         }
         if (component instanceof Container container) {

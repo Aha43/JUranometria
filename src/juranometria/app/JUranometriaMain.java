@@ -64,6 +64,11 @@ public final class JUranometriaMain {
         ChartViewController controller =
                 new ChartViewController(Atlas.assembler()::fits);
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
+        // The mark the gate chose, drawn at every size a window
+        // manager might want (issue #202). Without this the title
+        // bar, the task switcher and a portable launch all fall back
+        // to Java's default cup.
+        frame.setIconImages(ApplicationIcon.windowIcons());
         ChartComponent chart = new ChartComponent(Atlas.assembler());
         controller.onChange(chart::setViewState);
         // Hiding the family a searched target belongs to retires the

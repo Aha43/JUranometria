@@ -37,9 +37,9 @@ Measured by `make application-mark-study`. Every image is drawn at its own pixel
 
 ## Told apart from what it replaces
 
-At 16 px, against the mark the atlas ships today (the Tabler north-star in a rounded square) and against a bare card - the shape a reader sees when an application has no identity at all. The figure is the share of the card's pixels that differ.
+At 16 px, against the mark the atlas carried through 1.3.0 (the Tabler north-star in a rounded square) and against a bare card - the shape a reader sees when an application has no identity at all. The figure is the share of the card's pixels that differ.
 
-| mark | unlike a bare card | unlike today's north star |
+| mark | unlike a bare card | unlike the old north star |
 |---|---:|---:|
 | Rift | 77.0% | 77.4% |
 | Companion | 76.6% | 77.0% |
