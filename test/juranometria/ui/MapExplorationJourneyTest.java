@@ -542,11 +542,14 @@ class MapExplorationJourneyTest {
             assertTrue(navigation.state().targetLabel().contains("M31"));
             // The released default page, rendered at the reference's
             // own geometry from the state the journey ended in.
-            assertArrayEquals(referenceBytes(),
+            assertArrayEquals(ReleasedPage.here(),
                     renderedBytes(Atlas.assembler().assemble(
                             navigation.state(), 900, 700)),
                     "and the page it ends on is the released default,"
-                            + " pixel for pixel");
+                            + " pixel for pixel as this machine draws"
+                            + " it - not as the maintainer's does,"
+                            + " which the 1.0 contract never"
+                            + " promised (#209)");
         } finally {
             SwingUtilities.invokeAndWait(() -> {
                 inspector.dispose();

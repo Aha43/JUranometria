@@ -166,7 +166,7 @@ class DeepSkyFamilyJourneyTest {
             }
             assertEquals(ChartViewState.DEFAULT, navigation.state(),
                     "on the released default page");
-            assertArrayEquals(reference(), rendered(),
+            assertArrayEquals(ReleasedPage.here(), rendered(),
                     "which is the released page itself, pixel for"
                             + " pixel");
 
@@ -505,8 +505,9 @@ class DeepSkyFamilyJourneyTest {
             assertEquals(ChartViewState.DEFAULT, navigation.state());
             assertEquals(ChartOptions.DEFAULTS, options.options(),
                     "the released options exactly");
-            assertArrayEquals(reference(), rendered(),
-                    "and the journey ends on the released page itself");
+            assertArrayEquals(ReleasedPage.here(), rendered(),
+                    "and the journey ends on the released page"
+                            + " itself, as this machine draws it");
             assertEquals("true", store.get("chart.flamsteedNumbers", null),
                     "Restore Defaults did what it says - the released"
                             + " chart, not a partial one - which is why"

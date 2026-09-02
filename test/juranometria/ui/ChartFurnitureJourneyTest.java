@@ -254,8 +254,9 @@ class ChartFurnitureJourneyTest {
             assertEquals(ChartViewState.DEFAULT, navigation.state());
             assertEquals(ChartOptions.DEFAULTS, options.options(),
                     "and the released options exactly");
-            assertArrayEquals(reference(), rendered(),
-                    "the journey ends on the released page itself");
+            assertArrayEquals(ReleasedPage.here(), rendered(),
+                    "the journey ends on the released page itself,"
+                            + " as this machine draws it (#209)");
         } finally {
             SwingUtilities.invokeAndWait(() -> {
                 inspector.dispose();
