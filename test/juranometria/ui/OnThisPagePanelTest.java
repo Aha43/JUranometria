@@ -129,26 +129,99 @@ class OnThisPagePanelTest {
             List<OnThisPageTable.Row> rows = fixture.panel.rows();
             PageContents page = fixture.host.inventory();
 
-            long counted = rows.stream()
-                    .filter(OnThisPageTable.Row::counted).count();
-            assertTrue(counted <= 1,
-                    "at most one counted line, whatever the density");
-            if (page.anonymousStarCount() > 0) {
-                assertEquals(1, counted,
-                        "and exactly one when there are stars with no"
-                                + " name: " + page.anonymousStarCount());
-                assertEquals(String.format(java.util.Locale.ROOT,
-                                "and %,d further stars",
-                                page.anonymousStarCount()),
-                        rows.get(rows.size() - 1).name(),
-                        "which says exactly how many, so the line is a"
-                                + " fact rather than a shrug");
+            assertEquals(page.deepSky().size() + page.namedStars().size(),
+                    rows.size(),
+                    "every object that can be looked up is a row, and"
+                            + " nothing else is");
+            for (OnThisPageTable.Row row : rows) {
+                assertTrue(row.identity() != null,
+                        "every row is an object a reader could look"
+                                + " up: " + row.name());
             }
-            assertEquals(page.deepSky().size() + page.namedStars().size()
-                            + counted, rows.size(),
-                    "every object that can be looked up is listed, and"
-                            + " the rest are counted once");
+            if (page.anonymousStarCount() > 0) {
+                assertEquals(String.format(java.util.Locale.ROOT,
+                                "and %,d further stars, none of them named",
+                                page.anonymousStarCount()),
+                        fixture.panel.countedLine(),
+                        "the rest are counted beneath the table, where"
+                                + " no sort can move them into the"
+                                + " middle of it");
+            }
         }
+    }
+
+    @Test
+    void magnitudesAndDistancesSortByTheirNumbersNotTheirSpelling()
+            throws Exception {
+        // The table sorted its own display text, so 10.2 came before
+        // 2.1 and "not recorded" filed under N (review). A reader
+        // sorting by brightness got an order that is not one.
+        try (Fixture fixture = new Fixture(VIRGO, 36.0, 320, 420)) {
+            JTable table = fixture.panel.tableComponent();
+
+            for (int column : new int[] {1, 2}) {
+                sortBy(table, column);
+                List<Double> seen = new ArrayList<>();
+                boolean unknownSeen = false;
+                for (int view = 0; view < table.getRowCount(); view++) {
+                    OnThisPageTable.Row row = fixture.panel.rows()
+                            .get(table.convertRowIndexToModel(view));
+                    // Boxed on both sides: a ternary that mixes
+                    // Double and double unboxes, and unboxes null.
+                    Double value = column == 1 ? row.magnitudeValue()
+                            : Double.valueOf(row.separationDegrees());
+                    if (value == null) {
+                        unknownSeen = true;
+                        continue;
+                    }
+                    assertFalse(unknownSeen,
+                            "a recorded value after an unrecorded one:"
+                                    + " unrecorded sorts last, because"
+                                    + " it is unknown rather than"
+                                    + " bright");
+                    if (!seen.isEmpty()) {
+                        assertTrue(seen.get(seen.size() - 1) <= value,
+                                String.format("column %d ascends by"
+                                        + " number: %.2f then %.2f",
+                                        column, seen.get(seen.size() - 1),
+                                        value));
+                    }
+                    seen.add(value);
+                }
+                assertTrue(seen.size() > 10,
+                        "a real page, not three rows: " + seen.size());
+                // The defect itself, named: two values whose text
+                // order differs from their numeric order.
+                assertTrue(seen.stream().anyMatch(v -> v >= 10.0)
+                                && seen.stream().anyMatch(v -> v < 10.0),
+                        "and it spans ten, where the alphabet and the"
+                                + " numbers disagree");
+            }
+        }
+    }
+
+    @Test
+    void aSortDoesNotMoveTheCountedLineIntoTheMiddleOfTheTable()
+            throws Exception {
+        try (Fixture fixture = new Fixture(VIRGO, 36.0, 320, 420)) {
+            String before = fixture.panel.countedLine();
+            sortBy(fixture.panel.tableComponent(), 1);
+
+            assertEquals(before, fixture.panel.countedLine(),
+                    "it is a statement about the page rather than a"
+                            + " thing on it, so no sort can touch it");
+            for (OnThisPageTable.Row row : fixture.panel.rows()) {
+                assertFalse(row.name().contains("further stars"),
+                        "and it is not a row that could be sorted at"
+                                + " all: " + row.name());
+            }
+        }
+    }
+
+    private static void sortBy(JTable table, int column) throws Exception {
+        SwingUtilities.invokeAndWait(() -> table.getRowSorter()
+                .setSortKeys(List.of(new javax.swing.RowSorter.SortKey(
+                        column, javax.swing.SortOrder.ASCENDING))));
     }
 
     @Test

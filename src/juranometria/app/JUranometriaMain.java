@@ -172,6 +172,13 @@ public final class JUranometriaMain {
         // Quit all reach the same path, so leaving means one thing.
         AppShutdown shutdown = AppShutdown.real();
         shutdown.onShutdown(inspector::dispose);
+        // And the modules, on the same path. Disposing the panel a
+        // module put its table in is not releasing the module: it
+        // would still hold its subscriptions and still be
+        // contributing geometry to a chart on its way out (review).
+        // Detached newest first, which is what the detach step is
+        // for.
+        shutdown.onShutdown(modules::detachAll);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override

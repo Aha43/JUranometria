@@ -43,12 +43,23 @@ import juranometria.page.WorkingMarksModel;
 public final class OnThisPageTable extends JPanel {
 
     /**
-     * One line of the table. A counted line stands for many stars
-     * and carries no identity, because there is no one object it
-     * could be.
+     * One line of the table: one object a reader could look up.
+     *
+     * <p>It carries the <strong>numbers</strong> as well as the
+     * words. A table that sorted its own display text puts 10 before
+     * 2 and files "not recorded" under N, which is what the first
+     * version of this did (review) - so the comparators sort by
+     * {@code magnitudeValue} and {@code separationDegrees}, and the
+     * strings are only what a reader reads.
+     *
+     * <p>{@code magnitudeValue} is null where the source recorded
+     * none. Null is the honest representation of a silence; a
+     * sentinel number would sort as though the atlas knew something
+     * it does not.
      */
     public record Row(String identity, String name, String magnitude,
-               String from, String state, boolean counted) {
+                      String from, String state, Double magnitudeValue,
+                      double separationDegrees) {
     }
 
     private final ChartServices services;
@@ -56,6 +67,16 @@ public final class OnThisPageTable extends JPanel {
     private final JTable table = new JTable(model);
     private final JLabel heading = new JLabel();
     private final JLabel empty = new JLabel();
+    /**
+     * The stars the catalogue does not name, counted.
+     *
+     * <p>Beneath the table rather than in it. It is a statement
+     * about the page rather than a thing on the page - there is no
+     * one object it could be, nothing to mark, and nothing to look
+     * up - and as a row it sorted into the middle of the table by
+     * whatever column a reader chose (review).
+     */
+    private final JLabel counted = new JLabel();
     private final JScrollPane scroll = new JScrollPane(table);
     private final JButton centreHere = new JButton("Center here");
     private final JButton clearMarks = new JButton("Clear marks");
@@ -85,6 +106,13 @@ public final class OnThisPageTable extends JPanel {
 
         table.setSelectionMode(
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        // The cells hand out the row so the comparators can reach
+        // its numbers; these turn it back into the words a reader
+        // reads.
+        table.getColumnModel().getColumn(1).setCellRenderer(
+                new RowText(Row::magnitude));
+        table.getColumnModel().getColumn(2).setCellRenderer(
+                new RowText(Row::from));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setFillsViewportHeight(true);
         table.getAccessibleContext().setAccessibleName("Objects on this page");
@@ -97,6 +125,16 @@ public final class OnThisPageTable extends JPanel {
         // rather than replacing it.
         TableRowSorter<Model> sorter = new TableRowSorter<>(model);
         sorter.setSortsOnUpdates(false);
+        // By the numbers, not by their spelling. Unrecorded
+        // magnitudes go last ascending - they are not bright, they
+        // are unknown - and a descending sort reverses that with
+        // everything else, because reversing a sort reverses it.
+        sorter.setComparator(1, java.util.Comparator.comparing(
+                (Row row) -> row.magnitudeValue(),
+                java.util.Comparator.nullsLast(
+                        java.util.Comparator.naturalOrder())));
+        sorter.setComparator(2, java.util.Comparator.comparingDouble(
+                (Row row) -> row.separationDegrees()));
         table.setRowSorter(sorter);
         table.getSelectionModel().addListSelectionListener(event -> {
             if (following || event.getValueIsAdjusting()) {
@@ -122,6 +160,11 @@ public final class OnThisPageTable extends JPanel {
         clearMarks.addActionListener(event -> services.workingMarks().clear());
         clearMarks.setEnabled(false);
 
+        counted.setAlignmentX(0.0f);
+        counted.setVisible(false);
+        counted.getAccessibleContext().setAccessibleName(
+                "Stars with no catalogue name");
+
         JPanel actions = new JPanel();
         actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
         actions.add(centreHere);
@@ -137,7 +180,11 @@ public final class OnThisPageTable extends JPanel {
         top.add(empty);
         body.add(top, BorderLayout.NORTH);
         body.add(scroll, BorderLayout.CENTER);
-        body.add(actions, BorderLayout.SOUTH);
+        JPanel bottom = new JPanel();
+        bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+        bottom.add(counted);
+        bottom.add(actions);
+        body.add(bottom, BorderLayout.SOUTH);
         add(body, BorderLayout.CENTER);
         scroll.setPreferredSize(new Dimension(280, 240));
 
@@ -167,12 +214,21 @@ public final class OnThisPageTable extends JPanel {
         return clearMarks;
     }
 
+    /** What the counted line says, or empty when there is none. */
+    public String countedLine() {
+        return counted.isVisible() ? counted.getText() : "";
+    }
+
     /**
      * A new page. The rows are rebuilt from the inventory the chart
      * already holds - no catalogue query, and none while painting.
      */
     public void pageChanged(PageContents page) {
         List<Row> rows = rowsOf(page);
+        int anonymous = page.anonymousStarCount();
+        counted.setText(anonymous == 0 ? "" : String.format(Locale.ROOT,
+                "and %,d further stars, none of them named", anonymous));
+        counted.setVisible(anonymous > 0);
         model.replaceWith(rows);
         heading.setText(rows.isEmpty() ? "On this page"
                 : String.format(Locale.ROOT, "On this page · %,d",
@@ -208,7 +264,10 @@ public final class OnThisPageTable extends JPanel {
                             entry.object().recorded().band()),
                     String.format(Locale.ROOT, "%.2f°",
                             entry.separationDegrees()),
-                    wordFor(entry.visibility()), false));
+                    wordFor(entry.visibility()),
+                    Double.isNaN(entry.object().magnitude()) ? null
+                            : entry.object().magnitude(),
+                    entry.separationDegrees()));
         }
         for (PageEntry.StarEntry entry : page.namedStars()) {
             rows.add(new Row(entry.identity(),
@@ -216,16 +275,8 @@ public final class OnThisPageTable extends JPanel {
                     magnitudeOf(entry.star().magnitude(), null),
                     String.format(Locale.ROOT, "%.2f°",
                             entry.separationDegrees()),
-                    wordFor(entry.visibility()), false));
-        }
-        int anonymous = page.anonymousStarCount();
-        if (anonymous > 0) {
-            // One line, not six hundred rows a reader would scroll
-            // past to reach nothing: they are stars the catalogue
-            // never named, so there is nothing to look one up by.
-            rows.add(new Row(null, String.format(Locale.ROOT,
-                    "and %,d further stars", anonymous), "", "",
-                    "none named", true));
+                    wordFor(entry.visibility()),
+                    entry.star().magnitude(), entry.separationDegrees()));
         }
         return rows;
     }
@@ -235,16 +286,14 @@ public final class OnThisPageTable extends JPanel {
     private void markWhatIsSelected() {
         List<String> chosen = new ArrayList<>();
         for (int viewRow : table.getSelectedRows()) {
-            Row row = model.rows.get(table.convertRowIndexToModel(viewRow));
-            if (!row.counted()) {
-                chosen.add(row.identity());
-            }
+            chosen.add(model.rows.get(table.convertRowIndexToModel(viewRow))
+                    .identity());
         }
         String lead = null;
         int leadView = table.getSelectionModel().getLeadSelectionIndex();
         if (leadView >= 0 && leadView < table.getRowCount()) {
             Row row = model.rows.get(table.convertRowIndexToModel(leadView));
-            if (!row.counted() && chosen.contains(row.identity())) {
+            if (chosen.contains(row.identity())) {
                 lead = row.identity();
             }
         }
@@ -271,10 +320,8 @@ public final class OnThisPageTable extends JPanel {
     private boolean sameAsSelection(List<String> wanted) {
         List<String> shown = new ArrayList<>();
         for (int viewRow : table.getSelectedRows()) {
-            Row row = model.rows.get(table.convertRowIndexToModel(viewRow));
-            if (!row.counted()) {
-                shown.add(row.identity());
-            }
+            shown.add(model.rows.get(table.convertRowIndexToModel(viewRow))
+                    .identity());
         }
         return new java.util.HashSet<>(shown)
                 .equals(new java.util.HashSet<>(wanted));
@@ -300,7 +347,7 @@ public final class OnThisPageTable extends JPanel {
             table.clearSelection();
             for (int modelRow = 0; modelRow < model.rows.size(); modelRow++) {
                 Row row = model.rows.get(modelRow);
-                if (row.counted() || !marks.contains(row.identity())) {
+                if (!marks.contains(row.identity())) {
                     continue;
                 }
                 int viewRow = table.convertRowIndexToView(modelRow);
@@ -391,6 +438,22 @@ public final class OnThisPageTable extends JPanel {
         return String.format(Locale.ROOT, "%.1f%s", magnitude, suffix);
     }
 
+    /** Draws one of a row's words, whatever the cell handed over. */
+    private static final class RowText
+            extends javax.swing.table.DefaultTableCellRenderer {
+
+        private final java.util.function.Function<Row, String> word;
+
+        RowText(java.util.function.Function<Row, String> word) {
+            this.word = word;
+        }
+
+        @Override
+        protected void setValue(Object value) {
+            setText(value instanceof Row row ? word.apply(row) : "");
+        }
+    }
+
     /** The four decided columns, and nothing else. */
     private static final class Model extends AbstractTableModel {
 
@@ -419,12 +482,20 @@ public final class OnThisPageTable extends JPanel {
 
         @Override public Object getValueAt(int row, int column) {
             Row line = rows.get(row);
+            // The magnitude and distance columns hand out the row
+            // itself, so the comparators can reach the numbers; the
+            // renderer below turns it back into the words a reader
+            // reads. Handing out the display text instead is what
+            // made 10 sort before 2.
             return switch (column) {
                 case 0 -> line.name();
-                case 1 -> line.magnitude();
-                case 2 -> line.from();
+                case 1, 2 -> line;
                 default -> line.state();
             };
+        }
+
+        @Override public Class<?> getColumnClass(int column) {
+            return column == 1 || column == 2 ? Row.class : String.class;
         }
 
         @Override public boolean isCellEditable(int row, int column) {
