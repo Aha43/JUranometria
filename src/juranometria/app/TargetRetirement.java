@@ -55,10 +55,18 @@ public final class TargetRetirement {
             throw new IllegalArgumentException(
                     "options, the chart and navigation are all required");
         }
+        // The options in force before each change, because the rule
+        // is about a transition and not about a state (review). The
+        // first notification hands back what is already current, so
+        // it compares equal to itself and retires nothing.
+        java.util.concurrent.atomic.AtomicReference<ChartOptions> before =
+                new java.util.concurrent.atomic.AtomicReference<>(
+                        options.options());
         options.onChange(next -> {
-            if (retires(chart.currentScene(), next)) {
+            if (retires(chart.currentScene(), before.get(), next)) {
                 navigation.retireTarget();
             }
+            before.set(next);
             chart.setChartOptions(next);
         });
     }
@@ -66,13 +74,28 @@ public final class TargetRetirement {
     /**
      * Does this options change retire the scene's target?
      *
+     * <p>The question is about a <strong>transition</strong>, not a
+     * state: did <em>this</em> change hide the target's family? A
+     * rule that merely asked whether the family is hidden would
+     * retire a target on every later change while it stayed hidden -
+     * so a reader who hides Galaxies, searches M 33 (which names it
+     * again, as the decided rule says it should), and then toggles
+     * Nebulae or the grid would lose the target to an action that had
+     * nothing to do with it (review).
+     *
      * <p>True only when there is a target, the page carries it, it
-     * draws a symbol at all, and the new options no longer permit
-     * that symbol's family. An object the atlas draws no symbol for
-     * was never kept by the exemption and has nothing to lose.
+     * draws a symbol at all, and that symbol's family was permitted
+     * before this change and is not permitted after it. An object the
+     * atlas draws no symbol for was never kept by the exemption and
+     * has nothing to lose.
+     *
+     * <p>Permission is asked of {@link ChartOptions#effectiveFamily},
+     * which folds in the master switch, so a master-switch transition
+     * is the same transition by construction.
      */
-    public static boolean retires(ChartScene scene, ChartOptions next) {
-        if (scene == null || next == null
+    public static boolean retires(ChartScene scene, ChartOptions before,
+                                  ChartOptions next) {
+        if (scene == null || before == null || next == null
                 || scene.targetIdentity() == null) {
             return false;
         }
@@ -85,7 +108,8 @@ public final class TargetRetirement {
             if (symbol == ChartRenderer.Symbol.NONE) {
                 return false;
             }
-            return !next.effectiveFamily(symbol);
+            return before.effectiveFamily(symbol)
+                    && !next.effectiveFamily(symbol);
         }
         return false;
     }

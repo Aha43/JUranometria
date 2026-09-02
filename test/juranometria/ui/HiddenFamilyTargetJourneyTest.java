@@ -208,10 +208,40 @@ class HiddenFamilyTargetJourneyTest {
                 "searching while the family is hidden names it again");
         assertTrue(drawnIds().contains(M33),
                 "and draws it, because the reader just asked for it");
-        apply(options.options().withFamily(SymbolFamily.GALAXIES, false)
-                .withFamily(SymbolFamily.NEBULAE, false));
+
+        // And it keeps it. The rule is about a transition, not a
+        // state: with Galaxies already hidden, an action that hides
+        // something else is not an action about M 33, and must not
+        // take it away. An earlier draft of this journey asserted the
+        // opposite by accident - it toggled Nebulae and credited the
+        // retirement to Galaxies, which had not moved (review).
+        apply(options.options().withFamily(SymbolFamily.NEBULAE, false));
+        assertEquals(M33, navigation.state().targetIdentity(),
+                "hiding nebulae is not a statement about the galaxy"
+                        + " the reader just asked for");
+        assertTrue(drawnIds().contains(M33), "which is still drawn");
+        ChartOptions gridOff = options.options();
+        apply(new ChartOptions(gridOff.deepSkyObjects(),
+                gridOff.deepSkyLabels(), gridOff.constellationFigures(),
+                gridOff.constellationBoundaries(),
+                gridOff.constellationNames(), gridOff.starNames(),
+                gridOff.bayerLetters(), gridOff.flamsteedNumbers(),
+                false, gridOff.titleBlock(), gridOff.magnitudeKey(),
+                gridOff.galaxies(), gridOff.openClusters(),
+                gridOff.globularClusters(), gridOff.nebulae(),
+                gridOff.planetaryNebulae()));
+        assertEquals(M33, navigation.state().targetIdentity(),
+                "nor is switching the grid off");
+
+        // Showing its family and hiding it again is a real
+        // transition, and retires it.
+        apply(options.options().withFamily(SymbolFamily.GALAXIES, true));
+        assertEquals(M33, navigation.state().targetIdentity(),
+                "showing galaxies takes nothing away");
+        apply(options.options().withFamily(SymbolFamily.GALAXIES, false));
         assertNull(navigation.state().targetIdentity(),
-                "and switching its family off again retires it again");
+                "and hiding them again - shown to hidden, the real"
+                        + " transition - retires it");
 
         // 7. Cancel restores the options it was given and nothing
         // else. Retiring a target is a navigation transition - the

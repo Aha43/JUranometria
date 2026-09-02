@@ -36,6 +36,24 @@ This is the transition panning already makes, for the same reason and
 through the same atomic rule. Leaving the page is what retirement
 shares with panning away; losing your place is not.
 
+### It is a transition, not a state
+
+The rule asks whether **this change** hid the target's family:
+permitted before, not permitted after.
+
+Asking merely whether the family *is* hidden looks equivalent and is
+not. It would retire a target on every later options change while the
+family stayed hidden — so a reader who hides Galaxies, searches
+M 33 (which names it again, as the rule below says it should), and
+then toggles Nebulae or the grid would lose the target to an action
+that had nothing to do with it. The first draft did exactly that, and
+its journey asserted the fault by accident: it toggled Nebulae and
+credited the retirement to Galaxies, which had not moved.
+
+So the wiring keeps the options in force before each change, and the
+predicate compares the two. The first notification hands back what is
+already current, compares equal to itself, and retires nothing.
+
 ## What was asked, and decided
 
 **Does the master switch follow the same rule?** Yes, and by
@@ -87,11 +105,20 @@ once more, because the page's own target has changed.
 
 ## Where the rule lives
 
-`TargetRetirement.retires(scene, options)` is the decision alone —
+`TargetRetirement.retires(scene, before, next)` is the decision alone —
 no Swing, no navigation — and `TargetRetirement.connect(...)` is the
 one wiring the application and every journey install. A rule the
 application wires by hand and a test wires by hand again is two
 rules that can drift, and the second one always passes.
+
+`TargetRetirementTest` exercises the predicate with **no window and
+no display**, so CI runs it: the journeys that drive the rule through
+real controls abort where there is no display, and a rule proved only
+on a developer's machine is a rule with no gate under it. All four
+combinations are asserted — shown→hidden retires, hidden→hidden does
+not, hidden→shown does not, shown→shown does not — and reverting the
+predicate to the state check fails three of those tests as well as
+the journey.
 
 The predicate reads production for every part of its answer:
 `ChartRenderer.symbolForType` for the symbol an object draws, and
