@@ -136,21 +136,43 @@ public final class OnThisPageStudyMain {
                 .orElse(null);
     }
 
+    /** The paper, as the renderer clips it. */
+    private static final java.awt.geom.Rectangle2D PAPER =
+            new java.awt.geom.Rectangle2D.Double(1, 1, WIDTH - 2, HEIGHT - 2);
+
     /**
-     * Whether an object's <strong>recorded extent</strong> reaches
-     * the paper, not merely its centre (gate review).
+     * Whether an object's <strong>recorded ellipse</strong> reaches
+     * the paper.
      *
      * <p>A centre-only rule omits an object a reader can plainly
      * see: M 31 is 178 arcminutes long, so a page can be filled by
-     * its disc while its centre sits outside the paper. The table
-     * would then say the page held nothing while the page showed a
-     * galaxy.
+     * its disc while its centre sits outside the paper.
      *
-     * <p>The extent used is the <em>catalogue's</em> size, not the
-     * drawn symbol's. That keeps the inventory a fact about the sky:
-     * it does not move when a family is switched off, when the
-     * detail policy refuses a symbol, or when the practical-minimum
-     * clamp enlarges a tiny one for legibility.
+     * <p>The geometry is the <em>source's</em>, never the display
+     * values the loader substitutes so the renderer always has
+     * dimensions to draw with. Where the source is silent the
+     * fallback is explicit rather than invented, and each one is
+     * stated because each one is a different kind of ignorance:
+     *
+     * <ul>
+     *   <li><strong>no recorded size</strong> - the atlas knows of
+     *       no extent at all, so the object is a <strong>point</strong>;</li>
+     *   <li><strong>a major axis but no minor, or no position
+     *       angle</strong> - the catalogue permits a family of
+     *       ellipses, and every one of them fits inside the circle
+     *       of the recorded half-major, so that circle is used and
+     *       the answer is honestly conservative;</li>
+     *   <li><strong>the full ellipse</strong> - tested as the
+     *       ellipse it is, oriented as recorded, through the same
+     *       {@code Shape.intersects} the renderer's own
+     *       {@code drawnMarks} uses to decide what is on the
+     *       paper.</li>
+     * </ul>
+     *
+     * <p>The envelope was the whole rule until review pointed out
+     * that it is not what the decision says: a long thin galaxy
+     * lying away from the page can have its circle reach the paper
+     * while the ellipse never does.
      */
     private static boolean reachesPaper(GnomonicProjection projection,
                                         ViewportMapping mapping,
@@ -158,34 +180,54 @@ public final class OnThisPageStudyMain {
         PixelPoint centre = projection.project(dso.position())
                 .map(mapping::toPixel).orElse(null);
         if (centre == null) {
-            // Behind the projection's horizon: it has no place on
-            // this page at all.
+            // Behind the projection's horizon: no place on this page.
             return false;
         }
         if (insidePaper(centre)) {
             return true;
         }
-        if (!dso.recorded().hasSize()) {
-            // The source recorded no size, so the atlas knows of no
-            // extent to reach the paper with. The display value the
-            // loader substitutes for the renderer is not a
-            // catalogue fact and must not decide what is on a page
-            // (gate review): an object of unknown size is a point.
+        DeepSkyObject.Recorded recorded = dso.recorded();
+        if (!recorded.hasSize()) {
             return false;
         }
-        double halfMajorPx = dso.recorded().majorAxisArcmin() / 2.0 / 60.0
-                * mapping.pixelsPerPlaneUnit() * Math.PI / 180.0;
-        // The distance from the centre to the paper, not an expanded
-        // rectangle: a square of half the major axis reaches further
-        // at its corners than the object ever does, and would put
-        // objects on the page that are not on it. A circle of the
-        // recorded half-major contains the ellipse whichever way it
-        // lies, which is conservative in the one safe direction.
-        double dx = Math.max(0.0, Math.max(1 - centre.x(),
-                centre.x() - (WIDTH - 1)));
-        double dy = Math.max(0.0, Math.max(1 - centre.y(),
-                centre.y() - (HEIGHT - 1)));
-        return Math.hypot(dx, dy) <= halfMajorPx;
+        double majorPx = arcminToPx(recorded.majorAxisArcmin(), mapping);
+        if (recorded.minorAxisArcmin() == null
+                || recorded.positionAngleDegrees() == null) {
+            return circleReaches(centre, majorPx / 2.0);
+        }
+        double minorPx = arcminToPx(recorded.minorAxisArcmin(), mapping);
+        return recordedEllipse(centre, majorPx, minorPx,
+                recorded.positionAngleDegrees()).intersects(PAPER);
+    }
+
+    /** The recorded ellipse in page pixels, oriented as the chart draws. */
+    static java.awt.Shape recordedEllipse(PixelPoint centre, double majorPx,
+                                          double minorPx,
+                                          double positionAngleDegrees) {
+        java.awt.geom.Ellipse2D local = new java.awt.geom.Ellipse2D.Double(
+                -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
+        java.awt.geom.AffineTransform place =
+                java.awt.geom.AffineTransform.getTranslateInstance(
+                        centre.x(), centre.y());
+        // Position angle is east of north; east is left on the chart,
+        // which is a clockwise-negative rotation in pixel space - the
+        // renderer's own convention, not a second one.
+        place.rotate(-Math.toRadians(positionAngleDegrees));
+        return place.createTransformedShape(local);
+    }
+
+    static double arcminToPx(double arcmin, ViewportMapping mapping) {
+        return arcmin / 60.0 * mapping.pixelsPerPlaneUnit()
+                * Math.PI / 180.0;
+    }
+
+    /** The conservative envelope, used only where orientation is unknown. */
+    private static boolean circleReaches(PixelPoint centre, double radiusPx) {
+        double dx = Math.max(0.0, Math.max(PAPER.getMinX() - centre.x(),
+                centre.x() - PAPER.getMaxX()));
+        double dy = Math.max(0.0, Math.max(PAPER.getMinY() - centre.y(),
+                centre.y() - PAPER.getMaxY()));
+        return Math.hypot(dx, dy) <= radiusPx;
     }
 
     private static boolean insidePaper(PixelPoint pixel) {
@@ -330,15 +372,108 @@ public final class OnThisPageStudyMain {
                         + " ten, so the rule decides real rows rather"
                         + " than a corner case.%n%n",
                 100.0 * unsized() / packSize());
-        System.out.println("The reach is measured from the centre to"
-                + " the paper rather than by growing the paper into a"
-                + " square. A square of half the major axis reaches"
-                + " further at its corners than the object ever does,"
-                + " and would report objects on the page that are not"
-                + " on it. A circle of the recorded half-major"
-                + " contains the ellipse whichever way it lies, which"
-                + " errs in the one safe direction.");
+        System.out.println("### The ellipse, not an envelope");
         System.out.println();
+        System.out.println("An earlier draft asked whether a circle"
+                + " of the recorded half-major reached the paper."
+                + " That circle contains the ellipse whichever way it"
+                + " lies, so it never misses - but it is not what"
+                + " this decision says, and it says yes for thin"
+                + " objects whose known ellipse never comes near the"
+                + " page.");
+        System.out.println();
+        System.out.println("So the recorded ellipse is tested as the"
+                + " ellipse it is, oriented as the source recorded"
+                + " it, through the same `Shape.intersects` the"
+                + " renderer's own `drawnMarks` uses to decide what"
+                + " is on the paper. Where the source is silent the"
+                + " fallback is explicit rather than invented:");
+        System.out.println();
+        System.out.println("| what the source recorded | what is"
+                + " tested | rows in the pack |");
+        System.out.println("|---|---|---:|");
+        int[] tally = geometryTally();
+        System.out.printf(Locale.ROOT,
+                "| nothing | a **point** - the atlas knows of no"
+                        + " extent | %,d |%n", tally[0]);
+        System.out.printf(Locale.ROOT,
+                "| a major axis only, or no position angle | the"
+                        + " **circle** of the half-major, because"
+                        + " every ellipse the catalogue permits fits"
+                        + " inside it | %,d |%n", tally[1]);
+        System.out.printf(Locale.ROOT,
+                "| major, minor and orientation | the **ellipse**"
+                        + " itself | %,d |%n", tally[2]);
+        System.out.println();
+        System.out.printf(Locale.ROOT,
+                "The envelope therefore decides **%,d rows** and the"
+                        + " exact ellipse decides **%,d**, which is"
+                        + " the honest split: the conservative answer"
+                        + " is given exactly where the catalogue"
+                        + " leaves no better one.%n%n",
+                tally[1], tally[2]);
+        System.out.printf(Locale.ROOT,
+                "Across the study's pages the exact test removes"
+                        + " **%d** object%s the envelope would have"
+                        + " reported: a thin ellipse whose circle"
+                        + " touches the paper and whose recorded"
+                        + " shape does not. Few, and the point is"
+                        + " that the rule says what it does rather"
+                        + " than how many it moves.%n%n",
+                envelopeExtras(), envelopeExtras() == 1 ? "" : "s");
+        System.out.println();
+    }
+
+    /** How the pack's rows are decided: point, envelope, ellipse. */
+    private static int[] geometryTally() {
+        int[] tally = new int[3];
+        for (DeepSkyObject dso : DeepSkyVocabularyStudyMain.wholePack()) {
+            DeepSkyObject.Recorded recorded = dso.recorded();
+            if (!recorded.hasSize()) {
+                tally[0]++;
+            } else if (recorded.minorAxisArcmin() == null
+                    || recorded.positionAngleDegrees() == null) {
+                tally[1]++;
+            } else {
+                tally[2]++;
+            }
+        }
+        return tally;
+    }
+
+    /** What the envelope would have added over the exact ellipse. */
+    private static int envelopeExtras() {
+        int extras = 0;
+        for (Page page : PAGES) {
+            for (double field : FIELDS) {
+                ChartScene scene = pageOf(page, field);
+                GnomonicProjection projection =
+                        new GnomonicProjection(scene.viewport().centre());
+                ViewportMapping mapping =
+                        new ViewportMapping(scene.viewport());
+                for (DeepSkyObject dso : scene.deepSkyObjects()) {
+                    DeepSkyObject.Recorded recorded = dso.recorded();
+                    if (!recorded.hasSize()
+                            || recorded.minorAxisArcmin() == null
+                            || recorded.positionAngleDegrees() == null) {
+                        continue;
+                    }
+                    PixelPoint centre = projection.project(dso.position())
+                            .map(mapping::toPixel).orElse(null);
+                    if (centre == null || insidePaper(centre)) {
+                        continue;
+                    }
+                    double majorPx = arcminToPx(
+                            recorded.majorAxisArcmin(), mapping);
+                    boolean envelope = circleReaches(centre, majorPx / 2.0);
+                    boolean exact = reachesPaper(projection, mapping, dso);
+                    if (envelope && !exact) {
+                        extras++;
+                    }
+                }
+            }
+        }
+        return extras;
     }
 
     private static int unsized() {

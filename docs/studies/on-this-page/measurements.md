@@ -27,7 +27,7 @@ An object behind the projection's horizon has no place on the page and is not on
 | virgo | the densest galaxies | 18° | 780 | 154 | 934 |
 | virgo | the densest galaxies | 36° | 1836 | 647 | 2483 |
 | lmc | the Large Magellanic Cloud | 1° | 17 | 0 | 17 |
-| lmc | the Large Magellanic Cloud | 8° | 275 | 37 | 312 |
+| lmc | the Large Magellanic Cloud | 8° | 274 | 37 | 311 |
 | lmc | the Large Magellanic Cloud | 18° | 374 | 239 | 613 |
 | lmc | the Large Magellanic Cloud | 36° | 533 | 1011 | 1544 |
 | ra-zero | the seam | 1° | 0 | 1 | 1 |
@@ -54,16 +54,30 @@ An object is on the page when its **recorded extent** reaches the paper, not mer
 | orion | 36° | 244 | 245 | **1** |
 | virgo | 18° | 779 | 780 | **1** |
 | virgo | 36° | 1834 | 1836 | **2** |
-| lmc | 8° | 274 | 275 | **1** |
 | lmc | 36° | 532 | 533 | **1** |
 
-**14 objects** across these pages would have been left out of a table that asked only about centres - among them M 32 and M 110 on a 1° view of M 31, which is the closest look the atlas offers at the page it opens on.
+**13 objects** across these pages would have been left out of a table that asked only about centres - among them M 32 and M 110 on a 1° view of M 31, which is the closest look the atlas offers at the page it opens on.
 
 The extent used is what the **source recorded**, never the display size the loader substitutes for the renderer where the catalogue is silent. **An object of unknown size is a point**: the atlas knows of no extent for it to reach the paper with, and inventing one would put a size nobody measured in charge of what a table says is on the page.
 
 Measured over the bundled pack, **9.7% of rows record no size at all** - about one in ten, so the rule decides real rows rather than a corner case.
 
-The reach is measured from the centre to the paper rather than by growing the paper into a square. A square of half the major axis reaches further at its corners than the object ever does, and would report objects on the page that are not on it. A circle of the recorded half-major contains the ellipse whichever way it lies, which errs in the one safe direction.
+### The ellipse, not an envelope
+
+An earlier draft asked whether a circle of the recorded half-major reached the paper. That circle contains the ellipse whichever way it lies, so it never misses - but it is not what this decision says, and it says yes for thin objects whose known ellipse never comes near the page.
+
+So the recorded ellipse is tested as the ellipse it is, oriented as the source recorded it, through the same `Shape.intersects` the renderer's own `drawnMarks` uses to decide what is on the paper. Where the source is silent the fallback is explicit rather than invented:
+
+| what the source recorded | what is tested | rows in the pack |
+|---|---|---:|
+| nothing | a **point** - the atlas knows of no extent | 1,300 |
+| a major axis only, or no position angle | the **circle** of the half-major, because every ellipse the catalogue permits fits inside it | 1,296 |
+| major, minor and orientation | the **ellipse** itself | 10,775 |
+
+The envelope therefore decides **1,296 rows** and the exact ellipse decides **10,775**, which is the honest split: the conservative answer is given exactly where the catalogue leaves no better one.
+
+Across the study's pages the exact test removes **1** object the envelope would have reported: a thin ellipse whose circle touches the paper and whose recorded shape does not. Few, and the point is that the rule says what it does rather than how many it moves.
+
 
 ## Present, and why it cannot be seen
 
@@ -77,7 +91,7 @@ Every state is production's own answer. `permitted` is the rule the family switc
 | orion | 36° | 1564 | 0 | 0 | 26 | 207 |
 | virgo | 8° | 369 | 0 | 0 | 46 | 0 |
 | virgo | 36° | 669 | 0 | 0 | 288 | 1526 |
-| lmc | 8° | 293 | 0 | 0 | 19 | 0 |
+| lmc | 8° | 293 | 0 | 0 | 18 | 0 |
 | lmc | 36° | 1017 | 0 | 0 | 26 | 501 |
 | ra-zero | 8° | 55 | 0 | 0 | 3 | 0 |
 | ra-zero | 36° | 848 | 0 | 0 | 52 | 472 |

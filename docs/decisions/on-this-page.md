@@ -19,7 +19,7 @@ this answers the question beside it.
 
 ## What "on this page" means
 
-**An object is on the page when its recorded extent reaches the
+**An object is on the page when its recorded ellipse reaches the
 paper.** Not whether its symbol is drawn, its family switched on,
 its magnitude inside the limit, or the atlas has a symbol for its
 type at all.
@@ -40,11 +40,34 @@ measured in charge of the answer. **An object of unknown size is a
 point** — and that is not a corner case: **9.7% of the bundled pack
 records no size at all**.
 
-The reach is measured from the centre to the paper, not by growing
-the paper into a square. A square of half the major axis reaches
-further at its corners than the object ever does; a circle of the
-recorded half-major contains the ellipse whichever way it lies,
-which errs in the one safe direction.
+**The ellipse, not an envelope.** Two earlier drafts of this rule
+were bounds rather than the thing itself — first a square of the
+half-major, then a circle of it. A circle contains the ellipse
+whichever way it lies, so it never misses; but it is not what this
+decision says, and it answers *yes* for a thin object lying along
+the page edge whose known shape never comes near it.
+
+So the recorded ellipse is tested as the ellipse it is, oriented as
+the source recorded it, through the same `Shape.intersects` the
+renderer's own `drawnMarks` uses to decide what is on the paper.
+
+Where the source is silent the fallback is explicit, because each
+silence is a different kind of ignorance:
+
+| the source recorded | what is tested | rows in the pack |
+|---|---|---:|
+| nothing | a **point** — the atlas knows of no extent | 1,300 |
+| a major axis only, or no position angle | the **circle** of the half-major, since every ellipse the catalogue permits fits inside it | 1,296 |
+| major, minor and orientation | the **ellipse** itself | 10,775 |
+
+The conservative answer is given exactly where the catalogue leaves
+no better one, and nowhere else.
+
+`OnThisPageGeometryTest` checks the rule against an oracle that
+knows no Java2D — sampling the ellipse's own boundary and testing
+whether it holds a corner of the paper — over 5,400 combinations of
+position, size, axis ratio and orientation straddling the page edge,
+with the thin-ellipse case named so it cannot come back.
 
 The paper is the rectangle the renderer clips to — `1, 1, width-2,
 height-2` — which is the rectangle `drawnMarks` already tests
@@ -352,6 +375,12 @@ behind.
 - **The renderer's substituted dimensions as "extent".** Rejected:
   they exist so the renderer always has something to draw and are
   not catalogue facts. An unknown size is a point.
+- **A bounding square, then a bounding circle, as the page rule.**
+  Both reject nothing the ellipse would have accepted, and both
+  accept objects the ellipse rejects — a thin galaxy lying along the
+  edge. A bound is a fine thing to call a bound and a poor thing to
+  call an extent. The circle survives only as the stated fallback
+  where orientation is unrecorded.
 - **Firing bound actions off-screen as keyboard evidence.**
   Rejected: it proves a binding exists, not that a key reaches it.
 - **Hand-written mock-up rows.** Rejected after review caught one
