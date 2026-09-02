@@ -183,18 +183,23 @@ class SprintTwentyFourJourneyTest {
         //    draw, so the reader does what a reader would: turns the
         //    magnitude limit down, which makes several of the stars
         //    on this page present and undrawn.
-        SwingUtilities.invokeAndWait(navigation::decreaseMagnitudeLimit);
-        flush();
-        List<String> invisible = new ArrayList<>();
-        for (PageEntry entry : modules.inventory().entries()) {
-            if (entry.visibility() != PageVisibility.DRAWN
-                    && invisible.size() < 3) {
-                invisible.add(entry.identity());
-            }
+        int steps = 0;
+        while (undrawnRows().size() < 3 && steps < 4) {
+            SwingUtilities.invokeAndWait(navigation::decreaseMagnitudeLimit);
+            flush();
+            steps++;
         }
+        // From the table's own rows, not from the inventory: the
+        // unnamed stars are counted beneath the table rather than
+        // listed, so a reader cannot point at one. Taking them from
+        // the inventory marked objects no gesture could reach, which
+        // the display runner caught the moment this journey started
+        // using real clicks (sprint review).
+        List<String> invisible = undrawnRows().subList(0, 3);
         assertEquals(3, invisible.size(),
-                "turning the limit down leaves several objects present"
-                        + " and undrawn: " + modules.inventory().tally());
+                "turning the limit down leaves several listed objects"
+                        + " present and undrawn: "
+                        + modules.inventory().tally());
         String stillDrawn = firstWith(modules.inventory(), true).identity();
 
         // Marked the way a reader marks: a click, then the
@@ -238,8 +243,10 @@ class SprintTwentyFourJourneyTest {
         // The limit goes back up, which is a page change - so it is
         // counted after the assertion above rather than folded into
         // it.
-        SwingUtilities.invokeAndWait(navigation::increaseMagnitudeLimit);
-        flush();
+        for (int i = 0; i < steps; i++) {
+            SwingUtilities.invokeAndWait(navigation::increaseMagnitudeLimit);
+            flush();
+        }
         SwingUtilities.invokeAndWait(() ->
                 inspector.selectedModeButton().doClick());
         assertTrue(inspectorSays(invisible.get(2))
@@ -465,6 +472,19 @@ class SprintTwentyFourJourneyTest {
             }
         }
         return true;
+    }
+
+    /** The rows a reader can see that the chart does not draw. */
+    private List<String> undrawnRows() throws Exception {
+        List<String> found = new ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> {
+            for (OnThisPageTable.Row row : page.rows()) {
+                if (!"drawn".equals(row.state())) {
+                    found.add(row.identity());
+                }
+            }
+        });
+        return found;
     }
 
     /** The platform's own add-to-selection modifier. */
