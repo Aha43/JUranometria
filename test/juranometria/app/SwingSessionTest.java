@@ -132,9 +132,14 @@ class SwingSessionTest {
                     () -> juranometria.app.UiTheme.apply(false));
             java.awt.Font themes =
                     (java.awt.Font) UIManager.get("defaultFont");
+            // From the theme's own font rather than its family:
+            // on Linux the family is "SansSerif" while the name is
+            // "sansserif", so rebuilding from the family produces a
+            // font that is NOT equal and the premise below fails -
+            // found by the display CI of #209, where this test had
+            // never run.
             javax.swing.plaf.FontUIResource sameButChosen =
-                    new javax.swing.plaf.FontUIResource(themes.getFamily(),
-                            themes.getStyle(), themes.getSize());
+                    new javax.swing.plaf.FontUIResource(themes);
             assertEquals(themes, sameButChosen,
                     "the point of this test: the chosen font and the"
                             + " theme's are equal");

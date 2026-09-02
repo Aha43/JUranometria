@@ -28,3 +28,72 @@ jobs:
         run: scripts/download-libs.sh
       - name: Compile and run the test suite
         run: make test
+        # Headless. This is the required check and it stays fast and
+        # unconditional; what it cannot do is run the journeys that
+        # need a screen, which is what the job below is for.
+
+  # The display-dependent journeys (issue #209). Nineteen tests abort
+  # in the headless job - every one that drives a real window - and
+  # for the whole of Sprint 23 that meant `main` could be red on a
+  # maintainer's machine while every check here was green. A gate
+  # with a hole in it.
+  #
+  # xvfb gives them a screen, and a virtual one is better than a
+  # developer's: nothing else competes for the desktop, so a window
+  # that asks for focus gets it. #209 was exactly a focus request
+  # refused because another application held the desktop.
+  display:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/cache@v6
+        with:
+          path: lib
+          key: libs-${{ hashFiles('scripts/lib-versions.env') }}
+      - run: scripts/download-libs.sh
+      - name: Run the whole suite on a virtual display
+        # Once, and then read every counter. Zero aborted is not
+        # enough on its own: a run that found three tests and
+        # passed them reports zero aborted too (#209 review). So
+        # the whole tally has to agree - everything found was
+        # started, everything started succeeded, and nothing was
+        # skipped, aborted or failed.
+        run: |
+          set -o pipefail
+          xvfb-run -a make test 2>&1 | tee display-run.txt
+          count() {
+            grep -oE "[0-9]+ tests $1" display-run.txt \
+              | grep -oE '[0-9]+' | head -1
+          }
+          found=$(count found)
+          started=$(count started)
+          ok=$(count successful)
+          failed=$(count failed)
+          aborted=$(count aborted)
+          skipped=$(count skipped)
+          echo "on a display: found=$found started=$started" \
+               "successful=$ok failed=$failed aborted=$aborted" \
+               "skipped=$skipped"
+          fail() { echo "::error::$1"; exit 1; }
+          [ -n "$found" ] && [ -n "$ok" ] \
+            || fail 'the display run produced no test tally at all'
+          # A floor, so a suite that silently shrank cannot pass
+          # by running almost nothing. Raise it as the suite
+          # grows; it is deliberately well below the real count.
+          [ "$found" -ge 500 ] \
+            || fail "only $found tests found on the display run"
+          [ "$found" = "$started" ] \
+            || fail "$found found but $started started"
+          [ "$ok" = "$found" ] \
+            || fail "$found found but only $ok succeeded"
+          [ "$failed" = 0 ] || fail "$failed failed on a display"
+          [ "$skipped" = 0 ] || fail "$skipped skipped"
+          # The one this job exists for: every journey that needs
+          # a screen must actually have run.
+          [ "$aborted" = 0 ] \
+            || fail "$aborted aborted on a display run; this job" \
+                    'exists so that cannot happen quietly'

@@ -207,7 +207,14 @@ class MapExplorationJourneyTest {
 
             // Taken by keyboard, as a reader without a pointer does.
             javax.swing.JList<?> overlap = candidateList(inspector);
-            SwingUtilities.invokeAndWait(overlap::requestFocusInWindow);
+            assertTrue(FocusedWindow.tryToFocus(window),
+                    "the premise: the window is focused before any"
+                            + " keyboard step. "
+                            + FocusedWindow.state(window));
+            assertTrue(FocusedWindow.awaitFocusOwner(overlap),
+                    "the premise: the candidate list holds the"
+                            + " keyboard focus before it is sent any."
+                            + " " + FocusedWindow.state(window));
             flush();
             key(overlap, KeyEvent.VK_DOWN);
             key(overlap, KeyEvent.VK_ENTER);
@@ -305,7 +312,29 @@ class MapExplorationJourneyTest {
             javax.swing.JList<?> list = candidateList(inspector);
             // Walked with the arrow key and settled with Enter, as a
             // reader without a pointer does (sprint review).
-            SwingUtilities.invokeAndWait(list::requestFocusInWindow);
+            // Focus first, and only then the keyboard (#209 review).
+            // Asking afterwards cannot repair a request the desktop
+            // has already refused: the application calls
+            // requestFocusInWindow() inside the Enter handler, and
+            // outside the focused window that call does nothing at
+            // all. This is the step that has to happen before Down
+            // and Enter, not the assertion after them.
+            assertTrue(FocusedWindow.tryToFocus(window),
+                    "the premise: this window holds the keyboard"
+                            + " focus, so the application's own focus"
+                            + " requests can be granted. "
+                            + FocusedWindow.state(window));
+            // And the list itself must hold the focus, not merely
+            // the window (#209 review). The events below are
+            // dispatched straight at it, which works whether or not
+            // a reader's keyboard could ever have reached it - so
+            // the thing that makes it a keyboard journey is asserted
+            // here rather than assumed.
+            assertTrue(FocusedWindow.awaitFocusOwner(list),
+                    "the premise: the candidate list has the keyboard"
+                            + " focus, so Down and Enter are what a"
+                            + " reader's would be. "
+                            + FocusedWindow.state(window));
             flush();
             key(list, KeyEvent.VK_DOWN);
             assertEquals(1, list.getSelectedIndex(),
@@ -313,7 +342,12 @@ class MapExplorationJourneyTest {
             key(list, KeyEvent.VK_ENTER);
             assertTrue(settlesOn(inspector.focusTarget()),
                     "and Enter settled into the facts, not onto the"
-                            + " control that would move the chart");
+                            + " control that would move the chart."
+                            + " If this failed, read the focus state"
+                            + " first: a request is refused outside"
+                            + " the focused window, and then nothing"
+                            + " happened because nothing could (#209)."
+                            + " " + FocusedWindow.state(window));
             assertEquals(witnessedBeforeChoice + 1, witness.size(),
                     "choosing told the second observer exactly once");
             SelectionModel.Change heard = witness.get(witness.size() - 1);
@@ -537,11 +571,14 @@ class MapExplorationJourneyTest {
             assertTrue(navigation.state().targetLabel().contains("M31"));
             // The released default page, rendered at the reference's
             // own geometry from the state the journey ended in.
-            assertArrayEquals(referenceBytes(),
+            assertArrayEquals(ReleasedPage.here(),
                     renderedBytes(Atlas.assembler().assemble(
                             navigation.state(), 900, 700)),
                     "and the page it ends on is the released default,"
-                            + " pixel for pixel");
+                            + " pixel for pixel as this machine draws"
+                            + " it - not as the maintainer's does,"
+                            + " which the 1.0 contract never"
+                            + " promised (#209)");
         } finally {
             SwingUtilities.invokeAndWait(() -> {
                 inspector.dispose();
@@ -776,6 +813,14 @@ class MapExplorationJourneyTest {
     }
 
     /** Whether focus comes to rest on this component. */
+    /**
+     * Whether focus settles where the application put it.
+     *
+     * <p>The window must hold the keyboard focus first, or the
+     * application's own {@code requestFocusInWindow()} is refused
+     * and this reports a feature failure for an environment problem
+     * (issue #209).
+     */
     private boolean settlesOn(java.awt.Component expected)
             throws Exception {
         for (int attempt = 0; attempt < 20; attempt++) {
