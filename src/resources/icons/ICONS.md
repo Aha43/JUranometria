@@ -21,6 +21,7 @@ Icons bundled:
 | `minus.svg` | Toolbar: fewer stars (brighter magnitude limit) |
 | `plus.svg` | Toolbar: more stars (fainter magnitude limit) |
 | `list-details.svg` | Toolbar: show or hide the Inspector |
+| `x.svg` | Inspector: close the pane from its own heading |
 
 Add an icon only when a real action needs it: add the name to the
 script's `ICONS` list, re-run the script, and record it here.
