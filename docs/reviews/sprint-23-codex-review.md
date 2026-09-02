@@ -162,3 +162,49 @@ the ordinary 640/560 threshold survives different font metrics.
 The release hold on #209 remains unchanged: merge only after these
 journey gaps close; tag 1.4.0 only after #209 is fixed and the repaired
 display-backed test runs in CI.
+
+## Second follow-up — `ed1b68a`
+
+**Changes still requested.** The application-shaped restart now
+reconstructs the principal production objects from the persisted store,
+and the Quit mapping has moved into production. The enlarged-text work
+also uncovered a real overflow at the formerly sampled width. Two
+evidence defects remain before approval:
+
+### P1 — The enlarged-text width sweep stops checking containment
+
+`enlargedTextClipsNothingAndKeepsTheWayOut` checks component bounds only
+at `needed + 200`, 900, 700, and 560 pixels. Its advertised sweep down
+to 260 pixels checks only `exitButton().isVisible()`. A visible Swing
+button may be wholly or partly beyond its parent's edge; that was the
+exact weakness the first review identified. At 24-point text the full
+set of controls cannot physically fit into every width down to 260, so
+“controls never yield” is not by itself a responsive-layout solution.
+
+For every width claimed as supported, assert that every required
+control has non-empty bounds contained by the toolbar. Test this at the
+application's actual minimum usable width with the chart beside it. If
+the controls cannot fit, define an honest minimum window width or a
+second responsive presentation; do not turn clipping into success by
+checking only `isVisible()`.
+
+### P1 — The production Quit test cannot run where native Quit is unavailable
+
+The journey calls `installQuitHandler()` and requires a non-null result.
+Production deliberately returns null on a desktop without
+`APP_QUIT_HANDLER`, including a plausible Linux display-CI environment.
+The review required a seam that can run where the native handler is
+unavailable; the current test instead aborts headlessly and would fail
+on such a display. Inject or separate the small desktop-registration
+boundary so the test can capture and invoke the exact production
+handler without requiring host support. Independently assert that an
+unsupported desktop is a valid no-op. Keep one optional native exercise
+where the host supplies the facility, but do not make platform support
+a premise of the portable journey.
+
+The restart should also close the first window before opening the
+second, as its prose claims, and expose the fresh `SelectionModel` in
+the session assertion. Those are contained corrections to the otherwise
+sound restart repair.
+
+The #209/display-CI release hold remains in force.
