@@ -29,15 +29,28 @@ modules=java.base,java.desktop,java.logging,java.prefs
 rm -rf "$dest"
 mkdir -p "$dest"
 
-icon_arg=""
+# The application mark this platform installs (issue #202). A
+# MISSING icon is a failure, not a silent fallback: the whole point
+# of the mark is that the application does not arrive wearing Java's
+# default cup, and an image that quietly shipped without one would
+# pass every other check here.
 case "$(uname -s)" in
-    Darwin) [ -f "$root/packaging/icon/JUranometria.icns" ] \
-        && icon_arg="--icon $root/packaging/icon/JUranometria.icns" ;;
-    Linux)  [ -f "$root/packaging/icon/JUranometria-512.png" ] \
-        && icon_arg="--icon $root/packaging/icon/JUranometria-512.png" ;;
-    *)      [ -f "$root/packaging/icon/JUranometria.ico" ] \
-        && icon_arg="--icon $root/packaging/icon/JUranometria.ico" ;;
+    Darwin) icon="$root/packaging/icon/JUranometria.icns" ;;
+    Linux)  icon="$root/packaging/icon/JUranometria-512.png" ;;
+    *)      icon="$root/packaging/icon/JUranometria.ico" ;;
 esac
+[ -f "$icon" ] || {
+    echo "build-app-image: no application icon at $icon" >&2
+    echo "run 'make icons' to write it from the chosen geometry" >&2
+    exit 1
+}
+# Present is not enough. jpackage copies a container verbatim, so
+# eight bytes of rubbish named JUranometria.icns builds a complete
+# image with a broken icon - measured, not imagined. This asks the
+# only question that catches that: is what we ship still the mark
+# that was reviewed?
+"$root/scripts/verify-icons.sh" "$jar_dir/JUranometria.jar"
+icon_arg="--icon $icon"
 
 # shellcheck disable=SC2086
 jpackage \
@@ -184,6 +197,51 @@ case "$(uname -s)" in
     *) smoke="$image/bin/juranometria-smoke"
        [ -e "$smoke" ] || smoke="$image/juranometria-smoke.exe" ;;
 esac
+# The mark is IN the image, and on the platforms that copy it
+# verbatim it is the mark this repository committed - so a
+# substituted or truncated icon cannot pass unnoticed. Windows
+# embeds the ICO into the launcher, so there the committed container
+# is verified by its own tests and what is asserted here is that the
+# launcher exists; the boundary is stated rather than papered over.
+case "$(uname -s)" in
+    Darwin)
+        installed="$image/Contents/Resources/JUranometria.icns"
+        [ -f "$installed" ] || {
+            echo "build-app-image: the image carries no icon at" \
+                 "$installed" >&2
+            exit 1
+        }
+        cmp -s "$installed" "$icon" || {
+            echo "build-app-image: the image's icon is not the one" \
+                 "this repository committed" >&2
+            exit 1
+        }
+        echo "icon: $(basename "$icon") installed and identical"
+        ;;
+    Linux)
+        installed=$(find "$image" -name 'JUranometria.png' | head -1)
+        [ -n "$installed" ] || {
+            echo "build-app-image: the image carries no icon" >&2
+            find "$image" -maxdepth 3 -name '*.png' >&2 || true
+            exit 1
+        }
+        # jpackage may re-encode for the desktop entry, so this
+        # asserts a real PNG is there rather than identical bytes.
+        head -c 8 "$installed" | od -An -tx1 | grep -q "89 50 4e 47" || {
+            echo "build-app-image: the image's icon is not a PNG" >&2
+            exit 1
+        }
+        echo "icon: installed at ${installed#"$image"/}"
+        ;;
+    *)
+        [ -f "$launcher" ] || {
+            echo "build-app-image: no launcher to carry the icon" >&2
+            exit 1
+        }
+        echo "icon: embedded in $(basename "$launcher") by jpackage"
+        ;;
+esac
+
 out="$dest/native-smoke.png"
 env PATH=/nonexistent "$smoke" "$out" >/dev/null 2>&1 \
     || "$smoke" "$out" >/dev/null

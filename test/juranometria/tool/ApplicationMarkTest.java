@@ -7,7 +7,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import juranometria.tool.ApplicationMark.Candidate;
+import juranometria.app.ApplicationMark;
+import juranometria.app.ApplicationMark.Candidate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

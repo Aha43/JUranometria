@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.app;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -31,8 +31,13 @@ import java.util.List;
  * names its own stars so a study can leave one out and ask whether
  * the reader would have seen it.
  *
- * <p>Nothing here is packaging. The gate ends with a choice; #202
- * carries the chosen geometry into the platforms.
+ * <p>The gate chose {@link Candidate#RIFT} (issue #200). This is the
+ * single source of truth #202 packages from: the window icon set is
+ * drawn from it at run time, and every committed container - ICNS,
+ * ICO, PNG - is written from it too, so a container cannot come to
+ * disagree with what the running application shows. The rejected
+ * three stay because they are the evidence for the choice, and a
+ * decision that keeps only its winner cannot be re-examined.
  */
 public final class ApplicationMark {
 

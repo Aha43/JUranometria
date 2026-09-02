@@ -15,6 +15,7 @@ this archive.
 | Constellation geography (d3-celestial) | BSD-3-Clause | [`licenses/NOTICE-constellations.md`](licenses/NOTICE-constellations.md), [full text](licenses/LICENSE-BSD-3-Clause.txt) |
 | Star-identity data (d3-celestial) | BSD-3-Clause | [`licenses/NOTICE-star-identities.md`](licenses/NOTICE-star-identities.md), [full text](licenses/LICENSE-BSD-3-Clause.txt) |
 | Toolbar icons (Tabler) | MIT | [`licenses/LICENSE-Tabler-MIT.txt`](licenses/LICENSE-Tabler-MIT.txt) |
+| Application mark | MIT (JUranometria's own) | this repository's `LICENSE` |
 
 ## Redistributed runtime libraries
 
