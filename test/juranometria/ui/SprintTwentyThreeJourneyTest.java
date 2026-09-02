@@ -214,6 +214,11 @@ class SprintTwentyThreeJourneyTest {
         assertTrue(both.size() > 1, "M 32 sits inside M 31: " + both);
         assertEquals(M32, both.get(0), "the tighter mark leads");
         javax.swing.JList<?> list = candidateList();
+        // Focus before the keyboard, not after it (#209 review).
+        assertTrue(FocusedWindow.tryToFocus(window),
+                "the premise: the window holds the keyboard focus, so"
+                        + " the application's focus requests can be"
+                        + " granted. " + FocusedWindow.state(window));
         SwingUtilities.invokeAndWait(list::requestFocusInWindow);
         flush();
         key(list, KeyEvent.VK_DOWN);

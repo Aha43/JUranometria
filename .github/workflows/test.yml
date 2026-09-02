@@ -56,20 +56,44 @@ jobs:
           key: libs-${{ hashFiles('scripts/lib-versions.env') }}
       - run: scripts/download-libs.sh
       - name: Run the whole suite on a virtual display
-        # Once, and then read. A run where the journeys aborted
-        # again would look identical in the summary to one where
-        # they all passed, so the abort count is asserted rather
-        # than trusted. That is the point of this job.
+        # Once, and then read every counter. Zero aborted is not
+        # enough on its own: a run that found three tests and
+        # passed them reports zero aborted too (#209 review). So
+        # the whole tally has to agree - everything found was
+        # started, everything started succeeded, and nothing was
+        # skipped, aborted or failed.
         run: |
           set -o pipefail
           xvfb-run -a make test 2>&1 | tee display-run.txt
-          aborted=$(grep -oE '[0-9]+ tests aborted' display-run.txt \
-              | grep -oE '[0-9]+' | head -1)
-          ran=$(grep -oE '[0-9]+ tests successful' display-run.txt \
-              | grep -oE '[0-9]+' | head -1)
-          echo "on a display: ${ran:-?} ran, ${aborted:-?} aborted"
-          if [ "${aborted:-1}" != "0" ]; then
-            echo "::error::${aborted} tests aborted on a display" \
-                 "run; this job exists so that cannot happen quietly"
-            exit 1
-          fi
+          count() {
+            grep -oE "[0-9]+ tests $1" display-run.txt \
+              | grep -oE '[0-9]+' | head -1
+          }
+          found=$(count found)
+          started=$(count started)
+          ok=$(count successful)
+          failed=$(count failed)
+          aborted=$(count aborted)
+          skipped=$(count skipped)
+          echo "on a display: found=$found started=$started" \
+               "successful=$ok failed=$failed aborted=$aborted" \
+               "skipped=$skipped"
+          fail() { echo "::error::$1"; exit 1; }
+          [ -n "$found" ] && [ -n "$ok" ] \
+            || fail 'the display run produced no test tally at all'
+          # A floor, so a suite that silently shrank cannot pass
+          # by running almost nothing. Raise it as the suite
+          # grows; it is deliberately well below the real count.
+          [ "$found" -ge 500 ] \
+            || fail "only $found tests found on the display run"
+          [ "$found" = "$started" ] \
+            || fail "$found found but $started started"
+          [ "$ok" = "$found" ] \
+            || fail "$found found but only $ok succeeded"
+          [ "$failed" = 0 ] || fail "$failed failed on a display"
+          [ "$skipped" = 0 ] || fail "$skipped skipped"
+          # The one this job exists for: every journey that needs
+          # a screen must actually have run.
+          [ "$aborted" = 0 ] \
+            || fail "$aborted aborted on a display run; this job" \
+                    'exists so that cannot happen quietly'

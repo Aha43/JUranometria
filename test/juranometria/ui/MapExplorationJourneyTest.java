@@ -207,6 +207,10 @@ class MapExplorationJourneyTest {
 
             // Taken by keyboard, as a reader without a pointer does.
             javax.swing.JList<?> overlap = candidateList(inspector);
+            assertTrue(FocusedWindow.tryToFocus(window),
+                    "the premise: the window is focused before any"
+                            + " keyboard step. "
+                            + FocusedWindow.state(window));
             SwingUtilities.invokeAndWait(overlap::requestFocusInWindow);
             flush();
             key(overlap, KeyEvent.VK_DOWN);
@@ -305,6 +309,18 @@ class MapExplorationJourneyTest {
             javax.swing.JList<?> list = candidateList(inspector);
             // Walked with the arrow key and settled with Enter, as a
             // reader without a pointer does (sprint review).
+            // Focus first, and only then the keyboard (#209 review).
+            // Asking afterwards cannot repair a request the desktop
+            // has already refused: the application calls
+            // requestFocusInWindow() inside the Enter handler, and
+            // outside the focused window that call does nothing at
+            // all. This is the step that has to happen before Down
+            // and Enter, not the assertion after them.
+            assertTrue(FocusedWindow.tryToFocus(window),
+                    "the premise: this window holds the keyboard"
+                            + " focus, so the application's own focus"
+                            + " requests can be granted. "
+                            + FocusedWindow.state(window));
             SwingUtilities.invokeAndWait(list::requestFocusInWindow);
             flush();
             key(list, KeyEvent.VK_DOWN);
@@ -794,7 +810,6 @@ class MapExplorationJourneyTest {
      */
     private boolean settlesOn(java.awt.Component expected)
             throws Exception {
-        FocusedWindow.tryToFocus(window);
         for (int attempt = 0; attempt < 20; attempt++) {
             flush();
             java.awt.Component owner = java.awt.KeyboardFocusManager
