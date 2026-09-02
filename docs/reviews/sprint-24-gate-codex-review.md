@@ -381,3 +381,29 @@ it later.
 These are contained failure-contract corrections; the accepted spherical
 membership rule and all reported inventory decisions stay intact. Once fixed,
 merge the gate and begin #215.
+## Follow-up — `4bb0eba`
+
+**The geometry and failure contracts are approved.** Horizon crossings and
+flatness exhaustion now refuse rather than returning invented membership, and
+the early distance rejection is conservative by the spherical triangle
+inequality.
+
+One final P2 evidence correction remains. The new test says it decides “every
+object in the pack” across twelve pages, but `rowsFor(scene)` can inspect only
+the objects the catalogue query assembled into each of those scenes. Most of
+the 13,371-object all-sky pack is not present on those twelve pages. The report
+likewise says neither refusal happened for any of all 13,371 objects, which the
+run did not establish.
+
+Replace that claim with the structural bound the application actually gives:
+supported all-sky pages cap their corner reach at 60°, scene assembly queries
+with the pack's 5.39° maximum semi-extent margin, and a queried object's own
+rim adds at most another 5.39°. Thus every object that could be considered for
+a supported page remains below about 70.8° from its projection centre, safely
+short of the 90° horizon. Assert the relevant production constants/manifest
+value in a non-vacuous test so the proof fails if either limit changes. Keep
+the twelve-page walk as representative execution evidence, but name it as
+such rather than as a traversal of the whole pack.
+
+After that factual correction, merge the gate and begin #215; no further
+design review is required.
