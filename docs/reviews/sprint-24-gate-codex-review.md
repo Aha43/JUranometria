@@ -407,3 +407,33 @@ such rather than as a traversal of the whole pack.
 
 After that factual correction, merge the gate and begin #215; no further
 design review is required.
+
+## Follow-up — `8b301ff`
+
+**One final P2 remains.** The false whole-pack survey claim is removed and the
+manifest margin is now read from the real pack. The production page cap is not
+yet read from production.
+
+`OnThisPageStudyMain.PAGE_REACH_BOUND_DEG = 60.0` is a second literal owned by
+the study. The test would remain green if `SceneAssembler` changed its actual
+`PROJECTION_CORNER_LIMIT_DEGREES`. The surrounding 5:1/10:1 reasoning also
+uses raw hypothetical viewport dimensions, while production calls
+`maxPageHeightPx` and letterboxes the paper precisely so its corners stay
+within the cap. A supported chart does not escape the cap merely because its
+window is tall.
+
+Make the bound depend on the production contract: expose the projection-corner
+limit for read-only diagnostics, or build the tall cases through
+`SceneAssembler.maxPageHeightPx` and measure the resulting `ChartViewport`.
+Assert that the widest supported field and extreme requested aspect ratios are
+letterboxed to at most the production reach, then add the two manifest margins
+and compare with 90°. Remove the copied constant and the suggestion that an
+uncapped 10:1 production page is part of the proof.
+
+Issue #220 is correctly recorded separately and does not block this gate. The
+failure occurred in unchanged production/journey code and passed on a rerun of
+the identical commit; its size/scene-race hypothesis should be proved before
+fixing it.
+
+After the production-bound correction, merge #219 and begin #215 without
+another review round.
