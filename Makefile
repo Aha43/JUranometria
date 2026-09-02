@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study check-libs check-jdk dist app-image
 
 all: app
 
@@ -213,6 +213,14 @@ deep-sky-occlusion-study: classes
 	mkdir -p docs/studies/deep-sky-occlusion
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.DeepSkyOcclusionStudyMain \
 		> docs/studies/deep-sky-occlusion/measurements.md
+
+# The application mark's coded visual gate (issue #200): four
+# candidates from one geometry, exported at every size a desktop
+# asks for and measured at the ones that decide it.
+application-mark-study: classes
+	mkdir -p docs/studies/application-mark
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ApplicationMarkStudyMain \
+		> docs/studies/application-mark/measurements.md
 
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked
