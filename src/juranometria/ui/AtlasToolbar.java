@@ -232,6 +232,26 @@ public final class AtlasToolbar extends JToolBar {
         }
     }
 
+    /**
+     * The narrowest the bar can be and still hold everything it
+     * refuses to give up: every control's own preferred width, with
+     * neither piece of status text.
+     *
+     * <p>There is a floor, and pretending otherwise is how a
+     * responsive rule becomes a lie (#203 review). Below this width
+     * the bar has nothing left to yield - the version and the
+     * readout are already gone - and the controls must overflow,
+     * because a button cannot be narrower than a button. The number
+     * is not a constant: it moves with the application's text size,
+     * which is exactly why it is computed rather than written down.
+     *
+     * <p>At or above it, nothing clips. That is the promise, and it
+     * is the one worth testing.
+     */
+    public int minimumWidthForControls() {
+        return version == null ? 0 : requiredWidth(false, false);
+    }
+
     /** Whether the toolbar is currently showing the version. */
     public boolean isVersionShowing() {
         return version != null && version.isVisible();

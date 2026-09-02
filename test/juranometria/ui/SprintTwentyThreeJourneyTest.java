@@ -307,11 +307,20 @@ class SprintTwentyThreeJourneyTest {
 
         // 9. The reader closes the atlas and opens it again.
         //
-        // A fresh options controller reading the store would prove
-        // the store, which is the easy half. This builds the whole
-        // session again - navigation, chart, options, retirement
-        // wiring, inspector, toolbar - from the same preferences,
-        // and asks what a reader would see (#203 review).
+        // Closes it: the first window goes before the second opens,
+        // so this is a restart and not a second window (#203
+        // review). A fresh options controller reading the store
+        // would prove the store, which is the easy half; this builds
+        // the whole session again - navigation, chart, options,
+        // retirement wiring, inspector, toolbar - from the same
+        // preferences, and asks what a reader would see.
+        assertTrue(selection.selection() instanceof Selection.Object,
+                "the premise: this session has a selection to lose");
+        SwingUtilities.invokeAndWait(window::dispose);
+        flush();
+        assertFalse(window.isDisplayable(), "the first window is gone");
+        window = null;
+
         Session restarted = openASecondSession();
         try {
             assertEquals(ChartViewState.DEFAULT, restarted.navigation.state(),
@@ -345,6 +354,17 @@ class SprintTwentyThreeJourneyTest {
                     "with Andromeda's three galaxies drawn, which is"
                             + " where this sprint began: "
                             + onTheNewPage);
+            // And nothing chosen. Selection is state a module will
+            // read, and it is deliberately not persisted: a new
+            // session starts having selected nothing, rather than
+            // inheriting whatever the last one was looking at.
+            assertTrue(restarted.selection.selection()
+                            instanceof Selection.None,
+                    "a restarted session has selected nothing: "
+                            + restarted.selection.selection());
+            assertEquals(List.of(), restarted.selection.candidates(),
+                    "and offers no candidates from the session"
+                            + " before it");
         } finally {
             restarted.close();
         }
@@ -365,7 +385,12 @@ class SprintTwentyThreeJourneyTest {
                 "the window's own close box");
         assertEquals(List.of("detach", "flush", "dispose", "terminate"),
                 leavesBy(Surface.QUIT_HANDLER),
-                "and the platform's Quit");
+                desktopOffersQuit()
+                        ? "and the platform's Quit, pressed"
+                        : "and the platform's Quit, which this"
+                                + " desktop does not offer - so what"
+                                + " is asserted is that none was"
+                                + " installed");
 
         // 11. And the one non-default choice the reader arrived
         // with is still theirs.
@@ -586,7 +611,8 @@ class SprintTwentyThreeJourneyTest {
     private record Session(JFrame window, ChartComponent chart,
                            ChartViewController navigation,
                            ChartOptionsController options,
-                           AtlasToolbar toolbar) {
+                           AtlasToolbar toolbar,
+                           SelectionModel selection) {
         void close() throws Exception {
             SwingUtilities.invokeAndWait(window::dispose);
         }
@@ -630,7 +656,7 @@ class SprintTwentyThreeJourneyTest {
             frame.add(panel, BorderLayout.EAST);
             frame.setSize(1300, 820);
             frame.setVisible(true);
-            made[0] = new Session(frame, page, nav, opts, bar);
+            made[0] = new Session(frame, page, nav, opts, bar, chosen);
         });
         flush();
         for (int i = 0; i < 200; i++) {
@@ -723,11 +749,22 @@ class SprintTwentyThreeJourneyTest {
                     // instead would prove a copy of the wiring
                     // rather than the wiring (#203 review).
                     Runnable installed = shutdown.installQuitHandler();
-                    assertNotNull(installed,
-                            "this desktop takes a quit handler; where"
-                                    + " one does not, its own Quit is"
-                                    + " unaffected and the other three"
-                                    + " surfaces still lead here");
+                    // Not every desktop has a Quit to hand - a Linux
+                    // session under xvfb generally does not, and this
+                    // journey is meant to run there (#203 review). So
+                    // the assertion is the one that holds everywhere:
+                    // the application installs a handler exactly when
+                    // the platform offers one. Where it does, it is
+                    // pressed; where it does not, the platform keeps
+                    // its own Quit and the other three surfaces still
+                    // lead here.
+                    assertEquals(desktopOffersQuit(), installed != null,
+                            "a quit handler is installed exactly when"
+                                    + " the desktop supports one");
+                    if (installed == null) {
+                        return List.of("detach", "flush", "dispose",
+                                "terminate");
+                    }
                     SwingUtilities.invokeAndWait(installed::run);
                 }
             }
@@ -739,6 +776,17 @@ class SprintTwentyThreeJourneyTest {
             }
         }
         return steps;
+    }
+
+    /** Whether this desktop has a Quit for an application to take. */
+    private static boolean desktopOffersQuit() {
+        try {
+            return java.awt.Desktop.isDesktopSupported()
+                    && java.awt.Desktop.getDesktop().isSupported(
+                            java.awt.Desktop.Action.APP_QUIT_HANDLER);
+        } catch (RuntimeException ignored) {
+            return false;
+        }
     }
 
     private void pressSpace(Component target) throws Exception {

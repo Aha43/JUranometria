@@ -121,7 +121,7 @@ containers to compensate.
 ## Verification
 
 - **534 tests pass**, none aborted locally, and stable over
-  three consecutive runs after the journey was reworked.
+  three consecutive runs after each round of the review.
 - **Studies reproduce byte-for-byte**: the deep-sky occlusion study
   and the application-mark study, images included (39 of them).
 - **`docs/reference/m31-stars.png` changed once**, deliberately, by
@@ -206,8 +206,32 @@ A second round found three more, and one of those was a defect too:
   walks the bar narrower until each goes and asserts the order,
   rather than naming widths that move with the font.
 
+A third round closed the last three:
+
+- **The enlarged-text sweep watched `isVisible()`, not bounds.**
+  Below 560 px nothing checked whether a control was still inside
+  the bar — and at 260 px none of them can be. There is a floor, and
+  pretending otherwise is how a responsive rule becomes a lie.
+  `minimumWidthForControls()` now states it — every control's
+  preferred width with neither piece of status text, computed rather
+  than written down, because it moves with the font. Bounds are
+  checked at **every** width from roomy down to that floor. Below
+  it, what actually happens is measured rather than guessed: the
+  layout squeezes the controls rather than dropping them, which is
+  precisely why a sweep watching visibility saw nothing wrong.
+- **The Quit surface required a native quit handler**, so it could
+  not have run in the display-backed CI it is meant for — a Linux
+  session under xvfb generally offers none. The assertion is now the
+  one that holds everywhere: the application installs a handler
+  **exactly when** the platform offers one, and presses it where it
+  does.
+- **The restart did not restart.** The first window now closes
+  before the second opens, and the new session is asserted to have
+  **selected nothing** — selection is deliberately not persisted, so
+  a session must not inherit what the last one was looking at.
+
 Two of the first round's findings exposed real defects rather than
-weak tests. The
+weak tests, and so did one of the second round's. The
 responsive rule was **wired only by `JUranometriaMain`**, so every
 other window that built a toolbar silently had no responsive
 behaviour at all - the bar now watches its own width. And the
@@ -234,10 +258,11 @@ is to imply more:
   launcher's existence. Nobody has looked at a Windows task switcher
   or a Linux application entry showing this mark.
 - **Enlarged application text is now exercised** at 24 pt, laid out
-  for real at every width down to 260 px, and it found the defect
-  above. **Display scaling is still not exercised**, and the width
-  rule is asserted by laying the bar out rather than by a window
-  manager.
+  for real at every width from roomy down to the bar's own floor,
+  with the bounds of every control checked at each — and it found
+  the defect above. **Display scaling is still not exercised**, and
+  the width rule is asserted by laying the bar out rather than by a
+  window manager.
 
 ## Residual risks
 

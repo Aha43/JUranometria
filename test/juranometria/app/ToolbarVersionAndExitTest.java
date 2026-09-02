@@ -232,32 +232,42 @@ class ToolbarVersionAndExitTest {
             }
             assertTrue(needed > 0, "the premise: the bar wants room");
 
-            // Wide enough for everything, then squeezed to a window
-            // a reader might really use. Laid out for real at each.
-            for (int width : new int[] {needed + 200, 900, 700, 560}) {
+            // Every width from roomy down to the bar's own floor,
+            // and at each one the bounds are checked - not merely
+            // whether a control says it is visible. A control can be
+            // visible and half off the end, which is the failure this
+            // is looking for (#203 review).
+            int floor = toolbar.minimumWidthForControls();
+            assertTrue(floor > 0 && floor < needed,
+                    "the floor is the controls without the status"
+                            + " text: " + floor + " of " + needed);
+            for (int width = needed + 200; width >= floor; width -= 10) {
                 layOut(toolbar, width);
-                List<String> clipped = new ArrayList<>();
-                for (Component child : toolbar.getComponents()) {
-                    if (!child.isVisible() || child.getWidth() == 0) {
-                        continue;
-                    }
-                    if (child.getX() < 0
-                            || child.getX() + child.getWidth() > width) {
-                        clipped.add(child.getClass().getSimpleName()
-                                + " at " + child.getX() + "+"
-                                + child.getWidth());
-                    }
-                }
-                assertEquals(List.of(), clipped,
-                        "at " + width + " px with enlarged text,"
-                                + " nothing runs off the end: "
-                                + clipped);
-                assertTrue(toolbar.exitButton().isVisible()
-                                && toolbar.exitButton().getWidth() > 0,
-                        "and the way out is still there at " + width
-                                + " px - a control is never what"
-                                + " gives way");
+                assertNothingClipped(toolbar, width);
             }
+            layOut(toolbar, floor);
+            assertNothingClipped(toolbar, floor);
+
+            // And below the floor, what actually happens - measured,
+            // not guessed. The bar has nothing left to yield, so the
+            // layout compresses its controls below the size they
+            // asked for. It does not throw them off the end, which
+            // is why a sweep that only watched isVisible() saw
+            // nothing wrong at 260 px (#203 review).
+            layOut(toolbar, floor - 80);
+            List<String> squeezed = new ArrayList<>();
+            for (Component child : toolbar.getComponents()) {
+                if (child.isVisible()
+                        && child.getWidth() < child.getPreferredSize().width) {
+                    squeezed.add(child.getClass().getSimpleName());
+                }
+            }
+            assertFalse(squeezed.isEmpty(),
+                    "below its floor the bar squeezes its controls"
+                            + " rather than dropping them - a fact"
+                            + " about buttons, not a defect, and the"
+                            + " reason the floor is where the promise"
+                            + " stops: " + squeezed);
 
             // They yield in the decided order. Asserted by walking
             // the bar narrower until each goes, rather than by
@@ -266,7 +276,7 @@ class ToolbarVersionAndExitTest {
             // point of the test.
             int versionWentAt = 0;
             int readoutWentAt = 0;
-            for (int width = needed + 200; width >= 260; width -= 10) {
+            for (int width = needed + 200; width >= floor; width -= 10) {
                 layOut(toolbar, width);
                 if (versionWentAt == 0 && !toolbar.isVersionShowing()) {
                     versionWentAt = width;
@@ -288,6 +298,29 @@ class ToolbarVersionAndExitTest {
                             + versionWentAt + " px, readout at "
                             + readoutWentAt + " px");
         });
+    }
+
+    /** No visible child of the bar runs outside it. */
+    private static void assertNothingClipped(AtlasToolbar toolbar,
+                                             int width) {
+        List<String> clipped = new ArrayList<>();
+        for (Component child : toolbar.getComponents()) {
+            if (!child.isVisible() || child.getWidth() == 0) {
+                continue;
+            }
+            if (child.getX() < 0
+                    || child.getX() + child.getWidth() > width) {
+                clipped.add(child.getClass().getSimpleName() + " at "
+                        + child.getX() + "+" + child.getWidth());
+            }
+        }
+        assertEquals(List.of(), clipped,
+                "at " + width + " px with enlarged text, nothing runs"
+                        + " off the end: " + clipped);
+        assertTrue(toolbar.exitButton().isVisible()
+                        && toolbar.exitButton().getWidth() > 0,
+                "and the way out is still there at " + width + " px -"
+                        + " a control is never what gives way");
     }
 
     /** The field-and-magnitude readout: the bar's other status text. */
