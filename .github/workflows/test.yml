@@ -56,16 +56,20 @@ jobs:
           key: libs-${{ hashFiles('scripts/lib-versions.env') }}
       - run: scripts/download-libs.sh
       - name: Run the whole suite on a virtual display
-        run: xvfb-run -a make test
-      - name: Every display journey must have actually run
-        # The point of this job. A run where they aborted again would
-        # look identical to a green one in the summary above, so the
-        # count is asserted rather than read: nothing may abort here.
+        # Once, and then read. A run where the journeys aborted
+        # again would look identical in the summary to one where
+        # they all passed, so the abort count is asserted rather
+        # than trusted. That is the point of this job.
         run: |
+          set -o pipefail
           xvfb-run -a make test 2>&1 | tee display-run.txt
-          aborted=$(grep -oE '[0-9]+ tests aborted' display-run.txt               | grep -oE '[0-9]+' | head -1)
-          echo "aborted: ${aborted:-unknown}"
+          aborted=$(grep -oE '[0-9]+ tests aborted' display-run.txt \
+              | grep -oE '[0-9]+' | head -1)
+          ran=$(grep -oE '[0-9]+ tests successful' display-run.txt \
+              | grep -oE '[0-9]+' | head -1)
+          echo "on a display: ${ran:-?} ran, ${aborted:-?} aborted"
           if [ "${aborted:-1}" != "0" ]; then
-            echo "::error::$aborted tests aborted on a display run;"                  "this job exists so that cannot happen quietly"
+            echo "::error::${aborted} tests aborted on a display" \
+                 "run; this job exists so that cannot happen quietly"
             exit 1
           fi
