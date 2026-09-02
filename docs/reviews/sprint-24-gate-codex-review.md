@@ -222,3 +222,41 @@ tolerance/conservative rule rather than calling it exact. Then recompute the
 study count from the accepted rule.
 
 Do not merge the gate or begin #215 yet.
+
+## Follow-up — `13709c4`
+
+**One P1 remains.** Constructing the boundary on the sphere and projecting it
+is the right geometry, and it resolves the centre-scale approximation. The
+current intersection test and oracle do not yet prove or implement all ways
+that spherical region can meet the paper.
+
+### P1 — Sampled points are not a region/paper intersection
+
+`sphericalReaches` returns true only when one of 720 sampled boundary
+**points** lies inside the paper. It never tests the projected segment between
+successive samples. A thin edge or corner crossing can therefore pass through
+the paper entirely between samples and be reported absent—the same class of
+crossing defect Sprint 7 fixed for constellation boundaries.
+
+It also does not handle the complementary containment case. If the angular
+ellipse surrounds the paper while its centre lies outside the rectangle, no
+boundary point need lie on the paper even though every paper point belongs to
+the object. The private catalogue path's centre-inside shortcut handles only
+the opposite containment direction.
+
+The inverse oracle does not close either hole. It samples paper points every
+three pixels, so it can miss an intersection narrower than that lattice, and
+the sweep asserts only `oracle => rule`; a rule false positive is never a test
+failure despite the prose saying they agree. The named Cloud test is one
+boolean equality for one placement and may be false/false.
+
+Make the production candidate a real closed projected boundary: adaptively
+subdivide enough to bound projection error, test every consecutive segment
+against the paper, and test containment in both directions (or use an
+equivalent proven region operation that remains correct across RA wrap and the
+projection horizon). Make the oracle capable of resolving edge/corner slivers
+and require equality in both directions. Add explicit cases where no sampled
+vertex is inside but a segment crosses, and where the object contains the
+paper with its centre outside. Then recompute the gate measurements.
+
+Do not merge the gate or begin #215 yet.
