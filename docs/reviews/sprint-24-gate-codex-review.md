@@ -141,3 +141,46 @@ intentionally compared as an approximate common order. Define the rule
 and its unknown-value placement before #215 freezes the comparator.
 
 Do not merge the gate or begin #215 yet.
+
+## Follow-up — `e0722af`
+
+**One P1 remains.** The catalogue-truth and keyboard findings are otherwise
+resolved. Unknown sizes are now points, B/V ordering is stated honestly, and
+the display-backed test establishes a real focus owner before sending keys.
+Its Linux/macOS `Home` difference is useful evidence for the decision not to
+invent a module-level binding.
+
+### P1 — The major-axis circle is not the stated recorded extent
+
+The decision still says an object is on the page when its **recorded extent**
+reaches the paper, and says the square was rejected because it could report an
+object on the page that is not on it. `reachesPaper` now makes the same class
+of false-positive deliberately: it tests a circle whose radius is half the
+recorded major axis. For a thin galaxy, that circle reaches far beyond the
+recorded minor axis in most directions. A paper edge may therefore intersect
+the circle while missing the recorded ellipse entirely.
+
+Calling this the “one safe direction” does not reconcile the implementation
+with the headline contract. It is safe against false negatives, but it can
+make the inventory claim that an object is on the page when the catalogue's
+known geometry says it is not. The gate has not measured how often that occurs,
+and it still has no rotated-thin or projection oracle of the kind requested in
+the previous review.
+
+Implement the recorded ellipse where major axis, minor axis, and position
+angle are known, projected and intersected with the actual paper. Define the
+fallbacks separately: no major axis is a point; missing minor axis and/or
+orientation may require a conservative envelope because the source does not
+determine an ellipse. Verify this against an independently sampled spherical
+oracle at ordinary edges, RA wrap, polar pages, thin rotated objects, and the
+large nearby galaxies. Then recompute the fourteen-object result.
+
+Alternatively, if the product deliberately chooses a conservative
+major-axis envelope for every object, rename the contract to say exactly that,
+quantify its false positives against the recorded ellipses, and make clear in
+the table that “on this page” means *may reach the page given incomplete or
+discarded orientation information*, not that the recorded extent does reach
+it. That is a different product decision and should not be hidden under the
+word “extent.”
+
+Do not merge the gate or begin #215 yet.
