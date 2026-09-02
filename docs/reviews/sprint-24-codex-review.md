@@ -79,3 +79,57 @@ the journey fail on its own premise.
 
 Do not merge PR #223, close milestone 24, or cut 1.5.0 until both acceptance
 paths exercise the production feature they describe.
+
+## Follow-up — `bc462a6`
+
+**The packaged-rendering P1 is resolved.** The image acceptance now attaches
+the real module through `ChartModuleHost`, collects the module-owned geometry,
+paints the real `ChartComponent`, measures new pixels near the production
+projection, clears back to byte equality, and detaches. Removing the module or
+its interaction painter can no longer be replaced by a locally predicted list
+of IDs.
+
+The display journey now reaches the table's selection listener with mouse
+events and correctly limits its candidates to rows the table actually lists.
+One P1 control-path gap remains, plus one smaller restart claim.
+
+### P1 — Dispatched row clicks are not proved reachable by a pointer
+
+`clickRow` obtains `table.getCellRect(viewRow, 0, true)` and dispatches an event
+at that coordinate, but it neither scrolls the cell into the viewport nor
+asserts that the cell intersects `table.getVisibleRect()`. A `JTable` is taller
+than its viewport; Swing will accept a synthetic event at an off-screen row
+coordinate even though no reader can put a pointer there. After sorting, the
+three chosen undrawn rows may be anywhere in the model. This can therefore
+reintroduce the same defect the correction just found: marking an object the
+reader cannot actually reach, now because its row is clipped rather than
+because it was never a row.
+
+Scroll each target through the table's real scrolling path, wait for layout,
+and require its cell to be wholly visible before dispatching the click. Make a
+mutation that removes the scroll fail on that premise.
+
+The other two requested control paths also remain programmatic: sorting still
+uses `setSortKeys`, and changing the lead is another plain mouse click rather
+than keyboard movement/extension. Click the real header and use the focused
+table's real keyboard selection gesture for the lead/extension leg, asserting
+the table is the focus owner first. The journey already has the necessary
+display and `FocusedWindow` machinery; using it closes the difference between
+an action installed in Swing and an input a reader can deliver.
+
+### P2 — Packaged “restart begins empty” still has no restart
+
+The packaged method clears the current model, scans preference **key names**
+for the substring `mark`, then detaches. It no longer creates even the fresh
+`WorkingMarksModel` the earlier version did, let alone a second host/module
+session. The output nevertheless says “nothing persisted,” and the handover
+describes a restart beginning empty.
+
+End the first host, construct a fresh chart host and module against the same
+application preferences, and require its working set, lead, overlay
+contributions, and table selection to begin empty. Establish first that the
+old session contained a mark. A test that merely assumes persistence would use
+a key containing `mark` is not a session-boundary check.
+
+After these two corrections, PR #223 may proceed to final review. Keep the
+milestone and 1.5.0 held.
