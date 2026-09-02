@@ -9,8 +9,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **On this page: a table and working crosses** (Sprint 24, issue
-  #216). The Inspector gains a second mode listing everything the
+- **On this page** (Sprint 24, issues #214–#217). The Inspector can
+  now answer *what is on the page in front of me* — including what
+  the page does not draw. It lists every catalogued object on the
+  paper with its magnitude and band, its distance from the centre,
+  and why it can or cannot be seen; marking a row draws a small
+  cross wherever the chart shows nothing, so an object that is
+  present and invisible can still be found. Nothing is remembered
+  between sessions, and a page with nothing marked is the page the
+  atlas has always drawn.
+- **The table and the crosses, in detail** (issue #216). The Inspector gains a second mode listing everything the
   atlas holds on the page in front of the reader - object, magnitude
   with its band, distance from centre, and what it is doing on the
   chart - sortable by any column with the decided order beneath, and

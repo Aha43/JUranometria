@@ -99,6 +99,7 @@ public final class PackagedAcceptanceMain {
                 + " bundled runtime's preference backend)");
 
         readerJourney();
+        onThisPageJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -118,6 +119,90 @@ public final class PackagedAcceptanceMain {
      * no screen; what a screen adds is the on-screen journey the
      * maintainer runs on real machines.
      */
+    /**
+     * What a reader does with <strong>On this page</strong>, inside
+     * the packaged runtime (Sprint 24, issue #217).
+     *
+     * <p>Every native image runs this. The feature is built out of
+     * the bundled pack, the projection and the renderer, and a
+     * package that shipped a broken one of those would answer this
+     * wrongly here rather than in front of a reader.
+     *
+     * <p>It marks an object the page does <em>not</em> draw, on
+     * purpose: that is the case the whole sprint exists for, and the
+     * one a smoke test of the visible chart would never reach.
+     */
+    private static void onThisPageJourney() throws Exception {
+        ChartScene page = Atlas.assembler()
+                .assemble(ChartViewState.DEFAULT, 900, 700);
+        juranometria.page.PageContents inventory =
+                juranometria.page.PageInventory.of(page,
+                        ChartOptions.DEFAULTS);
+        require(inventory.entries().size() > 50,
+                "the released page has an inventory: "
+                        + inventory.entries().size() + " entries");
+
+        // Present and invisible: the state the table exists to
+        // explain, and the only kind of object that gets a cross.
+        juranometria.page.PageEntry invisible = null;
+        juranometria.page.PageEntry drawn = null;
+        for (juranometria.page.PageEntry entry : inventory.entries()) {
+            if (invisible == null && entry.visibility()
+                    != juranometria.page.PageVisibility.DRAWN) {
+                invisible = entry;
+            }
+            if (drawn == null && entry.visibility()
+                    == juranometria.page.PageVisibility.DRAWN) {
+                drawn = entry;
+            }
+        }
+        require(invisible != null && drawn != null,
+                "the released page holds both a drawn object and one"
+                        + " that is present but not drawn");
+
+        juranometria.page.WorkingMarksModel marks =
+                new juranometria.page.WorkingMarksModel();
+        marks.replaceWith(java.util.List.of(drawn.identity(),
+                invisible.identity()), invisible.identity());
+
+        // The crosses the chart would ink, built the way the module
+        // builds them: one for the invisible object and none for the
+        // one that already carries its own symbol.
+        java.util.List<String> crossed = new java.util.ArrayList<>();
+        for (String identity : marks.marks()) {
+            juranometria.page.PageEntry entry =
+                    inventory.find(identity).orElseThrow();
+            if (entry.visibility() != juranometria.page.PageVisibility.DRAWN) {
+                crossed.add(entry.identity());
+            }
+        }
+        require(crossed.equals(java.util.List.of(invisible.identity())),
+                "exactly one cross, for the object the page does not"
+                        + " draw: " + crossed);
+
+        marks.clear();
+        require(marks.marks().isEmpty() && marks.lead() == null,
+                "clearing leaves nothing marked");
+
+        // And a restart begins empty, because there is nowhere for a
+        // mark to have been kept: the reader's stored options survive
+        // and the working set does not.
+        Preferences node = Preferences.userRoot().node("juranometria");
+        node.flush();
+        for (String key : node.keys()) {
+            require(!key.toLowerCase(java.util.Locale.ROOT)
+                            .contains("mark"),
+                    "no working mark was written to preferences: " + key);
+        }
+        require(new juranometria.page.WorkingMarksModel().marks().isEmpty(),
+                "a fresh session begins with nothing marked");
+
+        System.out.println("on this page OK (" + inventory.entries().size()
+                + " entries, marked " + invisible.identity()
+                + " which the page does not draw, one cross, cleared,"
+                + " nothing persisted)");
+    }
+
     private static void readerJourney() throws Exception {
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         ChartViewController navigation =

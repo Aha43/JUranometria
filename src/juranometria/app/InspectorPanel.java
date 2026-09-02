@@ -73,8 +73,8 @@ public final class InspectorPanel extends JPanel {
     private final Runnable unsubscribe;
 
     /** The two modes, and the chooser that appears when there are two. */
-    static final String SELECTED_MODE = "selected";
-    static final String PAGE_MODE = "page";
+    public static final String SELECTED_MODE = "selected";
+    public static final String PAGE_MODE = "page";
     private final java.awt.CardLayout deck = new java.awt.CardLayout();
     private final JPanel modes = new JPanel(deck);
     private final JPanel modeSwitch = new JPanel();

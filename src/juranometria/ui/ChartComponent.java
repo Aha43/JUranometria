@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.List;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -81,7 +82,29 @@ public final class ChartComponent extends JComponent {
             throw new IllegalArgumentException("chart options must not be null");
         }
         this.chartOptions = options;
+        for (Runnable listener : List.copyOf(optionsListeners)) {
+            listener.run();
+        }
         repaint();
+    }
+
+    private final java.util.List<Runnable> optionsListeners =
+            new java.util.ArrayList<>();
+
+    /**
+     * Told when the reader changes what the chart draws.
+     *
+     * <p>Separate from {@link #onSceneChange}: the options do not
+     * change the assembled scene, only what is made of it. But they
+     * do change what can be <em>seen</em>, and anything that reports
+     * on visibility - the page inventory above all - is stale the
+     * moment a family is switched off. Without this the table went
+     * on calling a hidden galaxy "drawn" (issue #217).
+     */
+    public void onChartOptionsChange(Runnable listener) {
+        if (listener != null) {
+            optionsListeners.add(listener);
+        }
     }
 
     public juranometria.render.ChartOptions chartOptions() {

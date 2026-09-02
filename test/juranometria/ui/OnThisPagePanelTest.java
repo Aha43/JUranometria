@@ -80,10 +80,29 @@ class OnThisPagePanelTest {
         try (Fixture fixture = new Fixture(M31, 8.0, 240, 400)) {
             JTable table = fixture.panel.tableComponent();
             SwingUtilities.invokeAndWait(() -> { });
+            // Not "has some width": room for the words that must not
+            // truncate. Measured against the font the panel is
+            // actually using, because a column wide enough at 12 pt
+            // is not wide enough at 18.
+            java.awt.FontMetrics metrics =
+                    table.getFontMetrics(table.getFont());
+            assertTrue(table.getColumnModel().getColumn(1).getWidth()
+                            >= metrics.stringWidth("not recorded"),
+                    "\"not recorded\" is a fact and must not truncate"
+                            + " into \"not record…\": the column has "
+                            + table.getColumnModel().getColumn(1).getWidth()
+                            + " px and the words need "
+                            + metrics.stringWidth("not recorded"));
+            assertTrue(table.getColumnModel().getColumn(3).getWidth()
+                            >= metrics.stringWidth("too small here"),
+                    "and neither does the answer beside it: "
+                            + table.getColumnModel().getColumn(3).getWidth()
+                            + " px against "
+                            + metrics.stringWidth("too small here"));
             for (int column = 0; column < table.getColumnCount(); column++) {
-                int width = table.getColumnModel().getColumn(column)
-                        .getWidth();
-                assertTrue(width > 0, "column " + column + " has room");
+                assertTrue(table.getColumnModel().getColumn(column)
+                                .getWidth() > 0,
+                        "column " + column + " has room");
             }
             assertTrue(fixture.panel.centreHereButton().isVisible()
                             && fixture.panel.clearMarksButton().isVisible(),
