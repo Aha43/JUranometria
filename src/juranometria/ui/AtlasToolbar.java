@@ -194,21 +194,39 @@ public final class AtlasToolbar extends JToolBar {
      * is told (issue #198), so the rule can be driven in a test
      * without a window manager.
      *
-     * <p>When the toolbar is squeezed, <strong>the version copy
-     * yields first</strong>: it is the one thing here a reader can
-     * still find elsewhere, in Help - About. It is hidden whole
+     * <p>When the toolbar is squeezed, <strong>status text yields
+     * and controls do not</strong>. The version goes first: it is
+     * the one thing here a reader can find in Help - About. If that
+     * is not enough - and with enlarged application text it is not -
+     * the field-and-magnitude readout follows. Each is hidden whole
      * rather than truncated, because "v1.3" that is really 1.3.0 is
-     * worse than no version at all. Every control stays; nothing that
-     * does something is given up for something that says something.
+     * worse than no version at all. Nothing that does something is
+     * ever given up for something that says something.
      */
     public void setAvailableWidth(int width) {
         if (version == null) {
             return;
         }
-        boolean fits = width >= requiredWidthWithVersion();
-        if (fits != version.isVisible()) {
-            version.setVisible(fits);
-            versionGap.setVisible(fits);
+        // Status text yields, in the order of how easily a reader
+        // can find it elsewhere; controls never do. The version goes
+        // first - it is in Help > About. If the bar still does not
+        // fit, the field-and-magnitude readout goes too, because the
+        // alternative is pushing Exit off the end, and a control a
+        // reader cannot reach is worse than a number they can read
+        // from the chart's own title block.
+        //
+        // The second step was found by asking what enlarged
+        // application text does (#203 review): at 24 pt the bar
+        // overflowed a 560 px window even with the version already
+        // hidden, and Exit was the control that fell off.
+        boolean showVersion = width >= requiredWidth(true, true);
+        boolean showReadout = showVersion
+                || width >= requiredWidth(false, true);
+        if (showVersion != version.isVisible()
+                || showReadout != readout.isVisible()) {
+            version.setVisible(showVersion);
+            versionGap.setVisible(showVersion);
+            readout.setVisible(showReadout);
             revalidate();
             repaint();
         }
@@ -234,11 +252,17 @@ public final class AtlasToolbar extends JToolBar {
      * every component's own preferred width, with the glue counted
      * at nothing because it is what gives way first.
      */
-    private int requiredWidthWithVersion() {
+    private int requiredWidth(boolean withVersion, boolean withReadout) {
         int needed = 0;
         for (java.awt.Component component : getComponents()) {
             if (component == version || component == versionGap) {
-                needed += component.getPreferredSize().width;
+                if (withVersion) {
+                    needed += component.getPreferredSize().width;
+                }
+            } else if (component == readout) {
+                if (withReadout) {
+                    needed += component.getPreferredSize().width;
+                }
             } else if (!(component instanceof Box.Filler)) {
                 needed += component.getPreferredSize().width;
             }

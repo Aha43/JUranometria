@@ -305,18 +305,49 @@ class SprintTwentyThreeJourneyTest {
         assertEquals(ChartViewState.DEFAULT, navigation.state(),
                 "Home is the released chart");
 
-        // 9. And a restarted session opens on those same defaults,
-        // from the store this journey has been writing to - the
-        // reader's settings survive the application, which is the
-        // only place they are ever tested.
-        ChartOptions afterRestart = new ChartOptionsController(
-                ChartOptionsStore.forNode(store)).options();
-        assertFalse(afterRestart.globularClusters(),
-                "a fresh session reads back what OK persisted");
-        assertFalse(afterRestart.flamsteedNumbers(),
-                "and still has the choice the reader arrived with,"
-                        + " which nothing in this journey was"
-                        + " entitled to discard");
+        // 9. The reader closes the atlas and opens it again.
+        //
+        // A fresh options controller reading the store would prove
+        // the store, which is the easy half. This builds the whole
+        // session again - navigation, chart, options, retirement
+        // wiring, inspector, toolbar - from the same preferences,
+        // and asks what a reader would see (#203 review).
+        Session restarted = openASecondSession();
+        try {
+            assertEquals(ChartViewState.DEFAULT, restarted.navigation.state(),
+                    "a new session opens on the released page,"
+                            + " carrying no navigation across");
+            assertEquals(M31, restarted.navigation.state().targetIdentity(),
+                    "named for M 31, as the released page is - not"
+                            + " for the M 33 this journey retired,"
+                            + " because navigation is not persisted"
+                            + " and a retirement is navigation");
+            assertFalse(restarted.options.options().globularClusters(),
+                    "it reads back what OK persisted");
+            assertFalse(restarted.options.options().flamsteedNumbers(),
+                    "and still has the choice the reader arrived"
+                            + " with, which nothing in this journey"
+                            + " was entitled to discard");
+            assertEquals("v" + AppInfo.version(),
+                    restarted.toolbar.versionText(),
+                    "the bar says the same version");
+            assertFalse(restarted.window.getIconImages().isEmpty(),
+                    "and it wears the mark again");
+            List<String> onTheNewPage = new ArrayList<>();
+            for (DeepSkyObject dso : RENDERER.drawnDeepSky(
+                    restarted.chart.currentScene(),
+                    restarted.options.options())) {
+                onTheNewPage.add(dso.id());
+            }
+            assertTrue(onTheNewPage.contains(M31)
+                            && onTheNewPage.contains(M32)
+                            && onTheNewPage.contains(M110),
+                    "with Andromeda's three galaxies drawn, which is"
+                            + " where this sprint began: "
+                            + onTheNewPage);
+        } finally {
+            restarted.close();
+        }
 
         // 10. The way out is one path, whichever surface asks
         // (#198). Termination itself is proved by a JVM of its own
@@ -551,6 +582,72 @@ class SprintTwentyThreeJourneyTest {
         return null;
     }
 
+    /** A whole application session, so one can be opened twice. */
+    private record Session(JFrame window, ChartComponent chart,
+                           ChartViewController navigation,
+                           ChartOptionsController options,
+                           AtlasToolbar toolbar) {
+        void close() throws Exception {
+            SwingUtilities.invokeAndWait(window::dispose);
+        }
+    }
+
+    /**
+     * Opens the atlas again from the same preferences, the way the
+     * application opens it - the same wiring, in the same order.
+     */
+    private Session openASecondSession() throws Exception {
+        Session[] made = new Session[1];
+        SwingUtilities.invokeAndWait(() -> {
+            ChartViewController nav =
+                    new ChartViewController(Atlas.assembler()::fits);
+            ChartComponent page = new ChartComponent(Atlas.assembler());
+            nav.onChange(page::setViewState);
+            SelectionModel chosen = new SelectionModel();
+            SelectInteraction.install(page, chosen);
+            ChartOptionsController opts = new ChartOptionsController(
+                    ChartOptionsStore.forNode(store));
+            TargetRetirement.connect(opts, page, nav);
+            InspectorPanel panel = new InspectorPanel(chosen,
+                    page::currentScene, opts::options,
+                    where -> nav.recenter(where.position()));
+            page.onSceneChange(panel::refresh);
+            InspectorToggle switchIt = new InspectorToggle();
+            switchIt.bind(() -> panel.setRequestedVisible(
+                    !panel.isRequestedVisible()), panel::canShow);
+            panel.onVisibilityChange(switchIt::report);
+            AppShutdown leaving = new AppShutdown(() -> { }, () -> { },
+                    () -> { });
+            AtlasToolbar bar = new AtlasToolbar(nav,
+                    new SearchField(Atlas.search(), Atlas.assembler(), nav),
+                    switchIt, AppInfo.version(), leaving::request);
+            JFrame frame = new JFrame(
+                    AppInfo.NAME + " " + AppInfo.version());
+            frame.setIconImages(ApplicationIcon.windowIcons());
+            frame.setLayout(new BorderLayout());
+            frame.add(bar, BorderLayout.NORTH);
+            frame.add(page, BorderLayout.CENTER);
+            frame.add(panel, BorderLayout.EAST);
+            frame.setSize(1300, 820);
+            frame.setVisible(true);
+            made[0] = new Session(frame, page, nav, opts, bar);
+        });
+        flush();
+        for (int i = 0; i < 200; i++) {
+            ChartScene page = made[0].chart.currentScene();
+            if (page != null && made[0].chart.getWidth() > 0
+                    && page.viewport().widthPx()
+                            == made[0].chart.getWidth()) {
+                break;
+            }
+            flush();
+            Thread.sleep(10);
+        }
+        assertNotNull(made[0].chart.currentScene(),
+                "the second session assembled a page");
+        return made[0];
+    }
+
     // ---- the four ways out -----------------------------------------
 
     private enum Surface { POINTER, KEYBOARD, WINDOW_CLOSE, QUIT_HANDLER }
@@ -620,8 +717,19 @@ class SprintTwentyThreeJourneyTest {
                                 new java.awt.event.WindowEvent(frame[0],
                                         java.awt.event.WindowEvent
                                                 .WINDOW_CLOSING)));
-                case QUIT_HANDLER -> SwingUtilities.invokeAndWait(
-                        () -> quitHandlerFor(shutdown).run());
+                case QUIT_HANDLER -> {
+                    // Production's own installer, and the object it
+                    // installed. Writing shutdown::request here
+                    // instead would prove a copy of the wiring
+                    // rather than the wiring (#203 review).
+                    Runnable installed = shutdown.installQuitHandler();
+                    assertNotNull(installed,
+                            "this desktop takes a quit handler; where"
+                                    + " one does not, its own Quit is"
+                                    + " unaffected and the other three"
+                                    + " surfaces still lead here");
+                    SwingUtilities.invokeAndWait(installed::run);
+                }
             }
             flush();
         } finally {
@@ -631,11 +739,6 @@ class SprintTwentyThreeJourneyTest {
             }
         }
         return steps;
-    }
-
-    /** What JUranometriaMain hands the desktop's quit handler. */
-    private static Runnable quitHandlerFor(AppShutdown shutdown) {
-        return shutdown::request;
     }
 
     private void pressSpace(Component target) throws Exception {

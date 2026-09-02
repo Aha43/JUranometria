@@ -124,6 +124,39 @@ public final class AppShutdown {
     }
 
     /**
+     * Installs the platform's Quit as one more way to reach this
+     * path, and <strong>returns the very thing it installed</strong>
+     * (#203 review).
+     *
+     * <p>Returning it is the point. No API fires a desktop's quit
+     * handler from a test, so a journey that wants to prove Quit
+     * leaves the same way as everything else can only invoke the
+     * handler - and if the journey writes its own
+     * {@code shutdown::request} to invoke, it has proved a copy of
+     * the wiring rather than the wiring. This hands back production's
+     * own object, so what a test presses is what macOS presses.
+     *
+     * @return the handler installed, or null where the desktop has
+     *         no quit handler to give - in which case its own Quit
+     *         is unaffected and the other surfaces still work
+     */
+    public Runnable installQuitHandler() {
+        Runnable leave = this::request;
+        try {
+            java.awt.Desktop desktop = java.awt.Desktop.isDesktopSupported()
+                    ? java.awt.Desktop.getDesktop() : null;
+            if (desktop == null || !desktop.isSupported(
+                    java.awt.Desktop.Action.APP_QUIT_HANDLER)) {
+                return null;
+            }
+            desktop.setQuitHandler((event, response) -> leave.run());
+            return leave;
+        } catch (UnsupportedOperationException | SecurityException ignored) {
+            return null;
+        }
+    }
+
+    /**
      * Runs a step and swallows whatever it throws. Leaving is not the
      * moment to argue, and there is nowhere left to report it to.
      */

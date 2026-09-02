@@ -169,18 +169,9 @@ public final class JUranometriaMain {
         });
         // The application menu's Quit on macOS, and the equivalent
         // where a desktop provides one: without this it would exit by
-        // its own route and skip the flush the other two make.
-        try {
-            java.awt.Desktop desktop = java.awt.Desktop.isDesktopSupported()
-                    ? java.awt.Desktop.getDesktop() : null;
-            if (desktop != null && desktop.isSupported(
-                    java.awt.Desktop.Action.APP_QUIT_HANDLER)) {
-                desktop.setQuitHandler((event, response) -> shutdown.request());
-            }
-        } catch (UnsupportedOperationException | SecurityException ignored) {
-            // A desktop that will not take a quit handler keeps its
-            // own Quit; the other two surfaces are unaffected.
-        }
+        // its own route and skip the flush the other surfaces make.
+        // A desktop that will not take a handler keeps its own Quit.
+        shutdown.installQuitHandler();
 
         // The same AppInfo.version() About prints, handed over
         // rather than looked up twice.

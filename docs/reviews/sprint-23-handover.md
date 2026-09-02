@@ -120,7 +120,7 @@ containers to compensate.
 
 ## Verification
 
-- **533 tests pass**, none aborted locally, and stable over
+- **534 tests pass**, none aborted locally, and stable over
   three consecutive runs after the journey was reworked.
 - **Studies reproduce byte-for-byte**: the deep-sky occlusion study
   and the application-mark study, images included (39 of them).
@@ -181,7 +181,33 @@ most:
   - 640 px still fits, 560 px does not - and asserts that no control
   runs off the end and the chart keeps its minimum width.
 
-Two of those exposed real defects rather than weak tests. The
+A second round found three more, and one of those was a defect too:
+
+- **The "restart" rebuilt a controller, not a session.** It now opens
+  the atlas again - navigation, chart, options, retirement wiring,
+  inspector, toolbar, window - from the same preferences, and asks
+  what a reader would see. It caught my own misunderstanding on the
+  way: the second session *is* named for M 31, because the released
+  default page names its target; what must not come back is the
+  M 33 retirement, and that is what is asserted.
+- **The Quit test wrote its own `shutdown::request`**, which proves a
+  copy of the wiring rather than the wiring.
+  `AppShutdown.installQuitHandler()` now performs the desktop
+  registration and **returns the handler it installed**, so what the
+  journey presses is production's own object. No API fires a
+  desktop's quit handler from a test; returning it is the closest
+  honest thing.
+- **Enlarged text was never laid out — and the rule was wrong.**
+  At 24 pt the bar overflowed a 560 px window *with the version
+  already hidden*, and **Exit was the control pushed off the end**.
+  The rule now yields status text in order of how easily a reader
+  can find it elsewhere: the version first (it is in About), then
+  the field-and-magnitude readout. Controls never yield. The test
+  walks the bar narrower until each goes and asserts the order,
+  rather than naming widths that move with the font.
+
+Two of the first round's findings exposed real defects rather than
+weak tests. The
 responsive rule was **wired only by `JUranometriaMain`**, so every
 other window that built a toolbar silently had no responsive
 behaviour at all - the bar now watches its own width. And the
@@ -207,9 +233,11 @@ is to imply more:
   is asserted there is the container's correctness plus the
   launcher's existence. Nobody has looked at a Windows task switcher
   or a Linux application entry showing this mark.
-- Enlarged application text and display scaling were **not**
-  exercised beyond the toolbar's width rule, which is asserted by
-  width rather than by a window manager.
+- **Enlarged application text is now exercised** at 24 pt, laid out
+  for real at every width down to 260 px, and it found the defect
+  above. **Display scaling is still not exercised**, and the width
+  rule is asserted by laying the bar out rather than by a window
+  manager.
 
 ## Residual risks
 
