@@ -83,13 +83,22 @@ of a pixel** of the chord replacing it — the usual sagitta test,
 which spends subdivisions only where the curve needs them. A
 criterion is not a proof, so the distance achieved is **measured**:
 twenty thousand points of the true curve, each asked how far it lies
-from the path that claims to be it, across four pages and
-twenty-four shapes including a page-wide ellipse squashed to a
-twelfth of its length. **The worst is 0.0499 px** — below anything a
-reader could see, and far below the thinnest mark the atlas paints.
-The bound is written into the test as a literal rather than read
-from the constant being measured, so raising that constant breaks
-it.
+from the path that claims to be it, over **96 measurements** — 24
+shapes on each of four pages, including a page-wide ellipse squashed
+to a twelfth of its length. **The worst is 0.0499 px** — below
+anything a reader could see, and far below the thinnest mark the
+atlas paints. The bound is written into the test as a literal rather
+than read from the constant being measured, so raising that constant
+breaks it.
+
+**And a guarantee that can lapse in silence is not one.** The
+subdivision can run out of depth before it reaches flatness; it then
+draws the chord anyway, because there is nothing better to draw, but
+it no longer promises the twentieth of a pixel. That is now counted,
+printed by the study — **0 times across the whole pack**, so the
+bound holds for every row it reports — and asserted to be zero
+wherever the bound is claimed. The counter is shown to move: given a
+depth of one, the same curve cannot be followed and says so.
 
 Closing it also answers the one case a boundary can never show:
 **the object holding the whole page.** Nothing of its outline is on
@@ -99,13 +108,24 @@ intersects it. A rule built from sampled points answers that such an
 object is not there; the test for it fails on exactly that mutation,
 which is how we know the path is doing the work.
 
-Where part of the boundary is past the projection's horizon, what is
-left is closed by a chord rather than by the true curve. Only
-objects far larger than any the catalogue holds reach that, and the
-oracle is asked about it in both directions rather than trusted. A
-corner-containment fallback was written for this case and then
-removed: no mutation could make it matter, and code no test can kill
-is not evidence.
+**Where the curve runs off the projection the path breaks.** It does
+not carry on to the far side: joining those two ends draws a
+straight line standing for a stretch of sky the projection refused,
+and that line is not the object's edge. It was being drawn, and
+tested as though it were.
+
+Breaking it costs the containment that closure was giving for free —
+a long thin object laid across the page has both ends past the
+horizon and the paper lying *between* its two remaining arcs. So
+containment is asked of **the paper** instead: its corners and its
+centre, turned back into sky through the atlas's inverse and tested
+against the angular ellipse directly.
+
+That check was written once, found unkillable by any mutation, and
+removed as decoration — the honest thing to do at the time, since
+the closed path was answering it. Breaking the path at the horizon
+is what made it load bearing, and there is now a test that fails
+without it.
 
 Where the source is silent the fallback is explicit, because each
 silence is a different kind of ignorance:
@@ -485,6 +505,12 @@ behind.
   — are the places the question is asked. Arcs are subdivided until
   they are flat to a twentieth of a pixel, and the achieved distance
   is measured rather than assumed.
+- **Carrying the path across a stretch the projection refused.**
+  Rejected: the chord that closes such a gap stands for sky the
+  projection could not show, and testing it as the object's edge
+  answers about a line nothing drew. The path breaks, and
+  containment is asked of the paper rather than inferred from a
+  curve that is no longer closed.
 - **A bounding square, then a bounding circle, as the page rule.**
   Both reject nothing the ellipse would have accepted, and both
   accept objects the ellipse rejects — a thin galaxy lying along the

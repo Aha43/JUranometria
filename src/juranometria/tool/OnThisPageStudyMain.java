@@ -253,19 +253,40 @@ public final class OnThisPageStudyMain {
             return false;          // nothing of it is on this sky
         }
         outline.closePath();
-        // Closed, this answers both things a bag of points cannot.
         // A crossing anywhere along an edge counts, not only at a
-        // sample. And a rectangle lying inside the path intersects
-        // it - which is the object holding the whole page: nothing
-        // of its outline is on the paper and its centre is off it,
-        // yet every pixel in front of the reader is inside it.
+        // sample. And where the whole curve is on the page, a
+        // rectangle lying inside the path intersects it - which is
+        // the object holding the whole page.
+        if (outline.intersects(PAPER)) {
+            return true;
+        }
+        // But a curve that ran off the projection is drawn in
+        // pieces, and a piece cannot be asked about containment: a
+        // long thin object laid across the page has both ends past
+        // the horizon and the paper lying *between* its two
+        // remaining arcs. So containment is asked of the paper
+        // itself, turned back into sky through the atlas's inverse
+        // and tested against the angular ellipse directly.
         //
-        // Where part of the boundary is past the projection's
-        // horizon, what is left is closed by a chord rather than by
-        // the true curve. Only objects far larger than any the
-        // catalogue holds get there, and the oracle is asked about
-        // that case in both directions rather than trusted.
-        return outline.intersects(PAPER);
+        // This check was written once, found unkillable by any
+        // mutation, and removed as decoration. Breaking the path at
+        // the horizon - which stopped a straight line standing in
+        // for sky the projection had refused - is what made it load
+        // bearing, and there is now a test that fails without it.
+        for (double[] point : new double[][] {
+                {PAPER.getMinX(), PAPER.getMinY()},
+                {PAPER.getMaxX(), PAPER.getMinY()},
+                {PAPER.getMinX(), PAPER.getMaxY()},
+                {PAPER.getMaxX(), PAPER.getMaxY()},
+                {PAPER.getCenterX(), PAPER.getCenterY()}}) {
+            SkyPosition sky = juranometria.render.ChartHitTest.skyAt(
+                    scene, point[0], point[1]);
+            if (sky != null && insideAngularEllipse(centre, sky,
+                    semiMajorDeg, semiMinorDeg, positionAngleDeg)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -292,6 +313,14 @@ public final class OnThisPageStudyMain {
             GnomonicProjection projection, ViewportMapping mapping,
             SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
             double positionAngleDeg) {
+        return outlineOf(projection, mapping, centre, semiMajorDeg,
+                semiMinorDeg, positionAngleDeg, MAX_DEPTH);
+    }
+
+    static java.awt.geom.Path2D.Double outlineOf(
+            GnomonicProjection projection, ViewportMapping mapping,
+            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
+            double positionAngleDeg, int maxDepth) {
         java.awt.geom.Path2D.Double outline =
                 new java.awt.geom.Path2D.Double();
         java.awt.geom.Point2D.Double previous = null;
@@ -303,20 +332,23 @@ public final class OnThisPageStudyMain {
                     positionAngleDeg, t);
             if (here == null) {
                 // Past the projection's horizon; the curve leaves
-                // this page and the path breaks here.
+                // this page here.
                 previous = null;
                 continue;
             }
             if (previous == null) {
-                if (outline.getCurrentPoint() == null) {
-                    outline.moveTo(here.x, here.y);
-                } else {
-                    outline.lineTo(here.x, here.y);
-                }
+                // A new subpath, never a chord across the gap. The
+                // first version drew one - the curve went off the
+                // projection and came back, and the two ends were
+                // quietly joined by a straight line standing for a
+                // stretch of sky the projection had refused (gate
+                // review). That line is not the object's edge and
+                // must not be tested as though it were.
+                outline.moveTo(here.x, here.y);
             } else {
                 subdivide(projection, mapping, centre, semiMajorDeg,
                         semiMinorDeg, positionAngleDeg, previousT, previous,
-                        t, here, 0, outline);
+                        t, here, 0, maxDepth, outline);
             }
             previous = here;
             previousT = t;
@@ -330,21 +362,45 @@ public final class OnThisPageStudyMain {
                                   double semiMinorDeg, double positionAngleDeg,
                                   double t0, java.awt.geom.Point2D.Double p0,
                                   double t1, java.awt.geom.Point2D.Double p1,
-                                  int depth,
+                                  int depth, int maxDepth,
                                   java.awt.geom.Path2D.Double outline) {
         double tm = 0.5 * (t0 + t1);
         java.awt.geom.Point2D.Double pm = boundaryPixel(projection, mapping,
                 centre, semiMajorDeg, semiMinorDeg, positionAngleDeg, tm);
-        if (pm == null || depth >= MAX_DEPTH
-                || java.awt.geom.Line2D.ptSegDist(p0.x, p0.y, p1.x, p1.y,
-                        pm.x, pm.y) <= FLATNESS_PX) {
+        if (pm == null || java.awt.geom.Line2D.ptSegDist(p0.x, p0.y,
+                p1.x, p1.y, pm.x, pm.y) <= FLATNESS_PX) {
+            outline.lineTo(p1.x, p1.y);
+            return;
+        }
+        if (depth >= maxDepth) {
+            // The guarantee has run out. Emitting the chord anyway
+            // is the right thing to do - there is nothing better to
+            // draw - but doing it quietly is not: past here the
+            // twentieth of a pixel is no longer promised, and a
+            // promise that can lapse without saying so is not one
+            // (gate review). Counted, printed by the study, and
+            // asserted to be zero wherever the bound is claimed.
+            timesTheBoundLapsed++;
             outline.lineTo(p1.x, p1.y);
             return;
         }
         subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
-                positionAngleDeg, t0, p0, tm, pm, depth + 1, outline);
+                positionAngleDeg, t0, p0, tm, pm, depth + 1, maxDepth,
+                outline);
         subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
-                positionAngleDeg, tm, pm, t1, p1, depth + 1, outline);
+                positionAngleDeg, tm, pm, t1, p1, depth + 1, maxDepth,
+                outline);
+    }
+
+    /** How often the subdivision ran out of depth before flatness. */
+    private static long timesTheBoundLapsed;
+
+    static long timesTheBoundLapsed() {
+        return timesTheBoundLapsed;
+    }
+
+    static void forgetTheBoundLapses() {
+        timesTheBoundLapsed = 0;
     }
 
     /**
@@ -371,9 +427,16 @@ public final class OnThisPageStudyMain {
     static java.awt.geom.Path2D.Double outlineOn(ChartScene scene,
             SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
             double positionAngleDeg) {
+        return outlineOn(scene, centre, semiMajorDeg, semiMinorDeg,
+                positionAngleDeg, MAX_DEPTH);
+    }
+
+    static java.awt.geom.Path2D.Double outlineOn(ChartScene scene,
+            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
+            double positionAngleDeg, int maxDepth) {
         return outlineOf(new GnomonicProjection(scene.viewport().centre()),
                 new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
-                semiMinorDeg, positionAngleDeg);
+                semiMinorDeg, positionAngleDeg, maxDepth);
     }
 
     /** The same boundary point, for a page rather than a projection. */
@@ -679,6 +742,15 @@ public final class OnThisPageStudyMain {
                         + " is given exactly where the catalogue"
                         + " leaves no better one.%n%n",
                 tally[1], tally[2]);
+        System.out.printf(Locale.ROOT,
+                "Every boundary in this report was drawn to within a"
+                        + " twentieth of a pixel of the true curve."
+                        + " The subdivision ran out of depth before"
+                        + " reaching that **%,d times** across the"
+                        + " whole pack - so the bound holds for every"
+                        + " row above, rather than holding quietly"
+                        + " until it does not.%n%n",
+                timesTheBoundLapsed());
         System.out.println("`OnThisPageSphericalTest` checks the"
                 + " rule from the opposite direction: it samples the"
                 + " **paper**, turns each pixel back into a sky"

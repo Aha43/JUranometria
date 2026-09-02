@@ -89,7 +89,9 @@ class OnThisPageSphericalTest {
         // thousand points of the true curve, each asked how far it
         // is from the path that claims to be it.
         double worst = 0;
+        int shapes = 0;
         String worstCase = "none";
+        OnThisPageStudyMain.forgetTheBoundLapses();
         for (ChartScene scene : List.of(
                 page(80.894, -69.756, 36.0),
                 page(80.894, -69.756, 1.0),
@@ -103,6 +105,7 @@ class OnThisPageSphericalTest {
                         java.awt.geom.Path2D.Double outline =
                                 OnThisPageStudyMain.outlineOn(scene, centre,
                                         semiMajor, semiMajor * ratio, pa);
+                        shapes++;
                         double strayed = furthestFromPath(outline, scene,
                                 centre, semiMajor, semiMajor * ratio, pa);
                         if (strayed > worst) {
@@ -129,13 +132,19 @@ class OnThisPageSphericalTest {
                 String.format("the path strays %.4f px from the curve it"
                         + " stands for; a twentieth of a pixel is the"
                         + " bound. Worst: %s", worst, worstCase));
-        System.out.printf("outline strays at most %.4f px (%s)%n",
-                worst, worstCase);
         // And the bound is not vacuous: a thin ellipse turns hard
         // enough at the ends of its major axis that something has to
         // be subdivided, so a measurement of zero would mean the
         // measurement is not looking.
         assertTrue(worst > 0, "the measurement finds a real distance");
+        // The bound is claimed here, so it must not have lapsed
+        // here: reaching the depth limit emits a chord no longer
+        // promised to be flat (gate review).
+        assertEquals(0L, OnThisPageStudyMain.timesTheBoundLapsed(),
+                "the subdivision never ran out of depth over these "
+                        + shapes + " measurements");
+        System.out.printf("outline strays at most %.4f px over %d"
+                + " measurements (%s)%n", worst, shapes, worstCase);
     }
 
     /**
@@ -196,6 +205,69 @@ class OnThisPageSphericalTest {
             }
         }
         return segments;
+    }
+
+    @Test
+    void runningOutOfDepthIsCountedRatherThanPassedOverInSilence() {
+        // The counter has to be able to move, or asserting it is
+        // zero says nothing. Given a depth of one, a thin ellipse on
+        // a wide page cannot be followed to a twentieth of a pixel,
+        // and the lapse is recorded rather than absorbed.
+        ChartScene scene = page(80.894, -69.756, 36.0);
+        SkyPosition centre = scene.viewport().centre();
+
+        OnThisPageStudyMain.forgetTheBoundLapses();
+        OnThisPageStudyMain.outlineOn(scene, centre, 12.0, 1.0, 40.0, 1);
+        long lapsed = OnThisPageStudyMain.timesTheBoundLapsed();
+        assertTrue(lapsed > 0,
+                "a depth of one cannot follow this curve, and saying"
+                        + " so is the whole point: " + lapsed);
+
+        OnThisPageStudyMain.forgetTheBoundLapses();
+        OnThisPageStudyMain.outlineOn(scene, centre, 12.0, 1.0, 40.0);
+        assertEquals(0L, OnThisPageStudyMain.timesTheBoundLapsed(),
+                "and with the real depth the same curve is followed"
+                        + " all the way");
+    }
+
+    @Test
+    void aCurveLeavingTheProjectionIsNotRejoinedByAChord() {
+        // An object big enough to run off the projection comes back
+        // on the other side, and the two ends were being joined by a
+        // straight line standing for sky the projection had refused
+        // (gate review). That line is not the object's edge. The
+        // path must break instead - so it is drawn in more than one
+        // piece, and no single piece spans the gap.
+        // A long thin ellipse laid across the page: both ends of
+        // its major axis run past the projection's horizon while its
+        // waist stays on the page, so the curve leaves and returns
+        // twice. A single refused stretch would not show this - the
+        // remaining points are still one run, and there is nothing
+        // to bridge.
+        ChartScene scene = page(80.894, -69.756, 1.0);
+        SkyPosition centre = scene.viewport().centre();
+        java.awt.geom.Path2D.Double outline =
+                OnThisPageStudyMain.outlineOn(scene, centre, 100.0, 3.0, 0.0);
+
+        int pieces = 0;
+        double[] coords = new double[6];
+        for (java.awt.geom.PathIterator it = outline.getPathIterator(null);
+                !it.isDone(); it.next()) {
+            if (it.currentSegment(coords)
+                    == java.awt.geom.PathIterator.SEG_MOVETO) {
+                pieces++;
+            }
+        }
+        assertTrue(pieces > 1,
+                "the curve leaves the projection and returns, so the"
+                        + " path is drawn in pieces rather than closed"
+                        + " across the gap: " + pieces + " piece(s)");
+        // And breaking it does not cost the right answer: the
+        // inverse oracle is asked about the same shape, both ways.
+        assertEquals(oracleReaches(scene, centre, 100.0, 3.0, 0.0),
+                rule(scene, centre, 100.0, 3.0, 0.0),
+                "a curve drawn in pieces still decides the page"
+                        + " correctly");
     }
 
     // ----------------------------------------------------------------
