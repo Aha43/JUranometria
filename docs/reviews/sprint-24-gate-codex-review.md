@@ -437,3 +437,20 @@ fixing it.
 
 After the production-bound correction, merge #219 and begin #215 without
 another review round.
+
+## Final follow-up — `c52e821`
+
+**Approved.** The last duplicated premise is gone. Page reach is now measured
+from the tallest viewport `SceneAssembler.maxPageHeightPx` permits at the
+widest released field, the oversized control demonstrates that drawing past
+that limit would exceed the bound, and the pack's manifest margin is checked
+against its actual largest recorded object. The resulting structural sum stays
+well inside the projection horizon without depending on a survey of selected
+pages.
+
+All earlier catalogue-honesty, ordering, keyboard, spherical geometry,
+intersection, approximation, and failure-contract findings are resolved.
+Issue #220 is an independently recorded display-journey reliability issue and
+does not block this decision.
+
+PR #219 may merge. Issue #215 may begin.
