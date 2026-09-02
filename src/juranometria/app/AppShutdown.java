@@ -124,6 +124,82 @@ public final class AppShutdown {
     }
 
     /**
+     * Where a quit handler is registered, and whether this platform
+     * has a Quit to register one with.
+     *
+     * <p>A seam, because otherwise the behaviour can only be
+     * observed on a desktop that offers a quit handler - and the
+     * journey that observes it is meant to run under xvfb on Linux,
+     * which does not (#203 review). With the registry injected, the
+     * production path is exercised identically everywhere: the same
+     * handler is built, wired to the same {@link #request()}, and
+     * handed over. Only the thing it is handed to differs.
+     */
+    public interface QuitRegistry {
+        /**
+         * Takes a handler to run when the platform's Quit is chosen.
+         *
+         * @return false where this platform has no Quit to offer, in
+         *         which case nothing was registered
+         */
+        boolean register(Runnable leave);
+    }
+
+    /** The real one: the desktop's own quit handler. */
+    public static QuitRegistry desktopQuitRegistry() {
+        return leave -> {
+            try {
+                java.awt.Desktop desktop =
+                        java.awt.Desktop.isDesktopSupported()
+                                ? java.awt.Desktop.getDesktop() : null;
+                if (desktop == null || !desktop.isSupported(
+                        java.awt.Desktop.Action.APP_QUIT_HANDLER)) {
+                    return false;
+                }
+                desktop.setQuitHandler((event, response) -> leave.run());
+                return true;
+            } catch (UnsupportedOperationException | SecurityException
+                    ignored) {
+                return false;
+            }
+        };
+    }
+
+    /**
+     * Installs the platform's Quit as one more way to reach this
+     * path, and <strong>returns the very thing it installed</strong>
+     * (#203 review).
+     *
+     * <p>Returning it is the point. No API fires a desktop's quit
+     * handler from a test, so a journey that wants to prove Quit
+     * leaves the same way as everything else can only invoke the
+     * handler - and if the journey writes its own
+     * {@code shutdown::request} to invoke, it has proved a copy of
+     * the wiring rather than the wiring. This hands back production's
+     * own object, so what a test presses is what macOS presses.
+     *
+     * @return the handler installed, or null where the desktop has
+     *         no quit handler to give - in which case its own Quit
+     *         is unaffected and the other surfaces still work
+     */
+    public Runnable installQuitHandler() {
+        return installQuitHandler(desktopQuitRegistry());
+    }
+
+    /**
+     * The same installation against a given registry, so what a test
+     * observes is production building and wiring the handler rather
+     * than a test writing one of its own.
+     */
+    public Runnable installQuitHandler(QuitRegistry registry) {
+        if (registry == null) {
+            return null;
+        }
+        Runnable leave = this::request;
+        return registry.register(leave) ? leave : null;
+    }
+
+    /**
      * Runs a step and swallows whatever it throws. Leaving is not the
      * moment to argue, and there is nowhere left to report it to.
      */
