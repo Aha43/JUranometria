@@ -51,9 +51,14 @@ class DeepSkyStackingTest {
     }
 
     private static List<ChartRenderer.DrawnMark> deepSky(ChartScene scene) {
+        return deepSky(scene, OPTIONS);
+    }
+
+    private static List<ChartRenderer.DrawnMark> deepSky(
+            ChartScene scene, ChartOptions options) {
         List<ChartRenderer.DrawnMark> out = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark
-                : RENDERER.drawnMarks(scene, OPTIONS)) {
+                : RENDERER.drawnMarks(scene, options)) {
             if (mark.kind() == ChartRenderer.DrawnMark.Kind.DEEP_SKY) {
                 out.add(mark);
             }
@@ -95,17 +100,61 @@ class DeepSkyStackingTest {
     }
 
     /**
-     * The pixels this object is responsible for on the finished page:
-     * render it, render the page without it, count what changed.
-     * Nothing is inferred from geometry - the drawing answers.
+     * The chart with <strong>no deep-sky labels</strong>, so what is
+     * measured is the symbol pass alone.
      */
-    private static int survivingInk(ChartScene scene, String id) {
-        BufferedImage with = RENDERER.renderToImage(scene);
-        BufferedImage none = RENDERER.renderToImage(without(scene, id));
+    private static ChartOptions symbolsOnly() {
+        ChartOptions d = ChartOptions.DEFAULTS;
+        return new ChartOptions(d.deepSkyObjects(), false,
+                d.constellationFigures(), d.constellationBoundaries(),
+                d.constellationNames(), d.starNames(), d.bayerLetters(),
+                d.flamsteedNumbers(), d.equatorialGrid(), d.titleBlock(),
+                d.magnitudeKey(), d.galaxies(), d.openClusters(),
+                d.globularClusters(), d.nebulae(),
+                d.planetaryNebulae());
+    }
+
+    /** The same page with no searched target, so nothing is exempt. */
+    private static ChartScene anonymous(ChartScene scene) {
+        return new ChartScene(scene.viewport(), scene.stars(),
+                scene.deepSkyObjects(), scene.title(),
+                scene.limitingMagnitude(), null, scene.geography());
+    }
+
+    /**
+     * The pixels this object's <strong>symbol</strong> leaves on the
+     * page: render it, render the page without it, and count what
+     * changed <em>inside the mark's own outline</em>.
+     *
+     * <p>Three things are held away deliberately (#201 review).
+     * <strong>Labels are off</strong>, because under the defect
+     * M 32's label went on drawing while its ellipse was gone
+     * entirely - a measurement that counted the label would have
+     * called that "leaves ink" and proved nothing, which is the whole
+     * shape of the bug. <strong>The searched target is cleared</strong>,
+     * so no exemption can keep a symbol alive on the answer's behalf.
+     * And the count is <strong>confined to the mark's own
+     * outline</strong>, so a neighbour's ink cannot answer for it.
+     */
+    private static int symbolInk(ChartScene page, String id) {
+        ChartScene scene = anonymous(page);
+        ChartOptions options = symbolsOnly();
+        ChartRenderer.DrawnMark mark = named(deepSky(scene, options), id);
+        assertNotNull(mark, id + " draws a symbol on this page");
+        BufferedImage with = RENDERER.renderToImage(scene, options);
+        BufferedImage none = RENDERER.renderToImage(
+                without(scene, id), options);
+        java.awt.Shape outline = mark.outline();
         int changed = 0;
-        for (int y = 0; y < with.getHeight(); y++) {
-            for (int x = 0; x < with.getWidth(); x++) {
-                if (with.getRGB(x, y) != none.getRGB(x, y)) {
+        java.awt.geom.Rectangle2D box = outline.getBounds2D();
+        int x0 = Math.max(0, (int) Math.floor(box.getMinX()));
+        int x1 = Math.min(with.getWidth() - 1, (int) Math.ceil(box.getMaxX()));
+        int y0 = Math.max(0, (int) Math.floor(box.getMinY()));
+        int y1 = Math.min(with.getHeight() - 1, (int) Math.ceil(box.getMaxY()));
+        for (int y = y0; y <= y1; y++) {
+            for (int x = x0; x <= x1; x++) {
+                if (outline.contains(x + 0.5, y + 0.5)
+                        && with.getRGB(x, y) != none.getRGB(x, y)) {
                     changed++;
                 }
             }
@@ -167,51 +216,36 @@ class DeepSkyStackingTest {
     }
 
     @Test
-    void allThreeAndromedaGalaxiesLeaveInkOnTheDefaultPage() {
+    void everyAndromedaGalaxyLeavesSymbolInkOfItsOwn() {
+        // The acceptance, and nothing else in this test may carry it:
+        // each of the three leaves ink that is its own symbol, with
+        // labels off and no target exemption. Under the defect M 32
+        // scores exactly zero here while its label still drew.
         ChartScene scene = defaultPage();
-        List<ChartRenderer.DrawnMark> marks = deepSky(scene);
-
-        // The largest goes behind, so its companions survive it.
-        assertTrue(paintedAt(marks, M31) < paintedAt(marks, M32),
-                "M 31 is painted before M 32");
-        assertTrue(paintedAt(marks, M31) < paintedAt(marks, M110),
-                "M 31 is painted before M 110");
-
         for (String id : List.of(M31, M32, M110)) {
-            assertTrue(survivingInk(scene, id) > 0,
-                    id + " must leave identifiable ink on the page:"
-                            + " a label with no mark is what this"
-                            + " issue is about");
+            assertTrue(symbolInk(scene, id) > 0,
+                    id + " must leave symbol ink a reader can see -"
+                            + " a label with no mark under it is what"
+                            + " this issue is about");
         }
     }
 
     @Test
-    void eachOfTheThreeCanBeReachedByPointing() {
-        ChartScene scene = defaultPage();
-        List<ChartRenderer.DrawnMark> marks = deepSky(scene);
-        ChartHitTest hits = new ChartHitTest(RENDERER);
-
-        for (String id : List.of(M31, M32, M110)) {
-            ChartRenderer.DrawnMark mark = named(marks, id);
-            assertNotNull(mark, id);
-            ChartHitTest.Hit hit = hits.at(scene, OPTIONS,
-                    mark.centre().x(), mark.centre().y());
-            assertNotNull(hit, "pointing at " + id + " is on the paper");
-            List<String> offered = new ArrayList<>();
-            for (juranometria.chart.Selection.Object candidate
-                    : hit.candidates()) {
-                offered.add(candidate.catalogueId());
-            }
-            assertTrue(offered.contains(id),
-                    "pointing at " + id + " must offer it: " + offered);
-            // Standing on the small companion answers with the
-            // companion, not the disc it sits on.
-            if (!id.equals(M31)) {
-                assertEquals(id, offered.get(0),
-                        "the tighter mark answers first: " + offered);
-            }
-        }
+    void theLargestGalaxyIsPaintedBehindItsCompanions() {
+        List<ChartRenderer.DrawnMark> marks = deepSky(defaultPage());
+        assertTrue(paintedAt(marks, M31) < paintedAt(marks, M32),
+                "M 31 is painted before M 32");
+        assertTrue(paintedAt(marks, M31) < paintedAt(marks, M110),
+                "M 31 is painted before M 110");
     }
+
+    // Pointing is proved where a reader actually points: the
+    // Andromeda step of MapExplorationJourneyTest dispatches real
+    // mouse events through ChartComponent and SelectInteraction,
+    // and takes the overlapping candidate from the Inspector's list
+    // with the arrow key and Enter (#201 review). Asking ChartHitTest
+    // directly at exact internal coordinates would have proved the
+    // rule against itself.
 
     @Test
     void theOrderDoesNotDependOnHowTheCatalogueArrives() {

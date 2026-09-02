@@ -97,17 +97,29 @@ about — and to test — than a rule with a family exception in it.
 
 ### The default page, after
 
-| galaxy | painted | inside M 31's disc | leaves ink |
+| galaxy | painted | inside M 31's disc | symbol ink |
 |---|---:|---|---:|
-| M 31 / NGC 224 | 1st | — | 34,750 px |
-| M 110 / NGC 205 | 2nd | partly | 566 px |
-| M 32 / NGC 221 | 3rd | **entirely** | 220 px |
+| M 31 / NGC 224 | 1st | — | 33,834 px |
+| M 110 / NGC 205 | 2nd | partly | 325 px |
+| M 32 / NGC 221 | 3rd | **entirely** | 42 px |
 
-Surviving ink is measured, not argued: the page is rendered again
-with that one object removed, and the pixels that change are the ones
-it contributes. M 32 sits on M 31's fill, so what identifies it is its
-own grey-132 outline — which is exactly how the chart distinguishes a
-galaxy anywhere else.
+Symbol ink is measured, not argued: the page is rendered again with
+that one object removed, and the pixels that change **inside the
+mark's own outline** are what its symbol contributes.
+
+Three things are held away while it is measured, and the reason is
+the shape of the bug itself. **Labels are switched off**, because
+under the defect M 32's label went on drawing while its ellipse was
+gone entirely — a measurement that counted the label would have
+reported ink for a mark no reader could see, and passed. **The
+searched target is cleared**, so no exemption keeps a symbol alive on
+the answer's behalf. And the count is **confined to the mark's own
+outline**, so a neighbour cannot answer for it. With the rule
+removed, M 32 scores exactly zero.
+
+M 32 sits on M 31's fill, so what identifies it is its own grey-132
+outline — which is exactly how the chart distinguishes a galaxy
+anywhere else.
 
 ## Unavoidable cases
 
@@ -132,7 +144,19 @@ preserved for that reason.
 
 Hit testing already ordered its answer by *ink before nearness, then
 distance, then the tighter mark, then identity* — never by paint
-order — so it needed no change and got none. Standing on M 32 answers
-with M 32 rather than the disc it sits on, and each of the three is
-reachable through a real pointer interaction. That is asserted, not
-assumed.
+order — so it needed no change and got none.
+
+Reachability is proved where a reader actually points, in
+`MapExplorationJourneyTest`: real mouse events dispatched through
+`ChartComponent` and `SelectInteraction` reach each of the three, and
+the overlap where M 32 sits inside M 31 is taken from the Inspector's
+own candidate list with the arrow key and Enter. Standing on M 32
+answers with M 32, and the disc it sits on is the second candidate
+rather than a lost one.
+
+Asking `ChartHitTest` directly at exact internal coordinates would
+have proved the rule against itself, so it is not what this rests on.
+Note also what pointing does **not** establish: hit testing answers
+from published outlines, so it offered M 32 even when M 32 was
+invisible. That is the correct behaviour and the reason the defect
+needed the ink measurement to catch it.

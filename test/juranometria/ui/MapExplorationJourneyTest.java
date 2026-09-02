@@ -173,6 +173,50 @@ class MapExplorationJourneyTest {
                     witness.get(witness.size() - 1).selection(),
                     "and heard exactly what the inspector heard");
 
+            // 1b. Andromeda's three galaxies, each reached by
+            // pointing (issue #201). Until the stacking rule, M 31's
+            // opaque disc was painted last and M 32 left no ink at
+            // all - the reader met the name, looked for the third
+            // ellipse, and had nothing to point at. These are real
+            // mouse events through the chart, as step 1's were.
+            for (String galaxy : List.of("NGC 224", "NGC 221", "NGC 205")) {
+                ChartRenderer.DrawnMark mark = deepSkyNamed(galaxy);
+                clickOn(mark);
+                List<String> offered = selection.candidates().stream()
+                        .map(Selection.Object::catalogueId).toList();
+                assertTrue(offered.contains(galaxy),
+                        "pointing at " + galaxy + " must reach it: "
+                                + offered);
+            }
+
+            // M 32 sits wholly inside M 31's disc, so pointing there
+            // is genuinely ambiguous - and the reader is owed both,
+            // with the smaller mark leading.
+            ChartRenderer.DrawnMark m32 = deepSkyNamed("NGC 221");
+            clickOn(m32);
+            List<String> both = selection.candidates().stream()
+                    .map(Selection.Object::catalogueId).toList();
+            assertTrue(both.contains("NGC 221") && both.contains("NGC 224"),
+                    "standing on M 32 offers the companion and the"
+                            + " disc it sits on: " + both);
+            assertEquals("NGC 221", both.get(0),
+                    "and the tighter mark leads: " + both);
+            assertTrue(inspector.candidateLines().size() > 1,
+                    "the panel lists them: " + inspector.candidateLines());
+
+            // Taken by keyboard, as a reader without a pointer does.
+            javax.swing.JList<?> overlap = candidateList(inspector);
+            SwingUtilities.invokeAndWait(overlap::requestFocusInWindow);
+            flush();
+            key(overlap, KeyEvent.VK_DOWN);
+            key(overlap, KeyEvent.VK_ENTER);
+            assertEquals(both.get(1),
+                    assertInstanceOf(Selection.Object.class,
+                            selection.selection()).catalogueId(),
+                    "the arrow key and Enter took the second"
+                            + " candidate - the disc under the"
+                            + " companion");
+
             // 2. A deep-sky symbol, with the catalogue's silences
             // stated as silences.
             ChartRenderer.DrawnMark symbol = someDeepSky();
@@ -806,6 +850,15 @@ class MapExplorationJourneyTest {
                 .filter(mark -> !mark.deepSky().id().equals(target))
                 .filter(this::wellInside)
                 .findFirst().orElseThrow();
+    }
+
+    /** One named deep-sky mark on the page the reader is looking at. */
+    private ChartRenderer.DrawnMark deepSkyNamed(String catalogueId) {
+        return marks().stream()
+                .filter(mark -> mark.deepSky() != null)
+                .filter(mark -> catalogueId.equals(mark.deepSky().id()))
+                .findFirst().orElseThrow(() -> new AssertionError(
+                        catalogueId + " is not drawn on this page"));
     }
 
     private ChartRenderer.DrawnMark crowdedMark() {

@@ -354,7 +354,7 @@ public final class DeepSkyOcclusionStudyMain {
                 + " drawing order itself, not a description of it.");
         System.out.println();
         System.out.println("| painted | object | drawn axes (px) |"
-                + " leaves ink (px) |");
+                + " symbol ink (px) |");
         System.out.println("|---:|---|---:|---:|");
         int position = 0;
         for (ChartRenderer.DrawnMark mark : dsos) {
@@ -363,15 +363,19 @@ public final class DeepSkyOcclusionStudyMain {
                     ++position, mark.deepSky().id(),
                     Math.max(box.getWidth(), box.getHeight()),
                     Math.min(box.getWidth(), box.getHeight()),
-                    survivingInk(renderer, scene, options, mark));
+                    symbolInk(renderer, scene, mark.deepSky().id()));
         }
         System.out.println();
-        System.out.println("**Surviving ink** is measured, not"
-                + " assumed: the page is rendered again with that one"
-                + " object removed from the scene, and the pixels that"
-                + " change are the ones it contributes. Zero would"
-                + " mean a mark the reader cannot see - and a label"
-                + " with nothing to name.");
+        System.out.println("**Symbol ink** is measured, not assumed:"
+                + " the page is rendered again with that one object"
+                + " removed, and the pixels that change inside its own"
+                + " outline are the ones its symbol contributes."
+                + " Labels are switched off and the searched target"
+                + " cleared first, because under the defect M 32's"
+                + " label went on drawing while its ellipse was gone"
+                + " entirely - counting the label would have reported"
+                + " ink for a mark no reader could see. Zero means"
+                + " exactly that: a label with nothing under it.");
         System.out.println();
 
         andromedaTrio(renderer, scene, options, dsos);
@@ -402,7 +406,7 @@ public final class DeepSkyOcclusionStudyMain {
         System.out.println("### Andromeda's three galaxies");
         System.out.println();
         System.out.println("| galaxy | painted | inside M 31's disc |"
-                + " leaves ink (px) |");
+                + " symbol ink (px) |");
         System.out.println("|---|---:|---|---:|");
         for (ChartRenderer.DrawnMark mark
                 : List.of(m31, m32, m110)) {
@@ -411,7 +415,7 @@ public final class DeepSkyOcclusionStudyMain {
                     mark == m31 ? "-"
                             : (contains(m31, mark) ? "**entirely**"
                                     : "partly"),
-                    survivingInk(renderer, scene, options, mark));
+                    symbolInk(renderer, scene, mark.deepSky().id()));
         }
         System.out.println();
         System.out.printf(Locale.ROOT,
@@ -445,26 +449,70 @@ public final class DeepSkyOcclusionStudyMain {
     }
 
     /**
-     * How many pixels of the finished page this object is
-     * responsible for: render it, render the same page without it,
-     * and count what changed. Nothing is inferred from geometry -
-     * this is the drawing answering for itself.
+     * The pixels this object's <strong>symbol</strong> leaves on the
+     * page: render it, render the page without it, and count what
+     * changed inside the mark's own outline.
+     *
+     * <p>Labels are switched off and the searched target cleared
+     * first (#201 review). Under the defect M 32's label went on
+     * drawing while its ellipse was gone entirely, so a measurement
+     * that counted the label would have reported ink for a mark no
+     * reader could see - which is the exact shape of the bug this
+     * study exists to measure. Confining the count to the mark's own
+     * outline keeps a neighbour from answering for it.
      */
-    static int survivingInk(ChartRenderer renderer, ChartScene scene,
-                            ChartOptions options,
-                            ChartRenderer.DrawnMark mark) {
-        BufferedImage with = renderer.renderToImage(scene);
-        BufferedImage without = renderer.renderToImage(without(scene,
-                mark.deepSky().id()));
+    static int symbolInk(ChartRenderer renderer, ChartScene page,
+                         String id) {
+        ChartScene scene = anonymous(page);
+        ChartOptions options = symbolsOnly();
+        ChartRenderer.DrawnMark mark = null;
+        for (ChartRenderer.DrawnMark m
+                : renderer.drawnMarks(scene, options)) {
+            if (m.kind() == ChartRenderer.DrawnMark.Kind.DEEP_SKY
+                    && id.equals(m.deepSky().id())) {
+                mark = m;
+            }
+        }
+        if (mark == null) {
+            return 0;
+        }
+        BufferedImage with = renderer.renderToImage(scene, options);
+        BufferedImage none = renderer.renderToImage(
+                without(scene, id), options);
+        java.awt.Shape outline = mark.outline();
+        java.awt.geom.Rectangle2D box = outline.getBounds2D();
+        int x0 = Math.max(0, (int) Math.floor(box.getMinX()));
+        int x1 = Math.min(with.getWidth() - 1, (int) Math.ceil(box.getMaxX()));
+        int y0 = Math.max(0, (int) Math.floor(box.getMinY()));
+        int y1 = Math.min(with.getHeight() - 1, (int) Math.ceil(box.getMaxY()));
         int changed = 0;
-        for (int y = 0; y < with.getHeight(); y++) {
-            for (int x = 0; x < with.getWidth(); x++) {
-                if (with.getRGB(x, y) != without.getRGB(x, y)) {
+        for (int y = y0; y <= y1; y++) {
+            for (int x = x0; x <= x1; x++) {
+                if (outline.contains(x + 0.5, y + 0.5)
+                        && with.getRGB(x, y) != none.getRGB(x, y)) {
                     changed++;
                 }
             }
         }
         return changed;
+    }
+
+    /** The chart with no deep-sky labels: the symbol pass alone. */
+    private static ChartOptions symbolsOnly() {
+        ChartOptions d = ChartOptions.DEFAULTS;
+        return new ChartOptions(d.deepSkyObjects(), false,
+                d.constellationFigures(), d.constellationBoundaries(),
+                d.constellationNames(), d.starNames(), d.bayerLetters(),
+                d.flamsteedNumbers(), d.equatorialGrid(), d.titleBlock(),
+                d.magnitudeKey(), d.galaxies(), d.openClusters(),
+                d.globularClusters(), d.nebulae(), d.planetaryNebulae());
+    }
+
+    /** The same page with no searched target, so nothing is exempt. */
+    private static ChartScene anonymous(ChartScene scene) {
+        return new ChartScene(scene.viewport(), scene.stars(),
+                scene.deepSkyObjects(), scene.title(),
+                scene.limitingMagnitude(), null, scene.geography());
     }
 
     /** The same page, minus one object. */

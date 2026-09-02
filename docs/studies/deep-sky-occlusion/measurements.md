@@ -63,25 +63,25 @@ M 31 at a 8-degree field, stars to V 8.0 - the page the application opens on.
 
 Published by `drawnMarks`, which is the list the renderer paints from - so this is the drawing order itself, not a description of it.
 
-| painted | object | drawn axes (px) | leaves ink (px) |
+| painted | object | drawn axes (px) | symbol ink (px) |
 |---:|---|---:|---:|
-| 1 | NGC 224 | 283 x 219 | 34750 |
-| 2 | NGC 205 | 30 x 18 | 566 |
-| 3 | NGC 221 | 14 x 9 | 220 |
-| 4 | IC 1550 | 6 x 6 | 51 |
-| 5 | NGC 317 | 6 x 6 | 34 |
-| 6 | NGC 317A | 6 x 5 | 32 |
-| 7 | NGC 317B | 6 x 3 | 31 |
+| 1 | NGC 224 | 283 x 219 | 33834 |
+| 2 | NGC 205 | 30 x 18 | 325 |
+| 3 | NGC 221 | 14 x 9 | 42 |
+| 4 | IC 1550 | 6 x 6 | 28 |
+| 5 | NGC 317 | 6 x 6 | 12 |
+| 6 | NGC 317A | 6 x 5 | 12 |
+| 7 | NGC 317B | 6 x 3 | 13 |
 
-**Surviving ink** is measured, not assumed: the page is rendered again with that one object removed from the scene, and the pixels that change are the ones it contributes. Zero would mean a mark the reader cannot see - and a label with nothing to name.
+**Symbol ink** is measured, not assumed: the page is rendered again with that one object removed, and the pixels that change inside its own outline are the ones its symbol contributes. Labels are switched off and the searched target cleared first, because under the defect M 32's label went on drawing while its ellipse was gone entirely - counting the label would have reported ink for a mark no reader could see. Zero means exactly that: a label with nothing under it.
 
 ### Andromeda's three galaxies
 
-| galaxy | painted | inside M 31's disc | leaves ink (px) |
+| galaxy | painted | inside M 31's disc | symbol ink (px) |
 |---|---:|---|---:|
-| NGC 224 | 1 | - | 34750 |
-| NGC 221 | 3 | **entirely** | 220 |
-| NGC 205 | 2 | partly | 566 |
+| NGC 224 | 1 | - | 33834 |
+| NGC 221 | 3 | **entirely** | 42 |
+| NGC 205 | 2 | partly | 325 |
 
 M 31's disc **entirely contains** M 32's ellipse: every point of the smaller mark lies within the larger one, and the larger one is filled. Painting M 31 second - which storage order did - therefore leaves M 32 no ink at all, whatever the page. The stacking rule paints it first instead, and M 32 keeps its outline.
 
