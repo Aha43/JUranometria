@@ -113,3 +113,52 @@ display-backed run.
 
 The proposed **1.4.0** version remains appropriate once the closing
 evidence and #209 are resolved.
+
+## Follow-up — `daaf347`
+
+**Changes still requested.** The vacuous Inspector assertion is gone,
+the real dialog and Home controls are driven, the toolbar now responds
+to its own layout, and pointer, keyboard, and window-close shutdown
+routes have useful evidence. Three parts of the original review remain
+open:
+
+### P1 — A fresh options controller is not an application restart
+
+The new restart leg constructs only a `ChartOptionsController` and
+reads two booleans from it. The original finding asked for the
+application harness to be disposed and rebuilt, then for the restarted
+controller, options, selection, and rendered page to state the final
+contract. As written, stale in-memory navigation, selection, scene, or
+dialog state cannot fail this test.
+
+Close the first window and construct a second production-shaped
+harness from the same preferences node. Assert that it opens at Home,
+has no resurrected target or selection, renders the expected Home page,
+and carries the persisted Flamsteed and globular-cluster choices. This
+also makes the handover's phrase “a restarted session” accurate.
+
+### P1 — The Quit test duplicates the wiring it claims to test
+
+`quitHandlerFor` exists only in the test and returns
+`shutdown::request`, independently recreating the one-line mapping in
+`JUranometriaMain`. If production forgets or changes
+`Desktop.setQuitHandler`, this test remains green. Extract the handler
+or its installation behind a production seam and have both
+`JUranometriaMain` and the test use it. Keep the honest boundary already
+documented: the test can invoke the installed handler but cannot prove
+that a particular desktop calls it.
+
+### P2 — Enlarged-text layout evidence is still absent
+
+The corrected toolbar leg lays out real 640, 560, and 1300 pixel
+windows and checks containment, which closes the ordinary-text half of
+the finding. It never changes the UI font or repeats the constrained
+layout with enlarged text. Add the requested enlarged-text case under
+the shared Swing-state restoration guard and verify the required
+controls stay non-empty and contained while the chart retains its
+minimum width. Derive or discover the transition rather than assuming
+the ordinary 640/560 threshold survives different font metrics.
+
+The release hold on #209 remains unchanged: merge only after these
+journey gaps close; tag 1.4.0 only after #209 is fixed and the repaired
+display-backed test runs in CI.
