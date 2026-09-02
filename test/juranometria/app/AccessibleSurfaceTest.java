@@ -154,6 +154,17 @@ class AccessibleSurfaceTest {
                                         ChartOptionsStore.forNode(node)),
                                 () -> { }, () -> { }),
                         "Chart Options", unnamed);
+                // The Inspector is a surface a reader operates too,
+                // and since #197 it carries a control of its own.
+                collectUnnamed(new InspectorPanel(
+                                new juranometria.chart.SelectionModel(),
+                                () -> Atlas.assembler().assemble(
+                                        juranometria.chart.ChartViewState
+                                                .DEFAULT, 900, 700),
+                                () -> juranometria.render.ChartOptions
+                                        .DEFAULTS,
+                                chosen -> { }),
+                        "Inspector", unnamed);
                 collectUnnamed(AboutDialog.compactContent(() -> { }),
                         "About", unnamed);
                 collectUnnamed(AboutDialog.noticesContent(),

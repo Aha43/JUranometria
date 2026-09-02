@@ -61,6 +61,15 @@ public final class InspectorPanel extends JPanel {
     private final JList<String> candidates = new JList<>(candidateNames);
     private final JScrollPane candidateScroll = new JScrollPane(candidates);
     private final JButton centreHere = new JButton("Center here");
+    /**
+     * The pane's own dismissal (issue #197). The toolbar toggle
+     * remains the obvious way back, and this is where a reader looks
+     * once the pane is open: its upper-right corner, as side panes
+     * everywhere else are dismissed.
+     */
+    private final JButton close = new JButton(
+            new com.formdev.flatlaf.extras.FlatSVGIcon(
+                    "resources/icons/x.svg", 16, 16));
     private final Runnable unsubscribe;
     /** True while the panel is writing the list, so echoes are ignored. */
     private boolean updating;
@@ -132,9 +141,37 @@ public final class InspectorPanel extends JPanel {
         centreHere.addActionListener(event -> centreOn.accept(
                 selection.selection()));
 
+        close.setToolTipText("Close Inspector");
+        close.getAccessibleContext().setAccessibleName("Close Inspector");
+        close.getAccessibleContext().setAccessibleDescription(
+                "Hide the Inspector pane. The chart keeps its place,"
+                        + " its target and your selection, and widens"
+                        + " to use the space.");
+        // Quiet: an icon and its hover, not a bordered button
+        // competing with the heading beside it.
+        close.putClientProperty("JButton.buttonType", "toolBarButton");
+        close.setFocusable(true);
+        // Straight to the requested-visibility the toolbar toggle
+        // writes, so there is one wish and one switch. Not
+        // setVisible: that would hide the pane behind the toggle's
+        // back and leave the toolbar and the menu claiming a panel
+        // that is not there.
+        close.addActionListener(event -> dismiss());
+
+        // The heading and its dismissal on one line, the button
+        // pushed to the trailing edge.
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
+        header.setAlignmentX(0.0f);
+        header.add(heading);
+        header.add(Box.createHorizontalGlue());
+        header.add(close);
+        header.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                close.getPreferredSize().height));
+
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        body.add(heading);
+        body.add(header);
         body.add(Box.createVerticalStrut(10));
         body.add(candidateScroll);
         body.add(Box.createVerticalStrut(10));
@@ -149,11 +186,7 @@ public final class InspectorPanel extends JPanel {
         getActionMap().put("close", new javax.swing.AbstractAction() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent event) {
-                // Escape closes the inspector and hands the reader
-                // back to the chart, rather than leaving focus in a
-                // panel that is no longer there.
-                setRequestedVisible(false);
-                returnFocus.run();
+                dismiss();
             }
         });
 
@@ -290,6 +323,36 @@ public final class InspectorPanel extends JPanel {
      */
     public JComponent focusTarget() {
         return facts;
+    }
+
+    /**
+     * Closes the pane the way both of its own controls close it -
+     * Escape, and the heading's button - through the requested
+     * visibility the toolbar toggle writes, handing the reader back
+     * to the chart rather than leaving focus in a panel that is no
+     * longer there.
+     *
+     * <p>What this does not touch: navigation, the searched target,
+     * the chart options, and the selection - which survives with its
+     * candidate list, so reopening shows the same answer.
+     *
+     * <p>What it does cause, and is not hidden here (review): the
+     * chart takes the pane's width back, and
+     * {@code ChartComponent} assembles a page whenever it is
+     * resized. So a scene is assembled and the catalogue is asked -
+     * for the same centre, field width, limiting magnitude and
+     * target, at a new size. That is the chart filling the paper,
+     * not this control navigating, and the toolbar toggle has always
+     * done exactly the same.
+     */
+    private void dismiss() {
+        setRequestedVisible(false);
+        returnFocus.run();
+    }
+
+    /** The pane's own close control; for tests. */
+    public JButton closeButton() {
+        return close;
     }
 
     /** Where focus goes when the inspector closes: the chart. */

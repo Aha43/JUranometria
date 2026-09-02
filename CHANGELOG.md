@@ -7,6 +7,24 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A close button in the Inspector's own heading**
+  ([#197](https://github.com/Aha43/JUranometria/issues/197)). The
+  toolbar toggle remains the obvious way to reopen the pane, but once
+  it is open a reader looks inside it - at the upper-right corner -
+  for the way to dismiss it, as they would in any other side pane.
+  The button writes the same requested visibility the toggle writes,
+  so there is one wish and one switch: the toolbar and the View menu
+  follow immediately, and a pane closed deliberately does not
+  reappear when the window widens. Closing leaves navigation, the
+  searched target, the chart options and the selection exactly as
+  they were, and the chart relays itself out for the width it gets
+  back - as it always has when the pane is toggled from the toolbar.
+  Escape and the button share one dismissal, which hands the reader
+  back to the chart. The mark is the pinned Tabler `x`, added
+  through the existing icon and notice workflow.
+
 ### Fixed
 
 - **Hiding a deep-sky family now hides its searched target too**
