@@ -71,3 +71,38 @@ to the chart” is documentation rather than an application invariant.
 - With no contribution, ordinary chart rendering remains unchanged.
 
 Do not merge PR #222 or begin #217 until both findings are resolved.
+
+## Follow-up — `f01446d`
+
+**The production lifecycle finding is resolved.** The application registers
+the module host after the Inspector, so `AppShutdown`'s newest-first release
+detaches the module, withdraws its geometry, and releases its table
+subscription before the Inspector is disposed. The detach/re-attach tests and
+the production wiring guard make omission visible.
+
+The counted statement is also correctly outside the sortable object table,
+and recorded magnitude and separation now have typed numeric keys rather than
+formatted-string comparators. One P1 sorting defect remains.
+
+### P1 — Descending magnitude puts every unknown value first
+
+The gate's rule is unconditional: **unrecorded sorts last**. The magnitude
+comparator uses `nullsLast`, but `TableRowSorter` reverses the entire comparator
+for descending order. The result is that clicking **Mag** a second time moves
+every `not recorded` row to the beginning, before all known magnitudes. The
+comment now claims that reversal is intentional, but the reviewed decision
+still says unknown is last, and an absence does not become the largest known
+brightness merely because the reader reverses the known values.
+
+The new regression exercises ascending order only. This is precisely why it
+passes despite the original review requiring both directions.
+
+Keep unknown values after recorded ones in ascending and descending sorts,
+while reversing only the order among recorded numeric values. Drive the real
+header through ascending and descending and assert the complete rule in both:
+numeric ordering across 2/9/10, stable equal-value V/B rows, and all unrecorded
+rows last. A mutation back to a normally reversed `nullsLast` comparator must
+fail the descending leg.
+
+After this correction, PR #222 may proceed to its closing review. Keep #217
+held until then.
