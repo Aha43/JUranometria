@@ -165,12 +165,27 @@ public final class OnThisPageStudyMain {
         if (insidePaper(centre)) {
             return true;
         }
-        double halfMajorPx = dso.majorAxisArcmin() / 2.0 / 60.0
+        if (!dso.recorded().hasSize()) {
+            // The source recorded no size, so the atlas knows of no
+            // extent to reach the paper with. The display value the
+            // loader substitutes for the renderer is not a
+            // catalogue fact and must not decide what is on a page
+            // (gate review): an object of unknown size is a point.
+            return false;
+        }
+        double halfMajorPx = dso.recorded().majorAxisArcmin() / 2.0 / 60.0
                 * mapping.pixelsPerPlaneUnit() * Math.PI / 180.0;
-        return centre.x() >= 1 - halfMajorPx
-                && centre.y() >= 1 - halfMajorPx
-                && centre.x() <= WIDTH - 1 + halfMajorPx
-                && centre.y() <= HEIGHT - 1 + halfMajorPx;
+        // The distance from the centre to the paper, not an expanded
+        // rectangle: a square of half the major axis reaches further
+        // at its corners than the object ever does, and would put
+        // objects on the page that are not on it. A circle of the
+        // recorded half-major contains the ellipse whichever way it
+        // lies, which is conservative in the one safe direction.
+        double dx = Math.max(0.0, Math.max(1 - centre.x(),
+                centre.x() - (WIDTH - 1)));
+        double dy = Math.max(0.0, Math.max(1 - centre.y(),
+                centre.y() - (HEIGHT - 1)));
+        return Math.hypot(dx, dy) <= halfMajorPx;
     }
 
     private static boolean insidePaper(PixelPoint pixel) {
@@ -300,14 +315,44 @@ public final class OnThisPageStudyMain {
                         + " 1° view of M 31, which is the closest look"
                         + " the atlas offers at the page it opens"
                         + " on.%n%n", missedTotal);
-        System.out.println("The extent used is the **catalogue's**"
-                + " size, never the drawn symbol's. That keeps the"
-                + " inventory a fact about the sky: it does not move"
-                + " when a family is switched off, when the detail"
-                + " policy refuses a symbol, or when the"
-                + " practical-minimum clamp enlarges a tiny one for"
-                + " legibility.");
+        System.out.println("The extent used is what the **source"
+                + " recorded**, never the display size the loader"
+                + " substitutes for the renderer where the catalogue"
+                + " is silent. **An object of unknown size is a"
+                + " point**: the atlas knows of no extent for it to"
+                + " reach the paper with, and inventing one would put"
+                + " a size nobody measured in charge of what a table"
+                + " says is on the page.");
         System.out.println();
+        System.out.printf(Locale.ROOT,
+                "Measured over the bundled pack, **%.1f%% of rows"
+                        + " record no size at all** - about one in"
+                        + " ten, so the rule decides real rows rather"
+                        + " than a corner case.%n%n",
+                100.0 * unsized() / packSize());
+        System.out.println("The reach is measured from the centre to"
+                + " the paper rather than by growing the paper into a"
+                + " square. A square of half the major axis reaches"
+                + " further at its corners than the object ever does,"
+                + " and would report objects on the page that are not"
+                + " on it. A circle of the recorded half-major"
+                + " contains the ellipse whichever way it lies, which"
+                + " errs in the one safe direction.");
+        System.out.println();
+    }
+
+    private static int unsized() {
+        int count = 0;
+        for (DeepSkyObject dso : DeepSkyVocabularyStudyMain.wholePack()) {
+            if (!dso.recorded().hasSize()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static int packSize() {
+        return DeepSkyVocabularyStudyMain.wholePack().size();
     }
 
     private static void visibilityBreakdown() {
@@ -667,14 +712,41 @@ public final class OnThisPageStudyMain {
         return null;
     }
 
+    /**
+     * How a blue magnitude and a visual one sort together
+     * (gate review).
+     *
+     * <p>They are different measurements and the atlas does not
+     * convert between them - 68.1% of the bundled pack records no V
+     * magnitude at all, so a table refusing to place B rows would
+     * refuse most of the sky. The rule is therefore: <strong>sort by
+     * the recorded number, never converted, with the band always
+     * shown; where two numbers are equal, the visual one first;
+     * where nothing is recorded, last.</strong>
+     *
+     * <p>The consequence is stated rather than hidden: a B 9.0 sorts
+     * beside a V 9.0 though it is not the same measurement, and the
+     * reader can see which is which because the band is in the cell.
+     * Ordering approximately by brightness while labelling each
+     * value honestly is worth more than an exact order over a
+     * quantity the catalogue does not hold.
+     */
+    private static Comparator<DeepSkyObject> byRecordedBrightness() {
+        return Comparator
+                .comparingDouble((DeepSkyObject dso) ->
+                        Double.isNaN(dso.magnitude()) ? Double.MAX_VALUE
+                                : dso.magnitude())
+                .thenComparingInt(dso -> dso.recorded().band()
+                        == DeepSkyObject.Recorded.Band.VISUAL ? 0 : 1);
+    }
+
     private static Comparator<DeepSkyObject> defaultOrder(SkyPosition centre) {
         return Comparator
                 .comparingInt((DeepSkyObject dso) ->
                         messierOf(dso) == null ? 1 : 0)
                 .thenComparingInt(dso -> messierOf(dso) == null
                         ? Integer.MAX_VALUE : messierOf(dso))
-                .thenComparingDouble(dso -> Double.isNaN(dso.magnitude())
-                        ? Double.MAX_VALUE : dso.magnitude())
+                .thenComparing(byRecordedBrightness())
                 .thenComparingDouble(dso ->
                         centre.separationDegrees(dso.position()))
                 .thenComparing(DeepSkyObject::id);
@@ -683,136 +755,46 @@ public final class OnThisPageStudyMain {
     // ------------------------------------------------------------------
 
     /**
-     * Whether a reader without a pointer can work the table.
-     *
-     * <p>A picture cannot answer this (gate review): a static image
-     * of a sidebar shows what it looks like, not what a keyboard
-     * does to it. So the real table is built from the real rows and
-     * the platform's own key bindings are resolved and fired -
-     * exactly the actions Swing would run for those keystrokes -
-     * and the resulting selection is recorded.
+     * The keyboard decision. The evidence for it is a test rather
+     * than a report section: a study firing Swing actions on an
+     * off-screen table proves a binding exists, not that a key
+     * reaches it (gate review), and the difference is exactly what
+     * #209 turned out to be.
      */
     private static void keyboard() {
-        javax.swing.table.DefaultTableModel model =
-                new javax.swing.table.DefaultTableModel(
-                        new Object[] {"Object", "Mag", "From",
-                                "On the chart"}, 0);
-        for (Row row : rowsFor(scenePage("m31", 8.0),
-                ChartOptions.DEFAULTS)) {
-            model.addRow(new Object[] {row.identity(), row.magnitude(),
-                    row.from(), row.visibility()});
-        }
-        javax.swing.JTable table = new javax.swing.JTable(model);
-        table.setSelectionMode(javax.swing.ListSelectionModel
-                .MULTIPLE_INTERVAL_SELECTION);
-
         System.out.println("## Working it without a pointer");
         System.out.println();
-        System.out.println("The platform's own bindings, resolved"
-                + " from the table's input map and fired - the same"
-                + " actions Swing runs for those keystrokes - on the"
-                + " released page's real rows. A picture of a sidebar"
-                + " cannot answer this; running it can.");
-        System.out.println();
-        System.out.println("| keystroke | Swing's action | rows"
-                + " selected | lead |");
-        System.out.println("|---|---|---|---|");
-        press(table, javax.swing.KeyStroke.getKeyStroke("DOWN"));
-        press(table, javax.swing.KeyStroke.getKeyStroke("DOWN"));
-        press(table, javax.swing.KeyStroke.getKeyStroke("shift DOWN"));
-        press(table, javax.swing.KeyStroke.getKeyStroke("shift DOWN"));
-        press(table, javax.swing.KeyStroke.getKeyStroke("ctrl A"));
-        press(table, javax.swing.KeyStroke.getKeyStroke("meta A"));
-        press(table, javax.swing.KeyStroke.getKeyStroke("HOME"));
-        press(table, javax.swing.KeyStroke.getKeyStroke("ctrl HOME"));
-        System.out.println();
-        System.out.println("**Walking and extending are free.**"
-                + " Down moves the lead one row; shift-Down builds a"
-                + " marked set out of consecutive rows. Those are the"
-                + " two gestures the surface is mostly made of, and"
-                + " the platform already has them.");
-        System.out.println();
-        System.out.println("**Select-all is there, under the"
-                + " platform's own modifier and not the other one.**"
-                + " `meta A` runs `selectAll` and takes all 13 rows;"
-                + " `ctrl A` is bound to nothing. Which modifier that"
-                + " is belongs to the look and feel, and the module"
-                + " has no business choosing it.");
-        System.out.println();
-        System.out.println("**And returning to the top is not"
-                + " bound.** `HOME` moves to the first *column*, and"
-                + " `ctrl HOME` is bound to nothing at all - so a"
-                + " reader pressing Home to get back to M 31 stays"
-                + " where they are. That is a real gap, found by"
-                + " running the bindings rather than by assuming"
-                + " them, and it is the sort of thing a picture of a"
-                + " sidebar could never have shown.");
-        System.out.println();
-        System.out.println("So the decision is narrow and stated:"
-                + " **the module adds no key bindings of its own.**"
-                + " Where the platform binds a gesture the module"
-                + " uses it and does not care which modifier the look"
-                + " and feel chose; where it binds nothing - getting"
-                + " back to the top - #216 offers an explicit"
-                + " control beside **Clear marks** rather than"
-                + " inventing a keystroke."
-                + " A module that taught the table new keys would be"
-                + " a module assistive technology has to be taught"
+        System.out.println("**The module adds no key bindings of its"
+                + " own.** Walking rows and extending a selection are"
+                + " gestures the platform already provides, and a"
+                + " module that taught the table new keys would be a"
+                + " module assistive technology has to be taught"
                 + " too.");
         System.out.println();
-        System.out.println("What a reader needs beyond the platform's"
-                + " own is decided rather than invented: **Enter**"
-                + " takes the lead row into the Selected facts, and"
-                + " **Centre here** is an explicit action rather than"
-                + " a side effect of moving through rows. Selecting a"
-                + " row never moves the chart, so a reader can walk"
-                + " the whole page without losing their place - the"
-                + " promise point-and-identify has made since Sprint"
+        System.out.println("Where the platform binds nothing, #216"
+                + " offers an explicit control rather than inventing"
+                + " a keystroke. **Returning to the top is such a"
+                + " gap**: `HOME` moves to the first column, not the"
+                + " first row, so a reader cannot get back to M 31"
+                + " with it.");
+        System.out.println();
+        System.out.println("That is asserted in"
+                + " `OnThisPageKeyboardTest`, in a real window, with"
+                + " the window and the table made to hold the focus,"
+                + " using real key events - so a key is proved to"
+                + " *arrive*, not merely to have somewhere to arrive."
+                + " It runs in the display job on every pull request."
+                + " Firing the bound actions off-screen, as this"
+                + " study first did, would have proved the bindings"
+                + " exist while saying nothing about whether a"
+                + " reader's keys reach them.");
+        System.out.println();
+        System.out.println("**Enter** takes the lead row into the"
+                + " Selected facts and **Centre here** is explicit -"
+                + " selecting a row never moves the chart, the"
+                + " promise point-and-identify has kept since Sprint"
                 + " 19.");
         System.out.println();
-    }
-
-    /** Fires the action the platform binds to a keystroke. */
-    private static void press(javax.swing.JTable table,
-                              javax.swing.KeyStroke stroke) {
-        // JTable installs its bindings in the ancestor map, not the
-        // focused one - looking in the wrong map reported "no
-        // binding" for every key and would have had this section
-        // claiming the opposite of its own table.
-        Object name = null;
-        for (int which : new int[] {
-                javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
-                javax.swing.JComponent.WHEN_FOCUSED,
-                javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW}) {
-            name = table.getInputMap(which).get(stroke);
-            if (name != null) {
-                break;
-            }
-        }
-        if (name == null) {
-            System.out.printf(Locale.ROOT,
-                    "| `%s` | *no binding* | — | — |%n", stroke);
-            return;
-        }
-        javax.swing.Action action = table.getActionMap().get(name);
-        action.actionPerformed(new java.awt.event.ActionEvent(
-                table, java.awt.event.ActionEvent.ACTION_PERFORMED,
-                String.valueOf(name)));
-        int[] selected = table.getSelectedRows();
-        StringBuilder rows = new StringBuilder();
-        for (int i = 0; i < selected.length && i < 4; i++) {
-            rows.append(rows.isEmpty() ? "" : ", ")
-                    .append(table.getValueAt(selected[i], 0));
-        }
-        if (selected.length > 4) {
-            rows.append(", … (").append(selected.length).append(" rows)");
-        }
-        int lead = table.getSelectionModel().getLeadSelectionIndex();
-        System.out.printf(Locale.ROOT, "| `%s` | `%s` | %s | %s |%n",
-                stroke.toString().replace("pressed ", ""), name,
-                rows.isEmpty() ? "none" : rows,
-                lead < 0 || lead >= table.getRowCount() ? "—"
-                        : table.getValueAt(lead, 0));
     }
 
     private static void cost() {

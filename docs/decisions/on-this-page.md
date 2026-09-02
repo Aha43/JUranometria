@@ -24,18 +24,27 @@ paper.** Not whether its symbol is drawn, its family switched on,
 its magnitude inside the limit, or the atlas has a symbol for its
 type at all.
 
-**Extent, not centre** — the gate first proposed centres, and review
-was right that a large symbol can cross the page edge with its
-centre outside it, leaving a table reporting an empty page in front
-of a visible galaxy. Measured, that rule would have missed **15
+**Extent, not centre** — a large symbol can cross the page edge with
+its centre outside it, leaving a table reporting an empty page in
+front of a visible galaxy. Measured, a centre-only rule misses **14
 objects** across the study's pages, **including M 32 and M 110 on a
 1° view of M 31** — the closest look the atlas offers at the page it
 opens on.
 
-The extent is the **catalogue's** recorded size, never the drawn
-symbol's, so the inventory stays a fact about the sky: it does not
-move when a family is switched off, when the detail policy refuses a
-symbol, or when the practical-minimum clamp enlarges a tiny one.
+**The extent is what the source recorded**, never the display size
+the loader substitutes for the renderer where the catalogue is
+silent. That substitution exists so the renderer always has
+dimensions to draw with; it is not a catalogue fact, and letting it
+decide what a table says is on the page would put a size nobody
+measured in charge of the answer. **An object of unknown size is a
+point** — and that is not a corner case: **9.7% of the bundled pack
+records no size at all**.
+
+The reach is measured from the centre to the paper, not by growing
+the paper into a square. A square of half the major axis reaches
+further at its corners than the object ever does; a circle of the
+recorded half-major contains the ellipse whichever way it lies,
+which errs in the one safe direction.
 
 The paper is the rectangle the renderer clips to — `1, 1, width-2,
 height-2` — which is the rectangle `drawnMarks` already tests
@@ -161,6 +170,15 @@ must say which comes first or two runs can disagree.
    so it never sorts into the middle of its kind.
 2. **Within a kind: a Messier number first, then recorded
    brightness, then distance from centre, then catalogue identity.**
+   **Blue and visual magnitudes sort together by their recorded
+   number, never converted, with the band always shown; equal
+   numbers put the visual one first; unrecorded sorts last.** They
+   are different measurements and the atlas does not convert
+   between them — but 68.1% of the pack records no V magnitude, so a
+   table that refused to place B rows would refuse most of the sky.
+   The consequence is stated rather than hidden: a B 9.0 sorts
+   beside a V 9.0 though it is not the same measurement, and the
+   band is in the cell so a reader can see it.
    Identity last makes it total, so the same page always lists
    identically however the catalogue arrives — the lesson #201 paid
    for.
@@ -191,31 +209,30 @@ because it is evidence of the wrong thing.
 
 ## Working it without a pointer
 
-A picture cannot answer this either, so the study builds the real
-table from the real rows, resolves the platform's own key bindings,
-and fires them. What that found:
+**The module adds no key bindings of its own.** Walking rows and
+extending a selection are gestures the platform already provides,
+and a module that taught the table new keys would be one assistive
+technology has to be taught too. Which modifier the look and feel
+chose for select-all is the look and feel's business, not this
+module's.
 
-| keystroke | Swing's action | result |
-|---|---|---|
-| `DOWN` | `selectNextRow` | walks the lead, M 31 → M 32 |
-| `shift DOWN` | `selectNextRowExtendSelection` | builds M 32, M 110, NGC 317A |
-| `meta A` | `selectAll` | all 13 rows |
-| `ctrl A` | **no binding** | — |
-| `HOME` | `selectFirstColumn` | first *column*, not first row |
-| `ctrl HOME` | **no binding** | — |
+Where the platform binds nothing, #216 offers an explicit control
+rather than inventing a keystroke. **Returning to the top is such a
+gap**: `HOME` moves to the first column, not the first row, so a
+reader cannot get back to M 31 with it.
 
-Walking and extending — the two gestures the surface is mostly made
-of — are free. Select-all exists under the platform's own modifier
-and not the other one, and **which modifier that is belongs to the
-look and feel, not to this module**. Returning to the top is bound
-to nothing at all, which is a real gap and was found by running the
-bindings rather than assuming them.
+**The evidence is a test, not a report section.**
+`OnThisPageKeyboardTest` puts the table in a real window, makes the
+window *and the table* hold the focus, and dispatches real key
+events — so a key is proved to **arrive**, not merely to have
+somewhere to arrive. It runs in the display job on every pull
+request.
 
-**So the module adds no key bindings of its own.** Where the
-platform binds a gesture it is used as-is; where it binds nothing,
-#216 offers an explicit control beside **Clear marks** rather than
-inventing a keystroke. A module that taught the table new keys would
-be a module assistive technology has to be taught too.
+The first draft of this gate fired Swing's bound actions on an
+off-screen table. That proves a binding exists and says nothing
+about whether a reader's keys reach it — which is precisely what
+#209 turned out to be, and the reason that distinction is now
+worth a test rather than a paragraph.
 
 **Enter** takes the lead row into the Selected facts and **Centre
 here** is explicit — selecting a row never moves the chart, the
@@ -318,8 +335,13 @@ behind.
 
 ## Rejected
 
-- **Centres alone as the page rule.** Rejected by measuring it: 15
+- **Centres alone as the page rule.** Rejected by measuring it: 14
   objects missed, M 32 and M 110 among them.
+- **The renderer's substituted dimensions as "extent".** Rejected:
+  they exist so the renderer always has something to draw and are
+  not catalogue facts. An unknown size is a point.
+- **Firing bound actions off-screen as keyboard evidence.**
+  Rejected: it proves a binding exists, not that a key reaches it.
 - **Hand-written mock-up rows.** Rejected after review caught one
   naming an object the catalogue does not hold. The mock-ups are
   generated from the measured inventory.
