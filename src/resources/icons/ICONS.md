@@ -22,6 +22,7 @@ Icons bundled:
 | `plus.svg` | Toolbar: more stars (fainter magnitude limit) |
 | `list-details.svg` | Toolbar: show or hide the Inspector |
 | `x.svg` | Inspector: close the pane from its own heading |
+| `door-exit.svg` | Toolbar: exit JUranometria |
 
 Add an icon only when a real action needs it: add the name to the
 script's `ICONS` list, re-run the script, and record it here.

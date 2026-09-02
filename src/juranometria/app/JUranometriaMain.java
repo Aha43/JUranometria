@@ -64,7 +64,6 @@ public final class JUranometriaMain {
         ChartViewController controller =
                 new ChartViewController(Atlas.assembler()::fits);
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ChartComponent chart = new ChartComponent(Atlas.assembler());
         controller.onChange(chart::setViewState);
         // Hiding the family a searched target belongs to retires the
@@ -151,11 +150,47 @@ public final class JUranometriaMain {
         // pointer can reach the inspector at all.
         searchField.setSelectionModel(selection);
 
+        // One way out, whichever surface asks (issue #198). The
+        // toolbar button, the window's close box and the platform's
+        // Quit all reach the same path, so leaving means one thing.
+        AppShutdown shutdown = AppShutdown.real();
+        shutdown.onShutdown(inspector::dispose);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent event) {
+                shutdown.request();
+            }
+        });
+        // The application menu's Quit on macOS, and the equivalent
+        // where a desktop provides one: without this it would exit by
+        // its own route and skip the flush the other two make.
+        try {
+            java.awt.Desktop desktop = java.awt.Desktop.isDesktopSupported()
+                    ? java.awt.Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(
+                    java.awt.Desktop.Action.APP_QUIT_HANDLER)) {
+                desktop.setQuitHandler((event, response) -> shutdown.request());
+            }
+        } catch (UnsupportedOperationException | SecurityException ignored) {
+            // A desktop that will not take a quit handler keeps its
+            // own Quit; the other two surfaces are unaffected.
+        }
+
+        // The same AppInfo.version() About prints, handed over
+        // rather than looked up twice.
+        AtlasToolbar toolbar = new AtlasToolbar(controller, searchField,
+                inspectorToggle, AppInfo.version(), shutdown::request);
         frame.setLayout(new BorderLayout());
-        frame.add(new AtlasToolbar(controller, searchField, inspectorToggle),
-                BorderLayout.NORTH);
+        frame.add(toolbar, BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);
         frame.add(inspector, BorderLayout.EAST);
+        toolbar.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent event) {
+                toolbar.setAvailableWidth(toolbar.getWidth());
+            }
+        });
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
