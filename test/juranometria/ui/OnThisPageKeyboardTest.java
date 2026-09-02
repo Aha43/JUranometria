@@ -101,7 +101,7 @@ class OnThisPageKeyboardTest {
     }
 
     @Test
-    void returningToTheTopIsNotBoundAndTheGapIsRealNotAssumed()
+    void whatHomeDoesBelongsToTheLookAndFeelRatherThanToThisModule()
             throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "a key has nowhere to arrive without a display");
@@ -116,17 +116,26 @@ class OnThisPageKeyboardTest {
         press(KeyEvent.VK_DOWN, 0);
         assertEquals(List.of("M 110"), selected(), "three rows down");
 
-        // The gate's finding, held here so it cannot quietly stop
-        // being true: Home does not go back to the first row. If a
-        // look and feel ever binds it, this fails and the decision
-        // that #216 must offer an explicit control is revisited
-        // rather than left standing on stale evidence.
+        // Home does different things on different desktops, and
+        // the display CI is how that was learnt rather than assumed:
+        // under the macOS bindings it moves the column and leaves
+        // the selection where it was; on the Linux runner it returns
+        // to the first row. The gate had recorded the first as a
+        // universal gap, which it is not.
+        //
+        // So what is asserted is what holds wherever this runs: the
+        // table stays coherent, one row selected and the lead
+        // agreeing with it, whichever answer the look and feel
+        // gives. The module must not depend on either.
         press(KeyEvent.VK_HOME, 0);
-        assertEquals(List.of("M 110"), selected(),
-                "Home moved the column, not the row - so a reader"
-                        + " cannot get back to the top with it, which"
-                        + " is why #216 offers a control instead of"
-                        + " inventing a keystroke");
+        List<String> after = selected();
+        assertEquals(1, after.size(),
+                "Home leaves exactly one row selected, whatever the"
+                        + " look and feel binds it to: " + after);
+        assertEquals(after.get(0), lead(),
+                "and the lead agrees with the selection: " + after);
+        assertTrue(ROWS.contains(after.get(0)),
+                "on a real row of the page: " + after);
     }
 
     // ----------------------------------------------------------------

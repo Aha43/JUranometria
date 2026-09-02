@@ -771,23 +771,34 @@ public final class OnThisPageStudyMain {
                 + " module assistive technology has to be taught"
                 + " too.");
         System.out.println();
-        System.out.println("Where the platform binds nothing, #216"
-                + " offers an explicit control rather than inventing"
-                + " a keystroke. **Returning to the top is such a"
-                + " gap**: `HOME` moves to the first column, not the"
-                + " first row, so a reader cannot get back to M 31"
-                + " with it.");
+        System.out.println("**And what a key does is not the same"
+                + " everywhere.** `HOME` returns to the first row on"
+                + " the Linux runner and moves the column under the"
+                + " macOS bindings, leaving the selection where it"
+                + " was. This gate first recorded the second as a"
+                + " universal gap; the display job found otherwise on"
+                + " its first run of these tests.");
+        System.out.println();
+        System.out.println("That is the argument for the rule rather"
+                + " than against it. A module that reasoned about"
+                + " particular keys would have reasoned from one"
+                + " desktop. **#216 offers getting back to the top as"
+                + " an explicit control** - not because no platform"
+                + " binds a key for it, but because they do not agree"
+                + " on which.");
         System.out.println();
         System.out.println("That is asserted in"
                 + " `OnThisPageKeyboardTest`, in a real window, with"
                 + " the window and the table made to hold the focus,"
                 + " using real key events - so a key is proved to"
                 + " *arrive*, not merely to have somewhere to arrive."
-                + " It runs in the display job on every pull request."
-                + " Firing the bound actions off-screen, as this"
-                + " study first did, would have proved the bindings"
-                + " exist while saying nothing about whether a"
-                + " reader's keys reach them.");
+                + " It runs in the display job on every pull"
+                + " request, which is how the platform difference"
+                + " above came to light. Firing the bound actions"
+                + " off-screen, as this study first did, would have"
+                + " proved the bindings exist while saying nothing"
+                + " about whether a reader's keys reach them - and"
+                + " would have proved it on one desktop.");
         System.out.println();
         System.out.println("**Enter** takes the lead row into the"
                 + " Selected facts and **Centre here** is explicit -"

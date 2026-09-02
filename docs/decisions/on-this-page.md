@@ -216,17 +216,29 @@ technology has to be taught too. Which modifier the look and feel
 chose for select-all is the look and feel's business, not this
 module's.
 
-Where the platform binds nothing, #216 offers an explicit control
-rather than inventing a keystroke. **Returning to the top is such a
-gap**: `HOME` moves to the first column, not the first row, so a
-reader cannot get back to M 31 with it.
+**And what a key does is not the same everywhere.** `HOME` returns
+to the first row on the Linux runner and moves the column under the
+macOS bindings, leaving the selection where it was. This gate first
+recorded the second as a universal gap; the display job found
+otherwise the first time it ran these tests.
+
+That is the argument for the rule rather than against it — a module
+reasoning about particular keys would have been reasoning from one
+desktop. **#216 offers getting back to the top as an explicit
+control**, not because no platform binds a key for it, but because
+they do not agree on which.
 
 **The evidence is a test, not a report section.**
 `OnThisPageKeyboardTest` puts the table in a real window, makes the
 window *and the table* hold the focus, and dispatches real key
 events — so a key is proved to **arrive**, not merely to have
 somewhere to arrive. It runs in the display job on every pull
-request.
+request, which is how the platform difference above came to light.
+
+It asserts what holds wherever it runs — the rows walk, shift-Down
+builds a marked set, shift-Up narrows it, the lead follows, and
+after `HOME` the table is still coherent — and deliberately does not
+pin the answers a look and feel is entitled to choose.
 
 The first draft of this gate fired Swing's bound actions on an
 off-screen table. That proves a binding exists and says nothing
