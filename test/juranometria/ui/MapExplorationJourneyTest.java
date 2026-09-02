@@ -211,7 +211,10 @@ class MapExplorationJourneyTest {
                     "the premise: the window is focused before any"
                             + " keyboard step. "
                             + FocusedWindow.state(window));
-            SwingUtilities.invokeAndWait(overlap::requestFocusInWindow);
+            assertTrue(FocusedWindow.awaitFocusOwner(overlap),
+                    "the premise: the candidate list holds the"
+                            + " keyboard focus before it is sent any."
+                            + " " + FocusedWindow.state(window));
             flush();
             key(overlap, KeyEvent.VK_DOWN);
             key(overlap, KeyEvent.VK_ENTER);
@@ -321,7 +324,17 @@ class MapExplorationJourneyTest {
                             + " focus, so the application's own focus"
                             + " requests can be granted. "
                             + FocusedWindow.state(window));
-            SwingUtilities.invokeAndWait(list::requestFocusInWindow);
+            // And the list itself must hold the focus, not merely
+            // the window (#209 review). The events below are
+            // dispatched straight at it, which works whether or not
+            // a reader's keyboard could ever have reached it - so
+            // the thing that makes it a keyboard journey is asserted
+            // here rather than assumed.
+            assertTrue(FocusedWindow.awaitFocusOwner(list),
+                    "the premise: the candidate list has the keyboard"
+                            + " focus, so Down and Enter are what a"
+                            + " reader's would be. "
+                            + FocusedWindow.state(window));
             flush();
             key(list, KeyEvent.VK_DOWN);
             assertEquals(1, list.getSelectedIndex(),

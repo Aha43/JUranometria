@@ -84,6 +84,39 @@ final class FocusedWindow {
     }
 
     /**
+     * Waits until this component is the actual focus owner.
+     *
+     * <p>A journey that dispatches key events straight at a
+     * component proves nothing about keyboard access: {@code
+     * dispatchEvent} delivers them whether or not the component
+     * could ever have received them from a keyboard (#209 review).
+     * A reader's Down and Enter reach a list because the list has
+     * focus, so a journey claiming to press keys as a reader does
+     * must establish that first - the window being focused is
+     * necessary and not sufficient.
+     */
+    static boolean awaitFocusOwner(java.awt.Component component)
+            throws Exception {
+        for (int i = 0; i < ATTEMPTS; i++) {
+            if (isFocusOwner(component)) {
+                return true;
+            }
+            SwingUtilities.invokeAndWait(component::requestFocusInWindow);
+            Thread.sleep(PAUSE_MS);
+        }
+        return false;
+    }
+
+    private static boolean isFocusOwner(java.awt.Component component)
+            throws Exception {
+        boolean[] owns = new boolean[1];
+        SwingUtilities.invokeAndWait(() -> owns[0] =
+                KeyboardFocusManager.getCurrentKeyboardFocusManager()
+                        .getFocusOwner() == component);
+        return owns[0];
+    }
+
+    /**
      * What the focus subsystem looks like right now, for a failure
      * message. The whole of #209 was a legible failure wearing the
      * wrong name: "Enter went to the wrong control" when the truth

@@ -219,7 +219,13 @@ class SprintTwentyThreeJourneyTest {
                 "the premise: the window holds the keyboard focus, so"
                         + " the application's focus requests can be"
                         + " granted. " + FocusedWindow.state(window));
-        SwingUtilities.invokeAndWait(list::requestFocusInWindow);
+        // The list itself, not just the window: the events below go
+        // straight to the component, which would work even if no
+        // keyboard could reach it (#209 review).
+        assertTrue(FocusedWindow.awaitFocusOwner(list),
+                "the premise: the candidate list has the keyboard"
+                        + " focus, so Down and Enter are a reader's."
+                        + " " + FocusedWindow.state(window));
         flush();
         key(list, KeyEvent.VK_DOWN);
         key(list, KeyEvent.VK_ENTER);
