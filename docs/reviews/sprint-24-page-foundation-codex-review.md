@@ -125,3 +125,34 @@ stable disambiguation contract. Add one module returning duplicate point/path
 identities and prove it cannot create an ambiguous supposedly stable key.
 
 After these corrections, PR #221 may merge and #216 may begin.
+
+## Follow-up — `defac81`
+
+**P1 resolved.** Working-mark transitions now form a queued history, each
+complete state is installed immediately before its event, and the nested mark,
+clear, prune, and unmark regressions cover the behavior that accessor masking
+could not. Duplicate overlay identities within one module are also refused.
+
+Two P2 contract cleanups remain.
+
+### P2 — Public `Change` permits duplicate members in an “ordered set”
+
+`WorkingMarksModel.Change` is public and validates its lead relationship, but
+accepts `new Change(List.of("A", "A"), "A")`. Every state produced by the
+model is unique, yet the public value type representing that state permits a
+shape the model promises can never exist. Enforce uniqueness in the compact
+constructor while preserving order, and add the direct invariant test beside
+the existing invalid-lead cases.
+
+### P2 — Overlay ordering documentation contradicts its implementation
+
+`OverlayRegistry.collect()` deliberately returns modules in registration
+order, and the test asserts first-attached then second-attached. Its javadoc
+then says this means a page does not change when modules are attached in a
+different sequence—the opposite of what registration order means. Choose and
+state the contract accurately. Attachment order is acceptable if application
+composition owns a stable order; otherwise sort by a stable module priority or
+ID and test reversed attachment. Do not promise order independence while
+testing order dependence.
+
+After these two contained corrections, PR #221 may merge and #216 may begin.
