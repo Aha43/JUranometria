@@ -106,3 +106,18 @@ fail the descending leg.
 
 After this correction, PR #222 may proceed to its closing review. Keep #217
 held until then.
+
+## Final follow-up — `cbc3429`
+
+**Approved.** Missing magnitudes now remain after recorded measurements in
+both ascending and descending views, while the recorded numeric values reverse
+normally. The regression drives both sort directions across a dense real page,
+requires known and unknown rows to be present, checks the complete known-value
+order, and fails if an unknown row precedes a recorded one.
+
+Together with the earlier correction, alternate sorts now operate on typed
+magnitude and distance values, the counted statement cannot enter the sortable
+object rows, and production shutdown detaches the module through the
+application's single exit path.
+
+All review findings are resolved. PR #222 may merge and issue #217 may begin.
