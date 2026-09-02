@@ -208,3 +208,36 @@ the session assertion. Those are contained corrections to the otherwise
 sound restart repair.
 
 The #209/display-CI release hold remains in force.
+
+## Third follow-up — `56d8011`
+
+**One P1 remains.** The restart is now a real session boundary with a
+non-vacuous selection premise, and the enlarged-text test checks every
+visible component's bounds down to a computed, stated floor. Those
+findings are closed.
+
+### P1 — Unsupported Quit fabricates the successful shutdown sequence
+
+In `leavesBy(QUIT_HANDLER)`, when `installQuitHandler()` returns null,
+the test returns the literal expected result:
+
+```java
+return List.of("detach", "flush", "dispose", "terminate");
+```
+
+No shutdown was requested and `steps` is still empty. The outer
+assertion therefore passes on the future Linux display runner by being
+given the answer it expects, precisely where this round was meant to
+remove a platform-dependent premise.
+
+Do not make an unsupported native surface pretend it ran. Separate the
+desktop registration boundary behind an injectable production adapter:
+the supported fake captures the exact handler installed by production,
+which the test invokes and observes through `steps`; the unsupported
+fake accepts no handler and leaves `steps` empty. The optional real
+desktop exercise may report either supported-and-invoked or unsupported-
+and-not-installed, but only an invoked handler may satisfy the four-step
+shutdown assertion.
+
+Once this is corrected, PR #212 may merge. The #209/display-CI release
+hold remains unchanged.
