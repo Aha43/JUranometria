@@ -81,3 +81,63 @@ The gate should either make its headless requirement explicit in the
 target or establish why the ordinary invocation is portable.
 
 Do not merge PR #219 or begin #215 until these findings are resolved.
+
+## Follow-up — `b5fe4cd`
+
+**Changes still requested.** The centre-only defect is now measured,
+the row model is derived from the catalogue, and the cross-kind grouping
+is explicit. Two P1 findings remain beneath those corrections.
+
+### P1 — “Recorded extent” is implemented with substituted display geometry
+
+`reachesPaper` uses `dso.majorAxisArcmin()`. That field is deliberately
+always concrete because the renderer needs it; where OpenNGC records no
+size, the loader supplies a nominal display size. The source truth lives
+in `dso.recorded().majorAxisArcmin()` and may be null. The new inventory
+therefore claims a catalogue-recorded extent where the catalogue recorded
+none—the exact honesty error Sprint 19 added `Recorded` to prevent.
+
+The geometry is also only an axis-aligned square expanded by the major
+axis. It ignores the recorded minor axis and position angle, and converts
+angular extent with a centre-scale approximation. A thin rotated galaxy
+can be admitted where its recorded ellipse never reaches the paper.
+
+Use recorded geometry only. When no extent is recorded, the object is a
+point for page-membership purposes. Where an extent exists, test the
+actual recorded ellipse/shape under the production projection against
+the paper, with an independently sampled spherical oracle for boundary,
+RA-wrap, polar, rotated-thin, and large-object cases. If the catalogue
+records a major axis but not a minor or angle, define the conservative
+rule explicitly without presenting missing values as measured facts.
+
+Recompute the fifteen-object result after that correction; it is not yet
+evidence for the stated rule.
+
+### P1 — The keyboard study still bypasses keyboard focus and key dispatch
+
+The study creates an off-screen `JTable`, looks up actions in its input
+maps, and invokes `actionPerformed` directly. It opens no window,
+establishes no focus owner, and sends no `KeyEvent`. That proves what
+individual Swing actions do when called, but not that a reader can reach
+the table or that the platform's keystrokes select, extend, and select
+all. It is the table equivalent of the direct `dispatchEvent` weakness
+just fixed in #209.
+
+Use a real laid-out window in a display-backed test/study. Prove the
+window and table own focus before sending keys through the normal input
+path, then assert lead and marked rows. Run the platform-dependent
+modifier assertions where they apply rather than committing macOS's
+`meta A` result as universal; Windows/Linux ordinarily use Control.
+Include ordinary and enlarged text as #214 requires. Static images may
+remain the reproducible visual evidence, but they cannot stand in for
+this interaction evidence.
+
+### P2 — Magnitude ordering crosses incomparable bands without a rule
+
+Deep-sky ordering compares the numeric display magnitude directly even
+when one value is V and another is B. The table correctly labels the
+band, but “recorded brightness” does not state whether unlike bands are
+intentionally compared as an approximate common order. Define the rule
+and its unknown-value placement before #215 freezes the comparator.
+
+Do not merge the gate or begin #215 yet.
