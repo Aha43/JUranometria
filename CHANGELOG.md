@@ -7,6 +7,18 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-02
+
+Sprint 23 — Polish the instrument. A maintenance sprint, and the
+kind only possible once an application is real enough to be used:
+most of it came from opening the atlas and finding it wanting. The
+founding Andromeda page named three galaxies and drew two, a switch
+labelled "Galaxies" left one galaxy behind, the Inspector had no way
+to close itself, the version needed a dialog to read, and the
+application arrived in the dock wearing Java's default cup. All of
+it decided at measured gates and reviewed at every step
+([docs/reviews/sprint-23-handover.md](docs/reviews/sprint-23-handover.md)).
+
 ### Added
 
 - **JUranometria has its own application mark**
