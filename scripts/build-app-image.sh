@@ -49,7 +49,7 @@ esac
 # image with a broken icon - measured, not imagined. This asks the
 # only question that catches that: is what we ship still the mark
 # that was reviewed?
-"$root/scripts/verify-icons.sh" "$root/build/classes"
+"$root/scripts/verify-icons.sh" "$jar_dir/JUranometria.jar"
 icon_arg="--icon $icon"
 
 # shellcheck disable=SC2086

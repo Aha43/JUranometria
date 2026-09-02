@@ -2,7 +2,7 @@
 # The committed application-icon containers are exactly what the
 # chosen geometry produces (issue #202).
 #
-#   scripts/verify-icons.sh [classes-dir]
+#   scripts/verify-icons.sh [classpath]
 #
 # Checking that an icon file EXISTS catches a deletion and nothing
 # else. It was measured: replacing JUranometria.icns with eight bytes
@@ -24,19 +24,31 @@
 set -eu
 
 root="$(dirname "$0")/.."
-classes="${1:-$root/build/classes}"
 icons="$root/packaging/icon"
 
-if [ ! -d "$classes" ]; then
-    echo "verify-icons: no compiled classes at $classes" >&2
-    echo "run 'make classes' first" >&2
+# The application JAR by preference, because that is what the image
+# is built from and therefore what ships: verifying against it asks
+# whether the containers match the geometry a reader will actually
+# run. The classes directory is the fallback for a working tree that
+# has not been packaged yet. (The image workflow consumes a
+# prebuilt JAR and never compiles, which is how this was found.)
+if [ -n "${1:-}" ]; then
+    classpath="$1"
+elif [ -f "$root/build/app/JUranometria.jar" ]; then
+    classpath="$root/build/app/JUranometria.jar"
+elif [ -d "$root/build/classes" ]; then
+    classpath="$root/build/classes"
+else
+    echo "verify-icons: nothing to regenerate the mark from -" \
+         "no build/app/JUranometria.jar and no build/classes" >&2
+    echo "run 'make jar' or 'make classes' first" >&2
     exit 5
 fi
 
 fresh="$(mktemp -d)"
 trap 'rm -rf "$fresh"' EXIT
 
-java -cp "$classes" juranometria.tool.ApplicationIconMain "$fresh" \
+java -cp "$classpath" juranometria.tool.ApplicationIconMain "$fresh" \
     > /dev/null || {
     echo "verify-icons: the generator would not run" >&2
     exit 5
