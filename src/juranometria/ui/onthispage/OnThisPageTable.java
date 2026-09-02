@@ -125,14 +125,21 @@ public final class OnThisPageTable extends JPanel {
         // rather than replacing it.
         TableRowSorter<Model> sorter = new TableRowSorter<>(model);
         sorter.setSortsOnUpdates(false);
-        // By the numbers, not by their spelling. Unrecorded
-        // magnitudes go last ascending - they are not bright, they
-        // are unknown - and a descending sort reverses that with
-        // everything else, because reversing a sort reverses it.
-        sorter.setComparator(1, java.util.Comparator.comparing(
-                (Row row) -> row.magnitudeValue(),
-                java.util.Comparator.nullsLast(
-                        java.util.Comparator.naturalOrder())));
+        // By the numbers, not by their spelling - and unrecorded
+        // magnitudes stay last whichever way the column is sorted.
+        //
+        // A plain nullsLast is reversed with everything else when a
+        // reader sorts descending, which put every object whose
+        // magnitude the source never recorded at the top of the
+        // table (review). "Unknown" is not an extreme of brightness
+        // that belongs at one end or the other; it is the absence of
+        // a measurement, and it belongs after the measurements. So
+        // the comparator anticipates the reversal and inverts its
+        // own answer for the unknown cases only.
+        sorter.setComparator(1, unknownAlwaysLast(1, Row::magnitudeValue));
+        // Distance is always recorded - it is the page's own
+        // geometry rather than the catalogue's - so this one has no
+        // silence to place.
         sorter.setComparator(2, java.util.Comparator.comparingDouble(
                 (Row row) -> row.separationDegrees()));
         table.setRowSorter(sorter);
@@ -190,6 +197,36 @@ public final class OnThisPageTable extends JPanel {
 
         this.unsubscribe = services.workingMarks().onChange(this::marksChanged);
         pageChanged(services.inventory());
+    }
+
+    /**
+     * Numbers ascending, with the unrecorded ones after them in
+     * either direction.
+     */
+    private java.util.Comparator<Row> unknownAlwaysLast(int column,
+            java.util.function.Function<Row, Double> value) {
+        return (first, second) -> {
+            Double left = value.apply(first);
+            Double right = value.apply(second);
+            if (left != null && right != null) {
+                return Double.compare(left, right);
+            }
+            if (left == null && right == null) {
+                return 0;
+            }
+            int unknownAfter = left == null ? 1 : -1;
+            return descending(column) ? -unknownAfter : unknownAfter;
+        };
+    }
+
+    /** Which way this column is being sorted right now. */
+    private boolean descending(int column) {
+        for (RowSorter.SortKey key : table.getRowSorter().getSortKeys()) {
+            if (key.getColumn() == column) {
+                return key.getSortOrder() == javax.swing.SortOrder.DESCENDING;
+            }
+        }
+        return false;
     }
 
     /** Lets go of the chart. */

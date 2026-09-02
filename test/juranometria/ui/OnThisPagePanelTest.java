@@ -201,6 +201,58 @@ class OnThisPagePanelTest {
     }
 
     @Test
+    void unrecordedMagnitudesStayLastWhicheverWayTheColumnIsSorted()
+            throws Exception {
+        // A plain nullsLast is reversed with everything else when a
+        // reader sorts descending, which put every object whose
+        // magnitude was never recorded at the top (review). Unknown
+        // is not an extreme of brightness; it belongs after the
+        // measurements either way.
+        try (Fixture fixture = new Fixture(VIRGO, 36.0, 320, 420)) {
+            JTable table = fixture.panel.tableComponent();
+            for (javax.swing.SortOrder order
+                    : List.of(javax.swing.SortOrder.ASCENDING,
+                            javax.swing.SortOrder.DESCENDING)) {
+                sortBy(table, 1, order);
+
+                int unknownFrom = -1;
+                int recorded = 0;
+                int unknown = 0;
+                Double previous = null;
+                for (int view = 0; view < table.getRowCount(); view++) {
+                    OnThisPageTable.Row row = fixture.panel.rows()
+                            .get(table.convertRowIndexToModel(view));
+                    Double value = row.magnitudeValue();
+                    if (value == null) {
+                        if (unknownFrom < 0) {
+                            unknownFrom = view;
+                        }
+                        unknown++;
+                        continue;
+                    }
+                    recorded++;
+                    assertTrue(unknownFrom < 0, order
+                            + ": a recorded magnitude at row " + view
+                            + " after an unrecorded one at row "
+                            + unknownFrom);
+                    if (previous != null) {
+                        assertTrue(order == javax.swing.SortOrder.ASCENDING
+                                        ? previous <= value
+                                        : previous >= value,
+                                order + " orders the numbers: " + previous
+                                        + " then " + value);
+                    }
+                    previous = value;
+                }
+                assertTrue(recorded > 10 && unknown > 0,
+                        order + " is measured over a real page: "
+                                + recorded + " recorded, " + unknown
+                                + " not");
+            }
+        }
+    }
+
+    @Test
     void aSortDoesNotMoveTheCountedLineIntoTheMiddleOfTheTable()
             throws Exception {
         try (Fixture fixture = new Fixture(VIRGO, 36.0, 320, 420)) {
@@ -219,9 +271,15 @@ class OnThisPagePanelTest {
     }
 
     private static void sortBy(JTable table, int column) throws Exception {
+        sortBy(table, column, javax.swing.SortOrder.ASCENDING);
+    }
+
+    private static void sortBy(JTable table, int column,
+                               javax.swing.SortOrder order)
+            throws Exception {
         SwingUtilities.invokeAndWait(() -> table.getRowSorter()
                 .setSortKeys(List.of(new javax.swing.RowSorter.SortKey(
-                        column, javax.swing.SortOrder.ASCENDING))));
+                        column, order))));
     }
 
     @Test
