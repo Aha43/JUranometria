@@ -37,6 +37,7 @@ class InspectorToggleTest {
         SwingUtilities.invokeAndWait(() -> {
             ChartComponent chart = new ChartComponent(Atlas.assembler());
             panel[0] = new InspectorPanel(selection, chart::currentScene,
+                    () -> juranometria.render.ChartOptions.DEFAULTS,
                     chosen -> { });
             toggle.bind(() -> panel[0].setRequestedVisible(
                             !panel[0].isRequestedVisible()),

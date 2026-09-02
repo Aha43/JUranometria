@@ -49,7 +49,9 @@ class InspectorPanelTest {
         List<Selection> centred = new ArrayList<>();
         InspectorPanel[] panel = new InspectorPanel[1];
         SwingUtilities.invokeAndWait(() -> panel[0] = new InspectorPanel(
-                model, () -> scene, centred::add));
+                model, () -> scene,
+                () -> juranometria.render.ChartOptions.DEFAULTS,
+                centred::add));
         return new Fixture(panel[0], model, scene, centred);
     }
 
@@ -353,7 +355,9 @@ class InspectorPanelTest {
                     new juranometria.ui.ChartComponent(
                             juranometria.app.Atlas.assembler());
             InspectorPanel panel = new InspectorPanel(model,
-                    chart::currentScene, selection -> { });
+                    chart::currentScene,
+                    () -> juranometria.render.ChartOptions.DEFAULTS,
+                    selection -> { });
             javax.swing.JPanel window = new javax.swing.JPanel(
                     new java.awt.BorderLayout());
             window.add(chart, java.awt.BorderLayout.CENTER);
@@ -436,7 +440,9 @@ class InspectorPanelTest {
         SelectionModel model = new SelectionModel();
         InspectorPanel[] panel = new InspectorPanel[1];
         SwingUtilities.invokeAndWait(() -> panel[0] = new InspectorPanel(
-                model, () -> current[0], selection -> { }));
+                model, () -> current[0],
+                () -> juranometria.render.ChartOptions.DEFAULTS,
+                selection -> { }));
 
         ChartRenderer.DrawnMark mark = firstStar(first);
         model.select(ChartHitTest.selectionFor(mark));

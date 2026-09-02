@@ -68,15 +68,20 @@ public final class InspectorPanel extends JPanel {
     private boolean fitsHere = true;
     private java.util.function.Consumer<Boolean> onVisibilityChange;
     private Runnable returnFocus = () -> { };
+    private final Supplier<juranometria.render.ChartOptions> options;
 
     public InspectorPanel(SelectionModel selection,
                           Supplier<ChartScene> currentScene,
+                          Supplier<juranometria.render.ChartOptions> options,
                           Consumer<Selection> centreOn) {
-        if (selection == null || currentScene == null || centreOn == null) {
+        if (selection == null || currentScene == null || options == null
+                || centreOn == null) {
             throw new IllegalArgumentException(
                     "the inspector needs a selection model, the current"
-                            + " page, and a way to centre the chart");
+                            + " page, what that page draws, and a way"
+                            + " to centre the chart");
         }
+        this.options = options;
         this.selection = selection;
         this.currentScene = currentScene;
         this.centreOn = centreOn;
@@ -353,7 +358,8 @@ public final class InspectorPanel extends JPanel {
                     .ifPresentOrElse(star -> describeStar(star, change),
                             () -> SelectionDetails.deepSky(scene, current)
                                     .ifPresentOrElse(
-                                            dso -> describeDeepSky(dso, change),
+                                            dso -> describeDeepSkyIfDrawn(
+                                                    scene, dso, object, change),
                                             () -> describeAbsent(object)));
         }
         revalidate();
@@ -411,6 +417,31 @@ public final class InspectorPanel extends JPanel {
      * reader panned away. The panel says exactly that instead of
      * inventing facts or going quiet.
      */
+    /**
+     * A selected object the page no longer draws is reported as
+     * absent, not described as though it were there (issue #196).
+     *
+     * <p>Selection outlives presentation deliberately - it is
+     * UI-independent state a future module will read - so switching
+     * a family off does not clear what the reader chose. But the
+     * panel must not go on reciting the facts of a symbol that is no
+     * longer on the paper. The question is asked of production's own
+     * rule, {@link juranometria.render.ChartRenderer#permitted}, so
+     * the panel and the drawing cannot come to disagree about what is
+     * on the page.
+     */
+    private void describeDeepSkyIfDrawn(ChartScene scene,
+                                        juranometria.chart.DeepSkyObject dso,
+                                        Selection.Object object,
+                                        SelectionModel.Change change) {
+        if (juranometria.render.ChartRenderer.permitted(scene, dso,
+                options.get())) {
+            describeDeepSky(dso, change);
+        } else {
+            describeAbsent(object);
+        }
+    }
+
     private void describeAbsent(Selection.Object object) {
         heading.setText(object.catalogueId());
         fact(coordinates(object.position()));

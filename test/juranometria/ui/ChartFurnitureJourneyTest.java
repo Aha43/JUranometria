@@ -284,6 +284,7 @@ class ChartFurnitureJourneyTest {
         options.onChange(chart::setChartOptions);
         chart.setChartOptions(options.options());
         inspector = new InspectorPanel(selection, chart::currentScene,
+                options::options,
                 chosen -> navigation.recenter(chosen.position()));
         chart.onSceneChange(inspector::refresh);
         toggle = new InspectorToggle();

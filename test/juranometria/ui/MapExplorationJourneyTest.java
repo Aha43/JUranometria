@@ -91,6 +91,7 @@ class MapExplorationJourneyTest {
             selection = new SelectionModel();
             SelectInteraction.install(chart, selection);
             inspector = new InspectorPanel(selection, chart::currentScene,
+                    () -> options.options(),
                     chosen -> navigation.recenter(chosen.position()));
             chart.onSceneChange(inspector::refresh);
             selection.onChange(change -> chart.setHighlightedObject(
