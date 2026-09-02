@@ -38,6 +38,16 @@ public final class WorkingMarksModel {
 
         public Change {
             marks = List.copyOf(marks);
+            // An ordered set, so it says so. A duplicate would give a
+            // table two rows for one object and let a reader unmark
+            // something that stayed marked - and the record is
+            // public, so it is a state a module could build even
+            // though the model never produces one (review).
+            if (new java.util.HashSet<>(marks).size() != marks.size()) {
+                throw new IllegalArgumentException(
+                        "a marked set holds each identity once: "
+                                + marks);
+            }
             if (lead != null && !marks.contains(lead)) {
                 throw new IllegalArgumentException(
                         "the lead is always one of the marks: " + lead

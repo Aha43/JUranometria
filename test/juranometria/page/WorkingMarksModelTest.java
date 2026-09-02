@@ -65,6 +65,18 @@ class WorkingMarksModelTest {
     }
 
     @Test
+    void aChangeCannotHoldTheSameIdentityTwice() {
+        // The record is public, so a module can build one. An
+        // ordered set that accepted duplicates would give a table two
+        // rows for one object, and let a reader unmark something that
+        // stayed marked.
+        assertThrows(IllegalArgumentException.class,
+                () -> new WorkingMarksModel.Change(
+                        List.of("A", "B", "A"), "A"),
+                "a marked set holds each identity once");
+    }
+
+    @Test
     void onlyAMarkedIdentityCanLead() {
         WorkingMarksModel marks = new WorkingMarksModel();
         marks.mark("A");

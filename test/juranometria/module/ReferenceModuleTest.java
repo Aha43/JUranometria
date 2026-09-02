@@ -267,6 +267,39 @@ class ReferenceModuleTest {
     }
 
     @Test
+    void theCollectedOrderIsTheOrderModulesAttachedInAndNothingMore() {
+        // Stated because the documentation once claimed the
+        // opposite: this order follows attachment, and a module that
+        // leaves and comes back goes to the back of it. What layers
+        // over what is the chart's decision, by ink role - not a
+        // module's arrival time.
+        Services services = new Services();
+        SkyPosition somewhere = new SkyPosition(10.7, 41.3);
+        Runnable withdrawFirst = services.contribute("first",
+                () -> List.of(new OverlayContribution.Point("a", "a",
+                        somewhere, InkRole.INTERACTION)));
+        services.contribute("second",
+                () -> List.of(new OverlayContribution.Point("b", "b",
+                        somewhere, InkRole.INTERACTION)));
+
+        assertEquals(List.of("first", "second"), owners(services));
+
+        withdrawFirst.run();
+        services.contribute("first",
+                () -> List.of(new OverlayContribution.Point("a", "a",
+                        somewhere, InkRole.INTERACTION)));
+        assertEquals(List.of("second", "first"), owners(services),
+                "a module that detaches and re-attaches goes to the"
+                        + " back, because this is registration order"
+                        + " and nothing more");
+    }
+
+    private static List<String> owners(Services services) {
+        return services.overlays.collect().stream()
+                .map(OverlayRegistry.Owned::moduleId).toList();
+    }
+
+    @Test
     void aModuleThatRepeatsAnIdentityIsRefusedRatherThanDrawnTwice() {
         // Per-module ownership makes keys unique across modules; it
         // does nothing about one module repeating itself (review),

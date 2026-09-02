@@ -93,9 +93,21 @@ public final class OverlayRegistry {
     }
 
     /**
-     * Everything on offer, in the order modules registered - a
-     * defined order, so a page does not change because two modules
-     * were attached in a different sequence.
+     * Everything on offer, in the order modules registered.
+     *
+     * <p><strong>Registration order, which is attach order.</strong>
+     * An earlier draft of this sentence promised the opposite - that
+     * a page would not change because two modules were attached in a
+     * different sequence - and the code has never done that (review).
+     * Attaching them the other way round collects them the other way
+     * round; a module that detaches and re-attaches goes to the back.
+     *
+     * <p>What is guaranteed is that the order is <em>defined and
+     * repeatable</em> for a given sequence of attachments, rather
+     * than a map's iteration order. Anything stronger belongs to the
+     * chart, which decides how each {@link InkRole} is inked and in
+     * what layer - and roles, not arrival times, are what should
+     * decide what covers what.
      */
     public List<Owned> collect() {
         List<Owned> all = new ArrayList<>();
