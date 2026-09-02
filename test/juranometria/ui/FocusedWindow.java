@@ -53,6 +53,35 @@ final class FocusedWindow {
     private static final long PAUSE_MS = 20;
 
     /**
+     * Insists, for a journey that cannot proceed without focus.
+     *
+     * <p>A desktop that will not hand over the focus says nothing
+     * about the atlas, so this is <strong>not</strong> a failure: it
+     * ends the journey as unmet, with the focus subsystem's own
+     * state as the reason. On a developer's machine the terminal
+     * that started the build usually holds the focus, and a journey
+     * that fails there fails for the one reason #209 taught us to
+     * read carefully.
+     *
+     * <p>That is safe to skip locally only because it cannot be
+     * skipped where it counts: the display job runs this suite under
+     * xvfb and fails if a single test is aborted, so a journey that
+     * quietly stopped running would take the build with it.
+     */
+    static void insistOnFocus(Window window, java.awt.Component owner)
+            throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeTrue(tryToFocus(window),
+                "this desktop would not give the window the keyboard"
+                        + " focus, so a key has nowhere to arrive. "
+                        + state(window));
+        org.junit.jupiter.api.Assumptions.assumeTrue(
+                awaitFocusOwner(owner),
+                "the window is focused but the desktop would not give"
+                        + " the focus to " + describe(owner) + ". "
+                        + state(window));
+    }
+
+    /**
      * Asks the desktop to make this window the focused one, and
      * reports whether it agreed. Best effort by design: a journey
      * should try, and then say what happened, rather than insist.

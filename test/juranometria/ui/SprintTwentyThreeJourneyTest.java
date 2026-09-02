@@ -215,17 +215,10 @@ class SprintTwentyThreeJourneyTest {
         assertEquals(M32, both.get(0), "the tighter mark leads");
         javax.swing.JList<?> list = candidateList();
         // Focus before the keyboard, not after it (#209 review).
-        assertTrue(FocusedWindow.tryToFocus(window),
-                "the premise: the window holds the keyboard focus, so"
-                        + " the application's focus requests can be"
-                        + " granted. " + FocusedWindow.state(window));
         // The list itself, not just the window: the events below go
         // straight to the component, which would work even if no
         // keyboard could reach it (#209 review).
-        assertTrue(FocusedWindow.awaitFocusOwner(list),
-                "the premise: the candidate list has the keyboard"
-                        + " focus, so Down and Enter are a reader's."
-                        + " " + FocusedWindow.state(window));
+        FocusedWindow.insistOnFocus(window, list);
         flush();
         key(list, KeyEvent.VK_DOWN);
         key(list, KeyEvent.VK_ENTER);

@@ -874,17 +874,38 @@ class ReleaseAutomationTest {
     }
 
     /** The portable archive: the directory the reader unpacks names it. */
+    /**
+     * A stand-in for the reproducible portable archive.
+     *
+     * <p>Every entry is stamped with one fixed instant. Without it a
+     * zip entry carries the moment it was written, to a granularity
+     * of two seconds, so two of these built either side of a tick
+     * differ in bytes - and the fixture's whole premise is that they
+     * do not. That is a flake, and it caught the build rather than
+     * this test: it fires only when the two writes straddle the
+     * tick, which is roughly one run in a hundred and has nothing to
+     * do with what the test is about.
+     */
+    private static final long FIXED_ENTRY_TIME =
+            java.time.Instant.parse("2020-01-01T00:00:00Z").toEpochMilli();
+
     private static void portable(Path zip, String version)
             throws IOException {
         try (OutputStream out = Files.newOutputStream(zip);
                 ZipOutputStream zos = new ZipOutputStream(out)) {
-            zos.putNextEntry(new ZipEntry("JUranometria-" + version + "/"));
+            zos.putNextEntry(stamped("JUranometria-" + version + "/"));
             zos.closeEntry();
-            zos.putNextEntry(new ZipEntry(
+            zos.putNextEntry(stamped(
                     "JUranometria-" + version + "/JUranometria.jar"));
             zos.write("not really a jar".getBytes(StandardCharsets.UTF_8));
             zos.closeEntry();
         }
+    }
+
+    private static ZipEntry stamped(String name) {
+        ZipEntry entry = new ZipEntry(name);
+        entry.setTime(FIXED_ENTRY_TIME);
+        return entry;
     }
 
     private static void cleanUp(Path directory) throws IOException {
