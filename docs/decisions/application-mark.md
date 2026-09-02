@@ -4,10 +4,15 @@
 `make application-mark-study` →
 [`docs/studies/application-mark/`](../studies/application-mark/).
 
-**Status: awaiting the owner's selection.** This document recommends
-one composition and says plainly what is wrong with it. Nothing is
-packaged here; #202 carries whichever geometry is chosen into the
-four native images and About.
+**Status: decided. The mark is `Candidate.RIFT`.** Selected by the
+owner after the native-size evidence below, in these words:
+
+> Rift it is. It feels like JUranometria: restrained, cartographic,
+> and recognisable without becoming decorative.
+
+Nothing is packaged here. #202 carries this exact geometry —
+unchanged — into the four native images, the window icon set and
+About.
 
 ## What was made
 
@@ -30,7 +35,7 @@ No text, gradient, glow, texture, telescope, orbit or sparkle. No
 third-party illustration and no generated artwork: the geometry is
 four ellipses and ten circles, and it is all in one readable file.
 
-## The recommendation: **Rift**
+## The chosen mark: **Rift**
 
 It is the only one of the four that looks like a piece of *this*
 atlas rather than an astronomy application in general. The crop is
@@ -59,12 +64,13 @@ diagonal band on a white tile. That is distinctive, and it is not
 cartography. It is legible as *an identity*, not as *a galaxy and its
 stars*.
 
-Whether that is acceptable is exactly the judgement this gate exists
-to put in front of the owner, so it is stated first rather than
-buried under the numbers that flatter it. If it is not acceptable,
-the honest options are a simpler composition for the small sizes
-(which means the geometry stops being one drawing at every size, and
-that is a real cost) or accepting that 16 px carries identity only.
+That was put in front of the owner before the choice was made, and
+the choice was made knowing it: **16 px carries identity, not
+cartography**, and the geometry stays one drawing at every size
+rather than gaining a separate small-size composition. #202 inherits
+that as a settled constraint, not an open question - it must not
+quietly redesign the mark for the small containers to make them read
+better.
 
 ## The rejected three
 
@@ -101,8 +107,9 @@ correctly attributed until it is replaced.
 
 ## What #202 inherits
 
-The chosen geometry, unchanged, and the requirements this gate did
-not attempt: the ICNS, ICO and PNG containers, the window icon set,
+`Candidate.RIFT`, unchanged - the same fractions of the side, drawn
+at each container's own size rather than resampled - and the
+requirements this gate did not attempt: the ICNS, ICO and PNG containers, the window icon set,
 About, and mechanical verification that a missing or substituted icon
 cannot pass packaging. The astronomical mark does not change per
 platform; only the container does.
