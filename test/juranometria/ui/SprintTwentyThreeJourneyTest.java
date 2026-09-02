@@ -385,12 +385,20 @@ class SprintTwentyThreeJourneyTest {
                 "the window's own close box");
         assertEquals(List.of("detach", "flush", "dispose", "terminate"),
                 leavesBy(Surface.QUIT_HANDLER),
-                desktopOffersQuit()
-                        ? "and the platform's Quit, pressed"
-                        : "and the platform's Quit, which this"
-                                + " desktop does not offer - so what"
-                                + " is asserted is that none was"
-                                + " installed");
+                "and the handler the platform's Quit would call,"
+                        + " built and registered by production and"
+                        + " then chosen");
+
+        // And on a desktop that has a Quit, production really does
+        // reach it. Asserted separately, because it is the one part
+        // of this that a platform without a Quit cannot show - and
+        // saying so is better than a journey that quietly proves
+        // less on Linux than it claims.
+        assertEquals(desktopOffersQuit(),
+                new AppShutdown(() -> { }, () -> { }, () -> { })
+                        .installQuitHandler() != null,
+                "the real desktop registry accepts a handler exactly"
+                        + " when the platform offers Quit");
 
         // 11. And the one non-default choice the reader arrived
         // with is still theirs.
@@ -744,28 +752,31 @@ class SprintTwentyThreeJourneyTest {
                                         java.awt.event.WindowEvent
                                                 .WINDOW_CLOSING)));
                 case QUIT_HANDLER -> {
-                    // Production's own installer, and the object it
-                    // installed. Writing shutdown::request here
-                    // instead would prove a copy of the wiring
-                    // rather than the wiring (#203 review).
-                    Runnable installed = shutdown.installQuitHandler();
-                    // Not every desktop has a Quit to hand - a Linux
-                    // session under xvfb generally does not, and this
-                    // journey is meant to run there (#203 review). So
-                    // the assertion is the one that holds everywhere:
-                    // the application installs a handler exactly when
-                    // the platform offers one. Where it does, it is
-                    // pressed; where it does not, the platform keeps
-                    // its own Quit and the other three surfaces still
-                    // lead here.
-                    assertEquals(desktopOffersQuit(), installed != null,
-                            "a quit handler is installed exactly when"
-                                    + " the desktop supports one");
-                    if (installed == null) {
-                        return List.of("detach", "flush", "dispose",
-                                "terminate");
-                    }
-                    SwingUtilities.invokeAndWait(installed::run);
+                    // Production's own installer, against a registry
+                    // that stands in for the desktop's. The handler
+                    // is built and wired by production; what a test
+                    // supplies is only the place it is handed to
+                    // (#203 review). So this observes real behaviour
+                    // on every platform, including one with no Quit
+                    // of its own - which is where this journey is
+                    // meant to run.
+                    //
+                    // An earlier version returned the expected steps
+                    // literally when the desktop offered no handler.
+                    // That would have let Linux CI pass by supplying
+                    // its own answer, which is worse than no test.
+                    List<Runnable> registered = new ArrayList<>();
+                    Runnable installed = shutdown.installQuitHandler(
+                            leave -> registered.add(leave));
+                    assertEquals(1, registered.size(),
+                            "production registered exactly one"
+                                    + " handler");
+                    assertSame(installed, registered.get(0),
+                            "and handed back the one it registered");
+                    assertTrue(steps.isEmpty(),
+                            "registering leaves nothing: choosing"
+                                    + " Quit is what leaves");
+                    SwingUtilities.invokeAndWait(registered.get(0)::run);
                 }
             }
             flush();

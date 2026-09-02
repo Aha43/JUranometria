@@ -124,6 +124,48 @@ public final class AppShutdown {
     }
 
     /**
+     * Where a quit handler is registered, and whether this platform
+     * has a Quit to register one with.
+     *
+     * <p>A seam, because otherwise the behaviour can only be
+     * observed on a desktop that offers a quit handler - and the
+     * journey that observes it is meant to run under xvfb on Linux,
+     * which does not (#203 review). With the registry injected, the
+     * production path is exercised identically everywhere: the same
+     * handler is built, wired to the same {@link #request()}, and
+     * handed over. Only the thing it is handed to differs.
+     */
+    public interface QuitRegistry {
+        /**
+         * Takes a handler to run when the platform's Quit is chosen.
+         *
+         * @return false where this platform has no Quit to offer, in
+         *         which case nothing was registered
+         */
+        boolean register(Runnable leave);
+    }
+
+    /** The real one: the desktop's own quit handler. */
+    public static QuitRegistry desktopQuitRegistry() {
+        return leave -> {
+            try {
+                java.awt.Desktop desktop =
+                        java.awt.Desktop.isDesktopSupported()
+                                ? java.awt.Desktop.getDesktop() : null;
+                if (desktop == null || !desktop.isSupported(
+                        java.awt.Desktop.Action.APP_QUIT_HANDLER)) {
+                    return false;
+                }
+                desktop.setQuitHandler((event, response) -> leave.run());
+                return true;
+            } catch (UnsupportedOperationException | SecurityException
+                    ignored) {
+                return false;
+            }
+        };
+    }
+
+    /**
      * Installs the platform's Quit as one more way to reach this
      * path, and <strong>returns the very thing it installed</strong>
      * (#203 review).
@@ -141,19 +183,20 @@ public final class AppShutdown {
      *         is unaffected and the other surfaces still work
      */
     public Runnable installQuitHandler() {
-        Runnable leave = this::request;
-        try {
-            java.awt.Desktop desktop = java.awt.Desktop.isDesktopSupported()
-                    ? java.awt.Desktop.getDesktop() : null;
-            if (desktop == null || !desktop.isSupported(
-                    java.awt.Desktop.Action.APP_QUIT_HANDLER)) {
-                return null;
-            }
-            desktop.setQuitHandler((event, response) -> leave.run());
-            return leave;
-        } catch (UnsupportedOperationException | SecurityException ignored) {
+        return installQuitHandler(desktopQuitRegistry());
+    }
+
+    /**
+     * The same installation against a given registry, so what a test
+     * observes is production building and wiring the handler rather
+     * than a test writing one of its own.
+     */
+    public Runnable installQuitHandler(QuitRegistry registry) {
+        if (registry == null) {
             return null;
         }
+        Runnable leave = this::request;
+        return registry.register(leave) ? leave : null;
     }
 
     /**

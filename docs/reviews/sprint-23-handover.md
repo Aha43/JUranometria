@@ -221,10 +221,20 @@ A third round closed the last three:
   precisely why a sweep watching visibility saw nothing wrong.
 - **The Quit surface required a native quit handler**, so it could
   not have run in the display-backed CI it is meant for — a Linux
-  session under xvfb generally offers none. The assertion is now the
-  one that holds everywhere: the application installs a handler
-  **exactly when** the platform offers one, and presses it where it
-  does.
+  session under xvfb generally offers none. My first answer was
+  worse than the problem: where no handler could be installed, the
+  test **returned the expected shutdown sequence literally**, which
+  would have let Linux CI pass by supplying its own answer. A
+  fabricated result that looks like a measurement is worse than no
+  test at all.
+  `AppShutdown.QuitRegistry` is now an injected seam. Production
+  builds and wires the handler; only the place it is handed to
+  differs, so the journey observes **real behaviour on every
+  platform** — the handler is registered, firing it produces the
+  four steps, and registering alone produces none. That the real
+  desktop registry accepts a handler exactly when the platform
+  offers Quit is asserted separately, because it is the one part a
+  platform without Quit cannot show.
 - **The restart did not restart.** The first window now closes
   before the second opens, and the new session is asserted to have
   **selected nothing** — selection is deliberately not persisted, so
