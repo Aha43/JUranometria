@@ -6,11 +6,11 @@ production application paths.
 
 ## Result
 
-**Changes requested on the closing journey.** The seven delivered
-issue PRs are individually strong, but PR #212 does not yet prove the
-production-path and restart claims made by issue #203 and its
-handover. Do not merge the closing PR, close the milestone, or tag
-1.4.0 yet.
+**Approved for merge after four follow-up rounds.** The seven delivered
+issue PRs and the corrected closing journey now prove the Sprint 23
+contract. The findings below are retained as the review record. Do not
+tag 1.4.0 yet: issue #209 and display-backed CI remain a separate
+release gate.
 
 ## P1 — The Inspector retirement assertion is vacuous
 
@@ -241,3 +241,17 @@ shutdown assertion.
 
 Once this is corrected, PR #212 may merge. The #209/display-CI release
 hold remains unchanged.
+
+## Final follow-up — `22b0a8e`
+
+**Approved.** `AppShutdown.QuitRegistry` is now the production seam.
+The portable journey captures the exact handler production constructs,
+asserts registration alone performs no shutdown, invokes that handler,
+and observes the real detach/flush/dispose/terminate sequence. The real
+desktop adapter is checked separately and makes no claim that an
+unsupported platform exercised a native Quit.
+
+All closing-review findings are resolved. PR #212 may merge and
+milestone 23 may close. The proposed 1.4.0 release remains appropriate,
+but must wait for #209 to be resolved and for the repaired journey to
+run green in display-backed CI.
