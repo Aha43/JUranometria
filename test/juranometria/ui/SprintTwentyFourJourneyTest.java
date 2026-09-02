@@ -167,14 +167,23 @@ class SprintTwentyFourJourneyTest {
         // 3. Sorted and walked by keyboard alone.
         FocusedWindow.insistOnFocus(window, table);
         List<String> byDefault = viewOrder();
-        SwingUtilities.invokeAndWait(() -> table.getRowSorter().setSortKeys(
-                List.of(new javax.swing.RowSorter.SortKey(1,
-                        javax.swing.SortOrder.ASCENDING))));
-        flush();
-        assertNotEquals(byDefault, viewOrder(), "sorting rearranged them");
+        clickColumnHeader(1);
+        assertFalse(page.sortKeys().isEmpty(),
+                "clicking the Mag header sorted the table, as a reader"
+                        + " sorts it");
+        assertNotEquals(byDefault, viewOrder(), "and the rows moved");
+
+        // Walked and extended by keyboard alone, on the sorted view.
         press(KeyEvent.VK_DOWN, 0);
         assertEquals(List.of(viewOrder().get(0)), marks().marks(),
-                "and the keyboard walks the sorted view");
+                "the keyboard walks the sorted view");
+        press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
+        press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
+        assertEquals(viewOrder().subList(0, 3), marks().marks(),
+                "and shift-Down extends the marked set without a"
+                        + " pointer at all");
+        assertEquals(viewOrder().get(2), marks().lead(),
+                "with the last row reached leading");
 
         // 4. Several invisible objects marked: their crosses,
         //    exactly, and no second mark for a visible one.
@@ -482,6 +491,26 @@ class SprintTwentyFourJourneyTest {
         return true;
     }
 
+    /** A real click on the real column header, as a reader sorts. */
+    private void clickColumnHeader(int column) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            java.awt.Rectangle bounds =
+                    table.getTableHeader().getHeaderRect(column);
+            int x = bounds.x + bounds.width / 2;
+            int y = bounds.y + bounds.height / 2;
+            for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
+                    java.awt.event.MouseEvent.MOUSE_RELEASED,
+                    java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+                table.getTableHeader().dispatchEvent(
+                        new java.awt.event.MouseEvent(table.getTableHeader(),
+                                id, System.nanoTime() / 1_000_000, 0, x, y,
+                                1, false,
+                                java.awt.event.MouseEvent.BUTTON1));
+            }
+        });
+        flush();
+    }
+
     /** The rows a reader can see that the chart does not draw. */
     private List<String> undrawnRows() throws Exception {
         List<String> found = new ArrayList<>();
@@ -507,10 +536,24 @@ class SprintTwentyFourJourneyTest {
         return row;
     }
 
-    /** A real click, where a reader would put the pointer. */
+    /**
+     * A real click, where a reader would put the pointer.
+     *
+     * <p>Scrolled into view first, and checked: a click dispatched
+     * at a row that is off-screen lands on coordinates no reader
+     * could reach with a pointer, and the journey would be claiming
+     * a gesture nobody can make (sprint review).
+     */
     private void clickRow(int viewRow, int modifiers) throws Exception {
+        SwingUtilities.invokeAndWait(() -> table.scrollRectToVisible(
+                table.getCellRect(viewRow, 0, true)));
+        flush();
         SwingUtilities.invokeAndWait(() -> {
             java.awt.Rectangle cell = table.getCellRect(viewRow, 0, true);
+            assertTrue(table.getVisibleRect().intersects(cell),
+                    "row " + viewRow + " is on screen where a reader"
+                            + " could click it: " + cell + " within "
+                            + table.getVisibleRect());
             int x = cell.x + cell.width / 2;
             int y = cell.y + cell.height / 2;
             for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,

@@ -229,12 +229,46 @@ public final class PackagedAcceptanceMain {
         require(chart.overlays().collect().isEmpty(),
                 "and leaving releases the module");
 
+        // A second session, built the way the first was. Asserting
+        // that a fresh WorkingMarksModel is empty proves only that a
+        // new object is new (sprint review): what a restart has to
+        // show is that the application, assembled again from
+        // scratch, comes up with nothing marked and nothing inked -
+        // while the reader's stored options are still there, which
+        // is the difference between ephemeral and forgotten.
+        ChartOptions kept = ChartOptionsStore.user().load();
+        juranometria.ui.ChartComponent restarted =
+                new juranometria.ui.ChartComponent(Atlas.assembler());
+        restarted.setSize(900, 700);
+        restarted.setViewState(ChartViewState.DEFAULT);
+        juranometria.ui.ChartModuleHost second =
+                new juranometria.ui.ChartModuleHost(restarted,
+                        new juranometria.chart.SelectionModel(),
+                        request -> { });
+        juranometria.ui.onthispage.OnThisPageModule again =
+                second.attach(new juranometria.ui.onthispage.OnThisPageModule());
+        require(second.workingMarks().marks().isEmpty()
+                        && second.workingMarks().lead() == null,
+                "the new session begins with nothing marked");
+        require(restarted.overlays().collect().isEmpty(),
+                "and nothing inked");
+        require(again.panel().rows().size() == listed,
+                "it lists the same page as before: "
+                        + again.panel().rows().size() + " rows");
+        require(differingPixels(unmarked, paint(restarted)) == 0,
+                "and draws the same page, pixel for pixel");
+        require(ChartOptionsStore.user().load().equals(kept),
+                "while the reader's stored options survived the"
+                        + " restart, which the working marks did not");
+        second.detachAll();
+
         System.out.println("on this page OK (" + inventory.entries().size()
                 + " entries, " + listed
                 + " rows, marked " + invisible.identity()
                 + " which the page does not draw, " + added
                 + " pixels of cross drawn at its own position,"
-                + " cleared to the byte, nothing persisted)");
+                + " cleared to the byte, and a second session begins"
+                + " empty with the reader's options intact)");
     }
 
     /** The component's own painting, into an image. */
