@@ -69,6 +69,7 @@ The foundation took three more, and the table two:
 | #215.3 | the public `Change` accepted duplicate marks; `OverlayRegistry`'s documentation promised attachment-order independence the code never had |
 | #216.1 | sorting was textual, so 10 preceded 2 and "not recorded" filed under N; the application disposed the Inspector without detaching the module |
 | #216.2 | descending sort reversed `nullsLast`, putting every unrecorded magnitude first |
+| #217.1 | the packaged acceptance rebuilt a list of expected cross identities with its own copy of the module's rule, never attaching the module and never drawing a pixel; the closing journey drove its central multi-selection by calling the marks model directly instead of using the table's own pointer and keyboard |
 
 Two corrections are worth naming because they were mine to make and
 I got them wrong first:
@@ -80,6 +81,13 @@ I got them wrong first:
 - I asserted the flatness bound against the very constant it was
   measuring, so raising the constant would have kept the test green.
   The bound is a literal in the test now.
+- The first packaged acceptance for this feature predicted which
+  objects *would* be crossed, using a copy of the module's own rule,
+  and never attached the module or drew a pixel. It would have
+  passed in an image where the module was missing entirely. It now
+  attaches the real module and counts the ink: **48 pixels of cross,
+  drawn at the object's own projected position, cleared back to the
+  byte.**
 
 ## What I found that nobody asked for
 
@@ -175,8 +183,9 @@ Everything below was run on this machine at `<HEAD>`.
 - **Native image:** built for macOS-arm64, 76 MB unpacked, headless
   smoke render 53,501 bytes, and the extended packaged acceptance
   passes inside the bundled runtime with no system Java:
-  `on this page OK (56 entries, marked NGC 206 which the page does
-  not draw, one cross, cleared, nothing persisted)`.
+  `on this page OK (56 entries, 12 rows, marked NGC 206 which the
+  page does not draw, 48 pixels of cross drawn at its own position,
+  cleared to the byte, nothing persisted)`.
 - **Portable distribution:** `make dist` builds and verifies —
   contents exact, non-commercial notice present, packaged headless
   render from a path containing a space.

@@ -196,10 +196,22 @@ class SprintTwentyFourJourneyTest {
                 "turning the limit down leaves several objects present"
                         + " and undrawn: " + modules.inventory().tally());
         String stillDrawn = firstWith(modules.inventory(), true).identity();
-        List<String> marked = new ArrayList<>(invisible);
-        marked.add(stillDrawn);
-        marks().replaceWith(marked, invisible.get(0));
-        flush();
+
+        // Marked the way a reader marks: a click, then the
+        // platform's own toggle-click for each of the others. The
+        // first version of this called replaceWith on the model
+        // directly, which proves the model works and nothing about
+        // whether a reader can reach it (sprint review).
+        clickRow(viewRowOf(stillDrawn), 0);
+        for (String identity : invisible) {
+            clickRow(viewRowOf(identity), toggleModifier());
+        }
+        assertEquals(4, marks().marks().size(),
+                "four rows marked by pointer alone: " + marks().marks());
+        assertTrue(marks().marks().contains(stillDrawn)
+                        && marks().marks().containsAll(invisible),
+                "the drawn one and the three that are not: "
+                        + marks().marks());
 
         assertEquals(invisible, inkedIdentities(),
                 "a cross for each object the page does not draw, and"
@@ -212,8 +224,10 @@ class SprintTwentyFourJourneyTest {
         // 5. The lead changes; the facts and the public selection
         //    agree with it.
         heardSelections.clear();
-        marks().lead(invisible.get(2));
+        clickRow(viewRowOf(invisible.get(2)), 0);
         flush();
+        assertEquals(List.of(invisible.get(2)), marks().marks(),
+                "a plain click is a change of mind: one row marked");
         assertEquals(invisible.get(2),
                 assertInstanceOf(Selection.Object.class,
                         selection.selection()).catalogueId(),
@@ -451,6 +465,35 @@ class SprintTwentyFourJourneyTest {
             }
         }
         return true;
+    }
+
+    /** The platform's own add-to-selection modifier. */
+    private static int toggleModifier() {
+        return java.awt.Toolkit.getDefaultToolkit()
+                .getMenuShortcutKeyMaskEx();
+    }
+
+    private int viewRowOf(String identity) throws Exception {
+        int row = viewOrder().indexOf(identity);
+        assertTrue(row >= 0, identity + " is a row a reader can see");
+        return row;
+    }
+
+    /** A real click, where a reader would put the pointer. */
+    private void clickRow(int viewRow, int modifiers) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            java.awt.Rectangle cell = table.getCellRect(viewRow, 0, true);
+            int x = cell.x + cell.width / 2;
+            int y = cell.y + cell.height / 2;
+            for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
+                    java.awt.event.MouseEvent.MOUSE_RELEASED,
+                    java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+                table.dispatchEvent(new java.awt.event.MouseEvent(table, id,
+                        System.nanoTime() / 1_000_000, modifiers, x, y, 1,
+                        false, java.awt.event.MouseEvent.BUTTON1));
+            }
+        });
+        flush();
     }
 
     private void press(int keyCode, int modifiers) throws Exception {

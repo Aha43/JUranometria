@@ -133,14 +133,35 @@ public final class PackagedAcceptanceMain {
      * one a smoke test of the visible chart would never reach.
      */
     private static void onThisPageJourney() throws Exception {
-        ChartScene page = Atlas.assembler()
-                .assemble(ChartViewState.DEFAULT, 900, 700);
-        juranometria.page.PageContents inventory =
-                juranometria.page.PageInventory.of(page,
-                        ChartOptions.DEFAULTS);
+        // Through the real module on a real chart component, and the
+        // ink is counted rather than predicted.
+        //
+        // The first version of this built its own marks model and
+        // recomputed which objects "would" be crossed with a copy of
+        // the module's own rule (sprint review). It never attached
+        // the module and never drew a pixel, so it could have passed
+        // in an image where the module was missing or the ink was
+        // broken - which is the one thing a packaged acceptance
+        // exists to catch.
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler());
+        chart.setSize(900, 700);
+        chart.setViewState(ChartViewState.DEFAULT);
+        juranometria.ui.ChartModuleHost host =
+                new juranometria.ui.ChartModuleHost(chart,
+                        new juranometria.chart.SelectionModel(),
+                        request -> { });
+        juranometria.ui.onthispage.OnThisPageModule module =
+                host.attach(new juranometria.ui.onthispage.OnThisPageModule());
+
+        juranometria.page.PageContents inventory = host.inventory();
         require(inventory.entries().size() > 50,
                 "the released page has an inventory: "
                         + inventory.entries().size() + " entries");
+        int listed = module.panel().rows().size();
+        require(listed > 10,
+                "and the module's own table lists it: " + listed
+                        + " rows");
 
         // Present and invisible: the state the table exists to
         // explain, and the only kind of object that gets a cross.
@@ -160,33 +181,43 @@ public final class PackagedAcceptanceMain {
                 "the released page holds both a drawn object and one"
                         + " that is present but not drawn");
 
-        juranometria.page.WorkingMarksModel marks =
-                new juranometria.page.WorkingMarksModel();
-        marks.replaceWith(java.util.List.of(drawn.identity(),
+        java.awt.image.BufferedImage unmarked = paint(chart);
+
+        host.workingMarks().replaceWith(java.util.List.of(drawn.identity(),
                 invisible.identity()), invisible.identity());
 
-        // The crosses the chart would ink, built the way the module
-        // builds them: one for the invisible object and none for the
-        // one that already carries its own symbol.
-        java.util.List<String> crossed = new java.util.ArrayList<>();
-        for (String identity : marks.marks()) {
-            juranometria.page.PageEntry entry =
-                    inventory.find(identity).orElseThrow();
-            if (entry.visibility() != juranometria.page.PageVisibility.DRAWN) {
-                crossed.add(entry.identity());
-            }
+        // What the chart was actually given to ink, by the module.
+        java.util.List<String> offered = new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            offered.add(owned.geometry().identity());
         }
-        require(crossed.equals(java.util.List.of(invisible.identity())),
-                "exactly one cross, for the object the page does not"
-                        + " draw: " + crossed);
+        require(offered.equals(java.util.List.of(invisible.identity())),
+                "the module offers one cross, for the object the page"
+                        + " does not draw: " + offered);
 
-        marks.clear();
-        require(marks.marks().isEmpty() && marks.lead() == null,
-                "clearing leaves nothing marked");
+        // And what it looks like on the page: ink that was not there
+        // before, at the pixel the projection puts the object at.
+        java.awt.image.BufferedImage marked = paint(chart);
+        int added = differingPixels(unmarked, marked);
+        require(added > 8, "the cross reaches the page: " + added
+                + " pixels changed");
+        double[] at = host.projection().toPage(invisible.position())
+                .orElseThrow();
+        require(inkNear(marked, unmarked, (int) Math.round(at[0]),
+                        (int) Math.round(at[1]), 9),
+                "and it is drawn where the object is, at "
+                        + Math.round(at[0]) + "," + Math.round(at[1]));
 
-        // And a restart begins empty, because there is nowhere for a
-        // mark to have been kept: the reader's stored options survive
-        // and the working set does not.
+        host.workingMarks().clear();
+        require(chart.overlays().collect().isEmpty(),
+                "clearing withdraws the ink");
+        require(differingPixels(unmarked, paint(chart)) == 0,
+                "and the page returns to the one the atlas draws with"
+                        + " nothing marked, pixel for pixel");
+
+        // A restart begins empty, because there is nowhere for a mark
+        // to have been kept: the reader's stored options survive and
+        // the working set does not.
         Preferences node = Preferences.userRoot().node("juranometria");
         node.flush();
         for (String key : node.keys()) {
@@ -194,13 +225,65 @@ public final class PackagedAcceptanceMain {
                             .contains("mark"),
                     "no working mark was written to preferences: " + key);
         }
-        require(new juranometria.page.WorkingMarksModel().marks().isEmpty(),
-                "a fresh session begins with nothing marked");
+        host.detachAll();
+        require(chart.overlays().collect().isEmpty(),
+                "and leaving releases the module");
 
         System.out.println("on this page OK (" + inventory.entries().size()
-                + " entries, marked " + invisible.identity()
-                + " which the page does not draw, one cross, cleared,"
-                + " nothing persisted)");
+                + " entries, " + listed
+                + " rows, marked " + invisible.identity()
+                + " which the page does not draw, " + added
+                + " pixels of cross drawn at its own position,"
+                + " cleared to the byte, nothing persisted)");
+    }
+
+    /** The component's own painting, into an image. */
+    private static java.awt.image.BufferedImage paint(
+            juranometria.ui.ChartComponent chart) {
+        java.awt.image.BufferedImage image =
+                new java.awt.image.BufferedImage(chart.getWidth(),
+                        chart.getHeight(),
+                        java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            chart.paint(g);
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    private static int differingPixels(java.awt.image.BufferedImage a,
+                                       java.awt.image.BufferedImage b) {
+        int differing = 0;
+        for (int y = 0; y < a.getHeight(); y++) {
+            for (int x = 0; x < a.getWidth(); x++) {
+                if (a.getRGB(x, y) != b.getRGB(x, y)) {
+                    differing++;
+                }
+            }
+        }
+        return differing;
+    }
+
+    /** Whether new ink appeared within this many pixels of a point. */
+    private static boolean inkNear(java.awt.image.BufferedImage marked,
+                                   java.awt.image.BufferedImage unmarked,
+                                   int x, int y, int radius) {
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int px = x + dx;
+                int py = y + dy;
+                if (px < 0 || py < 0 || px >= marked.getWidth()
+                        || py >= marked.getHeight()) {
+                    continue;
+                }
+                if (marked.getRGB(px, py) != unmarked.getRGB(px, py)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static void readerJourney() throws Exception {
