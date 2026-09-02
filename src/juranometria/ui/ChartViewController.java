@@ -121,6 +121,31 @@ public final class ChartViewController {
      *
      * @return true when the pan was accepted and applied
      */
+    /**
+     * Retires the searched target where it stands (Sprint 23, issue
+     * #196): the label and the identity clear together, the centre,
+     * field width and limiting magnitude are untouched, and the chart
+     * titles honestly by its coordinates.
+     *
+     * <p>The same atomic rule panning already uses, for the same
+     * reason. A reader who switches off the family their target
+     * belongs to has asked for it to go; leaving it drawn because it
+     * is the target answers a question the reader did not ask, and
+     * leaves a galaxy on a chart whose galaxies are switched off with
+     * nothing on the surface to explain it. Leaving the page is what
+     * this shares with panning - not losing the place reached.
+     *
+     * @return true when a target was retired; false when there was
+     *         none, and nobody is notified
+     */
+    public boolean retireTarget() {
+        if (state.targetIdentity() == null) {
+            return false;
+        }
+        update(state.recenteredAt(state.centre()));
+        return true;
+    }
+
     public boolean pan(juranometria.chart.SkyPosition grabbed,
                        juranometria.project.PlanePoint target) {
         juranometria.project.PanSolver.PanSolution solution =

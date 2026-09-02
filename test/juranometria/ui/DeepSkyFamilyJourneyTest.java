@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -270,12 +271,16 @@ class DeepSkyFamilyJourneyTest {
             flush();
             SwingUtilities.invokeAndWait(masterBox()::doClick);
             flush();
-            // Everything goes but the target this page names - the
-            // same honesty rule the families obey, one level up.
-            assertEquals(List.of(navigation.state().targetIdentity()),
-                    drawnIds(),
-                    "the master off leaves only the named target: "
+            // Everything goes, the target included. The master
+            // switch is the same explicit request one level up, so
+            // it retires a target on the same rule a family does
+            // (#196) - a reader who switches deep-sky objects off
+            // and is left one galaxy has been told nothing useful.
+            assertEquals(List.of(), drawnIds(),
+                    "the master off leaves nothing drawn: "
                             + drawnIds());
+            assertNull(navigation.state().targetIdentity(),
+                    "and the target retires with the rest");
             for (SymbolFamily family : SymbolFamily.values()) {
                 assertFalse(familyBox(family).isEnabled(),
                         family + " is ineffective while the master is"
@@ -298,12 +303,19 @@ class DeepSkyFamilyJourneyTest {
                     familyBox(SymbolFamily.OPEN_CLUSTERS)::doClick);
             flush();
 
-            // 8. Labels ride symbols, and the target's name outlives
-            // both switches. Every claim here needs the page to be
-            // naming things first, so the premises come before the
-            // action rather than after it.
+            // 8. Labels ride symbols, and a searched target's name
+            // outlives the label switch. The page needs a target
+            // again first: step 7's master switch retired the one it
+            // had, which is the new rule working, so the reader asks
+            // for it back the only way there is - by searching. That
+            // is the decided rule for searching while a family is
+            // hidden: an explicit request establishes an explicit
+            // exemption (#196).
+            closeDialog();
+            searchFor("M31");
+            openDialog();
             String named = navigation.state().targetIdentity();
-            assertNotNull(named, "the page names a target");
+            assertNotNull(named, "searching names a target again");
             assertTrue(ChartRenderer.hasSymbol(objectFor(named)),
                     named + " has a symbol to carry a label");
             List<String> ordinary = ordinaryLabels();
@@ -327,8 +339,10 @@ class DeepSkyFamilyJourneyTest {
                             + " name, not merely some");
 
             // Hide the target's own family: its ordinary companions
-            // lose their marks and their names together, and the
-            // target keeps both. One action, both halves of the rule.
+            // lose their marks and their names together - and so does
+            // the target. Sprint 21 kept the target here; a reader
+            // switching Galaxies off and being left one galaxy, with
+            // nothing on the surface to say why, is what #196 filed.
             SymbolFamily targetFamily = SymbolFamily.of(objectFor(named));
             List<String> companions = ordinary.stream()
                     .filter(id -> SymbolFamily.of(objectFor(id))
@@ -345,10 +359,16 @@ class DeepSkyFamilyJourneyTest {
                 assertFalse(drawnDecisionIds().contains(companion),
                         "and its symbol");
             }
-            assertTrue(labelledIds().contains(named),
-                    "while the named target kept its label");
-            assertTrue(drawnDecisionIds().contains(named),
-                    "and its symbol");
+            assertFalse(labelledIds().contains(named),
+                    named + " lost its name with the rest of its"
+                            + " family - the explicit hide wins");
+            assertFalse(drawnDecisionIds().contains(named),
+                    "and its symbol with it");
+            assertNull(navigation.state().targetIdentity(),
+                    "because the target itself is retired, so the"
+                            + " chart titles honestly by coordinates"
+                            + " rather than for an object it no"
+                            + " longer draws");
             for (String labelled : labelledIds()) {
                 // Against the symbol pass's own decision, not against
                 // the marks: the marks are what survives the paper's
@@ -518,6 +538,8 @@ class DeepSkyFamilyJourneyTest {
         ChartViewState beforeFilters = navigation.state();
         ChartScene sceneBefore = chart.currentScene();
         String targetBefore = navigation.state().targetIdentity();
+        // Reassigned when a hide retires the target: from then on
+        // "unchanged" means unchanged from the retired page.
         ChartRenderer.DrawnMark aStar = someStar();
         clickOn(aStar);
         Selection selectedBefore = selection.selection();
@@ -531,24 +553,24 @@ class DeepSkyFamilyJourneyTest {
                     family + " must be on the page before hiding it"
                             + " proves anything");
             int queriesBefore = catalogue.queries;
+            String namedBefore = navigation.state().targetIdentity();
+            boolean holdsTheTarget = namedBefore != null
+                    && SymbolFamily.of(objectFor(namedBefore)) == family;
 
             SwingUtilities.invokeAndWait(familyBox(family)::doClick);
             flush();
 
             java.util.Map<SymbolFamily, Integer> after = marksByFamily();
-            // Everything of that family goes, except a target the
-            // page has named - which must stay, because a chart that
-            // titles itself by an object draws it. On the released
-            // page that is M 31 itself.
+            // Everything of that family goes - the target included.
+            // Sprint 21 exempted a target the page had named, which
+            // was internally consistent and read to a reader as one
+            // unexplained galaxy on a chart with galaxies switched
+            // off. Since #196 the explicit hide wins.
             List<String> survivors = drawnIds().stream()
                     .filter(id -> SymbolFamily.of(objectFor(id)) == family)
                     .toList();
-            String named = navigation.state().targetIdentity();
-            assertEquals(survivors.stream()
-                            .filter(id -> id.equals(named)).toList(),
-                    survivors,
-                    family + " left the page, but for a target the"
-                            + " page names: " + survivors);
+            assertEquals(List.of(), survivors,
+                    family + " left the page entirely: " + survivors);
             for (SymbolFamily other : SymbolFamily.values()) {
                 if (other != family) {
                     assertEquals(before.getOrDefault(other, 0),
@@ -556,14 +578,47 @@ class DeepSkyFamilyJourneyTest {
                             "and " + other + " did not");
                 }
             }
-            assertEquals(queriesBefore, catalogue.queries,
-                    family + " asked the catalogue nothing");
-            assertSame(sceneBefore, chart.currentScene(),
-                    "assembled no page");
-            assertEquals(beforeFilters, navigation.state(),
-                    "moved nothing");
-            assertEquals(targetBefore, navigation.state().targetIdentity(),
-                    "and changed no target");
+            if (holdsTheTarget) {
+                // The one case that is not repaint-only, and openly
+                // so: retiring a target is a navigation transition,
+                // so the page is assembled once more.
+                assertNull(navigation.state().targetIdentity(),
+                        family + " held the page's target, which"
+                                + " retires with it");
+                assertTrue(catalogue.queries > queriesBefore,
+                        family + " held the target, so the page is"
+                                + " assembled again - the conflict"
+                                + " case is a navigation transition");
+            } else {
+                assertEquals(queriesBefore, catalogue.queries,
+                        family + " asked the catalogue nothing");
+            }
+            if (holdsTheTarget) {
+                // Everything the retirement is NOT allowed to touch:
+                // the reader keeps the place they reached and the
+                // object they chose. Only the target goes.
+                assertEquals(beforeFilters.centre(),
+                        navigation.state().centre(), "stayed put");
+                assertEquals(beforeFilters.fieldWidthDegrees(),
+                        navigation.state().fieldWidthDegrees(),
+                        "at the same field width");
+                assertEquals(beforeFilters.limitingMagnitude(),
+                        navigation.state().limitingMagnitude(),
+                        "and the same limiting magnitude");
+                assertNull(navigation.state().targetLabel(),
+                        "the label goes with the identity, atomically");
+                sceneBefore = chart.currentScene();
+                beforeFilters = navigation.state();
+                targetBefore = null;
+            } else {
+                assertSame(sceneBefore, chart.currentScene(),
+                        "assembled no page");
+                assertEquals(beforeFilters, navigation.state(),
+                        "moved nothing");
+                assertEquals(targetBefore,
+                        navigation.state().targetIdentity(),
+                        "and changed no target");
+            }
             assertEquals(selectedBefore, selection.selection(),
                     "and disturbed no selection");
 
@@ -571,6 +626,17 @@ class DeepSkyFamilyJourneyTest {
             flush();
             assertEquals(before, marksByFamily(),
                     family + " came back exactly");
+            if (holdsTheTarget) {
+                // Every symbol returns - the former target among
+                // them, drawn now as the ordinary galaxy it is. What
+                // does not return is its privilege: showing galaxies
+                // again is not the same request as asking for this
+                // one, so the chart keeps its honest coordinate
+                // title rather than guessing.
+                assertNull(navigation.state().targetIdentity(),
+                        "the retired target is not resurrected by"
+                                + " showing its family again");
+            }
         }
         closeDialog();
     }
@@ -589,9 +655,10 @@ class DeepSkyFamilyJourneyTest {
         SelectInteraction.install(chart, selection);
         options = new ChartOptionsController(
                 ChartOptionsStore.forNode(store));
-        options.onChange(chart::setChartOptions);
+        juranometria.app.TargetRetirement.connect(options, chart, navigation);
         chart.setChartOptions(options.options());
         inspector = new InspectorPanel(selection, chart::currentScene,
+                options::options,
                 chosen -> navigation.recenter(chosen.position()));
         chart.onSceneChange(inspector::refresh);
         toggle = new InspectorToggle();

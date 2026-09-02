@@ -67,7 +67,14 @@ public final class JUranometriaMain {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ChartComponent chart = new ChartComponent(Atlas.assembler());
         controller.onChange(chart::setViewState);
-        chartOptions.onChange(chart::setChartOptions);
+        // Hiding the family a searched target belongs to retires the
+        // target (issue #196): the explicit hide is the later and
+        // equally explicit request, so it wins. Ordinary family
+        // hiding stays exactly what it was - a repaint - and only
+        // this conflict becomes a navigation transition, which is
+        // why the decision is asked here rather than folded into
+        // options state that owns no navigation.
+        TargetRetirement.connect(chartOptions, chart, controller);
         juranometria.ui.PanInteraction.install(chart, controller);
         juranometria.ui.ZoomInteraction.install(chart, controller);
 
@@ -78,7 +85,7 @@ public final class JUranometriaMain {
                 new juranometria.chart.SelectionModel();
         juranometria.ui.SelectInteraction.install(chart, selection);
         InspectorPanel inspector = new InspectorPanel(selection,
-                chart::currentScene,
+                chart::currentScene, chartOptions::options,
                 chosen -> centreOn(controller, chosen));
         // A second consumer of the same state, marking the chart:
         // proof in the running application that the seam carries

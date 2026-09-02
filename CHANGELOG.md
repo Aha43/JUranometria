@@ -9,6 +9,21 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Hiding a deep-sky family now hides its searched target too**
+  ([#196](https://github.com/Aha43/JUranometria/issues/196)). Search
+  M 33, switch **Galaxies** off, and every galaxy disappeared except
+  M 33 - because a chart titled for an object drew that object, which
+  was internally consistent and read as one unexplained galaxy on a
+  page with galaxies switched off. The explicit hide now wins: the
+  target retires where it stands, its label and identity clearing
+  together, the chart falling back to its honest coordinate title,
+  and the centre, field width, limiting magnitude and every unrelated
+  option untouched - the same transition panning already makes. The
+  master switch follows the same rule; selection survives and the
+  Inspector says plainly that what is selected is no longer on the
+  page; hiding an unrelated family is still repaint-only. Decided at
+  [docs/decisions/target-retirement.md](docs/decisions/target-retirement.md).
+
 - **Large deep-sky symbols no longer hide their smaller companions**
   ([#201](https://github.com/Aha43/JUranometria/issues/201)). The
   default Andromeda page named three galaxies and showed two: the
