@@ -218,10 +218,18 @@ class SprintTwentyFourJourneyTest {
                 "the drawn one and the three that are not: "
                         + marks().marks());
 
-        assertEquals(invisible, inkedIdentities(),
+        // As a set: the marks follow the order the rows are shown
+        // in, and the reader has sorted the table by magnitude, so
+        // the crosses arrive in that order rather than the
+        // catalogue's. Which objects are crossed is the promise;
+        // which order they were inked in is not.
+        assertEquals(new java.util.HashSet<>(invisible),
+                new java.util.HashSet<>(inkedIdentities()),
                 "a cross for each object the page does not draw, and"
                         + " none for the one that carries its own"
                         + " symbol");
+        assertEquals(invisible.size(), inkedIdentities().size(),
+                "each crossed once");
         for (String identity : invisible) {
             assertCrossLandsOn(identity);
         }
