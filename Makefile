@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study check-libs check-jdk dist app-image
 
 all: app
 
@@ -204,6 +204,15 @@ identify-study: classes
 deep-sky-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.DeepSkyVocabularyStudyMain \
 		> docs/studies/deep-sky-vocabulary/measurements.md
+
+# Overlapping deep-sky symbols (docs/decisions/deep-sky-stacking.md,
+# issue #201): which symbols hide which in the bundled pack, what
+# storage order buried, and what the stacking rule leaves. Measured
+# through the renderer's own published placements.
+deep-sky-occlusion-study: classes
+	mkdir -p docs/studies/deep-sky-occlusion
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.DeepSkyOcclusionStudyMain \
+		> docs/studies/deep-sky-occlusion/measurements.md
 
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked

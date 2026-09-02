@@ -288,6 +288,7 @@ public final class ChartRenderer {
                 1, 1, scene.viewport().widthPx() - 2,
                 scene.viewport().heightPx() - 2);
         java.util.List<DrawnMark> marks = new java.util.ArrayList<>();
+        java.util.List<DrawnMark> deepSky = new java.util.ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
             if (!permitted(scene, dso, options)) {
                 continue;
@@ -300,13 +301,15 @@ public final class ChartRenderer {
                 Shape outline = symbolOutline(dso, policy, centre,
                         mapping.pixelsPerPlaneUnit());
                 if (outline != null && outline.intersects(paper)) {
-                    marks.add(new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso,
+                    deepSky.add(new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso,
                             centre, outline,
                             symbolReach(dso, policy,
                                     mapping.pixelsPerPlaneUnit())));
                 }
             });
         }
+        deepSky.sort(stackingOrder(policy, mapping.pixelsPerPlaneUnit()));
+        marks.addAll(deepSky);
         for (Star star : scene.stars()) {
             if (star.magnitude() > scene.limitingMagnitude()) {
                 continue;
@@ -800,6 +803,75 @@ public final class ChartRenderer {
             return r * 1.7;
         }
         return axes[0] / 2.0;
+    }
+
+    /**
+     * The cartographic stacking rule (issue #201): <strong>the larger
+     * painted footprint goes behind</strong>, and a tie is broken by
+     * catalogue identity.
+     *
+     * <p>Catalogue order is storage order, not cartography. The
+     * bundled all-sky rows reach the default Andromeda page as NGC
+     * 205, NGC 221, NGC 224 - so M31's opaque disc, 178 arcminutes
+     * of it, was painted last and swallowed M32 whole. The label
+     * still drew, because labels are a later pass, which left the
+     * reader a name with no mark to attach it to on the atlas's own
+     * founding page.
+     *
+     * <p>The measure is the <strong>painted</strong> footprint: the
+     * area the symbol's own ink encloses at the size it is actually
+     * drawn, clamp included, computed from the drawn axes rather
+     * than from a bounding box. A box turns with the ellipse inside
+     * it - a 40x10 galaxy at 45 degrees bounds a square larger than
+     * its major axis - so ordering by one would let a companion
+     * surface or submerge as its neighbour rotates. Area from the
+     * axes is the same whichever way an object lies, and it already
+     * carries the practical-minimum clamp, so two objects are
+     * compared at the sizes the page really gives them rather than
+     * at the sizes the catalogue records.
+     *
+     * <p>Identity breaks ties so the order cannot depend on tile,
+     * CSV, map or collection iteration: reverse the input and the
+     * page is unchanged.
+     */
+    private static java.util.Comparator<DrawnMark> stackingOrder(
+            RegionalDetailPolicy policy, double pixelsPerPlaneUnit) {
+        return java.util.Comparator
+                .comparingDouble((DrawnMark mark) -> -symbolFootprintPx(
+                        mark.deepSky(), policy, pixelsPerPlaneUnit))
+                .thenComparing(mark -> mark.deepSky().id());
+    }
+
+    /**
+     * The area one symbol's ink encloses on the page, in square
+     * pixels, at the size it is drawn - the stacking rule's measure.
+     *
+     * <p>Only the galaxy ellipse paints an opaque interior, so it is
+     * the only symbol that can bury another. The rest are outlines
+     * and cross nothing out. The measure is defined for all of them
+     * anyway, because one rule that orders every mark is easier to
+     * reason about - and to test - than a rule with a family
+     * exception in it.
+     */
+    private static double symbolFootprintPx(DeepSkyObject dso,
+                                            RegionalDetailPolicy policy,
+                                            double pixelsPerPlaneUnit) {
+        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+        return switch (symbolFor(dso)) {
+            case ELLIPSE, DOTTED_CIRCLE ->
+                    Math.PI * axes[0] * axes[1] / 4.0;
+            case CROSSED_CIRCLE -> Math.PI * axes[0] * axes[0] / 4.0;
+            case BOX -> axes[0] * axes[1];
+            case PLANETARY -> {
+                // Its spokes reach further than its disc, but the
+                // disc is what it encloses.
+                double r = Math.max(
+                        RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
+                        axes[0]) / 2.0 / 1.7;
+                yield Math.PI * r * r;
+            }
+            case NONE -> 0.0;
+        };
     }
 
     /**
