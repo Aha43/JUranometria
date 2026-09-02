@@ -69,6 +69,28 @@ the projected points are joined into a closed path and the paper is
 tested against *that* — the edges between samples are part of the
 test, not gaps in it.
 
+The fifth was about the chords themselves. **A fixed number of
+samples has no bound on how far its chords stray from the curve they
+stand for.** The step is uniform in the parameter and neither the
+ellipse nor the projection is: a thin ellipse turns hardest at the
+ends of its major axis, and a gnomonic projection stretches without
+limit towards its horizon. Evenly spaced samples are furthest apart
+exactly where the curve bends most, and a chord that cuts a corner
+claims a corner the object never reaches.
+
+So each arc is **halved until its midpoint lies within a twentieth
+of a pixel** of the chord replacing it — the usual sagitta test,
+which spends subdivisions only where the curve needs them. A
+criterion is not a proof, so the distance achieved is **measured**:
+twenty thousand points of the true curve, each asked how far it lies
+from the path that claims to be it, across four pages and
+twenty-four shapes including a page-wide ellipse squashed to a
+twelfth of its length. **The worst is 0.0499 px** — below anything a
+reader could see, and far below the thinnest mark the atlas paints.
+The bound is written into the test as a literal rather than read
+from the constant being measured, so raising that constant breaks
+it.
+
 Closing it also answers the one case a boundary can never show:
 **the object holding the whole page.** Nothing of its outline is on
 the paper and its centre is off it, yet every pixel in front of the
@@ -106,7 +128,17 @@ object's angular ellipse, by true separation and bearing. Forward
 and inverse are independent enough to disagree if the geometry is
 wrong.
 
-Two things about it are deliberate. It reads **every pixel**, not
+**And an oracle that asks pixel centres cannot see between them.**
+So the edge and corner cases are decided by construction instead: a
+circle is *built* to pass a known number of pixels beyond a chosen
+point of the paper's edge — and beyond each of its four corners,
+where a chord does its worst — and the rule is held to the answer
+that construction fixes. Two pixels past is on the page, two short
+is not, and so is **half a pixel** either way. Nothing is sampled;
+there is nothing to fall between.
+
+Two things about the inverse oracle are deliberate. It reads
+**every pixel**, not
 every third: a coarser step walks over a sliver, and an oracle that
 misses what the rule finds reports the rule wrong for being right.
 And it asserts **both directions** — the rule finds everything the
@@ -116,8 +148,8 @@ passed. The sweep is smaller because each case now reads the whole
 paper; that is the trade an exhaustive oracle asks for, and it is
 the right way round.
 
-Neither change moved a single measured number. The stricter rule
-confirms the inventory the report already carried.
+None of these changes moved a single measured number. Each stricter
+rule confirms the inventory the report already carried.
 
 It is held to the cases where a flat ellipse would have been worst:
 a 36° field, a pole, the RA seam, and **the Magellanic Cloud placed
@@ -447,6 +479,12 @@ behind.
   prove nothing between themselves, and no boundary point at all
   lies on a page the object entirely contains. The samples are
   joined into a closed path, which answers both.
+- **A fixed number of samples, however large.** Rejected: it has no
+  bound on how far its chords stray from the curve, and the places
+  it is worst — a thin ellipse's turn, a projection near its horizon
+  — are the places the question is asked. Arcs are subdivided until
+  they are flat to a twentieth of a pixel, and the achieved distance
+  is measured rather than assumed.
 - **A bounding square, then a bounding circle, as the page rule.**
   Both reject nothing the ellipse would have accepted, and both
   accept objects the ellipse rejects — a thin galaxy lying along the

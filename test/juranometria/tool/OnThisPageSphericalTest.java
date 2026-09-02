@@ -79,6 +79,219 @@ class OnThisPageSphericalTest {
                 900, 700);
     }
 
+    // ----------------------------------------------------------------
+    // How far the drawn path may stray from the curve it stands for.
+
+    @Test
+    void theDrawnOutlineStaysWithinAMeasuredDistanceOfTheTrueCurve() {
+        // The subdivision criterion is a criterion, not a proof
+        // (gate review), so what it achieves is measured: twenty
+        // thousand points of the true curve, each asked how far it
+        // is from the path that claims to be it.
+        double worst = 0;
+        String worstCase = "none";
+        for (ChartScene scene : List.of(
+                page(80.894, -69.756, 36.0),
+                page(80.894, -69.756, 1.0),
+                page(0.0, 89.5, 12.0),
+                page(359.7, 0.0, 8.0))) {
+            for (double semiMajor : new double[] {0.02, 0.5, 4.0, 12.0}) {
+                for (double ratio : new double[] {1.0, 0.08}) {
+                    for (double pa : new double[] {0, 37, 115}) {
+                        SkyPosition centre = OnThisPageStudyMain.offsetOf(
+                                scene.viewport().centre(), semiMajor * 0.6, 25.0);
+                        java.awt.geom.Path2D.Double outline =
+                                OnThisPageStudyMain.outlineOn(scene, centre,
+                                        semiMajor, semiMajor * ratio, pa);
+                        double strayed = furthestFromPath(outline, scene,
+                                centre, semiMajor, semiMajor * ratio, pa);
+                        if (strayed > worst) {
+                            worst = strayed;
+                            worstCase = String.format(
+                                    "semi-major %.2f° ratio %.2f pa %.0f on"
+                                            + " a %.0f° page", semiMajor,
+                                    ratio, pa,
+                                    scene.viewport().fieldWidthDegrees());
+                        }
+                    }
+                }
+            }
+        }
+        // The bound is written here, not read from the code being
+        // measured: an assertion against the constant it is checking
+        // passes however high that constant is raised, which is the
+        // same "no bound" this test exists to close.
+        // A twentieth of a pixel is what the criterion asks of each
+        // midpoint; this is the distance measured anywhere on the
+        // curve, so it is given a little room above that rather than
+        // being pinned to the last digit of a double.
+        assertTrue(worst <= 0.06,
+                String.format("the path strays %.4f px from the curve it"
+                        + " stands for; a twentieth of a pixel is the"
+                        + " bound. Worst: %s", worst, worstCase));
+        System.out.printf("outline strays at most %.4f px (%s)%n",
+                worst, worstCase);
+        // And the bound is not vacuous: a thin ellipse turns hard
+        // enough at the ends of its major axis that something has to
+        // be subdivided, so a measurement of zero would mean the
+        // measurement is not looking.
+        assertTrue(worst > 0, "the measurement finds a real distance");
+    }
+
+    /**
+     * The furthest any point of the true curve lies from the path
+     * that stands for it.
+     */
+    private static double furthestFromPath(java.awt.geom.Path2D.Double path,
+                                           ChartScene scene,
+                                           SkyPosition centre,
+                                           double semiMajorDeg,
+                                           double semiMinorDeg,
+                                           double positionAngleDeg) {
+        List<double[]> segments = segmentsOf(path);
+        if (segments.isEmpty()) {
+            return 0;
+        }
+        double worst = 0;
+        int samples = 20_000;
+        for (int i = 0; i < samples; i++) {
+            java.awt.geom.Point2D.Double truth =
+                    OnThisPageStudyMain.boundaryPixelOn(scene, centre,
+                            semiMajorDeg, semiMinorDeg, positionAngleDeg,
+                            2 * Math.PI * i / samples);
+            if (truth == null) {
+                continue;      // past the horizon; no path claims it
+            }
+            double nearest = Double.MAX_VALUE;
+            for (double[] seg : segments) {
+                nearest = Math.min(nearest, java.awt.geom.Line2D.ptSegDist(
+                        seg[0], seg[1], seg[2], seg[3], truth.x, truth.y));
+            }
+            worst = Math.max(worst, nearest);
+        }
+        return worst;
+    }
+
+    private static List<double[]> segmentsOf(java.awt.geom.Path2D.Double path) {
+        List<double[]> segments = new java.util.ArrayList<>();
+        double[] coords = new double[6];
+        double lastX = 0;
+        double lastY = 0;
+        boolean have = false;
+        for (java.awt.geom.PathIterator it = path.getPathIterator(null);
+                !it.isDone(); it.next()) {
+            int kind = it.currentSegment(coords);
+            if (kind == java.awt.geom.PathIterator.SEG_MOVETO) {
+                lastX = coords[0];
+                lastY = coords[1];
+                have = true;
+            } else if (kind == java.awt.geom.PathIterator.SEG_LINETO) {
+                if (have) {
+                    segments.add(new double[] {lastX, lastY,
+                            coords[0], coords[1]});
+                }
+                lastX = coords[0];
+                lastY = coords[1];
+                have = true;
+            }
+        }
+        return segments;
+    }
+
+    // ----------------------------------------------------------------
+    // Grazing: an oracle that never looks at a pixel centre.
+
+    /**
+     * A circle whose boundary passes a known number of pixels beyond
+     * a chosen point of the paper.
+     *
+     * <p>The pixel oracle answers by asking pixel centres, so it
+     * cannot see a sliver that passes between them (gate review).
+     * This one asks nothing: the curve is <em>built</em> to pass
+     * through a point at a known offset from the paper's edge, so
+     * the true answer is known by construction and the rule is held
+     * to it.
+     */
+    private static boolean grazes(ChartScene scene, double targetX,
+                                  double targetY, double beyondPx) {
+        SkyPosition target = ChartHitTest.skyAt(scene, targetX, targetY);
+        assertTrue(target != null, "the target point is on the sky");
+        double radius = 3.0;
+        // The centre goes off the page, so that growing the radius
+        // pushes the curve past the target and into the paper.
+        SkyPosition centre = null;
+        double furthest = -1;
+        for (int bearing = 0; bearing < 360; bearing += 2) {
+            SkyPosition candidate =
+                    OnThisPageStudyMain.offsetOf(target, radius, bearing);
+            java.awt.geom.Point2D.Double where =
+                    OnThisPageStudyMain.boundaryPixelOn(scene, candidate,
+                            1e-6, 1e-6, 0.0, 0.0);
+            if (where == null) {
+                continue;
+            }
+            double away = Math.hypot(where.x - 450, where.y - 350);
+            if (away > furthest) {
+                furthest = away;
+                centre = candidate;
+            }
+        }
+        assertTrue(centre != null, "a centre off the page was found");
+        double scale = pixelsPerDegreeAt(scene, target);
+        double grown = radius + beyondPx / scale;
+        return OnThisPageStudyMain.reachesPaper(scene, centre, grown,
+                grown, 0.0);
+    }
+
+    /** How many pixels a degree covers near a given sky position. */
+    private static double pixelsPerDegreeAt(ChartScene scene,
+                                            SkyPosition where) {
+        java.awt.geom.Point2D.Double here =
+                OnThisPageStudyMain.boundaryPixelOn(scene, where,
+                        1e-6, 1e-6, 0.0, 0.0);
+        java.awt.geom.Point2D.Double there =
+                OnThisPageStudyMain.boundaryPixelOn(scene,
+                        OnThisPageStudyMain.offsetOf(where, 0.001, 0.0),
+                        1e-6, 1e-6, 0.0, 0.0);
+        assertTrue(here != null && there != null, "both points project");
+        return Math.hypot(there.x - here.x, there.y - here.y) / 0.001;
+    }
+
+    @Test
+    void aCurveGrazingAnEdgeIsDecidedByWhichSideOfItTheCurveIsOn() {
+        ChartScene scene = page(80.894, -69.756, 1.0);
+        double edgeX = 1.0;                 // the paper's left edge
+        double middleY = 350.0;
+
+        assertTrue(grazes(scene, edgeX, middleY, 2.0),
+                "two pixels past the edge is on the page");
+        assertTrue(!grazes(scene, edgeX, middleY, -2.0),
+                "two pixels short of it is not");
+        // And the half-pixel band, which a coarse path could get
+        // wrong in either direction.
+        assertTrue(grazes(scene, edgeX, middleY, 0.5),
+                "half a pixel past the edge is still on the page");
+        assertTrue(!grazes(scene, edgeX, middleY, -0.5),
+                "half a pixel short of it is still not");
+    }
+
+    @Test
+    void aCurveGrazingACornerIsNotCutByTheChordThatStandsForIt() {
+        // The corner is where a chord does its worst: it cuts across
+        // the turn, so a path too coarse to follow the curve claims
+        // a corner the object never reaches.
+        ChartScene scene = page(80.894, -69.756, 1.0);
+        for (double[] corner : new double[][] {
+                {1.0, 1.0}, {899.0, 1.0}, {1.0, 699.0}, {899.0, 699.0}}) {
+            assertTrue(grazes(scene, corner[0], corner[1], 2.0),
+                    "past the corner at " + corner[0] + "," + corner[1]);
+            assertTrue(!grazes(scene, corner[0], corner[1], -0.5),
+                    "and half a pixel short of it is not on the page,"
+                            + " however the chord is drawn: "
+                            + corner[0] + "," + corner[1]);
+        }
+    }
+
     @Test
     void theSphericalRuleAgreesWithTheInverseOracle() {
         // Pages chosen where a flat, centre-scale ellipse is most

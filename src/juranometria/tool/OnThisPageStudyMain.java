@@ -247,38 +247,9 @@ public final class OnThisPageStudyMain {
                                             double semiMajorDeg,
                                             double semiMinorDeg,
                                             double positionAngleDeg) {
-        // The boundary as a closed path, not as a bag of points.
-        // Sampled points prove nothing between themselves: a sliver
-        // can cross a corner of the paper between two of them and be
-        // missed (gate review). Joining them makes the edges part of
-        // the test, so a crossing anywhere along one counts.
-        java.awt.geom.Path2D.Double outline = new java.awt.geom.Path2D.Double();
-        boolean started = false;
-        boolean anyRefused = false;
-        for (int i = 0; i < BOUNDARY_SAMPLES; i++) {
-            double t = 2 * Math.PI * i / BOUNDARY_SAMPLES;
-            double along = semiMajorDeg * Math.cos(t);
-            double across = semiMinorDeg * Math.sin(t);
-            double distance = Math.hypot(along, across);
-            double bearing = positionAngleDeg
-                    + Math.toDegrees(Math.atan2(across, along));
-            PixelPoint pixel = projection
-                    .project(offsetOf(centre, distance, bearing))
-                    .map(mapping::toPixel).orElse(null);
-            if (pixel == null) {
-                // Past the projection's horizon: the outline is not a
-                // closed curve on this page any more.
-                anyRefused = true;
-                continue;
-            }
-            if (started) {
-                outline.lineTo(pixel.x(), pixel.y());
-            } else {
-                outline.moveTo(pixel.x(), pixel.y());
-                started = true;
-            }
-        }
-        if (!started) {
+        java.awt.geom.Path2D.Double outline = outlineOf(projection, mapping,
+                centre, semiMajorDeg, semiMinorDeg, positionAngleDeg);
+        if (outline.getCurrentPoint() == null) {
             return false;          // nothing of it is on this sky
         }
         outline.closePath();
@@ -295,6 +266,123 @@ public final class OnThisPageStudyMain {
         // catalogue holds get there, and the oracle is asked about
         // that case in both directions rather than trusted.
         return outline.intersects(PAPER);
+    }
+
+    /**
+     * The projected boundary, as a path that stays within
+     * {@link #FLATNESS_PX} of the true curve.
+     *
+     * <p>A fixed number of samples has no bound on how far its
+     * chords stray from the curve they stand for (gate review). The
+     * step is uniform in the parameter, and neither the ellipse nor
+     * the projection is: a thin ellipse turns hardest at the ends of
+     * its major axis, and a gnomonic projection stretches without
+     * limit towards its horizon. Wherever those meet, evenly spaced
+     * samples are furthest apart exactly where the curve bends most.
+     *
+     * <p>So each arc is halved until its midpoint lies within
+     * {@code FLATNESS_PX} of the chord that replaces it - the usual
+     * sagitta test, which spends subdivisions only where the curve
+     * actually needs them. The criterion is a criterion and not a
+     * proof, so the achieved distance is <em>measured</em> against a
+     * dense sample of the true curve in
+     * {@code OnThisPageSphericalTest}.
+     */
+    static java.awt.geom.Path2D.Double outlineOf(
+            GnomonicProjection projection, ViewportMapping mapping,
+            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
+            double positionAngleDeg) {
+        java.awt.geom.Path2D.Double outline =
+                new java.awt.geom.Path2D.Double();
+        java.awt.geom.Point2D.Double previous = null;
+        double previousT = 0;
+        for (int i = 0; i <= INITIAL_ARCS; i++) {
+            double t = 2 * Math.PI * i / INITIAL_ARCS;
+            java.awt.geom.Point2D.Double here = boundaryPixel(projection,
+                    mapping, centre, semiMajorDeg, semiMinorDeg,
+                    positionAngleDeg, t);
+            if (here == null) {
+                // Past the projection's horizon; the curve leaves
+                // this page and the path breaks here.
+                previous = null;
+                continue;
+            }
+            if (previous == null) {
+                if (outline.getCurrentPoint() == null) {
+                    outline.moveTo(here.x, here.y);
+                } else {
+                    outline.lineTo(here.x, here.y);
+                }
+            } else {
+                subdivide(projection, mapping, centre, semiMajorDeg,
+                        semiMinorDeg, positionAngleDeg, previousT, previous,
+                        t, here, 0, outline);
+            }
+            previous = here;
+            previousT = t;
+        }
+        return outline;
+    }
+
+    private static void subdivide(GnomonicProjection projection,
+                                  ViewportMapping mapping,
+                                  SkyPosition centre, double semiMajorDeg,
+                                  double semiMinorDeg, double positionAngleDeg,
+                                  double t0, java.awt.geom.Point2D.Double p0,
+                                  double t1, java.awt.geom.Point2D.Double p1,
+                                  int depth,
+                                  java.awt.geom.Path2D.Double outline) {
+        double tm = 0.5 * (t0 + t1);
+        java.awt.geom.Point2D.Double pm = boundaryPixel(projection, mapping,
+                centre, semiMajorDeg, semiMinorDeg, positionAngleDeg, tm);
+        if (pm == null || depth >= MAX_DEPTH
+                || java.awt.geom.Line2D.ptSegDist(p0.x, p0.y, p1.x, p1.y,
+                        pm.x, pm.y) <= FLATNESS_PX) {
+            outline.lineTo(p1.x, p1.y);
+            return;
+        }
+        subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
+                positionAngleDeg, t0, p0, tm, pm, depth + 1, outline);
+        subdivide(projection, mapping, centre, semiMajorDeg, semiMinorDeg,
+                positionAngleDeg, tm, pm, t1, p1, depth + 1, outline);
+    }
+
+    /**
+     * The boundary point at parameter {@code t}, projected onto the
+     * page. Null where the projection has nothing to say.
+     */
+    static java.awt.geom.Point2D.Double boundaryPixel(
+            GnomonicProjection projection, ViewportMapping mapping,
+            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
+            double positionAngleDeg, double t) {
+        double along = semiMajorDeg * Math.cos(t);
+        double across = semiMinorDeg * Math.sin(t);
+        double distance = Math.hypot(along, across);
+        double bearing = positionAngleDeg
+                + Math.toDegrees(Math.atan2(across, along));
+        PixelPoint pixel = projection
+                .project(offsetOf(centre, distance, bearing))
+                .map(mapping::toPixel).orElse(null);
+        return pixel == null ? null
+                : new java.awt.geom.Point2D.Double(pixel.x(), pixel.y());
+    }
+
+    /** The same boundary, for a page rather than for a projection. */
+    static java.awt.geom.Path2D.Double outlineOn(ChartScene scene,
+            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
+            double positionAngleDeg) {
+        return outlineOf(new GnomonicProjection(scene.viewport().centre()),
+                new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
+                semiMinorDeg, positionAngleDeg);
+    }
+
+    /** The same boundary point, for a page rather than a projection. */
+    static java.awt.geom.Point2D.Double boundaryPixelOn(ChartScene scene,
+            SkyPosition centre, double semiMajorDeg, double semiMinorDeg,
+            double positionAngleDeg, double t) {
+        return boundaryPixel(new GnomonicProjection(scene.viewport().centre()),
+                new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
+                semiMinorDeg, positionAngleDeg, t);
     }
 
     /**
@@ -331,8 +419,15 @@ public final class OnThisPageStudyMain {
         return degrees < 0 ? degrees + 360.0 : degrees;
     }
 
-    /** How finely the angular boundary is walked. */
-    private static final int BOUNDARY_SAMPLES = 720;
+    /**
+     * How far the drawn path may stray from the true curve, and how
+     * hard it may try. A twentieth of a pixel is far below anything
+     * a reader could see, and well below the width of the thinnest
+     * mark the atlas paints.
+     */
+    static final double FLATNESS_PX = 0.05;
+    private static final int INITIAL_ARCS = 48;
+    private static final int MAX_DEPTH = 18;
 
     /**
      * The point a given angular distance from a centre, at a given
