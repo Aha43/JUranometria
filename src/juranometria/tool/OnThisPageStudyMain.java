@@ -11,6 +11,7 @@ import java.util.Map;
 import juranometria.app.Atlas;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
+import juranometria.ui.SceneAssembler;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
@@ -254,7 +255,7 @@ public final class OnThisPageStudyMain {
         // by the projection's horizon is answered here rather than
         // walked.
         if (centre.separationDegrees(scene.viewport().centre())
-                > pageRadiusDegrees(scene) + semiMajorDeg) {
+                > pageReachDegrees(scene) + semiMajorDeg) {
             return false;
         }
         java.awt.geom.Path2D.Double outline = outlineOf(projection, mapping,
@@ -273,16 +274,17 @@ public final class OnThisPageStudyMain {
     }
 
     /**
-     * How far the paper reaches from the page centre, in degrees.
+     * How far this page's own corners reach from its centre, in
+     * degrees - asked of the page, at whatever size it was built.
      */
-    private static double pageRadiusDegrees(ChartScene scene) {
+    static double pageReachDegrees(ChartScene scene) {
         SkyPosition centre = scene.viewport().centre();
+        double width = scene.viewport().widthPx();
+        double height = scene.viewport().heightPx();
         double furthest = 0;
         for (double[] corner : new double[][] {
-                {PAPER.getMinX(), PAPER.getMinY()},
-                {PAPER.getMaxX(), PAPER.getMinY()},
-                {PAPER.getMinX(), PAPER.getMaxY()},
-                {PAPER.getMaxX(), PAPER.getMaxY()}}) {
+                {1, 1}, {width - 1, 1},
+                {1, height - 1}, {width - 1, height - 1}}) {
             SkyPosition sky = juranometria.render.ChartHitTest.skyAt(
                     scene, corner[0], corner[1]);
             if (sky != null) {
@@ -756,26 +758,29 @@ public final class OnThisPageStudyMain {
                 "Neither can happen with the bundled pack, and the"
                         + " reason is structural rather than a survey"
                         + " of pages. At the widest field the atlas"
-                        + " offers, a page reaches at most **%.0f°**"
-                        + " from its centre; the assembler queries"
+                        + " offers, the tallest page the assembler"
+                        + " will build reaches **%.1f°** from its"
+                        + " centre - it letterboxes a taller window"
+                        + " rather than promising sky the projection"
+                        + " cannot draw honestly; the assembler"
+                        + " queries"
                         + " that reach plus the pack's declared"
                         + " **%.2f°** object margin; and nothing it"
                         + " returns extends more than that same"
                         + " **%.2f°** from its own centre. So the"
                         + " furthest any boundary can lie from a page"
-                        + " centre is %.0f + %.2f + %.2f ="
+                        + " centre is %.1f + %.2f + %.2f ="
                         + " **%.2f°**, short of the %.0f° horizon."
                         + " The largest object the pack actually"
                         + " records is %.2f°, and it holds %,d in"
-                        + " all. The reach cap covers every window"
-                        + " shape up to about five times as tall as"
-                        + " it is wide; the sum itself only reaches"
-                        + " the horizon past about sixteen to"
-                        + " one.%n%n",
-                PAGE_REACH_BOUND_DEG, declaredObjectMarginDegrees(),
-                declaredObjectMarginDegrees(), PAGE_REACH_BOUND_DEG,
+                        + " all. Every number here is asked of"
+                        + " production rather than restated: the"
+                        + " margin from the pack's manifest, the reach"
+                        + " from a page the assembler built.%n%n",
+                widestPageReachDegrees(), declaredObjectMarginDegrees(),
+                declaredObjectMarginDegrees(), widestPageReachDegrees(),
                 declaredObjectMarginDegrees(), declaredObjectMarginDegrees(),
-                PAGE_REACH_BOUND_DEG + 2 * declaredObjectMarginDegrees(),
+                widestPageReachDegrees() + 2 * declaredObjectMarginDegrees(),
                 90.0, largestRecordedSemiMajorDegrees(), packSize());
         System.out.println("`OnThisPageSphericalTest` checks the"
                 + " rule from the opposite direction: it samples the"
@@ -824,15 +829,26 @@ public final class OnThisPageStudyMain {
     }
 
     /**
-     * A bound on how far a page reaches from its own centre.
+     * How far a page can reach from its centre, whatever window a
+     * reader opens.
      *
-     * <p>At the widest field the atlas offers - 36° - a 900x700 page
-     * reaches 22°, and it takes a window nearly ten times as tall as
-     * it is wide to reach this. It is a cap, not a measurement, and
-     * the point of it is that the sum below stays clear of the
-     * horizon without depending on the shape of anybody's window.
+     * <p>Not a number written down here: the assembler already caps
+     * it, letterboxing a tall window rather than promising sky the
+     * projection cannot draw honestly, and restating that cap in
+     * this study would be a second copy of it to drift (gate
+     * review). So the widest field the atlas offers is assembled
+     * into the tallest page the assembler will allow, and the page
+     * that comes back is asked how far its corners reach.
      */
-    static final double PAGE_REACH_BOUND_DEG = 60.0;
+    static double widestPageReachDegrees() {
+        SceneAssembler assembler = Atlas.assembler();
+        double widestField = ChartViewState.fieldWidthSteps().get(0);
+        SkyPosition centre = Atlas.DEFAULT_CENTRE;
+        int tallest = assembler.maxPageHeightPx(centre, widestField, WIDTH);
+        return pageReachDegrees(assembler.assemble(
+                new ChartViewState(centre, widestField, 8.0),
+                WIDTH, tallest));
+    }
 
     /** The largest object extent the pack's own manifest declares. */
     static double declaredObjectMarginDegrees() {

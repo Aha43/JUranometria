@@ -235,7 +235,7 @@ class OnThisPageSphericalTest {
         // page reach + query margin + object radius, against the
         // 90° horizon.
         double margin = OnThisPageStudyMain.declaredObjectMarginDegrees();
-        double reach = OnThisPageStudyMain.PAGE_REACH_BOUND_DEG;
+        double reach = OnThisPageStudyMain.widestPageReachDegrees();
 
         assertTrue(OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
                         <= margin,
@@ -244,41 +244,39 @@ class OnThisPageSphericalTest {
                         + OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
                         + " vs " + margin);
         assertTrue(reach + margin + margin < 90.0, String.format(
-                "%.0f° of page reach, %.2f° of query margin and %.2f°"
+                "%.2f° of page reach, %.2f° of query margin and %.2f°"
                         + " of object radius come to %.2f°, which must"
                         + " stay short of the 90° horizon",
                 reach, margin, margin, reach + margin + margin));
 
-        // And the cap has to be honest about what it covers. A 36°
-        // field is the widest the atlas offers; at that field the
-        // cap holds for any window up to about five times as tall as
-        // it is wide, which is where a first draft of this test was
-        // wrong - it claimed ten, and a 400x4000 page reaches 73°.
-        assertTrue(cornerReachDegrees(36.0, 900, 700) < reach,
-                "the page this study measures reaches "
-                        + cornerReachDegrees(36.0, 900, 700) + "°");
-        assertTrue(cornerReachDegrees(36.0, 900, 4500) < reach,
-                "and so does a window five times taller than it is"
-                        + " wide: " + cornerReachDegrees(36.0, 900, 4500)
-                        + "°");
+        // And the reach is the assembler's, not a second copy of it
+        // kept here (gate review). What holds it down is real
+        // behaviour: a window taller than the projection can draw
+        // honestly is letterboxed rather than filled.
+        juranometria.ui.SceneAssembler assembler = Atlas.assembler();
+        double widest = ChartViewState.fieldWidthSteps().get(0);
+        // Tall enough to be letterboxed: at this field a 900 px
+        // wide page may be 4,712 px high before its corners pass
+        // the projection's own limit.
+        int asked = 8000;
+        int allowed = assembler.maxPageHeightPx(Atlas.DEFAULT_CENTRE,
+                widest, 900);
+        assertTrue(allowed < asked, "a 900x" + asked + " window at a "
+                + widest + "° field is letterboxed to " + allowed
+                + " px of page");
 
-        // Beyond the cap the sum is what matters, and it has room to
-        // spare: even a window ten times taller than it is wide
-        // stays short of the horizon.
-        assertTrue(cornerReachDegrees(36.0, 400, 4000) + 2 * margin < 90.0,
-                "a ten-to-one window reaches "
-                        + cornerReachDegrees(36.0, 400, 4000)
-                        + "°, and even then the sum is short of the"
-                        + " horizon");
-    }
-
-    /** How far a page's corner lies from its centre, in degrees. */
-    private static double cornerReachDegrees(double fieldWidthDegrees,
-                                             int widthPx, int heightPx) {
-        double halfWidth = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
-        double halfHeight = halfWidth * heightPx / (double) widthPx;
-        return Math.toDegrees(
-                Math.atan(Math.hypot(halfWidth, halfHeight)));
+        // The cap is what makes the sum safe, so a page drawn past
+        // it would not be: this is the assertion that would fail if
+        // the letterboxing stopped happening.
+        ChartScene overreaching = assembler.assemble(
+                new ChartViewState(Atlas.DEFAULT_CENTRE, widest, 8.0),
+                900, asked);
+        assertTrue(OnThisPageStudyMain.pageReachDegrees(overreaching)
+                        > reach,
+                "a page taller than the assembler allows reaches"
+                        + " further than the cap: "
+                        + OnThisPageStudyMain.pageReachDegrees(overreaching)
+                        + "° against " + reach + "°");
     }
 
     // ----------------------------------------------------------------
