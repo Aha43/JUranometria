@@ -237,7 +237,12 @@ on-this-page-study: classes
 		> docs/studies/on-this-page/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.OnThisPageMockupMain
 
-.PHONY: place-and-time-study
+.PHONY: test-evidence-study place-and-time-study
+test-evidence-study: classes
+	mkdir -p docs/studies/test-evidence
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.TestEvidenceStudyMain \
+		> docs/studies/test-evidence/measurements.md
+
 place-and-time-study: classes
 	mkdir -p docs/studies/place-and-time
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeStudyMain \
