@@ -195,6 +195,16 @@ public final class OnThisPageTable extends JPanel {
         add(body, BorderLayout.CENTER);
         scroll.setPreferredSize(new Dimension(280, 240));
 
+        sizeColumns();
+        // The panel is resized by the window, not only by a new
+        // page, so the decision above is taken again whenever the
+        // room changes.
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                sizeColumns();
+            }
+        });
         this.unsubscribe = services.workingMarks().onChange(this::marksChanged);
         pageChanged(services.inventory());
     }
@@ -229,6 +239,56 @@ public final class OnThisPageTable extends JPanel {
         return false;
     }
 
+    /**
+     * Gives the answers the room they need, and lets the
+     * designations yield.
+     *
+     * <p>"not recorded" is a fact; cut to "not record…" it becomes a
+     * shrug, and "too small here" cut to "too small…" says something
+     * else. The gate said so of the mock-ups and the real panel did
+     * it anyway at 320 px (#217 inspection).
+     *
+     * <p>At the narrowest the Inspector goes, four columns cannot
+     * all have what they want, so this decides what gives: the
+     * <em>answers</em> keep their words and the object column
+     * shortens, because a designation cut to "NGC 317…" is still
+     * recognisable and an answer cut in half is not.
+     *
+     * <p>Measured from the table's own font, so it holds at enlarged
+     * text too rather than at twelve points only.
+     */
+    private void sizeColumns() {
+        java.awt.FontMetrics metrics = table.getFontMetrics(table.getFont());
+        int object = metrics.stringWidth("\u25cf NGC 317A") + 12;
+        int magnitude = metrics.stringWidth("not recorded") + 12;
+        int distance = metrics.stringWidth("00.00\u00b0") + 12;
+        int state = metrics.stringWidth("too small here") + 12;
+
+        setColumn(0, object);
+        setColumn(1, magnitude);
+        setColumn(2, distance);
+        setColumn(3, state);
+
+        // When the four cannot fit, the table keeps its columns and
+        // the pane scrolls, rather than squeezing every one of them
+        // into an ellipsis. Squeezing was the first fix and it
+        // produced a table of rows reading "… 3.4 V … drawn" - every
+        // answer intact and no way to tell which object it was about
+        // (#217 inspection).
+        int needed = object + magnitude + distance + state;
+        boolean fits = scroll.getViewport().getWidth() >= needed
+                || scroll.getViewport().getWidth() == 0;
+        table.setAutoResizeMode(fits ? JTable.AUTO_RESIZE_LAST_COLUMN
+                : JTable.AUTO_RESIZE_OFF);
+    }
+
+    private void setColumn(int index, int width) {
+        javax.swing.table.TableColumn column =
+                table.getColumnModel().getColumn(index);
+        column.setMinWidth(width);
+        column.setPreferredWidth(width);
+    }
+
     /** Lets go of the chart. */
     void release() {
         unsubscribe.run();
@@ -253,7 +313,10 @@ public final class OnThisPageTable extends JPanel {
 
     /** What the counted line says, or empty when there is none. */
     public String countedLine() {
-        return counted.isVisible() ? counted.getText() : "";
+        return counted.isVisible()
+                ? counted.getText().replaceAll("<[^>]*>", " ")
+                        .replaceAll("\\s+", " ").trim()
+                : "";
     }
 
     /**
@@ -262,9 +325,20 @@ public final class OnThisPageTable extends JPanel {
      */
     public void pageChanged(PageContents page) {
         List<Row> rows = rowsOf(page);
+        // Rebuilding the model empties the table's selection, and
+        // that arrives at the selection listener like any other
+        // change. Left ungarded it reads as the reader unmarking
+        // everything - so every page change silently threw away
+        // marks the new page still holds, which is what the closing
+        // journey caught when the magnitude limit went back up.
+        following = true;
         int anonymous = page.anonymousStarCount();
+        // Two lines rather than one clipped one: at a 240 px
+        // sidebar the single line ran off the edge, which is a
+        // counted line that cannot be counted (#217 inspection).
         counted.setText(anonymous == 0 ? "" : String.format(Locale.ROOT,
-                "and %,d further stars, none of them named", anonymous));
+                "<html>and %,d further stars,<br>none of them named</html>",
+                anonymous));
         counted.setVisible(anonymous > 0);
         model.replaceWith(rows);
         heading.setText(rows.isEmpty() ? "On this page"
@@ -282,6 +356,8 @@ public final class OnThisPageTable extends JPanel {
             empty.setVisible(false);
             scroll.setVisible(true);
         }
+        sizeColumns();
+        following = false;
         marksChanged(new WorkingMarksModel.Change(
                 services.workingMarks().marks(),
                 services.workingMarks().lead()));

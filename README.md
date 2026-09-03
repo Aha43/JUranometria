@@ -181,6 +181,27 @@ make import-star-identities
   moves the chart**; `Center here` is the one action that does, and
   only when you press it. Searching for an object selects it too, so
   the inspector is reachable without a pointer.
+- **Ask what is on the page.** The Inspector has a second mode, **On
+  this page**, listing everything the atlas holds on the page in
+  front of you — including what the page does not draw. Each row
+  gives the object, its magnitude *with the band it was measured in*,
+  its distance from the centre, and what it is doing on the chart:
+  *drawn*, *hidden* by a chart option, *too faint* for the page's
+  magnitude limit, *too small here* to draw honestly at this field,
+  or *no symbol* because the atlas draws nothing for its type. Stars
+  the catalogue never named are counted in one line beneath the
+  table rather than listed. Sort by any column; the default order —
+  Messier numbers, then brightness, then distance — sits underneath.
+- **Mark rows to find them on the chart.** Choose rows with the
+  ordinary gestures (click, ⌘/Ctrl-click, Shift-click, arrow keys)
+  and the atlas draws a small cross at the position of each marked
+  object **the page does not already draw**; an object with a symbol
+  of its own keeps it and gains nothing. The row you last reached is
+  the one the **Selected** facts describe. `Center here` moves the
+  chart to it, and nothing else does — reading rows never moves the
+  page. `Clear marks` removes them all. Marks are working notes for
+  the page you are on: they are pruned when you move away, and
+  nothing is remembered between sessions.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the

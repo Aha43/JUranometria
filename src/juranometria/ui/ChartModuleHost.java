@@ -61,6 +61,11 @@ public final class ChartModuleHost implements ChartServices {
         this.navigation = navigation;
         rebuild();
         chart.onSceneChange(this::rebuild);
+        // And when the reader changes what the chart draws: the
+        // scene is the same sky, but what can be seen of it is not,
+        // and an inventory that reported visibility from a stale
+        // options set would call a hidden object drawn.
+        chart.onChartOptionsChange(this::rebuild);
         LeadSelection.connect(marks, selection, this::inventory);
         // A mark changes what the page shows, and nothing else does
         // it for us: the crosses are painted from the marks, so the

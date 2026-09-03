@@ -80,10 +80,29 @@ class OnThisPagePanelTest {
         try (Fixture fixture = new Fixture(M31, 8.0, 240, 400)) {
             JTable table = fixture.panel.tableComponent();
             SwingUtilities.invokeAndWait(() -> { });
+            // Not "has some width": room for the words that must not
+            // truncate. Measured against the font the panel is
+            // actually using, because a column wide enough at 12 pt
+            // is not wide enough at 18.
+            java.awt.FontMetrics metrics =
+                    table.getFontMetrics(table.getFont());
+            assertTrue(table.getColumnModel().getColumn(1).getWidth()
+                            >= metrics.stringWidth("not recorded"),
+                    "\"not recorded\" is a fact and must not truncate"
+                            + " into \"not record…\": the column has "
+                            + table.getColumnModel().getColumn(1).getWidth()
+                            + " px and the words need "
+                            + metrics.stringWidth("not recorded"));
+            assertTrue(table.getColumnModel().getColumn(3).getWidth()
+                            >= metrics.stringWidth("too small here"),
+                    "and neither does the answer beside it: "
+                            + table.getColumnModel().getColumn(3).getWidth()
+                            + " px against "
+                            + metrics.stringWidth("too small here"));
             for (int column = 0; column < table.getColumnCount(); column++) {
-                int width = table.getColumnModel().getColumn(column)
-                        .getWidth();
-                assertTrue(width > 0, "column " + column + " has room");
+                assertTrue(table.getColumnModel().getColumn(column)
+                                .getWidth() > 0,
+                        "column " + column + " has room");
             }
             assertTrue(fixture.panel.centreHereButton().isVisible()
                             && fixture.panel.clearMarksButton().isVisible(),
@@ -93,8 +112,12 @@ class OnThisPagePanelTest {
 
     @Test
     void enlargedTextDoesNotPushTheActionsOffThePanel() throws Exception {
-        Font was = UIManager.getFont("defaultFont");
-        try {
+        // The shared guard, for the same reason the Inspector's
+        // sweep needed it: a font override belongs to the JVM the
+        // whole suite shares, and reading it back with getFont()
+        // returns the theme's own font rather than the absence of a
+        // choice (review).
+        juranometria.app.SwingSession.restoring(() -> {
             UIManager.put("defaultFont",
                     new Font(Font.SANS_SERIF, Font.PLAIN, 20));
             try (Fixture fixture = new Fixture(M31, 8.0, 320, 420)) {
@@ -114,9 +137,7 @@ class OnThisPagePanelTest {
                 assertTrue(fixture.panel.tableComponent().getRowHeight() > 0,
                         "and the rows have height to be read in");
             }
-        } finally {
-            UIManager.put("defaultFont", was);
-        }
+        });
     }
 
     @Test
@@ -285,6 +306,10 @@ class OnThisPagePanelTest {
     @Test
     void bothThemesLayTheSameTableOut() throws Exception {
         List<List<String>> perTheme = new ArrayList<>();
+        // The look and feel is the session's too: installed here and
+        // put back by the guard, rather than by applying the light
+        // theme and hoping the suite started light.
+        juranometria.app.SwingSession.restoring(() -> {
         for (boolean dark : new boolean[] {false, true}) {
             SwingUtilities.invokeAndWait(() -> { });
             if (dark) {
@@ -301,11 +326,11 @@ class OnThisPagePanelTest {
                 perTheme.add(rows);
             }
         }
+        });
         assertEquals(perTheme.get(0), perTheme.get(1),
                 "the theme is how the atlas is inked, not what it"
                         + " says: the same page reads the same in"
                         + " both");
-        com.formdev.flatlaf.FlatLightLaf.setup();
     }
 
     @Test

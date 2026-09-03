@@ -35,6 +35,57 @@ public final class PackagedAcceptanceMain {
     private PackagedAcceptanceMain() {
     }
 
+    /**
+     * Runs something with a temporary chart-options choice in the
+     * reader's own store, and puts theirs back whatever happens.
+     *
+     * <p>An acceptance run that changes a real preference and
+     * restores it on the way out restores it only when it passes -
+     * so the run that finds a defect is also the run that leaves the
+     * reader with galaxies switched off (sprint review). A check
+     * that damages what it is checking is worse than no check.
+     */
+    static void withTemporaryOptions(ChartOptionsStore store,
+                                     ChartOptions temporary,
+                                     ThrowingRunnable body) throws Exception {
+        // Read first, and mutate nothing until the guard is up: the
+        // save and the flush that follows can each fail, and the
+        // first version left them outside the try, so a flush that
+        // threw left the reader wearing this run's choice with
+        // nobody to put theirs back (sprint review).
+        ChartOptions theirs = store.load();
+        Throwable failure = null;
+        try {
+            store.save(temporary);
+            // Asked of this store rather than of a node assumed to
+            // be behind it - the helper used to flush the
+            // application's own node even when handed another store.
+            store.flush();
+            body.run();
+        } catch (Throwable thrown) {
+            failure = thrown;
+            throw thrown;
+        } finally {
+            try {
+                store.save(theirs);
+                store.flush();
+            } catch (RuntimeException | Error restoring) {
+                // A restoration that failed must not replace the
+                // failure it was cleaning up after: that would hide
+                // the very thing the run exists to report.
+                if (failure == null) {
+                    throw restoring;
+                }
+                failure.addSuppressed(restoring);
+            }
+        }
+    }
+
+    /** A body that may fail, which is the case that matters here. */
+    interface ThrowingRunnable {
+        void run() throws Exception;
+    }
+
     public static void main(String[] args) throws Exception {
         // About, through its real static content paths: the packaged
         // summary must state every licence family and the
@@ -86,12 +137,9 @@ public final class PackagedAcceptanceMain {
                 before.constellationNames(), before.starNames(),
                 before.bayerLetters(), before.flamsteedNumbers(),
                 !before.equatorialGrid());
-        store.save(flipped);
-        Preferences.userRoot().node("juranometria").flush();
-        require(ChartOptionsStore.user().load().equals(flipped),
-                "a fresh store reloads the changed preference");
-        store.save(before);
-        Preferences.userRoot().node("juranometria").flush();
+        withTemporaryOptions(store, flipped, () ->
+                require(ChartOptionsStore.user().load().equals(flipped),
+                        "a fresh store reloads the changed preference"));
         require(ChartOptionsStore.user().load().equals(before),
                 "the original preference is restored");
         System.out.println("preference change-and-reload OK"
@@ -99,6 +147,7 @@ public final class PackagedAcceptanceMain {
                 + " bundled runtime's preference backend)");
 
         readerJourney();
+        onThisPageJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -118,6 +167,245 @@ public final class PackagedAcceptanceMain {
      * no screen; what a screen adds is the on-screen journey the
      * maintainer runs on real machines.
      */
+    /**
+     * What a reader does with <strong>On this page</strong>, inside
+     * the packaged runtime (Sprint 24, issue #217).
+     *
+     * <p>Every native image runs this. The feature is built out of
+     * the bundled pack, the projection and the renderer, and a
+     * package that shipped a broken one of those would answer this
+     * wrongly here rather than in front of a reader.
+     *
+     * <p>It marks an object the page does <em>not</em> draw, on
+     * purpose: that is the case the whole sprint exists for, and the
+     * one a smoke test of the visible chart would never reach.
+     */
+    private static void onThisPageJourney() throws Exception {
+        // Through the real module on a real chart component, and the
+        // ink is counted rather than predicted.
+        //
+        // The first version of this built its own marks model and
+        // recomputed which objects "would" be crossed with a copy of
+        // the module's own rule (sprint review). It never attached
+        // the module and never drew a pixel, so it could have passed
+        // in an image where the module was missing or the ink was
+        // broken - which is the one thing a packaged acceptance
+        // exists to catch.
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler());
+        chart.setSize(900, 700);
+        chart.setViewState(ChartViewState.DEFAULT);
+        juranometria.ui.ChartModuleHost host =
+                new juranometria.ui.ChartModuleHost(chart,
+                        new juranometria.chart.SelectionModel(),
+                        request -> { });
+        juranometria.ui.onthispage.OnThisPageModule module =
+                host.attach(new juranometria.ui.onthispage.OnThisPageModule());
+
+        juranometria.page.PageContents inventory = host.inventory();
+        require(inventory.entries().size() > 50,
+                "the released page has an inventory: "
+                        + inventory.entries().size() + " entries");
+        int listed = module.panel().rows().size();
+        require(listed > 10,
+                "and the module's own table lists it: " + listed
+                        + " rows");
+
+        // Present and invisible: the state the table exists to
+        // explain, and the only kind of object that gets a cross.
+        juranometria.page.PageEntry invisible = null;
+        juranometria.page.PageEntry drawn = null;
+        for (juranometria.page.PageEntry entry : inventory.entries()) {
+            if (invisible == null && entry.visibility()
+                    != juranometria.page.PageVisibility.DRAWN) {
+                invisible = entry;
+            }
+            if (drawn == null && entry.visibility()
+                    == juranometria.page.PageVisibility.DRAWN) {
+                drawn = entry;
+            }
+        }
+        require(invisible != null && drawn != null,
+                "the released page holds both a drawn object and one"
+                        + " that is present but not drawn");
+
+        java.awt.image.BufferedImage unmarked = paint(chart);
+        // Declared out here so the summary below can still say what
+        // was measured, and assigned inside the guarded region.
+        int added;
+        try {
+
+        host.workingMarks().replaceWith(java.util.List.of(drawn.identity(),
+                invisible.identity()), invisible.identity());
+
+        // What the chart was actually given to ink, by the module.
+        java.util.List<String> offered = new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            offered.add(owned.geometry().identity());
+        }
+        require(offered.equals(java.util.List.of(invisible.identity())),
+                "the module offers one cross, for the object the page"
+                        + " does not draw: " + offered);
+
+        // And what it looks like on the page: ink that was not there
+        // before, at the pixel the projection puts the object at.
+        java.awt.image.BufferedImage marked = paint(chart);
+        added = differingPixels(unmarked, marked);
+        require(added > 8, "the cross reaches the page: " + added
+                + " pixels changed");
+        double[] at = host.projection().toPage(invisible.position())
+                .orElseThrow();
+        require(inkNear(marked, unmarked, (int) Math.round(at[0]),
+                        (int) Math.round(at[1]), 9),
+                "and it is drawn where the object is, at "
+                        + Math.round(at[0]) + "," + Math.round(at[1]));
+
+        host.workingMarks().clear();
+        require(chart.overlays().collect().isEmpty(),
+                "clearing withdraws the ink");
+        require(differingPixels(unmarked, paint(chart)) == 0,
+                "and the page returns to the one the atlas draws with"
+                        + " nothing marked, pixel for pixel");
+
+        // A restart begins empty, because there is nowhere for a mark
+        // to have been kept: the reader's stored options survive and
+        // the working set does not.
+        Preferences node = Preferences.userRoot().node("juranometria");
+        node.flush();
+        for (String key : node.keys()) {
+            require(!key.toLowerCase(java.util.Locale.ROOT)
+                            .contains("mark"),
+                    "no working mark was written to preferences: " + key);
+        }
+        } finally {
+            host.detachAll();
+        }
+        require(chart.overlays().collect().isEmpty(),
+                "and leaving releases the module");
+
+        // A second session, built the way the first was. Asserting
+        // that a fresh WorkingMarksModel is empty proves only that a
+        // new object is new (sprint review): what a restart has to
+        // show is that the application, assembled again from
+        // scratch, comes up with nothing marked and nothing inked -
+        // while the reader's stored options are still there, which
+        // is the difference between ephemeral and forgotten.
+        // The reader leaves with a choice made: galaxies off, and
+        // it goes back whatever happens below - including when a
+        // require fails and this run ends here.
+        ChartOptions theirs = ChartOptionsStore.user().load();
+        ChartOptions galaxiesOff = theirs.withFamily(
+                juranometria.render.SymbolFamily.GALAXIES, false);
+        int[] hiddenByChoice = {0};
+        withTemporaryOptions(ChartOptionsStore.user(), galaxiesOff, () -> {
+            juranometria.ui.ChartComponent restarted =
+                    new juranometria.ui.ChartComponent(Atlas.assembler());
+            restarted.setSize(900, 700);
+            restarted.setViewState(ChartViewState.DEFAULT);
+            ChartOptions reloaded = ChartOptionsStore.user().load();
+            restarted.setChartOptions(reloaded);
+            juranometria.ui.ChartModuleHost second =
+                    new juranometria.ui.ChartModuleHost(restarted,
+                            new juranometria.chart.SelectionModel(),
+                            request -> { });
+            juranometria.ui.onthispage.OnThisPageModule again =
+                    second.attach(
+                            new juranometria.ui.onthispage.OnThisPageModule());
+            try {
+                require(second.workingMarks().marks().isEmpty()
+                                && second.workingMarks().lead() == null,
+                        "the new session begins with nothing marked");
+                require(restarted.overlays().collect().isEmpty(),
+                        "and nothing inked");
+                require(again.panel().rows().size() == listed,
+                        "it lists the same page as before: "
+                                + again.panel().rows().size() + " rows");
+
+                // The reader's choice is not merely readable - it is
+                // in force.
+                require(reloaded.equals(galaxiesOff),
+                        "the restart read the choice the reader left");
+                require(restarted.chartOptions().equals(galaxiesOff),
+                        "and applied it, rather than starting on the"
+                                + " defaults");
+                hiddenByChoice[0] = second.inventory().tally()
+                        .get(juranometria.page.PageVisibility.FAMILY_HIDDEN);
+                require(hiddenByChoice[0] > 0,
+                        "so the restarted session reports objects"
+                                + " hidden by a chart option: "
+                                + second.inventory().tally());
+                require(second.inventory().entries().size()
+                                == inventory.entries().size(),
+                        "while the page holds exactly what it held"
+                                + " before - a choice about drawing is"
+                                + " not a choice about what is there");
+            } finally {
+                second.detachAll();
+            }
+        });
+        require(ChartOptionsStore.user().load().equals(theirs),
+                "and the reader's own options are back");
+        int hidden = hiddenByChoice[0];
+
+        System.out.println("on this page OK (" + inventory.entries().size()
+                + " entries, " + listed
+                + " rows, marked " + invisible.identity()
+                + " which the page does not draw, " + added
+                + " pixels of cross drawn at its own position,"
+                + " cleared to the byte, and a second session begins"
+                + " empty while wearing the reader's stored choice,"
+                + " with " + hidden + " objects hidden by it)");
+    }
+
+    /** The component's own painting, into an image. */
+    private static java.awt.image.BufferedImage paint(
+            juranometria.ui.ChartComponent chart) {
+        java.awt.image.BufferedImage image =
+                new java.awt.image.BufferedImage(chart.getWidth(),
+                        chart.getHeight(),
+                        java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            chart.paint(g);
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    private static int differingPixels(java.awt.image.BufferedImage a,
+                                       java.awt.image.BufferedImage b) {
+        int differing = 0;
+        for (int y = 0; y < a.getHeight(); y++) {
+            for (int x = 0; x < a.getWidth(); x++) {
+                if (a.getRGB(x, y) != b.getRGB(x, y)) {
+                    differing++;
+                }
+            }
+        }
+        return differing;
+    }
+
+    /** Whether new ink appeared within this many pixels of a point. */
+    private static boolean inkNear(java.awt.image.BufferedImage marked,
+                                   java.awt.image.BufferedImage unmarked,
+                                   int x, int y, int radius) {
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int px = x + dx;
+                int py = y + dy;
+                if (px < 0 || py < 0 || px >= marked.getWidth()
+                        || py >= marked.getHeight()) {
+                    continue;
+                }
+                if (marked.getRGB(px, py) != unmarked.getRGB(px, py)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private static void readerJourney() throws Exception {
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         ChartViewController navigation =
