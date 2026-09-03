@@ -30,6 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * reader actually makes one, by pressing Tab (review). So this
  * builds the real thing on a real display, and aborts rather than
  * pretends where the desktop refuses a window focus.
+ *
+ * <p>And through the doors a reader actually uses (review): the
+ * dialog is opened by clicking the View menu's own item, closed once
+ * by Escape and once by the window's close box, and reopened - a
+ * first version called {@code open()} directly and closed only with
+ * Escape, so the menu wiring and the closing path could both have
+ * broken while every test stayed green.
  */
 class PlaceAndTimeDialogLifecycleTest {
 
@@ -98,13 +105,21 @@ class PlaceAndTimeDialogLifecycleTest {
         SwingUtilities.invokeAndWait(() -> {
             owner = new JFrame("lifecycle");
             owner.setSize(600, 400);
+            // The real menu bar with the real wiring, so what is
+            // clicked below is the route a reader takes - not a call
+            // straight past it into open() (review).
+            owner.setJMenuBar(juranometria.app.AppMenuBar.create(null,
+                    () -> { }, () -> { }, () -> { }, null,
+                    () -> PlaceAndTimeDialog.open(owner, module, store,
+                            () -> WHEN)));
             owner.setVisible(true);
         });
-        SwingUtilities.invokeAndWait(() -> PlaceAndTimeDialog.open(
-                owner, module, store, () -> WHEN));
+        SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                "Place and Time...").doClick());
         flush();
 
-        assertEquals(1, dialogsShowing(), "one dialog");
+        assertEquals(1, dialogsShowing(),
+                "the View menu's item opened the dialog");
         PlaceAndTimeDialog dialog = (PlaceAndTimeDialog) java.util.Arrays
                 .stream(Window.getWindows())
                 .filter(w -> w instanceof PlaceAndTimeDialog
@@ -115,13 +130,14 @@ class PlaceAndTimeDialogLifecycleTest {
                 "the packed window holds the reviewed floor: "
                         + dialog.getWidth() + " px");
 
-        // Opening again brings the one dialog forward rather than
-        // multiplying stale copies - the Chart Options discipline.
-        SwingUtilities.invokeAndWait(() -> PlaceAndTimeDialog.open(
-                owner, module, store, () -> WHEN));
+        // Choosing the item again brings the one dialog forward
+        // rather than multiplying stale copies - the Chart Options
+        // discipline, exercised through the same menu.
+        SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                "Place and Time...").doClick());
         flush();
         assertEquals(1, dialogsShowing(),
-                "opened twice is still one dialog");
+                "chosen twice is still one dialog");
 
         // Every control fits inside the packed window: the claim the
         // photographs make, asserted on the real geometry.
@@ -182,5 +198,61 @@ class PlaceAndTimeDialogLifecycleTest {
         assertEquals(-33.87, module.observer().latitudeDegrees(),
                 "and closing takes nothing back: a committed field has"
                         + " already spoken");
+
+        // Reopened from the menu after Escape: a singleton that only
+        // checked for null would refuse to ever open again, and no
+        // test had asked (review).
+        SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                "Place and Time...").doClick());
+        flush();
+        assertEquals(1, dialogsShowing(),
+                "the menu opens a fresh dialog after Escape closed"
+                        + " the last one");
+        PlaceAndTimeDialog reopened = (PlaceAndTimeDialog)
+                java.util.Arrays.stream(Window.getWindows())
+                        .filter(w -> w instanceof PlaceAndTimeDialog
+                                && w.isDisplayable())
+                        .findFirst().orElseThrow();
+        assertEquals("-33.87", ((JTextField) named(
+                        reopened.getContentPane(), "latitudeField"))
+                        .getText(),
+                "and it wears the module's committed state, because"
+                        + " the state was never the dialog's to lose");
+
+        // The other way out: the window's own close box, which
+        // arrives as WINDOW_CLOSING rather than a keystroke.
+        SwingUtilities.invokeAndWait(() -> reopened.dispatchEvent(
+                new java.awt.event.WindowEvent(reopened,
+                        java.awt.event.WindowEvent.WINDOW_CLOSING)));
+        flush();
+        assertEquals(0, dialogsShowing(),
+                "the close box closes the window too");
+        assertEquals(-33.87, module.observer().latitudeDegrees(),
+                "and takes nothing back either");
+
+        // And one more reopen, so neither closing path is the one
+        // that quietly breaks the next opening.
+        SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                "Place and Time...").doClick());
+        flush();
+        assertEquals(1, dialogsShowing(),
+                "the dialog opens again after the close box closed"
+                        + " it");
+    }
+
+    /** The named item on the frame's real menu bar. */
+    private static javax.swing.JMenuItem menuItem(JFrame frame,
+                                                  String text) {
+        javax.swing.JMenuBar bar = frame.getJMenuBar();
+        for (int i = 0; i < bar.getMenuCount(); i++) {
+            var menu = bar.getMenu(i);
+            for (int j = 0; j < menu.getItemCount(); j++) {
+                var item = menu.getItem(j);
+                if (item != null && text.equals(item.getText())) {
+                    return item;
+                }
+            }
+        }
+        throw new AssertionError("the menu carries " + text);
     }
 }

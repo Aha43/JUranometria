@@ -5,8 +5,6 @@ import java.awt.GridLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -98,14 +96,12 @@ public final class PlaceAndTimeDialog extends JDialog {
         getAccessibleContext().setAccessibleDescription(
                 "Set where you are and the frozen instant the reference"
                         + " lines are drawn for");
+        // One closing mechanism, not two: an earlier version also
+        // disposed from a window listener, and the redundancy made
+        // the close box unbreakable by mutation - either half could
+        // rot and the other would cover for it.
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(content(module, store, clock));
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent event) {
-                dispose();
-            }
-        });
         getRootPane().registerKeyboardAction(event -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
