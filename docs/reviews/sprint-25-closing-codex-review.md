@@ -92,3 +92,59 @@ inventing additional ink.
 
 PR #238 remains held. Do not close milestone 25, change `VERSION`, tag, or
 release until these findings are closed and the closing evidence is reviewed.
+
+## Follow-up review at `0e8d33e`
+
+The scientific wording now agrees with the measured pixel consequence, and
+the 90-pixel catchment is gone. `ReferenceInk.labelBox` is chart-owned layout
+used by both painting and the audit, while line and point ink have bounded
+tolerances. Those two findings are closed.
+
+### P1 — The new key route is still vacuous, and one button still uses its back door
+
+`commit(...)` dispatches key events directly to the field but never requires
+that the click made that field the focus owner. Swing delivers a directly
+dispatched event even when a keyboard could not have sent it there—the exact
+failure mode already documented in the map-exploration journeys. The purported
+arrival check does not repair this: `differingText(entry, typed)` never compares
+with `typed`; it returns success for any nonblank value. Every field begins
+nonblank, so a field receiving no characters at all satisfies the assertion.
+
+The report also says there is no `doClick()` anywhere in the journey, but the
+View-menu openings and **Center on zenith** still use it. The centre action is
+one of the public controls this finding specifically required the journey to
+operate through pointer or keyboard input.
+
+After the pointer press, require the field to be the real focus owner before
+sending keys, with the same abort-on-desktop-refusal discipline used elsewhere.
+Require the committed canonical value expected for each input—not merely a
+nonblank field. Operate **Center on zenith** through a reachable pointer or
+keyboard gesture. Mutation-check a click that fails to transfer focus, dropped
+typed characters, and a centre button whose public event no longer invokes its
+action. Describe any deliberate menu-item `doClick()` accurately rather than
+claiming none remains.
+
+### P1 — The three “production startups” are still three copies
+
+The previous review explicitly required “one production startup seam shared
+with `JUranometriaMain`.” No such seam was added. The journey's
+`openTheAtlas(...)`, the packaged block, and `JUranometriaMain.start(...)` each
+independently perform `PlaceStore.load(clock)`, construct and attach a
+`MeridianModule`, and switch all three geometries off.
+
+The new tests now build substantially more realistic second sessions, but a
+future production change that restores an instant, uses a different store, or
+forgets to start quiet can still break `JUranometriaMain` while both copied
+test setups remain green. Calling each copy “the way JUranometriaMain builds
+it” is the duplication the requested seam was meant to remove.
+
+Extract the small place-and-time startup policy—not the whole application—so
+production, the display journey, and packaged acceptance all receive the
+module/session from the same store-plus-clock path. The seam must own loading
+the place at the supplied instant and the fresh-session visibility default.
+Then perform both second-session checks through it. Mutations to stored-switch
+behaviour, instant reuse, and store bypass must fail through the shared code,
+not through three matching implementations.
+
+PR #238 remains held on these two P1s. The corrected documentation and pixel
+accounting should be preserved.
