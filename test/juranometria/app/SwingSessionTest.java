@@ -267,6 +267,47 @@ class SwingSessionTest {
     }
 
     @org.junit.jupiter.api.Test
+    void aScratchNodesDeletionPersistsBeyondThisJvm() throws Exception {
+        // Proven from a process of its own, for a passing body and a
+        // failing one: a same-JVM nodeExists cannot tell an
+        // unflushed removal from a persistent one - which was the
+        // exit probe's bug, and would have been this helper's too
+        // (review). The helper flushes the parent, and the child
+        // process is the witness.
+        String[] name = new String[2];
+        SwingSession.scratchPreferences("juranometria-persist-test",
+                node -> {
+                    name[0] = node.name();
+                    node.put("k", "v");
+                });
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () ->
+                        SwingSession.scratchPreferences(
+                                "juranometria-persist-test", node -> {
+                                    name[1] = node.name();
+                                    node.put("k", "v");
+                                    throw new IllegalStateException(
+                                            "boom");
+                                }));
+        for (String gone : name) {
+            Process witness = new ProcessBuilder(
+                    System.getProperty("java.home") + "/bin/java",
+                    "-cp", "build/classes:build/test-classes:lib/*",
+                    "juranometria.app.PrefsExistsProbe", gone)
+                    .redirectErrorStream(true).start();
+            org.junit.jupiter.api.Assertions.assertTrue(
+                    witness.waitFor(60,
+                            java.util.concurrent.TimeUnit.SECONDS),
+                    "the witness process answers");
+            org.junit.jupiter.api.Assertions.assertEquals(0,
+                    witness.exitValue(),
+                    gone + " must be gone from the backing store as"
+                            + " another JVM sees it, passing body or"
+                            + " failing");
+        }
+    }
+
+    @org.junit.jupiter.api.Test
     void whatWasCapturedIsWhatComesBack() throws Exception {
         SwingSession.Held before = SwingSession.capture();
         SwingSession.Held held = SwingSession.capture();

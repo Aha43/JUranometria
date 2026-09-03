@@ -166,6 +166,12 @@ public final class SwingSession {
         java.util.prefs.Preferences node =
                 java.util.prefs.Preferences.userRoot().node(
                         prefix + "-" + System.nanoTime());
+        // The parent, captured while the node still has one:
+        // removal is only made persistent by flushing the PARENT -
+        // flushing the removed node itself is specified to throw -
+        // and a deletion that lives only in this JVM is the exit
+        // probe's bug wearing a helper's name (review).
+        java.util.prefs.Preferences parent = node.parent();
         guarded(() -> body.run(node), () -> {
             try {
                 node.removeNode();
@@ -173,6 +179,7 @@ public final class SwingSession {
                 // A body that removed the node itself - the broken-
                 // store fixtures do - has done this guard's work.
             }
+            parent.flush();
         });
     }
 
