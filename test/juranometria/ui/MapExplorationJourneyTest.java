@@ -145,10 +145,14 @@ class MapExplorationJourneyTest {
             // was to guess one and search for it.
             ChartRenderer.DrawnMark star = someUnlabelledStar();
             String whenTaken = pageState("when the pixel was taken");
+            String sceneWhenTaken =
+                    sceneState("and the scene then", star);
             ChartViewState beforeAsking = navigation.state();
             ChartScene sceneBeforeAsking = chart.currentScene();
             clickOn(star);
             String whenClicked = pageState("when it was clicked");
+            String sceneWhenClicked =
+                    sceneState("and the scene then", star);
             String whatWasThere = hitTestState(star.centre().x(),
                     star.centre().y());
 
@@ -158,7 +162,9 @@ class MapExplorationJourneyTest {
                             + Math.round(star.centre().x()) + ","
                             + Math.round(star.centre().y())
                             + " identified it.\n  " + whenTaken
+                            + "\n  " + sceneWhenTaken
                             + "\n  " + whenClicked
+                            + "\n  " + sceneWhenClicked
                             + "\n  " + whatWasThere
                             + "\n  if the first two differ, the click was"
                             + " resolved against a different page from"
@@ -742,6 +748,84 @@ class MapExplorationJourneyTest {
         return said[0];
     }
 
+    /**
+     * What the scene held at a moment, and where the chosen star was
+     * in it.
+     *
+     * <p>The third diagnostic for #220, and the one that separates
+     * the two explanations still standing. The first showed the page
+     * had not moved; the second showed the hit test finds nothing at
+     * the pixel, that the options are the journey's own, and that the
+     * nearest drawn mark is a different star 16.5 px away. What
+     * neither says is <em>why</em> the pixel is empty: the scene's
+     * contents may have changed under the journey, or the renderer
+     * may have placed the same star somewhere else.
+     *
+     * <p>So this reports the scene's identity, its size, its limiting
+     * magnitude, whether the chosen star is still in the catalogue
+     * list at all, and where - if anywhere - the renderer now draws
+     * it. Recorded at both moments and on the event thread, because
+     * the read that chose the mark was not on it.
+     *
+     * <ul>
+     *   <li>a different scene identity, or a different star count,
+     *       says the page was reassembled;</li>
+     *   <li>the same scene with the star present but drawn elsewhere
+     *       says the renderer placed it differently;</li>
+     *   <li>the same scene with the star absent from
+     *       {@code drawnMarks} but present in the scene says the
+     *       renderer dropped it;</li>
+     *   <li>and absent from the scene itself says the assembly did.
+     *       </li>
+     * </ul>
+     *
+     * <p>It asserts nothing. Which of those it is decides what the
+     * fix should be, and guessing that before the evidence arrives is
+     * how the first two hypotheses were spent.
+     */
+    private String sceneState(String when, ChartRenderer.DrawnMark star)
+            throws Exception {
+        String[] said = new String[1];
+        SwingUtilities.invokeAndWait(() -> {
+            ChartScene scene = chart.currentScene();
+            if (scene == null) {
+                said[0] = when + ": no scene at all";
+                return;
+            }
+            String id = star.star().id();
+            boolean inScene = scene.stars().stream()
+                    .anyMatch(catalogued -> catalogued.id().equals(id));
+            said[0] = String.format(java.util.Locale.ROOT,
+                    "%s: scene #%08x, which %s the one the mark was"
+                            + " taken from; %d stars, %d deep-sky,"
+                            + " limiting magnitude %.2f; %s is %s in"
+                            + " the scene, %s under the chart's"
+                            + " options, %s under DEFAULTS",
+                    when, System.identityHashCode(scene),
+                    scene == sceneBehindTheMark ? "IS" : "is NOT",
+                    scene.stars().size(), scene.deepSkyObjects().size(),
+                    scene.limitingMagnitude(), id,
+                    inScene ? "present" : "ABSENT",
+                    placedAt(scene, chart.chartOptions(), id),
+                    placedAt(scene, ChartOptions.DEFAULTS, id));
+        });
+        return said[0];
+    }
+
+    /** Where the renderer draws this star now, if it draws it. */
+    private static String placedAt(ChartScene scene, ChartOptions options,
+                                   String id) {
+        for (ChartRenderer.DrawnMark mark
+                : RENDERER.drawnMarks(scene, options)) {
+            if (mark.star() != null && mark.star().id().equals(id)) {
+                return String.format(java.util.Locale.ROOT,
+                        "drawn at %.1f,%.1f", mark.centre().x(),
+                        mark.centre().y());
+            }
+        }
+        return "NOT DRAWN";
+    }
+
     private ChartRenderer.DrawnMark someUnlabelledStar() {
         List<String> labelled = labelsOnPage();
         return marks().stream()
@@ -952,9 +1036,17 @@ class MapExplorationJourneyTest {
     }
 
     private List<ChartRenderer.DrawnMark> marks() {
-        return RENDERER.drawnMarks(chart.currentScene(),
-                ChartOptions.DEFAULTS);
+        // The scene is kept so the diagnostic below can say whether
+        // the EDT is holding this same one. This method runs off the
+        // event thread, which is one of the things #220 has to rule
+        // in or out; reading the field changes nothing about when.
+        ChartScene scene = chart.currentScene();
+        sceneBehindTheMark = scene;
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS);
     }
+
+    /** The scene the most recent {@link #marks()} call read. */
+    private ChartScene sceneBehindTheMark;
 
     /** A star comfortably inside the page. */
     private ChartRenderer.DrawnMark someStar() {
