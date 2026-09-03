@@ -137,6 +137,188 @@ class SkyOrientationTest {
         assertTrue(worst > 0, "and they are genuinely different code");
     }
 
+    // ---- the rotation itself, end to end ---------------------------
+
+    /**
+     * The pole of the ecliptic, which precession turns the celestial
+     * pole around. Its J2000 position follows from the obliquity
+     * alone and owes nothing to the rotations under test.
+     */
+    private static final SkyPosition ECLIPTIC_POLE =
+            new SkyPosition(270.0, 90.0 - 23.4392911);
+
+    @Test
+    void theCelestialPoleStaysOnTheCircleItIsSupposedToTurnOn() {
+        // The strongest end-to-end check available offline. Every
+        // component of this sprint can be individually right and the
+        // combined rotation still wrong - a swapped order, a
+        // transpose, a sign - and this catches all three: precession
+        // moves the celestial pole around the *ecliptic* pole at a
+        // fixed angular radius, the obliquity. A rotation assembled
+        // wrongly takes the pole off that circle immediately.
+        for (Instant instant : whenever()) {
+            SkyPosition poleOfDate = SkyOrientation.toJ2000(
+                    new SkyPosition(0, 90),
+                    SkyOrientation.julianDate(instant),
+                    SkyOrientation.Fidelity.PRECESSION_ONLY);
+            assertEquals(23.4392911,
+                    ECLIPTIC_POLE.separationDegrees(poleOfDate), 0.001,
+                    "the mean pole of " + instant + " is the obliquity"
+                            + " away from the ecliptic pole, as it must"
+                            + " be for every date");
+        }
+    }
+
+    @Test
+    void thePoleTurnsAtThePublishedRateAndInThePublishedDirection() {
+        // 50.29 arcseconds a year of general precession in longitude,
+        // and the celestial pole therefore moves 50.29 sin(obliquity)
+        // = 20.0 arcseconds a year. Textbook quantities, not this
+        // code's.
+        double years = 100.0;
+        Instant start = utc(2000, 1, 1, 12, 0, 0);
+        Instant later = start.plusSeconds((long) (years * 365.25 * 86400));
+
+        SkyPosition atStart = SkyOrientation.toJ2000(new SkyPosition(0, 90),
+                SkyOrientation.julianDate(start),
+                SkyOrientation.Fidelity.PRECESSION_ONLY);
+        SkyPosition atEnd = SkyOrientation.toJ2000(new SkyPosition(0, 90),
+                SkyOrientation.julianDate(later),
+                SkyOrientation.Fidelity.PRECESSION_ONLY);
+
+        double moved = atStart.separationDegrees(atEnd) * 3600.0 / years;
+        assertEquals(50.29 * Math.sin(Math.toRadians(23.4392911)), moved,
+                0.15, "the pole moves at the published rate: " + moved
+                        + " arcseconds a year");
+
+        // And the right way round the ecliptic pole: the longitude
+        // about it advances rather than retreats.
+        // How far it went round, and that it kept going the same
+        // way. The *sign* is not asserted: it belongs to the basis
+        // this test builds for itself, not to the sky, and claiming
+        // it would be dressing an arbitrary choice as physics.
+        double firstCentury = difference(longitudeAboutEclipticPole(atEnd),
+                longitudeAboutEclipticPole(atStart));
+        SkyPosition twoCenturiesOn = SkyOrientation.toJ2000(
+                new SkyPosition(0, 90),
+                SkyOrientation.julianDate(start.plusSeconds(
+                        (long) (2 * years * 365.25 * 86400))),
+                SkyOrientation.Fidelity.PRECESSION_ONLY);
+        double secondCentury = difference(
+                longitudeAboutEclipticPole(twoCenturiesOn),
+                longitudeAboutEclipticPole(atEnd));
+
+        assertEquals(50.29 * years / 3600.0, Math.abs(firstCentury), 0.01,
+                "it goes round by the published amount of general"
+                        + " precession in longitude");
+        assertTrue(Math.signum(firstCentury) == Math.signum(secondCentury),
+                "and keeps going the same way round: " + firstCentury
+                        + "° then " + secondCentury + "°");
+    }
+
+    @Test
+    void nutationMovesTheTruePoleByTheAmountItIsSupposedTo() {
+        // The true pole differs from the mean pole by the nutation,
+        // whose obliquity term is at most about 9.2 arcseconds. A
+        // nutation applied in the wrong place - or twice, or not at
+        // all - shows up here.
+        for (Instant instant : whenever()) {
+            double jd = SkyOrientation.julianDate(instant);
+            SkyPosition mean = SkyOrientation.toJ2000(new SkyPosition(0, 90),
+                    jd, SkyOrientation.Fidelity.PRECESSION_ONLY);
+            SkyPosition apparent = SkyOrientation.toJ2000(
+                    new SkyPosition(0, 90), jd,
+                    SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+            double moved = mean.separationDegrees(apparent) * 3600.0;
+
+            assertTrue(moved < 10.0, "nutation moves the pole by less"
+                    + " than ten arcseconds: " + moved + "\" at "
+                    + instant);
+            assertTrue(moved > 0.5, "and by more than nothing, so it"
+                    + " is actually being applied: " + moved + "\"");
+        }
+    }
+
+    @Test
+    void theEquationOfTheEquinoxesIsTheNutationItClaimsToBe() {
+        // GAST - GMST must equal the nutation in longitude times the
+        // cosine of the true obliquity. Two quantities the code
+        // computes by different routes, which must agree.
+        for (Instant instant : whenever()) {
+            double jd = SkyOrientation.julianDate(instant);
+            double t = SkyOrientation.centuries(jd);
+            double[] nutation = SkyOrientation.nutationDegrees(t);
+            double expected = nutation[0] * Math.cos(Math.toRadians(
+                    SkyOrientation.meanObliquityDegrees(t) + nutation[1]));
+
+            assertEquals(expected, difference(SkyOrientation.gastDegrees(jd),
+                            SkyOrientation.gmstDegrees(jd)), 1e-9,
+                    "the equation of the equinoxes at " + instant);
+        }
+    }
+
+    @Test
+    void theTransformationIsARotationAndNotSomethingElse() {
+        // A rotation preserves every angle. Nothing that is not a
+        // rotation does - a scaling, a projection, a matrix composed
+        // in the wrong order with a transpose in it - so this is the
+        // structural property to ask for, and it needs no inverse to
+        // ask it with.
+        List<SkyPosition> directions = List.of(
+                new SkyPosition(0.0, 0.0),
+                new SkyPosition(359.9, -0.1),
+                new SkyPosition(83.8, -5.4),
+                new SkyPosition(0.0, 89.9),
+                new SkyPosition(180.0, -89.9),
+                new SkyPosition(266.4, -28.9));
+
+        for (Instant instant : whenever()) {
+            double jd = SkyOrientation.julianDate(instant);
+            for (int i = 0; i < directions.size(); i++) {
+                for (int j = i + 1; j < directions.size(); j++) {
+                    SkyPosition first = directions.get(i);
+                    SkyPosition second = directions.get(j);
+                    assertEquals(first.separationDegrees(second),
+                            SkyOrientation.toJ2000(first, jd,
+                                    SkyOrientation.Fidelity
+                                            .PRECESSION_AND_NUTATION)
+                                    .separationDegrees(
+                                            SkyOrientation.toJ2000(second, jd,
+                                                    SkyOrientation.Fidelity
+                                                        .PRECESSION_AND_NUTATION)),
+                            1e-9,
+                            "the angle between " + first + " and "
+                                    + second + " survives the change of"
+                                    + " frame at " + instant);
+                }
+            }
+        }
+    }
+
+    /** Longitude about the ecliptic pole, for direction of travel. */
+    private static double longitudeAboutEclipticPole(SkyPosition point) {
+        double[] pole = SkyOrientation.toVector(ECLIPTIC_POLE);
+        double[] reference = SkyOrientation.toVector(new SkyPosition(0, 0));
+        double[] first = normalise(cross(cross(pole, reference), pole));
+        double[] second = cross(pole, first);
+        double[] v = SkyOrientation.toVector(point);
+        return Math.toDegrees(Math.atan2(dot(v, second), dot(v, first)));
+    }
+
+    private static double dot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+    private static double[] cross(double[] a, double[] b) {
+        return new double[] {a[1] * b[2] - a[2] * b[1],
+                a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
+    }
+
+    private static double[] normalise(double[] v) {
+        double n = Math.sqrt(dot(v, v));
+        return new double[] {v[0] / n, v[1] / n, v[2] / n};
+    }
+
     // ---- invariants ------------------------------------------------
 
     private static final SkyOrientation.Observer OSLO =

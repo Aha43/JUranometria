@@ -201,18 +201,28 @@ public final class PlaceAndTimeStudyMain {
         }
         row("UTC stands in for TT in the precession arguments", tt);
 
-        // The nutation series, truncated.
-        double truncation = 0;
-        for (Moment moment : MOMENTS) {
-            double t = SkyOrientation.centuries(
-                    SkyOrientation.julianDate(moment.instant()));
-            double[] full = SkyOrientation.nutationDegrees(t);
-            double[] four = SkyOrientation.nutationDegrees(t, 4);
-            truncation = Math.max(truncation,
-                    Math.abs(full[0] - four[0]) + Math.abs(full[1] - four[1]));
-        }
-        row("the nutation series stops at twenty terms (this is what"
-                + " terms 5-20 are worth)", truncation);
+        // The nutation series, truncated - measured against the
+        // published full-series value rather than against a shorter
+        // version of itself.
+        //
+        // The first draft compared twenty terms with four and called
+        // the difference the truncation cost (gate review). That
+        // measures what terms 5-20 contribute; it says nothing about
+        // the terms beyond the twentieth, which are the ones
+        // actually omitted.
+        double againstPublished = nutationAgainstPublished();
+        row("the nutation series stops at twenty terms, against the"
+                + " published full-series value for 1987 April 10",
+                againstPublished);
+        double tail = omittedTailBound();
+        row("the same, bounded for any date by the series' own"
+                + " ordering (see below)", tail);
+
+        // The precession model itself is a choice, and two accepted
+        // ones do not agree exactly.
+        double models = precessionModelSpread();
+        row("IAU 1976 precession against the IAU 2006 form, over two"
+                + " centuries", models);
         System.out.println();
         System.out.println("Polar motion (under 0.5\"), diurnal"
                 + " aberration (under 0.3\") and refraction are not"
@@ -221,16 +231,81 @@ public final class PlaceAndTimeStudyMain {
                 + " rather than of the sky, which is why the horizon"
                 + " here is named **mathematical**.");
         System.out.println();
+        System.out.println("**How the nutation tail is bounded.** The"
+                + " IAU 1980 series is ordered by decreasing"
+                + " amplitude, and the twentieth term's coefficient in"
+                + " longitude is 0.0046\". Every omitted term is"
+                + " therefore no larger than that, and the row above"
+                + " sums the whole tail as though all of them fell in"
+                + " phase at their maximum - which they cannot. The"
+                + " measured residual against the published"
+                + " full-series value for the same date is the"
+                + " realistic figure; the bound is the honest"
+                + " worst case.");
+        System.out.println();
+        double budget = ut1 + tail + models;
         System.out.printf(Locale.ROOT,
-                "**The accuracy contract.** The atlas places the"
+                "**The accuracy contract.** Adding the terms above at"
+                        + " their worst - %s for UT1, %s for the"
+                        + " nutation tail, %s for the choice of"
+                        + " precession model - the atlas places the"
                         + " zenith, meridian and horizon within"
-                        + " **%s** of where the observer's own frame"
-                        + " puts them - dominated entirely by not"
-                        + " knowing UT1 - which is %.1f px at the"
-                        + " widest field and %.1f px at the"
-                        + " narrowest.%n%n",
-                angle(ut1), ut1 * pixelsPerDegree(36.0),
-                ut1 * pixelsPerDegree(1.0));
+                        + " **%s** of the observer's own frame. That"
+                        + " is %.2f px at the widest field and %.1f px"
+                        + " at the narrowest, and it is dominated by"
+                        + " not knowing UT1: every other term together"
+                        + " is worth %s.%n%n",
+                angle(ut1), angle(tail), angle(models), angle(budget),
+                budget * pixelsPerDegree(36.0),
+                budget * pixelsPerDegree(1.0), angle(tail + models));
+    }
+
+    /**
+     * This twenty-term series against the published full-series
+     * value for Meeus's worked example (22.a, 1987 April 10):
+     * dpsi = -3.788", deps = +9.443".
+     */
+    private static double nutationAgainstPublished() {
+        double t = SkyOrientation.centuries(
+                SkyOrientation.julianDate(utc(1987, 4, 10, 0, 0)));
+        double[] mine = SkyOrientation.nutationDegrees(t);
+        double inLongitude = Math.abs(mine[0] - (-3.788 / 3600.0));
+        double inObliquity = Math.abs(mine[1] - (9.443 / 3600.0));
+        return inLongitude + inObliquity;
+    }
+
+    /**
+     * The worst the omitted terms can be worth, from the series'
+     * own ordering: none of them exceeds the twentieth, and the
+     * IAU 1980 series has 106 terms in all.
+     */
+    private static double omittedTailBound() {
+        double largestOmitted = 46 / 10000.0 / 3600.0;   // 0.0046"
+        return (106 - 20) * largestOmitted;
+    }
+
+    /**
+     * Two accepted precession models, over the range the atlas is
+     * meant to be used in. The spread is a real uncertainty in the
+     * frame rather than an error in either.
+     */
+    private static double precessionModelSpread() {
+        double worst = 0;
+        for (int year : new int[] {1900, 1950, 2000, 2026, 2050, 2100}) {
+            double jd = SkyOrientation.julianDate(utc(year, 6, 15, 0, 0));
+            double t = SkyOrientation.centuries(jd);
+            double days = jd - 2451545.0;
+            double classical = SkyOrientation.gmstDegrees(jd);
+            double era = 360.0 * (0.7790572732640
+                    + 1.00273781191135448 * days)
+                    + (0.014506 + 4612.156534 * t + 1.3915817 * t * t
+                            - 0.00000044 * t * t * t
+                            - 0.000029956 * t * t * t * t) / 3600.0;
+            double apart = Math.abs(((classical - era) % 360.0 + 540.0)
+                    % 360.0 - 180.0);
+            worst = Math.max(worst, apart);
+        }
+        return worst;
     }
 
     private static void row(String what, double degrees) {
@@ -502,6 +577,9 @@ public final class PlaceAndTimeStudyMain {
     /** An angle in the unit a reader of a table can compare. */
     private static String angle(double degrees) {
         double arcseconds = degrees * 3600.0;
+        if (arcseconds < 0.01) {
+            return String.format(Locale.ROOT, "%.4f\"", arcseconds);
+        }
         if (arcseconds < 60) {
             return String.format(Locale.ROOT, "%.2f\"", arcseconds);
         }

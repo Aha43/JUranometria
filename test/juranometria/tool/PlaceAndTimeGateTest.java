@@ -136,7 +136,7 @@ class PlaceAndTimeGateTest {
                 "docs/decisions/place-and-time.md"));
 
         for (String claim : List.of("13.54\"", "21.17'", "39.34'",
-                "8.80'", "0.0000 px")) {
+                "8.80'", "0.0000 px", "14.22\"", "0.40\"", "0.28\"")) {
             assertTrue(report.contains(claim),
                     "the study measures " + claim);
             assertTrue(decision.contains(claim.replace("\"", "″")

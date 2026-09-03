@@ -62,22 +62,33 @@ Three simplifications remain, each priced rather than hidden:
 
 | simplification | worst error | at 36° | at 1° |
 |---|---:|---:|---:|
-| UTC stands in for UT1 (bounded at 0.9 s by agreement) | 13.54″ | 0.09 px | 3.38 px |
+| UTC stands in for UT1 (bounded at 0.9 s by agreement) | **13.54″** | 0.09 px | 3.38 px |
 | UTC stands in for TT in the precession arguments | 0.00″ | 0.00 px | 0.00 px |
-| the nutation series stops at twenty terms | 0.18″ | 0.00 px | 0.05 px |
+| the nutation series stops at twenty terms — against the published full-series value | 0.0009″ | 0.00 px | 0.00 px |
+| the same, bounded for any date by the series' own ordering | 0.40″ | 0.00 px | 0.10 px |
+| IAU 1976 precession against the IAU 2006 form | 0.28″ | 0.00 px | 0.07 px |
 
 Polar motion (< 0.5″), diurnal aberration (< 0.3″) and refraction
 are not modelled at all.
 
-> **The accuracy contract.** The zenith, meridian and horizon are
-> placed within **15 arcseconds** of the observer's own frame —
-> dominated entirely by not knowing UT1, which the atlas cannot know
-> without shipping data it refuses to ship. That is a tenth of a
-> pixel at the widest field and under four pixels at the narrowest.
+**The nutation tail is bounded rather than guessed at.** An earlier
+draft compared twenty terms against four and called the difference
+the truncation cost. That measures what terms 5–20 contribute and
+says nothing about the terms actually omitted (review). Two things
+are measured instead: this series against the **published
+full-series value** for Meeus's worked example, which is 0.0009″;
+and a worst case from the series' own ordering — the twentieth
+term's amplitude is 0.0046″, no later term exceeds it, and 86 of
+them in phase at maximum would be 0.40″, which they cannot be.
 
-The contract is stated in that direction on purpose: it is a
-**bound**, and the study measures the terms that make it up so a
-later reader can see which one would have to change first.
+> **The accuracy contract, derived rather than asserted.** Adding
+> those terms at their worst — 13.54″ for UT1, 0.40″ for the
+> nutation tail, 0.28″ for the choice of precession model — the
+> zenith, meridian and horizon are placed within **14.22″** of the
+> observer's own frame: 0.10 px at the widest field, 3.6 px at the
+> narrowest. Every term other than UT1 is worth 0.68″ together, so
+> the bound is what not knowing UT1 costs, and nothing else matters
+> until that changes.
 
 ## The three geometries
 
@@ -102,11 +113,40 @@ they cannot look at.
 ## What it looks like on a page
 
 **A gnomonic projection maps every great circle to a straight line**
-— measured at 0.0000 px of deviation across every field. The
-meridian and the horizon are therefore *straight* on this chart, and
-#227 needs no subdivision of the kind Sprint 24's deep-sky extents
-required. This is the single largest simplification in the sprint,
-and it is a property of the projection rather than a tolerance.
+— measured at 0.0000 px of deviation across every field.
+
+That does *not* make a polyline sufficient, which an earlier draft
+of this gate claimed (review). `OverlayContribution.Path` is a list
+of positions: subdivision by another name — the study was passing it
+720 — and no list of vertices can say where the **infinite** circle
+crosses the paper when every vertex it was given lies outside it. A
+one-degree page with a circle sampled at eight points has no vertex
+anywhere near the paper, and a polyline through them draws nothing.
+
+**So the seam gains one generic geometry: a great circle, given by
+its pole.** A pole is a direction; the chart learns no astronomy
+from being handed one. Because the projection is gnomonic, the chart
+can then be exact: the projected circle is fixed by any two of its
+points that project at all, and the resulting line is clipped to the
+paper analytically. Nothing about what a reader sees is decided by
+sampling.
+
+The cases that decide it are measured, not argued — every one of
+them a case a polyline answers wrongly:
+
+| case | answered |
+|---|---|
+| every supplied vertex off the paper | the crossing is found |
+| a page lying wholly between two sparse samples | the crossing is found |
+| a corner clip a few dozen pixels long | exact, and short |
+| the half of the circle the projection refuses | clipped from the visible half |
+| polar pages, both poles, and the RA seam | no different |
+| a circle that misses the paper | silence |
+
+Each returned endpoint is checked against the sky rather than
+against the arithmetic that produced it: the pixel is turned back
+into a direction through the chart's own inverse, and its angle from
+the pole must be ninety degrees.
 
 Ink, chosen by drawing it over real pages in both themes:
 
@@ -172,14 +212,15 @@ Inspector mode would also push the mode chooser to three stacked
 rows at that width, spending the panel's height on chrome before a
 reader has read anything.
 
-## The module seam is sufficient
+## The module seam needs one addition
 
-The seam from #215 already carries this, and the gate confirms it
-rather than extending it:
+The seam from #215 carries almost all of this. It needs exactly one
+new thing, and the gate names it rather than pretending it does not:
 
-- the module contributes **`OverlayContribution.Path`** for the
-  meridian and the horizon and **`Point`** for the zenith, all in
-  the existing **`REFERENCE_LINE`** ink role;
+- the module contributes a **great circle** — the one new,
+  domain-neutral geometry — for the meridian and the horizon, and
+  **`Point`** for the zenith, both in the existing
+  **`REFERENCE_LINE`** ink role;
 - the chart learns **how to ink that role** — and nothing else. It
   gains no observer, no clock, no longitude, no sidereal time, no
   meridian and no horizon;
@@ -189,10 +230,16 @@ rather than extending it:
 - **`Center on zenith`** is an ordinary `NavigationRequest`, which
   already carries a reason.
 
-The one thing the chart must gain is a *reference* ink for a
-contributed **point** — the zenith ring — because today it inks
-points only in the interaction role, as crosses. That is a rule
-about ink, not about astronomy.
+Two things the chart must gain, both rules about geometry and ink
+rather than about astronomy:
+
+1. **A great-circle contribution**, clipped analytically as above.
+   It is given a pole and a role. It knows nothing of meridians,
+   horizons, observers or time, and a future module drawing a
+   galactic equator would use the same type.
+2. **A reference ink for a contributed point** — the zenith ring —
+   because today the chart inks points only in the interaction role,
+   as crosses.
 
 ## Rejected
 
@@ -211,6 +258,11 @@ about ink, not about astronomy.
 - **A third Inspector mode.** Rejected by mock-up at 240 px.
 - **Naming the anti-meridian and the nadir.** Rejected: more
   vocabulary than the drawing needs.
+- **Contributing the lines as polylines.** Rejected by the cases
+  above: a polyline cannot answer a page that lies between its own
+  vertices, and specifying a sampling rule would reintroduce every
+  problem Sprint 24 spent eight review rounds removing — for
+  geometry that does not need sampling at all.
 - **A real (terrain or refracted) horizon.** Rejected: the atlas
   knows nothing about air or hills, and a line implying otherwise
   would be a promise it cannot keep.
@@ -219,11 +271,34 @@ about ink, not about astronomy.
 
 **#226** — the observer record, GMST/GAST, the precession and
 nutation rotations, and the three geometries, all UI-independent;
-the accuracy contract above as an executable statement; and an
-oracle held to published values, an independent derivation of
-sidereal time, and the invariants (a horizon exactly 90° from its
-zenith, a meridian through both poles, the pole overhead at the
-pole).
+the 14.22″ contract above as an executable statement; and the oracle
+described below.
+
+### What the oracle rests on, and what it does not
+
+The gate review asked for authoritative end-to-end vectors, ideally
+from IAU SOFA. **Those could not be obtained here: this work is
+done offline, and the atlas takes no network dependency**, so
+transcribing SOFA output would mean typing numbers from memory —
+which is exactly the way to put an invented constant into an
+astronomical model. What stands in their place, and what each
+actually proves:
+
+| check | what it would catch |
+|---|---|
+| Meeus worked examples 7.b, 12.a, 12.b, 22.a | a wrong Julian date, sidereal time or nutation |
+| sidereal time by the IAU 2000 Earth rotation angle | a wrong classical polynomial (they agree to 0.28″ and deliberately not to zero) |
+| **the pole of date stays exactly one obliquity from the ecliptic pole, at every date** | a wrong matrix order, a transpose, or a sign in the combined rotation |
+| **the pole moves at 50.29″·sin ε per year, and keeps going the same way** | a precession applied backwards or at the wrong rate |
+| **nutation moves the true pole by between 0.5″ and 10″** | nutation omitted, doubled, or applied in the wrong frame |
+| **the equation of the equinoxes equals Δψ cos ε** | GAST and the nutation series disagreeing |
+| **every angle between directions survives the transformation** | anything that is not a rotation at all |
+
+The third and fourth are the end-to-end anchors the review asked
+for: they constrain the *combined* transformation against known
+physics rather than against its own components. **#226 should still
+commit SOFA-derived vectors** when a primary source is at hand; this
+gate states plainly that it has not done so.
 
 **#227** — the removable module and the chart's reference-line ink:
 the vocabulary above, straight-line geometry with no subdivision,

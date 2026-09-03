@@ -43,12 +43,16 @@ Three simplifications, each a decision with a price rather than an oversight. Th
 | simplification | worst error | at 36° | at 1° |
 |---|---:|---:|---:|
 | UTC stands in for UT1 (up to 0.9 s apart) | 13.54" | 0.09 px | 3.38 px |
-| UTC stands in for TT in the precession arguments | 0.00" | 0.00 px | 0.00 px |
-| the nutation series stops at twenty terms (this is what terms 5-20 are worth) | 0.18" | 0.00 px | 0.05 px |
+| UTC stands in for TT in the precession arguments | 0.0002" | 0.00 px | 0.00 px |
+| the nutation series stops at twenty terms, against the published full-series value for 1987 April 10 | 0.0033" | 0.00 px | 0.00 px |
+| the same, bounded for any date by the series' own ordering (see below) | 0.40" | 0.00 px | 0.10 px |
+| IAU 1976 precession against the IAU 2006 form, over two centuries | 0.28" | 0.00 px | 0.07 px |
 
 Polar motion (under 0.5"), diurnal aberration (under 0.3") and refraction are not modelled at all: the first two are below a pixel at every field, and the third is a property of air rather than of the sky, which is why the horizon here is named **mathematical**.
 
-**The accuracy contract.** The atlas places the zenith, meridian and horizon within **13.54"** of where the observer's own frame puts them - dominated entirely by not knowing UT1 - which is 0.1 px at the widest field and 3.4 px at the narrowest.
+**How the nutation tail is bounded.** The IAU 1980 series is ordered by decreasing amplitude, and the twentieth term's coefficient in longitude is 0.0046". Every omitted term is therefore no larger than that, and the row above sums the whole tail as though all of them fell in phase at their maximum - which they cannot. The measured residual against the published full-series value for the same date is the realistic figure; the bound is the honest worst case.
+
+**The accuracy contract.** Adding the terms above at their worst - 13.54" for UT1, 0.40" for the nutation tail, 0.28" for the choice of precession model - the atlas places the zenith, meridian and horizon within **14.22"** of the observer's own frame. That is 0.10 px at the widest field and 3.6 px at the narrowest, and it is dominated by not knowing UT1: every other term together is worth 0.68".
 
 ## The three geometries
 
