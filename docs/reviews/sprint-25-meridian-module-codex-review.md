@@ -123,3 +123,36 @@ The next repair must follow the reported state. Metal remains correlation, not
 cause, until a failure with the expanded diagnostic identifies which set or
 decision changed.
 
+## Follow-up review at `7444848`
+
+The naming, isolated packaged-horizon evidence, and gate amendment close their
+findings. In particular, the horizon is now required to change exactly zero
+pixels on its own, so overlap or antialiasing in the combined render cannot
+hide stray horizon ink.
+
+### P1 — The production redraw test proves only the negative half
+
+`ModuleRedrawTest.redrawRebuildsNothingAndTellsNobodyThePageChanged` proves
+that production `redraw()` does not replace the scene or inventory and does not
+announce a page change. Its control proves those observations can detect a
+rebuild. This closes the most dangerous half of the original finding.
+
+But the test invokes `services.redraw()` directly and observes no positive
+effect. Replacing `ChartModuleHost.redraw()` with a no-op leaves every assertion
+in the new test green. The packaged acceptance paints explicitly after each
+module change, so it also does not prove that the running UI schedules a paint.
+The module's fake-service test only proves that the module asks; the production
+test only proves that the host does not rebuild. Nothing yet proves that the
+request crosses the real seam and causes fresh module geometry to appear.
+
+Drive an observer, instant, or visibility change through a `MeridianModule`
+attached to the real host and prove the positive effect without calling paint
+or `redraw()` from the test: either observe the repaint request itself, or use a
+display-backed test that waits for the changed reference pixels to appear.
+Keep the identity and announcement assertions, since they prove the repaint is
+paint-only. Mutation-check both halves independently: `redraw()` changed to
+`rebuild()` must fail the negative evidence, and `redraw()` changed to a no-op
+must fail the positive evidence.
+
+PR #236 remains held on this one production-path gap. PR #235 is merged and is
+not part of this finding.
