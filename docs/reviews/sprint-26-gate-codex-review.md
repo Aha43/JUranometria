@@ -69,3 +69,51 @@ PackagedAcceptance/ExitProbe findings. Re-run the study twice and compare it
 byte-for-byte after expanding its scope and correcting the taxonomy. Production
 must remain untouched. Do not begin #224 until these findings are closed and
 the corrected gate is reviewed.
+
+## Follow-up review at `d6bf18c`
+
+The four original findings are substantially answered, and the expanded scan
+found a real Sprint-1 look-and-feel leak. Two remaining P1s prevent approval.
+
+### P1 — The evidence inventory counts its own marker table as behaviour
+
+`scanEvidenceExecutables()` walks every Java file under
+`src/juranometria/tool`, including `TestEvidenceScan.java` itself. Its marker
+literals contain every state-touching API and its documentation contains
+`SwingSession.restoring`; the generated report consequently says the scanner
+touches look and feel, locale, time zone, repaint manager, and preferences and
+is protected by the shared guard. It does none of those things.
+
+The reported six evidence executables are therefore five real executables plus
+the measuring instrument misreading its own vocabulary. Select actual runnable
+evidence entry points (for example, the relevant `*Main` files plus packaged
+acceptance), or explicitly exclude the scanner and prove that an unrelated
+tool helper containing marker text cannot enter the inventory. Regenerate the
+counts and keep the four photographers visible as the reviewed single-JVM
+exceptions.
+
+### P1 — The real-preference guard misses the production routes to that node
+
+`opensRealPreferences()` catches only the exact text
+`.node("juranometria")`. A test can call `ChartOptionsStore.user()`,
+`AppearanceStore.user()`, or `PlaceStore.user()` and edit the same reader node
+without containing that literal. Whitespace, a constant, or another production
+factory provides similar holes. The fixture proves only the spelling the
+implementation searches for.
+
+Guard the capability tests actually must not use, including the production
+store factories, while retaining packaged acceptance as an explicit reviewed
+exception. Add a mutation fixture that calls at least one real production
+factory and require it to fail the guard. The standing zero must mean zero
+ways for an ordinary test to acquire the reader's store, not zero appearances
+of one string.
+
+### P2 — The source fixture is promised but absent from the inventory
+
+The decision names both `reference-vectors.txt` and `reference-vectors.c` as
+byte-exact fixtures, and the classifier unit test classifies both names. The
+artifact walk covers only `docs/studies`, while the actual generator is
+`scripts/reference-vectors.c`; the generated report therefore enumerates only
+the text fixture. Either include the script in the artifact inventory or
+describe it separately with the same provenance contract. Do not claim both
+are enumerated when only one is reached by the scan.
