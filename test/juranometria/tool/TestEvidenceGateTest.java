@@ -116,34 +116,91 @@ class TestEvidenceGateTest {
     @Test
     void aTouchWithNoRestoreIsCaughtAndTheDebtIsPinned()
             throws IOException {
-        // The mechanism, proven on a fixture that does the wrong
-        // thing on purpose: sets a look and feel and walks away.
-        TestEvidenceScan.File broken = TestEvidenceScan.classify(
+        // The mechanism, proven on fixtures that do the wrong
+        // thing on purpose. The needles are split in this source,
+        // so the gate test does not scan as its own fixture.
+        TestEvidenceScan.File bare = TestEvidenceScan.classify(
                 "Fixture.java",
-                // The needles are split in this source, so the gate
-                // test does not scan as its own fixture.
                 "class Fixture { void t() throws Exception {"
                         + " javax.swing.UIManager.setLook" + "AndFeel("
                         + "new javax.swing.plaf.metal.MetalLookAndFeel());"
                         + " } }");
-        assertEquals("UNPROTECTED", broken.stateClass(),
+        assertEquals("UNPROTECTED", bare.stateClass(),
                 "a theme set and never restored is the leak the guard"
                         + " names");
 
-        // And the corpus, pinned exactly: the three flagged files
-        // are read and owned in the decision document, and a fourth
+        // The review's exact case: an unrelated finally in the same
+        // file must not vouch for a state nobody captured.
+        TestEvidenceScan.File unrelatedFinally =
+                TestEvidenceScan.classify("Fixture.java",
+                        "class Fixture { void t() throws Exception {"
+                                + " javax.swing.UIManager.setLook"
+                                + "AndFeel(new javax.swing.plaf.metal"
+                                + ".MetalLookAndFeel());"
+                                + " java.io.InputStream in = open();"
+                                + " try { in.read(); } finally {"
+                                + " in.close(); } } }");
+        assertEquals(List.of("look-and-feel"),
+                unrelatedFinally.unprotectedState(),
+                "closing a stream is not restoring a theme");
+
+        // And a theme set through a door with no setter in sight -
+        // the AppSmokeTest shape, which the first rule missed.
+        TestEvidenceScan.File throughTheDoor =
+                TestEvidenceScan.classify("Fixture.java",
+                        "class Fixture { void t() { UiTheme.app"
+                                + "ly(); } }");
+        assertEquals("UNPROTECTED", throughTheDoor.stateClass(),
+                "UiTheme.app" + "ly installs a look and feel just as"
+                        + " surely as the setter does");
+
+        // The corpus, pinned exactly: the five flagged files are
+        // read and owned in the decision document - two real leaks,
+        // two crash-path gaps, one fixture by design - and a sixth
         // would be a new leak nobody has read.
         List<TestEvidenceScan.File> files =
                 TestEvidenceScan.scan(Path.of("test"));
-        assertEquals(3, count(files, "UNPROTECTED"),
-                "the flagged set is the decision document's three -"
-                        + " one real leak, one crash-path gap, one"
-                        + " fixture by design - and must shrink under"
-                        + " #224, never grow: "
-                        + files.stream().filter(f -> f.stateClass()
+        assertEquals(List.of(
+                        "juranometria/app/AppSmokeTest.java",
+                        "juranometria/app/ExitProbeMain.java",
+                        "juranometria/app/PackagedAcceptanceRestoresTest.java",
+                        "juranometria/app/StartupFailureTest.java",
+                        "juranometria/app/ToolbarVersionAndExitTest.java"),
+                files.stream().filter(f -> f.stateClass()
                                 .equals("UNPROTECTED"))
-                                .map(TestEvidenceScan.File::path)
-                                .toList());
+                        .map(TestEvidenceScan.File::path).toList(),
+                "the flagged set must shrink under #224, never grow");
+    }
+
+    @Test
+    void theEvidenceExecutablesAreScannedAndTheirDebtIsPinned()
+            throws IOException {
+        // The review's first finding: the study mains and the
+        // packaged acceptance modify preferences, fonts and themes
+        // and the first scan never looked at them.
+        List<TestEvidenceScan.File> executables =
+                TestEvidenceScan.scanEvidenceExecutables();
+        assertTrue(executables.stream().anyMatch(f -> f.path()
+                        .endsWith("PackagedAcceptanceMain.java")),
+                "the packaged acceptance is in the inventory");
+        assertTrue(executables.stream()
+                        .filter(f -> f.path()
+                                .endsWith("PackagedAcceptanceMain.java"))
+                        .allMatch(f -> f.unprotectedState().isEmpty()),
+                "and its preference use is paired: restored under"
+                        + " guard, restart node removed");
+        List<String> unpaired = executables.stream()
+                .filter(f -> !f.unprotectedState().isEmpty())
+                .map(TestEvidenceScan.File::path).sorted().toList();
+        assertEquals(List.of(
+                        "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
+                        "src/juranometria/tool/OnThisPageMockupMain.java",
+                        "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
+                        "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java"),
+                unpaired,
+                "the four widget photographers, whose theme dies with"
+                        + " the JVM - benign by construction, and"
+                        + " pinned so a fifth arrives by decision");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -231,29 +288,39 @@ class TestEvidenceGateTest {
     }
 
     @Test
-    void theEvidenceClassesAreDisjointAndCompletelyNamed()
+    void theFiveEvidenceClassesEachClaimTheRightArtifacts()
             throws IOException {
-        // Guard G5's premise: the report classifies every study
-        // artifact into exactly one of the three classes, and the
-        // photographs are the named set - a new session-dependent
-        // artifact must arrive with a decision, not a habit.
+        // Guard G5, proven on one name from each class. The first
+        // draft filed every PNG as inspection imagery - weakening
+        // the renderer studies' byte contract - and the SOFA oracle
+        // as artwork (review).
+        assertEquals("deterministic-report",
+                TestEvidenceScan.artifactClass("measurements.md"));
+        assertEquals("byte-exact-fixture",
+                TestEvidenceScan.artifactClass("reference-vectors.txt"),
+                "the SOFA oracle is committed data with provenance,"
+                        + " not artwork");
+        assertEquals("byte-exact-fixture",
+                TestEvidenceScan.artifactClass("reference-vectors.c"));
+        assertEquals("renderer-drawn",
+                TestEvidenceScan.artifactClass("m31-08.png"),
+                "a chart study keeps its byte-reproducibility"
+                        + " contract");
+        assertEquals("widget-rendered-inspection",
+                TestEvidenceScan.artifactClass("controls-dialog.png"));
+        assertEquals("widget-rendered-inspection",
+                TestEvidenceScan.artifactClass("sidebar-dense.png"));
+        assertEquals("session-photograph",
+                TestEvidenceScan.artifactClass("dialog-real-dark.png"));
+
         String report = Files.readString(REPORT);
-        assertTrue(report.contains("deterministic reports")
-                        && report.contains(
-                                "platform-rendered inspection")
-                        && report.contains(
-                                "session-dependent photographs"),
-                "three classes, each named");
-        for (String photograph : List.of("dialog-real.png",
-                "dialog-real-enlarged.png", "dialog-real-dark.png")) {
-            assertTrue(report.contains(photograph),
-                    "the photographs are enumerated by name: "
-                            + photograph);
+        for (String named : List.of("deterministic-report",
+                "byte-exact-fixture", "renderer-drawn",
+                "widget-rendered-inspection", "session-photograph",
+                "reference-vectors.txt", "dialog-real.png")) {
+            assertTrue(report.contains(named),
+                    "the report names it: " + named);
         }
-        assertTrue(!report.contains(
-                        "docs/studies/place-and-time/measurements.md"
-                                + " | photograph"),
-                "and no report is filed as a photograph");
     }
 
     // ----------------------------------------------------------------

@@ -40,24 +40,53 @@ is what the contracts below buy.
 
 ## What the suite touches, and how it is protected
 
-From the measurements (the exact tables live there):
+From the measurements (the exact tables live there). Protection is
+the paired shape — capture, restoring write, and a place to run it
+— because the review showed an unrelated `finally` could vouch for
+a leak it never touched, and because a correct restore often holds
+exactly one setter with the disturbance arriving through `UiTheme`
+or a FlatLaf setup.
 
-- **36 files** touch process-wide state. **6** use the shared
+- **38 files** touch process-wide state. **6** use the shared
   `SwingSession` guard; **27** restore locally — correct, verified
   by reading each, but the same capture-and-restore written out
   again and again, which is how one of them eventually rots.
-- **3 flagged unprotected**, now read individually:
+- **5 flagged unprotected**, each read individually:
+  - `AppSmokeTest` — **a real leak, and an old one.** The Sprint-1
+    smoke test calls `UiTheme.apply()` and never restores, so every
+    test that runs after it in the same JVM inherits FlatLaf, and
+    the suite's look and feel depends on execution order. Caught
+    only when the review widened the touch needles past the bare
+    setter.
   - `PackagedAcceptanceRestoresTest` — **a real leak.** Its
     dedicated node `juranometria-acceptance-restore-test` is never
     removed, so every run leaves it in the developer's real
     preference store.
   - `ExitProbeMain` — a probe, not a test; its scratch node is
     removed on the success path only, so a crash leaks it.
+  - `ToolbarVersionAndExitTest` — the same crash-path shape: its
+    "doomed" node is a fixture (removed to make `flush` throw), and
+    the removal happens inline rather than in a `finally`.
   - `StartupFailureTest` — **by design.** Removing the node *is*
     the fixture: the test exists to prove the atlas classifies a
     broken preference store honestly.
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
+
+## Evidence executables under src
+
+The review's first finding: the initial scan looked only under
+`test/` and missed the study mains and the packaged acceptance —
+single-JVM executables whose look-and-feel dies with the process
+but whose preference writes outlive it. Scanned now: **6** touch
+process-wide state; **4** carry an unpaired touch, and all four
+are the widget-photography mains whose FlatLaf and font settings
+are the photograph's subject and die with the JVM — benign **by
+construction, not by silence**, which is why they stay in the
+table rather than being excused from it. Their preference use is
+clean: the dialog study removes its throwaway node in a `finally`,
+and the packaged acceptance restores the reader's store under
+guard and removes its restart node.
 
 ## Display-dependent tests
 
@@ -89,20 +118,31 @@ in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already
 fail 3/3 and are the standing proof for guard G4.
 
-## Generated evidence: three kinds, three contracts
+## Generated evidence: five kinds, five contracts
 
-| kind | examples | the contract |
+The review's third finding, and the correction that mattered most:
+an earlier draft classified every study PNG as a non-deterministic
+inspection image, which quietly weakened a byte-reproducibility
+contract sprints of renderer studies had honoured — and filed the
+SOFA oracle as artwork. The classes are now:
+
+| class | examples | the contract |
 |---|---|---|
 | **deterministic reports** | every `docs/studies/*/measurements.md` | regenerate **byte-for-byte** on the same tree; a diff is a finding |
-| **platform-rendered inspection artifacts** | study PNGs, mock-ups, ink studies | regenerated on the maintainer's machine and reviewed by eye; identical bytes are **not** the contract, the drawn claim is |
-| **session-dependent photographs** | `dialog-real*.png` | drift a few hundred bytes between desktop sessions (font rasterisation); the packed geometry is the claim, asserted by the lifecycle test, and the bytes are illustrations |
+| **byte-exact fixtures** | `reference-vectors.txt`, `reference-vectors.c` | committed data with provenance; never regenerated casually, and a change is a provenance event |
+| **renderer-drawn images** | the chart study PNGs — regional, grid, ink, occlusion, identity | **byte-reproducible per machine**: production ink through the headless renderer, no widgets; cross-platform identity is measured by the native-smoke comparison, not merely hoped |
+| **widget-rendered inspection artifacts** | `controls-*`, `sidebar-*`, `deep-sky-tab*` | Swing painted offscreen; platform-rendered, reviewed by eye; a new one arrives by a reviewed addition to the scanner's named list |
+| **session photographs** | `dialog-real*.png` | a packed window on a display; drifts a few hundred bytes between desktop sessions; the packed geometry is the claim, asserted by the lifecycle test |
 
 `docs/reference/*.png` are **canonical**: CI compares rendered
 bytes against them and changing one is a reviewed decision. Nothing
 in this sprint may blur these classes into each other — a
 photograph must never be diffed as if it were a report, and a
 report must never be excused as if it were a photograph. Issue
-**#242** owns making these contracts executable.
+**#242** owns making these contracts executable, and the
+renderer-drawn class gives it teeth: a widget PNG misfiled as
+renderer-drawn will fail #242's regenerate-and-diff immediately,
+so the default is fail-safe.
 
 ## What stays required, and what may abort
 
@@ -126,11 +166,11 @@ still carries debt, so the debt can shrink but never grow.
 
 | guard | what it prevents | proof at this gate | owner |
 |---|---|---|---|
-| **G1** global-state protection: every toucher uses `SwingSession` or a local capture-and-restore | the silent theme/font/locale leak | broken fixture classified UNPROTECTED; counts pinned: 6 shared / 27 local / 3 flagged | #224 moves the 27 onto shared session guards and settles the 3 |
+| **G1** global-state protection: every toucher carries capture, restoring write, and a place to run it — or the shared `SwingSession` | the silent theme/font/locale leak, including one set through `UiTheme.apply` with no setter in sight | broken fixtures classified UNPROTECTED, including the review's exact case of an unrelated `finally` vouching for nothing; counts pinned: 6 shared / 27 local / 5 flagged (2 real leaks, 2 crash-path gaps, 1 by design) | #224 moves the 27 onto shared session guards and settles the 5 |
 | **G2** no test opens the real `juranometria` node | a test editing the reader's settings | fixture with the bare node caught; count pinned at 0 | held from this gate on |
 | **G3** display tests state their premises through named helpers (focused window, focus owner, showing, reachable point, settled layout) | clicks landing nowhere a reader could click | fixture with pointer events and no premise caught; adoption counts pinned (7 / 2 of 20) | #243 raises adoption to the whole display corpus |
 | **G4** live state derived and acted on in one event-thread turn | the #220 family of stale reads | the standing 3/3 mutations on the atomic `clickOn` and its two race steps | #243 extends the pattern; the ratchet pins back-door counts (16 files) so they shrink |
-| **G5** the three evidence classes keep their separate contracts | a photograph diffed as a report, or a report excused as a photograph | classification exercised over the real tree in the study; fixture path classified | #242 makes regenerate-and-diff executable for reports |
+| **G5** the five evidence classes keep their separate contracts | a photograph diffed as a report, a renderer study stripped of its byte contract, an oracle filed as artwork | every class exercised over the real tree; the classifier proven on one name from each class | #242 makes regenerate-and-diff executable for reports and renderer-drawn images |
 
 ## Out of scope, reaffirmed
 

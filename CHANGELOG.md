@@ -12,8 +12,10 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **The test-and-evidence friction gate** (Sprint 26, issue #241).
   A mechanical scan of the test suite (`make test-evidence-study`)
   and the decision document `docs/decisions/test-evidence.md`: what
-  process-wide state the suite touches and how it is protected (one
-  real scratch-store leak found), which display tests state their
+  process-wide state the suite touches and how it is protected (two
+  real leaks found: a look and feel installed by the first smoke
+  test and never restored, and a scratch preference node written to
+  the developer's real store on every run), which display tests state their
   premises, where the event-thread traffic runs, what each kind of
   generated evidence must promise, and five guards — each proven
   against a deliberately broken fixture, with the remaining debt

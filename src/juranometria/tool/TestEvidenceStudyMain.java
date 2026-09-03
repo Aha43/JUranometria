@@ -52,7 +52,10 @@ public final class TestEvidenceStudyMain {
         out.println("|---|---|---|");
         for (TestEvidenceScan.File f : touching) {
             out.printf("| %s | %s | %s |%n", f.path(),
-                    String.join(", ", f.globalState()), f.stateClass());
+                    String.join(", ", f.globalState()),
+                    f.unprotectedState().isEmpty() ? f.stateClass()
+                            : "UNPROTECTED: " + String.join(", ",
+                                    f.unprotectedState()));
         }
         out.println();
         out.printf("**%d files** touch process-wide state: %d"
@@ -79,6 +82,37 @@ public final class TestEvidenceStudyMain {
         out.printf("**%d test files** open the application's real"
                 + " preference node. Zero is the standing state, and"
                 + " the gate pins it there.%n", realPrefs);
+        out.println();
+
+        // ---- evidence executables under src ------------------------
+        out.println("## Evidence executables under src");
+        out.println();
+        out.println("The study mains and the packaged acceptance are"
+                + " single-JVM runs: a look and feel or a default font"
+                + " they set dies with the process, but a preference"
+                + " write outlives it. The same mechanical rule is"
+                + " applied and the decision document reads each"
+                + " flagged case for which of those it is.");
+        out.println();
+        List<TestEvidenceScan.File> executables =
+                TestEvidenceScan.scanEvidenceExecutables().stream()
+                        .filter(f -> !f.globalState().isEmpty())
+                        .toList();
+        out.println("| executable | touches | protection |");
+        out.println("|---|---|---|");
+        for (TestEvidenceScan.File f : executables) {
+            out.printf("| %s | %s | %s |%n", f.path(),
+                    String.join(", ", f.globalState()),
+                    f.unprotectedState().isEmpty() ? f.stateClass()
+                            : "UNPROTECTED: " + String.join(", ",
+                                    f.unprotectedState()));
+        }
+        out.println();
+        out.printf("**%d evidence executables** touch process-wide"
+                        + " state; %d carry an unpaired touch.%n",
+                executables.size(),
+                executables.stream().filter(f ->
+                        !f.unprotectedState().isEmpty()).count());
         out.println();
 
         // ---- display dependence ------------------------------------
@@ -172,42 +206,63 @@ public final class TestEvidenceStudyMain {
         // ---- generated evidence ------------------------------------
         out.println("## Generated evidence, classified");
         out.println();
-        List<String> reports = new ArrayList<>();
-        List<String> images = new ArrayList<>();
-        List<String> photographs = new ArrayList<>();
+        java.util.Map<String, List<String>> classes =
+                new java.util.TreeMap<>();
         try (Stream<Path> tree = Files.walk(Path.of("docs/studies"))) {
             for (Path artifact : tree.filter(Files::isRegularFile)
                     .sorted().toList()) {
-                String name = artifact.getFileName().toString();
-                String path = artifact.toString()
-                        .replace(java.io.File.separatorChar, '/');
-                if (name.endsWith(".md")) {
-                    reports.add(path);
-                } else if (name.startsWith("dialog-real")) {
-                    photographs.add(path);
-                } else if (name.endsWith(".png")
-                        || name.endsWith(".txt")
-                        || name.endsWith(".c")) {
-                    images.add(path);
-                }
+                classes.computeIfAbsent(
+                        TestEvidenceScan.artifactClass(
+                                artifact.getFileName().toString()),
+                        k -> new ArrayList<>()).add(artifact.toString()
+                        .replace(java.io.File.separatorChar, '/'));
             }
         }
-        out.printf("- **deterministic reports** (must regenerate"
-                + " byte-for-byte on the same tree): %d files%n",
-                reports.size());
-        for (String path : reports) {
-            out.println("  - " + path);
+        out.println("| class | the contract | files |");
+        out.println("|---|---|---|");
+        out.printf("| deterministic-report | regenerates"
+                        + " byte-for-byte on the same tree | %d |%n",
+                classes.getOrDefault("deterministic-report",
+                        List.of()).size());
+        out.printf("| byte-exact-fixture | committed data with"
+                        + " provenance; never regenerated casually"
+                        + " | %d |%n",
+                classes.getOrDefault("byte-exact-fixture",
+                        List.of()).size());
+        out.printf("| renderer-drawn | byte-reproducible per"
+                        + " machine; production ink, no widgets"
+                        + " | %d |%n",
+                classes.getOrDefault("renderer-drawn",
+                        List.of()).size());
+        out.printf("| widget-rendered-inspection | Swing painted"
+                        + " offscreen; platform-rendered, reviewed by"
+                        + " eye | %d |%n",
+                classes.getOrDefault("widget-rendered-inspection",
+                        List.of()).size());
+        out.printf("| session-photograph | a packed window on a"
+                        + " display; drifts between desktop sessions"
+                        + " | %d |%n",
+                classes.getOrDefault("session-photograph",
+                        List.of()).size());
+        out.println();
+        out.println("The byte-exact fixtures:");
+        for (String path : classes.getOrDefault("byte-exact-fixture",
+                List.of())) {
+            out.println("- " + path);
         }
-        out.printf("- **platform-rendered inspection artifacts**"
-                + " (regenerated on the maintainer's machine,"
-                + " reviewed by eye; identical bytes are not the"
-                + " contract): %d files%n", images.size());
-        out.printf("- **session-dependent photographs** (drift a few"
-                + " hundred bytes between desktop sessions; the"
-                + " packed geometry, not the bytes, is the claim):"
-                + " %d files%n", photographs.size());
-        for (String path : photographs) {
-            out.println("  - " + path);
+        out.println();
+        out.println("The widget-rendered artifacts (a new one arrives"
+                + " by a reviewed addition to the scanner's list, not"
+                + " a habit):");
+        for (String path : classes.getOrDefault(
+                "widget-rendered-inspection", List.of())) {
+            out.println("- " + path);
+        }
+        out.println();
+        out.println("The session photographs:");
+        for (String path : classes.getOrDefault("session-photograph",
+                List.of())) {
+            out.println("- " + path);
         }
         out.println();
         out.println("The reference images under docs/reference are"
