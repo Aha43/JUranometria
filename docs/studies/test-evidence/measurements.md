@@ -59,10 +59,9 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeControlsMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeDialogStudyMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
-| src/juranometria/tool/TestEvidenceScan.java | look-and-feel, locale, time-zone, repaint-manager, preferences | protected-shared |
 | src/juranometria/app/PackagedAcceptanceMain.java | preferences | protected-locally |
 
-**6 evidence executables** touch process-wide state; 4 carry an unpaired touch.
+**5 evidence executables** touch process-wide state; 4 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -118,13 +117,14 @@ Whether a particular read happens on the event thread is control flow, which tex
 | class | the contract | files |
 |---|---|---|
 | deterministic-report | regenerates byte-for-byte on the same tree | 8 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 1 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 2 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 170 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 24 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
 - docs/studies/place-and-time/reference-vectors.txt
+- scripts/reference-vectors.c
 
 The widget-rendered artifacts (a new one arrives by a reviewed addition to the scanner's list, not a habit):
 - docs/studies/deep-sky-vocabulary/deep-sky-tab-dark.png

@@ -78,8 +78,11 @@ or a FlatLaf setup.
 The review's first finding: the initial scan looked only under
 `test/` and missed the study mains and the packaged acceptance —
 single-JVM executables whose look-and-feel dies with the process
-but whose preference writes outlive it. Scanned now: **6** touch
-process-wide state; **4** carry an unpaired touch, and all four
+but whose preference writes outlive it. Scanned now (the two
+measuring instruments excluded by pinned name, because their marker
+definitions read exactly like the behaviour they detect): **5**
+touch process-wide state; **4** carry an unpaired touch, and all
+four
 are the widget-photography mains whose FlatLaf and font settings
 are the photograph's subject and die with the JVM — benign **by
 construction, not by silence**, which is why they stay in the
@@ -167,7 +170,7 @@ still carries debt, so the debt can shrink but never grow.
 | guard | what it prevents | proof at this gate | owner |
 |---|---|---|---|
 | **G1** global-state protection: every toucher carries capture, restoring write, and a place to run it — or the shared `SwingSession` | the silent theme/font/locale leak, including one set through `UiTheme.apply` with no setter in sight | broken fixtures classified UNPROTECTED, including the review's exact case of an unrelated `finally` vouching for nothing; counts pinned: 6 shared / 27 local / 5 flagged (2 real leaks, 2 crash-path gaps, 1 by design) | #224 moves the 27 onto shared session guards and settles the 5 |
-| **G2** no test opens the real `juranometria` node | a test editing the reader's settings | fixture with the bare node caught; count pinned at 0 | held from this gate on |
+| **G2** no test reaches the reader's real preference store — by the bare node or through any production store factory | a test editing the reader's settings | fixtures with the bare node and with `ChartOptionsStore.user()` both caught; count pinned at 0 | held from this gate on |
 | **G3** display tests state their premises through named helpers (focused window, focus owner, showing, reachable point, settled layout) | clicks landing nowhere a reader could click | fixture with pointer events and no premise caught; adoption counts pinned (7 / 2 of 20) | #243 raises adoption to the whole display corpus |
 | **G4** live state derived and acted on in one event-thread turn | the #220 family of stale reads | the standing 3/3 mutations on the atomic `clickOn` and its two race steps | #243 extends the pattern; the ratchet pins back-door counts (16 files) so they shrink |
 | **G5** the five evidence classes keep their separate contracts | a photograph diffed as a report, a renderer study stripped of its byte contract, an oracle filed as artwork | every class exercised over the real tree; the classifier proven on one name from each class | #242 makes regenerate-and-diff executable for reports and renderer-drawn images |

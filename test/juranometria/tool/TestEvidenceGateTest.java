@@ -173,6 +173,18 @@ class TestEvidenceGateTest {
     }
 
     @Test
+    void theInstrumentsAreExcludedByExactlyTheirTwoNames() {
+        // The ruler is not a thing being measured: the scanner's
+        // marker definitions are string literals that read exactly
+        // like the behaviour they detect (review). Pinned, so the
+        // exemption cannot quietly grow into a dump.
+        assertEquals(List.of(
+                        "src/juranometria/tool/TestEvidenceScan.java",
+                        "src/juranometria/tool/TestEvidenceStudyMain.java"),
+                TestEvidenceScan.INSTRUMENTS);
+    }
+
+    @Test
     void theEvidenceExecutablesAreScannedAndTheirDebtIsPinned()
             throws IOException {
         // The review's first finding: the study mains and the
@@ -215,6 +227,19 @@ class TestEvidenceGateTest {
                                 + "ia\").put(\"k\", \"v\"); } }"),
                 "the bare node is the reader's own settings, and the"
                         + " scanner sees it");
+        // The review's case: a production factory opens the same
+        // store on the caller's behalf, and the literal-node needle
+        // walked straight past it.
+        assertTrue(TestEvidenceScan.opensRealPreferences(
+                        "class Fixture { void t() {"
+                                + " var store = ChartOptionsStore.us"
+                                + "er(); store.load(); } }"),
+                "a store factory is a door to the same settings");
+        assertTrue(TestEvidenceScan.opensRealPreferences(
+                        "class Fixture { void t() {"
+                                + " PlaceStore.us" + "er().flush();"
+                                + " } }"),
+                "and so is the place store's");
         int offenders = 0;
         try (var tree = Files.walk(Path.of("test"))) {
             for (Path source : tree
@@ -317,7 +342,9 @@ class TestEvidenceGateTest {
         for (String named : List.of("deterministic-report",
                 "byte-exact-fixture", "renderer-drawn",
                 "widget-rendered-inspection", "session-photograph",
-                "reference-vectors.txt", "dialog-real.png")) {
+                "reference-vectors.txt",
+                "scripts/reference-vectors.c",
+                "dialog-real.png")) {
             assertTrue(report.contains(named),
                     "the report names it: " + named);
         }

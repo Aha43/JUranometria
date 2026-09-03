@@ -217,6 +217,17 @@ public final class TestEvidenceScan {
      * writes outlive it (review: the first scan looked only under
      * test/ and missed them).
      */
+    /**
+     * The measuring instruments themselves, excluded by name: their
+     * marker definitions are string literals that read exactly like
+     * the behaviour they detect, so scanning them reports the ruler
+     * as a thing being measured (review). The list is pinned by the
+     * gate so it cannot quietly grow into an exemption dump.
+     */
+    public static final List<String> INSTRUMENTS = List.of(
+            "src/juranometria/tool/TestEvidenceScan.java",
+            "src/juranometria/tool/TestEvidenceStudyMain.java");
+
     public static List<File> scanEvidenceExecutables()
             throws IOException {
         List<File> files = new ArrayList<>();
@@ -225,9 +236,13 @@ public final class TestEvidenceScan {
             for (Path source : tree
                     .filter(p -> p.toString().endsWith(".java"))
                     .sorted().toList()) {
-                files.add(classify(source.toString()
-                                .replace(java.io.File.separatorChar, '/'),
-                        "executable", Files.readString(source)));
+                String path = source.toString()
+                        .replace(java.io.File.separatorChar, '/');
+                if (INSTRUMENTS.contains(path)) {
+                    continue;
+                }
+                files.add(classify(path, "executable",
+                        Files.readString(source)));
             }
         }
         Path acceptance =
@@ -292,14 +307,25 @@ public final class TestEvidenceScan {
     }
 
     /**
-     * Whether a test source opens the application's real preference
-     * node. Zero is the standing state and the gate holds it there:
-     * a test that wrote to the reader's own store would be a test
+     * Whether a test source reaches the application's real
+     * preference store - by opening the bare node, or through any
+     * of the production store factories that open it on the
+     * caller's behalf (review: the literal node was the only needle,
+     * and {@code ChartOptionsStore.user()} walked straight past it).
+     * Zero is the standing state and the gate holds it there: a
+     * test that wrote to the reader's own store would be a test
      * editing somebody's settings.
      */
     public static boolean opensRealPreferences(String rawSource) {
-        return withoutComments(rawSource)
-                .contains(".node(\"juranometria\")");
+        String source = withoutComments(rawSource);
+        for (String door : new String[] {".node(\"juranometria\")",
+                "ChartOptionsStore.user()", "PlaceStore.user()",
+                "AppearanceStore.user()"}) {
+            if (source.contains(door)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ----------------------------------------------------------------

@@ -218,6 +218,21 @@ public final class TestEvidenceStudyMain {
                         .replace(java.io.File.separatorChar, '/'));
             }
         }
+        // The SOFA oracle's generator lives under scripts, which the
+        // docs walk cannot see - the decision promised both halves
+        // of the fixture and the first scan reached only the data
+        // (review).
+        try (Stream<Path> tree = Files.walk(Path.of("scripts"))) {
+            for (Path artifact : tree.filter(Files::isRegularFile)
+                    .filter(f -> f.toString().endsWith(".c"))
+                    .sorted().toList()) {
+                classes.computeIfAbsent(
+                        TestEvidenceScan.artifactClass(
+                                artifact.getFileName().toString()),
+                        k -> new ArrayList<>()).add(artifact.toString()
+                        .replace(java.io.File.separatorChar, '/'));
+            }
+        }
         out.println("| class | the contract | files |");
         out.println("|---|---|---|");
         out.printf("| deterministic-report | regenerates"
