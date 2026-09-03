@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The test-and-evidence friction gate** (Sprint 26, issue #241).
+  A mechanical scan of the test suite (`make test-evidence-study`)
+  and the decision document `docs/decisions/test-evidence.md`: what
+  process-wide state the suite touches and how it is protected (one
+  real scratch-store leak found), which display tests state their
+  premises, where the event-thread traffic runs, what each kind of
+  generated evidence must promise, and five guards — each proven
+  against a deliberately broken fixture, with the remaining debt
+  pinned so it can shrink under its named owner but never grow.
+  Production is untouched.
+
 ## [1.6.0] - 2026-09-03
 
 Sprint 25 — Orient the chart to place and time. The atlas has
