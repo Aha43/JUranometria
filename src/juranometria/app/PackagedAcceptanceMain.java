@@ -35,6 +35,35 @@ public final class PackagedAcceptanceMain {
     private PackagedAcceptanceMain() {
     }
 
+    /**
+     * Runs something with a temporary chart-options choice in the
+     * reader's own store, and puts theirs back whatever happens.
+     *
+     * <p>An acceptance run that changes a real preference and
+     * restores it on the way out restores it only when it passes -
+     * so the run that finds a defect is also the run that leaves the
+     * reader with galaxies switched off (sprint review). A check
+     * that damages what it is checking is worse than no check.
+     */
+    static void withTemporaryOptions(ChartOptionsStore store,
+                                     ChartOptions temporary,
+                                     ThrowingRunnable body) throws Exception {
+        ChartOptions theirs = store.load();
+        store.save(temporary);
+        Preferences.userRoot().node("juranometria").flush();
+        try {
+            body.run();
+        } finally {
+            store.save(theirs);
+            Preferences.userRoot().node("juranometria").flush();
+        }
+    }
+
+    /** A body that may fail, which is the case that matters here. */
+    interface ThrowingRunnable {
+        void run() throws Exception;
+    }
+
     public static void main(String[] args) throws Exception {
         // About, through its real static content paths: the packaged
         // summary must state every licence family and the
@@ -86,12 +115,9 @@ public final class PackagedAcceptanceMain {
                 before.constellationNames(), before.starNames(),
                 before.bayerLetters(), before.flamsteedNumbers(),
                 !before.equatorialGrid());
-        store.save(flipped);
-        Preferences.userRoot().node("juranometria").flush();
-        require(ChartOptionsStore.user().load().equals(flipped),
-                "a fresh store reloads the changed preference");
-        store.save(before);
-        Preferences.userRoot().node("juranometria").flush();
+        withTemporaryOptions(store, flipped, () ->
+                require(ChartOptionsStore.user().load().equals(flipped),
+                        "a fresh store reloads the changed preference"));
         require(ChartOptionsStore.user().load().equals(before),
                 "the original preference is restored");
         System.out.println("preference change-and-reload OK"
@@ -182,6 +208,10 @@ public final class PackagedAcceptanceMain {
                         + " that is present but not drawn");
 
         java.awt.image.BufferedImage unmarked = paint(chart);
+        // Declared out here so the summary below can still say what
+        // was measured, and assigned inside the guarded region.
+        int added;
+        try {
 
         host.workingMarks().replaceWith(java.util.List.of(drawn.identity(),
                 invisible.identity()), invisible.identity());
@@ -198,7 +228,7 @@ public final class PackagedAcceptanceMain {
         // And what it looks like on the page: ink that was not there
         // before, at the pixel the projection puts the object at.
         java.awt.image.BufferedImage marked = paint(chart);
-        int added = differingPixels(unmarked, marked);
+        added = differingPixels(unmarked, marked);
         require(added > 8, "the cross reaches the page: " + added
                 + " pixels changed");
         double[] at = host.projection().toPage(invisible.position())
@@ -225,7 +255,9 @@ public final class PackagedAcceptanceMain {
                             .contains("mark"),
                     "no working mark was written to preferences: " + key);
         }
-        host.detachAll();
+        } finally {
+            host.detachAll();
+        }
         require(chart.overlays().collect().isEmpty(),
                 "and leaving releases the module");
 
@@ -236,64 +268,62 @@ public final class PackagedAcceptanceMain {
         // scratch, comes up with nothing marked and nothing inked -
         // while the reader's stored options are still there, which
         // is the difference between ephemeral and forgotten.
-        // The reader leaves with a choice made: galaxies off. A
-        // restart that reloaded the store and compared it with
-        // itself would prove the store round-trips and nothing about
-        // whether the application comes back wearing the reader's
-        // choices (sprint review), so the second session is started
-        // the way the application starts - by applying what was
-        // stored.
-        ChartOptions before = ChartOptionsStore.user().load();
-        ChartOptions galaxiesOff = before.withFamily(
+        // The reader leaves with a choice made: galaxies off, and
+        // it goes back whatever happens below - including when a
+        // require fails and this run ends here.
+        ChartOptions theirs = ChartOptionsStore.user().load();
+        ChartOptions galaxiesOff = theirs.withFamily(
                 juranometria.render.SymbolFamily.GALAXIES, false);
-        ChartOptionsStore.user().save(galaxiesOff);
-        Preferences.userRoot().node("juranometria").flush();
+        int[] hiddenByChoice = {0};
+        withTemporaryOptions(ChartOptionsStore.user(), galaxiesOff, () -> {
+            juranometria.ui.ChartComponent restarted =
+                    new juranometria.ui.ChartComponent(Atlas.assembler());
+            restarted.setSize(900, 700);
+            restarted.setViewState(ChartViewState.DEFAULT);
+            ChartOptions reloaded = ChartOptionsStore.user().load();
+            restarted.setChartOptions(reloaded);
+            juranometria.ui.ChartModuleHost second =
+                    new juranometria.ui.ChartModuleHost(restarted,
+                            new juranometria.chart.SelectionModel(),
+                            request -> { });
+            juranometria.ui.onthispage.OnThisPageModule again =
+                    second.attach(
+                            new juranometria.ui.onthispage.OnThisPageModule());
+            try {
+                require(second.workingMarks().marks().isEmpty()
+                                && second.workingMarks().lead() == null,
+                        "the new session begins with nothing marked");
+                require(restarted.overlays().collect().isEmpty(),
+                        "and nothing inked");
+                require(again.panel().rows().size() == listed,
+                        "it lists the same page as before: "
+                                + again.panel().rows().size() + " rows");
 
-        juranometria.ui.ChartComponent restarted =
-                new juranometria.ui.ChartComponent(Atlas.assembler());
-        restarted.setSize(900, 700);
-        restarted.setViewState(ChartViewState.DEFAULT);
-        ChartOptions reloaded = ChartOptionsStore.user().load();
-        restarted.setChartOptions(reloaded);
-        juranometria.ui.ChartModuleHost second =
-                new juranometria.ui.ChartModuleHost(restarted,
-                        new juranometria.chart.SelectionModel(),
-                        request -> { });
-        juranometria.ui.onthispage.OnThisPageModule again =
-                second.attach(new juranometria.ui.onthispage.OnThisPageModule());
-        require(second.workingMarks().marks().isEmpty()
-                        && second.workingMarks().lead() == null,
-                "the new session begins with nothing marked");
-        require(restarted.overlays().collect().isEmpty(),
-                "and nothing inked");
-        require(again.panel().rows().size() == listed,
-                "it lists the same page as before: "
-                        + again.panel().rows().size() + " rows");
-
-        // The reader's choice is not merely readable - it is in
-        // force. The page still holds the same objects, and the new
-        // session says why they cannot be seen.
-        require(reloaded.equals(galaxiesOff),
-                "the restart read the choice the reader left");
-        require(restarted.chartOptions().equals(galaxiesOff),
-                "and applied it, rather than starting on the"
-                        + " defaults");
-        int hidden = second.inventory().tally()
-                .get(juranometria.page.PageVisibility.FAMILY_HIDDEN);
-        require(hidden > 0,
-                "so the restarted session reports objects hidden by a"
-                        + " chart option: " + second.inventory().tally());
-        require(second.inventory().entries().size()
-                        == inventory.entries().size(),
-                "while the page holds exactly what it held before -"
-                        + " a choice about drawing is not a choice"
-                        + " about what is there");
-
-        second.detachAll();
-        ChartOptionsStore.user().save(before);
-        Preferences.userRoot().node("juranometria").flush();
-        require(ChartOptionsStore.user().load().equals(before),
-                "and the reader's original choice is restored");
+                // The reader's choice is not merely readable - it is
+                // in force.
+                require(reloaded.equals(galaxiesOff),
+                        "the restart read the choice the reader left");
+                require(restarted.chartOptions().equals(galaxiesOff),
+                        "and applied it, rather than starting on the"
+                                + " defaults");
+                hiddenByChoice[0] = second.inventory().tally()
+                        .get(juranometria.page.PageVisibility.FAMILY_HIDDEN);
+                require(hiddenByChoice[0] > 0,
+                        "so the restarted session reports objects"
+                                + " hidden by a chart option: "
+                                + second.inventory().tally());
+                require(second.inventory().entries().size()
+                                == inventory.entries().size(),
+                        "while the page holds exactly what it held"
+                                + " before - a choice about drawing is"
+                                + " not a choice about what is there");
+            } finally {
+                second.detachAll();
+            }
+        });
+        require(ChartOptionsStore.user().load().equals(theirs),
+                "and the reader's own options are back");
+        int hidden = hiddenByChoice[0];
 
         System.out.println("on this page OK (" + inventory.entries().size()
                 + " entries, " + listed

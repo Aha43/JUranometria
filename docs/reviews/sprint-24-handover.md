@@ -72,6 +72,7 @@ The foundation took three more, and the table two:
 | #217.1 | the packaged acceptance rebuilt a list of expected cross identities with its own copy of the module's rule, never attaching the module and never drawing a pixel; the closing journey drove its central multi-selection by calling the marks model directly instead of using the table's own pointer and keyboard |
 | #217.2 | row clicks could land on cells no reader could reach; sorting still went through the sorter's API rather than the real header; keyboard extension was untested in the closing journey; and the packaged "restart" never built a second session |
 | #217.3 | the click test proved a *cell* was partly visible rather than that the *point clicked* was reachable; the packaged restart compared two loads of one preference store without ever applying those options to the restarted application |
+| #217.4 | the packaged run changed a real preference and restored it only when it passed — so the run that found a defect was also the run that left a reader with their galaxies switched off |
 
 Two corrections are worth naming because they were mine to make and
 I got them wrong first:
@@ -83,6 +84,13 @@ I got them wrong first:
 - I asserted the flatness bound against the very constant it was
   measuring, so raising the constant would have kept the test green.
   The bound is a literal in the test now.
+- The packaged acceptance changed a real preference to prove a
+  restart wears the reader's choices, and put it back only on the
+  way out — so a run that *failed* would have left a reader with
+  their galaxies switched off. Restoration and module release are in
+  `finally` now, through one `withTemporaryOptions` seam, and the
+  failure path has its own test: a body that throws still gives the
+  reader their settings back, and the failure still propagates.
 - The first packaged acceptance for this feature predicted which
   objects *would* be crossed, using a copy of the module's own rule,
   and never attached the module or drew a pixel. It would have
@@ -176,10 +184,10 @@ Everything below was run on this machine at `<HEAD>`.
 - **Clean bootstrap:** `make clean`, `rm -rf lib`,
   `scripts/download-libs.sh`, then a full build. All four pinned
   jars fetched.
-- **Full suite:** **626 tests found, 0 failed.** On this desktop 12
+- **Full suite:** **629 tests found, 0 failed.** On this desktop 12
   display-backed journeys end *unmet* when the window manager will
   not grant focus; on the CI display job, where an abort fails the
-  build, all 626 run.
+  build, all 629 run.
 - **Studies:** every study regenerated and reproduces byte-for-byte,
   except the pre-existing point-and-identify drift recorded above.
 - **Native image:** built for macOS-arm64, 76 MB unpacked, headless
