@@ -176,3 +176,25 @@ action can answer on the reader's behalf.
 
 This is the last open finding on PR #238. Preserve the shared startup seam,
 canonical field checks, corrected accuracy wording and bounded ink audit.
+
+## Final review at `ebc8cb9`
+
+Approved. The remaining P1 is closed.
+
+Every pointer gesture aimed at a dialog control now establishes that the
+control is showing, has nonzero bounds, and that the exact point dispatched is
+inside its visible rectangle. This includes the switches and **Center on
+zenith**, so a hidden, clipped, or zero-sized control cannot answer on a
+reader's behalf. Field gestures additionally establish keyboard focus before
+typing and compare the committed canonical value.
+
+PR #238 also contains the approved #220 settled-scene repair from main. Its
+fresh display run found, started, and passed all 738 tests with zero aborts,
+skips, or failures. The release documentation states the measured accuracy,
+the restart evidence uses the shared production session seam, and quiet and
+detached rendering return to the released page byte for byte.
+
+All Sprint 25 findings are closed. PR #238 is ready to merge. After confirming
+the reviewed tree survives that merge, milestone 25 may close and the 1.6.0
+release preparation may begin under the normal tag automation and external
+artifact verification.
