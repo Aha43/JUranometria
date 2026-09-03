@@ -260,3 +260,15 @@ or otherwise reflow if they genuinely cannot fit—without reducing the chart's
 
 Treat this as part of #217 and the 1.5.0 release gate, since it was found on
 the feature being handed over rather than after release.
+
+## Follow-up — `1926bc6`
+
+**The preference-safety P1 is resolved.** The guarded interval now begins
+before the first write, the store being mutated owns its flush operation, and
+failure-path tests cover a write refusal, a flush failure after mutation, and
+a failed restoration without replacing the acceptance failure it accompanies.
+The same seam also removes the older equatorial-grid acceptance hazard.
+
+The clipped **On this page** control reported during dogfooding remains open;
+this commit does not change its layout. PR #223 and 1.5.0 remain held only for
+that visible surface correction and its cross-font/width evidence.
