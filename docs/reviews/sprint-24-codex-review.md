@@ -302,3 +302,19 @@ it found them, including when an assertion throws.
 
 After that contained test cleanup, all Sprint 24 findings are resolved and PR
 #223 may merge for the recommended 1.5.0 release.
+
+## Final follow-up — `7673508`
+
+**Approved.** Both Sprint 24 font/theme sweeps now run through the shared
+`SwingSession.restoring` guard. They preserve the inherited look and feel and
+the presence or absence of an explicit font override, including exceptional
+exit, rather than installing a resolved look-and-feel font as a choice nobody
+made. The table theme sweep also no longer assumes the suite began in light
+mode.
+
+Issue #224 correctly records the nine older unguarded tests as follow-up work;
+they predate this sprint and need not widen the release PR.
+
+All gate, foundation, module, interaction, packaged-acceptance, preference
+safety, responsive-layout, and test-isolation findings are resolved. PR #223
+may merge, milestone 24 may close, and the reviewed work may release as 1.5.0.
