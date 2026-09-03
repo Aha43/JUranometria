@@ -218,7 +218,7 @@ public final class PlaceAndTimeStudyMain {
         // difference between this and a real observer's direction,
         // so they belong in the total rather than in a footnote
         // (review).
-        row("polar motion, not modelled", POLAR_MOTION);
+        row("polar motion, not modelled (an allowance)", POLAR_MOTION);
         row("diurnal aberration, not modelled", DIURNAL_ABERRATION);
 
         // The precession model itself is a choice, and two accepted
@@ -271,20 +271,24 @@ public final class PlaceAndTimeStudyMain {
         System.out.println("| UTC for UT1 | a **bound**: the two stay"
                 + " within 0.9 s of each other by international"
                 + " agreement |");
-        System.out.println("| polar motion | a **bound**: the pole"
-                + " stays within about 15 m of the reference pole |");
+        System.out.println("| polar motion | an **allowance**, not a"
+                + " bound: chosen larger than the wander, with no"
+                + " citable maximum behind it |");
         System.out.println("| diurnal aberration | a **bound**: the"
                 + " observer's own rotation, greatest at the equator |");
-        System.out.println("| the whole rotation - precession model,"
-                + " nutation truncation and composition together | a"
-                + " **measurement against IAU SOFA** over eighty"
-                + " cases, 1975-2100, both poles and the seam: "
-                + "**0.0101\"** |");
+        System.out.printf(Locale.ROOT,
+                "| the whole rotation - precession model, nutation"
+                        + " truncation and composition together | a"
+                        + " **measurement against IAU SOFA** over %d"
+                        + " cases, 1975-2100, both poles and the seam:"
+                        + " **%s** |%n",
+                referenceCases(), angle(againstSofa()));
         System.out.println();
         System.out.printf(Locale.ROOT,
-                "The three bounded terms come to **%s**, of which %s"
+                "The bounded terms and the polar-motion allowance come"
+                        + " to **%s**, of which %s"
                         + " is not knowing UT1. The rotation itself is"
-                        + " measured against SOFA at **0.0101\"**"
+                        + " measured against SOFA at **%s**"
                         + " across the range above - a hundredth of an"
                         + " arcsecond, and a four-hundredth of a pixel"
                         + " at the narrowest field - which supersedes"
@@ -293,7 +297,7 @@ public final class PlaceAndTimeStudyMain {
                         + " the truncated nutation series and the"
                         + " composition at once.%n%n",
                 angle(ut1 + POLAR_MOTION + DIURNAL_ABERRATION),
-                angle(ut1));
+                angle(ut1), angle(againstSofa()));
     }
 
     /**
@@ -311,8 +315,18 @@ public final class PlaceAndTimeStudyMain {
     }
 
     /**
-     * Polar motion: the pole wanders within about fifteen metres of
-     * the reference pole, which is half an arcsecond of direction.
+     * Polar motion, as a stated <em>allowance</em> rather than a
+     * proven bound.
+     *
+     * <p>The pole wanders by a few tenths of an arcsecond, and this
+     * study has no citable source for a maximum, so half an
+     * arcsecond is an allowance chosen to be comfortably larger
+     * than the wander rather than a limit anyone has guaranteed
+     * (re-review). Calling it a bound would be borrowing authority
+     * the evidence here does not have. An IERS-sourced maximum
+     * would turn it into one; until then it is labelled for what it
+     * is, and it is in any case twenty-seven times smaller than not
+     * knowing UT1.
      */
     private static final double POLAR_MOTION = 0.5 / 3600.0;
 
@@ -344,6 +358,49 @@ public final class PlaceAndTimeStudyMain {
             worst = Math.max(worst, apart);
         }
         return worst;
+    }
+
+    /**
+     * The worst this model differs from the checked-in SOFA vectors.
+     *
+     * <p>Measured here rather than quoted: a figure typed into the
+     * report is a figure that goes on saying 0.0101" after the model
+     * has moved (re-review).
+     */
+    private static double againstSofa() {
+        double worst = 0;
+        for (String[] row : referenceRows()) {
+            SkyPosition mine = SkyOrientation.toJ2000(
+                    new SkyPosition(Double.parseDouble(row[1]),
+                            Double.parseDouble(row[2])),
+                    SkyOrientation.julianDate(Instant.parse(row[0])),
+                    SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+            worst = Math.max(worst, mine.separationDegrees(
+                    new SkyPosition(Double.parseDouble(row[3]),
+                            Double.parseDouble(row[4]))));
+        }
+        return worst;
+    }
+
+    private static int referenceCases() {
+        return referenceRows().size();
+    }
+
+    private static List<String[]> referenceRows() {
+        List<String[]> rows = new ArrayList<>();
+        try {
+            for (String line : java.nio.file.Files.readAllLines(
+                    java.nio.file.Path.of("docs/studies/place-and-time"
+                            + "/reference-vectors.txt"))) {
+                if (!line.isBlank() && !line.startsWith("#")) {
+                    rows.add(line.trim().split("\\s+"));
+                }
+            }
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException(
+                    "the reference vectors are part of this study", e);
+        }
+        return rows;
     }
 
     private static void row(String what, double degrees) {
@@ -615,7 +672,10 @@ public final class PlaceAndTimeStudyMain {
     /** An angle in the unit a reader of a table can compare. */
     private static String angle(double degrees) {
         double arcseconds = degrees * 3600.0;
-        if (arcseconds < 0.01) {
+        if (arcseconds < 0.1) {
+            // Four places below a tenth of an arcsecond: at two,
+            // the SOFA residual reads "0.01" and the decision that
+            // quotes it cannot be checked against it.
             return String.format(Locale.ROOT, "%.4f\"", arcseconds);
         }
         if (arcseconds < 60) {

@@ -45,24 +45,24 @@ Three simplifications, each a decision with a price rather than an oversight. Th
 | UTC stands in for UT1 (up to 0.9 s apart) | 13.54" | 0.09 px | 3.38 px |
 | UTC stands in for TT in the precession arguments | 0.0002" | 0.00 px | 0.00 px |
 | the nutation series stops at twenty terms, against the published full-series value for 1987 April 10 | 0.0033" | 0.00 px | 0.00 px |
-| polar motion, not modelled | 0.50" | 0.00 px | 0.12 px |
+| polar motion, not modelled (an allowance) | 0.50" | 0.00 px | 0.12 px |
 | diurnal aberration, not modelled | 0.32" | 0.00 px | 0.08 px |
 | IAU 1976 precession against the IAU 2006 form, over two centuries | 0.28" | 0.00 px | 0.07 px |
 
 Refraction is not modelled and is not in the table: it is a property of air rather than of the sky, which is why the horizon here is named **mathematical** rather than corrected.
 
-**What the nutation row is, and is not.** It is the residual of this twenty-term series against the published full-series value at one date. An earlier draft also claimed a worst case for *any* date, by adding the amplitudes of the omitted terms; that was not a bound (review). It ignored the terms' time-dependent coefficients, and it added quantities in longitude as though they were angles on the sky, which they are not - a nutation in longitude moves a direction by less than itself, by a factor that depends on where the direction lies relative to the ecliptic. A rigorous any-date bound needs the whole 106-term table, which this atlas does not ship, so **no such bound is claimed here**. What can be said is the sensitivity: at ten times the measured residual the tail would still be 0.03", four hundred times smaller than not knowing UT1.
+**What the nutation row is, and is not.** It is the residual of this twenty-term series against the published full-series value at one date. An earlier draft also claimed a worst case for *any* date, by adding the amplitudes of the omitted terms; that was not a bound (review). It ignored the terms' time-dependent coefficients, and it added quantities in longitude as though they were angles on the sky, which they are not - a nutation in longitude moves a direction by less than itself, by a factor that depends on where the direction lies relative to the ecliptic. A rigorous any-date bound needs the whole 106-term table, which this atlas does not ship, so **no such bound is claimed here**. What can be said is the sensitivity: at ten times the measured residual the tail would still be 0.0335", four hundred times smaller than not knowing UT1.
 
 **What is bounded, and what is only measured.**
 
 | term | kind |
 |---|---|
 | UTC for UT1 | a **bound**: the two stay within 0.9 s of each other by international agreement |
-| polar motion | a **bound**: the pole stays within about 15 m of the reference pole |
+| polar motion | an **allowance**, not a bound: chosen larger than the wander, with no citable maximum behind it |
 | diurnal aberration | a **bound**: the observer's own rotation, greatest at the equator |
-| the whole rotation - precession model, nutation truncation and composition together | a **measurement against IAU SOFA** over eighty cases, 1975-2100, both poles and the seam: **0.0101"** |
+| the whole rotation - precession model, nutation truncation and composition together | a **measurement against IAU SOFA** over 80 cases, 1975-2100, both poles and the seam: **0.0101"** |
 
-The three bounded terms come to **14.36"**, of which 13.54" is not knowing UT1. The rotation itself is measured against SOFA at **0.0101"** across the range above - a hundredth of an arcsecond, and a four-hundredth of a pixel at the narrowest field - which supersedes the earlier estimates of its parts: the comparison covers the precession model, the truncated nutation series and the composition at once.
+The bounded terms and the polar-motion allowance come to **14.36"**, of which 13.54" is not knowing UT1. The rotation itself is measured against SOFA at **0.0101"** across the range above - a hundredth of an arcsecond, and a four-hundredth of a pixel at the narrowest field - which supersedes the earlier estimates of its parts: the comparison covers the precession model, the truncated nutation series and the composition at once.
 
 ## The three geometries
 

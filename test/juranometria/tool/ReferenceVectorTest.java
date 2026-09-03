@@ -76,13 +76,15 @@ class ReferenceVectorTest {
                 worstCase = row.utc() + " at " + row.ofDate();
             }
         }
-        // Measured at 0.0101", and asserted with room for the last
-        // digits of double arithmetic on another machine - not so
-        // much room that a real regression could hide in it.
-        assertTrue(worst < 0.05, String.format(
-                "the rotation is within a twentieth of an arcsecond of"
-                        + " SOFA's, everywhere: worst %.4f\" at %s",
-                worst, worstCase));
+        // Measured at 0.0101". The tolerance was five times that,
+        // which would have let a fivefold regression stay green
+        // (re-review); it is now half again as much, which is room
+        // for the last digits of double arithmetic on another
+        // machine and nothing else.
+        assertTrue(worst < 0.015, String.format(
+                "the rotation agrees with SOFA's everywhere: worst"
+                        + " %.4f\" at %s, against a tolerance of"
+                        + " 0.015\"", worst, worstCase));
         assertTrue(worst > 0,
                 "and these are two independent computations, not one"
                         + " compared with itself");
@@ -97,7 +99,8 @@ class ReferenceVectorTest {
             worst = Math.max(worst,
                     Math.abs(mine - row.gmstDegrees()) * 3600.0);
         }
-        assertTrue(worst < 0.01, String.format(
+        // Measured at 0.0005".
+        assertTrue(worst < 0.002, String.format(
                 "Greenwich mean sidereal time agrees with SOFA's own"
                         + " to %.4f arcseconds", worst));
     }

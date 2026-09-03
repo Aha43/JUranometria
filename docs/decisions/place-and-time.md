@@ -92,10 +92,19 @@ ship, so none is claimed. What can be said is the sensitivity — at
 ten times the measured residual the tail would still be 0.03″, four
 hundred times smaller than not knowing UT1.
 
-**What is bounded, and what is measured.** Three terms are bounds —
-UT1 (0.9 s by international agreement), polar motion (the pole stays
-within about fifteen metres of the reference pole) and diurnal
-aberration (the observer's own rotation, greatest at the equator).
+**What is bounded, what is allowed for, and what is measured.** Two
+terms are bounds: UT1 (0.9 s by international agreement) and diurnal
+aberration (the observer's own rotation with the Earth, greatest at
+the equator and computable from its radius and period).
+
+**Polar motion is an allowance, not a bound.** An earlier draft
+called it one on the strength of "about fifteen metres", which is a
+description rather than a source (re-review). The pole wanders by a
+few tenths of an arcsecond; half an arcsecond is chosen to sit
+comfortably above that, and no maximum is claimed. An IERS-sourced
+figure would make it a bound; until one is quoted, the label says
+what it is. It is in any case twenty-seven times smaller than not
+knowing UT1.
 An earlier draft added those to three *measurements* and called the
 total a contract; **a sum containing measurements is not a bound**
 (re-review), and it has been taken apart.
@@ -107,13 +116,18 @@ right-ascension seam:
 
 > **The rotation agrees with SOFA to 0.0101″** — a hundredth of an
 > arcsecond, a four-hundredth of a pixel at the narrowest field —
-> and sidereal time to 0.0005″. That single comparison supersedes
+> and sidereal time to 0.0005″. Both are measured by the study from
+> the checked-in vectors rather than quoted, and the test that
+> guards them allows 0.015″: half again as much as the measurement,
+> which is room for another machine's last digits and not for a
+> regression. That single comparison supersedes
 > the separate estimates for the precession model, the truncated
 > nutation series and the composition, because it covers all three
 > at once.
 >
-> **The bounded terms come to 14.36″**, of which 13.54″ is not
-> knowing UT1: 0.10 px at the widest field, 3.6 px at the narrowest.
+> **The bounded terms and the polar-motion allowance come to
+> 14.36″**, of which 13.54″ is not knowing UT1: 0.10 px at the
+> widest field, 3.6 px at the narrowest.
 
 So the honest statement is two sentences rather than one number: the
 model's *frame* is right to a hundredth of an arcsecond, and its
@@ -305,15 +319,12 @@ the bounded terms above as an executable statement; the SOFA
 fixture, extended if new geometry needs it; and the oracle described
 below.
 
-### What the oracle rests on, and what it does not
+### What the oracle rests on
 
-The gate review asked for authoritative end-to-end vectors, ideally
-from IAU SOFA. **Those could not be obtained here: this work is
-done offline, and the atlas takes no network dependency**, so
-transcribing SOFA output would mean typing numbers from memory —
-which is exactly the way to put an invented constant into an
-astronomical model. What stands in their place, and what each
-actually proves:
+The authority is IAU SOFA, and the comparison is described above.
+These checks sit beneath it — they are cheaper, they run on every
+direction the model produces rather than on eighty fixed cases, and
+they say *which* thing broke when something does:
 
 | check | what it would catch |
 |---|---|
