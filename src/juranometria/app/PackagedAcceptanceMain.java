@@ -223,11 +223,38 @@ public final class PackagedAcceptanceMain {
         require(module.timesTheSkyWasComputed() == 0,
                 "and works out no sidereal time to say so");
 
+        // Each geometry alone, before all three together: a single
+        // combined count would accept an incorrectly drawn horizon,
+        // because any pixels it wrongly put down would hide inside
+        // the meridian's and the zenith's (review). On this page the
+        // horizon is ninety degrees from a zenith that is ON the
+        // page, so the right amount of horizon ink is exactly none -
+        // proved on its own, where nothing else's ink can cover for
+        // it.
+        module.showing(false, true, false);
+        require(differingPixels(without, paint(chart)) == 0,
+                "the horizon alone leaves this page untouched: it"
+                        + " crosses no part of the paper, and off the"
+                        + " page is silence");
+        module.showing(true, false, false);
+        int meridianInk = differingPixels(without, paint(chart));
+        require(meridianInk > 100, "the meridian alone is drawn: "
+                + meridianInk + " pixels");
+        module.showing(false, false, true);
+        int zenithInk = differingPixels(without, paint(chart));
+        require(zenithInk > 8 && zenithInk < meridianInk,
+                "the zenith alone is a small ring, not a line: "
+                        + zenithInk + " pixels");
+
         module.showing(true, true, true);
         java.awt.image.BufferedImage with = paint(chart);
         int ink = differingPixels(without, with);
         require(ink > 100, "the reference ink reaches the page: " + ink
                 + " pixels changed");
+        require(ink <= meridianInk + zenithInk,
+                "and all three together add nothing a horizon could"
+                        + " be hiding in: " + ink + " pixels against "
+                        + meridianInk + " + " + zenithInk);
 
         java.util.List<String> offered = new java.util.ArrayList<>();
         for (var owned : chart.overlays().collect()) {
@@ -265,9 +292,10 @@ public final class PackagedAcceptanceMain {
         require(differingPixels(without, paint(chart)) == 0,
                 "and the page is the page the atlas draws without it");
 
-        System.out.println("meridian module OK (" + ink + " pixels of"
-                + " reference ink, withdrawn cleanly, page never"
-                + " moved except when asked)");
+        System.out.println("meridian module OK (" + meridianInk
+                + " px meridian + " + zenithInk + " px zenith, the"
+                + " horizon proved silent alone, withdrawn cleanly,"
+                + " page never moved except when asked)");
     }
 
     private static void onThisPageJourney() throws Exception {

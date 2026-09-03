@@ -73,10 +73,26 @@ class MeridianModuleTest {
         for (OverlayContribution offered : module.contributedGeometry()) {
             assertEquals(InkRole.REFERENCE_LINE, offered.role(),
                     "all three are reference ink: " + offered.identity());
-            assertTrue(!offered.accessibleName().isBlank(),
-                    "and each says what it is, in words: "
-                            + offered.identity());
         }
+    }
+
+    @Test
+    void theNamesAreTheGatesNamesAndTheHorizonIsMathematical() {
+        // The gate: "the horizon is named mathematical, in the
+        // interface and not only here." An earlier version shortened
+        // it to "Horizon" on the page (review) - the quiet claim the
+        // longer name exists to refuse, since a reader's real horizon
+        // has hills and air in it and this line does not know about
+        // either. The accessible name is the drawn label and the word
+        // a screen reader speaks, so it is pinned exactly.
+        MeridianModule module = new MeridianModule(OSLO);
+
+        assertEquals("Meridian",
+                circle(module, "meridian").accessibleName());
+        assertEquals("Mathematical horizon",
+                circle(module, "horizon").accessibleName(),
+                "the full name, as the gate requires in the interface");
+        assertEquals("Zenith", point(module, "zenith").accessibleName());
     }
 
     @Test

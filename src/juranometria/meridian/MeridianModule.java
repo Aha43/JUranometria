@@ -183,12 +183,17 @@ public final class MeridianModule implements ChartModule {
                     InkRole.REFERENCE_LINE));
         }
         if (horizonShowing) {
-            // A boundary of what can be seen, and named
-            // "mathematical" nowhere but in the documentation: the
-            // word a reader is shown is the word on the page, and
-            // the atlas does not claim to know about hills or air.
+            // "Mathematical horizon", because the gate says the name
+            // belongs in the interface and not only in the
+            // documentation (review). An earlier version shortened it
+            // to "Horizon" on the page, which is precisely the quiet
+            // claim the longer name exists to refuse: a reader's real
+            // horizon has hills and air in it, and this line is where
+            // the sky meets a perfectly flat, perfectly transparent
+            // Earth.
             offered.add(new OverlayContribution.GreatCircle(
-                    "horizon", "Horizon", sky.horizon().pole(),
+                    "horizon", "Mathematical horizon",
+                    sky.horizon().pole(),
                     OverlayContribution.Reference.BOUNDARY,
                     InkRole.REFERENCE_LINE));
         }
