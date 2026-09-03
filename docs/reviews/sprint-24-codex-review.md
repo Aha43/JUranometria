@@ -239,3 +239,24 @@ after that actual node has been flushed.
 Once the mutation itself is inside the protected interval and the correct
 store is flushed, the sprint may receive final approval. PR #223, milestone 24,
 and 1.5.0 remain held.
+
+### P2 — The new mode control is clipped in the running application
+
+Dogfooding on 3 September found the Inspector's new **On this page** toggle
+rendered as **“On this pa”** on an ordinary application start. It has also been
+seen unclipped, so the surface currently depends on the window/font/layout
+state it happens to receive. This is the control that names and opens Sprint
+24's feature; shipping it truncated would contradict the gate's decision that
+the words carrying meaning remain whole.
+
+Reproduce the actual Inspector composition at its 240 px floor, preferred
+width, both themes, the supported platform font stacks, and enlarged text.
+Measure the toggle's rendered text and insets against its allocated bounds,
+not merely `isVisible()` or a positive width. Choose a responsive arrangement
+that keeps **Selected** and **On this page** whole—allowing the chooser to stack
+or otherwise reflow if they genuinely cannot fit—without reducing the chart's
+400 px floor or hiding either mode. Add a regression that fails on the observed
+“On this pa” allocation and visually inspect the real panel after correction.
+
+Treat this as part of #217 and the 1.5.0 release gate, since it was found on
+the feature being handed over rather than after release.
