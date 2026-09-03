@@ -244,6 +244,7 @@ place-and-time-study: classes
 		> docs/studies/place-and-time/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeInkStudyMain
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeControlsMockupMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeDialogStudyMain
 
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked
