@@ -246,3 +246,62 @@ Issue #224 should be fixed in a separate PR before using display CI as evidence
 for this gate. A required check failing four of five runs is not trustworthy
 release evidence, and guarding the nine known Swing-session borrowers is a
 contained prerequisite rather than astronomy work smuggled into PR #231.
+
+## Third follow-up review at 1882222
+
+The absolute-orientation blocker is closed. The fixture has strong provenance,
+the checked-in generator makes the matrix direction and time-scale convention
+inspectable, and eighty end-to-end SOFA vectors cover the sign and phase errors
+that the invariants could not. The generator's use of the official IAU 1976/
+1980 routines matches the model being assessed rather than changing standards
+mid-comparison. No runtime or build dependency has been introduced.
+
+Splitting model agreement from unavailable Earth-orientation inputs is also the
+right conceptual result. One evidence defect and two wording defects remain.
+
+### P1 — The claimed SOFA residual is hard-coded, not reproduced
+
+`PlaceAndTimeStudyMain` prints `0.0101″` literally; it never reads the SOFA
+fixture or measures the production transformation against it. The test performs
+the comparison but accepts any result below `0.05″`. `PlaceAndTimeGateTest`
+then checks only that the same literal occurs in report and decision.
+
+This permits a substantial regression while preserving every green check and
+the old published claim: moving the result from 0.0101″ to 0.0499″ would still
+pass `ReferenceVectorTest`, while the reproducible study continued to report
+0.0101″.
+
+Put fixture parsing and residual measurement behind one test/tool seam. Have
+the study derive and print the worst result and its case from those eighty
+rows, and have the regression test constrain the computed value at the precision
+the decision states. Keep a small allowance for serialized coordinates and
+cross-platform floating point, but do not permit five times the claimed error.
+Mutation-check this by perturbing the transformation enough to contradict
+0.0101″ while remaining below the former 0.05″ threshold.
+
+### P2 — “Bounded” still rests on an approximate polar-motion statement
+
+The 0.9-second UT1 limit and the equatorial maximum for diurnal aberration are
+bounds. “The pole stays within **about** fifteen metres” is not, by its own
+wording, a rigorous bound. Either cite and encode an authoritative maximum for
+the declared operating interval, or call 0.50″ a conservative design allowance
+and call 14.36″ the sum of bounded terms and that allowance. This does not
+weaken the useful conclusion that unavailable UT1 dominates the placement.
+
+### P2 — The decision retains the obsolete statement that SOFA was unavailable
+
+Under “What the oracle rests on,” the document still says the SOFA vectors
+could not be obtained and describes the invariants as standing in their place;
+the following paragraphs say the vectors were obtained and close the issue.
+Remove the superseded paragraph rather than asking a reader to reconcile both
+histories. The review document already preserves why the fixture was requested.
+
+## Third follow-up decision
+
+One evidentiary correction requested before #226. The architecture, astronomy
+model choice, SOFA oracle, geometry, controls, and visual direction are
+approved. Once the SOFA residual is actually reproduced and the two statements
+above are made precise, the design gate is ready to merge.
+
+PR #232 correctly separates diagnosis from repair. Issue #224 can remain a
+later consolidation; the evidence showed it was not the cause of #220.
