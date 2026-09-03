@@ -196,6 +196,63 @@ class MapExplorationJourneyTest {
                     witness.get(witness.size() - 1).selection(),
                     "and heard exactly what the inspector heard");
 
+            // 1a. The same question with the event thread
+            // deliberately busy, because that is the shape of the
+            // failure the three diagnostics finally caught on a CI
+            // runner: the mark was derived from a pre-layout scene
+            // while the EDT settled on a taller one, the click went
+            // to coordinates the settled page had moved out from
+            // under, and empty sky was the right answer to a stale
+            // question. Here the EDT is held while a page change is
+            // queued behind it - the deterministic form of that
+            // race, using a recentre rather than a window resize
+            // because a resize goes through the native peer and
+            // lands when the desktop pleases, while a recentre
+            // reassembles the scene inside its own event. The
+            // settled-scene read waits its turn and derives from the
+            // page as it will be; the old off-EDT read derives from
+            // the page as it was, and its click misses by the fifth
+            // of a degree the page moved.
+            java.util.concurrent.CountDownLatch busy =
+                    new java.util.concurrent.CountDownLatch(1);
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    busy.await(5, java.util.concurrent.TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+            SwingUtilities.invokeLater(() -> navigation.recenter(
+                    new juranometria.chart.SkyPosition(
+                            navigation.state().centre().raDegrees() + 0.2,
+                            navigation.state().centre().decDegrees())));
+            ChartRenderer.DrawnMark[] derived =
+                    new ChartRenderer.DrawnMark[1];
+            Thread deriving = new Thread(() -> derived[0] = someStar());
+            deriving.start();
+            // Long enough for an off-EDT read to have read the stale
+            // scene; the settled read is still waiting on the EDT.
+            Thread.sleep(150);
+            busy.countDown();
+            deriving.join(10_000);
+            flush();
+            clickOn(derived[0]);
+            assertInstanceOf(Selection.Object.class,
+                    selection.selection(),
+                    "a mark derived while the event thread was busy"
+                            + " relaying out still lands on its star:"
+                            + " derived from the settled scene, not"
+                            + " the one mid-flight (#220).\n  "
+                            + hitTestState(derived[0].centre().x(),
+                                    derived[0].centre().y()));
+            assertEquals(derived[0].star().id(),
+                    ((Selection.Object) selection.selection())
+                            .catalogueId(),
+                    "and it is that star, not a neighbour the stale"
+                            + " page put under the pointer");
+            SwingUtilities.invokeAndWait(navigation::reset);
+            flush();
+
             // 1b. Andromeda's three galaxies, each reached by
             // pointing (issue #201). Until the stacking rule, M 31's
             // opaque disc was painted last and M 32 left no ink at
@@ -1035,14 +1092,39 @@ class MapExplorationJourneyTest {
         SwingUtilities.invokeAndWait(() -> { });
     }
 
+    @SuppressWarnings("unchecked")
     private List<ChartRenderer.DrawnMark> marks() {
-        // The scene is kept so the diagnostic below can say whether
-        // the EDT is holding this same one. This method runs off the
-        // event thread, which is one of the things #220 has to rule
-        // in or out; reading the field changes nothing about when.
-        ChartScene scene = chart.currentScene();
-        sceneBehindTheMark = scene;
-        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS);
+        // On the event thread, from one settled scene. This read ran
+        // off the EDT for twenty sprints and mostly got away with it;
+        // issue #220's three diagnostics finally caught it mid-crime
+        // on a CI runner - the mark was derived from a pre-layout
+        // 716-px-tall scene while the EDT settled on 747, so the
+        // click went to coordinates the settled page had moved out
+        // from under, and empty sky was the correct answer to a
+        // stale question. Production was exonerated by the same
+        // evidence: the settled scene drew the star and the hit test
+        // found it at its true pixel. Deriving on the EDT means the
+        // scene read here is the scene the dispatched click will
+        // resolve against, because both are serialized on the one
+        // thread that owns them.
+        Object[] settled = new Object[2];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                ChartScene scene = chart.currentScene();
+                settled[0] = scene;
+                settled[1] = RENDERER.drawnMarks(scene,
+                        ChartOptions.DEFAULTS);
+            });
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "the settled scene could not be read", e);
+        }
+        // Kept so the diagnostics can say whether the EDT still
+        // holds this same scene at click time; they report, and do
+        // not assert, because a later legitimate relayout is the
+        // EDT's right.
+        sceneBehindTheMark = (ChartScene) settled[0];
+        return (List<ChartRenderer.DrawnMark>) settled[1];
     }
 
     /** The scene the most recent {@link #marks()} call read. */
@@ -1114,8 +1196,16 @@ class MapExplorationJourneyTest {
     }
 
     private void clickOn(ChartRenderer.DrawnMark mark) throws Exception {
+        // The page offset is read on the EDT with the same
+        // discipline as the mark: a relayout between deriving and
+        // clicking could move the page inside the component, and an
+        // offset captured off-thread would quietly re-open the gap
+        // the settled-scene read just closed (#220).
+        int[] offset = new int[1];
+        SwingUtilities.invokeAndWait(() ->
+                offset[0] = chart.pageOffsetY());
         click((int) Math.round(mark.centre().x()),
-                (int) Math.round(mark.centre().y()) + chart.pageOffsetY());
+                (int) Math.round(mark.centre().y()) + offset[0]);
     }
 
     private void clickOnEmptySky() throws Exception {
