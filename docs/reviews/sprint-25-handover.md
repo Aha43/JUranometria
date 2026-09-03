@@ -53,8 +53,10 @@ nothing rather than promise a line that is not there.
   makes no network call, so it reads the instant as UTC. The price
   is bounded and stated: |UT1−UTC| ≤ 13.54″ of rotation, plus a
   0.50″ polar-motion *allowance* and 0.32″ of diurnal aberration —
-  **14.36″ in all**, about 1/250 of the narrowest field's finest
-  visible detail.
+  **14.36″ in all**. That is under half a pixel at the default 8°
+  field and up to **3.6 pixels** at the narrowest 1° field: not
+  invisible, and not claimed to be. The lines are reference
+  furniture, and the price is stated where a reader can see it.
 - **Mathematical, not apparent.** The horizon drawn is where the sky
   meets a perfectly flat, transparent Earth. A real horizon has
   hills and air in it; a line quietly claiming to be that would be a
@@ -110,6 +112,7 @@ Every round found something real. This is the honest record.
 | #228 | every commit in the first suite took the Enter path on a detached panel; the menu route, the close box, reopening, and real focus traversal were all untested — and the packed-dialog photographs the review demanded immediately exposed a real layout bug (`setSize` leaves the tree valid, so the width floor never reached the controls) |
 | #228 | a redundant second closing mechanism made the close box unbreakable by mutation; removed |
 | #229 | the journey's first red run: "home" via bare recentre is not home — the released default carries its target's identity in the title block, 1,168 pixels of difference |
+| #229 review | the journey drove fields and buttons through their back doors (`setText`, `doClick`) rather than pointer and keyboard events; both "restart" checks reloaded the store without starting a second session; the README called the 14″ envelope invisible when the study's own table says 3.6 px at the narrowest field; "every changed pixel accounted" allowed a 90 px catchment, which is no bound — the label boxes now come from the painter's own layout |
 
 ## Evidence
 
@@ -117,14 +120,18 @@ Every round found something real. This is the honest record.
   run aborts only the tests that honestly need a desktop, and the
   display job requires found == started == successful.
 - **The journey** (`SprintTwentyFiveJourneyTest`) walks the
-  production path: menu → dialog → fields → switches, the three
+  production path with real pointer and keyboard events - clicks
+  into fields, the platform select-all, typed characters, Enter -
+  menu → dialog → fields → switches, the three
   geometries identified from the page itself (ink along the seam's
   predicted arc, pushed back through the chart's own inverse),
   longitude/latitude/time each changing only what astronomy says,
   the RA seam, a polar and a southern page with every changed pixel
   accounted to a geometry or its label, one navigation in the whole
   journey, byte-identical recovery on disable *and* on detach, and a
-  restart returning the place, not the instant, not the switches.
+  restart that is a second application session - the whole wiring
+  built again, the dialog reopened from its menu - returning the
+  place, not the instant, not the switches.
 - **Packaged acceptance** runs inside every native image on the
   bundled runtime alone: the model computes, the module contributes,
   the painter inks (meridian and zenith counted separately, the
@@ -153,8 +160,9 @@ Every round found something real. This is the honest record.
 ## Residual risks
 
 - **Scientific.** The 14.36″ UTC/UT1-and-allowances envelope is
-  real and stated; it is invisible at every field the atlas draws.
-  The polar-motion term is an allowance, not a computation. Nothing
+  real and stated: up to 3.6 pixels of line placement at the
+  narrowest field, under half a pixel at the default. The
+  polar-motion term is an allowance, not a computation. Nothing
   models refraction, and the horizon says so by its name.
 - **UI.** Focus-out commitment depends on the desktop granting
   focus; the lifecycle test aborts honestly where it will not.

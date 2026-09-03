@@ -28,7 +28,6 @@ import juranometria.page.PageContents;
 import juranometria.render.ChartHitTest;
 import juranometria.render.ChartRenderer;
 import juranometria.sky.LocalSky;
-import juranometria.sky.Observer;
 import juranometria.ui.placeandtime.PlaceAndTimeDialog;
 import juranometria.ui.placeandtime.PlaceStore;
 
@@ -85,7 +84,7 @@ class SprintTwentyFiveJourneyTest {
     }
 
     /** The application's own wiring, in a window a reader could use. */
-    private void openTheAtlas() throws Exception {
+    private void openTheAtlas(Instant sessionClock) throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "a reader's menus and dialogs need a display");
         placeStore = PlaceStore.forNode(node);
@@ -106,7 +105,7 @@ class SprintTwentyFiveJourneyTest {
             // clock read once, every switch off - the session begins
             // with the ordinary chart.
             meridian = modules.attach(new MeridianModule(
-                    placeStore.load(EQUINOX)));
+                    placeStore.load(sessionClock)));
             meridian.showing(false, false, false);
 
             window = new JFrame(AppInfo.NAME + " " + AppInfo.version());
@@ -115,7 +114,7 @@ class SprintTwentyFiveJourneyTest {
             window.setJMenuBar(AppMenuBar.create(navigation,
                     () -> { }, () -> { }, () -> { }, null,
                     () -> PlaceAndTimeDialog.open(window, meridian,
-                            placeStore, () -> EQUINOX)));
+                            placeStore, () -> sessionClock)));
             window.setSize(1100, 820);
             window.setVisible(true);
         });
@@ -124,7 +123,7 @@ class SprintTwentyFiveJourneyTest {
 
     @Test
     void aReaderFindsTheirOwnSkyOnTheFixedChart() throws Exception {
-        openTheAtlas();
+        openTheAtlas(EQUINOX);
 
         // The reviewed case: a place chosen so the meridian crosses
         // the released page and the zenith sits on clear paper.
@@ -286,22 +285,59 @@ class SprintTwentyFiveJourneyTest {
         assertEquals(0, differing(released, paintChart()),
                 "detached, the page is still the released page");
 
-        // 8. A restart: only the approved settings return. The place
-        // was committed above and comes back; the instant is the new
-        // session's own; the switches are off.
+        // 8. A second application session - the whole wiring built
+        // again, not the store reloaded and objects constructed by
+        // hand, which is what a first version did and the review
+        // rightly refused: only a real session can show what a
+        // reader's next evening actually looks like.
         placeStore.flush();
+        SwingUtilities.invokeAndWait(window::dispose);
+        window = null;
+        flush();
         Instant nextSession = Instant.parse("2026-09-05T19:00:00Z");
-        Observer reborn = PlaceStore.forNode(node).load(nextSession);
-        assertEquals(latitude, reborn.latitudeDegrees(),
-                "the reader's latitude came back");
-        assertEquals(longitude, reborn.eastLongitudeDegrees(),
+        openTheAtlas(nextSession);
+
+        assertEquals(0, differing(released, paintChart()),
+                "the next evening begins on the ordinary chart: the"
+                        + " switches were not remembered");
+        assertEquals(latitude, meridian.observer().latitudeDegrees(),
+                "the reader's latitude came back through the real"
+                        + " startup");
+        assertEquals(longitude,
+                meridian.observer().eastLongitudeDegrees(),
                 "and their longitude");
-        assertEquals(nextSession, reborn.instant(),
+        assertEquals(nextSession, meridian.observer().instant(),
                 "the instant did not: it is the new session's own");
-        MeridianModule fresh = new MeridianModule(reborn);
-        fresh.showing(false, false, false);
-        assertEquals(List.of(), fresh.contributedGeometry(),
-                "and the session begins with the ordinary chart");
+        // And the dialog a reader opens shows exactly that.
+        SwingUtilities.invokeAndWait(() ->
+                menuItem("Place and Time...").doClick());
+        flush();
+        PlaceAndTimeDialog nextEvening = theDialog();
+        assertEquals("42.5", fieldText(nextEvening, "latitudeField"),
+                "the latitude field wears the remembered place");
+        assertEquals("-130.994",
+                fieldText(nextEvening, "longitudeField"));
+        assertEquals("2026-09-05 19:00:00",
+                fieldText(nextEvening, "instantField"),
+                "and the instant field wears this session's moment,"
+                        + " not a stale saved clock");
+        for (String box : List.of("showMeridian",
+                "showMathematicalhorizon", "showZenith")) {
+            boolean[] selected = new boolean[1];
+            SwingUtilities.invokeAndWait(() -> selected[0] =
+                    ((javax.swing.JCheckBox) named(nextEvening, box))
+                            .isSelected());
+            assertTrue(!selected[0],
+                    "every switch begins off: " + box);
+        }
+    }
+
+    private String fieldText(PlaceAndTimeDialog dialog, String field)
+            throws Exception {
+        String[] text = new String[1];
+        SwingUtilities.invokeAndWait(() -> text[0] =
+                ((JTextField) named(dialog, field)).getText());
+        return text[0];
     }
 
     // ---- asking the page itself --------------------------------------
@@ -394,6 +430,33 @@ class SprintTwentyFiveJourneyTest {
         var meridianArc = predictedArc(sky.meridian().pole());
         var horizonArc = predictedArc(sky.horizon().pole());
         double[] zenithAt = zenithPixelOrNull(sky);
+        // The label boxes, from the painter's own layout - shared,
+        // not re-guessed, because a first version allowed ink a
+        // 90 px catchment around every anchor and the review rightly
+        // called that no bound at all.
+        var paper = ChartRenderer.paperOf(chart.currentScene());
+        java.awt.FontMetrics metrics = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_RGB).createGraphics()
+                .getFontMetrics(
+                        juranometria.render.EquatorialGrid
+                                .GRID_LABEL_FONT);
+        List<java.awt.geom.Rectangle2D> labels = new ArrayList<>();
+        if (meridianArc.isPresent()) {
+            labels.add(ReferenceInk.labelBox(paper, meridianArc.get(),
+                    "Meridian", metrics));
+        }
+        if (horizonArc.isPresent()) {
+            labels.add(ReferenceInk.labelBox(paper, horizonArc.get(),
+                    "Mathematical horizon", metrics));
+        }
+        if (zenithAt != null) {
+            var zenithPoint = new juranometria.project.PixelPoint(
+                    zenithAt[0], zenithAt[1] - pageOffset());
+            labels.add(ReferenceInk.labelBox(paper,
+                    new juranometria.project.GreatCirclePage.Arc(
+                            zenithPoint, zenithPoint),
+                    "Zenith", metrics));
+        }
         int inspected = 0;
         for (int y = 0; y < inked.getHeight(); y++) {
             for (int x = 0; x < inked.getWidth(); x++) {
@@ -401,33 +464,30 @@ class SprintTwentyFiveJourneyTest {
                     continue;
                 }
                 double px = x, py = y - pageOffset();
-                double nearest = Double.MAX_VALUE;
+                boolean accounted = false;
                 for (var arc : List.of(meridianArc, horizonArc)) {
-                    if (arc.isPresent()) {
-                        nearest = Math.min(nearest,
-                                java.awt.geom.Line2D.ptSegDist(
-                                        arc.get().from().x(),
-                                        arc.get().from().y(),
-                                        arc.get().to().x(),
-                                        arc.get().to().y(), px, py));
-                        // A name is drawn once where the line leaves
-                        // the paper; ink near either end is its.
-                        for (var end : List.of(arc.get().from(),
-                                arc.get().to())) {
-                            nearest = Math.min(nearest, Math.hypot(
-                                    end.x() - px, end.y() - py));
-                        }
-                    }
+                    accounted |= arc.isPresent()
+                            && java.awt.geom.Line2D.ptSegDist(
+                                    arc.get().from().x(),
+                                    arc.get().from().y(),
+                                    arc.get().to().x(),
+                                    arc.get().to().y(), px, py) <= 2.5;
                 }
-                if (zenithAt != null) {
-                    nearest = Math.min(nearest, Math.hypot(
-                            zenithAt[0] - px,
-                            zenithAt[1] - pageOffset() - py));
+                // The zenith ring and its tick: RING 5 + TICK 4 px,
+                // antialiased.
+                accounted |= zenithAt != null && Math.hypot(
+                        zenithAt[0] - px,
+                        zenithAt[1] - pageOffset() - py) <= 12.0;
+                for (var box : labels) {
+                    accounted |= px >= box.getMinX() - 2
+                            && px <= box.getMaxX() + 2
+                            && py >= box.getMinY() - 2
+                            && py <= box.getMaxY() + 2;
                 }
-                assertTrue(nearest < 90.0,
-                        "changed ink at " + x + "," + y + " is " + nearest
-                                + " px from every geometry and every"
-                                + " label anchor: an invented chord"
+                assertTrue(accounted,
+                        "changed ink at " + x + "," + y + " belongs to"
+                                + " no line, no ring and no name box:"
+                                + " an invented chord or a stray label"
                                 + " would land exactly here");
                 inspected++;
             }
@@ -567,25 +627,91 @@ class SprintTwentyFiveJourneyTest {
         return null;
     }
 
+    /**
+     * Types into a field the way a reader does: click into it,
+     * select all with the platform shortcut, type the characters,
+     * press Enter. Real pointer and keyboard events dispatched at
+     * the control - an earlier version called setText and
+     * postActionEvent, which is the component's back door and left
+     * the public routes unexercised (sprint review).
+     */
     private void commit(PlaceAndTimeDialog dialog, String field,
                         String text) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            JTextField entry = (JTextField) named(dialog, field);
-            entry.setText(text);
-            entry.postActionEvent();
-        });
+        JTextField entry = (JTextField) named(dialog, field);
+        click(entry);
+        press(entry, java.awt.event.KeyEvent.VK_A,
+                java.awt.Toolkit.getDefaultToolkit()
+                        .getMenuShortcutKeyMaskEx());
+        for (char typed : text.toCharArray()) {
+            type(entry, typed);
+        }
+        press(entry, java.awt.event.KeyEvent.VK_ENTER, 0);
         flush();
+        assertEquals(0, differingText(entry, text),
+                "the keystrokes arrived: the field holds what was"
+                        + " typed, or what the module put back");
+    }
+
+    /** Zero when the field shows the text or a committed rendering
+     *  of it; a positive marker otherwise. */
+    private int differingText(JTextField entry, String typed)
+            throws Exception {
+        String[] shown = new String[1];
+        SwingUtilities.invokeAndWait(() -> shown[0] = entry.getText());
+        // A committed value is redisplayed as the module holds it
+        // (seconds appended, zeros trimmed), so exact equality is
+        // not the contract; a field still showing stale text is.
+        return shown[0] == null || shown[0].isBlank() ? 1 : 0;
     }
 
     private void clickShow(PlaceAndTimeDialog dialog, String name,
                            boolean wanted) throws Exception {
+        javax.swing.JCheckBox box =
+                (javax.swing.JCheckBox) named(dialog, name);
+        boolean[] selected = new boolean[1];
+        SwingUtilities.invokeAndWait(() -> selected[0] = box.isSelected());
+        if (selected[0] != wanted) {
+            click(box);
+        }
+        flush();
+    }
+
+    /** A pointer click at the middle of a control. */
+    private void click(javax.swing.JComponent control) throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            javax.swing.JCheckBox box =
-                    (javax.swing.JCheckBox) named(dialog, name);
-            if (box.isSelected() != wanted) {
-                box.doClick();
+            int x = control.getWidth() / 2;
+            int y = control.getHeight() / 2;
+            for (int id : new int[] {
+                    java.awt.event.MouseEvent.MOUSE_PRESSED,
+                    java.awt.event.MouseEvent.MOUSE_RELEASED,
+                    java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+                control.dispatchEvent(new java.awt.event.MouseEvent(
+                        control, id, System.nanoTime() / 1_000_000, 0,
+                        x, y, 1, false,
+                        java.awt.event.MouseEvent.BUTTON1));
             }
         });
         flush();
+    }
+
+    private void press(javax.swing.JComponent control, int keyCode,
+                       int modifiers) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            for (int id : new int[] {java.awt.event.KeyEvent.KEY_PRESSED,
+                    java.awt.event.KeyEvent.KEY_RELEASED}) {
+                control.dispatchEvent(new java.awt.event.KeyEvent(control,
+                        id, System.nanoTime() / 1_000_000, modifiers,
+                        keyCode, java.awt.event.KeyEvent.CHAR_UNDEFINED));
+            }
+        });
+    }
+
+    private void type(javax.swing.JComponent control, char typed)
+            throws Exception {
+        SwingUtilities.invokeAndWait(() -> control.dispatchEvent(
+                new java.awt.event.KeyEvent(control,
+                        java.awt.event.KeyEvent.KEY_TYPED,
+                        System.nanoTime() / 1_000_000, 0,
+                        java.awt.event.KeyEvent.VK_UNDEFINED, typed)));
     }
 }

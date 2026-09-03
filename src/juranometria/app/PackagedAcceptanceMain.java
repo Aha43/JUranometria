@@ -292,13 +292,16 @@ public final class PackagedAcceptanceMain {
         require(differingPixels(without, paint(chart)) == 0,
                 "and the page is the page the atlas draws without it");
 
-        // The stored-state restart, through the bundled runtime's
-        // own preference backend (issue #229): the place is saved,
-        // read back by a fresh store as a fresh session would, and
-        // comes back as an observer wearing the new session's
-        // instant - because no instant is ever stored, and a stale
-        // saved clock must not masquerade as Now. Run against a
-        // dedicated node, never the reader's real preferences.
+        // The stored-state restart, as a second application session
+        // (issue #229): the place is saved through the bundled
+        // preference backend, and then the whole wiring is built
+        // again the way JUranometriaMain builds it - a fresh chart,
+        // a fresh host, a fresh module fed from a fresh store. A
+        // first version only reloaded the store and constructed an
+        // observer by hand, which proves the backend and nothing
+        // about what a reader's next evening looks like (sprint
+        // review). Run against a dedicated node, never the reader's
+        // real preferences.
         java.util.prefs.Preferences restartNode =
                 java.util.prefs.Preferences.userRoot().node(
                         "juranometria-packaged-restart");
@@ -308,22 +311,55 @@ public final class PackagedAcceptanceMain {
                             .forNode(restartNode);
             first.save(42.5, -130.994);
             first.flush();
+
+            // A September moment at the same sidereal time as the
+            // equinox case, so the remembered place puts the same
+            // lines back on this same page - the sky repeats every
+            // sidereal day, and an arbitrary hour would honestly
+            // draw nothing here.
             java.time.Instant secondSession =
-                    java.time.Instant.parse("2026-09-05T19:00:00Z");
-            juranometria.sky.Observer reborn =
-                    juranometria.ui.placeandtime.PlaceStore
-                            .forNode(restartNode).load(secondSession);
-            require(reborn.latitudeDegrees() == 42.5
-                            && reborn.eastLongitudeDegrees() == -130.994,
-                    "a fresh session reads the place back through the"
-                            + " bundled preference backend");
-            require(reborn.instant().equals(secondSession),
-                    "wearing the new session's instant: no stored"
-                            + " moment exists to masquerade as Now");
-            for (String key : restartNode.keys()) {
-                require(key.startsWith("place."),
-                        "the store holds the place and nothing else: "
-                                + key);
+                    java.time.Instant.parse("2026-09-05T10:28:31Z");
+            juranometria.ui.ChartComponent nextEvening =
+                    new juranometria.ui.ChartComponent(Atlas.assembler());
+            nextEvening.setSize(900, 700);
+            nextEvening.setViewState(ChartViewState.DEFAULT);
+            juranometria.ui.ChartModuleHost secondHost =
+                    new juranometria.ui.ChartModuleHost(nextEvening,
+                            new juranometria.chart.SelectionModel(),
+                            request -> { });
+            juranometria.meridian.MeridianModule restarted =
+                    secondHost.attach(
+                            new juranometria.meridian.MeridianModule(
+                                    juranometria.ui.placeandtime.PlaceStore
+                                            .forNode(restartNode)
+                                            .load(secondSession)));
+            restarted.showing(false, false, false);
+            try {
+                require(restarted.observer().latitudeDegrees() == 42.5
+                                && restarted.observer()
+                                        .eastLongitudeDegrees()
+                                        == -130.994,
+                        "the second session's module wears the place the"
+                                + " first one saved, read through the"
+                                + " bundled preference backend");
+                require(restarted.observer().instant()
+                                .equals(secondSession),
+                        "and the new session's instant: no stored"
+                                + " moment exists to masquerade as Now");
+                require(differingPixels(without, paint(nextEvening)) == 0,
+                        "the next evening begins on the ordinary chart:"
+                                + " the switches were not remembered");
+                restarted.showing(true, true, true);
+                require(differingPixels(without, paint(nextEvening)) > 100,
+                        "and the remembered place draws real lines when"
+                                + " asked");
+                for (String key : restartNode.keys()) {
+                    require(key.startsWith("place."),
+                            "the store holds the place and nothing"
+                                    + " else: " + key);
+                }
+            } finally {
+                secondHost.detachAll();
             }
         } finally {
             restartNode.removeNode();

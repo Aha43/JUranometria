@@ -229,8 +229,11 @@ make import-star-identities
   a third of a degree from the pole of that night's sky. One
   stated limit: the atlas reads your instant as UTC and ships no
   earth-rotation tables, which can place the lines up to about
-  14 arcseconds off — far below anything visible on any page it
-  draws. Your place is remembered between sessions; the instant
+  14 arcseconds off their true position — under half a pixel at
+  the default 8° field, but as much as 3.6 pixels of line
+  placement at the narrowest 1° field. The lines are reference
+  furniture, not measuring instruments, and this is the honest
+  price of an atlas that phones nobody. Your place is remembered between sessions; the instant
   and the switches deliberately are not, so every session begins
   with the ordinary chart and no stale saved clock can masquerade
   as now.

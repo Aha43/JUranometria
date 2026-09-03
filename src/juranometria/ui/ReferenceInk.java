@@ -173,22 +173,42 @@ public final class ReferenceInk {
      */
     private static void label(Graphics2D g, Rectangle2D paper,
                               GreatCirclePage.Arc arc, String name) {
+        g.setColor(EquatorialGrid.GRID_LABEL_INK);
+        g.setFont(EquatorialGrid.GRID_LABEL_FONT);
+        Rectangle2D box = labelBox(paper, arc, name,
+                g.getFontMetrics());
+        g.drawString(name, (float) box.getMinX(),
+                (float) (box.getMaxY() - g.getFontMetrics().getDescent()));
+    }
+
+    /**
+     * Where this arc's name lands on the page: at the upper end (the
+     * right one if they are level), inset and clamped to the paper.
+     *
+     * <p>Public, because the journey that audits the page needs the
+     * same truth the painter uses - a test that re-guessed the
+     * layout would either drift from it or have to allow ink a broad
+     * catchment around every anchor, and a review rightly refused
+     * the catchment.
+     */
+    public static Rectangle2D labelBox(Rectangle2D paper,
+                                       GreatCirclePage.Arc arc,
+                                       String name, FontMetrics metrics) {
         PixelPoint end = arc.to().y() < arc.from().y()
                 || (arc.to().y() == arc.from().y()
                         && arc.to().x() > arc.from().x())
                 ? arc.to() : arc.from();
-        g.setColor(EquatorialGrid.GRID_LABEL_INK);
-        g.setFont(EquatorialGrid.GRID_LABEL_FONT);
-        FontMetrics metrics = g.getFontMetrics();
         double width = metrics.stringWidth(name);
         double x = Math.min(Math.max(end.x() + LABEL_INSET,
                         paper.getMinX() + LABEL_INSET),
                 paper.getMaxX() - LABEL_INSET - width);
-        double y = Math.min(Math.max(end.y() + LABEL_INSET
+        double baseline = Math.min(Math.max(end.y() + LABEL_INSET
                         + metrics.getAscent(),
                         paper.getMinY() + LABEL_INSET + metrics.getAscent()),
                 paper.getMaxY() - LABEL_INSET);
-        g.drawString(name, (float) x, (float) y);
+        return new Rectangle2D.Double(x,
+                baseline - metrics.getAscent(), width,
+                metrics.getAscent() + metrics.getDescent());
     }
 
     private static void drawPoint(Graphics2D g,
