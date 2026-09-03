@@ -1,99 +1,48 @@
-package juranometria.tool;
+package juranometria.sky;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 import juranometria.chart.SkyPosition;
 
 /**
- * Where a reader's sky is, in the chart's own frame (Sprint 25,
- * issue #225 — the gate's working model).
+ * The rotation between a reader's sky and the chart's (Sprint 25,
+ * issue #226).
  *
- * <p>The atlas draws a <strong>fixed</strong> celestial chart in
- * ICRS/J2000. A meridian, a zenith and a horizon are not fixed: they
- * belong to a place and an instant, and they are defined against the
- * <em>true equator and equinox of date</em>. Putting them on a J2000
- * page is therefore a frame problem, and the whole point of this
- * gate is to solve it in the open rather than to plot
- * {@code RA = sidereal time} and hope.
+ * <p>The chart is ICRS/J2000. A meridian, a zenith and a horizon are
+ * defined against the <strong>true equator and equinox of date</strong>.
+ * This class is the change of frame between them, and the gate spent
+ * itself establishing that the change must actually be made:
+ * plotting sidereal time straight onto a J2000 page is wrong by
+ * 21 arcminutes today and 39 by 2050.
  *
- * <h2>The chain</h2>
+ * <p><strong>There is no shortcut to fall back to.</strong> The gate
+ * measured and rejected one, so this class does not offer it: every
+ * public route carries precession (IAU 1976) and nutation (IAU 1980,
+ * twenty terms). A caller cannot ask for the wrong answer.
  *
- * <ol>
- *   <li>An instant in UTC becomes a Julian date.</li>
- *   <li><strong>GMST</strong> follows from it, then <strong>GAST</strong>
- *       by the equation of the equinoxes, which is where nutation
- *       first enters.</li>
- *   <li>The zenith is {@code (RA = GAST + east longitude,
- *       Dec = latitude)} <em>in the true frame of date</em>; the
- *       meridian and horizon are the two great circles that follow
- *       from it.</li>
- *   <li>Every one of those directions is rotated back through
- *       nutation and precession into <strong>J2000</strong>, which is
- *       the only frame the chart knows.</li>
- * </ol>
+ * <h2>The accuracy contract</h2>
  *
- * <h2>What is deliberately not modelled</h2>
+ * <p>Measured against IAU SOFA release 2023-10-11 over eighty cases
+ * spanning 1975-2100 and ten directions, including both poles and
+ * the right-ascension seam: <strong>the rotation agrees to 0.0101
+ * arcseconds</strong> and sidereal time to 0.0005. The vectors are
+ * checked in at {@code docs/studies/place-and-time/reference-vectors.txt}
+ * with their provenance, and the comparison runs in the suite.
  *
- * <p>No UT1−UTC, no leap-second table, no polar motion, no
- * aberration, no refraction. Each is a decision with a measured
- * price, recorded in {@code docs/decisions/place-and-time.md} and
- * measured by the study: the atlas ships no time-scale data and
- * makes no network call, and says what that costs instead of
- * pretending it is free.
- *
- * <p>This class lives in {@code juranometria.tool} on purpose. The
- * gate changes no production behaviour; #226 gives the model its own
- * home.
+ * <p>What the atlas does not know is stated rather than hidden: UTC
+ * stands in for UT1, which the two differ by at most 0.9 seconds -
+ * <strong>13.54 arcseconds of Earth rotation</strong>, and the
+ * largest term by far. Polar motion (an allowance of 0.5") and
+ * diurnal aberration (0.32") are not modelled. No leap-second table,
+ * no UT1 series, no network: the atlas ships none of it and says
+ * what that costs.
  */
-public final class SkyOrientation {
+public final class SkyFrame {
 
-    private SkyOrientation() {
+    private SkyFrame() {
     }
 
-    /** Where a reader is: degrees north, degrees east. */
-    public record Observer(double latitudeDegrees, double eastLongitudeDegrees) {
-
-        public Observer {
-            if (latitudeDegrees < -90 || latitudeDegrees > 90) {
-                throw new IllegalArgumentException(
-                        "a latitude is between -90 and 90: "
-                                + latitudeDegrees);
-            }
-            if (eastLongitudeDegrees < -180 || eastLongitudeDegrees > 360) {
-                throw new IllegalArgumentException(
-                        "a longitude is degrees east: "
-                                + eastLongitudeDegrees);
-            }
-        }
-    }
-
-    /**
-     * How faithfully the frames are carried, as a choice rather than
-     * an accident.
-     *
-     * <p>The study measures each of these in arcseconds of sky and
-     * in pixels of page, at every field the atlas offers, so the
-     * decision is made against numbers.
-     */
-    public enum Fidelity {
-
-        /**
-         * Plot the date's coordinates on the J2000 page unchanged -
-         * the shortcut this gate exists to reject. Wrong by the whole
-         * of precession since J2000.
-         */
-        EPOCH_SHORTCUT,
-
-        /** Precession only: nutation left in, as the residual. */
-        PRECESSION_ONLY,
-
-        /** Precession and nutation: what the atlas will ship. */
-        PRECESSION_AND_NUTATION
-    }
-
-    // ---- time ------------------------------------------------------
 
     private static final double J2000 = 2451545.0;
     private static final double DAYS_PER_CENTURY = 36525.0;
@@ -138,117 +87,20 @@ public final class SkyOrientation {
                 + nutation[0] * Math.cos(Math.toRadians(obliquity)));
     }
 
-    // ---- the three geometries --------------------------------------
-
-    /**
-     * The point overhead, in the chart's J2000 frame.
-     */
-    public static SkyPosition zenith(Observer observer, Instant instant,
-                                     Fidelity fidelity) {
-        double jd = julianDate(instant);
-        double localSiderealTime = fidelity == Fidelity.PRECESSION_AND_NUTATION
-                ? gastDegrees(jd) : gmstDegrees(jd);
-        SkyPosition ofDate = new SkyPosition(
-                normalise(localSiderealTime + observer.eastLongitudeDegrees()),
-                observer.latitudeDegrees());
-        return toJ2000(ofDate, jd, fidelity);
-    }
-
-    /**
-     * The reader's meridian: the great circle through both celestial
-     * poles and the zenith, as a closed run of J2000 positions.
-     *
-     * <p>Sampled in declination of date rather than in the plane,
-     * because the curve the page shows is what the projection makes
-     * of a great circle, and a straight line between two projected
-     * points is not that curve.
-     */
-    public static List<SkyPosition> meridian(Observer observer,
-                                             Instant instant,
-                                             Fidelity fidelity, int samples) {
-        double jd = julianDate(instant);
-        double lst = normalise((fidelity == Fidelity.PRECESSION_AND_NUTATION
-                ? gastDegrees(jd) : gmstDegrees(jd))
-                + observer.eastLongitudeDegrees());
-        List<SkyPosition> circle = new ArrayList<>();
-        for (int i = 0; i <= samples; i++) {
-            // Up the reader's own half from pole to pole, and back
-            // down the far half: one closed curve, so a page that
-            // holds the anti-meridian shows it without the module
-            // having to name it.
-            double along = 360.0 * i / samples;
-            double declination;
-            double rightAscension;
-            if (along <= 180.0) {
-                declination = -90.0 + along;
-                rightAscension = lst;
-            } else {
-                declination = 90.0 - (along - 180.0);
-                rightAscension = lst + 180.0;
-            }
-            circle.add(toJ2000(new SkyPosition(normalise(rightAscension),
-                    clampDeclination(declination)), jd, fidelity));
-        }
-        return List.copyOf(circle);
-    }
-
-    /**
-     * The mathematical horizon: every direction ninety degrees from
-     * the zenith, as a closed run of J2000 positions.
-     *
-     * <p>Mathematical, and named so in the vocabulary: no terrain,
-     * no refraction, no trees. It is where the sky would meet a
-     * perfectly flat, perfectly transparent Earth, which is a
-     * cartographic line rather than a promise about a reader's view.
-     */
-    public static List<SkyPosition> horizon(Observer observer,
-                                            Instant instant,
-                                            Fidelity fidelity, int samples) {
-        double jd = julianDate(instant);
-        double lst = normalise((fidelity == Fidelity.PRECESSION_AND_NUTATION
-                ? gastDegrees(jd) : gmstDegrees(jd))
-                + observer.eastLongitudeDegrees());
-        double[] up = toVector(new SkyPosition(lst,
-                observer.latitudeDegrees()));
-        // Two directions across the horizon: due north along the
-        // meridian, and due east.
-        double[] north = normalised(cross(cross(up,
-                new double[] {0, 0, 1}), up));
-        double[] east = normalised(cross(new double[] {0, 0, 1}, up));
-
-        List<SkyPosition> circle = new ArrayList<>();
-        for (int i = 0; i <= samples; i++) {
-            double azimuth = Math.toRadians(360.0 * i / samples);
-            double[] point = new double[3];
-            for (int axis = 0; axis < 3; axis++) {
-                point[axis] = Math.cos(azimuth) * north[axis]
-                        + Math.sin(azimuth) * east[axis];
-            }
-            circle.add(toJ2000(toPosition(point), jd, fidelity));
-        }
-        return List.copyOf(circle);
-    }
-
-    // ---- frames ----------------------------------------------------
 
     /**
      * A direction of date, expressed in the chart's J2000 frame.
      *
-     * <p>{@link Fidelity#EPOCH_SHORTCUT} returns it untouched, which
-     * is what plotting sidereal time straight onto a J2000 chart
-     * amounts to. The study measures what that costs.
+     * <p>Precession and nutation, always. The gate rejected the
+     * shortcut by measuring it, so there is no argument here to
+     * choose it with: an implementation that could be asked for
+     * {@code RA = LST} in J2000 is an implementation that will
+     * eventually be asked for it.
      */
-    public static SkyPosition toJ2000(SkyPosition ofDate, double julianDate,
-                                      Fidelity fidelity) {
-        if (fidelity == Fidelity.EPOCH_SHORTCUT) {
-            return ofDate;
-        }
+    public static SkyPosition toJ2000(SkyPosition ofDate, double julianDate) {
         double t = centuries(julianDate);
-        double[] vector = toVector(ofDate);
-        if (fidelity == Fidelity.PRECESSION_AND_NUTATION) {
-            vector = applyNutationInverse(vector, t);
-        }
-        return toPosition(applyPrecessionInverse(vector, t));
+        return toPosition(applyPrecessionInverse(
+                applyNutationInverse(toVector(ofDate), t), t));
     }
 
     /**
@@ -295,16 +147,16 @@ public final class SkyOrientation {
      * Nutation in longitude and obliquity, in degrees: the twenty
      * largest terms of the IAU 1980 series.
      *
-     * <p>Truncated on purpose, and the truncation is measured rather
-     * than assumed: the study compares this against the four-term
-     * form to show what the tail is worth, in arcseconds and in
-     * pixels.
+     * <p>Twenty, and not a number a caller chooses. An earlier
+     * version took the term count as an argument so the study could
+     * compare shorter forms - which is the same lesser-answer
+     * control the gate rejected in another guise (review), reachable
+     * by anyone and invisible to the test that walks this class for
+     * mode enums. The truncation is now the model's own decision,
+     * and what it costs is measured against SOFA rather than against
+     * a shorter copy of itself.
      */
     public static double[] nutationDegrees(double centuries) {
-        return nutationDegrees(centuries, TERMS.length);
-    }
-
-    public static double[] nutationDegrees(double centuries, int terms) {
         double t = centuries;
         double d = Math.toRadians(297.85036 + 445267.111480 * t
                 - 0.0019142 * t * t + t * t * t / 189474.0);
@@ -319,7 +171,7 @@ public final class SkyOrientation {
 
         double longitude = 0;
         double obliquity = 0;
-        for (int i = 0; i < Math.min(terms, TERMS.length); i++) {
+        for (int i = 0; i < TERMS.length; i++) {
             double[] term = TERMS[i];
             double argument = term[0] * d + term[1] * m + term[2] * mPrime
                     + term[3] * f + term[4] * omega;

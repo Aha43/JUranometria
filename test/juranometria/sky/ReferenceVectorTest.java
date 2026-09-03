@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.sky;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,9 +67,8 @@ class ReferenceVectorTest {
         double worst = 0;
         String worstCase = "none";
         for (Reference row : rows) {
-            SkyPosition mine = SkyOrientation.toJ2000(row.ofDate(),
-                    SkyOrientation.julianDate(row.utc()),
-                    SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+            SkyPosition mine = SkyFrame.toJ2000(row.ofDate(),
+                    SkyFrame.julianDate(row.utc()));
             double apart = mine.separationDegrees(row.j2000()) * 3600.0;
             if (apart > worst) {
                 worst = apart;
@@ -94,8 +93,8 @@ class ReferenceVectorTest {
     void siderealTimeAgreesWithSofaToo() throws IOException {
         double worst = 0;
         for (Reference row : published()) {
-            double mine = SkyOrientation.gmstDegrees(
-                    SkyOrientation.julianDate(row.utc()));
+            double mine = SkyFrame.gmstDegrees(
+                    SkyFrame.julianDate(row.utc()));
             worst = Math.max(worst,
                     Math.abs(mine - row.gmstDegrees()) * 3600.0);
         }

@@ -49,16 +49,12 @@ class PlaceAndTimeGateTest {
                 ChartOptions.DEFAULTS);
         // Everything the gate can do, done: the model runs, the
         // geometries are built, the frames are carried.
-        SkyOrientation.Observer observer =
-                new SkyOrientation.Observer(59.913, 10.752);
-        java.time.Instant instant = java.time.Instant.parse(
-                "2026-03-20T21:33:00Z");
-        SkyOrientation.zenith(observer, instant,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
-        SkyOrientation.meridian(observer, instant,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION, 720);
-        SkyOrientation.horizon(observer, instant,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION, 720);
+        juranometria.sky.LocalSky sky = new juranometria.sky.LocalSky(
+                new juranometria.sky.Observer(59.913, 10.752,
+                        java.time.Instant.parse("2026-03-20T21:33:00Z")));
+        sky.zenith();
+        sky.meridian().around(720);
+        sky.horizon().around(720);
         BufferedImage after = renderer.renderToImage(scene,
                 ChartOptions.DEFAULTS);
 
@@ -68,23 +64,29 @@ class PlaceAndTimeGateTest {
     }
 
     @Test
-    void nothingOutsideTheStudyPipelineKnowsThisSprintExists()
+    void theChartCoreStillKnowsNothingOfObserversOrTime()
             throws IOException {
+        // The gate kept the model in the study pipeline; #226 gave
+        // it a home in juranometria.sky. What must stay true is the
+        // direction: the chart core has not learnt about observers,
+        // clocks, longitude, sidereal time, meridians or horizons.
         List<String> offenders = new ArrayList<>();
-        for (Path source : java(Path.of("src/juranometria"))) {
-            if (source.toString().contains("/tool/")) {
-                continue;
-            }
-            String code = withoutComments(Files.readString(source));
-            if (code.contains("SkyOrientation")
-                    || code.contains("PlaceAndTime")) {
-                offenders.add(source.toString());
+        for (String directory : List.of("src/juranometria/chart",
+                "src/juranometria/render", "src/juranometria/catalog",
+                "src/juranometria/geo", "src/juranometria/search")) {
+            for (Path source : java(Path.of(directory))) {
+                String code = withoutComments(Files.readString(source));
+                if (code.contains("juranometria.sky")
+                        || code.contains("PlaceAndTime")
+                        || code.contains("Observer")
+                        || code.contains("siderealTime")) {
+                    offenders.add(source.toString());
+                }
             }
         }
         assertEquals(List.of(), offenders,
-                "the model and the studies live in the study pipeline"
-                        + " until #226 gives them a home; the running"
-                        + " atlas has not been told about them");
+                "the chart core draws a fixed sky and knows nothing"
+                        + " about who is looking at it or when");
     }
 
     @Test
@@ -93,7 +95,7 @@ class PlaceAndTimeGateTest {
         // ephemeris would arrive with provenance, a licence and an
         // expiry date. This one is polynomials and rotations.
         String code = withoutComments(Files.readString(
-                Path.of("src/juranometria/tool/SkyOrientation.java")));
+                Path.of("src/juranometria/sky/SkyFrame.java")));
         for (String forbidden : List.of("java.net", "java.io.File",
                 "Files.", "getResource", "URL", "Socket", "http")) {
             assertTrue(!code.contains(forbidden),
@@ -140,7 +142,7 @@ class PlaceAndTimeGateTest {
         // decision against 0.0033" in the report - was a figure
         // written by hand before the study was regenerated, and it
         // survived because this list did not cover it.
-        for (String claim : List.of("13.54\"", "21.17'", "39.34'",
+        for (String claim : List.of("13.54\"", "21.26'", "39.55'",
                 "8.80'", "0.0000 px", "14.36\"", "0.0101\"",
                 "0.50\"", "0.32\"")) {
             assertTrue(report.contains(claim),
