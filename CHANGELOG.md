@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-03
+
+Sprint 24 — Discover what is on this page. The atlas could always
+draw the sky; it could not tell a reader what was on the page in
+front of them, and least of all about the things it had decided not
+to draw. A reader looking at Andromeda saw M31 and had no way to
+learn that NGC 206 was there too, because the atlas draws nothing
+for its type and therefore said nothing at all.
+
+Four issues: a design gate that measured the feature before building
+it, a page inventory and the chart's first module seam, the table
+and its working crosses, and the closing journey.
+
 ### Added
 
 - **On this page** (Sprint 24, issues #214–#217). The Inspector can
