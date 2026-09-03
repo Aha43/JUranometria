@@ -232,7 +232,19 @@ class PlaceAndTimeDialogTest {
                     "and the field is put back as it was: " + wrong);
         }
         for (String wrong : List.of("today", "2026-13-01 00:00",
-                "21:33 2026-03-20", "2026-03-20")) {
+                "21:33 2026-03-20", "2026-03-20",
+                // Impossible moments the default resolver quietly
+                // repaired: February 30th became the 28th, 24:00
+                // became the following morning, and a reader was
+                // answered with a sky for a moment they never asked
+                // about (review). Strict resolution refuses them.
+                // In both accepted shapes, because each has its own
+                // formatter and a mutation relaxing only the
+                // with-seconds one slipped past the minute forms.
+                "2026-02-30 12:00", "2026-02-30 12:00:00",
+                "2026-03-20 24:00", "2026-03-20 24:00:00",
+                "2026-02-29 12:00", "2026-02-29 12:00:00",
+                "2026-04-31 12:00", "2026-03-20 12:60")) {
             commit(rig.field("instantField"), wrong);
             assertEquals(before, rig.module.observer(),
                     "an instant that is not one applies nothing: "
@@ -259,6 +271,56 @@ class PlaceAndTimeDialogTest {
                 "and the store is untouched: a reader who set only a"
                         + " moment has told the atlas nothing worth"
                         + " keeping");
+    }
+
+    @Test
+    void aRealLeapDayIsStillAccepted() {
+        // Strictness must refuse the impossible, not the rare: 2028
+        // has a February 29th, and a reader who wants it gets it.
+        Rig rig = new Rig(node);
+        commit(rig.field("instantField"), "2028-02-29 12:00:00");
+        assertEquals(Instant.parse("2028-02-29T12:00:00Z"),
+                rig.module.observer().instant());
+    }
+
+    @Test
+    void leavingAFieldCommitsItJustAsEnterDoes() {
+        // The other half of the gesture, which the first suite never
+        // exercised: every commit went through the Enter path, so a
+        // dialog whose focus listener was deleted would have passed
+        // (review). The registered focus listeners are invoked here -
+        // a field with none has nothing to invoke and this fails -
+        // and the true traversal, desktop focus and all, is walked in
+        // PlaceAndTimeDialogLifecycleTest, because a synthetic
+        // FocusEvent is swallowed by the KeyboardFocusManager rather
+        // than delivered.
+        Rig rig = new Rig(node);
+        JTextField latitude = rig.field("latitudeField");
+        assertTrue(latitude.getFocusListeners().length > 0,
+                "leaving the field is a commitment, so something must"
+                        + " be listening for it");
+
+        latitude.setText("-33.87");
+        focusLeft(latitude);
+        assertEquals(-33.87, rig.module.observer().latitudeDegrees(),
+                "leaving the field is the commitment, same as Enter");
+
+        latitude.setText("not a latitude");
+        focusLeft(latitude);
+        assertEquals(-33.87, rig.module.observer().latitudeDegrees(),
+                "and a wrong entry left behind is refused the same"
+                        + " way");
+        assertEquals("-33.87", latitude.getText(),
+                "and put back");
+    }
+
+    /** What the toolkit does when focus leaves this field. */
+    private static void focusLeft(JTextField field) {
+        var event = new java.awt.event.FocusEvent(field,
+                java.awt.event.FocusEvent.FOCUS_LOST);
+        for (var listener : field.getFocusListeners()) {
+            listener.focusLost(event);
+        }
     }
 
     @Test

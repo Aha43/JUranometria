@@ -70,13 +70,25 @@ public final class PlaceAndTimeDialog extends JDialog {
     /** What the reviewed mock-up was drawn at. */
     public static final int ORDINARY_WIDTH = 420;
 
-    /** Shown with seconds, because a minute is a quarter degree of
-     *  sidereal turning; accepted with or without them. */
+    /**
+     * Shown with seconds, because a minute is a quarter degree of
+     * sidereal turning; accepted with or without them.
+     *
+     * <p>STRICT, because the default resolver quietly repairs
+     * impossible dates - February 30th became the 28th, and 24:00
+     * became the following morning (review). A reader who mistypes a
+     * date must be told by the field going back, not answered with a
+     * sky for a moment they never asked about. Strict resolution
+     * reads {@code uuuu}, not {@code yyyy}: the pattern year is
+     * year-of-era, and strictness refuses it without an era.
+     */
     private static final DateTimeFormatter SHOWN = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ROOT)
+            .ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT)
+            .withResolverStyle(java.time.format.ResolverStyle.STRICT)
             .withZone(ZoneOffset.UTC);
     private static final DateTimeFormatter TYPED_SHORT = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm", Locale.ROOT)
+            .ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT)
+            .withResolverStyle(java.time.format.ResolverStyle.STRICT)
             .withZone(ZoneOffset.UTC);
 
     private PlaceAndTimeDialog(Frame owner, MeridianModule module,
@@ -99,6 +111,13 @@ public final class PlaceAndTimeDialog extends JDialog {
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         pack();
         setSize(Math.max(getWidth(), ORDINARY_WIDTH), getHeight());
+        // And laid out again at that size - invalidate first,
+        // because setSize leaves the tree marked valid and a bare
+        // validate() is then a no-op: the floor was applied to the
+        // window but not to the controls inside it, which the
+        // study's dark photograph showed at 344 px.
+        invalidate();
+        validate();
         setLocationRelativeTo(owner);
     }
 
@@ -115,14 +134,18 @@ public final class PlaceAndTimeDialog extends JDialog {
     }
 
     /**
-     * The dialog's content, for the study that photographs it. The
-     * study reviews the surface a reader gets, so it builds the
-     * surface a reader gets; its clock answers a fixed instant,
-     * because a photograph is not a session.
+     * The packed production dialog, unshown, for the study that
+     * photographs it. The whole dialog and not its content in a
+     * stand-in panel: a photograph of an artificial arrangement can
+     * hide a clipped control the packed geometry would show
+     * (review). Its clock answers the frozen instant, because a
+     * photograph is not a session. Needs a display, as any dialog
+     * does; the caller owns disposing it.
      */
-    public static JComponent contentForStudy(MeridianModule module,
-                                             PlaceStore store) {
-        return content(module, store,
+    public static PlaceAndTimeDialog packedForStudy(Frame owner,
+                                                    MeridianModule module,
+                                                    PlaceStore store) {
+        return new PlaceAndTimeDialog(owner, module, store,
                 () -> module.observer().instant());
     }
 
