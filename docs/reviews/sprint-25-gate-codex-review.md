@@ -181,3 +181,68 @@ Changes still requested before #226 begins. The chart/module architecture,
 interaction concept, visual treatment, and great-circle vocabulary are
 accepted. The remaining work is to make the accuracy promise and absolute
 frame orientation as evidence-based as the rest of the gate.
+
+## Second follow-up review at 35d18ad
+
+The documentation mismatch and the false omitted-tail bound are corrected,
+and polar motion and diurnal aberration are no longer hidden beside the total.
+The gate is also now candid that its invariants do not identify the absolute
+orientation. Those are meaningful corrections.
+
+Two blockers remain, one already acknowledged and one introduced by the new
+14.64″ total.
+
+### P1 — 14.64″ is still presented as a bound although two operands are not bounds
+
+The decision now says no worst-case nutation-tail bound is known, but then adds
+the **single-date 0.0033″ residual** as though it were a worst term in a derived
+accuracy contract. “Ten times the measured residual” is a useful sensitivity
+illustration, but the factor ten is arbitrary and cannot turn one observation
+into a bound.
+
+The 0.28″ precession term is also mislabeled. `precessionModelSpread()` does
+not compare an IAU 1976 precession matrix with an IAU 2006 precession matrix.
+It compares the classical GMST expression with Earth rotation angle plus an
+IAU 2006 precession-in-right-ascension expression, at six dates. That is a
+sidereal-time comparison, not an angular error bound for the combined
+true-of-date to J2000 transformation. Sampling six dates would not establish a
+two-century worst case even if the quantities were the intended ones.
+
+Consequently, “adding every term above” does not derive 14.64″. Until the full
+reference comparison exists, state the individually supported figures and the
+pixel scale they imply, but do not publish a summed accuracy contract. The
+SOFA comparison should measure the final direction over a declared supported
+date interval; its maximum angular residual can then replace both speculative
+model/truncation operands in one coherent error budget.
+
+### P1 — The absolute-orientation fixture remains a condition, not completed evidence
+
+The gate now describes this accurately and assigns a concrete fixture to
+#226. That is acceptable issue scoping, but it is not a closed review finding.
+The project has network access available through this review environment, and
+the official IAU SOFA C source and documentation are currently obtainable from
+the IAU SOFA site. The fixture can therefore be generated from a named SOFA
+release without introducing any application runtime or network dependency.
+
+Record at least:
+
+- the SOFA release identifier and source URL;
+- the exact SOFA calls and matrix direction used;
+- the time-scale convention used when producing each date;
+- enough significant digits that the promised tolerance, rather than decimal
+  rounding, decides the comparison; and
+- cases away from J2000 and across both hemispheres, a pole, and the RA seam.
+
+The expected values should be generated artifacts committed to the repository,
+not values recalled or maintained by hand.
+
+## Second follow-up decision
+
+Changes still requested. The geometry/module part of the gate is approved.
+The astronomy gate becomes approvable when the unsupported summed contract is
+removed or replaced by the SOFA-backed end-to-end measurement.
+
+Issue #224 should be fixed in a separate PR before using display CI as evidence
+for this gate. A required check failing four of five runs is not trustworthy
+release evidence, and guarding the nine known Swing-session borrowers is a
+contained prerequisite rather than astronomy work smuggled into PR #231.
