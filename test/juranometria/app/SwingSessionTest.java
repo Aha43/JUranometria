@@ -229,6 +229,44 @@ class SwingSessionTest {
     }
 
     @org.junit.jupiter.api.Test
+    void aFailingCleanupIsSuppressedBehindTheFailureThatMatters() {
+        // Both halves fail: the reader must see the body's failure,
+        // with the cleanup's trouble attached as suppressed - never
+        // the other way round, which is what the first wrappers did
+        // (review).
+        IllegalStateException primary =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        IllegalStateException.class, () ->
+                                SwingSession.guarded(() -> {
+                                    throw new IllegalStateException(
+                                            "the failure that matters");
+                                }, () -> {
+                                    throw new IllegalStateException(
+                                            "cleanup trouble");
+                                }));
+        org.junit.jupiter.api.Assertions.assertEquals(
+                "the failure that matters", primary.getMessage(),
+                "the body's failure is the one thrown");
+        org.junit.jupiter.api.Assertions.assertEquals(1,
+                primary.getSuppressed().length,
+                "with the cleanup's trouble attached");
+        org.junit.jupiter.api.Assertions.assertEquals(
+                "cleanup trouble",
+                primary.getSuppressed()[0].getMessage());
+
+        // And a cleanup failing alone still surfaces.
+        IllegalStateException alone =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        IllegalStateException.class, () ->
+                                SwingSession.guarded(() -> { }, () -> {
+                                    throw new IllegalStateException(
+                                            "cleanup trouble");
+                                }));
+        org.junit.jupiter.api.Assertions.assertEquals(
+                "cleanup trouble", alone.getMessage());
+    }
+
+    @org.junit.jupiter.api.Test
     void whatWasCapturedIsWhatComesBack() throws Exception {
         SwingSession.Held before = SwingSession.capture();
         SwingSession.Held held = SwingSession.capture();

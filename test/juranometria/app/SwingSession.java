@@ -37,6 +37,38 @@ public final class SwingSession {
     }
 
     /**
+     * Runs a body and then its cleanup, preserving the primary
+     * failure: if both fail, the body's exception is the one thrown
+     * and the cleanup's is attached as suppressed - the project's
+     * standing rule, which the first version of these guards got
+     * backwards by letting a failing restore replace the failure a
+     * reader actually needed to see (review).
+     */
+    static void guarded(Body body, Body cleanup) throws Exception {
+        Throwable primary = null;
+        try {
+            body.run();
+        } catch (Throwable failure) {
+            primary = failure;
+        }
+        try {
+            cleanup.run();
+        } catch (Throwable trouble) {
+            if (primary == null) {
+                primary = trouble;
+            } else {
+                primary.addSuppressed(trouble);
+            }
+        }
+        if (primary instanceof Exception failure) {
+            throw failure;
+        }
+        if (primary instanceof Error failure) {
+            throw failure;
+        }
+    }
+
+    /**
      * Runs a body and puts the look and feel and the default-font
      * override back the way they were - whatever they were.
      *
@@ -45,11 +77,7 @@ public final class SwingSession {
      */
     public static void restoring(Body body) throws Exception {
         Held inherited = capture();
-        try {
-            body.run();
-        } finally {
-            inherited.restore();
-        }
+        guarded(body, inherited::restore);
     }
 
     /**
@@ -98,21 +126,13 @@ public final class SwingSession {
      */
     public static void restoringLocale(Body body) throws Exception {
         java.util.Locale inherited = java.util.Locale.getDefault();
-        try {
-            body.run();
-        } finally {
-            java.util.Locale.setDefault(inherited);
-        }
+        guarded(body, () -> java.util.Locale.setDefault(inherited));
     }
 
     /** Runs a body and puts the default time zone back. */
     public static void restoringTimeZone(Body body) throws Exception {
         java.util.TimeZone inherited = java.util.TimeZone.getDefault();
-        try {
-            body.run();
-        } finally {
-            java.util.TimeZone.setDefault(inherited);
-        }
+        guarded(body, () -> java.util.TimeZone.setDefault(inherited));
     }
 
     /**
@@ -124,11 +144,8 @@ public final class SwingSession {
             throws Exception {
         javax.swing.RepaintManager inherited =
                 javax.swing.RepaintManager.currentManager(null);
-        try {
-            body.run();
-        } finally {
-            javax.swing.RepaintManager.setCurrentManager(inherited);
-        }
+        guarded(body, () -> javax.swing.RepaintManager
+                .setCurrentManager(inherited));
     }
 
     /** A body handed a scratch preference node. */
@@ -149,16 +166,14 @@ public final class SwingSession {
         java.util.prefs.Preferences node =
                 java.util.prefs.Preferences.userRoot().node(
                         prefix + "-" + System.nanoTime());
-        try {
-            body.run(node);
-        } finally {
+        guarded(() -> body.run(node), () -> {
             try {
                 node.removeNode();
             } catch (IllegalStateException alreadyRemoved) {
                 // A body that removed the node itself - the broken-
                 // store fixtures do - has done this guard's work.
             }
-        }
+        });
     }
 
     /**
