@@ -272,3 +272,33 @@ The same seam also removes the older equatorial-grid acceptance hazard.
 The clipped **On this page** control reported during dogfooding remains open;
 this commit does not change its layout. PR #223 and 1.5.0 remain held only for
 that visible surface correction and its cross-font/width evidence.
+
+## Follow-up — `6674063`
+
+**The visible clipping defect is resolved.** The chooser now uses the full
+Inspector width, gives both names equal room while they fit, and stacks them
+when they do not. The regression measures the text in each button's actual
+font across 240/320/420 px and 11–24 pt, and separately pins the alignment and
+responsive shape that caused the observed “O”.
+
+One P2 test-isolation correction remains.
+
+### P2 — The new font sweep bypasses the shared Swing-state guard
+
+`InspectorModeChooserTest` captures `UIManager.getFont("defaultFont")`, writes
+several overrides, then restores by putting that resolved font back. Sprint
+21 established `SwingSession.restoring` precisely because `UIManager.get`
+cannot distinguish an explicit override from the active look-and-feel's own
+font. Putting the resolved LAF value back can invent an override that did not
+exist and pin it across the next theme, making unrelated display tests depend
+on execution order.
+
+Run both font-mutating tests inside `SwingSession.restoring`, as the existing
+dialog, accessibility, toolbar, and contrast tests do. Keep the three
+failure-mode proofs in `SwingSessionTest` load-bearing; do not recreate a
+smaller local restoration scheme. Confirm the chooser test leaves both the
+inherited look and feel and the presence/absence of a font override exactly as
+it found them, including when an assertion throws.
+
+After that contained test cleanup, all Sprint 24 findings are resolved and PR
+#223 may merge for the recommended 1.5.0 release.
