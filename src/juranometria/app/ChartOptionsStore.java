@@ -19,6 +19,19 @@ public interface ChartOptionsStore {
 
     void save(ChartOptions options);
 
+    /**
+     * Pushes what has been saved to wherever this store keeps it.
+     *
+     * <p>A store that keeps nothing beyond the session has nothing
+     * to push, so this does nothing by default. It exists because a
+     * caller that needs a saved choice to be readable by a *fresh*
+     * store has to be able to ask <em>this</em> store to settle,
+     * rather than reaching past it to a node it assumed (issue
+     * #217).
+     */
+    default void flush() {
+    }
+
     /** The JDK-preferences implementation used by the application. */
     static ChartOptionsStore user() {
         return forNode(Preferences.userRoot().node("juranometria"));
@@ -27,6 +40,16 @@ public interface ChartOptionsStore {
     /** An implementation over an explicit node; tests use a test node. */
     static ChartOptionsStore forNode(Preferences node) {
         return new ChartOptionsStore() {
+            @Override
+            public void flush() {
+                try {
+                    node.flush();
+                } catch (java.util.prefs.BackingStoreException e) {
+                    throw new IllegalStateException(
+                            "the preference store would not settle", e);
+                }
+            }
+
             @Override
             public ChartOptions load() {
                 return new ChartOptions(

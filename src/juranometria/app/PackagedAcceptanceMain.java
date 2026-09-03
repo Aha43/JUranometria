@@ -48,14 +48,36 @@ public final class PackagedAcceptanceMain {
     static void withTemporaryOptions(ChartOptionsStore store,
                                      ChartOptions temporary,
                                      ThrowingRunnable body) throws Exception {
+        // Read first, and mutate nothing until the guard is up: the
+        // save and the flush that follows can each fail, and the
+        // first version left them outside the try, so a flush that
+        // threw left the reader wearing this run's choice with
+        // nobody to put theirs back (sprint review).
         ChartOptions theirs = store.load();
-        store.save(temporary);
-        Preferences.userRoot().node("juranometria").flush();
+        Throwable failure = null;
         try {
+            store.save(temporary);
+            // Asked of this store rather than of a node assumed to
+            // be behind it - the helper used to flush the
+            // application's own node even when handed another store.
+            store.flush();
             body.run();
+        } catch (Throwable thrown) {
+            failure = thrown;
+            throw thrown;
         } finally {
-            store.save(theirs);
-            Preferences.userRoot().node("juranometria").flush();
+            try {
+                store.save(theirs);
+                store.flush();
+            } catch (RuntimeException | Error restoring) {
+                // A restoration that failed must not replace the
+                // failure it was cleaning up after: that would hide
+                // the very thing the run exists to report.
+                if (failure == null) {
+                    throw restoring;
+                }
+                failure.addSuppressed(restoring);
+            }
         }
     }
 

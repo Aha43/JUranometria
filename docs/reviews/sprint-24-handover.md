@@ -73,6 +73,7 @@ The foundation took three more, and the table two:
 | #217.2 | row clicks could land on cells no reader could reach; sorting still went through the sorter's API rather than the real header; keyboard extension was untested in the closing journey; and the packaged "restart" never built a second session |
 | #217.3 | the click test proved a *cell* was partly visible rather than that the *point clicked* was reachable; the packaged restart compared two loads of one preference store without ever applying those options to the restarted application |
 | #217.4 | the packaged run changed a real preference and restored it only when it passed — so the run that found a defect was also the run that left a reader with their galaxies switched off |
+| #217.5 | the write and its flush still sat *outside* the guard, so either could fail after the mutation with nobody to undo it; and the helper settled the application's own preference node whatever store it had been handed |
 
 Two corrections are worth naming because they were mine to make and
 I got them wrong first:
@@ -90,7 +91,11 @@ I got them wrong first:
   their galaxies switched off. Restoration and module release are in
   `finally` now, through one `withTemporaryOptions` seam, and the
   failure path has its own test: a body that throws still gives the
-  reader their settings back, and the failure still propagates.
+  reader their settings back, and the failure still propagates. The
+  guarded interval begins *before* the mutation — a flush that fails
+  after a successful write is exactly the case a restore-on-exit
+  misses — and the helper settles the store it was handed rather
+  than the node it used to assume.
 - The first packaged acceptance for this feature predicted which
   objects *would* be crossed, using a copy of the module's own rule,
   and never attached the module or drew a pixel. It would have
@@ -184,10 +189,10 @@ Everything below was run on this machine at `<HEAD>`.
 - **Clean bootstrap:** `make clean`, `rm -rf lib`,
   `scripts/download-libs.sh`, then a full build. All four pinned
   jars fetched.
-- **Full suite:** **629 tests found, 0 failed.** On this desktop 12
+- **Full suite:** **633 tests found, 0 failed.** On this desktop 12
   display-backed journeys end *unmet* when the window manager will
   not grant focus; on the CI display job, where an abort fails the
-  build, all 629 run.
+  build, all 633 run.
 - **Studies:** every study regenerated and reproduces byte-for-byte,
   except the pre-existing point-and-identify drift recorded above.
 - **Native image:** built for macOS-arm64, 76 MB unpacked, headless
