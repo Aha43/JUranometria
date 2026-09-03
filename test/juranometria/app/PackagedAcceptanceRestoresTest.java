@@ -32,6 +32,16 @@ class PackagedAcceptanceRestoresTest {
                 .node("juranometria-acceptance-restore-test"));
     }
 
+    @org.junit.jupiter.api.AfterEach
+    void leaveNoNodeBehind() throws Exception {
+        // The gate's real-leak finding (#241): this node outlived
+        // every run and accumulated in the developer's preference
+        // store. Removed after each test, whatever happened in it.
+        Preferences.userRoot()
+                .node("juranometria-acceptance-restore-test")
+                .removeNode();
+    }
+
     @Test
     void aFailingRunPutsTheReadersChoiceBack() throws Exception {
         ChartOptionsStore store = store();

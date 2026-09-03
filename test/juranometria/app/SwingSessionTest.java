@@ -163,4 +163,87 @@ class SwingSessionTest {
                             + " theme");
         });
     }
+
+    @org.junit.jupiter.api.Test
+    void localeAndTimeZoneComeBackExactlyEvenWhenTheBodyFails() {
+        java.util.Locale locale = java.util.Locale.getDefault();
+        java.util.TimeZone zone = java.util.TimeZone.getDefault();
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () ->
+                        SwingSession.restoringLocale(() ->
+                                SwingSession.restoringTimeZone(() -> {
+                                    java.util.Locale.setDefault(
+                                            java.util.Locale
+                                                    .forLanguageTag("tr-TR"));
+                                    java.util.TimeZone.setDefault(
+                                            java.util.TimeZone.getTimeZone(
+                                                    "Pacific/Kiritimati"));
+                                    throw new IllegalStateException("boom");
+                                })));
+        org.junit.jupiter.api.Assertions.assertEquals(locale,
+                java.util.Locale.getDefault(),
+                "a failing body cannot leak a locale");
+        org.junit.jupiter.api.Assertions.assertEquals(zone,
+                java.util.TimeZone.getDefault(),
+                "or a time zone");
+    }
+
+    @org.junit.jupiter.api.Test
+    void theRepaintManagerComesBackTheSameInstance() throws Exception {
+        javax.swing.RepaintManager inherited =
+                javax.swing.RepaintManager.currentManager(null);
+        SwingSession.restoringRepaintManager(() ->
+                javax.swing.RepaintManager.setCurrentManager(
+                        new javax.swing.RepaintManager()));
+        org.junit.jupiter.api.Assertions.assertSame(inherited,
+                javax.swing.RepaintManager.currentManager(null),
+                "what was there, not a fresh one");
+    }
+
+    @org.junit.jupiter.api.Test
+    void aScratchNodeIsRemovedWhateverHappensAndToleratesTheFixture()
+            throws Exception {
+        String[] name = new String[1];
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () ->
+                        SwingSession.scratchPreferences(
+                                "juranometria-scratch-guard-test",
+                                node -> {
+                                    name[0] = node.name();
+                                    node.put("k", "v");
+                                    throw new IllegalStateException("boom");
+                                }));
+        org.junit.jupiter.api.Assertions.assertFalse(
+                java.util.prefs.Preferences.userRoot()
+                        .nodeExists(name[0]),
+                "the node is gone even though the body failed - the"
+                        + " gap that leaked two nodes before #224");
+
+        // And a body that removes the node as its own fixture - the
+        // broken-store tests do - is not punished for it.
+        SwingSession.scratchPreferences(
+                "juranometria-scratch-guard-test", node -> {
+                    node.put("k", "v");
+                    node.removeNode();
+                });
+    }
+
+    @org.junit.jupiter.api.Test
+    void whatWasCapturedIsWhatComesBack() throws Exception {
+        SwingSession.Held before = SwingSession.capture();
+        SwingSession.Held held = SwingSession.capture();
+        javax.swing.UIManager.put("defaultFont",
+                new java.awt.Font(java.awt.Font.SANS_SERIF,
+                        java.awt.Font.PLAIN, 23));
+        held.restore();
+        org.junit.jupiter.api.Assertions.assertEquals(
+                before.fontOverride(),
+                SwingSession.fontOverride(),
+                "the exact override that was found - a font somebody"
+                        + " chose, or nothing at all");
+        org.junit.jupiter.api.Assertions.assertSame(
+                before.lookAndFeel(),
+                javax.swing.UIManager.getLookAndFeel(),
+                "and the same look and feel instance");
+    }
 }

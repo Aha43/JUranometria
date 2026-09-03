@@ -452,14 +452,15 @@ class ToolbarVersionAndExitTest {
         // removed underneath it. Preferences.flush() throws
         // IllegalStateException for a removed node, which is exactly
         // the runtime failure the guard now covers.
-        Preferences doomed = Preferences.userRoot()
-                .node("juranometria-removed-" + System.nanoTime());
-        doomed.put("chart.deepSkyObjects", "true");
-        doomed.removeNode();
+        SwingSession.scratchPreferences("juranometria-removed",
+                doomed -> {
+                    doomed.put("chart.deepSkyObjects", "true");
+                    doomed.removeNode();
 
-        AppShutdown.flushPreferences(doomed);
-        assertFalse(doomed.nodeExists(""),
-                "the premise: the node really is gone");
+                    AppShutdown.flushPreferences(doomed);
+                    assertFalse(doomed.nodeExists(""),
+                            "the premise: the node really is gone");
+                });
     }
 
     @Test

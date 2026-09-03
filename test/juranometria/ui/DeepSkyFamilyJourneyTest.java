@@ -100,26 +100,19 @@ class DeepSkyFamilyJourneyTest {
     private JFrame window;
     private Preferences store;
     private java.awt.Container dialogPane;
-    private javax.swing.LookAndFeel inheritedLookAndFeel;
+    private juranometria.app.SwingSession.Held inheritedSession;
 
     @org.junit.jupiter.api.BeforeEach
     void rememberTheLookAndFeel() {
-        inheritedLookAndFeel = javax.swing.UIManager.getLookAndFeel();
+        inheritedSession = juranometria.app.SwingSession.capture();
     }
 
     @org.junit.jupiter.api.AfterEach
     void leaveNoTrace() throws Exception {
-        if (!GraphicsEnvironment.isHeadless()
-                && inheritedLookAndFeel != null) {
-            SwingUtilities.invokeAndWait(() -> {
-                try {
-                    javax.swing.UIManager.setLookAndFeel(
-                            inheritedLookAndFeel);
-                    com.formdev.flatlaf.FlatLaf.updateUI();
-                } catch (javax.swing.UnsupportedLookAndFeelException e) {
-                    throw new IllegalStateException(e);
-                }
-            });
+        if (inheritedSession != null) {
+            // The shared guard's restore (#224): exactly what was
+            // captured, live components refreshed with it.
+            inheritedSession.restore();
         }
         if (store != null) {
             store.removeNode();

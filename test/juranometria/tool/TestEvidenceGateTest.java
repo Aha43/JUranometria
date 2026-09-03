@@ -154,22 +154,33 @@ class TestEvidenceGateTest {
                 "UiTheme.app" + "ly installs a look and feel just as"
                         + " surely as the setter does");
 
-        // The corpus, pinned exactly: the five flagged files are
-        // read and owned in the decision document - two real leaks,
-        // two crash-path gaps, one fixture by design - and a sixth
-        // would be a new leak nobody has read.
+        // The corpus, settled by #224 and pinned there: nothing is
+        // unprotected, and every JVM-global state flows through the
+        // shared guard - the only file restoring one locally is the
+        // guard itself, whose body IS the restore. The preference
+        // locals are the JUnit-fixture removal shape, kept on
+        // purpose because a node's life spans BeforeEach to
+        // AfterEach and a body-wrapper cannot hold it.
         List<TestEvidenceScan.File> files =
                 TestEvidenceScan.scan(Path.of("test"));
-        assertEquals(List.of(
-                        "juranometria/app/AppSmokeTest.java",
-                        "juranometria/app/ExitProbeMain.java",
-                        "juranometria/app/PackagedAcceptanceRestoresTest.java",
-                        "juranometria/app/StartupFailureTest.java",
-                        "juranometria/app/ToolbarVersionAndExitTest.java"),
+        assertEquals(List.of(),
                 files.stream().filter(f -> f.stateClass()
                                 .equals("UNPROTECTED"))
                         .map(TestEvidenceScan.File::path).toList(),
-                "the flagged set must shrink under #224, never grow");
+                "the gate found five and #224 settled them; the sixth"
+                        + " is caught here, at the source, before a"
+                        + " stranger's flaky run finds it");
+        assertEquals(List.of("juranometria/app/SwingSession.java"),
+                files.stream()
+                        .filter(f -> f.stateClass()
+                                .equals("protected-locally"))
+                        .filter(f -> !f.unprotectedState().isEmpty()
+                                || !f.globalState().equals(
+                                        List.of("preferences")))
+                        .map(TestEvidenceScan.File::path).toList(),
+                "every non-preference global flows through the shared"
+                        + " guard; the one local restorer left is the"
+                        + " guard's own body");
     }
 
     @Test

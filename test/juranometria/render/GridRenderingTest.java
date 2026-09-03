@@ -156,18 +156,15 @@ class GridRenderingTest {
                 new Star("TYC 1-1-1", CENTRE, 1.0)));
         int[] reference = pixels(RENDERER.renderToImage(page));
         assertArrayEquals(reference, pixels(RENDERER.renderToImage(page)));
-        Locale locale = Locale.getDefault();
-        javax.swing.LookAndFeel laf = javax.swing.UIManager.getLookAndFeel();
-        try {
-            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
-            javax.swing.UIManager.setLookAndFeel(
-                    new com.formdev.flatlaf.FlatDarkLaf());
-            assertArrayEquals(reference,
-                    pixels(RENDERER.renderToImage(page)),
-                    "paper and ink in every locale and theme");
-        } finally {
-            Locale.setDefault(locale);
-            javax.swing.UIManager.setLookAndFeel(laf);
-        }
+        // The shared guards put both back exactly (#224).
+        juranometria.app.SwingSession.restoring(() ->
+                juranometria.app.SwingSession.restoringLocale(() -> {
+                    Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                    javax.swing.UIManager.setLookAndFeel(
+                            new com.formdev.flatlaf.FlatDarkLaf());
+                    assertArrayEquals(reference,
+                            pixels(RENDERER.renderToImage(page)),
+                            "paper and ink in every locale and theme");
+                }));
     }
 }
