@@ -202,6 +202,41 @@ make import-star-identities
   page. `Clear marks` removes them all. Marks are working notes for
   the page you are on: they are pruned when you move away, and
   nothing is remembered between sessions.
+- **Find your own sky on the fixed chart.** **View → Place and
+  Time…** takes a latitude, an east-positive longitude (the label
+  says which way it counts — west is negative), and one frozen
+  instant in UTC. Switch on any of three reference lines and the
+  chart draws them in quiet grey, beneath every star: your
+  **meridian** (a solid line through both celestial poles and the
+  point over your head), your **zenith** (a small ring with an
+  upward tick), and your **mathematical horizon** (a dashed line —
+  *mathematical* because it is where the sky meets a perfectly
+  flat, perfectly transparent Earth; your real horizon has hills
+  and air in it, and the atlas does not pretend to know about
+  either). On most pages none of the three crosses the paper, and
+  the atlas draws nothing rather than promise a line that is not
+  there. **Nothing ticks**: the chart is drawn for the instant you
+  typed and stays there — **Now** re-freezes on the moment you
+  press it, and pressing it again is how you move the sky forward.
+  **Center on zenith** moves the chart to the point overhead, and
+  is the only thing in the dialog that moves the page. Behind the
+  lines sits real astronomy: the chart's fixed star positions are
+  for the year-2000 reference frame, and your meridian is computed
+  for the sky *of your date* — carrying precession and nutation
+  properly, checked against the IAU's own reference code to a
+  hundredth of an arcsecond — so on a polar page the meridian
+  passes honestly *beside* the chart's pole, which by 2050 will be
+  a third of a degree from the pole of that night's sky. One
+  stated limit: the atlas reads your instant as UTC and ships no
+  earth-rotation tables, which can place the lines up to about
+  14 arcseconds off their true position — under half a pixel at
+  the default 8° field, but as much as 3.6 pixels of line
+  placement at the narrowest 1° field. The lines are reference
+  furniture, not measuring instruments, and this is the honest
+  price of an atlas that phones nobody. Your place is remembered between sessions; the instant
+  and the switches deliberately are not, so every session begins
+  with the ordinary chart and no stale saved clock can masquerade
+  as now.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the

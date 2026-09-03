@@ -83,6 +83,28 @@ Swing owns input events and window state. Panning and zooming update an
 immutable viewport and request a repaint. The first vertical slice needs one
 window and one custom chart component, with no general UI framework.
 
+### Modules
+
+The chart publishes services; removable modules consume them
+(`juranometria.module`, decided in Sprint 24). A module owns its domain
+state, contributes typed geometry — points, paths, regions, great circles
+by their poles — under an ink role, and never receives a graphics context,
+a pixel, a renderer, or the catalogue. The chart owns how each role is
+inked, where it sits in the stack, and whether it draws at all.
+
+Two modules now share the seam, which is the evidence the design asked
+for: **On this page** (Sprint 24) reads the page inventory and contributes
+interaction crosses; the **meridian module** (Sprint 25) owns an observer
+and a frozen instant and contributes reference lines from the
+UI-independent sky model in `juranometria.sky`. The chart core learned
+neither domain — it still knows nothing of tables, observers, clocks, or
+sidereal time — and either module detaches leaving the released page byte
+for byte, which the packaged acceptance proves inside every native image.
+An architecture test holds the boundaries executable: `juranometria.sky`,
+`juranometria.project`, `juranometria.module`, and `juranometria.meridian`
+are scanned at the class-file level for toolkit, preferences, file, and
+network dependencies.
+
 ## Decisions deliberately deferred
 
 - ~~The minimum supported Java release~~ — decided in issue #1 and
