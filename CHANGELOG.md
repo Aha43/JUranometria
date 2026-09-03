@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-09-03
+
+Sprint 25 — Orient the chart to place and time. The atlas has
+always drawn one fixed sky for every reader alike; it can now
+answer the first question an observer standing outside asks of a
+chart: *where is all this, for me, tonight?* A removable module
+lays the reader's own meridian, zenith and mathematical horizon
+over the unchanged chart, for one frozen instant at one stated
+place — computed properly across the reference frames, checked
+against the IAU's own code to a hundredth of an arcsecond, drawn
+as exact straight lines, and honestly absent from every page they
+do not cross. Nothing ticks, nothing phones anywhere, and with the
+module quiet the atlas is the released atlas, byte for byte.
+
 ### Added
 
 - **The place-and-time journey and packaged evidence** (Sprint 25,
