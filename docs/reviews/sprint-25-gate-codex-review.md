@@ -305,3 +305,41 @@ above are made precise, the design gate is ready to merge.
 
 PR #232 correctly separates diagnosis from repair. Issue #224 can remain a
 later consolidation; the evidence showed it was not the cause of #220.
+
+## Final gate review at 5aed15b
+
+Approved. All requested gate corrections are closed.
+
+- The SOFA residual and case count are now computed from the checked-in
+  vectors by the study rather than copied into its output. The regression
+  tolerance is close enough to the observed result to reject a meaningful
+  change while allowing serialization and floating-point noise.
+- UT1 and diurnal aberration are identified as bounds, polar motion as a
+  deliberately conservative allowance, and the SOFA result as a measurement.
+  The 14.36″ statement names the mixture rather than presenting it as a proven
+  total error bound.
+- The obsolete account of SOFA being unavailable is removed. The decision now
+  has one coherent account of the oracle and preserves the role of the cheaper
+  invariants beneath it.
+
+The model comparison was independently inspected: the generator applies the
+IAU 1976 precession and IAU 1980 nutation matrices in the documented J2000 to
+true-of-date direction, transposes that composition for the operation under
+test, and deliberately gives SOFA the same UTC-as-TT convention as production
+so the fixture isolates frame rotation. Its provenance and precision are
+adequate for the asserted tolerance.
+
+Local regeneration reproduced the numerical report without a diff. The later
+display-dependent image phase aborted on an unattended macOS desktop; required
+CI reports all 669 tests started and successful with none aborted, and the
+committed study artifacts are unchanged.
+
+Issue #226 may begin after this gate merges. Preserve the SOFA fixture as the
+absolute oracle, the pole-based great-circle geometry as the generic chart
+seam, and the distinction between model accuracy and unavailable Earth-
+orientation inputs.
+
+For #220, add the proposed hit-test candidates and nearest-mark distance to the
+diagnostic before changing behavior. The latest evidence disproves both the
+relayout and leaked-look-and-feel hypotheses; Metal is a correlation to
+investigate, not yet a cause. Issue #224 remains separate consolidation.
