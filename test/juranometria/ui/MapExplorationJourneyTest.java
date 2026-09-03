@@ -157,10 +157,12 @@ class MapExplorationJourneyTest {
                             + Math.round(star.centre().y())
                             + " identified it.\n  " + whenTaken
                             + "\n  " + whenClicked
-                            + "\n  the two lines above must agree; if"
-                            + " they do not, the click was resolved"
-                            + " against a different page from the one"
-                            + " the pixel came from (#220)");
+                            + "\n  if those two differ, the click was"
+                            + " resolved against a different page from"
+                            + " the one the pixel came from - which"
+                            + " may be legitimate relayout rather than"
+                            + " a defect, so they are reported and not"
+                            + " required to match (#220)");
             assertEquals(star.star().id(), identified.catalogueId(),
                     "the star under the pointer is the one identified");
             assertFalse(String.join(" ", labelsOnPage())
