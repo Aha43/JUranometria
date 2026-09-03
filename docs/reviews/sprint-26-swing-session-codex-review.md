@@ -44,3 +44,24 @@ swallow restoration failure when the body succeeded.
 Keep the zero-unprotected structural ratchet and the exact inherited-state
 tests. Re-run the full display suite after the correction, since look-and-feel
 restoration refreshes live windows. #243 remains held.
+
+## Follow-up review at `194ace2`
+
+The exit probe now proves deletion from its parent JVM after synchronising the
+backing store, and shared wrapper failures preserve the primary exception.
+One P1 remains from the original finding.
+
+### P1 — `scratchPreferences` still proves only in-process removal
+
+The original review required the same persistent-deletion rule for the shared
+`scratchPreferences` helper. It still calls `node.removeNode()` without
+settling the parent, and `aScratchNodeIsRemovedWhateverHappens...` still asks
+`nodeExists` from the same JVM. Thus the exit probe is repaired, while the
+helper now intended to own every scratch fixture retains the backing-store gap.
+
+Capture the parent before removal, remove the child, and flush or sync the
+parent through the same guarded cleanup. Test from a fresh process or otherwise
+demonstrate backing-store visibility after both a successful body and a failing
+body. Ensure a failure settling the deletion follows the newly established
+suppression rule: primary when the body succeeded, suppressed when the body
+already failed.
