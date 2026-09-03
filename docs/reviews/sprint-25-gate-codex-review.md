@@ -105,3 +105,79 @@ of verification; they do not by themselves prove this implementation's bound.
   <https://www.iers.org/iers/en/service/glossary/functions/glossary/L>
 - IAU SOFA cookbooks: <https://www.iausofa.org/cookbooks>
 - IAU SOFA current software: <https://www.iausofa.org/current-software>
+
+## Follow-up review at 4154cc6
+
+The great-circle finding is closed in design. A pole-based great circle is a
+small, reusable geometric addition to the module seam; it does not teach the
+chart about time or observers. The production implementation should retain the
+named clipping cases and either derive the projected line directly from the
+projection basis or demonstrate that choosing its two defining points cannot
+become numerically unstable near the projection horizon.
+
+The two astronomy findings remain open.
+
+### P1 — The 14.22″ contract is still not a derived worst-case bound
+
+There are three independent problems in the revised budget:
+
+1. The decision says the twenty-term result differs from the published example
+   by 0.0009″. The reproducible report says **0.0033″**. The implementation adds
+   the absolute longitude and obliquity residuals from published values rounded
+   to 0.001″, so neither number is an established angular error of the final
+   direction. The gate and its generated evidence already disagree.
+2. `omittedTailBound()` assumes all 86 omitted IAU 1980 terms are bounded by
+   the twentieth term's 0.0046″ longitude coefficient. The terms include both
+   longitude and obliquity coefficients and coefficients varying with Julian
+   centuries. Ordering at the table's epoch does not prove a combined angular
+   bound “for any date”; the time-dependent parts alone make that unqualified
+   claim false outside a stated date interval. Counting terms times one copied
+   coefficient is not a bound on the omitted vector rotation.
+3. The total calls itself error relative to “the observer's own frame” while
+   explicitly omitting polar motion and diurnal aberration, then excludes both
+   from the addition. The earlier review required those residuals either to be
+   bounded consistently or excluded by defining an idealised target frame. The
+   revision does neither. Its own stated upper figures would also consume most
+   of the remaining 0.78″ margin.
+
+Choose and name a supported date interval and compare the actual final
+twenty-term transformation with an authoritative full transformation over that
+interval. Measure angular separation of directions, not a sum of rounded
+component residuals. Define the target as an idealised frame if polar motion
+and diurnal aberration are outside the promise. Only then state the resulting
+number; 15″ need not be preserved if honest evidence gives another answer.
+
+### P1 — The absolute orientation remains unverified
+
+The revision explicitly postpones SOFA-derived vectors to #226. That is a
+reasonable implementation task, but it means this gate has not closed the
+finding it says it closed.
+
+The new invariants establish useful structural properties but not the absolute
+orientation:
+
+- Angle preservation proves the matrix is a rotation, not that it is the right
+  rotation.
+- A pole remaining one obliquity from the ecliptic pole permits the wrong phase
+  around that circle.
+- The precession test takes the magnitude of the first century and explicitly
+  declines to assert the sign; a consistently reversed precession passes.
+- Nutation lying between 0.5″ and 10″ permits the wrong direction and phase.
+- The equation-of-equinoxes assertion compares two outputs built from the same
+  production nutation calculation.
+
+Consequently, a coherent inverse/sign error can still put every zenith,
+meridian, and horizon on the wrong J2000 sky while these checks remain green.
+The authoritative end-to-end vectors requested in the first review are still
+required. Network access is unnecessary at test or runtime: obtain them once
+from a primary implementation or worked source, record their provenance and
+precision, commit the constants as fixtures, and compare the final transformed
+directions. If that work belongs to #226, the gate must state the finding is an
+acceptance condition for #226 rather than claim it is already closed.
+
+## Follow-up decision
+
+Changes still requested before #226 begins. The chart/module architecture,
+interaction concept, visual treatment, and great-circle vocabulary are
+accepted. The remaining work is to make the accuracy promise and absolute
+frame orientation as evidence-based as the rest of the gate.
