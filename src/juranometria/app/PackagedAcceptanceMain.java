@@ -292,10 +292,48 @@ public final class PackagedAcceptanceMain {
         require(differingPixels(without, paint(chart)) == 0,
                 "and the page is the page the atlas draws without it");
 
+        // The stored-state restart, through the bundled runtime's
+        // own preference backend (issue #229): the place is saved,
+        // read back by a fresh store as a fresh session would, and
+        // comes back as an observer wearing the new session's
+        // instant - because no instant is ever stored, and a stale
+        // saved clock must not masquerade as Now. Run against a
+        // dedicated node, never the reader's real preferences.
+        java.util.prefs.Preferences restartNode =
+                java.util.prefs.Preferences.userRoot().node(
+                        "juranometria-packaged-restart");
+        try {
+            juranometria.ui.placeandtime.PlaceStore first =
+                    juranometria.ui.placeandtime.PlaceStore
+                            .forNode(restartNode);
+            first.save(42.5, -130.994);
+            first.flush();
+            java.time.Instant secondSession =
+                    java.time.Instant.parse("2026-09-05T19:00:00Z");
+            juranometria.sky.Observer reborn =
+                    juranometria.ui.placeandtime.PlaceStore
+                            .forNode(restartNode).load(secondSession);
+            require(reborn.latitudeDegrees() == 42.5
+                            && reborn.eastLongitudeDegrees() == -130.994,
+                    "a fresh session reads the place back through the"
+                            + " bundled preference backend");
+            require(reborn.instant().equals(secondSession),
+                    "wearing the new session's instant: no stored"
+                            + " moment exists to masquerade as Now");
+            for (String key : restartNode.keys()) {
+                require(key.startsWith("place."),
+                        "the store holds the place and nothing else: "
+                                + key);
+            }
+        } finally {
+            restartNode.removeNode();
+        }
+
         System.out.println("meridian module OK (" + meridianInk
                 + " px meridian + " + zenithInk + " px zenith, the"
                 + " horizon proved silent alone, withdrawn cleanly,"
-                + " page never moved except when asked)");
+                + " page never moved except when asked, and the place"
+                + " survives a restart while the instant does not)");
     }
 
     private static void onThisPageJourney() throws Exception {

@@ -9,6 +9,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The place-and-time journey and packaged evidence** (Sprint 25,
+  issue #229). One production-path journey from the View menu to a
+  byte-identical homecoming, packaged acceptance that proves the
+  model, the module, the painter and the stored-place restart inside
+  every native image, reader documentation for the new controls, and
+  the sprint handover in `docs/reviews/sprint-25-handover.md`.
 - **Place and Time controls** (Sprint 25, issue #228). A dialog on
   the View menu, beside Chart Options: latitude, east-positive
   longitude (the label says which way it counts), and a frozen UTC
