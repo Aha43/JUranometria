@@ -113,6 +113,18 @@ public final class JUranometriaMain {
         juranometria.ui.onthispage.OnThisPageModule onThisPage =
                 modules.attach(
                         new juranometria.ui.onthispage.OnThisPageModule());
+        // The second module (issue #228). The place is remembered;
+        // the instant is read from the clock exactly once, here,
+        // stated rather than hidden in a constructor - and frozen
+        // until the reader presses Now. Every session begins with
+        // the ordinary chart: the switches are not stored, so the
+        // reference lines are a choice a reader makes each time.
+        juranometria.ui.placeandtime.PlaceStore placeStore =
+                juranometria.ui.placeandtime.PlaceStore.user();
+        juranometria.meridian.MeridianModule meridian =
+                modules.attach(new juranometria.meridian.MeridianModule(
+                        placeStore.load(java.time.Instant.now())));
+        meridian.showing(false, false, false);
         inspector.showPageView(onThisPage.panel());
         inspector.onClose(chart::requestFocusInWindow);
         // One switch, three ways to reach it: the toolbar button, the
@@ -137,7 +149,10 @@ public final class JUranometriaMain {
                     inspectorToggle.toggle();
                     frame.revalidate();
                     frame.repaint();
-                }));
+                },
+                () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
+                        frame, meridian, placeStore,
+                        java.time.Instant::now)));
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

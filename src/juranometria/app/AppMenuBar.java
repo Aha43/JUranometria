@@ -81,6 +81,26 @@ public final class AppMenuBar {
                                   Runnable openChartOptions,
                                   Runnable openAbout,
                                   Runnable toggleInspector) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, null);
+    }
+
+    /**
+     * The menu bar with Place and Time (Sprint 25, issue #228). A
+     * place and an instant are settings, not readings, so the item
+     * lives on the View menu beside Chart Options - the gate's
+     * ruling, measured against the Inspector alternative at 240 px.
+     *
+     * @param openPlaceAndTime runs on the View menu's Place and
+     *     Time... item (may be null, omitting the item - which is
+     *     what an atlas without the meridian module shows)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime) {
         if (openAbout == null) {
             throw new IllegalArgumentException("about action is required");
         }
@@ -110,6 +130,18 @@ public final class AppMenuBar {
                     "Choose which chart content and labels draw");
             chartOptions.addActionListener(event -> openChartOptions.run());
             view.add(chartOptions);
+            if (openPlaceAndTime != null) {
+                JMenuItem placeAndTime = new JMenuItem("Place and Time...");
+                placeAndTime.setMnemonic('P');
+                placeAndTime.getAccessibleContext().setAccessibleName(
+                        "Place and Time");
+                placeAndTime.getAccessibleContext().setAccessibleDescription(
+                        "Set where you are and the frozen instant the"
+                                + " reference lines are drawn for");
+                placeAndTime.addActionListener(event ->
+                        openPlaceAndTime.run());
+                view.add(placeAndTime);
+            }
             if (toggleInspector != null) {
                 // A checkbox, because the reader must be able to see
                 // whether the inspector is showing - especially when

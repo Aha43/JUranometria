@@ -9,6 +9,24 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Place and Time controls** (Sprint 25, issue #228). A dialog on
+  the View menu, beside Chart Options: latitude, east-positive
+  longitude (the label says which way it counts), and a frozen UTC
+  instant, with switches for the meridian, the mathematical horizon
+  and the zenith, and exactly two actions — **Now**, which re-freezes
+  on the moment it is pressed, and **Center on zenith**, the one
+  thing that moves the page. Typing applies nothing until the field
+  is committed. The place is remembered between sessions; the
+  instant and the switches deliberately are not.
+- **The removable meridian module and reference-line ink** (Sprint
+  25, issue #227). The atlas's first sky-reading module: it owns an
+  observer and offers the meridian, the mathematical horizon and the
+  zenith to the chart as typed geometry, which the chart inks in its
+  own quiet vocabulary — a solid grey line, a dashed boundary, a
+  small ring for the point overhead — above the grid and beneath
+  every star. Clipped analytically, silent off the page, and
+  removable to the byte: with the module absent or quiet the chart
+  is the released page exactly.
 - **The observer, sidereal time, and the sky's orientation** (Sprint
   25, issue #226). The atlas can now be told where a reader is and
   when they are looking, and work out what is overhead, where their
