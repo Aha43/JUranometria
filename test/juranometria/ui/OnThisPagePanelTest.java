@@ -112,8 +112,12 @@ class OnThisPagePanelTest {
 
     @Test
     void enlargedTextDoesNotPushTheActionsOffThePanel() throws Exception {
-        Font was = UIManager.getFont("defaultFont");
-        try {
+        // The shared guard, for the same reason the Inspector's
+        // sweep needed it: a font override belongs to the JVM the
+        // whole suite shares, and reading it back with getFont()
+        // returns the theme's own font rather than the absence of a
+        // choice (review).
+        juranometria.app.SwingSession.restoring(() -> {
             UIManager.put("defaultFont",
                     new Font(Font.SANS_SERIF, Font.PLAIN, 20));
             try (Fixture fixture = new Fixture(M31, 8.0, 320, 420)) {
@@ -133,9 +137,7 @@ class OnThisPagePanelTest {
                 assertTrue(fixture.panel.tableComponent().getRowHeight() > 0,
                         "and the rows have height to be read in");
             }
-        } finally {
-            UIManager.put("defaultFont", was);
-        }
+        });
     }
 
     @Test
@@ -304,6 +306,10 @@ class OnThisPagePanelTest {
     @Test
     void bothThemesLayTheSameTableOut() throws Exception {
         List<List<String>> perTheme = new ArrayList<>();
+        // The look and feel is the session's too: installed here and
+        // put back by the guard, rather than by applying the light
+        // theme and hoping the suite started light.
+        juranometria.app.SwingSession.restoring(() -> {
         for (boolean dark : new boolean[] {false, true}) {
             SwingUtilities.invokeAndWait(() -> { });
             if (dark) {
@@ -320,11 +326,11 @@ class OnThisPagePanelTest {
                 perTheme.add(rows);
             }
         }
+        });
         assertEquals(perTheme.get(0), perTheme.get(1),
                 "the theme is how the atlas is inked, not what it"
                         + " says: the same page reads the same in"
                         + " both");
-        com.formdev.flatlaf.FlatLightLaf.setup();
     }
 
     @Test

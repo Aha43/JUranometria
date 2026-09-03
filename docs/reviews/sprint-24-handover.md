@@ -75,6 +75,7 @@ The foundation took three more, and the table two:
 | #217.4 | the packaged run changed a real preference and restored it only when it passed — so the run that found a defect was also the run that left a reader with their galaxies switched off |
 | #217.5 | the write and its flush still sat *outside* the guard, so either could fail after the mutation with nobody to undo it; and the helper settled the application's own preference node whatever store it had been handed |
 | #217.6 | the Inspector's mode chooser was clipped — at 320 px and 18 pt the second mode read "O" — and there was no width-and-font evidence for it on any platform |
+| #217.7 | the new font sweep bypassed the shared `SwingSession` guard, so it could hand the rest of the suite a `defaultFont` override nobody chose |
 
 Two corrections are worth naming because they were mine to make and
 I got them wrong first:
@@ -129,6 +130,16 @@ I got them wrong first:
   with no room for both. The column is aligned from the left now,
   and the chooser takes a line each when the names stop fitting side
   by side.
+- **Nine older tests disturb the shared session without the guard.**
+  The review caught two of mine bypassing `SwingSession.restoring`;
+  fixing them, I scanned the rest and found nine that predate this
+  sprint installing a look and feel or a font override and walking
+  away. Nothing fails today — which is the point, since the failure
+  that eventually follows is order-dependent and lands somewhere
+  else. Opened as
+  [#224](https://github.com/Aha43/JUranometria/issues/224), with a
+  structural guard proposed so the tenth is caught at the source. I
+  did not widen this PR into nine unrelated files.
 - **[#220](https://github.com/Aha43/JUranometria/issues/220)**, an
   intermittent failure in a Sprint 23 journey on the display runner,
   fired twice during this sprint and is open with evidence and an

@@ -49,9 +49,12 @@ class InspectorModeChooserTest {
     @Test
     void everyModeIsFullyReadableAtEveryWidthAndTextSize()
             throws Exception {
-        Font was = UIManager.getFont("defaultFont");
+        // Under the shared guard: reading the override with
+        // getFont() and putting the answer back installs the look
+        // and feel's own font as a choice nobody made, and hands it
+        // to whatever runs next (review).
         List<String> clipped = new ArrayList<>();
-        try {
+        SwingSession.restoring(() -> {
             for (int points : POINTS) {
                 UIManager.put("defaultFont",
                         new Font(Font.SANS_SERIF, Font.PLAIN, points));
@@ -75,9 +78,7 @@ class InspectorModeChooserTest {
                     }
                 }
             }
-        } finally {
-            UIManager.put("defaultFont", was);
-        }
+        });
         assertEquals(List.of(), clipped,
                 "a mode a reader cannot read is a mode they will not"
                         + " find");
@@ -88,8 +89,7 @@ class InspectorModeChooserTest {
         // Stacking costs vertical space, so it is not the default -
         // it is what happens when the names stop fitting side by
         // side, and nothing else.
-        Font was = UIManager.getFont("defaultFont");
-        try {
+        SwingSession.restoring(() -> {
             UIManager.put("defaultFont",
                     new Font(Font.SANS_SERIF, Font.PLAIN, 12));
             InspectorPanel roomy = laidOut(420, 12);
@@ -104,9 +104,7 @@ class InspectorModeChooserTest {
                     "and a line each when they do not: two rows of"
                             + " readable control beat one row of"
                             + " initials");
-        } finally {
-            UIManager.put("defaultFont", was);
-        }
+        });
     }
 
     @Test
