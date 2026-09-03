@@ -144,7 +144,6 @@ class MapExplorationJourneyTest {
             // none carry a name, and until now the only way to ask
             // was to guess one and search for it.
             ChartViewState beforeAsking = navigation.state();
-            ChartScene sceneBeforeAsking = chart.currentScene();
             ChartRenderer.DrawnMark star =
                     clickOn(this::someUnlabelledStar);
             String whenTaken = pageState(
@@ -188,7 +187,14 @@ class MapExplorationJourneyTest {
             // The promise: a question is not a command.
             assertEquals(beforeAsking, navigation.state(),
                     "asking moved nothing");
-            assertSame(sceneBeforeAsking, chart.currentScene(),
+            // The click assembled nothing: the scene it ran against
+            // - recorded inside its own turn - is the scene still
+            // current. The premise used to be captured off the EDT a
+            // moment earlier, and the full suite's churn caught that
+            // stale read the same way the CI runner caught marks():
+            // a queued relayout landed between the capture and the
+            // click.
+            assertSame(sceneBehindTheMark, chart.currentScene(),
                     "and assembled nothing: the page is the same page");
             assertEquals(witnessedAtStart + 1, witness.size(),
                     "the second observer heard it exactly once - one"
