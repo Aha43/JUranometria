@@ -88,3 +88,29 @@ clipped real dialog look complete.
 
 PR #237 remains held. #229 should not begin until these controls are reviewed
 and merged.
+
+## Follow-up review at `f54b4f1`
+
+The strict instant parser closes the first P1, including both accepted input
+shapes and the leap-day control. The study now derives its dimensions from the
+packed production dialog and exposed a real stale-layout defect; with the
+artefact described as the packed dialog's content pane, that closes the P2.
+The real focus transfer also proves the focus-out listener is load-bearing.
+
+### P1 — The menu and window-close routes remain bypassed
+
+One production-path gap remains from the lifecycle finding. The new display
+test calls `PlaceAndTimeDialog.open(...)` directly. It does not invoke
+the View menu item action, so deleting or miswiring that action still leaves the
+test green. After Escape it does not reopen the dialog and dispatch the window
+close event, so the second close path requested in the first review remains
+unexercised too.
+
+Extend the display test through the existing `AppMenuBar` item: activate
+**Place and Time...**, require the production action to open the one dialog,
+and mutation-check that removing that action fails. After the existing Escape
+leg, reopen through the menu and close with a real `WINDOW_CLOSING` event,
+requiring no dialog remains and no unintended module/store transition occurs.
+This is a small correction to the evidence, not a request for more behaviour.
+
+PR #237 remains held on that final P1. #229 remains unstarted.
