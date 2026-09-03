@@ -62,9 +62,9 @@ public final class TestEvidenceStudyMain {
                         + " protected by the shared SwingSession"
                         + " guard, %d restoring locally - the"
                         + " JUnit-fixture preference shape the"
-                        + " consolidation (#224) deliberately kept,"
-                        + " plus the guard itself - and %d"
-                        + " unprotected.%n",
+                        + " consolidation (#224) deliberately kept -"
+                        + " %d unprotected, and the guard itself"
+                        + " classified as what it is.%n",
                 touching.size(),
                 count(touching, "protected-shared"),
                 count(touching, "protected-locally"),

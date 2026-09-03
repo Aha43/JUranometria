@@ -66,8 +66,9 @@ that removes as its own fixture), and a `capture()`/`Held.restore()`
 pair for disturbances that span JUnit fixtures. Every JVM-global
 state now flows through the shared guard; the flagged five are
 settled (the exit probe cleans up in a JVM shutdown hook, the only
-place that runs on its success path); **the one local restorer
-left is the guard's own body.** The preference locals — the
+place that runs on its success path); **no local restorer of a
+JVM-global remains; the guard itself is classified as what it
+is.** The preference locals — the
 `@AfterEach` node-removal shape — are kept **on purpose**: a
 node's life spans `BeforeEach` to `AfterEach`, a body-wrapper
 cannot hold it, and the scanner verifies each carries its removal.
@@ -76,7 +77,7 @@ non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **37 files** touch process-wide state —
-**16** use the shared guard, **21** restore locally,
+**16** use the shared guard, **20** restore locally,
 **0 flagged unprotected** — and **20 files** depend on a display.
 
 - **0 test files** open the application's real `juranometria`

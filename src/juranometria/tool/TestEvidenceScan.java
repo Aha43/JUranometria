@@ -161,6 +161,20 @@ public final class TestEvidenceScan {
     public static File classify(String path, String kind,
                                 String rawSource) {
         String source = withoutComments(rawSource);
+        // The shared guard itself: its bodies ARE the captures and
+        // restores every other file is measured against, and after
+        // the suppression rework (#224 review) they run through
+        // guarded() rather than a literal finally - so the rule
+        // that serves the corpus would flag the instrument. Named
+        // for what it is instead, and the gate pins that exactly
+        // one file may claim the name.
+        if (source.contains("class SwingSession")
+                && source.contains("static void guarded(")) {
+            return new File(path, kind, List.of("all-of-them"),
+                    List.of(), "the-shared-guard", false, List.of(),
+                    List.of(), List.of(), count(source, "invokeAndWait"),
+                    0);
+        }
         // A place a cleanup actually runs: a finally, a JUnit
         // AfterEach, or a JVM shutdown hook - the last for probes
         // whose success path is System.exit, where nothing written

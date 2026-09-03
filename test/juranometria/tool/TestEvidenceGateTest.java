@@ -170,17 +170,22 @@ class TestEvidenceGateTest {
                 "the gate found five and #224 settled them; the sixth"
                         + " is caught here, at the source, before a"
                         + " stranger's flaky run finds it");
-        assertEquals(List.of("juranometria/app/SwingSession.java"),
+        assertEquals(List.of(),
                 files.stream()
                         .filter(f -> f.stateClass()
                                 .equals("protected-locally"))
-                        .filter(f -> !f.unprotectedState().isEmpty()
-                                || !f.globalState().equals(
-                                        List.of("preferences")))
+                        .filter(f -> !f.globalState().equals(
+                                List.of("preferences")))
                         .map(TestEvidenceScan.File::path).toList(),
                 "every non-preference global flows through the shared"
-                        + " guard; the one local restorer left is the"
-                        + " guard's own body");
+                        + " guard");
+        assertEquals(List.of("juranometria/app/SwingSession.java"),
+                files.stream()
+                        .filter(f -> f.stateClass()
+                                .equals("the-shared-guard"))
+                        .map(TestEvidenceScan.File::path).toList(),
+                "and exactly one file is the guard itself - a second"
+                        + " claimant would be a copy wearing its name");
     }
 
     @Test
