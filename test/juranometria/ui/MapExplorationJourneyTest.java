@@ -143,14 +143,15 @@ class MapExplorationJourneyTest {
             // 1. An unlabelled star. The chart draws hundreds; almost
             // none carry a name, and until now the only way to ask
             // was to guess one and search for it.
-            ChartRenderer.DrawnMark star = someUnlabelledStar();
-            String whenTaken = pageState("when the pixel was taken");
-            String sceneWhenTaken =
-                    sceneState("and the scene then", star);
             ChartViewState beforeAsking = navigation.state();
             ChartScene sceneBeforeAsking = chart.currentScene();
-            clickOn(star);
-            String whenClicked = pageState("when it was clicked");
+            ChartRenderer.DrawnMark star =
+                    clickOn(this::someUnlabelledStar);
+            String whenTaken = pageState(
+                    "when the pixel was taken and clicked, one turn");
+            String sceneWhenTaken =
+                    sceneState("and the scene then", star);
+            String whenClicked = pageState("when it was reported");
             String sceneWhenClicked =
                     sceneState("and the scene then", star);
             String whatWasThere = hitTestState(star.centre().x(),
@@ -174,7 +175,7 @@ class MapExplorationJourneyTest {
                             + " required to match (#220)");
             assertEquals(star.star().id(), identified.catalogueId(),
                     "the star under the pointer is the one identified");
-            assertFalse(String.join(" ", labelsOnPage())
+            assertFalse(String.join(" ", labelsOnPage(chart.currentScene()))
                             .contains(star.star().id()),
                     "and it carries no label on the chart - which is"
                             + " why a reader had to ask");
@@ -228,15 +229,21 @@ class MapExplorationJourneyTest {
                             navigation.state().centre().decDegrees())));
             ChartRenderer.DrawnMark[] derived =
                     new ChartRenderer.DrawnMark[1];
-            Thread deriving = new Thread(() -> derived[0] = someStar());
+            Thread deriving = new Thread(() -> {
+                try {
+                    derived[0] = clickOn(this::someStar);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            });
             deriving.start();
             // Long enough for an off-EDT read to have read the stale
-            // scene; the settled read is still waiting on the EDT.
+            // scene; the settled derive-and-click is still waiting
+            // on the EDT.
             Thread.sleep(150);
             busy.countDown();
             deriving.join(10_000);
             flush();
-            clickOn(derived[0]);
             assertInstanceOf(Selection.Object.class,
                     selection.selection(),
                     "a mark derived while the event thread was busy"
@@ -253,6 +260,40 @@ class MapExplorationJourneyTest {
             SwingUtilities.invokeAndWait(navigation::reset);
             flush();
 
+            // 1c. The complementary race: a page change queued not
+            // before the derivation but from within it, so it lands
+            // in the gap between a derivation turn and a click turn
+            // - if there is one. The chooser runs inside the
+            // derivation turn in any implementation, which is what
+            // makes this deterministic: one atomic task clicks
+            // before the queued recentre can run, while a repair
+            // that derived in one turn and clicked in another would
+            // click a page the recentre had already replaced, and
+            // miss by the fifth of a degree it moved (#220 review).
+            ChartRenderer.DrawnMark inTheGap = clickOn(scene -> {
+                SwingUtilities.invokeLater(() -> navigation.recenter(
+                        new juranometria.chart.SkyPosition(
+                                navigation.state().centre().raDegrees()
+                                        + 0.2,
+                                navigation.state().centre()
+                                        .decDegrees())));
+                return someStar(scene);
+            });
+            flush();
+            assertInstanceOf(Selection.Object.class,
+                    selection.selection(),
+                    "a change queued during derivation cannot come"
+                            + " between the mark and its click: they"
+                            + " share one event-thread turn (#220).\n  "
+                            + hitTestState(inTheGap.centre().x(),
+                                    inTheGap.centre().y()));
+            assertEquals(inTheGap.star().id(),
+                    ((Selection.Object) selection.selection())
+                            .catalogueId(),
+                    "and the star clicked is the star derived");
+            SwingUtilities.invokeAndWait(navigation::reset);
+            flush();
+
             // 1b. Andromeda's three galaxies, each reached by
             // pointing (issue #201). Until the stacking rule, M 31's
             // opaque disc was painted last and M 32 left no ink at
@@ -260,8 +301,7 @@ class MapExplorationJourneyTest {
             // ellipse, and had nothing to point at. These are real
             // mouse events through the chart, as step 1's were.
             for (String galaxy : List.of("NGC 224", "NGC 221", "NGC 205")) {
-                ChartRenderer.DrawnMark mark = deepSkyNamed(galaxy);
-                clickOn(mark);
+                clickOn(scene -> deepSkyNamed(scene, galaxy));
                 List<String> offered = selection.candidates().stream()
                         .map(Selection.Object::catalogueId).toList();
                 assertTrue(offered.contains(galaxy),
@@ -272,8 +312,7 @@ class MapExplorationJourneyTest {
             // M 32 sits wholly inside M 31's disc, so pointing there
             // is genuinely ambiguous - and the reader is owed both,
             // with the smaller mark leading.
-            ChartRenderer.DrawnMark m32 = deepSkyNamed("NGC 221");
-            clickOn(m32);
+            clickOn(scene -> deepSkyNamed(scene, "NGC 221"));
             List<String> both = selection.candidates().stream()
                     .map(Selection.Object::catalogueId).toList();
             assertTrue(both.contains("NGC 221") && both.contains("NGC 224"),
@@ -299,8 +338,8 @@ class MapExplorationJourneyTest {
 
             // 2. A deep-sky symbol, with the catalogue's silences
             // stated as silences.
-            ChartRenderer.DrawnMark symbol = someDeepSky();
-            clickOn(symbol);
+            ChartRenderer.DrawnMark symbol =
+                    clickOn(this::someDeepSky);
             String deepSky = String.join(" | ", inspector.lines());
             switch (symbol.deepSky().recorded().band()) {
                 case VISUAL -> assertTrue(deepSky.contains("visual magnitude"),
@@ -330,19 +369,17 @@ class MapExplorationJourneyTest {
             // photometry at all; it carries none lacking an extent,
             // so "size not recorded" is covered by the unit test that
             // builds such an object, not claimed here.
-            ChartRenderer.DrawnMark noAngle = deepSkyLacking(
-                    mark -> !mark.deepSky().recorded().hasPositionAngle());
-            inspect(noAngle);
+            inspect(scene -> deepSkyLacking(scene,
+                    mark -> !mark.deepSky().recorded().hasPositionAngle()));
             assertTrue(String.join(" | ", inspector.lines())
                             .contains("orientation not recorded"),
                     "an unrecorded orientation is stated, never drawn"
                             + " as PA 0: " + inspector.lines());
 
-            ChartRenderer.DrawnMark blueOnly = deepSkyLacking(
+            inspect(scene -> deepSkyLacking(scene,
                     mark -> mark.deepSky().recorded().band()
                             == juranometria.chart.DeepSkyObject.Recorded
-                                    .Band.BLUE);
-            inspect(blueOnly);
+                                    .Band.BLUE));
             String blueSaid = String.join(" | ", inspector.lines());
             assertTrue(blueSaid.contains("blue magnitude")
                             && blueSaid.contains("no V recorded"),
@@ -350,11 +387,10 @@ class MapExplorationJourneyTest {
             assertFalse(blueSaid.contains("visual magnitude"),
                     "and is never labelled visual: " + blueSaid);
 
-            ChartRenderer.DrawnMark unphotometered = deepSkyLacking(
+            inspect(scene -> deepSkyLacking(scene,
                     mark -> mark.deepSky().recorded().band()
                             == juranometria.chart.DeepSkyObject.Recorded
-                                    .Band.NONE);
-            inspect(unphotometered);
+                                    .Band.NONE));
             assertTrue(String.join(" | ", inspector.lines())
                             .contains("magnitude not recorded"),
                     "and an unmeasured one says so: " + inspector.lines());
@@ -368,8 +404,8 @@ class MapExplorationJourneyTest {
                     "real wheel zoom walked out to the widest page");
             dragBy(200, 0);
             flush();
-            ChartRenderer.DrawnMark crowded = crowdedMark();
-            clickOn(crowded);
+            ChartRenderer.DrawnMark crowded =
+                    clickOn(this::crowdedMark);
             assertTrue(selection.candidates().size() > 1,
                     "the reader is offered every candidate: "
                             + selection.candidates().size());
@@ -439,8 +475,8 @@ class MapExplorationJourneyTest {
                     {"acrux", 18.0}}) {     // far south
                 searchFor((String) place[0]);
                 zoomTo((Double) place[1]);
-                ChartRenderer.DrawnMark there = someStar();
-                clickOn(there);
+                ChartRenderer.DrawnMark there =
+                        clickOn(this::someStar);
                 // The star is always OFFERED. It is not always first:
                 // in Crux this very star lies inside IC 2944's
                 // outline, and the reviewed rule puts ink before
@@ -472,8 +508,8 @@ class MapExplorationJourneyTest {
             // only when pressed.
             searchFor("M31");
             zoomTo(8.0);
-            ChartRenderer.DrawnMark offCentre = offCentreStar();
-            clickOn(offCentre);
+            ChartRenderer.DrawnMark offCentre =
+                    clickOn(this::offCentreStar);
             SkyPosition wasCentred = navigation.state().centre();
             SwingUtilities.invokeAndWait(() ->
                     centreButton(inspector).doClick());
@@ -550,7 +586,7 @@ class MapExplorationJourneyTest {
                             all.bayerLetters(), all.flamsteedNumbers(),
                             all.equatorialGrid())));
             flush();
-            clickOn(visibleSymbol);
+            clickOnStale(visibleSymbol);
             assertFalse(selection.selection() instanceof Selection.Object
                             object
                             && object.catalogueId()
@@ -577,8 +613,8 @@ class MapExplorationJourneyTest {
             flush();
             assertFalse(inspector.isVisible(),
                     "at 600 px the inspector yields to the chart");
-            ChartRenderer.DrawnMark narrowStar = someStar();
-            clickOn(narrowStar);
+            ChartRenderer.DrawnMark narrowStar =
+                    clickOn(this::someStar);
             // Offered, as everywhere else: this star lies inside
             // M31's ellipse, so the galaxy the reader is standing on
             // leads and the star follows.
@@ -883,18 +919,17 @@ class MapExplorationJourneyTest {
         return "NOT DRAWN";
     }
 
-    private ChartRenderer.DrawnMark someUnlabelledStar() {
-        List<String> labelled = labelsOnPage();
-        return marks().stream()
+    private ChartRenderer.DrawnMark someUnlabelledStar(ChartScene scene) {
+        List<String> labelled = labelsOnPage(scene);
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.star() != null)
-                .filter(this::wellInside)
+                .filter(mark -> wellInside(scene, mark))
                 .filter(mark -> !labelled.contains(mark.star().id()))
                 .findFirst().orElseThrow();
     }
 
     /** The stars this page actually labels, from the renderer itself. */
-    private List<String> labelsOnPage() {
-        ChartScene scene = chart.currentScene();
+    private List<String> labelsOnPage(ChartScene scene) {
         java.awt.image.BufferedImage probe =
                 new java.awt.image.BufferedImage(1, 1,
                         java.awt.image.BufferedImage.TYPE_INT_RGB);
@@ -1014,8 +1049,9 @@ class MapExplorationJourneyTest {
      * than one thing. Returns with the inspector describing exactly
      * the object asked about.
      */
-    private void inspect(ChartRenderer.DrawnMark mark) throws Exception {
-        clickOn(mark);
+    private void inspect(java.util.function.Function<ChartScene,
+            ChartRenderer.DrawnMark> choose) throws Exception {
+        ChartRenderer.DrawnMark mark = clickOn(choose);
         String wanted = mark.deepSky() != null ? mark.deepSky().id()
                 : mark.star().id();
         List<String> offered = selection.candidates().stream()
@@ -1076,12 +1112,11 @@ class MapExplorationJourneyTest {
      * {@link #inspect} walks the candidate list to the intended one
      * rather than assuming a click lands on it.
      */
-    private ChartRenderer.DrawnMark deepSkyLacking(
+    private ChartRenderer.DrawnMark deepSkyLacking(ChartScene scene,
             java.util.function.Predicate<ChartRenderer.DrawnMark> lacking) {
-        List<ChartRenderer.DrawnMark> all = marks();
-        return all.stream()
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.deepSky() != null)
-                .filter(this::wellInside)
+                .filter(mark -> wellInside(scene, mark))
                 .filter(lacking)
                 .findFirst().orElseThrow(() -> new AssertionError(
                         "this page carries no such object, so the"
@@ -1130,26 +1165,26 @@ class MapExplorationJourneyTest {
     /** The scene the most recent {@link #marks()} call read. */
     private ChartScene sceneBehindTheMark;
 
-    /** A star comfortably inside the page. */
-    private ChartRenderer.DrawnMark someStar() {
-        return marks().stream()
+    /** A star comfortably inside the given page. */
+    private ChartRenderer.DrawnMark someStar(ChartScene scene) {
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.star() != null)
-                .filter(this::wellInside)
+                .filter(mark -> wellInside(scene, mark))
                 .findFirst().orElseThrow();
     }
 
-    private ChartRenderer.DrawnMark offCentreStar() {
-        return marks().stream()
+    private ChartRenderer.DrawnMark offCentreStar(ChartScene scene) {
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.star() != null)
-                .filter(this::wellInside)
+                .filter(mark -> wellInside(scene, mark))
                 .filter(mark -> Math.abs(mark.centre().x() - 450) > 150)
                 .findFirst().orElseThrow();
     }
 
-    private ChartRenderer.DrawnMark someDeepSky() {
-        return marks().stream()
+    private ChartRenderer.DrawnMark someDeepSky(ChartScene scene) {
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.deepSky() != null)
-                .filter(this::wellInside)
+                .filter(mark -> wellInside(scene, mark))
                 .findFirst().orElseThrow();
     }
 
@@ -1158,27 +1193,30 @@ class MapExplorationJourneyTest {
      * hiding its family really does remove it.
      */
     private ChartRenderer.DrawnMark someDeepSkyOtherThanTarget() {
-        String target = chart.currentScene().targetIdentity();
+        ChartScene scene = chart.currentScene();
         return marks().stream()
                 .filter(mark -> mark.deepSky() != null)
-                .filter(mark -> !mark.deepSky().id().equals(target))
-                .filter(this::wellInside)
+                .filter(mark -> !mark.deepSky().id()
+                        .equals(scene.targetIdentity()))
+                .filter(mark -> wellInside(scene, mark))
                 .findFirst().orElseThrow();
     }
 
     /** One named deep-sky mark on the page the reader is looking at. */
-    private ChartRenderer.DrawnMark deepSkyNamed(String catalogueId) {
-        return marks().stream()
+    private ChartRenderer.DrawnMark deepSkyNamed(ChartScene scene,
+                                                 String catalogueId) {
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.deepSky() != null)
                 .filter(mark -> catalogueId.equals(mark.deepSky().id()))
                 .findFirst().orElseThrow(() -> new AssertionError(
                         catalogueId + " is not drawn on this page"));
     }
 
-    private ChartRenderer.DrawnMark crowdedMark() {
-        List<ChartRenderer.DrawnMark> all = marks();
+    private ChartRenderer.DrawnMark crowdedMark(ChartScene scene) {
+        List<ChartRenderer.DrawnMark> all =
+                RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS);
         return all.stream()
-                .filter(this::wellInside)
+                .filter(mark -> wellInside(scene, mark))
                 .filter(mark -> all.stream()
                         .filter(other -> other.hitBy(mark.centre().x(),
                                 mark.centre().y(),
@@ -1187,20 +1225,56 @@ class MapExplorationJourneyTest {
                 .findFirst().orElseThrow();
     }
 
-    private boolean wellInside(ChartRenderer.DrawnMark mark) {
-        ChartScene scene = chart.currentScene();
+    private boolean wellInside(ChartScene scene,
+                               ChartRenderer.DrawnMark mark) {
         return mark.centre().x() > 60
                 && mark.centre().x() < scene.viewport().widthPx() - 60
                 && mark.centre().y() > 60
                 && mark.centre().y() < scene.viewport().heightPx() - 60;
     }
 
-    private void clickOn(ChartRenderer.DrawnMark mark) throws Exception {
-        // The page offset is read on the EDT with the same
-        // discipline as the mark: a relayout between deriving and
-        // clicking could move the page inside the component, and an
-        // offset captured off-thread would quietly re-open the gap
-        // the settled-scene read just closed (#220).
+    /**
+     * Derives a mark from the settled scene, reads the page offset,
+     * and dispatches the click - all in <strong>one</strong> event-
+     * thread task, so nothing queued can replace the scene between
+     * them (#220 review). An earlier repair derived on the EDT but
+     * clicked in a second turn, and a layout or navigation event
+     * landing in the gap would have re-opened exactly the failure
+     * the settled-scene read closed. The chooser runs inside the
+     * derivation turn, which is what lets the complementary race
+     * step queue a page change from within it and prove the gap
+     * shut.
+     */
+    private ChartRenderer.DrawnMark clickOn(
+            java.util.function.Function<ChartScene,
+                    ChartRenderer.DrawnMark> choose) throws Exception {
+        ChartRenderer.DrawnMark[] chosen = new ChartRenderer.DrawnMark[1];
+        SwingUtilities.invokeAndWait(() -> {
+            ChartScene scene = chart.currentScene();
+            sceneBehindTheMark = scene;
+            chosen[0] = choose.apply(scene);
+            int x = (int) Math.round(chosen[0].centre().x());
+            int y = (int) Math.round(chosen[0].centre().y())
+                    + chart.pageOffsetY();
+            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
+                    MouseEvent.MOUSE_RELEASED}) {
+                chart.dispatchEvent(new MouseEvent(chart, id,
+                        System.nanoTime() / 1_000_000,
+                        MouseEvent.BUTTON1_DOWN_MASK, x, y, 1, false,
+                        MouseEvent.BUTTON1));
+            }
+        });
+        flush();
+        return chosen[0];
+    }
+
+    /**
+     * Clicks a mark derived from an <em>earlier</em> scene, on
+     * purpose: step 10 hides a layer after choosing its symbol, and
+     * the staleness is the premise, not a defect.
+     */
+    private void clickOnStale(ChartRenderer.DrawnMark mark)
+            throws Exception {
         int[] offset = new int[1];
         SwingUtilities.invokeAndWait(() ->
                 offset[0] = chart.pageOffsetY());
