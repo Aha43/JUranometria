@@ -148,3 +148,31 @@ not through three matching implementations.
 
 PR #238 remains held on these two P1s. The corrected documentation and pixel
 accounting should be preserved.
+
+## Second follow-up review at `8834842`
+
+The session-start P1 is closed. `PlaceAndTimeSession.begin(...)` now owns the
+remembered-place, supplied-instant, fresh-switch and attachment policy, and
+main, the display journey and packaged acceptance all call it. The field route
+also establishes focus before keys and compares the committed canonical value,
+so the earlier nonblank assertion is gone.
+
+### P1 — Pointer events still have no reachability premise
+
+The shared `click(...)` helper dispatches mouse events directly to a component
+without first requiring that component to be showing, have nonzero bounds, or
+that the chosen centre lies inside its visible rectangle. Direct dispatch still
+invokes a button that a reader cannot see or reach. The field leg happens to
+gain a second premise from the subsequent focus-owner assertion; the switches
+and **Center on zenith** do not. A clipped or zero-sized centre button can
+therefore satisfy the journey's sole-navigation claim.
+
+Before dispatch, require the target to be showing with positive bounds and the
+actual click point to lie inside its visible rectangle, in this journey's live
+dialog. Pin those premises for every click, including switches and **Center on
+zenith**. Mutation-check a centre button laid outside the visible dialog or
+collapsed before the event: the journey must fail on reachability before its
+action can answer on the reader's behalf.
+
+This is the last open finding on PR #238. Preserve the shared startup seam,
+canonical field checks, corrected accuracy wording and bounded ink audit.
