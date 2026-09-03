@@ -309,23 +309,119 @@ public final class TestEvidenceScan {
     /**
      * Whether a test source reaches the application's real
      * preference store - by opening the bare node, or through any
-     * of the production store factories that open it on the
-     * caller's behalf (review: the literal node was the only needle,
-     * and {@code ChartOptionsStore.user()} walked straight past it).
-     * Zero is the standing state and the gate holds it there: a
-     * test that wrote to the reader's own store would be a test
-     * editing somebody's settings.
+     * production entry point that opens it on the caller's behalf.
+     *
+     * <p>The doors are <em>derived</em>, not remembered: an earlier
+     * needle list named the three store factories and missed
+     * {@code AppShutdown.real()}, and a remembered subset misses
+     * whatever is added next (review). Every non-private static
+     * method in production whose body carries the bare-node literal
+     * is a door, found by {@link #realPreferenceDoors}, and the gate
+     * pins the derived set so a new door arrives as a visible pin
+     * change rather than a silent gap.
      */
-    public static boolean opensRealPreferences(String rawSource) {
+    public static boolean opensRealPreferences(String rawSource)
+            throws IOException {
         String source = withoutComments(rawSource);
-        for (String door : new String[] {".node(\"juranometria\")",
-                "ChartOptionsStore.user()", "PlaceStore.user()",
-                "AppearanceStore.user()"}) {
+        if (source.contains(".node(\"juranometria\")")) {
+            return true;
+        }
+        for (String door : realPreferenceDoors()) {
             if (source.contains(door)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static List<String> doors;
+
+    /**
+     * Every production entry point to the real preference node, as
+     * {@code Class.method(} needles, derived from the sources under
+     * src/juranometria and sorted.
+     */
+    public static synchronized List<String> realPreferenceDoors()
+            throws IOException {
+        if (doors != null) {
+            return doors;
+        }
+        List<String> found = new ArrayList<>();
+        try (Stream<Path> tree = Files.walk(Path.of("src/juranometria"))) {
+            for (Path source : tree
+                    .filter(p -> p.toString().endsWith(".java"))
+                    .sorted().toList()) {
+                String name = source.getFileName().toString();
+                found.addAll(doorsIn(
+                        name.substring(0, name.length() - 5),
+                        Files.readString(source)));
+            }
+        }
+        doors = List.copyOf(found.stream().sorted().distinct().toList());
+        return doors;
+    }
+
+    /**
+     * The doors one production source declares: each non-private
+     * static method whose body chunk - the text from its header to
+     * the next static header - contains the bare-node literal. A
+     * private method is not an entry point a test could call, so
+     * the door it serves is the public one that wraps it.
+     */
+    static List<String> doorsIn(String className, String rawSource) {
+        String source = withoutComments(rawSource);
+        if (!source.contains(".node(\"juranometria\")")) {
+            return List.of();
+        }
+        java.util.regex.Matcher headers = java.util.regex.Pattern
+                .compile("(private\\s+)?static\\s+[\\w<>\\[\\].]+"
+                        + "\\s+(\\w+)\\s*\\(")
+                .matcher(source);
+        List<int[]> starts = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        List<Boolean> visible = new ArrayList<>();
+        while (headers.find()) {
+            starts.add(new int[] {headers.start()});
+            names.add(headers.group(2));
+            visible.add(headers.group(1) == null);
+        }
+        // First the chunks that hold the literal themselves, any
+        // visibility - a private holder is not a door, but a public
+        // method that calls it in the same file is, which is how the
+        // packaged acceptance's main reaches the store through its
+        // private journey helpers (review: the set must be complete,
+        // not remembered).
+        List<String> holders = new ArrayList<>();
+        for (int i = 0; i < starts.size(); i++) {
+            if (chunk(source, starts, i)
+                    .contains(".node(\"juranometria\")")) {
+                holders.add(names.get(i));
+            }
+        }
+        List<String> found = new ArrayList<>();
+        for (int i = 0; i < starts.size(); i++) {
+            if (!visible.get(i)) {
+                continue;
+            }
+            String body = chunk(source, starts, i);
+            boolean door = body.contains(".node(\"juranometria\")");
+            for (String holder : holders) {
+                door |= !names.get(i).equals(holder)
+                        && body.contains(holder + "(");
+            }
+            if (door) {
+                found.add(className + "." + names.get(i) + "(");
+            }
+        }
+        return found;
+    }
+
+    private static String chunk(String source, List<int[]> starts,
+                                int index) {
+        int from = starts.get(index)[0];
+        int to = index + 1 < starts.size() ? starts.get(index + 1)[0]
+                : source.length();
+        return source.substring(from, to);
     }
 
     // ----------------------------------------------------------------

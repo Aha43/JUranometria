@@ -237,9 +237,44 @@ class TestEvidenceGateTest {
                 "a store factory is a door to the same settings");
         assertTrue(TestEvidenceScan.opensRealPreferences(
                         "class Fixture { void t() {"
-                                + " PlaceStore.us" + "er().flush();"
+                                + " AppShutdown.re" + "al().run();"
                                 + " } }"),
-                "and so is the place store's");
+                "and so is the shutdown route the remembered list"
+                        + " missed - which is why the set is derived"
+                        + " now");
+
+        // The derivation itself, proven on a synthetic production
+        // source: a public factory over the literal derives, its
+        // private helper does not, and a public method reaching the
+        // literal through that helper derives too.
+        assertEquals(List.of("Fixture.begin(", "Fixture.open("),
+                TestEvidenceScan.doorsIn("Fixture",
+                        "class Fixture {"
+                                + " public static Fixture open() {"
+                                + " return of(Preferences.user"
+                                + "Root().node(\"juranometr"
+                                + "ia\")); }"
+                                + " private static Preferences held() {"
+                                + " return Preferences.user" + "Root()"
+                                + ".node(\"juranometr" + "ia\"); }"
+                                + " public static void begin() {"
+                                + " held().put(\"k\", \"v\"); } }")
+                        .stream().sorted().toList(),
+                "doors are every non-private static route to the"
+                        + " literal, direct or through a same-file"
+                        + " helper");
+
+        // And the derived set over the real production tree, pinned:
+        // a new door arrives as a visible pin change, never a silent
+        // gap in a remembered list (review).
+        assertEquals(List.of("AppShutdown.re" + "al(",
+                        "AppearanceStore.us" + "er(",
+                        "ChartOptionsStore.us" + "er(",
+                        "PackagedAcceptanceMain.ma" + "in(",
+                        "PlaceStore.us" + "er("),
+                TestEvidenceScan.realPreferenceDoors(),
+                "the five production entry points to the reader's"
+                        + " store");
         int offenders = 0;
         try (var tree = Files.walk(Path.of("test"))) {
             for (Path source : tree
