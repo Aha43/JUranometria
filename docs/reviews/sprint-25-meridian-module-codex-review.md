@@ -156,3 +156,21 @@ must fail the positive evidence.
 
 PR #236 remains held on this one production-path gap. PR #235 is merged and is
 not part of this finding.
+
+## Final review at `0c95f1c`
+
+Approved. The remaining P1 is closed.
+
+The production-path test now drives an observer change through an attached
+`MeridianModule`, clears setup repaint noise before that transition, and
+observes that Swing is asked to repaint the actual chart component. At the same
+time, scene and inventory identity and page-change silence retain the negative
+half of the contract. The global repaint manager is restored in `finally`.
+
+The two relevant mutations are independent: replacing production `redraw()`
+with `rebuild()` fails the identity evidence, while replacing it with a no-op
+fails the repaint evidence. Together they establish that module invalidation
+causes paint, and only paint.
+
+All findings on PR #236 are closed. The meridian module foundation is ready to
+merge; #228 may begin after that merge.
