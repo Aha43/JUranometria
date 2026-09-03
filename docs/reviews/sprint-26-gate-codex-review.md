@@ -117,3 +117,22 @@ artifact walk covers only `docs/studies`, while the actual generator is
 the text fixture. Either include the script in the artifact inventory or
 describe it separately with the same provenance contract. Do not claim both
 are enumerated when only one is reached by the scan.
+
+## Closing review at `c6ff866`
+
+The instrument exclusion and both SOFA paths are now correct. One P1 remains.
+
+### P1 — `AppShutdown.real()` is another public door to the reader's store
+
+The revised G2 claims to catch every production factory that opens the real
+preference node, but its list omits `AppShutdown.real()`. That public factory
+opens `Preferences.userRoot().node("juranometria")` and installs its flush in
+the returned shutdown path. A test can therefore acquire and act on the real
+store through production code while the guard reports zero offenders.
+
+Inventory the production source for every real-node entry point and make the
+guard's door list agree with that inventory, rather than maintaining an
+independent remembered subset. At minimum, add `AppShutdown.real()` and a
+fixture proving it is rejected. Pin the complete production-door set so a new
+factory cannot appear without updating the guard. Packaged acceptance remains
+the named executable exception; ordinary tests must have no route.
