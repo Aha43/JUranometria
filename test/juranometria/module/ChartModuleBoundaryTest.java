@@ -98,9 +98,24 @@ class ChartModuleBoundaryTest {
                     source.getFileName() + " must not pass a graphics"
                             + " context to a module");
         }
-        assertEquals(3, OverlayContribution.class.getPermittedSubclasses().length,
-                "a point, a path and a region - the geometry a module"
-                        + " may contribute, and nothing else");
+        // The closed set, by name rather than by count: Sprint 25's
+        // gate added the great circle - a pole and a role, the one
+        // geometry a straight-line reference needs and the one thing
+        // a polyline could not express - and a count alone would not
+        // have said which of these had arrived.
+        assertEquals(java.util.List.of("GreatCircle", "Point", "Path",
+                        "Region"),
+                java.util.Arrays.stream(OverlayContribution.class
+                                .getPermittedSubclasses())
+                        .map(Class::getSimpleName).sorted(
+                                java.util.Comparator.comparingInt(
+                                        java.util.List.of("GreatCircle",
+                                                "Point", "Path",
+                                                "Region")::indexOf))
+                        .toList(),
+                "a great circle, a point, a path and a region - the"
+                        + " geometry a module may contribute, and"
+                        + " nothing else");
     }
 
     @Test

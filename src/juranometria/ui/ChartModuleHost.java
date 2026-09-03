@@ -182,6 +182,14 @@ public final class ChartModuleHost implements ChartServices {
     }
 
     @Override
+    public void redraw() {
+        // Paint, and nothing else: no rebuild, so no catalogue query
+        // and no inventory. What a module changed is its own
+        // geometry, which the chart pulls when it paints.
+        chart.repaint();
+    }
+
+    @Override
     public Runnable contribute(String moduleId,
                                Supplier<List<OverlayContribution>> geometry) {
         Runnable withdraw = chart.overlays().offer(moduleId, geometry);

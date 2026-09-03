@@ -56,6 +56,25 @@ public interface ChartServices {
     void request(NavigationRequest request);
 
     /**
+     * Asks the chart to draw again (Sprint 25, issue #227).
+     *
+     * <p>Not to move, not to reassemble, and not to query anything:
+     * only to paint what it already has. Geometry is pulled, so a
+     * module whose own state has changed - a different place, a
+     * different instant, a line switched off - has new geometry to
+     * offer and no way to say so, and #215's seam left it with none.
+     * A module that cannot ask for its own ink to be redrawn is a
+     * module whose state cannot change.
+     *
+     * <p>The gate said the seam needed no eighth capability, and
+     * meant no catalogue handle, no renderer, no graphics context
+     * and no window - the things that would let a module invent
+     * cartography. This is none of those: the chart still decides
+     * what to draw and when it is worth drawing.
+     */
+    void redraw();
+
+    /**
      * Offers geometry for the chart to ink, under this module's own
      * name, and returns the handle that withdraws it.
      *

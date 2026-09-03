@@ -63,7 +63,12 @@ public final class ChartRenderer {
     private static final Color NEBULA_OUTLINE = new Color(132, 132, 132);
     private static final Color TEXT_INK = new Color(34, 34, 34);
     /** Geography sits under everything: quiet greys, dotted boundaries. */
-    private static final Color FIGURE_INK = new Color(120, 120, 120);
+    /**
+     * The grey constellation figures are drawn in, and now reference
+     * lines with them: the chart's existing weight for ink that is
+     * read across the page rather than pointed at.
+     */
+    public static final Color FIGURE_INK = new Color(120, 120, 120);
     private static final Color BOUNDARY_INK = new Color(190, 190, 190);
     private static final Color CONSTELLATION_NAME_INK = new Color(120, 120, 120);
     private static final java.awt.Stroke BOUNDARY_STROKE = new BasicStroke(
@@ -383,7 +388,36 @@ public final class ChartRenderer {
         }
     }
 
+    /**
+     * Ink the chart lays between its geography and its marks
+     * (Sprint 25, issue #227).
+     *
+     * <p>The layer, and not who fills it. A reference line belongs
+     * above the grid and the constellation figures and below every
+     * catalogued mark and label, because it exists to be read
+     * <em>across</em> the chart and must never hide an object. That
+     * is a decision about layering, so the renderer owns the moment;
+     * what gets drawn in it is decided elsewhere, by whoever holds a
+     * chart's modules. The renderer learns no observer, no clock and
+     * no meridian from this.
+     */
+    @FunctionalInterface
+    public interface ReferenceLayer {
+
+        /** Nothing to draw, which is what an atlas with no module has. */
+        ReferenceLayer NONE = (g, scene) -> { };
+
+        void paint(Graphics2D g, ChartScene scene);
+    }
+
     public void render(Graphics2D g, ChartScene scene, ChartOptions options) {
+        // One code path, so a chart with no reference layer is not
+        // merely similar to the released chart but identical to it.
+        render(g, scene, options, ReferenceLayer.NONE);
+    }
+
+    public void render(Graphics2D g, ChartScene scene, ChartOptions options,
+                       ReferenceLayer reference) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
 
@@ -422,6 +456,10 @@ public final class ChartRenderer {
                             : null));
         }
         drawGeography(g, scene, options, projection, mapping);
+        // Above the grid and the figures, below every mark: a
+        // reference line is read across the chart and must not hide
+        // an object (docs/decisions/place-and-time.md).
+        reference.paint(g, scene);
         // Symbols and stars are drawn from the published placements
         // (issue #168), so what a reader can point at is exactly
         // what the reader can see - there is no second geometry.
