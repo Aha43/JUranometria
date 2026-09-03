@@ -133,3 +133,43 @@ a key containing `mark` is not a session-boundary check.
 
 After these two corrections, PR #223 may proceed to final review. Keep the
 milestone and 1.5.0 held.
+
+## Follow-up — `3b45d9a`
+
+The real header and keyboard-extension paths are now present, and the journey
+scrolls before its pointer selections. The packaged run also constructs a
+second host and module. Two vacuity gaps remain in the new premises.
+
+### P1 — The visibility premise does not cover the dispatched click point
+
+`clickRow` asserts `table.getVisibleRect().intersects(cell)`, then dispatches
+at the centre of `cell`. Intersection proves only that some part of the cell is
+visible. A clipped sliver can satisfy it while the centre `(x, y)` remains
+outside the viewport, leaving the synthetic event deliverable where a reader's
+pointer cannot reach.
+
+After scrolling, compute the exact click point and require
+`visibleRect.contains(x, y)` before dispatch. Prefer requiring the cell's
+vertical span to be contained as well, since a row fits in the viewport; do
+not require a wide first column to fit horizontally if the chosen click point
+itself is reachable. Mutation-check the distinction with a viewport/cell
+arrangement that intersects but does not contain the click point.
+
+### P2 — The second session compares the preference store to itself
+
+The packaged acceptance assigns `kept = ChartOptionsStore.user().load()`,
+constructs a fresh `ChartComponent`, but never applies the loaded options to
+that component or otherwise gives the store to the second session. It then
+calls `ChartOptionsStore.user().load()` again and compares that result with
+`kept`. Barring an external concurrent write, this is true regardless of
+whether restart wiring reads or applies any option.
+
+Establish a known non-default option through the production store/controller
+path in the first session. In the second session, construct/load options as
+the application does, apply them to the restarted chart, and require both the
+controller/chart option and the inventory's resulting visibility to reflect
+the persisted choice. Restore the user's original value in cleanup. A mutation
+that leaves the restarted chart at `ChartOptions.DEFAULTS` must fail while its
+working marks, lead, overlays, and table selection still begin empty.
+
+PR #223, milestone 24, and 1.5.0 remain held for these contained corrections.
