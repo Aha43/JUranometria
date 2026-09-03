@@ -74,6 +74,7 @@ The foundation took three more, and the table two:
 | #217.3 | the click test proved a *cell* was partly visible rather than that the *point clicked* was reachable; the packaged restart compared two loads of one preference store without ever applying those options to the restarted application |
 | #217.4 | the packaged run changed a real preference and restored it only when it passed — so the run that found a defect was also the run that left a reader with their galaxies switched off |
 | #217.5 | the write and its flush still sat *outside* the guard, so either could fail after the mutation with nobody to undo it; and the helper settled the application's own preference node whatever store it had been handed |
+| #217.6 | the Inspector's mode chooser was clipped — at 320 px and 18 pt the second mode read "O" — and there was no width-and-font evidence for it on any platform |
 
 Two corrections are worth naming because they were mine to make and
 I got them wrong first:
@@ -114,11 +115,20 @@ I got them wrong first:
   changed, so the table went on calling a hidden galaxy "drawn".
   Both are exactly what a production-path journey is for: each
   component was correct alone.
-- **Visual inspection found two more.** At the sidebar's own width
+- **Visual inspection found three more.** At the sidebar's own width
   the magnitude column truncated "not recorded" into "not record…" —
   the precise thing the gate said must never happen — and the
   counted line ran off the edge. Columns are now sized from the
-  table's own font metrics.
+  table's own font metrics. Then the sprint review found the worst
+  of them: at 320 px and 18 pt the **mode chooser's second button
+  read "O"**, so the control that opens the whole feature could
+  neither be read nor recognised. Two faults met there — a
+  `BoxLayout` column whose children disagreed about their alignment,
+  which put the header and the chooser on a 0.408 axis and squeezed
+  them to 171 px inside a 288 px panel, and two buttons in a row
+  with no room for both. The column is aligned from the left now,
+  and the chooser takes a line each when the names stop fitting side
+  by side.
 - **[#220](https://github.com/Aha43/JUranometria/issues/220)**, an
   intermittent failure in a Sprint 23 journey on the display runner,
   fired twice during this sprint and is open with evidence and an
@@ -189,10 +199,10 @@ Everything below was run on this machine at `<HEAD>`.
 - **Clean bootstrap:** `make clean`, `rm -rf lib`,
   `scripts/download-libs.sh`, then a full build. All four pinned
   jars fetched.
-- **Full suite:** **633 tests found, 0 failed.** On this desktop 12
+- **Full suite:** **636 tests found, 0 failed.** On this desktop 12
   display-backed journeys end *unmet* when the window manager will
   not grant focus; on the CI display job, where an abort fails the
-  build, all 633 run.
+  build, all 636 run.
 - **Studies:** every study regenerated and reproduces byte-for-byte,
   except the pre-existing point-and-identify drift recorded above.
 - **Native image:** built for macOS-arm64, 76 MB unpacked, headless
@@ -213,6 +223,7 @@ Everything below was run on this machine at `<HEAD>`.
   | light, 320 px, released page | M31, M32, M110 first, bands shown, three marks highlighted, both actions enabled |
   | dark, 320 px | the same table, the same words; theme is how the atlas is inked, not what it says |
   | 18 pt, 320 px | both actions still fit; the state column moves off-screen and the pane scrolls to it |
+  | the Inspector at 240, 320 and 420 px, 11–24 pt | both mode names whole at every combination, measured in the font each button is using rather than pinned to a pixel count |
   | 240 px (the Inspector's minimum) | object, magnitude and distance whole; the state column scrolls |
   | Virgo, 36° | 2,018 rows, Messier numbers first, 561 unnamed stars counted in one line beneath |
 

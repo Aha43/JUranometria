@@ -192,14 +192,20 @@ public final class InspectorPanel extends JPanel {
         // one mode needs no chooser.
         JPanel selectedMode = new JPanel();
         selectedMode.setLayout(new BoxLayout(selectedMode, BoxLayout.Y_AXIS));
+        selectedMode.setAlignmentX(0.0f);
         selectedMode.add(candidateScroll);
-        selectedMode.add(Box.createVerticalStrut(10));
+        selectedMode.add(gap(10));
         selectedMode.add(facts);
-        selectedMode.add(Box.createVerticalGlue());
+        selectedMode.add(stretch());
         selectedMode.add(centreHere);
         modes.add(selectedMode, SELECTED_MODE);
 
-        modeSwitch.setLayout(new BoxLayout(modeSwitch, BoxLayout.X_AXIS));
+        // Two equal halves of whatever room there is, rather than
+        // two natural widths in a row that runs off the edge. At
+        // 320 px and 18 pt the row overflowed and the second mode
+        // read "O" - a control a reader can neither read nor reach,
+        // and the one that opens the whole feature (#217 review).
+        modeSwitch.setLayout(new java.awt.GridLayout(1, 2, 6, 0));
         modeSwitch.setAlignmentX(0.0f);
         modeSwitch.setVisible(false);
         showSelected.setSelected(true);
@@ -215,16 +221,18 @@ public final class InspectorPanel extends JPanel {
         showSelected.addActionListener(event -> showMode(SELECTED_MODE));
         showPage.addActionListener(event -> showMode(PAGE_MODE));
         modeSwitch.add(showSelected);
-        modeSwitch.add(Box.createHorizontalStrut(6));
         modeSwitch.add(showPage);
-        modeSwitch.add(Box.createHorizontalGlue());
+        fitModeChooser();
+
+        modes.setAlignmentX(0.0f);
 
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+        body.setAlignmentX(0.0f);
         body.add(header);
-        body.add(Box.createVerticalStrut(10));
+        body.add(gap(10));
         body.add(modeSwitch);
-        body.add(Box.createVerticalStrut(10));
+        body.add(gap(10));
         body.add(modes);
         add(body, BorderLayout.CENTER);
 
@@ -427,6 +435,72 @@ public final class InspectorPanel extends JPanel {
         if (SELECTED_MODE.equals(mode)) {
             heading.setText(text);
         }
+    }
+
+    /**
+     * The chooser decides its shape whenever the panel is laid out.
+     *
+     * <p>Not from a resize event: those arrive through the event
+     * queue, so a panel that has just been sized has not been told
+     * yet - and the chooser went on laying itself out for the width
+     * it used to have. Laying out is the moment the room is known.
+     */
+    @Override
+    public void doLayout() {
+        fitModeChooser();
+        super.doLayout();
+    }
+
+    /**
+     * Side by side while both names fit; stacked when they do not.
+     *
+     * <p>The names are the modes, and a mode a reader cannot read is
+     * a mode they will not find. At enlarged text "On this page"
+     * needs more than half of a 320 px sidebar, so the two share the
+     * width only while that is honest and take a line each when it
+     * is not - two rows of readable control being worth more than
+     * one row of "S…" and "O…".
+     */
+    private void fitModeChooser() {
+        int available = getWidth() - getInsets().left - getInsets().right;
+        // Twice the wider name, not the sum of the two: equal
+        // halves mean the wider one decides, and comparing the sum
+        // left "On this page" 16 px short of its own half.
+        int needed = 2 * Math.max(showSelected.getPreferredSize().width,
+                showPage.getPreferredSize().width) + 6;
+        boolean sideBySide = available <= 0 || available >= needed;
+        modeSwitch.setLayout(sideBySide
+                ? new java.awt.GridLayout(1, 2, 6, 0)
+                : new java.awt.GridLayout(2, 1, 0, 4));
+        int rows = sideBySide ? 1 : 2;
+        int height = Math.max(showSelected.getPreferredSize().height,
+                showPage.getPreferredSize().height) * rows
+                + (rows - 1) * 4;
+        modeSwitch.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
+        modeSwitch.setPreferredSize(new Dimension(
+                modeSwitch.getPreferredSize().width, height));
+    }
+
+    /**
+     * Vertical space that does not drag the column off the left.
+     *
+     * <p>A {@code BoxLayout} lines its children up on one axis, and
+     * a plain strut sits at 0.5 while the panels beside it sit at
+     * 0.0 - so the column's axis lands somewhere in between and
+     * every left-aligned child is pushed in and squeezed. That is
+     * how the mode chooser came to be 171 px wide inside a 288 px
+     * panel, and why its second button read "O" (#217 review).
+     */
+    private static java.awt.Component gap(int height) {
+        java.awt.Component strut = Box.createVerticalStrut(height);
+        ((JComponent) strut).setAlignmentX(0.0f);
+        return strut;
+    }
+
+    private static java.awt.Component stretch() {
+        java.awt.Component glue = Box.createVerticalGlue();
+        ((JComponent) glue).setAlignmentX(0.0f);
+        return glue;
     }
 
     /**
