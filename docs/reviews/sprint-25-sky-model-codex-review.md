@@ -142,3 +142,38 @@ One P2 correction requested. The astronomy model, SOFA binding, closed-form
 great-circle projection, and dependency direction are otherwise approved.
 After the missing boundary guard and finite-page invariant land, PR #234 is
 ready to merge and #227 may begin.
+
+## Final follow-up review at 0d9c244
+
+Approved, conditional on the required display check completing green. Both P2
+findings are closed.
+
+The compiled-class boundary test is stronger than the requested source scan:
+it covers every class in both packages, detects actual constant-pool references,
+and proves both that it inspected nonempty packages and that the same mechanism
+finds AWT in a class known to draw. Restoring the former `Rectangle2D`
+dependency fails it.
+
+`GreatCirclePage.Page` now refuses non-finite coordinates on every edge as well
+as zero or negative dimensions. Its test reaches each invalid position and
+keeps a valid rectangle as a positive control.
+
+No further source finding remains in #226. The approved implementation keeps:
+
+- one full-fidelity public sky-frame answer;
+- a pole-based, closed-form great-circle clip with no sampled production path;
+- an AWT-free, UI-free, preference-free, file-free and network-free model and
+  projection boundary;
+- the SOFA end-to-end oracle and the apparent-versus-mean sidereal-time guard;
+  and
+- an unchanged chart when this removable model is absent.
+
+The current required display run is red in the pre-existing #220 journey. That
+does not create a #226 code finding, but this project does not merge an approved
+PR with a red required matrix. Re-run it and merge when green.
+
+For #220, take the final diagnostic step before repair: record limiting
+magnitude, scene identity and star count, whether the originally chosen star is
+still in the scene, and whether it remains in `drawnMarks`, at both moments on
+the EDT. The present evidence establishes absence at the clicked pixel but does
+not yet distinguish changed scene content from a changed rendering decision.
