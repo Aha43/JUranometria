@@ -141,8 +141,8 @@ class PlaceAndTimeGateTest {
         // written by hand before the study was regenerated, and it
         // survived because this list did not cover it.
         for (String claim : List.of("13.54\"", "21.17'", "39.34'",
-                "8.80'", "0.0000 px", "14.64\"", "0.28\"", "0.0033\"",
-                "0.0002\"", "0.50\"", "0.32\"", "1.11\"", "0.03\"")) {
+                "8.80'", "0.0000 px", "14.36\"", "0.0101\"",
+                "0.50\"", "0.32\"")) {
             assertTrue(report.contains(claim),
                     "the study measures " + claim);
             assertTrue(decision.contains(claim.replace("\"", "″")

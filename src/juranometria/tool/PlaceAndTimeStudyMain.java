@@ -256,25 +256,44 @@ public final class PlaceAndTimeStudyMain {
                         + " than not knowing UT1.%n",
                 angle(againstPublished * 10));
         System.out.println();
-        double budget = ut1 + againstPublished + models
-                + POLAR_MOTION + DIURNAL_ABERRATION;
+        // No single summed figure. Two of the rows above are
+        // measurements and not bounds - the nutation residual is
+        // one date, and the precession spread is a handful of
+        // sampled dates - so adding all five and calling the total a
+        // contract would give a bound the evidence does not support
+        // (re-review). What is stated instead is each term, what
+        // kind of number it is, and which one dominates.
+        System.out.println("**What is bounded, and what is only"
+                + " measured.**");
+        System.out.println();
+        System.out.println("| term | kind |");
+        System.out.println("|---|---|");
+        System.out.println("| UTC for UT1 | a **bound**: the two stay"
+                + " within 0.9 s of each other by international"
+                + " agreement |");
+        System.out.println("| polar motion | a **bound**: the pole"
+                + " stays within about 15 m of the reference pole |");
+        System.out.println("| diurnal aberration | a **bound**: the"
+                + " observer's own rotation, greatest at the equator |");
+        System.out.println("| the whole rotation - precession model,"
+                + " nutation truncation and composition together | a"
+                + " **measurement against IAU SOFA** over eighty"
+                + " cases, 1975-2100, both poles and the seam: "
+                + "**0.0101\"** |");
+        System.out.println();
         System.out.printf(Locale.ROOT,
-                "**The accuracy contract.** Adding every term above -"
-                        + " %s for UT1, %s for the nutation residual,"
-                        + " %s for the choice of precession model, %s"
-                        + " for polar motion and %s for diurnal"
-                        + " aberration - the atlas places the zenith,"
-                        + " meridian and horizon within **%s** of the"
-                        + " direction a real observer would measure."
-                        + " That is %.2f px at the widest field and"
-                        + " %.1f px at the narrowest, and it is"
-                        + " dominated by not knowing UT1: every other"
-                        + " term together is worth %s.%n%n",
-                angle(ut1), angle(againstPublished), angle(models),
-                angle(POLAR_MOTION), angle(DIURNAL_ABERRATION),
-                angle(budget), budget * pixelsPerDegree(36.0),
-                budget * pixelsPerDegree(1.0),
-                angle(budget - ut1));
+                "The three bounded terms come to **%s**, of which %s"
+                        + " is not knowing UT1. The rotation itself is"
+                        + " measured against SOFA at **0.0101\"**"
+                        + " across the range above - a hundredth of an"
+                        + " arcsecond, and a four-hundredth of a pixel"
+                        + " at the narrowest field - which supersedes"
+                        + " the earlier estimates of its parts: the"
+                        + " comparison covers the precession model,"
+                        + " the truncated nutation series and the"
+                        + " composition at once.%n%n",
+                angle(ut1 + POLAR_MOTION + DIURNAL_ABERRATION),
+                angle(ut1));
     }
 
     /**

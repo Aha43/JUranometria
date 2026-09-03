@@ -92,15 +92,33 @@ ship, so none is claimed. What can be said is the sensitivity — at
 ten times the measured residual the tail would still be 0.03″, four
 hundred times smaller than not knowing UT1.
 
-> **The accuracy contract, derived rather than asserted.** Adding
-> every term above — 13.54″ for UT1, 0.50″ for polar motion, 0.32″
-> for diurnal aberration, 0.28″ for the choice of precession model,
-> 0.0033″ for the nutation residual and 0.0002″ for the time scale —
-> the zenith, meridian and horizon are placed within **14.64″** of
-> the direction a real observer would measure: 0.10 px at the widest
-> field, 3.7 px at the narrowest. Every term other than UT1 is worth
-> 1.11″ together, so the bound is what not knowing UT1 costs, and
-> nothing else matters until that changes.
+**What is bounded, and what is measured.** Three terms are bounds —
+UT1 (0.9 s by international agreement), polar motion (the pole stays
+within about fifteen metres of the reference pole) and diurnal
+aberration (the observer's own rotation, greatest at the equator).
+An earlier draft added those to three *measurements* and called the
+total a contract; **a sum containing measurements is not a bound**
+(re-review), and it has been taken apart.
+
+The rotation itself is no longer estimated from its parts. It is
+**measured against IAU SOFA**, release 2023-10-11, over eighty cases
+spanning 1975–2100 and ten directions including both poles and the
+right-ascension seam:
+
+> **The rotation agrees with SOFA to 0.0101″** — a hundredth of an
+> arcsecond, a four-hundredth of a pixel at the narrowest field —
+> and sidereal time to 0.0005″. That single comparison supersedes
+> the separate estimates for the precession model, the truncated
+> nutation series and the composition, because it covers all three
+> at once.
+>
+> **The bounded terms come to 14.36″**, of which 13.54″ is not
+> knowing UT1: 0.10 px at the widest field, 3.6 px at the narrowest.
+
+So the honest statement is two sentences rather than one number: the
+model's *frame* is right to a hundredth of an arcsecond, and its
+*placement in time* is uncertain by up to 13.5″ because the atlas
+refuses to ship UT1.
 
 ## The three geometries
 
@@ -283,9 +301,9 @@ rather than about astronomy:
 
 **#226** — the observer record, GMST/GAST, the precession and
 nutation rotations, and the three geometries, all UI-independent;
-the 14.64″ contract above as an executable statement; **the SOFA
-fixture described below, which is a condition of the issue rather
-than a nicety**; and the oracle described below.
+the bounded terms above as an executable statement; the SOFA
+fixture, extended if new geometry needs it; and the oracle described
+below.
 
 ### What the oracle rests on, and what it does not
 
@@ -310,7 +328,7 @@ actually proves:
 The third and fourth constrain the *combined* transformation against
 known physics rather than against its own components.
 
-**They are still not sufficient, and the re-review is right about
+**They were not sufficient, and the re-review was right about
 why.** Every one of them is invariant under a coherent error: a sign
 convention wrong in the same way in the nutation and in the equation
 of the equinoxes, or a phase shifted consistently through both,
@@ -319,15 +337,21 @@ right amount, with every angle preserved — and put every reference
 line in the wrong place. Invariants constrain a transformation; they
 do not identify it.
 
-**What is needed, and what blocks it.** Authoritative end-to-end
-vectors: for a handful of instants, the direction a primary source
-places a known direction in after the true-of-date to J2000
-rotation. IAU SOFA is the right source. It cannot be obtained here —
-this work is offline and the atlas takes no network dependency — and
-transcribing values from memory is precisely how an invented
-constant enters an astronomical model, so it has not been done.
+**This is now closed.** The vectors were generated from the official
+IAU SOFA release 2023-10-11, downloaded from `iausofa.org`, compiled
+unmodified, and driven by `scripts/reference-vectors.c` — which is
+checked in, so the fixture can be reproduced. The result is
+`docs/studies/place-and-time/reference-vectors.txt`, carrying its
+own provenance: source URL, release, the archive's SHA-256, and the
+statements SOFA's licence asks a derived work to make.
 
-The fixture that closes it is small and mechanical:
+**No dependency follows.** No SOFA source is vendored, nothing is
+fetched at build or run time, and the atlas's licensing position is
+untouched: these are eighty rows of numbers in a test fixture. The
+earlier draft of this section said the comparison could not be made
+offline and named #226 as owning it; that is superseded.
+
+The fixture is small and mechanical:
 
 ```
 # utc                     ra_of_date  dec_of_date   ra_j2000   dec_j2000
@@ -336,13 +360,9 @@ The fixture that closes it is small and mechanical:
 2050-07-04T03:00:00Z      0.000000   90.000000      ...        ...
 ```
 
-— produced by SOFA's `iauNut80`, `iauPmat76`/`iauPn` chain on any
-machine that has it, committed as
-`docs/studies/place-and-time/sofa-vectors.txt`, and asserted at the
-accuracy this decision promises. **#226 owns it and must not ship
-without it.** Until then the model's absolute orientation rests on
-invariants and published component values, which this document says
-rather than implies.
+**#226 inherits the fixture rather than the obligation to create
+it**, and must extend it if it adds geometry the eighty cases do not
+cover.
 
 **#227** — the removable module and the chart's reference-line ink:
 the vocabulary above, straight-line geometry with no subdivision,
