@@ -149,6 +149,8 @@ class MapExplorationJourneyTest {
             ChartScene sceneBeforeAsking = chart.currentScene();
             clickOn(star);
             String whenClicked = pageState("when it was clicked");
+            String whatWasThere = hitTestState(star.centre().x(),
+                    star.centre().y());
 
             Selection.Object identified = assertInstanceOf(
                     Selection.Object.class, selection.selection(),
@@ -157,7 +159,8 @@ class MapExplorationJourneyTest {
                             + Math.round(star.centre().y())
                             + " identified it.\n  " + whenTaken
                             + "\n  " + whenClicked
-                            + "\n  if those two differ, the click was"
+                            + "\n  " + whatWasThere
+                            + "\n  if the first two differ, the click was"
                             + " resolved against a different page from"
                             + " the one the pixel came from - which"
                             + " may be legitimate relayout rather than"
@@ -677,6 +680,64 @@ class MapExplorationJourneyTest {
                     scene == null ? Double.NaN
                             : scene.viewport().fieldWidthDegrees(),
                     javax.swing.UIManager.getLookAndFeel().getName());
+        });
+        return said[0];
+    }
+
+    /**
+     * What the chart's own hit test finds at a pixel, and under
+     * which options.
+     *
+     * <p>The first diagnostic showed the page had not moved between
+     * taking a mark's pixel and clicking it - same size, same
+     * offset, same viewport - so the click was resolved against the
+     * page it came from (#220). What it did not report is
+     * <em>which marks were there</em>.
+     *
+     * <p>That matters because this journey picks its mark from
+     * {@code drawnMarks(scene, ChartOptions.DEFAULTS)} while the
+     * application resolves the click against the options the chart
+     * is actually holding. If those two ever differ, the journey
+     * clicks a mark the chart is not drawing, and the answer is
+     * honestly empty sky. This reports both, so the next red run
+     * says whether that is what happened.
+     */
+    private String hitTestState(double x, double y) throws Exception {
+        String[] said = new String[1];
+        SwingUtilities.invokeAndWait(() -> {
+            ChartScene scene = chart.currentScene();
+            ChartOptions chartsOwn = chart.chartOptions();
+            List<ChartRenderer.DrawnMark> underChart =
+                    ChartHitTest.orderedHits(
+                            RENDERER.drawnMarks(scene, chartsOwn), x, y,
+                            ChartHitTest.TOLERANCE_PX);
+            List<ChartRenderer.DrawnMark> underDefaults =
+                    ChartHitTest.orderedHits(
+                            RENDERER.drawnMarks(scene,
+                                    ChartOptions.DEFAULTS), x, y,
+                            ChartHitTest.TOLERANCE_PX);
+            double nearest = Double.MAX_VALUE;
+            String nearestId = "none";
+            for (ChartRenderer.DrawnMark mark
+                    : RENDERER.drawnMarks(scene, chartsOwn)) {
+                double away = Math.hypot(mark.centre().x() - x,
+                        mark.centre().y() - y);
+                if (away < nearest) {
+                    nearest = away;
+                    nearestId = mark.star() != null ? mark.star().id()
+                            : mark.deepSky().id();
+                }
+            }
+            said[0] = String.format(java.util.Locale.ROOT,
+                    "at %.0f,%.0f the chart's own options find %d"
+                            + " candidate(s); the journey's DEFAULTS"
+                            + " find %d; nearest drawn mark is %s at"
+                            + " %.1f px; the chart's options %s"
+                            + " DEFAULTS",
+                    x, y, underChart.size(), underDefaults.size(),
+                    nearestId, nearest,
+                    chartsOwn.equals(ChartOptions.DEFAULTS)
+                            ? "equal" : "DIFFER FROM");
         });
         return said[0];
     }
