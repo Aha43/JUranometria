@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The observer, sidereal time, and the sky's orientation** (Sprint
+  25, issue #226). The atlas can now be told where a reader is and
+  when they are looking, and work out what is overhead, where their
+  meridian runs and where the mathematical horizon lies — all in the
+  chart's own J2000 frame, carrying precession and nutation properly
+  rather than taking the shortcut the gate measured and rejected.
+  UI-independent: no window, no preferences, no clock, no network.
+  Held to IAU SOFA to a hundredth of an arcsecond.
+
 ## [1.5.0] - 2026-09-03
 
 Sprint 24 — Discover what is on this page. The atlas could always

@@ -11,6 +11,10 @@ import juranometria.app.Atlas;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
+import juranometria.sky.GreatCircle;
+import juranometria.sky.LocalSky;
+import juranometria.sky.Observer;
+import juranometria.sky.SkyFrame;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -41,17 +45,22 @@ public final class PlaceAndTimeStudyMain {
     private static final double[] FIELDS =
             {36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
 
-    private record Place(String name, SkyOrientation.Observer observer) {
+    private record Place(String name, double latitude, double eastLongitude) {
+    }
+
+    /** The study crosses places with instants; the model pairs them. */
+    private static Observer observerAt(Place place, Moment moment) {
+        return new Observer(place.latitude(), place.eastLongitude(),
+                moment.instant());
     }
 
     private static final List<Place> PLACES = List.of(
-            new Place("Oslo", new SkyOrientation.Observer(59.913, 10.752)),
-            new Place("Greenwich", new SkyOrientation.Observer(51.478, -0.0015)),
-            new Place("Quito", new SkyOrientation.Observer(-0.180, -78.468)),
-            new Place("Sydney", new SkyOrientation.Observer(-33.869, 151.209)),
-            new Place("the north pole", new SkyOrientation.Observer(90.0, 0.0)),
-            new Place("the south pole",
-                    new SkyOrientation.Observer(-90.0, 0.0)));
+            new Place("Oslo", 59.913, 10.752),
+            new Place("Greenwich", 51.478, -0.0015),
+            new Place("Quito", -0.180, -78.468),
+            new Place("Sydney", -33.869, 151.209),
+            new Place("the north pole", 90.0, 0.0),
+            new Place("the south pole", -90.0, 0.0));
 
     private record Moment(String name, Instant instant) {
     }
@@ -120,28 +129,23 @@ public final class PlaceAndTimeStudyMain {
                 + " of precession since 2000, and it gets worse every"
                 + " year the atlas is used.");
         System.out.println();
-        System.out.println("| instant | shortcut | precession only |"
-                + " worst pixels at 36° | worst pixels at 1° |");
-        System.out.println("|---|---:|---:|---:|---:|");
+        System.out.println("| instant | shortcut | worst pixels at"
+                + " 36° | worst pixels at 1° |");
+        System.out.println("|---|---:|---:|---:|");
         for (Moment moment : MOMENTS) {
             double shortcut = 0;
-            double precessionOnly = 0;
             for (Place place : PLACES) {
-                SkyPosition truth = SkyOrientation.zenith(place.observer(),
-                        moment.instant(),
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
-                shortcut = Math.max(shortcut, truth.separationDegrees(
-                        SkyOrientation.zenith(place.observer(),
-                                moment.instant(),
-                                SkyOrientation.Fidelity.EPOCH_SHORTCUT)));
-                precessionOnly = Math.max(precessionOnly,
-                        truth.separationDegrees(SkyOrientation.zenith(
-                                place.observer(), moment.instant(),
-                                SkyOrientation.Fidelity.PRECESSION_ONLY)));
+                LocalSky sky = new LocalSky(observerAt(place, moment));
+                // The shortcut needs no implementation of its own:
+                // it *is* the of-date position, plotted unchanged.
+                SkyPosition asPlotted = new SkyPosition(
+                        sky.localSiderealTimeDegrees(), place.latitude());
+                shortcut = Math.max(shortcut,
+                        sky.zenith().separationDegrees(asPlotted));
             }
             System.out.printf(Locale.ROOT,
-                    "| %s | %s | %s | %,.0f px | %,.0f px |%n",
-                    moment.name(), angle(shortcut), angle(precessionOnly),
+                    "| %s | %s | %,.0f px | %,.0f px |%n",
+                    moment.name(), angle(shortcut),
                     shortcut * pixelsPerDegree(36.0),
                     shortcut * pixelsPerDegree(1.0));
         }
@@ -149,11 +153,16 @@ public final class PlaceAndTimeStudyMain {
         System.out.println("**The shortcut is rejected.** At the"
                 + " atlas's widest field it puts the zenith a third of"
                 + " a degree from where it belongs today, and at the"
-                + " narrowest it is off the page. **Precession alone**"
-                + " leaves nutation as the residual - small, but"
-                + " several pixels at the narrowest field, and free to"
-                + " avoid. The atlas carries **precession and"
-                + " nutation**.");
+                + " narrowest it is off the page.");
+        System.out.println();
+        System.out.println("The precession-only variant the gate also"
+                + " priced is no longer computed here. Production"
+                + " carries precession **and** nutation and offers no"
+                + " way to ask for less (#226), so a column measuring"
+                + " the lesser answer would need a second"
+                + " implementation of it in this study - and the"
+                + " residual it was measuring is now covered directly"
+                + " by the comparison against SOFA below.");
         System.out.println();
     }
 
@@ -173,12 +182,9 @@ public final class PlaceAndTimeStudyMain {
         double ut1 = 0;
         for (Place place : PLACES) {
             for (Moment moment : MOMENTS) {
-                SkyPosition onTime = SkyOrientation.zenith(place.observer(),
-                        moment.instant(),
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
-                SkyPosition late = SkyOrientation.zenith(place.observer(),
-                        moment.instant().plusMillis(900),
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+                SkyPosition onTime = new LocalSky(observerAt(place, moment)).zenith();
+                SkyPosition late = new LocalSky(observerAt(place, moment)
+                        .at(moment.instant().plusMillis(900))).zenith();
                 ut1 = Math.max(ut1, onTime.separationDegrees(late));
             }
         }
@@ -189,13 +195,11 @@ public final class PlaceAndTimeStudyMain {
         double tt = 0;
         for (Place place : PLACES) {
             for (Moment moment : MOMENTS) {
-                double jd = SkyOrientation.julianDate(moment.instant());
-                SkyPosition asIs = SkyOrientation.toJ2000(
-                        new SkyPosition(80.0, 20.0), jd,
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
-                SkyPosition shifted = SkyOrientation.toJ2000(
-                        new SkyPosition(80.0, 20.0), jd + 69.184 / 86400.0,
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+                double jd = SkyFrame.julianDate(moment.instant());
+                SkyPosition asIs = SkyFrame.toJ2000(
+                        new SkyPosition(80.0, 20.0), jd);
+                SkyPosition shifted = SkyFrame.toJ2000(
+                        new SkyPosition(80.0, 20.0), jd + 69.184 / 86400.0);
                 tt = Math.max(tt, asIs.separationDegrees(shifted));
             }
         }
@@ -306,9 +310,9 @@ public final class PlaceAndTimeStudyMain {
      * dpsi = -3.788", deps = +9.443".
      */
     private static double nutationAgainstPublished() {
-        double t = SkyOrientation.centuries(
-                SkyOrientation.julianDate(utc(1987, 4, 10, 0, 0)));
-        double[] mine = SkyOrientation.nutationDegrees(t);
+        double t = SkyFrame.centuries(
+                SkyFrame.julianDate(utc(1987, 4, 10, 0, 0)));
+        double[] mine = SkyFrame.nutationDegrees(t);
         double inLongitude = Math.abs(mine[0] - (-3.788 / 3600.0));
         double inObliquity = Math.abs(mine[1] - (9.443 / 3600.0));
         return inLongitude + inObliquity;
@@ -344,10 +348,10 @@ public final class PlaceAndTimeStudyMain {
     private static double precessionModelSpread() {
         double worst = 0;
         for (int year : new int[] {1900, 1950, 2000, 2026, 2050, 2100}) {
-            double jd = SkyOrientation.julianDate(utc(year, 6, 15, 0, 0));
-            double t = SkyOrientation.centuries(jd);
+            double jd = SkyFrame.julianDate(utc(year, 6, 15, 0, 0));
+            double t = SkyFrame.centuries(jd);
             double days = jd - 2451545.0;
-            double classical = SkyOrientation.gmstDegrees(jd);
+            double classical = SkyFrame.gmstDegrees(jd);
             double era = 360.0 * (0.7790572732640
                     + 1.00273781191135448 * days)
                     + (0.014506 + 4612.156534 * t + 1.3915817 * t * t
@@ -370,11 +374,10 @@ public final class PlaceAndTimeStudyMain {
     private static double againstSofa() {
         double worst = 0;
         for (String[] row : referenceRows()) {
-            SkyPosition mine = SkyOrientation.toJ2000(
+            SkyPosition mine = SkyFrame.toJ2000(
                     new SkyPosition(Double.parseDouble(row[1]),
                             Double.parseDouble(row[2])),
-                    SkyOrientation.julianDate(Instant.parse(row[0])),
-                    SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+                    SkyFrame.julianDate(Instant.parse(row[0])));
             worst = Math.max(worst, mine.separationDegrees(
                     new SkyPosition(Double.parseDouble(row[3]),
                             Double.parseDouble(row[4]))));
@@ -441,12 +444,11 @@ public final class PlaceAndTimeStudyMain {
         for (Place place : List.of(PLACES.get(0), PLACES.get(3),
                 PLACES.get(4))) {
             for (Moment moment : List.of(MOMENTS.get(1), MOMENTS.get(4))) {
-                SkyPosition j2000 = SkyOrientation.zenith(place.observer(),
-                        moment.instant(),
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
-                SkyPosition ofDate = SkyOrientation.zenith(place.observer(),
-                        moment.instant(),
-                        SkyOrientation.Fidelity.EPOCH_SHORTCUT);
+                SkyPosition j2000 = new LocalSky(observerAt(place, moment)).zenith();
+                SkyPosition ofDate = new SkyPosition(
+                        new LocalSky(observerAt(place, moment))
+                                .localSiderealTimeDegrees(),
+                        place.latitude());
                 System.out.printf(Locale.ROOT,
                         "| %s | %s | %s | %s | %s |%n",
                         place.name(), moment.name(), position(j2000),
@@ -473,14 +475,13 @@ public final class PlaceAndTimeStudyMain {
         System.out.println("| page | field | meridian on paper |"
                 + " horizon on paper | zenith on paper |");
         System.out.println("|---|---:|---:|---:|---|");
-        SkyOrientation.Observer oslo = PLACES.get(0).observer();
+        Place oslo = PLACES.get(0);
         Instant when = MOMENTS.get(1).instant();
-        SkyPosition zenith = SkyOrientation.zenith(oslo, when,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
-        List<SkyPosition> meridian = SkyOrientation.meridian(oslo, when,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION, 3600);
-        List<SkyPosition> horizon = SkyOrientation.horizon(oslo, when,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION, 3600);
+        LocalSky sky = new LocalSky(new Observer(oslo.latitude(),
+                oslo.eastLongitude(), when));
+        SkyPosition zenith = sky.zenith();
+        List<SkyPosition> meridian = sky.meridian().around(3600);
+        List<SkyPosition> horizon = sky.horizon().around(3600);
 
         for (String where : new String[] {"M31", "the zenith"}) {
             SkyPosition centre = "M31".equals(where)
@@ -526,20 +527,19 @@ public final class PlaceAndTimeStudyMain {
                 + " from the chart's pole | at 36° | at 4° |"
                 + " meridian misses the chart's pole by |");
         System.out.println("|---|---|---:|---:|---:|---:|");
-        SkyOrientation.Observer oslo = PLACES.get(0).observer();
+        Place oslo = PLACES.get(0);
         for (Moment moment : MOMENTS) {
-            SkyPosition poleOfDate = SkyOrientation.toJ2000(
+            SkyPosition poleOfDate = SkyFrame.toJ2000(
                     new SkyPosition(0, 90),
-                    SkyOrientation.julianDate(moment.instant()),
-                    SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+                    SkyFrame.julianDate(moment.instant()));
             double apart = 90.0 - poleOfDate.decDegrees();
             // How far the drawn line passes from the chart's own
             // pole, measured on the sky rather than guessed at.
             double miss = 90.0;
-            for (SkyPosition point : SkyOrientation.meridian(oslo,
-                    moment.instant(),
-                    SkyOrientation.Fidelity.PRECESSION_AND_NUTATION,
-                    200000)) {
+            for (SkyPosition point : new LocalSky(
+                    new Observer(oslo.latitude(), oslo.eastLongitude(),
+                            moment.instant()))
+                    .meridian().around(200000)) {
                 miss = Math.min(miss,
                         point.separationDegrees(new SkyPosition(0, 90)));
             }
@@ -579,20 +579,17 @@ public final class PlaceAndTimeStudyMain {
         System.out.println();
         System.out.println("| field | meridian | horizon |");
         System.out.println("|---:|---:|---:|");
-        SkyOrientation.Observer oslo = PLACES.get(0).observer();
+        Place oslo = PLACES.get(0);
         Instant when = MOMENTS.get(1).instant();
-        SkyPosition zenith = SkyOrientation.zenith(oslo, when,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+        LocalSky sky = new LocalSky(new Observer(oslo.latitude(),
+                oslo.eastLongitude(), when));
+        SkyPosition zenith = sky.zenith();
         for (double field : new double[] {36.0, 8.0, 1.0}) {
             ChartScene scene = page(zenith, field);
             System.out.printf(Locale.ROOT, "| %.0f° | %.4f px | %.4f px |%n",
                     field,
-                    straightness(scene, SkyOrientation.meridian(oslo, when,
-                            SkyOrientation.Fidelity.PRECESSION_AND_NUTATION,
-                            720)),
-                    straightness(scene, SkyOrientation.horizon(oslo, when,
-                            SkyOrientation.Fidelity.PRECESSION_AND_NUTATION,
-                            720)));
+                    straightness(scene, sky.meridian().around(720)),
+                    straightness(scene, sky.horizon().around(720)));
         }
         System.out.println();
         System.out.println("Straight to a thousandth of a pixel, which"

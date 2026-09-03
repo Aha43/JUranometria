@@ -25,16 +25,18 @@ A page is 900 px wide, so a degree of sky is worth this much of it:
 
 The shortcut is to compute the zenith's right ascension from sidereal time and plot it on the J2000 page unchanged. It is wrong by the whole of precession since 2000, and it gets worse every year the atlas is used.
 
-| instant | shortcut | precession only | worst pixels at 36° | worst pixels at 1° |
-|---|---:|---:|---:|---:|
-| J2000 itself | 8.00" | 8.00" | 0 px | 2 px |
-| March equinox 2026 | 21.17' | 9.46" | 9 px | 318 px |
-| June solstice 2026 | 21.36' | 8.31" | 9 px | 320 px |
-| December solstice 2026 | 21.63' | 7.75" | 9 px | 324 px |
-| 2050 | 39.34' | 8.63" | 16 px | 590 px |
-| 1975 | 20.11' | 7.92" | 8 px | 302 px |
+| instant | shortcut | worst pixels at 36° | worst pixels at 1° |
+|---|---:|---:|---:|
+| J2000 itself | 14.70" | 0 px | 4 px |
+| March equinox 2026 | 21.26' | 9 px | 319 px |
+| June solstice 2026 | 21.47' | 9 px | 322 px |
+| December solstice 2026 | 21.77' | 9 px | 327 px |
+| 2050 | 39.55' | 16 px | 593 px |
+| 1975 | 19.94' | 8 px | 299 px |
 
-**The shortcut is rejected.** At the atlas's widest field it puts the zenith a third of a degree from where it belongs today, and at the narrowest it is off the page. **Precession alone** leaves nutation as the residual - small, but several pixels at the narrowest field, and free to avoid. The atlas carries **precession and nutation**.
+**The shortcut is rejected.** At the atlas's widest field it puts the zenith a third of a degree from where it belongs today, and at the narrowest it is off the page.
+
+The precession-only variant the gate also priced is no longer computed here. Production carries precession **and** nutation and offers no way to ask for less (#226), so a column measuring the lesser answer would need a second implementation of it in this study - and the residual it was measuring is now covered directly by the comparison against SOFA below.
 
 ## What the atlas does not know about time
 
@@ -78,12 +80,12 @@ Sample zeniths, in the chart's own frame:
 
 | place | instant | zenith (J2000) | of date | apart |
 |---|---|---|---|---:|
-| Oslo | March equinox 2026 | 46.624°, +59.811° | 47.141°, +59.913° | 16.74' |
-| Oslo | 2050 | 337.613°, +59.651° | 338.080°, +59.913° | 21.14' |
-| Sydney | March equinox 2026 | 187.251°, -33.723° | 187.598°, -33.869° | 19.38' |
-| Sydney | 2050 | 118.056°, -33.733° | 118.537°, -33.869° | 25.33' |
-| the north pole | March equinox 2026 | 0.822°, +89.853° | 36.389°, +90.000° | 8.80' |
-| the north pole | 2050 | 359.296°, +89.717° | 327.328°, +90.000° | 16.96' |
+| Oslo | March equinox 2026 | 46.624°, +59.811° | 47.142°, +59.913° | 16.79' |
+| Oslo | 2050 | 337.613°, +59.651° | 338.084°, +59.913° | 21.21' |
+| Sydney | March equinox 2026 | 187.251°, -33.723° | 187.599°, -33.869° | 19.45' |
+| Sydney | 2050 | 118.056°, -33.733° | 118.541°, -33.869° | 25.50' |
+| the north pole | March equinox 2026 | 0.822°, +89.853° | 36.390°, +90.000° | 8.80' |
+| the north pole | 2050 | 359.296°, +89.717° | 327.332°, +90.000° | 16.96' |
 
 ## What the frame difference looks like
 
@@ -93,7 +95,7 @@ On a polar page the difference stops being a number in a table. The meridian pas
 
 | instant | pole of date, in J2000 | from the chart's pole | at 36° | at 4° | meridian misses the chart's pole by |
 |---|---|---:|---:|---:|---:|
-| J2000 itself | 226.211°, +89.998° | 8.00" | 0 px | 0 px | 7.89" |
+| J2000 itself | 226.211°, +89.998° | 8.00" | 0 px | 0 px | 7.25" |
 | March equinox 2026 | 0.822°, +89.853° | 8.80' | 4 px | 33 px | 6.33' |
 | June solstice 2026 | 0.657°, +89.852° | 8.89' | 4 px | 33 px | 6.32' |
 | December solstice 2026 | 0.532°, +89.849° | 9.07' | 4 px | 34 px | 5.96' |

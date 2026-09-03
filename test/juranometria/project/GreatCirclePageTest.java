@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.project;
 
 import java.time.Instant;
 import java.util.List;
@@ -10,6 +10,10 @@ import juranometria.app.Atlas;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
+import juranometria.sky.GreatCircle;
+import juranometria.sky.LocalSky;
+import juranometria.sky.Observer;
+import juranometria.sky.SkyFrame;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -35,7 +39,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and taking its angle from the pole. That is independent of how the
  * clipping arrived at it.
  */
-class GreatCircleOnPageTest {
+class GreatCirclePageTest {
+
+    /** The clipping, asked the way the chart will ask it. */
+    private static java.util.Optional<GreatCirclePage.Arc> clip(
+            ChartScene scene, SkyPosition pole) {
+        return GreatCirclePage.clip(
+                new GnomonicProjection(scene.viewport().centre()),
+                new ViewportMapping(scene.viewport()),
+                ChartRenderer.paperOf(scene),
+                new GreatCircle(pole).around(180));
+    }
 
     private static ChartScene page(SkyPosition centre, double field) {
         return Atlas.assembler().assemble(
@@ -52,7 +66,7 @@ class GreatCircleOnPageTest {
 
     private static void assertLandsOnTheCircle(ChartScene scene,
                                                SkyPosition pole,
-                                               GreatCircleOnPage.Crossing arc) {
+                                               GreatCirclePage.Arc arc) {
         for (PixelPoint end : List.of(arc.from(), arc.to())) {
             assertTrue(offTheCircle(scene, pole, end) < 1e-6,
                     "an end of the drawn arc is on the great circle:"
@@ -83,7 +97,7 @@ class GreatCircleOnPageTest {
         ChartScene scene = page(new SkyPosition(0.0, 20.0), 1.0);
 
         int onPaper = 0;
-        for (SkyPosition vertex : GreatCircleOnPage.sample(pole, 8)) {
+        for (SkyPosition vertex : new GreatCircle(pole).around(8)) {
             PixelPoint at = pixel(scene, vertex);
             if (at != null && ChartRenderer.paperOf(scene)
                     .contains(at.x(), at.y())) {
@@ -93,7 +107,7 @@ class GreatCircleOnPageTest {
         assertEquals(0, onPaper,
                 "the premise: no supplied vertex is on this page");
 
-        GreatCircleOnPage.Crossing arc = GreatCircleOnPage.clip(scene, pole)
+        GreatCirclePage.Arc arc = clip(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "the circle crosses this page and must be found"));
         assertLandsOnTheCircle(scene, pole, arc);
@@ -105,11 +119,11 @@ class GreatCircleOnPageTest {
         // enough to fall entirely between two neighbouring vertices
         // of any reasonable sampling.
         SkyPosition pole = new SkyPosition(123.4, 5.6);
-        List<SkyPosition> coarse = GreatCircleOnPage.sample(pole, 36);
+        List<SkyPosition> coarse = new GreatCircle(pole).around(36);
         SkyPosition between = midpoint(coarse.get(0), coarse.get(1));
         ChartScene scene = page(between, 1.0);
 
-        GreatCircleOnPage.Crossing arc = GreatCircleOnPage.clip(scene, pole)
+        GreatCirclePage.Arc arc = clip(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "a page between samples is still crossed"));
         assertLandsOnTheCircle(scene, pole, arc);
@@ -122,7 +136,7 @@ class GreatCircleOnPageTest {
         SkyPosition centre = new SkyPosition(10.684, 41.269);
         ChartScene scene = page(centre, 8.0);
 
-        assertEquals(Optional.empty(), GreatCircleOnPage.clip(scene, centre),
+        assertEquals(Optional.empty(), clip(scene, centre),
                 "the circle of a pole at the page centre is ninety"
                         + " degrees away, and the honest answer is"
                         + " nothing");
@@ -134,7 +148,7 @@ class GreatCircleOnPageTest {
         // clipping must answer from the visible half rather than
         // being confused by the refused one.
         SkyPosition pole = new SkyPosition(200.0, 60.0);
-        List<SkyPosition> around = GreatCircleOnPage.sample(pole, 360);
+        List<SkyPosition> around = new GreatCircle(pole).around(360);
         ChartScene scene = page(around.get(0), 24.0);
 
         int refused = 0;
@@ -147,7 +161,7 @@ class GreatCircleOnPageTest {
                 "the premise: much of this circle is behind the"
                         + " projection - " + refused + " of 360");
 
-        GreatCircleOnPage.Crossing arc = GreatCircleOnPage.clip(scene, pole)
+        GreatCirclePage.Arc arc = clip(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "the visible half crosses this page"));
         assertLandsOnTheCircle(scene, pole, arc);
@@ -173,7 +187,7 @@ class GreatCircleOnPageTest {
                 paper.getMaxX() - 60, paper.getMaxY() - 5);
         SkyPosition pole = poleThrough(acrossOneWay, acrossTheOther);
 
-        GreatCircleOnPage.Crossing arc = GreatCircleOnPage.clip(scene, pole)
+        GreatCirclePage.Arc arc = clip(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "a circle clipping the corner is on the page"));
         assertLandsOnTheCircle(scene, pole, arc);
@@ -187,11 +201,10 @@ class GreatCircleOnPageTest {
 
     @Test
     void polarAndSeamPagesAreNoDifferent() {
-        SkyOrientation.Observer oslo =
-                new SkyOrientation.Observer(59.913, 10.752);
         Instant when = Instant.parse("2026-03-20T21:33:00Z");
-        SkyPosition meridian = GreatCircleOnPage.meridianPole(oslo, when);
-        SkyPosition horizon = GreatCircleOnPage.horizonPole(oslo, when);
+        Observer oslo = new Observer(59.913, 10.752, when);
+        SkyPosition meridian = new LocalSky(oslo.at(when)).meridian().pole();
+        SkyPosition horizon = new LocalSky(oslo.at(when)).horizon().pole();
 
         for (SkyPosition centre : List.of(
                 new SkyPosition(0.0, 89.6),     // hard against the pole
@@ -200,7 +213,7 @@ class GreatCircleOnPageTest {
             for (double field : new double[] {36.0, 4.0, 1.0}) {
                 ChartScene scene = page(centre, field);
                 for (SkyPosition pole : List.of(meridian, horizon)) {
-                    GreatCircleOnPage.clip(scene, pole).ifPresent(arc ->
+                    clip(scene, pole).ifPresent(arc ->
                             assertLandsOnTheCircle(scene, pole, arc));
                 }
             }
@@ -212,19 +225,17 @@ class GreatCircleOnPageTest {
         // Against the slow way round: sample the circle finely, keep
         // what lands on the paper, and require the analytic answer to
         // cover it. The two are computed differently and must agree.
-        SkyOrientation.Observer oslo =
-                new SkyOrientation.Observer(59.913, 10.752);
         Instant when = Instant.parse("2026-03-20T21:33:00Z");
-        SkyPosition pole = GreatCircleOnPage.meridianPole(oslo, when);
-        SkyPosition zenith = SkyOrientation.zenith(oslo, when,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+        Observer oslo = new Observer(59.913, 10.752, when);
+        SkyPosition pole = new LocalSky(oslo.at(when)).meridian().pole();
+        SkyPosition zenith = new LocalSky(oslo.at(when)).zenith();
 
         for (double field : new double[] {36.0, 8.0, 1.0}) {
             ChartScene scene = page(zenith, field);
-            GreatCircleOnPage.Crossing arc =
-                    GreatCircleOnPage.clip(scene, pole).orElseThrow();
+            GreatCirclePage.Arc arc =
+                    clip(scene, pole).orElseThrow();
 
-            for (SkyPosition point : GreatCircleOnPage.sample(pole, 200000)) {
+            for (SkyPosition point : new GreatCircle(pole).around(200000)) {
                 PixelPoint at = pixel(scene, point);
                 if (at == null || !ChartRenderer.paperOf(scene)
                         .contains(at.x(), at.y())) {
@@ -244,19 +255,14 @@ class GreatCircleOnPageTest {
     void theMeridianOfAnObserverPassesThroughTheirZenith() {
         // The astronomy the pole is supposed to encode, checked
         // against the model rather than assumed by construction.
-        SkyOrientation.Observer oslo =
-                new SkyOrientation.Observer(59.913, 10.752);
         Instant when = Instant.parse("2026-03-20T21:33:00Z");
-        SkyPosition pole = GreatCircleOnPage.meridianPole(oslo, when);
-        SkyPosition zenith = SkyOrientation.zenith(oslo, when,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+        Observer oslo = new Observer(59.913, 10.752, when);
+        SkyPosition pole = new LocalSky(oslo.at(when)).meridian().pole();
+        SkyPosition zenith = new LocalSky(oslo.at(when)).zenith();
 
         assertEquals(90.0, pole.separationDegrees(zenith), 1e-6,
                 "the zenith is on the meridian");
-        assertEquals(90.0, pole.separationDegrees(SkyOrientation.toJ2000(
-                        new SkyPosition(0, 90),
-                        SkyOrientation.julianDate(when),
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION)),
+        assertEquals(90.0, pole.separationDegrees(SkyFrame.toJ2000(new SkyPosition(0, 90), SkyFrame.julianDate(when))),
                 1e-6, "and so is the celestial pole of date");
     }
 
@@ -269,18 +275,18 @@ class GreatCircleOnPageTest {
     }
 
     private static SkyPosition midpoint(SkyPosition a, SkyPosition b) {
-        double[] first = SkyOrientation.toVector(a);
-        double[] second = SkyOrientation.toVector(b);
-        return SkyOrientation.toPosition(new double[] {
+        double[] first = SkyFrame.toVector(a);
+        double[] second = SkyFrame.toVector(b);
+        return SkyFrame.toPosition(new double[] {
                 first[0] + second[0], first[1] + second[1],
                 first[2] + second[2]});
     }
 
     /** The pole of the great circle through two positions. */
     private static SkyPosition poleThrough(SkyPosition a, SkyPosition b) {
-        double[] first = SkyOrientation.toVector(a);
-        double[] second = SkyOrientation.toVector(b);
-        return SkyOrientation.toPosition(new double[] {
+        double[] first = SkyFrame.toVector(a);
+        double[] second = SkyFrame.toVector(b);
+        return SkyFrame.toPosition(new double[] {
                 first[1] * second[2] - first[2] * second[1],
                 first[2] * second[0] - first[0] * second[2],
                 first[0] * second[1] - first[1] * second[0]});

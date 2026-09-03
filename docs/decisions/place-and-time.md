@@ -49,14 +49,25 @@ unchanged is wrong by the whole of precession since 2000:
 
 | instant | error | at the 36° field | at the 1° field |
 |---|---:|---:|---:|
-| J2000 itself | 8.00″ | 0 px | 2 px |
-| March 2026 | 21.17′ | 9 px | 318 px |
-| 2050 | 39.34′ | 16 px | 590 px |
+| J2000 itself | 14.70″ | 0 px | 4 px |
+| March 2026 | 21.26′ | 9 px | 319 px |
+| 2050 | 39.55′ | 16 px | 593 px |
 
-**Precession alone** leaves nutation as the residual — about 9″, or
-2 px at the narrowest field. Free to avoid, so it is avoided: the
-atlas carries **precession (IAU 1976) and nutation (IAU 1980,
-twenty terms)**.
+*(These moved by about a tenth of an arcminute when #226 built the
+model. The shortcut is now measured as production's own apparent
+sidereal time plotted unchanged — which is what a naive
+implementation reusing this model would actually produce — rather
+than through a second, mean-time code path that only the study had.
+The conclusion is untouched.)*
+
+The atlas carries **precession (IAU 1976) and nutation (IAU 1980,
+twenty terms)**, and #226 gives it **no way to ask for less**: there
+is no fidelity argument and no shortcut to fall back to, because an
+implementation that can be asked for the wrong answer eventually
+will be. The precession-only variant the gate priced at about 9″ is
+no longer computed in the study either — measuring it would need a
+second implementation of the lesser answer, and the residual it
+stood for is now covered directly by the comparison against SOFA.
 
 Three simplifications remain, each priced rather than hidden:
 

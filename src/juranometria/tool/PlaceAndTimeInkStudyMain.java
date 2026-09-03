@@ -25,6 +25,8 @@ import juranometria.app.Atlas;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
+import juranometria.sky.LocalSky;
+import juranometria.sky.Observer;
 import juranometria.chart.StarSizePolicy;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
@@ -58,10 +60,10 @@ public final class PlaceAndTimeInkStudyMain {
             new ChartRenderer(StarSizePolicy.DEFAULT);
 
     /** An observer, and the instant the study is drawn for. */
-    private static final SkyOrientation.Observer OSLO =
-            new SkyOrientation.Observer(59.913, 10.752);
     private static final Instant WHEN = ZonedDateTime
             .of(2026, 3, 20, 21, 33, 0, 0, ZoneOffset.UTC).toInstant();
+    private static final LocalSky OSLO =
+            new LocalSky(new Observer(59.913, 10.752, WHEN));
 
     /**
      * Two candidates, so the choice is between things rather than
@@ -77,8 +79,7 @@ public final class PlaceAndTimeInkStudyMain {
 
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
-        SkyPosition zenith = SkyOrientation.zenith(OSLO, WHEN,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION);
+        SkyPosition zenith = OSLO.zenith();
 
         for (Candidate candidate : Candidate.values()) {
             String name = candidate.name().toLowerCase(Locale.ROOT);
@@ -111,8 +112,7 @@ public final class PlaceAndTimeInkStudyMain {
 
     /** A page centred where the horizon crosses, and the zenith does not. */
     private static SkyPosition horizonEdge(SkyPosition zenith) {
-        return SkyOrientation.horizon(OSLO, WHEN,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION, 72).get(9);
+        return OSLO.horizon().around(72).get(9);
     }
 
     private static ChartScene page(SkyPosition centre, double field) {
@@ -158,13 +158,9 @@ public final class PlaceAndTimeInkStudyMain {
                 : new Color(110, 110, 110);
 
         List<List<PixelPoint>> meridian = runsOnPaper(scene,
-                SkyOrientation.meridian(OSLO, WHEN,
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION,
-                        200000));
+                OSLO.meridian().around(200000));
         List<List<PixelPoint>> horizon = runsOnPaper(scene,
-                SkyOrientation.horizon(OSLO, WHEN,
-                        SkyOrientation.Fidelity.PRECESSION_AND_NUTATION,
-                        200000));
+                OSLO.horizon().around(200000));
 
         g.setColor(ink);
         g.setStroke(new BasicStroke(1.0f));
@@ -184,8 +180,7 @@ public final class PlaceAndTimeInkStudyMain {
         // The zenith: an open ring with a short upward tick, so it
         // reads as a place rather than as an object, and cannot be
         // mistaken for a working cross.
-        PixelPoint zenith = pixel(scene, SkyOrientation.zenith(OSLO, WHEN,
-                SkyOrientation.Fidelity.PRECESSION_AND_NUTATION));
+        PixelPoint zenith = pixel(scene, OSLO.zenith());
         if (zenith != null && ChartRenderer.paperOf(scene)
                 .contains(zenith.x(), zenith.y())) {
             g.setStroke(new BasicStroke(1.0f));
