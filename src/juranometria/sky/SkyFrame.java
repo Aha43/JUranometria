@@ -147,16 +147,16 @@ public final class SkyFrame {
      * Nutation in longitude and obliquity, in degrees: the twenty
      * largest terms of the IAU 1980 series.
      *
-     * <p>Truncated on purpose, and the truncation is measured rather
-     * than assumed: the study compares this against the four-term
-     * form to show what the tail is worth, in arcseconds and in
-     * pixels.
+     * <p>Twenty, and not a number a caller chooses. An earlier
+     * version took the term count as an argument so the study could
+     * compare shorter forms - which is the same lesser-answer
+     * control the gate rejected in another guise (review), reachable
+     * by anyone and invisible to the test that walks this class for
+     * mode enums. The truncation is now the model's own decision,
+     * and what it costs is measured against SOFA rather than against
+     * a shorter copy of itself.
      */
     public static double[] nutationDegrees(double centuries) {
-        return nutationDegrees(centuries, TERMS.length);
-    }
-
-    public static double[] nutationDegrees(double centuries, int terms) {
         double t = centuries;
         double d = Math.toRadians(297.85036 + 445267.111480 * t
                 - 0.0019142 * t * t + t * t * t / 189474.0);
@@ -171,7 +171,7 @@ public final class SkyFrame {
 
         double longitude = 0;
         double obliquity = 0;
-        for (int i = 0; i < Math.min(terms, TERMS.length); i++) {
+        for (int i = 0; i < TERMS.length; i++) {
             double[] term = TERMS[i];
             double argument = term[0] * d + term[1] * m + term[2] * mPrime
                     + term[3] * f + term[4] * omega;

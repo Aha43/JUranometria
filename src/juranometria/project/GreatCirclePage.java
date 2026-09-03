@@ -1,7 +1,5 @@
 package juranometria.project;
 
-import java.awt.geom.Rectangle2D;
-import java.util.List;
 import java.util.Optional;
 
 import juranometria.chart.SkyPosition;
@@ -9,19 +7,39 @@ import juranometria.chart.SkyPosition;
 /**
  * Where a great circle crosses a page (Sprint 25, issue #226).
  *
- * <p>Geometry, not astronomy. This class is given a circle's pole
- * and a rectangle, and it answers with the arc a reader would see -
- * it has never heard of meridians, horizons, observers or time, and
- * the same code would clip a galactic equator.
+ * <p>Geometry, not astronomy. This class is given a circle's
+ * <strong>pole</strong> and a rectangle of page, and it answers with
+ * the arc a reader would see - it has never heard of meridians,
+ * horizons, observers or time, and the same code would clip a
+ * galactic equator.
+ *
+ * <p>It takes the pole rather than points on the circle. An earlier
+ * version took a list of positions, which left every caller
+ * responsible for the sampling the gate rejected and made it their
+ * job to sample finely enough - exactly the failure mode the
+ * analytic clip exists to remove (review). Given the pole, there is
+ * no sampling left to be responsible for.
+ *
+ * <p>Its boundary is {@link Page}, four numbers, rather than an AWT
+ * rectangle: this is projection geometry, and a package that draws
+ * nothing should not need a windowing toolkit to describe a
+ * rectangle (review).
  *
  * <h2>Why it can be exact</h2>
  *
  * <p>A gnomonic projection maps every great circle to a straight
- * line. So the projected circle is fixed <em>exactly</em> by any two
- * of its points that project at all, and the line is then clipped to
- * the rectangle analytically. Nothing a reader sees is decided by
- * sampling: sampling is used only to find two points somewhere on
- * the visible half, which is half the sky.
+ * line, and the line has a closed form. A visible direction
+ * {@code p} at plane coordinates {@code (xi, eta)} is
+ * {@code p = cos(d) * (xi*east + eta*north + centre)}, so the
+ * circle's defining condition {@code pole . p = 0} becomes
+ *
+ * <pre>  (pole.east) * xi + (pole.north) * eta + (pole.centre) = 0</pre>
+ *
+ * <p>which is the equation of a straight line in the plane, with no
+ * approximation and nothing to choose. The pixel map is affine, so
+ * that line stays a line in pixels, and it is then clipped to the
+ * rectangle analytically. Not one number a reader sees comes from a
+ * sample or a tolerance.
  *
  * <p>That is the opposite of Sprint 24's deep-sky extents, which are
  * not great circles and did need subdivision to a measured bound.
@@ -41,6 +59,25 @@ public final class GreatCirclePage {
     private GreatCirclePage() {
     }
 
+    /**
+     * The page to clip against: the rectangle of pixels the chart
+     * is willing to draw in.
+     */
+    public record Page(double minX, double minY, double maxX, double maxY) {
+
+        public Page {
+            if (!(maxX > minX) || !(maxY > minY)) {
+                throw new IllegalArgumentException(
+                        "a page has width and height: " + minX + ","
+                                + minY + " to " + maxX + "," + maxY);
+            }
+        }
+
+        public boolean contains(double x, double y) {
+            return x >= minX && x <= maxX && y >= minY && y <= maxY;
+        }
+    }
+
     /** The two ends of the arc a page shows. */
     public record Arc(PixelPoint from, PixelPoint to) {
 
@@ -57,39 +94,52 @@ public final class GreatCirclePage {
     }
 
     /**
-     * Where the great circle with this pole crosses the rectangle.
+     * Where the great circle with this pole crosses the page.
      *
-     * @param points positions around the circle, from which two
-     *     that project are taken; what they are is unimportant, and
-     *     none of them need be on the page
+     * @param pole a direction perpendicular to every point of the
+     *     circle - the whole of what this needs to be told
      */
     public static Optional<Arc> clip(GnomonicProjection projection,
                                      ViewportMapping mapping,
-                                     Rectangle2D paper,
-                                     List<SkyPosition> points) {
-        PixelPoint first = null;
-        PixelPoint furthest = null;
-        double apart = -1;
-        for (SkyPosition point : points) {
-            PixelPoint at = projection.project(point)
-                    .map(mapping::toPixel).orElse(null);
-            if (at == null) {
-                continue;
-            }
-            if (first == null) {
-                first = at;
-                continue;
-            }
-            double away = Math.hypot(at.x() - first.x(), at.y() - first.y());
-            if (away > apart) {
-                apart = away;
-                furthest = at;
-            }
-        }
-        if (first == null || furthest == null || apart < 1e-9) {
+                                     Page paper,
+                                     SkyPosition pole) {
+        double[] axis = unit(pole);
+        double[] centre = unit(projection.centre());
+        double ra = Math.toRadians(projection.centre().raDegrees());
+        double dec = Math.toRadians(projection.centre().decDegrees());
+        double[] east = {-Math.sin(ra), Math.cos(ra), 0};
+        double[] north = {-Math.sin(dec) * Math.cos(ra),
+                -Math.sin(dec) * Math.sin(ra), Math.cos(dec)};
+
+        double a = dot(axis, east);
+        double b = dot(axis, north);
+        double c = dot(axis, centre);
+        double gradient = a * a + b * b;
+        if (gradient < 1e-24) {
+            // The pole is the page's own centre: the circle is the
+            // projection's horizon, ninety degrees away in every
+            // direction, and no point of it has an image at all.
             return Optional.empty();
         }
-        return clipToRectangle(first, furthest, paper);
+        // The point of the line closest to the plane's origin, and
+        // the line's direction - two points, exactly on the line.
+        double nearXi = -a * c / gradient;
+        double nearEta = -b * c / gradient;
+        PixelPoint from = mapping.toPixel(new PlanePoint(nearXi, nearEta));
+        PixelPoint to = mapping.toPixel(
+                new PlanePoint(nearXi - b, nearEta + a));
+        return clipToRectangle(from, to, paper);
+    }
+
+    private static double[] unit(SkyPosition position) {
+        double ra = Math.toRadians(position.raDegrees());
+        double dec = Math.toRadians(position.decDegrees());
+        return new double[] {Math.cos(dec) * Math.cos(ra),
+                Math.cos(dec) * Math.sin(ra), Math.sin(dec)};
+    }
+
+    private static double dot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
     }
 
     /**
@@ -98,16 +148,16 @@ public final class GreatCirclePage {
      * answered exactly rather than by inspecting vertices.
      */
     private static Optional<Arc> clipToRectangle(PixelPoint a, PixelPoint b,
-                                                 Rectangle2D paper) {
+                                                 Page paper) {
         double dx = b.x() - a.x();
         double dy = b.y() - a.y();
         double enter = Double.NEGATIVE_INFINITY;
         double leave = Double.POSITIVE_INFINITY;
         double[][] edges = {
-            {-dx, a.x() - paper.getMinX()},
-            {dx, paper.getMaxX() - a.x()},
-            {-dy, a.y() - paper.getMinY()},
-            {dy, paper.getMaxY() - a.y()},
+            {-dx, a.x() - paper.minX()},
+            {dx, paper.maxX() - a.x()},
+            {-dy, a.y() - paper.minY()},
+            {dy, paper.maxY() - a.y()},
         };
         for (double[] edge : edges) {
             double p = edge[0];

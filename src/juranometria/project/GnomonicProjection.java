@@ -21,15 +21,22 @@ public final class GnomonicProjection {
      */
     private static final double MIN_COS_ANGULAR_DISTANCE = 1e-12;
 
+    private final SkyPosition centre;
     private final double centreRaRadians;
     private final double sinCentreDec;
     private final double cosCentreDec;
 
     public GnomonicProjection(SkyPosition centre) {
+        this.centre = centre;
         this.centreRaRadians = Math.toRadians(centre.raDegrees());
         double centreDecRadians = Math.toRadians(centre.decDegrees());
         this.sinCentreDec = Math.sin(centreDecRadians);
         this.cosCentreDec = Math.cos(centreDecRadians);
+    }
+
+    /** The position the plane is tangent at. */
+    public SkyPosition centre() {
+        return centre;
     }
 
     /** Projects a sky position onto the tangent plane. */

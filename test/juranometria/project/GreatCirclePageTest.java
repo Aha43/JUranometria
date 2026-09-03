@@ -44,11 +44,13 @@ class GreatCirclePageTest {
     /** The clipping, asked the way the chart will ask it. */
     private static java.util.Optional<GreatCirclePage.Arc> clip(
             ChartScene scene, SkyPosition pole) {
+        java.awt.geom.Rectangle2D paper = ChartRenderer.paperOf(scene);
         return GreatCirclePage.clip(
                 new GnomonicProjection(scene.viewport().centre()),
                 new ViewportMapping(scene.viewport()),
-                ChartRenderer.paperOf(scene),
-                new GreatCircle(pole).around(180));
+                new GreatCirclePage.Page(paper.getMinX(), paper.getMinY(),
+                        paper.getMaxX(), paper.getMaxY()),
+                pole);
     }
 
     private static ChartScene page(SkyPosition centre, double field) {
@@ -140,6 +142,85 @@ class GreatCirclePageTest {
                 "the circle of a pole at the page centre is ninety"
                         + " degrees away, and the honest answer is"
                         + " nothing");
+    }
+
+    @Test
+    void aCircleThatPassesWideOfThePaperIsAnsweredWithSilence() {
+        // Not the degenerate case above: this circle projects
+        // perfectly well, to a line thirty degrees from the page
+        // centre. The page simply is not on it, and the clipping -
+        // not the projection - has to say so. Without a test that
+        // reaches it, the refusal was a branch no mutation could
+        // kill, which is the fault Sprint 24's gate deleted a
+        // fallback for (review).
+        SkyPosition centre = new SkyPosition(0.0, 0.0);
+        SkyPosition pole = new SkyPosition(0.0, 60.0);
+        ChartScene scene = page(centre, 4.0);
+
+        assertEquals(30.0, 90.0 - pole.separationDegrees(centre), 1e-9,
+                "the premise: the circle is thirty degrees away - real,"
+                        + " projectable, and nowhere near this page");
+        int onPaper = 0;
+        for (SkyPosition point : new GreatCircle(pole).around(3600)) {
+            PixelPoint at = pixel(scene, point);
+            if (at != null && ChartRenderer.paperOf(scene)
+                    .contains(at.x(), at.y())) {
+                onPaper++;
+            }
+        }
+        assertEquals(0, onPaper, "and no point of it is on the paper");
+
+        assertEquals(Optional.empty(), clip(scene, pole),
+                "so the answer is nothing, rather than a line drawn"
+                        + " off the edge of the page");
+    }
+
+    @Test
+    void aCircleThatPassesDiagonallyBeyondACornerIsRefused() {
+        // The other way to miss, and the one a rectangle test gets
+        // wrong: a slanted line that crosses the page's column of
+        // pixels and its row of pixels, but not both at once - it
+        // goes by outside the corner. The line above misses while
+        // running parallel to an edge, which is an easier question.
+        SkyPosition centre = new SkyPosition(80.0, -10.0);
+        ChartScene wide = page(centre, 8.0);
+        java.awt.geom.Rectangle2D paper = ChartRenderer.paperOf(wide);
+        SkyPosition pole = poleThrough(
+                ChartHitTest.skyAt(wide, paper.getMaxX() - 5,
+                        paper.getMaxY() - 60),
+                ChartHitTest.skyAt(wide, paper.getMaxX() - 60,
+                        paper.getMaxY() - 5));
+
+        GreatCirclePage.Arc corner = clip(wide, pole).orElseThrow(
+                () -> new AssertionError("the premise: at this field"
+                        + " the circle does clip the corner"));
+        double dx = Math.abs(corner.to().x() - corner.from().x());
+        double dy = Math.abs(corner.to().y() - corner.from().y());
+        assertTrue(dx > 1 && dy > 1,
+                "and it is slanted, so neither the horizontal nor the"
+                        + " vertical edges can answer alone: " + dx
+                        + " by " + dy + " px");
+
+        // The same circle, the same centre, half the field: the page
+        // has zoomed in past the corner the line went through.
+        assertEquals(Optional.empty(), clip(page(centre, 4.0), pole),
+                "the line now goes by outside the corner, and the"
+                        + " honest answer is nothing");
+    }
+
+    @Test
+    void thePoleExactlyAtThePageCentreIsRefusedRatherThanDivided() {
+        // RA 0, Dec 0 is the one place the arithmetic is exact: the
+        // circle's line has no gradient at all, and computing it
+        // means dividing by zero. The answer must be silence, not an
+        // arc whose ends are NaN. Chosen deliberately - a pole a
+        // millionth of a degree off the centre divides by 1e-34 and
+        // never reaches the refusal.
+        SkyPosition origin = new SkyPosition(0.0, 0.0);
+        ChartScene scene = page(origin, 8.0);
+
+        assertEquals(Optional.empty(), clip(scene, origin),
+                "the projection's own horizon is on no page");
     }
 
     @Test
