@@ -216,7 +216,15 @@ public final class ChartComponent extends JComponent {
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.translate(0, pageOffsetY());
-            renderer.render(g2, scene, chartOptions);
+            // The reference layer is handed to the renderer rather
+            // than painted after it: a line of reference belongs
+            // above the grid and below every mark, and that is the
+            // only moment it can be laid down (#227). With no module
+            // contributing, the layer is empty and the page is the
+            // released page.
+            renderer.render(g2, scene, chartOptions,
+                    (layerG, layerScene) -> ReferenceInk.paint(layerG,
+                            layerScene, overlays.collect()));
             renderer.drawSelectionHighlight(g2, scene, chartOptions,
                     highlighted);
             // After the chart, never inside it: working crosses are

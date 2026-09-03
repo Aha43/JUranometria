@@ -30,6 +30,65 @@ public sealed interface OverlayContribution {
     /** What a reader is told this is, in words. */
     String accessibleName();
 
+    /**
+     * What a reference line <em>is</em>, so the chart can decide
+     * what it looks like.
+     *
+     * <p>Not an appearance. A module that said "dashed" would be
+     * inking, which is the chart's decision and not its own; what it
+     * says instead is whether the line is drawn through the sky or
+     * bounds what can be seen of it, and the chart draws the second
+     * one dashed because a boundary of visibility is not a thing in
+     * the sky.
+     *
+     * <p>The gate said the seam needed exactly one new thing, the
+     * great circle. It needs this too, and it is worth saying why
+     * rather than quietly adding it: the ink was decided as solid
+     * for the meridian and dashed for the horizon, and the only
+     * other way for the chart to tell those apart is to know what a
+     * horizon is - which is the one thing the seam exists to
+     * prevent. So the distinction is carried, in the module's
+     * vocabulary rather than the chart's.
+     */
+    enum Reference {
+
+        /** A line drawn across the sky. */
+        LINE,
+
+        /** The boundary of what can be seen of it. */
+        BOUNDARY
+    }
+
+    /**
+     * A great circle, given by its pole.
+     *
+     * <p>The one new geometry the gate named. A pole and nothing
+     * else: the chart clips it to the page analytically, because a
+     * gnomonic projection maps every great circle to a straight
+     * line, and a polyline could not answer a page that lies between
+     * its own vertices. It knows nothing of meridians, horizons,
+     * observers or time, and a module drawing a galactic equator
+     * would use this same type.
+     */
+    record GreatCircle(String identity, String accessibleName,
+                       SkyPosition pole, Reference reference, InkRole role)
+            implements OverlayContribution {
+
+        public GreatCircle {
+            requireIdentified(identity, accessibleName, role);
+            if (pole == null) {
+                throw new IllegalArgumentException(
+                        "a great circle is given by its pole: "
+                                + identity);
+            }
+            if (reference == null) {
+                throw new IllegalArgumentException(
+                        "a reference line says whether it crosses the"
+                                + " sky or bounds it: " + identity);
+            }
+        }
+    }
+
     /** A single place on the sky. */
     record Point(String identity, String accessibleName, SkyPosition at,
                  InkRole role) implements OverlayContribution {

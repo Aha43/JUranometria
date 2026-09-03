@@ -52,16 +52,36 @@ class RemovableModelBoundaryTest {
             "java/nio/file",     // no files
             "java/io/File");     // and no paths to them
 
+    /**
+     * The one exception, and it is a reviewed one: the seam names
+     * {@code ChartOptions}, which lives in the renderer's package.
+     * That is deliberate - the options are how the page is drawn,
+     * and #215 decided a module may be told them. It is a record of
+     * settings, not a renderer, and the module that consumes the
+     * seam is held to the whole list.
+     */
+    private static final List<String> ALLOWED_IN_THE_SEAM =
+            List.of("juranometria/render");
+
+    private static List<String> forbiddenIn(String pkg) {
+        return pkg.equals("juranometria/module")
+                ? FORBIDDEN.stream()
+                        .filter(name -> !ALLOWED_IN_THE_SEAM.contains(name))
+                        .toList()
+                : FORBIDDEN;
+    }
+
     private static final Path CLASSES = Path.of("build/classes");
 
     @Test
-    void theSkyModelAndTheProjectionDependOnNoneOfThem()
+    void theModelTheProjectionTheSeamAndTheModuleDependOnNoneOfThem()
             throws IOException {
         List<String> offenders = new ArrayList<>();
         for (String pkg : List.of("juranometria/sky",
-                "juranometria/project")) {
+                "juranometria/project", "juranometria/meridian",
+                "juranometria/module")) {
             for (Path type : classesIn(pkg)) {
-                for (String forbidden : refersTo(type)) {
+                for (String forbidden : refersTo(type, forbiddenIn(pkg))) {
                     offenders.add(type.getFileName() + " -> " + forbidden);
                 }
             }
@@ -82,7 +102,7 @@ class RemovableModelBoundaryTest {
                 "juranometria/render/ChartRenderer.class");
         assertTrue(Files.exists(renderer),
                 "the classes are compiled: " + renderer.toAbsolutePath());
-        assertTrue(refersTo(renderer).contains("java/awt"),
+        assertTrue(refersTo(renderer, FORBIDDEN).contains("java/awt"),
                 "a class that does draw is caught by the same scan,"
                         + " so the clean answer above is an answer and"
                         + " not a silence");
@@ -96,6 +116,10 @@ class RemovableModelBoundaryTest {
                 "the sky model's classes are where this looks");
         assertTrue(classesIn("juranometria/project").size() >= 6,
                 "and so are the projection's");
+        assertTrue(classesIn("juranometria/meridian").size() >= 1,
+                "and the module's");
+        assertTrue(classesIn("juranometria/module").size() >= 6,
+                "and the seam's");
     }
 
     // ----------------------------------------------------------------
@@ -112,9 +136,10 @@ class RemovableModelBoundaryTest {
     }
 
     /** Which forbidden packages this class file refers to. */
-    private static List<String> refersTo(Path type) throws IOException {
+    private static List<String> refersTo(Path type, List<String> forbidden)
+            throws IOException {
         String pool = new String(Files.readAllBytes(type),
                 java.nio.charset.StandardCharsets.ISO_8859_1);
-        return FORBIDDEN.stream().filter(pool::contains).toList();
+        return forbidden.stream().filter(pool::contains).toList();
     }
 }

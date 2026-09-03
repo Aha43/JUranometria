@@ -285,6 +285,34 @@ new thing, and the gate names it rather than pretending it does not:
 - **`Center on zenith`** is an ordinary `NavigationRequest`, which
   already carries a reason.
 
+### Amended in #227's review (PR #236)
+
+Implementation found the seam needed two more things than the one
+named above, and the review agreed they are justified rather than
+scope drift. Recorded here so the gate stays the account of what the
+seam is:
+
+- **The great-circle contribution carries a `Reference` kind —
+  `LINE` or `BOUNDARY`.** The ink table above decides solid for the
+  meridian and dashed for the horizon, and the only other way for
+  the chart to tell those apart is to know what a horizon *is* —
+  the one thing the seam exists to prevent. So the distinction
+  travels in the module's vocabulary: a line drawn across the sky,
+  or the boundary of what can be seen of it. It is a statement of
+  what the geometry is, never of what it looks like; the chart
+  still owns every stroke.
+
+- **`ChartServices.redraw()` — paint-only.** Geometry is pulled, so
+  a module whose own state changed (another place, another instant,
+  a line switched off) had new geometry to offer and no way to say
+  so. `redraw()` asks the chart to paint what it already has:
+  no catalogue query, no scene reassembly, no inventory rebuild and
+  no page-change announcement — a contract held against the
+  production host by identity, not described in a comment. It is
+  none of the capabilities the gate refused (no catalogue handle,
+  no renderer, no graphics context, no window): the chart still
+  decides what is drawn and when drawing is worth doing.
+
 Two things the chart must gain, both rules about geometry and ink
 rather than about astronomy:
 

@@ -94,83 +94,9 @@ class ReferenceModuleTest {
         }
     }
 
-    /** The chart, as a module is allowed to see it. */
-    private static final class Services implements ChartServices {
-
-        private final ChartViewState state = ChartViewState.DEFAULT;
-        private final ChartScene scene =
-                Atlas.assembler().assemble(ChartViewState.DEFAULT, 900, 700);
-        private final ChartOptions options = ChartOptions.DEFAULTS;
-        private final PageContents inventory =
-                PageInventory.of(
-                        Atlas.assembler().assemble(ChartViewState.DEFAULT,
-                                900, 700), ChartOptions.DEFAULTS);
-        private final SelectionModel selection = new SelectionModel();
-        private final WorkingMarksModel marks = new WorkingMarksModel();
-        final List<NavigationRequest> requested = new ArrayList<>();
-        final OverlayRegistry overlays = new OverlayRegistry();
-
-        @Override public ChartViewState viewState() {
-            return state;
-        }
-
-        @Override public ChartScene scene() {
-            return scene;
-        }
-
-        @Override public ChartOptions options() {
-            return options;
-        }
-
-        @Override public PageContents inventory() {
-            return inventory;
-        }
-
-        @Override public Runnable onPageChange(Consumer<PageContents> l) {
-            l.accept(inventory);
-            return () -> { };
-        }
-
-        @Override public Projection projection() {
-            return new Projection() {
-                @Override public Optional<double[]> toPage(SkyPosition at) {
-                    return new juranometria.project.GnomonicProjection(
-                            scene.viewport().centre()).project(at)
-                            .map(plane -> {
-                                var pixel = new juranometria.project
-                                        .ViewportMapping(scene.viewport())
-                                        .toPixel(plane);
-                                return new double[] {pixel.x(), pixel.y()};
-                            });
-                }
-
-                @Override public SkyPosition toSky(double x, double y) {
-                    return juranometria.render.ChartHitTest.skyAt(scene, x, y);
-                }
-            };
-        }
-
-        @Override public SelectionModel selection() {
-            return selection;
-        }
-
-        @Override public WorkingMarksModel workingMarks() {
-            return marks;
-        }
-
-        @Override public void request(NavigationRequest request) {
-            requested.add(request);
-        }
-
-        @Override public Runnable contribute(String moduleId,
-                java.util.function.Supplier<List<OverlayContribution>> geometry) {
-            return overlays.offer(moduleId, geometry);
-        }
-    }
-
     @Test
     void aModuleReadsThePageMarksItAndOffersGeometryForTheChartToInk() {
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         MarkingModule module = new MarkingModule("reference");
         module.attach(services);
 
@@ -194,7 +120,7 @@ class ReferenceModuleTest {
 
     @Test
     void aModuleAsksTheChartToMoveRatherThanMovingIt() {
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         MarkingModule module = new MarkingModule("reference");
         module.attach(services);
 
@@ -225,7 +151,7 @@ class ReferenceModuleTest {
         // The earlier seam took a bare list, so whichever module
         // contributed last replaced the other's ink and neither
         // could take back only its own (review).
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         MarkingModule first = new MarkingModule("first");
         MarkingModule second = new MarkingModule("second");
         first.attach(services);
@@ -254,7 +180,7 @@ class ReferenceModuleTest {
 
     @Test
     void aModuleCannotContributeTwiceUnderOneName() {
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         MarkingModule module = new MarkingModule("reference");
         module.attach(services);
 
@@ -273,7 +199,7 @@ class ReferenceModuleTest {
         // leaves and comes back goes to the back of it. What layers
         // over what is the chart's decision, by ink role - not a
         // module's arrival time.
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         SkyPosition somewhere = new SkyPosition(10.7, 41.3);
         Runnable withdrawFirst = services.contribute("first",
                 () -> List.of(new OverlayContribution.Point("a", "a",
@@ -294,7 +220,7 @@ class ReferenceModuleTest {
                         + " and nothing more");
     }
 
-    private static List<String> owners(Services services) {
+    private static List<String> owners(TestChartServices services) {
         return services.overlays.collect().stream()
                 .map(OverlayRegistry.Owned::moduleId).toList();
     }
@@ -305,7 +231,7 @@ class ReferenceModuleTest {
         // does nothing about one module repeating itself (review),
         // and two pieces of ink under one supposedly stable key
         // leave a hit test unable to say which was pointed at.
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         SkyPosition somewhere = new SkyPosition(10.7, 41.3);
         services.contribute("careless", () -> List.of(
                 new OverlayContribution.Point("same", "the first",
@@ -322,7 +248,7 @@ class ReferenceModuleTest {
 
     @Test
     void twoModulesMayRepeatEachOthersIdentitiesWithoutColliding() {
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         SkyPosition somewhere = new SkyPosition(10.7, 41.3);
         services.contribute("first", () -> List.of(
                 new OverlayContribution.Point("m31", "one module's m31",
@@ -340,7 +266,7 @@ class ReferenceModuleTest {
 
     @Test
     void aDetachedModuleHearsNothingFurtherAndHoldsNothing() {
-        Services services = new Services();
+        TestChartServices services = new TestChartServices();
         MarkingModule module = new MarkingModule("reference");
         module.attach(services);
         services.workingMarks().mark("NGC 224");

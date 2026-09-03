@@ -148,6 +148,7 @@ public final class PackagedAcceptanceMain {
 
         readerJourney();
         onThisPageJourney();
+        meridianJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -180,6 +181,123 @@ public final class PackagedAcceptanceMain {
      * purpose: that is the case the whole sprint exists for, and the
      * one a smoke test of the visible chart would never reach.
      */
+    private static void meridianJourney() throws Exception {
+        // The removable meridian module, on a real chart component,
+        // through the bundled runtime (issue #227). Counted rather
+        // than predicted, and for the same reason as the journey
+        // below it: an image missing the module, the reference
+        // painter or the sky model must fail here, and only a page
+        // that was actually drawn can show that.
+        //
+        // The observer is a stated case, not a place anyone lives:
+        // 42.5 N, 130.994 W at the 2026 equinox, chosen because it
+        // lays the meridian across the released reference page and
+        // puts the zenith on clear paper above M31. The horizon is
+        // ninety degrees from that zenith and crosses no part of
+        // this page - the silence the decision asks for, exercised
+        // on purpose.
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler());
+        chart.setSize(900, 700);
+        chart.setViewState(ChartViewState.DEFAULT);
+        java.util.List<juranometria.module.NavigationRequest> asked =
+                new java.util.ArrayList<>();
+        juranometria.ui.ChartModuleHost host =
+                new juranometria.ui.ChartModuleHost(chart,
+                        new juranometria.chart.SelectionModel(), asked::add);
+
+        java.awt.image.BufferedImage without = paint(chart);
+
+        juranometria.meridian.MeridianModule module =
+                host.attach(new juranometria.meridian.MeridianModule(
+                        new juranometria.sky.Observer(42.5, -130.994,
+                                java.time.Instant.parse(
+                                        "2026-03-20T21:33:00Z"))));
+
+        // Attached but showing nothing: removable has to mean
+        // removable, and a module that is merely quiet must leave the
+        // page exactly as it found it.
+        module.showing(false, false, false);
+        require(differingPixels(without, paint(chart)) == 0,
+                "a module showing nothing leaves no mark on the page");
+        require(module.timesTheSkyWasComputed() == 0,
+                "and works out no sidereal time to say so");
+
+        // Each geometry alone, before all three together: a single
+        // combined count would accept an incorrectly drawn horizon,
+        // because any pixels it wrongly put down would hide inside
+        // the meridian's and the zenith's (review). On this page the
+        // horizon is ninety degrees from a zenith that is ON the
+        // page, so the right amount of horizon ink is exactly none -
+        // proved on its own, where nothing else's ink can cover for
+        // it.
+        module.showing(false, true, false);
+        require(differingPixels(without, paint(chart)) == 0,
+                "the horizon alone leaves this page untouched: it"
+                        + " crosses no part of the paper, and off the"
+                        + " page is silence");
+        module.showing(true, false, false);
+        int meridianInk = differingPixels(without, paint(chart));
+        require(meridianInk > 100, "the meridian alone is drawn: "
+                + meridianInk + " pixels");
+        module.showing(false, false, true);
+        int zenithInk = differingPixels(without, paint(chart));
+        require(zenithInk > 8 && zenithInk < meridianInk,
+                "the zenith alone is a small ring, not a line: "
+                        + zenithInk + " pixels");
+
+        module.showing(true, true, true);
+        java.awt.image.BufferedImage with = paint(chart);
+        int ink = differingPixels(without, with);
+        require(ink > 100, "the reference ink reaches the page: " + ink
+                + " pixels changed");
+        require(ink <= meridianInk + zenithInk,
+                "and all three together add nothing a horizon could"
+                        + " be hiding in: " + ink + " pixels against "
+                        + meridianInk + " + " + zenithInk);
+
+        java.util.List<String> offered = new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            offered.add(owned.geometry().identity());
+        }
+        require(offered.equals(java.util.List.of("meridian", "horizon",
+                        "zenith")),
+                "the module offers its three geometries: " + offered);
+
+        // And the zenith ring is drawn where the model puts it.
+        double[] at = host.projection()
+                .toPage(new juranometria.sky.LocalSky(module.observer())
+                        .zenith())
+                .orElseThrow();
+        require(inkNear(with, without, (int) Math.round(at[0]),
+                        (int) Math.round(at[1]), 10),
+                "and the zenith is inked where the model puts it, at "
+                        + Math.round(at[0]) + "," + Math.round(at[1]));
+
+        // Setting a place or an instant redraws and does not move the
+        // page; only a reader asking does that.
+        juranometria.chart.ChartViewState where = chart.viewState();
+        module.observer(module.observer().from(-33.87, 151.21));
+        require(chart.viewState().equals(where)
+                        && asked.isEmpty(),
+                "changing the place redraws the lines and leaves the"
+                        + " page where the reader put it");
+        module.centreOnZenith();
+        require(asked.size() == 1,
+                "and only a reader asking moves it, once: " + asked);
+
+        module.detach();
+        require(chart.overlays().collect().isEmpty(),
+                "detaching withdraws every line");
+        require(differingPixels(without, paint(chart)) == 0,
+                "and the page is the page the atlas draws without it");
+
+        System.out.println("meridian module OK (" + meridianInk
+                + " px meridian + " + zenithInk + " px zenith, the"
+                + " horizon proved silent alone, withdrawn cleanly,"
+                + " page never moved except when asked)");
+    }
+
     private static void onThisPageJourney() throws Exception {
         // Through the real module on a real chart component, and the
         // ink is counted rather than predicted.
