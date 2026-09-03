@@ -237,6 +237,14 @@ on-this-page-study: classes
 		> docs/studies/on-this-page/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.OnThisPageMockupMain
 
+.PHONY: place-and-time-study
+place-and-time-study: classes
+	mkdir -p docs/studies/place-and-time
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeStudyMain \
+		> docs/studies/place-and-time/measurements.md
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeInkStudyMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeControlsMockupMain
+
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked
 # source - application JAR, the manifest-referenced lib/ dependencies,
