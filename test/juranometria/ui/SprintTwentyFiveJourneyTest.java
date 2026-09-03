@@ -696,11 +696,30 @@ class SprintTwentyFiveJourneyTest {
         flush();
     }
 
-    /** A pointer click at the middle of a control. */
+    /**
+     * A pointer click at the middle of a control - a control first
+     * proven to be somewhere a pointer could go. Dispatched events
+     * land on a clipped or zero-sized control just as happily as on
+     * a visible one (review), and Sprint 24's journey already
+     * learned this lesson for table rows: the point itself must be
+     * reachable, not merely the component real.
+     */
     private void click(javax.swing.JComponent control) throws Exception {
         SwingUtilities.invokeAndWait(() -> {
+            assertTrue(control.isShowing(),
+                    control.getName() + " is on screen, in a window a"
+                            + " reader can see");
+            assertTrue(control.getWidth() > 0 && control.getHeight() > 0,
+                    control.getName() + " has a size a pointer could"
+                            + " hit: " + control.getWidth() + "x"
+                            + control.getHeight());
             int x = control.getWidth() / 2;
             int y = control.getHeight() / 2;
+            assertTrue(control.getVisibleRect().contains(x, y),
+                    "the point clicked on " + control.getName()
+                            + " is one a reader could reach: " + x + ","
+                            + y + " within "
+                            + control.getVisibleRect());
             for (int id : new int[] {
                     java.awt.event.MouseEvent.MOUSE_PRESSED,
                     java.awt.event.MouseEvent.MOUSE_RELEASED,
