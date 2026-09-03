@@ -101,12 +101,12 @@ class SprintTwentyFiveJourneyTest {
                 requests.add(request);
                 navigation.recenter(request.centre());
             });
-            // The application's startup: the remembered place, the
-            // clock read once, every switch off - the session begins
-            // with the ordinary chart.
-            meridian = modules.attach(new MeridianModule(
-                    placeStore.load(sessionClock)));
-            meridian.showing(false, false, false);
+            // The application's startup, through the production
+            // seam that owns it - not a transcription of the policy,
+            // which a first version carried and the review refused:
+            // three copies of a policy is how one quietly changes.
+            meridian = juranometria.ui.placeandtime.PlaceAndTimeSession
+                    .begin(modules, placeStore, sessionClock);
 
             window = new JFrame(AppInfo.NAME + " " + AppInfo.version());
             window.setLayout(new BorderLayout());
@@ -248,10 +248,7 @@ class SprintTwentyFiveJourneyTest {
         // module action has requested.
         assertEquals(0, requests.size(),
                 "no module action so far has asked the chart to move");
-        SwingUtilities.invokeAndWait(() ->
-                ((javax.swing.AbstractButton) named(dialog,
-                        "centreButton")).doClick());
-        flush();
+        click((javax.swing.JComponent) named(dialog, "centreButton"));
         assertEquals(1, requests.size(),
                 "Center on zenith asked once");
         assertEquals(new LocalSky(meridian.observer()).zenith(),
@@ -629,16 +626,30 @@ class SprintTwentyFiveJourneyTest {
 
     /**
      * Types into a field the way a reader does: click into it,
-     * select all with the platform shortcut, type the characters,
-     * press Enter. Real pointer and keyboard events dispatched at
-     * the control - an earlier version called setText and
-     * postActionEvent, which is the component's back door and left
-     * the public routes unexercised (sprint review).
+     * confirm the keyboard actually arrived there, select all with
+     * the platform shortcut, type the characters, press Enter. Real
+     * pointer and keyboard events - an earlier version called
+     * setText and postActionEvent, which is the component's back
+     * door and left the public routes unexercised (sprint review).
+     *
+     * <p>The focus premise is asserted, not hoped: keystrokes
+     * dispatched at an unfocused control still run its bindings, so
+     * without the premise this would type into a field no reader's
+     * keyboard could reach. Where the desktop refuses focus the
+     * journey aborts honestly, the same discipline as the other
+     * display journeys.
      */
     private void commit(PlaceAndTimeDialog dialog, String field,
                         String text) throws Exception {
         JTextField entry = (JTextField) named(dialog, field);
         click(entry);
+        boolean[] owns = new boolean[1];
+        SwingUtilities.invokeAndWait(() ->
+                owns[0] = entry.isFocusOwner());
+        Assumptions.assumeTrue(owns[0],
+                "this desktop would not give " + field + " the"
+                        + " keyboard focus, so a reader's keys could"
+                        + " not arrive there");
         press(entry, java.awt.event.KeyEvent.VK_A,
                 java.awt.Toolkit.getDefaultToolkit()
                         .getMenuShortcutKeyMaskEx());
@@ -647,21 +658,30 @@ class SprintTwentyFiveJourneyTest {
         }
         press(entry, java.awt.event.KeyEvent.VK_ENTER, 0);
         flush();
-        assertEquals(0, differingText(entry, text),
-                "the keystrokes arrived: the field holds what was"
-                        + " typed, or what the module put back");
+        // Arrival, asserted for real: what the field shows after the
+        // commit must mean the same value that was typed - the
+        // module's own rendering of it (zeros trimmed, seconds
+        // appended), never the stale text a lost keystroke would
+        // leave. A first version only checked the field was
+        // nonblank, which a field never touched also is (review).
+        String shown = fieldTextOf(entry);
+        if (text.contains(":")) {
+            assertEquals(text.length() == 16 ? text + ":00" : text,
+                    shown,
+                    "the committed instant is redisplayed as the"
+                            + " module holds it");
+        } else {
+            assertEquals(Double.parseDouble(text),
+                    Double.parseDouble(shown), 1e-9,
+                    "the committed degrees are redisplayed as the"
+                            + " module holds them");
+        }
     }
 
-    /** Zero when the field shows the text or a committed rendering
-     *  of it; a positive marker otherwise. */
-    private int differingText(JTextField entry, String typed)
-            throws Exception {
+    private String fieldTextOf(JTextField entry) throws Exception {
         String[] shown = new String[1];
         SwingUtilities.invokeAndWait(() -> shown[0] = entry.getText());
-        // A committed value is redisplayed as the module holds it
-        // (seconds appended, zeros trimmed), so exact equality is
-        // not the contract; a field still showing stale text is.
-        return shown[0] == null || shown[0].isBlank() ? 1 : 0;
+        return shown[0];
     }
 
     private void clickShow(PlaceAndTimeDialog dialog, String name,

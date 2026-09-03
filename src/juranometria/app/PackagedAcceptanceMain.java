@@ -328,12 +328,11 @@ public final class PackagedAcceptanceMain {
                             new juranometria.chart.SelectionModel(),
                             request -> { });
             juranometria.meridian.MeridianModule restarted =
-                    secondHost.attach(
-                            new juranometria.meridian.MeridianModule(
+                    juranometria.ui.placeandtime.PlaceAndTimeSession
+                            .begin(secondHost,
                                     juranometria.ui.placeandtime.PlaceStore
-                                            .forNode(restartNode)
-                                            .load(secondSession)));
-            restarted.showing(false, false, false);
+                                            .forNode(restartNode),
+                                    secondSession);
             try {
                 require(restarted.observer().latitudeDegrees() == 42.5
                                 && restarted.observer()

@@ -113,6 +113,7 @@ Every round found something real. This is the honest record.
 | #228 | a redundant second closing mechanism made the close box unbreakable by mutation; removed |
 | #229 | the journey's first red run: "home" via bare recentre is not home — the released default carries its target's identity in the title block, 1,168 pixels of difference |
 | #229 review | the journey drove fields and buttons through their back doors (`setText`, `doClick`) rather than pointer and keyboard events; both "restart" checks reloaded the store without starting a second session; the README called the 14″ envelope invisible when the study's own table says 3.6 px at the narrowest field; "every changed pixel accounted" allowed a 90 px catchment, which is no bound — the label boxes now come from the painter's own layout |
+| #229 re-review | keystrokes were dispatched with no focus-owner premise (an unfocused field still runs its bindings) and "arrival" was checked as nonblank, which an untouched field also is; `Center on zenith` still went through `doClick`; and main, the journey and the packaged acceptance each carried a hand copy of the session-start policy — it now lives once, in `PlaceAndTimeSession.begin`, and all three go through it |
 
 ## Evidence
 
