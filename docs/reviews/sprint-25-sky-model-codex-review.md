@@ -96,3 +96,49 @@ options mismatch and confirms that the queried pixel held no mark at click
 time. A changed limiting magnitude or scene contents is now the useful next
 distinction; Metal remains correlation only.
 
+## Follow-up review at fa26638
+
+All three P1 findings are closed in substance.
+
+- Production exposes only the chosen twenty-term nutation result; the
+  term-count control is gone.
+- `GreatCirclePage` accepts the pole and derives the projected line directly
+  from the gnomonic tangent basis. The derivation and east/north pixel mapping
+  were inspected and agree. No sampling count or point list remains in the
+  production call.
+- The projection boundary now uses its own numeric page value and imports no
+  AWT.
+
+The refusal and corner cases are independently useful, and the mutation list
+shows the closed-form coefficients carry distinct evidence. One P2 remains.
+
+### P2 — The repaired architecture boundary is not guarded
+
+The first review explicitly requested an architecture test over both
+`juranometria.sky` and the new projection surface that rejects Swing, AWT,
+preferences, renderer/UI, OS, and network imports. The implementation removes
+the current AWT import, but adds no such test.
+
+`ChartModuleBoundaryTest` does not supply that evidence: its window-independence
+check scans only `juranometria.page` and `juranometria.module`, and it rejects
+`java.awt.event` rather than AWT generally. `PlaceAndTimeGateTest` scans only
+`SkyFrame` for selected file/network strings. Reintroducing `Rectangle2D` into
+`GreatCirclePage`, or adding a UI/preference dependency to another sky class,
+would therefore leave the suite green.
+
+Add the structural test requested in the original finding and mutation-check
+it by restoring the former `java.awt.geom.Rectangle2D` import. Keep the scope
+specific to the model's intended boundary; tests and study tools may of course
+use AWT when rendering evidence.
+
+While touching the public `Page` invariant, reject non-finite bounds as well as
+non-positive width and height. Infinity currently passes `maxX > minX` and can
+turn the clipping result into infinities or NaNs. A page is a finite pixel
+rectangle, and its constructor should enforce that once for every caller.
+
+## Follow-up decision
+
+One P2 correction requested. The astronomy model, SOFA binding, closed-form
+great-circle projection, and dependency direction are otherwise approved.
+After the missing boundary guard and finite-page invariant land, PR #234 is
+ready to merge and #227 may begin.
