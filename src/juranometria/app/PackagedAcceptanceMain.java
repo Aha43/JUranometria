@@ -236,11 +236,25 @@ public final class PackagedAcceptanceMain {
         // scratch, comes up with nothing marked and nothing inked -
         // while the reader's stored options are still there, which
         // is the difference between ephemeral and forgotten.
-        ChartOptions kept = ChartOptionsStore.user().load();
+        // The reader leaves with a choice made: galaxies off. A
+        // restart that reloaded the store and compared it with
+        // itself would prove the store round-trips and nothing about
+        // whether the application comes back wearing the reader's
+        // choices (sprint review), so the second session is started
+        // the way the application starts - by applying what was
+        // stored.
+        ChartOptions before = ChartOptionsStore.user().load();
+        ChartOptions galaxiesOff = before.withFamily(
+                juranometria.render.SymbolFamily.GALAXIES, false);
+        ChartOptionsStore.user().save(galaxiesOff);
+        Preferences.userRoot().node("juranometria").flush();
+
         juranometria.ui.ChartComponent restarted =
                 new juranometria.ui.ChartComponent(Atlas.assembler());
         restarted.setSize(900, 700);
         restarted.setViewState(ChartViewState.DEFAULT);
+        ChartOptions reloaded = ChartOptionsStore.user().load();
+        restarted.setChartOptions(reloaded);
         juranometria.ui.ChartModuleHost second =
                 new juranometria.ui.ChartModuleHost(restarted,
                         new juranometria.chart.SelectionModel(),
@@ -255,12 +269,31 @@ public final class PackagedAcceptanceMain {
         require(again.panel().rows().size() == listed,
                 "it lists the same page as before: "
                         + again.panel().rows().size() + " rows");
-        require(differingPixels(unmarked, paint(restarted)) == 0,
-                "and draws the same page, pixel for pixel");
-        require(ChartOptionsStore.user().load().equals(kept),
-                "while the reader's stored options survived the"
-                        + " restart, which the working marks did not");
+
+        // The reader's choice is not merely readable - it is in
+        // force. The page still holds the same objects, and the new
+        // session says why they cannot be seen.
+        require(reloaded.equals(galaxiesOff),
+                "the restart read the choice the reader left");
+        require(restarted.chartOptions().equals(galaxiesOff),
+                "and applied it, rather than starting on the"
+                        + " defaults");
+        int hidden = second.inventory().tally()
+                .get(juranometria.page.PageVisibility.FAMILY_HIDDEN);
+        require(hidden > 0,
+                "so the restarted session reports objects hidden by a"
+                        + " chart option: " + second.inventory().tally());
+        require(second.inventory().entries().size()
+                        == inventory.entries().size(),
+                "while the page holds exactly what it held before -"
+                        + " a choice about drawing is not a choice"
+                        + " about what is there");
+
         second.detachAll();
+        ChartOptionsStore.user().save(before);
+        Preferences.userRoot().node("juranometria").flush();
+        require(ChartOptionsStore.user().load().equals(before),
+                "and the reader's original choice is restored");
 
         System.out.println("on this page OK (" + inventory.entries().size()
                 + " entries, " + listed
@@ -268,7 +301,8 @@ public final class PackagedAcceptanceMain {
                 + " which the page does not draw, " + added
                 + " pixels of cross drawn at its own position,"
                 + " cleared to the byte, and a second session begins"
-                + " empty with the reader's options intact)");
+                + " empty while wearing the reader's stored choice,"
+                + " with " + hidden + " objects hidden by it)");
     }
 
     /** The component's own painting, into an image. */

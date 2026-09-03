@@ -550,12 +550,16 @@ class SprintTwentyFourJourneyTest {
         flush();
         SwingUtilities.invokeAndWait(() -> {
             java.awt.Rectangle cell = table.getCellRect(viewRow, 0, true);
-            assertTrue(table.getVisibleRect().intersects(cell),
-                    "row " + viewRow + " is on screen where a reader"
-                            + " could click it: " + cell + " within "
-                            + table.getVisibleRect());
             int x = cell.x + cell.width / 2;
             int y = cell.y + cell.height / 2;
+            // The point itself, not the cell. A cell can be half on
+            // screen with its middle below the fold, and then the
+            // pointer would be landing where no reader could put it
+            // (sprint review).
+            assertTrue(table.getVisibleRect().contains(x, y),
+                    "the point clicked on row " + viewRow + " is one a"
+                            + " reader could reach: " + x + "," + y
+                            + " within " + table.getVisibleRect());
             for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
                     java.awt.event.MouseEvent.MOUSE_RELEASED,
                     java.awt.event.MouseEvent.MOUSE_CLICKED}) {
