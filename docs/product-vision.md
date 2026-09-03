@@ -15,8 +15,10 @@ and print.
 ## Product principles
 
 - **Atlas first.** The chart, not application chrome, is the main experience.
-- **Timeless.** Use celestial coordinates rather than a horizon, clock, or
-  observer location.
+- **A fixed chart.** Celestial coordinates and a stable epoch remain the
+  atlas's ground. A removable module may relate that chart to a stated place,
+  instant, or other domain, but it must do so as frozen cartography: no ticking
+  sky, automatic following, or hidden change of reference frame.
 - **Continuous scale.** Move naturally between finder charts and regional
   maps, with detail chosen for each scale.
 - **Cartographic judgement.** Do not merely plot every available catalogue
@@ -53,9 +55,14 @@ and print.
 - Photographic sky imagery or three-dimensional travel.
 - Full catalogue coverage in the first milestone.
 
+## Directions beyond the initial scope
+
+The atlas has grown beyond its first proof without replacing it. Durable
+directions and their guardrails live in [the roadmap](roadmap.md). They are
+arches toward possible work, not promised releases.
+
 ## First proof
 
 The idea is validated when a static M31 chart made from a small bundled data
 set already feels like a page from a serious working atlas. Interaction and
 large catalogues follow only after that visual proof.
-
