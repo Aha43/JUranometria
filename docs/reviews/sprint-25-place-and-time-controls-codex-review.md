@@ -114,3 +114,18 @@ requiring no dialog remains and no unintended module/store transition occurs.
 This is a small correction to the evidence, not a request for more behaviour.
 
 PR #237 remains held on that final P1. #229 remains unstarted.
+
+## Final review at `76f8027`
+
+Approved. The remaining production-path finding is closed.
+
+The display test now activates the real **Place and Time...** menu item for
+every opening, proves choosing it again preserves a single live dialog, and
+proves reopening after both Escape and a `WINDOW_CLOSING` event. The reopened
+surface reads the module's committed state, and neither close path changes it.
+Removing the redundant window listener leaves one close-box mechanism, so the
+three relevant mutations—dead menu wiring, a singleton that never reopens, and
+a close box that does nothing—fail independently.
+
+All findings on PR #237 are closed. #228 is ready to merge; #229 may begin
+after that merge.
