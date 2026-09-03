@@ -205,3 +205,37 @@ case cleanup exists to handle.
 
 After this correction, PR #223 may proceed to final approval. Keep milestone
 24 and 1.5.0 held until then.
+
+## Follow-up — `596ce87`
+
+The failure-path test correctly proves that an exception thrown by the body is
+preserved and that restoration still runs. Both module hosts now detach from
+their guarded bodies. The hazardous preference boundary remains outside the
+guard, however.
+
+### P1 — The temporary write can fail before the restoration `finally` exists
+
+`withTemporaryOptions` executes `store.save(temporary)` and the first
+`flush()` before entering its `try`. A preferences backend can write some keys
+and then throw, or accept the writes and fail while flushing them. In either
+case control never enters the `try`, the restoration `finally` is never
+installed, and the reader is left with the partial or complete temporary
+choice. This is the same release-safety defect one step earlier than the body
+failure now tested.
+
+Enter `try` before the first mutating operation, then save, flush, and run the
+body inside it; restore and flush from `finally`. Add an injected store/flush
+failure that occurs after mutation and prove the original options are restored
+while the original failure remains observable (with any restoration failure
+handled deliberately rather than silently replacing it).
+
+The helper also accepts an arbitrary `ChartOptionsStore` but flushes the
+hard-coded production node. Its tests use
+`juranometria-acceptance-restore-test`, so they never flush the node they
+modify. Put flushing behind the same injected persistence boundary (or pass
+the matching flush operation explicitly) and make the fresh-store test read
+after that actual node has been flushed.
+
+Once the mutation itself is inside the protected interval and the correct
+store is flushed, the sprint may receive final approval. PR #223, milestone 24,
+and 1.5.0 remain held.
