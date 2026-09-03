@@ -136,3 +136,11 @@ independent remembered subset. At minimum, add `AppShutdown.real()` and a
 fixture proving it is rejected. Pin the complete production-door set so a new
 factory cannot appear without updating the guard. Packaged acceptance remains
 the named executable exception; ordinary tests must have no route.
+
+## Approval at `09c7ea7`
+
+All findings are closed. The evidence scan now measures its actual corpus
+without counting its own vocabulary, derives and pins every production entry
+point to the reader's preference store, carries both halves of the SOFA oracle,
+and preserves the stronger renderer-study byte contract. The gate may merge;
+#224 may begin after the merge.
