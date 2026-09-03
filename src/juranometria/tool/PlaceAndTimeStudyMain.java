@@ -214,9 +214,12 @@ public final class PlaceAndTimeStudyMain {
         row("the nutation series stops at twenty terms, against the"
                 + " published full-series value for 1987 April 10",
                 againstPublished);
-        double tail = omittedTailBound();
-        row("the same, bounded for any date by the series' own"
-                + " ordering (see below)", tail);
+        // Polar motion and diurnal aberration are part of the
+        // difference between this and a real observer's direction,
+        // so they belong in the total rather than in a footnote
+        // (review).
+        row("polar motion, not modelled", POLAR_MOTION);
+        row("diurnal aberration, not modelled", DIURNAL_ABERRATION);
 
         // The precession model itself is a choice, and two accepted
         // ones do not agree exactly.
@@ -224,40 +227,54 @@ public final class PlaceAndTimeStudyMain {
         row("IAU 1976 precession against the IAU 2006 form, over two"
                 + " centuries", models);
         System.out.println();
-        System.out.println("Polar motion (under 0.5\"), diurnal"
-                + " aberration (under 0.3\") and refraction are not"
-                + " modelled at all: the first two are below a pixel"
-                + " at every field, and the third is a property of air"
-                + " rather than of the sky, which is why the horizon"
-                + " here is named **mathematical**.");
+        System.out.println("Refraction is not modelled and is not in"
+                + " the table: it is a property of air rather than of"
+                + " the sky, which is why the horizon here is named"
+                + " **mathematical** rather than corrected.");
         System.out.println();
-        System.out.println("**How the nutation tail is bounded.** The"
-                + " IAU 1980 series is ordered by decreasing"
-                + " amplitude, and the twentieth term's coefficient in"
-                + " longitude is 0.0046\". Every omitted term is"
-                + " therefore no larger than that, and the row above"
-                + " sums the whole tail as though all of them fell in"
-                + " phase at their maximum - which they cannot. The"
-                + " measured residual against the published"
-                + " full-series value for the same date is the"
-                + " realistic figure; the bound is the honest"
-                + " worst case.");
-        System.out.println();
-        double budget = ut1 + tail + models;
         System.out.printf(Locale.ROOT,
-                "**The accuracy contract.** Adding the terms above at"
-                        + " their worst - %s for UT1, %s for the"
-                        + " nutation tail, %s for the choice of"
-                        + " precession model - the atlas places the"
-                        + " zenith, meridian and horizon within"
-                        + " **%s** of the observer's own frame. That"
-                        + " is %.2f px at the widest field and %.1f px"
-                        + " at the narrowest, and it is dominated by"
-                        + " not knowing UT1: every other term together"
-                        + " is worth %s.%n%n",
-                angle(ut1), angle(tail), angle(models), angle(budget),
-                budget * pixelsPerDegree(36.0),
-                budget * pixelsPerDegree(1.0), angle(tail + models));
+                "**What the nutation row is, and is not.** It is the"
+                        + " residual of this twenty-term series"
+                        + " against the published full-series value at"
+                        + " one date. An earlier draft also claimed a"
+                        + " worst case for *any* date, by adding the"
+                        + " amplitudes of the omitted terms; that was"
+                        + " not a bound (review). It ignored the"
+                        + " terms' time-dependent coefficients, and it"
+                        + " added quantities in longitude as though"
+                        + " they were angles on the sky, which they"
+                        + " are not - a nutation in longitude moves a"
+                        + " direction by less than itself, by a factor"
+                        + " that depends on where the direction lies"
+                        + " relative to the ecliptic. A rigorous"
+                        + " any-date bound needs the whole 106-term"
+                        + " table, which this atlas does not ship, so"
+                        + " **no such bound is claimed here**. What"
+                        + " can be said is the sensitivity: at ten"
+                        + " times the measured residual the tail would"
+                        + " still be %s, four hundred times smaller"
+                        + " than not knowing UT1.%n",
+                angle(againstPublished * 10));
+        System.out.println();
+        double budget = ut1 + againstPublished + models
+                + POLAR_MOTION + DIURNAL_ABERRATION;
+        System.out.printf(Locale.ROOT,
+                "**The accuracy contract.** Adding every term above -"
+                        + " %s for UT1, %s for the nutation residual,"
+                        + " %s for the choice of precession model, %s"
+                        + " for polar motion and %s for diurnal"
+                        + " aberration - the atlas places the zenith,"
+                        + " meridian and horizon within **%s** of the"
+                        + " direction a real observer would measure."
+                        + " That is %.2f px at the widest field and"
+                        + " %.1f px at the narrowest, and it is"
+                        + " dominated by not knowing UT1: every other"
+                        + " term together is worth %s.%n%n",
+                angle(ut1), angle(againstPublished), angle(models),
+                angle(POLAR_MOTION), angle(DIURNAL_ABERRATION),
+                angle(budget), budget * pixelsPerDegree(36.0),
+                budget * pixelsPerDegree(1.0),
+                angle(budget - ut1));
     }
 
     /**
@@ -275,14 +292,16 @@ public final class PlaceAndTimeStudyMain {
     }
 
     /**
-     * The worst the omitted terms can be worth, from the series'
-     * own ordering: none of them exceeds the twentieth, and the
-     * IAU 1980 series has 106 terms in all.
+     * Polar motion: the pole wanders within about fifteen metres of
+     * the reference pole, which is half an arcsecond of direction.
      */
-    private static double omittedTailBound() {
-        double largestOmitted = 46 / 10000.0 / 3600.0;   // 0.0046"
-        return (106 - 20) * largestOmitted;
-    }
+    private static final double POLAR_MOTION = 0.5 / 3600.0;
+
+    /**
+     * Diurnal aberration: the observer's own rotation with the
+     * Earth, at most 0.32" at the equator.
+     */
+    private static final double DIURNAL_ABERRATION = 0.32 / 3600.0;
 
     /**
      * Two accepted precession models, over the range the atlas is

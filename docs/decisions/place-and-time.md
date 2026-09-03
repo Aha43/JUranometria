@@ -60,35 +60,47 @@ twenty terms)**.
 
 Three simplifications remain, each priced rather than hidden:
 
-| simplification | worst error | at 36° | at 1° |
+| term | worst | at 36° | at 1° |
 |---|---:|---:|---:|
 | UTC stands in for UT1 (bounded at 0.9 s by agreement) | **13.54″** | 0.09 px | 3.38 px |
-| UTC stands in for TT in the precession arguments | 0.00″ | 0.00 px | 0.00 px |
-| the nutation series stops at twenty terms — against the published full-series value | 0.0009″ | 0.00 px | 0.00 px |
-| the same, bounded for any date by the series' own ordering | 0.40″ | 0.00 px | 0.10 px |
+| polar motion, not modelled | 0.50″ | 0.00 px | 0.12 px |
+| diurnal aberration, not modelled | 0.32″ | 0.00 px | 0.08 px |
 | IAU 1976 precession against the IAU 2006 form | 0.28″ | 0.00 px | 0.07 px |
+| the nutation series stops at twenty terms, against the published full-series value | 0.0033″ | 0.00 px | 0.00 px |
+| UTC stands in for TT in the precession arguments | 0.0002″ | 0.00 px | 0.00 px |
 
-Polar motion (< 0.5″), diurnal aberration (< 0.3″) and refraction
-are not modelled at all.
+Refraction is not in the table at all: it is a property of air
+rather than of the sky, which is why the horizon here is named
+**mathematical** rather than corrected.
 
-**The nutation tail is bounded rather than guessed at.** An earlier
-draft compared twenty terms against four and called the difference
-the truncation cost. That measures what terms 5–20 contribute and
-says nothing about the terms actually omitted (review). Two things
-are measured instead: this series against the **published
-full-series value** for Meeus's worked example, which is 0.0009″;
-and a worst case from the series' own ordering — the twentieth
-term's amplitude is 0.0046″, no later term exceeds it, and 86 of
-them in phase at maximum would be 0.40″, which they cannot be.
+**Polar motion and diurnal aberration are in the total, not in a
+footnote.** A contract about the direction a real observer would
+measure has to carry everything between the model and that observer
+(review), and these two are part of it. They were listed beside the
+table in an earlier draft, which quietly excluded them from the very
+number they belonged in.
+
+**What the nutation row is, and is not.** It is the residual of this
+twenty-term series against the published full-series value at one
+date: **0.0033″**. An earlier draft also claimed a worst case for
+*any* date by adding the amplitudes of the omitted terms. **That was
+not a bound** (review): it ignored their time-dependent
+coefficients, and it added quantities in longitude as though they
+were angles on the sky, which they are not. A rigorous any-date
+bound needs the whole 106-term table, which this atlas does not
+ship, so none is claimed. What can be said is the sensitivity — at
+ten times the measured residual the tail would still be 0.03″, four
+hundred times smaller than not knowing UT1.
 
 > **The accuracy contract, derived rather than asserted.** Adding
-> those terms at their worst — 13.54″ for UT1, 0.40″ for the
-> nutation tail, 0.28″ for the choice of precession model — the
-> zenith, meridian and horizon are placed within **14.22″** of the
-> observer's own frame: 0.10 px at the widest field, 3.6 px at the
-> narrowest. Every term other than UT1 is worth 0.68″ together, so
-> the bound is what not knowing UT1 costs, and nothing else matters
-> until that changes.
+> every term above — 13.54″ for UT1, 0.50″ for polar motion, 0.32″
+> for diurnal aberration, 0.28″ for the choice of precession model,
+> 0.0033″ for the nutation residual and 0.0002″ for the time scale —
+> the zenith, meridian and horizon are placed within **14.64″** of
+> the direction a real observer would measure: 0.10 px at the widest
+> field, 3.7 px at the narrowest. Every term other than UT1 is worth
+> 1.11″ together, so the bound is what not knowing UT1 costs, and
+> nothing else matters until that changes.
 
 ## The three geometries
 
@@ -271,8 +283,9 @@ rather than about astronomy:
 
 **#226** — the observer record, GMST/GAST, the precession and
 nutation rotations, and the three geometries, all UI-independent;
-the 14.22″ contract above as an executable statement; and the oracle
-described below.
+the 14.64″ contract above as an executable statement; **the SOFA
+fixture described below, which is a condition of the issue rather
+than a nicety**; and the oracle described below.
 
 ### What the oracle rests on, and what it does not
 
@@ -294,11 +307,42 @@ actually proves:
 | **the equation of the equinoxes equals Δψ cos ε** | GAST and the nutation series disagreeing |
 | **every angle between directions survives the transformation** | anything that is not a rotation at all |
 
-The third and fourth are the end-to-end anchors the review asked
-for: they constrain the *combined* transformation against known
-physics rather than against its own components. **#226 should still
-commit SOFA-derived vectors** when a primary source is at hand; this
-gate states plainly that it has not done so.
+The third and fourth constrain the *combined* transformation against
+known physics rather than against its own components.
+
+**They are still not sufficient, and the re-review is right about
+why.** Every one of them is invariant under a coherent error: a sign
+convention wrong in the same way in the nutation and in the equation
+of the equinoxes, or a phase shifted consistently through both,
+would leave the pole on its circle, moving at the right rate, by the
+right amount, with every angle preserved — and put every reference
+line in the wrong place. Invariants constrain a transformation; they
+do not identify it.
+
+**What is needed, and what blocks it.** Authoritative end-to-end
+vectors: for a handful of instants, the direction a primary source
+places a known direction in after the true-of-date to J2000
+rotation. IAU SOFA is the right source. It cannot be obtained here —
+this work is offline and the atlas takes no network dependency — and
+transcribing values from memory is precisely how an invented
+constant enters an astronomical model, so it has not been done.
+
+The fixture that closes it is small and mechanical:
+
+```
+# utc                     ra_of_date  dec_of_date   ra_j2000   dec_j2000
+2026-03-20T21:33:00Z      0.000000    0.000000      ...        ...
+2026-03-20T21:33:00Z      83.822083  -5.391111      ...        ...
+2050-07-04T03:00:00Z      0.000000   90.000000      ...        ...
+```
+
+— produced by SOFA's `iauNut80`, `iauPmat76`/`iauPn` chain on any
+machine that has it, committed as
+`docs/studies/place-and-time/sofa-vectors.txt`, and asserted at the
+accuracy this decision promises. **#226 owns it and must not ship
+without it.** Until then the model's absolute orientation rests on
+invariants and published component values, which this document says
+rather than implies.
 
 **#227** — the removable module and the chart's reference-line ink:
 the vocabulary above, straight-line geometry with no subdivision,

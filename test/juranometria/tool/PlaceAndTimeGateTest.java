@@ -135,8 +135,14 @@ class PlaceAndTimeGateTest {
         String decision = Files.readString(Path.of(
                 "docs/decisions/place-and-time.md"));
 
+        // Every number the decision states, including the small
+        // ones: the mismatch the review found - 0.0009" in the
+        // decision against 0.0033" in the report - was a figure
+        // written by hand before the study was regenerated, and it
+        // survived because this list did not cover it.
         for (String claim : List.of("13.54\"", "21.17'", "39.34'",
-                "8.80'", "0.0000 px", "14.22\"", "0.40\"", "0.28\"")) {
+                "8.80'", "0.0000 px", "14.64\"", "0.28\"", "0.0033\"",
+                "0.0002\"", "0.50\"", "0.32\"", "1.11\"", "0.03\"")) {
             assertTrue(report.contains(claim),
                     "the study measures " + claim);
             assertTrue(decision.contains(claim.replace("\"", "″")
