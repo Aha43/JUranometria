@@ -32,3 +32,22 @@ turns must fail.
 Do not forbid later legitimate relayout and do not change production code.
 This remains a journey-test repair. PR #238 should continue waiting for this PR
 to merge and be incorporated.
+
+## Follow-up review at `62f5c7c`
+
+Approved. The P1 is closed.
+
+`clickOn` now reads the current scene, chooses from that exact scene, reads the
+page offset, and dispatches both pointer events in one EDT task. A queued event
+cannot replace the page between those operations. Choosers receive the captured
+scene rather than consulting the component again, and the sole intentionally
+stale interaction has its own named helper.
+
+The two deterministic races distinguish the repaired properties: an event
+already queued before derivation proves the work waits for the EDT, while a
+recenter queued from inside the chooser proves there is no second turn for it
+to enter before the click. The journey also compares scene identity with the
+scene captured inside the atomic task, closing the third off-EDT premise read.
+
+PR #239 is ready to merge. After merging, update PR #238 from main and rerun its
+required checks before resuming the Sprint 25 closing review.
