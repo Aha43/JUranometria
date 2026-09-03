@@ -173,3 +173,35 @@ that leaves the restarted chart at `ChartOptions.DEFAULTS` must fail while its
 working marks, lead, overlays, and table selection still begin empty.
 
 PR #223, milestone 24, and 1.5.0 remain held for these contained corrections.
+
+## Follow-up — `3c5f5c3`
+
+**The pointer premise is resolved.** The journey now checks the exact point it
+will dispatch against the table's visible rectangle. The second packaged
+session also loads and applies a persisted family choice, begins with empty
+working state, and proves the inventory reports the option's effect without
+changing page membership.
+
+One P1 release-safety defect remains.
+
+### P1 — A failing packaged acceptance leaves the reader's real settings changed
+
+`onThisPageJourney` saves Galaxies-off to `ChartOptionsStore.user()`, performs
+all second-session assertions, detaches, and only then restores `before`.
+Restoration is ordinary success-path code. If any `require`, render, catalogue
+operation, or detach throws after the save, the packaged verifier exits while
+leaving the actual `juranometria` preference node changed. This acceptance is
+also run manually against downloaded releases, so the affected store is not
+only an isolated CI account.
+
+Wrap the entire mutation interval in `try/finally`: capture the original
+options before writing, establish and assert a genuinely distinctive stored
+choice, build/use/detach the second session inside the guarded body, and
+restore plus flush in `finally`. Keep module detachment in cleanup as well, so
+an assertion cannot leak either resource. Add a failure-path test or injectable
+probe that throws after the changed option is applied and requires the original
+store to be restored. A success-only final assertion is not sufficient for the
+case cleanup exists to handle.
+
+After this correction, PR #223 may proceed to final approval. Keep milestone
+24 and 1.5.0 held until then.
