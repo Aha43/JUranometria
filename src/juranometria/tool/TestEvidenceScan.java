@@ -190,6 +190,14 @@ public final class TestEvidenceScan {
             for (String touch : state.touches()) {
                 touches |= source.contains(touch);
             }
+            // Preferences are touched by creating or writing, not by
+            // looking: a witness that syncs and asks nodeExists
+            // disturbs nothing and owes no cleanup (#224 review
+            // round - the persistence probe flagged itself).
+            if (state.name().equals("preferences")
+                    && !source.contains(".node(")) {
+                touches = false;
+            }
             if (!touches) {
                 continue;
             }
