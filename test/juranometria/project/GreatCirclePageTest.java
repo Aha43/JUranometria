@@ -21,6 +21,7 @@ import juranometria.render.ChartHitTest;
 import juranometria.render.ChartRenderer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -129,6 +130,40 @@ class GreatCirclePageTest {
                 .orElseThrow(() -> new AssertionError(
                         "a page between samples is still crossed"));
         assertLandsOnTheCircle(scene, pole, arc);
+    }
+
+    @Test
+    void aPageInsistsOnBeingAFiniteRectangle() {
+        // Width and height alone let an infinite edge through: it is
+        // greater than its opposite, so the rectangle looks well
+        // formed, and the clipping then divides by it and hands back
+        // an arc whose ends are infinity or not-a-number - a line no
+        // renderer can draw and no test of the arc would recognise
+        // as wrong (review).
+        for (double bad : new double[] {Double.POSITIVE_INFINITY,
+                Double.NEGATIVE_INFINITY, Double.NaN}) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> new GreatCirclePage.Page(0, 0, bad, 700),
+                    "an edge that is not a pixel: " + bad);
+            assertThrows(IllegalArgumentException.class,
+                    () -> new GreatCirclePage.Page(bad, 0, 900, 700),
+                    "on either side: " + bad);
+            assertThrows(IllegalArgumentException.class,
+                    () -> new GreatCirclePage.Page(0, bad, 900, 700),
+                    "and in either direction: " + bad);
+            assertThrows(IllegalArgumentException.class,
+                    () -> new GreatCirclePage.Page(0, 0, 900, bad),
+                    "or the far one: " + bad);
+        }
+        assertThrows(IllegalArgumentException.class,
+                () -> new GreatCirclePage.Page(0, 0, 0, 700),
+                "and a page of no width is not a page either");
+
+        // Not vacuous: the same rectangle with real edges is fine.
+        GreatCirclePage.Page page = new GreatCirclePage.Page(0, 0, 900, 700);
+        assertEquals(900.0, page.maxX(), 0.0);
+        assertTrue(page.contains(450, 350) && !page.contains(450, 701),
+                "and it knows what is on it");
     }
 
     @Test

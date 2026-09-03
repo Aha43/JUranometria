@@ -67,9 +67,24 @@ public final class GreatCirclePage {
 
         public Page {
             if (!(maxX > minX) || !(maxY > minY)) {
+                // Not-a-number fails this too: no comparison with
+                // NaN is true, so a NaN edge never gets past it.
                 throw new IllegalArgumentException(
                         "a page has width and height: " + minX + ","
                                 + minY + " to " + maxX + "," + maxY);
+            }
+            if (Double.isInfinite(minX) || Double.isInfinite(minY)
+                    || Double.isInfinite(maxX) || Double.isInfinite(maxY)) {
+                // An infinite edge passes the width and height check
+                // and then poisons the clipping: the parameter along
+                // the line comes out as infinity or NaN, and the arc
+                // that comes back has ends no renderer can draw
+                // (review). A page is a rectangle of pixels, and
+                // there is no such pixel.
+                throw new IllegalArgumentException(
+                        "a page is a finite rectangle of pixels: "
+                                + minX + "," + minY + " to " + maxX
+                                + "," + maxY);
             }
         }
 
