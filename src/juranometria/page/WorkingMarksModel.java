@@ -101,8 +101,22 @@ public final class WorkingMarksModel {
      * scope is hidden here and untouched in the model.
      */
     private PageContents scope;
+
+    /**
+     * One model subscription and one serialized view queue
+     * (review): every view listener hears the same states in the
+     * same order, whether a transition arrived from the model or
+     * from a scope change, and a nested {@code pruneTo} during a
+     * delivery is queued in turn rather than broadcast midway -
+     * the models' own discipline, applied to the view.
+     */
     private final List<Consumer<Change>> viewListeners =
             new ArrayList<>();
+    private final java.util.Deque<Change> pending =
+            new java.util.ArrayDeque<>();
+    private boolean delivering;
+    /** The view state that has been delivered. */
+    private Change delivered = new Change(List.of(), null);
 
     /** An adapter over its own private model - tests and fixtures. */
     public WorkingMarksModel() {
@@ -116,6 +130,10 @@ public final class WorkingMarksModel {
                     "the adapter is a view of the one model");
         }
         this.model = model;
+        // The one model subscription, for the adapter's lifetime:
+        // every model transition is re-addressed through the scope
+        // and joins the same serialized queue as scope changes.
+        model.onChange(change -> queue(viewOf(change)));
     }
 
     /** The one model this adapter re-addresses. */
@@ -125,41 +143,31 @@ public final class WorkingMarksModel {
 
     /** The marked identities the view shows, in marked order. */
     public List<String> marks() {
-        return view().marks();
+        return delivered.marks();
     }
 
     /** The view's lead identity, or null when the view is empty. */
     public String lead() {
-        return view().lead();
+        return delivered.lead();
     }
 
     public boolean isMarked(String identity) {
-        return view().marks().contains(identity);
+        return delivered.marks().contains(identity);
     }
 
     /**
      * Subscribes a consumer to this view of the one model - told
-     * the current view immediately, again for every model
-     * transition, and for every view-scope change - and returns
-     * the releasing handle.
+     * the current view immediately (during a delivery, the state
+     * being delivered), again for every model transition, and for
+     * every view-scope change - and returns the releasing handle.
      */
     public Runnable onChange(Consumer<Change> listener) {
         if (listener == null) {
             throw new IllegalArgumentException("listener must not be null");
         }
         viewListeners.add(listener);
-        Runnable releaseModel = model.onChange(change ->
-                listener.accept(viewOf(change)));
-        return () -> {
-            viewListeners.remove(listener);
-            releaseModel.run();
-        };
-    }
-
-    /** The current view: the model through this page's scope. */
-    private Change view() {
-        return viewOf(new juranometria.chart.WorkingSelection.Change(
-                model.members(), model.lead()));
+        listener.accept(delivered);
+        return () -> viewListeners.remove(listener);
     }
 
     private Change viewOf(
@@ -215,14 +223,41 @@ public final class WorkingMarksModel {
         if (page == null) {
             throw new IllegalArgumentException("a page to prune to");
         }
-        Change before = view();
         this.scope = page;
-        Change after = view();
-        if (before.equals(after)) {
+        Change after = viewOf(new juranometria.chart.WorkingSelection
+                .Change(model.members(), model.lead()));
+        Change base = pending.isEmpty() ? delivered
+                : pending.peekLast();
+        if (base.equals(after)) {
             return;                // nothing a consumer could observe
         }
-        for (Consumer<Change> listener : List.copyOf(viewListeners)) {
-            listener.accept(after);
+        queue(after);
+    }
+
+    /**
+     * Queues a whole view state and drains, applying each before
+     * delivering its own event - so a listener that prunes or
+     * writes while being told enqueues in turn, and every listener
+     * hears one order.
+     */
+    private void queue(Change change) {
+        pending.addLast(change);
+        if (delivering) {
+            return;
+        }
+        delivering = true;
+        try {
+            Change next;
+            while ((next = pending.pollFirst()) != null) {
+                this.delivered = next;
+                for (Consumer<Change> listener
+                        : List.copyOf(viewListeners)) {
+                    listener.accept(next);
+                }
+            }
+        } finally {
+            delivering = false;
+            pending.clear();
         }
     }
 }

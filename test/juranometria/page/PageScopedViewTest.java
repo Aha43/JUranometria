@@ -90,6 +90,72 @@ class PageScopedViewTest {
     }
 
     @Test
+    void twoListenersHearOneOrderWhenAListenerPrunesMidDelivery() {
+        // The review's exact failure: with a subscription per
+        // listener and a mid-delivery broadcast, the first listener
+        // heard [before, after] while the second heard
+        // [after, after]. One model subscription and one serialized
+        // view queue give every listener the same history.
+        WorkingSelection model = new WorkingSelection();
+        WorkingMarksModel view = new WorkingMarksModel(model);
+        List<String> first = new ArrayList<>();
+        List<String> second = new ArrayList<>();
+        boolean[] reacted = {false};
+        view.onChange(change -> {
+            first.add(change.marks().toString());
+            if (!reacted[0] && change.marks().contains("M 42")) {
+                reacted[0] = true;
+                view.pruneTo(pageOf("M 31"));   // nested scope change
+            }
+        });
+        view.onChange(change -> second.add(change.marks().toString()));
+        first.clear();
+        second.clear();
+
+        model.replaceWith(List.of("M 31", "M 42"), "M 42");
+        assertEquals(first, second,
+                "every view listener hears the same states in the"
+                        + " same order, nested prune included");
+        assertEquals(List.of("[M 31, M 42]", "[M 31]"), first,
+                "the model's state first, the narrowed scope after -"
+                        + " queued, never broadcast midway");
+    }
+
+    @Test
+    void twoListenersHearOneOrderWhenAListenerWritesDuringAPrune() {
+        // The other direction: a listener reacting to a scope
+        // change with a model write. The write's transition queues
+        // behind the scope change for everyone alike.
+        WorkingSelection model = new WorkingSelection();
+        WorkingMarksModel view = new WorkingMarksModel(model);
+        model.replaceWith(List.of("M 31", "M 42"), "M 42");
+        List<String> first = new ArrayList<>();
+        List<String> second = new ArrayList<>();
+        boolean[] reacted = {false};
+        view.onChange(change -> {
+            first.add(change.marks().toString());
+            if (!reacted[0] && !change.marks().contains("M 42")) {
+                reacted[0] = true;
+                view.mark("NGC 206");          // nested model write
+            }
+        });
+        view.onChange(change -> second.add(change.marks().toString()));
+        first.clear();
+        second.clear();
+
+        view.pruneTo(pageOf("M 31", "NGC 206"));
+        assertEquals(first, second,
+                "one order for every listener in this direction too");
+        assertEquals(List.of("[M 31]", "[M 31, NGC 206]"), first,
+                "the scope change first, the nested write queued"
+                        + " after it");
+        assertEquals(List.of("M 31", "M 42", "NGC 206"),
+                model.members(),
+                "and the model holds everything: the scoped-out"
+                        + " member survived both transitions");
+    }
+
+    @Test
     void theViewRefusesBlanksLikeEverythingElse() {
         assertThrows(IllegalArgumentException.class, () ->
                 new WorkingMarksModel.Change(List.of(" "), " "));
