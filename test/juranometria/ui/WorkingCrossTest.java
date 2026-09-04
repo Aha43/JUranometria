@@ -69,7 +69,8 @@ class WorkingCrossTest {
         try {
             g.setColor(java.awt.Color.WHITE);
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
-            WorkingCrossInk.paint(g, scene, contributions, lead);
+            WorkingCrossInk.paint(g, scene, contributions, lead,
+                    juranometria.render.ChartPalette.WHITE_PAPER);
         } finally {
             g.dispose();
         }
@@ -357,6 +358,43 @@ class WorkingCrossTest {
     }
 
     /** The centre and size of everything inked: {x, y, width, height}. */
+    @Test
+    void aCrossOnTheBlackSkyIsAsProminentAsAStar() {
+        // Sprint 26, issue #246: interaction ink keeps its parity
+        // with star ink on either ground - black on paper, white on
+        // the black sky - so a reader's own mark never sinks into
+        // the ground it was made on.
+        ChartScene scene = page(new SkyPosition(0.0, 0.0), 8.0);
+        SkyPosition object = juranometria.page.PageExtent.offsetOf(
+                scene.viewport().centre(), 1.5, 40.0);
+        BufferedImage image = new BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        try {
+            g.setColor(juranometria.render.ChartPalette.BLACK_SKY
+                    .ground());
+            g.fillRect(0, 0, image.getWidth(), image.getHeight());
+            WorkingCrossInk.paint(g, scene,
+                    List.of(crossAt("TEST", object)), null,
+                    juranometria.render.ChartPalette.BLACK_SKY);
+        } finally {
+            g.dispose();
+        }
+        int white = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (image.getRGB(x, y) == juranometria.render
+                        .ChartPalette.BLACK_SKY.interactionInk()
+                        .getRGB()) {
+                    white++;
+                }
+            }
+        }
+        assertTrue(white > 0, "the cross is drawn in the black-sky"
+                + " interaction ink, exact white on the ground");
+    }
+
     private static double[] inkBounds(BufferedImage image) {
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;

@@ -49,6 +49,48 @@ class ChartOptionsStoreTest {
     }
 
     @Test
+    void theChartGroundPersistsAndFallsBackToWhitePaper()
+            throws Exception {
+        // Sprint 26, issue #246: the palette is a token, not a flag.
+        // A pre-1.7.0 store has no key; unknown or corrupt values
+        // mean the released white paper, never a launch failure; and
+        // a black-sky choice survives the round trip like any other.
+        Preferences node = Preferences.userRoot()
+                .node("juranometria-test-" + System.nanoTime());
+        try {
+            ChartOptionsStore store = ChartOptionsStore.forNode(node);
+            assertEquals(juranometria.render.ChartPalette.WHITE_PAPER,
+                    store.load().palette(),
+                    "an upgrading store keeps the chart it left"
+                            + " behind");
+
+            store.save(ChartOptions.DEFAULTS.withPalette(
+                    juranometria.render.ChartPalette.BLACK_SKY));
+            assertEquals(juranometria.render.ChartPalette.BLACK_SKY,
+                    store.load().palette(),
+                    "a black-sky choice sticks");
+            assertEquals("black-sky", node.get("chart.palette", null),
+                    "stored as its token");
+
+            node.put("chart.palette", "octarine");
+            assertEquals(juranometria.render.ChartPalette.WHITE_PAPER,
+                    store.load().palette(),
+                    "a corrupt token means white paper, not a"
+                            + " failure");
+            assertEquals(ChartOptions.DEFAULTS.withPalette(
+                            juranometria.render.ChartPalette.BLACK_SKY),
+                    ChartOptions.DEFAULTS.withPalette(
+                            juranometria.render.ChartPalette.BLACK_SKY)
+                            .withFamily(juranometria.render.SymbolFamily
+                                    .GALAXIES, true),
+                    "withFamily threads the palette rather than"
+                            + " dropping it");
+        } finally {
+            node.removeNode();
+        }
+    }
+
+    @Test
     void optionsRoundTripAndToleratesTheUnknownWithoutRealPreferences()
             throws Exception {
         Preferences node = Preferences.userRoot()

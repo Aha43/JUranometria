@@ -3,6 +3,7 @@ package juranometria.app;
 import java.util.prefs.Preferences;
 
 import juranometria.render.ChartOptions;
+import juranometria.render.ChartPalette;
 
 /**
  * The tiny injectable persistence boundary for chart options (issue
@@ -78,7 +79,14 @@ public interface ChartOptionsStore {
                         flag(node, "chart.openClusters"),
                         flag(node, "chart.globularClusters"),
                         flag(node, "chart.nebulae"),
-                        flag(node, "chart.planetaryNebulae"));
+                        flag(node, "chart.planetaryNebulae"),
+                        // The chart ground (Sprint 26, issue #246):
+                        // a token, not a flag. A pre-1.7.0 store has
+                        // no key, and unknown or corrupt values mean
+                        // the released white paper, never a launch
+                        // failure (docs/decisions/black-sky.md).
+                        ChartPalette.stored(
+                                node.get("chart.palette", null)));
             }
 
             @Override
@@ -115,6 +123,7 @@ public interface ChartOptionsStore {
                         Boolean.toString(options.nebulae()));
                 node.put("chart.planetaryNebulae",
                         Boolean.toString(options.planetaryNebulae()));
+                node.put("chart.palette", options.palette().storedAs());
             }
         };
     }

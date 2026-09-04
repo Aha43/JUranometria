@@ -76,6 +76,12 @@ public final class EvidenceContractMain {
                 "docs/studies/test-evidence/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PlaceAndTimeStudyMain",
                 "docs/studies/place-and-time/measurements.md");
+        // Writes its renderer-drawn pages beside the report as it
+        // runs (issue #246), so capturing the report regenerates
+        // them too - byte-reproducible per machine, like every
+        // renderer study.
+        REPORT_MAINS.put("juranometria.tool.BlackSkyStudyMain",
+                "docs/studies/black-sky/measurements.md");
     }
 
     /**

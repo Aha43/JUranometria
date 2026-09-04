@@ -91,7 +91,8 @@ public final class ReferenceInk {
      * produce the same page.
      */
     public static void paint(Graphics2D g, ChartScene scene,
-                      List<OverlayRegistry.Owned> contributions) {
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette) {
         if (contributions.isEmpty()) {
             return;
         }
@@ -121,13 +122,15 @@ public final class ReferenceInk {
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.GreatCircle circle) {
-                    drawCircle(g2, projection, mapping, page, paper, circle);
+                    drawCircle(g2, projection, mapping, page, paper, circle,
+                            palette);
                 }
             }
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.Point point) {
-                    drawPoint(g2, projection, mapping, paper, point);
+                    drawPoint(g2, projection, mapping, paper, point,
+                            palette);
                 }
             }
         } finally {
@@ -140,7 +143,8 @@ public final class ReferenceInk {
                                    ViewportMapping mapping,
                                    GreatCirclePage.Page page,
                                    Rectangle2D paper,
-                                   OverlayContribution.GreatCircle circle) {
+                                   OverlayContribution.GreatCircle circle,
+                                   juranometria.render.ChartPalette palette) {
         Optional<GreatCirclePage.Arc> crossing = GreatCirclePage.clip(
                 projection, mapping, page, circle.pole());
         if (crossing.isEmpty()) {
@@ -150,12 +154,12 @@ public final class ReferenceInk {
             return;
         }
         GreatCirclePage.Arc arc = crossing.get();
-        g.setColor(ChartRenderer.FIGURE_INK);
+        g.setColor(palette.figureInk());
         g.setStroke(circle.reference() == OverlayContribution.Reference.BOUNDARY
                 ? DASHED : SOLID);
         g.draw(new Line2D.Double(arc.from().x(), arc.from().y(),
                 arc.to().x(), arc.to().y()));
-        label(g, paper, arc, circle.accessibleName());
+        label(g, paper, arc, circle.accessibleName(), palette);
     }
 
     /**
@@ -172,8 +176,9 @@ public final class ReferenceInk {
      * chart's own furniture.
      */
     private static void label(Graphics2D g, Rectangle2D paper,
-                              GreatCirclePage.Arc arc, String name) {
-        g.setColor(EquatorialGrid.GRID_LABEL_INK);
+                              GreatCirclePage.Arc arc, String name,
+                              juranometria.render.ChartPalette palette) {
+        g.setColor(palette.gridLabelInk());
         g.setFont(EquatorialGrid.GRID_LABEL_FONT);
         Rectangle2D box = labelBox(paper, arc, name,
                 g.getFontMetrics());
@@ -215,13 +220,14 @@ public final class ReferenceInk {
                                   GnomonicProjection projection,
                                   ViewportMapping mapping,
                                   Rectangle2D paper,
-                                  OverlayContribution.Point point) {
+                                  OverlayContribution.Point point,
+                                  juranometria.render.ChartPalette palette) {
         PixelPoint at = projection.project(point.at())
                 .map(mapping::toPixel).orElse(null);
         if (at == null || !paper.contains(at.x(), at.y())) {
             return;
         }
-        g.setColor(ChartRenderer.FIGURE_INK);
+        g.setColor(palette.figureInk());
         g.setStroke(SOLID);
         g.draw(new Ellipse2D.Double(at.x() - RING, at.y() - RING,
                 2.0 * RING, 2.0 * RING));
@@ -230,6 +236,6 @@ public final class ReferenceInk {
         g.draw(new Line2D.Double(at.x(), at.y() - RING,
                 at.x(), at.y() - RING - TICK));
         label(g, paper, new GreatCirclePage.Arc(at, at),
-                point.accessibleName());
+                point.accessibleName(), palette);
     }
 }

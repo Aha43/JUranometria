@@ -7,6 +7,24 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Black sky** (Sprint 26, issue #246). The chart's ground is the
+  reader's: a persisted Chart Options choice (View > Chart Options >
+  Chart) draws white stars and restrained light ink on black, in
+  either application theme. Not an inversion: every ink keeps the
+  WCAG contrast ratio it earned on white paper, derived by
+  measurement (`make black-sky-study`), pinned in one `ChartPalette`
+  type, and verified on rendered sparse, dense, polar, RA-seam,
+  narrow and wide pages - every pixel grey, every bulk colour a
+  reviewed palette value, geometry identical across grounds to the
+  measured mask bound. Switching is repaint-only, Cancel reverts,
+  Restore Defaults returns to white paper, the theme boundary holds
+  in both directions, and the released white-paper chart stays
+  byte-identical. The Milky Way's dark treatment is explicitly
+  deferred with its unlicensed source
+  (docs/decisions/black-sky.md).
+
 ### Fixed
 
 - **The Andromeda mark is the Mac application identity** (Sprint 26,

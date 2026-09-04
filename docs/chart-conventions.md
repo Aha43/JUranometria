@@ -18,6 +18,12 @@ projection; this is outside the first milestone.
 ## Visual language
 
 - White background, black and grey marks, no photographic imagery.
+  From Sprint 26 the reader may instead choose **Black sky** in
+  Chart Options: white stars and restrained light ink on black,
+  each ink the equal-contrast partner of its white-paper value, the
+  same marks and the same hierarchy on the other ground
+  ([the black-sky decision](decisions/black-sky.md)). White paper
+  remains the released default and the reference rendering.
 - Stars are filled circles whose radius varies monotonically with magnitude.
 - Brighter stars receive larger marks, with a bounded nonlinear scale so they
   do not dominate the page.

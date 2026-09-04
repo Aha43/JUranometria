@@ -302,8 +302,10 @@ ellipses lean the way the galaxies do. Stellar-type entries,
 associations, and novae stay undrawn - a stellar entry would only
 duplicate the star layer - though they remain searchable and
 recentre the chart. A `--dark` argument runs the dark
-application theme; the chart page itself stays white paper in both
-themes.
+application theme; the chart page itself never follows the theme.
+The page's own ground is a chart choice: white paper by default, or
+**Black sky** (View > Chart Options > Chart) - white stars and
+restrained light ink on black - in either application theme.
 
 ## Licensing
 
