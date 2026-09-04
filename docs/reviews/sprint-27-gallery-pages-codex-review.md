@@ -35,3 +35,15 @@ and software it builds beside visible.
 This is a human review criterion, not a banned-word scanner. Words such as
 “honest” have precise uses in the rendering and test contracts; the problem is
 the implied comparison, which requires reading the sentence.
+
+## Re-review
+
+Resolved at `9b16095`. `docs/development.md` now carries the documentation
+voice beside the project's definition of done, covering confident description,
+unsupported comparative claims, gratitude and provenance, and the need for
+human editorial judgment. The gallery decision points to that shared home.
+
+No findings remain. PR #264 is approved. Remove the temporary
+`feature/gallery-pages` workflow trigger after this approval is recorded and
+delete its GitHub Pages deployment policy after the resulting main-only head
+is ready to deploy.
