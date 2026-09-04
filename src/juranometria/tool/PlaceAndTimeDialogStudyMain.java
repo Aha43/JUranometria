@@ -58,7 +58,7 @@ public final class PlaceAndTimeDialogStudyMain {
     }
 
     private static void write(String name, int points, boolean dark)
-            throws IOException {
+            throws Exception {
         if (dark) {
             com.formdev.flatlaf.FlatDarkLaf.setup();
         } else {
@@ -72,31 +72,48 @@ public final class PlaceAndTimeDialogStudyMain {
         java.util.prefs.Preferences throwaway =
                 java.util.prefs.Preferences.userRoot()
                         .node("juranometria-study-" + name);
-        Frame owner = new JFrame("study");
-        PlaceAndTimeDialog dialog = null;
+        // Built and painted on the event thread, like every other
+        // living Swing surface: the first version worked off it, and
+        // FlatLaf's layout state made the packed width depend on
+        // which theme had run first in the JVM - a black stripe
+        // where the fill and the paint disagreed, which the new
+        // structural checks caught in a committed photograph (#242).
+        Frame[] owner = new Frame[1];
+        PlaceAndTimeDialog[] dialog = new PlaceAndTimeDialog[1];
+        BufferedImage[] image = new BufferedImage[1];
+        int[] size = new int[2];
         try {
-            dialog = PlaceAndTimeDialog.packedForStudy(owner, module,
-                    PlaceStore.forNode(throwaway));
-            java.awt.Container content = dialog.getContentPane();
-            BufferedImage image = new BufferedImage(content.getWidth(),
-                    content.getHeight(), BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = image.createGraphics();
-            try {
-                g.setColor(content.getBackground());
-                g.fillRect(0, 0, content.getWidth(), content.getHeight());
-                content.paint(g);
-            } finally {
-                g.dispose();
-            }
-            ImageIO.write(image, "png", new File(DIR, name + ".png"));
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("study");
+                dialog[0] = PlaceAndTimeDialog.packedForStudy(owner[0],
+                        module, PlaceStore.forNode(throwaway));
+                java.awt.Container content = dialog[0].getContentPane();
+                size[0] = content.getWidth();
+                size[1] = content.getHeight();
+                image[0] = new BufferedImage(size[0], size[1],
+                        BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = image[0].createGraphics();
+                try {
+                    g.setColor(content.getBackground());
+                    g.fillRect(0, 0, size[0], size[1]);
+                    content.paint(g);
+                } finally {
+                    g.dispose();
+                }
+            });
+            ImageIO.write(image[0], "png", new File(DIR, name + ".png"));
             System.out.printf(Locale.ROOT, "  %s (%dx%d px, %d pt%s)%n",
-                    name, content.getWidth(), content.getHeight(), points,
+                    name, size[0], size[1], points,
                     dark ? ", dark" : "");
         } finally {
-            if (dialog != null) {
-                dialog.dispose();
-            }
-            owner.dispose();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                if (dialog[0] != null) {
+                    dialog[0].dispose();
+                }
+                if (owner[0] != null) {
+                    owner[0].dispose();
+                }
+            });
             try {
                 // A photograph is not a session, and must not leave
                 // one behind in the developer's real preferences.

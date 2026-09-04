@@ -173,11 +173,38 @@ SOFA oracle as artwork. The classes are now:
 bytes against them and changing one is a reviewed decision. Nothing
 in this sprint may blur these classes into each other — a
 photograph must never be diffed as if it were a report, and a
-report must never be excused as if it were a photograph. Issue
-**#242** owns making these contracts executable, and the
-renderer-drawn class gives it teeth: a widget PNG misfiled as
-renderer-drawn will fail #242's regenerate-and-diff immediately,
-so the default is fail-safe.
+report must never be excused as if it were a photograph.
+
+**As #242 settled it, the contracts are executable.**
+`make evidence-contracts` regenerates everything but the session
+photographs and reports a verdict per artifact — *reproduced*,
+*visually-inspected* (widget drift restored from the committed
+snapshot, never left as churn), *deliberately-unchanged*
+(fixtures checksum-verified; photographs whose generator needs a
+display), *widget-measured* — and exits nonzero on any breach. The
+cheap half runs in the ordinary suite: the four fast reports
+reproduced from their mains' stdout on every push, the fixtures
+held to pinned digests, every report present, and the inspection
+imagery held to structure (themes by corner luminance, enlarged
+wider than plain, the 240 px mock-up its named width, variants
+genuinely distinct). What pixels cannot prove — the right dialog,
+unclipped controls — the packed-dialog lifecycle test proves
+against the production window itself.
+
+**One recorded exception**, as the issue required: the
+deep-sky-vocabulary measurements embed widget-measured dialog
+geometry, so their bytes depend on a display and a look-and-feel;
+that report is regenerated on the maintainer's machine and held to
+existence and substance, not bytes.
+
+**What making the contracts executable found**, first runs: a
+committed light-theme dialog photograph carrying the 344 px
+black-stripe defect from #228's stale-class window (the study
+built Swing off the event thread, making packed widths depend on
+which theme ran first in the JVM — it photographs on the EDT now);
+and fifteen Sprint 19–20 renderer study images stale against
+production, one visibly missing the ν Bayer letter Sprint 17
+added. All re-baselined under the stated environment.
 
 ## What stays required, and what may abort
 
