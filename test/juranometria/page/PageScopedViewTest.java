@@ -156,6 +156,48 @@ class PageScopedViewTest {
     }
 
     @Test
+    void offPageModelChangesStaySilentAtTheQueueBoundary() {
+        // The review's remaining P1: a model transition entirely
+        // outside the scope maps to an identical view and must not
+        // publish a duplicate event.
+        WorkingSelection model = new WorkingSelection();
+        WorkingMarksModel view = new WorkingMarksModel(model);
+        model.replaceWith(List.of("M 31", "M 42"), "M 31");
+        view.pruneTo(pageOf("M 31"));
+        List<String> heard = new ArrayList<>();
+        view.onChange(change -> heard.add(change.marks() + "/"
+                + change.lead()));
+        heard.clear();
+
+        model.add("NGC 206");          // off this page
+        model.lead("M 42");            // off-page lead movement
+        model.remove("NGC 206");       // off-page removal
+        assertEquals(List.of(), heard,
+                "changes the view cannot show publish nothing");
+        assertEquals(List.of("M 31", "M 42"), model.members(),
+                "while the model heard every one of them");
+
+        // But a change that moves what is visible - here the
+        // fallback lead, when a visible member arrives while the
+        // model's lead is off the page - differs and publishes.
+        view.pruneTo(pageOf("M 31", "NGC 205"));
+        heard.clear();
+        model.add("NGC 205");
+        assertEquals(List.of("[M 31, NGC 205]/NGC 205"), heard,
+                "a visible arrival publishes once, leading the view");
+        model.lead("M 42");            // off-page again
+        assertEquals(List.of("[M 31, NGC 205]/NGC 205"), heard,
+                "an off-page lead change leaves the visible fallback"
+                        + " exactly as it was - silent");
+        model.remove("NGC 205");
+        assertEquals(2, heard.size(),
+                "removing the visible fallback changes the view");
+        assertEquals("[M 31]/M 31", heard.get(1),
+                "and the fallback passes to the remaining visible"
+                        + " member");
+    }
+
+    @Test
     void theViewRefusesBlanksLikeEverythingElse() {
         assertThrows(IllegalArgumentException.class, () ->
                 new WorkingMarksModel.Change(List.of(" "), " "));

@@ -224,14 +224,8 @@ public final class WorkingMarksModel {
             throw new IllegalArgumentException("a page to prune to");
         }
         this.scope = page;
-        Change after = viewOf(new juranometria.chart.WorkingSelection
-                .Change(model.members(), model.lead()));
-        Change base = pending.isEmpty() ? delivered
-                : pending.peekLast();
-        if (base.equals(after)) {
-            return;                // nothing a consumer could observe
-        }
-        queue(after);
+        queue(viewOf(new juranometria.chart.WorkingSelection
+                .Change(model.members(), model.lead())));
     }
 
     /**
@@ -241,6 +235,17 @@ public final class WorkingMarksModel {
      * hears one order.
      */
     private void queue(Change change) {
+        // Suppression lives at the shared boundary (review): a
+        // model change entirely outside the scope maps to the view
+        // state already delivered - or already queued - and is
+        // nothing a consumer could observe, whichever door it came
+        // through. A change that moves anything visible, the
+        // fallback lead included, differs and publishes.
+        Change base = pending.isEmpty() ? delivered
+                : pending.peekLast();
+        if (base.equals(change)) {
+            return;
+        }
         pending.addLast(change);
         if (delivering) {
             return;
