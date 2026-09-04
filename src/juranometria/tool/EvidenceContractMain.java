@@ -305,16 +305,16 @@ public final class EvidenceContractMain {
                         + "822ee2cc7d4c4100152418c7");
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-index-narrow.png",
-                "29b15a83eb88a24632f9cff5f26815eca57f1e91"
-                        + "c149002037ce9a45b2abf495");
+                "47fd872a95f4939b1b3fc0c6b35be484a37dcbda"
+                        + "db7b78307ad26bd50a77456b");
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-slide-desktop.png",
                 "17174c76c08c7e07c843125927213f44b19e9c42"
                         + "609169e807cb3b5ca6455167");
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-slide-narrow.png",
-                "8dea3e6f54496fcb4fe00a1b9de05178508ff035"
-                        + "7ef3f7e50580f0541cbfffe7");
+                "d6f67f6a9710fa9f9a5e03e2e852a977c6f0ac5c"
+                        + "2e47f09cc54bef54139cc6c0");
     }
 
     /**

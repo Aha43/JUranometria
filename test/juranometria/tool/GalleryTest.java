@@ -100,6 +100,56 @@ class GalleryTest {
     }
 
     @Test
+    void theContactCapturesShowThePageAndNothingElse()
+            throws IOException {
+        // The review's finding, made structural (#252, P1): the
+        // committed captures had carried browser chrome and personal
+        // workspace UI past a claim of cropping. The gallery page's
+        // own ground is white and its body padding keeps every
+        // corner empty, while browser chrome, a desktop wallpaper or
+        // a dock is dark ink in exactly those corners - so each
+        // corner patch of every capture must average nearly pure
+        // white, and a capture that leaks any surrounding UI fails
+        // here rather than in a review.
+        try (var tree = Files.walk(Path.of("docs/studies/gallery"))) {
+            List<Path> captures = tree.filter(f -> f.getFileName()
+                            .toString().startsWith("screenshot-gallery-"))
+                    .sorted().toList();
+            assertTrue(captures.size() >= 4,
+                    "the four responsive captures are committed");
+            for (Path capture : captures) {
+                java.awt.image.BufferedImage image =
+                        javax.imageio.ImageIO.read(capture.toFile());
+                int patch = 8;
+                for (int[] corner : new int[][] {
+                        {0, 0},
+                        {image.getWidth() - patch, 0},
+                        {0, image.getHeight() - patch},
+                        {image.getWidth() - patch,
+                                image.getHeight() - patch}}) {
+                    long sum = 0;
+                    for (int y = corner[1]; y < corner[1] + patch; y++) {
+                        for (int x = corner[0]; x < corner[0] + patch;
+                                x++) {
+                            int rgb = image.getRGB(x, y);
+                            sum += ((rgb >> 16 & 0xff)
+                                    + (rgb >> 8 & 0xff)
+                                    + (rgb & 0xff)) / 3;
+                        }
+                    }
+                    long mean = sum / (patch * patch);
+                    assertTrue(mean >= 245,
+                            capture.getFileName() + " corner at "
+                                    + corner[0] + "," + corner[1]
+                                    + " is the page's own white"
+                                    + " margin, not surrounding UI:"
+                                    + " mean " + mean);
+                }
+            }
+        }
+    }
+
+    @Test
     void theGalleryShipsNoRemoteAssets() throws IOException {
         try (var tree = Files.walk(GALLERY)) {
             for (Path page : tree.filter(f ->
