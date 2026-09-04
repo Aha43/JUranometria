@@ -116,43 +116,19 @@ public final class OnThisPageStudyMain {
                 + " uses the states' declared order, never their"
                 + " spelling.");
         System.out.println();
-        String[] oldWords = {"On the chart", "drawn", "hidden",
-                "too faint", "no symbol", "too small here"};
-        System.out.println("| text size | column before | column"
-                + " after | four columns before | after | fits 240?"
-                + " | fits 320? |");
-        System.out.println("|---|---|---|---|---|---|---|");
-        java.awt.image.BufferedImage probe =
-                new java.awt.image.BufferedImage(1, 1,
-                        java.awt.image.BufferedImage.TYPE_INT_RGB);
-        java.awt.Graphics2D g = probe.createGraphics();
-        try {
-            for (int size : new int[] {12, 18}) {
-                java.awt.FontMetrics metrics = g.getFontMetrics(
-                        new java.awt.Font(java.awt.Font.SANS_SERIF,
-                                java.awt.Font.PLAIN, size));
-                int before = 0;
-                for (String word : oldWords) {
-                    before = Math.max(before,
-                            metrics.stringWidth(word));
-                }
-                before += 12;
-                int after = juranometria.ui.onthispage.OnThisPageTable
-                        .stateColumnWidth(metrics, metrics);
-                int others = metrics.stringWidth("\u25cf NGC 317A")
-                        + metrics.stringWidth("not recorded")
-                        + metrics.stringWidth("00.00\u00b0") + 36;
-                System.out.printf(java.util.Locale.ROOT,
-                        "| %d pt | %d px | %d px | %d px | %d px |"
-                                + " %s | %s |%n",
-                        size, before, after, others + before,
-                        others + after,
-                        others + after <= 240 ? "yes" : "no (scrolls)",
-                        others + after <= 320 ? "yes" : "no (scrolls)");
-            }
-        } finally {
-            g.dispose();
-        }
+        System.out.println("Column widths are font metrics and"
+                + " therefore per machine and per platform, so the"
+                + " numbers do not live in this cross-platform"
+                + " report: the maintainer's measured before/after"
+                + " table, face and sizes stated, is recorded in"
+                + " docs/decisions/on-this-page.md. What holds"
+                + " everywhere is the mechanism: the column takes"
+                + " the width of its own widest word and header,"
+                + " measured from the fonts actually in use"
+                + " (OnThisPageTable.stateColumnWidth), and the"
+                + " suite asserts the four columns fit the ordinary"
+                + " 320 px Inspector at normal text on whatever"
+                + " platform it runs.");
         System.out.println();
         System.out.println("Where all four columns cannot honestly"
                 + " fit, the table scrolls rather than truncating an"
