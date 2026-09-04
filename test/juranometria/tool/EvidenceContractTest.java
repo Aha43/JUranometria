@@ -93,6 +93,62 @@ class EvidenceContractTest {
         }
     }
 
+    // ---- the restoration guarantees, regression-tested ---------------
+
+    @Test
+    void restorationSurvivesWhateverHappenedAndRemovesStrays()
+            throws Exception {
+        // The guarantee the review refused to accept as a rehearsal
+        // in a pull-request narrative: drift on inspection imagery
+        // is put back, inspection strays are removed, and files of
+        // other classes are left for the newcomer breach to name.
+        Path root = Files.createTempDirectory("evidence-restore");
+        try {
+            Path inspection = root.resolve("controls-thing.png");
+            Path renderer = root.resolve("page-thing.png");
+            Files.write(inspection, new byte[] {1, 2, 3});
+            Files.write(renderer, new byte[] {4, 5, 6});
+            var committed = EvidenceContractMain.snapshot(root);
+
+            // A generation that drifted, strayed, and died: nothing
+            // after this point may depend on the run having finished.
+            Files.write(inspection, new byte[] {9, 9, 9});
+            Files.write(root.resolve("controls-stray.png"),
+                    new byte[] {7});
+            Files.write(root.resolve("page-stray.png"),
+                    new byte[] {8});
+
+            List<String> breaches = EvidenceContractMain
+                    .newcomerBreaches(root, committed);
+            assertEquals(2, breaches.size(),
+                    "every newcomer is named, whatever its class: "
+                            + breaches);
+
+            EvidenceContractMain.restoreInspectionImagery(root,
+                    committed);
+            assertArrayEquals(new byte[] {1, 2, 3},
+                    Files.readAllBytes(inspection),
+                    "inspection drift went back to committed bytes");
+            assertFalse(Files.exists(
+                            root.resolve("controls-stray.png")),
+                    "the inspection stray is gone");
+            assertTrue(Files.exists(root.resolve("page-stray.png")),
+                    "the renderer stray is left for its named breach"
+                            + " - restoration never deletes what a"
+                            + " human must rule on");
+            assertArrayEquals(new byte[] {4, 5, 6},
+                    Files.readAllBytes(renderer),
+                    "and the renderer file is untouched");
+        } finally {
+            try (var tree = Files.walk(root)) {
+                for (Path file : tree.sorted(
+                        java.util.Comparator.reverseOrder()).toList()) {
+                    Files.deleteIfExists(file);
+                }
+            }
+        }
+    }
+
     // ---- inspection imagery, by structure ----------------------------
 
     private static BufferedImage png(String path) throws Exception {

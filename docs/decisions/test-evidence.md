@@ -192,8 +192,28 @@ restored — inspect before any recommit*, *deliberately-unchanged*
 nonzero on any breach. An outer restoration path runs whatever
 happens — a generator dying mid-run included — putting inspection
 imagery back to its committed bytes and removing inspection-class
-strays; a file generation creates that nobody committed is a
-breach by name, never a silent escape. The
+strays, while strays of other classes are left for their named
+breach; a file generation creates that nobody committed is a
+breach by name, never a silent escape. The restoration and
+newcomer guarantees carry regression tests of their own, with two
+mutations killed (a restore skipped, a deletion that overreached).
+
+**The promoted studies are compared, not merely held** (review):
+the six legacy generators run too — eleven seconds in all — and
+every hand-promoted page under regional, constellation, grid,
+bayer, chart-options and star-identity is byte-compared against
+its own generator's build output, paired per directory after a
+name collision (two studies each promoted an
+orion-36-everything.png) briefly cross-compared them. Seventy-
+three pages had quietly fallen behind the atlas — pre-grid,
+pre-Bayer renderings of pages whose studies' own rule is that
+they track production — and were re-baselined. **Eight promoted
+files match no generator output by name** — hand-composed
+variants from their sprints — pinned by exact path and held as
+committed; a ninth arrives by decision. The constellation
+generator is input-gated on its gitignored downloads, skipped
+with a stated verdict where absent, so clean checkouts still
+verify everything else. The
 cheap half runs in the ordinary suite: the four fast reports
 reproduced from their mains' stdout on every push, the fixtures
 held to pinned digests, every report present, and the inspection

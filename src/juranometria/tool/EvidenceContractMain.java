@@ -103,6 +103,79 @@ public final class EvidenceContractMain {
             "juranometria.tool.PlaceAndTimeInkStudyMain",
             "juranometria.tool.PlaceAndTimeControlsMockupMain");
 
+    /**
+     * The legacy generators: they write under build/, and their
+     * docs/studies directories were hand-promoted at their sprints.
+     * The review refused to leave those ninety images unchecked, so
+     * the verifier runs these too and compares each promoted file
+     * against the generator's build output by name - the studies'
+     * own rule is that chosen pages are production output, so a
+     * mismatch is a study fallen behind the atlas. The constellation
+     * generator is input-gated: its raw sources are gitignored
+     * downloads, so a checkout without them skips it with a stated
+     * verdict rather than failing clean-worktree runs.
+     */
+    private static final Map<String, String> BUILD_WRITERS =
+            new LinkedHashMap<>();
+    static {
+        BUILD_WRITERS.put("juranometria.tool.RegionalStudyMain",
+                "build/regional-study");
+        BUILD_WRITERS.put("juranometria.tool.ConstellationStudyMain",
+                "build/constellation-study");
+        BUILD_WRITERS.put("juranometria.tool.ChartOptionsStudyMain",
+                "build/chart-options-study");
+        BUILD_WRITERS.put("juranometria.tool.StarIdentityStudyMain",
+                "build/star-identity-study");
+        BUILD_WRITERS.put("juranometria.tool.GridStudyMain",
+                "build/grid-study");
+        BUILD_WRITERS.put("juranometria.tool.BayerStudyMain",
+                "build/bayer-study");
+    }
+
+    /** Each promoted docs directory and the build output it mirrors. */
+    private static final Map<String, String> PROMOTED_DIRECTORIES =
+            new LinkedHashMap<>();
+    static {
+        PROMOTED_DIRECTORIES.put("docs/studies/regional-detail/",
+                "build/regional-study");
+        PROMOTED_DIRECTORIES.put("docs/studies/regional-zoom/",
+                "build/regional-study");
+        PROMOTED_DIRECTORIES.put(
+                "docs/studies/constellation-geography/",
+                "build/constellation-study");
+        PROMOTED_DIRECTORIES.put(
+                "docs/studies/constellation-rendering/",
+                "build/constellation-study");
+        PROMOTED_DIRECTORIES.put("docs/studies/coordinate-grid/",
+                "build/grid-study");
+        PROMOTED_DIRECTORIES.put("docs/studies/bayer-notation/",
+                "build/bayer-study");
+        PROMOTED_DIRECTORIES.put("docs/studies/chart-options/",
+                "build/chart-options-study");
+        PROMOTED_DIRECTORIES.put("docs/studies/star-identity/",
+                "build/star-identity-study");
+    }
+
+    private static final String GATED_GENERATOR =
+            "juranometria.tool.ConstellationStudyMain";
+    private static final Path GATED_INPUT =
+            Path.of("imports/raw/constellations");
+
+    /**
+     * The promoted files no generator output matches by name -
+     * variants composed by hand at their sprints. Recorded, held as
+     * committed, and pinned: an eighth arrives by decision.
+     */
+    private static final List<String> PROMOTED_WITHOUT_GENERATOR =
+            List.of("docs/studies/bayer-notation/crux-18-greek-wide.png",
+                    "docs/studies/constellation-rendering/lmc-36deg.png",
+                    "docs/studies/bayer-notation/m31-08-greek-wide.png",
+                    "docs/studies/bayer-notation/orion-36-greek-wide.png",
+                    "docs/studies/bayer-notation/orion-36-lettered-both.png",
+                    "docs/studies/coordinate-grid/m31-08-absent.png",
+                    "docs/studies/coordinate-grid/m31-08-labelled.png",
+                    "docs/studies/coordinate-grid/m31-08-lines-only.png");
+
     /** The byte-exact fixtures, pinned by digest. */
     public static final Map<String, String> FIXTURES = Map.of(
             "docs/studies/place-and-time/reference-vectors.txt",
@@ -113,7 +186,7 @@ public final class EvidenceContractMain {
                     + "b8a675c55ba56ca1300f1b3e");
 
     /** One committed file: its bytes and when it was last written. */
-    private record Snapshot(byte[] bytes,
+    record Snapshot(byte[] bytes,
                             java.nio.file.attribute.FileTime written) {
     }
 
@@ -130,32 +203,61 @@ public final class EvidenceContractMain {
             // and inspection-class newcomers are removed, so a
             // failed verification never leaves drift or strays
             // looking like work in git.
-            for (Map.Entry<String, Snapshot> entry
-                    : committed.entrySet()) {
-                if (!inspectionClass(entry.getKey())) {
-                    continue;
-                }
-                Path path = Path.of(entry.getKey());
-                if (!Files.exists(path)
-                        || !java.util.Arrays.equals(
-                                entry.getValue().bytes(),
-                                Files.readAllBytes(path))) {
-                    Files.write(path, entry.getValue().bytes());
-                }
+            restoreInspectionImagery(Path.of("docs/studies"),
+                    committed);
+        }
+    }
+
+    /**
+     * Puts every inspection-class file back to its snapshotted bytes
+     * and removes inspection-class newcomers. Extracted so the
+     * guarantee has regression tests of its own rather than a
+     * rehearsal in a pull-request narrative (review).
+     */
+    static void restoreInspectionImagery(Path root,
+            Map<String, Snapshot> committed) throws IOException {
+        for (Map.Entry<String, Snapshot> entry : committed.entrySet()) {
+            if (!inspectionClass(entry.getKey())) {
+                continue;
             }
-            try (Stream<Path> tree =
-                    Files.walk(Path.of("docs/studies"))) {
-                for (Path file : tree.filter(Files::isRegularFile)
-                        .sorted().toList()) {
-                    String key = file.toString().replace(
-                            java.io.File.separatorChar, '/');
-                    if (!committed.containsKey(key)
-                            && inspectionClass(key)) {
-                        Files.delete(file);
-                    }
+            Path path = Path.of(entry.getKey());
+            if (!Files.exists(path)
+                    || !java.util.Arrays.equals(
+                            entry.getValue().bytes(),
+                            Files.readAllBytes(path))) {
+                Files.write(path, entry.getValue().bytes());
+            }
+        }
+        try (Stream<Path> tree = Files.walk(root)) {
+            for (Path file : tree.filter(Files::isRegularFile)
+                    .sorted().toList()) {
+                String key = file.toString().replace(
+                        java.io.File.separatorChar, '/');
+                if (!committed.containsKey(key)
+                        && inspectionClass(key)) {
+                    Files.delete(file);
                 }
             }
         }
+    }
+
+    /** The newcomer breaches under a root, against a snapshot. */
+    static List<String> newcomerBreaches(Path root,
+            Map<String, Snapshot> committed) throws IOException {
+        List<String> breaches = new ArrayList<>();
+        try (Stream<Path> tree = Files.walk(root)) {
+            for (Path file : tree.filter(Files::isRegularFile)
+                    .sorted().toList()) {
+                String key = file.toString().replace(
+                        java.io.File.separatorChar, '/');
+                if (!committed.containsKey(key)) {
+                    breaches.add(key + ": generated but not committed"
+                            + " - a new artifact arrives by commit and"
+                            + " review, not by regeneration");
+                }
+            }
+        }
+        return breaches;
     }
 
     private static boolean inspectionClass(String path) {
@@ -212,22 +314,70 @@ public final class EvidenceContractMain {
             tally(verdicts,
                     "widget-measured (display required; held to substance)");
         }
+        // The legacy generators, compared against their promoted
+        // docs directories. Paired per directory, never by a global
+        // name map: two studies both promoted an
+        // orion-36-everything.png, and the first draft compared one
+        // of them against the other study's page of the same name.
+        java.util.Set<String> judgedViaBuild = new java.util.TreeSet<>();
+        boolean gatedSkipped = false;
+        for (Map.Entry<String, String> writer : BUILD_WRITERS.entrySet()) {
+            if (writer.getKey().equals(GATED_GENERATOR)
+                    && !Files.isDirectory(GATED_INPUT)) {
+                gatedSkipped = true;
+                tally(verdicts, "input-gated (constellation sources"
+                        + " absent; run the download script to"
+                        + " verify)");
+                continue;
+            }
+            Class.forName(writer.getKey())
+                    .getMethod("main", String[].class)
+                    .invoke(null, (Object) new String[0]);
+        }
+        for (Map.Entry<String, String> pair
+                : PROMOTED_DIRECTORIES.entrySet()) {
+            if (gatedSkipped && pair.getValue()
+                    .equals("build/constellation-study")) {
+                continue;
+            }
+            Map<String, Path> outputs = new TreeMap<>();
+            try (Stream<Path> tree =
+                    Files.walk(Path.of(pair.getValue()))) {
+                tree.filter(f -> f.toString().endsWith(".png"))
+                        .forEach(f -> outputs.put(
+                                f.getFileName().toString(), f));
+            }
+            for (String path : committed.keySet()) {
+                if (!path.startsWith(pair.getKey())
+                        || !path.endsWith(".png")) {
+                    continue;
+                }
+                Path match = outputs.get(
+                        Path.of(path).getFileName().toString());
+                if (match == null) {
+                    continue; // pinned residue, judged below
+                }
+                judgedViaBuild.add(path);
+                if (java.util.Arrays.equals(
+                        committed.get(path).bytes(),
+                        Files.readAllBytes(match))) {
+                    tally(verdicts, "reproduced (via generator build"
+                            + " output)");
+                } else {
+                    failures.add(path + ": the promoted study page no"
+                            + " longer matches its generator's output"
+                            + " - the study has fallen behind the"
+                            + " atlas");
+                }
+            }
+        }
+
         // Newcomers first: a file the generation created that the
         // snapshot never held is an artifact nobody committed - a
         // breach whatever its class, and never silent (review). The
         // inspection-class ones are removed by the outer restoration.
-        try (Stream<Path> tree = Files.walk(Path.of("docs/studies"))) {
-            for (Path file : tree.filter(Files::isRegularFile)
-                    .sorted().toList()) {
-                String key = file.toString().replace(
-                        java.io.File.separatorChar, '/');
-                if (!committed.containsKey(key)) {
-                    failures.add(key + ": generated but not committed"
-                            + " - a new artifact arrives by commit and"
-                            + " review, not by regeneration");
-                }
-            }
-        }
+        failures.addAll(newcomerBreaches(Path.of("docs/studies"),
+                committed));
         for (Map.Entry<String, Snapshot> entry : committed.entrySet()) {
             String path = entry.getKey();
             if (path.endsWith(".md")) {
@@ -245,16 +395,18 @@ public final class EvidenceContractMain {
                             .equals(entry.getValue().written());
             switch (cls) {
                 case "renderer-drawn" -> {
-                    if (!rewritten) {
-                        // No active generator writes here: the
-                        // directory is a hand-promoted baseline from
-                        // its sprint. Counting it "reproduced" would
-                        // claim a regeneration that never happened
-                        // (review).
+                    if (judgedViaBuild.contains(path)) {
+                        // Compared against its generator's build
+                        // output above.
+                    } else if (!rewritten) {
                         tally(verdicts, same
-                                ? "legacy-baseline (no active"
-                                        + " generator; held as"
-                                        + " committed)"
+                                ? (PROMOTED_WITHOUT_GENERATOR
+                                        .contains(path)
+                                        ? "promoted-without-generator"
+                                                + " (pinned residue;"
+                                                + " held as committed)"
+                                        : "legacy-baseline (held as"
+                                                + " committed)")
                                 : failuresAdd(failures, path
                                         + ": legacy baseline changed"
                                         + " though nothing generates"
@@ -337,8 +489,12 @@ public final class EvidenceContractMain {
     }
 
     private static Map<String, Snapshot> snapshot() throws IOException {
+        return snapshot(Path.of("docs/studies"));
+    }
+
+    static Map<String, Snapshot> snapshot(Path root) throws IOException {
         Map<String, Snapshot> files = new TreeMap<>();
-        try (Stream<Path> tree = Files.walk(Path.of("docs/studies"))) {
+        try (Stream<Path> tree = Files.walk(root)) {
             for (Path file : tree.filter(Files::isRegularFile)
                     .sorted().toList()) {
                 files.put(file.toString()
