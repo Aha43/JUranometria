@@ -41,7 +41,12 @@ public final class ChartModuleHost implements ChartServices {
 
     private final ChartComponent chart;
     private final SelectionModel selection;
-    private final WorkingMarksModel marks = new WorkingMarksModel();
+    private final juranometria.chart.WorkingSelection workingSelection =
+            new juranometria.chart.WorkingSelection();
+    private final juranometria.chart.SelectionMode selectionMode =
+            new juranometria.chart.SelectionMode();
+    private final WorkingMarksModel marks =
+            new WorkingMarksModel(workingSelection);
     private final Consumer<NavigationRequest> navigation;
     private final List<Consumer<PageContents>> pageListeners =
             new ArrayList<>();
@@ -167,6 +172,16 @@ public final class ChartModuleHost implements ChartServices {
     @Override
     public WorkingMarksModel workingMarks() {
         return marks;
+    }
+
+    @Override
+    public juranometria.chart.WorkingSelection workingSelection() {
+        return workingSelection;
+    }
+
+    @Override
+    public juranometria.chart.SelectionMode selectionMode() {
+        return selectionMode;
     }
 
     @Override
