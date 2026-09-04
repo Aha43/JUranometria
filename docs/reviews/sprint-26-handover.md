@@ -98,14 +98,16 @@ warm plus the clean cold run above).
 | local clean checkout, cold | — | 45.2 s | first measurement |
 
 No causation is claimed from these samples; runner variance alone
-spans much of each gap, and the suite is measurably bigger and
-doing measurably more per test. The honest summary is the gate's
-own finding restated: **elapsed time was never the friction and has
-grown only with the work performed.** What the sprint actually
-bought is structural and now mechanical — zero unprotected shared
-state, premises before events, contracts that regenerate and
-compare instead of trusting commits, and incomplete verification
-that fails loudly with its remedy named.
+spans much of each gap. What can be said without one: the suite is
+measurably bigger (738 → 783 tests) and several of the new tests do
+measurably more work per test, elapsed time is modestly higher, and
+these samples cannot apportion the difference between that and the
+runners. The gate's own finding stands unchanged: **elapsed time
+was never the friction.** What the sprint actually bought is
+structural and now mechanical — zero unprotected shared state,
+premises before events, contracts that regenerate and compare
+instead of trusting commits, and incomplete verification that
+fails loudly with its remedy named.
 
 ## Reader-facing additions, demonstrated
 
@@ -114,9 +116,11 @@ that fails loudly with its remedy named.
 captures under `docs/studies/mac-identity/` show the Andromeda mark
 on every `.app` surface (Finder pre-launch, Dock, switcher, Desktop
 alias, `/Applications`) and Java's figure on the portable
-`java -jar` route — recorded narrowly as a property of a bundle-less
-launch, with the `.app` named plainly in the README as the branded
-route. The unreferenced-ICNS packaging check was mutation-rehearsed
+`java -jar` route — recorded narrowly, per the #245 review: a JAR
+is not a bundle Finder can brand, and the current launcher sets no
+runtime Dock image, so the Dock half is a property of today's
+launcher rather than a law of the operating system — with the
+`.app` named plainly in the README as the branded route. The unreferenced-ICNS packaging check was mutation-rehearsed
 both ways and the candidate image's Dock tile committed as the
 after-evidence.
 
@@ -245,10 +249,13 @@ test.
 
 ## Residual risks, stated
 
-- **The portable JAR wears Java's Dock icon** — an inherent
-  property of a bundle-less launch, recorded in the decision and
-  the README. `java.awt.Taskbar.setIconImage` could brand the
-  running process's tile; that follow-up is recorded but not filed.
+- **The portable JAR's Dock tile shows Java's default icon**,
+  because the current launcher executes a plain `java -jar` with no
+  runtime Dock-icon integration — a property of today's launcher,
+  not of every bundle-less launch, exactly as the #245 review had
+  it narrowed; Finder identity alone is out of a JAR's reach.
+  `java.awt.Taskbar.setIconImage` could brand the running process's
+  tile; that follow-up is recorded but not filed.
 - **Two flush-drop mutants are macOS-equivalent**: this platform
   persists a preference-node removal without an explicit flush, so
   those mutants survive here by platform behaviour; the
