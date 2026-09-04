@@ -190,12 +190,15 @@ public final class TestEvidenceScan {
             for (String touch : state.touches()) {
                 touches |= source.contains(touch);
             }
-            // Preferences are touched by creating or writing, not by
-            // looking: a witness that syncs and asks nodeExists
-            // disturbs nothing and owes no cleanup (#224 review
-            // round - the persistence probe flagged itself).
+            // The read-only witnesses, exempted by pinned name
+            // rather than by shape: an earlier rule exempted every
+            // source with no .node( call, which also exempted a
+            // direct write to the root itself (review). The list is
+            // pinned by the gate, and everything else that reaches
+            // userRoot - roots, nodes, reads that turn out to write -
+            // stays detectable.
             if (state.name().equals("preferences")
-                    && !source.contains(".node(")) {
+                    && READ_ONLY_WITNESSES.contains(path)) {
                 touches = false;
             }
             if (!touches) {
@@ -263,6 +266,15 @@ public final class TestEvidenceScan {
      * as a thing being measured (review). The list is pinned by the
      * gate so it cannot quietly grow into an exemption dump.
      */
+    /**
+     * Sources that only look at the preference store - a sync and a
+     * nodeExists, nothing created, nothing written. Exempt by exact
+     * name and pinned by the gate: a second witness arrives by
+     * decision, and nothing is exempted by shape.
+     */
+    public static final List<String> READ_ONLY_WITNESSES = List.of(
+            "juranometria/app/PrefsExistsProbe.java");
+
     public static final List<String> INSTRUMENTS = List.of(
             "src/juranometria/tool/TestEvidenceScan.java",
             "src/juranometria/tool/TestEvidenceStudyMain.java");

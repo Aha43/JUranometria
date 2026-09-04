@@ -189,6 +189,33 @@ class TestEvidenceGateTest {
     }
 
     @Test
+    void aDirectWriteToTheRootIsStillCaughtAndTheWitnessIsPinned() {
+        // The review's case: exempting by no-.node( shape also
+        // exempted a write straight to the root. Shape exemptions
+        // are gone; the one read-only witness is exempt by exact
+        // name, and a root write classifies as the touch it is.
+        TestEvidenceScan.File rootWriter = TestEvidenceScan.classify(
+                "Fixture.java",
+                "class Fixture { void t() {"
+                        + " java.util.prefs.Preferences.user"
+                        + "Root().put(\"k\", \"v\"); } }");
+        assertTrue(rootWriter.globalState().contains("preferences")
+                        && rootWriter.stateClass().equals("UNPROTECTED"),
+                "a write to the root itself is a preference touch"
+                        + " with no cleanup");
+        TestEvidenceScan.File readOnly = TestEvidenceScan.classify(
+                "juranometria/app/PrefsExistsProbe.java", "test",
+                "class PrefsExistsProbe { void t() throws Exception {"
+                        + " java.util.prefs.Preferences.user"
+                        + "Root().sync(); } }");
+        assertTrue(!readOnly.globalState().contains("preferences"),
+                "the pinned witness is exempt by its exact name");
+        assertEquals(List.of("juranometria/app/PrefsExistsProbe.java"),
+                TestEvidenceScan.READ_ONLY_WITNESSES,
+                "and the exemption list is exactly that one name");
+    }
+
+    @Test
     void theInstrumentsAreExcludedByExactlyTheirTwoNames() {
         // The ruler is not a thing being measured: the scanner's
         // marker definitions are string literals that read exactly
