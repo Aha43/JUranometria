@@ -68,6 +68,24 @@ gallery test executes both halves against the artifact classes of
 `docs/decisions/test-evidence.md`, so a silently promoted mock-up
 fails the suite, not a review.
 
+The rule then earned its second instance, and a refinement, on the
+live site: the owner's eye caught a constellation figure line and
+the ghost of CANIS MAJOR showing *through* the Orion slide's title
+block - which the shipped renderer, whose furniture is opaque and
+drawn last, never does. The slide's source was
+`constellation-rendering/m42-36deg.png`, whose gate-era generator
+composites candidate geography **over** the finished page,
+furniture included; the renderer-drawn artifact class alone did
+not prove production composition. The slide now uses the pure
+production render of the same page
+(`regional-zoom/m42-36deg.png`), and the refinement is executable:
+a chart slide's source directory must come from the pinned list of
+generators that draw through the production pass alone -
+`docs/reference/`, the gallery's own component-composed slides,
+and the two studies that call `renderToImage` and composite
+nothing after it. A compositing study joins the list only by
+becoming a production-pass generator.
+
 Black sky is deliberately absent from this first set: the issue
 scopes the gallery to what 1.6.0 released and was filed before
 1.7.0 published. A black-sky room or slide is a natural later

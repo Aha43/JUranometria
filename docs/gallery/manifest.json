@@ -44,8 +44,8 @@
       "region": "Orion and neighbours",
       "field": "36°",
       "ink": "Core chart ink only.",
-      "source": "docs/studies/constellation-rendering/m42-36deg.png",
-      "produced": "Production render; regenerated and compared against its generator by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "source": "docs/studies/regional-zoom/m42-36deg.png",
+      "produced": "Production render (RegionalStudyMain, the renderer's own pass alone); regenerated and compared against its generator by make evidence-contracts. v1.7.0 tree (8820a6d).",
       "alt": "A dense wide-field star chart: Orion's stick figure with named bright stars Betelgeuse, Bellatrix, Rigel and Saiph, the constellation name ORION in small capitals, boxed nebulae near the Sword, and the names of neighbouring constellations at their figures."
     },
     {

@@ -23,6 +23,21 @@ class GalleryTest {
 
     private static final Path GALLERY = Path.of("docs/gallery");
 
+    /**
+     * The directories whose generators draw chart pages through the
+     * production pass alone - docs/reference is the canonical page
+     * CI holds renders to, docs/studies/gallery is the production
+     * component itself (GalleryPageMain), and the two studies here
+     * call {@code renderToImage} and composite nothing after it.
+     * Pinned after the owner found a study-composited figure line
+     * ghosting through a title block on the live site.
+     */
+    private static final List<String> PRODUCTION_PASS_SOURCES =
+            List.of("docs/reference/",
+                    "docs/studies/gallery/",
+                    "docs/studies/regional-zoom/",
+                    "docs/studies/coordinate-grid/");
+
     @Test
     void thePagesAreExactlyWhatTheManifestDerives() throws Exception {
         Path scratch = Files.createTempDirectory("gallery");
@@ -95,6 +110,24 @@ class GalleryTest {
                         slug + " claims chart output, so its source"
                                 + " keeps the renderer-drawn contract:"
                                 + " " + artifactClass);
+                // The owner's live-review find (#253): the
+                // renderer-drawn class alone did not prove the page
+                // was drawn by the production pass - the
+                // constellation-rendering study composites candidate
+                // geography OVER the finished page, furniture
+                // included, and a figure line ghosted through the
+                // Orion slide's title block on the public site. A
+                // chart slide's source directory is therefore
+                // pinned to the generators that draw through the
+                // production pass alone; a compositing study joins
+                // this list only by becoming one.
+                assertTrue(PRODUCTION_PASS_SOURCES.stream()
+                                .anyMatch(root -> GalleryMain
+                                        .text(slide, "source")
+                                        .startsWith(root)),
+                        slug + "'s source comes from a production-pass"
+                                + " generator: "
+                                + GalleryMain.text(slide, "source"));
             }
         }
     }
