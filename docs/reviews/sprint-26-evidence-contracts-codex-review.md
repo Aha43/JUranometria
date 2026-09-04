@@ -124,3 +124,55 @@ operation, then commit the two regressions described in the first review:
   fails by that artifact's name.
 
 Verdict remains changes requested on these two P1 findings.
+
+## Second follow-up at `b192d69`
+
+The promoted-output comparison is now directory-scoped, avoiding collisions
+between studies that use the same filename, and 77 generated pages are
+actually compared. The extracted restoration and newcomer operations are a
+useful start. Three parts of the P1 closure remain.
+
+### P1 — The exact residue list is not enforced
+
+`PROMOTED_WITHOUT_GENERATOR` names eight intended exceptions, but an unmatched
+renderer file not in that list falls through to `legacy-baseline (held as
+committed)` and succeeds. Therefore a ninth hand-promoted file passes without
+review, and an existing generated page also silently becomes a baseline if
+its generator stops emitting the matching filename. The promised exact pin
+has no rejecting branch.
+
+After output matching, require the unmatched promoted set to equal the eight
+paths exactly. Test both directions: adding a ninth residue and removing one
+expected generator output must fail by path.
+
+### P1 — Missing constellation inputs turn complete verification into a partial success
+
+When `imports/raw/constellations` is absent, the runner tallies one
+`input-gated` line, skips both constellation promoted directories, then
+accepts those untouched images through the same legacy-baseline fallback. It
+still prints `EVIDENCE CONTRACTS OK` and exits zero. That is not the clear
+pre-generation refusal requested in the first review; it reports a partial
+run as completion.
+
+Either make the pinned downloader/input verification a prerequisite or fail
+nonzero before any generation, naming
+`scripts/download-constellation-sources.sh`. A separate explicitly named
+partial mode could verify everything else, but the command advertised as the
+evidence contract must not say OK while a whole evidence family was skipped.
+
+### P1 — The regression test still does not exercise a failure or the outer `finally`
+
+`restorationSurvivesWhateverHappenedAndRemovesStrays()` writes drift and
+strays, then calls `newcomerBreaches(...)` and
+`restoreInspectionImagery(...)` sequentially. Nothing throws. It would remain
+green if `main` lost its outer `finally`, if generator invocation failed to
+reach restoration, or if cleanup replaced the primary failure. Its comment
+says the generation “died,” but the test does not perform that event.
+
+Extract/run the generation transaction with an injected throwing action, or
+invoke an equivalent test seam. Assert that the action's exception remains
+primary, cleanup still restores/removes, and cleanup failure is suppressed
+rather than substituted. The second newcomer-completes case should likewise
+exercise the transaction's verdict, not only the helper that returns strings.
+
+Verdict remains changes requested on these P1 findings.
