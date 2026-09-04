@@ -43,3 +43,29 @@ construction and bulk/captured-transaction paths share the invariant. Extend
 the existing `duplicatesAndBlankIdentitiesAreImpossible` test to exercise a
 blank member through both `replaceWith` and direct `Change` construction; its
 current blank assertion covers only `add` and leaves the actual hole open.
+
+## Re-review: [P1] Serialize model and scope changes before notifying the view
+
+The two original findings are closed at `f885e5c`: navigation now changes only
+the adapter's presentation scope, and canonical `Change` construction rejects
+blank members through both bulk routes. The scoped view, however, breaks the
+delivery discipline it is preserving when more than one consumer listens.
+
+`onChange` creates a separate `model.onChange` subscription for every view
+listener. If the first listener calls `pruneTo` while a model change is being
+delivered, `pruneTo` immediately broadcasts the scoped result to **all** view
+listeners. Control then returns to the model's original listener loop, whose
+second adapter subscription computes that same model event under the new
+scope. The first consumer hears `[before scope, after scope]`; the second hears
+`[after scope, after scope]`. It misses the state the first consumer saw and
+receives a duplicate, contrary to the standing guarantee that every consumer
+hears one order of whole states. The existing nested-prune test has only one
+listener, so it cannot expose this.
+
+Subscribe the adapter to the model once and serialize both model-derived view
+changes and scope changes through one view-level delivery queue before walking
+a copied listener list. Suppress consecutive identical views as ordinary
+no-ops. Add two listeners, make the first change scope during delivery, and
+require both to hear the same exact sequence once each while `marks()` and
+`lead()` agree with the event in flight. Also exercise a nested model write
+from a scope notification, so neither direction can interleave the other.
