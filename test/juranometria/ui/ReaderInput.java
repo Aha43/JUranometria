@@ -84,12 +84,18 @@ public final class ReaderInput {
     public static void typeAndEnter(JTextField field, String text)
             throws Exception {
         click(field);
-        boolean[] owns = new boolean[1];
-        SwingUtilities.invokeAndWait(() -> owns[0] = field.isFocusOwner());
-        Assumptions.assumeTrue(owns[0],
-                "this desktop would not give " + name(field)
-                        + " the keyboard focus, so a reader's keys"
-                        + " could not arrive there");
+        // Insist, the way every focused journey already does: under
+        // xvfb no window manager hands focus to a click, and the CI
+        // display run proved a bare click-then-check aborts there
+        // while insisting succeeds (#243). Where the desktop truly
+        // refuses, this still aborts with the focus subsystem's own
+        // state as the reason.
+        java.awt.Window window =
+                SwingUtilities.getWindowAncestor(field);
+        Assumptions.assumeTrue(window != null,
+                name(field) + " sits in a window a desktop could"
+                        + " focus");
+        FocusedWindow.insistOnFocus(window, field);
         press(field, KeyEvent.VK_A,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
         for (char typed : text.toCharArray()) {
