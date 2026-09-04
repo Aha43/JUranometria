@@ -1,8 +1,6 @@
 package juranometria.page;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -27,22 +25,52 @@ import java.util.function.Consumer;
  * stories - its change is queued and delivered in turn, in one order
  * for every consumer.
  */
+/**
+ * The page surfaces' view of the working selection (Sprint 24,
+ * issue #215; narrowed to a one-way adapter by Sprint 27, issue
+ * #260).
+ *
+ * <p>The membership truth now lives in
+ * {@link juranometria.chart.WorkingSelection} — one session-level
+ * model, never pruned by navigation, never persisted. This class
+ * keeps the Sprint 24 API its consumers were reviewed against and
+ * holds <strong>no state of its own</strong>: every write forwards
+ * to the one model, every read comes from it, and every
+ * notification is the model's own, re-addressed. Two models that
+ * could disagree are one model with two names.
+ *
+ * <p>{@link #pruneTo} survives here, not on the model — and it
+ * narrows only this <strong>view</strong> (review): the model is
+ * never mutated by navigation, which is its defining cross-page
+ * invariant, while this adapter keeps presenting the page-bound
+ * picture today's surfaces were reviewed against - members the
+ * current page does not hold are outside the view, and the view's
+ * lead falls back to the last-marked visible member. The scope is
+ * presentation state, never a second membership truth: no member
+ * exists here that the model does not hold.
+ * <strong>Retirement path:</strong> the surfaces issue (#261)
+ * moves the table, module and journeys onto
+ * {@code WorkingSelection} and the decided cross-page gestures;
+ * when its last consumer moves, this adapter and its view scope go
+ * with it.
+ */
 public final class WorkingMarksModel {
 
     /**
-     * What consumers are told. Always the whole state: the marks in
-     * order and which of them leads, never a delta a listener has to
-     * reconstruct.
+     * What consumers are told - the Sprint 24 shape, unchanged:
+     * always the whole state.
      */
     public record Change(List<String> marks, String lead) {
 
         public Change {
             marks = List.copyOf(marks);
-            // An ordered set, so it says so. A duplicate would give a
-            // table two rows for one object and let a reader unmark
-            // something that stayed marked - and the record is
-            // public, so it is a state a module could build even
-            // though the model never produces one (review).
+            for (String mark : marks) {
+                if (mark == null || mark.isBlank()) {
+                    throw new IllegalArgumentException(
+                            "a mark is a catalogue identity: "
+                                    + marks);
+                }
+            }
             if (new java.util.HashSet<>(marks).size() != marks.size()) {
                 throw new IllegalArgumentException(
                         "a marked set holds each identity once: "
@@ -65,188 +93,159 @@ public final class WorkingMarksModel {
         }
     }
 
-    private final List<Consumer<Change>> listeners = new ArrayList<>();
+    private final juranometria.chart.WorkingSelection model;
 
     /**
-     * Transitions awaiting delivery, each a whole state.
-     *
-     * <p>Masking the accessors was not enough (review). The model
-     * moved the moment a mutator was called, so a listener that
-     * marked something while being told about a mark was computing
-     * its own change against a state nobody could see - and the
-     * fields disagreed with the event in flight underneath the mask.
-     *
-     * <p>So this follows {@code SelectionModel} exactly: a
-     * transition is queued <strong>whole</strong> and applied
-     * immediately before its own event is delivered. The fields
-     * always describe the change being delivered, because they are
-     * set from it.
+     * The page this view is scoped to, or null for the whole set -
+     * presentation scope, never membership: a member outside the
+     * scope is hidden here and untouched in the model.
      */
-    private final Deque<Change> pending = new ArrayDeque<>();
+    private PageContents scope;
+
+    /**
+     * One model subscription and one serialized view queue
+     * (review): every view listener hears the same states in the
+     * same order, whether a transition arrived from the model or
+     * from a scope change, and a nested {@code pruneTo} during a
+     * delivery is queued in turn rather than broadcast midway -
+     * the models' own discipline, applied to the view.
+     */
+    private final List<Consumer<Change>> viewListeners =
+            new ArrayList<>();
+    private final java.util.Deque<Change> pending =
+            new java.util.ArrayDeque<>();
     private boolean delivering;
+    /** The view state that has been delivered. */
+    private Change delivered = new Change(List.of(), null);
 
-    /** The state that has been delivered. */
-    private List<String> marks = List.of();
-    private String lead;
-
-    /** The marked identities, in the order they were marked. */
-    public List<String> marks() {
-        return marks;
+    /** An adapter over its own private model - tests and fixtures. */
+    public WorkingMarksModel() {
+        this(new juranometria.chart.WorkingSelection());
     }
 
-    /** The lead identity, or null when nothing is marked. */
+    /** The production shape: one model, this view of it. */
+    public WorkingMarksModel(juranometria.chart.WorkingSelection model) {
+        if (model == null) {
+            throw new IllegalArgumentException(
+                    "the adapter is a view of the one model");
+        }
+        this.model = model;
+        // The one model subscription, for the adapter's lifetime:
+        // every model transition is re-addressed through the scope
+        // and joins the same serialized queue as scope changes.
+        model.onChange(change -> queue(viewOf(change)));
+    }
+
+    /** The one model this adapter re-addresses. */
+    public juranometria.chart.WorkingSelection model() {
+        return model;
+    }
+
+    /** The marked identities the view shows, in marked order. */
+    public List<String> marks() {
+        return delivered.marks();
+    }
+
+    /** The view's lead identity, or null when the view is empty. */
     public String lead() {
-        return lead;
+        return delivered.lead();
     }
 
     public boolean isMarked(String identity) {
-        return marks.contains(identity);
+        return delivered.marks().contains(identity);
     }
 
     /**
-     * Subscribes a consumer and returns the handle that unsubscribes
-     * it. The consumer is told the current state immediately, so it
-     * never has to ask separately what it missed - and during a
-     * delivery that is the state being delivered, because the fields
-     * are it.
+     * Subscribes a consumer to this view of the one model - told
+     * the current view immediately (during a delivery, the state
+     * being delivered), again for every model transition, and for
+     * every view-scope change - and returns the releasing handle.
      */
     public Runnable onChange(Consumer<Change> listener) {
         if (listener == null) {
             throw new IllegalArgumentException("listener must not be null");
         }
-        listeners.add(listener);
-        listener.accept(new Change(marks, lead));
-        return () -> listeners.remove(listener);
+        viewListeners.add(listener);
+        listener.accept(delivered);
+        return () -> viewListeners.remove(listener);
     }
 
-    /**
-     * Marks an identity and makes it the lead - what marking one
-     * more object means: the newest question is the one being asked.
-     */
+    private Change viewOf(
+            juranometria.chart.WorkingSelection.Change change) {
+        if (scope == null) {
+            return new Change(change.members(), change.lead());
+        }
+        List<String> visible = new ArrayList<>();
+        for (String identity : change.members()) {
+            if (scope.holds(identity)) {
+                visible.add(identity);
+            }
+        }
+        String lead = visible.contains(change.lead()) ? change.lead()
+                : visible.isEmpty() ? null
+                        : visible.get(visible.size() - 1);
+        return new Change(visible, lead);
+    }
+
+    /** Marks an identity and makes it the lead. */
     public void mark(String identity) {
-        requireIdentity(identity);
-        Change base = intended();
-        if (base.marks().contains(identity)
-                && identity.equals(base.lead())) {
-            return;                // nothing a consumer could observe
-        }
-        List<String> next = new ArrayList<>(base.marks());
-        if (!next.contains(identity)) {
-            next.add(identity);
-        }
-        queue(new Change(next, identity));
+        model.add(identity);
     }
 
     /** Unmarks an identity, doing nothing if it was not marked. */
     public void unmark(String identity) {
-        requireIdentity(identity);
-        Change base = intended();
-        if (!base.marks().contains(identity)) {
-            return;
-        }
-        List<String> next = new ArrayList<>(base.marks());
-        next.remove(identity);
-        queue(new Change(next, identity.equals(base.lead())
-                ? lastOf(next) : base.lead()));
+        model.remove(identity);
     }
 
     /** Makes an already-marked identity the lead. */
     public void lead(String identity) {
-        requireIdentity(identity);
-        Change base = intended();
-        if (!base.marks().contains(identity)) {
-            throw new IllegalArgumentException(
-                    "only a marked identity can lead: " + identity);
-        }
-        if (identity.equals(base.lead())) {
-            return;
-        }
-        queue(new Change(base.marks(), identity));
+        model.lead(identity);
     }
 
-    /**
-     * Replaces the whole marked set in <strong>one</strong>
-     * transition.
-     *
-     * <p>What a reader's shift-click means: five rows chosen by one
-     * gesture is one change of mind, not five. Reconciling it as a
-     * run of marks and unmarks would publish four states nobody
-     * asked about, and a subscriber redrawing on each would flicker
-     * through sets the reader never chose (issue #216).
-     */
+    /** Replaces the whole marked set in one transition. */
     public void replaceWith(List<String> identities, String lead) {
-        List<String> next = List.copyOf(identities);
-        Change base = intended();
-        if (base.marks().equals(next)
-                && java.util.Objects.equals(base.lead(), lead)) {
-            return;
-        }
-        queue(new Change(next, lead));
+        model.replaceWith(identities, lead);
     }
 
     /** Nothing is marked. */
     public void clear() {
-        if (intended().isEmpty()) {
-            return;
-        }
-        queue(new Change(List.of(), null));
+        model.clear();
     }
 
     /**
-     * Drops every mark the new page does not hold, as
-     * <strong>one</strong> change.
-     *
-     * <p>A view change must not publish a cloud of transient states
-     * in which some marks have gone and others have not, and a
-     * consumer must never see a lead that has already left the page.
-     * Searching elsewhere does not carry a cloud of crosses to
-     * another region.
+     * Scopes this view to a page, as one change - the page-bound
+     * picture today's surfaces were reviewed against. The model is
+     * <strong>never</strong> touched (review): navigation narrows
+     * what this view shows, and every member stays a member of the
+     * one session set underneath.
      */
     public void pruneTo(PageContents page) {
         if (page == null) {
             throw new IllegalArgumentException("a page to prune to");
         }
-        Change base = intended();
-        if (base.isEmpty()) {
-            return;
-        }
-        List<String> survivors = new ArrayList<>();
-        for (String identity : base.marks()) {
-            if (page.holds(identity)) {
-                survivors.add(identity);
-            }
-        }
-        if (survivors.size() == base.marks().size()) {
-            return;                // nothing left the page
-        }
-        queue(new Change(survivors,
-                survivors.contains(base.lead()) ? base.lead()
-                        : lastOf(survivors)));
-    }
-
-    // ----------------------------------------------------------------
-
-    /**
-     * The state a new change is built on: the last one queued, or
-     * the delivered one when nothing is waiting.
-     *
-     * <p>Not the delivered state while a queue exists. Two reentrant
-     * changes built on the same base would each describe a whole
-     * state, and the second would silently undo the first - a mark
-     * made during a delivery would vanish when its event arrived.
-     * Every transition is built on the one before it, so the queue
-     * is a history rather than a set of competing guesses.
-     */
-    private Change intended() {
-        return pending.isEmpty() ? new Change(marks, lead)
-                : pending.peekLast();
+        this.scope = page;
+        queue(viewOf(new juranometria.chart.WorkingSelection
+                .Change(model.members(), model.lead())));
     }
 
     /**
-     * Queues a whole transition and drains the queue, applying each
-     * state immediately before delivering its own event.
+     * Queues a whole view state and drains, applying each before
+     * delivering its own event - so a listener that prunes or
+     * writes while being told enqueues in turn, and every listener
+     * hears one order.
      */
     private void queue(Change change) {
+        // Suppression lives at the shared boundary (review): a
+        // model change entirely outside the scope maps to the view
+        // state already delivered - or already queued - and is
+        // nothing a consumer could observe, whichever door it came
+        // through. A change that moves anything visible, the
+        // fallback lead included, differs and publishes.
+        Change base = pending.isEmpty() ? delivered
+                : pending.peekLast();
+        if (base.equals(change)) {
+            return;
+        }
         pending.addLast(change);
         if (delivering) {
             return;
@@ -255,29 +254,15 @@ public final class WorkingMarksModel {
         try {
             Change next;
             while ((next = pending.pollFirst()) != null) {
-                this.marks = next.marks();
-                this.lead = next.lead();
-                // A copy, so a listener that unsubscribes while being
-                // told cannot disturb the notification in progress.
-                for (Consumer<Change> listener : List.copyOf(listeners)) {
+                this.delivered = next;
+                for (Consumer<Change> listener
+                        : List.copyOf(viewListeners)) {
                     listener.accept(next);
                 }
             }
         } finally {
             delivering = false;
             pending.clear();
-        }
-    }
-
-    private static String lastOf(List<String> identities) {
-        return identities.isEmpty() ? null
-                : identities.get(identities.size() - 1);
-    }
-
-    private static void requireIdentity(String identity) {
-        if (identity == null || identity.isBlank()) {
-            throw new IllegalArgumentException(
-                    "a mark is a catalogue identity");
         }
     }
 }

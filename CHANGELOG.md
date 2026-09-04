@@ -9,6 +9,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The working-selection foundation** (Sprint 27, issue #260). The
+  session-level model the #258 gate decided: `WorkingSelection` -
+  one ordered set of unique identities with one lead, transitions
+  for replace, toggle, add, remove, lead and clear under the exact
+  decided rules, whole-state reentrant delivery in the project's
+  standing discipline, no page-pruning operation and no persistence
+  route, held by a bytecode boundary and a preference-door proof.
+  The page-bound `WorkingMarksModel` is narrowed to a stateless
+  one-way adapter over the one model - its Sprint 24 API and the
+  page-pruning seam survive only for today's surfaces, with the
+  stated retirement in the surfaces issue - and chart services
+  expose the model and the session Accumulate switch. Reader
+  surfaces are unchanged; every Sprint 24 test passes against the
+  adapter unmodified.
 - **The working-selection gate** (Sprint 27, issue #258). The
   decision for a temporary cross-page working set - an ordered set
   of identities with one lead, built from chart points and
@@ -24,23 +38,6 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   study photographs today's two leads disagreeing and previews the
   decided presentation through unchanged production painters.
   Production behaviour is untouched by this gate.
-
-### Changed
-
-- **The On-this-page chart-status column earns its width** (Sprint
-  27, issue #257). The column header is now **Chart** and the five
-  answers read **Shown, Hidden, Faint, Small, No mark** - measured
-  against the real Inspector widths, where the old wording needed
-  319 px of the ordinary 320 at normal text and the compact one
-  needs 287. Nothing is lost: the header carries the complete
-  question and every cell its whole answer as tooltip and
-  accessible description, the column stays independently sortable -
-  now by the states' declared meaning rather than their spelling -
-  and reorderable, and where all four columns honestly cannot fit,
-  the table still scrolls rather than truncating an answer.
-
-### Added
-
 - **The public atlas gallery, decided and curated** (Sprint 27,
   issue #252). Nine slides in three rooms — Core chart, On This
   Page, Place and Time — under `docs/gallery/`: one manifest
@@ -55,6 +52,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   in the gallery test. UI photographs appear only labelled
   "Application UI". Publication itself waits for issue #253
   (docs/decisions/gallery.md).
+
+### Changed
+
+- **The On-this-page chart-status column earns its width** (Sprint
+  27, issue #257). The column header is now **Chart** and the five
+  answers read **Shown, Hidden, Faint, Small, No mark** - measured
+  against the real Inspector widths, where the old wording needed
+  319 px of the ordinary 320 at normal text and the compact one
+  needs 287. Nothing is lost: the header carries the complete
+  question and every cell its whole answer as tooltip and
+  accessible description, the column stays independently sortable -
+  now by the states' declared meaning rather than their spelling -
+  and reorderable, and where all four columns honestly cannot fit,
+  the table still scrolls rather than truncating an answer.
 
 ## [1.7.0] - 2026-09-04
 

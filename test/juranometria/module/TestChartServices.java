@@ -35,7 +35,12 @@ public final class TestChartServices implements ChartServices {
                 Atlas.assembler().assemble(ChartViewState.DEFAULT,
                         900, 700), ChartOptions.DEFAULTS);
     private final SelectionModel selection = new SelectionModel();
-    private final WorkingMarksModel marks = new WorkingMarksModel();
+    private final juranometria.chart.WorkingSelection workingSelection =
+            new juranometria.chart.WorkingSelection();
+    private final juranometria.chart.SelectionMode selectionMode =
+            new juranometria.chart.SelectionMode();
+    private final WorkingMarksModel marks =
+            new WorkingMarksModel(workingSelection);
     public final List<NavigationRequest> requested = new ArrayList<>();
     public final OverlayRegistry overlays = new OverlayRegistry();
 
@@ -88,6 +93,14 @@ public final class TestChartServices implements ChartServices {
 
     @Override public SelectionModel selection() {
         return selection;
+    }
+
+    @Override public juranometria.chart.WorkingSelection workingSelection() {
+        return workingSelection;
+    }
+
+    @Override public juranometria.chart.SelectionMode selectionMode() {
+        return selectionMode;
     }
 
     @Override public WorkingMarksModel workingMarks() {

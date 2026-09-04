@@ -46,8 +46,28 @@ public interface ChartServices {
     /** The chart's existing singular selection. */
     SelectionModel selection();
 
-    /** The ordered marked set and its lead. */
+    /**
+     * The page surfaces' Sprint 24 view of the working selection -
+     * a one-way adapter over {@link #workingSelection()}, kept for
+     * the callers reviewed against it and retiring with the
+     * surfaces issue (#261). Never a second truth.
+     */
     WorkingMarksModel workingMarks();
+
+    /**
+     * The session-level working selection (issue #260): membership,
+     * order and lead, cross-page, never pruned by navigation, never
+     * persisted. The one truth {@link #workingMarks()} re-addresses.
+     * A module observes it; private mutable copies are the mirror
+     * the #258 gate forbids.
+     */
+    juranometria.chart.WorkingSelection workingSelection();
+
+    /**
+     * Whether gestures accumulate (issue #258's visible control and
+     * the platform modifier read the same switch). Session-only.
+     */
+    juranometria.chart.SelectionMode selectionMode();
 
     /**
      * Asks the chart to move. Deliberate and explicit: a module
