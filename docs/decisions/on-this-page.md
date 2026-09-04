@@ -586,3 +586,31 @@ above, the counted line for anonymous stars, alternate sorts stable
 beneath the default order, crosses only where there is no visible
 mark, and ordinary and reference rendering byte-identical with
 nothing marked.
+
+## The chart-status column, compacted (Sprint 27, issue #257)
+
+Dogfooding found the visibility column's wording — the **On the
+chart** header above *drawn / hidden / too faint / no symbol /
+too small here* — forcing a horizontal scrollbar at ordinary
+Inspector widths. Measured (`make on-this-page-study`, the
+chart-status section): on the maintainer's face at 12 pt the four
+columns needed 319 px of the preferred 320 before the change and
+287 px after; at 18 pt both wordings scroll honestly, per the
+standing #217 rule that answers keep their words and the table
+scrolls rather than truncating meaning.
+
+The compact vocabulary — header **Chart**; **Shown, Hidden,
+Faint, Small, No mark** — lives in one home, `PageVisibility
+.label()`, read by the table, the study and the mock-ups alike. A
+word was chosen over a bare check mark for Shown: five distinct
+states share the column, and one glyph among four words reads as
+a private code. The whole answers stay reachable: the header
+carries the complete question — *Whether and why this object is
+drawn on the chart* — as tooltip and accessible description, and
+every cell's short word rides with its full `prose()` the same
+two ways. The column remains independently sortable — now by the
+states' declared order rather than their spelling, which
+alphabetical display words would scramble — and reorderable, both
+held by tests. The row model carries the enum itself, which is
+also what stopped a journey's `"drawn".equals(state)` from
+silently rotting when the words changed.

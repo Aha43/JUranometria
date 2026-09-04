@@ -58,13 +58,41 @@ public final class OnThisPageTable extends JPanel {
      * it does not.
      */
     public record Row(String identity, String name, String magnitude,
-                      String from, String state, Double magnitudeValue,
+                      String from, PageVisibility state,
+                      Double magnitudeValue,
                       double separationDegrees) {
     }
 
     private final ChartServices services;
     private final Model model = new Model();
-    private final JTable table = new JTable(model);
+    /**
+     * The table, whose header carries the Chart column's complete
+     * question - "Whether and why this object is drawn on the
+     * chart" - as tooltip and accessible description (issue #257):
+     * the compact header word earns its width, the whole question
+     * stays reachable.
+     */
+    private final JTable table = new JTable(model) {
+        @Override
+        protected javax.swing.table.JTableHeader createDefaultTableHeader() {
+            javax.swing.table.JTableHeader header =
+                    new javax.swing.table.JTableHeader(columnModel) {
+                @Override
+                public String getToolTipText(java.awt.event.MouseEvent event) {
+                    int column = columnModel.getColumnIndexAtX(
+                            event.getPoint().x);
+                    return column >= 0 && columnModel.getColumn(column)
+                            .getModelIndex() == 3
+                            ? CHART_COLUMN_QUESTION : null;
+                }
+            };
+            return header;
+        }
+    };
+
+    /** The Chart column's complete question, kept whole (#257). */
+    public static final String CHART_COLUMN_QUESTION =
+            "Whether and why this object is drawn on the chart";
     private final JLabel heading = new JLabel();
     private final JLabel empty = new JLabel();
     /**
@@ -113,6 +141,40 @@ public final class OnThisPageTable extends JPanel {
                 new RowText(Row::magnitude));
         table.getColumnModel().getColumn(2).setCellRenderer(
                 new RowText(Row::from));
+        // The Chart column's short word, with its whole answer
+        // riding along (issue #257): the cell shows "Faint", and its
+        // tooltip and accessible description say "fainter than the
+        // magnitude limit" - the compact label supports scanning and
+        // never becomes a private code.
+        table.getColumnModel().getColumn(3).setCellRenderer(
+                new StateText());
+        // The complete question belongs to the Chart HEADER CELL,
+        // not the whole header (#257 review): a wrapper over the
+        // look-and-feel's own header renderer sets the accessible
+        // name and description exactly when the cell being rendered
+        // is the Chart column's - keyed by model identity, so it
+        // travels with the column when a reader drags it, and is
+        // cleared for every other header the shared component
+        // renders next.
+        javax.swing.table.TableCellRenderer headerCells =
+                (tbl, value, selected, focused, row, column) -> {
+            java.awt.Component cell = tbl.getTableHeader()
+                    .getDefaultRenderer()
+                    .getTableCellRendererComponent(tbl, value,
+                            selected, focused, row, column);
+            boolean chart = tbl.getColumnModel().getColumn(column)
+                    .getModelIndex() == 3;
+            cell.getAccessibleContext().setAccessibleName(
+                    chart ? "Chart" : String.valueOf(value));
+            cell.getAccessibleContext().setAccessibleDescription(
+                    chart ? CHART_COLUMN_QUESTION : null);
+            return cell;
+        };
+        for (int column = 0; column < table.getColumnModel()
+                .getColumnCount(); column++) {
+            table.getColumnModel().getColumn(column)
+                    .setHeaderRenderer(headerCells);
+        }
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setFillsViewportHeight(true);
         table.getAccessibleContext().setAccessibleName("Objects on this page");
@@ -142,6 +204,12 @@ public final class OnThisPageTable extends JPanel {
         // silence to place.
         sorter.setComparator(2, java.util.Comparator.comparingDouble(
                 (Row row) -> row.separationDegrees()));
+        // By the meaning, not the spelling (issue #257): the
+        // visibility states sort in their declared order - Shown,
+        // Hidden, Faint, No mark, Small - which alphabetical display
+        // words would scramble.
+        sorter.setComparator(3, java.util.Comparator.comparingInt(
+                (Row row) -> row.state().ordinal()));
         table.setRowSorter(sorter);
         table.getSelectionModel().addListSelectionListener(event -> {
             if (following || event.getValueIsAdjusting()) {
@@ -262,12 +330,24 @@ public final class OnThisPageTable extends JPanel {
         int object = metrics.stringWidth("\u25cf NGC 317A") + 12;
         int magnitude = metrics.stringWidth("not recorded") + 12;
         int distance = metrics.stringWidth("00.00\u00b0") + 12;
-        int state = metrics.stringWidth("too small here") + 12;
+        int state = stateColumnWidth(metrics,
+                table.getTableHeader() == null ? metrics
+                        : table.getTableHeader().getFontMetrics(
+                                table.getTableHeader().getFont()));
 
-        setColumn(0, object);
-        setColumn(1, magnitude);
-        setColumn(2, distance);
-        setColumn(3, state);
+        // By model identity, not view position (#257 review): once
+        // a reader drags a column somewhere else, the next resize
+        // or page change must still hand each width to its own
+        // semantic column, wherever it sits.
+        int[] byModel = {object, magnitude, distance, state};
+        for (int view = 0; view < table.getColumnModel()
+                .getColumnCount(); view++) {
+            javax.swing.table.TableColumn column =
+                    table.getColumnModel().getColumn(view);
+            int width = byModel[column.getModelIndex()];
+            column.setMinWidth(width);
+            column.setPreferredWidth(width);
+        }
 
         // When the four cannot fit, the table keeps its columns and
         // the pane scrolls, rather than squeezing every one of them
@@ -282,11 +362,21 @@ public final class OnThisPageTable extends JPanel {
                 : JTable.AUTO_RESIZE_OFF);
     }
 
-    private void setColumn(int index, int width) {
-        javax.swing.table.TableColumn column =
-                table.getColumnModel().getColumn(index);
-        column.setMinWidth(width);
-        column.setPreferredWidth(width);
+    /**
+     * The Chart column's width, from the widest of its own words
+     * and its header (issue #257): measured, so the compact
+     * vocabulary earns its narrowness at every text size rather
+     * than assuming one machine's metrics. Shared with the study
+     * that records the before/after widths.
+     */
+    public static int stateColumnWidth(java.awt.FontMetrics cells,
+                                       java.awt.FontMetrics header) {
+        int widest = header.stringWidth("Chart");
+        for (PageVisibility state : PageVisibility.values()) {
+            widest = Math.max(widest,
+                    cells.stringWidth(state.label()));
+        }
+        return widest + 12;
     }
 
     /** Lets go of the chart. */
@@ -377,7 +467,7 @@ public final class OnThisPageTable extends JPanel {
                             entry.object().recorded().band()),
                     String.format(Locale.ROOT, "%.2f°",
                             entry.separationDegrees()),
-                    wordFor(entry.visibility()),
+                    entry.visibility(),
                     Double.isNaN(entry.object().magnitude()) ? null
                             : entry.object().magnitude(),
                     entry.separationDegrees()));
@@ -388,7 +478,7 @@ public final class OnThisPageTable extends JPanel {
                     magnitudeOf(entry.star().magnitude(), null),
                     String.format(Locale.ROOT, "%.2f°",
                             entry.separationDegrees()),
-                    wordFor(entry.visibility()),
+                    entry.visibility(),
                     entry.star().magnitude(), entry.separationDegrees()));
         }
         return rows;
@@ -484,15 +574,9 @@ public final class OnThisPageTable extends JPanel {
                         "the reader asked to centre on " + lead)));
     }
 
-    /** The short word the table shows for a state. */
+    /** The short word the table shows for a state (issue #257). */
     public static String wordFor(PageVisibility state) {
-        return switch (state) {
-            case DRAWN -> "drawn";
-            case FAMILY_HIDDEN -> "hidden";
-            case BELOW_LIMIT -> "too faint";
-            case NO_SYMBOL -> "no symbol";
-            case TOO_SMALL -> "too small here";
-        };
+        return state.label();
     }
 
     private static String nameOf(PageEntry.DeepSky entry) {
@@ -551,6 +635,27 @@ public final class OnThisPageTable extends JPanel {
         return String.format(Locale.ROOT, "%.1f%s", magnitude, suffix);
     }
 
+    /**
+     * The Chart column's renderer: the compact label as text, the
+     * whole answer as tooltip and accessible description.
+     */
+    private static final class StateText
+            extends javax.swing.table.DefaultTableCellRenderer {
+
+        @Override
+        protected void setValue(Object value) {
+            if (value instanceof Row row) {
+                setText(row.state().label());
+                setToolTipText(row.state().prose());
+                getAccessibleContext().setAccessibleDescription(
+                        row.state().prose());
+            } else {
+                setText("");
+                setToolTipText(null);
+            }
+        }
+    }
+
     /** Draws one of a row's words, whatever the cell handed over. */
     private static final class RowText
             extends javax.swing.table.DefaultTableCellRenderer {
@@ -571,7 +676,7 @@ public final class OnThisPageTable extends JPanel {
     private static final class Model extends AbstractTableModel {
 
         private static final String[] COLUMNS =
-                {"Object", "Mag", "From", "On the chart"};
+                {"Object", "Mag", "From", "Chart"};
 
         private final List<Row> rows = new ArrayList<>();
 
@@ -602,13 +707,12 @@ public final class OnThisPageTable extends JPanel {
             // made 10 sort before 2.
             return switch (column) {
                 case 0 -> line.name();
-                case 1, 2 -> line;
-                default -> line.state();
+                default -> line;
             };
         }
 
         @Override public Class<?> getColumnClass(int column) {
-            return column == 1 || column == 2 ? Row.class : String.class;
+            return column == 0 ? String.class : Row.class;
         }
 
         @Override public boolean isCellEditable(int row, int column) {

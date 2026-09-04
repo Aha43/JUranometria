@@ -146,6 +146,14 @@ The released page, in that order:
 
 **8** deep-sky rows in all on that page.
 
+## The chart-status column, measured (#257)
+
+The column is useful because it is a real, sortable, reorderable column; its wording was costing width it did not need. The compact vocabulary - header **Chart**; Shown, Hidden, Faint, Small, No mark - against the wording it replaced, measured with the sidebar mock-ups' own face at normal and enlarged sizes. The full question and the whole answers ride the header's and every cell's accessible descriptions; sorting uses the states' declared order, never their spelling.
+
+Column widths are font metrics and therefore per machine and per platform, so the numbers do not live in this cross-platform report: the maintainer's measured before/after table, face and sizes stated, is recorded in docs/decisions/on-this-page.md. What holds everywhere is the mechanism: the column takes the width of its own widest word and header, measured from the fonts actually in use (OnThisPageTable.stateColumnWidth), and the suite asserts the four columns fit the ordinary 320 px Inspector at normal text on whatever platform it runs.
+
+Where all four columns cannot honestly fit, the table scrolls rather than truncating an answer into ambiguity - the #217 rule, unchanged.
+
 ## Working it without a pointer
 
 **The module adds no key bindings of its own.** Walking rows and extending a selection are gestures the platform already provides, and a module that taught the table new keys would be a module assistive technology has to be taught too.

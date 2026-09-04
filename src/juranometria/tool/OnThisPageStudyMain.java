@@ -88,8 +88,52 @@ public final class OnThisPageStudyMain {
         visibilityBreakdown();
         theStarQuestion();
         ordering();
+        chartColumn();
         keyboard();
         cost();
+    }
+
+    /**
+     * The chart-status column, measured (issue #257): the widths of
+     * the old and compact vocabularies at the mock-ups' own faces
+     * and sizes, against the Inspector's real widths. Per machine,
+     * like every font measurement here - the boundary is recorded,
+     * not pinned as universal.
+     */
+    private static void chartColumn() {
+        System.out.println("## The chart-status column, measured"
+                + " (#257)");
+        System.out.println();
+        System.out.println("The column is useful because it is a"
+                + " real, sortable, reorderable column; its wording"
+                + " was costing width it did not need. The compact"
+                + " vocabulary - header **Chart**; Shown, Hidden,"
+                + " Faint, Small, No mark - against the wording it"
+                + " replaced, measured with the sidebar mock-ups' own"
+                + " face at normal and enlarged sizes. The full"
+                + " question and the whole answers ride the header's"
+                + " and every cell's accessible descriptions; sorting"
+                + " uses the states' declared order, never their"
+                + " spelling.");
+        System.out.println();
+        System.out.println("Column widths are font metrics and"
+                + " therefore per machine and per platform, so the"
+                + " numbers do not live in this cross-platform"
+                + " report: the maintainer's measured before/after"
+                + " table, face and sizes stated, is recorded in"
+                + " docs/decisions/on-this-page.md. What holds"
+                + " everywhere is the mechanism: the column takes"
+                + " the width of its own widest word and header,"
+                + " measured from the fonts actually in use"
+                + " (OnThisPageTable.stateColumnWidth), and the"
+                + " suite asserts the four columns fit the ordinary"
+                + " 320 px Inspector at normal text on whatever"
+                + " platform it runs.");
+        System.out.println();
+        System.out.println("Where all four columns cannot honestly"
+                + " fit, the table scrolls rather than truncating an"
+                + " answer into ambiguity - the #217 rule, unchanged.");
+        System.out.println();
     }
 
     // ------------------------------------------------------------------
@@ -724,15 +768,9 @@ public final class OnThisPageStudyMain {
                         : " " + identity.constellation());
     }
 
-    /** The short word the table shows for a state. */
+    /** The short word the table shows for a state: its one home. */
     static String wordFor(PageVisibility state) {
-        return switch (state) {
-            case DRAWN -> "drawn";
-            case FAMILY_HIDDEN -> "hidden";
-            case BELOW_LIMIT -> "too faint";
-            case NO_SYMBOL -> "no symbol";
-            case TOO_SMALL -> "too small here";
-        };
+        return state.label();
     }
 
     /** The released page, for the mock-ups to draw the real thing. */

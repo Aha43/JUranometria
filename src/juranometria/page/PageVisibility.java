@@ -16,27 +16,41 @@ package juranometria.page;
 public enum PageVisibility {
 
     /** The page draws it. */
-    DRAWN("drawn"),
+    DRAWN("Shown", "drawn"),
 
     /** Its family is switched off in Chart Options. */
-    FAMILY_HIDDEN("hidden by a chart option"),
+    FAMILY_HIDDEN("Hidden", "hidden by a chart option"),
 
     /** Fainter than this page's limiting magnitude. */
-    BELOW_LIMIT("fainter than the magnitude limit"),
+    BELOW_LIMIT("Faint", "fainter than the magnitude limit"),
 
     /** The atlas has no symbol for its catalogue type. */
-    NO_SYMBOL("no chart symbol for its type"),
+    NO_SYMBOL("No mark", "no chart symbol for its type"),
 
     /** Too small to draw honestly at this field. */
-    TOO_SMALL("below the detail policy at this field");
+    TOO_SMALL("Small", "below the detail policy at this field");
 
+    private final String label;
     private final String prose;
 
-    PageVisibility(String prose) {
+    PageVisibility(String label, String prose) {
+        this.label = label;
         this.prose = prose;
     }
 
-    /** The words a reader is shown. */
+    /**
+     * The compact word the table's Chart column shows (issue #257,
+     * measured against the real table's fonts and Inspector widths):
+     * one home for it, so the table, the study and the mock-ups
+     * cannot drift apart. The full meaning stays in {@link #prose}
+     * and rides every cell's accessible description - the short word
+     * supports scanning and never becomes a private code.
+     */
+    public String label() {
+        return label;
+    }
+
+    /** The whole answer, for accessibility and the study's prose. */
     public String prose() {
         return prose;
     }
