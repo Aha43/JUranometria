@@ -165,6 +165,23 @@ identity source command).
 
 Verdict remains changes requested on the P1 and P2 above.
 
+## Closing review at `cd09a39`
+
+Both remaining findings are closed.
+
+The tests now read and pin the verifier's actual two gated generators, their
+input paths, and their exact fetch commands. Removing the production
+star-identity gate therefore fails rather than leaving a synthetic formatter
+test green. Vanished residue entries are checked one-for-one and each breach
+must name its own path.
+
+The restoration transaction is exercised in both failure combinations:
+generation plus cleanup failure preserves generation as primary with cleanup
+suppressed, while cleanup failure after successful generation surfaces on its
+own.
+
+Approved. No findings remain for PR #250.
+
 ## Fourth follow-up at `6209e72`
 
 The verifier now preserves the evidence failure and suppresses restoration
