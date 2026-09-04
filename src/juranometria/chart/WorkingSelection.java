@@ -39,6 +39,17 @@ public final class WorkingSelection {
 
         public Change {
             members = List.copyOf(members);
+            // Every member is an identity, whichever door it came
+            // through (review): the bulk routes and direct
+            // construction are held to the same rule as every
+            // individual operation.
+            for (String member : members) {
+                if (member == null || member.isBlank()) {
+                    throw new IllegalArgumentException(
+                            "a selection member is a catalogue"
+                                    + " identity: " + members);
+                }
+            }
             // An ordered set, so it says so: a duplicate would give
             // a table two rows for one object and let a reader
             // remove something that stayed a member.

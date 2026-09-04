@@ -39,14 +39,20 @@ import java.util.function.Consumer;
  * notification is the model's own, re-addressed. Two models that
  * could disagree are one model with two names.
  *
- * <p>{@link #pruneTo} survives here, not on the model: it is the
- * compatibility seam that preserves today's page-bound surface
- * behaviour — computed against the model's state and applied as
- * one whole replace — until the reader surfaces move to the
- * cross-page semantics. <strong>Retirement path:</strong> the
- * surfaces issue (#261) moves the table, module and journeys onto
- * {@code WorkingSelection} and the decided gestures; when its last
- * consumer moves, this adapter and its prune go with it.
+ * <p>{@link #pruneTo} survives here, not on the model — and it
+ * narrows only this <strong>view</strong> (review): the model is
+ * never mutated by navigation, which is its defining cross-page
+ * invariant, while this adapter keeps presenting the page-bound
+ * picture today's surfaces were reviewed against - members the
+ * current page does not hold are outside the view, and the view's
+ * lead falls back to the last-marked visible member. The scope is
+ * presentation state, never a second membership truth: no member
+ * exists here that the model does not hold.
+ * <strong>Retirement path:</strong> the surfaces issue (#261)
+ * moves the table, module and journeys onto
+ * {@code WorkingSelection} and the decided cross-page gestures;
+ * when its last consumer moves, this adapter and its view scope go
+ * with it.
  */
 public final class WorkingMarksModel {
 
@@ -58,6 +64,13 @@ public final class WorkingMarksModel {
 
         public Change {
             marks = List.copyOf(marks);
+            for (String mark : marks) {
+                if (mark == null || mark.isBlank()) {
+                    throw new IllegalArgumentException(
+                            "a mark is a catalogue identity: "
+                                    + marks);
+                }
+            }
             if (new java.util.HashSet<>(marks).size() != marks.size()) {
                 throw new IllegalArgumentException(
                         "a marked set holds each identity once: "
@@ -82,6 +95,15 @@ public final class WorkingMarksModel {
 
     private final juranometria.chart.WorkingSelection model;
 
+    /**
+     * The page this view is scoped to, or null for the whole set -
+     * presentation scope, never membership: a member outside the
+     * scope is hidden here and untouched in the model.
+     */
+    private PageContents scope;
+    private final List<Consumer<Change>> viewListeners =
+            new ArrayList<>();
+
     /** An adapter over its own private model - tests and fixtures. */
     public WorkingMarksModel() {
         this(new juranometria.chart.WorkingSelection());
@@ -101,30 +123,60 @@ public final class WorkingMarksModel {
         return model;
     }
 
-    /** The marked identities, in the order they were marked. */
+    /** The marked identities the view shows, in marked order. */
     public List<String> marks() {
-        return model.members();
+        return view().marks();
     }
 
-    /** The lead identity, or null when nothing is marked. */
+    /** The view's lead identity, or null when the view is empty. */
     public String lead() {
-        return model.lead();
+        return view().lead();
     }
 
     public boolean isMarked(String identity) {
-        return model.isMember(identity);
+        return view().marks().contains(identity);
     }
 
     /**
-     * Subscribes a consumer to the one model's changes, re-addressed
-     * in the Sprint 24 shape, and returns the releasing handle.
+     * Subscribes a consumer to this view of the one model - told
+     * the current view immediately, again for every model
+     * transition, and for every view-scope change - and returns
+     * the releasing handle.
      */
     public Runnable onChange(Consumer<Change> listener) {
         if (listener == null) {
             throw new IllegalArgumentException("listener must not be null");
         }
-        return model.onChange(change -> listener.accept(
-                new Change(change.members(), change.lead())));
+        viewListeners.add(listener);
+        Runnable releaseModel = model.onChange(change ->
+                listener.accept(viewOf(change)));
+        return () -> {
+            viewListeners.remove(listener);
+            releaseModel.run();
+        };
+    }
+
+    /** The current view: the model through this page's scope. */
+    private Change view() {
+        return viewOf(new juranometria.chart.WorkingSelection.Change(
+                model.members(), model.lead()));
+    }
+
+    private Change viewOf(
+            juranometria.chart.WorkingSelection.Change change) {
+        if (scope == null) {
+            return new Change(change.members(), change.lead());
+        }
+        List<String> visible = new ArrayList<>();
+        for (String identity : change.members()) {
+            if (scope.holds(identity)) {
+                visible.add(identity);
+            }
+        }
+        String lead = visible.contains(change.lead()) ? change.lead()
+                : visible.isEmpty() ? null
+                        : visible.get(visible.size() - 1);
+        return new Change(visible, lead);
     }
 
     /** Marks an identity and makes it the lead. */
@@ -153,33 +205,24 @@ public final class WorkingMarksModel {
     }
 
     /**
-     * Drops every mark the new page does not hold, as one change -
-     * the page-bound behaviour today's surfaces were reviewed
-     * against, computed here and applied as one whole replace on
-     * the model. The compatibility seam, with its retirement path
-     * in the class comment: the model itself has no prune, and the
-     * cross-page semantics arrive with the surfaces issue.
+     * Scopes this view to a page, as one change - the page-bound
+     * picture today's surfaces were reviewed against. The model is
+     * <strong>never</strong> touched (review): navigation narrows
+     * what this view shows, and every member stays a member of the
+     * one session set underneath.
      */
     public void pruneTo(PageContents page) {
         if (page == null) {
             throw new IllegalArgumentException("a page to prune to");
         }
-        List<String> current = model.members();
-        if (current.isEmpty()) {
-            return;
+        Change before = view();
+        this.scope = page;
+        Change after = view();
+        if (before.equals(after)) {
+            return;                // nothing a consumer could observe
         }
-        List<String> survivors = new ArrayList<>();
-        for (String identity : current) {
-            if (page.holds(identity)) {
-                survivors.add(identity);
-            }
+        for (Consumer<Change> listener : List.copyOf(viewListeners)) {
+            listener.accept(after);
         }
-        if (survivors.size() == current.size()) {
-            return;                // nothing left the page
-        }
-        model.replaceWith(survivors,
-                survivors.contains(model.lead()) ? model.lead()
-                        : survivors.isEmpty() ? null
-                                : survivors.get(survivors.size() - 1));
     }
 }

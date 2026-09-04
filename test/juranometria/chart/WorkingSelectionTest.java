@@ -87,6 +87,13 @@ class WorkingSelectionTest {
                 selection.replaceWith(List.of("M 31", "M 31"), "M 31"));
         assertThrows(IllegalArgumentException.class, () ->
                 selection.add(" "));
+        // The bulk routes are held to the same identity rule as
+        // every individual operation (review): neither replaceWith
+        // nor direct Change construction admits a blank.
+        assertThrows(IllegalArgumentException.class, () ->
+                selection.replaceWith(List.of(" "), " "));
+        assertThrows(IllegalArgumentException.class, () ->
+                new WorkingSelection.Change(List.of(" "), " "));
         assertThrows(IllegalArgumentException.class, () ->
                 new WorkingSelection.Change(List.of("M 31"), "M 32"));
         assertThrows(IllegalArgumentException.class, () ->
