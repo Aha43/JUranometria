@@ -11,8 +11,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Sprint 26 — Keep the evidence trustworthy. A maintenance sprint
 with a measuring gate at its head, cut as a minor release for the
-two reader-facing repairs that rode with it: the chart's first
-second ground — **Black sky**, white stars and restrained light
+two reader-facing repairs that rode with it: the chart's second
+intentional ground — **Black sky**, white stars and restrained light
 ink on black, derived by measurement and chosen in Chart Options
 inside either application theme — and the Mac application identity
 verified from the public downloads, with packaging that now
