@@ -64,3 +64,41 @@ Changes requested. The production application is untouched and the migrated
 pointer/text routes are stronger, but the PR does not yet establish the one
 keyboard discipline or the complete pointer discipline it records in the
 decision.
+
+## Follow-up at `846245c`
+
+The tab-header reachability finding is closed. `chooseTab(...)` now tests the
+actual header midpoint against the tab strip's visible rectangle before it
+dispatches the click.
+
+### P1 remains — focused-window and focused-component keys were conflated
+
+The four raw dispatchers moved into `ReaderInput.shortcut(...)`, but that
+method establishes only that the containing window is focused. That is the
+right premise for the application shortcuts explicitly registered with
+`WHEN_IN_FOCUSED_WINDOW`, including zoom and the dialog's Escape binding. It
+does not establish the premise for `DeepSkyFamilyJourneyTest`'s tab traversal.
+Ctrl-PageUp/Down is the tabbed pane's own keyboard route: its binding belongs
+to the tabbed pane's focus/ancestor input map. A reader can invoke it only
+when the tabbed pane is the keyboard target (or focus lies in the applicable
+ancestry). Directly dispatching the event to an unfocused tabbed pane still
+runs it, so the journey can remain green with broken keyboard reachability.
+
+The new structural check also retains the masking shape it says it removes.
+For a file containing raw key dispatch, any occurrence of
+`ReaderInput.shortcut(...)`, `ReaderInput.typeAndEnter(...)`, or a focus helper
+anywhere in that file excuses the dispatch. A future raw dispatch can therefore
+borrow an unrelated honest gesture in the same file exactly as before.
+At this head the actual raw-dispatcher set is just `ReaderInput.java`, so pin
+that exact set instead of inferring local honesty from another substring.
+
+Separate the two contracts in the shared vocabulary: one operation for an
+application shortcut that requires a focused window, and one for a component
+key that requires the supplied component to be the actual focus owner.
+`DeepSkyFamilyJourneyTest` needs the latter; the zoom/interval/Escape routes
+need the former. Mutation proof should make focus acquisition for the tab
+strip fail while the window remains focused and require the journey to stop
+on that premise. The structural test should fail if a raw `KEY_PRESSED`
+dispatch is added to any file other than the one exact shared helper.
+
+Verdict remains changes requested on this P1.
