@@ -165,6 +165,87 @@ class EvidenceContractTest {
         }
     }
 
+    @Test
+    void aFailingRestorationRidesSuppressedBehindTheEvidenceFailure()
+            throws Exception {
+        // The standing suppression rule, held on the verifier's own
+        // outer path (review): both halves fail, the evidence
+        // failure is thrown, the cleanup's trouble is attached.
+        Path root = Files.createTempDirectory("evidence-suppress");
+        Path inspection = root.resolve("controls-x.png");
+        Files.write(inspection, new byte[] {1});
+        var committed = EvidenceContractMain.snapshot(root);
+        // Restoration will fail: the tree it must walk is gone.
+        try (var tree = Files.walk(root)) {
+            for (Path f : tree.sorted(
+                    java.util.Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(f);
+            }
+        }
+        IllegalStateException primary =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        IllegalStateException.class, () ->
+                EvidenceContractMain.generateUnderRestoration(root,
+                        committed, () -> {
+                            throw new IllegalStateException(
+                                    "the evidence failure");
+                        }));
+        assertEquals("the evidence failure", primary.getMessage(),
+                "cleanup trouble must not replace the failure a"
+                        + " maintainer needs to see");
+        assertTrue(primary.getSuppressed().length >= 1,
+                "and the restoration's own trouble rides suppressed: "
+                        + java.util.Arrays.toString(
+                                primary.getSuppressed()));
+    }
+
+    @Test
+    void theResiduePinJudgesAllFourBranches() {
+        String pinned = EvidenceContractMain
+                .PROMOTED_WITHOUT_GENERATOR.get(0);
+        assertEquals(List.of(),
+                EvidenceContractMain.promotedPinBreaches(pinned, false),
+                "a pinned file with no match is the recorded residue");
+        assertEquals(1, EvidenceContractMain
+                        .promotedPinBreaches(pinned, true).size(),
+                "a pinned file that gains a match is a stale pin");
+        assertEquals(1, EvidenceContractMain.promotedPinBreaches(
+                        "docs/studies/bayer-notation/handmade.png",
+                        false).size(),
+                "an unmatched file outside the pin is a breach, never"
+                        + " a silent baseline");
+        assertEquals(List.of(),
+                EvidenceContractMain.promotedPinBreaches(
+                        "docs/studies/bayer-notation/ordinary.png",
+                        true),
+                "and a matched unpinned file is simply compared");
+
+        assertEquals(1, EvidenceContractMain.stalePinBreaches(
+                        java.util.Set.of()).size() > 0 ? 1 : 0,
+                "a pinned entry missing from the tree is a stale pin");
+        assertEquals(List.of(), EvidenceContractMain.stalePinBreaches(
+                        new java.util.TreeSet<>(EvidenceContractMain
+                                .PROMOTED_WITHOUT_GENERATOR)),
+                "and a tree holding every pinned entry is clean");
+    }
+
+    @Test
+    void anAbsentGatedInputFailsLoudlyWithItsExactFetchCommand() {
+        var gate = new EvidenceContractMain.Gate(
+                Path.of("imports/raw/constellations"),
+                "scripts/download-constellation-sources.sh");
+        String breach = EvidenceContractMain.incompleteBreach(
+                "build/constellation-study", gate, false);
+        assertTrue(breach.contains("VERIFICATION INCOMPLETE"),
+                "incomplete is not success");
+        assertTrue(breach.contains(
+                        "scripts/download-constellation-sources.sh"),
+                "and the exact fetch command is named: " + breach);
+        assertEquals(null, EvidenceContractMain.incompleteBreach(
+                        "build/constellation-study", gate, true),
+                "present inputs gate nothing");
+    }
+
     // ---- inspection imagery, by structure ----------------------------
 
     private static BufferedImage png(String path) throws Exception {

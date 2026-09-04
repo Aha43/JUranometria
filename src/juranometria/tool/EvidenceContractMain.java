@@ -163,18 +163,77 @@ public final class EvidenceContractMain {
      * star-identity study when the review's incomplete-fails-loudly
      * rule was rehearsed with imports/raw moved aside.
      */
-    private static final Map<String, Path> GATED_GENERATORS = Map.of(
+    /** A gated generator's input directory and its exact fetch. */
+    record Gate(Path input, String fetch) {
+    }
+
+    private static final Map<String, Gate> GATED_GENERATORS = Map.of(
             "juranometria.tool.ConstellationStudyMain",
-            Path.of("imports/raw/constellations"),
+            new Gate(Path.of("imports/raw/constellations"),
+                    "scripts/download-constellation-sources.sh"),
             "juranometria.tool.StarIdentityStudyMain",
-            Path.of("imports/raw/star-identities"));
+            new Gate(Path.of("imports/raw/star-identities"),
+                    "scripts/download-constellation-sources.sh and"
+                            + " scripts/download-catalogue-sources.sh"));
+
+    /**
+     * The incomplete-run breach for a gated family, or null when its
+     * inputs are present. Extracted so the branch has a committed
+     * regression test, and so the message carries the exact command
+     * that completes the run (review).
+     */
+    static String incompleteBreach(String buildDir, Gate gate,
+                                   boolean inputPresent) {
+        if (inputPresent) {
+            return null;
+        }
+        return "VERIFICATION INCOMPLETE: " + buildDir + "'s evidence"
+                + " family was not verified - its raw sources ("
+                + gate.input() + ") are gitignored downloads; run "
+                + gate.fetch() + " and rerun";
+    }
+
+    /**
+     * How a promoted file is judged against its generator match and
+     * the residue pin - every branch a breach or a silence, none an
+     * accepted baseline by accident. Extracted for its regression
+     * tests (review).
+     */
+    static List<String> promotedPinBreaches(String path,
+                                            boolean matchedByName) {
+        boolean pinned = PROMOTED_WITHOUT_GENERATOR.contains(path);
+        if (!matchedByName && !pinned) {
+            return List.of(path + ": promoted file matches no"
+                    + " generator output and is not in the pinned"
+                    + " residue");
+        }
+        if (matchedByName && pinned) {
+            return List.of(path + ": pinned as having no generator"
+                    + " output, but a build output matches it by name"
+                    + " - the pin is stale");
+        }
+        return List.of();
+    }
+
+    /** Pinned entries missing from the tree: stale the other way. */
+    static List<String> stalePinBreaches(
+            java.util.Set<String> treePaths) {
+        List<String> breaches = new ArrayList<>();
+        for (String pinned : PROMOTED_WITHOUT_GENERATOR) {
+            if (!treePaths.contains(pinned)) {
+                breaches.add(pinned + ": pinned residue file is"
+                        + " missing from the tree - the pin is stale");
+            }
+        }
+        return breaches;
+    }
 
     /**
      * The promoted files no generator output matches by name -
      * variants composed by hand at their sprints. Recorded, held as
      * committed, and pinned: an eighth arrives by decision.
      */
-    private static final List<String> PROMOTED_WITHOUT_GENERATOR =
+    static final List<String> PROMOTED_WITHOUT_GENERATOR =
             List.of("docs/studies/bayer-notation/crux-18-greek-wide.png",
                     "docs/studies/constellation-rendering/lmc-36deg.png",
                     "docs/studies/bayer-notation/m31-08-greek-wide.png",
@@ -222,10 +281,30 @@ public final class EvidenceContractMain {
     static void generateUnderRestoration(Path root,
             Map<String, Snapshot> committed, Generation body)
             throws Exception {
+        // The project's standing suppression rule (review): if the
+        // generation and the restoration both fail, the evidence
+        // failure is the one thrown and the cleanup's trouble rides
+        // as suppressed - never the other way round.
+        Throwable primary = null;
         try {
             body.run();
-        } finally {
+        } catch (Throwable failure) {
+            primary = failure;
+        }
+        try {
             restoreInspectionImagery(root, committed);
+        } catch (Throwable trouble) {
+            if (primary == null) {
+                primary = trouble;
+            } else {
+                primary.addSuppressed(trouble);
+            }
+        }
+        if (primary instanceof Exception failure) {
+            throw failure;
+        }
+        if (primary instanceof Error failure) {
+            throw failure;
         }
     }
 
@@ -343,18 +422,13 @@ public final class EvidenceContractMain {
         java.util.Set<String> judgedViaBuild = new java.util.TreeSet<>();
         java.util.Set<String> skippedBuildDirs = new java.util.TreeSet<>();
         for (Map.Entry<String, String> writer : BUILD_WRITERS.entrySet()) {
-            Path gate = GATED_GENERATORS.get(writer.getKey());
-            if (gate != null && !Files.isDirectory(gate)) {
+            Gate gate = GATED_GENERATORS.get(writer.getKey());
+            String incomplete = gate == null ? null
+                    : incompleteBreach(writer.getValue(), gate,
+                            Files.isDirectory(gate.input()));
+            if (incomplete != null) {
                 skippedBuildDirs.add(writer.getValue());
-                // Incomplete is not success (review): a family left
-                // unverified fails the run, with the one command
-                // that completes it - never a green light over a
-                // gap.
-                failures.add("VERIFICATION INCOMPLETE: "
-                        + writer.getValue() + "'s evidence family was"
-                        + " not verified - its raw sources ("
-                        + gate + ") are gitignored downloads; fetch"
-                        + " them and rerun");
+                failures.add(incomplete);
                 continue;
             }
             Class.forName(writer.getKey())
@@ -380,23 +454,10 @@ public final class EvidenceContractMain {
                 }
                 Path match = outputs.get(
                         Path.of(path).getFileName().toString());
+                failures.addAll(promotedPinBreaches(path,
+                        match != null));
                 if (match == null) {
-                    // Unmatched is only ever the pinned residue: a
-                    // ninth hand-composed variant arrives through
-                    // the pin and a review, never by silently
-                    // becoming an accepted baseline (review).
-                    if (!PROMOTED_WITHOUT_GENERATOR.contains(path)) {
-                        failures.add(path + ": promoted file matches"
-                                + " no generator output and is not in"
-                                + " the pinned residue");
-                    }
                     continue;
-                }
-                if (PROMOTED_WITHOUT_GENERATOR.contains(path)) {
-                    failures.add(path + ": pinned as having no"
-                            + " generator output, but "
-                            + match + " matches it by name - the pin"
-                            + " is stale");
                 }
                 judgedViaBuild.add(path);
                 if (java.util.Arrays.equals(
@@ -413,12 +474,7 @@ public final class EvidenceContractMain {
             }
         }
 
-        for (String pinned : PROMOTED_WITHOUT_GENERATOR) {
-            if (!committed.containsKey(pinned)) {
-                failures.add(pinned + ": pinned residue file is"
-                        + " missing from the tree - the pin is stale");
-            }
-        }
+        failures.addAll(stalePinBreaches(committed.keySet()));
 
         // Newcomers first: a file the generation created that the
         // snapshot never held is an artifact nobody committed - a
