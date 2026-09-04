@@ -68,11 +68,11 @@ The first four include their own Java runtime - install nothing.
 They are also what carries the application's own identity: on a
 Mac, `JUranometria.app` wears the Andromeda mark in Finder, the
 Dock and the application switcher, wherever you keep or alias it.
-The portable flavour runs under your own Java, and macOS shows a
-plain JAR with Java's generic icon in the Dock - that is how the
-operating system treats any JAR, not a defect in the download. If
-you want the application to look like an application, take the
-`.app`. Each archive carries a `README.txt`; the portable one also
+The portable flavour runs under your own Java, and its running
+Dock tile shows Java's generic icon: the launcher executes a plain
+`java -jar` with no runtime Dock-icon integration, and a JAR is
+not a bundle Finder can brand. If you want the application to look
+like an application, take the `.app`. Each archive carries a `README.txt`; the portable one also
 covers troubleshooting for a missing or too-old Java, and
 `SHA256SUMS.txt` beside the downloads lets you verify what you
 got.

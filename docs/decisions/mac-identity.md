@@ -45,7 +45,9 @@ accessibility position rather than aimed by eye.
 
 The portable flavour's `juranometria` launcher script `exec`s
 `java -jar` after its version check, so a shell launch of the
-portable download is mechanically the same route as the fourth row.
+portable download is mechanically the same route as the portable
+`java -jar` row above - named by route, not by number, so an
+inserted row cannot make this reference stale.
 Launching the `.app`'s embedded binary from a shell stays inside
 the bundle and keeps its identity.
 
@@ -60,16 +62,20 @@ No fresh-filename, fresh-account or Launch Services experiment was
 run, because there was no `.app` failure to chase: the mark
 appeared on every `.app` surface at first arrival, with no cache
 touched. The Java figure on the JAR route is not a cache artifact
-either — it is the AWT runtime's own Dock icon, which is what
-macOS shows for any process that is not a bundle.
+either — it is Java's default Dock icon, shown because the process
+sets no Dock image of its own through the runtime's Taskbar API.
 
 ## The decision
 
-This is the issue's second branch: **only the portable JAR shows
-Java branding, and that is an operating-system/JAR limitation, not
-a packaging defect.** macOS assigns Finder and Dock identity to
-bundles; a bare JAR is not a bundle, and no icns of ours changes
-what the OS decorates it with. So:
+This is the issue's second branch: **only the portable JAR route
+shows Java branding, and no packaging change reaches it.** The
+measured claim, stated no wider than the measurement: a JAR is not
+a bundle, so Finder identity is out of reach for it entirely; and
+its running Dock tile shows Java's generic icon because the
+current launcher executes a plain `java -jar` with no runtime
+Taskbar-icon integration. A runtime API could brand that one tile
+— the follow-up below — so the Dock half of this is a property of
+today's launcher, not a law of the operating system. So:
 
 - the native `JUranometria.app` is the unmistakable reader route,
   and the README now says so plainly where the downloads are named,

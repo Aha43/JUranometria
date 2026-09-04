@@ -14,9 +14,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   macOS/arm64: the native `JUranometria.app` shows the mark on every
   surface inspected — Finder before launch, the Dock, the
   application switcher, a Desktop alias, a copy in `/Applications` —
-  while the portable JAR's Dock tile shows Java's generic icon,
-  which is how macOS treats any bare JAR and is recorded as an
-  operating-system limitation, not papered over. The README now
+  while the portable JAR's Dock tile shows Java's generic icon —
+  the current launcher executes a plain `java -jar` with no runtime
+  Dock-icon integration, and Finder cannot brand a JAR at all —
+  recorded narrowly rather than papered over, with a runtime
+  Taskbar icon noted as a possible follow-up. The README now
   names the `.app` as the branded route plainly. Packaging closed
   its one real gap: `build-app-image.sh` now reads
   `CFBundleIconFile` back from the built image, so an ICNS that is
