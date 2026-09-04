@@ -102,3 +102,38 @@ on that premise. The structural test should fail if a raw `KEY_PRESSED`
 dispatch is added to any file other than the one exact shared helper.
 
 Verdict remains changes requested on this P1.
+
+## Second follow-up at `8cd11cf`
+
+`shortcutOn(...)` closes the tab-strip finding: it insists that the supplied
+component is the actual focus owner before dispatch. The exact raw-dispatcher
+pin also correctly restricts construction and dispatch of `KeyEvent` to
+`ReaderInput.java`.
+
+### P1 remains — premise-free `press(...)` is still a public journey route
+
+The exact pin controls the implementation of raw dispatch, but public
+`ReaderInput.press(...)` deliberately carries no focus premise. Calling it is
+therefore a complete bypass that does not change the pinned raw-dispatcher set.
+Two current callers demonstrate that this is not only a future risk:
+
+- `MapExplorationJourneyTest.inspect(...)` calls
+  `requestFocusInWindow()` and then `ReaderInput.press(...)`. The request may
+  be silently refused; this is the original #209 shape.
+- Sprint 23's keyboard Exit route likewise requests focus, asserts only
+  `isFocusable()`, and calls `ReaderInput.press(...)`. `isFocusable()` says the
+  button is eligible to own focus, not that the keyboard arrived there.
+
+In both cases direct dispatch can run the binding while no reader's key could.
+The reported route vocabulary therefore is not yet closed, and the structural
+pin cannot see the escape hatch.
+
+Do not expose premise-free raw dispatch to journeys. Keep it private inside
+`ReaderInput`; `typeAndEnter`, focused-window `shortcut`, and component-focused
+`shortcutOn` can use it after establishing their respective premises. Migrate
+all current direct `press(...)` callers to `shortcutOn(...)` (or an equally
+inseparable focus-owner route). Mutating focus acquisition away in the
+candidate-list and keyboard-Exit cases should then fail each on its own
+premise.
+
+Verdict remains changes requested on this P1.
