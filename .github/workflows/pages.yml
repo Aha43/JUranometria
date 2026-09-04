@@ -58,8 +58,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Enabling Pages is a one-time repository-admin action the
+      # owner performs; this token deliberately cannot (least
+      # privilege), so configure-pages only reads the existing site.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - id: deployment
         uses: actions/deploy-pages@v4
