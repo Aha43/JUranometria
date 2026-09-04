@@ -9,6 +9,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Display-test discipline** (Sprint 26, issue #243). Every
+  route-claiming journey now presses what a reader presses, through
+  one shared `ReaderInput`: premise-asserted pointer clicks,
+  focus-proven typing that aborts honestly where a desktop refuses,
+  and pointer-chosen tabs. The premises caught three standing
+  dishonesties on their first runs — two journeys drove windows
+  never made visible, one toggled a checkbox on a tab nobody had
+  opened, one typed into a field attached to no window — each now
+  honest and each reintroduction failing its journey. Six
+  consecutive full-suite runs, two under stated random class-order
+  seeds, all clean.
 - **The suite's shared-state consolidation** (Sprint 26, issue
   #224). `SwingSession` grew the whole restoring vocabulary — a
   locale guard, a time-zone guard, a repaint-manager guard, a

@@ -143,7 +143,7 @@ class OnThisPageJourneyTest {
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
         assertFalse(marks().marks().isEmpty());
 
-        SwingUtilities.invokeAndWait(() -> panel.clearMarksButton().doClick());
+        ReaderInput.click(panel.clearMarksButton());
         flush();
 
         assertTrue(marks().marks().isEmpty(), "every mark is gone");
@@ -166,7 +166,7 @@ class OnThisPageJourneyTest {
                         + " reader walked it would be unusable");
 
         String lead = marks().lead();
-        SwingUtilities.invokeAndWait(() -> panel.centreHereButton().doClick());
+        ReaderInput.click(panel.centreHereButton());
         flush();
 
         assertEquals(1, requests.size(), "one request, when asked");
@@ -286,14 +286,10 @@ class OnThisPageJourneyTest {
 
     /** A real key event, to the component that owns the focus. */
     private void press(int keyCode, int modifiers) throws Exception {
-        for (int id : new int[] {KeyEvent.KEY_PRESSED,
-                KeyEvent.KEY_RELEASED}) {
-            SwingUtilities.invokeAndWait(() -> table.dispatchEvent(
-                    new KeyEvent(table, id,
-                            System.nanoTime() / 1_000_000, modifiers,
-                            keyCode, KeyEvent.CHAR_UNDEFINED)));
-        }
-        flush();
+        // The focus-proven route: the premise travels with the
+        // gesture rather than being trusted to a distant call site
+        // (#243 review).
+        ReaderInput.shortcutOn(table, keyCode, modifiers);
     }
 
     /** A real click, on the real header, where a reader would click. */

@@ -297,7 +297,8 @@ class SprintTwentyThreeJourneyTest {
 
         // Home, from the toolbar control a reader presses.
         SwingUtilities.invokeAndWait(
-                () -> toolbarButton("Reset view").doClick());
+                () -> { });
+        ReaderInput.click(toolbarButton("Reset view"));
         flush();
         awaitSettled();
         assertEquals(ChartViewState.DEFAULT, navigation.state(),
@@ -799,13 +800,8 @@ class SprintTwentyThreeJourneyTest {
     }
 
     private void pressSpace(Component target) throws Exception {
-        for (int id : new int[] {KeyEvent.KEY_PRESSED,
-                KeyEvent.KEY_RELEASED}) {
-            SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
-                    new KeyEvent(target, id,
-                            System.nanoTime() / 1_000_000, 0,
-                            KeyEvent.VK_SPACE, ' ')));
-        }
+        ReaderInput.shortcutOn((javax.swing.JComponent) target,
+                KeyEvent.VK_SPACE, 0);
         flush();
     }
 
@@ -817,11 +813,8 @@ class SprintTwentyThreeJourneyTest {
     }
 
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
-        flush();
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
         flush();
     }
 
@@ -846,11 +839,8 @@ class SprintTwentyThreeJourneyTest {
     }
 
     private void key(Component target, int keyCode) throws Exception {
-        SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
-                new KeyEvent(target, KeyEvent.KEY_PRESSED,
-                        System.nanoTime() / 1_000_000, 0, keyCode,
-                        KeyEvent.CHAR_UNDEFINED)));
-        flush();
+        ReaderInput.shortcutOn((javax.swing.JComponent) target,
+                keyCode, 0);
     }
 
     /**

@@ -185,14 +185,12 @@ class PlaceAndTimeDialogLifecycleTest {
                         + " real focus traversal, not a synthesized"
                         + " event");
 
-        // Escape closes; the committed state stays committed.
-        SwingUtilities.invokeAndWait(() -> dialog.getRootPane()
-                .dispatchEvent(new java.awt.event.KeyEvent(
-                        dialog.getRootPane(),
-                        java.awt.event.KeyEvent.KEY_PRESSED,
-                        System.currentTimeMillis(), 0,
-                        java.awt.event.KeyEvent.VK_ESCAPE,
-                        java.awt.event.KeyEvent.CHAR_UNDEFINED)));
+        // Escape closes; the committed state stays committed. With
+        // its premise, through the shared shortcut route - the
+        // anti-masking pin caught this very dispatch borrowing a
+        // premise from the field traversal above (#243 review).
+        juranometria.ui.ReaderInput.shortcut(dialog.getRootPane(),
+                java.awt.event.KeyEvent.VK_ESCAPE, 0);
         flush();
         assertEquals(0, dialogsShowing(), "Escape closed the window");
         assertEquals(-33.87, module.observer().latitudeDegrees(),

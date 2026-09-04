@@ -200,8 +200,7 @@ class ChartFurnitureJourneyTest {
                     "nor disturbs the selection");
 
             // 7. Cancel reverts; a confirmed choice persists.
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialogPane, "Cancel").doClick());
+            ReaderInput.click(button(dialogPane, "Cancel"));
             flush();
             assertFalse(options.options().magnitudeKey(),
                     "Cancel took the preview away");
@@ -212,8 +211,7 @@ class ChartFurnitureJourneyTest {
             SwingUtilities.invokeAndWait(
                     furnitureBox("Stellar-magnitude key")::doClick);
             flush();
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialogPane, "OK").doClick());
+            ReaderInput.click(button(dialogPane, "OK"));
             flush();
             assertTrue(options.options().magnitudeKey(),
                     "OK kept the reader's choice");
@@ -229,18 +227,16 @@ class ChartFurnitureJourneyTest {
 
             // 8. Restore Defaults, then Home.
             openDialog();
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialogPane, "Restore Defaults").doClick());
+            ReaderInput.click(button(dialogPane, "Restore Defaults"));
             flush();
             assertTrue(options.options().titleBlock(),
                     "the released chart keeps its title block");
             assertFalse(options.options().magnitudeKey(),
                     "and has no key");
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialogPane, "OK").doClick());
+            ReaderInput.click(button(dialogPane, "OK"));
             flush();
-            SwingUtilities.invokeAndWait(() ->
-                    button(window.getContentPane(), "Reset view").doClick());
+            ReaderInput.click(button(window.getContentPane(),
+                    "Reset view"));
             flush();
 
             // 9. The exact released default page, pixel for pixel.

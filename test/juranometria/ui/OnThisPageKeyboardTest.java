@@ -153,14 +153,10 @@ class OnThisPageKeyboardTest {
 
     /** A real key event, to the component that owns the focus. */
     private void press(int keyCode, int modifiers) throws Exception {
-        for (int id : new int[] {KeyEvent.KEY_PRESSED,
-                KeyEvent.KEY_RELEASED}) {
-            SwingUtilities.invokeAndWait(() -> table.dispatchEvent(
-                    new KeyEvent(table, id,
-                            System.nanoTime() / 1_000_000, modifiers,
-                            keyCode, KeyEvent.CHAR_UNDEFINED)));
-        }
-        flush();
+        // The focus-proven route: the premise travels with the
+        // gesture rather than being trusted to a distant call site
+        // (#243 review).
+        ReaderInput.shortcutOn(table, keyCode, modifiers);
     }
 
     private List<String> selected() throws Exception {

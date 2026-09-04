@@ -74,6 +74,11 @@ class NamedStarJourneyTest {
                 frame[0].pack();
                 frame[0].setSize(900, 700);
                 frame[0].validate();
+                // Shown, because the premises now insist on it: the
+                // old back-door actions typed into and clicked a
+                // window no reader could see, and the discipline's
+                // first run here caught exactly that (#243).
+                frame[0].setVisible(true);
             });
             flush();
 
@@ -153,9 +158,13 @@ class NamedStarJourneyTest {
             JDialog dialog = optionsDialog();
             assertNotNull(dialog, "the View menu opened the dialog");
             juranometria.chart.ChartScene sceneBefore = chart[0].scene();
-            SwingUtilities.invokeAndWait(() ->
-                    box(dialog.getContentPane(), "Star names").doClick());
-            flush();
+            // The Stars tab first, as a reader must: a control on an
+            // unchosen tab is not showing, and the premises refuse it
+            // - which is how this discipline caught the old click
+            // toggling a box nobody could see (#243).
+            ReaderInput.chooseTab(tabbedPane(dialog), "Stars");
+            ReaderInput.click(box(dialog.getContentPane(),
+                    "Star names"));
             assertFalse(options.options().starNames(),
                     "the toggle previews live");
             assertSame(sceneBefore, chart[0].scene(),
@@ -189,9 +198,7 @@ class NamedStarJourneyTest {
                             + " ordinary star labels are off");
 
             // OK persists the choice; a restarted session reads it.
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialog.getContentPane(), "OK").doClick());
-            flush();
+            ReaderInput.click(button(dialog.getContentPane(), "OK"));
             assertFalse(store.load().starNames(),
                     "OK persisted the choice");
             assertFalse(new ChartOptionsController(store).options()
@@ -223,16 +230,12 @@ class NamedStarJourneyTest {
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog reopened = optionsDialog();
-            SwingUtilities.invokeAndWait(() -> {
-                button(reopened.getContentPane(),
-                        "Restore Defaults").doClick();
-                button(reopened.getContentPane(), "OK").doClick();
-            });
-            flush();
-            SwingUtilities.invokeAndWait(() ->
-                    button(frame[0].getContentPane(), "Reset view")
-                            .doClick());
-            flush();
+            ReaderInput.chooseTab(tabbedPane(reopened), "Stars");
+            ReaderInput.click(button(reopened.getContentPane(),
+                    "Restore Defaults"));
+            ReaderInput.click(button(reopened.getContentPane(), "OK"));
+            ReaderInput.click(button(frame[0].getContentPane(),
+                    "Reset view"));
             assertEquals(ChartOptions.DEFAULTS, store.load());
             assertEquals(ChartViewState.DEFAULT, navigation.state());
             assertEquals("M31 · Andromeda Galaxy region",
@@ -255,11 +258,26 @@ class NamedStarJourneyTest {
     private SearchField searchField;
 
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
-        flush();
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
+    }
+
+    private static javax.swing.JTabbedPane tabbedPane(
+            javax.swing.JDialog dialog) {
+        java.util.ArrayDeque<java.awt.Component> walk =
+                new java.util.ArrayDeque<>();
+        walk.add(dialog.getContentPane());
+        while (!walk.isEmpty()) {
+            java.awt.Component next = walk.poll();
+            if (next instanceof javax.swing.JTabbedPane tabs) {
+                return tabs;
+            }
+            if (next instanceof java.awt.Container inner) {
+                java.util.Collections.addAll(walk,
+                        inner.getComponents());
+            }
+        }
+        throw new AssertionError("the dialog carries its tab strip");
     }
 
     private static javax.swing.JCheckBox box(java.awt.Component component,

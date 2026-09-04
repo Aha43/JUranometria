@@ -87,12 +87,11 @@ class PublicFaceJourneyTest {
             JDialog settings = visibleDialog("Settings");
             assertNotNull(settings, "the Settings dialog opened");
             assertSame(frame[0], settings.getOwner());
-            SwingUtilities.invokeAndWait(() -> {
-                findRadio(settings, "Dark appearance").doClick();
-                AboutDialogTest.button(settings.getContentPane(), "OK")
-                        .doClick();
-            });
-            flush();
+            juranometria.ui.ReaderInput.click(
+                    findRadio(settings, "Dark appearance"));
+            juranometria.ui.ReaderInput.click(
+                    AboutDialogTest.button(settings.getContentPane(),
+                            "OK"));
             assertFalse(settings.isDisplayable(), "OK closes Settings");
             assertTrue(UIManager.getLookAndFeel().getName()
                     .toLowerCase(java.util.Locale.ROOT).contains("dark"),
@@ -119,12 +118,11 @@ class PublicFaceJourneyTest {
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog reopened = visibleDialog("Settings");
-            SwingUtilities.invokeAndWait(() -> {
-                findRadio(reopened, "Light appearance").doClick();
-                AboutDialogTest.button(reopened.getContentPane(), "Cancel")
-                        .doClick();
-            });
-            flush();
+            juranometria.ui.ReaderInput.click(
+                    findRadio(reopened, "Light appearance"));
+            juranometria.ui.ReaderInput.click(
+                    AboutDialogTest.button(reopened.getContentPane(),
+                            "Cancel"));
             assertEquals(Optional.of("dark"), store.load(),
                     "Cancel persisted nothing");
             assertTrue(UIManager.getLookAndFeel().getName()
@@ -135,11 +133,10 @@ class PublicFaceJourneyTest {
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog again = visibleDialog("Settings");
-            SwingUtilities.invokeAndWait(() -> {
-                findRadio(again, "Light appearance").doClick();
-                AboutDialogTest.button(again.getContentPane(), "OK").doClick();
-            });
-            flush();
+            juranometria.ui.ReaderInput.click(
+                    findRadio(again, "Light appearance"));
+            juranometria.ui.ReaderInput.click(
+                    AboutDialogTest.button(again.getContentPane(), "OK"));
             assertEquals(Optional.of("light"), store.load());
         } finally {
             SwingUtilities.invokeAndWait(() -> {

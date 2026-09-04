@@ -518,7 +518,8 @@ class MapExplorationJourneyTest {
                     clickOn(this::offCentreStar);
             SkyPosition wasCentred = navigation.state().centre();
             SwingUtilities.invokeAndWait(() ->
-                    centreButton(inspector).doClick());
+                    { });
+            ReaderInput.click(centreButton(inspector));
             flush();
             assertFalse(wasCentred.equals(navigation.state().centre()),
                     "Center here moved the chart");
@@ -670,7 +671,9 @@ class MapExplorationJourneyTest {
             // 15. Home, from the toolbar: the released default,
             // rendered exactly as the reference records it.
             SwingUtilities.invokeAndWait(() ->
-                    button(window.getContentPane(), "Reset view").doClick());
+                    { });
+            ReaderInput.click(button(window.getContentPane(),
+                    "Reset view"));
             flush();
             assertEquals(ChartViewState.DEFAULT, navigation.state(),
                     "the journey ends where every reader begins");
@@ -703,10 +706,8 @@ class MapExplorationJourneyTest {
 
     /** Types a query and presses Enter, as a reader does. */
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
         flush();
     }
 
@@ -1067,14 +1068,12 @@ class MapExplorationJourneyTest {
                 "and the reader can reach it with the arrow key");
     }
 
-    /** A key press delivered to a component, as a keyboard does. */
+    /** A key press delivered to a component the desktop has been
+     *  made to focus, through the focus-proven route (#243). */
     private void key(java.awt.Component target, int keyCode)
             throws Exception {
-        SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
-                new KeyEvent(target, KeyEvent.KEY_PRESSED,
-                        System.nanoTime() / 1_000_000, 0, keyCode,
-                        KeyEvent.CHAR_UNDEFINED)));
-        flush();
+        ReaderInput.shortcutOn((javax.swing.JComponent) target,
+                keyCode, 0);
     }
 
     /** Whether focus comes to rest on this component. */

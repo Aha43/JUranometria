@@ -139,7 +139,8 @@ class SprintTwentyFourJourneyTest {
         // 1. Open "On this page" from the Inspector a reader already
         //    has, through its own chooser.
         SwingUtilities.invokeAndWait(() ->
-                inspector.pageModeButton().doClick());
+                { });
+        ReaderInput.click(inspector.pageModeButton());
         assertEquals(InspectorPanel.PAGE_MODE, inspector.mode(),
                 "the reader is looking at the page rather than at one"
                         + " object");
@@ -265,21 +266,23 @@ class SprintTwentyFourJourneyTest {
             flush();
         }
         SwingUtilities.invokeAndWait(() ->
-                inspector.selectedModeButton().doClick());
+                { });
+        ReaderInput.click(inspector.selectedModeButton());
         assertTrue(inspectorSays(invisible.get(2))
                         || selection.selection() == Selection.NOTHING,
                 "and the Selected facts are about the same object, or"
                         + " about nothing once it has left the page: "
                         + invisible.get(2));
         SwingUtilities.invokeAndWait(() ->
-                inspector.pageModeButton().doClick());
+                { });
+        ReaderInput.click(inspector.pageModeButton());
 
         // 6. Centring is asked for once, explicitly.
         SkyPosition where = chart.viewState().centre();
         assertEquals(List.of(), requests,
                 "nothing a reader has done so far moved the page");
         assertEquals(where, chart.viewState().centre());
-        SwingUtilities.invokeAndWait(() -> page.centreHereButton().doClick());
+        ReaderInput.click(page.centreHereButton());
         flush();
         assertEquals(1, requests.size(), "one request, when asked for");
         assertNotEquals(where, chart.viewState().centre(),
@@ -331,7 +334,7 @@ class SprintTwentyFourJourneyTest {
         flush();
 
         // 9. Cleared, and home to the released page.
-        SwingUtilities.invokeAndWait(() -> page.clearMarksButton().doClick());
+        ReaderInput.click(page.clearMarksButton());
         flush();
         assertTrue(marks().marks().isEmpty() && inkedIdentities().isEmpty(),
                 "nothing marked, nothing inked");
@@ -572,14 +575,10 @@ class SprintTwentyFourJourneyTest {
     }
 
     private void press(int keyCode, int modifiers) throws Exception {
-        for (int id : new int[] {KeyEvent.KEY_PRESSED,
-                KeyEvent.KEY_RELEASED}) {
-            SwingUtilities.invokeAndWait(() -> table.dispatchEvent(
-                    new KeyEvent(table, id,
-                            System.nanoTime() / 1_000_000, modifiers,
-                            keyCode, KeyEvent.CHAR_UNDEFINED)));
-        }
-        flush();
+        // The focus-proven route: the premise travels with the
+        // gesture rather than being trusted to a distant call site
+        // (#243 review).
+        ReaderInput.shortcutOn(table, keyCode, modifiers);
     }
 
     private static void flush() throws Exception {
