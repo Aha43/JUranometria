@@ -54,6 +54,37 @@ Likely reader value lies first in identification: reveal that a plotted star
 is a component or that an unresolved mark represents a recorded pair. Any
 special chart ink must follow only after the data and the scale justify it.
 
+### Variable stars
+
+Variable-star identity belongs in an atlas even when the reader has no
+observing programme for variable stars. The fact changes how one reads a
+familiar field: a plotted magnitude is not the star's one enduring brightness,
+and names such as Mira, Algol, Delta Cephei, and RR Lyrae describe physical
+behaviour as well as landmarks.
+
+JUranometria cannot state that today. Its bright-sky pack keeps a TYC
+identifier, J2000 position, and one derived visual magnitude; the optional
+identity pack adds names and Bayer and Flamsteed designations. Neither pack
+records variable-star identity, type, period, epoch, amplitude, or magnitude
+range. A variable star may therefore already be present as an ordinary dot,
+but the atlas does not know that it varies. Different catalogue magnitudes are
+not evidence from which the application may infer variability.
+
+This also needs a source-and-model gate before a drawing change. It should
+settle an authoritative catalogue, licensing and redistribution, joins to the
+bundled TYC identities, variable designations and aliases, variability types,
+periodic and irregular cases, passbands, magnitude ranges, epochs, uncertainty,
+and how records whose classifications change are kept durable offline. It must
+also decide what the chart's single plotted magnitude means for a variable
+star, particularly when its range crosses the limiting magnitude.
+
+Reader value again begins with identification and search: name the variability
+and state the recorded range and type in the Inspector or an appropriate
+catalogue-reading surface. A special chart symbol must earn its ink in a
+cartographic study. Phase at a chosen instant, light curves, and predictions
+would be time-dependent tools or modules with separate accuracy contracts;
+none follows merely from teaching the atlas the catalogue fact.
+
 - Other related designations and catalogue relationships already present in
   bundled data.
 - Explicit explanations for “here but not drawn” as chart policies evolve.
