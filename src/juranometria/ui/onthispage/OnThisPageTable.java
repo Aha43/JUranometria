@@ -86,8 +86,6 @@ public final class OnThisPageTable extends JPanel {
                             ? CHART_COLUMN_QUESTION : null;
                 }
             };
-            header.getAccessibleContext().setAccessibleDescription(
-                    CHART_COLUMN_QUESTION);
             return header;
         }
     };
@@ -150,6 +148,33 @@ public final class OnThisPageTable extends JPanel {
         // never becomes a private code.
         table.getColumnModel().getColumn(3).setCellRenderer(
                 new StateText());
+        // The complete question belongs to the Chart HEADER CELL,
+        // not the whole header (#257 review): a wrapper over the
+        // look-and-feel's own header renderer sets the accessible
+        // name and description exactly when the cell being rendered
+        // is the Chart column's - keyed by model identity, so it
+        // travels with the column when a reader drags it, and is
+        // cleared for every other header the shared component
+        // renders next.
+        javax.swing.table.TableCellRenderer headerCells =
+                (tbl, value, selected, focused, row, column) -> {
+            java.awt.Component cell = tbl.getTableHeader()
+                    .getDefaultRenderer()
+                    .getTableCellRendererComponent(tbl, value,
+                            selected, focused, row, column);
+            boolean chart = tbl.getColumnModel().getColumn(column)
+                    .getModelIndex() == 3;
+            cell.getAccessibleContext().setAccessibleName(
+                    chart ? "Chart" : String.valueOf(value));
+            cell.getAccessibleContext().setAccessibleDescription(
+                    chart ? CHART_COLUMN_QUESTION : null);
+            return cell;
+        };
+        for (int column = 0; column < table.getColumnModel()
+                .getColumnCount(); column++) {
+            table.getColumnModel().getColumn(column)
+                    .setHeaderRenderer(headerCells);
+        }
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setFillsViewportHeight(true);
         table.getAccessibleContext().setAccessibleName("Objects on this page");
@@ -310,10 +335,19 @@ public final class OnThisPageTable extends JPanel {
                         : table.getTableHeader().getFontMetrics(
                                 table.getTableHeader().getFont()));
 
-        setColumn(0, object);
-        setColumn(1, magnitude);
-        setColumn(2, distance);
-        setColumn(3, state);
+        // By model identity, not view position (#257 review): once
+        // a reader drags a column somewhere else, the next resize
+        // or page change must still hand each width to its own
+        // semantic column, wherever it sits.
+        int[] byModel = {object, magnitude, distance, state};
+        for (int view = 0; view < table.getColumnModel()
+                .getColumnCount(); view++) {
+            javax.swing.table.TableColumn column =
+                    table.getColumnModel().getColumn(view);
+            int width = byModel[column.getModelIndex()];
+            column.setMinWidth(width);
+            column.setPreferredWidth(width);
+        }
 
         // When the four cannot fit, the table keeps its columns and
         // the pane scrolls, rather than squeezing every one of them
@@ -343,13 +377,6 @@ public final class OnThisPageTable extends JPanel {
                     cells.stringWidth(state.label()));
         }
         return widest + 12;
-    }
-
-    private void setColumn(int index, int width) {
-        javax.swing.table.TableColumn column =
-                table.getColumnModel().getColumn(index);
-        column.setMinWidth(width);
-        column.setPreferredWidth(width);
     }
 
     /** Lets go of the chart. */

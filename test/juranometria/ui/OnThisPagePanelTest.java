@@ -139,27 +139,34 @@ class OnThisPagePanelTest {
         // private code (issue #257).
         try (Fixture fixture = new Fixture(M31, 8.0, 320, 400)) {
             JTable table = fixture.panel.tableComponent();
-            String[] header = new String[1];
+            String[] chartHeader = new String[1];
+            String[] objectHeader = new String[1];
             String[] cellTip = new String[1];
             String[] cellAccessible = new String[1];
             juranometria.page.PageVisibility[] state =
                     new juranometria.page.PageVisibility[1];
             SwingUtilities.invokeAndWait(() -> {
-                header[0] = table.getTableHeader()
-                        .getAccessibleContext()
-                        .getAccessibleDescription();
+                // Dragged first, so the question provably travels
+                // with the Chart header cell rather than sitting on
+                // the whole header or on a position (#257 review).
+                table.getColumnModel().moveColumn(3, 0);
+                chartHeader[0] = headerDescription(table, 0);
+                objectHeader[0] = headerDescription(table, 1);
                 java.awt.Component cell = table.prepareRenderer(
-                        table.getCellRenderer(0, 3), 0, 3);
+                        table.getCellRenderer(0, 0), 0, 0);
                 cellTip[0] = ((javax.swing.JComponent) cell)
                         .getToolTipText();
                 cellAccessible[0] = cell.getAccessibleContext()
                         .getAccessibleDescription();
                 state[0] = ((OnThisPageTable.Row)
-                        table.getValueAt(0, 3)).state();
+                        table.getValueAt(0, 0)).state();
             });
             assertEquals(OnThisPageTable.CHART_COLUMN_QUESTION,
-                    header[0],
-                    "the header keeps the complete question");
+                    chartHeader[0],
+                    "the Chart header cell carries the complete"
+                            + " question, wherever the column sits");
+            assertEquals(null, objectHeader[0],
+                    "and no other header inherits it");
             assertEquals(state[0].prose(), cellTip[0],
                     "a cell's tooltip is the whole answer");
             assertEquals(state[0].prose(), cellAccessible[0],
@@ -190,7 +197,43 @@ class OnThisPagePanelTest {
                             .state(),
                     "and its semantic sort: Shown first, wherever the"
                             + " column sits");
+
+            // And through the next resize (#257 review): widths are
+            // reapplied by model identity, so the dragged Chart
+            // column keeps the Chart width and Object keeps the
+            // room its designations need, at their new positions.
+            SwingUtilities.invokeAndWait(() -> {
+                fixture.panel.setSize(300, 420);
+                layOut(fixture.panel);
+            });
+            SwingUtilities.invokeAndWait(() -> { });
+            java.awt.FontMetrics cells =
+                    table.getFontMetrics(table.getFont());
+            int chartWidth = OnThisPageTable.stateColumnWidth(cells,
+                    table.getTableHeader().getFontMetrics(
+                            table.getTableHeader().getFont()));
+            assertEquals(chartWidth, table.getColumnModel()
+                            .getColumn(0).getPreferredWidth(),
+                    "the Chart column keeps the Chart width at the"
+                            + " front");
+            assertEquals(cells.stringWidth("\u25cf NGC 317A") + 12,
+                    table.getColumnModel().getColumn(1)
+                            .getPreferredWidth(),
+                    "and Object keeps the designations' room beside"
+                            + " it - not the width meant for another"
+                            + " column");
         }
+    }
+
+    /** The accessible description a column's header cell renders. */
+    private static String headerDescription(JTable table, int view) {
+        javax.swing.table.TableColumn column =
+                table.getColumnModel().getColumn(view);
+        java.awt.Component cell = column.getHeaderRenderer()
+                .getTableCellRendererComponent(table,
+                        column.getHeaderValue(), false, false, -1,
+                        view);
+        return cell.getAccessibleContext().getAccessibleDescription();
     }
 
     @Test
