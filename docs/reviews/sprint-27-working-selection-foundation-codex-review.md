@@ -69,3 +69,23 @@ no-ops. Add two listeners, make the first change scope during delivery, and
 require both to hear the same exact sequence once each while `marks()` and
 `lead()` agree with the event in flight. Also exercise a nested model write
 from a scope notification, so neither direction can interleave the other.
+
+## Second re-review: [P1] Suppress model changes invisible through the scope
+
+The single subscription and serialized queue at `0bdbdfb` close the
+interleaving defect in both directions. However, only `pruneTo` compares its
+projected result with the last intended view. The model subscription calls
+`queue(viewOf(change))` unconditionally. When the view is scoped to a page
+holding M31, adding or removing an off-page M42 therefore publishes the same
+`[M31]` view again even though no mark or lead visible through this adapter
+changed. That contradicts both the inherited “nothing a consumer could
+observe” rule and the previous review's explicit requirement to suppress
+consecutive identical views.
+
+Put duplicate suppression at the common queue boundary, comparing against the
+last pending state or the delivered state, so it covers model and scope
+origins alike. Add a scoped two-listener regression that adds, changes the lead
+to, and removes off-page members while the projected marks and lead remain
+unchanged; neither listener should hear an event. Include a control where the
+underlying transition changes the visible fallback lead, which must still
+publish, so the suppression cannot hide an observable view change.
