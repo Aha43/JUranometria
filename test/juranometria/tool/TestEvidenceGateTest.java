@@ -365,11 +365,12 @@ class TestEvidenceGateTest {
                 f.premises().contains("point-reachable")).count();
         assertEquals(20, display.size(),
                 "the display corpus is the twenty the decision names");
-        assertTrue(focusPremise >= 7,
-                "focus premises may only spread under #243: "
-                        + focusPremise + " of " + display.size());
-        assertTrue(reachPremise >= 2,
-                "and so may reachability premises: " + reachPremise);
+        assertTrue(focusPremise >= 14,
+                "focus premises spread under #243 and may not"
+                        + " retreat: " + focusPremise + " of "
+                        + display.size());
+        assertTrue(reachPremise >= 13,
+                "nor may reachability premises: " + reachPremise);
     }
 
     // ---- guard G4/G5 ratchets ---------------------------------------
@@ -382,12 +383,13 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 25,
-                "doClick files are the measured twenty-five, shrinking"
-                        + " under #243: " + doClick);
-        assertTrue(postAction <= 12,
-                "postActionEvent files are the measured twelve,"
-                        + " shrinking under #243: " + postAction);
+        assertTrue(doClick <= 22,
+                "doClick files shrank under #243 to menu convention"
+                        + " and mechanism tests, and may not grow: "
+                        + doClick);
+        assertTrue(postAction <= 3,
+                "postActionEvent survives only in the named mechanism"
+                        + " tests: " + postAction);
     }
 
     @Test

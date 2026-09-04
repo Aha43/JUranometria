@@ -483,16 +483,15 @@ class DeepSkyFamilyJourneyTest {
                     "and the journey never touched a preference"
                             + " outside the chart's own");
             openDialog();
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialogPane, "Restore Defaults").doClick());
+            ReaderInput.click(button(dialogPane, "Restore Defaults"));
             flush();
             for (SymbolFamily family : SymbolFamily.values()) {
                 assertTrue(familyBox(family).isSelected(),
                         family + " is back with the released chart");
             }
             closeDialogWithOk();
-            SwingUtilities.invokeAndWait(() ->
-                    button(window.getContentPane(), "Reset view").doClick());
+            ReaderInput.click(button(window.getContentPane(),
+                    "Reset view"));
             flush();
 
             assertEquals(ChartViewState.DEFAULT, navigation.state());
@@ -703,8 +702,7 @@ class DeepSkyFamilyJourneyTest {
     private void closeDialog() throws Exception {
         JDialog dialog = optionsDialog();
         if (dialog != null) {
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialogPane, "Cancel").doClick());
+            ReaderInput.click(button(dialogPane, "Cancel"));
             flush();
         }
     }
@@ -712,8 +710,7 @@ class DeepSkyFamilyJourneyTest {
     private void closeDialogWithOk() throws Exception {
         JDialog dialog = optionsDialog();
         if (dialog != null) {
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialogPane, "OK").doClick());
+            ReaderInput.click(button(dialogPane, "OK"));
             flush();
         }
     }
@@ -740,19 +737,16 @@ class DeepSkyFamilyJourneyTest {
 
     /** The real search field, as a reader uses it: type and Enter. */
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
-        flush();
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
         flush();
     }
 
     private void zoomOutTo(double field) throws Exception {
         for (int guard = 0; guard < 8
                 && navigation.state().fieldWidthDegrees() < field; guard++) {
-            SwingUtilities.invokeAndWait(() ->
-                    button(window.getContentPane(), "Zoom out").doClick());
+            ReaderInput.click(button(window.getContentPane(),
+                    "Zoom out"));
             flush();
         }
         assertEquals(field, navigation.state().fieldWidthDegrees(), 0.001,
@@ -761,8 +755,8 @@ class DeepSkyFamilyJourneyTest {
 
     private void openInspector() throws Exception {
         if (!inspector.isVisible()) {
-            SwingUtilities.invokeAndWait(() -> find(window.getContentPane(),
-                    javax.swing.JToggleButton.class, "Inspector").doClick());
+            ReaderInput.click(find(window.getContentPane(),
+                    javax.swing.JToggleButton.class, "Inspector"));
             flush();
         }
     }

@@ -68,14 +68,18 @@ class ChartOptionsJourneyTest {
                         java.awt.BorderLayout.NORTH);
                 frame[0].add(chart[0], java.awt.BorderLayout.CENTER);
                 frame[0].pack();
+                frame[0].setSize(900, 700);
+                // Shown, because the premises insist: the old back
+                // doors typed into a window no reader could see
+                // (#243).
+                frame[0].setVisible(true);
             });
             flush();
 
             // Released defaults, then out to wide Orion via real search.
             assertEquals(ChartOptions.DEFAULTS, options.options());
+            ReaderInput.typeAndEnter(search[0], "m 42");
             SwingUtilities.invokeAndWait(() -> {
-                search[0].setText("m 42");
-                search[0].postActionEvent();
                 while (navigation.state().fieldWidthDegrees() < 36.0) {
                     navigation.zoomOut();
                 }
@@ -96,19 +100,15 @@ class ChartOptionsJourneyTest {
             juranometria.chart.ChartScene sceneBefore = chart[0].scene();
             // A label toggle first: the crowd's labels hide while the
             // target's rides its always-drawn symbol (PR #110 review).
-            SwingUtilities.invokeAndWait(() ->
-                    box(dialog.getContentPane(), "Deep-sky labels")
-                            .doClick());
-            flush();
+            ReaderInput.click(box(dialog.getContentPane(),
+                    "Deep-sky labels"));
             assertFalse(options.options().effectiveDeepSkyLabels(),
                     "the label choice previews live");
             assertSame(sceneBefore, chart[0].scene(),
                     "a label toggle re-renders the identical scene object");
             // Then the content toggle.
-            SwingUtilities.invokeAndWait(() ->
-                    box(dialog.getContentPane(), "Deep-sky objects")
-                            .doClick());
-            flush();
+            ReaderInput.click(box(dialog.getContentPane(),
+                    "Deep-sky objects"));
             assertFalse(options.options().deepSkyObjects(),
                     "the choice previews live");
             assertSame(wideOrion, navigation.state(),
@@ -132,11 +132,9 @@ class ChartOptionsJourneyTest {
 
             // Restore Defaults and confirm: the released chart returns
             // and persists; then a restarted session reads it.
-            SwingUtilities.invokeAndWait(() -> {
-                button(dialog.getContentPane(), "Restore Defaults").doClick();
-                button(dialog.getContentPane(), "OK").doClick();
-            });
-            flush();
+            ReaderInput.click(button(dialog.getContentPane(),
+                    "Restore Defaults"));
+            ReaderInput.click(button(dialog.getContentPane(), "OK"));
             assertEquals(ChartOptions.DEFAULTS, options.options());
             assertEquals(ChartOptions.DEFAULTS, store.load(),
                     "OK persisted the restored defaults");

@@ -204,9 +204,9 @@ class CoordinateGridJourneyTest {
             assertNotNull(dialog, "the View menu opened the dialog");
             var sceneBefore = chart.scene();
             ChartViewState navBefore = navigation.state();
-            SwingUtilities.invokeAndWait(() ->
-                    box(dialog.getContentPane(),
-                            "Equatorial coordinate grid").doClick());
+            ReaderInput.chooseTab(tabbedPane(dialog), "Chart");
+            ReaderInput.click(box(dialog.getContentPane(),
+                    "Equatorial coordinate grid"));
             flush();
             assertFalse(options.options().equatorialGrid(),
                     "the toggle previews live");
@@ -220,8 +220,8 @@ class CoordinateGridJourneyTest {
             assertFalse(gridInkPresent(), "the preview really hid the grid");
 
             // Cancel restores the opening value...
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialog.getContentPane(), "Cancel").doClick());
+            ReaderInput.click(button(dialog.getContentPane(),
+                    "Cancel"));
             flush();
             assertTrue(options.options().equatorialGrid(),
                     "Cancel restores the grid");
@@ -230,20 +230,18 @@ class CoordinateGridJourneyTest {
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog second = optionsDialog();
-            SwingUtilities.invokeAndWait(() -> {
-                box(second.getContentPane(),
-                        "Equatorial coordinate grid").doClick();
-                button(second.getContentPane(), "OK").doClick();
-            });
+            ReaderInput.chooseTab(tabbedPane(second), "Chart");
+            ReaderInput.click(box(second.getContentPane(),
+                    "Equatorial coordinate grid"));
+            ReaderInput.click(button(second.getContentPane(), "OK"));
             flush();
             assertFalse(store.load().equatorialGrid(),
                     "OK persisted the grid-off choice");
 
             // Home resets navigation only; a restart honours the
             // confirmed choice.
-            SwingUtilities.invokeAndWait(() ->
-                    button(frame[0].getContentPane(), "Reset view")
-                            .doClick());
+            ReaderInput.click(button(frame[0].getContentPane(),
+                    "Reset view"));
             flush();
             assertEquals(ChartViewState.DEFAULT, navigation.state());
             assertFalse(options.options().equatorialGrid(),
@@ -257,10 +255,10 @@ class CoordinateGridJourneyTest {
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog third = optionsDialog();
-            SwingUtilities.invokeAndWait(() -> {
-                button(third.getContentPane(), "Restore Defaults").doClick();
-                button(third.getContentPane(), "OK").doClick();
-            });
+            ReaderInput.chooseTab(tabbedPane(third), "Chart");
+            ReaderInput.click(button(third.getContentPane(),
+                    "Restore Defaults"));
+            ReaderInput.click(button(third.getContentPane(), "OK"));
             flush();
             assertEquals(ChartOptions.DEFAULTS, store.load());
             assertEquals(ChartViewState.DEFAULT, navigation.state());
@@ -331,11 +329,8 @@ class CoordinateGridJourneyTest {
     }
 
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
-        flush();
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
     }
 
     private MouseWheelEvent wheel(int x, int y, double rotation)
@@ -406,5 +401,23 @@ class CoordinateGridJourneyTest {
     private static void flush() throws Exception {
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    private static javax.swing.JTabbedPane tabbedPane(
+            javax.swing.JDialog dialog) {
+        java.util.ArrayDeque<java.awt.Component> walk =
+                new java.util.ArrayDeque<>();
+        walk.add(dialog.getContentPane());
+        while (!walk.isEmpty()) {
+            java.awt.Component next = walk.poll();
+            if (next instanceof javax.swing.JTabbedPane tabs) {
+                return tabs;
+            }
+            if (next instanceof java.awt.Container inner) {
+                java.util.Collections.addAll(walk,
+                        inner.getComponents());
+            }
+        }
+        throw new AssertionError("the dialog carries its tab strip");
     }
 }

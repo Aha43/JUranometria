@@ -169,8 +169,10 @@ class LetteredStarJourneyTest {
             assertNotNull(dialog, "the View menu opened the dialog");
             var sceneBefore = chart.scene();
             ChartViewState navBefore = navigation.state();
-            SwingUtilities.invokeAndWait(() ->
-                    box(dialog.getContentPane(), "Star names").doClick());
+            ReaderInput.chooseTab(tabbedPane(dialog), "Stars");
+            SwingUtilities.invokeAndWait(() -> { });
+            ReaderInput.click(box(dialog.getContentPane(),
+                    "Star names"));
             flush();
             assertFalse(options.options().starNames(),
                     "names hidden, letters kept");
@@ -187,8 +189,7 @@ class LetteredStarJourneyTest {
             assertFalse(labels().contains("Merak β"),
                     "no pair survives with names hidden: " + labels());
 
-            SwingUtilities.invokeAndWait(() ->
-                    button(dialog.getContentPane(), "OK").doClick());
+            ReaderInput.click(button(dialog.getContentPane(), "OK"));
             flush();
             assertFalse(store.load().starNames(), "OK persisted the choice");
             assertFalse(new ChartOptionsController(store).options()
@@ -271,13 +272,13 @@ class LetteredStarJourneyTest {
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog reopened = optionsDialog();
-            SwingUtilities.invokeAndWait(() -> {
-                button(reopened.getContentPane(), "Restore Defaults").doClick();
-                button(reopened.getContentPane(), "OK").doClick();
-            });
+            ReaderInput.chooseTab(tabbedPane(reopened), "Stars");
+            ReaderInput.click(button(reopened.getContentPane(),
+                    "Restore Defaults"));
+            ReaderInput.click(button(reopened.getContentPane(), "OK"));
             flush();
-            SwingUtilities.invokeAndWait(() ->
-                    button(frame[0].getContentPane(), "Reset view").doClick());
+            ReaderInput.click(button(frame[0].getContentPane(),
+                    "Reset view"));
             flush();
             assertEquals(ChartOptions.DEFAULTS, store.load());
             assertEquals(ChartViewState.DEFAULT, navigation.state());
@@ -368,11 +369,8 @@ class LetteredStarJourneyTest {
     }
 
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
-        flush();
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
     }
 
     private void mouse(int id, int x, int y) throws Exception {
@@ -432,5 +430,23 @@ class LetteredStarJourneyTest {
     private static void flush() throws Exception {
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    private static javax.swing.JTabbedPane tabbedPane(
+            javax.swing.JDialog dialog) {
+        java.util.ArrayDeque<java.awt.Component> walk =
+                new java.util.ArrayDeque<>();
+        walk.add(dialog.getContentPane());
+        while (!walk.isEmpty()) {
+            java.awt.Component next = walk.poll();
+            if (next instanceof javax.swing.JTabbedPane tabs) {
+                return tabs;
+            }
+            if (next instanceof java.awt.Container inner) {
+                java.util.Collections.addAll(walk,
+                        inner.getComponents());
+            }
+        }
+        throw new AssertionError("the dialog carries its tab strip");
     }
 }

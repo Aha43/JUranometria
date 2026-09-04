@@ -143,7 +143,7 @@ class OnThisPageJourneyTest {
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
         assertFalse(marks().marks().isEmpty());
 
-        SwingUtilities.invokeAndWait(() -> panel.clearMarksButton().doClick());
+        ReaderInput.click(panel.clearMarksButton());
         flush();
 
         assertTrue(marks().marks().isEmpty(), "every mark is gone");
@@ -166,7 +166,7 @@ class OnThisPageJourneyTest {
                         + " reader walked it would be unusable");
 
         String lead = marks().lead();
-        SwingUtilities.invokeAndWait(() -> panel.centreHereButton().doClick());
+        ReaderInput.click(panel.centreHereButton());
         flush();
 
         assertEquals(1, requests.size(), "one request, when asked");

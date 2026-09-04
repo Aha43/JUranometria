@@ -348,6 +348,11 @@ class HiddenFamilyTargetJourneyTest {
             searchField.setSelectionModel(selection);
             window = new JFrame("retirement journey");
             window.setLayout(new BorderLayout());
+            // The field must live where a reader could type into it:
+            // the old back door typed into a component attached to no
+            // window at all, and the premises caught it (#243).
+            window.add(new AtlasToolbar(navigation, searchField),
+                    BorderLayout.NORTH);
             window.add(chart, BorderLayout.CENTER);
             window.add(inspector, BorderLayout.EAST);
             window.setSize(1100, 760);
@@ -362,11 +367,8 @@ class HiddenFamilyTargetJourneyTest {
     }
 
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
-        flush();
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
         flush();
     }
 

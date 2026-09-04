@@ -88,11 +88,7 @@ class DirectZoomJourneyTest {
 
             // The released starting point, then a named star.
             assertEquals(ChartViewState.DEFAULT, navigation.state());
-            SwingUtilities.invokeAndWait(() -> {
-                searchField.setText("betelgeuse");
-                searchField.postActionEvent();
-            });
-            flush();
+            ReaderInput.typeAndEnter(searchField, "betelgeuse");
             assertEquals("TYC 129-1873-1",
                     navigation.state().targetIdentity());
 
@@ -171,9 +167,8 @@ class DirectZoomJourneyTest {
             // The toolbar agrees: its zoom is the same centred
             // transition the shortcuts perform.
             ChartViewState beforeToolbar = navigation.state();
-            SwingUtilities.invokeAndWait(() ->
-                    button(frame[0].getContentPane(), "Zoom out").doClick());
-            flush();
+            ReaderInput.click(button(frame[0].getContentPane(),
+                    "Zoom out"));
             assertEquals(12.0, navigation.state().fieldWidthDegrees());
             assertEquals(beforeToolbar.centre(), navigation.state().centre());
             key(KeyEvent.VK_ADD, AppMenuBar.menuShortcutMask());
@@ -188,20 +183,16 @@ class DirectZoomJourneyTest {
             mouse(MouseEvent.MOUSE_RELEASED, 490, 405);
             assertTrue(!beforePan.equals(navigation.state().centre()),
                     "the drag panned");
-            SwingUtilities.invokeAndWait(() ->
-                    button(frame[0].getContentPane(), "Fewer stars")
-                            .doClick());
-            flush();
+            ReaderInput.click(button(frame[0].getContentPane(),
+                    "Fewer stars"));
             assertEquals(7.0, navigation.state().limitingMagnitude());
             wheel(300, 300, -1.0);
             assertEquals(6.0, navigation.state().fieldWidthDegrees());
 
             // Home through the real toolbar control: the exact
             // released default, whatever the journey did.
-            SwingUtilities.invokeAndWait(() ->
-                    button(frame[0].getContentPane(), "Reset view")
-                            .doClick());
-            flush();
+            ReaderInput.click(button(frame[0].getContentPane(),
+                    "Reset view"));
             assertEquals(ChartViewState.DEFAULT, navigation.state());
             assertEquals("M31 · Andromeda Galaxy region",
                     chart.scene().title());

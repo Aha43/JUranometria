@@ -518,7 +518,8 @@ class MapExplorationJourneyTest {
                     clickOn(this::offCentreStar);
             SkyPosition wasCentred = navigation.state().centre();
             SwingUtilities.invokeAndWait(() ->
-                    centreButton(inspector).doClick());
+                    { });
+            ReaderInput.click(centreButton(inspector));
             flush();
             assertFalse(wasCentred.equals(navigation.state().centre()),
                     "Center here moved the chart");
@@ -670,7 +671,9 @@ class MapExplorationJourneyTest {
             // 15. Home, from the toolbar: the released default,
             // rendered exactly as the reference records it.
             SwingUtilities.invokeAndWait(() ->
-                    button(window.getContentPane(), "Reset view").doClick());
+                    { });
+            ReaderInput.click(button(window.getContentPane(),
+                    "Reset view"));
             flush();
             assertEquals(ChartViewState.DEFAULT, navigation.state(),
                     "the journey ends where every reader begins");
@@ -703,10 +706,8 @@ class MapExplorationJourneyTest {
 
     /** Types a query and presses Enter, as a reader does. */
     private void searchFor(String query) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            searchField.setText(query);
-            searchField.postActionEvent();
-        });
+        // Typed and entered as a reader types, premises first (#243).
+        ReaderInput.typeAndEnter(searchField, query);
         flush();
     }
 

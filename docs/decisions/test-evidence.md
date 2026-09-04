@@ -78,7 +78,9 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **37 files** touch process-wide state —
 **16** use the shared guard, **20** restore locally,
-**0 flagged unprotected** — and **20 files** depend on a display.
+**0 flagged unprotected** — and **20 files** depend on a display,
+of which **14** state a focus premise and **13** a reachability
+premise through the shared route helper.
 
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
@@ -118,6 +120,26 @@ the conventional route for menus in these tests (the item's action
 is its whole surface); `doClick()` on buttons and checkboxes inside
 windows, and `postActionEvent()` on fields, are the back doors the
 discipline replaces.
+
+**As #243 settled it:** the discipline lives once, in
+`ReaderInput` — premise-asserted pointer clicks (showing, sized,
+point within the visible rectangle), focus-proven typing that
+aborts with a stated reason where the desktop refuses, and
+pointer-chosen tabs. Every route-claiming journey goes through it.
+The migration's premises caught three standing dishonesties on
+their first runs: two journeys drove windows that were **never
+made visible**, one journey toggled a checkbox on a **tab nobody
+had opened**, and one typed into a search field **attached to no
+window at all** — each now honest, each reintroduction failing its
+journey. The mechanism tests kept beside the journeys, by name:
+`ExplorationJourneyTest` and `SearchFieldTest` (the search field's
+action-event mechanism, headless), `PlaceAndTimeDialogTest` (the
+dialog content's semantics, whose route twin is the lifecycle
+test), and `ChartOptionsDialogTest` (the dialog's own mechanics).
+Order dependence was exercised: six consecutive full-suite runs,
+four in declared order and two with random class order under
+stated seeds (42 and 20260904), all with zero failures and zero
+aborts — a run count, not a claim of eliminated intermittence.
 
 ## Event-thread traffic
 

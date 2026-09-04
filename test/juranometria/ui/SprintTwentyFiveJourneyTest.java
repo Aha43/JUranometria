@@ -248,7 +248,8 @@ class SprintTwentyFiveJourneyTest {
         // module action has requested.
         assertEquals(0, requests.size(),
                 "no module action so far has asked the chart to move");
-        click((javax.swing.JComponent) named(dialog, "centreButton"));
+        ReaderInput.click((javax.swing.JComponent) named(dialog,
+                "centreButton"));
         assertEquals(1, requests.size(),
                 "Center on zenith asked once");
         assertEquals(new LocalSky(meridian.observer()).zenith(),
@@ -625,45 +626,16 @@ class SprintTwentyFiveJourneyTest {
     }
 
     /**
-     * Types into a field the way a reader does: click into it,
-     * confirm the keyboard actually arrived there, select all with
-     * the platform shortcut, type the characters, press Enter. Real
-     * pointer and keyboard events - an earlier version called
-     * setText and postActionEvent, which is the component's back
-     * door and left the public routes unexercised (sprint review).
-     *
-     * <p>The focus premise is asserted, not hoped: keystrokes
-     * dispatched at an unfocused control still run its bindings, so
-     * without the premise this would type into a field no reader's
-     * keyboard could reach. Where the desktop refuses focus the
-     * journey aborts honestly, the same discipline as the other
-     * display journeys.
+     * Commits a field through the shared reader-input discipline
+     * (#243) and asserts arrival: the field must redisplay the
+     * committed value as the module holds it - parsed degrees
+     * equal, instants equal with seconds appended - never the stale
+     * text a lost keystroke would leave.
      */
     private void commit(PlaceAndTimeDialog dialog, String field,
                         String text) throws Exception {
         JTextField entry = (JTextField) named(dialog, field);
-        click(entry);
-        boolean[] owns = new boolean[1];
-        SwingUtilities.invokeAndWait(() ->
-                owns[0] = entry.isFocusOwner());
-        Assumptions.assumeTrue(owns[0],
-                "this desktop would not give " + field + " the"
-                        + " keyboard focus, so a reader's keys could"
-                        + " not arrive there");
-        press(entry, java.awt.event.KeyEvent.VK_A,
-                java.awt.Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMaskEx());
-        for (char typed : text.toCharArray()) {
-            type(entry, typed);
-        }
-        press(entry, java.awt.event.KeyEvent.VK_ENTER, 0);
-        flush();
-        // Arrival, asserted for real: what the field shows after the
-        // commit must mean the same value that was typed - the
-        // module's own rendering of it (zeros trimmed, seconds
-        // appended), never the stale text a lost keystroke would
-        // leave. A first version only checked the field was
-        // nonblank, which a field never touched also is (review).
+        ReaderInput.typeAndEnter(entry, text);
         String shown = fieldTextOf(entry);
         if (text.contains(":")) {
             assertEquals(text.length() == 16 ? text + ":00" : text,
@@ -691,66 +663,8 @@ class SprintTwentyFiveJourneyTest {
         boolean[] selected = new boolean[1];
         SwingUtilities.invokeAndWait(() -> selected[0] = box.isSelected());
         if (selected[0] != wanted) {
-            click(box);
+            ReaderInput.click(box);
         }
         flush();
-    }
-
-    /**
-     * A pointer click at the middle of a control - a control first
-     * proven to be somewhere a pointer could go. Dispatched events
-     * land on a clipped or zero-sized control just as happily as on
-     * a visible one (review), and Sprint 24's journey already
-     * learned this lesson for table rows: the point itself must be
-     * reachable, not merely the component real.
-     */
-    private void click(javax.swing.JComponent control) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            assertTrue(control.isShowing(),
-                    control.getName() + " is on screen, in a window a"
-                            + " reader can see");
-            assertTrue(control.getWidth() > 0 && control.getHeight() > 0,
-                    control.getName() + " has a size a pointer could"
-                            + " hit: " + control.getWidth() + "x"
-                            + control.getHeight());
-            int x = control.getWidth() / 2;
-            int y = control.getHeight() / 2;
-            assertTrue(control.getVisibleRect().contains(x, y),
-                    "the point clicked on " + control.getName()
-                            + " is one a reader could reach: " + x + ","
-                            + y + " within "
-                            + control.getVisibleRect());
-            for (int id : new int[] {
-                    java.awt.event.MouseEvent.MOUSE_PRESSED,
-                    java.awt.event.MouseEvent.MOUSE_RELEASED,
-                    java.awt.event.MouseEvent.MOUSE_CLICKED}) {
-                control.dispatchEvent(new java.awt.event.MouseEvent(
-                        control, id, System.nanoTime() / 1_000_000, 0,
-                        x, y, 1, false,
-                        java.awt.event.MouseEvent.BUTTON1));
-            }
-        });
-        flush();
-    }
-
-    private void press(javax.swing.JComponent control, int keyCode,
-                       int modifiers) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            for (int id : new int[] {java.awt.event.KeyEvent.KEY_PRESSED,
-                    java.awt.event.KeyEvent.KEY_RELEASED}) {
-                control.dispatchEvent(new java.awt.event.KeyEvent(control,
-                        id, System.nanoTime() / 1_000_000, modifiers,
-                        keyCode, java.awt.event.KeyEvent.CHAR_UNDEFINED));
-            }
-        });
-    }
-
-    private void type(javax.swing.JComponent control, char typed)
-            throws Exception {
-        SwingUtilities.invokeAndWait(() -> control.dispatchEvent(
-                new java.awt.event.KeyEvent(control,
-                        java.awt.event.KeyEvent.KEY_TYPED,
-                        System.nanoTime() / 1_000_000, 0,
-                        java.awt.event.KeyEvent.VK_UNDEFINED, typed)));
     }
 }

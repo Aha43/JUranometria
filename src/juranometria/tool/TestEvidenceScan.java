@@ -129,9 +129,12 @@ public final class TestEvidenceScan {
 
     private static final List<Marker> PREMISES = List.of(
             new Marker("focused-window", "insistOnFocus"),
-            new Marker("focus-owner", "isFocusOwner()"),
-            new Marker("point-reachable", "getVisibleRect().contains"),
-            new Marker("control-showing", "isShowing()"),
+            new Marker("focus-owner", "isFocusOwner()",
+                    "ReaderInput.typeAndEnter("),
+            new Marker("point-reachable", "getVisibleRect().contains",
+                    "ReaderInput.click("),
+            new Marker("control-showing", "isShowing()",
+                    "ReaderInput.click("),
             new Marker("focus-settles", "settlesOn("));
 
     private static final List<Marker> ROUTES = List.of(
