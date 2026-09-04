@@ -7,6 +7,24 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The working-selection gate** (Sprint 27, issue #258). The
+  decision for a temporary cross-page working set - an ordered set
+  of identities with one lead, built from chart points and
+  On-this-page rows alike, never pruned by navigation and never
+  persisted - is measured and recorded before any code:
+  docs/decisions/working-selection.md settles the full gesture
+  semantics (ordinary replaces, a visible Accumulate control and
+  the platform modifier toggle, the lead-replacement rule), the
+  migration of today's two disagreeing models onto one session
+  truth, the ink rule (the existing ring once per drawn member,
+  the existing cross once per on-page undrawn member, never both,
+  nothing off-page), and the Inspector's working-set surface. The
+  study photographs today's two leads disagreeing and previews the
+  decided presentation through unchanged production painters.
+  Production behaviour is untouched by this gate.
+
 ### Changed
 
 - **The On-this-page chart-status column earns its width** (Sprint

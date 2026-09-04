@@ -82,6 +82,10 @@ public final class EvidenceContractMain {
         // renderer study.
         REPORT_MAINS.put("juranometria.tool.BlackSkyStudyMain",
                 "docs/studies/black-sky/measurements.md");
+        // Writes its component-composed evidence images beside the
+        // report (issue #258), the black-sky pattern.
+        REPORT_MAINS.put("juranometria.tool.WorkingSelectionStudyMain",
+                "docs/studies/working-selection/measurements.md");
     }
 
     /**
@@ -114,7 +118,10 @@ public final class EvidenceContractMain {
             "juranometria.tool.PlaceAndTimeControlsMockupMain",
             // The gallery's module slides (issue #252): composed by
             // the production component, renderer-drawn contract.
-            "juranometria.tool.GalleryPageMain");
+            "juranometria.tool.GalleryPageMain",
+            // The working-selection surface mock-ups (issue #258):
+            // widget-rendered inspection, the selection- prefix.
+            "juranometria.tool.WorkingSelectionMockupMain");
 
     /**
      * The legacy generators: they write under build/, and their

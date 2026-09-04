@@ -263,6 +263,17 @@ gallery-site:
 
 .PHONY: gallery gallery-pages gallery-site
 
+# The working-selection gate (docs/decisions/working-selection.md,
+# issue #258): the census of today's two models, the composed
+# evidence, and the surface mock-ups.
+working-selection-study: classes
+	mkdir -p docs/studies/working-selection
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WorkingSelectionStudyMain \
+		> docs/studies/working-selection/measurements.md
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WorkingSelectionMockupMain
+
+.PHONY: working-selection-study
+
 # The black-sky palette (docs/decisions/black-sky.md, issue #246):
 # the derivation executed and verified against the pinned palette,
 # the representative pages rendered in both palettes, every pixel

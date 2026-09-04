@@ -251,11 +251,14 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
-                        "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java"),
+                        "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
+                        "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the four widget photographers, whose theme dies with"
-                        + " the JVM - benign by construction, and"
-                        + " pinned so a fifth arrives by decision");
+                "the five widget photographers, whose font setting"
+                        + " dies with the JVM - benign by"
+                        + " construction, and pinned so the next one"
+                        + " arrives by decision; the fifth arrived by"
+                        + " exactly that route (#258's gate)");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
