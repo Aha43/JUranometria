@@ -76,12 +76,12 @@ operation is discoverable and accessible without remembering it.
 | gesture | ordinary | additive |
 |---|---|---|
 | chart click, one object hit | replace the set with that object; it leads | toggle it: added → it leads; removed → the lead rule below |
-| chart click, several candidates | replace with the current candidate; candidates offered as today; choosing another candidate retargets member and lead in one transition | add the current candidate (it leads); the chooser retargets what was just added |
+| chart click, several candidates | replace with the current candidate; candidates offered as today; choosing another candidate retargets member and lead in one transition | one captured toggle transaction against the pre-click set — defined for every absent/present combination below |
 | chart click, empty sky | replace with the empty set; the Inspector answers with the place as today | membership untouched; the Inspector still answers the place — a question, not an edit |
 | chart click, off the paper | nothing, as today | nothing |
 | search result chosen | recentre as today; replace with the found object; it leads | recentre; add it; it leads |
 | table row click | replace with that row; it leads | toggle that row |
-| table range (shift, pointer or keyboard) | one transition: replace with the range, lead = last reached | one transition: the range joins the set, lead = last reached |
+| table range (shift, pointer or keyboard) | an anchored transaction: at every extension **or retraction**, replace with the current range; lead = the active end | an anchored transaction: at every extension **or retraction**, membership = the pre-gesture set ∪ the current range — growth and contraction both defined below |
 | table toggle (platform modifier / Accumulate) | — | toggle rows in and out; off-page members are never dropped by a table gesture |
 | remove one member (Inspector ✕, or additive toggle) | the rest stay; removing the lead passes the lead to the **last-marked remaining member** — `WorkingMarksModel`'s standing rule, restated and kept | same |
 | choose a different lead | membership untouched | same |
@@ -92,6 +92,68 @@ operation is discoverable and accessible without remembering it.
 Order is the order of first membership; re-adding a member does
 not move it. Duplicates are impossible by the model's constructor
 rule. A lead change is never a silent removal.
+
+### The two captured transactions (review)
+
+Two gestures unfold over time, and per-step rules would let them
+edit membership by accident. Each is therefore a **captured
+transaction**: the membership at the gesture's start is
+snapshotted, every intermediate state is computed fresh from that
+snapshot and delivered whole, and the state when the gesture ends
+is the only lasting edit.
+
+**The ambiguous additive click.** The transaction is *toggle
+exactly one candidate — the one the reader settles on — against
+the pre-click set*. The click applies it to the current candidate;
+**cycling the chooser retracts the transaction's own effect and
+replays the single toggle against the snapshot for the newly
+chosen candidate**, one whole transition per step. So for every
+absent/present combination:
+
+- current candidate absent from the snapshot → shown added, and
+  it leads;
+- current candidate present in the snapshot → shown removed, the
+  lead by the removal rule on (snapshot − candidate);
+- cycling between an absent and a present candidate flips between
+  exactly those two outcomes — never both applied. Cycling
+  M 31 → M 32 → M 31 over members and non-members alike can
+  neither accumulate members nor shed extra ones, because each
+  step is the snapshot with one toggle, not the previous step with
+  another.
+
+The transaction ends at the next membership transition from any
+other gesture: that transition drives the answering model, whose
+candidate list collapses to the new lead, so a stale chooser
+cannot reopen a finished click.
+
+**The additive range.** The transaction is anchored where the
+range began (the lead when the first shift-gesture arrived). At
+every extension **and every retraction** — shift-Down then
+shift-Up, or a shrinking shift-click — membership is recomputed as
+**snapshot ∪ current range**, delivered whole. Therefore:
+
+- retracting removes exactly the rows the range itself had added
+  and no longer covers;
+- a pre-existing member the range passes over and then retracts
+  from **stays a member** — it is in the snapshot, and the union
+  cannot drop it;
+- off-page members are untouched throughout — in the snapshot, out
+  of every range by definition;
+- the lead is the active end of the range at every step; a range
+  retracted to nothing leaves the anchor leading;
+- order is the snapshot's order followed by the range's newcomers
+  in view order, recomputed with the union so it cannot depend on
+  the path the range took.
+
+The ordinary (replacing) range is the same anchored recomputation
+with *replace by current range* in place of the union. The range
+transaction ends when a non-range gesture arrives; what the union
+held at that moment is the membership, now permanent in the order
+stated.
+
+Both transactions join the mutation checks: an ambiguous cycle
+that accumulates, and a range retraction that removes a
+pre-existing or off-page member, must each fail a committed test.
 
 ## The chart's ink
 
@@ -150,8 +212,10 @@ reentrant listeners observing the state their transition
 describes; packaged restart beginning empty beside intact reader
 options; and the named mutation checks — accidental pruning,
 replacement while accumulate is active, irremovable member,
-duplicate identities, lead/member disagreement, and any write of
-selection identity to any store.
+duplicate identities, lead/member disagreement, any write of
+selection identity to any store, an ambiguous cycle that
+accumulates, and a range retraction that removes a pre-existing
+or off-page member.
 
 ## Out of scope
 
