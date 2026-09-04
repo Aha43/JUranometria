@@ -95,9 +95,9 @@ The review's first finding: the initial scan looked only under
 single-JVM executables whose look-and-feel dies with the process
 but whose preference writes outlive it. Scanned now (the two
 measuring instruments excluded by pinned name, because their marker
-definitions read exactly like the behaviour they detect): **5**
-touch process-wide state; **4** carry an unpaired touch, and all
-four
+definitions read exactly like the behaviour they detect): **6**
+touch process-wide state; **5** carry an unpaired touch, and all
+five
 are the widget-photography mains whose FlatLaf and font settings
 are the photograph's subject and die with the JVM — benign **by
 construction, not by silence**, which is why they stay in the

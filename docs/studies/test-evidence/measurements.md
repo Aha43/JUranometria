@@ -60,9 +60,10 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeControlsMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeDialogStudyMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
+| src/juranometria/tool/WorkingSelectionMockupMain.java | default-font | UNPROTECTED: default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | preferences | protected-locally |
 
-**5 evidence executables** touch process-wide state; 4 carry an unpaired touch.
+**6 evidence executables** touch process-wide state; 5 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -118,11 +119,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 9 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 10 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 2 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 182 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 29 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 184 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 34 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -174,6 +175,11 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/place-and-time/controls-dialog-enlarged.png
 - docs/studies/place-and-time/controls-dialog.png
 - docs/studies/place-and-time/controls-sidebar-240.png
+- docs/studies/working-selection/selection-accumulate.png
+- docs/studies/working-selection/selection-set-dark.png
+- docs/studies/working-selection/selection-set-enlarged.png
+- docs/studies/working-selection/selection-set-narrow.png
+- docs/studies/working-selection/selection-set.png
 
 The session photographs:
 - docs/studies/place-and-time/dialog-real-dark.png
