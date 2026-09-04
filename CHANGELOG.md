@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-09-04
+
+Sprint 26 — Keep the evidence trustworthy. A maintenance sprint
+with a measuring gate at its head, cut as a minor release for the
+two reader-facing repairs that rode with it: the chart's second
+intentional ground — **Black sky**, white stars and restrained light
+ink on black, derived by measurement and chosen in Chart Options
+inside either application theme — and the Mac application identity
+verified from the public downloads, with packaging that now
+refuses a missing, substituted, malformed, or unreferenced icon.
+Beneath them, the suite's shared state rides one guard, every
+journey presses what a reader presses, and every generated
+artifact is held to an executable contract; the ordinary
+white-paper chart is byte-identical throughout, and an upgrading
+reader keeps every choice they had.
+
 ### Added
 
 - **Black sky** (Sprint 26, issue #246). The chart's ground is the
