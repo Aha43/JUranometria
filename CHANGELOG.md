@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **The On-this-page chart-status column earns its width** (Sprint
+  27, issue #257). The column header is now **Chart** and the five
+  answers read **Shown, Hidden, Faint, Small, No mark** - measured
+  against the real Inspector widths, where the old wording needed
+  319 px of the ordinary 320 at normal text and the compact one
+  needs 287. Nothing is lost: the header carries the complete
+  question and every cell its whole answer as tooltip and
+  accessible description, the column stays independently sortable -
+  now by the states' declared meaning rather than their spelling -
+  and reorderable, and where all four columns honestly cannot fit,
+  the table still scrolls rather than truncating an answer.
+
 ### Added
 
 - **The public atlas gallery, decided and curated** (Sprint 27,

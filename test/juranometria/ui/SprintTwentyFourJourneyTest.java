@@ -152,7 +152,8 @@ class SprintTwentyFourJourneyTest {
         PageContents contents = modules.inventory();
         PageEntry drawn = firstWith(contents, true);
         PageEntry hidden = firstWith(contents, false);
-        assertEquals("drawn", stateShownFor(drawn.identity()),
+        assertEquals(juranometria.page.PageVisibility.DRAWN.label(),
+                stateShownFor(drawn.identity()),
                 drawn.identity() + " is drawn, and says so");
         assertEquals(OnThisPageTable.wordFor(hidden.visibility()),
                 stateShownFor(hidden.identity()),
@@ -326,7 +327,8 @@ class SprintTwentyFourJourneyTest {
         assertEquals(present, identities(modules.inventory()),
                 "the page holds the same objects with a family hidden:"
                         + " presence is a fact about the sky");
-        assertEquals("hidden", stateShownFor(drawn.identity()),
+        assertEquals(PageVisibility.FAMILY_HIDDEN.label(),
+                stateShownFor(drawn.identity()),
                 drawn.identity() + " is still here, and the table says"
                         + " why it cannot be seen");
         SwingUtilities.invokeAndWait(() ->
@@ -401,7 +403,7 @@ class SprintTwentyFourJourneyTest {
         SwingUtilities.invokeAndWait(() -> {
             for (OnThisPageTable.Row row : page.rows()) {
                 if (row.identity().equals(identity)) {
-                    said[0] = row.state();
+                    said[0] = row.state().label();
                     return;
                 }
             }
@@ -519,7 +521,11 @@ class SprintTwentyFourJourneyTest {
         List<String> found = new ArrayList<>();
         SwingUtilities.invokeAndWait(() -> {
             for (OnThisPageTable.Row row : page.rows()) {
-                if (!"drawn".equals(row.state())) {
+                // By the meaning, not the spelling (#257): the row
+                // carries the enum now, which is exactly what stops
+                // this comparison silently rotting when the display
+                // words change.
+                if (row.state() != PageVisibility.DRAWN) {
                     found.add(row.identity());
                 }
             }

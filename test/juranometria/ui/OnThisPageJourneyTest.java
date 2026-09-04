@@ -220,8 +220,11 @@ class OnThisPageJourneyTest {
 
         int row = viewOrder().indexOf(undrawn);
         assertTrue(row >= 0, undrawn + " is on the page, so it is listed");
+        // The cell hands out the row so the sorter can reach the
+        // state's meaning (#257); the renderer shows its label.
         assertEquals(OnThisPageTable.wordFor(state),
-                table.getValueAt(row, 3),
+                ((OnThisPageTable.Row) table.getValueAt(row, 3))
+                        .state().label(),
                 "the row says why it cannot be seen, in the decided"
                         + " words");
 

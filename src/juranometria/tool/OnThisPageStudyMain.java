@@ -88,8 +88,76 @@ public final class OnThisPageStudyMain {
         visibilityBreakdown();
         theStarQuestion();
         ordering();
+        chartColumn();
         keyboard();
         cost();
+    }
+
+    /**
+     * The chart-status column, measured (issue #257): the widths of
+     * the old and compact vocabularies at the mock-ups' own faces
+     * and sizes, against the Inspector's real widths. Per machine,
+     * like every font measurement here - the boundary is recorded,
+     * not pinned as universal.
+     */
+    private static void chartColumn() {
+        System.out.println("## The chart-status column, measured"
+                + " (#257)");
+        System.out.println();
+        System.out.println("The column is useful because it is a"
+                + " real, sortable, reorderable column; its wording"
+                + " was costing width it did not need. The compact"
+                + " vocabulary - header **Chart**; Shown, Hidden,"
+                + " Faint, Small, No mark - against the wording it"
+                + " replaced, measured with the sidebar mock-ups' own"
+                + " face at normal and enlarged sizes. The full"
+                + " question and the whole answers ride the header's"
+                + " and every cell's accessible descriptions; sorting"
+                + " uses the states' declared order, never their"
+                + " spelling.");
+        System.out.println();
+        String[] oldWords = {"On the chart", "drawn", "hidden",
+                "too faint", "no symbol", "too small here"};
+        System.out.println("| text size | column before | column"
+                + " after | four columns before | after | fits 240?"
+                + " | fits 320? |");
+        System.out.println("|---|---|---|---|---|---|---|");
+        java.awt.image.BufferedImage probe =
+                new java.awt.image.BufferedImage(1, 1,
+                        java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = probe.createGraphics();
+        try {
+            for (int size : new int[] {12, 18}) {
+                java.awt.FontMetrics metrics = g.getFontMetrics(
+                        new java.awt.Font(java.awt.Font.SANS_SERIF,
+                                java.awt.Font.PLAIN, size));
+                int before = 0;
+                for (String word : oldWords) {
+                    before = Math.max(before,
+                            metrics.stringWidth(word));
+                }
+                before += 12;
+                int after = juranometria.ui.onthispage.OnThisPageTable
+                        .stateColumnWidth(metrics, metrics);
+                int others = metrics.stringWidth("\u25cf NGC 317A")
+                        + metrics.stringWidth("not recorded")
+                        + metrics.stringWidth("00.00\u00b0") + 36;
+                System.out.printf(java.util.Locale.ROOT,
+                        "| %d pt | %d px | %d px | %d px | %d px |"
+                                + " %s | %s |%n",
+                        size, before, after, others + before,
+                        others + after,
+                        others + after <= 240 ? "yes" : "no (scrolls)",
+                        others + after <= 320 ? "yes" : "no (scrolls)");
+            }
+        } finally {
+            g.dispose();
+        }
+        System.out.println();
+        System.out.println("Where all four columns cannot honestly"
+                + " fit, the table scrolls rather than truncating an"
+                + " answer into ambiguity - the #217 rule, unchanged.");
+        System.out.println();
     }
 
     // ------------------------------------------------------------------
@@ -724,15 +792,9 @@ public final class OnThisPageStudyMain {
                         : " " + identity.constellation());
     }
 
-    /** The short word the table shows for a state. */
+    /** The short word the table shows for a state: its one home. */
     static String wordFor(PageVisibility state) {
-        return switch (state) {
-            case DRAWN -> "drawn";
-            case FAMILY_HIDDEN -> "hidden";
-            case BELOW_LIMIT -> "too faint";
-            case NO_SYMBOL -> "no symbol";
-            case TOO_SMALL -> "too small here";
-        };
+        return state.label();
     }
 
     /** The released page, for the mock-ups to draw the real thing. */

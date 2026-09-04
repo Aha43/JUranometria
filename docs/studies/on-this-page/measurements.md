@@ -146,6 +146,17 @@ The released page, in that order:
 
 **8** deep-sky rows in all on that page.
 
+## The chart-status column, measured (#257)
+
+The column is useful because it is a real, sortable, reorderable column; its wording was costing width it did not need. The compact vocabulary - header **Chart**; Shown, Hidden, Faint, Small, No mark - against the wording it replaced, measured with the sidebar mock-ups' own face at normal and enlarged sizes. The full question and the whole answers ride the header's and every cell's accessible descriptions; sorting uses the states' declared order, never their spelling.
+
+| text size | column before | column after | four columns before | after | fits 240? | fits 320? |
+|---|---|---|---|---|---|---|
+| 12 pt | 94 px | 62 px | 319 px | 287 px | no (scrolls) | yes |
+| 18 pt | 137 px | 87 px | 447 px | 397 px | no (scrolls) | no (scrolls) |
+
+Where all four columns cannot honestly fit, the table scrolls rather than truncating an answer into ambiguity - the #217 rule, unchanged.
+
 ## Working it without a pointer
 
 **The module adds no key bindings of its own.** Walking rows and extending a selection are gestures the platform already provides, and a module that taught the table new keys would be a module assistive technology has to be taught too.

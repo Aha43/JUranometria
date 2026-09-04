@@ -134,7 +134,7 @@ public final class OnThisPageMockupMain {
             panel.add(empty, java.awt.BorderLayout.CENTER);
         } else {
             DefaultTableModel model = new DefaultTableModel(
-                    new Object[] {"Object", "Mag", "From", "On the chart"},
+                    new Object[] {"Object", "Mag", "From", "Chart"},
                     0);
             for (OnThisPageStudyMain.Row row : rows) {
                 // Kind travels with the name rather than in a column
@@ -160,6 +160,20 @@ public final class OnThisPageMockupMain {
                     .setPreferredWidth(textSize * 7);
             table.getColumnModel().getColumn(2)
                     .setPreferredWidth(textSize * 5);
+            // The Chart column earns its width from its own words
+            // and header, the production policy (#257) - so the
+            // mock-up shows the answers whole, "No mark" included,
+            // at the narrow sidebar too.
+            table.getColumnModel().getColumn(3).setPreferredWidth(
+                    juranometria.ui.onthispage.OnThisPageTable
+                            .stateColumnWidth(
+                                    table.getFontMetrics(table.getFont()),
+                                    table.getTableHeader().getFontMetrics(
+                                            table.getTableHeader()
+                                                    .getFont())));
+            table.getColumnModel().getColumn(3).setMinWidth(
+                    table.getColumnModel().getColumn(3)
+                            .getPreferredWidth());
             table.setSelectionMode(javax.swing.ListSelectionModel
                     .MULTIPLE_INTERVAL_SELECTION);
             // Two marked, one of them the lead: what a reader sees

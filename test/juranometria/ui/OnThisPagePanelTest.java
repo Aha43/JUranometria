@@ -71,6 +71,129 @@ class OnThisPagePanelTest {
     private static final SkyPosition VIRGO = new SkyPosition(186.6, 12.7);
 
     @Test
+    void theChartColumnSortsByMeaningNotSpelling() throws Exception {
+        // Issue #257: Shown sorts first because the page draws it,
+        // not because of where S falls in the alphabet - which would
+        // put it fourth of five. The M31 page carries both drawn
+        // rows and the symbol-less NGC 206, so the two orders
+        // genuinely differ here.
+        try (Fixture fixture = new Fixture(M31, 8.0, 320, 400)) {
+            JTable table = fixture.panel.tableComponent();
+            SwingUtilities.invokeAndWait(() ->
+                    table.getRowSorter().setSortKeys(java.util.List.of(
+                            new javax.swing.RowSorter.SortKey(3,
+                                    javax.swing.SortOrder.ASCENDING))));
+            SwingUtilities.invokeAndWait(() -> { });
+            int previous = -1;
+            for (int row = 0; row < table.getRowCount(); row++) {
+                int ordinal = ((OnThisPageTable.Row)
+                        table.getValueAt(row, 3)).state().ordinal();
+                assertTrue(ordinal >= previous,
+                        "the states arrive in their declared order,"
+                                + " Shown before every silence: row "
+                                + row);
+                previous = ordinal;
+            }
+            assertEquals(juranometria.page.PageVisibility.DRAWN,
+                    ((OnThisPageTable.Row) table.getValueAt(0, 3))
+                            .state(),
+                    "and the first row ascending is a drawn one -"
+                            + " alphabetical display words would put"
+                            + " Faint there");
+        }
+    }
+
+    @Test
+    void theFourColumnsFitTheOrdinaryInspectorAtNormalText()
+            throws Exception {
+        // Issue #257's point: at the preferred 320 px Inspector and
+        // normal text, the compact vocabulary must not force a
+        // horizontal scrollbar. Measured with the fonts actually in
+        // use, so the claim is this platform's, not one machine's
+        // metrics pinned as universal.
+        try (Fixture fixture = new Fixture(M31, 8.0, 320, 400)) {
+            JTable table = fixture.panel.tableComponent();
+            SwingUtilities.invokeAndWait(() -> { });
+            int needed = 0;
+            for (int column = 0; column < table.getColumnCount();
+                    column++) {
+                needed += table.getColumnModel().getColumn(column)
+                        .getPreferredWidth();
+            }
+            assertTrue(needed <= 320,
+                    "the default arrangement fits the ordinary"
+                            + " Inspector without scrolling: needs "
+                            + needed + " px of 320");
+            assertEquals(JTable.AUTO_RESIZE_LAST_COLUMN,
+                    table.getAutoResizeMode(),
+                    "so the table stretches rather than scrolls");
+        }
+    }
+
+    @Test
+    void theCompactWordsKeepTheirWholeMeaningReachable()
+            throws Exception {
+        // The header keeps the complete question, and every cell's
+        // short word carries the whole answer as tooltip and
+        // accessible description - a glyph-short label, never a
+        // private code (issue #257).
+        try (Fixture fixture = new Fixture(M31, 8.0, 320, 400)) {
+            JTable table = fixture.panel.tableComponent();
+            String[] header = new String[1];
+            String[] cellTip = new String[1];
+            String[] cellAccessible = new String[1];
+            juranometria.page.PageVisibility[] state =
+                    new juranometria.page.PageVisibility[1];
+            SwingUtilities.invokeAndWait(() -> {
+                header[0] = table.getTableHeader()
+                        .getAccessibleContext()
+                        .getAccessibleDescription();
+                java.awt.Component cell = table.prepareRenderer(
+                        table.getCellRenderer(0, 3), 0, 3);
+                cellTip[0] = ((javax.swing.JComponent) cell)
+                        .getToolTipText();
+                cellAccessible[0] = cell.getAccessibleContext()
+                        .getAccessibleDescription();
+                state[0] = ((OnThisPageTable.Row)
+                        table.getValueAt(0, 3)).state();
+            });
+            assertEquals(OnThisPageTable.CHART_COLUMN_QUESTION,
+                    header[0],
+                    "the header keeps the complete question");
+            assertEquals(state[0].prose(), cellTip[0],
+                    "a cell's tooltip is the whole answer");
+            assertEquals(state[0].prose(), cellAccessible[0],
+                    "and so is its accessible description");
+        }
+    }
+
+    @Test
+    void theChartColumnSurvivesBeingDraggedSomewhereElse()
+            throws Exception {
+        // Reader-controlled reordering is part of why the column is
+        // worth its width (issue #257): moved to the front, it keeps
+        // its label, its meaning, and its semantic sort.
+        try (Fixture fixture = new Fixture(M31, 8.0, 320, 400)) {
+            JTable table = fixture.panel.tableComponent();
+            SwingUtilities.invokeAndWait(() ->
+                    table.getColumnModel().moveColumn(3, 0));
+            SwingUtilities.invokeAndWait(() ->
+                    table.getRowSorter().setSortKeys(java.util.List.of(
+                            new javax.swing.RowSorter.SortKey(3,
+                                    javax.swing.SortOrder.ASCENDING))));
+            SwingUtilities.invokeAndWait(() -> { });
+            assertEquals("Chart",
+                    table.getColumnModel().getColumn(0).getHeaderValue(),
+                    "the moved column keeps its header");
+            assertEquals(juranometria.page.PageVisibility.DRAWN,
+                    ((OnThisPageTable.Row) table.getValueAt(0, 0))
+                            .state(),
+                    "and its semantic sort: Shown first, wherever the"
+                            + " column sits");
+        }
+    }
+
+    @Test
     void everyWordTheTableExistsToSayFitsInANarrowSidebar()
             throws Exception {
         // 240 px is the narrowest the Inspector goes before it yields
@@ -93,12 +216,17 @@ class OnThisPagePanelTest {
                             + table.getColumnModel().getColumn(1).getWidth()
                             + " px and the words need "
                             + metrics.stringWidth("not recorded"));
+            int widestLabel = 0;
+            for (juranometria.page.PageVisibility state
+                    : juranometria.page.PageVisibility.values()) {
+                widestLabel = Math.max(widestLabel,
+                        metrics.stringWidth(state.label()));
+            }
             assertTrue(table.getColumnModel().getColumn(3).getWidth()
-                            >= metrics.stringWidth("too small here"),
+                            >= widestLabel,
                     "and neither does the answer beside it: "
                             + table.getColumnModel().getColumn(3).getWidth()
-                            + " px against "
-                            + metrics.stringWidth("too small here"));
+                            + " px against " + widestLabel);
             for (int column = 0; column < table.getColumnCount(); column++) {
                 assertTrue(table.getColumnModel().getColumn(column)
                                 .getWidth() > 0,

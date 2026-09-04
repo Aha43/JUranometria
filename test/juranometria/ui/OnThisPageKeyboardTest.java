@@ -134,10 +134,10 @@ class OnThisPageKeyboardTest {
     private void openTable() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             DefaultTableModel model = new DefaultTableModel(
-                    new Object[] {"Object", "Mag", "From", "On the chart"},
+                    new Object[] {"Object", "Mag", "From", "Chart"},
                     0);
             for (String row : ROWS) {
-                model.addRow(new Object[] {row, "—", "—", "drawn"});
+                model.addRow(new Object[] {row, "—", "—", "Shown"});
             }
             table = new JTable(model);
             table.setSelectionMode(
