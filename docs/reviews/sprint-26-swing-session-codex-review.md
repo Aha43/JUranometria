@@ -65,3 +65,23 @@ demonstrate backing-store visibility after both a successful body and a failing
 body. Ensure a failure settling the deletion follows the newly established
 suppression rule: primary when the body succeeded, suppressed when the body
 already failed.
+
+## Closing review at `f619a7c`
+
+Persistent deletion is now proved from another JVM after both body outcomes.
+One new P1 in the scanner must be closed before approval.
+
+### P1 — The read-only witness exemption hides preference writes without `.node(`
+
+The scanner now cancels a `Preferences.userRoot` touch whenever the file lacks
+`.node(`. That is not equivalent to read-only access: the root is itself a
+preference node, so `Preferences.userRoot().put(...)` or `.clear()` writes the
+backing store without ever calling `.node(`. A write through an already-held
+node can have the same shape. Such a file now classifies as touching nothing
+and escapes the zero-unprotected ratchet.
+
+Keep the general preference rule conservative and give `PrefsExistsProbe` a
+narrow, pinned read-only-witness exemption, or detect the actual write APIs as
+well as child-node creation. Add an adversarial fixture that writes directly
+to `userRoot()` with no `.node(` and require it to classify as a preference
+touch. Also prove the witness remains the only accepted read-only exception.
