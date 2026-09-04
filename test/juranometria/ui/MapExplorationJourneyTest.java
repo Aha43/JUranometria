@@ -1068,11 +1068,12 @@ class MapExplorationJourneyTest {
                 "and the reader can reach it with the arrow key");
     }
 
-    /** A key press delivered to a component, as a keyboard does;
-     *  the caller stands behind its own insistOnFocus (#243). */
+    /** A key press delivered to a component the desktop has been
+     *  made to focus, through the focus-proven route (#243). */
     private void key(java.awt.Component target, int keyCode)
             throws Exception {
-        ReaderInput.press((javax.swing.JComponent) target, keyCode, 0);
+        ReaderInput.shortcutOn((javax.swing.JComponent) target,
+                keyCode, 0);
     }
 
     /** Whether focus comes to rest on this component. */

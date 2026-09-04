@@ -575,9 +575,10 @@ class SprintTwentyFourJourneyTest {
     }
 
     private void press(int keyCode, int modifiers) throws Exception {
-        // Through the one raw dispatcher; the table's focus premise
-        // is established by insistOnFocus at the call sites (#243).
-        ReaderInput.press(table, keyCode, modifiers);
+        // The focus-proven route: the premise travels with the
+        // gesture rather than being trusted to a distant call site
+        // (#243 review).
+        ReaderInput.shortcutOn(table, keyCode, modifiers);
     }
 
     private static void flush() throws Exception {

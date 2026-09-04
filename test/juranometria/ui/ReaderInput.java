@@ -188,13 +188,15 @@ public final class ReaderInput {
 
     /**
      * A key pressed and released at a control - the one raw
-     * dispatcher in the whole suite, which the gate pins to exactly
-     * this file. The focus premise is the caller's: typeAndEnter,
-     * shortcut and shortcutOn establish it, and a journey calling
-     * press directly stands behind its own insistOnFocus.
+     * dispatcher in the whole suite, pinned to this file by the
+     * gate, and private (review): a public premise-free press was a
+     * bypass wearing the helper's name, and two journeys walked
+     * through it behind a requestFocusInWindow the desktop is free
+     * to refuse silently. Every outside caller takes a route that
+     * proves its premise - typeAndEnter, shortcut, or shortcutOn.
      */
-    public static void press(JComponent control, int keyCode,
-                             int modifiers) throws Exception {
+    private static void press(JComponent control, int keyCode,
+                              int modifiers) throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             for (int id : new int[] {KeyEvent.KEY_PRESSED,
                     KeyEvent.KEY_RELEASED}) {

@@ -800,7 +800,7 @@ class SprintTwentyThreeJourneyTest {
     }
 
     private void pressSpace(Component target) throws Exception {
-        ReaderInput.press((javax.swing.JComponent) target,
+        ReaderInput.shortcutOn((javax.swing.JComponent) target,
                 KeyEvent.VK_SPACE, 0);
         flush();
     }
@@ -839,7 +839,8 @@ class SprintTwentyThreeJourneyTest {
     }
 
     private void key(Component target, int keyCode) throws Exception {
-        ReaderInput.press((javax.swing.JComponent) target, keyCode, 0);
+        ReaderInput.shortcutOn((javax.swing.JComponent) target,
+                keyCode, 0);
     }
 
     /**

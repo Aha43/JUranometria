@@ -396,8 +396,15 @@ class TestEvidenceGateTest {
         assertEquals(List.of("test/juranometria/ui/ReaderInput.java"),
                 dispatchers,
                 "every journey presses through the shared routes -"
-                        + " typeAndEnter, shortcut, shortcutOn, or"
-                        + " press behind its own insistOnFocus");
+                        + " typeAndEnter, shortcut, or shortcutOn");
+        // And the raw dispatcher is private (review): a public
+        // premise-free press was a bypass wearing the helper's name.
+        String helper = Files.readString(
+                Path.of("test/juranometria/ui/ReaderInput.java"));
+        assertTrue(helper.contains("private static void press("),
+                "press is the helper's own business");
+        assertTrue(!helper.contains("public static void press("),
+                "and no route without a premise is public");
     }
 
     // ---- guard G4/G5 ratchets ---------------------------------------
