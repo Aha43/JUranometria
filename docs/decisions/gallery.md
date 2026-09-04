@@ -91,6 +91,31 @@ scopes the gallery to what 1.6.0 released and was filed before
 1.7.0 published. A black-sky room or slide is a natural later
 curation, by manifest change, not a silent scope growth here.
 
+## The editorial rule: describe, never compare
+
+The gallery is where JUranometria first speaks publicly in a
+sustained voice, and the review caught that voice slipping once:
+the Polaris caption called the pole "the page every equatorial
+chart is secretly about" — a trace of competitive product
+language, *other charts show the surface; this one reveals the
+secret*. Nothing in the project's reason for existing says that.
+JUranometria exists alongside Stellarium, printed atlases,
+planetarium software and the old chart sheet on a desk; it does
+not need to defeat them, and its confidence comes from precision,
+restraint and usefulness. The quiet-chart principle governs prose
+too.
+
+The rule, for the gallery and all future documentation:
+
+> **Describe what JUranometria lets the reader see. Do not imply
+> that other charts, tools, or readers failed to see it.**
+
+Pride belongs in the care of the work; it does not need to appear
+as comparison. The Polaris caption now reads "Here the geometry of
+equatorial coordinates becomes visible," and the same sweep
+retired two smaller flourishes ("honestly", "says so honestly")
+for plain statements of what the page shows.
+
 ## Interaction and visual contract
 
 - One index, three sections with their room names; every slide a
