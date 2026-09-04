@@ -176,12 +176,24 @@ photograph must never be diffed as if it were a report, and a
 report must never be excused as if it were a photograph.
 
 **As #242 settled it, the contracts are executable.**
-`make evidence-contracts` regenerates everything but the session
-photographs and reports a verdict per artifact — *reproduced*,
-*visually-inspected* (widget drift restored from the committed
-snapshot, never left as churn), *deliberately-unchanged*
-(fixtures checksum-verified; photographs whose generator needs a
-display), *widget-measured* — and exits nonzero on any breach. The
+`make evidence-contracts` runs every generator that writes into
+docs/studies — the eight legacy study mains that write only under
+`build/` are not run, which is also what makes the command work
+from a clean checkout: the one gitignored input (the constellation
+downloads) belonged to a main that verified nothing here. Verdicts
+per artifact, none claiming an inspection no command performed:
+*reproduced* (rewritten, byte-identical — told apart from merely
+untouched by modification time), *legacy-baseline* (a directory
+its sprint hand-promoted; no active generator, held as committed),
+*inspection-imagery unchanged / regenerated identical / drift
+restored — inspect before any recommit*, *deliberately-unchanged*
+(fixtures checksum-verified; session photographs), and
+*widget-measured (display required; held to substance)*. Exits
+nonzero on any breach. An outer restoration path runs whatever
+happens — a generator dying mid-run included — putting inspection
+imagery back to its committed bytes and removing inspection-class
+strays; a file generation creates that nobody committed is a
+breach by name, never a silent escape. The
 cheap half runs in the ordinary suite: the four fast reports
 reproduced from their mains' stdout on every push, the fixtures
 held to pinned digests, every report present, and the inspection

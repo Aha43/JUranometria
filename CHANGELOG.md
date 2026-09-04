@@ -11,8 +11,9 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - **Executable evidence contracts** (Sprint 26, issue #242).
   `make evidence-contracts` regenerates the generated evidence and
-  reports a verdict per artifact — reproduced, visually-inspected
-  (drift restored, never churned), deliberately-unchanged — while
+  reports a verdict per artifact — reproduced, legacy-baseline,
+  inspection-imagery (drift restored, never churned, never claimed
+  inspected by a command without eyes), deliberately-unchanged — while
   the ordinary suite reproduces the fast reports from their mains,
   pins the SOFA fixtures by digest, and holds inspection imagery to
   structure: themes, sizes, distinctness. Making the contracts
