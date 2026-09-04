@@ -33,7 +33,11 @@ import java.util.stream.Stream;
  *       a command that has no eyes (review);</li>
  *   <li><strong>deliberately-unchanged</strong> - byte-exact
  *       fixtures (checksum-verified) and session photographs, whose
- *       generator needs a display and is not run here at all.</li>
+ *       generator needs a display and is not run here at all;</li>
+ *   <li><strong>checksum-verified (captured evidence)</strong> -
+ *       operating-system screenshots (issue #245), digest-pinned:
+ *       no command regenerates a desktop's Finder or Dock, so a
+ *       change or an unpinned newcomer is a breach by name.</li>
  * </ul>
  *
  * <p>The whole committed tree under docs/studies is snapshotted -
@@ -242,6 +246,87 @@ public final class EvidenceContractMain {
                     "docs/studies/coordinate-grid/m31-08-absent.png",
                     "docs/studies/coordinate-grid/m31-08-labelled.png",
                     "docs/studies/coordinate-grid/m31-08-lines-only.png");
+
+    /**
+     * The captured evidence, pinned by digest: operating-system
+     * screenshots (issue #245) that no command of ours can
+     * regenerate - the desktop's own Finder, Dock and switcher
+     * surfaces at a stated moment, with their provenance in the
+     * decision document. A capture without a pin, a pin without its
+     * capture, and changed bytes are each their own breach: a
+     * re-capture arrives by commit and review, like a fixture's
+     * provenance event, never by a file quietly swapped in.
+     */
+    static final Map<String, String> CAPTURES = new TreeMap<>();
+    static {
+        CAPTURES.put("docs/studies/mac-identity/"
+                        + "screenshot-applications-folder.png",
+                "c99125132638540ced866e1268ee0d870814a6ce"
+                        + "cf7086db31385a8ce40b4b4a");
+        CAPTURES.put("docs/studies/mac-identity/"
+                        + "screenshot-desktop-alias.png",
+                "961c4ddc311e0062713b37ec7e0c83666e0f2a6b"
+                        + "a3982c2ccb85eda954507386");
+        CAPTURES.put("docs/studies/mac-identity/"
+                        + "screenshot-dock-app.png",
+                "170ddb6dd475a0efb7c2f60fa693f4ef8b8f6ed9"
+                        + "249e7d871f912d1385c38c0b");
+        CAPTURES.put("docs/studies/mac-identity/"
+                        + "screenshot-dock-candidate.png",
+                "d7921af08fff6dffd493fa1942660fad75e1cd77"
+                        + "51d9e1219759e3abd01fa424");
+        CAPTURES.put("docs/studies/mac-identity/"
+                        + "screenshot-dock-jar.png",
+                "833eb38785ee88ba93949733e3607a8860b59040"
+                        + "5ae7c4b56dae326f0b921767");
+        CAPTURES.put("docs/studies/mac-identity/"
+                        + "screenshot-finder-prelaunch.png",
+                "d01ea316b407aef5b19faef8b7facda51e6beedd"
+                        + "cc7457283299da8db2e66b71");
+        CAPTURES.put("docs/studies/mac-identity/"
+                        + "screenshot-switcher.png",
+                "f23e58127b49789f8371ba6c41d5b6ccdf59c67f"
+                        + "4bff1ea5b2f3450b14579fad");
+    }
+
+    /**
+     * The breaches for one captured-evidence artifact: unpinned,
+     * vanished mid-run, or no longer the pinned bytes. Extracted so
+     * each branch has a regression test rather than a rehearsal.
+     */
+    static List<String> captureBreaches(String path, byte[] now) {
+        String pin = CAPTURES.get(path);
+        if (pin == null) {
+            return List.of(path + ": captured evidence without a"
+                    + " pinned digest - a capture arrives with its"
+                    + " provenance pinned, not by a file copied in");
+        }
+        if (now == null) {
+            return List.of(path + ": captured evidence vanished"
+                    + " during generation");
+        }
+        String digest = juranometria.catalog.Sha256.hex(now);
+        if (!digest.equals(pin)) {
+            return List.of(path + ": captured evidence changed - a"
+                    + " re-capture is a provenance event, not a"
+                    + " regeneration: " + digest);
+        }
+        return List.of();
+    }
+
+    /** Pinned captures the committed tree no longer holds. */
+    static List<String> vanishedCapturePins(
+            java.util.Set<String> committed) {
+        List<String> breaches = new ArrayList<>();
+        for (String pinned : CAPTURES.keySet()) {
+            if (!committed.contains(pinned)) {
+                breaches.add(pinned + ": pinned captured evidence is"
+                        + " missing from the tree - removing one is a"
+                        + " reviewed decision, pin and file together");
+            }
+        }
+        return breaches;
+    }
 
     /** The byte-exact fixtures, pinned by digest. */
     public static final Map<String, String> FIXTURES = Map.of(
@@ -552,9 +637,20 @@ public final class EvidenceContractMain {
                 case "byte-exact-fixture" ->
                         tally(verdicts, "deliberately-unchanged"
                                 + " (fixture)");
+                case "captured-evidence" -> {
+                    List<String> breaches = captureBreaches(path, now);
+                    if (breaches.isEmpty()) {
+                        tally(verdicts, "checksum-verified"
+                                + " (captured evidence)");
+                    } else {
+                        failures.addAll(breaches);
+                    }
+                }
                 default -> tally(verdicts, cls);
             }
         }
+
+        failures.addAll(vanishedCapturePins(committed.keySet()));
 
         // ---- fixtures, by digest -----------------------------------
         for (Map.Entry<String, String> fixture : FIXTURES.entrySet()) {

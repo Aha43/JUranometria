@@ -427,7 +427,7 @@ class TestEvidenceGateTest {
     }
 
     @Test
-    void theFiveEvidenceClassesEachClaimTheRightArtifacts()
+    void theSixEvidenceClassesEachClaimTheRightArtifacts()
             throws IOException {
         // Guard G5, proven on one name from each class. The first
         // draft filed every PNG as inspection imagery - weakening
@@ -451,14 +451,22 @@ class TestEvidenceGateTest {
                 TestEvidenceScan.artifactClass("sidebar-dense.png"));
         assertEquals("session-photograph",
                 TestEvidenceScan.artifactClass("dialog-real-dark.png"));
+        assertEquals("captured-evidence",
+                TestEvidenceScan.artifactClass(
+                        "screenshot-dock-app.png"),
+                "an operating-system screenshot is captured"
+                        + " evidence, digest-pinned - never filed as"
+                        + " artwork a command could regenerate");
 
         String report = Files.readString(REPORT);
         for (String named : List.of("deterministic-report",
                 "byte-exact-fixture", "renderer-drawn",
                 "widget-rendered-inspection", "session-photograph",
+                "captured-evidence",
                 "reference-vectors.txt",
                 "scripts/reference-vectors.c",
-                "dialog-real.png")) {
+                "dialog-real.png",
+                "screenshot-dock-app.png")) {
             assertTrue(report.contains(named),
                     "the report names it: " + named);
         }

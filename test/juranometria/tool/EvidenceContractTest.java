@@ -93,6 +93,69 @@ class EvidenceContractTest {
         }
     }
 
+    @Test
+    void theCapturedEvidenceCarriesExactlyItsPinnedBytes()
+            throws Exception {
+        for (Map.Entry<String, String> capture
+                : EvidenceContractMain.CAPTURES.entrySet()) {
+            assertEquals(capture.getValue(),
+                    juranometria.catalog.Sha256.hex(Files.readAllBytes(
+                            Path.of(capture.getKey()))),
+                    capture.getKey() + " is an operating-system"
+                            + " screenshot with provenance; a"
+                            + " re-capture is a provenance event, not"
+                            + " a regeneration");
+        }
+    }
+
+    @Test
+    void theCaptureContractJudgesAllItsBranches() throws Exception {
+        String pinned = EvidenceContractMain.CAPTURES.keySet()
+                .iterator().next();
+        byte[] bytes = Files.readAllBytes(Path.of(pinned));
+
+        assertEquals(List.of(),
+                EvidenceContractMain.captureBreaches(pinned, bytes),
+                "the pinned bytes pass");
+        List<String> unpinned = EvidenceContractMain.captureBreaches(
+                "docs/studies/mac-identity/screenshot-stray.png",
+                bytes);
+        assertEquals(1, unpinned.size(),
+                "a capture nobody pinned is a breach, never a silent"
+                        + " baseline");
+        assertTrue(unpinned.get(0).contains("without a pinned digest"),
+                unpinned.get(0));
+        List<String> vanished = EvidenceContractMain.captureBreaches(
+                pinned, null);
+        assertEquals(1, vanished.size(), "a capture that vanished"
+                + " mid-run is a breach");
+        assertTrue(vanished.get(0).contains("vanished"),
+                vanished.get(0));
+        byte[] doctored = bytes.clone();
+        doctored[doctored.length / 2] ^= 1;
+        List<String> changed = EvidenceContractMain.captureBreaches(
+                pinned, doctored);
+        assertEquals(1, changed.size(),
+                "one flipped bit in a substituted screenshot is"
+                        + " caught by its digest");
+        assertTrue(changed.get(0).contains("provenance event"),
+                changed.get(0));
+
+        List<String> allVanished = EvidenceContractMain
+                .vanishedCapturePins(java.util.Set.of());
+        assertEquals(EvidenceContractMain.CAPTURES.size(),
+                allVanished.size(),
+                "every vanished pinned capture is its own breach");
+        for (String breach : allVanished) {
+            assertTrue(breach.contains("missing from the tree"),
+                    breach);
+        }
+        assertEquals(List.of(), EvidenceContractMain
+                        .vanishedCapturePins(
+                                EvidenceContractMain.CAPTURES.keySet()),
+                "and a tree holding every pinned capture is clean");
+    }
+
     // ---- the restoration guarantees, regression-tested ---------------
 
     @Test

@@ -65,9 +65,17 @@ unpack it anywhere (paths with spaces are fine):
 | Bring your own Java 21+ | `...-portable.zip` | `./juranometria`, `juranometria.bat`, or `java -jar JUranometria.jar` |
 
 The first four include their own Java runtime - install nothing.
-Each archive carries a `README.txt`; the portable one also covers
-troubleshooting for a missing or too-old Java, and `SHA256SUMS.txt`
-beside the downloads lets you verify what you got.
+They are also what carries the application's own identity: on a
+Mac, `JUranometria.app` wears the Andromeda mark in Finder, the
+Dock and the application switcher, wherever you keep or alias it.
+The portable flavour runs under your own Java, and macOS shows a
+plain JAR with Java's generic icon in the Dock - that is how the
+operating system treats any JAR, not a defect in the download. If
+you want the application to look like an application, take the
+`.app`. Each archive carries a `README.txt`; the portable one also
+covers troubleshooting for a missing or too-old Java, and
+`SHA256SUMS.txt` beside the downloads lets you verify what you
+got.
 
 **These builds are unsigned.** On macOS, Gatekeeper may block the
 first launch: right-click the app and choose Open, or approve it

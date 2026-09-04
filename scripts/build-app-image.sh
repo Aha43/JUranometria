@@ -216,7 +216,28 @@ case "$(uname -s)" in
                  "this repository committed" >&2
             exit 1
         }
-        echo "icon: $(basename "$icon") installed and identical"
+        # Installed and identical is still not DISPLAYED: macOS
+        # reads whatever container Info.plist names through
+        # CFBundleIconFile, so a bundle can carry a perfect icns
+        # that nothing references and wear Java's default anyway
+        # (issue #245: an unreferenced ICNS must not pass). The
+        # key may name the file with or without its extension;
+        # both resolve to the container asserted above.
+        iconref=$(/usr/libexec/PlistBuddy \
+            -c 'Print :CFBundleIconFile' \
+            "$image/Contents/Info.plist" 2>/dev/null || true)
+        case "$iconref" in
+            JUranometria.icns|JUranometria) ;;
+            *)
+                echo "build-app-image: Info.plist does not reference" \
+                     "the installed icon container" >&2
+                echo "  CFBundleIconFile: '${iconref:-missing}'" >&2
+                echo "  installed:        $(basename "$installed")" >&2
+                exit 1
+                ;;
+        esac
+        echo "icon: $(basename "$icon") installed, identical, and" \
+             "referenced by CFBundleIconFile"
         ;;
     Linux)
         installed=$(find "$image" -name 'JUranometria.png' | head -1)
