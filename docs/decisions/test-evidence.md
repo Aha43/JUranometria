@@ -173,11 +173,76 @@ SOFA oracle as artwork. The classes are now:
 bytes against them and changing one is a reviewed decision. Nothing
 in this sprint may blur these classes into each other — a
 photograph must never be diffed as if it were a report, and a
-report must never be excused as if it were a photograph. Issue
-**#242** owns making these contracts executable, and the
-renderer-drawn class gives it teeth: a widget PNG misfiled as
-renderer-drawn will fail #242's regenerate-and-diff immediately,
-so the default is fail-safe.
+report must never be excused as if it were a photograph.
+
+**As #242 settled it, the contracts are executable.**
+`make evidence-contracts` runs every generator that writes into
+docs/studies — the eight legacy study mains that write only under
+`build/` are not run, which is also what makes the command work
+from a clean checkout: the one gitignored input (the constellation
+downloads) belonged to a main that verified nothing here. Verdicts
+per artifact, none claiming an inspection no command performed:
+*reproduced* (rewritten, byte-identical — told apart from merely
+untouched by modification time), *legacy-baseline* (a directory
+its sprint hand-promoted; no active generator, held as committed),
+*inspection-imagery unchanged / regenerated identical / drift
+restored — inspect before any recommit*, *deliberately-unchanged*
+(fixtures checksum-verified; session photographs), and
+*widget-measured (display required; held to substance)*. Exits
+nonzero on any breach. An outer restoration path runs whatever
+happens — a generator dying mid-run included — putting inspection
+imagery back to its committed bytes and removing inspection-class
+strays, while strays of other classes are left for their named
+breach; a file generation creates that nobody committed is a
+breach by name, never a silent escape. The restoration and
+newcomer guarantees carry regression tests of their own, with two
+mutations killed (a restore skipped, a deletion that overreached).
+
+**The promoted studies are compared, not merely held** (review):
+the six legacy generators run too — eleven seconds in all — and
+every hand-promoted page under regional, constellation, grid,
+bayer, chart-options and star-identity is byte-compared against
+its own generator's build output, paired per directory after a
+name collision (two studies each promoted an
+orion-36-everything.png) briefly cross-compared them. Seventy-
+three pages had quietly fallen behind the atlas — pre-grid,
+pre-Bayer renderings of pages whose studies' own rule is that
+they track production — and were re-baselined. **Eight promoted
+files match no generator output by name** — hand-composed
+variants from their sprints — pinned by exact path and held as
+committed, and the pin is enforced in both directions: an
+unmatched promoted file outside the pin is a breach, and a
+pinned entry that gains a generator match or vanishes is a stale
+pin, also a breach. Two generators are input-gated on gitignored
+downloads (constellations and star identities — the second found
+when incomplete-fails-loudly was rehearsed); where their inputs
+are absent the run **fails as incomplete** with the fetch command
+named, because a family left unverified is not a green light. The
+outer restoration runs as the verifier's own `finally`, and its
+regression test throws a generator through that very path. The
+cheap half runs in the ordinary suite: the four fast reports
+reproduced from their mains' stdout on every push, the fixtures
+held to pinned digests, every report present, and the inspection
+imagery held to structure (themes by corner luminance, enlarged
+wider than plain, the 240 px mock-up its named width, variants
+genuinely distinct). What pixels cannot prove — the right dialog,
+unclipped controls — the packed-dialog lifecycle test proves
+against the production window itself.
+
+**One recorded exception**, as the issue required: the
+deep-sky-vocabulary measurements embed widget-measured dialog
+geometry, so their bytes depend on a display and a look-and-feel;
+that report is regenerated on the maintainer's machine and held to
+existence and substance, not bytes.
+
+**What making the contracts executable found**, first runs: a
+committed light-theme dialog photograph carrying the 344 px
+black-stripe defect from #228's stale-class window (the study
+built Swing off the event thread, making packed widths depend on
+which theme ran first in the JVM — it photographs on the EDT now);
+and fifteen Sprint 19–20 renderer study images stale against
+production, one visibly missing the ν Bayer letter Sprint 17
+added. All re-baselined under the stated environment.
 
 ## What stays required, and what may abort
 

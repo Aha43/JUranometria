@@ -367,7 +367,7 @@ public final class TestEvidenceScan {
             }
         }
         for (String prefix : new String[] {"controls-", "sidebar-",
-                "deep-sky-tab"}) {
+                "deep-sky-tab", "tab-", "symbols-"}) {
             if (fileName.startsWith(prefix)) {
                 return "widget-rendered-inspection";
             }

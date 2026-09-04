@@ -117,8 +117,8 @@ Whether a particular read happens on the event thread is control flow, which tex
 |---|---|---|
 | deterministic-report | regenerates byte-for-byte on the same tree | 8 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 2 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 170 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 24 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 165 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 29 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -138,6 +138,11 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/deep-sky-vocabulary/deep-sky-tab-short-screen-large-text.png
 - docs/studies/deep-sky-vocabulary/deep-sky-tab-short-screen.png
 - docs/studies/deep-sky-vocabulary/deep-sky-tab.png
+- docs/studies/deep-sky-vocabulary/symbols-11px.png
+- docs/studies/deep-sky-vocabulary/symbols-14px.png
+- docs/studies/deep-sky-vocabulary/tab-chart.png
+- docs/studies/deep-sky-vocabulary/tab-constellations.png
+- docs/studies/deep-sky-vocabulary/tab-stars.png
 - docs/studies/on-this-page/sidebar-dense-enlarged.png
 - docs/studies/on-this-page/sidebar-dense.png
 - docs/studies/on-this-page/sidebar-empty.png

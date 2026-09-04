@@ -9,6 +9,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Executable evidence contracts** (Sprint 26, issue #242).
+  `make evidence-contracts` regenerates the generated evidence and
+  reports a verdict per artifact — reproduced, legacy-baseline,
+  inspection-imagery (drift restored, never churned, never claimed
+  inspected by a command without eyes), deliberately-unchanged — while
+  the ordinary suite reproduces the fast reports from their mains,
+  pins the SOFA fixtures by digest, and holds inspection imagery to
+  structure: themes, sizes, distinctness. Making the contracts
+  executable immediately found a committed dialog photograph
+  carrying a stale-class rendering defect and fifteen Sprint 19–20
+  study images quietly stale against production; all re-baselined.
 - **Display-test discipline** (Sprint 26, issue #243). Every
   route-claiming journey now presses what a reader presses, through
   one shared `ReaderInput`: premise-asserted pointer clicks,

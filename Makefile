@@ -237,7 +237,10 @@ on-this-page-study: classes
 		> docs/studies/on-this-page/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.OnThisPageMockupMain
 
-.PHONY: test-evidence-study place-and-time-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study
+evidence-contracts: classes
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
+
 test-evidence-study: classes
 	mkdir -p docs/studies/test-evidence
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.TestEvidenceStudyMain \
