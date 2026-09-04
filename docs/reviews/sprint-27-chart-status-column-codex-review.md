@@ -42,3 +42,15 @@ also require a different header such as Object not to inherit Chart's
 description. This keeps the compact visual word from becoming private while
 avoiding a screen reader being told that every column answers the visibility
 question.
+
+## Re-review
+
+Resolved at `d93e49d`. Column widths are now applied by each visible column's
+model identity, and the regression carries a reordered table through a later
+resize before checking both Chart and Object. The complete question is carried
+by a wrapper around the look-and-feel header renderer for the Chart cell
+alone; the wrapper keys it to model identity and clears the reused component's
+description for Object and the other headers.
+
+No findings remain. PR #265 is approved; the working-selection gate may begin
+after this issue merges.
