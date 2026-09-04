@@ -34,7 +34,13 @@ whatever releases exist later. Use the immutable v1.7.0 release URL
 release value, so the public gallery's stated provenance and download
 destination cannot drift apart after 1.8.0.
 
-## Result
+## Re-review
 
-One P1 captured-evidence correction and one P2 provenance-link correction
-remain. Publication issue #253 stays held.
+Resolved at `5ef5b26`. Both narrow captures now contain only gallery page
+content when inspected at native size, their digests are repinned, and the
+regression reads every committed gallery capture's own corner patches rather
+than a stand-in. The manifest and every derived footer now point to the
+immutable v1.7.0 release URL.
+
+No findings remain. PR #263 is approved; publication issue #253 may begin
+after this gate merges.
