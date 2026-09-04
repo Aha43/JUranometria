@@ -85,3 +85,11 @@ narrow, pinned read-only-witness exemption, or detect the actual write APIs as
 well as child-node creation. Add an adversarial fixture that writes directly
 to `userRoot()` with no `.node(` and require it to classify as a preference
 touch. Also prove the witness remains the only accepted read-only exception.
+
+## Approval at `3874414`
+
+All findings are closed. Scratch-node deletion is settled through the parent
+and witnessed from another JVM after both body outcomes; failure suppression
+preserves the evidence that matters; direct root writes remain guarded; and the
+single read-only witness is exempted only by its pinned path. PR #248 may merge,
+and #243 may begin after that merge.
