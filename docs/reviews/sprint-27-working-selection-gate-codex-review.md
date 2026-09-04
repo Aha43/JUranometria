@@ -52,3 +52,17 @@ directions with real keyboard and pointer gestures, including a pre-existing
 member inside the range and an off-page member outside it. “One transition”
 must apply to each delivered range change without making the visible table and
 the session set disagree.
+
+## Re-review
+
+Resolved at `195fbf2`. Both interactions are now captured transactions whose
+intermediate states are recomputed from the membership at gesture start.
+Ambiguous candidate cycling applies exactly one reversible toggle for the
+currently offered candidate across every absent/present combination. Additive
+range growth and contraction use the snapshot union the current anchored
+range, preserving pre-existing and off-page members, retracting only the
+range's own additions, and deriving order independently of the path taken.
+The ordinary range uses the same transaction with replacement semantics, and
+both new failure modes are named in the implementation's owed mutation checks.
+
+No findings remain. PR #266 is approved; #260 may begin after the gate merges.
