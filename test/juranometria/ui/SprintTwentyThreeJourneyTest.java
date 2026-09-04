@@ -71,12 +71,12 @@ class SprintTwentyThreeJourneyTest {
     private JFrame window;
     private javax.swing.JCheckBoxMenuItem inspectorItem;
     private Preferences store;
-    private javax.swing.LookAndFeel inheritedLookAndFeel;
+    private juranometria.app.SwingSession.Held inheritedSession;
     private final List<String> shutdownSteps = new ArrayList<>();
 
     @org.junit.jupiter.api.BeforeEach
     void rememberTheLookAndFeel() {
-        inheritedLookAndFeel = javax.swing.UIManager.getLookAndFeel();
+        inheritedSession = juranometria.app.SwingSession.capture();
     }
 
     @org.junit.jupiter.api.AfterEach
@@ -85,15 +85,9 @@ class SprintTwentyThreeJourneyTest {
             SwingUtilities.invokeAndWait(window::dispose);
             window = null;
         }
-        if (!GraphicsEnvironment.isHeadless() && inheritedLookAndFeel != null) {
-            SwingUtilities.invokeAndWait(() -> {
-                try {
-                    javax.swing.UIManager.setLookAndFeel(inheritedLookAndFeel);
-                    com.formdev.flatlaf.FlatLaf.updateUI();
-                } catch (javax.swing.UnsupportedLookAndFeelException e) {
-                    throw new IllegalStateException(e);
-                }
-            });
+        if (inheritedSession != null) {
+            // The shared guard's restore (#224).
+            inheritedSession.restore();
         }
         if (store != null) {
             store.removeNode();

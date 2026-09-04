@@ -33,8 +33,32 @@ public final class ExitProbeMain {
     }
 
     public static void main(String[] args) throws Exception {
-        Preferences scratch = Preferences.userRoot()
-                .node("juranometria-exit-probe-" + System.nanoTime());
+        // The node's name comes from the parent test, which asserts
+        // after this JVM ends that the deletion really reached the
+        // backing store - a probe that only promised to clean up
+        // was proving nothing (review).
+        Preferences scratch = Preferences.userRoot().node(
+                args.length > 0 ? args[0]
+                        : "juranometria-exit-probe-" + System.nanoTime());
+        // The probe's success path IS System.exit, so a cleanup
+        // written after the click can never run on success - which
+        // is how every passing probe run leaked a node until the
+        // gate counted them (#241, #224). A shutdown hook runs on
+        // both paths. Removal is flushed through the PARENT, because
+        // flushing a removed node throws - the first version did
+        // exactly that and swallowed it, so the deletion could die
+        // in memory (review). Trouble is printed, not swallowed:
+        // the parent captures this stream.
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                Preferences parent = scratch.parent();
+                scratch.removeNode();
+                parent.flush();
+            } catch (Exception trouble) {
+                System.err.println("exit probe cleanup failed: "
+                        + trouble);
+            }
+        }));
         AppShutdown shutdown = new AppShutdown(
                 () -> AppShutdown.flushPreferences(scratch),
                 AppShutdown::disposeEveryWindow,
@@ -57,11 +81,6 @@ public final class ExitProbeMain {
         // Only reached if the button did not take the application
         // out. Say which half failed, so the test can report it.
         Thread.sleep(2000);
-        try {
-            scratch.removeNode();
-        } catch (Exception ignored) {
-            // Nothing to do on the way to failing.
-        }
         System.err.println(detached[0]
                 ? "shutdown ran but did not terminate"
                 : "the exit button did not reach the shutdown path");

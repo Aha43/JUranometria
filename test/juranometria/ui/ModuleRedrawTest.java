@@ -92,11 +92,11 @@ class ModuleRedrawTest {
     }
 
     @Test
-    void aModuleChangeRepaintsTheChartAndRebuildsNothing() {
-        RepaintManager before = RepaintManager.currentManager(null);
+    void aModuleChangeRepaintsTheChartAndRebuildsNothing()
+            throws Exception {
         RecordingRepaints repaints = new RecordingRepaints();
-        RepaintManager.setCurrentManager(repaints);
-        try {
+        juranometria.app.SwingSession.restoringRepaintManager(() -> {
+            RepaintManager.setCurrentManager(repaints);
             Rig rig = new Rig();
             MeridianModule module = rig.host.attach(new MeridianModule(
                     new juranometria.sky.Observer(59.913, 10.752,
@@ -128,9 +128,7 @@ class ModuleRedrawTest {
                     "and no page-change was announced, because the"
                             + " page did not change - a module"
                             + " redrawing its own lines is not news");
-        } finally {
-            RepaintManager.setCurrentManager(before);
-        }
+        });
     }
 
     @Test

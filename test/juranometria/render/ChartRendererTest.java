@@ -263,18 +263,15 @@ class ChartRendererTest {
     }
 
     @Test
-    void chartNotationIsIndependentOfTheDefaultLocale() {
-        Locale original = Locale.getDefault();
-        try {
+    void chartNotationIsIndependentOfTheDefaultLocale() throws Exception {
+        juranometria.app.SwingSession.restoringLocale(() -> {
             Locale.setDefault(Locale.forLanguageTag("nb-NO"));
             int[] norwegian = pixels(RENDERER.renderToImage(SCENE));
             Locale.setDefault(Locale.US);
             int[] us = pixels(RENDERER.renderToImage(SCENE));
             assertArrayEquals(norwegian, us,
                     "rendering must not depend on the machine locale");
-        } finally {
-            Locale.setDefault(original);
-        }
+        });
     }
 
     @Test

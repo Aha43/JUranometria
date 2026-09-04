@@ -215,28 +215,26 @@ class LocalSkyTest {
     // ---- determinism -----------------------------------------------
 
     @Test
-    void theAnswerDoesNotDependOnTheMachine() {
-        Locale locale = Locale.getDefault();
-        TimeZone zone = TimeZone.getDefault();
-        try {
-            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
-            TimeZone.setDefault(TimeZone.getTimeZone(
-                    ZoneId.of("Pacific/Kiritimati")));
-            SkyPosition there = sky(59.913, 10.752).zenith();
+    void theAnswerDoesNotDependOnTheMachine() throws Exception {
+        juranometria.app.SwingSession.restoringLocale(() ->
+                juranometria.app.SwingSession.restoringTimeZone(() -> {
+                    Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                    TimeZone.setDefault(TimeZone.getTimeZone(
+                            ZoneId.of("Pacific/Kiritimati")));
+                    SkyPosition there = sky(59.913, 10.752).zenith();
 
-            Locale.setDefault(Locale.forLanguageTag("en-GB"));
-            TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC));
-            SkyPosition here = sky(59.913, 10.752).zenith();
+                    Locale.setDefault(Locale.forLanguageTag("en-GB"));
+                    TimeZone.setDefault(TimeZone.getTimeZone(
+                            ZoneOffset.UTC));
+                    SkyPosition here = sky(59.913, 10.752).zenith();
 
-            assertEquals(here, there,
-                    "an instant is an instant: the host's locale and"
-                            + " time zone change nothing, and a model"
-                            + " that read them would give two readers"
-                            + " different skies");
-        } finally {
-            Locale.setDefault(locale);
-            TimeZone.setDefault(zone);
-        }
+                    assertEquals(here, there,
+                            "an instant is an instant: the host's"
+                                    + " locale and time zone change"
+                                    + " nothing, and a model that read"
+                                    + " them would give two readers"
+                                    + " different skies");
+                }));
     }
 
     @Test

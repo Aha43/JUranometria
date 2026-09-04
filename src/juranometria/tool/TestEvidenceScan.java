@@ -81,7 +81,7 @@ public final class TestEvidenceScan {
      */
     private record SharedState(String name, String[] touches,
                                String[] captures, String[] restores,
-                               boolean swingSessionCovers) {
+                               String[] sharedGuards) {
     }
 
     private static final List<SharedState> GLOBAL_STATE = List.of(
@@ -90,31 +90,37 @@ public final class TestEvidenceScan {
                             "FlatLightLaf.setup", "FlatDarkLaf.setup",
                             "UiTheme.apply"},
                     new String[] {"UIManager.getLookAndFeel"},
-                    new String[] {"UIManager.setLookAndFeel"}, true),
+                    new String[] {"UIManager.setLookAndFeel"},
+                    new String[] {"SwingSession.restoring(",
+                            "SwingSession.capture()"}),
             new SharedState("default-font",
                     new String[] {"UIManager.put(\"defaultFont\""},
                     new String[] {"fontOverride()",
                             "get(\"defaultFont\")",
                             "containsKey(\"defaultFont\")"},
                     new String[] {"UIManager.put(\"defaultFont\""},
-                    true),
+                    new String[] {"SwingSession.restoring(",
+                            "SwingSession.capture()"}),
             new SharedState("locale",
                     new String[] {"Locale.setDefault"},
                     new String[] {"Locale.getDefault"},
-                    new String[] {"Locale.setDefault"}, false),
+                    new String[] {"Locale.setDefault"},
+                    new String[] {"SwingSession.restoringLocale("}),
             new SharedState("time-zone",
                     new String[] {"TimeZone.setDefault"},
                     new String[] {"TimeZone.getDefault"},
-                    new String[] {"TimeZone.setDefault"}, false),
+                    new String[] {"TimeZone.setDefault"},
+                    new String[] {"SwingSession.restoringTimeZone("}),
             new SharedState("repaint-manager",
                     new String[] {"RepaintManager.setCurrentManager"},
                     new String[] {"RepaintManager.currentManager"},
                     new String[] {"RepaintManager.setCurrentManager"},
-                    false),
+                    new String[] {"SwingSession.restoringRepaintManager("}),
             new SharedState("preferences",
                     new String[] {"Preferences.userRoot"},
                     new String[] {},
-                    new String[] {"removeNode()", ".clear()"}, false));
+                    new String[] {"removeNode()", ".clear()"},
+                    new String[] {"SwingSession.scratchPreferences("}));
 
     private static final List<Marker> DISPLAY = List.of(
             new Marker("display",
@@ -155,9 +161,27 @@ public final class TestEvidenceScan {
     public static File classify(String path, String kind,
                                 String rawSource) {
         String source = withoutComments(rawSource);
-        boolean shared = source.contains("SwingSession.restoring");
+        // The shared guard itself: its bodies ARE the captures and
+        // restores every other file is measured against, and after
+        // the suppression rework (#224 review) they run through
+        // guarded() rather than a literal finally - so the rule
+        // that serves the corpus would flag the instrument. Named
+        // for what it is instead, and the gate pins that exactly
+        // one file may claim the name.
+        if (source.contains("class SwingSession")
+                && source.contains("static void guarded(")) {
+            return new File(path, kind, List.of("all-of-them"),
+                    List.of(), "the-shared-guard", false, List.of(),
+                    List.of(), List.of(), count(source, "invokeAndWait"),
+                    0);
+        }
+        // A place a cleanup actually runs: a finally, a JUnit
+        // AfterEach, or a JVM shutdown hook - the last for probes
+        // whose success path is System.exit, where nothing written
+        // after the click can ever run.
         boolean restorePlace = source.contains("finally")
-                || source.contains("AfterEach");
+                || source.contains("AfterEach")
+                || source.contains("addShutdownHook");
         List<String> touched = new ArrayList<>();
         List<String> unprotected = new ArrayList<>();
         boolean anyShared = false;
@@ -166,11 +190,29 @@ public final class TestEvidenceScan {
             for (String touch : state.touches()) {
                 touches |= source.contains(touch);
             }
+            // The read-only witnesses, exempted by pinned name
+            // rather than by shape: an earlier rule exempted every
+            // source with no .node( call, which also exempted a
+            // direct write to the root itself (review). The list is
+            // pinned by the gate, and everything else that reaches
+            // userRoot - roots, nodes, reads that turn out to write -
+            // stays detectable.
+            if (state.name().equals("preferences")
+                    && READ_ONLY_WITNESSES.contains(path)) {
+                touches = false;
+            }
             if (!touches) {
                 continue;
             }
             touched.add(state.name());
-            if (state.swingSessionCovers() && shared) {
+            // Each state has its own shared guards, matched with an
+            // opening parenthesis so restoringLocale( cannot vouch
+            // for a look and feel that restoring( would have.
+            boolean guarded = false;
+            for (String guard : state.sharedGuards()) {
+                guarded |= source.contains(guard);
+            }
+            if (guarded) {
                 anyShared = true;
                 continue;
             }
@@ -224,6 +266,15 @@ public final class TestEvidenceScan {
      * as a thing being measured (review). The list is pinned by the
      * gate so it cannot quietly grow into an exemption dump.
      */
+    /**
+     * Sources that only look at the preference store - a sync and a
+     * nodeExists, nothing created, nothing written. Exempt by exact
+     * name and pinned by the gate: a second witness arrives by
+     * decision, and nothing is exempted by shape.
+     */
+    public static final List<String> READ_ONLY_WITNESSES = List.of(
+            "juranometria/app/PrefsExistsProbe.java");
+
     public static final List<String> INSTRUMENTS = List.of(
             "src/juranometria/tool/TestEvidenceScan.java",
             "src/juranometria/tool/TestEvidenceStudyMain.java");

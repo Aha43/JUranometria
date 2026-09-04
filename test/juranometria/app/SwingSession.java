@@ -37,6 +37,38 @@ public final class SwingSession {
     }
 
     /**
+     * Runs a body and then its cleanup, preserving the primary
+     * failure: if both fail, the body's exception is the one thrown
+     * and the cleanup's is attached as suppressed - the project's
+     * standing rule, which the first version of these guards got
+     * backwards by letting a failing restore replace the failure a
+     * reader actually needed to see (review).
+     */
+    static void guarded(Body body, Body cleanup) throws Exception {
+        Throwable primary = null;
+        try {
+            body.run();
+        } catch (Throwable failure) {
+            primary = failure;
+        }
+        try {
+            cleanup.run();
+        } catch (Throwable trouble) {
+            if (primary == null) {
+                primary = trouble;
+            } else {
+                primary.addSuppressed(trouble);
+            }
+        }
+        if (primary instanceof Exception failure) {
+            throw failure;
+        }
+        if (primary instanceof Error failure) {
+            throw failure;
+        }
+    }
+
+    /**
      * Runs a body and puts the look and feel and the default-font
      * override back the way they were - whatever they were.
      *
@@ -44,27 +76,111 @@ public final class SwingSession {
      * inside it cannot leak a theme into whatever runs next.
      */
     public static void restoring(Body body) throws Exception {
-        LookAndFeel inherited = UIManager.getLookAndFeel();
-        Object inheritedFont = fontOverride();
-        try {
-            body.run();
-        } finally {
+        Held inherited = capture();
+        guarded(body, inherited::restore);
+    }
+
+    /**
+     * What the session held, for a disturbance that spans JUnit
+     * fixtures: capture in {@code BeforeEach}, hand it back in
+     * {@code AfterEach}. Five journeys carried their own copy of
+     * this pair before the gate counted them (#241, #224).
+     */
+    public record Held(LookAndFeel lookAndFeel, Object fontOverride) {
+
+        /** Puts back exactly what was captured. */
+        public void restore() throws Exception {
             SwingUtilities.invokeAndWait(() -> {
                 // The look and feel first, then the exact override
                 // that was found - a font somebody chose, or nothing
                 // at all.
-                if (inherited != null) {
+                if (lookAndFeel != null) {
                     try {
-                        UIManager.setLookAndFeel(inherited);
+                        UIManager.setLookAndFeel(lookAndFeel);
+                        // Live components wear the restored theme
+                        // too - the journeys' own copies all did
+                        // this, and a window left behind in the
+                        // wrong clothes is a trace.
+                        com.formdev.flatlaf.FlatLaf.updateUI();
                     } catch (Exception e) {
                         throw new IllegalStateException(
-                                "could not restore " + inherited.getName(),
-                                e);
+                                "could not restore "
+                                        + lookAndFeel.getName(), e);
                     }
                 }
-                UIManager.put("defaultFont", inheritedFont);
+                UIManager.put("defaultFont", fontOverride);
             });
         }
+    }
+
+    /** The look and feel and font override as they stand. */
+    public static Held capture() {
+        return new Held(UIManager.getLookAndFeel(), fontOverride());
+    }
+
+    /**
+     * Runs a body and puts the default locale back - whatever it
+     * was. The gate (#241) found the same capture-and-restore
+     * written out in every rendering test that formats numbers;
+     * this is that shape, once.
+     */
+    public static void restoringLocale(Body body) throws Exception {
+        java.util.Locale inherited = java.util.Locale.getDefault();
+        guarded(body, () -> java.util.Locale.setDefault(inherited));
+    }
+
+    /** Runs a body and puts the default time zone back. */
+    public static void restoringTimeZone(Body body) throws Exception {
+        java.util.TimeZone inherited = java.util.TimeZone.getDefault();
+        guarded(body, () -> java.util.TimeZone.setDefault(inherited));
+    }
+
+    /**
+     * Runs a body and puts the current repaint manager back. Global
+     * like the look and feel, and restored the same way: what was
+     * there, not what a fresh JVM would have had.
+     */
+    public static void restoringRepaintManager(Body body)
+            throws Exception {
+        javax.swing.RepaintManager inherited =
+                javax.swing.RepaintManager.currentManager(null);
+        guarded(body, () -> javax.swing.RepaintManager
+                .setCurrentManager(inherited));
+    }
+
+    /** A body handed a scratch preference node. */
+    public interface NodeBody {
+        void run(java.util.prefs.Preferences node) throws Exception;
+    }
+
+    /**
+     * Runs a body with a dedicated scratch preference node, and
+     * removes the node afterwards <em>whatever happens</em> - the
+     * gate (#241) found two nodes that outlived their tests because
+     * removal sat on the success path only. The name is prefixed
+     * and salted, so parallel runs cannot collide and nothing can
+     * reach the reader's real store by mistake.
+     */
+    public static void scratchPreferences(String prefix, NodeBody body)
+            throws Exception {
+        java.util.prefs.Preferences node =
+                java.util.prefs.Preferences.userRoot().node(
+                        prefix + "-" + System.nanoTime());
+        // The parent, captured while the node still has one:
+        // removal is only made persistent by flushing the PARENT -
+        // flushing the removed node itself is specified to throw -
+        // and a deletion that lives only in this JVM is the exit
+        // probe's bug wearing a helper's name (review).
+        java.util.prefs.Preferences parent = node.parent();
+        guarded(() -> body.run(node), () -> {
+            try {
+                node.removeNode();
+            } catch (IllegalStateException alreadyRemoved) {
+                // A body that removed the node itself - the broken-
+                // store fixtures do - has done this guard's work.
+            }
+            parent.flush();
+        });
     }
 
     /**

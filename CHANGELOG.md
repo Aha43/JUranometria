@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The suite's shared-state consolidation** (Sprint 26, issue
+  #224). `SwingSession` grew the whole restoring vocabulary — a
+  locale guard, a time-zone guard, a repaint-manager guard, a
+  scratch-preferences guard whose removal survives a failing body,
+  and a `capture()`/`restore()` pair for disturbances that span
+  JUnit fixtures — and every JVM-global state in the suite now
+  flows through it. The gate's five flagged files are settled,
+  including the two real leaks: the Sprint-1 smoke test that had
+  themed every later test in the JVM for twenty-six sprints, and a
+  scratch preference node that outlived every run. The exit probe
+  cleans up in a JVM shutdown hook, the only place that runs on a
+  path whose success is `System.exit`. The gate test now pins the
+  settled state: zero unprotected, and the only local restorer of
+  a JVM-global is the guard's own body.
+
 ### Added
 
 - **The test-and-evidence friction gate** (Sprint 26, issue #241).

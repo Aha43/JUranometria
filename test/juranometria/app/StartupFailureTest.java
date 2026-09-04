@@ -54,13 +54,17 @@ class StartupFailureTest {
             throws Exception {
         // The real shape: the JDK's preferences store throws from its
         // own frames. Re-downloading the atlas would not touch it.
-        Preferences node = Preferences.userRoot()
-                .node("juranometria-test-" + System.nanoTime());
-        node.put("chart.deepSkyObjects", "false");
-        ChartOptionsStore store = ChartOptionsStore.forNode(node);
-        node.removeNode();
-        Throwable thrown = org.junit.jupiter.api.Assertions.assertThrows(
-                IllegalStateException.class, store::load);
+        Throwable[] caught = new Throwable[1];
+        SwingSession.scratchPreferences("juranometria-test", node -> {
+            node.put("chart.deepSkyObjects", "false");
+            ChartOptionsStore store = ChartOptionsStore.forNode(node);
+            // Removing the node IS the fixture: the guard tolerates
+            // a body that has already done its cleanup for it.
+            node.removeNode();
+            caught[0] = org.junit.jupiter.api.Assertions.assertThrows(
+                    IllegalStateException.class, store::load);
+        });
+        Throwable thrown = caught[0];
 
         assertEquals(StartupFailure.Kind.SETTINGS,
                 StartupFailure.classify(thrown),

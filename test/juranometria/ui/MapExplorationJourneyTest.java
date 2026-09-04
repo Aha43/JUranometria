@@ -72,7 +72,7 @@ class MapExplorationJourneyTest {
     private ChartOptionsController options;
     private JFrame window;
     private Preferences optionsNode;
-    private javax.swing.LookAndFeel inheritedLookAndFeel;
+    private juranometria.app.SwingSession.Held inheritedSession;
     /** The second consumer: proof the seam is not the inspector's alone. */
     private final List<SelectionModel.Change> witness = new ArrayList<>();
 
@@ -1020,28 +1020,16 @@ class MapExplorationJourneyTest {
      */
     @org.junit.jupiter.api.BeforeEach
     void rememberTheLookAndFeel() {
-        inheritedLookAndFeel = javax.swing.UIManager.getLookAndFeel();
+        inheritedSession = juranometria.app.SwingSession.capture();
     }
 
     @org.junit.jupiter.api.AfterEach
     void leaveNoTrace() throws Exception {
-        if (!GraphicsEnvironment.isHeadless()
-                && inheritedLookAndFeel != null) {
-            // Restored, not assumed (sprint review): applying the
-            // light theme would leave the JVM in whatever state this
-            // test prefers rather than the one it was handed, which
-            // is a different kind of trace, not the absence of one.
-            SwingUtilities.invokeAndWait(() -> {
-                try {
-                    javax.swing.UIManager.setLookAndFeel(
-                            inheritedLookAndFeel);
-                    com.formdev.flatlaf.FlatLaf.updateUI();
-                } catch (javax.swing.UnsupportedLookAndFeelException e) {
-                    throw new IllegalStateException(
-                            "cannot restore the look and feel this test"
-                                    + " was given", e);
-                }
-            });
+        if (inheritedSession != null) {
+            // Restored, not assumed (sprint review) - and now through
+            // the shared guard (#224): exactly what was captured,
+            // live components refreshed with it.
+            inheritedSession.restore();
         }
         if (optionsNode != null) {
             optionsNode.removeNode();

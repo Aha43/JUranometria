@@ -452,14 +452,15 @@ class ToolbarVersionAndExitTest {
         // removed underneath it. Preferences.flush() throws
         // IllegalStateException for a removed node, which is exactly
         // the runtime failure the guard now covers.
-        Preferences doomed = Preferences.userRoot()
-                .node("juranometria-removed-" + System.nanoTime());
-        doomed.put("chart.deepSkyObjects", "true");
-        doomed.removeNode();
+        SwingSession.scratchPreferences("juranometria-removed",
+                doomed -> {
+                    doomed.put("chart.deepSkyObjects", "true");
+                    doomed.removeNode();
 
-        AppShutdown.flushPreferences(doomed);
-        assertFalse(doomed.nodeExists(""),
-                "the premise: the node really is gone");
+                    AppShutdown.flushPreferences(doomed);
+                    assertFalse(doomed.nodeExists(""),
+                            "the premise: the node really is gone");
+                });
     }
 
     @Test
@@ -468,11 +469,13 @@ class ToolbarVersionAndExitTest {
         // terminated, so it is proved in a process of its own. This
         // needs no display, so CI runs it rather than only a
         // developer's machine.
+        String probeNode = "juranometria-exit-probe-"
+                + System.nanoTime();
         List<String> command = new ArrayList<>(List.of(
                 System.getProperty("java.home") + "/bin/java",
                 "-Djava.awt.headless=true",
                 "-cp", "build/classes:build/test-classes:lib/*",
-                "juranometria.app.ExitProbeMain"));
+                "juranometria.app.ExitProbeMain", probeNode));
         Process probe = new ProcessBuilder(command)
                 .redirectErrorStream(true)
                 .start();
@@ -487,5 +490,22 @@ class ToolbarVersionAndExitTest {
                         + " application: " + said);
         assertEquals(0, probe.exitValue(),
                 "and end it cleanly: " + said);
+        // The deletion reached the backing store, proven from THIS
+        // process: the probe's own flush-after-remove used to throw
+        // and be swallowed, so the node could die only in the
+        // child's memory (review). sync() refreshes this JVM's view
+        // from the store before asking.
+        Preferences.userRoot().sync();
+        assertFalse(Preferences.userRoot().nodeExists(probeNode),
+                "the probe's scratch node is gone from the backing"
+                        + " store, not merely from the exited JVM's"
+                        + " memory: " + said);
+        // And the cleanup ran clean, not merely limped: flushing a
+        // removed node throws, and on platforms that auto-persist
+        // the deletion anyway that mistake would hide behind a
+        // passing nodeExists check - the probe prints its trouble
+        // to the stream this test is already reading.
+        assertFalse(said.contains("exit probe cleanup failed"),
+                "the probe's cleanup must not have thrown: " + said);
     }
 }

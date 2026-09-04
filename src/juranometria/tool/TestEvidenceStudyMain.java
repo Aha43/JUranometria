@@ -60,9 +60,11 @@ public final class TestEvidenceStudyMain {
         out.println();
         out.printf("**%d files** touch process-wide state: %d"
                         + " protected by the shared SwingSession"
-                        + " guard, %d restoring locally (correct but"
-                        + " duplicated - the consolidation issue #224"
-                        + " owns them), %d unprotected.%n",
+                        + " guard, %d restoring locally - the"
+                        + " JUnit-fixture preference shape the"
+                        + " consolidation (#224) deliberately kept -"
+                        + " %d unprotected, and the guard itself"
+                        + " classified as what it is.%n",
                 touching.size(),
                 count(touching, "protected-shared"),
                 count(touching, "protected-locally"),

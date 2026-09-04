@@ -47,29 +47,39 @@ a leak it never touched, and because a correct restore often holds
 exactly one setter with the disturbance arriving through `UiTheme`
 or a FlatLaf setup.
 
-- **38 files** touch process-wide state. **6** use the shared
-  `SwingSession` guard; **27** restore locally — correct, verified
-  by reading each, but the same capture-and-restore written out
-  again and again, which is how one of them eventually rots.
-- **5 flagged unprotected**, each read individually:
-  - `AppSmokeTest` — **a real leak, and an old one.** The Sprint-1
-    smoke test calls `UiTheme.apply()` and never restores, so every
-    test that runs after it in the same JVM inherits FlatLaf, and
-    the suite's look and feel depends on execution order. Caught
-    only when the review widened the touch needles past the bare
-    setter.
-  - `PackagedAcceptanceRestoresTest` — **a real leak.** Its
-    dedicated node `juranometria-acceptance-restore-test` is never
-    removed, so every run leaves it in the developer's real
-    preference store.
-  - `ExitProbeMain` — a probe, not a test; its scratch node is
-    removed on the success path only, so a crash leaks it.
-  - `ToolbarVersionAndExitTest` — the same crash-path shape: its
-    "doomed" node is a fixture (removed to make `flush` throw), and
-    the removal happens inline rather than in a `finally`.
-  - `StartupFailureTest` — **by design.** Removing the node *is*
-    the fixture: the test exists to prove the atlas classifies a
-    broken preference store honestly.
+As the gate measured it: **38 files** touched process-wide state,
+6 on the shared guard, 27 restoring locally with their own copies
+of the same shape, and **5 flagged** — two real leaks
+(`AppSmokeTest`, whose `UiTheme.apply()` had themed every later
+test in the JVM since Sprint 1; `PackagedAcceptanceRestoresTest`,
+whose node outlived every run), two crash-path gaps
+(`ExitProbeMain`, whose success path is `System.exit` so no
+cleanup written after the click could ever run;
+`ToolbarVersionAndExitTest`'s inline fixture removal), and one by
+design (`StartupFailureTest`, where removing the node *is* the
+fixture).
+
+**As #224 settled it:** `SwingSession` grew the whole vocabulary —
+`restoringLocale`, `restoringTimeZone`, `restoringRepaintManager`,
+`scratchPreferences` (removal in `finally`, tolerant of a body
+that removes as its own fixture), and a `capture()`/`Held.restore()`
+pair for disturbances that span JUnit fixtures. Every JVM-global
+state now flows through the shared guard; the flagged five are
+settled (the exit probe cleans up in a JVM shutdown hook, the only
+place that runs on its success path); **no local restorer of a
+JVM-global remains; the guard itself is classified as what it
+is.** The preference locals — the
+`@AfterEach` node-removal shape — are kept **on purpose**: a
+node's life spans `BeforeEach` to `AfterEach`, a body-wrapper
+cannot hold it, and the scanner verifies each carries its removal.
+The gate test pins all of it: zero unprotected, and the
+non-preference locals list is exactly `SwingSession.java`.
+
+The standing counts, quoted from the scanner so the gate can hold
+this document to them: **37 files** touch process-wide state —
+**16** use the shared guard, **20** restore locally,
+**0 flagged unprotected** — and **20 files** depend on a display.
+
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
 
@@ -169,7 +179,7 @@ still carries debt, so the debt can shrink but never grow.
 
 | guard | what it prevents | proof at this gate | owner |
 |---|---|---|---|
-| **G1** global-state protection: every toucher carries capture, restoring write, and a place to run it — or the shared `SwingSession` | the silent theme/font/locale leak, including one set through `UiTheme.apply` with no setter in sight | broken fixtures classified UNPROTECTED, including the review's exact case of an unrelated `finally` vouching for nothing; counts pinned: 6 shared / 27 local / 5 flagged (2 real leaks, 2 crash-path gaps, 1 by design) | #224 moves the 27 onto shared session guards and settles the 5 |
+| **G1** global-state protection: every toucher carries capture, restoring write, and a place to run it — or the shared `SwingSession` | the silent theme/font/locale leak, including one set through `UiTheme.apply` with no setter in sight | broken fixtures classified UNPROTECTED, including the review's exact case of an unrelated `finally` vouching for nothing | **done in #224**: zero unprotected, every JVM-global on the shared guard, preference fixtures verified locally by choice — all pinned |
 | **G2** no test reaches the reader's real preference store — by the bare node or through any production entry point, the set of which is **derived from the production sources and pinned**, never remembered | a test editing the reader's settings, through a door the list forgot — `AppShutdown.real()` was exactly that door | derivation proven on a synthetic source (direct door, private helper, and the public route through it); the derived set pinned at its five names; fixtures for the bare node, a factory, and the shutdown route all caught | held from this gate on |
 | **G3** display tests state their premises through named helpers (focused window, focus owner, showing, reachable point, settled layout) | clicks landing nowhere a reader could click | fixture with pointer events and no premise caught; adoption counts pinned (7 / 2 of 20) | #243 raises adoption to the whole display corpus |
 | **G4** live state derived and acted on in one event-thread turn | the #220 family of stale reads | the standing 3/3 mutations on the atomic `clickOn` and its two race steps | #243 extends the pattern; the ratchet pins back-door counts (16 files) so they shrink |

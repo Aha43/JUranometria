@@ -206,18 +206,16 @@ class StarLabelRenderingTest {
 
         int[] reference = pixels(page, ChartOptions.DEFAULTS);
         assertArrayEquals(reference, pixels(page, ChartOptions.DEFAULTS));
-        Locale locale = Locale.getDefault();
-        javax.swing.LookAndFeel laf = javax.swing.UIManager.getLookAndFeel();
-        try {
-            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
-            javax.swing.UIManager.setLookAndFeel(
-                    new com.formdev.flatlaf.FlatDarkLaf());
-            assertArrayEquals(reference, pixels(page, ChartOptions.DEFAULTS),
-                    "Greek notation is identical in every locale and theme");
-        } finally {
-            Locale.setDefault(locale);
-            javax.swing.UIManager.setLookAndFeel(laf);
-        }
+        juranometria.app.SwingSession.restoring(() ->
+                juranometria.app.SwingSession.restoringLocale(() -> {
+                    Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                    javax.swing.UIManager.setLookAndFeel(
+                            new com.formdev.flatlaf.FlatDarkLaf());
+                    assertArrayEquals(reference,
+                            pixels(page, ChartOptions.DEFAULTS),
+                            "Greek notation is identical in every locale"
+                                    + " and theme");
+                }));
     }
 
     @Test
@@ -227,20 +225,16 @@ class StarLabelRenderingTest {
         assertArrayEquals(reference, pixels(scene, ChartOptions.DEFAULTS),
                 "repeated renders are identical");
 
-        Locale locale = Locale.getDefault();
-        javax.swing.LookAndFeel laf =
-                javax.swing.UIManager.getLookAndFeel();
-        try {
-            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
-            javax.swing.UIManager.setLookAndFeel(
-                    new com.formdev.flatlaf.FlatDarkLaf());
-            assertArrayEquals(reference,
-                    pixels(scene, ChartOptions.DEFAULTS),
-                    "the chart is paper and ink in every locale and theme");
-        } finally {
-            Locale.setDefault(locale);
-            javax.swing.UIManager.setLookAndFeel(laf);
-        }
+        juranometria.app.SwingSession.restoring(() ->
+                juranometria.app.SwingSession.restoringLocale(() -> {
+                    Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                    javax.swing.UIManager.setLookAndFeel(
+                            new com.formdev.flatlaf.FlatDarkLaf());
+                    assertArrayEquals(reference,
+                            pixels(scene, ChartOptions.DEFAULTS),
+                            "the chart is paper and ink in every locale"
+                                    + " and theme");
+                }));
     }
 
     @Test

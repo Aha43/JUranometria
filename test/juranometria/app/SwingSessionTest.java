@@ -163,4 +163,166 @@ class SwingSessionTest {
                             + " theme");
         });
     }
+
+    @org.junit.jupiter.api.Test
+    void localeAndTimeZoneComeBackExactlyEvenWhenTheBodyFails() {
+        java.util.Locale locale = java.util.Locale.getDefault();
+        java.util.TimeZone zone = java.util.TimeZone.getDefault();
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () ->
+                        SwingSession.restoringLocale(() ->
+                                SwingSession.restoringTimeZone(() -> {
+                                    java.util.Locale.setDefault(
+                                            java.util.Locale
+                                                    .forLanguageTag("tr-TR"));
+                                    java.util.TimeZone.setDefault(
+                                            java.util.TimeZone.getTimeZone(
+                                                    "Pacific/Kiritimati"));
+                                    throw new IllegalStateException("boom");
+                                })));
+        org.junit.jupiter.api.Assertions.assertEquals(locale,
+                java.util.Locale.getDefault(),
+                "a failing body cannot leak a locale");
+        org.junit.jupiter.api.Assertions.assertEquals(zone,
+                java.util.TimeZone.getDefault(),
+                "or a time zone");
+    }
+
+    @org.junit.jupiter.api.Test
+    void theRepaintManagerComesBackTheSameInstance() throws Exception {
+        javax.swing.RepaintManager inherited =
+                javax.swing.RepaintManager.currentManager(null);
+        SwingSession.restoringRepaintManager(() ->
+                javax.swing.RepaintManager.setCurrentManager(
+                        new javax.swing.RepaintManager()));
+        org.junit.jupiter.api.Assertions.assertSame(inherited,
+                javax.swing.RepaintManager.currentManager(null),
+                "what was there, not a fresh one");
+    }
+
+    @org.junit.jupiter.api.Test
+    void aScratchNodeIsRemovedWhateverHappensAndToleratesTheFixture()
+            throws Exception {
+        String[] name = new String[1];
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () ->
+                        SwingSession.scratchPreferences(
+                                "juranometria-scratch-guard-test",
+                                node -> {
+                                    name[0] = node.name();
+                                    node.put("k", "v");
+                                    throw new IllegalStateException("boom");
+                                }));
+        org.junit.jupiter.api.Assertions.assertFalse(
+                java.util.prefs.Preferences.userRoot()
+                        .nodeExists(name[0]),
+                "the node is gone even though the body failed - the"
+                        + " gap that leaked two nodes before #224");
+
+        // And a body that removes the node as its own fixture - the
+        // broken-store tests do - is not punished for it.
+        SwingSession.scratchPreferences(
+                "juranometria-scratch-guard-test", node -> {
+                    node.put("k", "v");
+                    node.removeNode();
+                });
+    }
+
+    @org.junit.jupiter.api.Test
+    void aFailingCleanupIsSuppressedBehindTheFailureThatMatters() {
+        // Both halves fail: the reader must see the body's failure,
+        // with the cleanup's trouble attached as suppressed - never
+        // the other way round, which is what the first wrappers did
+        // (review).
+        IllegalStateException primary =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        IllegalStateException.class, () ->
+                                SwingSession.guarded(() -> {
+                                    throw new IllegalStateException(
+                                            "the failure that matters");
+                                }, () -> {
+                                    throw new IllegalStateException(
+                                            "cleanup trouble");
+                                }));
+        org.junit.jupiter.api.Assertions.assertEquals(
+                "the failure that matters", primary.getMessage(),
+                "the body's failure is the one thrown");
+        org.junit.jupiter.api.Assertions.assertEquals(1,
+                primary.getSuppressed().length,
+                "with the cleanup's trouble attached");
+        org.junit.jupiter.api.Assertions.assertEquals(
+                "cleanup trouble",
+                primary.getSuppressed()[0].getMessage());
+
+        // And a cleanup failing alone still surfaces.
+        IllegalStateException alone =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        IllegalStateException.class, () ->
+                                SwingSession.guarded(() -> { }, () -> {
+                                    throw new IllegalStateException(
+                                            "cleanup trouble");
+                                }));
+        org.junit.jupiter.api.Assertions.assertEquals(
+                "cleanup trouble", alone.getMessage());
+    }
+
+    @org.junit.jupiter.api.Test
+    void aScratchNodesDeletionPersistsBeyondThisJvm() throws Exception {
+        // Proven from a process of its own, for a passing body and a
+        // failing one: a same-JVM nodeExists cannot tell an
+        // unflushed removal from a persistent one - which was the
+        // exit probe's bug, and would have been this helper's too
+        // (review). The helper flushes the parent, and the child
+        // process is the witness.
+        String[] name = new String[2];
+        SwingSession.scratchPreferences("juranometria-persist-test",
+                node -> {
+                    name[0] = node.name();
+                    node.put("k", "v");
+                });
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class, () ->
+                        SwingSession.scratchPreferences(
+                                "juranometria-persist-test", node -> {
+                                    name[1] = node.name();
+                                    node.put("k", "v");
+                                    throw new IllegalStateException(
+                                            "boom");
+                                }));
+        for (String gone : name) {
+            Process witness = new ProcessBuilder(
+                    System.getProperty("java.home") + "/bin/java",
+                    "-cp", "build/classes:build/test-classes:lib/*",
+                    "juranometria.app.PrefsExistsProbe", gone)
+                    .redirectErrorStream(true).start();
+            org.junit.jupiter.api.Assertions.assertTrue(
+                    witness.waitFor(60,
+                            java.util.concurrent.TimeUnit.SECONDS),
+                    "the witness process answers");
+            org.junit.jupiter.api.Assertions.assertEquals(0,
+                    witness.exitValue(),
+                    gone + " must be gone from the backing store as"
+                            + " another JVM sees it, passing body or"
+                            + " failing");
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    void whatWasCapturedIsWhatComesBack() throws Exception {
+        SwingSession.Held before = SwingSession.capture();
+        SwingSession.Held held = SwingSession.capture();
+        javax.swing.UIManager.put("defaultFont",
+                new java.awt.Font(java.awt.Font.SANS_SERIF,
+                        java.awt.Font.PLAIN, 23));
+        held.restore();
+        org.junit.jupiter.api.Assertions.assertEquals(
+                before.fontOverride(),
+                SwingSession.fontOverride(),
+                "the exact override that was found - a font somebody"
+                        + " chose, or nothing at all");
+        org.junit.jupiter.api.Assertions.assertSame(
+                before.lookAndFeel(),
+                javax.swing.UIManager.getLookAndFeel(),
+                "and the same look and feel instance");
+    }
 }

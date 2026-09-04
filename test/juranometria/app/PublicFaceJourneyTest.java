@@ -40,7 +40,8 @@ class PublicFaceJourneyTest {
     void aboutAndSettingsJourneyThroughRealMenusAndWindows() throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "dialog ownership needs a display; content is tested headless");
-        javax.swing.LookAndFeel previousLaf = UIManager.getLookAndFeel();
+        juranometria.app.SwingSession.Held previousSession =
+                juranometria.app.SwingSession.capture();
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-" + System.nanoTime());
         JFrame[] frame = new JFrame[1];
@@ -150,12 +151,8 @@ class PublicFaceJourneyTest {
                         dialog.dispose();
                     }
                 }
-                try {
-                    UIManager.setLookAndFeel(previousLaf);
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
             });
+            previousSession.restore();
             node.removeNode();
         }
     }
