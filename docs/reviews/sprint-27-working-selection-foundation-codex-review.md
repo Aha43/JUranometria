@@ -89,3 +89,14 @@ to, and removes off-page members while the projected marks and lead remain
 unchanged; neither listener should hear an event. Include a control where the
 underlying transition changes the visible fallback lead, which must still
 publish, so the suppression cannot hide an observable view change.
+
+## Approval
+
+Approved at `2b232f5`. Duplicate suppression now sits at the shared queue
+boundary and compares with the last intended view, whether that is the state
+already delivered or the tail waiting to be delivered. Model and scope changes
+therefore share one no-op rule without weakening serialized, reentrant
+delivery. The regression exercises off-page membership and lead changes that
+must stay silent, then proves that a visible arrival and fallback-lead change
+still publish. The original page-scope, identity, and multi-listener findings
+remain closed. No findings remain for #260.
