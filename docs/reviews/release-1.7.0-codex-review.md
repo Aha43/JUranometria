@@ -8,6 +8,11 @@ The candidate is correctly limited to `VERSION` and `CHANGELOG.md`; metadata agr
 
 The release summary currently calls Black sky “the chart's first second ground.” This is a visible grammatical contradiction in the changelog text that will become the public GitHub release notes. Use “the chart's second intentional ground” (matching `ChartPalette` and the decision document), or an equally plain formulation.
 
-## Result
+## Re-review
 
-One P2 release-note correction remains. Do not tag this head.
+Resolved at `f61c876`. The public summary now calls Black sky the chart's
+“second intentional ground,” matching the palette and decision vocabulary.
+Metadata agreement still holds and every required check is green on the exact
+amended head.
+
+No findings remain. PR #256 is approved to merge and release as v1.7.0.
