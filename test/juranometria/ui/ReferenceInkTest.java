@@ -54,7 +54,8 @@ class ReferenceInkTest {
         try {
             RENDERER.render(g, SCENE, ChartOptions.DEFAULTS,
                     (layerG, scene) ->
-                            ReferenceInk.paint(layerG, scene, ink));
+                            ReferenceInk.paint(layerG, scene, ink,
+                                    ChartOptions.DEFAULTS.palette()));
         } finally {
             g.dispose();
         }

@@ -237,7 +237,16 @@ on-this-page-study: classes
 		> docs/studies/on-this-page/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.OnThisPageMockupMain
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study
+# The black-sky palette (docs/decisions/black-sky.md, issue #246):
+# the derivation executed and verified against the pinned palette,
+# the representative pages rendered in both palettes, every pixel
+# accounted.
+black-sky-study: classes
+	mkdir -p docs/studies/black-sky
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
+		> docs/studies/black-sky/measurements.md
+
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study
 evidence-contracts: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 

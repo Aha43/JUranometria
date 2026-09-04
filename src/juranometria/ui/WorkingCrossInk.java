@@ -41,8 +41,6 @@ final class WorkingCrossInk {
     private WorkingCrossInk() {
     }
 
-    /** Ink shared with the chart's own selection treatment. */
-    private static final Color INK = new Color(0, 0, 0);
     private static final BasicStroke STROKE = new BasicStroke(1.0f);
     private static final BasicStroke LEAD_STROKE = new BasicStroke(1.5f);
 
@@ -60,7 +58,8 @@ final class WorkingCrossInk {
      */
     static void paint(Graphics2D g, ChartScene scene,
                       List<OverlayRegistry.Owned> contributions,
-                      String leadIdentity) {
+                      String leadIdentity,
+                      juranometria.render.ChartPalette palette) {
         if (contributions.isEmpty()) {
             return;
         }
@@ -74,7 +73,9 @@ final class WorkingCrossInk {
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(INK);
+            // As prominent as a star on either ground: the cross is
+            // the reader's own mark and must never sink into the sky.
+            g2.setColor(palette.interactionInk());
             for (OverlayRegistry.Owned owned : contributions) {
                 if (owned.geometry().role() != InkRole.INTERACTION
                         || !(owned.geometry()

@@ -796,6 +796,59 @@ public final class PackagedAcceptanceMain {
         System.out.println("chart options journey OK (layers off "
                 + bareInk + " ink, all on " + homeInk + ")");
 
+        // The black sky (issue #246): the same page on the other
+        // ground must differ for the intended palette pixels while
+        // its geometry - the set of non-ground pixels - and the
+        // reader's state stay put. The 99.9% bound is the study's
+        // measured worst case (155 edge-rounding pixels of 630,000)
+        // with room, and a broken palette misses it by miles.
+        ChartViewState placeBefore = navigation.state();
+        BufferedImage paperPage = page(renderer, navigation,
+                ChartOptions.DEFAULTS);
+        BufferedImage darkPage = page(renderer, navigation,
+                ChartOptions.DEFAULTS.withPalette(
+                        juranometria.render.ChartPalette.BLACK_SKY));
+        require(!java.util.Arrays.equals(bytes(paperPage),
+                        bytes(darkPage)),
+                "the black sky draws different ink");
+        int paperGround = juranometria.render.ChartPalette.WHITE_PAPER
+                .ground().getRGB();
+        int darkGround = juranometria.render.ChartPalette.BLACK_SKY
+                .ground().getRGB();
+        int maskAgree = 0;
+        int total = paperPage.getWidth() * paperPage.getHeight();
+        for (int y = 0; y < paperPage.getHeight(); y++) {
+            for (int x = 0; x < paperPage.getWidth(); x++) {
+                if ((paperPage.getRGB(x, y) != paperGround)
+                        == (darkPage.getRGB(x, y) != darkGround)) {
+                    maskAgree++;
+                }
+            }
+        }
+        require(maskAgree >= total * 0.999,
+                "the black sky changes ink, never geometry: "
+                        + (total - maskAgree) + " mask pixels differ");
+        // The commonest pixel, not the centre one: the default page
+        // centres on M31, whose pale wash is exactly what sits at
+        // the middle - the sky is what dominates the page.
+        java.util.Map<Integer, Integer> darkCensus =
+                new java.util.HashMap<>();
+        for (int y = 0; y < darkPage.getHeight(); y++) {
+            for (int x = 0; x < darkPage.getWidth(); x++) {
+                darkCensus.merge(darkPage.getRGB(x, y), 1,
+                        Integer::sum);
+            }
+        }
+        require(darkCensus.entrySet().stream()
+                        .max(java.util.Map.Entry.comparingByValue())
+                        .orElseThrow().getKey() == darkGround,
+                "the dark page's sky is the black ground");
+        require(navigation.state() == placeBefore,
+                "and rendering the other ground moved nothing");
+        System.out.println("black sky journey OK (mask agreement "
+                + (total - maskAgree) + " px short of exact on "
+                + total + ", ground black, place untouched)");
+
         // Persistence and the documented upgrade, through the
         // bundled runtime's own preference backend, on a scratch
         // node so the reader's settings are never involved.

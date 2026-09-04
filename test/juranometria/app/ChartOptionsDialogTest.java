@@ -113,6 +113,53 @@ class ChartOptionsDialogTest {
     }
 
     @Test
+    void blackSkyPreviewsLiveDependsOnNothingAndRestoresToPaper()
+            throws Exception {
+        // Sprint 26, issue #246: one persisted choice for the chart
+        // ground on the Chart tab, previewing live like every other
+        // control, reset by Restore Defaults, and touching no
+        // application chrome - the look and feel before and after
+        // the toggle is the same installed object.
+        Preferences node = Preferences.userRoot()
+                .node("juranometria-test-" + System.nanoTime());
+        try {
+            ChartOptionsStore store = ChartOptionsStore.forNode(node);
+            ChartOptionsController controller =
+                    new ChartOptionsController(store);
+            JComponent content = ChartOptionsDialog.content(controller,
+                    () -> { }, () -> { });
+
+            assertFalse(box(content, "Black sky").isSelected(),
+                    "the released chart is white paper");
+            assertTrue(box(content, "Black sky").isEnabled(),
+                    "the ground depends on nothing");
+
+            var lookAndFeel = javax.swing.UIManager.getLookAndFeel();
+            box(content, "Black sky").doClick();
+            assertEquals(juranometria.render.ChartPalette.BLACK_SKY,
+                    controller.options().palette(),
+                    "the ground previews immediately");
+            assertEquals(juranometria.render.ChartPalette.WHITE_PAPER,
+                    store.load().palette(),
+                    "previewing persists nothing");
+            assertTrue(lookAndFeel
+                            == javax.swing.UIManager.getLookAndFeel(),
+                    "a chart-ground change never alters application"
+                            + " chrome");
+
+            AboutDialogTest.button(content, "Restore Defaults").doClick();
+            assertEquals(juranometria.render.ChartPalette.WHITE_PAPER,
+                    controller.options().palette(),
+                    "Restore Defaults returns to the released"
+                            + " white-paper chart");
+            assertFalse(box(content, "Black sky").isSelected(),
+                    "and the control shows it");
+        } finally {
+            node.removeNode();
+        }
+    }
+
+    @Test
     void theDialogIsSingleInstanceAndEscapeIsCancel() throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "window behaviour needs a display; content is tested headless");

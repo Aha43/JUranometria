@@ -28,49 +28,23 @@ import juranometria.project.ViewportMapping;
  * it consumes a complete scene, fetches nothing, and mutates no state
  * outside the drawing target.
  *
- * The chart owns its own palette — white paper with black and grey ink —
- * independent of the application theme. Galaxies are drawn under the stars
- * as oriented outline ellipses; labels and the title block are drawn last.
+ * The chart owns its own palette — one of the two intentional grounds of
+ * {@link ChartPalette}, chosen through the chart options and independent
+ * of the application theme. Galaxies are drawn under the stars as
+ * oriented outline ellipses; labels and the title block are drawn last.
+ * Which colour each ink purpose wears is {@code ChartPalette}'s single
+ * answer; the nebula box's contrast floor and every other value
+ * justification live there and in docs/decisions/black-sky.md.
  */
 public final class ChartRenderer {
 
-    /** The selection ring: the graticule's grey, quieter than ink. */
     /** The key's heading: visual magnitude, said plainly. */
     private static final String KEY_HEADING = "Stars, visual magnitude";
     /** Room for the widest sample circle, plus breathing space. */
     private static final int KEY_CIRCLE_COLUMN_PX = 20;
 
-    private static final Color SELECTION_INK = new Color(0x88, 0x88, 0x88);
     private static final java.awt.BasicStroke SELECTION_STROKE =
             new java.awt.BasicStroke(1.2f);
-
-    private static final Color PAPER = Color.WHITE;
-    private static final Color INK = Color.BLACK;
-    private static final Color FRAME = new Color(51, 51, 51);
-    private static final Color GALAXY_FILL = new Color(232, 232, 232);
-    private static final Color GALAXY_OUTLINE = new Color(102, 102, 102);
-    /**
-     * Nebulae are faint; their boxes recede so the page stays
-     * restrained - but not below the point of being seen. Grey 150
-     * scored 2.96:1 against the paper, under the 3:1 floor for a
-     * graphical object, and Sprint 21 makes the box carry a family a
-     * reader switches on and off: a mark that teaches has to be
-     * visible. Grey 132 scores 3.74:1, a quarter clear of the floor
-     * rather than the one part in a hundred that 148 would give, and
-     * stays visibly lighter than the 102 the other symbols use
-     * (docs/decisions/deep-sky-vocabulary.md).
-     */
-    private static final Color NEBULA_OUTLINE = new Color(132, 132, 132);
-    private static final Color TEXT_INK = new Color(34, 34, 34);
-    /** Geography sits under everything: quiet greys, dotted boundaries. */
-    /**
-     * The grey constellation figures are drawn in, and now reference
-     * lines with them: the chart's existing weight for ink that is
-     * read across the page rather than pointed at.
-     */
-    public static final Color FIGURE_INK = new Color(120, 120, 120);
-    private static final Color BOUNDARY_INK = new Color(190, 190, 190);
-    private static final Color CONSTELLATION_NAME_INK = new Color(120, 120, 120);
     private static final java.awt.Stroke BOUNDARY_STROKE = new BasicStroke(
             1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
             new float[] {1.0f, 3.0f}, 0.0f);
@@ -376,7 +350,7 @@ public final class ChartRenderer {
             try {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                         RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(SELECTION_INK);
+                g2.setColor(options.palette().selectionInk());
                 g2.setStroke(SELECTION_STROKE);
                 double r = Math.max(mark.reach() + 5.0, 7.0);
                 g2.draw(new Ellipse2D.Double(mark.centre().x() - r,
@@ -420,6 +394,7 @@ public final class ChartRenderer {
                        ReferenceLayer reference) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
+        ChartPalette palette = options.palette();
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -428,7 +403,7 @@ public final class ChartRenderer {
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
                 RenderingHints.VALUE_STROKE_PURE);
 
-        g.setColor(PAPER);
+        g.setColor(palette.ground());
         g.fillRect(0, 0, width, height);
 
         GnomonicProjection projection = new GnomonicProjection(scene.viewport().centre());
@@ -453,7 +428,7 @@ public final class ChartRenderer {
                     options.magnitudeKey()
                             ? magnitudeKeyBounds(
                                     g.getFontMetrics(LABEL_FONT), scene)
-                            : null));
+                            : null), palette);
         }
         drawGeography(g, scene, options, projection, mapping);
         // Above the grid and the figures, below every mark: a
@@ -468,10 +443,10 @@ public final class ChartRenderer {
         for (DrawnMark mark : marks) {
             if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
                 drawSymbol(g, mark.deepSky(), policy, mark.centre(),
-                        mapping.pixelsPerPlaneUnit());
+                        mapping.pixelsPerPlaneUnit(), palette);
             }
         }
-        g.setColor(INK);
+        g.setColor(palette.starInk());
         for (DrawnMark mark : marks) {
             // The scene's stated limit governs what is drawn; the size
             // policy only decides mark sizes (Codex review, issue #13).
@@ -482,21 +457,22 @@ public final class ChartRenderer {
         drawStarLabels(g, scene, options, policy, projection, mapping);
         for (DeepSkyObject dso : labelledDeepSky(scene, options, policy)) {
             projection.project(dso.position()).ifPresent(plane ->
-                    drawLabel(g, dso, mapping.toPixel(plane), mapping.pixelsPerPlaneUnit()));
+                    drawLabel(g, dso, mapping.toPixel(plane),
+                            mapping.pixelsPerPlaneUnit(), palette));
         }
         // Furniture last and opaque, in the decided order (Sprint 20,
         // docs/decisions/chart-furniture.md): neither block is ever
         // half-covered by chart ink, and each is the reader's to
         // switch off.
         if (options.titleBlock()) {
-            drawTitleBlock(g, scene);
+            drawTitleBlock(g, scene, palette);
         }
         if (options.magnitudeKey()) {
-            drawMagnitudeKey(g, scene);
+            drawMagnitudeKey(g, scene, palette);
         }
         g.setClip(null);
 
-        g.setColor(FRAME);
+        g.setColor(palette.frameInk());
         g.setStroke(new BasicStroke(1.0f));
         g.draw(new Rectangle2D.Double(0.5, 0.5, width - 1.0, height - 1.0));
     }
@@ -516,15 +492,16 @@ public final class ChartRenderer {
                                       ViewportMapping mapping) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
+        ChartPalette palette = options.palette();
         if (options.constellationBoundaries() && policy.boundariesDrawn()) {
-            g.setColor(BOUNDARY_INK);
+            g.setColor(palette.boundaryInk());
             g.setStroke(BOUNDARY_STROKE);
             for (GeoSegment segment : scene.geography().boundarySegments()) {
                 drawGeographySegment(g, segment, scene, projection, mapping, null);
             }
         }
         if (options.constellationFigures() && policy.figuresDrawn()) {
-            g.setColor(FIGURE_INK);
+            g.setColor(palette.figureInk());
             g.setStroke(OUTLINE_STROKE);
             java.util.Map<String, double[]> visibleInk =
                     new java.util.LinkedHashMap<>();
@@ -535,7 +512,7 @@ public final class ChartRenderer {
             // Names depend on figures by decision, which is also why
             // their visible-ink anchors exist exactly when they draw.
             if (options.effectiveConstellationNames() && policy.namesDrawn()) {
-                drawConstellationNames(g, scene, visibleInk);
+                drawConstellationNames(g, scene, visibleInk, palette);
             }
         }
     }
@@ -585,9 +562,10 @@ public final class ChartRenderer {
      * pretty placement); the title block draws later and always wins.
      */
     private static void drawConstellationNames(Graphics2D g, ChartScene scene,
-                                               java.util.Map<String, double[]> visibleInk) {
+                                               java.util.Map<String, double[]> visibleInk,
+                                               ChartPalette palette) {
         g.setFont(CONSTELLATION_NAME_FONT);
-        g.setColor(CONSTELLATION_NAME_INK);
+        g.setColor(palette.constellationNameInk());
         for (java.util.Map.Entry<String, String> name
                 : scene.geography().latinNames().entrySet()) {
             double[] sum = visibleInk.get(name.getKey());
@@ -791,7 +769,7 @@ public final class ChartRenderer {
                                 GnomonicProjection projection,
                                 ViewportMapping mapping) {
         g.setFont(LABEL_FONT);
-        g.setColor(TEXT_INK);
+        g.setColor(options.palette().textInk());
         FontMetrics metrics = g.getFontMetrics();
         for (StarLabelPlacement placement : starLabelPlacements(metrics,
                 scene, options, detailPolicy, projection, mapping)) {
@@ -990,10 +968,11 @@ public final class ChartRenderer {
 
     private static void drawSymbol(Graphics2D g, DeepSkyObject dso,
                                    RegionalDetailPolicy policy,
-                                   PixelPoint centre, double pixelsPerPlaneUnit) {
+                                   PixelPoint centre, double pixelsPerPlaneUnit,
+                                   ChartPalette palette) {
         double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
         paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
-                axes[0], axes[1], dso.positionAngleDegrees());
+                axes[0], axes[1], dso.positionAngleDegrees(), palette);
     }
 
     /**
@@ -1009,7 +988,8 @@ public final class ChartRenderer {
     private static void paintSymbol(Graphics2D g, Symbol symbol,
                                     double centreX, double centreY,
                                     double majorPx, double minorPx,
-                                    double positionAngleDegrees) {
+                                    double positionAngleDegrees,
+                                    ChartPalette palette) {
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -1022,20 +1002,20 @@ public final class ChartRenderer {
                 case ELLIPSE -> {
                     Shape ellipse = new Ellipse2D.Double(
                             -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
-                    g2.setColor(GALAXY_FILL);
+                    g2.setColor(palette.galaxyFill());
                     g2.fill(ellipse);
-                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setColor(palette.deepSkyOutline());
                     g2.setStroke(OUTLINE_STROKE);
                     g2.draw(ellipse);
                 }
                 case DOTTED_CIRCLE -> {
-                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setColor(palette.deepSkyOutline());
                     g2.setStroke(DOTTED_STROKE);
                     g2.draw(new Ellipse2D.Double(
                             -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx));
                 }
                 case CROSSED_CIRCLE -> {
-                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setColor(palette.deepSkyOutline());
                     g2.setStroke(OUTLINE_STROKE);
                     g2.draw(new Ellipse2D.Double(
                             -majorPx / 2.0, -majorPx / 2.0, majorPx, majorPx));
@@ -1045,7 +1025,7 @@ public final class ChartRenderer {
                             0.0, -majorPx / 2.0, 0.0, majorPx / 2.0));
                 }
                 case BOX -> {
-                    g2.setColor(NEBULA_OUTLINE);
+                    g2.setColor(palette.nebulaOutline());
                     g2.setStroke(OUTLINE_STROKE);
                     g2.draw(new Rectangle2D.Double(
                             -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx));
@@ -1054,7 +1034,7 @@ public final class ChartRenderer {
                     // A small crossed circle: four spokes reaching beyond it.
                     double r = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX, majorPx) / 2.0;
                     double spoke = r * 1.7;
-                    g2.setColor(GALAXY_OUTLINE);
+                    g2.setColor(palette.deepSkyOutline());
                     g2.setStroke(OUTLINE_STROKE);
                     g2.draw(new Ellipse2D.Double(-r / 1.7, -r / 1.7,
                             2.0 * r / 1.7, 2.0 * r / 1.7));
@@ -1075,9 +1055,10 @@ public final class ChartRenderer {
      * fixture; general collision avoidance is deliberately out of scope.
      */
     private static void drawLabel(Graphics2D g, DeepSkyObject dso,
-                                  PixelPoint centre, double pixelsPerPlaneUnit) {
+                                  PixelPoint centre, double pixelsPerPlaneUnit,
+                                  ChartPalette palette) {
         g.setFont(LABEL_FONT);
-        g.setColor(TEXT_INK);
+        g.setColor(palette.textInk());
         Rectangle2D bounds = labelBounds(g.getFontMetrics(), dso, centre,
                 pixelsPerPlaneUnit);
         g.drawString(labelTextFor(dso), (float) bounds.getX(),
@@ -1193,7 +1174,11 @@ public final class ChartRenderer {
      * nothing here either - a legend that invented a mark for them
      * would be teaching a symbol the chart does not have.
      *
-     * <p>{@code sizePx} is the symbol's larger axis.
+     * <p>{@code sizePx} is the symbol's larger axis. Legends live in
+     * application chrome - the options dialog's chips, the study
+     * sheets - which the chart palette never alters, so a legend
+     * draws in the white-paper ink it always drew in
+     * (docs/decisions/black-sky.md).
      */
     public static void drawLegendSymbol(Graphics2D g, DsoType type,
                                         double centreX, double centreY,
@@ -1205,7 +1190,7 @@ public final class ChartRenderer {
         LegendShape shape = legendShapeFor(symbol);
         paintSymbol(g, symbol, centreX, centreY, sizePx,
                 sizePx * shape.minorFraction(),
-                shape.positionAngleDegrees());
+                shape.positionAngleDegrees(), ChartPalette.WHITE_PAPER);
     }
 
     /**
@@ -1446,6 +1431,12 @@ public final class ChartRenderer {
      * describe a chart the atlas no longer draws.
      */
     public void drawMagnitudeKey(Graphics2D g, ChartScene scene) {
+        drawMagnitudeKey(g, scene, ChartPalette.WHITE_PAPER);
+    }
+
+    /** The key on the given ground, furniture interior included. */
+    public void drawMagnitudeKey(Graphics2D g, ChartScene scene,
+                                 ChartPalette palette) {
         FontMetrics metrics = g.getFontMetrics(LABEL_FONT);
         java.awt.Rectangle box =
                 magnitudeKeyBounds(metrics, scene, starSizePolicy);
@@ -1459,14 +1450,14 @@ public final class ChartRenderer {
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(PAPER);
+            g2.setColor(palette.ground());
             g2.fillRect(box.x, box.y, box.width, box.height);
-            g2.setColor(FRAME);
+            g2.setColor(palette.frameInk());
             g2.setStroke(new BasicStroke(1.0f));
             g2.drawRect(box.x, box.y, box.width, box.height);
 
             g2.setFont(LABEL_FONT);
-            g2.setColor(INK);
+            g2.setColor(palette.starInk());
             int baseline = box.y + TITLE_PADDING_PX + metrics.getAscent();
             g2.drawString(KEY_HEADING, box.x + TITLE_PADDING_PX, baseline);
 
@@ -1526,7 +1517,8 @@ public final class ChartRenderer {
         return new java.awt.Rectangle(boxX, boxY, boxWidth, boxHeight);
     }
 
-    private void drawTitleBlock(Graphics2D g, ChartScene scene) {
+    private void drawTitleBlock(Graphics2D g, ChartScene scene,
+                                ChartPalette palette) {
         // A viewport too small to hold the block with its margins omits it
         // rather than clipping formal notation (Codex review, PR #12).
         java.awt.Rectangle box = titleBlockBounds(g, scene);
@@ -1538,13 +1530,13 @@ public final class ChartRenderer {
         FontMetrics metrics = g.getFontMetrics();
         int lineHeight = metrics.getHeight();
 
-        g.setColor(PAPER);
+        g.setColor(palette.ground());
         g.fillRect(box.x, box.y, box.width, box.height);
-        g.setColor(FRAME);
+        g.setColor(palette.frameInk());
         g.setStroke(new BasicStroke(1.0f));
         g.drawRect(box.x, box.y, box.width, box.height);
 
-        g.setColor(TEXT_INK);
+        g.setColor(palette.textInk());
         int baseline = box.y + TITLE_PADDING_PX + metrics.getAscent();
         for (int i = 0; i < lines.length; i++) {
             g.setFont(i == 0 ? TITLE_FONT : LABEL_FONT);

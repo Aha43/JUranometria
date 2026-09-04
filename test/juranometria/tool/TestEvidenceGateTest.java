@@ -363,8 +363,11 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(20, display.size(),
-                "the display corpus is the twenty the decision names");
+        assertEquals(21, display.size(),
+                "the display corpus is the twenty the decision names"
+                        + " plus the black-sky journey (#246), which"
+                        + " arrived through the shared routes with"
+                        + " its premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
@@ -417,9 +420,12 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 22,
+        assertTrue(doClick <= 23,
                 "doClick files shrank under #243 to menu convention"
-                        + " and mechanism tests, and may not grow: "
+                        + " and mechanism tests, and may not grow"
+                        + " beyond them - the black-sky journey"
+                        + " (#246) added one file whose only doClick"
+                        + " is the recorded View-menu convention: "
                         + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"

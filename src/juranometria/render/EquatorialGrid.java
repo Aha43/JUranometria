@@ -39,8 +39,15 @@ public final class EquatorialGrid {
     private EquatorialGrid() {
     }
 
-    public static final Color GRID_INK = new Color(216, 216, 216);
-    public static final Color GRID_LABEL_INK = new Color(150, 150, 150);
+    /**
+     * The white-paper grid inks, published for tests and studies
+     * that name the released values; the drawing itself asks the
+     * chart's {@link ChartPalette} (issue #246).
+     */
+    public static final Color GRID_INK =
+            ChartPalette.WHITE_PAPER.gridInk();
+    public static final Color GRID_LABEL_INK =
+            ChartPalette.WHITE_PAPER.gridLabelInk();
     public static final Font GRID_LABEL_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
 
     /** Pleasant right-ascension steps, in degrees (1m ... 6h of time). */
@@ -446,13 +453,18 @@ public final class EquatorialGrid {
         return false;
     }
 
-    /** Draws a computed grid onto a graphics context, quietest ink. */
+    /** Draws a computed grid in the released white-paper ink. */
     public static void draw(Graphics2D g, Grid grid) {
+        draw(g, grid, ChartPalette.WHITE_PAPER);
+    }
+
+    /** Draws a computed grid onto a graphics context, quietest ink. */
+    public static void draw(Graphics2D g, Grid grid, ChartPalette palette) {
         g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setColor(GRID_INK);
+        g.setColor(palette.gridInk());
         g.setStroke(new BasicStroke(1.0f));
         for (List<List<PixelPoint>> family
                 : List.of(grid.meridians(), grid.parallels())) {
@@ -464,7 +476,7 @@ public final class EquatorialGrid {
                 }
             }
         }
-        g.setColor(GRID_LABEL_INK);
+        g.setColor(palette.gridLabelInk());
         g.setFont(GRID_LABEL_FONT);
         for (Label label : grid.labels()) {
             g.drawString(label.text(), (float) label.x(), (float) label.y());

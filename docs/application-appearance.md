@@ -25,9 +25,13 @@ typography, line weights, and symbols. A dark application theme must not
 silently turn the atlas into a dark planetarium display.
 
 The default chart remains white paper with black and grey ink in both
-application themes. A purpose-built red-light or inverted chart mode may be
-considered later, but it must be a deliberate chart style with printable
-behaviour, not an accidental consequence of Swing theme colors.
+application themes. The deliberate chart style this paragraph anticipated
+arrived as **Black sky** (Sprint 26, issue #246,
+`docs/decisions/black-sky.md`): a persisted Chart Options choice, white
+stars and restrained light ink on black, derived by measurement rather
+than inversion — a chart palette, never a Swing theme consequence, and
+available inside either application chrome. Red-light adaptation remains
+future work under the same rule.
 
 ## Visual character
 

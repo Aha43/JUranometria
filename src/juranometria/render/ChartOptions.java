@@ -32,17 +32,44 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            boolean titleBlock, boolean magnitudeKey,
                            boolean galaxies, boolean openClusters,
                            boolean globularClusters, boolean nebulae,
-                           boolean planetaryNebulae) {
+                           boolean planetaryNebulae,
+                           ChartPalette palette) {
 
     /**
-     * The released chart: every layer on, the title block on, and
-     * the stellar-magnitude key OFF - the Sprint 20 decision, which
+     * The released chart: every layer on, the title block on, the
+     * stellar-magnitude key OFF - the Sprint 20 decision, which
      * measured the key covering up to 436 px of star and symbol ink
-     * on a wide page and left it for the reader to ask for.
+     * on a wide page and left it for the reader to ask for - and
+     * white paper (docs/decisions/black-sky.md).
      */
     public static final ChartOptions DEFAULTS = new ChartOptions(
             true, true, true, true, true, true, true, true, true,
-            true, false, true, true, true, true, true);
+            true, false, true, true, true, true, true,
+            ChartPalette.WHITE_PAPER);
+
+    /**
+     * The chart before the ground was the reader's (through 1.6.0):
+     * every page on white paper. An upgrading store keeps the chart
+     * it left behind (docs/decisions/black-sky.md).
+     */
+    public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
+                        boolean constellationFigures,
+                        boolean constellationBoundaries,
+                        boolean constellationNames,
+                        boolean starNames, boolean bayerLetters,
+                        boolean flamsteedNumbers,
+                        boolean equatorialGrid,
+                        boolean titleBlock, boolean magnitudeKey,
+                        boolean galaxies, boolean openClusters,
+                        boolean globularClusters, boolean nebulae,
+                        boolean planetaryNebulae) {
+        this(deepSkyObjects, deepSkyLabels, constellationFigures,
+                constellationBoundaries, constellationNames, starNames,
+                bayerLetters, flamsteedNumbers, equatorialGrid,
+                titleBlock, magnitudeKey, galaxies, openClusters,
+                globularClusters, nebulae, planetaryNebulae,
+                ChartPalette.WHITE_PAPER);
+    }
 
     /**
      * The chart before the deep-sky families became the reader's
@@ -173,7 +200,17 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                         : globularClusters,
                 family == SymbolFamily.NEBULAE ? enabled : nebulae,
                 family == SymbolFamily.PLANETARY_NEBULAE ? enabled
-                        : planetaryNebulae);
+                        : planetaryNebulae, palette);
+    }
+
+    /** This chart on the other ground, nothing else touched. */
+    public ChartOptions withPalette(ChartPalette chosen) {
+        return new ChartOptions(deepSkyObjects, deepSkyLabels,
+                constellationFigures, constellationBoundaries,
+                constellationNames, starNames, bayerLetters,
+                flamsteedNumbers, equatorialGrid, titleBlock, magnitudeKey,
+                galaxies, openClusters, globularClusters, nebulae,
+                planetaryNebulae, chosen);
     }
 
     /** Names depend on figures: names anchor on visible figure ink. */

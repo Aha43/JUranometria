@@ -224,7 +224,8 @@ public final class ChartComponent extends JComponent {
             // released page.
             renderer.render(g2, scene, chartOptions,
                     (layerG, layerScene) -> ReferenceInk.paint(layerG,
-                            layerScene, overlays.collect()));
+                            layerScene, overlays.collect(),
+                            chartOptions.palette()));
             renderer.drawSelectionHighlight(g2, scene, chartOptions,
                     highlighted);
             // After the chart, never inside it: working crosses are
@@ -232,7 +233,8 @@ public final class ChartComponent extends JComponent {
             // ordinary and reference rendering are untouched by them
             // - and identical when nothing is marked, because a
             // module with nothing to say contributes nothing.
-            WorkingCrossInk.paint(g2, scene, overlays.collect(), highlighted);
+            WorkingCrossInk.paint(g2, scene, overlays.collect(), highlighted,
+                    chartOptions.palette());
         } finally {
             g2.dispose();
         }

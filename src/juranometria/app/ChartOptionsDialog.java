@@ -31,6 +31,7 @@ import javax.swing.Scrollable;
 import javax.swing.ScrollPaneConstants;
 
 import juranometria.render.ChartOptions;
+import juranometria.render.ChartPalette;
 import juranometria.render.SymbolFamily;
 import juranometria.ui.SymbolChip;
 
@@ -185,6 +186,12 @@ public final class ChartOptionsDialog extends JDialog {
                 "A key in the upper right showing the circle size the"
                         + " chart draws for three visual magnitudes,"
                         + " including this page's limit");
+        JCheckBox blackSky = checkBox("Black sky", 'B',
+                initial.palette() == ChartPalette.BLACK_SKY, "Black sky",
+                "White stars and restrained light ink on a black"
+                        + " ground, instead of the white-paper chart;"
+                        + " a chart choice, independent of the"
+                        + " application's light or dark appearance");
 
         Runnable sync = () -> {
             // The two decided dependencies, and the five families,
@@ -204,7 +211,9 @@ public final class ChartOptionsDialog extends JDialog {
                     families.get(1).isSelected(),
                     families.get(2).isSelected(),
                     families.get(3).isSelected(),
-                    families.get(4).isSelected());
+                    families.get(4).isSelected(),
+                    blackSky.isSelected() ? ChartPalette.BLACK_SKY
+                            : ChartPalette.WHITE_PAPER);
             controller.apply(next);
         };
         labels.setEnabled(initial.deepSkyObjects());
@@ -214,7 +223,8 @@ public final class ChartOptionsDialog extends JDialog {
         }
         List<JCheckBox> all = new ArrayList<>(List.of(dsos, labels, figures,
                 boundaries, names, starNames, bayerLetters,
-                flamsteedNumbers, grid, titleBlock, magnitudeKey));
+                flamsteedNumbers, grid, titleBlock, magnitudeKey,
+                blackSky));
         all.addAll(families);
         for (JCheckBox box : all) {
             box.addActionListener(event -> sync.run());
@@ -234,7 +244,7 @@ public final class ChartOptionsDialog extends JDialog {
         tabs.addTab("Constellations", scrolling(column(figures, boundaries,
                 names)));
         tabs.addTab("Chart", scrolling(column(grid, titleBlock,
-                magnitudeKey)));
+                magnitudeKey, blackSky)));
 
         JButton restore = new JButton("Restore Defaults");
         restore.setMnemonic('R');
@@ -242,7 +252,7 @@ public final class ChartOptionsDialog extends JDialog {
         restore.getAccessibleContext().setAccessibleDescription(
                 "Preview the released chart: every layer and every"
                         + " deep-sky family on, the title block on, the"
-                        + " magnitude key off");
+                        + " magnitude key off, on white paper");
         restore.addActionListener(event -> {
             controller.restoreDefaults();
             ChartOptions defaults = controller.options();
@@ -257,6 +267,8 @@ public final class ChartOptionsDialog extends JDialog {
             bayerLetters.setSelected(defaults.bayerLetters());
             flamsteedNumbers.setSelected(defaults.flamsteedNumbers());
             grid.setSelected(defaults.equatorialGrid());
+            blackSky.setSelected(
+                    defaults.palette() == ChartPalette.BLACK_SKY);
             for (int i = 0; i < families.size(); i++) {
                 families.get(i).setSelected(
                         defaults.family(SymbolFamily.values()[i]));
