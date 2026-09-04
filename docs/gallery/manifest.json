@@ -13,7 +13,7 @@
     {
       "id": "on-this-page",
       "name": "On This Page",
-      "lead": "A removable module that lists everything the page carries — including what the chart honestly does not draw — and lets a reader mark entries with working crosses. Interaction ink, never catalogue vocabulary."
+      "lead": "A removable module that lists everything the page carries — including what the chart does not draw — and lets a reader mark entries with working crosses. Interaction ink, never catalogue vocabulary."
     },
     {
       "id": "place-and-time",
@@ -44,8 +44,8 @@
       "region": "Orion and neighbours",
       "field": "36°",
       "ink": "Core chart ink only.",
-      "source": "docs/studies/constellation-rendering/m42-36deg.png",
-      "produced": "Production render; regenerated and compared against its generator by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "source": "docs/studies/regional-zoom/m42-36deg.png",
+      "produced": "Production render (RegionalStudyMain, the renderer's own pass alone); regenerated and compared against its generator by make evidence-contracts. v1.7.0 tree (8820a6d).",
       "alt": "A dense wide-field star chart: Orion's stick figure with named bright stars Betelgeuse, Bellatrix, Rigel and Saiph, the constellation name ORION in small capitals, boxed nebulae near the Sword, and the names of neighbouring constellations at their figures."
     },
     {
@@ -66,7 +66,7 @@
       "room": "core-chart",
       "kind": "chart",
       "title": "Around the celestial pole",
-      "caption": "Polaris near the middle and the grid's parallels closing into rings around it — the page every equatorial chart is secretly about.",
+      "caption": "Polaris near the middle, with the grid's parallels closing into rings around the celestial pole. Here the geometry of equatorial coordinates becomes visible.",
       "region": "Ursa Minor, the north celestial pole",
       "field": "36°",
       "ink": "Core chart ink only.",
@@ -92,7 +92,7 @@
       "room": "on-this-page",
       "kind": "ui",
       "title": "The page's own inventory",
-      "caption": "Application UI — the On This Page panel beside the chart: thirteen rows for the Andromeda page, each stating brightness, distance from centre, and whether the chart draws it. NGC 206 says so honestly: not recorded, no symbol.",
+      "caption": "Application UI — the On This Page panel beside the chart: thirteen rows for the Andromeda page, each stating brightness, distance from centre, and whether the chart draws it. The row for NGC 206 states it plainly: not recorded, no symbol.",
       "region": "M 31, Andromeda",
       "field": "8°",
       "ink": "Application UI, not chart output.",

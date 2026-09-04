@@ -68,10 +68,56 @@ gallery test executes both halves against the artifact classes of
 `docs/decisions/test-evidence.md`, so a silently promoted mock-up
 fails the suite, not a review.
 
+The rule then earned its second instance, and a refinement, on the
+live site: the owner's eye caught a constellation figure line and
+the ghost of CANIS MAJOR showing *through* the Orion slide's title
+block - which the shipped renderer, whose furniture is opaque and
+drawn last, never does. The slide's source was
+`constellation-rendering/m42-36deg.png`, whose gate-era generator
+composites candidate geography **over** the finished page,
+furniture included; the renderer-drawn artifact class alone did
+not prove production composition. The slide now uses the pure
+production render of the same page
+(`regional-zoom/m42-36deg.png`), and the refinement is executable:
+a chart slide's source directory must come from the pinned list of
+generators that draw through the production pass alone -
+`docs/reference/`, the gallery's own component-composed slides,
+and the two studies that call `renderToImage` and composite
+nothing after it. A compositing study joins the list only by
+becoming a production-pass generator.
+
 Black sky is deliberately absent from this first set: the issue
 scopes the gallery to what 1.6.0 released and was filed before
 1.7.0 published. A black-sky room or slide is a natural later
 curation, by manifest change, not a silent scope growth here.
+
+## The editorial rule: describe, never compare
+
+The gallery is where JUranometria first speaks publicly in a
+sustained voice, and the review caught that voice slipping once:
+the Polaris caption called the pole "the page every equatorial
+chart is secretly about" — a trace of competitive product
+language, *other charts show the surface; this one reveals the
+secret*. Nothing in the project's reason for existing says that.
+JUranometria exists alongside Stellarium, printed atlases,
+planetarium software and the old chart sheet on a desk; it does
+not need to defeat them, and its confidence comes from precision,
+restraint and usefulness. The quiet-chart principle governs prose
+too.
+
+The rule, for the gallery and all future documentation — general
+guidance now lives in
+[docs/development.md](../development.md#documentation-voice), where
+every documentation review reads it:
+
+> **Describe what JUranometria lets the reader see. Do not imply
+> that other charts, tools, or readers failed to see it.**
+
+Pride belongs in the care of the work; it does not need to appear
+as comparison. The Polaris caption now reads "Here the geometry of
+equatorial coordinates becomes visible," and the same sweep
+retired two smaller flourishes ("honestly", "says so honestly")
+for plain statements of what the page shows.
 
 ## Interaction and visual contract
 

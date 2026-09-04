@@ -1,0 +1,61 @@
+# Publishes the reviewed public gallery (issue #253) with GitHub
+# Pages, and nothing else: the job assembles the self-contained
+# site artifact from the checked-out tree - compiling only the two
+# JDK-pure tool sources, no dependency download - and hands it to
+# the official Pages actions. Deployment never edits any branch,
+# and the workflow holds the least privilege that can deploy:
+# contents read to check out, pages write and an OIDC token only in
+# the deploy job.
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/gallery/**'
+      - 'docs/studies/gallery/**'
+      - 'docs/reference/**'
+      - 'src/juranometria/tool/GalleryMain.java'
+      - 'src/juranometria/tool/MiniJson.java'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Assemble the site artifact
+        run: make gallery-site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/gallery-site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Enabling Pages is a one-time repository-admin action the
+      # owner performs; this token deliberately cannot (least
+      # privilege), so configure-pages only reads the existing site.
+      - uses: actions/configure-pages@v5
+      - id: deployment
+        uses: actions/deploy-pages@v4

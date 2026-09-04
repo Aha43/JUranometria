@@ -301,8 +301,8 @@ public final class EvidenceContractMain {
         // browser; provenance in docs/decisions/gallery.md.
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-index-desktop.png",
-                "6b45e1ee5ba7ba0c9ea7f7431e5a352937dac16a"
-                        + "822ee2cc7d4c4100152418c7");
+                "ad16b3ed006ada7a36a88a242c72993cf4c7156d"
+                        + "c8bb86b70989ad644f581cbb");
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-index-narrow.png",
                 "47fd872a95f4939b1b3fc0c6b35be484a37dcbda"
@@ -313,8 +313,19 @@ public final class EvidenceContractMain {
                         + "609169e807cb3b5ca6455167");
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-slide-narrow.png",
-                "d6f67f6a9710fa9f9a5e03e2e852a977c6f0ac5c"
-                        + "2e47f09cc54bef54139cc6c0");
+                "3bd83d7f25620af85f7e98d8e9be02ac9a0cdeba"
+                        + "7d2059bc3a6f0a11a7e96b90");
+        // The published site itself (issue #253): the public
+        // github.io URL in a fresh browser session, desktop and
+        // narrow, after the Pages deploy.
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-public-desktop.png",
+                "ad16b3ed006ada7a36a88a242c72993cf4c7156d"
+                        + "c8bb86b70989ad644f581cbb");
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-public-narrow.png",
+                "117670b356cbe8218b26fcd93b149b109ea344da"
+                        + "045ec27c5e99bde5b3a088c1");
     }
 
     /**

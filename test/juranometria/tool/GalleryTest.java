@@ -23,6 +23,21 @@ class GalleryTest {
 
     private static final Path GALLERY = Path.of("docs/gallery");
 
+    /**
+     * The directories whose generators draw chart pages through the
+     * production pass alone - docs/reference is the canonical page
+     * CI holds renders to, docs/studies/gallery is the production
+     * component itself (GalleryPageMain), and the two studies here
+     * call {@code renderToImage} and composite nothing after it.
+     * Pinned after the owner found a study-composited figure line
+     * ghosting through a title block on the live site.
+     */
+    private static final List<String> PRODUCTION_PASS_SOURCES =
+            List.of("docs/reference/",
+                    "docs/studies/gallery/",
+                    "docs/studies/regional-zoom/",
+                    "docs/studies/coordinate-grid/");
+
     @Test
     void thePagesAreExactlyWhatTheManifestDerives() throws Exception {
         Path scratch = Files.createTempDirectory("gallery");
@@ -95,6 +110,113 @@ class GalleryTest {
                         slug + " claims chart output, so its source"
                                 + " keeps the renderer-drawn contract:"
                                 + " " + artifactClass);
+                // The owner's live-review find (#253): the
+                // renderer-drawn class alone did not prove the page
+                // was drawn by the production pass - the
+                // constellation-rendering study composites candidate
+                // geography OVER the finished page, furniture
+                // included, and a figure line ghosted through the
+                // Orion slide's title block on the public site. A
+                // chart slide's source directory is therefore
+                // pinned to the generators that draw through the
+                // production pass alone; a compositing study joins
+                // this list only by becoming one.
+                assertTrue(PRODUCTION_PASS_SOURCES.stream()
+                                .anyMatch(root -> GalleryMain
+                                        .text(slide, "source")
+                                        .startsWith(root)),
+                        slug + "'s source comes from a production-pass"
+                                + " generator: "
+                                + GalleryMain.text(slide, "source"));
+            }
+        }
+    }
+
+    @Test
+    void theSiteIsSelfContainedAndEveryReferenceResolves()
+            throws Exception {
+        // Issue #253's executable acceptance: the publishable site
+        // assembles from the checkout alone, every internal link
+        // and image resolves inside the artifact, ids are unique,
+        // and every image carries its alt text.
+        Path site = Files.createTempDirectory("gallery-site");
+        try {
+            GalleryMain.generateSite(GALLERY, site);
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            int pages = 0;
+            try (var tree = Files.walk(site)) {
+                for (Path page : tree.filter(f ->
+                        f.toString().endsWith(".html")).sorted()
+                        .toList()) {
+                    pages++;
+                    String html = Files.readString(page);
+                    var references = java.util.regex.Pattern
+                            .compile("(?:src|href)=\"([^\"]+)\"")
+                            .matcher(html);
+                    while (references.find()) {
+                        String target = references.group(1);
+                        if (target.startsWith("https://github.com/"
+                                + "Aha43/JUranometria")) {
+                            continue; // the stated repo/release links
+                        }
+                        assertFalse(target.startsWith("http"),
+                                page + " reaches only into the site: "
+                                        + target);
+                        Path resolved = page.getParent()
+                                .resolve(target).normalize();
+                        assertTrue(resolved.startsWith(site),
+                                page + " stays inside the artifact: "
+                                        + target);
+                        assertTrue(Files.exists(resolved),
+                                page + " links something the artifact"
+                                        + " carries: " + target);
+                    }
+                    var images = java.util.regex.Pattern
+                            .compile("<img [^>]*alt=\"([^\"]*)\"")
+                            .matcher(html);
+                    while (images.find()) {
+                        assertFalse(images.group(1).isBlank(),
+                                page + " gives every image real alt"
+                                        + " text");
+                    }
+                }
+            }
+            assertTrue(pages >= 10, "the index and every slide page"
+                    + " are in the artifact: " + pages);
+            for (Map<String, Object> slide : slides()) {
+                assertTrue(seen.add(GalleryMain.text(slide, "slug")),
+                        "slide ids are unique: "
+                                + GalleryMain.text(slide, "slug"));
+            }
+        } finally {
+            try (var tree = Files.walk(site)) {
+                for (Path file : tree.sorted(
+                        java.util.Comparator.reverseOrder()).toList()) {
+                    Files.delete(file);
+                }
+            }
+        }
+    }
+
+    @Test
+    void noModuleInkIsLabelledAsTheCoreChart() throws IOException {
+        // Issue #253: a module slide labelled as core is the exact
+        // confusion the two development principles forbid.
+        for (Map<String, Object> slide : slides()) {
+            String room = GalleryMain.text(slide, "room");
+            String ink = GalleryMain.text(slide, "ink");
+            if (room.equals("core-chart")) {
+                assertTrue(ink.equals("Core chart ink only."),
+                        GalleryMain.text(slide, "slug")
+                                + " sits in the core room, so its ink"
+                                + " is the core chart's alone: " + ink);
+            } else {
+                assertTrue(ink.contains("module ink")
+                                || ink.contains("Application UI"),
+                        GalleryMain.text(slide, "slug")
+                                + " sits in a module room, so its ink"
+                                + " attribution names the module or"
+                                + " says UI: " + ink);
             }
         }
     }

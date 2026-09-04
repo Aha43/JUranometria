@@ -247,7 +247,21 @@ gallery-pages: classes
 gallery: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GalleryMain
 
-.PHONY: gallery gallery-pages
+# The publishable site (issue #253): self-contained under
+# build/gallery-site, assembled from the manifest and committed
+# assets alone. Compiles only the two JDK-pure tool sources it
+# needs, so a clean checkout builds it with no dependency download
+# - the Pages workflow runs exactly this target.
+gallery-site:
+	mkdir -p build/site-classes
+	$(JAVAC) --release 21 -d build/site-classes \
+		src/juranometria/tool/MiniJson.java \
+		src/juranometria/tool/GalleryMain.java
+	rm -rf build/gallery-site
+	$(JAVA) -cp build/site-classes juranometria.tool.GalleryMain \
+		site build/gallery-site
+
+.PHONY: gallery gallery-pages gallery-site
 
 # The black-sky palette (docs/decisions/black-sky.md, issue #246):
 # the derivation executed and verified against the pinned palette,
