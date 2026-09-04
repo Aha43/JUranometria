@@ -332,13 +332,9 @@ class DirectZoomJourneyTest {
         flush();
     }
 
-    /** A masked key press dispatched to the Search field itself. */
+    /** A masked shortcut, with its focused-window premise (#243). */
     private void key(int keyCode, int mask) throws Exception {
-        SwingUtilities.invokeAndWait(() -> searchField.dispatchEvent(
-                new KeyEvent(searchField, KeyEvent.KEY_PRESSED,
-                        System.nanoTime() / 1_000_000, mask, keyCode,
-                        KeyEvent.CHAR_UNDEFINED)));
-        flush();
+        ReaderInput.shortcut(searchField, keyCode, mask);
     }
 
     private static JButton button(java.awt.Component component,

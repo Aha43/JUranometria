@@ -168,7 +168,31 @@ public final class ReaderInput {
         press(target, keyCode, modifiers);
     }
 
-    /** A key pressed and released at a control. */
+    /**
+     * A shortcut whose binding needs the target itself focused - a
+     * tab strip's Ctrl-PageUp, a table's arrows - insisted on
+     * component-deep, not merely window-deep (review): window focus
+     * proves a reader could press an accelerator, and only target
+     * focus proves they could walk this control.
+     */
+    public static void shortcutOn(JComponent target, int keyCode,
+                                  int modifiers) throws Exception {
+        java.awt.Window window =
+                SwingUtilities.getWindowAncestor(target);
+        Assumptions.assumeTrue(window != null,
+                name(target) + " sits in a window a desktop could"
+                        + " focus");
+        FocusedWindow.insistOnFocus(window, target);
+        press(target, keyCode, modifiers);
+    }
+
+    /**
+     * A key pressed and released at a control - the one raw
+     * dispatcher in the whole suite, which the gate pins to exactly
+     * this file. The focus premise is the caller's: typeAndEnter,
+     * shortcut and shortcutOn establish it, and a journey calling
+     * press directly stands behind its own insistOnFocus.
+     */
     public static void press(JComponent control, int keyCode,
                              int modifiers) throws Exception {
         SwingUtilities.invokeAndWait(() -> {

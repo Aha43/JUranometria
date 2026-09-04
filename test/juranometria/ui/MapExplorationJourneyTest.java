@@ -1068,14 +1068,11 @@ class MapExplorationJourneyTest {
                 "and the reader can reach it with the arrow key");
     }
 
-    /** A key press delivered to a component, as a keyboard does. */
+    /** A key press delivered to a component, as a keyboard does;
+     *  the caller stands behind its own insistOnFocus (#243). */
     private void key(java.awt.Component target, int keyCode)
             throws Exception {
-        SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
-                new KeyEvent(target, KeyEvent.KEY_PRESSED,
-                        System.nanoTime() / 1_000_000, 0, keyCode,
-                        KeyEvent.CHAR_UNDEFINED)));
-        flush();
+        ReaderInput.press((javax.swing.JComponent) target, keyCode, 0);
     }
 
     /** Whether focus comes to rest on this component. */

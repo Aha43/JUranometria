@@ -153,14 +153,9 @@ class OnThisPageKeyboardTest {
 
     /** A real key event, to the component that owns the focus. */
     private void press(int keyCode, int modifiers) throws Exception {
-        for (int id : new int[] {KeyEvent.KEY_PRESSED,
-                KeyEvent.KEY_RELEASED}) {
-            SwingUtilities.invokeAndWait(() -> table.dispatchEvent(
-                    new KeyEvent(table, id,
-                            System.nanoTime() / 1_000_000, modifiers,
-                            keyCode, KeyEvent.CHAR_UNDEFINED)));
-        }
-        flush();
+        // Through the one raw dispatcher; the table's focus premise
+        // is established by insistOnFocus at the call sites (#243).
+        ReaderInput.press(table, keyCode, modifiers);
     }
 
     private List<String> selected() throws Exception {

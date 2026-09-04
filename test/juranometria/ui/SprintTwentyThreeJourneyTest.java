@@ -800,13 +800,8 @@ class SprintTwentyThreeJourneyTest {
     }
 
     private void pressSpace(Component target) throws Exception {
-        for (int id : new int[] {KeyEvent.KEY_PRESSED,
-                KeyEvent.KEY_RELEASED}) {
-            SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
-                    new KeyEvent(target, id,
-                            System.nanoTime() / 1_000_000, 0,
-                            KeyEvent.VK_SPACE, ' ')));
-        }
+        ReaderInput.press((javax.swing.JComponent) target,
+                KeyEvent.VK_SPACE, 0);
         flush();
     }
 
@@ -844,11 +839,7 @@ class SprintTwentyThreeJourneyTest {
     }
 
     private void key(Component target, int keyCode) throws Exception {
-        SwingUtilities.invokeAndWait(() -> target.dispatchEvent(
-                new KeyEvent(target, KeyEvent.KEY_PRESSED,
-                        System.nanoTime() / 1_000_000, 0, keyCode,
-                        KeyEvent.CHAR_UNDEFINED)));
-        flush();
+        ReaderInput.press((javax.swing.JComponent) target, keyCode, 0);
     }
 
     /**

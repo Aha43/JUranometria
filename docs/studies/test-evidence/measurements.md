@@ -78,13 +78,13 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/DirectZoomJourneyTest.java | focus-owner, point-reachable, control-showing | pointer-events, keyboard-events |
 | juranometria/ui/HiddenFamilyTargetJourneyTest.java | focus-owner | none |
 | juranometria/ui/LetteredStarJourneyTest.java | focus-owner, point-reachable, control-showing | pointer-events, back-door-click |
-| juranometria/ui/MapExplorationJourneyTest.java | focused-window, focus-owner, point-reachable, control-showing, focus-settles | pointer-events, keyboard-events, back-door-click |
+| juranometria/ui/MapExplorationJourneyTest.java | focused-window, focus-owner, point-reachable, control-showing, focus-settles | pointer-events, back-door-click |
 | juranometria/ui/NamedStarJourneyTest.java | focus-owner, point-reachable, control-showing | pointer-events, back-door-click |
-| juranometria/ui/OnThisPageJourneyTest.java | focused-window, point-reachable, control-showing | pointer-events, keyboard-events |
-| juranometria/ui/OnThisPageKeyboardTest.java | focused-window | keyboard-events |
+| juranometria/ui/OnThisPageJourneyTest.java | focused-window, point-reachable, control-showing | pointer-events |
+| juranometria/ui/OnThisPageKeyboardTest.java | focused-window | none |
 | juranometria/ui/SprintTwentyFiveJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
-| juranometria/ui/SprintTwentyFourJourneyTest.java | focused-window, point-reachable, control-showing | pointer-events, keyboard-events |
-| juranometria/ui/SprintTwentyThreeJourneyTest.java | focused-window, focus-owner, point-reachable, control-showing | pointer-events, keyboard-events, back-door-click |
+| juranometria/ui/SprintTwentyFourJourneyTest.java | focused-window, point-reachable, control-showing | pointer-events |
+| juranometria/ui/SprintTwentyThreeJourneyTest.java | focused-window, focus-owner, point-reachable, control-showing | pointer-events, back-door-click |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
 **20 display-dependent files.** 14 state a focused-window or focus-owner premise, 13 state a reachability premise, and 12 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
@@ -92,7 +92,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 ## Input routes across the whole suite
 
 - files dispatching real pointer events: 15
-- files dispatching real keyboard events: 7
+- files dispatching real keyboard events: 2
 - files using doClick somewhere: 22
 - files using postActionEvent somewhere: 3
 
@@ -109,7 +109,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **306** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **417**
+- explicit event-thread hand-offs (invokeAndWait): **410**
 
 ## Generated evidence, classified
 

@@ -725,9 +725,10 @@ class DeepSkyFamilyJourneyTest {
     }
 
     private void pressOn(JTabbedPane tabs, int keyCode) throws Exception {
-        // The premise, insisted rather than requested and hoped
-        // (#243 review): a request the desktop refuses is silent.
-        ReaderInput.shortcut(tabs, keyCode, KeyEvent.CTRL_DOWN_MASK);
+        // Component-deep, not window-deep (#243 re-review): walking
+        // the tabs needs the tab strip itself to own the focus a
+        // reader's Ctrl-PageUp would need.
+        ReaderInput.shortcutOn(tabs, keyCode, KeyEvent.CTRL_DOWN_MASK);
     }
 
     /** The real search field, as a reader uses it: type and Enter. */

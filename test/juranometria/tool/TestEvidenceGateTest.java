@@ -374,42 +374,30 @@ class TestEvidenceGateTest {
     }
 
     @Test
-    void everyRawKeyDispatcherInsistsOnFocusForItself()
+    void theOnlyRawKeyDispatcherIsTheSharedHelperItself()
             throws IOException {
-        // The anti-masking pin (review): premises were counted per
-        // file, so one honest gesture could vouch for a raw key
-        // dispatched elsewhere in the same file. Raw dispatchers are
-        // now held one by one: a display file that dispatches
-        // KEY_PRESSED itself must insist on focus itself - through
-        // FocusedWindow or by routing through ReaderInput.shortcut -
-        // and the shared helper is the only file allowed to dispatch
-        // without insisting in its own text, because insisting is
-        // what it exists to do... and it does, in the same file.
-        List<String> masked = new java.util.ArrayList<>();
+        // The exact pin the review asked for, replacing a rule an
+        // unrelated helper call in the same file could still mask:
+        // one file in the whole test tree may build and dispatch a
+        // raw KeyEvent, and it is the shared helper whose routes
+        // carry the premises. A second dispatcher arrives by
+        // decision, through this pin, or not at all.
+        List<String> dispatchers = new java.util.ArrayList<>();
         try (var tree = Files.walk(Path.of("test"))) {
             for (Path source : tree
                     .filter(f -> f.toString().endsWith(".java"))
                     .sorted().toList()) {
-                String text = Files.readString(source);
-                TestEvidenceScan.File classified =
-                        TestEvidenceScan.classify(source.toString(),
-                                Files.readString(source));
-                if (!classified.displayDependent()
-                        || !TestEvidenceScan.dispatchesRawKeys(text)) {
-                    continue;
-                }
-                if (!text.contains("insistOnFocus")
-                        && !text.contains("FocusedWindow.tryToFocus")
-                        && !text.contains("ReaderInput.shortcut(")
-                        && !text.contains("ReaderInput.typeAndEnter(")) {
-                    masked.add(source.toString());
+                if (TestEvidenceScan.dispatchesRawKeys(
+                        Files.readString(source))) {
+                    dispatchers.add(source.toString());
                 }
             }
         }
-        assertEquals(List.of(), masked,
-                "a raw key dispatcher must establish focus in its own"
-                        + " file, not borrow a premise from an"
-                        + " unrelated gesture");
+        assertEquals(List.of("test/juranometria/ui/ReaderInput.java"),
+                dispatchers,
+                "every journey presses through the shared routes -"
+                        + " typeAndEnter, shortcut, shortcutOn, or"
+                        + " press behind its own insistOnFocus");
     }
 
     // ---- guard G4/G5 ratchets ---------------------------------------
