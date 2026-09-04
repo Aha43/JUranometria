@@ -72,3 +72,55 @@ the strongest evidence class in its own output.
 Changes requested. The contracts have useful substance, but the full runner
 is not yet clean-checkout reproducible, exception-safe, complete over outputs,
 or honest about the inspection it performed.
+
+## Follow-up at `d34cd1e`
+
+The inspection wording is corrected, newcomer detection is now performed
+after generation, and restoration sits in an outer `finally`. Omitting the
+raw-input-dependent generator also makes the command finish in a worktree
+without `imports/raw`. Two findings remain.
+
+### P1 — Ninety renderer artifacts lost the contract the gate assigned them
+
+The decision still defines `renderer-drawn` as “byte-reproducible per
+machine.” The fix instead omits eight existing renderer study mains because
+they write under `build/`, then labels their 90 committed artifacts
+`legacy-baseline (no active generator; held as committed)`. That verdict proves
+only that this command did not rewrite a file. It does not compare the chart
+the current production renderer draws with the committed evidence. A stale or
+hand-edited legacy image passes unchanged.
+
+Writing to `build/` is not a reason the generators verify nothing; it is the
+safe place from which the verifier can compare their outputs with the mapped
+files under `docs/studies`. Either teach the runner those output mappings or
+give the mains an explicit destination. For gitignored source inputs, declare
+and checksum the prerequisite (and make a missing prerequisite a clear,
+pre-generation refusal) rather than removing the corresponding evidence from
+verification. If some artifact truly has no reproducible generator, that is a
+separate recorded exception, not a 90-file replacement for the renderer class
+the gate chose.
+
+Mutation proof should change a committed legacy renderer image while leaving
+production/current generated output alone and require the contract to fail.
+At this head the unchanged image is the baseline, so no such mutation can be
+killed.
+
+### P1 — The new failure guarantees exist only in a manual rehearsal
+
+The requested throwing-generator and newcomer tests were not added;
+`EvidenceContractTest` is unchanged and the suite count remains 760. The
+reported saboteur run is useful exploratory evidence, but it does not keep the
+outer `finally`, primary-failure preservation, stray removal, or post-run
+inventory check from regressing tomorrow.
+
+Make generator invocation injectable or extract the transaction into a testable
+operation, then commit the two regressions described in the first review:
+
+- a generator changes a committed inspection artifact, creates a newcomer,
+  and throws; original bytes return, the newcomer is removed, and the primary
+  failure remains the one reported (with cleanup trouble suppressed if both
+  fail);
+- a generator completes while creating an uncommitted artifact; verification
+  fails by that artifact's name.
+
+Verdict remains changes requested on these two P1 findings.
