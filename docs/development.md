@@ -86,6 +86,34 @@ An issue is complete when:
 For a renderer issue, also save or inspect a deterministic reference image so
 the chart can be judged rather than inferred from tests alone.
 
+## Documentation voice
+
+Reader-facing prose — the gallery, the README, release notes,
+captions, and documentation generally — keeps the quiet-chart
+principle. The rule, first recorded for the gallery
+([docs/decisions/gallery.md](decisions/gallery.md)) and general
+from Sprint 27 on:
+
+> **Describe what JUranometria lets the reader see and do. Do not
+> imply that other charts, tools, or readers failed to see it.**
+
+In practice:
+
+- Describe what a reader sees and does; let precision and
+  restraint carry the confidence.
+- Avoid unsupported superlatives, uniqueness claims, marketing
+  comparisons, and implied criticism of other tools or of readers.
+  JUranometria exists alongside Stellarium, printed atlases,
+  planetarium software, and the chart sheet on a desk; it does not
+  need to defeat them.
+- Acknowledge sources and the wider ecosystem where relevant — the
+  project stands on catalogues, geography, algorithms, and a
+  cartographic tradition it is grateful for, and its notices and
+  provenance lines are part of its voice.
+- This is a human editorial judgment applied in review, not a
+  banned-word test; a word is not the problem, the posture is.
+  Pride belongs in the care of the work, not in comparison.
+
 ## Tests and evidence
 
 The evidence taxonomy and the contract each class keeps are decided in

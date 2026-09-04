@@ -105,7 +105,10 @@ not need to defeat them, and its confidence comes from precision,
 restraint and usefulness. The quiet-chart principle governs prose
 too.
 
-The rule, for the gallery and all future documentation:
+The rule, for the gallery and all future documentation — general
+guidance now lives in
+[docs/development.md](../development.md#documentation-voice), where
+every documentation review reads it:
 
 > **Describe what JUranometria lets the reader see. Do not imply
 > that other charts, tools, or readers failed to see it.**
