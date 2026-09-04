@@ -86,6 +86,36 @@ An issue is complete when:
 For a renderer issue, also save or inspect a deterministic reference image so
 the chart can be judged rather than inferred from tests alone.
 
+## Tests and evidence
+
+The evidence taxonomy and the contract each class keeps are decided in
+[docs/decisions/test-evidence.md](decisions/test-evidence.md) (Sprint 26) and
+are executable, not aspirational:
+
+- **`make test`** runs the whole suite. Every process-wide disturbance — look
+  and feel, default font, locale, time zone, repaint manager, preferences —
+  rides the shared `SwingSession` guard or its deliberate local fixture shape,
+  and the gate (`TestEvidenceGateTest`) pins the corpus: no test reaches the
+  reader's real preference store through any derived production door, display
+  tests state their premises, and exactly one file (`ReaderInput`) may build
+  and dispatch a raw key event.
+- **Display tests press what a reader presses**, through `ReaderInput`:
+  premise-asserted pointer clicks, focus-insisting typing that aborts honestly
+  where a desktop refuses, pointer-chosen tabs, and focus-proven shortcuts. A
+  menu item's `doClick()` is the one recorded back-door convention.
+- **`make evidence-contracts`** regenerates the generated evidence and holds
+  every artifact to its class's contract, exiting nonzero on any breach. The
+  six classes: deterministic reports (byte-for-byte from their mains),
+  byte-exact fixtures (digest-pinned; a change is a provenance event),
+  renderer-drawn images (byte-reproducible per machine, compared against
+  their generators), widget-rendered inspection artifacts (restored on drift,
+  never silently churned), session photographs (display-bound; structure
+  asserted in the suite), and captured evidence (operating-system
+  screenshots, digest-pinned; re-capture is a reviewed provenance event).
+- **Studies are reproducibility paths** (`make <name>-study`); their chosen
+  pages are production output, and the contracts compare them against their
+  generators' build output rather than trusting the commit.
+
 ## Releases
 
 Merging is not the same as releasing. Changes accumulate under `Unreleased`.
