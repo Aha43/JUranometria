@@ -10,7 +10,12 @@ name: pages
 
 on:
   push:
-    branches: [main]
+    # feature/gallery-pages is TEMPORARY: the issue's stop wants the
+    # live Pages result reviewed before merge, and a dispatch can
+    # only reach workflows already on the default branch - so the
+    # review deploy rides this branch trigger, which the approval
+    # round removes, leaving main alone.
+    branches: [main, feature/gallery-pages]
     paths:
       - 'docs/gallery/**'
       - 'docs/studies/gallery/**'
