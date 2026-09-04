@@ -149,8 +149,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **309
-reads of live chart state** against **420 explicit hand-offs**
+own premise capture). The measurements count the traffic: **310
+reads of live chart state** against **428 explicit hand-offs**
 suite-wide. The discipline that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already
