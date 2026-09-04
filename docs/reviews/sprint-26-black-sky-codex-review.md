@@ -18,6 +18,16 @@ Consequently, changing either `ChartComponent` call to pass `ChartPalette.WHITE_
 
 Please make one black-sky acceptance render travel through a real `ChartComponent` with both kinds of contributed geometry present: the meridian module supplies solid line, dashed boundary, label and point; On-this-page supplies an interaction cross. Assert the actual final ink on black (including that the cross is visible at its projected position), then switch grounds and prove the geometry/working set/module state did not change. It can live in the display journey or packaged acceptance, but it should kill each wiring mutation independently. This will make the central module claim executable rather than inferred from the method signatures.
 
+## Re-review
+
+Resolved at `a1384b3`. `BlackSkyModuleInkTest` now crosses the real
+`ChartComponent` seam in both directions: a working mark enters through the
+overlay registry, and the real meridian module enters through
+`ChartModuleHost`. Each assertion is made over the changed-pixel set between
+otherwise identical component renders, so ordinary chart ink cannot answer
+for either contribution. Hard-coding the white-paper palette independently at
+the reference-ink and working-cross call sites kills the corresponding test.
+
 ## Result
 
-One P1 remains. Do not merge yet.
+No findings remain. PR #254 is approved for merge.
