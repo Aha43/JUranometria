@@ -103,6 +103,23 @@ dispatch is added to any file other than the one exact shared helper.
 
 Verdict remains changes requested on this P1.
 
+## Closing review at `e9482d9`
+
+The remaining P1 is closed.
+
+`ReaderInput.press(...)` is private. Every journey now chooses a public route
+whose focus premise is inseparable from the gesture: `typeAndEnter(...)`,
+focused-window `shortcut(...)`, or component-focused `shortcutOn(...)`. The
+two request-and-hope callers identified in review and the other former direct
+callers all use `shortcutOn(...)`.
+
+The structural guard pins both relevant facts: `ReaderInput.java` is the sole
+file that constructs and dispatches raw key events, and its raw `press(...)`
+method must remain private. A new unguarded caller can no longer hide behind
+an honest operation elsewhere in its file.
+
+Approved. No findings remain for PR #249.
+
 ## Second follow-up at `8cd11cf`
 
 `shortcutOn(...)` closes the tab-strip finding: it insists that the supplied
