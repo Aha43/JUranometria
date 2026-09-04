@@ -39,3 +39,14 @@ insert cannot make it stale again.
 Changes requested on this P2 wording correction. The visual evidence,
 captured-evidence contract, decision branch, and bundle verification otherwise
 pass review.
+
+## Closing review at `54ba7c2`
+
+The wording finding is closed. The documentation now distinguishes the two
+facts precisely: a JAR has no native Finder bundle identity, while the current
+portable process shows Duke in the Dock because its launcher does not set a
+runtime Taskbar image. The possible runtime follow-up therefore no longer
+contradicts the stated limitation. The route-matrix reference names the
+portable `java -jar` route rather than a row number.
+
+Approved. No findings remain for PR #251.
