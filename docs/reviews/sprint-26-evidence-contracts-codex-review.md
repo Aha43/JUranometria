@@ -125,6 +125,46 @@ operation, then commit the two regressions described in the first review:
 
 Verdict remains changes requested on these two P1 findings.
 
+## Third follow-up at `13f1293`
+
+The comparison now rejects an unpinned unmatched promoted file, rejects a pin
+that gains a generator match or loses its file, and makes a missing gated
+family contribute a contract failure. The restoration regression now throws
+through the same wrapper used by `main`. Two closure items remain.
+
+### P1 — Cleanup failure replaces the evidence failure
+
+`generateUnderRestoration(...)` uses a plain `try/finally`. If its generation
+body throws and `restoreInspectionImagery(...)` also throws, Java propagates
+the cleanup exception and discards the generator/contract failure. The first
+review explicitly required the primary failure to remain primary with cleanup
+trouble attached as suppressed. The new regression tests only the case where
+cleanup succeeds, so it cannot detect this replacement.
+
+Use the same guarded-cleanup discipline already established in
+`SwingSession`: retain the body failure, attempt restoration, and suppress a
+restoration failure onto it; surface restoration alone when the body
+succeeded. Test both-fail and cleanup-only-fails. A useful cleanup failure can
+be produced with an inspection path that restoration cannot rewrite/delete,
+without mocking the transaction away.
+
+### P2 — The new exact pins and incomplete result are still rehearsal-only
+
+No committed test exercises the promoted residue rules or either gated-input
+failure. The only changed test is the restoration test; the reported ninth
+file and missing-input checks were manual rehearsals. These are the branches
+that prevent 90 files from quietly returning to “baseline,” so they need the
+same regression status as restoration.
+
+Add tests for an unpinned ninth residue, a stale pin in each direction, and a
+missing gated family producing a failing/incomplete result. The incomplete
+diagnostic also says only “fetch them and rerun”; it should name the exact
+repository command for each family, as the PR report and decision claim
+(`scripts/download-constellation-sources.sh` and the corresponding star-
+identity source command).
+
+Verdict remains changes requested on the P1 and P2 above.
+
 ## Second follow-up at `b192d69`
 
 The promoted-output comparison is now directory-scoped, avoiding collisions
