@@ -301,8 +301,8 @@ public final class EvidenceContractMain {
         // browser; provenance in docs/decisions/gallery.md.
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-index-desktop.png",
-                "6b45e1ee5ba7ba0c9ea7f7431e5a352937dac16a"
-                        + "822ee2cc7d4c4100152418c7");
+                "6665f2bb3274ccb4ac03f8d642a7e26798131ca4"
+                        + "678a9507a41152f045649d33");
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-index-narrow.png",
                 "47fd872a95f4939b1b3fc0c6b35be484a37dcbda"
@@ -320,8 +320,8 @@ public final class EvidenceContractMain {
         // narrow, after the Pages deploy.
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-public-desktop.png",
-                "27ab14970bc1a1ca71b764e79206458694d34a8c"
-                        + "211c5b02a69901914256f507");
+                "6665f2bb3274ccb4ac03f8d642a7e26798131ca4"
+                        + "678a9507a41152f045649d33");
         CAPTURES.put("docs/studies/gallery/"
                         + "screenshot-gallery-public-narrow.png",
                 "117670b356cbe8218b26fcd93b149b109ea344da"
