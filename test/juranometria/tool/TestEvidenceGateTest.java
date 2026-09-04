@@ -373,6 +373,45 @@ class TestEvidenceGateTest {
                 "nor may reachability premises: " + reachPremise);
     }
 
+    @Test
+    void everyRawKeyDispatcherInsistsOnFocusForItself()
+            throws IOException {
+        // The anti-masking pin (review): premises were counted per
+        // file, so one honest gesture could vouch for a raw key
+        // dispatched elsewhere in the same file. Raw dispatchers are
+        // now held one by one: a display file that dispatches
+        // KEY_PRESSED itself must insist on focus itself - through
+        // FocusedWindow or by routing through ReaderInput.shortcut -
+        // and the shared helper is the only file allowed to dispatch
+        // without insisting in its own text, because insisting is
+        // what it exists to do... and it does, in the same file.
+        List<String> masked = new java.util.ArrayList<>();
+        try (var tree = Files.walk(Path.of("test"))) {
+            for (Path source : tree
+                    .filter(f -> f.toString().endsWith(".java"))
+                    .sorted().toList()) {
+                String text = Files.readString(source);
+                TestEvidenceScan.File classified =
+                        TestEvidenceScan.classify(source.toString(),
+                                Files.readString(source));
+                if (!classified.displayDependent()
+                        || !TestEvidenceScan.dispatchesRawKeys(text)) {
+                    continue;
+                }
+                if (!text.contains("insistOnFocus")
+                        && !text.contains("FocusedWindow.tryToFocus")
+                        && !text.contains("ReaderInput.shortcut(")
+                        && !text.contains("ReaderInput.typeAndEnter(")) {
+                    masked.add(source.toString());
+                }
+            }
+        }
+        assertEquals(List.of(), masked,
+                "a raw key dispatcher must establish focus in its own"
+                        + " file, not borrow a premise from an"
+                        + " unrelated gesture");
+    }
+
     // ---- guard G4/G5 ratchets ---------------------------------------
 
     @Test

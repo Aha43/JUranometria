@@ -725,14 +725,9 @@ class DeepSkyFamilyJourneyTest {
     }
 
     private void pressOn(JTabbedPane tabs, int keyCode) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            tabs.requestFocusInWindow();
-            tabs.dispatchEvent(new KeyEvent(tabs, KeyEvent.KEY_PRESSED,
-                    System.nanoTime() / 1_000_000,
-                    KeyEvent.CTRL_DOWN_MASK, keyCode,
-                    KeyEvent.CHAR_UNDEFINED));
-        });
-        flush();
+        // The premise, insisted rather than requested and hoped
+        // (#243 review): a request the desktop refuses is silent.
+        ReaderInput.shortcut(tabs, keyCode, KeyEvent.CTRL_DOWN_MASK);
     }
 
     /** The real search field, as a reader uses it: type and Enter. */

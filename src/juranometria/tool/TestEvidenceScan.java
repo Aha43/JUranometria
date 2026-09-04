@@ -137,6 +137,21 @@ public final class TestEvidenceScan {
                     "ReaderInput.click("),
             new Marker("focus-settles", "settlesOn("));
 
+    /**
+     * Raw keyboard dispatch outside the shared helper: the shape
+     * that let two journeys press shortcuts no reader could have
+     * pressed, masked in per-file premise counts by an unrelated
+     * honest gesture (review). Counted so the gate can pin the
+     * dispatchers to the files that establish focus for that very
+     * gesture - the shared helper itself, and journeys that insist
+     * before they press.
+     */
+    public static boolean dispatchesRawKeys(String rawSource) {
+        String source = withoutComments(rawSource);
+        return source.contains("KeyEvent.KEY_PRESSED")
+                && source.contains("dispatchEvent");
+    }
+
     private static final List<Marker> ROUTES = List.of(
             new Marker("pointer-events", "MouseEvent.MOUSE_PRESSED"),
             new Marker("keyboard-events", "KeyEvent.KEY_PRESSED",

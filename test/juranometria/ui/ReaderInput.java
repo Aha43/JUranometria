@@ -128,6 +128,10 @@ public final class ReaderInput {
                             + " press");
             int x = header.x + header.width / 2;
             int y = header.y + header.height / 2;
+            assertTrue(tabs.getVisibleRect().contains(x, y),
+                    "the point pressed on " + title + "'s header is"
+                            + " one a reader could reach: " + x + ","
+                            + y + " within " + tabs.getVisibleRect());
             for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
                     MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED}) {
                 tabs.dispatchEvent(new MouseEvent(tabs, id,
@@ -138,6 +142,30 @@ public final class ReaderInput {
                     "the pointer chose " + title);
         });
         flush();
+    }
+
+    /**
+     * A platform shortcut, with its premise: the target's window
+     * must hold the keyboard focus, insisted on the way the focused
+     * journeys insist, because a WHEN_IN_FOCUSED_WINDOW binding a
+     * reader could fire needs a focused window to fire in - and a
+     * dispatched key runs the binding either way, which is how two
+     * journeys pressed shortcuts no reader could have pressed
+     * (review). Aborts with the focus subsystem's own state where
+     * the desktop refuses.
+     */
+    public static void shortcut(JComponent target, int keyCode,
+                                int modifiers) throws Exception {
+        java.awt.Window window =
+                SwingUtilities.getWindowAncestor(target);
+        Assumptions.assumeTrue(window != null,
+                name(target) + " sits in a window a desktop could"
+                        + " focus");
+        Assumptions.assumeTrue(FocusedWindow.tryToFocus(window),
+                "this desktop would not give the window the keyboard"
+                        + " focus, so a shortcut has nowhere to"
+                        + " arrive. " + FocusedWindow.state(window));
+        press(target, keyCode, modifiers);
     }
 
     /** A key pressed and released at a control. */

@@ -320,12 +320,9 @@ class CoordinateGridJourneyTest {
     /** A masked key press dispatched to the Search field itself:
      *  the root pane's focused-window binding must catch it. */
     private void key(int keyCode, int mask) throws Exception {
-        SwingUtilities.invokeAndWait(() -> searchField.dispatchEvent(
-                new java.awt.event.KeyEvent(searchField,
-                        java.awt.event.KeyEvent.KEY_PRESSED,
-                        System.nanoTime() / 1_000_000, mask, keyCode,
-                        java.awt.event.KeyEvent.CHAR_UNDEFINED)));
-        flush();
+        // With its premise: a WHEN_IN_FOCUSED_WINDOW shortcut needs
+        // the focused window it names (#243 review).
+        ReaderInput.shortcut(searchField, keyCode, mask);
     }
 
     private void searchFor(String query) throws Exception {

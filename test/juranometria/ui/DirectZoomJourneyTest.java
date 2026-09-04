@@ -272,12 +272,8 @@ class DirectZoomJourneyTest {
             assertEquals("NGC 224", fenced.state().targetIdentity(),
                     "and keeps the target untouched");
 
-            SwingUtilities.invokeAndWait(() -> fencedChart[0].dispatchEvent(
-                    new KeyEvent(fencedChart[0], KeyEvent.KEY_PRESSED,
-                            System.nanoTime() / 1_000_000,
-                            AppMenuBar.menuShortcutMask(),
-                            KeyEvent.VK_EQUALS, KeyEvent.CHAR_UNDEFINED)));
-            flush();
+            ReaderInput.shortcut(fencedChart[0], KeyEvent.VK_EQUALS,
+                    AppMenuBar.menuShortcutMask());
             assertEquals(before, fenced.state(),
                     "the coverage-refused shortcut is a guarded no-op");
 
