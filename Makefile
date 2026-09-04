@@ -237,6 +237,18 @@ on-this-page-study: classes
 		> docs/studies/on-this-page/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.OnThisPageMockupMain
 
+# The public gallery (docs/decisions/gallery.md, issue #252): the
+# module slides composed by the production component, and the pages
+# derived from the one manifest.
+gallery-pages: classes
+	mkdir -p docs/studies/gallery
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GalleryPageMain
+
+gallery: classes
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.GalleryMain
+
+.PHONY: gallery gallery-pages
+
 # The black-sky palette (docs/decisions/black-sky.md, issue #246):
 # the derivation executed and verified against the pinned palette,
 # the representative pages rendered in both palettes, every pixel

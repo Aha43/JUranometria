@@ -111,7 +111,10 @@ public final class EvidenceContractMain {
             "juranometria.tool.OnThisPageMockupMain",
             "juranometria.tool.DeepSkyVocabularyMockupMain",
             "juranometria.tool.PlaceAndTimeInkStudyMain",
-            "juranometria.tool.PlaceAndTimeControlsMockupMain");
+            "juranometria.tool.PlaceAndTimeControlsMockupMain",
+            // The gallery's module slides (issue #252): composed by
+            // the production component, renderer-drawn contract.
+            "juranometria.tool.GalleryPageMain");
 
     /**
      * The legacy generators: they write under build/, and their
@@ -293,6 +296,25 @@ public final class EvidenceContractMain {
                         + "screenshot-switcher.png",
                 "f23e58127b49789f8371ba6c41d5b6ccdf59c67f"
                         + "4bff1ea5b2f3450b14579fad");
+        // The gallery's responsive contact captures (issue #252):
+        // the index and one slide, desktop and narrow, in a real
+        // browser; provenance in docs/decisions/gallery.md.
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-index-desktop.png",
+                "6b45e1ee5ba7ba0c9ea7f7431e5a352937dac16a"
+                        + "822ee2cc7d4c4100152418c7");
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-index-narrow.png",
+                "47fd872a95f4939b1b3fc0c6b35be484a37dcbda"
+                        + "db7b78307ad26bd50a77456b");
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-slide-desktop.png",
+                "17174c76c08c7e07c843125927213f44b19e9c42"
+                        + "609169e807cb3b5ca6455167");
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-slide-narrow.png",
+                "d6f67f6a9710fa9f9a5e03e2e852a977c6f0ac5c"
+                        + "2e47f09cc54bef54139cc6c0");
     }
 
     /**

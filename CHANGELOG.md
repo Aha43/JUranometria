@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The public atlas gallery, decided and curated** (Sprint 27,
+  issue #252). Nine slides in three rooms — Core chart, On This
+  Page, Place and Time — under `docs/gallery/`: one manifest
+  recording caption, region, ink attribution, source and
+  provenance per slide, static HTML derived from it, keyboard-usable
+  with plain prev/next links and no remote asset of any kind. The
+  module chart slides are composed by the production component with
+  the real painters (`GalleryPageMain`), because the existing
+  place-and-time pages were pre-#227 candidate previews and no
+  committed artifact showed working crosses — the study previews
+  were rejected rather than promoted, and the rule is now executable
+  in the gallery test. UI photographs appear only labelled
+  "Application UI". Publication itself waits for issue #253
+  (docs/decisions/gallery.md).
+
 ## [1.7.0] - 2026-09-04
 
 Sprint 26 — Keep the evidence trustworthy. A maintenance sprint

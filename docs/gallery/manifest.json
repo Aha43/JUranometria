@@ -1,0 +1,143 @@
+{
+  "title": "JUranometria — a quiet star atlas",
+  "strapline": "White paper, black ink, the fixed sky. The core chart is a chart; each module has a room of its own.",
+  "release": "1.7.0",
+  "downloads": "https://github.com/Aha43/JUranometria/releases/tag/v1.7.0",
+  "repository": "https://github.com/Aha43/JUranometria",
+  "rooms": [
+    {
+      "id": "core-chart",
+      "name": "Core chart",
+      "lead": "The ordinary atlas as itself: stars sized by brightness, deep-sky symbols at catalogued size and orientation, constellation geography and the equatorial grid in quiet greys, and a title block that states exactly what the page shows."
+    },
+    {
+      "id": "on-this-page",
+      "name": "On This Page",
+      "lead": "A removable module that lists everything the page carries — including what the chart honestly does not draw — and lets a reader mark entries with working crosses. Interaction ink, never catalogue vocabulary."
+    },
+    {
+      "id": "place-and-time",
+      "name": "Place and Time",
+      "lead": "A removable module that lays one observer's meridian, zenith and mathematical horizon over the fixed chart, for one frozen instant at one stated place. Nothing ticks."
+    }
+  ],
+  "slides": [
+    {
+      "slug": "andromeda",
+      "room": "core-chart",
+      "kind": "chart",
+      "title": "The Andromeda Galaxy region",
+      "caption": "The atlas's home page: M 31 leaning the way the galaxy leans, its companions M 32 and M 110 beside it, every star to V 8.0.",
+      "region": "M 31, Andromeda",
+      "field": "8°",
+      "ink": "Core chart ink only.",
+      "source": "docs/reference/m31-stars.png",
+      "produced": "The canonical released page: CI compares rendered bytes against this file. v1.7.0 tree (8820a6d).",
+      "alt": "A star chart on white paper: the large tilted ellipse of the Andromeda Galaxy with two small companion ellipses labelled M 110 and M 32, black star dots of varying size, a pale curved coordinate grid, and a title block reading M31, Andromeda Galaxy region."
+    },
+    {
+      "slug": "orion",
+      "room": "core-chart",
+      "kind": "chart",
+      "title": "Orion at a glance",
+      "caption": "A wide field: the hunter's figure joined star to star, Betelgeuse to Rigel, the Sword's nebulae boxed, neighbouring constellations named in small capitals.",
+      "region": "Orion and neighbours",
+      "field": "36°",
+      "ink": "Core chart ink only.",
+      "source": "docs/studies/constellation-rendering/m42-36deg.png",
+      "produced": "Production render; regenerated and compared against its generator by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "A dense wide-field star chart: Orion's stick figure with named bright stars Betelgeuse, Bellatrix, Rigel and Saiph, the constellation name ORION in small capitals, boxed nebulae near the Sword, and the names of neighbouring constellations at their figures."
+    },
+    {
+      "slug": "crux",
+      "room": "core-chart",
+      "kind": "chart",
+      "title": "The Southern Cross",
+      "caption": "Crux and Musca under the deep southern sky, where the grid's parallels curve hard and the Bayer letters do the naming.",
+      "region": "Crux and Musca",
+      "field": "18°",
+      "ink": "Core chart ink only.",
+      "source": "docs/studies/coordinate-grid/crux-18.png",
+      "produced": "Production render; regenerated and compared against its generator by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "A southern star chart: the compact cross of Crux with Acrux, Mimosa, Gacrux and Imai named, strongly curved declination parallels of the coordinate grid, and Musca's figure below."
+    },
+    {
+      "slug": "pole",
+      "room": "core-chart",
+      "kind": "chart",
+      "title": "Around the celestial pole",
+      "caption": "Polaris near the middle and the grid's parallels closing into rings around it — the page every equatorial chart is secretly about.",
+      "region": "Ursa Minor, the north celestial pole",
+      "field": "36°",
+      "ink": "Core chart ink only.",
+      "source": "docs/studies/regional-zoom/polar-36deg.png",
+      "produced": "Production render; regenerated and compared against its generator by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "A polar star chart: concentric circles of the coordinate grid closing around Polaris, Ursa Minor's figure reaching toward the centre, with Draco, Cepheus and Camelopardalis at the edges."
+    },
+    {
+      "slug": "working-marks",
+      "room": "on-this-page",
+      "kind": "chart",
+      "title": "Working crosses on the Andromeda page",
+      "caption": "Three marked rows from the page's inventory. M 32 and M 110 wear plain crosses over their own symbols; the lead mark — ringed, like any selection — stands on NGC 206, a star cloud the chart records but draws no symbol for. The cross is the only ink it has, which is what the cross is for.",
+      "region": "M 31, Andromeda",
+      "field": "8°",
+      "ink": "Working crosses and the lead ring are On This Page module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/on-this-page-marks.png",
+      "produced": "Composed by the production chart component with the real overlay registry and cross painter (GalleryPageMain); regenerated and compared by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "The Andromeda Galaxy chart with three thin crosses added: one on each companion galaxy's ellipse, and one ringed cross standing alone inside the big ellipse where no symbol is drawn."
+    },
+    {
+      "slug": "inventory",
+      "room": "on-this-page",
+      "kind": "ui",
+      "title": "The page's own inventory",
+      "caption": "Application UI — the On This Page panel beside the chart: thirteen rows for the Andromeda page, each stating brightness, distance from centre, and whether the chart draws it. NGC 206 says so honestly: not recorded, no symbol.",
+      "region": "M 31, Andromeda",
+      "field": "8°",
+      "ink": "Application UI, not chart output.",
+      "source": "docs/studies/on-this-page/sidebar-released.png",
+      "produced": "Widget-rendered panel inspection image, reviewed by eye; held unchanged by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "A narrow application panel titled On this page, 13 rows: Messier and NGC objects with magnitudes and offsets marked drawn, and a highlighted row for NGC 206 reading not recorded, no symbol."
+    },
+    {
+      "slug": "zenith",
+      "room": "place-and-time",
+      "kind": "chart",
+      "title": "The point overhead",
+      "caption": "Oslo, the March equinox evening, 21:33 UTC: the meridian runs solid through the small ring of the zenith — which happens to stand inside the Big Dipper's bowl.",
+      "region": "Ursa Major",
+      "field": "24°",
+      "ink": "The meridian line and zenith ring are Place and Time module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/place-and-time-zenith.png",
+      "produced": "Composed by the production chart component with the real meridian module and reference-ink painter (GalleryPageMain); regenerated and compared by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "A star chart of Ursa Major with a thin vertical line labelled Meridian passing through a small ring labelled Zenith, set among the Dipper's named stars Dubhe and Merak."
+    },
+    {
+      "slug": "horizon",
+      "room": "place-and-time",
+      "kind": "chart",
+      "title": "Where the sky meets the ground",
+      "caption": "The same evening's mathematical horizon, dashed, crossing a field between Cygnus and Hercules: below the line, that observer cannot look. The longer name is worn deliberately — a real horizon has hills and air in it.",
+      "region": "Vulpecula, toward Cygnus",
+      "field": "24°",
+      "ink": "The dashed horizon is Place and Time module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/place-and-time-horizon.png",
+      "produced": "Composed by the production chart component with the real meridian module and reference-ink painter (GalleryPageMain); regenerated and compared by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "A star chart with a long dashed diagonal line labelled Mathematical horizon crossing the whole field of small star dots between Cygnus and Hercules."
+    },
+    {
+      "slug": "controls",
+      "room": "place-and-time",
+      "kind": "ui",
+      "title": "Three fields, three switches, two actions",
+      "caption": "Application UI — the Place and Time dialog: latitude, east-positive longitude, one frozen UTC instant, switches for the three reference lines, and exactly two buttons. The chart is drawn for that instant and stays there; nothing ticks.",
+      "region": "",
+      "field": "",
+      "ink": "Application UI, not chart output.",
+      "source": "docs/studies/place-and-time/dialog-real.png",
+      "produced": "Session photograph of the real dialog on a display; held unchanged by make evidence-contracts. v1.7.0 tree (8820a6d).",
+      "alt": "A small dialog with fields Latitude 59.913, Longitude east positive 10.752, Instant UTC 2026-03-20 21:33:00, a note reading the chart is drawn for that instant and stays there, nothing ticks, three checkboxes for Meridian, Mathematical horizon and Zenith, and buttons Now and Center on zenith."
+    }
+  ]
+}
