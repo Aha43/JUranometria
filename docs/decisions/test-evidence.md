@@ -210,10 +210,16 @@ pre-Bayer renderings of pages whose studies' own rule is that
 they track production — and were re-baselined. **Eight promoted
 files match no generator output by name** — hand-composed
 variants from their sprints — pinned by exact path and held as
-committed; a ninth arrives by decision. The constellation
-generator is input-gated on its gitignored downloads, skipped
-with a stated verdict where absent, so clean checkouts still
-verify everything else. The
+committed, and the pin is enforced in both directions: an
+unmatched promoted file outside the pin is a breach, and a
+pinned entry that gains a generator match or vanishes is a stale
+pin, also a breach. Two generators are input-gated on gitignored
+downloads (constellations and star identities — the second found
+when incomplete-fails-loudly was rehearsed); where their inputs
+are absent the run **fails as incomplete** with the fetch command
+named, because a family left unverified is not a green light. The
+outer restoration runs as the verifier's own `finally`, and its
+regression test throws a generator through that very path. The
 cheap half runs in the ordinary suite: the four fast reports
 reproduced from their mains' stdout on every push, the fixtures
 held to pinned digests, every report present, and the inspection

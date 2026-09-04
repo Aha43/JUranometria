@@ -110,22 +110,38 @@ class EvidenceContractTest {
             Files.write(renderer, new byte[] {4, 5, 6});
             var committed = EvidenceContractMain.snapshot(root);
 
-            // A generation that drifted, strayed, and died: nothing
-            // after this point may depend on the run having finished.
-            Files.write(inspection, new byte[] {9, 9, 9});
-            Files.write(root.resolve("controls-stray.png"),
-                    new byte[] {7});
-            Files.write(root.resolve("page-stray.png"),
-                    new byte[] {8});
-
-            List<String> breaches = EvidenceContractMain
-                    .newcomerBreaches(root, committed);
-            assertEquals(2, breaches.size(),
-                    "every newcomer is named, whatever its class: "
-                            + breaches);
-
-            EvidenceContractMain.restoreInspectionImagery(root,
-                    committed);
+            // A generation that drifts, strays, and THROWS - run
+            // through the verifier's own outer finally, not a
+            // cleanup called by hand (review). The failure must
+            // still come out the other side.
+            IllegalStateException died =
+                    org.junit.jupiter.api.Assertions.assertThrows(
+                            IllegalStateException.class, () ->
+                    EvidenceContractMain.generateUnderRestoration(
+                            root, committed, () -> {
+                                Files.write(inspection,
+                                        new byte[] {9, 9, 9});
+                                Files.write(root.resolve(
+                                        "controls-stray.png"),
+                                        new byte[] {7});
+                                Files.write(root.resolve(
+                                        "page-stray.png"),
+                                        new byte[] {8});
+                                List<String> breaches =
+                                        EvidenceContractMain
+                                                .newcomerBreaches(root,
+                                                        committed);
+                                assertEquals(2, breaches.size(),
+                                        "every newcomer is named,"
+                                                + " whatever its"
+                                                + " class: "
+                                                + breaches);
+                                throw new IllegalStateException(
+                                        "generator died mid-run");
+                            }));
+            assertEquals("generator died mid-run", died.getMessage(),
+                    "the failure comes out the other side of the"
+                            + " restoration, not swallowed by it");
             assertArrayEquals(new byte[] {1, 2, 3},
                     Files.readAllBytes(inspection),
                     "inspection drift went back to committed bytes");

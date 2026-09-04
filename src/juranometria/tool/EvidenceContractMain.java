@@ -156,10 +156,18 @@ public final class EvidenceContractMain {
                 "build/star-identity-study");
     }
 
-    private static final String GATED_GENERATOR =
-            "juranometria.tool.ConstellationStudyMain";
-    private static final Path GATED_INPUT =
-            Path.of("imports/raw/constellations");
+    /**
+     * The generators whose raw sources are gitignored downloads.
+     * Both discovered the same way: by the verifier failing on a
+     * checkout without them - constellations at review, and the
+     * star-identity study when the review's incomplete-fails-loudly
+     * rule was rehearsed with imports/raw moved aside.
+     */
+    private static final Map<String, Path> GATED_GENERATORS = Map.of(
+            "juranometria.tool.ConstellationStudyMain",
+            Path.of("imports/raw/constellations"),
+            "juranometria.tool.StarIdentityStudyMain",
+            Path.of("imports/raw/star-identities"));
 
     /**
      * The promoted files no generator output matches by name -
@@ -194,17 +202,30 @@ public final class EvidenceContractMain {
         Map<String, Snapshot> committed = snapshot();
         List<String> failures = new ArrayList<>();
         Map<String, Integer> verdicts = new TreeMap<>();
+        generateUnderRestoration(Path.of("docs/studies"), committed,
+                () -> run(committed, failures, verdicts));
+    }
+
+    /** A generation step that may fail. */
+    interface Generation {
+        void run() throws Exception;
+    }
+
+    /**
+     * The outer restoration path itself, extracted so a regression
+     * test can throw a generator through the real finally rather
+     * than calling the cleanup by hand (review): whatever the body
+     * does - dying mid-run included - the inspection imagery goes
+     * back to its committed bytes and inspection-class newcomers
+     * are removed before the failure continues on its way.
+     */
+    static void generateUnderRestoration(Path root,
+            Map<String, Snapshot> committed, Generation body)
+            throws Exception {
         try {
-            run(committed, failures, verdicts);
+            body.run();
         } finally {
-            // The outer restoration path (review): whatever happened
-            // above - a generator that threw included - the
-            // inspection imagery goes back to its committed bytes,
-            // and inspection-class newcomers are removed, so a
-            // failed verification never leaves drift or strays
-            // looking like work in git.
-            restoreInspectionImagery(Path.of("docs/studies"),
-                    committed);
+            restoreInspectionImagery(root, committed);
         }
     }
 
@@ -320,14 +341,20 @@ public final class EvidenceContractMain {
         // orion-36-everything.png, and the first draft compared one
         // of them against the other study's page of the same name.
         java.util.Set<String> judgedViaBuild = new java.util.TreeSet<>();
-        boolean gatedSkipped = false;
+        java.util.Set<String> skippedBuildDirs = new java.util.TreeSet<>();
         for (Map.Entry<String, String> writer : BUILD_WRITERS.entrySet()) {
-            if (writer.getKey().equals(GATED_GENERATOR)
-                    && !Files.isDirectory(GATED_INPUT)) {
-                gatedSkipped = true;
-                tally(verdicts, "input-gated (constellation sources"
-                        + " absent; run the download script to"
-                        + " verify)");
+            Path gate = GATED_GENERATORS.get(writer.getKey());
+            if (gate != null && !Files.isDirectory(gate)) {
+                skippedBuildDirs.add(writer.getValue());
+                // Incomplete is not success (review): a family left
+                // unverified fails the run, with the one command
+                // that completes it - never a green light over a
+                // gap.
+                failures.add("VERIFICATION INCOMPLETE: "
+                        + writer.getValue() + "'s evidence family was"
+                        + " not verified - its raw sources ("
+                        + gate + ") are gitignored downloads; fetch"
+                        + " them and rerun");
                 continue;
             }
             Class.forName(writer.getKey())
@@ -336,8 +363,7 @@ public final class EvidenceContractMain {
         }
         for (Map.Entry<String, String> pair
                 : PROMOTED_DIRECTORIES.entrySet()) {
-            if (gatedSkipped && pair.getValue()
-                    .equals("build/constellation-study")) {
+            if (skippedBuildDirs.contains(pair.getValue())) {
                 continue;
             }
             Map<String, Path> outputs = new TreeMap<>();
@@ -355,7 +381,22 @@ public final class EvidenceContractMain {
                 Path match = outputs.get(
                         Path.of(path).getFileName().toString());
                 if (match == null) {
-                    continue; // pinned residue, judged below
+                    // Unmatched is only ever the pinned residue: a
+                    // ninth hand-composed variant arrives through
+                    // the pin and a review, never by silently
+                    // becoming an accepted baseline (review).
+                    if (!PROMOTED_WITHOUT_GENERATOR.contains(path)) {
+                        failures.add(path + ": promoted file matches"
+                                + " no generator output and is not in"
+                                + " the pinned residue");
+                    }
+                    continue;
+                }
+                if (PROMOTED_WITHOUT_GENERATOR.contains(path)) {
+                    failures.add(path + ": pinned as having no"
+                            + " generator output, but "
+                            + match + " matches it by name - the pin"
+                            + " is stale");
                 }
                 judgedViaBuild.add(path);
                 if (java.util.Arrays.equals(
@@ -369,6 +410,13 @@ public final class EvidenceContractMain {
                             + " - the study has fallen behind the"
                             + " atlas");
                 }
+            }
+        }
+
+        for (String pinned : PROMOTED_WITHOUT_GENERATOR) {
+            if (!committed.containsKey(pinned)) {
+                failures.add(pinned + ": pinned residue file is"
+                        + " missing from the tree - the pin is stale");
             }
         }
 
