@@ -70,6 +70,28 @@ Mars's retrograde loop is the defining visual case. Mercury near the Sun, the
 Moon's rapid motion, an outer planet's slow track, and an RA-seam crossing are
 necessary counter-cases.
 
+## A smaller future module: meteor showers
+
+Meteor-shower radiants offer a compact use of the same celestial machinery.
+The reader chooses one established shower and a date; the module centres the
+chart on the shower's radiant, marks it with restrained reference ink, and
+states the date. Nothing needs to animate, predict an observing session, or
+fill the chart with every active shower. A later Moon module could add useful
+context without becoming a dependency of the shower module.
+
+The apparent simplicity should remain explicit about the astronomy. A gate
+must choose an authoritative source and verify its redistribution terms, then
+settle the radiant's coordinate frame and epoch, the shower's activity and
+peak dates, radiant drift through the activity interval, and whether the source
+defines timing by calendar date or solar longitude. “Centre on the radiant” is
+a reader-requested navigation action; merely enabling the module must not move
+the page.
+
+The first useful acceptance case is deliberately small: select one familiar
+annual shower, choose a date within its recorded interval, arrive at the
+source-derived radiant on the fixed chart, and see the shower name and stated
+date. Removing the module leaves the ordinary chart unchanged.
+
 ## Guardrails
 
 - No ticking clock, animation, device orientation, or automatic recentering.
