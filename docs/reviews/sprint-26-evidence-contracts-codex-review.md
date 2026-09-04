@@ -165,6 +165,48 @@ identity source command).
 
 Verdict remains changes requested on the P1 and P2 above.
 
+## Fourth follow-up at `6209e72`
+
+The verifier now preserves the evidence failure and suppresses restoration
+trouble, and the test throws through the real transaction. The promoted-pin
+and input-gate rules are extracted and tested. The design findings are closed;
+two test-strength findings remain.
+
+### P1 — The gated-input test supplies its own configuration
+
+`anAbsentGatedInputFailsLoudlyWithItsExactFetchCommand()` constructs a new
+synthetic `Gate` containing the constellation path and command, then tests the
+formatter. It never reads the production `GATED_GENERATORS` map used by the
+runner. Removing `StarIdentityStudyMain` from that map, changing its real fetch
+command, or wiring a build writer to the wrong gate leaves this test green.
+That is the test writing the expected answer for itself.
+
+Expose a read-only description of the actual configured gates (or extract the
+production lookup) and pin both real entries, their input paths, their exact
+commands, and their associated build writers. Mutation proof should remove
+the star-identity gate and fail this test.
+
+### P2 — Two claimed branches are not actually held
+
+The vanished-residue assertion converts the number of breaches to a boolean
+and back to `1`:
+
+```java
+assertEquals(1, stalePinBreaches(Set.of()).size() > 0 ? 1 : 0)
+```
+
+All eight pins are absent in that fixture, so an implementation reporting only
+one of them passes. Test one selected pin missing while the other seven are
+present, and assert the exact path/message (or assert the complete eight-item
+result for an empty tree).
+
+Also add the cleanup-only-fails case requested in the prior review: a
+successful body followed by failed restoration must surface the restoration
+failure. The implementation currently does this, but the regression suite
+does not hold it.
+
+Verdict remains changes requested on this P1 and P2.
+
 ## Second follow-up at `b192d69`
 
 The promoted-output comparison is now directory-scoped, avoiding collisions
