@@ -167,7 +167,7 @@ public final class EvidenceContractMain {
     record Gate(Path input, String fetch) {
     }
 
-    private static final Map<String, Gate> GATED_GENERATORS = Map.of(
+    static final Map<String, Gate> GATED_GENERATORS = Map.of(
             "juranometria.tool.ConstellationStudyMain",
             new Gate(Path.of("imports/raw/constellations"),
                     "scripts/download-constellation-sources.sh"),

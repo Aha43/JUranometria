@@ -200,6 +200,26 @@ class EvidenceContractTest {
     }
 
     @Test
+    void aCleanupFailureAloneStillSurfaces() throws Exception {
+        // The primary==null path (review): a healthy generation
+        // whose restoration then fails must not exit quietly.
+        Path root = Files.createTempDirectory("evidence-cleanup-only");
+        Files.write(root.resolve("controls-x.png"), new byte[] {1});
+        var committed = EvidenceContractMain.snapshot(root);
+        try (var tree = Files.walk(root)) {
+            for (Path f : tree.sorted(
+                    java.util.Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(f);
+            }
+        }
+        org.junit.jupiter.api.Assertions.assertThrows(Exception.class,
+                () -> EvidenceContractMain.generateUnderRestoration(
+                        root, committed, () -> { }),
+                "a restoration that fails after a clean generation is"
+                        + " a failure, not a shrug");
+    }
+
+    @Test
     void theResiduePinJudgesAllFourBranches() {
         String pinned = EvidenceContractMain
                 .PROMOTED_WITHOUT_GENERATOR.get(0);
@@ -220,9 +240,19 @@ class EvidenceContractTest {
                         true),
                 "and a matched unpinned file is simply compared");
 
-        assertEquals(1, EvidenceContractMain.stalePinBreaches(
-                        java.util.Set.of()).size() > 0 ? 1 : 0,
-                "a pinned entry missing from the tree is a stale pin");
+        List<String> allVanished = EvidenceContractMain
+                .stalePinBreaches(java.util.Set.of());
+        assertEquals(EvidenceContractMain.PROMOTED_WITHOUT_GENERATOR
+                        .size(), allVanished.size(),
+                "every vanished pinned entry is its own breach");
+        for (int i = 0; i < allVanished.size(); i++) {
+            assertTrue(allVanished.get(i).startsWith(
+                            EvidenceContractMain
+                                    .PROMOTED_WITHOUT_GENERATOR.get(i))
+                            && allVanished.get(i).contains(
+                                    "missing from the tree"),
+                    "and names its own file: " + allVanished.get(i));
+        }
         assertEquals(List.of(), EvidenceContractMain.stalePinBreaches(
                         new java.util.TreeSet<>(EvidenceContractMain
                                 .PROMOTED_WITHOUT_GENERATOR)),
@@ -230,20 +260,43 @@ class EvidenceContractTest {
     }
 
     @Test
-    void anAbsentGatedInputFailsLoudlyWithItsExactFetchCommand() {
-        var gate = new EvidenceContractMain.Gate(
-                Path.of("imports/raw/constellations"),
-                "scripts/download-constellation-sources.sh");
-        String breach = EvidenceContractMain.incompleteBreach(
-                "build/constellation-study", gate, false);
-        assertTrue(breach.contains("VERIFICATION INCOMPLETE"),
-                "incomplete is not success");
-        assertTrue(breach.contains(
-                        "scripts/download-constellation-sources.sh"),
-                "and the exact fetch command is named: " + breach);
-        assertEquals(null, EvidenceContractMain.incompleteBreach(
-                        "build/constellation-study", gate, true),
-                "present inputs gate nothing");
+    void theRealGatesArePinnedAndFailLoudlyWithTheirExactCommands() {
+        // The REAL configuration, not one the test built for itself
+        // (review): removing either gate from the verifier fails
+        // here, and each breach message carries that gate's own
+        // fetch command.
+        var gates = EvidenceContractMain.GATED_GENERATORS;
+        assertEquals(2, gates.size(),
+                "exactly the two gated families the verifier found"
+                        + " the hard way");
+        var constellation = gates.get(
+                "juranometria.tool.ConstellationStudyMain");
+        assertEquals(Path.of("imports/raw/constellations"),
+                constellation.input());
+        assertEquals("scripts/download-constellation-sources.sh",
+                constellation.fetch());
+        var stars = gates.get(
+                "juranometria.tool.StarIdentityStudyMain");
+        assertEquals(Path.of("imports/raw/star-identities"),
+                stars.input());
+        assertTrue(stars.fetch().contains(
+                        "scripts/download-constellation-sources.sh")
+                        && stars.fetch().contains(
+                                "scripts/download-catalogue-sources.sh"),
+                "the star-identity family names both of its fetch"
+                        + " commands: " + stars.fetch());
+
+        for (var gate : gates.values()) {
+            String breach = EvidenceContractMain.incompleteBreach(
+                    "build/x", gate, false);
+            assertTrue(breach.contains("VERIFICATION INCOMPLETE")
+                            && breach.contains(gate.fetch()),
+                    "absent inputs fail loudly with the exact"
+                            + " command: " + breach);
+            assertEquals(null, EvidenceContractMain.incompleteBreach(
+                            "build/x", gate, true),
+                    "and present inputs gate nothing");
+        }
     }
 
     // ---- inspection imagery, by structure ----------------------------
