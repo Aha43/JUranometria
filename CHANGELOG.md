@@ -9,6 +9,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The Andromeda mark is the Mac application identity** (Sprint 26,
+  issue #245). Reproduced from the published 1.6.0 downloads on
+  macOS/arm64: the native `JUranometria.app` shows the mark on every
+  surface inspected — Finder before launch, the Dock, the
+  application switcher, a Desktop alias, a copy in `/Applications` —
+  while the portable JAR's Dock tile shows Java's generic icon —
+  the current launcher executes a plain `java -jar` with no runtime
+  Dock-icon integration, and Finder cannot brand a JAR at all —
+  recorded narrowly rather than papered over, with a runtime
+  Taskbar icon noted as a possible follow-up. The README now
+  names the `.app` as the branded route plainly. Packaging closed
+  its one real gap: `build-app-image.sh` now reads
+  `CFBundleIconFile` back from the built image, so an ICNS that is
+  present, byte-identical, yet **unreferenced** fails the build —
+  missing, substituted and malformed were already caught. The visual
+  evidence ships digest-pinned under `docs/studies/mac-identity/` as
+  a new captured-evidence class in the evidence contracts.
 - **Executable evidence contracts** (Sprint 26, issue #242).
   `make evidence-contracts` regenerates the generated evidence and
   reports a verdict per artifact — reproduced, legacy-baseline,

@@ -246,6 +246,11 @@ public final class TestEvidenceStudyMain {
                         + " | %d |%n",
                 classes.getOrDefault("byte-exact-fixture",
                         List.of()).size());
+        out.printf("| captured-evidence | an operating-system"
+                        + " screenshot, digest-pinned; a re-capture"
+                        + " is a provenance event | %d |%n",
+                classes.getOrDefault("captured-evidence",
+                        List.of()).size());
         out.printf("| renderer-drawn | byte-reproducible per"
                         + " machine; production ink, no widgets"
                         + " | %d |%n",
@@ -264,6 +269,14 @@ public final class TestEvidenceStudyMain {
         out.println();
         out.println("The byte-exact fixtures:");
         for (String path : classes.getOrDefault("byte-exact-fixture",
+                List.of())) {
+            out.println("- " + path);
+        }
+        out.println();
+        out.println("The captured evidence (operating-system"
+                + " screenshots; provenance in the decision document"
+                + " that committed them):");
+        for (String path : classes.getOrDefault("captured-evidence",
                 List.of())) {
             out.println("- " + path);
         }

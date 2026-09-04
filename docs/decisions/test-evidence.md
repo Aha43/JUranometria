@@ -153,7 +153,7 @@ in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already
 fail 3/3 and are the standing proof for guard G4.
 
-## Generated evidence: five kinds, five contracts
+## Generated evidence: six kinds, six contracts
 
 The review's third finding, and the correction that mattered most:
 an earlier draft classified every study PNG as a non-deterministic
@@ -168,6 +168,7 @@ SOFA oracle as artwork. The classes are now:
 | **renderer-drawn images** | the chart study PNGs — regional, grid, ink, occlusion, identity | **byte-reproducible per machine**: production ink through the headless renderer, no widgets; cross-platform identity is measured by the native-smoke comparison, not merely hoped |
 | **widget-rendered inspection artifacts** | `controls-*`, `sidebar-*`, `deep-sky-tab*` | Swing painted offscreen; platform-rendered, reviewed by eye; a new one arrives by a reviewed addition to the scanner's named list |
 | **session photographs** | `dialog-real*.png` | a packed window on a display; drifts a few hundred bytes between desktop sessions; the packed geometry is the claim, asserted by the lifecycle test |
+| **captured evidence** | `screenshot-*` (#245's Finder, Dock and switcher inspections) | an operating-system screenshot no command of ours can regenerate; digest-pinned in the verifier, so a substitution, a deletion, or an unpinned newcomer is each its own breach, and a re-capture is a provenance event recorded in its decision document |
 
 `docs/reference/*.png` are **canonical**: CI compares rendered
 bytes against them and changing one is a reviewed decision. Nothing
@@ -187,7 +188,9 @@ untouched by modification time), *legacy-baseline* (a directory
 its sprint hand-promoted; no active generator, held as committed),
 *inspection-imagery unchanged / regenerated identical / drift
 restored — inspect before any recommit*, *deliberately-unchanged*
-(fixtures checksum-verified; session photographs), and
+(fixtures checksum-verified; session photographs),
+*checksum-verified (captured evidence)* (the `screenshot-*`
+class, held to its pinned digests), and
 *widget-measured (display required; held to substance)*. Exits
 nonzero on any breach. An outer restoration path runs whatever
 happens — a generator dying mid-run included — putting inspection

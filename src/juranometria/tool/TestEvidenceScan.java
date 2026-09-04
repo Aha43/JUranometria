@@ -352,7 +352,12 @@ public final class TestEvidenceScan {
      * photograph Swing; a new one arrives by adding its name here,
      * which is a reviewed decision, not a habit. Text fixtures -
      * the SOFA oracle and the script that regenerates it - are
-     * byte-exact committed data, not artwork.
+     * byte-exact committed data, not artwork. Captured evidence -
+     * the {@code screenshot-} prefix - is an operating-system
+     * screenshot no command of ours can regenerate: what the desktop
+     * showed a reader at a stated moment (issue #245's Finder, Dock
+     * and switcher inspections). Its contract is a pinned digest,
+     * so a re-capture is a provenance event, never a regeneration.
      */
     public static String artifactClass(String fileName) {
         if (fileName.endsWith(".md")) {
@@ -360,6 +365,11 @@ public final class TestEvidenceScan {
         }
         if (fileName.endsWith(".txt") || fileName.endsWith(".c")) {
             return "byte-exact-fixture";
+        }
+        for (String prefix : new String[] {"screenshot-"}) {
+            if (fileName.startsWith(prefix)) {
+                return "captured-evidence";
+            }
         }
         for (String prefix : new String[] {"dialog-real"}) {
             if (fileName.startsWith(prefix)) {

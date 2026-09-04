@@ -117,6 +117,7 @@ Whether a particular read happens on the event thread is control flow, which tex
 |---|---|---|
 | deterministic-report | regenerates byte-for-byte on the same tree | 8 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 2 |
+| captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 7 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 165 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 29 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
@@ -124,6 +125,15 @@ Whether a particular read happens on the event thread is control flow, which tex
 The byte-exact fixtures:
 - docs/studies/place-and-time/reference-vectors.txt
 - scripts/reference-vectors.c
+
+The captured evidence (operating-system screenshots; provenance in the decision document that committed them):
+- docs/studies/mac-identity/screenshot-applications-folder.png
+- docs/studies/mac-identity/screenshot-desktop-alias.png
+- docs/studies/mac-identity/screenshot-dock-app.png
+- docs/studies/mac-identity/screenshot-dock-candidate.png
+- docs/studies/mac-identity/screenshot-dock-jar.png
+- docs/studies/mac-identity/screenshot-finder-prelaunch.png
+- docs/studies/mac-identity/screenshot-switcher.png
 
 The widget-rendered artifacts (a new one arrives by a reviewed addition to the scanner's list, not a habit):
 - docs/studies/deep-sky-vocabulary/deep-sky-tab-dark.png
