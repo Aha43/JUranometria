@@ -16,6 +16,12 @@ The timing section correctly says its small samples cannot establish causation, 
 
 Use the same careful formulation as the table: elapsed time remains modest and grew alongside the additional evidence, while the measured source of costly friction was diagnosis of untrustworthy failures rather than the gate’s wall time.
 
-## Result
+## Re-review
 
-Two P2 documentation corrections remain. No code or release-process finding.
+Resolved at `8487245`. The handover now distinguishes Finder's bundle identity
+from the current launcher's unset runtime Dock image in both affected places,
+matching the approved #245 decision. Its timing account now reports the larger
+suite, heavier tests and higher elapsed time without assigning shares of the
+change to those facts or to runner variance.
+
+No findings remain. PR #255 and the Sprint 26 close are approved.
