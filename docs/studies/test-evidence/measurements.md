@@ -120,7 +120,7 @@ Whether a particular read happens on the event thread is control flow, which tex
 |---|---|---|
 | deterministic-report | regenerates byte-for-byte on the same tree | 9 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 2 |
-| captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 11 |
+| captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 182 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 29 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
@@ -132,6 +132,8 @@ The byte-exact fixtures:
 The captured evidence (operating-system screenshots; provenance in the decision document that committed them):
 - docs/studies/gallery/screenshot-gallery-index-desktop.png
 - docs/studies/gallery/screenshot-gallery-index-narrow.png
+- docs/studies/gallery/screenshot-gallery-public-desktop.png
+- docs/studies/gallery/screenshot-gallery-public-narrow.png
 - docs/studies/gallery/screenshot-gallery-slide-desktop.png
 - docs/studies/gallery/screenshot-gallery-slide-narrow.png
 - docs/studies/mac-identity/screenshot-applications-folder.png

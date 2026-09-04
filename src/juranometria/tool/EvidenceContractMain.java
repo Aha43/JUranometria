@@ -315,6 +315,17 @@ public final class EvidenceContractMain {
                         + "screenshot-gallery-slide-narrow.png",
                 "d6f67f6a9710fa9f9a5e03e2e852a977c6f0ac5c"
                         + "2e47f09cc54bef54139cc6c0");
+        // The published site itself (issue #253): the public
+        // github.io URL in a fresh browser session, desktop and
+        // narrow, after the Pages deploy.
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-public-desktop.png",
+                "27ab14970bc1a1ca71b764e79206458694d34a8c"
+                        + "211c5b02a69901914256f507");
+        CAPTURES.put("docs/studies/gallery/"
+                        + "screenshot-gallery-public-narrow.png",
+                "117670b356cbe8218b26fcd93b149b109ea344da"
+                        + "045ec27c5e99bde5b3a088c1");
     }
 
     /**
