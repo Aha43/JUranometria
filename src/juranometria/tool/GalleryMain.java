@@ -30,8 +30,50 @@ public final class GalleryMain {
     private static final Path DIR = Path.of("docs/gallery");
 
     public static void main(String[] args) throws IOException {
+        if (args.length == 2 && args[0].equals("site")) {
+            generateSite(DIR, Path.of(args[1]));
+            System.out.println("gallery site assembled in " + args[1]);
+            return;
+        }
         generate(DIR, DIR);
         System.out.println("gallery: pages written to " + DIR);
+    }
+
+    /**
+     * Assembles the publishable site (issue #253): the same pages,
+     * derived from the same manifest, with the slide images copied
+     * in byte-identically beside them - self-contained, so Pages
+     * uploads one directory and the evidence artifacts under
+     * docs/studies stay exactly where and what they are. The copies
+     * are not re-encoded: every page is already a compact
+     * monochrome PNG, and an "optimized" lossy copy would weaken
+     * the evidence it shows.
+     */
+    static void generateSite(Path manifestDir, Path out)
+            throws IOException {
+        generate(manifestDir, out, true);
+        Files.createDirectories(out.resolve("images"));
+        Map<String, Object> manifest = MiniJson.object(MiniJson.parse(
+                Files.readString(manifestDir.resolve("manifest.json"),
+                        StandardCharsets.UTF_8)));
+        java.util.Set<String> basenames = new java.util.HashSet<>();
+        for (Object entry : MiniJson.array(manifest.get("slides"))) {
+            Map<String, Object> slide = MiniJson.object(entry);
+            Path source = Path.of(text(slide, "source"));
+            String basename = source.getFileName().toString();
+            if (!basenames.add(basename)) {
+                throw new IllegalStateException("two slides share the"
+                        + " image basename " + basename
+                        + " - the site's flat images/ needs distinct"
+                        + " names");
+            }
+            Files.copy(source, out.resolve("images").resolve(basename),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+        for (String asset : new String[] {"gallery.css", "gallery.js"}) {
+            Files.copy(manifestDir.resolve(asset), out.resolve(asset),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     /**
@@ -41,6 +83,11 @@ public final class GalleryMain {
      * to what the manifest derives.
      */
     static void generate(Path manifestDir, Path out) throws IOException {
+        generate(manifestDir, out, false);
+    }
+
+    private static void generate(Path manifestDir, Path out,
+                                 boolean site) throws IOException {
         Map<String, Object> manifest = MiniJson.object(MiniJson.parse(
                 Files.readString(manifestDir.resolve("manifest.json"),
                         StandardCharsets.UTF_8)));
@@ -54,12 +101,13 @@ public final class GalleryMain {
         }
 
         Files.createDirectories(out.resolve("slides"));
-        write(out.resolve("index.html"), index(manifest, rooms, slides));
+        write(out.resolve("index.html"),
+                index(manifest, rooms, slides, site));
         for (int i = 0; i < slides.size(); i++) {
             Map<String, Object> slide = slides.get(i);
             write(out.resolve("slides")
                             .resolve(text(slide, "slug") + ".html"),
-                    slidePage(manifest, rooms, slides, i));
+                    slidePage(manifest, rooms, slides, i, site));
         }
     }
 
@@ -67,7 +115,8 @@ public final class GalleryMain {
 
     private static String index(Map<String, Object> manifest,
                                 List<Map<String, Object>> rooms,
-                                List<Map<String, Object>> slides) {
+                                List<Map<String, Object>> slides,
+                                boolean site) {
         StringBuilder html = new StringBuilder();
         html.append(head(text(manifest, "title"), "gallery.css"));
         html.append("<body>\n<header>\n");
@@ -92,8 +141,9 @@ public final class GalleryMain {
                 html.append("<li><a href=\"slides/")
                         .append(esc(text(slide, "slug")))
                         .append(".html\">");
-                html.append("<img src=\"../")
-                        .append(esc(sourceFromGallery(slide)))
+                html.append("<img src=\"")
+                        .append(esc(site ? "images/" + basenameOf(slide)
+                                : "../" + sourceFromGallery(slide)))
                         .append("\" alt=\"").append(esc(text(slide, "alt")))
                         .append("\" loading=\"lazy\">");
                 html.append("<span>").append(esc(text(slide, "title")));
@@ -114,7 +164,7 @@ public final class GalleryMain {
     private static String slidePage(Map<String, Object> manifest,
                                     List<Map<String, Object>> rooms,
                                     List<Map<String, Object>> slides,
-                                    int at) {
+                                    int at, boolean site) {
         Map<String, Object> slide = slides.get(at);
         Map<String, Object> previous = at > 0 ? slides.get(at - 1) : null;
         Map<String, Object> next =
@@ -148,8 +198,9 @@ public final class GalleryMain {
         html.append("</p>\n");
         html.append("<h1>").append(esc(text(slide, "title")))
                 .append("</h1>\n");
-        html.append("<figure>\n<img src=\"../../")
-                .append(esc(sourceFromGallery(slide)))
+        html.append("<figure>\n<img src=\"")
+                .append(esc(site ? "../images/" + basenameOf(slide)
+                        : "../../" + sourceFromGallery(slide)))
                 .append("\" alt=\"").append(esc(text(slide, "alt")))
                 .append("\">\n");
         html.append("<figcaption>").append(esc(text(slide, "caption")))
@@ -208,6 +259,10 @@ public final class GalleryMain {
         }
         throw new IllegalStateException("a slide names a room the"
                 + " manifest does not define: " + id);
+    }
+
+    private static String basenameOf(Map<String, Object> slide) {
+        return Path.of(text(slide, "source")).getFileName().toString();
     }
 
     /** The source path relative to docs/, for ../-prefixed links. */

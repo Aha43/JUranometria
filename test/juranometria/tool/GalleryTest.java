@@ -100,6 +100,95 @@ class GalleryTest {
     }
 
     @Test
+    void theSiteIsSelfContainedAndEveryReferenceResolves()
+            throws Exception {
+        // Issue #253's executable acceptance: the publishable site
+        // assembles from the checkout alone, every internal link
+        // and image resolves inside the artifact, ids are unique,
+        // and every image carries its alt text.
+        Path site = Files.createTempDirectory("gallery-site");
+        try {
+            GalleryMain.generateSite(GALLERY, site);
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            int pages = 0;
+            try (var tree = Files.walk(site)) {
+                for (Path page : tree.filter(f ->
+                        f.toString().endsWith(".html")).sorted()
+                        .toList()) {
+                    pages++;
+                    String html = Files.readString(page);
+                    var references = java.util.regex.Pattern
+                            .compile("(?:src|href)=\"([^\"]+)\"")
+                            .matcher(html);
+                    while (references.find()) {
+                        String target = references.group(1);
+                        if (target.startsWith("https://github.com/"
+                                + "Aha43/JUranometria")) {
+                            continue; // the stated repo/release links
+                        }
+                        assertFalse(target.startsWith("http"),
+                                page + " reaches only into the site: "
+                                        + target);
+                        Path resolved = page.getParent()
+                                .resolve(target).normalize();
+                        assertTrue(resolved.startsWith(site),
+                                page + " stays inside the artifact: "
+                                        + target);
+                        assertTrue(Files.exists(resolved),
+                                page + " links something the artifact"
+                                        + " carries: " + target);
+                    }
+                    var images = java.util.regex.Pattern
+                            .compile("<img [^>]*alt=\"([^\"]*)\"")
+                            .matcher(html);
+                    while (images.find()) {
+                        assertFalse(images.group(1).isBlank(),
+                                page + " gives every image real alt"
+                                        + " text");
+                    }
+                }
+            }
+            assertTrue(pages >= 10, "the index and every slide page"
+                    + " are in the artifact: " + pages);
+            for (Map<String, Object> slide : slides()) {
+                assertTrue(seen.add(GalleryMain.text(slide, "slug")),
+                        "slide ids are unique: "
+                                + GalleryMain.text(slide, "slug"));
+            }
+        } finally {
+            try (var tree = Files.walk(site)) {
+                for (Path file : tree.sorted(
+                        java.util.Comparator.reverseOrder()).toList()) {
+                    Files.delete(file);
+                }
+            }
+        }
+    }
+
+    @Test
+    void noModuleInkIsLabelledAsTheCoreChart() throws IOException {
+        // Issue #253: a module slide labelled as core is the exact
+        // confusion the two development principles forbid.
+        for (Map<String, Object> slide : slides()) {
+            String room = GalleryMain.text(slide, "room");
+            String ink = GalleryMain.text(slide, "ink");
+            if (room.equals("core-chart")) {
+                assertTrue(ink.equals("Core chart ink only."),
+                        GalleryMain.text(slide, "slug")
+                                + " sits in the core room, so its ink"
+                                + " is the core chart's alone: " + ink);
+            } else {
+                assertTrue(ink.contains("module ink")
+                                || ink.contains("Application UI"),
+                        GalleryMain.text(slide, "slug")
+                                + " sits in a module room, so its ink"
+                                + " attribution names the module or"
+                                + " says UI: " + ink);
+            }
+        }
+    }
+
+    @Test
     void theContactCapturesShowThePageAndNothingElse()
             throws IOException {
         // The review's finding, made structural (#252, P1): the
