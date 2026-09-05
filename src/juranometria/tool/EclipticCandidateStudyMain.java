@@ -16,7 +16,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import juranometria.app.Atlas;
@@ -26,15 +25,17 @@ import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
 import juranometria.module.InkRole;
 import juranometria.module.OverlayContribution;
+import juranometria.module.OverlayRegistry;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.GreatCirclePage;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
+import juranometria.chart.StarSizePolicy;
 import juranometria.render.ChartOptions;
 import juranometria.render.ChartPalette;
+import juranometria.render.ChartRenderer;
 import juranometria.render.EquatorialGrid;
 import juranometria.sky.SkyFrame;
-import juranometria.ui.ChartComponent;
 import juranometria.ui.ReferenceInk;
 
 /**
@@ -64,6 +65,19 @@ import juranometria.ui.ReferenceInk;
  * being compared do not exist yet. They use production's own
  * clipping, palette and label placement, so nothing but the stroke
  * and the symbol differs.
+ *
+ * <p><strong>And they are drawn in production's own reference
+ * layer.</strong> An earlier draft painted the candidates
+ * <em>after</em> a completed chart, which put them above every star,
+ * symbol and label - so the pages answered the opposite of the
+ * question they were used to settle: whether the ecliptic hides an
+ * object, and whether a diamond survives beside deep-sky ink. In
+ * production a mark covers the reference line, not the other way
+ * round (PR #276 round 2). The study now drives
+ * {@link ChartRenderer#render} directly and fills its
+ * {@code ReferenceLayer}, the same boundary {@code ChartComponent}
+ * hands to {@code ReferenceInk}: above the grid and the geography,
+ * below every catalogued mark and label.
  */
 public final class EclipticCandidateStudyMain {
 
@@ -197,8 +211,8 @@ public final class EclipticCandidateStudyMain {
      * because the treatments do not exist in the chart yet.
      */
     public static void drawChosen(Graphics2D g, ChartScene scene,
-                                  boolean black) {
-        draw(g, scene, black, chosenLine(), chosenLandmark(), LANDMARKS);
+                                  ChartPalette palette) {
+        draw(g, scene, palette, chosenLine(), chosenLandmark(), LANDMARKS);
     }
 
     /** The stroke the gate chose; see docs/decisions/ecliptic.md. */
@@ -222,38 +236,37 @@ public final class EclipticCandidateStudyMain {
                     : new Font(Font.SANS_SERIF, Font.PLAIN, 12);
             UIManager.put("defaultFont", base.deriveFont(18.0f));
         }
-        ChartComponent[] holder = new ChartComponent[1];
-        SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(Atlas.assembler());
-            holder[0].setSize(900, 700);
-            if (black) {
-                holder[0].setChartOptions(ChartOptions.DEFAULTS
-                        .withPalette(ChartPalette.BLACK_SKY));
-            }
-            holder[0].setViewState(new ChartViewState(centre, field, 8.0));
-            // The meridian, production geometry in production ink.
-            holder[0].overlays().offer("meridian", () -> List.of(
-                    new OverlayContribution.GreatCircle("meridian",
-                            "Meridian", MERIDIAN_POLE,
-                            OverlayContribution.Reference.LINE,
-                            InkRole.REFERENCE_LINE)));
-        });
-        SwingUtilities.invokeAndWait(() -> { });
-        SwingUtilities.invokeAndWait(() -> { });
+        ChartScene scene = Atlas.assembler().assemble(
+                new ChartViewState(centre, field, 8.0), 900, 700);
+        ChartOptions options = black
+                ? ChartOptions.DEFAULTS.withPalette(ChartPalette.BLACK_SKY)
+                : ChartOptions.DEFAULTS;
+        ChartPalette palette = options.palette();
 
-        ChartComponent chart = holder[0];
-        BufferedImage image = new BufferedImage(chart.getWidth(),
-                chart.getHeight(), BufferedImage.TYPE_INT_RGB);
-        SwingUtilities.invokeAndWait(() -> {
-            Graphics2D g = image.createGraphics();
-            try {
-                chart.paint(g);
-                drawCandidate(g, chart.currentScene(), black, line,
-                        landmark);
-            } finally {
-                g.dispose();
-            }
-        });
+        // The meridian: production geometry, offered exactly as
+        // MeridianModule offers it, and inked by the real
+        // ReferenceInk inside the renderer's own reference layer.
+        List<OverlayRegistry.Owned> meridian = List.of(
+                new OverlayRegistry.Owned("meridian",
+                        new OverlayContribution.GreatCircle("meridian",
+                                "Meridian", MERIDIAN_POLE,
+                                OverlayContribution.Reference.LINE,
+                                InkRole.REFERENCE_LINE)));
+
+        BufferedImage image = new BufferedImage(900, 700,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        try {
+            new ChartRenderer(StarSizePolicy.DEFAULT).render(g, scene,
+                    options, (layerG, layerScene) -> {
+                        ReferenceInk.paint(layerG, layerScene, meridian,
+                                palette);
+                        drawCandidate(layerG, layerScene, palette, line,
+                                landmark);
+                    });
+        } finally {
+            g.dispose();
+        }
         File file = new File(DIR, "candidate-" + name + ".png");
         ImageIO.write(image, "png", file);
         if (enlargedText) {
@@ -273,21 +286,19 @@ public final class EclipticCandidateStudyMain {
      * stroke and the landmark symbol are this study's.
      */
     private static void drawCandidate(Graphics2D g, ChartScene scene,
-                                      boolean black, Candidate line,
+                                      ChartPalette palette, Candidate line,
                                       Landmark landmark) {
         // The candidate pages show one landmark - the one that sits
         // on this page, where the two lines cross.
-        draw(g, scene, black, line, landmark, List.of(
+        draw(g, scene, palette, line, landmark, List.of(
                 new Mark("December solstice",
                         new SkyPosition(270.0, -EPS0))));
     }
 
     private static void draw(Graphics2D g, ChartScene scene,
-                             boolean black, Candidate line,
+                             ChartPalette palette, Candidate line,
                              Landmark landmark, List<Mark> landmarks) {
         ChartViewport viewport = scene.viewport();
-        ChartPalette palette = black ? ChartPalette.BLACK_SKY
-                : ChartPalette.WHITE_PAPER;
         GnomonicProjection projection =
                 new GnomonicProjection(viewport.centre());
         ViewportMapping mapping = new ViewportMapping(viewport);

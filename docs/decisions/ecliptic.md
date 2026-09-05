@@ -67,6 +67,14 @@ At J2000 both offsets are exactly zero — the of-date candidate *is*
 the J2000 candidate there — which is the check that the two are being
 read in one frame.
 
+**The dates are UTC; SOFA's `iauEcm06` and `iauObl06` take TT.** No
+conversion is applied, and the price is measured rather than left to
+look like it was not there: advancing every date by the present
+TT−UTC of 69.184 s moves these directions by at most **0.000110″** —
+about 540 times below the 0.06″ the implementation is held to, and
+far below a pixel at any field (PR #276 round 2). The generator
+computes this and the fixture records it.
+
 The **plane barely moves**: the of-date pole stays under an arcminute
 from the J2000 pole across two centuries. The **equinox slides**
 ~50″/yr *along* the circle, past a degree by 2100.
@@ -209,7 +217,19 @@ the line vocabulary is decided, and #273 should implement a reviewed
 contract rather than reopen the question while changing production.
 So the candidates were drawn — on the page where the two lines
 actually cross, in a dense Sagittarius field, in both grounds
-(`make ecliptic-study`, `candidate-line-*.png`):
+(`make ecliptic-study`, `candidate-line-*.png`).
+
+**They are drawn in production's own reference layer.** A first
+version of the study painted them *after* a completed chart, which
+put the candidate above every star, symbol and label — so the pages
+answered the opposite of the question they were being used to settle:
+in production a catalogued mark covers the reference line, and there
+the line covered the mark (PR #276 round 2). The study now drives
+`ChartRenderer.render` and fills its `ReferenceLayer`, the same
+boundary `ChartComponent` hands to `ReferenceInk` — above the grid
+and the geography, below every mark and label — with the production
+meridian inked in that layer beside the candidate. The verdicts
+below are from the corrected pages.
 
 | candidate | verdict |
 |---|---|
@@ -310,12 +330,22 @@ Why the menu:
   would be a window built around a single checkbox. This is the whole
   difference from place-and-time, which needed a dialog because it
   had a latitude, a longitude and an instant to hold.
-- **A menu cannot be truncated by a narrow window.** A popup is laid
-  out by its own content, not by the window it hangs from — the
-  measured widths are **140 px** at ordinary text and **215 px** at
-  18 pt, in both themes, regardless of the window. That is precisely
-  what disqualified the Inspector for place-and-time at its 240 px
-  floor, and it does not apply here.
+- **A menu cannot be truncated by a narrow window.** A popup is
+  sized by its own content, not by the window it hangs from. That is
+  a structural property, and it is precisely what disqualified the
+  Inspector for place-and-time at its 240 px floor: the Inspector is
+  a panel *inside* the window and inherits its width, and a menu is
+  not. No measurement of the window can make a menu item narrower.
+
+  *The study's pixel numbers are not the View popup's.* Its images
+  are arrangement mock-ups — production item classes, with the
+  neighbours' real accelerators, but laid out in a `JPanel` rather
+  than by the menu UI, which owns its own check-icon and accelerator
+  columns, insets and separator metrics; a popup paints nothing until
+  it is shown (PR #276 round 2). The images show the arrangement and
+  the tick states; the no-truncation claim rests on the structural
+  reason above, not on them. **#274 owes a real-menu test**: both
+  themes, enlarged text, nothing clipped.
 - **Its state is visible.** A tick shows whether the ecliptic is on
   without the reader having to look at the chart and guess.
 - **Chart Options is for the chart's own drawing** — palette, grid,
@@ -327,7 +357,39 @@ Why the menu:
 
 Shown at ordinary and enlarged text in both application themes:
 `controls-view-menu.png`, `controls-view-menu-enlarged.png`,
-`controls-view-menu-dark.png`, `controls-view-menu-dark-enlarged.png`.
+`controls-view-menu-dark.png`, `controls-view-menu-dark-enlarged.png`
+— all four with the ecliptic **shown**, a reader-selected state.
+`controls-view-menu-default.png` shows the **released default**,
+which is not that.
+
+### The released default: hidden
+
+> **A reader who has never asked for the ecliptic does not get it.**
+> On a fresh install the item is present and unticked, and the chart
+> is the chart it has always been.
+
+An earlier draft specified how an existing value survives the
+module's absence but never said what a fresh store means, which left
+#274 unable to implement restart semantics (PR #276 round 2). It is
+decided here, and the atlas has already decided it once: the meridian
+module is attached at startup and immediately told
+`showing(false, false, false)`, so a reader who opens the atlas for
+the first time sees no reference lines at all.
+
+The reasons are the same ones, and one more that matters for a
+removable module:
+
+- **the default page is the quiet chart.** The ecliptic is a thing a
+  reader turns on to ask a question; the document says so, and a
+  default that turned it on would contradict it.
+- **installing a module must not redraw everyone's chart.** With the
+  module absent there is no ecliptic. If the module defaulted to
+  *shown*, merely adding it would change the default page for every
+  reader who never asked — the module would be making a decision
+  about the atlas rather than offering one to the reader.
+- **off is recoverable in one click; on is a surprise.** A reader who
+  wants it finds a ticked box where they expect it. A reader who does
+  not want it never had to discover why a new line appeared.
 
 ### Persistence, including when the module is absent
 
@@ -336,6 +398,21 @@ reader wants the ecliptic shown is a stable display preference, like
 the palette or the grid — unlike place-and-time's *instant*, a frozen
 snapshot that would come back stale. The ecliptic has no date and no
 observer, so there is nothing else to store.
+
+**Three states, and they stay distinct:**
+
+| store | means | drawn |
+|---|---|---|
+| key absent | the reader has never chosen | no — the released default |
+| explicit `false` | the reader chose to hide it | no |
+| explicit `true` | the reader chose to show it | yes |
+
+The absent key and the explicit `false` are **not collapsed**, even
+though both render the same today: a reader's stated choice must
+outlive a change of default, and it is what lets a removal and a
+return preserve intent rather than silently resetting it. So the
+preference is read as an optional value, never as a boolean with a
+default baked into the read.
 
 The module is removable, so the gate states what happens when it is
 not there:
@@ -399,14 +476,20 @@ not there:
   `GreatCircle` and four `Point` marks in `REFERENCE_LINE`. Add the
   **two** domain-neutral kinds named above, and ink them as chosen
   here: the circle **dash-dot 12-4-2-4**, one pixel, in the figure
-  grey; a landmark as a **small open diamond**. Layering and label
-  rules as above. The chart gains no astronomy, and no enum value
+  grey; a landmark as a **small open diamond**. Both are inked in the
+  renderer's existing `ReferenceLayer` — above grid and geography,
+  below every mark and label — which is where the gate's candidate
+  pages drew them. The chart gains no astronomy, and no enum value
   names the ecliptic.
 - **#274 — controls.** A `JCheckBoxMenuItem` named **Ecliptic** on
   the View menu, below the Inspector's, present only while the module
-  is loaded; the shown state remembered across sessions as a display
-  preference, surviving the module's absence, with an absent module
-  neither reading nor writing it.
+  is loaded. **Released default: hidden.** The choice is remembered
+  across sessions as a display preference and read as an optional
+  value, so a missing key, an explicit `false` and an absent module
+  stay distinguishable; an absent module neither reads nor writes it.
+  Owes a **real-menu test** — a shown popup, both themes, enlarged
+  text, nothing clipped — since the gate's control images are
+  arrangement mock-ups.
 - **#275 — journey and handover.** A reader-level journey that turns
   the ecliptic on from the View menu, reads a named landmark, and
   turns it off to a clean chart; the Sprint 28 handover.

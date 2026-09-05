@@ -179,6 +179,19 @@ public final class EclipticStudyMain {
                 + " candidate *is* the J2000 candidate there — which is"
                 + " the check that the two are being read in one frame.");
         p("");
+        p(String.format(Locale.ROOT,
+                "**The dates are UTC, and SOFA's `iauEcm06` and"
+                        + " `iauObl06` take TT.** No conversion is"
+                        + " applied, and the price is measured rather"
+                        + " than waved away: advancing each date by the"
+                        + " present TT−UTC of 69.184 s moves these"
+                        + " directions by at most **%.6f″** — about"
+                        + " %.0f times below the 0.06″ the"
+                        + " implementation is held to, and far below a"
+                        + " pixel at any field. It cannot affect the"
+                        + " decision (PR #276 round 2).",
+                timeScaleCost(), 0.06 / timeScaleCost()));
+        p("");
         p("So a naive of-date *line* would look nearly right, and only"
                 + " the **equinox landmark** betrays a wrong frame."
                 + " That is why a fixed atlas anchors both the circle"
@@ -372,6 +385,17 @@ public final class EclipticStudyMain {
                             Double.parseDouble(f[6]))));
         }
         return rows;
+    }
+
+    /** What passing UTC dates to SOFA's TT routines costs, measured. */
+    private static double timeScaleCost() throws Exception {
+        for (String line : Files.readAllLines(ORACLE)) {
+            if (line.startsWith("utc_as_tt_worst_arcsec")) {
+                return Double.parseDouble(line.trim().split("\\s+")[1]);
+            }
+        }
+        throw new IllegalStateException(
+                "the oracle records no time-scale cost");
     }
 
     /** SOFA's own J2000 ecliptic pole, in ICRS. */

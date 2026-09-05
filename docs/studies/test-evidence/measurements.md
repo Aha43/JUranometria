@@ -128,7 +128,7 @@ Whether a particular read happens on the event thread is control flow, which tex
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 4 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 210 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 38 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -172,6 +172,7 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/deep-sky-vocabulary/tab-stars.png
 - docs/studies/ecliptic/controls-view-menu-dark-enlarged.png
 - docs/studies/ecliptic/controls-view-menu-dark.png
+- docs/studies/ecliptic/controls-view-menu-default.png
 - docs/studies/ecliptic/controls-view-menu-enlarged.png
 - docs/studies/ecliptic/controls-view-menu.png
 - docs/studies/on-this-page/sidebar-dense-enlarged.png

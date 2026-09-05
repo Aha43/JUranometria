@@ -25,16 +25,45 @@
 /* The ICRS direction of an ecliptic-frame axis, for the mean ecliptic
    and equinox of the given date.  Axis 0 is the equinox (the ecliptic
    x-axis); axis 2 is the ecliptic north pole. */
-static void ecliptic_axis(double d1, double d2, int axis,
-                          double *ra, double *dec) {
-    double rm[3][3], v[3] = {0.0, 0.0, 0.0}, eq[3];
+static void ecliptic_axis_vector(double d1, double d2, int axis,
+                                 double eq[3]) {
+    double rm[3][3], v[3] = {0.0, 0.0, 0.0};
     v[axis] = 1.0;
     iauEcm06(d1, d2, rm);   /* ICRS -> mean ecliptic & equinox of date */
     iauTrxp(rm, v, eq);     /* transpose: ecliptic frame -> ICRS       */
+}
+
+static void ecliptic_axis(double d1, double d2, int axis,
+                          double *ra, double *dec) {
+    double eq[3];
+    ecliptic_axis_vector(d1, d2, axis, eq);
     iauC2s(eq, ra, dec);
     *ra = iauAnp(*ra) * DR2D;
     *dec = *dec * DR2D;
 }
+
+/* SOFA's iauEcm06 and iauObl06 take TT.  The dates below are stated
+   in UTC, and passed through unconverted.  This measures what that
+   costs: the same direction computed with the date advanced by the
+   present TT-UTC of 69.184 s, against the same direction without it.
+   The larger of the two axes is returned, in arcseconds. */
+#define TT_MINUS_UTC_SECONDS 69.184
+
+static double utc_as_tt_arcsec(double d1, double d2) {
+    double a[3], b[3], worst = 0.0, apart;
+    double shifted = d2 + TT_MINUS_UTC_SECONDS / 86400.0;
+    for (int axis = 0; axis < 3; axis += 2) {   /* equinox, then pole */
+        ecliptic_axis_vector(d1, d2, axis, a);
+        ecliptic_axis_vector(d1, shifted, axis, b);
+        apart = iauSepp(a, b) * DR2D * 3600.0;
+        if (apart > worst) {
+            worst = apart;
+        }
+    }
+    return worst;
+}
+
+static double worst_time_scale = 0.0;
 
 static void candidate(const char *iso, int y, int m, int d,
                       int hh, int mm, int ss) {
@@ -46,6 +75,13 @@ static void candidate(const char *iso, int y, int m, int d,
     eps = iauObl06(djm0, d2) * DR2D;         /* mean obliquity of date */
     ecliptic_axis(djm0, d2, 2, &pra, &pdec); /* ecliptic pole of date  */
     ecliptic_axis(djm0, d2, 0, &era, &edec); /* mean equinox of date   */
+
+    {
+        double cost = utc_as_tt_arcsec(djm0, d2);
+        if (cost > worst_time_scale) {
+            worst_time_scale = cost;
+        }
+    }
 
     printf("ofdate %s %.9f %.9f %.9f %.9f %.9f\n",
            iso, eps, pra, pdec, era, edec);
@@ -84,6 +120,10 @@ int main(void) {
     printf("#     equatorial direction of an ecliptic-frame direction, via the\n");
     printf("#     J2000 ecliptic matrix (iauEcm06), degrees.\n");
     printf("#   eclpole <ra_j2000> <dec_j2000> : the J2000 ecliptic north pole.\n");
+    printf("#   utc_as_tt_worst_arcsec : what passing these UTC dates to\n");
+    printf("#     SOFA's TT-based routines costs, at the worst of the dates\n");
+    printf("#     and axes below. The dates are UTC; no TT conversion is\n");
+    printf("#     applied, and this is the price of that.\n");
     printf("#   ofdate <iso> <eps_of_date> <pole_ra> <pole_dec> <equinox_ra>\n");
     printf("#     <equinox_dec> : the rival candidate - the MEAN ecliptic and\n");
     printf("#     equinox OF DATE - expressed in the same ICRS/J2000 frame.\n");
@@ -120,5 +160,6 @@ int main(void) {
     candidate("2026-03-20T21:33:00Z", 2026, 3, 20, 21, 33, 0);
     candidate("2050-07-04T03:00:00Z", 2050, 7, 4, 3, 0, 0);
     candidate("2100-01-01T00:00:00Z", 2100, 1, 1, 0, 0, 0);
+    printf("utc_as_tt_worst_arcsec %.9f\n", worst_time_scale);
     return 0;
 }

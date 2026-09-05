@@ -45,6 +45,8 @@ They differ in two ways, and the sizes are what settle the decision:
 
 At J2000 itself both offsets are exactly zero — the of-date candidate *is* the J2000 candidate there — which is the check that the two are being read in one frame.
 
+**The dates are UTC, and SOFA's `iauEcm06` and `iauObl06` take TT.** No conversion is applied, and the price is measured rather than waved away: advancing each date by the present TT−UTC of 69.184 s moves these directions by at most **0.000110″** — about 544 times below the 0.06″ the implementation is held to, and far below a pixel at any field. It cannot affect the decision (PR #276 round 2).
+
 So a naive of-date *line* would look nearly right, and only the **equinox landmark** betrays a wrong frame. That is why a fixed atlas anchors both the circle and its landmarks to J2000, and why the oracle check is made at dates far from J2000 rather than on the line alone.
 
 ## Agreement with the SOFA oracle
