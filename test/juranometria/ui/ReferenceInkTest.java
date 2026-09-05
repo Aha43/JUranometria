@@ -542,12 +542,17 @@ class ReferenceInkTest {
         assertTrue(most > 100,
                 "the equator is drawn across this page");
 
-        // A window clear of catalogue ink, which would break runs
-        // that belong to the stroke.
+        // The whole line, not a chosen window. A first version read a
+        // fixed span picked because it was clear of catalogue ink,
+        // which would have broken on an unrelated catalogue change
+        // (PR #278 round 2). Catalogue marks painted over the line
+        // hide some of it, so some runs are interrupted; the caller
+        // asks for a number of intact cycles anywhere along the row
+        // rather than for an unbroken pattern everywhere.
         List<int[]> runs = new java.util.ArrayList<>();
         int current = -1;
         int length = 0;
-        for (int x = 200; x < 320; x++) {
+        for (int x = 2; x < plain.getWidth() - 2; x++) {
             int ink = plain.getRGB(x, row) != drawn.getRGB(x, row) ? 1 : 0;
             if (ink == current) {
                 length++;
@@ -618,6 +623,28 @@ class ReferenceInkTest {
                                 + ": the edges run diagonally, which is"
                                 + " what makes it a diamond and not a"
                                 + " ring or a box");
+            }
+        }
+
+        // And the vertices are JOINED - four straight edges, not four
+        // arms. Vertices plus empty corners would be satisfied by a
+        // plus-shaped mark, which is a different symbol entirely
+        // (PR #278 round 2). Every point where |dx| + |dy| is the
+        // diamond's half-diagonal lies on an edge, so every one of
+        // them carries ink.
+        for (int step = 1; step <= 5; step++) {
+            int dx = step;
+            int dy = 6 - step;
+            for (int sx : new int[] {-1, 1}) {
+                for (int sy : new int[] {-1, 1}) {
+                    assertTrue(inkWithin(plain, drawn, cx + sx * dx,
+                                    cy + sy * dy, 1),
+                            "the edge from one vertex to the next"
+                                    + " carries ink at " + (sx * dx)
+                                    + "," + (sy * dy) + ": the four"
+                                    + " points are joined, so this is"
+                                    + " a diamond and not a cross");
+                }
             }
         }
 
