@@ -478,34 +478,72 @@ class ReferenceInkTest {
         List<int[]> runs = runsAlongTheLine(equatorial,
                 OverlayContribution.Reference.PERMANENT);
 
-        int cycles = 0;
-        for (int i = 0; i + 3 < runs.size(); i++) {
-            if (isRun(runs.get(i), 1, 12) && isRun(runs.get(i + 1), 0, 4)
-                    && isRun(runs.get(i + 2), 1, 2)
-                    && isRun(runs.get(i + 3), 0, 4)) {
-                cycles++;
+        // The WHOLE line, not three cycles somewhere in it. On blank
+        // ground nothing can interrupt a run, so anything other than
+        // the pattern repeating end to end is the stroke being wrong
+        // somewhere (PR #278 round 4).
+        //
+        // The two outermost ink runs are exempt from the length
+        // check: the line is clipped to the paper wherever the cycle
+        // happens to have got to, so the first and last are partial
+        // by construction. Everything between them is held exactly.
+        assertTrue(runs.size() >= 12,
+                "the line is long enough to hold several cycles: "
+                        + runs.size() + " runs");
+        assertEquals(1, runs.get(0)[0],
+                "the reading starts at ink");
+        assertEquals(1, runs.get(runs.size() - 1)[0],
+                "and ends at ink");
+
+        // Every gap is four; every interior dash is a long 12 or a
+        // short 2; and the long and the short alternate. Together
+        // that is 12-4-2-4 repeating, stated without arithmetic on
+        // indices.
+        List<Boolean> longDashes = new java.util.ArrayList<>();
+        for (int i = 0; i < runs.size(); i++) {
+            int[] run = runs.get(i);
+            if (i % 2 == 0) {
+                assertEquals(1, run[0],
+                        "ink and gap alternate, at run " + i);
+                if (i == 0 || i == runs.size() - 1) {
+                    // Clipped where the cycle had got to.
+                    continue;
+                }
+                boolean isLong = Math.abs(run[1] - 12) <= 1;
+                boolean isDot = Math.abs(run[1] - 2) <= 1;
+                assertTrue(isLong || isDot,
+                        "run " + i + " is a 12-pixel dash or a 2-pixel"
+                                + " dot, not " + run[1] + " pixels");
+                longDashes.add(isLong);
+            } else {
+                assertEquals(0, run[0],
+                        "ink and gap alternate, at run " + i);
+                assertTrue(Math.abs(run[1] - 4) <= 1,
+                        "every gap is four pixels, not " + run[1]
+                                + ", at run " + i);
             }
         }
-        assertTrue(cycles >= 3, "the permanent stroke is 12 on, 4 off,"
-                + " 2 on, 4 off - the cartographic datum line the gate"
-                + " chose; found " + cycles + " complete cycles in "
-                + runs.size() + " runs");
+        assertTrue(longDashes.size() >= 6,
+                "the line holds several complete dashes and dots: "
+                        + longDashes.size());
+        for (int i = 1; i < longDashes.size(); i++) {
+            assertNotEquals(longDashes.get(i - 1), longDashes.get(i),
+                    "dash and dot alternate all the way along: two"
+                            + " of the same kind in a row at " + i);
+        }
+    }
 
-        // And the same reading of a solid line finds no such cycle,
-        // so the check above is discriminating and not a coincidence
-        // of how runs are counted.
+    @Test
+    void aSolidLineShowsNoDashDotCycleAtAll() {
+        ChartScene equatorial = Atlas.assembler().assemble(
+                new ChartViewState(new SkyPosition(80.0, 0.0), 24.0, 8.0),
+                900, 700);
         List<int[]> solid = runsAlongTheLine(equatorial,
                 OverlayContribution.Reference.LINE);
-        int solidCycles = 0;
-        for (int i = 0; i + 3 < solid.size(); i++) {
-            if (isRun(solid.get(i), 1, 12) && isRun(solid.get(i + 1), 0, 4)
-                    && isRun(solid.get(i + 2), 1, 2)
-                    && isRun(solid.get(i + 3), 0, 4)) {
-                solidCycles++;
-            }
-        }
-        assertEquals(0, solidCycles,
-                "and a solid line shows none of them");
+        assertEquals(1, solid.size(),
+                "a solid line is one unbroken run, so the reading"
+                        + " above is discriminating and not an artefact"
+                        + " of how runs are counted: " + solid.size());
     }
 
     /** A run of ink (1) or paper (0), and how long it is. */
@@ -549,10 +587,26 @@ class ReferenceInkTest {
         // the catalogue paints near it - it can hide a run, and it
         // could in principle contribute to one (PR #278 rounds 2 and
         // 3). Here the only thing on the page is the line.
+        // Between the first and last ink on the row, so the blank
+        // paper either side of the line is not read as a gap in it,
+        // and the last run is closed rather than dropped.
+        int from = -1;
+        int to = -1;
+        for (int x = 1; x < drawn.getWidth() - 1; x++) {
+            if (inked(drawn, x, row)) {
+                if (from < 0) {
+                    from = x;
+                }
+                to = x;
+            }
+        }
+        assertTrue(from >= 0 && to > from,
+                "the line has an extent on this row");
+
         List<int[]> runs = new java.util.ArrayList<>();
         int current = -1;
         int length = 0;
-        for (int x = 2; x < drawn.getWidth() - 2; x++) {
+        for (int x = from; x <= to; x++) {
             int ink = inked(drawn, x, row) ? 1 : 0;
             if (ink == current) {
                 length++;
@@ -564,6 +618,7 @@ class ReferenceInkTest {
                 length = 1;
             }
         }
+        runs.add(new int[] {current, length});
         return runs;
     }
 
@@ -588,23 +643,16 @@ class ReferenceInkTest {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            // The renderer's own hints, because the stroke must
-            // rasterise the way it does on a page: without pure
-            // stroke control and antialiasing the same geometry lands
-            // on different pixels, and the shape being held would be
-            // this test's rather than production's.
-            g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-            g.setRenderingHint(
-                    java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
-                    java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            g.setRenderingHint(
-                    java.awt.RenderingHints.KEY_STROKE_CONTROL,
-                    java.awt.RenderingHints.VALUE_STROKE_PURE);
+            // The renderer's own hints and the renderer's own paper,
+            // asked of the renderer rather than copied here: without
+            // pure stroke control the same geometry lands on
+            // different pixels, and a second statement of either
+            // would let this ground drift from the page a reader sees
+            // (PR #278 round 4).
+            ChartRenderer.applyRenderingHints(g);
             g.setColor(ChartOptions.DEFAULTS.palette().ground());
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
-            g.clip(new java.awt.Rectangle(1, 1, image.getWidth() - 2,
-                    image.getHeight() - 2));
+            g.clip(ChartRenderer.paperOf(scene));
             ReferenceInk.paint(g, scene, ink,
                     ChartOptions.DEFAULTS.palette());
         } finally {
