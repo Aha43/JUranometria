@@ -90,9 +90,10 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/SprintTwentyFourJourneyTest.java | focused-window, point-reachable, control-showing | pointer-events |
 | juranometria/ui/SprintTwentyThreeJourneyTest.java | focused-window, focus-owner, point-reachable, control-showing | pointer-events, back-door-click |
 | juranometria/ui/WorkingSelectionSurfacesJourneyTest.java | focus-owner, point-reachable, control-showing | pointer-events |
+| juranometria/ui/WorkingSelectionTableGestureTest.java | point-reachable | pointer-events |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
-**22 display-dependent files.** 15 state a focused-window or focus-owner premise, 15 state a reachability premise, and 13 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**23 display-dependent files.** 15 state a focused-window or focus-owner premise, 16 state a reachability premise, and 13 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 

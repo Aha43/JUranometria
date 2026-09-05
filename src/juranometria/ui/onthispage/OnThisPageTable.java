@@ -549,8 +549,8 @@ public final class OnThisPageTable extends JPanel {
         pendingGesture = new Gesture(
                 (modifiersEx & java.awt.event.InputEvent.SHIFT_DOWN_MASK)
                         != 0,
-                (modifiersEx & java.awt.Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMaskEx()) != 0);
+                (modifiersEx & juranometria.ui.SelectInteraction
+                        .toggleModifierMask()) != 0);
     }
 
     /**

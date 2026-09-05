@@ -5,9 +5,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+import java.awt.GraphicsEnvironment;
+
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import juranometria.app.Atlas;
@@ -48,6 +51,14 @@ class WorkingSelectionTableGestureTest {
         final OnThisPageTable panel;
 
         Fixture() throws Exception {
+            // Swing's own table UI asks the toolkit for the platform
+            // modifier while handling a press, and a headless
+            // toolkit refuses the question - so these gestures need
+            // a display, exactly as a reader's do.
+            Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                    "the table's press handling asks the toolkit for"
+                            + " the platform modifier, which a"
+                            + " headless toolkit refuses");
             ChartComponent[] made = new ChartComponent[1];
             SwingUtilities.invokeAndWait(() -> {
                 made[0] = new ChartComponent(Atlas.assembler());
@@ -93,8 +104,7 @@ class WorkingSelectionTableGestureTest {
     }
 
     private static int toggleMask() {
-        return java.awt.Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMaskEx();
+        return SelectInteraction.toggleModifierMask();
     }
 
     /** One press-and-release at a row, with the given held keys. */
@@ -104,6 +114,9 @@ class WorkingSelectionTableGestureTest {
         int x = (int) cell.getCenterX();
         int y = (int) cell.getCenterY();
         SwingUtilities.invokeAndWait(() -> {
+            assertTrue(table.getVisibleRect().contains(x, y),
+                    "the point clicked on row " + viewRow + " is one a"
+                            + " pointer could reach");
             table.dispatchEvent(new MouseEvent(table,
                     MouseEvent.MOUSE_PRESSED, System.nanoTime() / 1_000_000,
                     InputEvent.BUTTON1_DOWN_MASK | keyMask, x, y, 1, false,

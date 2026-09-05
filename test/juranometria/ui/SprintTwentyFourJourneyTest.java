@@ -547,8 +547,7 @@ class SprintTwentyFourJourneyTest {
 
     /** The platform's own add-to-selection modifier. */
     private static int toggleModifier() {
-        return java.awt.Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMaskEx();
+        return SelectInteraction.toggleModifierMask();
     }
 
     private int viewRowOf(String identity) throws Exception {

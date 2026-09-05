@@ -103,6 +103,23 @@ public final class SelectInteraction extends MouseAdapter {
         return interaction;
     }
 
+    /**
+     * The platform's add-to-selection modifier, as a modifier mask -
+     * the one answer every gesture surface reads, which is why it
+     * lives here rather than being asked of the toolkit at each
+     * press. A headless toolkit refuses the question (it has no
+     * menus and no pointer), so headless runs - where every gesture
+     * is a dispatched test event - use Ctrl, and the tests dispatch
+     * with the same answer they read from here.
+     */
+    public static int toggleModifierMask() {
+        if (java.awt.GraphicsEnvironment.isHeadless()) {
+            return java.awt.event.InputEvent.CTRL_DOWN_MASK;
+        }
+        return java.awt.Toolkit.getDefaultToolkit()
+                .getMenuShortcutKeyMaskEx();
+    }
+
     @Override
     public void mousePressed(MouseEvent event) {
         pressedAt = SwingUtilities.isLeftMouseButton(event)
@@ -110,8 +127,7 @@ public final class SelectInteraction extends MouseAdapter {
         // Read at the press, not the release: the reader may let the
         // modifier go while the button is still down.
         pressedAdditive = (event.getModifiersEx()
-                & java.awt.Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMaskEx()) != 0;
+                & toggleModifierMask()) != 0;
     }
 
     @Override

@@ -444,8 +444,7 @@ class WorkingSelectionSurfacesJourneyTest {
 
     /** The platform's own add-to-selection modifier. */
     private static int toggleModifier() {
-        return java.awt.Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMaskEx();
+        return SelectInteraction.toggleModifierMask();
     }
 
     private static void flush() throws Exception {

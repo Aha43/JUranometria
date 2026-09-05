@@ -79,8 +79,7 @@ class WorkingSelectionChartGestureTest {
     }
 
     private static int toggleMask() {
-        return java.awt.Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMaskEx();
+        return SelectInteraction.toggleModifierMask();
     }
 
     private static void click(ChartComponent chart, int x, int y,

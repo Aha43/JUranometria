@@ -366,12 +366,13 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(22, display.size(),
+        assertEquals(23, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246) and the"
-                        + " working-selection surfaces journey (#261),"
-                        + " each arrived through the shared routes"
-                        + " with its premises stated");
+                        + " #261 pair - the surfaces journey and the"
+                        + " table gestures, whose presses go through"
+                        + " Swing's own toolkit-asking UI - each with"
+                        + " its premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
