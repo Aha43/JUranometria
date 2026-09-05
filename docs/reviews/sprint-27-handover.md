@@ -90,19 +90,46 @@ from the store at the time:
   horizontal scrolling — "not recorded" and "No mark" whole — the
   counted line beneath ("and 77 further stars, none of them
   named"), and a real click on the Chart header sorted by meaning:
-  every Shown first in stable default order, No mark last. Column
-  rearrangement and the enlarged-text fallback are held by the
-  committed #257 evidence (`theChartColumnSurvivesBeingDragged
-  SomewhereElse`, the width studies at 12 and 18 pt), which this
-  walk did not repeat by hand.
+  every Shown first in stable default order, No mark last.
 
-The remaining gesture routes — table toggles and both range
-transactions, per-surface agreement after every move, the
-mutation checks — run as committed display evidence
-(`WorkingSelectionSurfacesJourneyTest`,
-`WorkingSelectionTableGestureTest`,
+**The integrated closing journey** (the closing review's
+requirement) runs the filed steps the manual walk had left to
+component evidence, in one committed display journey —
+`theClosingJourneyWalksEveryFiledStepThroughRealControls` in
+`WorkingSelectionSurfacesJourneyTest` — through real reader
+routes, failing if any transition is removed:
+
+- an ordinary chart click and an Accumulate table click build a
+  set holding a **drawn and an undrawn member**; the undrawn
+  member's **single cross** is proven from the chart's own
+  registry and the projection's own pixel, with every surface
+  agreeing;
+- the Chart column is **sorted and then dragged to the front at
+  its real header**, and holds its measured width by model
+  identity wherever it sits; under **enlarged application text**
+  (20 pt, on the shared guard) the width rule holds again after a
+  real resize — whole words, never cut — with membership, order
+  and lead fixed throughout;
+- search **carries the undrawn member off-page** as a member, not
+  as ink (no contribution of either kind remains), the working
+  set labelling both absentees in words;
+- under that same live set, the real Chart Options dialog hides
+  and restores an ordinary family (the member moves ring → cross
+  → ring; the set never moves), **Black sky** is chosen and OK
+  persists it, and the application theme is applied **both
+  directions** on the shared guard — membership, order and lead
+  identical after every one of these presentation changes;
+- **Clear selection** through the real control empties every
+  surface, and a **second session** built from the same store
+  begins with a clean working selection while the persisted black
+  sky is in force.
+
+Beneath it, the narrower committed evidence stands unchanged —
+table toggles and both range transactions, the ambiguous
+transactions, the mutation checks
+(`WorkingSelectionTableGestureTest`,
 `WorkingSelectionChartGestureTest`, the retold Sprint 24
-journeys), all green in the runs below.
+journeys) — all green in the runs below.
 
 ## The required evidence, run and counted
 
@@ -111,8 +138,9 @@ fresh directory, dependencies fetched by
 `scripts/download-libs.sh`, Apple-silicon Mac, Darwin 25.5.0,
 Homebrew OpenJDK 21, display present so the display corpus runs
 rather than aborts): **140 containers found / 140 successful /
-0 failed / 0 aborted; 823 tests found / 823 successful / 0 failed
-/ 0 aborted / 0 skipped**; 43.6 s test run, 46.7 s wall, cold.
+0 failed / 0 aborted; 824 tests found / 824 successful / 0 failed
+/ 0 aborted / 0 skipped**; 46.9 s wall, cold, the integrated
+closing journey included.
 The required xvfb display job runs the same corpus in CI and is
 green on the merged head (112 s on the approved head; 87–115 s
 over the sprint's last four runs).
@@ -164,14 +192,14 @@ last four `test`-workflow runs and the approved head's
 
 | check | before (1.7.0) | after (this close) | reading |
 |---|---|---|---|
-| CI `test` | 84 s avg, worst 98 (n=4) | 88 s avg, worst 92 (n=4) | 783 → 823 tests |
+| CI `test` | 84 s avg, worst 98 (n=4) | 88 s avg, worst 92 (n=4) | 783 → 824 tests |
 | CI `display` | 98 s avg, worst 117 (n=4) | 102 s avg, worst 115 (n=4) | three gesture/journey classes added |
 | CI `image` cells | 82–139 s | 75–117 s (n=1 each) | flat within variance |
 | CI `dist` verify | 43–46 s each | 39–42 s each | flat |
-| local clean checkout, cold | 45.2 s / 783 | 46.7 s / 823 | ≈58 ms per test, unchanged |
+| local clean checkout, cold | 45.2 s / 783 | 46.9 s / 824 | ≈57 ms per test, unchanged |
 
 No causation is claimed from these samples; runner variance spans
-the gaps. The suite grew by forty tests — most of them real-window
+the gaps. The suite grew by forty-one tests — most of them real-window
 gesture evidence — at essentially flat cost.
 
 ## The ordinary chart is byte-identical

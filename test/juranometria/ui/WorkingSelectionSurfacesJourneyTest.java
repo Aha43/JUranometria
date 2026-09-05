@@ -56,6 +56,7 @@ class WorkingSelectionSurfacesJourneyTest {
     private JTable table;
     private SearchField search;
     private AtlasToolbar toolbar;
+    private juranometria.app.ChartOptionsController chartOptions;
     private final List<juranometria.module.NavigationRequest> requests =
             new ArrayList<>();
     /** Every inventory rebuild: the catalogue-traffic meter. */
@@ -76,13 +77,31 @@ class WorkingSelectionSurfacesJourneyTest {
 
     /** The application's own wiring, in a window a reader could use. */
     private void openTheAtlas(int width) throws Exception {
+        openTheAtlas(width, null);
+    }
+
+    /**
+     * The same wiring with the reader's chart options attached the
+     * way the application attaches them - the controller, the
+     * production {@code TargetRetirement} seam, and the dialog the
+     * View menu opens - so the closing journey can change an
+     * ordinary option, the palette and the theme under a live set.
+     */
+    private void openTheAtlas(int width,
+                              juranometria.app.ChartOptionsController
+                                      options) throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "a reader's keys and clicks need a display");
+        this.chartOptions = options;
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
             chart = new ChartComponent(Atlas.assembler());
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
+            if (options != null) {
+                juranometria.app.TargetRetirement.connect(options, chart,
+                        navigation);
+            }
             selection = new SelectionModel();
             modules = new ChartModuleHost(chart, selection, request -> {
                 requests.add(request);
@@ -92,7 +111,8 @@ class WorkingSelectionSurfacesJourneyTest {
                     modules.workingSelection(), modules.selectionMode());
             modules.onPageChange(contents -> rebuilds++);
             inspector = new InspectorPanel(selection, chart::currentScene,
-                    () -> chart.chartOptions(),
+                    options != null ? options::options
+                            : () -> chart.chartOptions(),
                     chosen -> navigation.recenter(chosen.position()));
             inspector.showWorkingSet(modules.workingSelection(),
                     modules::inventory);
@@ -276,6 +296,180 @@ class WorkingSelectionSurfacesJourneyTest {
         }
     }
 
+    @Test
+    void theClosingJourneyWalksEveryFiledStepThroughRealControls()
+            throws Exception {
+        // The Sprint 27 close (#262, closing review): one integrated
+        // journey through real reader routes - the compact table
+        // manipulated at its own header and at enlarged text, an
+        // undrawn member wearing its single cross and carried
+        // off-page, an ordinary option, the palette and the theme
+        // all changed under the same live set with membership, order
+        // and lead fixed throughout, the clear through the real
+        // control, and a restart whose working selection is clean
+        // while the chosen persistent option survives.
+        java.util.prefs.Preferences node = java.util.prefs.Preferences
+                .userRoot().node("juranometria-test-" + System.nanoTime());
+        try {
+            juranometria.app.ChartOptionsStore store =
+                    juranometria.app.ChartOptionsStore.forNode(node);
+            openTheAtlas(1300,
+                    new juranometria.app.ChartOptionsController(store));
+
+            // ---- Drawn and undrawn members, from chart and table.
+            String drawn = anotherDrawnObjectOnThisPage("");
+            clickChartOn(drawn, 0);
+            ReaderInput.click(toolbar.accumulateButton());
+            String undrawn = firstUndrawnRow();
+            clickRow(viewRowOf(undrawn), 0);
+            assertEverySurfaceAgrees(List.of(drawn, undrawn), undrawn);
+            assertEquals(List.of(undrawn), inked(),
+                    "the undrawn member wears its single cross - one"
+                            + " contribution, none for the drawn one");
+            assertCrossLandsOn(undrawn);
+
+            // ---- The compact table, manipulated at its real header.
+            clickColumnHeader(3);
+            assertTrue(!page.sortKeys().isEmpty(),
+                    "the header click sorted the Chart column");
+            assertEverySurfaceAgrees(List.of(drawn, undrawn), undrawn);
+            dragColumnHeader(3, 0);
+            assertEquals(0, chartColumnViewIndex(),
+                    "the Chart column was dragged to the front by its"
+                            + " real header");
+            assertStateColumnKeepsItsMeasuredWidth();
+            assertEverySurfaceAgrees(List.of(drawn, undrawn), undrawn);
+
+            // ---- Enlarged text: the honest fallback, the set held.
+            // The font override is JVM-wide state on the shared
+            // guard (#224).
+            juranometria.app.SwingSession.restoring(() -> {
+                SwingUtilities.invokeAndWait(() -> {
+                    javax.swing.UIManager.put("defaultFont",
+                            new java.awt.Font(java.awt.Font.SANS_SERIF,
+                                    java.awt.Font.PLAIN, 20));
+                    SwingUtilities.updateComponentTreeUI(window);
+                    // A resize retakes the width decision with the
+                    // enlarged metrics, as any real window's would.
+                    window.setSize(1299, 860);
+                });
+                flush();
+                assertStateColumnKeepsItsMeasuredWidth();
+                assertEverySurfaceAgrees(List.of(drawn, undrawn),
+                        undrawn);
+            });
+            SwingUtilities.invokeAndWait(() -> {
+                SwingUtilities.updateComponentTreeUI(window);
+                window.setSize(1300, 860);
+            });
+            flush();
+
+            // ---- Carried off-page: navigation edits nothing.
+            ReaderInput.typeAndEnter(search, "M 42");
+            flush();
+            String m42 = "NGC 1976";
+            List<String> held = List.of(drawn, undrawn, m42);
+            assertEquals(held, working().members(),
+                    "the undrawn member crossed the page boundary as a"
+                            + " member, not as ink");
+            assertEquals(m42, working().lead());
+            assertTrue(inked().isEmpty(),
+                    "off-page members leave no ink of either kind");
+            assertEquals(List.of(drawn + " — off this page",
+                            undrawn + " — off this page", "◉ " + m42),
+                    inspector.workingSetLines());
+
+            // ---- An ordinary option, under the live set: the real
+            // dialog, the real checkbox. M 42's family hidden moves
+            // the member from ring to cross; membership never moves.
+            SwingUtilities.invokeAndWait(() ->
+                    juranometria.app.ChartOptionsDialog.open(window,
+                            chartOptions));
+            flush();
+            javax.swing.JDialog dialog = optionsDialog();
+            assertTrue(dialog != null, "the Chart Options dialog is"
+                    + " open in front of the reader");
+            ReaderInput.click(box(dialog.getContentPane(), "Nebulae"));
+            flush();
+            assertEquals(held, working().members(),
+                    "hiding a family changes what can be seen, never"
+                            + " what is selected");
+            assertEquals(m42, working().lead());
+            assertEquals(List.of(m42), inked(),
+                    "the hidden member moved from ring to cross");
+            ReaderInput.click(box(dialog.getContentPane(), "Nebulae"));
+            flush();
+            assertTrue(inked().isEmpty(), "and back to its ring");
+
+            // ---- The palette, kept for the restart: Black sky, OK.
+            ReaderInput.chooseTab(tabsIn(dialog.getContentPane()),
+                    "Chart");
+            ReaderInput.click(box(dialog.getContentPane(), "Black sky"));
+            flush();
+            assertEquals(held, working().members(),
+                    "the ground changes and the set does not");
+            assertEquals(m42, working().lead());
+            ReaderInput.click(button(dialog.getContentPane(), "OK"));
+            flush();
+            assertEquals(juranometria.render.ChartPalette.BLACK_SKY,
+                    store.load().palette(),
+                    "OK persisted the reader's sky");
+            assertEquals(held, working().members());
+
+            // ---- The theme, both directions, under the same set.
+            // Look-and-feel is process-wide state on the shared
+            // guard (#224).
+            juranometria.app.SwingSession.restoring(() -> {
+                for (boolean dark : new boolean[] {true, false}) {
+                    SwingUtilities.invokeAndWait(() -> {
+                        juranometria.app.UiTheme.apply(dark);
+                        com.formdev.flatlaf.FlatLaf.updateUI();
+                    });
+                    flush();
+                    assertEquals(held, working().members(),
+                            "application chrome is presentation:"
+                                    + " membership holds under a "
+                                    + (dark ? "dark" : "light")
+                                    + " theme");
+                    assertEquals(m42, working().lead());
+                    assertEquals(List.of(m42), selectedRows(),
+                            "and the table still shows the"
+                                    + " intersection with this page");
+                }
+            });
+
+            // ---- Cleared through the real control; restarted clean.
+            ReaderInput.click(inspector.clearSelectionButton());
+            assertTrue(working().members().isEmpty(),
+                    "Clear selection empties the whole set");
+            assertEquals(Selection.NOTHING, selection.selection());
+            assertTrue(inked().isEmpty());
+            closeTheWindow();
+
+            openTheAtlas(1300,
+                    new juranometria.app.ChartOptionsController(store));
+            assertTrue(working().members().isEmpty(),
+                    "a new session begins with no working selection");
+            assertEquals(Selection.NOTHING, selection.selection());
+            assertTrue(!inspector.workingSetShown(),
+                    "and no working-set section claims otherwise");
+            assertEquals(juranometria.render.ChartPalette.BLACK_SKY,
+                    chart.chartOptions().palette(),
+                    "while the chosen persistent option is in force -"
+                            + " the difference between session state"
+                            + " and a reader's choice");
+        } finally {
+            SwingUtilities.invokeAndWait(() -> {
+                for (java.awt.Window open : java.awt.Window.getWindows()) {
+                    if (open instanceof javax.swing.JDialog dialog) {
+                        dialog.dispose();
+                    }
+                }
+            });
+            node.removeNode();
+        }
+    }
+
     // ----------------------------------------------------------------
 
     /** Membership, order and lead, read at every surface. */
@@ -445,6 +639,223 @@ class WorkingSelectionSurfacesJourneyTest {
     /** The platform's own add-to-selection modifier. */
     private static int toggleModifier() {
         return SelectInteraction.toggleModifierMask();
+    }
+
+    /** The first row this page lists that the chart does not draw. */
+    private String firstUndrawnRow() throws Exception {
+        String[] found = new String[1];
+        SwingUtilities.invokeAndWait(() -> {
+            for (OnThisPageTable.Row row : page.rows()) {
+                if (row.state() != juranometria.page.PageVisibility.DRAWN) {
+                    found[0] = row.identity();
+                    return;
+                }
+            }
+        });
+        assertTrue(found[0] != null,
+                "this page lists an object it does not draw");
+        return found[0];
+    }
+
+    /** What the chart has been given to ink, in order. */
+    private List<String> inked() {
+        List<String> identities = new ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            identities.add(owned.geometry().identity());
+        }
+        return identities;
+    }
+
+    /**
+     * That the cross for this object sits where the production
+     * projection puts the object itself, on the paper.
+     */
+    private void assertCrossLandsOn(String identity) throws Exception {
+        var at = modules.inventory().find(identity).orElseThrow()
+                .position();
+        var expected = modules.projection().toPage(at).orElseThrow();
+        var contributed = chart.overlays().collect().stream()
+                .filter(owned -> owned.geometry().identity()
+                        .equals(identity))
+                .findFirst().orElseThrow();
+        var offered = ((juranometria.module.OverlayContribution.Point)
+                contributed.geometry()).at();
+        var where = modules.projection().toPage(offered).orElseThrow();
+        assertEquals(expected[0], where[0], 1e-9,
+                identity + " is offered at its own recorded position");
+        assertEquals(expected[1], where[1], 1e-9, identity);
+        assertTrue(juranometria.render.ChartRenderer
+                        .paperOf(chart.currentScene())
+                        .contains(where[0], where[1]),
+                identity + " lands on the paper");
+    }
+
+    /** A real click on the real column header, as a reader sorts. */
+    private void clickColumnHeader(int viewColumn) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            java.awt.Rectangle bounds =
+                    table.getTableHeader().getHeaderRect(viewColumn);
+            int x = bounds.x + bounds.width / 2;
+            int y = bounds.y + bounds.height / 2;
+            for (int id : new int[] {
+                    java.awt.event.MouseEvent.MOUSE_PRESSED,
+                    java.awt.event.MouseEvent.MOUSE_RELEASED,
+                    java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+                table.getTableHeader().dispatchEvent(
+                        new java.awt.event.MouseEvent(
+                                table.getTableHeader(), id,
+                                System.nanoTime() / 1_000_000, 0, x, y,
+                                1, false,
+                                java.awt.event.MouseEvent.BUTTON1));
+            }
+        });
+        flush();
+    }
+
+    /**
+     * A real drag on the real column header: pressed at one header
+     * cell, moved in steps a hand would make, released where the
+     * reader wants the column - Swing's own reordering in the loop.
+     */
+    private void dragColumnHeader(int fromView, int toView)
+            throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            var header = table.getTableHeader();
+            java.awt.Rectangle from = header.getHeaderRect(fromView);
+            java.awt.Rectangle to = header.getHeaderRect(toView);
+            int y = from.y + from.height / 2;
+            int startX = from.x + from.width / 2;
+            int endX = to.x + to.width / 2;
+            header.dispatchEvent(new java.awt.event.MouseEvent(header,
+                    java.awt.event.MouseEvent.MOUSE_PRESSED,
+                    System.nanoTime() / 1_000_000,
+                    java.awt.event.InputEvent.BUTTON1_DOWN_MASK,
+                    startX, y, 1, false,
+                    java.awt.event.MouseEvent.BUTTON1));
+            int steps = 12;
+            for (int i = 1; i <= steps; i++) {
+                int x = startX + (endX - startX) * i / steps;
+                header.dispatchEvent(new java.awt.event.MouseEvent(header,
+                        java.awt.event.MouseEvent.MOUSE_DRAGGED,
+                        System.nanoTime() / 1_000_000,
+                        java.awt.event.InputEvent.BUTTON1_DOWN_MASK,
+                        x, y, 1, false,
+                        java.awt.event.MouseEvent.BUTTON1));
+            }
+            header.dispatchEvent(new java.awt.event.MouseEvent(header,
+                    java.awt.event.MouseEvent.MOUSE_RELEASED,
+                    System.nanoTime() / 1_000_000, 0, endX, y, 1, false,
+                    java.awt.event.MouseEvent.BUTTON1));
+        });
+        flush();
+    }
+
+    /** Where the Chart column sits now, by its model identity. */
+    private int chartColumnViewIndex() throws Exception {
+        int[] view = {-1};
+        SwingUtilities.invokeAndWait(() -> {
+            for (int i = 0; i < table.getColumnModel()
+                    .getColumnCount(); i++) {
+                if (table.getColumnModel().getColumn(i)
+                        .getModelIndex() == 3) {
+                    view[0] = i;
+                    return;
+                }
+            }
+        });
+        return view[0];
+    }
+
+    /**
+     * The #257 rule, held in the running window: wherever the Chart
+     * column sits and whatever the text size, its width is at least
+     * its own measured need, so the compact words are never cut.
+     */
+    private void assertStateColumnKeepsItsMeasuredWidth()
+            throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            int measured = OnThisPageTable.stateColumnWidth(
+                    table.getFontMetrics(table.getFont()),
+                    table.getTableHeader().getFontMetrics(
+                            table.getTableHeader().getFont()));
+            javax.swing.table.TableColumn state = null;
+            for (int i = 0; i < table.getColumnModel()
+                    .getColumnCount(); i++) {
+                if (table.getColumnModel().getColumn(i)
+                        .getModelIndex() == 3) {
+                    state = table.getColumnModel().getColumn(i);
+                }
+            }
+            assertTrue(state != null && state.getWidth() >= measured,
+                    "the Chart column keeps its measured width by"
+                            + " model identity - " + (state == null
+                                    ? "missing"
+                                    : state.getWidth() + " px")
+                            + " against " + measured + " needed");
+        });
+    }
+
+    private static javax.swing.JDialog optionsDialog() {
+        for (java.awt.Window open : java.awt.Window.getWindows()) {
+            if (open instanceof javax.swing.JDialog dialog
+                    && dialog.isDisplayable()
+                    && "Chart Options".equals(dialog.getTitle())) {
+                return dialog;
+            }
+        }
+        return null;
+    }
+
+    private static javax.swing.JTabbedPane tabsIn(
+            java.awt.Component component) {
+        if (component instanceof javax.swing.JTabbedPane tabs) {
+            return tabs;
+        }
+        if (component instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                var found = tabsIn(child);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static javax.swing.JCheckBox box(java.awt.Component component,
+                                             String accessibleName) {
+        if (component instanceof javax.swing.JCheckBox checkBox
+                && accessibleName.equals(checkBox.getAccessibleContext()
+                        .getAccessibleName())) {
+            return checkBox;
+        }
+        if (component instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                var found = box(child, accessibleName);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static javax.swing.JButton button(java.awt.Component component,
+                                              String accessibleName) {
+        if (component instanceof javax.swing.JButton candidate
+                && accessibleName.equals(candidate.getAccessibleContext()
+                        .getAccessibleName())) {
+            return candidate;
+        }
+        if (component instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                var found = button(child, accessibleName);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     private static void flush() throws Exception {
