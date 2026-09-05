@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -253,7 +254,11 @@ class EclipticControlsJourneyTest {
                     new juranometria.chart.SelectionModel(), asked::add);
             EclipticStore store = EclipticStore.forNode(node);
             EclipticModule module = EclipticSession.begin(host);
-            EclipticSession.restore(module, store, null);
+            JMenuBar bar = AppMenuBar.create(null, null, () -> { },
+                    () -> { }, () -> { }, () -> { },
+                    EclipticSession.toggle(module, store));
+            EclipticSession.restore(module, store,
+                    AppMenuBar.eclipticItem(bar));
 
             ChartViewState where = chart.viewState();
             ChartOptions options = chart.chartOptions();
@@ -266,6 +271,43 @@ class EclipticControlsJourneyTest {
                     "and changes no chart option");
             assertEquals(List.of(), asked,
                     "and asks the chart to move nowhere");
+        });
+    }
+
+    @Test
+    void aLoadedModuleWithoutAControlIsRefused() throws Exception {
+        // The pairing that must not exist: a module that can draw,
+        // a remembered choice that says draw it, and nothing a
+        // reader could use to stop it (PR #279 round 3).
+        SwingSession.scratchPreferences("ecliptic-no-control", node -> {
+            EclipticStore store = EclipticStore.forNode(node);
+            store.save(true);
+            ChartComponent[] holder = new ChartComponent[1];
+            ChartComponent chart = chartOn(eclipticPage(), holder);
+            ChartModuleHost host = new ChartModuleHost(chart,
+                    new juranometria.chart.SelectionModel(),
+                    request -> { });
+            EclipticModule module = EclipticSession.begin(host);
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> EclipticSession.restore(module, store, null),
+                    "restoring a loaded module without a control is a"
+                            + " miswiring, not a configuration");
+            assertFalse(module.showing(),
+                    "and it is refused before anything is drawn, so"
+                            + " the refusal leaves no half-restored"
+                            + " chart behind");
+
+            // A bar built with no View menu has no item either, and
+            // is caught the same way rather than silently drawing.
+            JMenuBar noViewMenu = AppMenuBar.create(null, null, null,
+                    () -> { }, () -> { }, () -> { }, () -> { });
+            assertNull(AppMenuBar.eclipticItem(noViewMenu),
+                    "a bar with no View menu carries no item");
+            assertThrows(IllegalArgumentException.class,
+                    () -> EclipticSession.restore(module, store,
+                            AppMenuBar.eclipticItem(noViewMenu)),
+                    "and restoring against it is refused too");
         });
     }
 
@@ -499,8 +541,12 @@ class EclipticControlsJourneyTest {
                     new juranometria.chart.SelectionModel(),
                     request -> { });
             EclipticModule three = EclipticSession.begin(hostThree);
+            JMenuBar barThree = AppMenuBar.create(null, null, () -> { },
+                    () -> { }, () -> { }, () -> { },
+                    EclipticSession.toggle(three,
+                            EclipticStore.forNode(node)));
             EclipticSession.restore(three, EclipticStore.forNode(node),
-                    null);
+                    AppMenuBar.eclipticItem(barThree));
             assertFalse(three.showing(),
                     "hiding it again is a choice that survives too,"
                             + " and is not read back as never having"

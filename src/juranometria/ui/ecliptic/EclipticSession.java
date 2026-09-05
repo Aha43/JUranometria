@@ -68,9 +68,18 @@ public final class EclipticSession {
      * drive it, and deleting either statement left the other looking
      * right (PR #279 re-review).
      *
-     * @param item the Ecliptic menu item, or null in an atlas that
-     *     has no such item - which is what a build without the
-     *     module shows
+     * <p><strong>The item is required.</strong> An earlier version
+     * accepted null, on the reasoning that an atlas without the
+     * module has no such item - but a module being restored is a
+     * module that is loaded, and the pairing that allows is the one
+     * thing this must not permit: a remembered choice drawing the
+     * ecliptic on a reader's chart with no control anywhere to turn
+     * it off (PR #279 round 3). An atlas without the module does not
+     * reach here at all; one that does reach here has a control, or
+     * it is miswired.
+     *
+     * @param item the Ecliptic menu item, which a loaded module
+     *     always has
      */
     public static void restore(EclipticModule module,
                                EclipticStore store,
@@ -79,9 +88,14 @@ public final class EclipticSession {
             throw new IllegalArgumentException(
                     "a session restores a module from a store");
         }
-        module.showing(store.shownOrDefault());
-        if (item != null) {
-            item.setSelected(module.showing());
+        if (item == null) {
+            throw new IllegalArgumentException(
+                    "a loaded ecliptic module has a control: without"
+                            + " one, a remembered choice could draw"
+                            + " the ecliptic with no way for a reader"
+                            + " to turn it off");
         }
+        module.showing(store.shownOrDefault());
+        item.setSelected(module.showing());
     }
 }
