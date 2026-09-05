@@ -259,8 +259,12 @@ class SprintTwentyFourJourneyTest {
                 assertInstanceOf(Selection.Object.class,
                         selection.selection()).catalogueId(),
                 "the chart's own selection follows the lead");
-        assertEquals(1, heardSelections.size(),
-                "once, not once per marked object");
+        assertEquals(0, heardSelections.size(),
+                "and is not re-told at all: the lead was already the"
+                        + " answer - it led the marks the reader just"
+                        + " replaced - and a transition nobody could"
+                        + " observe is not delivered (#260's no-op"
+                        + " rule, at the lead bridge)");
 
         // The limit goes back up, which is a page change - so it is
         // counted after the assertion above rather than folded into

@@ -542,7 +542,8 @@ public final class PackagedAcceptanceMain {
                 + " entries, " + listed
                 + " rows, marked " + invisible.identity()
                 + " which the page does not draw, " + added
-                + " pixels of cross drawn at its own position,"
+                + " pixels of selection ink - its cross at its own"
+                + " position, the drawn member's ring - laid down,"
                 + " cleared to the byte, and a second session begins"
                 + " empty while wearing the reader's stored choice,"
                 + " with " + hidden + " objects hidden by it)");
