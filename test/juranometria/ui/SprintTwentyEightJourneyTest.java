@@ -126,8 +126,20 @@ class SprintTwentyEightJourneyTest {
             ChartViewController controller =
                     new ChartViewController(Atlas.assembler()::fits);
             ChartComponent chart = chart(ChartViewState.DEFAULT);
-            SwingUtilities.invokeAndWait(() ->
-                    controller.onChange(chart::setViewState));
+            AtlasToolbar[] toolbarHolder = new AtlasToolbar[1];
+            SwingUtilities.invokeAndWait(() -> {
+                controller.onChange(chart::setViewState);
+                // The real toolbar, because Home is a control a
+                // reader presses - calling the controller's method
+                // would skip the button that does it and whatever
+                // else that button does (PR #280 round 3).
+                toolbarHolder[0] = new AtlasToolbar(controller,
+                        new SearchField(new juranometria.search
+                                .LocalSearch(List.of(), List.of()),
+                                Atlas.assembler(), controller));
+            });
+            SwingUtilities.invokeAndWait(() -> { });
+            AtlasToolbar toolbar = toolbarHolder[0];
             BufferedImage home = paint(chart);
             SwingUtilities.invokeAndWait(() -> controller.recenter(
                     EQUINOX_PAGE.centre(),
@@ -410,10 +422,25 @@ class SprintTwentyEightJourneyTest {
                     chart.viewState().centre(),
                     "7. the reader is away from Home before pressing"
                             + " it, so the press has somewhere to go");
-            SwingUtilities.invokeAndWait(controller::reset);
+            javax.swing.JButton resetView = null;
+            for (java.awt.Component each : toolbar.getComponents()) {
+                if (each instanceof javax.swing.JButton button
+                        && "Reset view".equals(button
+                                .getAccessibleContext()
+                                .getAccessibleName())) {
+                    resetView = button;
+                }
+            }
+            assertTrue(resetView != null,
+                    "the toolbar carries the Reset view control");
+            assertTrue(resetView.isEnabled(),
+                    "and it is reachable rather than greyed");
+            javax.swing.JButton pressed = resetView;
+            SwingUtilities.invokeAndWait(pressed::doClick);
             SwingUtilities.invokeAndWait(() -> { });
             assertEquals(ChartViewState.DEFAULT, chart.viewState(),
-                    "and pressing Home returns the released view"
+                    "and pressing Reset view - the reader's own Home"
+                            + " control - returns the released view"
                             + " state");
 
             ChartComponent neverHadAModule =

@@ -26,6 +26,10 @@ for, in one production-path sequence. Every claim is asked of the
 module's own contribution or of the pixels the production painter
 put down; nothing reconstructs an expected line.
 
+*Driven through the production `ChartViewController` and the real
+`AtlasToolbar` throughout: the reader navigates and goes Home by the
+controls the application gives them.*
+
 1. **The released default, undisturbed.** A reader who has never
    asked opens with the ecliptic hidden. Loading the module changed
    **no pixel**, moved no page, and selected nothing.
@@ -53,8 +57,11 @@ put down; nothing reconstructs an expected line.
 6. **Put away, and remembered.** The page is the released page byte
    for byte; the store holds the choice *as a choice*; detaching
    leaves no contribution and exactly one preference key.
-7. **Home.** The default page equals the page drawn by an atlas that
-   never had the module at all.
+7. **Home.** The toolbar's **Reset view** button is pressed — the
+   reader's own Home control, not the method behind it — and the
+   released view state returns. The page equals one drawn by an
+   atlas that never had the module, and equals the page this walk
+   opened on.
 
 ## The required evidence, run and counted
 
@@ -192,7 +199,7 @@ chart would not need to change to accept them.
 
 ## Every review correction, by round
 
-Twenty-six findings across five gated issues. **Not one touched the
+Twenty-seven findings across five gated issues. **Not one touched the
 astronomy, the module design, the layering or the lifecycle** — the
 geometry was right from the first push of each issue. Every finding
 was about evidence.
@@ -237,7 +244,7 @@ fail; two statements the test repeated by hand; and a `null` the
 test found convenient, which allowed a loaded module with no
 control.
 
-**#275, this close — two rounds.** Four assertions in the closing
+**#275, this close — three rounds.** Four assertions in the closing
 journey that looked like they walked the journey and did not: it
 checked landmark geometry through the *static model* rather than
 the module's contributed and painted landmark; it counted the
@@ -256,6 +263,13 @@ it bypassed the toolbar's control and the controller's own reset
 path. The journey now runs through the production
 `ChartViewController` throughout and calls `reset()` — exactly what
 Reset view runs.
+
+And a third: calling `reset()` is still not *pressing* a control,
+which is what the step claimed. The journey now builds the real
+`AtlasToolbar` and clicks its **Reset view** button. That
+distinction is not pedantry — unwiring the button from `reset()`
+while leaving `reset()` correct is a defect only a real press can
+see, and it is now checked.
 
 ### What I got wrong about my own process
 
