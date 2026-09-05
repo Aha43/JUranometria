@@ -192,7 +192,7 @@ chart would not need to change to accept them.
 
 ## Every review correction, by round
 
-Twenty-five findings across five gated issues. **Not one touched the
+Twenty-six findings across five gated issues. **Not one touched the
 astronomy, the module design, the layering or the lifecycle** — the
 geometry was right from the first push of each issue. Every finding
 was about evidence.
@@ -237,7 +237,7 @@ fail; two statements the test repeated by hand; and a `null` the
 test found convenient, which allowed a loaded module with no
 control.
 
-**#275, this close — one round.** Four assertions in the closing
+**#275, this close — two rounds.** Four assertions in the closing
 journey that looked like they walked the journey and did not: it
 checked landmark geometry through the *static model* rather than
 the module's contributed and painted landmark; it counted the
@@ -249,6 +249,13 @@ through the walk itself, and a fifth defect surfaced while
 verifying them — the bare-line probe used to prove a landmark is a
 *mark* rather than the line through it was landing off the paper,
 where it counted zero and let the ratio pass for free.
+
+Then a second round: the Home step still *assigned*
+`ChartViewState.DEFAULT` rather than pressing the reader's Home, so
+it bypassed the toolbar's control and the controller's own reset
+path. The journey now runs through the production
+`ChartViewController` throughout and calls `reset()` — exactly what
+Reset view runs.
 
 ### What I got wrong about my own process
 
@@ -273,6 +280,14 @@ exposed a further defect.
 **I refuted my own risk note with arithmetic I never checked.** I
 raised the systematic-shift risk on the `±1` tolerance and dismissed
 it by claiming 11 and 5 "each fail their own bound". They do not.
+
+**A green test does not mean the edit landed.** Fixing the Home
+step, my edit silently failed to match and the journey went on
+passing — with the old assignment still in it. Only mutating
+`reset()` to do nothing, and finding that *nothing failed*, exposed
+that the fix was never applied. Verifying a fix by running the test
+proves the test still passes; verifying it by mutation proves the
+test now depends on the thing that was fixed.
 
 ## Residual risks, stated
 

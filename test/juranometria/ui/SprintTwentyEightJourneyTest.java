@@ -31,6 +31,7 @@ import juranometria.ui.ecliptic.EclipticStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -118,7 +119,25 @@ class SprintTwentyEightJourneyTest {
             List<NavigationRequest> asked = new ArrayList<>();
 
             // ---- 1. the released default, undisturbed ------------
-            ChartComponent chart = chart(EQUINOX_PAGE);
+            // Through the production controller, which is what the
+            // toolbar's Reset view drives - so Home at step 7 is the
+            // reader's own control rather than an assignment
+            // (PR #280 re-review).
+            ChartViewController controller =
+                    new ChartViewController(Atlas.assembler()::fits);
+            ChartComponent chart = chart(ChartViewState.DEFAULT);
+            SwingUtilities.invokeAndWait(() ->
+                    controller.onChange(chart::setViewState));
+            BufferedImage home = paint(chart);
+            SwingUtilities.invokeAndWait(() -> controller.recenter(
+                    EQUINOX_PAGE.centre(),
+                    EQUINOX_PAGE.fieldWidthDegrees()));
+            SwingUtilities.invokeAndWait(() -> { });
+            assertEquals(EQUINOX_PAGE.centre(),
+                    chart.viewState().centre(),
+                    "1. the reader navigates to the equinox page"
+                            + " through the controller the toolbar"
+                            + " drives");
             SelectionModel selection = new SelectionModel();
             ChartModuleHost host = new ChartModuleHost(chart, selection,
                     asked::add);
@@ -383,20 +402,29 @@ class SprintTwentyEightJourneyTest {
                             + java.util.Arrays.toString(node.keys()));
 
             // ---- 7. home, module-free ---------------------------
-            // This journey's own chart, taken Home - not two fresh
-            // ones compared with each other, which would have proved
-            // the atlas deterministic and nothing about the walk
-            // (PR #280 review).
-            SwingUtilities.invokeAndWait(() ->
-                    chart.setViewState(ChartViewState.DEFAULT));
+            // Home is PRESSED, not assigned: controller.reset() is
+            // exactly what the toolbar's Reset view runs, and an
+            // assignment bypasses the reader's control and the
+            // controller's own reset path (PR #280 re-review).
+            assertNotEquals(ChartViewState.DEFAULT.centre(),
+                    chart.viewState().centre(),
+                    "7. the reader is away from Home before pressing"
+                            + " it, so the press has somewhere to go");
+            SwingUtilities.invokeAndWait(controller::reset);
             SwingUtilities.invokeAndWait(() -> { });
+            assertEquals(ChartViewState.DEFAULT, chart.viewState(),
+                    "and pressing Home returns the released view"
+                            + " state");
+
             ChartComponent neverHadAModule =
                     chart(ChartViewState.DEFAULT);
             assertEquals(0, differences(paint(chart),
                             paint(neverHadAModule)),
-                    "7. and the chart this reader has been using all"
-                            + " along, taken Home, is the page an"
-                            + " atlas that never had the module draws");
+                    "and the chart this reader has been using all"
+                            + " along is the page an atlas that never"
+                            + " had the module draws");
+            assertEquals(0, differences(home, paint(chart)),
+                    "the same page it opened on, byte for byte");
         });
     }
 }
