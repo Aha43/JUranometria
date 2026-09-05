@@ -233,19 +233,57 @@ class EclipticTest {
     }
 
     @Test
-    void nothingHereCanReadALocaleAZoneOrAClock()
+    void theValuesThemselvesArePinned() {
+        // The model claims to be the same on every host. The honest
+        // way to hold that is the values, not an architecture scan:
+        // whatever any dependency does, these numbers are what the
+        // gate was approved on, and a drift anywhere - here, in
+        // SkyFrame, or in something either of them calls - fails
+        // here (PR #277 review).
+        assertEquals(23.43929111111111, Ecliptic.OBLIQUITY_DEGREES, 0.0,
+                "the J2000 mean obliquity, to the last bit");
+        assertEquals(270.0, Ecliptic.POLE.raDegrees(), 0.0,
+                "the ecliptic pole's right ascension");
+        assertEquals(66.56070888888888, Ecliptic.POLE.decDegrees(), 0.0,
+                "and its declination");
+
+        assertEquals(0.0, at("march-equinox").raDegrees(), 0.0);
+        assertEquals(0.0, at("march-equinox").decDegrees(), 0.0);
+        assertEquals(90.0, at("june-solstice").raDegrees(), 0.0);
+        assertEquals(23.439291111111107,
+                at("june-solstice").decDegrees(), 0.0);
+        assertEquals(180.0, at("september-equinox").raDegrees(), 0.0);
+        assertEquals(270.0, at("december-solstice").raDegrees(), 0.0);
+        assertEquals(-23.439291111111107,
+                at("december-solstice").decDegrees(), 0.0);
+        // The September equinox's declination is zero to within the
+        // last bits of a sine, not exactly zero, and pinning it to
+        // 0.0 would be pinning a lie.
+        assertEquals(0.0, at("september-equinox").decDegrees(), 1.0e-12,
+                "the September equinox is on the equator to the"
+                        + " precision a rotation can give");
+    }
+
+    private static SkyPosition at(String identity) {
+        return Ecliptic.landmark(identity).orElseThrow().at();
+    }
+
+    @Test
+    void theEclipticItselfRefersToNoLocaleZoneOrClock()
             throws java.io.IOException {
-        // The model states it is deterministic on every host. An
-        // earlier version of this test proved it by swapping the
-        // default locale and time zone, which meant a pure-geometry
-        // test mutating process-wide state - and the evidence gate
-        // rightly refused it, since a global touched outside the
-        // shared guard is a global that escapes one afternoon.
+        // What this proves and what it does not, stated exactly.
         //
-        // The constant pool answers the same question better: a class
-        // that cannot refer to a locale, a calendar, a formatter or a
-        // clock cannot vary with one. It is also the check the
-        // removable-model boundary already uses, for the same reason.
+        // It proves that Ecliptic's OWN code refers to no locale,
+        // calendar, formatter or clock - that the type is not written
+        // in terms of any of them. That is architecture evidence, and
+        // it is worth having.
+        //
+        // It does NOT prove host-independence transitively: Ecliptic
+        // calls SkyFrame, and something introduced behind that call
+        // would not appear in this constant pool (PR #277 review). An
+        // earlier version of this test claimed otherwise. The result
+        // is held instead by the pinned values above, by the SOFA
+        // fixture, and by the suite running on four platforms in CI.
         String pool = new String(java.nio.file.Files.readAllBytes(
                         java.nio.file.Path.of("build/classes",
                                 "juranometria/sky/Ecliptic.class")),
@@ -254,8 +292,7 @@ class EclipticTest {
                 "TimeZone", "Calendar", "java/text",
                 "currentTimeMillis", "nanoTime", "Random")) {
             assertTrue(!pool.contains(forbidden),
-                    "the ecliptic refers to no " + forbidden
-                            + ", so it cannot vary with one");
+                    "the ecliptic's own code refers to no " + forbidden);
         }
         assertTrue(pool.contains("juranometria/chart/SkyPosition"),
                 "and the scan is looking at the right class, which is"
@@ -263,27 +300,89 @@ class EclipticTest {
     }
 
     @Test
-    void thereIsNoWayToAskForTheEclipticOfDate() {
-        // The gate's central refusal, executed rather than promised:
-        // no method here takes an epoch, an instant or a date, so the
-        // rejected shortcut is not reachable from this type.
-        List<String> dated = java.util.Arrays.stream(
-                        Ecliptic.class.getDeclaredMethods())
-                .filter(method -> java.lang.reflect.Modifier
-                        .isPublic(method.getModifiers()))
-                .filter(method -> java.util.Arrays
-                        .stream(method.getParameterTypes())
-                        .anyMatch(type ->
-                                type.getName().contains("time")
-                                        || type.getName().contains("Date")
-                                        || type.getName()
-                                                .contains("Instant")))
-                .map(java.lang.reflect.Method::getName).sorted().toList();
-        assertEquals(List.of(), dated,
-                "no public method takes a date, an instant or an"
-                        + " epoch: the ecliptic of date is not"
-                        + " reachable from here");
-        assertNotEquals(0, Ecliptic.landmarks().size(),
-                "and the type is not empty, so that is an answer");
+    void thePublicSurfaceIsExactlyThisAndNothingCanAskForADate() {
+        // The gate's central refusal, executed rather than promised.
+        //
+        // An earlier version looked for parameter TYPES named after
+        // time - Instant, Date - and would have waved through
+        // `circle(double centuries)` or `toEquatorial(lon, lat,
+        // double epoch)`, which is precisely how SkyFrame represents
+        // an epoch today and precisely the mutation that matters
+        // (PR #277 review). A needle list cannot express "and nothing
+        // else"; an exact surface can.
+        //
+        // So the whole public API is pinned. Any new public route
+        // into this type - an epoch, a fidelity mode, anything -
+        // fails here and arrives by a reviewed change to this list.
+        assertEquals(List.of(
+                        "Coordinates toEcliptic(SkyPosition)",
+                        "GreatCircle circle()",
+                        "List landmarks()",
+                        "Optional landmark(String)",
+                        "SkyPosition toEquatorial(double, double)",
+                        "double latitudeDegrees(SkyPosition)"),
+                publicMethods(Ecliptic.class),
+                "the ecliptic's public surface, entire: no method"
+                        + " takes an epoch, a date, an instant or a"
+                        + " fidelity mode, in any type");
+
+        assertEquals(List.of(
+                        "SkyPosition POLE",
+                        "double OBLIQUITY_DEGREES"),
+                publicFields(Ecliptic.class),
+                "and its public constants, entire");
+
+        // The nested types are part of the surface too: a landmark
+        // that carried an epoch would be just as much a way to ask.
+        assertEquals(List.of(
+                        "SkyPosition at()",
+                        "String identity()",
+                        "String name()",
+                        "double longitudeDegrees()"),
+                publicMethods(Ecliptic.Landmark.class),
+                "a landmark is an identity, a name, a longitude and a"
+                        + " place - and carries no date");
+        assertEquals(List.of(
+                        "double latitudeDegrees()",
+                        "double longitudeDegrees()"),
+                publicMethods(Ecliptic.Coordinates.class),
+                "and a coordinate pair is two angles");
+
+        // There is also no way in through a constructor.
+        assertEquals(0, java.util.Arrays.stream(
+                        Ecliptic.class.getDeclaredConstructors())
+                        .filter(c -> java.lang.reflect.Modifier
+                                .isPublic(c.getModifiers()))
+                        .count(),
+                "the type is not constructed, so there is no epoch to"
+                        + " pass to it either");
+    }
+
+    /** Public methods as "Return name(Param, Param)", sorted. */
+    private static List<String> publicMethods(Class<?> type) {
+        return java.util.Arrays.stream(type.getDeclaredMethods())
+                .filter(m -> java.lang.reflect.Modifier
+                        .isPublic(m.getModifiers()))
+                // Records synthesise these; they are not surface a
+                // reviewer needs to pin.
+                .filter(m -> !List.of("equals", "hashCode", "toString")
+                        .contains(m.getName()))
+                .map(m -> m.getReturnType().getSimpleName() + " "
+                        + m.getName() + "("
+                        + java.util.Arrays.stream(m.getParameterTypes())
+                                .map(Class::getSimpleName)
+                                .collect(java.util.stream.Collectors
+                                        .joining(", "))
+                        + ")")
+                .sorted().toList();
+    }
+
+    /** Public fields as "Type NAME", sorted by name. */
+    private static List<String> publicFields(Class<?> type) {
+        return java.util.Arrays.stream(type.getDeclaredFields())
+                .filter(f -> java.lang.reflect.Modifier
+                        .isPublic(f.getModifiers()))
+                .map(f -> f.getType().getSimpleName() + " " + f.getName())
+                .sorted().toList();
     }
 }
