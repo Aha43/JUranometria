@@ -83,7 +83,8 @@ of which **15** state a focus premise and **15** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
-premises stated.)
+premises stated; #261 added the working-selection surfaces
+journey, through the shared routes with both premises.)
 
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
@@ -150,7 +151,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **325
-reads of live chart state** against **489 explicit hand-offs**
+reads of live chart state** against **490 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline). The discipline that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change

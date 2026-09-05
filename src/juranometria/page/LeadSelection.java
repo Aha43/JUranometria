@@ -59,11 +59,18 @@ public final class LeadSelection {
                             + " and a page");
         }
         // Session-only resolution memory: identity to the selectable
-        // object the page reported, learned whenever a member is on
-        // the page. Derived presentation data, never membership.
+        // object the page reported - or the answering model itself
+        // answered, which is how a star the catalogue does not name
+        // is remembered, since no inventory lists it. Derived
+        // presentation data, never membership.
         java.util.Map<String, Selection.Object> known =
                 new java.util.HashMap<>();
-        return working.onChange(change -> {
+        Runnable releaseAnswers = selection.onChange(change -> {
+            if (change.selection() instanceof Selection.Object object) {
+                known.put(object.catalogueId(), object);
+            }
+        });
+        Runnable releaseLeads = working.onChange(change -> {
             PageContents contents = page.get();
             for (String member : change.members()) {
                 selectable(contents, member)
@@ -90,6 +97,10 @@ public final class LeadSelection {
                 selection.clear();
             }
         });
+        return () -> {
+            releaseLeads.run();
+            releaseAnswers.run();
+        };
     }
 
     /** The lead, as the chart's own idea of a selected object. */

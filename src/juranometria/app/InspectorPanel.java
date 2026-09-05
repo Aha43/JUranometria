@@ -471,6 +471,11 @@ public final class InspectorPanel extends JPanel {
                     "the section needs the working selection and the"
                             + " page it is judged against");
         }
+        if (this.working != null) {
+            throw new IllegalStateException(
+                    "the working set is wired once: a second wiring"
+                            + " would double every control's action");
+        }
         this.working = working;
         this.pageContents = pageContents;
         clearSelection.getAccessibleContext().setAccessibleName(
@@ -508,8 +513,14 @@ public final class InspectorPanel extends JPanel {
             juranometria.page.PageContents page = pageContents.get();
             for (String member : members) {
                 boolean leads = member.equals(working.lead());
-                boolean offPage = page == null
-                        || page.find(member).isEmpty();
+                // The inventory answers for everything it lists; a
+                // star the catalogue does not name is on no list,
+                // but the assembled page still knows it - and "off
+                // this page" must not be said of a star whose ring
+                // is in front of the reader.
+                boolean offPage = (page == null
+                        || page.find(member).isEmpty())
+                        && !sceneHoldsStar(member);
                 workingSet.add(memberRow(member, leads, offPage));
                 workingSetTexts.add((leads ? "◉ " : "") + member
                         + (offPage ? " — off this page" : ""));
@@ -522,6 +533,20 @@ public final class InspectorPanel extends JPanel {
         workingSet.repaint();
         revalidate();
         repaint();
+    }
+
+    /** Whether the assembled page carries this star, named or not. */
+    private boolean sceneHoldsStar(String identity) {
+        ChartScene scene = currentScene.get();
+        if (scene == null) {
+            return false;
+        }
+        for (Star star : scene.stars()) {
+            if (star.id().equals(identity)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** One member's row: lead mark, name, off-page word, remove. */
