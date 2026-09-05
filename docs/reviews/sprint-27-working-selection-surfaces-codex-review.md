@@ -66,3 +66,25 @@ notification and edits no membership. The header-driven regression completes
 an additive range, sorts, and proves that the next Shift range snapshots the
 post-sort working set, retaining its members and joining order. Both original
 findings are closed; no findings remain for #261.
+
+## Post-approval review: [P1] The display table tests still click an unreachable component
+
+The shared modifier fallback at `9380294` correctly keeps headless chart
+gestures from asking a headless toolkit for a platform menu modifier. Moving
+`WorkingSelectionTableGestureTest` to the display corpus is also justified by
+Swing's own table UI asking that question. But the fixture still deliberately
+puts the table in no window. Its new assertion checks only that the point is
+inside `table.getVisibleRect()`; a sized component that is not showing has a
+local visible rectangle too. Every dispatched press therefore remains a click
+no reader could make, now wearing a display assumption and a reachability pin.
+This is the precise premise gap #243's shared `ReaderInput.click` route was
+created to close.
+
+Show the fixture in a real window, wait for layout, and route its pointer
+gestures — rows and column header — through `ReaderInput.click`, which proves
+showing, size, and the actual point inside the visible rectangle before
+dispatch. Dispose the window in the fixture's existing close path. Keep the
+headless assumption because the table UI genuinely requires a toolkit, and
+require the full display run to execute the class with zero aborts. A mutation
+that omits showing the window must fail on the shared premise, so the new
+display classification cannot become ceremonial.
