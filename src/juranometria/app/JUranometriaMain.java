@@ -131,8 +131,7 @@ public final class JUranometriaMain {
         juranometria.ui.ecliptic.EclipticStore eclipticStore =
                 juranometria.ui.ecliptic.EclipticStore.user();
         juranometria.ecliptic.EclipticModule ecliptic =
-                juranometria.ui.ecliptic.EclipticSession.begin(
-                        modules, eclipticStore);
+                juranometria.ui.ecliptic.EclipticSession.begin(modules);
         inspector.showPageView(onThisPage.panel());
         inspector.onClose(chart::requestFocusInWindow);
         // One switch, three ways to reach it: the toolbar button, the
@@ -166,11 +165,11 @@ public final class JUranometriaMain {
                 // a reader sets off.
                 juranometria.ui.ecliptic.EclipticSession.toggle(
                         ecliptic, eclipticStore)));
-        javax.swing.JCheckBoxMenuItem eclipticItem =
-                AppMenuBar.eclipticItem(frame.getJMenuBar());
-        if (eclipticItem != null) {
-            eclipticItem.setSelected(ecliptic.showing());
-        }
+        // One call, so the chart and the tick cannot disagree about
+        // what the reader last chose.
+        juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
+                eclipticStore,
+                AppMenuBar.eclipticItem(frame.getJMenuBar()));
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

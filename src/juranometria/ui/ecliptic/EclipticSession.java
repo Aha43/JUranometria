@@ -48,20 +48,40 @@ public final class EclipticSession {
     }
 
     /**
-     * Attaches the module and restores the reader's choice.
+     * Attaches the module, showing nothing.
      *
-     * <p>The store is read exactly once, here. Nothing else in the
-     * session consults it, so there is one place where a remembered
-     * choice becomes a drawn chart.
+     * <p>Attaching alone must change no page, so the module arrives
+     * hidden and stays hidden until {@link #restore} says otherwise.
      */
-    public static EclipticModule begin(ChartModuleHost modules,
-                                       EclipticStore store) {
-        if (store == null) {
+    public static EclipticModule begin(ChartModuleHost modules) {
+        return modules.attach(new EclipticModule());
+    }
+
+    /**
+     * Turns a remembered choice into both a drawn chart and a shown
+     * tick - in one place.
+     *
+     * <p>The store is read exactly once, here, and both things that
+     * have to agree about it are set from that one read. An earlier
+     * version restored the module in one statement and the tick in
+     * another, so a test could only rehearse the pairing rather than
+     * drive it, and deleting either statement left the other looking
+     * right (PR #279 re-review).
+     *
+     * @param item the Ecliptic menu item, or null in an atlas that
+     *     has no such item - which is what a build without the
+     *     module shows
+     */
+    public static void restore(EclipticModule module,
+                               EclipticStore store,
+                               javax.swing.JCheckBoxMenuItem item) {
+        if (module == null || store == null) {
             throw new IllegalArgumentException(
-                    "a session restores from a store");
+                    "a session restores a module from a store");
         }
-        EclipticModule module = modules.attach(new EclipticModule());
         module.showing(store.shownOrDefault());
-        return module;
+        if (item != null) {
+            item.setSelected(module.showing());
+        }
     }
 }

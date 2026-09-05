@@ -202,17 +202,22 @@ class EclipticControlsJourneyTest {
             ChartModuleHost host = new ChartModuleHost(chart,
                     new juranometria.chart.SelectionModel(),
                     request -> { });
-            EclipticModule module = EclipticSession.begin(host, store);
+            EclipticModule module = EclipticSession.begin(host);
             BufferedImage hidden = paint(chart);
 
             JMenuBar bar = AppMenuBar.create(null, null, () -> { },
                     () -> { }, () -> { }, () -> { },
                     EclipticSession.toggle(module, store));
             JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
-            item.setSelected(module.showing());
+            // Production's own restore, not a rehearsal of it: one
+            // call sets both the chart and the tick from one read of
+            // the store.
+            EclipticSession.restore(module, store, item);
             assertFalse(item.isSelected(),
                     "the item starts out showing the released"
                             + " default, which is hidden");
+            assertFalse(module.showing(),
+                    "and so does the chart");
 
             item.doClick();
             assertTrue(module.showing(),
@@ -247,7 +252,8 @@ class EclipticControlsJourneyTest {
             ChartModuleHost host = new ChartModuleHost(chart,
                     new juranometria.chart.SelectionModel(), asked::add);
             EclipticStore store = EclipticStore.forNode(node);
-            EclipticModule module = EclipticSession.begin(host, store);
+            EclipticModule module = EclipticSession.begin(host);
+            EclipticSession.restore(module, store, null);
 
             ChartViewState where = chart.viewState();
             ChartOptions options = chart.chartOptions();
@@ -447,12 +453,18 @@ class EclipticControlsJourneyTest {
             ChartModuleHost hostOne = new ChartModuleHost(chartOne,
                     new juranometria.chart.SelectionModel(),
                     request -> { });
-            EclipticModule one = EclipticSession.begin(hostOne, store);
+            EclipticModule one = EclipticSession.begin(hostOne);
+            JMenuBar barOne = AppMenuBar.create(null, null, () -> { },
+                    () -> { }, () -> { }, () -> { },
+                    EclipticSession.toggle(one, store));
+            JCheckBoxMenuItem itemOne = AppMenuBar.eclipticItem(barOne);
+            EclipticSession.restore(one, store, itemOne);
             assertFalse(one.showing(),
                     "a first session begins with the released"
                             + " default, hidden");
-            one.showing(true);
-            store.save(true);
+            assertFalse(itemOne.isSelected(),
+                    "and its tick says so");
+            itemOne.doClick();
             store.flush();
 
             // A genuine second session: fresh chart, fresh host,
@@ -463,23 +475,33 @@ class EclipticControlsJourneyTest {
             ChartModuleHost hostTwo = new ChartModuleHost(chartTwo,
                     new juranometria.chart.SelectionModel(),
                     request -> { });
-            EclipticModule two = EclipticSession.begin(hostTwo,
-                    EclipticStore.forNode(node));
+            EclipticModule two = EclipticSession.begin(hostTwo);
+            JMenuBar barTwo = AppMenuBar.create(null, null, () -> { },
+                    () -> { }, () -> { }, () -> { },
+                    EclipticSession.toggle(two,
+                            EclipticStore.forNode(node)));
+            JCheckBoxMenuItem itemTwo = AppMenuBar.eclipticItem(barTwo);
+            EclipticSession.restore(two, EclipticStore.forNode(node),
+                    itemTwo);
             assertTrue(two.showing(),
                     "and the second session draws what the first one"
                             + " chose");
+            assertTrue(itemTwo.isSelected(),
+                    "with the tick showing it, from the same one read"
+                            + " of the store");
 
             // And the reader can put it back, and that survives too.
-            two.showing(false);
-            EclipticStore.forNode(node).save(false);
+            itemTwo.doClick();
             EclipticStore.forNode(node).flush();
             ChartComponent[] third = new ChartComponent[1];
             ChartComponent chartThree = chartOn(eclipticPage(), third);
             ChartModuleHost hostThree = new ChartModuleHost(chartThree,
                     new juranometria.chart.SelectionModel(),
                     request -> { });
-            assertFalse(EclipticSession.begin(hostThree,
-                            EclipticStore.forNode(node)).showing(),
+            EclipticModule three = EclipticSession.begin(hostThree);
+            EclipticSession.restore(three, EclipticStore.forNode(node),
+                    null);
+            assertFalse(three.showing(),
                     "hiding it again is a choice that survives too,"
                             + " and is not read back as never having"
                             + " chosen");
