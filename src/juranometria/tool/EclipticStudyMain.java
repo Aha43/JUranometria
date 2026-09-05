@@ -179,18 +179,34 @@ public final class EclipticStudyMain {
                 + " candidate *is* the J2000 candidate there — which is"
                 + " the check that the two are being read in one frame.");
         p("");
+        p("**The dates are UTC, and SOFA's `iauEcm06` and `iauObl06`"
+                + " take TT.** No conversion is applied. What follows"
+                + " is a **sensitivity experiment**, not the"
+                + " conversion: no single offset is the true one for"
+                + " all five dates, because UTC did not exist in 1900"
+                + " and the leap seconds after today have not been"
+                + " decided (PR #276 round 3).");
+        p("");
+        p("| date shifted by | worst displacement | against the 0.06″ tolerance |");
+        p("|---|---:|---:|");
         p(String.format(Locale.ROOT,
-                "**The dates are UTC, and SOFA's `iauEcm06` and"
-                        + " `iauObl06` take TT.** No conversion is"
-                        + " applied, and the price is measured rather"
-                        + " than waved away: advancing each date by the"
-                        + " present TT−UTC of 69.184 s moves these"
-                        + " directions by at most **%.6f″** — about"
-                        + " %.0f times below the 0.06″ the"
-                        + " implementation is held to, and far below a"
-                        + " pixel at any field. It cannot affect the"
-                        + " decision (PR #276 round 2).",
-                timeScaleCost(), 0.06 / timeScaleCost()));
+                "| %.3f s — today's TT−UTC | %.6f″ | %.0f× smaller |",
+                SHIFT_TODAY, shiftCost(SHIFT_TODAY),
+                0.06 / shiftCost(SHIFT_TODAY)));
+        p(String.format(Locale.ROOT,
+                "| %.0f s — an allowance over 1900–2100 | %.6f″ | %.0f× smaller |",
+                SHIFT_ALLOWANCE, shiftCost(SHIFT_ALLOWANCE),
+                0.06 / shiftCost(SHIFT_ALLOWANCE)));
+        p("");
+        p("The second row is an **allowance, not a bound**: ΔT was"
+                + " near zero around 1900, is about 69 s now, and"
+                + " published projections for 2100 are of order 200 s"
+                + " with wide uncertainty. 300 s is chosen to sit above"
+                + " all of that; no maximum beyond it is claimed, and"
+                + " the atlas ships no ΔT table. Even so the"
+                + " displacement stays two orders of magnitude below"
+                + " the tolerance, so **no time-scale choice available"
+                + " here can affect the decision**.");
         p("");
         p("So a naive of-date *line* would look nearly right, and only"
                 + " the **equinox landmark** betrays a wrong frame."
@@ -387,15 +403,22 @@ public final class EclipticStudyMain {
         return rows;
     }
 
-    /** What passing UTC dates to SOFA's TT routines costs, measured. */
-    private static double timeScaleCost() throws Exception {
+    /** Today's TT-UTC, and an allowance over 1900-2100. */
+    private static final double SHIFT_TODAY = 69.184;
+    private static final double SHIFT_ALLOWANCE = 300.0;
+
+    /** How far a date shift of this many seconds moves the axes. */
+    private static double shiftCost(double seconds) throws Exception {
         for (String line : Files.readAllLines(ORACLE)) {
-            if (line.startsWith("utc_as_tt_worst_arcsec")) {
-                return Double.parseDouble(line.trim().split("\\s+")[1]);
+            if (line.startsWith("timescale_shift_arcsec")) {
+                String[] f = line.trim().split("\\s+");
+                if (Math.abs(Double.parseDouble(f[1]) - seconds) < 1e-6) {
+                    return Double.parseDouble(f[2]);
+                }
             }
         }
         throw new IllegalStateException(
-                "the oracle records no time-scale cost");
+                "the oracle records no shift of " + seconds + " s");
     }
 
     /** SOFA's own J2000 ecliptic pole, in ICRS. */

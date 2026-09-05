@@ -68,12 +68,25 @@ the J2000 candidate there — which is the check that the two are being
 read in one frame.
 
 **The dates are UTC; SOFA's `iauEcm06` and `iauObl06` take TT.** No
-conversion is applied, and the price is measured rather than left to
-look like it was not there: advancing every date by the present
-TT−UTC of 69.184 s moves these directions by at most **0.000110″** —
-about 540 times below the 0.06″ the implementation is held to, and
-far below a pixel at any field (PR #276 round 2). The generator
-computes this and the fixture records it.
+conversion is applied. What the generator records is a **sensitivity
+experiment**, and it is labelled as one rather than as the price of
+the omission: no single offset *is* the conversion for all five
+dates, because UTC did not exist in 1900 and the leap seconds after
+today have not been decided (PR #276 round 3).
+
+| date shifted by | worst displacement | against the 0.06″ tolerance |
+|---|---:|---:|
+| 69.184 s — today's TT−UTC | 0.000110″ | 544× smaller |
+| 300 s — an allowance over 1900–2100 | 0.000478″ | 125× smaller |
+
+The second row is an **allowance, not a bound** — the distinction
+place-and-time's gate already draws for polar motion. ΔT was near
+zero around 1900, is about 69 s now, and published projections for
+2100 are of order 200 s with wide uncertainty; 300 s is chosen to sit
+above all of that, and no maximum beyond it is claimed. The atlas
+ships no ΔT table and needs none: even at 300 s the displacement is
+two orders of magnitude below the tolerance, so **no time-scale
+choice available here can affect this decision**.
 
 The **plane barely moves**: the of-date pole stays under an arcminute
 from the J2000 pole across two centuries. The **equinox slides**

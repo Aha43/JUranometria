@@ -43,15 +43,29 @@ static void ecliptic_axis(double d1, double d2, int axis,
 }
 
 /* SOFA's iauEcm06 and iauObl06 take TT.  The dates below are stated
-   in UTC, and passed through unconverted.  This measures what that
-   costs: the same direction computed with the date advanced by the
-   present TT-UTC of 69.184 s, against the same direction without it.
-   The larger of the two axes is returned, in arcseconds. */
-#define TT_MINUS_UTC_SECONDS 69.184
+   in UTC and passed through unconverted.
 
-static double utc_as_tt_arcsec(double d1, double d2) {
+   This is a SENSITIVITY EXPERIMENT, not a conversion.  It moves the
+   date by a fixed number of seconds and measures how far the two
+   ecliptic axes travel.  It is deliberately not called the cost of
+   omitting UTC->TT: UTC did not exist in 1900, and TAI-UTC after
+   today depends on leap-second decisions nobody has taken yet, so no
+   single offset is the conversion for all five dates (PR #276 round
+   3).
+
+   Two shifts are reported.  69.184 s is today's actual TT-UTC
+   (32.184 + 37 leap seconds), which makes the experiment concrete.
+   300 s is an ALLOWANCE chosen to sit above delta-T across
+   1900-2100: it was near zero around 1900, is about 69 s now, and
+   published projections for 2100 are of order 200 s with wide
+   uncertainty.  No maximum beyond 300 s is claimed, and the atlas
+   ships no delta-T table.
+
+   The larger displacement of the two axes is returned, in
+   arcseconds. */
+static double shift_arcsec(double d1, double d2, double seconds) {
     double a[3], b[3], worst = 0.0, apart;
-    double shifted = d2 + TT_MINUS_UTC_SECONDS / 86400.0;
+    double shifted = d2 + seconds / 86400.0;
     for (int axis = 0; axis < 3; axis += 2) {   /* equinox, then pole */
         ecliptic_axis_vector(d1, d2, axis, a);
         ecliptic_axis_vector(d1, shifted, axis, b);
@@ -63,7 +77,11 @@ static double utc_as_tt_arcsec(double d1, double d2) {
     return worst;
 }
 
-static double worst_time_scale = 0.0;
+#define SHIFT_TODAY 69.184
+#define SHIFT_ALLOWANCE 300.0
+
+static double worst_today = 0.0;
+static double worst_allowance = 0.0;
 
 static void candidate(const char *iso, int y, int m, int d,
                       int hh, int mm, int ss) {
@@ -77,9 +95,13 @@ static void candidate(const char *iso, int y, int m, int d,
     ecliptic_axis(djm0, d2, 0, &era, &edec); /* mean equinox of date   */
 
     {
-        double cost = utc_as_tt_arcsec(djm0, d2);
-        if (cost > worst_time_scale) {
-            worst_time_scale = cost;
+        double today = shift_arcsec(djm0, d2, SHIFT_TODAY);
+        double allowance = shift_arcsec(djm0, d2, SHIFT_ALLOWANCE);
+        if (today > worst_today) {
+            worst_today = today;
+        }
+        if (allowance > worst_allowance) {
+            worst_allowance = allowance;
         }
     }
 
@@ -120,10 +142,15 @@ int main(void) {
     printf("#     equatorial direction of an ecliptic-frame direction, via the\n");
     printf("#     J2000 ecliptic matrix (iauEcm06), degrees.\n");
     printf("#   eclpole <ra_j2000> <dec_j2000> : the J2000 ecliptic north pole.\n");
-    printf("#   utc_as_tt_worst_arcsec : what passing these UTC dates to\n");
-    printf("#     SOFA's TT-based routines costs, at the worst of the dates\n");
-    printf("#     and axes below. The dates are UTC; no TT conversion is\n");
-    printf("#     applied, and this is the price of that.\n");
+    printf("#   timescale_shift_arcsec <seconds> <worst> : a SENSITIVITY\n");
+    printf("#     experiment, not a conversion. Moving every date below by\n");
+    printf("#     <seconds> displaces the ecliptic axes by at most <worst>\n");
+    printf("#     arcseconds. The dates are UTC and are passed to SOFA's\n");
+    printf("#     TT-based routines unconverted; no single offset is the\n");
+    printf("#     true conversion for all of them, because UTC did not exist\n");
+    printf("#     in 1900 and future leap seconds are undecided. 69.184 s is\n");
+    printf("#     today's TT-UTC; 300 s is an allowance above delta-T across\n");
+    printf("#     1900-2100, beyond which no maximum is claimed.\n");
     printf("#   ofdate <iso> <eps_of_date> <pole_ra> <pole_dec> <equinox_ra>\n");
     printf("#     <equinox_dec> : the rival candidate - the MEAN ecliptic and\n");
     printf("#     equinox OF DATE - expressed in the same ICRS/J2000 frame.\n");
@@ -160,6 +187,9 @@ int main(void) {
     candidate("2026-03-20T21:33:00Z", 2026, 3, 20, 21, 33, 0);
     candidate("2050-07-04T03:00:00Z", 2050, 7, 4, 3, 0, 0);
     candidate("2100-01-01T00:00:00Z", 2100, 1, 1, 0, 0, 0);
-    printf("utc_as_tt_worst_arcsec %.9f\n", worst_time_scale);
+    printf("timescale_shift_arcsec %.3f %.9f\n",
+           SHIFT_TODAY, worst_today);
+    printf("timescale_shift_arcsec %.3f %.9f\n",
+           SHIFT_ALLOWANCE, worst_allowance);
     return 0;
 }
