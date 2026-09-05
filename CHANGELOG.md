@@ -7,6 +7,28 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-09-05
+
+Sprint 27 — Sirius: Use the atlas. The sprint the atlas went
+public and grew its first cross-page reader state, cut as a minor
+release. The gallery is live at
+https://aha43.github.io/JUranometria/ — nine curated slides in
+three rooms, self-contained, navigable by keyboard and readable
+with JavaScript off, under a least-privilege main-only deployment.
+On the chart, a reader now builds a **working selection** that
+survives navigation: chart clicks, table rows and search feed one
+session set with one lead, gestures accumulate through the visible
+**Accumulate** control or the platform's own modifier, the
+Inspector's **Working set** section lists every member across
+pages with off-page members labelled in words, and each drawn
+member wears the chart's existing ring while each on-page undrawn
+member wears the existing cross — never both, nothing off-page.
+The On-this-page **Chart** column earned its width with five
+compact words that sort by meaning. Nothing about the selection is
+ever persisted — every session begins empty by decision — the
+ordinary chart is byte-identical throughout, and an upgrading
+reader keeps every choice they had.
+
 ### Added
 
 - **The working selection across every reader surface** (Sprint 27,
@@ -61,6 +83,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   study photographs today's two leads disagreeing and previews the
   decided presentation through unchanged production painters.
   Production behaviour is untouched by this gate.
+- **The public atlas gallery, live** (Sprint 27, issue #253). The
+  curated gallery is published at
+  https://aha43.github.io/JUranometria/ through GitHub Pages: a
+  self-contained artifact generated from the one manifest, its
+  images byte-identical to the repository's reviewed evidence,
+  deployed by a main-only workflow holding only the two
+  permissions Pages needs, with `main` the sole branch the
+  environment accepts. Keyboard navigation rides plain
+  previous/next links (the one small script only saves reaching
+  for the pointer), and the downloads link points at the immutable
+  release tag.
 - **The public atlas gallery, decided and curated** (Sprint 27,
   issue #252). Nine slides in three rooms — Core chart, On This
   Page, Place and Time — under `docs/gallery/`: one manifest
@@ -73,7 +106,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   committed artifact showed working crosses — the study previews
   were rejected rather than promoted, and the rule is now executable
   in the gallery test. UI photographs appear only labelled
-  "Application UI". Publication itself waits for issue #253
+  "Application UI". Publication followed as issue #253
   (docs/decisions/gallery.md).
 
 ### Changed
