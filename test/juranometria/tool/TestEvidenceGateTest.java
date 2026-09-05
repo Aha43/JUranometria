@@ -249,16 +249,22 @@ class TestEvidenceGateTest {
                 .map(TestEvidenceScan.File::path).sorted().toList();
         assertEquals(List.of(
                         "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
+                        "src/juranometria/tool/EclipticCandidateStudyMain.java",
+                        "src/juranometria/tool/EclipticControlStudyMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the five widget photographers, whose font setting"
+                "the seven widget photographers, whose font setting"
                         + " dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
-                        + " exactly that route (#258's gate)");
+                        + " exactly that route (#258's gate), and the"
+                        + " sixth and seventh by #271's - the ecliptic"
+                        + " control mock-up, and the candidate study,"
+                        + " which sets the font only to show that"
+                        + " enlarged text does not reach the chart");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------

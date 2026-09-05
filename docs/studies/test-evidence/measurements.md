@@ -58,13 +58,15 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | executable | touches | protection |
 |---|---|---|
 | src/juranometria/tool/DeepSkyVocabularyMockupMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
+| src/juranometria/tool/EclipticCandidateStudyMain.java | default-font | UNPROTECTED: default-font |
+| src/juranometria/tool/EclipticControlStudyMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeControlsMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeDialogStudyMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/WorkingSelectionMockupMain.java | default-font | UNPROTECTED: default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | preferences | protected-locally |
 
-**6 evidence executables** touch process-wide state; 5 carry an unpaired touch.
+**8 evidence executables** touch process-wide state; 7 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -122,15 +124,17 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 10 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 2 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 11 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 4 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 184 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 34 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 210 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
+- docs/studies/ecliptic/reference-vectors.txt
 - docs/studies/place-and-time/reference-vectors.txt
+- scripts/ecliptic-vectors.c
 - scripts/reference-vectors.c
 
 The captured evidence (operating-system screenshots; provenance in the decision document that committed them):
@@ -166,6 +170,11 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/deep-sky-vocabulary/tab-chart.png
 - docs/studies/deep-sky-vocabulary/tab-constellations.png
 - docs/studies/deep-sky-vocabulary/tab-stars.png
+- docs/studies/ecliptic/controls-view-menu-dark-enlarged.png
+- docs/studies/ecliptic/controls-view-menu-dark.png
+- docs/studies/ecliptic/controls-view-menu-default.png
+- docs/studies/ecliptic/controls-view-menu-enlarged.png
+- docs/studies/ecliptic/controls-view-menu.png
 - docs/studies/on-this-page/sidebar-dense-enlarged.png
 - docs/studies/on-this-page/sidebar-dense.png
 - docs/studies/on-this-page/sidebar-empty.png
