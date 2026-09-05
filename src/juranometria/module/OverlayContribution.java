@@ -56,7 +56,56 @@ public sealed interface OverlayContribution {
         LINE,
 
         /** The boundary of what can be seen of it. */
-        BOUNDARY
+        BOUNDARY,
+
+        /**
+         * A permanent circle of the celestial sphere: true for every
+         * observer and every date.
+         *
+         * <p>The Sprint 28 gate's one addition to this vocabulary
+         * (docs/decisions/ecliptic.md). A meridian belongs to a place
+         * and a moment; a horizon bounds what one observer can see;
+         * this belongs to the frame itself and to nobody. Drawing it
+         * in the meridian's stroke made the two indistinguishable on
+         * a page carrying both, which the gate's candidate pages
+         * showed.
+         *
+         * <p>Like the other two, it says what the geometry <em>is</em>
+         * and never what it looks like. It is deliberately not named
+         * for the ecliptic: a module drawing the galactic equator
+         * would say exactly this.
+         */
+        PERMANENT
+    }
+
+    /**
+     * What a contributed point <em>is</em>, so the chart can decide
+     * what it looks like.
+     *
+     * <p>The Sprint 28 gate's second addition, and it exists for the
+     * same reason as {@link Reference}: the chart drew every
+     * reference point as the zenith's ring and upward tick, and the
+     * tick means <em>overhead</em>. An equinox is not overhead. A
+     * shared Java type did not make that cartographic meaning
+     * generic, and only the module knows which kind it is offering.
+     *
+     * <p>Consulted only for {@link InkRole#REFERENCE_LINE}. A working
+     * mark is inked by its role, and its kind says nothing.
+     */
+    enum Mark {
+
+        /**
+         * A place an observer stands under or faces: it has an up.
+         * The zenith is one; nothing else so far is.
+         */
+        PLACE,
+
+        /**
+         * A distinguished position <em>on</em> a reference line, with
+         * no orientation of its own - an equinox, a solstice, or the
+         * galactic centre on a galactic equator.
+         */
+        LANDMARK
     }
 
     /**
@@ -91,7 +140,7 @@ public sealed interface OverlayContribution {
 
     /** A single place on the sky. */
     record Point(String identity, String accessibleName, SkyPosition at,
-                 InkRole role) implements OverlayContribution {
+                 Mark mark, InkRole role) implements OverlayContribution {
 
         public Point {
             requireIdentified(identity, accessibleName, role);
@@ -99,6 +148,25 @@ public sealed interface OverlayContribution {
                 throw new IllegalArgumentException(
                         "a point is somewhere: " + identity);
             }
+            if (mark == null) {
+                throw new IllegalArgumentException(
+                        "a point says what kind of place it is: "
+                                + identity);
+            }
+        }
+
+        /**
+         * A point whose kind is a {@link Mark#PLACE}.
+         *
+         * <p>For the working-mark role, where the kind is not
+         * consulted at all: a mark a reader put on the chart is inked
+         * by its role, and asking every caller to classify it would
+         * be ceremony for a question the chart does not ask. The
+         * reference role states its kind explicitly.
+         */
+        public Point(String identity, String accessibleName,
+                     SkyPosition at, InkRole role) {
+            this(identity, accessibleName, at, Mark.PLACE, role);
         }
     }
 

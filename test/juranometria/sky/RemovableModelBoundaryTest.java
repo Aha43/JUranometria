@@ -79,7 +79,7 @@ class RemovableModelBoundaryTest {
         List<String> offenders = new ArrayList<>();
         for (String pkg : List.of("juranometria/sky",
                 "juranometria/project", "juranometria/meridian",
-                "juranometria/module")) {
+                "juranometria/ecliptic", "juranometria/module")) {
             for (Path type : classesIn(pkg)) {
                 for (String forbidden : refersTo(type, forbiddenIn(pkg))) {
                     offenders.add(type.getFileName() + " -> " + forbidden);
@@ -118,6 +118,8 @@ class RemovableModelBoundaryTest {
                 "and so are the projection's");
         assertTrue(classesIn("juranometria/meridian").size() >= 1,
                 "and the module's");
+        assertTrue(classesIn("juranometria/ecliptic").size() >= 1,
+                "and the ecliptic module's");
         assertTrue(classesIn("juranometria/module").size() >= 6,
                 "and the seam's");
     }

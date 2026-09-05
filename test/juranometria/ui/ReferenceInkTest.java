@@ -171,6 +171,22 @@ class ReferenceInkTest {
                 "the spot is genuinely clear enough for ink to show");
     }
 
+    /**
+     * The topmost row carrying this mark's ink, in the column
+     * through its centre.
+     */
+    private static int highestInk(BufferedImage drawn, int x, int y) {
+        BufferedImage plain = ordinaryPage();
+        for (int row = y - 20; row <= y; row++) {
+            for (int dx = -2; dx <= 2; dx++) {
+                if (plain.getRGB(x + dx, row) != drawn.getRGB(x + dx, row)) {
+                    return row;
+                }
+            }
+        }
+        return y;
+    }
+
     /** A white pixel with white around it, well inside the paper. */
     private static int[] aClearPixel(BufferedImage page) {
         int paper = java.awt.Color.WHITE.getRGB();
@@ -400,6 +416,107 @@ class ReferenceInkTest {
                 "and it is the dashed one, so it puts down less ink: "
                         + differences(ordinaryPage(), boundary) + " px"
                         + " against " + differences(ordinaryPage(), line));
+    }
+
+    @Test
+    void aPermanentCircleIsDrawnLikeNeitherOfTheOtherTwo() {
+        // The Sprint 28 gate's finding, executed: drawn in the
+        // meridian's stroke the ecliptic was indistinguishable from
+        // it on a page carrying both, and the horizon's dash means
+        // something the ecliptic is not.
+        SkyPosition pole = new SkyPosition(100.0, 0.0);
+        BufferedImage line = page(offered("m", List.of(circle(pole,
+                OverlayContribution.Reference.LINE))));
+        BufferedImage boundary = page(offered("m", List.of(circle(pole,
+                OverlayContribution.Reference.BOUNDARY))));
+        BufferedImage permanent = page(offered("m", List.of(circle(pole,
+                OverlayContribution.Reference.PERMANENT))));
+
+        assertTrue(differences(permanent, line) > 0,
+                "a permanent circle is not the meridian's solid line");
+        assertTrue(differences(permanent, boundary) > 0,
+                "nor the horizon's even dash");
+        // Dash-dot puts down more ink than an even 6-on 4-off dash
+        // and less than a solid line: it reads as a line rather than
+        // a boundary, without being mistaken for one.
+        int solidInk = differences(ordinaryPage(), line);
+        int dashInk = differences(ordinaryPage(), boundary);
+        int dashDotInk = differences(ordinaryPage(), permanent);
+        assertTrue(dashDotInk < solidInk,
+                "it is broken, so it puts down less ink than solid: "
+                        + dashDotInk + " against " + solidInk);
+        assertTrue(dashDotInk > dashInk,
+                "and more than the even dash, whose gaps are a larger"
+                        + " share of it: " + dashDotInk + " against "
+                        + dashInk);
+    }
+
+    private static OverlayContribution circle(SkyPosition pole,
+            OverlayContribution.Reference reference) {
+        return new OverlayContribution.GreatCircle("x", "X", pole,
+                reference, InkRole.REFERENCE_LINE);
+    }
+
+    @Test
+    void aLandmarkIsDrawnDifferentlyFromAPlace() {
+        // The gate's second finding: every reference point wore the
+        // zenith's ring and upward tick, and the tick means overhead.
+        // An equinox is not overhead.
+        // A degree off centre: the released page is centred on M31,
+        // whose symbol is drawn over the reference layer and would
+        // cover a five-pixel mark entirely - which is the layering
+        // working, and no place to ask what a mark looks like.
+        SkyPosition at = new SkyPosition(
+                SCENE.viewport().centre().raDegrees(),
+                SCENE.viewport().centre().decDegrees() + 1.0);
+        BufferedImage place = page(offered("m", List.of(
+                new OverlayContribution.Point("p", "P", at,
+                        OverlayContribution.Mark.PLACE,
+                        InkRole.REFERENCE_LINE))));
+        BufferedImage landmark = page(offered("m", List.of(
+                new OverlayContribution.Point("p", "P", at,
+                        OverlayContribution.Mark.LANDMARK,
+                        InkRole.REFERENCE_LINE))));
+
+        assertTrue(differences(place, landmark) > 0,
+                "a position on a line is not inked as a place a"
+                        + " reader stands under");
+
+        // And the difference is the tick: a place points up, so its
+        // ink reaches further above its own centre than a landmark's
+        // does. Asked as a comparison rather than at one chosen row,
+        // because the exact row depends on the size of two shapes and
+        // on where antialiasing stops.
+        double[] pixel = pixelOf(at);
+        int x = (int) Math.round(pixel[0]);
+        int y = (int) Math.round(pixel[1]);
+        int placeTop = highestInk(place, x, y);
+        int landmarkTop = highestInk(landmark, x, y);
+        assertTrue(placeTop < landmarkTop, String.format(
+                "a place reaches higher above its centre than a"
+                        + " landmark: the tick ends at row %d and the"
+                        + " diamond's vertex at %d", placeTop,
+                landmarkTop));
+    }
+
+    @Test
+    void aPointWithNoStatedKindIsStillAPlace() {
+        // The convenience constructor exists for the working-mark
+        // role, where the kind is never consulted. It must not
+        // quietly change what the zenith looks like.
+        SkyPosition at = new SkyPosition(
+                SCENE.viewport().centre().raDegrees(),
+                SCENE.viewport().centre().decDegrees() + 1.0);
+        assertEquals(0, differences(
+                page(offered("m", List.of(
+                        new OverlayContribution.Point("p", "P", at,
+                                InkRole.REFERENCE_LINE)))),
+                page(offered("m", List.of(
+                        new OverlayContribution.Point("p", "P", at,
+                                OverlayContribution.Mark.PLACE,
+                                InkRole.REFERENCE_LINE))))),
+                "an unclassified point is a place, which is what the"
+                        + " zenith has always been");
     }
 
     @Test

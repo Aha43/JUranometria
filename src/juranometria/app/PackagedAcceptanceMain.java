@@ -292,6 +292,77 @@ public final class PackagedAcceptanceMain {
         require(differingPixels(without, paint(chart)) == 0,
                 "and the page is the page the atlas draws without it");
 
+        // The second removable module, on the same chart, through the
+        // same host and painter (Sprint 28, issue #273). Asked of the
+        // final pixels: a reconstruction of the expected line would
+        // prove the test's arithmetic, not the atlas's.
+        juranometria.ecliptic.EclipticModule ecliptic =
+                host.attach(new juranometria.ecliptic.EclipticModule());
+        require(!ecliptic.showing(),
+                "a fresh ecliptic module is hidden: the released"
+                        + " default is that a reader who never asked"
+                        + " for it does not get it");
+        require(differingPixels(without, paint(chart)) == 0,
+                "so attaching it changes no page");
+        require(ecliptic.timesTheGeometryWasBuilt() == 0,
+                "and it works out no ecliptic to say so");
+
+        ecliptic.showing(true);
+        java.awt.image.BufferedImage withEcliptic = paint(chart);
+        int eclipticInk = differingPixels(without, withEcliptic);
+        require(eclipticInk > 100,
+                "shown, the ecliptic reaches the page: " + eclipticInk
+                        + " pixels");
+
+        java.util.List<String> eclipticOffered =
+                new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            eclipticOffered.add(owned.geometry().identity());
+        }
+        require(eclipticOffered.equals(java.util.List.of("ecliptic",
+                        "march-equinox", "june-solstice",
+                        "september-equinox", "december-solstice")),
+                "offering the circle and its four landmarks: "
+                        + eclipticOffered);
+
+        // Each landmark that this page can hold is inked where the
+        // model puts it.
+        int landmarksSeen = 0;
+        for (juranometria.sky.Ecliptic.Landmark landmark
+                : juranometria.sky.Ecliptic.landmarks()) {
+            var page = host.projection().toPage(landmark.at());
+            if (page.isEmpty()) {
+                continue;
+            }
+            int x = (int) Math.round(page.get()[0]);
+            int y = (int) Math.round(page.get()[1]);
+            if (x < 10 || y < 10 || x > 890 || y > 690) {
+                continue;
+            }
+            require(inkNear(withEcliptic, without, x, y, 10),
+                    landmark.name() + " is inked where the model puts"
+                            + " it, at " + x + "," + y);
+            landmarksSeen++;
+        }
+        require(landmarksSeen > 0,
+                "and at least one landmark was on this page, so that"
+                        + " check is an answer");
+
+        // Both modules at once: each keeps its own ink, and detaching
+        // one leaves the other's alone.
+        host.attach(module);
+        module.showing(true, true, true);
+        require(chart.overlays().collect().size() == 8,
+                "the two modules compose: three geometries and five");
+        ecliptic.detach();
+        require(chart.overlays().collect().size() == 3,
+                "detaching the ecliptic removes only its own");
+        require(differingPixels(without, paint(chart)) > 0,
+                "and the meridian is still drawn");
+        module.detach();
+        require(differingPixels(without, paint(chart)) == 0,
+                "and with both gone the atlas is the atlas again");
+
         // The stored-state restart, as a second application session
         // (issue #229): the place is saved through the bundled
         // preference backend, and then the whole wiring is built

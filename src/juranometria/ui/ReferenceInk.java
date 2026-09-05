@@ -73,9 +73,26 @@ public final class ReferenceInk {
             BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
             new float[] {6.0f, 4.0f}, 0.0f);
 
+    /**
+     * Long dash, short dot: the cartographic datum line.
+     *
+     * <p>Chosen by the Sprint 28 gate by drawing the candidates over
+     * production pages beside the meridian, in both grounds
+     * (docs/decisions/ecliptic.md). It is distinct from all three
+     * lines it must not be confused with: the meridian's solid, the
+     * horizon's even dash, and the constellation boundaries' fine
+     * dots - which is what disqualified a plain dotted candidate.
+     */
+    private static final BasicStroke DASH_DOT = new BasicStroke(1.0f,
+            BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
+            new float[] {12.0f, 4.0f, 2.0f, 4.0f}, 0.0f);
+
     /** The zenith ring and its tick, in pixels. */
     private static final double RING = 5.0;
     private static final double TICK = 4.0;
+
+    /** Half the diagonal of a landmark's diamond, in pixels. */
+    private static final double DIAMOND = 6.0;
 
     /** How far a label sits off the paper's edge. */
     private static final double LABEL_INSET = 4.0;
@@ -155,11 +172,26 @@ public final class ReferenceInk {
         }
         GreatCirclePage.Arc arc = crossing.get();
         g.setColor(palette.figureInk());
-        g.setStroke(circle.reference() == OverlayContribution.Reference.BOUNDARY
-                ? DASHED : SOLID);
+        g.setStroke(strokeFor(circle.reference()));
         g.draw(new Line2D.Double(arc.from().x(), arc.from().y(),
                 arc.to().x(), arc.to().y()));
         label(g, paper, arc, circle.accessibleName(), palette);
+    }
+
+    /**
+     * What each kind of reference line looks like.
+     *
+     * <p>The chart's decision, from the module's statement of what
+     * the geometry is: a line across the sky, the boundary of what
+     * can be seen of it, or a permanent circle of the sphere.
+     */
+    private static BasicStroke strokeFor(
+            OverlayContribution.Reference reference) {
+        return switch (reference) {
+            case LINE -> SOLID;
+            case BOUNDARY -> DASHED;
+            case PERMANENT -> DASH_DOT;
+        };
     }
 
     /**
@@ -229,13 +261,35 @@ public final class ReferenceInk {
         }
         g.setColor(palette.figureInk());
         g.setStroke(SOLID);
-        g.draw(new Ellipse2D.Double(at.x() - RING, at.y() - RING,
-                2.0 * RING, 2.0 * RING));
-        // Upward, because a place overhead has a direction and a
-        // ring alone would read as an object.
-        g.draw(new Line2D.Double(at.x(), at.y() - RING,
-                at.x(), at.y() - RING - TICK));
+        switch (point.mark()) {
+            case PLACE -> {
+                g.draw(new Ellipse2D.Double(at.x() - RING, at.y() - RING,
+                        2.0 * RING, 2.0 * RING));
+                // Upward, because a place overhead has a direction
+                // and a ring alone would read as an object.
+                g.draw(new Line2D.Double(at.x(), at.y() - RING,
+                        at.x(), at.y() - RING - TICK));
+            }
+            // An open diamond: no other mark on this chart is one.
+            // Stars are filled discs, deep-sky objects are ellipses,
+            // dotted and crossed circles, boxes and spoked squares,
+            // a working mark is a gapped cross, and a place is the
+            // ring and tick above. It reads as a marked position on
+            // a line rather than as a place or an object.
+            case LANDMARK -> g.draw(diamond(at));
+        }
         label(g, paper, new GreatCirclePage.Arc(at, at),
                 point.accessibleName(), palette);
+    }
+
+    /** A landmark's open diamond, about its position. */
+    private static java.awt.geom.Path2D diamond(PixelPoint at) {
+        java.awt.geom.Path2D shape = new java.awt.geom.Path2D.Double();
+        shape.moveTo(at.x(), at.y() - DIAMOND);
+        shape.lineTo(at.x() + DIAMOND, at.y());
+        shape.lineTo(at.x(), at.y() + DIAMOND);
+        shape.lineTo(at.x() - DIAMOND, at.y());
+        shape.closePath();
+        return shape;
     }
 }
