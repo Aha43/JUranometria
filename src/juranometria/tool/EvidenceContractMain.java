@@ -86,6 +86,8 @@ public final class EvidenceContractMain {
         // report (issue #258), the black-sky pattern.
         REPORT_MAINS.put("juranometria.tool.WorkingSelectionStudyMain",
                 "docs/studies/working-selection/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.EclipticStudyMain",
+                "docs/studies/ecliptic/measurements.md");
     }
 
     /**

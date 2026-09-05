@@ -283,7 +283,7 @@ black-sky-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study
 evidence-contracts: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 
@@ -299,6 +299,11 @@ place-and-time-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeInkStudyMain
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeControlsMockupMain
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeDialogStudyMain
+
+ecliptic-study: classes
+	mkdir -p docs/studies/ecliptic
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.EclipticStudyMain \
+		> docs/studies/ecliptic/measurements.md
 
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked
