@@ -1,12 +1,11 @@
 package juranometria.ui;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
-import java.awt.GraphicsEnvironment;
-
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
@@ -34,9 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * while Accumulate is active, and a range retraction that removes a
  * pre-existing or off-page member, each fail these tests.
  *
- * <p>Every gesture is a real mouse event dispatched at the real
- * table, so Swing's own press handling - anchor, lead, extend,
- * toggle - is in the loop, exactly as a reader's hand would have it.
+ * <p>Every gesture goes through the shared {@code ReaderInput}
+ * pointer route at a table shown in a real window (post-approval
+ * review): the premises prove the clicked point is one a reader
+ * could actually reach, and Swing's own press handling - anchor,
+ * lead, extend, toggle - is in the loop, exactly as a reader's
+ * hand would have it.
  */
 class WorkingSelectionTableGestureTest {
 
@@ -49,6 +51,7 @@ class WorkingSelectionTableGestureTest {
         final ChartComponent chart;
         final ChartModuleHost host;
         final OnThisPageTable panel;
+        final JFrame window;
 
         Fixture() throws Exception {
             // Swing's own table UI asks the toolkit for the platform
@@ -60,6 +63,7 @@ class WorkingSelectionTableGestureTest {
                             + " the platform modifier, which a"
                             + " headless toolkit refuses");
             ChartComponent[] made = new ChartComponent[1];
+            JFrame[] shown = new JFrame[1];
             SwingUtilities.invokeAndWait(() -> {
                 made[0] = new ChartComponent(Atlas.assembler());
                 made[0].setSize(900, 700);
@@ -69,10 +73,18 @@ class WorkingSelectionTableGestureTest {
             host = new ChartModuleHost(chart, new SelectionModel(),
                     request -> { });
             panel = host.attach(new OnThisPageModule()).panel();
+            // In a real, shown window (post-approval review): the
+            // shared pointer route's premises are only evidence of
+            // reachability when the table is really on screen.
             SwingUtilities.invokeAndWait(() -> {
-                panel.setSize(360, 480);
-                layOut(panel);
+                shown[0] = new JFrame("table gestures");
+                shown[0].setLayout(new java.awt.BorderLayout());
+                shown[0].add(panel, java.awt.BorderLayout.CENTER);
+                shown[0].setSize(420, 520);
+                shown[0].setVisible(true);
             });
+            window = shown[0];
+            SwingUtilities.invokeAndWait(() -> { });
         }
 
         WorkingSelection working() {
@@ -89,16 +101,10 @@ class WorkingSelectionTableGestureTest {
         }
 
         @Override
-        public void close() {
+        public void close() throws Exception {
             host.detachAll();
-        }
-    }
-
-    private static void layOut(java.awt.Component component) {
-        component.doLayout();
-        if (component instanceof java.awt.Container container) {
-            for (java.awt.Component child : container.getComponents()) {
-                layOut(child);
+            if (window != null) {
+                SwingUtilities.invokeAndWait(window::dispose);
             }
         }
     }
@@ -107,25 +113,17 @@ class WorkingSelectionTableGestureTest {
         return SelectInteraction.toggleModifierMask();
     }
 
-    /** One press-and-release at a row, with the given held keys. */
+    /**
+     * One reader's click at a row, with the given held keys,
+     * through the shared route that proves the point is reachable.
+     */
     private static void click(JTable table, int viewRow, int keyMask)
             throws Exception {
+        SwingUtilities.invokeAndWait(() -> table.scrollRectToVisible(
+                table.getCellRect(viewRow, 0, true)));
         Rectangle cell = table.getCellRect(viewRow, 0, true);
-        int x = (int) cell.getCenterX();
-        int y = (int) cell.getCenterY();
-        SwingUtilities.invokeAndWait(() -> {
-            assertTrue(table.getVisibleRect().contains(x, y),
-                    "the point clicked on row " + viewRow + " is one a"
-                            + " pointer could reach");
-            table.dispatchEvent(new MouseEvent(table,
-                    MouseEvent.MOUSE_PRESSED, System.nanoTime() / 1_000_000,
-                    InputEvent.BUTTON1_DOWN_MASK | keyMask, x, y, 1, false,
-                    MouseEvent.BUTTON1));
-            table.dispatchEvent(new MouseEvent(table,
-                    MouseEvent.MOUSE_RELEASED, System.nanoTime() / 1_000_000,
-                    keyMask, x, y, 1, false, MouseEvent.BUTTON1));
-        });
-        SwingUtilities.invokeAndWait(() -> { });
+        ReaderInput.click(table, (int) cell.getCenterX(),
+                (int) cell.getCenterY(), keyMask);
     }
 
     @Test
@@ -301,28 +299,10 @@ class WorkingSelectionTableGestureTest {
     /** A real click on the real column header, as a reader sorts. */
     private static void clickHeader(JTable table, int column)
             throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            javax.swing.table.JTableHeader header = table.getTableHeader();
-            if (header.getWidth() == 0) {
-                // The fixture's panel is never shown, so the scroll
-                // pane has not laid the header out; give it its own
-                // preferred shape - a real window does exactly this.
-                header.setSize(header.getPreferredSize());
-                header.doLayout();
-            }
-            java.awt.Rectangle bounds = header.getHeaderRect(column);
-            assertTrue(bounds.width > 0 && bounds.height > 0,
-                    "the header cell has a size a pointer could hit");
-            int x = (int) bounds.getCenterX();
-            int y = (int) bounds.getCenterY();
-            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
-                    MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED}) {
-                header.dispatchEvent(new MouseEvent(header, id,
-                        System.nanoTime() / 1_000_000, 0, x, y, 1,
-                        false, MouseEvent.BUTTON1));
-            }
-        });
-        SwingUtilities.invokeAndWait(() -> { });
+        Rectangle bounds =
+                table.getTableHeader().getHeaderRect(column);
+        ReaderInput.click(table.getTableHeader(),
+                (int) bounds.getCenterX(), (int) bounds.getCenterY(), 0);
     }
 
     @Test
