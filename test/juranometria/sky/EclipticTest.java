@@ -238,28 +238,51 @@ class EclipticTest {
         // way to hold that is the values, not an architecture scan:
         // whatever any dependency does, these numbers are what the
         // gate was approved on, and a drift anywhere - here, in
-        // SkyFrame, or in something either of them calls - fails
-        // here (PR #277 review).
+        // SkyFrame, or behind either - fails here (PR #277 review).
+        //
+        // Two tolerances, and the difference is not fussiness.
+        //
+        // The obliquity and the pole are bit-exact, and may be held
+        // to the last bit: meanObliquityDegrees is a polynomial in
+        // +, -, * and /, whose results Java specifies exactly
+        // (IEEE 754), and the pole is 270 and 90 minus that. No
+        // transcendental function is involved, so every conforming
+        // JVM produces these same bits.
         assertEquals(23.43929111111111, Ecliptic.OBLIQUITY_DEGREES, 0.0,
-                "the J2000 mean obliquity, to the last bit");
+                "the J2000 mean obliquity, to the last bit - exact"
+                        + " arithmetic, so this is safe to demand");
         assertEquals(270.0, Ecliptic.POLE.raDegrees(), 0.0,
                 "the ecliptic pole's right ascension");
         assertEquals(66.56070888888888, Ecliptic.POLE.decDegrees(), 0.0,
                 "and its declination");
 
-        assertEquals(0.0, at("march-equinox").raDegrees(), 0.0);
-        assertEquals(0.0, at("march-equinox").decDegrees(), 0.0);
-        assertEquals(90.0, at("june-solstice").raDegrees(), 0.0);
+        // The landmark positions are not, and demanding bit identity
+        // for them would be asserting something Java does not
+        // promise (PR #277 round 2). They come through Math.sin,
+        // cos, atan2 and asin, which are allowed to differ by an ulp
+        // between implementations; StrictMath would fix the bits but
+        // is not what production uses, and the atlas already treats
+        // rendered evidence as "byte-reproducible per machine"
+        // rather than across them.
+        //
+        // A picodegree is 3.6e-9 arcseconds: six orders of magnitude
+        // tighter than the 0.06" the model is held to against SOFA,
+        // so this still catches any drift that could mean anything,
+        // and none that cannot.
+        double ulps = 1.0e-12;
+        assertEquals(0.0, at("march-equinox").raDegrees(), ulps);
+        assertEquals(0.0, at("march-equinox").decDegrees(), ulps);
+        assertEquals(90.0, at("june-solstice").raDegrees(), ulps);
         assertEquals(23.439291111111107,
-                at("june-solstice").decDegrees(), 0.0);
-        assertEquals(180.0, at("september-equinox").raDegrees(), 0.0);
-        assertEquals(270.0, at("december-solstice").raDegrees(), 0.0);
+                at("june-solstice").decDegrees(), ulps);
+        assertEquals(180.0, at("september-equinox").raDegrees(), ulps);
+        assertEquals(270.0, at("december-solstice").raDegrees(), ulps);
         assertEquals(-23.439291111111107,
-                at("december-solstice").decDegrees(), 0.0);
+                at("december-solstice").decDegrees(), ulps);
         // The September equinox's declination is zero to within the
         // last bits of a sine, not exactly zero, and pinning it to
         // 0.0 would be pinning a lie.
-        assertEquals(0.0, at("september-equinox").decDegrees(), 1.0e-12,
+        assertEquals(0.0, at("september-equinox").decDegrees(), ulps,
                 "the September equinox is on the equator to the"
                         + " precision a rotation can give");
     }
@@ -363,10 +386,13 @@ class EclipticTest {
         return java.util.Arrays.stream(type.getDeclaredMethods())
                 .filter(m -> java.lang.reflect.Modifier
                         .isPublic(m.getModifiers()))
-                // Records synthesise these; they are not surface a
-                // reviewer needs to pin.
-                .filter(m -> !List.of("equals", "hashCode", "toString")
-                        .contains(m.getName()))
+                // Records synthesise exactly three methods, and only
+                // those exact signatures are excluded. Filtering by
+                // NAME would let `toString(double centuries)` or
+                // `equals(String epoch)` - legal overloads, and
+                // public routes like any other - escape the pin
+                // entirely (PR #277 round 2).
+                .filter(m -> !isRecordSynthesised(m))
                 .map(m -> m.getReturnType().getSimpleName() + " "
                         + m.getName() + "("
                         + java.util.Arrays.stream(m.getParameterTypes())
@@ -375,6 +401,27 @@ class EclipticTest {
                                         .joining(", "))
                         + ")")
                 .sorted().toList();
+    }
+
+    /**
+     * The three methods a record generates, by exact signature.
+     *
+     * <p>Not by name: an overload sharing one of these names is a
+     * public route into the type and must face the pin.
+     */
+    private static boolean isRecordSynthesised(
+            java.lang.reflect.Method method) {
+        Class<?>[] parameters = method.getParameterTypes();
+        return switch (method.getName()) {
+            case "equals" -> parameters.length == 1
+                    && parameters[0] == Object.class
+                    && method.getReturnType() == boolean.class;
+            case "hashCode" -> parameters.length == 0
+                    && method.getReturnType() == int.class;
+            case "toString" -> parameters.length == 0
+                    && method.getReturnType() == String.class;
+            default -> false;
+        };
     }
 
     /** Public fields as "Type NAME", sorted by name. */
