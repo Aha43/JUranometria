@@ -88,3 +88,15 @@ headless assumption because the table UI genuinely requires a toolkit, and
 require the full display run to execute the class with zero aborts. A mutation
 that omits showing the window must fail on the shared premise, so the new
 display classification cannot become ceremonial.
+
+## Final approval
+
+Approved at `afe2697`. The shared pointer route now accepts an explicit point
+and modifiers while proving the control is showing, sized, and that this exact
+point lies inside its visible rectangle before dispatch. The gesture fixture
+places the production table in a real shown window, sends every row and header
+click through that route, and disposes the window in its close path. Removing
+the window's `setVisible` fails on the shared showing premise, so the display
+classification and reachability evidence are load-bearing. The headless
+toolkit limitation remains stated honestly, while the display run executes all
+nine gesture tests. No findings remain for #261.
