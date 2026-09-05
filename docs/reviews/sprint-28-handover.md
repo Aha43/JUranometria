@@ -192,7 +192,7 @@ chart would not need to change to accept them.
 
 ## Every review correction, by round
 
-Twenty-one findings across four gated issues. **Not one touched the
+Twenty-five findings across five gated issues. **Not one touched the
 astronomy, the module design, the layering or the lifecycle** — the
 geometry was right from the first push of each issue. Every finding
 was about evidence.
@@ -236,6 +236,19 @@ instead of the wiring; a comparison weakened until it could not
 fail; two statements the test repeated by hand; and a `null` the
 test found convenient, which allowed a loaded module with no
 control.
+
+**#275, this close — one round.** Four assertions in the closing
+journey that looked like they walked the journey and did not: it
+checked landmark geometry through the *static model* rather than
+the module's contributed and painted landmark; it counted the
+meridian's contributions without showing that any observer ink
+appeared; it cleared a fresh, disconnected, already-empty working
+selection; and its Home step compared two fresh default charts
+instead of taking the journey's own chart Home. All four now go
+through the walk itself, and a fifth defect surfaced while
+verifying them — the bare-line probe used to prove a landmark is a
+*mark* rather than the line through it was landing off the paper,
+where it counted zero and let the ratio pass for free.
 
 ### What I got wrong about my own process
 

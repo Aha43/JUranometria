@@ -76,6 +76,24 @@ class SprintTwentyEightJourneyTest {
         return count;
     }
 
+    /** How many pixels changed in a box about a point. */
+    private static int inkCount(BufferedImage without, BufferedImage with,
+                                int x, int y, int radius) {
+        int count = 0;
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int px = x + dx;
+                int py = y + dy;
+                if (px >= 0 && py >= 0 && px < with.getWidth()
+                        && py < with.getHeight()
+                        && with.getRGB(px, py) != without.getRGB(px, py)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     private static ChartComponent chart(ChartViewState state)
             throws Exception {
         ChartComponent[] holder = new ChartComponent[1];
@@ -141,27 +159,83 @@ class SprintTwentyEightJourneyTest {
                     "the circle and its four named landmarks, and"
                             + " nothing else");
 
-            // Its geometry, in the chart's own fixed frame: the March
-            // equinox at the right-ascension origin, the solstices an
-            // obliquity north and south, every landmark on the
-            // circle.
-            assertEquals(0.0, Ecliptic.landmark("march-equinox")
-                            .orElseThrow().at().raDegrees(), 1.0e-9,
-                    "the March equinox sits at the RA origin, which is"
-                            + " what it means on a J2000 chart");
-            assertEquals(Ecliptic.OBLIQUITY_DEGREES,
-                    Ecliptic.landmark("june-solstice").orElseThrow()
-                            .at().decDegrees(), 1.0e-9,
-                    "the June solstice is an obliquity north");
-            assertEquals(-Ecliptic.OBLIQUITY_DEGREES,
-                    Ecliptic.landmark("december-solstice").orElseThrow()
-                            .at().decDegrees(), 1.0e-9,
-                    "and the December solstice as far south");
-            for (Ecliptic.Landmark landmark : Ecliptic.landmarks()) {
-                assertEquals(0.0,
-                        Ecliptic.latitudeDegrees(landmark.at()), 1.0e-9,
-                        landmark.name() + " lies on the circle");
+            // Its geometry, taken from what the MODULE contributed
+            // rather than from the model it was built from: asking
+            // the static model would prove the model and say nothing
+            // about what this page is carrying (PR #280 review).
+            java.util.Map<String, SkyPosition> contributed =
+                    new java.util.LinkedHashMap<>();
+            SkyPosition circlePole = null;
+            for (OverlayRegistry.Owned owned : chart.overlays().collect()) {
+                if (owned.geometry()
+                        instanceof juranometria.module.OverlayContribution
+                                .Point point) {
+                    assertEquals(juranometria.module.OverlayContribution
+                                    .Mark.LANDMARK, point.mark(),
+                            point.accessibleName() + " is offered as a"
+                                    + " landmark, not a place");
+                    contributed.put(point.identity(), point.at());
+                } else if (owned.geometry()
+                        instanceof juranometria.module.OverlayContribution
+                                .GreatCircle circle) {
+                    circlePole = circle.pole();
+                }
             }
+            assertEquals(0.0,
+                    contributed.get("march-equinox").raDegrees(), 1.0e-9,
+                    "the offered March equinox sits at the RA origin,"
+                            + " which is what it means on a J2000"
+                            + " chart");
+            assertEquals(Ecliptic.OBLIQUITY_DEGREES,
+                    contributed.get("june-solstice").decDegrees(), 1.0e-9,
+                    "the offered June solstice is an obliquity north");
+            assertEquals(-Ecliptic.OBLIQUITY_DEGREES,
+                    contributed.get("december-solstice").decDegrees(),
+                    1.0e-9, "and the December solstice as far south");
+            for (java.util.Map.Entry<String, SkyPosition> each
+                    : contributed.entrySet()) {
+                assertEquals(90.0,
+                        circlePole.separationDegrees(each.getValue()),
+                        1.0e-9, each.getKey() + " lies on the circle"
+                                + " this module offered, not on some"
+                                + " other one");
+            }
+
+            // And the one this page carries is actually drawn, as a
+            // mark rather than as the line running through it: the
+            // circle passes through every landmark, so ink near one
+            // proves nothing on its own.
+            double[] equinoxAt = host.projection()
+                    .toPage(contributed.get("march-equinox"))
+                    .orElseThrow();
+            int atTheMark = inkCount(released, shown,
+                    (int) Math.round(equinoxAt[0]),
+                    (int) Math.round(equinoxAt[1]), 6);
+            // Five degrees of longitude along: far enough from the
+            // mark that no part of it reaches, and still well inside
+            // the paper - a probe that lands off the page counts
+            // zero and makes the ratio below pass for free, which is
+            // how the first version of this check failed to bite.
+            double[] bareLine = host.projection()
+                    .toPage(Ecliptic.toEquatorial(5.0, 0.0))
+                    .orElseThrow();
+            int bareX = (int) Math.round(bareLine[0]);
+            int bareY = (int) Math.round(bareLine[1]);
+            assertTrue(bareX > 20 && bareX < 880
+                            && bareY > 20 && bareY < 680,
+                    "the bare-line probe is on the paper, at "
+                            + bareX + "," + bareY);
+            assertTrue(Math.hypot(bareX - equinoxAt[0],
+                            bareY - equinoxAt[1]) > 60.0,
+                    "and clear of the mark");
+            int onBareLine = inkCount(released, shown, bareX, bareY, 6);
+            assertTrue(onBareLine > 0,
+                    "and the line really is drawn there: " + onBareLine
+                            + " px");
+            assertTrue(atTheMark > onBareLine * 2, "the March equinox"
+                    + " is painted as a mark where the model puts it: "
+                    + atTheMark + " px against " + onBareLine
+                    + " on bare line");
 
             // ---- 3. the awkward pages ---------------------------
             record Page(String what, ChartViewState state,
@@ -209,10 +283,30 @@ class SprintTwentyEightJourneyTest {
             // observer and no clock; the meridian has both. They are
             // drawn on one page without either borrowing the other's
             // frame.
+            // An observer whose meridian actually crosses this page,
+            // derived rather than hoped for: local sidereal time is
+            // Greenwich apparent sidereal time plus east longitude,
+            // so a longitude of minus GAST puts the observer's
+            // meridian through right ascension 0h - the middle of
+            // this page. Counting contributions without showing the
+            // ink was the gap (PR #280 review).
+            java.time.Instant equinoxEvening =
+                    java.time.Instant.parse("2026-03-20T21:33:00Z");
+            double gast = juranometria.sky.SkyFrame.gastDegrees(
+                    juranometria.sky.SkyFrame.julianDate(equinoxEvening));
+            double eastLongitude = -gast;
+            while (eastLongitude < -180.0) {
+                eastLongitude += 360.0;
+            }
             MeridianModule meridian = host.attach(new MeridianModule(
-                    new Observer(59.9, 10.7, java.time.Instant.parse(
-                            "2026-03-20T21:33:00Z"))));
+                    new Observer(59.9, eastLongitude, equinoxEvening)));
             meridian.showing(true, true, true);
+            BufferedImage withBoth = paint(chart);
+            assertTrue(differences(shown, withBoth) > 100,
+                    "4. the observer's own lines are drawn beside the"
+                            + " ecliptic, not merely contributed: "
+                            + differences(shown, withBoth) + " px more"
+                            + " ink than the ecliptic alone");
             List<String> together = new ArrayList<>();
             for (OverlayRegistry.Owned owned : chart.overlays().collect()) {
                 together.add(owned.geometry().identity());
@@ -246,10 +340,25 @@ class SprintTwentyEightJourneyTest {
             assertEquals(0, differences(shown, paint(chart)),
                     "and changing it back gives the same page");
 
-            WorkingSelection working = new WorkingSelection();
-            working.clear();
+            // The chart's own working selection, with something
+            // really in it. A fresh disconnected one, already empty,
+            // was the gap (PR #280 review).
+            WorkingSelection working = host.workingSelection();
+            String member = chart.currentScene().deepSkyObjects()
+                    .get(0).id();
+            working.add(member);
+            assertEquals(List.of(member), working.members(),
+                    "the reader marks something");
             assertTrue(ecliptic.showing(),
-                    "the working selection is not its business either");
+                    "the working selection is not the ecliptic's"
+                            + " business");
+            assertTrue(item.isSelected(), "and its tick is untouched");
+            working.clear();
+            assertEquals(List.of(), working.members(),
+                    "and clearing it is not the ecliptic's business"
+                            + " either");
+            assertTrue(ecliptic.showing(),
+                    "with the ecliptic still shown throughout");
             assertEquals(List.of(), asked,
                     "and nothing in any of this asked the chart to"
                             + " move");
@@ -274,14 +383,20 @@ class SprintTwentyEightJourneyTest {
                             + java.util.Arrays.toString(node.keys()));
 
             // ---- 7. home, module-free ---------------------------
-            ChartComponent home = chart(ChartViewState.DEFAULT);
+            // This journey's own chart, taken Home - not two fresh
+            // ones compared with each other, which would have proved
+            // the atlas deterministic and nothing about the walk
+            // (PR #280 review).
+            SwingUtilities.invokeAndWait(() ->
+                    chart.setViewState(ChartViewState.DEFAULT));
+            SwingUtilities.invokeAndWait(() -> { });
             ChartComponent neverHadAModule =
                     chart(ChartViewState.DEFAULT);
-            assertEquals(0, differences(paint(home),
+            assertEquals(0, differences(paint(chart),
                             paint(neverHadAModule)),
-                    "7. and Home is the released page, drawn by an"
-                            + " atlas that never had the module at"
-                            + " all");
+                    "7. and the chart this reader has been using all"
+                            + " along, taken Home, is the page an"
+                            + " atlas that never had the module draws");
         });
     }
 }
