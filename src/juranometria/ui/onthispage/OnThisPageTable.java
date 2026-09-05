@@ -570,6 +570,18 @@ public final class OnThisPageTable extends JPanel {
             }
             return;
         }
+        // A gesture whose selection already agrees with the model
+        // decides nothing - and a noted press that changed no
+        // selection leaves its note behind, so without this a later
+        // sorter restore would be read as that gesture and sorting
+        // could rewrite the set's joining order (a named mutation).
+        String modelLead = working.lead();
+        boolean leadAgrees = modelLead == null
+                || !pageHolds(modelLead)
+                || modelLead.equals(leadRowIdentity());
+        if (sameAsSelection(working.members()) && leadAgrees) {
+            return;
+        }
         boolean additive = services.selectionMode().accumulate()
                 || gesture.toggle();
         publishing = true;
@@ -625,6 +637,16 @@ public final class OnThisPageTable extends JPanel {
         if (!sameAsSelection(services.workingSelection().members())) {
             followTheModel(services.workingSelection().members());
         }
+    }
+
+    /** Whether this page lists the identity as a row. */
+    private boolean pageHolds(String identity) {
+        for (Row row : model.rows) {
+            if (row.identity().equals(identity)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** The range's rows, anchor to active end, in view order. */

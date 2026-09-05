@@ -286,6 +286,37 @@ class WorkingSelectionTableGestureTest {
     }
 
     @Test
+    void aStaleGestureNoteCannotTurnSortingIntoAnEdit() throws Exception {
+        // The subtle route to the sorting mutation: a press that
+        // changes no selection (clicking the already-sole-selected
+        // row) fires no event to consume its note, and the sorter's
+        // restore event arrives next. Read as that gesture, it
+        // would replace the cross-page set with the rows in the new
+        // view order - dropping the off-page member and rewriting
+        // the joining order.
+        try (Fixture fixture = new Fixture()) {
+            String r0 = fixture.rowIdentity(0);
+            String r2 = fixture.rowIdentity(2);
+            click(fixture.table(), 0, 0);
+            click(fixture.table(), 0, 0);   // no change: the note stays
+            fixture.working().replaceWith(List.of(r2, r0, OFF_PAGE), r0);
+
+            SwingUtilities.invokeAndWait(() -> fixture.table()
+                    .getRowSorter().setSortKeys(List.of(
+                            new javax.swing.RowSorter.SortKey(2,
+                                    javax.swing.SortOrder.DESCENDING))));
+            SwingUtilities.invokeAndWait(() -> { });
+
+            assertEquals(List.of(r2, r0, OFF_PAGE),
+                    fixture.working().members(),
+                    "sorting after an eventless press still edits"
+                            + " nothing: membership, joining order and"
+                            + " the off-page member all survive");
+            assertEquals(r0, fixture.working().lead());
+        }
+    }
+
+    @Test
     void tableRowsShowMembershipAfterSortingAndReordering()
             throws Exception {
         try (Fixture fixture = new Fixture()) {
