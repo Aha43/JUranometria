@@ -156,17 +156,36 @@ public sealed interface OverlayContribution {
         }
 
         /**
-         * A point whose kind is a {@link Mark#PLACE}.
+         * A point in a role that does not consult its kind.
          *
-         * <p>For the working-mark role, where the kind is not
-         * consulted at all: a mark a reader put on the chart is inked
-         * by its role, and asking every caller to classify it would
-         * be ceremony for a question the chart does not ask. The
-         * reference role states its kind explicitly.
+         * <p>For the working-mark role: a mark a reader put on the
+         * chart is inked by its role, and asking every caller to
+         * classify it would be ceremony for a question the chart
+         * never asks.
+         *
+         * <p><strong>Refused for {@link InkRole#REFERENCE_LINE}.</strong>
+         * That role is exactly where the kind decides what is drawn,
+         * and a convenience that quietly supplied {@code PLACE} there
+         * would preserve the failure this vocabulary was added to
+         * end: a module contributing an equinox, saying nothing, and
+         * silently receiving the zenith's ring and upward tick
+         * (PR #278 review). A reference point states what it is.
          */
         public Point(String identity, String accessibleName,
                      SkyPosition at, InkRole role) {
-            this(identity, accessibleName, at, Mark.PLACE, role);
+            this(identity, accessibleName, at, requirePlaceable(role,
+                    identity), role);
+        }
+
+        private static Mark requirePlaceable(InkRole role,
+                                             String identity) {
+            if (role == InkRole.REFERENCE_LINE) {
+                throw new IllegalArgumentException(
+                        "a reference point says whether it is a place"
+                                + " or a landmark; the chart inks the"
+                                + " two differently: " + identity);
+            }
+            return Mark.PLACE;
         }
     }
 

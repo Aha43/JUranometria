@@ -27,7 +27,9 @@ import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -167,7 +169,8 @@ class ReferenceInkTest {
         assertTrue(differences(before,
                         page(offered("other", List.of(
                                 new OverlayContribution.Point("mark", "Mark",
-                                        on, InkRole.REFERENCE_LINE))))) > 0,
+                                        on, OverlayContribution.Mark.PLACE,
+                                        InkRole.REFERENCE_LINE))))) > 0,
                 "the spot is genuinely clear enough for ink to show");
     }
 
@@ -458,6 +461,186 @@ class ReferenceInkTest {
     }
 
     @Test
+    void thePermanentStrokeIsTheApprovedTwelveFourTwoFour() {
+        // The relative ink counts above show it is neither of the
+        // other two; they do not say which pattern it is, and many
+        // would satisfy them (PR #278 review). This holds the stroke
+        // the gate chose, read off the page.
+        //
+        // On controlled geometry: a page centred on the equator, and
+        // the equator itself, which projects to a horizontal line
+        // through the middle of the paper. A run along a raster row
+        // is then the dash pattern itself rather than a diagonal's
+        // staircase.
+        ChartScene equatorial = Atlas.assembler().assemble(
+                new ChartViewState(new SkyPosition(80.0, 0.0), 24.0, 8.0),
+                900, 700);
+        List<int[]> runs = runsAlongTheLine(equatorial,
+                OverlayContribution.Reference.PERMANENT);
+
+        int cycles = 0;
+        for (int i = 0; i + 3 < runs.size(); i++) {
+            if (isRun(runs.get(i), 1, 12) && isRun(runs.get(i + 1), 0, 4)
+                    && isRun(runs.get(i + 2), 1, 2)
+                    && isRun(runs.get(i + 3), 0, 4)) {
+                cycles++;
+            }
+        }
+        assertTrue(cycles >= 3, "the permanent stroke is 12 on, 4 off,"
+                + " 2 on, 4 off - the cartographic datum line the gate"
+                + " chose; found " + cycles + " complete cycles in "
+                + runs.size() + " runs");
+
+        // And the same reading of a solid line finds no such cycle,
+        // so the check above is discriminating and not a coincidence
+        // of how runs are counted.
+        List<int[]> solid = runsAlongTheLine(equatorial,
+                OverlayContribution.Reference.LINE);
+        int solidCycles = 0;
+        for (int i = 0; i + 3 < solid.size(); i++) {
+            if (isRun(solid.get(i), 1, 12) && isRun(solid.get(i + 1), 0, 4)
+                    && isRun(solid.get(i + 2), 1, 2)
+                    && isRun(solid.get(i + 3), 0, 4)) {
+                solidCycles++;
+            }
+        }
+        assertEquals(0, solidCycles,
+                "and a solid line shows none of them");
+    }
+
+    /** A run of ink (1) or paper (0), and how long it is. */
+    private static boolean isRun(int[] run, int ink, int length) {
+        // One pixel either way: the raster may round an end.
+        return run[0] == ink && Math.abs(run[1] - length) <= 1;
+    }
+
+    /**
+     * The ink and gap runs along the row where a horizontal reference
+     * line was drawn.
+     */
+    private static List<int[]> runsAlongTheLine(ChartScene scene,
+            OverlayContribution.Reference reference) {
+        BufferedImage plain = pageOf(scene, List.of());
+        BufferedImage drawn = pageOf(scene, offered("m", List.of(
+                new OverlayContribution.GreatCircle("x", "X",
+                        new SkyPosition(0.0, 90.0), reference,
+                        InkRole.REFERENCE_LINE))));
+        int row = -1;
+        int most = 0;
+        for (int y = 0; y < plain.getHeight(); y++) {
+            int changed = 0;
+            for (int x = 0; x < plain.getWidth(); x++) {
+                if (plain.getRGB(x, y) != drawn.getRGB(x, y)) {
+                    changed++;
+                }
+            }
+            if (changed > most) {
+                most = changed;
+                row = y;
+            }
+        }
+        assertTrue(most > 100,
+                "the equator is drawn across this page");
+
+        // A window clear of catalogue ink, which would break runs
+        // that belong to the stroke.
+        List<int[]> runs = new java.util.ArrayList<>();
+        int current = -1;
+        int length = 0;
+        for (int x = 200; x < 320; x++) {
+            int ink = plain.getRGB(x, row) != drawn.getRGB(x, row) ? 1 : 0;
+            if (ink == current) {
+                length++;
+            } else {
+                if (current >= 0) {
+                    runs.add(new int[] {current, length});
+                }
+                current = ink;
+                length = 1;
+            }
+        }
+        return runs;
+    }
+
+    private static BufferedImage pageOf(ChartScene scene,
+            List<OverlayRegistry.Owned> ink) {
+        BufferedImage image = new BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        try {
+            RENDERER.render(g, scene, ChartOptions.DEFAULTS,
+                    (layerG, painted) -> ReferenceInk.paint(layerG,
+                            painted, ink, ChartOptions.DEFAULTS.palette()));
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    @Test
+    void theLandmarkIsTheApprovedOpenDiamond() {
+        // Proving it differs from the zenith's ring says nothing
+        // about which shape it is: a circle, a square or a triangle
+        // would pass that (PR #278 review). This holds the diamond.
+        SkyPosition at = new SkyPosition(
+                SCENE.viewport().centre().raDegrees(),
+                SCENE.viewport().centre().decDegrees() + 1.0);
+        BufferedImage drawn = page(offered("m", List.of(
+                new OverlayContribution.Point("p", "P", at,
+                        OverlayContribution.Mark.LANDMARK,
+                        InkRole.REFERENCE_LINE))));
+        BufferedImage plain = ordinaryPage();
+        double[] pixel = pixelOf(at);
+        int cx = (int) Math.round(pixel[0]);
+        int cy = (int) Math.round(pixel[1]);
+
+        // Four vertices, on the axes through its centre.
+        assertTrue(inkWithin(plain, drawn, cx, cy - 6, 1),
+                "the diamond has a vertex above its centre");
+        assertTrue(inkWithin(plain, drawn, cx, cy + 6, 1),
+                "and below");
+        assertTrue(inkWithin(plain, drawn, cx - 6, cy, 1),
+                "and to one side");
+        assertTrue(inkWithin(plain, drawn, cx + 6, cy, 1),
+                "and to the other");
+
+        // Open, not filled.
+        assertEquals(plain.getRGB(cx, cy), drawn.getRGB(cx, cy),
+                "and its centre is open");
+
+        // The diagonals are cut away: a circle or a square of this
+        // size would put ink at the corners, and a diamond cannot.
+        for (int dx : new int[] {-5, 5}) {
+            for (int dy : new int[] {-5, 5}) {
+                assertFalse(inkWithin(plain, drawn, cx + dx, cy + dy, 0),
+                        "no ink at the corner " + dx + "," + dy
+                                + ": the edges run diagonally, which is"
+                                + " what makes it a diamond and not a"
+                                + " ring or a box");
+            }
+        }
+
+        // And nothing above it: a landmark points nowhere.
+        assertFalse(inkWithin(plain, drawn, cx, cy - 9, 1),
+                "and it carries no upward tick");
+    }
+
+    private static boolean inkWithin(BufferedImage plain,
+                                     BufferedImage drawn,
+                                     int x, int y, int radius) {
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                if (plain.getRGB(x + dx, y + dy)
+                        != drawn.getRGB(x + dx, y + dy)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Test
     void aLandmarkIsDrawnDifferentlyFromAPlace() {
         // The gate's second finding: every reference point wore the
         // zenith's ring and upward tick, and the tick means overhead.
@@ -500,23 +683,27 @@ class ReferenceInkTest {
     }
 
     @Test
-    void aPointWithNoStatedKindIsStillAPlace() {
+    void aReferencePointMustSayWhatKindOfPlaceItIs() {
         // The convenience constructor exists for the working-mark
-        // role, where the kind is never consulted. It must not
-        // quietly change what the zenith looks like.
-        SkyPosition at = new SkyPosition(
-                SCENE.viewport().centre().raDegrees(),
-                SCENE.viewport().centre().decDegrees() + 1.0);
-        assertEquals(0, differences(
-                page(offered("m", List.of(
-                        new OverlayContribution.Point("p", "P", at,
-                                InkRole.REFERENCE_LINE)))),
-                page(offered("m", List.of(
-                        new OverlayContribution.Point("p", "P", at,
-                                OverlayContribution.Mark.PLACE,
-                                InkRole.REFERENCE_LINE))))),
-                "an unclassified point is a place, which is what the"
-                        + " zenith has always been");
+        // role, where the kind is never consulted. Allowing it for
+        // reference ink would preserve exactly the failure this
+        // vocabulary was added to end: a module contributing an
+        // equinox, saying nothing, and silently receiving the
+        // zenith's ring and upward tick (PR #278 review).
+        SkyPosition at = SCENE.viewport().centre();
+        assertThrows(IllegalArgumentException.class,
+                () -> new OverlayContribution.Point("p", "P", at,
+                        InkRole.REFERENCE_LINE),
+                "an unclassified reference point is refused");
+
+        // And the convenience still works where the kind is ignored,
+        // so the refusal is a boundary rather than a removal.
+        assertEquals(OverlayContribution.Mark.PLACE,
+                new OverlayContribution.Point("p", "P", at,
+                        InkRole.INTERACTION).mark(),
+                "a working mark may still be contributed without"
+                        + " classifying itself: its role picks the"
+                        + " painter, and its kind is never asked");
     }
 
     @Test
@@ -544,6 +731,7 @@ class ReferenceInkTest {
         SkyPosition zenith = new SkyPosition(10.7, 41.3);
         List<OverlayRegistry.Owned> ink = offered("m", List.of(
                 new OverlayContribution.Point("zenith", "Zenith", zenith,
+                        OverlayContribution.Mark.PLACE,
                         InkRole.REFERENCE_LINE)));
         page(ink);
 

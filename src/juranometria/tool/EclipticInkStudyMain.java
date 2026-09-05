@@ -68,15 +68,31 @@ public final class EclipticInkStudyMain {
                         InkRole.REFERENCE_LINE),
                 new OverlayContribution.Point("march-equinox",
                         "March equinox", new SkyPosition(0.0, 0.0),
+                        // PLACE deliberately: these pages exist to
+                        // show the treatment the gate rejected -
+                        // an equinox wearing the zenith's symbol.
+                        OverlayContribution.Mark.PLACE,
                         InkRole.REFERENCE_LINE),
                 new OverlayContribution.Point("june-solstice",
                         "June solstice", new SkyPosition(90.0, EPS0),
+                        // PLACE deliberately: these pages exist to
+                        // show the treatment the gate rejected -
+                        // an equinox wearing the zenith's symbol.
+                        OverlayContribution.Mark.PLACE,
                         InkRole.REFERENCE_LINE),
                 new OverlayContribution.Point("september-equinox",
                         "September equinox", new SkyPosition(180.0, 0.0),
+                        // PLACE deliberately: these pages exist to
+                        // show the treatment the gate rejected -
+                        // an equinox wearing the zenith's symbol.
+                        OverlayContribution.Mark.PLACE,
                         InkRole.REFERENCE_LINE),
                 new OverlayContribution.Point("december-solstice",
                         "December solstice", new SkyPosition(270.0, -EPS0),
+                        // PLACE deliberately: these pages exist to
+                        // show the treatment the gate rejected -
+                        // an equinox wearing the zenith's symbol.
+                        OverlayContribution.Mark.PLACE,
                         InkRole.REFERENCE_LINE));
     }
 
