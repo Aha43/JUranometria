@@ -51,3 +51,18 @@ the header, then begin a Shift range in the sorted view. The post-sort gesture
 must snapshot the membership that existed after the first range, retain all
 of it, and add its current range once. Include a mutation that leaves the old
 snapshot alive; it should fail on the member the stale recomputation drops.
+
+## Approval
+
+Approved at `84a77df`. The inventory is now the Inspector's sole page
+boundary, with separate premises and answers for an unnamed star on the paper
+and one held only in the scene's query margin. The additional ink regression
+confirms that an on-paper unnamed member remains in the inventory when the
+magnitude limit hides it and receives exactly its working cross, so the
+incorrect residual limitation is removed rather than documented.
+
+Sorting now ends the range transaction through the row sorter's own change
+notification and edits no membership. The header-driven regression completes
+an additive range, sorts, and proves that the next Shift range snapshots the
+post-sort working set, retaining its members and joining order. Both original
+findings are closed; no findings remain for #261.
