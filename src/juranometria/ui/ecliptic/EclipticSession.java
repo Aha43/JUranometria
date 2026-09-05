@@ -22,6 +22,32 @@ public final class EclipticSession {
     }
 
     /**
+     * What the Ecliptic menu item does.
+     *
+     * <p>Here rather than inline in the application, so the chain a
+     * reader actually sets off - item to module to remembered choice
+     * - is one named thing that a test can drive (PR #279 review).
+     * Rehearsing the three effects separately proves each of them
+     * and none of the wiring between them.
+     *
+     * <p>Two effects and no others: the module shows or stops
+     * showing, and the reader's choice is remembered. The page does
+     * not move, the selection does not change, no clock is read, and
+     * no chart option is touched.
+     */
+    public static Runnable toggle(EclipticModule module,
+                                  EclipticStore store) {
+        if (module == null || store == null) {
+            throw new IllegalArgumentException(
+                    "the switch needs a module and a store");
+        }
+        return () -> {
+            module.showing(!module.showing());
+            store.save(module.showing());
+        };
+    }
+
+    /**
      * Attaches the module and restores the reader's choice.
      *
      * <p>The store is read exactly once, here. Nothing else in the

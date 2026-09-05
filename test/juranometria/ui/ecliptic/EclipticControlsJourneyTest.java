@@ -184,6 +184,85 @@ class EclipticControlsJourneyTest {
                         + " second path with its own behaviour");
     }
 
+    // ---- the wiring a reader actually sets off ------------------------
+
+    @Test
+    void theMenuItemDrivesTheModuleAndRemembersTheChoice()
+            throws Exception {
+        // The chain, end to end, through the production menu bar and
+        // the production toggle. Rehearsing the item, the module and
+        // the store separately proves each of them and none of the
+        // wiring between them (PR #279 review): an item bound to
+        // nothing, or a toggle that forgot to save, would pass all
+        // three.
+        SwingSession.scratchPreferences("ecliptic-wiring", node -> {
+            EclipticStore store = EclipticStore.forNode(node);
+            ChartComponent[] holder = new ChartComponent[1];
+            ChartComponent chart = chartOn(eclipticPage(), holder);
+            ChartModuleHost host = new ChartModuleHost(chart,
+                    new juranometria.chart.SelectionModel(),
+                    request -> { });
+            EclipticModule module = EclipticSession.begin(host, store);
+            BufferedImage hidden = paint(chart);
+
+            JMenuBar bar = AppMenuBar.create(null, null, () -> { },
+                    () -> { }, () -> { }, () -> { },
+                    EclipticSession.toggle(module, store));
+            JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
+            item.setSelected(module.showing());
+            assertFalse(item.isSelected(),
+                    "the item starts out showing the released"
+                            + " default, which is hidden");
+
+            item.doClick();
+            assertTrue(module.showing(),
+                    "the item drives the module");
+            assertEquals(java.util.Optional.of(Boolean.TRUE),
+                    store.shown(),
+                    "and the same click remembers the choice");
+            assertTrue(item.isSelected(),
+                    "and the tick shows what is on the chart");
+            assertTrue(differences(hidden, paint(chart)) > 100,
+                    "and the ecliptic is on the page");
+
+            item.doClick();
+            assertFalse(module.showing(), "clicking again hides it");
+            assertEquals(java.util.Optional.of(Boolean.FALSE),
+                    store.shown(),
+                    "and remembers that too - hiding it is a choice,"
+                            + " not a return to never having chosen");
+            assertFalse(item.isSelected(), "and the tick clears");
+            assertEquals(0, differences(hidden, paint(chart)),
+                    "and the page is the page it started as");
+        });
+    }
+
+    @Test
+    void theSwitchMovesNothingButItsOwnLayer() throws Exception {
+        SwingSession.scratchPreferences("ecliptic-quiet", node -> {
+            ChartComponent[] holder = new ChartComponent[1];
+            ChartComponent chart = chartOn(eclipticPage(), holder);
+            List<juranometria.module.NavigationRequest> asked =
+                    new java.util.ArrayList<>();
+            ChartModuleHost host = new ChartModuleHost(chart,
+                    new juranometria.chart.SelectionModel(), asked::add);
+            EclipticStore store = EclipticStore.forNode(node);
+            EclipticModule module = EclipticSession.begin(host, store);
+
+            ChartViewState where = chart.viewState();
+            ChartOptions options = chart.chartOptions();
+            EclipticSession.toggle(module, store).run();
+
+            assertEquals(where, chart.viewState(),
+                    "showing the ecliptic leaves the page where the"
+                            + " reader put it");
+            assertEquals(options, chart.chartOptions(),
+                    "and changes no chart option");
+            assertEquals(List.of(), asked,
+                    "and asks the chart to move nowhere");
+        });
+    }
+
     // ---- what the switch does -----------------------------------------
 
     @Test
@@ -297,13 +376,23 @@ class EclipticControlsJourneyTest {
         // the ecliptic's where it is.
         meridian.showing(true, true, true);
         BufferedImage both = paint(chart);
+        ecliptic.showing(false);
+        BufferedImage meridianOnly = paint(chart);
+        ecliptic.showing(true);
+
+        // An earlier version asserted differences(...) >= 0 here,
+        // which cannot fail (PR #279 review). What is worth
+        // asserting is that neither answers for the other: with both
+        // on, removing the ecliptic changes the page, and removing
+        // the meridian gives back exactly the ecliptic's own.
+        assertTrue(differences(both, meridianOnly) > 0,
+                "with both showing, the ecliptic is contributing ink"
+                        + " of its own");
         meridian.showing(false, false, false);
         assertEquals(0, differences(eclipticOnly, paint(chart)),
-                "turning the other module off and on again returns"
-                        + " the ecliptic's page unchanged");
-        assertTrue(differences(both, eclipticOnly) >= 0,
-                "and the two compose without either answering for the"
-                        + " other");
+                "and turning the other module off and on again"
+                        + " returns the ecliptic's page unchanged,"
+                        + " byte for byte");
 
         // The registry keeps them apart by name.
         List<String> owners = new java.util.ArrayList<>();

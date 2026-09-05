@@ -161,13 +161,11 @@ public final class JUranometriaMain {
                 () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
                         frame, meridian, placeStore,
                         java.time.Instant::now),
-                () -> {
-                    // One switch, and the only thing it does: the
-                    // module repaints, and the reader's choice is
-                    // remembered for next time.
-                    ecliptic.showing(!ecliptic.showing());
-                    eclipticStore.save(ecliptic.showing());
-                }));
+                // One switch, and its whole behaviour lives in the
+                // module's own seam so a test can drive exactly what
+                // a reader sets off.
+                juranometria.ui.ecliptic.EclipticSession.toggle(
+                        ecliptic, eclipticStore)));
         javax.swing.JCheckBoxMenuItem eclipticItem =
                 AppMenuBar.eclipticItem(frame.getJMenuBar());
         if (eclipticItem != null) {
