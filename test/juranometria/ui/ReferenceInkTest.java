@@ -531,6 +531,54 @@ class ReferenceInkTest {
                     "dash and dot alternate all the way along: two"
                             + " of the same kind in a row at " + i);
         }
+
+        // The per-run pixel of latitude is for the raster, not for
+        // the pattern. On its own it accepts a stroke that is wrong
+        // in the same direction everywhere - 11-5-2-4 satisfies every
+        // individual bound above (PR #278 round 5) - so each class of
+        // run is also held at its mean, where a systematic shift
+        // cannot hide and single-pixel rounding averages away.
+        assertEquals(12.0, mean(lengths(runs, 1, 12)), 0.3,
+                "the long dashes average twelve pixels");
+        assertEquals(2.0, mean(lengths(runs, 1, 2)), 0.3,
+                "the short dots average two");
+        assertEquals(4.0, mean(lengths(runs, 0, 4)), 0.3,
+                "and the gaps four");
+    }
+
+    /**
+     * The lengths of the interior runs of one kind, taken as those
+     * nearer {@code about} than any other expected length.
+     */
+    private static List<Integer> lengths(List<int[]> runs, int ink,
+                                         int about) {
+        List<Integer> found = new java.util.ArrayList<>();
+        for (int i = 1; i < runs.size() - 1; i++) {
+            int[] run = runs.get(i);
+            if (run[0] != ink) {
+                continue;
+            }
+            int[] expected = ink == 1 ? new int[] {12, 2} : new int[] {4};
+            int nearest = expected[0];
+            for (int candidate : expected) {
+                if (Math.abs(run[1] - candidate)
+                        < Math.abs(run[1] - nearest)) {
+                    nearest = candidate;
+                }
+            }
+            if (nearest == about) {
+                found.add(run[1]);
+            }
+        }
+        return found;
+    }
+
+    private static double mean(List<Integer> values) {
+        assertTrue(values.size() >= 3,
+                "there are enough runs of this kind to average: "
+                        + values.size());
+        return values.stream().mapToInt(Integer::intValue).average()
+                .orElseThrow();
     }
 
     @Test
@@ -643,22 +691,61 @@ class ReferenceInkTest {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            // The renderer's own hints and the renderer's own paper,
-            // asked of the renderer rather than copied here: without
-            // pure stroke control the same geometry lands on
-            // different pixels, and a second statement of either
-            // would let this ground drift from the page a reader sees
-            // (PR #278 round 4).
-            ChartRenderer.applyRenderingHints(g);
+            // The renderer's own live hints and its own clip, taken
+            // from the reference layer itself rather than restated
+            // here and rather than widening production's API for a
+            // test (PR #278 round 5). Without pure stroke control the
+            // same geometry lands on different pixels, so this ground
+            // has to be the page's ground in every respect but what
+            // is on it.
             g.setColor(ChartOptions.DEFAULTS.palette().ground());
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
-            g.clip(ChartRenderer.paperOf(scene));
+            g.setRenderingHints(layerHints(scene));
+            g.setClip(layerClip(scene));
             ReferenceInk.paint(g, scene, ink,
                     ChartOptions.DEFAULTS.palette());
         } finally {
             g.dispose();
         }
         return image;
+    }
+
+    /**
+     * The hints the renderer has in force when it calls the
+     * reference layer.
+     *
+     * <p>Asked of a real render through the real callback: whatever
+     * the renderer sets, this is what the reference ink is drawn
+     * under, and there is no second statement of it anywhere.
+     */
+    private static java.awt.RenderingHints layerHints(ChartScene scene) {
+        java.awt.RenderingHints[] captured =
+                new java.awt.RenderingHints[1];
+        throughTheLayer(scene, (layerG, painted) ->
+                captured[0] = (java.awt.RenderingHints)
+                        layerG.getRenderingHints());
+        return captured[0];
+    }
+
+    /** The clip the renderer has in force at the same moment. */
+    private static java.awt.Shape layerClip(ChartScene scene) {
+        java.awt.Shape[] captured = new java.awt.Shape[1];
+        throughTheLayer(scene, (layerG, painted) ->
+                captured[0] = layerG.getClip());
+        return captured[0];
+    }
+
+    private static void throughTheLayer(ChartScene scene,
+            ChartRenderer.ReferenceLayer layer) {
+        BufferedImage scratch = new BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scratch.createGraphics();
+        try {
+            RENDERER.render(g, scene, ChartOptions.DEFAULTS, layer);
+        } finally {
+            g.dispose();
+        }
     }
 
     /** Whether this pixel carries ink, on blank ground. */

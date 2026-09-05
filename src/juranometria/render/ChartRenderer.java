@@ -384,24 +384,6 @@ public final class ChartRenderer {
         void paint(Graphics2D g, ChartScene scene);
     }
 
-    /**
-     * The hints every chart page is drawn under.
-     *
-     * <p>Stated once. The same geometry lands on different pixels
-     * without pure stroke control - a diamond rasterises a third
-     * larger and asymmetric - so anything that needs to see what a
-     * reader sees has to draw under these, and a second copy of them
-     * is a second copy to drift (PR #278 round 4).
-     */
-    public static void applyRenderingHints(Graphics2D g) {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
-                RenderingHints.VALUE_STROKE_PURE);
-    }
-
     public void render(Graphics2D g, ChartScene scene, ChartOptions options) {
         // One code path, so a chart with no reference layer is not
         // merely similar to the released chart but identical to it.
@@ -414,7 +396,12 @@ public final class ChartRenderer {
         int height = scene.viewport().heightPx();
         ChartPalette palette = options.palette();
 
-        applyRenderingHints(g);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
+                RenderingHints.VALUE_STROKE_PURE);
 
         g.setColor(palette.ground());
         g.fillRect(0, 0, width, height);
