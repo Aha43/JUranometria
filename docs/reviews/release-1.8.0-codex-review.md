@@ -46,3 +46,14 @@ contents-read for the build, pages-write and OIDC only for deploy.
 
 Keep PR #270 unmerged and do not create `v1.8.0` until the gallery link and
 release notes agree with the release they publish.
+
+## Approval
+
+Approved at `a6acb06`. The manifest now names the immutable v1.8.0 release and
+all ten generated gallery pages carry the same link and label, while every
+slide retains the v1.7.0 tree as its actual production provenance. The #260
+entry now describes `WorkingMarksModel` as a page-scoped compatibility view
+whose state is presentation rather than membership, and the #253 entry names
+all three explicit workflow permissions in their proper jobs. Release
+metadata agreement still holds. No findings remain for the 1.8.0 candidate;
+after tagging, verify that the public gallery's release link resolves.
