@@ -124,6 +124,14 @@ public final class JUranometriaMain {
         juranometria.meridian.MeridianModule meridian =
                 juranometria.ui.placeandtime.PlaceAndTimeSession.begin(
                         modules, placeStore, java.time.Instant.now());
+        // The third module (issue #274), begun through its own seam:
+        // attached, then told what the reader last chose. A reader
+        // who never chose gets the released default, which is
+        // hidden.
+        juranometria.ui.ecliptic.EclipticStore eclipticStore =
+                juranometria.ui.ecliptic.EclipticStore.user();
+        juranometria.ecliptic.EclipticModule ecliptic =
+                juranometria.ui.ecliptic.EclipticSession.begin(modules);
         inspector.showPageView(onThisPage.panel());
         inspector.onClose(chart::requestFocusInWindow);
         // One switch, three ways to reach it: the toolbar button, the
@@ -151,7 +159,17 @@ public final class JUranometriaMain {
                 },
                 () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
                         frame, meridian, placeStore,
-                        java.time.Instant::now)));
+                        java.time.Instant::now),
+                // One switch, and its whole behaviour lives in the
+                // module's own seam so a test can drive exactly what
+                // a reader sets off.
+                juranometria.ui.ecliptic.EclipticSession.toggle(
+                        ecliptic, eclipticStore)));
+        // One call, so the chart and the tick cannot disagree about
+        // what the reader last chose.
+        juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
+                eclipticStore,
+                AppMenuBar.eclipticItem(frame.getJMenuBar()));
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

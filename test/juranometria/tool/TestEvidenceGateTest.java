@@ -322,11 +322,16 @@ class TestEvidenceGateTest {
         assertEquals(List.of("AppShutdown.re" + "al(",
                         "AppearanceStore.us" + "er(",
                         "ChartOptionsStore.us" + "er(",
+                        "EclipticStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
                         "PlaceStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the five production entry points to the reader's"
-                        + " store");
+                "the six production entry points to the reader's"
+                        + " store - the sixth is #274's, which keeps"
+                        + " one key for whether the ecliptic is shown,"
+                        + " and arrives by this pin changing rather"
+                        + " than by a silent gap in a remembered"
+                        + " list");
         int offenders = 0;
         try (var tree = Files.walk(Path.of("test"))) {
             for (Path source : tree
@@ -372,13 +377,17 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(23, display.size(),
+        assertEquals(24, display.size(),
                 "the display corpus is the twenty the decision names"
-                        + " plus the black-sky journey (#246) and the"
+                        + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
                         + " table gestures, whose presses go through"
-                        + " Swing's own toolkit-asking UI - each with"
-                        + " its premises stated");
+                        + " Swing's own toolkit-asking UI - and"
+                        + " #274's menu surface, which shows a real"
+                        + " popup because the gate's own control"
+                        + " images were arrangement mock-ups and a"
+                        + " popup paints nothing until it is shown;"
+                        + " each with its premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
@@ -431,7 +440,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 26,
+        assertTrue(doClick <= 27,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -444,7 +453,12 @@ class TestEvidenceGateTest {
                         + " real pointer events, and the #262 closing"
                         + " journey reaches Settings and Chart"
                         + " Options through the same recorded"
-                        + " menu-item convention: " + doClick);
+                        + " menu-item convention, and #274's controls"
+                        + " journey reaches the Ecliptic item through"
+                        + " it too - a checkbox menu item, which is"
+                        + " what that convention is for, with the"
+                        + " shown popup exercised separately on a"
+                        + " display: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);
