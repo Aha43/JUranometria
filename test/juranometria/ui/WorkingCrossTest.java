@@ -365,6 +365,62 @@ class WorkingCrossTest {
     }
 
     @Test
+    void anUnnamedStarBelowTheLimitWearsTheCrossLikeAnyMember()
+            throws Exception {
+        // The pinned promise behind the corrected reading (review):
+        // the inventory carries an entry for every on-paper star,
+        // named or not, so a selected unnamed star that the
+        // magnitude limit stops drawing gets the working cross
+        // exactly as a named member would - there is no unnamed
+        // no-ink hole.
+        Host host = new Host();
+        try {
+            PageContents page = host.services.inventory();
+            java.util.Set<String> listed = new java.util.HashSet<>();
+            for (PageEntry.StarEntry entry : page.namedStars()) {
+                listed.add(entry.identity());
+            }
+            String unnamed = null;
+            double magnitude = 0;
+            for (PageEntry entry : page.entries()) {
+                if (entry instanceof PageEntry.StarEntry star
+                        && entry.visibility() == PageVisibility.DRAWN
+                        && !listed.contains(entry.identity())
+                        && star.star().magnitude() > 5.0) {
+                    unnamed = entry.identity();
+                    magnitude = star.star().magnitude();
+                    break;
+                }
+            }
+            assertTrue(unnamed != null, "the page draws an unnamed"
+                    + " star fainter than magnitude 5");
+
+            host.services.workingSelection().add(unnamed);
+            assertEquals(List.of(), crossedIdentities(host),
+                    "drawn: the ring's job, no cross");
+
+            String member = unnamed;
+            SwingUtilities.invokeAndWait(() -> host.chart.setViewState(
+                    new ChartViewState(ChartViewState.DEFAULT.centre(),
+                            8.0, 5.0)));
+            assertEquals(PageVisibility.BELOW_LIMIT,
+                    host.services.inventory().find(member)
+                            .orElseThrow().visibility(),
+                    "the limit now stops drawing it, and the"
+                            + " inventory still answers for it: mag "
+                            + magnitude);
+            assertEquals(List.of(member), crossedIdentities(host),
+                    "so it wears the working cross like any on-page"
+                            + " undrawn member");
+            assertEquals(List.of(member),
+                    host.services.workingSelection().members(),
+                    "with membership untouched by the limit change");
+        } finally {
+            host.dispose();
+        }
+    }
+
+    @Test
     void paintingAndMarkingBuildNoInventoryOfTheirOwn() throws Exception {
         // "No catalogue query during paint or a selection-only
         // repaint" is a property of when the inventory is built, so

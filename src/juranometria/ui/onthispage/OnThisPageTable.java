@@ -256,6 +256,12 @@ public final class OnThisPageTable extends JPanel {
         sorter.setComparator(3, java.util.Comparator.comparingInt(
                 (Row row) -> row.state().ordinal()));
         table.setRowSorter(sorter);
+        // Sorting is a distinct, non-range gesture (review): it ends
+        // any captured range transaction - without editing anything -
+        // so the next shift gesture snapshots the membership that
+        // actually exists, in the order the reader is now looking at,
+        // rather than replaying a set captured before the rows moved.
+        sorter.addRowSorterListener(event -> rangeSnapshotMembers = null);
         table.getSelectionModel().addListSelectionListener(event -> {
             if (following || event.getValueIsAdjusting()) {
                 return;

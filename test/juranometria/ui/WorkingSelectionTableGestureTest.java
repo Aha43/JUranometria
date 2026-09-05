@@ -285,6 +285,100 @@ class WorkingSelectionTableGestureTest {
         }
     }
 
+    /** A real click on the real column header, as a reader sorts. */
+    private static void clickHeader(JTable table, int column)
+            throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            javax.swing.table.JTableHeader header = table.getTableHeader();
+            if (header.getWidth() == 0) {
+                // The fixture's panel is never shown, so the scroll
+                // pane has not laid the header out; give it its own
+                // preferred shape - a real window does exactly this.
+                header.setSize(header.getPreferredSize());
+                header.doLayout();
+            }
+            java.awt.Rectangle bounds = header.getHeaderRect(column);
+            assertTrue(bounds.width > 0 && bounds.height > 0,
+                    "the header cell has a size a pointer could hit");
+            int x = (int) bounds.getCenterX();
+            int y = (int) bounds.getCenterY();
+            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
+                    MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED}) {
+                header.dispatchEvent(new MouseEvent(header, id,
+                        System.nanoTime() / 1_000_000, 0, x, y, 1,
+                        false, MouseEvent.BUTTON1));
+            }
+        });
+        SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    @Test
+    void sortingEndsTheRangeTransactionWithoutEditingAnything()
+            throws Exception {
+        // The gate: a range transaction ends when a non-range
+        // gesture arrives, and sorting through the header is one.
+        // A shift gesture begun in the sorted view must snapshot the
+        // membership that exists NOW - everything the completed
+        // pre-sort range established included - not replay the set
+        // captured before the rows moved, which would remove
+        // members an additive gesture is bound to preserve.
+        try (Fixture fixture = new Fixture()) {
+            String r0 = fixture.rowIdentity(0);
+            String r1 = fixture.rowIdentity(1);
+            String r2 = fixture.rowIdentity(2);
+            click(fixture.table(), 0, 0);
+            click(fixture.table(), 2,
+                    InputEvent.SHIFT_DOWN_MASK | toggleMask());
+            assertEquals(List.of(r0, r1, r2),
+                    fixture.working().members(),
+                    "the first additive range establishes three"
+                            + " members");
+
+            clickHeader(fixture.table(), 2);
+            assertTrue(!fixture.table().getRowSorter().getSortKeys()
+                            .isEmpty(),
+                    "the header click really sorted the table");
+            assertEquals(List.of(r0, r1, r2),
+                    fixture.working().members(),
+                    "and sorting edited nothing");
+
+            click(fixture.table(), 1,
+                    InputEvent.SHIFT_DOWN_MASK | toggleMask());
+            // The new transaction's truth, read from the table's own
+            // anchor and lead after the gesture: snapshot-union-range
+            // over the membership that existed after the first range.
+            List<String> range = new java.util.ArrayList<>();
+            SwingUtilities.invokeAndWait(() -> {
+                int anchor = fixture.table().getSelectionModel()
+                        .getAnchorSelectionIndex();
+                int lead = fixture.table().getSelectionModel()
+                        .getLeadSelectionIndex();
+                for (int view = Math.min(anchor, lead);
+                        view <= Math.max(anchor, lead); view++) {
+                    range.add(fixture.rowIdentity(view));
+                }
+            });
+            List<String> expected =
+                    new java.util.ArrayList<>(List.of(r0, r1, r2));
+            for (String identity : range) {
+                if (!expected.contains(identity)) {
+                    expected.add(identity);
+                }
+            }
+            assertEquals(expected, fixture.working().members(),
+                    "the post-sort shift gesture snapshots the"
+                            + " membership after the first range,"
+                            + " retains all of it, and adds its own"
+                            + " range once - a stale snapshot would"
+                            + " have dropped what the new range does"
+                            + " not cover");
+            assertEquals(List.of(r0, r1, r2),
+                    fixture.working().members().subList(0, 3),
+                    "with the established members' joining order"
+                            + " untouched");
+        }
+    }
+
     @Test
     void aStaleGestureNoteCannotTurnSortingIntoAnEdit() throws Exception {
         // The subtle route to the sorting mutation: a press that

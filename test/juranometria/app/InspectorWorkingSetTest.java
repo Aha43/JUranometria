@@ -82,40 +82,60 @@ class InspectorWorkingSetTest {
     }
 
     @Test
-    void aStarTheCatalogueDoesNotNameIsNotCalledOffThePage()
+    void theInventoryIsTheOnePageBoundaryForUnnamedStars()
             throws Exception {
-        // The census deliberately lists no unnamed stars, so the
-        // inventory cannot answer for one - but a reader can select
-        // one on the chart, its ring is in front of them, and the
-        // section must not say "off this page" of it. The assembled
-        // page itself is asked instead.
+        // The inventory carries an entry for every on-paper star,
+        // named or not - only the table's listing filters the
+        // unnamed ones - while the scene deliberately holds a query
+        // margin beyond the paper (review). So the section's
+        // off-page word follows the inventory alone: an unnamed
+        // star whose PageEntry is on the paper is not called
+        // off-page, and an unnamed star present only in the scene's
+        // query margin is.
         ChartScene scene = page();
-        String unnamed = null;
         PageContents inventory =
                 PageInventory.of(scene, ChartOptions.DEFAULTS);
+        java.util.Set<String> listed = new java.util.HashSet<>();
+        for (var entry : inventory.namedStars()) {
+            listed.add(entry.identity());
+        }
+        String onPaper = null;
+        String inMarginOnly = null;
         for (juranometria.chart.Star star : scene.stars()) {
-            if (inventory.find(star.id()).isEmpty()) {
-                unnamed = star.id();
-                break;
+            if (inventory.find(star.id()).isPresent()) {
+                if (onPaper == null && !listed.contains(star.id())) {
+                    onPaper = star.id();
+                }
+            } else if (inMarginOnly == null) {
+                inMarginOnly = star.id();
             }
         }
-        assertTrue(unnamed != null, "the page holds an unnamed star");
+        // Both premises asserted: the case cannot silently pick the
+        // wrong kind of star and pass anyway.
+        assertTrue(onPaper != null,
+                "the paper holds a star the table does not list");
+        assertTrue(inMarginOnly != null,
+                "and the scene's query margin holds one the paper"
+                        + " does not");
+
         SelectionModel model = new SelectionModel();
         WorkingSelection working = new WorkingSelection();
         InspectorPanel[] panel = new InspectorPanel[1];
-        String member = unnamed;
         SwingUtilities.invokeAndWait(() -> {
             panel[0] = new InspectorPanel(model, () -> scene,
                     () -> ChartOptions.DEFAULTS, chosen -> { });
             panel[0].showWorkingSet(working, () -> inventory);
         });
-        working.add(member);
+        working.add(onPaper);
+        working.add(inMarginOnly);
+        working.lead(onPaper);
         flush();
-        assertEquals(List.of("◉ " + member),
+        assertEquals(List.of("◉ " + onPaper,
+                        inMarginOnly + " — off this page"),
                 panel[0].workingSetLines(),
-                "listed plainly, with no off-page word: the page"
-                        + " holds it whether or not the census names"
-                        + " it");
+                "on the paper: said plainly whether or not the census"
+                        + " names it; in the margin only: off this"
+                        + " page, because the margin is not the page");
     }
 
     @Test
