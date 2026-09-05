@@ -5,10 +5,14 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.awt.GraphicsEnvironment;
+
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import juranometria.app.AppMenuBar;
@@ -114,6 +118,13 @@ class SprintTwentyEightJourneyTest {
     @Test
     void theReaderWalksTheEclipticAndPutsTheChartBackAsTheyFoundIt()
             throws Exception {
+        // The walk ends by PRESSING the toolbar's Reset view, which
+        // means the toolbar has to be on screen: a click on a button
+        // in no window proves nothing about whether a reader could
+        // reach it (PR #280 round 4). The geometry, the module, the
+        // ink and the store are all covered headless elsewhere.
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "pressing a real control needs a display");
         SwingSession.scratchPreferences("sprint-28-journey", node -> {
             EclipticStore store = EclipticStore.forNode(node);
             List<NavigationRequest> asked = new ArrayList<>();
@@ -127,6 +138,7 @@ class SprintTwentyEightJourneyTest {
                     new ChartViewController(Atlas.assembler()::fits);
             ChartComponent chart = chart(ChartViewState.DEFAULT);
             AtlasToolbar[] toolbarHolder = new AtlasToolbar[1];
+            JFrame[] window = new JFrame[1];
             SwingUtilities.invokeAndWait(() -> {
                 controller.onChange(chart::setViewState);
                 // The real toolbar, because Home is a control a
@@ -137,9 +149,27 @@ class SprintTwentyEightJourneyTest {
                         new SearchField(new juranometria.search
                                 .LocalSearch(List.of(), List.of()),
                                 Atlas.assembler(), controller));
+                // On screen, in a window a reader can see: showing,
+                // size and point-reachability are what make a press
+                // evidence of anything.
+                window[0] = new JFrame("sprint-28-journey");
+                window[0].setLayout(new java.awt.BorderLayout());
+                window[0].add(toolbarHolder[0], java.awt.BorderLayout.NORTH);
+                // The chart keeps the 900x700 the rest of the suite
+                // compares at, so packing around it gives a real
+                // reader's window without resizing the page under
+                // the pixel comparisons.
+                chart.setPreferredSize(new java.awt.Dimension(900, 700));
+                window[0].add(chart, java.awt.BorderLayout.CENTER);
+                window[0].pack();
+                window[0].setVisible(true);
             });
             SwingUtilities.invokeAndWait(() -> { });
             AtlasToolbar toolbar = toolbarHolder[0];
+            assertEquals(900, chart.getWidth(),
+                    "the page is the size the suite compares at");
+            assertEquals(700, chart.getHeight(),
+                    "in both directions");
             BufferedImage home = paint(chart);
             SwingUtilities.invokeAndWait(() -> controller.recenter(
                     EQUINOX_PAGE.centre(),
@@ -435,9 +465,11 @@ class SprintTwentyEightJourneyTest {
                     "the toolbar carries the Reset view control");
             assertTrue(resetView.isEnabled(),
                     "and it is reachable rather than greyed");
-            javax.swing.JButton pressed = resetView;
-            SwingUtilities.invokeAndWait(pressed::doClick);
-            SwingUtilities.invokeAndWait(() -> { });
+            // A real pointer press, through the shared route helper,
+            // which proves the button is showing, has a size, and
+            // that the point pressed is one a reader could reach
+            // before it dispatches anything.
+            ReaderInput.click(resetView);
             assertEquals(ChartViewState.DEFAULT, chart.viewState(),
                     "and pressing Reset view - the reader's own Home"
                             + " control - returns the released view"
@@ -452,6 +484,8 @@ class SprintTwentyEightJourneyTest {
                             + " had the module draws");
             assertEquals(0, differences(home, paint(chart)),
                     "the same page it opened on, byte for byte");
+
+            SwingUtilities.invokeAndWait(window[0]::dispose);
         });
     }
 }

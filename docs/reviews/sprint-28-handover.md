@@ -57,9 +57,10 @@ controls the application gives them.*
 6. **Put away, and remembered.** The page is the released page byte
    for byte; the store holds the choice *as a choice*; detaching
    leaves no contribution and exactly one preference key.
-7. **Home.** The toolbar's **Reset view** button is pressed — the
-   reader's own Home control, not the method behind it — and the
-   released view state returns. The page equals one drawn by an
+7. **Home.** The toolbar's **Reset view** button is pressed in a
+   real window through the shared route helper — showing, sized and
+   point-reachable, not a method call and not an unreachable
+   `doClick` — and the released view state returns. The page equals one drawn by an
    atlas that never had the module, and equals the page this walk
    opened on.
 
@@ -199,7 +200,7 @@ chart would not need to change to accept them.
 
 ## Every review correction, by round
 
-Twenty-seven findings across five gated issues. **Not one touched the
+Twenty-eight findings across five gated issues. **Not one touched the
 astronomy, the module design, the layering or the lifecycle** — the
 geometry was right from the first push of each issue. Every finding
 was about evidence.
@@ -244,7 +245,7 @@ fail; two statements the test repeated by hand; and a `null` the
 test found convenient, which allowed a loaded module with no
 control.
 
-**#275, this close — three rounds.** Four assertions in the closing
+**#275, this close — four rounds.** Four assertions in the closing
 journey that looked like they walked the journey and did not: it
 checked landmark geometry through the *static model* rather than
 the module's contributed and painted landmark; it counted the
@@ -270,6 +271,14 @@ which is what the step claimed. The journey now builds the real
 distinction is not pedantry — unwiring the button from `reset()`
 while leaving `reset()` correct is a defect only a real press can
 see, and it is now checked.
+
+And a fourth: the toolbar existed but was never *shown*, and
+`doClick()` activates a button no reader could reach. The journey
+now puts the toolbar and the chart in a real window and presses
+Reset view through the shared `ReaderInput.click`, which proves the
+control is showing, has a size, and that the point pressed lies
+inside its visible rectangle before it dispatches anything. That
+makes the journey display-dependent, and it says so.
 
 ### What I got wrong about my own process
 

@@ -78,7 +78,7 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **41 files** touch process-wide state —
 **20** use the shared guard, **20** restore locally,
-**0 flagged unprotected** — and **24 files** depend on a display,
+**0 flagged unprotected** — and **25 files** depend on a display,
 of which **15** state a focus premise and **16** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -90,7 +90,9 @@ for the platform modifier while handling a press; #274 added the
 ecliptic menu surface, a guard-protected look-and-feel toucher and
 display-dependent because it shows a real popup — the gate's own
 control images were arrangement mock-ups, since a popup paints
-nothing until it is shown.)
+nothing until it is shown; and #275's closing journey, which shows
+the real toolbar so its Reset view can be pressed through the
+shared route helper rather than activated in no window.)
 
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
