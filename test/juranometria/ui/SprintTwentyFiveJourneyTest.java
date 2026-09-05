@@ -95,12 +95,14 @@ class SprintTwentyFiveJourneyTest {
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
             SelectionModel selection = new SelectionModel();
-            SelectInteraction.install(chart, selection);
-
             modules = new ChartModuleHost(chart, selection, request -> {
                 requests.add(request);
                 navigation.recenter(request.centre());
             });
+            // The application's own wiring (#261): one working
+            // selection, the host's, drives clicks, ink and table.
+            SelectInteraction.install(chart, selection,
+                    modules.workingSelection(), modules.selectionMode());
             // The application's startup, through the production
             // seam that owns it - not a transcription of the policy,
             // which a first version carried and the review refused:

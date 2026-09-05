@@ -7,7 +7,6 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SelectionModel;
 import juranometria.page.PageContents;
-import juranometria.page.WorkingMarksModel;
 import juranometria.render.ChartOptions;
 
 /**
@@ -47,19 +46,12 @@ public interface ChartServices {
     SelectionModel selection();
 
     /**
-     * The page surfaces' Sprint 24 view of the working selection -
-     * a one-way adapter over {@link #workingSelection()}, kept for
-     * the callers reviewed against it and retiring with the
-     * surfaces issue (#261). Never a second truth.
-     */
-    WorkingMarksModel workingMarks();
-
-    /**
      * The session-level working selection (issue #260): membership,
      * order and lead, cross-page, never pruned by navigation, never
-     * persisted. The one truth {@link #workingMarks()} re-addresses.
-     * A module observes it; private mutable copies are the mirror
-     * the #258 gate forbids.
+     * persisted. The one truth every surface reads - the Sprint 24
+     * page-scoped adapter retired with its last consumer (#261). A
+     * module observes it; private mutable copies are the mirror the
+     * #258 gate forbids.
      */
     juranometria.chart.WorkingSelection workingSelection();
 

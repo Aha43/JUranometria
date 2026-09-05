@@ -334,7 +334,9 @@ class HiddenFamilyTargetJourneyTest {
             chart = new ChartComponent(Atlas.assembler());
             navigation.onChange(chart::setViewState);
             selection = new SelectionModel();
-            SelectInteraction.install(chart, selection);
+            SelectInteraction.install(chart, selection,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
             options = new ChartOptionsController(
                     ChartOptionsStore.forNode(store));
             // The one wiring, shared with the application itself.

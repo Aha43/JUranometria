@@ -13,7 +13,7 @@ import juranometria.app.Atlas;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SelectionModel;
 import juranometria.chart.SkyPosition;
-import juranometria.page.WorkingMarksModel;
+import juranometria.chart.WorkingSelection;
 import juranometria.ui.onthispage.OnThisPageModule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +50,7 @@ class OnThisPageLifecycleTest {
         OnThisPageModule module = host.attach(new OnThisPageModule());
 
         String first = host.inventory().entries().get(0).identity();
-        host.workingMarks().mark(first);
+        host.workingSelection().add(first);
         assertTrue(chart.overlays().holds(OnThisPageModule.ID),
                 "attached, it is contributing");
 
@@ -64,10 +64,10 @@ class OnThisPageLifecycleTest {
         // Its table is unsubscribed too, so a later change reaches
         // nobody: a module that kept listening after being released
         // is a leak wearing a lifecycle.
-        List<WorkingMarksModel.Change> afterwards = new ArrayList<>();
-        host.workingMarks().onChange(afterwards::add);
+        List<WorkingSelection.Change> afterwards = new ArrayList<>();
+        host.workingSelection().onChange(afterwards::add);
         afterwards.clear();
-        host.workingMarks().clear();
+        host.workingSelection().clear();
         assertEquals(1, afterwards.size(),
                 "the model still works for whoever is left listening");
         assertEquals(0, chart.overlays().collect().size(),
@@ -98,7 +98,7 @@ class OnThisPageLifecycleTest {
         ChartModuleHost host = new ChartModuleHost(chart,
                 new SelectionModel(), request -> { });
         host.attach(new OnThisPageModule());
-        host.workingMarks().mark(host.inventory().entries().get(0).identity());
+        host.workingSelection().add(host.inventory().entries().get(0).identity());
         host.detachAll();
 
         SwingUtilities.invokeAndWait(() -> chart.setViewState(

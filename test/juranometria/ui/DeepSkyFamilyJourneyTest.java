@@ -645,7 +645,9 @@ class DeepSkyFamilyJourneyTest {
         navigation.onChange(chart::setViewState);
         PanInteraction.install(chart, navigation);
         selection = new SelectionModel();
-        SelectInteraction.install(chart, selection);
+        SelectInteraction.install(chart, selection,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
         options = new ChartOptionsController(
                 ChartOptionsStore.forNode(store));
         juranometria.app.TargetRetirement.connect(options, chart, navigation);

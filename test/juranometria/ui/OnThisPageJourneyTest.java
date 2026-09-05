@@ -26,7 +26,7 @@ import juranometria.module.NavigationRequest;
 import juranometria.page.PageContents;
 import juranometria.page.PageEntry;
 import juranometria.page.PageVisibility;
-import juranometria.page.WorkingMarksModel;
+import juranometria.chart.WorkingSelection;
 import juranometria.ui.onthispage.OnThisPageModule;
 import juranometria.ui.onthispage.OnThisPageTable;
 
@@ -95,7 +95,7 @@ class OnThisPageJourneyTest {
         openThePage();
 
         press(KeyEvent.VK_DOWN, 0);
-        assertEquals(List.of(identityAtView(0)), marks().marks(),
+        assertEquals(List.of(identityAtView(0)), marks().members(),
                 "walking to a row marks it");
         assertEquals(identityAtView(0), marks().lead(),
                 "and the row a reader reached is the one they are"
@@ -104,7 +104,7 @@ class OnThisPageJourneyTest {
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
         assertEquals(List.of(identityAtView(0), identityAtView(1),
-                        identityAtView(2)), marks().marks(),
+                        identityAtView(2)), marks().members(),
                 "shift-Down builds the marked set");
         assertEquals(identityAtView(2), marks().lead(),
                 "and the last row reached leads");
@@ -122,17 +122,28 @@ class OnThisPageJourneyTest {
         // five: a subscriber redrawing on each would flicker through
         // sets the reader never chose.
         openThePage();
-        List<WorkingMarksModel.Change> heard = new ArrayList<>();
+        press(KeyEvent.VK_DOWN, 0);
+        List<WorkingSelection.Change> heard = new ArrayList<>();
         marks().onChange(heard::add);
         heard.clear();
 
+        // One reader gesture - a shift-Down sweeping four more rows
+        // is delivered per keystroke, but a single shift-extension
+        // is one whole transition, never one event per row (#261:
+        // programmatic selection writes are display maintenance and
+        // reach the model not at all).
+        press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
+        assertEquals(1, heard.size(),
+                "one transition for one gesture: " + heard);
+        assertEquals(2, heard.get(0).members().size());
+
+        heard.clear();
         SwingUtilities.invokeAndWait(() ->
                 table.setRowSelectionInterval(0, 4));
         flush();
-
-        assertEquals(1, heard.size(),
-                "one transition for one gesture: " + heard);
-        assertEquals(5, heard.get(0).marks().size());
+        assertEquals(List.of(), heard,
+                "a programmatic rewrite of the table's own selection"
+                        + " is nobody's gesture and edits nothing");
     }
 
     @Test
@@ -141,12 +152,12 @@ class OnThisPageJourneyTest {
         ChartViewState before = chart.viewState();
         press(KeyEvent.VK_DOWN, 0);
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
-        assertFalse(marks().marks().isEmpty());
+        assertFalse(marks().members().isEmpty());
 
         ReaderInput.click(panel.clearMarksButton());
         flush();
 
-        assertTrue(marks().marks().isEmpty(), "every mark is gone");
+        assertTrue(marks().members().isEmpty(), "every mark is gone");
         assertEquals(0, table.getSelectedRowCount(),
                 "and the table agrees, rather than showing rows that"
                         + " are no longer marked");
@@ -192,7 +203,7 @@ class OnThisPageJourneyTest {
         assertFalse(panel.sortKeys().isEmpty(), "the table is sorted now");
         assertFalse(viewOrder().equals(defaultOrder),
                 "and the rows moved");
-        assertEquals(List.of(marked), marks().marks(),
+        assertEquals(List.of(marked), marks().members(),
                 "sorting is a way of looking, not a change of mind:"
                         + " what was marked stays marked");
         int selectedRow = table.getSelectedRow();
@@ -228,11 +239,8 @@ class OnThisPageJourneyTest {
                 "the row says why it cannot be seen, in the decided"
                         + " words");
 
-        final int chosen = row;
-        SwingUtilities.invokeAndWait(() ->
-                table.setRowSelectionInterval(chosen, chosen));
-        flush();
-        assertEquals(List.of(undrawn), marks().marks(),
+        clickRow(row);
+        assertEquals(List.of(undrawn), marks().members(),
                 "and a reader can mark what they cannot see - which is"
                         + " the whole point of listing it");
         assertEquals(1, chart.overlays().collect().size(),
@@ -240,36 +248,40 @@ class OnThisPageJourneyTest {
     }
 
     @Test
-    void movingToAnotherRegionTakesTheMarksAndTheRowsWithIt()
+    void movingToAnotherRegionKeepsTheSetAndInksNothingThere()
             throws Exception {
         openThePage();
         press(KeyEvent.VK_DOWN, 0);
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
-        assertEquals(2, marks().marks().size());
+        List<String> kept = marks().members();
+        assertEquals(2, kept.size());
         List<String> before = viewOrder();
 
         // A search elsewhere: the chart goes to another part of the
-        // sky entirely.
+        // sky entirely. The set is the reader's, and navigation
+        // never edits it (#258/#261).
         SwingUtilities.invokeAndWait(() -> chart.setViewState(
                 new ChartViewState(new SkyPosition(83.822, -5.391),
                         8.0, 8.0)));
         flush();
 
-        assertTrue(marks().marks().isEmpty(),
-                "no cloud of crosses follows the reader to Orion: "
-                        + marks().marks());
+        assertEquals(kept, marks().members(),
+                "the membership travels with the reader, untouched: "
+                        + marks().members());
         assertEquals(0, chart.overlays().collect().size(),
-                "and nothing is left to ink");
+                "while no cloud of crosses follows them to Orion -"
+                        + " off-page members leave no ink");
         assertFalse(viewOrder().equals(before),
                 "the table describes the page in front of the reader");
         assertEquals(0, table.getSelectedRowCount(),
-                "with nothing shown as marked");
+                "and its rows show the intersection with the working"
+                        + " set, which here is empty");
     }
 
     // ----------------------------------------------------------------
 
-    private WorkingMarksModel marks() {
-        return host.workingMarks();
+    private WorkingSelection marks() {
+        return host.workingSelection();
     }
 
     private List<String> viewOrder() throws Exception {
@@ -293,6 +305,30 @@ class OnThisPageJourneyTest {
         // gesture rather than being trusted to a distant call site
         // (#243 review).
         ReaderInput.shortcutOn(table, keyCode, modifiers);
+    }
+
+    /** A real click, on a real row, where a reader would click. */
+    private void clickRow(int viewRow) throws Exception {
+        SwingUtilities.invokeAndWait(() -> table.scrollRectToVisible(
+                table.getCellRect(viewRow, 0, true)));
+        flush();
+        SwingUtilities.invokeAndWait(() -> {
+            java.awt.Rectangle cell = table.getCellRect(viewRow, 0, true);
+            int x = cell.x + cell.width / 2;
+            int y = cell.y + cell.height / 2;
+            assertTrue(table.getVisibleRect().contains(x, y),
+                    "the point clicked on row " + viewRow + " is one a"
+                            + " reader could reach");
+            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
+                    MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED}) {
+                table.dispatchEvent(new MouseEvent(table, id,
+                        System.nanoTime() / 1_000_000,
+                        id == MouseEvent.MOUSE_PRESSED
+                                ? InputEvent.BUTTON1_DOWN_MASK : 0,
+                        x, y, 1, false, MouseEvent.BUTTON1));
+            }
+        });
+        flush();
     }
 
     /** A real click, on the real header, where a reader would click. */

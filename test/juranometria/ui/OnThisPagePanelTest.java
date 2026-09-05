@@ -17,7 +17,7 @@ import juranometria.chart.SelectionModel;
 import juranometria.chart.SkyPosition;
 import juranometria.page.PageContents;
 import juranometria.page.PageEntry;
-import juranometria.page.WorkingMarksModel;
+import juranometria.chart.WorkingSelection;
 import juranometria.ui.onthispage.OnThisPageModule;
 import juranometria.ui.onthispage.OnThisPageTable;
 
@@ -522,19 +522,19 @@ class OnThisPagePanelTest {
         // Suitable for future modules: no duplicate events, and none
         // that say nothing changed.
         try (Fixture fixture = new Fixture(M31, 8.0, 320, 420)) {
-            List<WorkingMarksModel.Change> first = new ArrayList<>();
-            List<WorkingMarksModel.Change> second = new ArrayList<>();
-            fixture.host.workingMarks().onChange(first::add);
-            fixture.host.workingMarks().onChange(second::add);
+            List<WorkingSelection.Change> first = new ArrayList<>();
+            List<WorkingSelection.Change> second = new ArrayList<>();
+            fixture.host.workingSelection().onChange(first::add);
+            fixture.host.workingSelection().onChange(second::add);
             first.clear();
             second.clear();
 
             String one = fixture.host.inventory().entries().get(0).identity();
             PageEntry other = fixture.host.inventory().entries().get(1);
-            fixture.host.workingMarks().mark(one);
-            fixture.host.workingMarks().mark(one);          // again
-            fixture.host.workingMarks().mark(other.identity());
-            fixture.host.workingMarks().clear();
+            fixture.host.workingSelection().add(one);
+            fixture.host.workingSelection().add(one);          // again
+            fixture.host.workingSelection().add(other.identity());
+            fixture.host.workingSelection().clear();
 
             assertEquals(3, first.size(),
                     "one event per real change, and none for the mark"
@@ -553,10 +553,10 @@ class OnThisPagePanelTest {
     // ----------------------------------------------------------------
 
     private static List<String> describe(
-            List<WorkingMarksModel.Change> changes) {
+            List<WorkingSelection.Change> changes) {
         List<String> said = new ArrayList<>();
-        for (WorkingMarksModel.Change change : changes) {
-            said.add(change.marks() + " lead " + change.lead());
+        for (WorkingSelection.Change change : changes) {
+            said.add(change.members() + " lead " + change.lead());
         }
         return said;
     }

@@ -57,6 +57,22 @@ public final class SearchField extends JTextField {
         this.selection = model;
     }
 
+    /** Optional: the working selection and its mode (issue #261). */
+    private juranometria.chart.WorkingSelection working;
+    private juranometria.chart.SelectionMode mode;
+
+    /**
+     * Tells search where the working selection lives, so a found
+     * object joins the set - replacing it ordinarily, added to it
+     * when gestures accumulate.
+     */
+    public void setWorkingSelection(
+            juranometria.chart.WorkingSelection working,
+            juranometria.chart.SelectionMode mode) {
+        this.working = working;
+        this.mode = mode;
+    }
+
     public SearchField(LocalSearch search, SceneAssembler assembler,
                        ChartViewController controller) {
         super(14);
@@ -110,7 +126,7 @@ public final class SearchField extends JTextField {
      */
     Outcome apply(SearchResult result) {
         return switch (SearchNavigation.apply(result, assembler,
-                controller, selection)) {
+                controller, selection, working, mode)) {
             case RECENTERED -> Outcome.RECENTERED;
             case RECENTERED_NARROWER -> Outcome.RECENTERED_NARROWER;
             case NO_FIT -> Outcome.NO_FIT;

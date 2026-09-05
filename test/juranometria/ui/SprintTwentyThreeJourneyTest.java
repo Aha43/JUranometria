@@ -428,7 +428,9 @@ class SprintTwentyThreeJourneyTest {
             chart = new ChartComponent(Atlas.assembler());
             navigation.onChange(chart::setViewState);
             selection = new SelectionModel();
-            SelectInteraction.install(chart, selection);
+            SelectInteraction.install(chart, selection,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
             options = new ChartOptionsController(
                     ChartOptionsStore.forNode(store));
             TargetRetirement.connect(options, chart, navigation);
@@ -637,7 +639,9 @@ class SprintTwentyThreeJourneyTest {
             ChartComponent page = new ChartComponent(Atlas.assembler());
             nav.onChange(page::setViewState);
             SelectionModel chosen = new SelectionModel();
-            SelectInteraction.install(page, chosen);
+            SelectInteraction.install(page, chosen,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
             ChartOptionsController opts = new ChartOptionsController(
                     ChartOptionsStore.forNode(store));
             TargetRetirement.connect(opts, page, nav);

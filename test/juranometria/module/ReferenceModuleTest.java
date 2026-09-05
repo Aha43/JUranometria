@@ -15,7 +15,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.page.PageContents;
 import juranometria.page.PageEntry;
 import juranometria.page.PageInventory;
-import juranometria.page.WorkingMarksModel;
+import juranometria.chart.WorkingSelection;
 import juranometria.render.ChartOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +45,7 @@ class ReferenceModuleTest {
         private ChartServices services;
         private Runnable unsubscribe;
         private Runnable withdraw;
-        private final List<WorkingMarksModel.Change> heard = new ArrayList<>();
+        private final List<WorkingSelection.Change> heard = new ArrayList<>();
 
         MarkingModule(String id) {
             this.id = id;
@@ -59,7 +59,7 @@ class ReferenceModuleTest {
         @Override
         public void attach(ChartServices services) {
             this.services = services;
-            this.unsubscribe = services.workingMarks().onChange(heard::add);
+            this.unsubscribe = services.workingSelection().onChange(heard::add);
             this.withdraw = services.contribute(id, this::overlay);
         }
 
@@ -79,7 +79,7 @@ class ReferenceModuleTest {
         /** Its contribution: a cross per marked object, as points. */
         List<OverlayContribution> overlay() {
             List<OverlayContribution> geometry = new ArrayList<>();
-            for (String identity : services.workingMarks().marks()) {
+            for (String identity : services.workingSelection().members()) {
                 PageEntry entry = services.inventory().find(identity)
                         .orElse(null);
                 if (entry == null) {
@@ -101,7 +101,7 @@ class ReferenceModuleTest {
         module.attach(services);
 
         String first = services.inventory().deepSky().get(0).identity();
-        services.workingMarks().mark(first);
+        services.workingSelection().add(first);
 
         List<OverlayRegistry.Owned> collected = services.overlays.collect();
         assertEquals(1, collected.size(),
@@ -158,7 +158,7 @@ class ReferenceModuleTest {
         second.attach(services);
 
         String marked = services.inventory().deepSky().get(0).identity();
-        services.workingMarks().mark(marked);
+        services.workingSelection().add(marked);
 
         List<OverlayRegistry.Owned> both = services.overlays.collect();
         assertEquals(List.of("first", "second"),
@@ -269,19 +269,19 @@ class ReferenceModuleTest {
         TestChartServices services = new TestChartServices();
         MarkingModule module = new MarkingModule("reference");
         module.attach(services);
-        services.workingMarks().mark("NGC 224");
+        services.workingSelection().add("NGC 224");
         int heardWhileAttached = module.heard.size();
 
         module.detach();
         assertTrue(!services.overlays.holds("reference"),
                 "its ink went with it");
-        services.workingMarks().mark("NGC 205");
+        services.workingSelection().add("NGC 205");
 
         assertEquals(heardWhileAttached, module.heard.size(),
                 "removing a module removes its feature: it is"
                         + " unsubscribed, not merely ignored");
         assertEquals(List.of("NGC 224", "NGC 205"),
-                services.workingMarks().marks(),
+                services.workingSelection().members(),
                 "and the chart's own state is untouched by its"
                         + " departure - no module-specific state left"
                         + " behind, and nothing missing either");

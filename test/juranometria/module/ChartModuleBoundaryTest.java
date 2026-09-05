@@ -135,13 +135,13 @@ class ChartModuleBoundaryTest {
         // And nothing a module could hold changes that page. With
         // nothing marked, the chart is byte-identical to the chart
         // that has no modules at all.
-        juranometria.page.WorkingMarksModel marks =
-                new juranometria.page.WorkingMarksModel();
+        juranometria.chart.WorkingSelection marks =
+                new juranometria.chart.WorkingSelection();
         juranometria.page.PageContents inventory =
                 juranometria.page.PageInventory.of(scene, ChartOptions.DEFAULTS);
         assertTrue(!inventory.entries().isEmpty(),
                 "the module has something to say about this page");
-        assertTrue(marks.marks().isEmpty(), "and nothing is marked");
+        assertTrue(marks.members().isEmpty(), "and nothing is marked");
 
         java.awt.image.BufferedImage again =
                 renderer.renderToImage(scene, ChartOptions.DEFAULTS);

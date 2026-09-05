@@ -35,6 +35,9 @@ public final class ChartComponent extends JComponent {
     private juranometria.render.ChartOptions chartOptions =
             juranometria.render.ChartOptions.DEFAULTS;
     private ChartScene scene;
+    /** The selected members, in membership order; ink only. */
+    private List<String> selected = List.of();
+    /** The lead identity, wearing the cross vocabulary's treatment. */
     private String highlighted;
     private final java.util.List<Runnable> sceneListeners =
             new java.util.ArrayList<>();
@@ -133,10 +136,29 @@ public final class ChartComponent extends JComponent {
      * no scene, and asks the catalogue nothing.
      */
     public void setHighlightedObject(String catalogueId) {
-        if (java.util.Objects.equals(highlighted, catalogueId)) {
+        setWorkingSelection(catalogueId == null ? List.of()
+                : List.of(catalogueId), catalogueId);
+    }
+
+    /**
+     * The reader's working selection, as ink (issue #261,
+     * docs/decisions/working-selection.md): the chart's existing
+     * selection ring around each selected member whose symbol is
+     * drawn - the renderer already answers "is it drawn" per
+     * identity, so an undrawn or off-page member simply leaves no
+     * ring - and the lead treatment for the cross vocabulary.
+     * Presentation only, exactly as the single highlight was: no
+     * view state, no scene, no catalogue query.
+     */
+    public void setWorkingSelection(List<String> members, String lead) {
+        List<String> next = members == null ? List.of()
+                : List.copyOf(members);
+        if (selected.equals(next)
+                && java.util.Objects.equals(highlighted, lead)) {
             return;
         }
-        this.highlighted = catalogueId;
+        this.selected = next;
+        this.highlighted = lead;
         repaint();
     }
 
@@ -226,8 +248,15 @@ public final class ChartComponent extends JComponent {
                     (layerG, layerScene) -> ReferenceInk.paint(layerG,
                             layerScene, overlays.collect(),
                             chartOptions.palette()));
-            renderer.drawSelectionHighlight(g2, scene, chartOptions,
-                    highlighted);
+            // One ring per selected drawn member (issue #261): the
+            // renderer draws nothing for an identity the page does
+            // not draw, so an on-page undrawn member is left to its
+            // cross and an off-page member leaves no ink at all -
+            // never both treatments for one object.
+            for (String member : selected) {
+                renderer.drawSelectionHighlight(g2, scene, chartOptions,
+                        member);
+            }
             // After the chart, never inside it: working crosses are
             // an interaction overlay and not catalogue symbols, so
             // ordinary and reference rendering are untouched by them

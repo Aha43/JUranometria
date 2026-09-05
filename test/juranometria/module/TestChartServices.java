@@ -12,7 +12,6 @@ import juranometria.chart.SelectionModel;
 import juranometria.chart.SkyPosition;
 import juranometria.page.PageContents;
 import juranometria.page.PageInventory;
-import juranometria.page.WorkingMarksModel;
 import juranometria.render.ChartOptions;
 
 /**
@@ -39,8 +38,6 @@ public final class TestChartServices implements ChartServices {
             new juranometria.chart.WorkingSelection();
     private final juranometria.chart.SelectionMode selectionMode =
             new juranometria.chart.SelectionMode();
-    private final WorkingMarksModel marks =
-            new WorkingMarksModel(workingSelection);
     public final List<NavigationRequest> requested = new ArrayList<>();
     public final OverlayRegistry overlays = new OverlayRegistry();
 
@@ -101,10 +98,6 @@ public final class TestChartServices implements ChartServices {
 
     @Override public juranometria.chart.SelectionMode selectionMode() {
         return selectionMode;
-    }
-
-    @Override public WorkingMarksModel workingMarks() {
-        return marks;
     }
 
     @Override public void request(NavigationRequest request) {
