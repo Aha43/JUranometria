@@ -307,11 +307,49 @@ public final class PackagedAcceptanceMain {
         require(ecliptic.timesTheGeometryWasBuilt() == 0,
                 "and it works out no ecliptic to say so");
 
+        // Shown, and still nothing - because the reviewed default
+        // page is centred on M31, at declination +41, and the
+        // ecliptic does not pass anywhere near it. An earlier version
+        // of this check asserted ink here and failed on every native
+        // image: zero was the correct answer, and the premise was
+        // wrong (PR #278 correction). Off the page is silence, and
+        // that is worth asserting where it is true.
+        ecliptic.showing(true);
+        require(differingPixels(without, paint(chart)) == 0,
+                "on the default page the ecliptic is drawn as"
+                        + " nothing: it does not cross this sky, and a"
+                        + " line drawn anyway would be a promise the"
+                        + " sky has not made");
+        boolean anyLandmarkOnTheDefaultPage = false;
+        for (juranometria.sky.Ecliptic.Landmark landmark
+                : juranometria.sky.Ecliptic.landmarks()) {
+            var page = host.projection().toPage(landmark.at());
+            anyLandmarkOnTheDefaultPage |= page.isPresent()
+                    && page.get()[0] >= 0 && page.get()[0] < 900
+                    && page.get()[1] >= 0 && page.get()[1] < 700;
+        }
+        require(!anyLandmarkOnTheDefaultPage,
+                "and none of its landmarks is on this page either, so"
+                        + " the silence above is the geometry and not"
+                        + " a module that has stopped working");
+
+        // A stated ecliptic page: centred on the March equinox, where
+        // the circle crosses the equator by definition. Here the
+        // geometry must reach the paper, and this is where the ink is
+        // proved.
+        ChartViewState eclipticPage = new ChartViewState(
+                new SkyPosition(0.0, 0.0), 24.0,
+                ChartViewState.DEFAULT.limitingMagnitude());
+        chart.setViewState(eclipticPage);
+        ecliptic.showing(false);
+        java.awt.image.BufferedImage withoutOnEclipticPage = paint(chart);
         ecliptic.showing(true);
         java.awt.image.BufferedImage withEcliptic = paint(chart);
-        int eclipticInk = differingPixels(without, withEcliptic);
+        int eclipticInk = differingPixels(withoutOnEclipticPage,
+                withEcliptic);
         require(eclipticInk > 100,
-                "shown, the ecliptic reaches the page: " + eclipticInk
+                "on the March equinox page at 24 degrees the ecliptic"
+                        + " reaches the paper: " + eclipticInk
                         + " pixels");
 
         java.util.List<String> eclipticOffered =
@@ -326,7 +364,8 @@ public final class PackagedAcceptanceMain {
                         + eclipticOffered);
 
         // Each landmark that this page can hold is inked where the
-        // model puts it.
+        // model puts it - and on this page at least one is, which is
+        // what makes the loop an answer.
         int landmarksSeen = 0;
         for (juranometria.sky.Ecliptic.Landmark landmark
                 : juranometria.sky.Ecliptic.landmarks()) {
@@ -347,6 +386,10 @@ public final class PackagedAcceptanceMain {
         require(landmarksSeen > 0,
                 "and at least one landmark was on this page, so that"
                         + " check is an answer");
+        require(inkNear(withEcliptic, withoutOnEclipticPage, 450, 350, 12),
+                "the circle itself crosses the middle of the page,"
+                        + " where the equator and the ecliptic meet at"
+                        + " the March equinox");
 
         // Both modules at once: each keeps its own ink, and detaching
         // one leaves the other's alone.
@@ -354,14 +397,29 @@ public final class PackagedAcceptanceMain {
         module.showing(true, true, true);
         require(chart.overlays().collect().size() == 8,
                 "the two modules compose: three geometries and five");
+        java.awt.image.BufferedImage both = paint(chart);
+
         ecliptic.detach();
-        require(chart.overlays().collect().size() == 3,
-                "detaching the ecliptic removes only its own");
-        require(differingPixels(without, paint(chart)) > 0,
-                "and the meridian is still drawn");
+        java.util.List<String> leftBehind = new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            leftBehind.add(owned.geometry().identity());
+        }
+        require(leftBehind.equals(java.util.List.of("meridian",
+                        "horizon", "zenith")),
+                "detaching the ecliptic removes its own contributions"
+                        + " and leaves the other module's: "
+                        + leftBehind);
+        // Asked of the page as the difference detaching made, not of
+        // whether the meridian happens to cross this sky: an earlier
+        // version required the meridian to be drawn here, which is
+        // the same false premise the ecliptic check had (PR #278
+        // correction).
+        require(differingPixels(both, paint(chart)) > 0,
+                "and the ecliptic's ink is off the page with it");
         module.detach();
-        require(differingPixels(without, paint(chart)) == 0,
+        require(differingPixels(withoutOnEclipticPage, paint(chart)) == 0,
                 "and with both gone the atlas is the atlas again");
+        chart.setViewState(ChartViewState.DEFAULT);
 
         // The stored-state restart, as a second application session
         // (issue #229): the place is saved through the bundled
@@ -440,6 +498,12 @@ public final class PackagedAcceptanceMain {
                 + " horizon proved silent alone, withdrawn cleanly,"
                 + " page never moved except when asked, and the place"
                 + " survives a restart while the instant does not)");
+        System.out.println("ecliptic module OK (hidden by default and"
+                + " silent on the M31 page it does not cross, "
+                + eclipticInk + " px on the March equinox page at 24"
+                + " degrees with " + landmarksSeen + " landmark(s)"
+                + " inked where the model puts them, composed with the"
+                + " meridian and withdrawn without touching it)");
     }
 
     private static void onThisPageJourney() throws Exception {
