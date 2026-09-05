@@ -29,11 +29,13 @@ import juranometria.ui.ChartComponent;
  * {@code GreatCircle} plus four {@code Point} marks for the cardinal
  * landmarks, which is the whole of the geometry the module will owe.
  *
- * <p>These pages show the ecliptic in the existing {@code LINE}
- * treatment, which is the meridian's: the study exists partly to
- * show that the ecliptic needs its own distinct style so the two are
- * never confused, the one production addition the decision names for
- * issue #273.
+ * <p>These pages show the ecliptic in the <em>existing</em>
+ * treatments, and exist to show that both are wrong for it: the
+ * {@code LINE} stroke is the meridian's own, and the {@code Point}
+ * symbol is the zenith's ring and tick - a <em>place</em> overhead,
+ * which an equinox is not. Those are the two additions the decision
+ * names for issue #273; {@link EclipticCandidateStudyMain} draws the
+ * candidates and the chosen replacements.
  */
 public final class EclipticInkStudyMain {
 
@@ -46,23 +48,35 @@ public final class EclipticInkStudyMain {
     private static final SkyPosition POLE =
             new SkyPosition(270.0, 90.0 - EPS0);
 
-    /** The ecliptic circle and its four named cardinal marks. */
+    /**
+     * The geometry the module will contribute: the circle by its
+     * pole, and a point for each named landmark.
+     *
+     * <p>Offered to the chart and inked by the real
+     * {@code ReferenceInk}, so these pages prove the existing
+     * {@code GreatCircle} and {@code Point} carry the ecliptic with no
+     * new geometry type. What they also show - which is why the gate
+     * needed them - is that the existing <em>treatments</em> are
+     * wrong for it: the line is the meridian's own stroke and the
+     * marks are the zenith's own symbol.
+     * {@link EclipticCandidateStudyMain} draws the replacements.
+     */
     private static List<OverlayContribution> ecliptic() {
         return List.of(
                 new OverlayContribution.GreatCircle("ecliptic", "Ecliptic",
                         POLE, OverlayContribution.Reference.LINE,
                         InkRole.REFERENCE_LINE),
-                new OverlayContribution.Point("vernal-equinox",
-                        "Vernal equinox", new SkyPosition(0.0, 0.0),
+                new OverlayContribution.Point("march-equinox",
+                        "March equinox", new SkyPosition(0.0, 0.0),
                         InkRole.REFERENCE_LINE),
-                new OverlayContribution.Point("summer-solstice",
-                        "Summer solstice", new SkyPosition(90.0, EPS0),
+                new OverlayContribution.Point("june-solstice",
+                        "June solstice", new SkyPosition(90.0, EPS0),
                         InkRole.REFERENCE_LINE),
-                new OverlayContribution.Point("autumnal-equinox",
-                        "Autumnal equinox", new SkyPosition(180.0, 0.0),
+                new OverlayContribution.Point("september-equinox",
+                        "September equinox", new SkyPosition(180.0, 0.0),
                         InkRole.REFERENCE_LINE),
-                new OverlayContribution.Point("winter-solstice",
-                        "Winter solstice", new SkyPosition(270.0, -EPS0),
+                new OverlayContribution.Point("december-solstice",
+                        "December solstice", new SkyPosition(270.0, -EPS0),
                         InkRole.REFERENCE_LINE));
     }
 

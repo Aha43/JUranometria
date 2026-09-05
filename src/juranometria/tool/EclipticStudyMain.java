@@ -2,12 +2,15 @@ package juranometria.tool;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
+import juranometria.project.GnomonicProjection;
+import juranometria.project.PixelPoint;
+import juranometria.project.ViewportMapping;
 import juranometria.sky.GreatCircle;
 import juranometria.sky.SkyFrame;
 
@@ -34,11 +37,21 @@ public final class EclipticStudyMain {
     private static final SkyPosition ECLIPTIC_POLE =
             new SkyPosition(270.0, 90.0 - EPS0);
 
-    private static final String[] DATES = {
-        "1900-01-01T00:00:00Z", "2000-01-01T12:00:00Z",
-        "2026-03-20T21:33:00Z", "2050-07-04T03:00:00Z",
-        "2100-01-01T00:00:00Z",
-    };
+    /** The fields the rendered study pages use. */
+    private static final double[] FIELDS = {8.0, 18.0, 36.0};
+
+    /** A page is 900x700, as every rendered study page is. */
+    private static final int PAGE_WIDTH = 900;
+    private static final int PAGE_HEIGHT = 700;
+
+    /**
+     * The rival candidate at one date, as SOFA gives it: the
+     * <em>mean</em> ecliptic and equinox of date, already expressed in
+     * ICRS/J2000.
+     */
+    private record OfDate(String iso, double obliquity, SkyPosition pole,
+                          SkyPosition equinox) {
+    }
 
     public static void main(String[] args) throws Exception {
         p("# Which ecliptic belongs on a fixed J2000 chart");
@@ -85,14 +98,20 @@ public final class EclipticStudyMain {
                 + " named marks). Each lies on the circle to machine"
                 + " precision.");
         p("");
+        p("**Named by month, not by season.** \"Summer solstice\""
+                + " reverses for a southern reader, and \"vernal\""
+                + " carries the same northern assumption, while this"
+                + " geometry has no observer at all (PR #276 review)."
+                + " The month names are true everywhere.");
+        p("");
         p("| landmark | RA | Dec | off-circle |");
         p("|---|---:|---:|---:|");
-        landmark(ecliptic, "Vernal equinox", 0.0, 0.0);
-        landmark(ecliptic, "Summer solstice", 90.0, EPS0);
-        landmark(ecliptic, "Autumnal equinox", 180.0, 0.0);
-        landmark(ecliptic, "Winter solstice", 270.0, -EPS0);
+        landmark(ecliptic, "March equinox", 0.0, 0.0);
+        landmark(ecliptic, "June solstice", 90.0, EPS0);
+        landmark(ecliptic, "September equinox", 180.0, 0.0);
+        landmark(ecliptic, "December solstice", 270.0, -EPS0);
         p("");
-        p("The vernal equinox falls at exactly RA 0h, Dec 0° — right"
+        p("The March equinox falls at exactly RA 0h, Dec 0° — right"
                 + " ascension is measured from it, so on a J2000 chart"
                 + " the ecliptic crosses the equator at the RA origin"
                 + " by definition.");
@@ -111,43 +130,61 @@ public final class EclipticStudyMain {
      * The heart of the gate: the circle is nearly timeless, the
      * equinox is where precession lives.
      */
-    private static void twoMotions() {
+    private static void twoMotions() throws Exception {
         p("## Two motions of very different size");
         p("");
-        p("An of-date ecliptic and the fixed J2000 ecliptic differ in"
-                + " two ways, and the sizes are what settle the"
+        p("The two candidates are the **mean ecliptic and equinox of"
+                + " J2000** and the **mean ecliptic and equinox of"
+                + " date**. Both are *mean*: no nutation is applied to"
+                + " either, because nutation belongs to neither"
+                + " candidate.");
+        p("");
+        p("**Both come from SOFA, not from the atlas.** An earlier"
+                + " draft built the of-date pole and equinox in mean"
+                + " coordinates and passed them to `SkyFrame.toJ2000`,"
+                + " whose input is a *true* direction and which"
+                + " therefore removes a nutation that was never there"
+                + " (PR #276 review). That added a rotation belonging"
+                + " to neither candidate, and measured the comparison"
+                + " with production's own transformation rather than"
+                + " with the independent authority. Both candidates are"
+                + " now read from"
+                + " `docs/studies/ecliptic/reference-vectors.txt`,"
+                + " where SOFA's `iauEcm06` supplies each date's"
+                + " ecliptic frame directly in ICRS.");
+        p("");
+        p("They differ in two ways, and the sizes are what settle the"
                 + " decision:");
         p("");
-        p("- the **circle** (the plane) barely moves — the of-date"
-                + " ecliptic pole, transformed into J2000, sits a"
-                + " fraction of an arcminute from the J2000 pole;");
-        p("- the **equinox** slides ~50″/yr *along* the circle — the"
-                + " of-date vernal equinox, correctly transformed into"
-                + " J2000, drifts degrees from (0h, 0°).");
+        p("- the **circle** (the plane) moves very little — the"
+                + " of-date ecliptic pole stays under an arcminute from"
+                + " the J2000 pole across two centuries;");
+        p("- the **equinox** slides ~50″/yr *along* the circle,"
+                + " drifting well over a degree.");
         p("");
-        p("| date | ε(t) | circle: pole shift | equinox: drift from (0h,0°) |");
+        p("| date | ε(t) | circle: pole offset | equinox: offset from J2000 equinox |");
         p("|---|---:|---:|---:|");
-        for (String iso : DATES) {
-            double jd = SkyFrame.julianDate(Instant.parse(iso));
-            double t = SkyFrame.centuries(jd);
-            double epsT = SkyFrame.meanObliquityDegrees(t);
-            SkyPosition poleShift = SkyFrame.toJ2000(
-                    new SkyPosition(270.0, 90.0 - epsT), jd);
-            double circle = poleShift.separationDegrees(ECLIPTIC_POLE);
-            SkyPosition equinox = SkyFrame.toJ2000(
-                    new SkyPosition(0.0, 0.0), jd);
-            double drift = equinox.separationDegrees(new SkyPosition(0, 0));
+        List<OfDate> candidates = ofDateCandidates();
+        SkyPosition j2000Equinox = sofaEquinoxJ2000();
+        SkyPosition j2000Pole = sofaPoleJ2000();
+        for (OfDate row : candidates) {
             p(String.format(Locale.ROOT,
                     "| %s | %.5f° | %.2f′ | %.3f° |",
-                    iso.substring(0, 10), epsT, circle * 60.0, drift));
+                    row.iso().substring(0, 10), row.obliquity(),
+                    row.pole().separationDegrees(j2000Pole) * 60.0,
+                    row.equinox().separationDegrees(j2000Equinox)));
         }
         p("");
-        p("So a naive of-date *line* would look almost right — under an"
-                + " arcminute — and only the **equinox landmark**"
-                + " betrays a wrong frame. That is why a fixed atlas"
-                + " anchors both the circle and its landmarks to J2000,"
-                + " and why the gate insists on landmark checks at"
-                + " dates far from J2000 rather than the line alone.");
+        p("At J2000 itself both offsets are exactly zero — the of-date"
+                + " candidate *is* the J2000 candidate there — which is"
+                + " the check that the two are being read in one frame.");
+        p("");
+        p("So a naive of-date *line* would look nearly right, and only"
+                + " the **equinox landmark** betrays a wrong frame."
+                + " That is why a fixed atlas anchors both the circle"
+                + " and its landmarks to J2000, and why the oracle"
+                + " check is made at dates far from J2000 rather than"
+                + " on the line alone.");
         p("");
     }
 
@@ -193,25 +230,172 @@ public final class EclipticStudyMain {
         p("");
     }
 
-    /** What these angles are worth in pixels at chart scale. */
-    private static void pixelScale() {
-        p("## At chart scale");
+    /**
+     * What the two offsets are worth on the paper, measured through
+     * the production projection and viewport mapping.
+     */
+    private static void pixelScale() throws Exception {
+        p("## On the paper");
         p("");
-        p("A page is 900 px wide, so a degree spans this many pixels:");
+        p("Measured through the atlas's own `GnomonicProjection` and"
+                + " `ViewportMapping` at the positions concerned, on"
+                + " the 900x700 page every rendered study page uses."
+                + " An earlier draft used a flat `900 / field`, which"
+                + " is neither the gnomonic scale nor the mapping"
+                + " production applies (PR #276 review).");
         p("");
-        p("| field | px per degree | 1.4° equinox drift | 0.9′ circle shift |");
-        p("|---:|---:|---:|---:|");
-        for (double field : new double[] {8, 18, 36}) {
-            double pxPerDeg = 900.0 / field;
-            p(String.format(Locale.ROOT,
-                    "| %.0f° | %.1f | %.0f px | %.1f px |",
-                    field, pxPerDeg, 1.398 * pxPerDeg,
-                    (0.93 / 60.0) * pxPerDeg));
+        p("**Each is measured on the page where it is worst**, which"
+                + " is not the same page. The two circles *cross* at"
+                + " the equinoxes, so an equinox page is the one place"
+                + " the lines coincide and would flatter the of-date"
+                + " candidate; they are furthest apart a quarter turn"
+                + " away, at the solstices. The equinox marks, of"
+                + " course, are compared on the equinox page.");
+        p("");
+        List<OfDate> candidates = ofDateCandidates();
+        SkyPosition j2000Equinox = sofaEquinoxJ2000();
+        SkyPosition j2000Pole = sofaPoleJ2000();
+        SkyPosition equinoxPage = new SkyPosition(0.0, 0.0);
+        SkyPosition solsticePage = new SkyPosition(90.0, EPS0);
+
+        p("| date | " + fieldHeadings("circle, June solstice page")
+                + " | " + fieldHeadings("March equinox mark") + " |");
+        p("|---|---:|---:|---:|---:|---:|---:|");
+        for (OfDate row : candidates) {
+            StringBuilder line = new StringBuilder();
+            line.append("| ").append(row.iso(), 0, 10).append(" |");
+            for (double field : FIELDS) {
+                line.append(String.format(Locale.ROOT, " %.1f px |",
+                        circlePixels(solsticePage, field, j2000Pole,
+                                row.pole())));
+            }
+            for (double field : FIELDS) {
+                line.append(String.format(Locale.ROOT, " %.0f px |",
+                        pixelsApart(equinoxPage, field, j2000Equinox,
+                                row.equinox())));
+            }
+            p(line.toString());
         }
         p("");
-        p("The equinox drift is a chart-scale distance a reader would"
-                + " see; the circle shift is a fraction of a pixel."
-                + " The line can be called timeless; its equinox cannot.");
+        p(String.format(Locale.ROOT,
+                "For contrast, on the **equinox** page — where the"
+                        + " circles cross — the 2100 circle offset is"
+                        + " %.1f px at the 8° field, effectively"
+                        + " nothing.",
+                circlePixels(equinoxPage, 8.0, j2000Pole,
+                        candidates.get(candidates.size() - 1).pole())));
+        p("");
+        p("**The circle is not identical, and the earlier draft"
+                + " overstated it as \"under a pixel at every field\"**"
+                + " (PR #276 review). Even at its worst page and"
+                + " narrowest field the two circles are only a pixel or"
+                + " so apart — small, but visible ink rather than"
+                + " nothing. The equinox mark is two orders of"
+                + " magnitude worse.");
+        p("");
+        p("That ratio, not either number alone, is the decision: a"
+                + " reader could not tell the two *lines* apart, and"
+                + " could not miss the two *marks* being apart. A"
+                + " chart that fixed its circle to J2000 and its"
+                + " landmarks to the date would look right and read"
+                + " wrong.");
+    }
+
+    private static String fieldHeadings(String what) {
+        StringBuilder heading = new StringBuilder();
+        for (int i = 0; i < FIELDS.length; i++) {
+            heading.append(String.format(Locale.ROOT, "%s %.0f°",
+                    i == 0 ? what + ":" : "", FIELDS[i]));
+            if (i < FIELDS.length - 1) {
+                heading.append(" | ");
+            }
+        }
+        return heading.toString();
+    }
+
+    /** Two sky positions, in pixels apart on a page of this field. */
+    private static double pixelsApart(SkyPosition centre, double field,
+                                      SkyPosition a, SkyPosition b) {
+        ChartViewport viewport = new ChartViewport(centre, field,
+                PAGE_WIDTH, PAGE_HEIGHT);
+        GnomonicProjection projection = new GnomonicProjection(centre);
+        ViewportMapping mapping = new ViewportMapping(viewport);
+        PixelPoint first = projection.project(a).map(mapping::toPixel)
+                .orElseThrow();
+        PixelPoint second = projection.project(b).map(mapping::toPixel)
+                .orElseThrow();
+        return Math.hypot(first.x() - second.x(), first.y() - second.y());
+    }
+
+    /**
+     * How far apart the two circles are on the paper, at the page
+     * centre: the nearest point of each circle to the centre,
+     * projected, and measured.
+     */
+    private static double circlePixels(SkyPosition centre, double field,
+                                       SkyPosition poleA,
+                                       SkyPosition poleB) {
+        return pixelsApart(centre, field, nearestOnCircle(centre, poleA),
+                nearestOnCircle(centre, poleB));
+    }
+
+    /** The point of the circle about {@code pole} nearest {@code to}. */
+    private static SkyPosition nearestOnCircle(SkyPosition to,
+                                               SkyPosition pole) {
+        double[] c = SkyFrame.toVector(to);
+        double[] p = SkyFrame.toVector(pole);
+        double dot = c[0] * p[0] + c[1] * p[1] + c[2] * p[2];
+        double[] n = {c[0] - dot * p[0], c[1] - dot * p[1],
+                c[2] - dot * p[2]};
+        double norm = Math.sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+        return SkyFrame.toPosition(new double[] {n[0] / norm,
+                n[1] / norm, n[2] / norm});
+    }
+
+    // ---- the oracle, read rather than recomputed --------------------
+
+    private static final Path ORACLE =
+            Path.of("docs/studies/ecliptic/reference-vectors.txt");
+
+    /** The rival candidate at each date, as SOFA expressed it. */
+    private static List<OfDate> ofDateCandidates() throws Exception {
+        List<OfDate> rows = new ArrayList<>();
+        for (String line : Files.readAllLines(ORACLE)) {
+            if (!line.startsWith("ofdate ")) {
+                continue;
+            }
+            String[] f = line.trim().split("\\s+");
+            rows.add(new OfDate(f[1], Double.parseDouble(f[2]),
+                    new SkyPosition(Double.parseDouble(f[3]),
+                            Double.parseDouble(f[4])),
+                    new SkyPosition(Double.parseDouble(f[5]),
+                            Double.parseDouble(f[6]))));
+        }
+        return rows;
+    }
+
+    /** SOFA's own J2000 ecliptic pole, in ICRS. */
+    private static SkyPosition sofaPoleJ2000() throws Exception {
+        for (String line : Files.readAllLines(ORACLE)) {
+            if (line.startsWith("eclpole ")) {
+                String[] f = line.trim().split("\\s+");
+                return new SkyPosition(Double.parseDouble(f[1]),
+                        Double.parseDouble(f[2]));
+            }
+        }
+        throw new IllegalStateException("the oracle records no pole");
+    }
+
+    /** SOFA's own J2000 equinox (λ=0), in ICRS. */
+    private static SkyPosition sofaEquinoxJ2000() throws Exception {
+        for (String line : Files.readAllLines(ORACLE)) {
+            if (line.startsWith("ecl 0.0000 ")) {
+                String[] f = line.trim().split("\\s+");
+                return new SkyPosition(Double.parseDouble(f[3]),
+                        Double.parseDouble(f[4]));
+            }
+        }
+        throw new IllegalStateException("the oracle records no equinox");
     }
 
     /** Ecliptic (λ, β=0) to J2000 equatorial, via the mean obliquity. */
