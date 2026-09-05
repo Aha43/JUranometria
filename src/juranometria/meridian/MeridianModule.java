@@ -200,6 +200,9 @@ public final class MeridianModule implements ChartModule {
         if (zenithShowing) {
             offered.add(new OverlayContribution.Point(
                     "zenith", "Zenith", sky.zenith(),
+                    // A place a reader stands under: it has an up,
+                    // and the chart draws the tick for it.
+                    OverlayContribution.Mark.PLACE,
                     InkRole.REFERENCE_LINE));
         }
         return List.copyOf(offered);

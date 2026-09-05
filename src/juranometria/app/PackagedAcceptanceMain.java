@@ -292,6 +292,178 @@ public final class PackagedAcceptanceMain {
         require(differingPixels(without, paint(chart)) == 0,
                 "and the page is the page the atlas draws without it");
 
+        // The second removable module, on the same chart, through the
+        // same host and painter (Sprint 28, issue #273). Asked of the
+        // final pixels: a reconstruction of the expected line would
+        // prove the test's arithmetic, not the atlas's.
+        juranometria.ecliptic.EclipticModule ecliptic =
+                host.attach(new juranometria.ecliptic.EclipticModule());
+        require(!ecliptic.showing(),
+                "a fresh ecliptic module is hidden: the released"
+                        + " default is that a reader who never asked"
+                        + " for it does not get it");
+        require(differingPixels(without, paint(chart)) == 0,
+                "so attaching it changes no page");
+        require(ecliptic.timesTheGeometryWasBuilt() == 0,
+                "and it works out no ecliptic to say so");
+
+        // Shown, and still nothing - because the reviewed default
+        // page is centred on M31, at declination +41, and the
+        // ecliptic does not pass anywhere near it. An earlier version
+        // of this check asserted ink here and failed on every native
+        // image: zero was the correct answer, and the premise was
+        // wrong (PR #278 correction). Off the page is silence, and
+        // that is worth asserting where it is true.
+        ecliptic.showing(true);
+        require(differingPixels(without, paint(chart)) == 0,
+                "on the default page the ecliptic is drawn as"
+                        + " nothing: it does not cross this sky, and a"
+                        + " line drawn anyway would be a promise the"
+                        + " sky has not made");
+        boolean anyLandmarkOnTheDefaultPage = false;
+        for (juranometria.sky.Ecliptic.Landmark landmark
+                : juranometria.sky.Ecliptic.landmarks()) {
+            var page = host.projection().toPage(landmark.at());
+            anyLandmarkOnTheDefaultPage |= page.isPresent()
+                    && page.get()[0] >= 0 && page.get()[0] < 900
+                    && page.get()[1] >= 0 && page.get()[1] < 700;
+        }
+        require(!anyLandmarkOnTheDefaultPage,
+                "and none of its landmarks is on this page either, so"
+                        + " the silence above is the geometry and not"
+                        + " a module that has stopped working");
+
+        // A stated ecliptic page: centred on the March equinox, where
+        // the circle crosses the equator by definition. Here the
+        // geometry must reach the paper, and this is where the ink is
+        // proved.
+        ChartViewState eclipticPage = new ChartViewState(
+                new SkyPosition(0.0, 0.0), 24.0,
+                ChartViewState.DEFAULT.limitingMagnitude());
+        chart.setViewState(eclipticPage);
+        ecliptic.showing(false);
+        java.awt.image.BufferedImage withoutOnEclipticPage = paint(chart);
+        ecliptic.showing(true);
+        java.awt.image.BufferedImage withEcliptic = paint(chart);
+        int eclipticInk = differingPixels(withoutOnEclipticPage,
+                withEcliptic);
+        require(eclipticInk > 100,
+                "on the March equinox page at 24 degrees the ecliptic"
+                        + " reaches the paper: " + eclipticInk
+                        + " pixels");
+
+        java.util.List<String> eclipticOffered =
+                new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            eclipticOffered.add(owned.geometry().identity());
+        }
+        require(eclipticOffered.equals(java.util.List.of("ecliptic",
+                        "march-equinox", "june-solstice",
+                        "september-equinox", "december-solstice")),
+                "offering the circle and its four landmarks: "
+                        + eclipticOffered);
+
+        // Each landmark that this page can hold is inked where the
+        // model puts it - and on this page at least one is, which is
+        // what makes the loop an answer.
+        int landmarksSeen = 0;
+        int landmarkInk = 0;
+        for (juranometria.sky.Ecliptic.Landmark landmark
+                : juranometria.sky.Ecliptic.landmarks()) {
+            var page = host.projection().toPage(landmark.at());
+            if (page.isEmpty()) {
+                continue;
+            }
+            int x = (int) Math.round(page.get()[0]);
+            int y = (int) Math.round(page.get()[1]);
+            if (x < 10 || y < 10 || x > 890 || y > 690) {
+                continue;
+            }
+            // Against THIS page's baseline. An earlier version
+            // compared with the M31 page, so every pixel differed
+            // and the check could not fail (PR #278 re-review).
+            //
+            // And counted, not merely found: the circle passes
+            // through every landmark, so ink NEAR one is satisfied by
+            // the line alone and a missing mark would go unnoticed.
+            // A mark puts down several times what the line does in
+            // the same small box.
+            landmarkInk = inkCount(withEcliptic, withoutOnEclipticPage,
+                    x, y, 6);
+            require(inkNear(withEcliptic, withoutOnEclipticPage,
+                            x, y, 10),
+                    landmark.name() + " is inked where the model puts"
+                            + " it, at " + x + "," + y);
+            landmarksSeen++;
+        }
+        require(landmarksSeen > 0,
+                "and at least one landmark was on this page, so that"
+                        + " check is an answer");
+        // The circle itself, probed WELL AWAY from every landmark.
+        // An earlier version probed the middle of the page, which on
+        // this page is the March equinox - so the diamond satisfied
+        // both the landmark check and the circle check, and one mark
+        // stood for the whole line (PR #278 re-review).
+        SkyPosition onTheCircle =
+                juranometria.sky.Ecliptic.toEquatorial(10.0, 0.0);
+        double[] alongIt = host.projection().toPage(onTheCircle)
+                .orElseThrow(() -> new IllegalStateException(
+                        "the probe point is on this page"));
+        int px = (int) Math.round(alongIt[0]);
+        int py = (int) Math.round(alongIt[1]);
+        for (juranometria.sky.Ecliptic.Landmark landmark
+                : juranometria.sky.Ecliptic.landmarks()) {
+            var mark = host.projection().toPage(landmark.at());
+            if (mark.isEmpty()) {
+                continue;
+            }
+            require(Math.hypot(mark.get()[0] - px, mark.get()[1] - py)
+                            > 60.0,
+                    "the probe is clear of " + landmark.name()
+                            + ", so what it finds is the line and not"
+                            + " a mark");
+        }
+        int lineInk = inkCount(withEcliptic, withoutOnEclipticPage,
+                px, py, 6);
+        require(lineInk > 0,
+                "and the circle itself is drawn along the sky between"
+                        + " its landmarks, at " + px + "," + py);
+        require(landmarkInk > lineInk * 2,
+                "and a landmark is a mark and not just the line"
+                        + " passing through it: " + landmarkInk
+                        + " pixels in a box at the landmark against "
+                        + lineInk + " in the same box on bare line");
+
+        // Both modules at once: each keeps its own ink, and detaching
+        // one leaves the other's alone.
+        host.attach(module);
+        module.showing(true, true, true);
+        require(chart.overlays().collect().size() == 8,
+                "the two modules compose: three geometries and five");
+        java.awt.image.BufferedImage both = paint(chart);
+
+        ecliptic.detach();
+        java.util.List<String> leftBehind = new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            leftBehind.add(owned.geometry().identity());
+        }
+        require(leftBehind.equals(java.util.List.of("meridian",
+                        "horizon", "zenith")),
+                "detaching the ecliptic removes its own contributions"
+                        + " and leaves the other module's: "
+                        + leftBehind);
+        // Asked of the page as the difference detaching made, not of
+        // whether the meridian happens to cross this sky: an earlier
+        // version required the meridian to be drawn here, which is
+        // the same false premise the ecliptic check had (PR #278
+        // correction).
+        require(differingPixels(both, paint(chart)) > 0,
+                "and the ecliptic's ink is off the page with it");
+        module.detach();
+        require(differingPixels(withoutOnEclipticPage, paint(chart)) == 0,
+                "and with both gone the atlas is the atlas again");
+        chart.setViewState(ChartViewState.DEFAULT);
+
         // The stored-state restart, as a second application session
         // (issue #229): the place is saved through the bundled
         // preference backend, and then the whole wiring is built
@@ -369,6 +541,14 @@ public final class PackagedAcceptanceMain {
                 + " horizon proved silent alone, withdrawn cleanly,"
                 + " page never moved except when asked, and the place"
                 + " survives a restart while the instant does not)");
+        System.out.println("ecliptic module OK (hidden by default and"
+                + " silent on the M31 page it does not cross, "
+                + eclipticInk + " px on the March equinox page at 24"
+                + " degrees with " + landmarksSeen + " landmark(s)"
+                + " inked where the model puts them - " + landmarkInk
+                + " px in a box at the mark against " + lineInk
+                + " on bare line - composed with the meridian and"
+                + " withdrawn without touching it)");
     }
 
     private static void onThisPageJourney() throws Exception {
@@ -579,6 +759,24 @@ public final class PackagedAcceptanceMain {
     }
 
     /** Whether new ink appeared within this many pixels of a point. */
+    /** How many pixels changed in a box about a point. */
+    private static int inkCount(BufferedImage with, BufferedImage without,
+                                int x, int y, int radius) {
+        int count = 0;
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int px = x + dx;
+                int py = y + dy;
+                if (px >= 0 && py >= 0 && px < with.getWidth()
+                        && py < with.getHeight()
+                        && with.getRGB(px, py) != without.getRGB(px, py)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     private static boolean inkNear(java.awt.image.BufferedImage marked,
                                    java.awt.image.BufferedImage unmarked,
                                    int x, int y, int radius) {
