@@ -11,6 +11,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
+import juranometria.sky.Ecliptic;
 import juranometria.sky.GreatCircle;
 import juranometria.sky.SkyFrame;
 
@@ -30,12 +31,11 @@ public final class EclipticStudyMain {
     private EclipticStudyMain() {
     }
 
-    /** The J2000 mean obliquity, from the atlas's own model. */
-    private static final double EPS0 = SkyFrame.meanObliquityDegrees(0.0);
-
-    /** The fixed mean ecliptic of J2000, as a great circle. */
-    private static final SkyPosition ECLIPTIC_POLE =
-            new SkyPosition(270.0, 90.0 - EPS0);
+    // The production model (#272), not a second copy of it: the
+    // study measures what the atlas will draw, and one
+    // transformation in the tree cannot disagree with itself.
+    private static final double EPS0 = Ecliptic.OBLIQUITY_DEGREES;
+    private static final SkyPosition ECLIPTIC_POLE = Ecliptic.POLE;
 
     /** The fields the rendered study pages use. */
     private static final double[] FIELDS = {8.0, 18.0, 36.0};
@@ -91,7 +91,7 @@ public final class EclipticStudyMain {
 
     /** The four cardinal landmarks, each exactly on the circle. */
     private static void landmarks() {
-        GreatCircle ecliptic = new GreatCircle(ECLIPTIC_POLE);
+        GreatCircle ecliptic = Ecliptic.circle();
         p("## The cardinal landmarks");
         p("");
         p("Fixed points, named in the interface (issue #271 chose"
@@ -106,10 +106,9 @@ public final class EclipticStudyMain {
         p("");
         p("| landmark | RA | Dec | off-circle |");
         p("|---|---:|---:|---:|");
-        landmark(ecliptic, "March equinox", 0.0, 0.0);
-        landmark(ecliptic, "June solstice", 90.0, EPS0);
-        landmark(ecliptic, "September equinox", 180.0, 0.0);
-        landmark(ecliptic, "December solstice", 270.0, -EPS0);
+        for (Ecliptic.Landmark each : Ecliptic.landmarks()) {
+            landmark(each);
+        }
         p("");
         p("The March equinox falls at exactly RA 0h, Dec 0° — right"
                 + " ascension is measured from it, so on a J2000 chart"
@@ -118,12 +117,11 @@ public final class EclipticStudyMain {
         p("");
     }
 
-    private static void landmark(GreatCircle circle, String name,
-                                 double ra, double dec) {
-        SkyPosition at = new SkyPosition(ra, dec);
-        double off = Math.abs(90.0 - ECLIPTIC_POLE.separationDegrees(at));
+    private static void landmark(Ecliptic.Landmark landmark) {
+        SkyPosition at = landmark.at();
+        double off = Math.abs(Ecliptic.latitudeDegrees(at));
         p(String.format(Locale.ROOT, "| %s | %.3f° | %+.4f° | %.1e° |",
-                name, ra, dec, off));
+                landmark.name(), at.raDegrees(), at.decDegrees(), off));
     }
 
     /**
@@ -236,7 +234,7 @@ public final class EclipticStudyMain {
             } else if (line.startsWith("ecl ")) {
                 String[] f = line.split("\\s+");
                 double lambda = Double.parseDouble(f[1]);
-                SkyPosition mine = eclipticToEquatorial(lambda);
+                SkyPosition mine = Ecliptic.toEquatorial(lambda, 0.0);
                 SkyPosition sofa = new SkyPosition(
                         Double.parseDouble(f[3]), Double.parseDouble(f[4]));
                 worst = Math.max(worst,
@@ -443,18 +441,6 @@ public final class EclipticStudyMain {
             }
         }
         throw new IllegalStateException("the oracle records no equinox");
-    }
-
-    /** Ecliptic (λ, β=0) to J2000 equatorial, via the mean obliquity. */
-    private static SkyPosition eclipticToEquatorial(double lambdaDegrees) {
-        double lambda = Math.toRadians(lambdaDegrees);
-        double eps = Math.toRadians(EPS0);
-        double x = Math.cos(lambda);
-        double y = Math.sin(lambda) * Math.cos(eps);
-        double z = Math.sin(lambda) * Math.sin(eps);
-        double ra = Math.toDegrees(Math.atan2(y, x));
-        double dec = Math.toDegrees(Math.asin(z));
-        return new SkyPosition(ra < 0 ? ra + 360.0 : ra, dec);
     }
 
     private static void p(String line) {

@@ -34,12 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class EclipticReferenceVectorTest {
 
-    /** The atlas's own J2000 mean obliquity. */
-    private static final double EPS0 = SkyFrame.meanObliquityDegrees(0.0);
-
-    /** The ecliptic north pole, ε₀ from the celestial pole. */
-    private static final SkyPosition ECLIPTIC_POLE =
-            new SkyPosition(270.0, 90.0 - EPS0);
+    // The production model, not a copy of it. Until #272 there was
+    // no model to hold, so this test carried the arithmetic itself;
+    // now it holds the thing the atlas will actually draw.
+    private static final double EPS0 = Ecliptic.OBLIQUITY_DEGREES;
+    private static final SkyPosition ECLIPTIC_POLE = Ecliptic.POLE;
 
     private record Row(double lambda, double beta,
                        SkyPosition j2000) {
@@ -91,7 +90,7 @@ class EclipticReferenceVectorTest {
         assertEquals(8, rows.size(),
                 "eight ecliptic longitudes, 45° apart, all at β=0");
 
-        GreatCircle ecliptic = new GreatCircle(ECLIPTIC_POLE);
+        GreatCircle ecliptic = Ecliptic.circle();
         double worst = 0;
         double worstLambda = -1;
         for (Row row : rows) {
@@ -121,29 +120,19 @@ class EclipticReferenceVectorTest {
     @Test
     void theCardinalLandmarksSitWhereSofaPutsThem() throws IOException {
         List<Row> rows = directions();
-        // The four landmarks the decision names, built from the
-        // atlas's own obliquity, held to SOFA's directions at the
-        // same longitudes.
-        record Landmark(String name, double lambda, SkyPosition at) {
-        }
-        List<Landmark> landmarks = List.of(
-                new Landmark("Vernal equinox", 0.0,
-                        new SkyPosition(0.0, 0.0)),
-                new Landmark("Summer solstice", 90.0,
-                        new SkyPosition(90.0, EPS0)),
-                new Landmark("Autumnal equinox", 180.0,
-                        new SkyPosition(180.0, 0.0)),
-                new Landmark("Winter solstice", 270.0,
-                        new SkyPosition(270.0, -EPS0)));
-
+        // The four landmarks the decision names, as the production
+        // model computes them, held to SOFA's directions at the same
+        // longitudes.
         double worst = 0;
         String worstName = "none";
-        for (Landmark landmark : landmarks) {
+        for (Ecliptic.Landmark landmark : Ecliptic.landmarks()) {
             Row sofa = rows.stream()
-                    .filter(r -> r.lambda() == landmark.lambda())
+                    .filter(r -> r.lambda()
+                            == landmark.longitudeDegrees())
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException(
-                            "the oracle has no λ=" + landmark.lambda()));
+                            "the oracle has no λ="
+                                    + landmark.longitudeDegrees()));
             double apart = landmark.at()
                     .separationDegrees(sofa.j2000()) * 3600.0;
             if (apart > worst) {
@@ -168,6 +157,54 @@ class EclipticReferenceVectorTest {
                 new SkyPosition(0.0, 90.0));
         assertEquals(EPS0, apart, 1.0e-9,
                 "the ecliptic pole is ε₀ from the celestial pole");
+    }
+
+    @Test
+    void datesFarFromJ2000TellTheFixedEclipticFromTheOfDateOne()
+            throws IOException {
+        // The gate's central refusal, held to the authority rather
+        // than to the model's own arithmetic. SOFA supplies the mean
+        // equinox of date for five dates, already in ICRS; the model
+        // must be the J2000 one and must visibly not be the others.
+        record OfDate(String iso, SkyPosition equinox) {
+        }
+        List<OfDate> dated = new ArrayList<>();
+        for (String line : Files.readAllLines(ORACLE)) {
+            if (line.startsWith("ofdate ")) {
+                String[] f = line.trim().split("\\s+");
+                dated.add(new OfDate(f[1], new SkyPosition(
+                        Double.parseDouble(f[5]),
+                        Double.parseDouble(f[6]))));
+            }
+        }
+        assertEquals(5, dated.size(),
+                "five dates spanning 1900-2100");
+
+        SkyPosition march = Ecliptic.landmark("march-equinox")
+                .orElseThrow().at();
+        double atJ2000 = 0;
+        double furthest = 0;
+        String furthestDate = "none";
+        for (OfDate row : dated) {
+            double apart = march.separationDegrees(row.equinox());
+            if (row.iso().startsWith("2000-01-01")) {
+                atJ2000 = apart;
+            }
+            if (apart > furthest) {
+                furthest = apart;
+                furthestDate = row.iso();
+            }
+        }
+        // At J2000 the two candidates are the same point, to the
+        // frame bias the gate measured at 0.0403".
+        assertTrue(atJ2000 * 3600.0 < 0.06, String.format(
+                "at J2000 the fixed equinox is the of-date one:"
+                        + " %.4f\"", atJ2000 * 3600.0));
+        // Away from it they are degrees apart - which is what makes
+        // the choice of frame visible on a page rather than academic.
+        assertTrue(furthest > 1.0, String.format(
+                "and far from J2000 they are not: %.3f° at %s",
+                furthest, furthestDate));
     }
 
     @Test
