@@ -367,6 +367,7 @@ public final class PackagedAcceptanceMain {
         // model puts it - and on this page at least one is, which is
         // what makes the loop an answer.
         int landmarksSeen = 0;
+        int landmarkInk = 0;
         for (juranometria.sky.Ecliptic.Landmark landmark
                 : juranometria.sky.Ecliptic.landmarks()) {
             var page = host.projection().toPage(landmark.at());
@@ -378,7 +379,19 @@ public final class PackagedAcceptanceMain {
             if (x < 10 || y < 10 || x > 890 || y > 690) {
                 continue;
             }
-            require(inkNear(withEcliptic, without, x, y, 10),
+            // Against THIS page's baseline. An earlier version
+            // compared with the M31 page, so every pixel differed
+            // and the check could not fail (PR #278 re-review).
+            //
+            // And counted, not merely found: the circle passes
+            // through every landmark, so ink NEAR one is satisfied by
+            // the line alone and a missing mark would go unnoticed.
+            // A mark puts down several times what the line does in
+            // the same small box.
+            landmarkInk = inkCount(withEcliptic, withoutOnEclipticPage,
+                    x, y, 6);
+            require(inkNear(withEcliptic, withoutOnEclipticPage,
+                            x, y, 10),
                     landmark.name() + " is inked where the model puts"
                             + " it, at " + x + "," + y);
             landmarksSeen++;
@@ -386,10 +399,40 @@ public final class PackagedAcceptanceMain {
         require(landmarksSeen > 0,
                 "and at least one landmark was on this page, so that"
                         + " check is an answer");
-        require(inkNear(withEcliptic, withoutOnEclipticPage, 450, 350, 12),
-                "the circle itself crosses the middle of the page,"
-                        + " where the equator and the ecliptic meet at"
-                        + " the March equinox");
+        // The circle itself, probed WELL AWAY from every landmark.
+        // An earlier version probed the middle of the page, which on
+        // this page is the March equinox - so the diamond satisfied
+        // both the landmark check and the circle check, and one mark
+        // stood for the whole line (PR #278 re-review).
+        SkyPosition onTheCircle =
+                juranometria.sky.Ecliptic.toEquatorial(10.0, 0.0);
+        double[] alongIt = host.projection().toPage(onTheCircle)
+                .orElseThrow(() -> new IllegalStateException(
+                        "the probe point is on this page"));
+        int px = (int) Math.round(alongIt[0]);
+        int py = (int) Math.round(alongIt[1]);
+        for (juranometria.sky.Ecliptic.Landmark landmark
+                : juranometria.sky.Ecliptic.landmarks()) {
+            var mark = host.projection().toPage(landmark.at());
+            if (mark.isEmpty()) {
+                continue;
+            }
+            require(Math.hypot(mark.get()[0] - px, mark.get()[1] - py)
+                            > 60.0,
+                    "the probe is clear of " + landmark.name()
+                            + ", so what it finds is the line and not"
+                            + " a mark");
+        }
+        int lineInk = inkCount(withEcliptic, withoutOnEclipticPage,
+                px, py, 6);
+        require(lineInk > 0,
+                "and the circle itself is drawn along the sky between"
+                        + " its landmarks, at " + px + "," + py);
+        require(landmarkInk > lineInk * 2,
+                "and a landmark is a mark and not just the line"
+                        + " passing through it: " + landmarkInk
+                        + " pixels in a box at the landmark against "
+                        + lineInk + " in the same box on bare line");
 
         // Both modules at once: each keeps its own ink, and detaching
         // one leaves the other's alone.
@@ -502,8 +545,10 @@ public final class PackagedAcceptanceMain {
                 + " silent on the M31 page it does not cross, "
                 + eclipticInk + " px on the March equinox page at 24"
                 + " degrees with " + landmarksSeen + " landmark(s)"
-                + " inked where the model puts them, composed with the"
-                + " meridian and withdrawn without touching it)");
+                + " inked where the model puts them - " + landmarkInk
+                + " px in a box at the mark against " + lineInk
+                + " on bare line - composed with the meridian and"
+                + " withdrawn without touching it)");
     }
 
     private static void onThisPageJourney() throws Exception {
@@ -714,6 +759,24 @@ public final class PackagedAcceptanceMain {
     }
 
     /** Whether new ink appeared within this many pixels of a point. */
+    /** How many pixels changed in a box about a point. */
+    private static int inkCount(BufferedImage with, BufferedImage without,
+                                int x, int y, int radius) {
+        int count = 0;
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int px = x + dx;
+                int py = y + dy;
+                if (px >= 0 && py >= 0 && px < with.getWidth()
+                        && py < with.getHeight()
+                        && with.getRGB(px, py) != without.getRGB(px, py)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     private static boolean inkNear(java.awt.image.BufferedImage marked,
                                    java.awt.image.BufferedImage unmarked,
                                    int x, int y, int radius) {
