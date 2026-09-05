@@ -94,3 +94,23 @@ window or choosing a clipped endpoint must fail on the premise rather than
 still reorder an off-screen Swing component. The closing journey should not
 introduce a second, weaker definition of a reader-reachable header one commit
 after the first was removed.
+
+## Approval
+
+Approved at `dbd2489`. The integrated journey now installs the production
+`AppMenuBar`, opens Chart Options and Settings through their real menu items,
+and changes options, palette and both appearances through the dialogs' own
+controls and confirmation paths. Membership, joining order and lead remain
+fixed after each presentation transition, while the persisted palette is read
+by the new session.
+
+The ink evidence now paints the real `ChartComponent`: it accounts for the
+drawn member's ring without a cross, the undrawn member's cross without a
+ring, and the observable ring-to-cross-to-ring transition when its family is
+hidden and restored. Registry and projection checks remain useful diagnostics
+beneath the rendered result. Header sorting uses the shared point-aware click,
+and column movement uses the new shared drag route, which proves showing,
+size, and both endpoints inside the visible rectangle before dispatch. All
+three re-review findings are closed. PR #269 may merge, milestone 27 may close,
+and the reviewed work may proceed to the recommended 1.8.0 release under the
+project's usual release discipline.
