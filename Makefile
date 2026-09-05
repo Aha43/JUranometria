@@ -304,6 +304,7 @@ ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.EclipticStudyMain \
 		> docs/studies/ecliptic/measurements.md
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.EclipticInkStudyMain
 
 # The 1.0 release archive (docs/decisions/one-point-zero-contract.md,
 # issue #144): one deterministic unpack-and-run zip built from checked
