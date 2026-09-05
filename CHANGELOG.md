@@ -61,11 +61,13 @@ reader keeps every choice they had.
   decided rules, whole-state reentrant delivery in the project's
   standing discipline, no page-pruning operation and no persistence
   route, held by a bytecode boundary and a preference-door proof.
-  The page-bound `WorkingMarksModel` is narrowed to a stateless
-  one-way adapter over the one model - its Sprint 24 API and the
-  page-pruning seam survive only for today's surfaces, with the
-  stated retirement in the surfaces issue - and chart services
-  expose the model and the session Accumulate switch. Reader
+  The page-bound `WorkingMarksModel` is narrowed to a page-scoped
+  one-way compatibility view over the one model - it carries
+  presentation state of its own (the delivered page scope), never
+  membership; its Sprint 24 API and the page-pruning seam survive
+  only for today's surfaces, with the stated retirement in the
+  surfaces issue - and chart services expose the model and the
+  session Accumulate switch. Reader
   surfaces are unchanged; every Sprint 24 test passes against the
   adapter unmodified.
 - **The working-selection gate** (Sprint 27, issue #258). The
@@ -88,9 +90,10 @@ reader keeps every choice they had.
   https://aha43.github.io/JUranometria/ through GitHub Pages: a
   self-contained artifact generated from the one manifest, its
   images byte-identical to the repository's reviewed evidence,
-  deployed by a main-only workflow holding only the two
-  permissions Pages needs, with `main` the sole branch the
-  environment accepts. Keyboard navigation rides plain
+  deployed by a main-only workflow whose jobs hold three explicit
+  permissions and nothing else - contents-read to build, then
+  pages-write and the OIDC id-token to deploy - with `main` the
+  sole branch the environment accepts. Keyboard navigation rides plain
   previous/next links (the one small script only saves reaching
   for the pointer), and the downloads link points at the immutable
   release tag.
