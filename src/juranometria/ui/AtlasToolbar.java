@@ -27,6 +27,7 @@ public final class AtlasToolbar extends JToolBar {
     private final JButton resetView;
     private final JLabel readout = new JLabel();
     private javax.swing.JToggleButton inspectorButton;
+    private javax.swing.JToggleButton accumulate;
     /**
      * The running version, as status text (issue #198). The toolbar
      * is handed the string rather than looking it up, so it holds no
@@ -74,6 +75,28 @@ public final class AtlasToolbar extends JToolBar {
                         InspectorToggle inspector,
                         String versionText,
                         Runnable requestExit) {
+        this(controller, searchField, inspector, versionText, requestExit,
+                null);
+    }
+
+    /**
+     * The toolbar with the visible <strong>Accumulate</strong>
+     * control (issue #261, decided by the #258 gate): the switch
+     * that makes gestures add and remove instead of replace, placed
+     * beside search so it serves chart and table gestures alike. The
+     * control exists so the operation is discoverable and accessible
+     * without remembering a modifier - the platform's
+     * add-to-selection modifier always works regardless.
+     *
+     * <p>The toolbar reads and writes the shared mode and holds no
+     * state of its own, the same seam as every other control here.
+     */
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField,
+                        InspectorToggle inspector,
+                        String versionText,
+                        Runnable requestExit,
+                        juranometria.chart.SelectionMode selectionMode) {
         setFloatable(false);
 
         zoomIn = iconButton("zoom-in", "Zoom in",
@@ -114,6 +137,26 @@ public final class AtlasToolbar extends JToolBar {
             });
             inspector.onChange(this::syncInspector);
             add(inspectorButton);
+            addSeparator();
+        }
+        if (selectionMode != null) {
+            accumulate = new javax.swing.JToggleButton("Accumulate");
+            accumulate.setFocusable(true);
+            accumulate.getAccessibleContext().setAccessibleName(
+                    "Accumulate selection");
+            accumulate.setToolTipText("When on, choosing objects adds"
+                    + " them to the working selection and choosing them"
+                    + " again removes them, instead of replacing the"
+                    + " selection. The platform's add-to-selection"
+                    + " modifier always works.");
+            accumulate.getAccessibleContext().setAccessibleDescription(
+                    accumulate.getToolTipText());
+            accumulate.addActionListener(event ->
+                    selectionMode.accumulate(accumulate.isSelected()));
+            // The mode is the truth; the button says what it holds,
+            // however it was changed.
+            selectionMode.onChange(accumulate::setSelected);
+            add(accumulate);
             addSeparator();
         }
         add(searchField);
@@ -265,6 +308,11 @@ public final class AtlasToolbar extends JToolBar {
     /** The way out, for tests that drive it as a reader would. */
     public JButton exitButton() {
         return exit;
+    }
+
+    /** The Accumulate control, for tests that drive it as a reader would. */
+    public javax.swing.JToggleButton accumulateButton() {
+        return accumulate;
     }
 
     /**

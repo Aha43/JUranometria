@@ -78,12 +78,15 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **39 files** touch process-wide state —
 **18** use the shared guard, **20** restore locally,
-**0 flagged unprotected** — and **21 files** depend on a display,
-of which **14** state a focus premise and **14** a reachability
+**0 flagged unprotected** — and **23 files** depend on a display,
+of which **15** state a focus premise and **16** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
-premises stated.)
+premises stated; #261 added the surfaces journey, through the
+shared routes with both premises, and the table-gesture tests,
+display-dependent because Swing's own table UI asks the toolkit
+for the platform modifier while handling a press.)
 
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
@@ -149,9 +152,10 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **310
-reads of live chart state** against **437 explicit hand-offs**
-suite-wide. The discipline that closed #220 — derive, read and act
+own premise capture). The measurements count the traffic: **325
+reads of live chart state** against **494 explicit hand-offs**
+suite-wide (requoted for the #261 reader-surface tests, which read
+scenes and marks under the same one-hand-off discipline). The discipline that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already
 fail 3/3 and are the standing proof for guard G4.

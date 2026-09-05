@@ -4,22 +4,31 @@ import java.util.Optional;
 
 import juranometria.chart.Selection;
 import juranometria.chart.SelectionModel;
+import juranometria.chart.WorkingSelection;
 
 /**
- * The bridge between the marked set's lead and the chart's existing
- * singular selection (Sprint 24, issue #215).
+ * The bridge between the working selection's lead and the chart's
+ * existing singular selection (Sprint 24, issue #215; retargeted to
+ * the session model by issue #261).
  *
- * <p>A reader marks several objects and reads the facts of one of
+ * <p>A reader selects several objects and reads the facts of one of
  * them - the lead. The chart already has exactly one way to say
  * "this object is the one being read about": {@link SelectionModel}.
  * Teaching it about sets would put multi-selection into a model
  * every other surface depends on being singular, so the lead is
- * <em>fed</em> to it instead, and the set keeps its own seam.
+ * <em>fed</em> to it instead (the #258 decision: production wiring
+ * drives the answering model from the working selection's lead).
  *
- * <p>The direction is one way. Marks lead the selection; the
- * selection does not silently mark. A reader who clicks the chart
- * has selected something, not marked it, and the difference is the
- * point of working marks being ephemeral.
+ * <p>The direction is one way, with one deliberate silence: a lead
+ * the answering model is <strong>already answering</strong> is left
+ * alone. A gesture that offered candidates has said more than the
+ * lead's identity - the chooser is open - and re-asserting the same
+ * lead would collapse a choice the reader is in the middle of
+ * making. The rule is the queue-boundary no-op rule of #260 again:
+ * a transition nobody could observe is not delivered. A lead the
+ * model is <em>not</em> answering is fed to it, which is also what
+ * ends a finished click's transaction: the candidate list collapses
+ * to the new lead, so a stale chooser cannot reopen it.
  */
 public final class LeadSelection {
 
@@ -27,34 +36,71 @@ public final class LeadSelection {
     }
 
     /**
-     * Keeps {@code selection} showing whatever the marks lead with,
-     * for as long as the returned handle is not run.
+     * Keeps {@code selection} answering whatever the working
+     * selection leads with, for as long as the returned handle is
+     * not run.
      *
-     * <p>The lead's identity has to become a selectable object, and
-     * only the page knows where an identity is and what kind of
-     * thing it is - so the page is asked, and an identity the page
-     * no longer holds selects nothing rather than a guess.
+     * <p>The lead's identity has to become a selectable object. The
+     * page is asked first - it knows where an identity is and what
+     * kind of thing it is. A lead the page no longer holds is
+     * resolved from what the bridge learned when the page did hold
+     * it: every member joins the set through a gesture on the page
+     * that shows it, so its position was known at that moment, and a
+     * position is a catalogue fact rather than a second membership
+     * truth. Only an identity the bridge has never resolved selects
+     * nothing rather than a guess.
      */
-    public static Runnable connect(WorkingMarksModel marks,
+    public static Runnable connect(WorkingSelection working,
                                    SelectionModel selection,
                                    java.util.function.Supplier<PageContents> page) {
-        if (marks == null || selection == null || page == null) {
+        if (working == null || selection == null || page == null) {
             throw new IllegalArgumentException(
-                    "a bridge needs marks, a selection and a page");
+                    "a bridge needs the working selection, a selection"
+                            + " and a page");
         }
-        return marks.onChange(change -> {
-            if (change.lead() == null) {
-                selection.clear();
+        // Session-only resolution memory: identity to the selectable
+        // object the page reported - or the answering model itself
+        // answered, which is how a star the catalogue does not name
+        // is remembered, since no inventory lists it. Derived
+        // presentation data, never membership.
+        java.util.Map<String, Selection.Object> known =
+                new java.util.HashMap<>();
+        Runnable releaseAnswers = selection.onChange(change -> {
+            if (change.selection() instanceof Selection.Object object) {
+                known.put(object.catalogueId(), object);
+            }
+        });
+        Runnable releaseLeads = working.onChange(change -> {
+            PageContents contents = page.get();
+            for (String member : change.members()) {
+                selectable(contents, member)
+                        .ifPresent(object -> known.put(member, object));
+            }
+            String lead = change.lead();
+            if (lead == null) {
+                if (!(selection.selection() instanceof Selection.None)) {
+                    selection.clear();
+                }
                 return;
             }
-            Optional<Selection.Object> object =
-                    selectable(page.get(), change.lead());
-            if (object.isPresent()) {
-                selection.select(object.get());
+            if (selection.selection() instanceof Selection.Object current
+                    && current.catalogueId().equals(lead)) {
+                // Already the answer - and possibly a richer one,
+                // with the click's candidates still offered.
+                return;
+            }
+            Selection.Object object = selectable(contents, lead)
+                    .orElseGet(() -> known.get(lead));
+            if (object != null) {
+                selection.select(object);
             } else {
                 selection.clear();
             }
         });
+        return () -> {
+            releaseLeads.run();
+            releaseAnswers.run();
+        };
     }
 
     /** The lead, as the chart's own idea of a selected object. */

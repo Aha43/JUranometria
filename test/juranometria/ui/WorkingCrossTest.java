@@ -194,7 +194,7 @@ class WorkingCrossTest {
 
             String drawn = firstWith(page, PageVisibility.DRAWN);
             String undrawn = firstUndrawn(page);
-            host.services.workingMarks().replaceWith(
+            host.services.workingSelection().replaceWith(
                     List.of(drawn, undrawn), undrawn);
 
             // Read through the chart's own registry rather than
@@ -205,7 +205,7 @@ class WorkingCrossTest {
                     "the visible object keeps its own symbol, and"
                             + " marking it adds no second mark for the"
                             + " same thing");
-            assertTrue(host.services.workingMarks().isMarked(drawn),
+            assertTrue(host.services.workingSelection().isMember(drawn),
                     "though it is certainly marked");
         } finally {
             host.dispose();
@@ -225,13 +225,196 @@ class WorkingCrossTest {
                     undrawn.add(entry.identity());
                 }
             }
-            host.services.workingMarks().replaceWith(undrawn,
+            host.services.workingSelection().replaceWith(undrawn,
                     undrawn.get(undrawn.size() - 1));
 
             List<String> crossed = crossedIdentities(host);
             assertEquals(undrawn, crossed,
                     "exactly their crosses, in the order they were"
                             + " marked - no more and no fewer");
+        } finally {
+            host.dispose();
+        }
+    }
+
+    @Test
+    void oneTreatmentPerSelectedObjectAndNoInkOffPage() throws Exception {
+        // Issue #261, the decided ink: a drawn member wears the
+        // chart's existing ring, an on-page undrawn member the
+        // existing cross - never both for one object - and an
+        // off-page member leaves no ink while staying in the set.
+        Host host = new Host();
+        try {
+            PageContents page = host.services.inventory();
+            List<String> drawn = new ArrayList<>();
+            for (PageEntry entry : page.entries()) {
+                if (entry.visibility() == PageVisibility.DRAWN
+                        && drawn.size() < 2) {
+                    drawn.add(entry.identity());
+                }
+            }
+            String undrawn = firstUndrawn(page);
+            BufferedImage before = paint(host.chart);
+
+            host.services.workingSelection().replaceWith(
+                    List.of(drawn.get(0), drawn.get(1), undrawn), undrawn);
+            BufferedImage marked = paint(host.chart);
+
+            assertEquals(List.of(undrawn), crossedIdentities(host),
+                    "cross contributions exist exactly for the on-page"
+                            + " undrawn member");
+            int offsetY = host.chart.pageOffsetY();
+            ChartScene scene = host.chart.currentScene();
+            for (String member : List.of(drawn.get(0), drawn.get(1))) {
+                // The ring follows the mark it names - its radius is
+                // the mark's own reach - so the probe sits on the
+                // ring, not at the centre it encircles.
+                ChartRenderer.DrawnMark mark = RENDERER
+                        .drawnMarks(scene, host.chart.chartOptions())
+                        .stream()
+                        .filter(m -> member.equals(m.star() != null
+                                ? m.star().id() : m.deepSky().id()))
+                        .findFirst().orElseThrow();
+                double radius = Math.max(mark.reach() + 5.0, 7.0);
+                assertTrue(changedNear(before, marked,
+                                (int) Math.round(mark.centre().x() + radius),
+                                (int) Math.round(mark.centre().y())
+                                        + offsetY, 3),
+                        "the drawn member wears the chart's ring: "
+                                + member);
+            }
+            double[] at = host.services.projection()
+                    .toPage(page.find(undrawn).orElseThrow().position())
+                    .orElseThrow();
+            assertTrue(changedNear(before, marked,
+                            (int) Math.round(at[0]),
+                            (int) Math.round(at[1]) + offsetY, 14),
+                    "the on-page undrawn member wears the cross: "
+                            + undrawn);
+
+            // An off-page member: in the set, and not on the paper.
+            // Joined with the lead unchanged, so the only difference
+            // the page could show would be the member's own ink.
+            host.services.workingSelection().replaceWith(
+                    List.of(drawn.get(0), drawn.get(1), undrawn,
+                            "NGC 1976"), undrawn);
+            BufferedImage withOffPage = paint(host.chart);
+            assertTrue(host.services.workingSelection()
+                            .isMember("NGC 1976"),
+                    "the off-page member stays in the set");
+            assertEquals(List.of(undrawn), crossedIdentities(host),
+                    "and contributes nothing to this page's ink");
+            assertTrue(identical(marked, withOffPage),
+                    "pixel for pixel: off-page members leave no ink");
+        } finally {
+            host.dispose();
+        }
+    }
+
+    @Test
+    void presentationFollowsVisibilityAndMembershipDoesNot()
+            throws Exception {
+        // Hiding a family moves a member between ring and cross
+        // without touching the set (#258): membership is the model's,
+        // presentation is the page's.
+        Host host = new Host();
+        try {
+            PageContents page = host.services.inventory();
+            String target = host.chart.currentScene().targetIdentity();
+            PageEntry chosen = null;
+            for (PageEntry entry : page.entries()) {
+                // Not the searched target: a target keeps its symbol
+                // when its family hides (issue #196), which is its
+                // own decided behaviour, not this one.
+                if (entry.visibility() == PageVisibility.DRAWN
+                        && !entry.identity().equals(target)
+                        && entry instanceof PageEntry.DeepSky deepSky
+                        && juranometria.render.SymbolFamily.of(
+                                deepSky.object()) != null) {
+                    chosen = entry;
+                    break;
+                }
+            }
+            assertTrue(chosen != null, "the page draws a deep-sky"
+                    + " object whose family can be switched off");
+            String member = chosen.identity();
+            juranometria.render.SymbolFamily family =
+                    juranometria.render.SymbolFamily.of(
+                            ((PageEntry.DeepSky) chosen).object());
+            host.services.workingSelection().add(member);
+            assertEquals(List.of(), crossedIdentities(host),
+                    "drawn: the ring, and no cross");
+
+            SwingUtilities.invokeAndWait(() -> host.chart.setChartOptions(
+                    ChartOptions.DEFAULTS.withFamily(family, false)));
+            assertEquals(List.of(member), crossedIdentities(host),
+                    "hidden: the cross takes over");
+            assertEquals(List.of(member),
+                    host.services.workingSelection().members(),
+                    "and the set is untouched by the options change");
+
+            SwingUtilities.invokeAndWait(() -> host.chart.setChartOptions(
+                    ChartOptions.DEFAULTS));
+            assertEquals(List.of(), crossedIdentities(host),
+                    "shown again: back to the ring alone");
+            assertEquals(List.of(member),
+                    host.services.workingSelection().members());
+        } finally {
+            host.dispose();
+        }
+    }
+
+    @Test
+    void anUnnamedStarBelowTheLimitWearsTheCrossLikeAnyMember()
+            throws Exception {
+        // The pinned promise behind the corrected reading (review):
+        // the inventory carries an entry for every on-paper star,
+        // named or not, so a selected unnamed star that the
+        // magnitude limit stops drawing gets the working cross
+        // exactly as a named member would - there is no unnamed
+        // no-ink hole.
+        Host host = new Host();
+        try {
+            PageContents page = host.services.inventory();
+            java.util.Set<String> listed = new java.util.HashSet<>();
+            for (PageEntry.StarEntry entry : page.namedStars()) {
+                listed.add(entry.identity());
+            }
+            String unnamed = null;
+            double magnitude = 0;
+            for (PageEntry entry : page.entries()) {
+                if (entry instanceof PageEntry.StarEntry star
+                        && entry.visibility() == PageVisibility.DRAWN
+                        && !listed.contains(entry.identity())
+                        && star.star().magnitude() > 5.0) {
+                    unnamed = entry.identity();
+                    magnitude = star.star().magnitude();
+                    break;
+                }
+            }
+            assertTrue(unnamed != null, "the page draws an unnamed"
+                    + " star fainter than magnitude 5");
+
+            host.services.workingSelection().add(unnamed);
+            assertEquals(List.of(), crossedIdentities(host),
+                    "drawn: the ring's job, no cross");
+
+            String member = unnamed;
+            SwingUtilities.invokeAndWait(() -> host.chart.setViewState(
+                    new ChartViewState(ChartViewState.DEFAULT.centre(),
+                            8.0, 5.0)));
+            assertEquals(PageVisibility.BELOW_LIMIT,
+                    host.services.inventory().find(member)
+                            .orElseThrow().visibility(),
+                    "the limit now stops drawing it, and the"
+                            + " inventory still answers for it: mag "
+                            + magnitude);
+            assertEquals(List.of(member), crossedIdentities(host),
+                    "so it wears the working cross like any on-page"
+                            + " undrawn member");
+            assertEquals(List.of(member),
+                    host.services.workingSelection().members(),
+                    "with membership untouched by the limit change");
         } finally {
             host.dispose();
         }
@@ -250,7 +433,7 @@ class WorkingCrossTest {
             rebuilds[0] = 0;
 
             String undrawn = firstUndrawn(host.services.inventory());
-            host.services.workingMarks().mark(undrawn);
+            host.services.workingSelection().add(undrawn);
             for (int i = 0; i < 5; i++) {
                 paint(host.chart);
             }
@@ -435,6 +618,21 @@ class WorkingCrossTest {
             }
         }
         return count;
+    }
+
+    /** Whether any pixel within reach of a point differs. */
+    private static boolean changedNear(BufferedImage a, BufferedImage b,
+                                       int cx, int cy, int reach) {
+        for (int y = Math.max(0, cy - reach);
+                y <= Math.min(a.getHeight() - 1, cy + reach); y++) {
+            for (int x = Math.max(0, cx - reach);
+                    x <= Math.min(a.getWidth() - 1, cx + reach); x++) {
+                if (a.getRGB(x, y) != b.getRGB(x, y)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static boolean identical(BufferedImage a, BufferedImage b) {

@@ -137,4 +137,79 @@ class SearchSelectionTest {
                 navigation.state().targetIdentity(),
                 "search recentres with no selection model at all");
     }
+
+    // ---- the working-selection route (issue #261) ----------------
+
+    private record WorkingFixture(SearchField field,
+                                  juranometria.chart.WorkingSelection working,
+                                  juranometria.chart.SelectionMode mode) {
+    }
+
+    private static WorkingFixture workingFixture() throws Exception {
+        ChartViewController navigation =
+                new ChartViewController(Atlas.assembler()::fits);
+        juranometria.chart.WorkingSelection working =
+                new juranometria.chart.WorkingSelection();
+        juranometria.chart.SelectionMode mode =
+                new juranometria.chart.SelectionMode();
+        SearchField[] field = new SearchField[1];
+        SwingUtilities.invokeAndWait(() -> {
+            field[0] = new SearchField(Atlas.search(), Atlas.assembler(),
+                    navigation);
+            field[0].setSelectionModel(new SelectionModel());
+            field[0].setWorkingSelection(working, mode);
+        });
+        return new WorkingFixture(field[0], working, mode);
+    }
+
+    @Test
+    void anOrdinarySearchReplacesTheWorkingSelection() throws Exception {
+        // The decided search semantics: recentre as today, replace
+        // the set with the found object, and it leads.
+        WorkingFixture fixture = workingFixture();
+        fixture.working().replaceWith(
+                java.util.List.of("NGC 224", "NGC 221"), "NGC 221");
+
+        SearchResult m42 = find("M42");
+        SwingUtilities.invokeAndWait(() -> fixture.field().apply(m42));
+
+        assertEquals(java.util.List.of(m42.identity()),
+                fixture.working().members(),
+                "the ordinary search is a change of mind about the"
+                        + " whole set");
+        assertEquals(m42.identity(), fixture.working().lead());
+    }
+
+    @Test
+    void anAdditiveSearchAddsTheFoundObjectAndItLeads() throws Exception {
+        WorkingFixture fixture = workingFixture();
+        fixture.working().replaceWith(
+                java.util.List.of("NGC 224"), "NGC 224");
+        fixture.mode().accumulate(true);
+
+        SearchResult m42 = find("M42");
+        SwingUtilities.invokeAndWait(() -> fixture.field().apply(m42));
+
+        assertEquals(java.util.List.of("NGC 224", m42.identity()),
+                fixture.working().members(),
+                "while gestures accumulate, search adds rather than"
+                        + " replaces");
+        assertEquals(m42.identity(), fixture.working().lead());
+    }
+
+    @Test
+    void searchingCoordinatesEditsNoMembership() throws Exception {
+        // A place is a question, not an edit - the set is not an
+        // answer to be cleared by asking where something is.
+        WorkingFixture fixture = workingFixture();
+        fixture.working().replaceWith(
+                java.util.List.of("NGC 224"), "NGC 224");
+
+        SwingUtilities.invokeAndWait(() ->
+                fixture.field().apply(find("83.82 -5.39")));
+
+        assertEquals(java.util.List.of("NGC 224"),
+                fixture.working().members(),
+                "coordinates leave the working selection untouched");
+    }
 }

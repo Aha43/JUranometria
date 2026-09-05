@@ -33,7 +33,9 @@ class SelectInteractionTest {
             new ChartRenderer(StarSizePolicy.DEFAULT);
 
     private record Fixture(ChartComponent chart, ChartViewController navigation,
-                           SelectionModel selection) {
+                           SelectionModel selection,
+                           juranometria.chart.WorkingSelection working,
+                           juranometria.chart.SelectionMode mode) {
     }
 
     private static Fixture fixture(double ra, double dec, double field)
@@ -42,16 +44,20 @@ class SelectInteractionTest {
         ChartViewController navigation =
                 new ChartViewController(Atlas.assembler()::fits);
         SelectionModel selection = new SelectionModel();
+        juranometria.chart.WorkingSelection working =
+                new juranometria.chart.WorkingSelection();
+        juranometria.chart.SelectionMode mode =
+                new juranometria.chart.SelectionMode();
         SwingUtilities.invokeAndWait(() -> {
             chart[0] = new ChartComponent(Atlas.assembler());
             navigation.onChange(chart[0]::setViewState);
             PanInteraction.install(chart[0], navigation);
-            SelectInteraction.install(chart[0], selection);
+            SelectInteraction.install(chart[0], selection, working, mode);
             chart[0].setSize(900, 760);
             navigation.recenter(new SkyPosition(ra, dec), field);
         });
         flush();
-        return new Fixture(chart[0], navigation, selection);
+        return new Fixture(chart[0], navigation, selection, working, mode);
     }
 
     private static void flush() throws Exception {
@@ -160,7 +166,9 @@ class SelectInteractionTest {
         SwingUtilities.invokeAndWait(() -> {
             chart[0] = new ChartComponent(Atlas.assembler());
             navigation.onChange(chart[0]::setViewState);
-            SelectInteraction.install(chart[0], selection);
+            SelectInteraction.install(chart[0], selection,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
             chart[0].setSize(900, 6000);
             navigation.recenter(new SkyPosition(83.8, 0.0), 36.0);
         });

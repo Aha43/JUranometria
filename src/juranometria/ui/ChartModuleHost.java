@@ -17,7 +17,6 @@ import juranometria.module.OverlayContribution;
 import juranometria.page.LeadSelection;
 import juranometria.page.PageContents;
 import juranometria.page.PageInventory;
-import juranometria.page.WorkingMarksModel;
 import juranometria.render.ChartOptions;
 
 /**
@@ -45,8 +44,6 @@ public final class ChartModuleHost implements ChartServices {
             new juranometria.chart.WorkingSelection();
     private final juranometria.chart.SelectionMode selectionMode =
             new juranometria.chart.SelectionMode();
-    private final WorkingMarksModel marks =
-            new WorkingMarksModel(workingSelection);
     private final Consumer<NavigationRequest> navigation;
     private final List<Consumer<PageContents>> pageListeners =
             new ArrayList<>();
@@ -71,11 +68,13 @@ public final class ChartModuleHost implements ChartServices {
         // and an inventory that reported visibility from a stale
         // options set would call a hidden object drawn.
         chart.onChartOptionsChange(this::rebuild);
-        LeadSelection.connect(marks, selection, this::inventory);
-        // A mark changes what the page shows, and nothing else does
-        // it for us: the crosses are painted from the marks, so the
-        // component has to be told to paint again.
-        marks.onChange(change -> chart.repaint());
+        LeadSelection.connect(workingSelection, selection, this::inventory);
+        // The selection changes what the page shows, and nothing
+        // else does it for us: the rings and crosses are painted
+        // from the membership, so the component is handed the whole
+        // state - which is also what repaints it.
+        workingSelection.onChange(change -> chart.setWorkingSelection(
+                change.members(), change.lead()));
     }
 
     /** Attaches a module and returns it, for the caller to keep. */
@@ -167,11 +166,6 @@ public final class ChartModuleHost implements ChartServices {
     @Override
     public SelectionModel selection() {
         return selection;
-    }
-
-    @Override
-    public WorkingMarksModel workingMarks() {
-        return marks;
     }
 
     @Override

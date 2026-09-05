@@ -9,6 +9,29 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The working selection across every reader surface** (Sprint 27,
+  issue #261). The chart, the On-this-page table, search and the
+  Inspector become four views of the one session model the #258
+  gate decided. Chart clicks replace ordinarily and toggle
+  additively - Accumulate on, or the platform's add-to-selection
+  modifier, which always works - with the ambiguous additive click
+  a captured transaction against the pre-click set; empty sky
+  answers the place without editing when additive. Table gestures
+  follow the same table, with both range transactions anchored and
+  recomputed whole so no retraction can drop a pre-existing or
+  off-page member. Search replaces or adds the found object, and
+  it leads. The chart draws its existing selection ring once per
+  drawn member and the existing cross once per on-page undrawn
+  member - never both, no ink off-page - and the answering model
+  is driven by the lead, ending the two-leads disagreement the
+  gate photographed. The toolbar gains the visible **Accumulate
+  selection** control; the Inspector gains the **Working set**
+  section - every member across pages in joining order, the lead
+  named, off-page members labelled in words, per-member remove and
+  Clear selection. Navigation never edits membership, nothing is
+  ever persisted, and the Sprint 24 page-scoped adapter retires
+  with its last consumer.
+
 - **The working-selection foundation** (Sprint 27, issue #260). The
   session-level model the #258 gate decided: `WorkingSelection` -
   one ordered set of unique identities with one lead, transitions

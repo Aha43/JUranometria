@@ -366,10 +366,12 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(21, display.size(),
+        assertEquals(23, display.size(),
                 "the display corpus is the twenty the decision names"
-                        + " plus the black-sky journey (#246), which"
-                        + " arrived through the shared routes with"
+                        + " plus the black-sky journey (#246) and the"
+                        + " #261 pair - the surfaces journey and the"
+                        + " table gestures, whose presses go through"
+                        + " Swing's own toolkit-asking UI - each with"
                         + " its premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
@@ -423,13 +425,17 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 23,
+        assertTrue(doClick <= 25,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
                         + " (#246) added one file whose only doClick"
-                        + " is the recorded View-menu convention: "
-                        + doClick);
+                        + " is the recorded View-menu convention, and"
+                        + " the reader surfaces (#261) added two"
+                        + " control-mechanism files (the Accumulate"
+                        + " toggle, the working-set rows) whose"
+                        + " journeys drive the same controls with"
+                        + " real pointer events: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

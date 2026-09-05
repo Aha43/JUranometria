@@ -77,6 +77,44 @@ public final class ReaderInput {
     }
 
     /**
+     * A pointer click at a chosen point of a control - a table row,
+     * a header cell - with the modifiers the reader's other hand
+     * holds. The same premises as the centred click, proven for the
+     * actual point before anything is dispatched: the control is
+     * showing in a window, it has a size, and the point lies inside
+     * its visible rectangle - which is only evidence of
+     * reachability when the control is really on screen, so showing
+     * is asserted first (post-approval review, #261).
+     */
+    public static void click(JComponent control, int x, int y,
+                             int modifiersEx) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            assertTrue(control.isShowing(),
+                    name(control) + " is on screen, in a window a"
+                            + " reader can see");
+            assertTrue(control.getWidth() > 0 && control.getHeight() > 0,
+                    name(control) + " has a size a pointer could hit: "
+                            + control.getWidth() + "x"
+                            + control.getHeight());
+            assertTrue(control.getVisibleRect().contains(x, y),
+                    "the point clicked on " + name(control)
+                            + " is one a reader could reach: " + x + ","
+                            + y + " within " + control.getVisibleRect());
+            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
+                    MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED}) {
+                control.dispatchEvent(new MouseEvent(control, id,
+                        System.nanoTime() / 1_000_000,
+                        id == MouseEvent.MOUSE_PRESSED
+                                ? java.awt.event.InputEvent
+                                        .BUTTON1_DOWN_MASK | modifiersEx
+                                : modifiersEx,
+                        x, y, 1, false, MouseEvent.BUTTON1));
+            }
+        });
+        flush();
+    }
+
+    /**
      * Types into a field the way a reader does: click in, prove the
      * keyboard arrived, platform select-all, the characters, Enter.
      * Aborts honestly where the desktop refuses the field focus.

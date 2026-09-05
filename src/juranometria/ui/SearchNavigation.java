@@ -52,6 +52,23 @@ public final class SearchNavigation {
                                 SceneAssembler assembler,
                                 ChartViewController controller,
                                 SelectionModel selection) {
+        return apply(result, assembler, controller, selection, null, null);
+    }
+
+    /**
+     * The same policy, with the working selection listening (issue
+     * #261): a found object joins the set under the decided search
+     * semantics - the ordinary search replaces the set with it, an
+     * additive search adds it, and either way it leads. Both the
+     * working selection and the mode may be null where no set is
+     * kept.
+     */
+    public static Outcome apply(SearchResult result,
+                                SceneAssembler assembler,
+                                ChartViewController controller,
+                                SelectionModel selection,
+                                juranometria.chart.WorkingSelection working,
+                                juranometria.chart.SelectionMode mode) {
         boolean coordinates = result.kind() == SearchResult.Kind.COORDINATES;
         String targetLabel = coordinates ? null : result.regionTitle();
         String targetIdentity = coordinates ? null : result.identity();
@@ -59,7 +76,7 @@ public final class SearchNavigation {
         if (assembler.fits(result.position(), currentField)) {
             controller.recenter(result.position(), targetLabel,
                     targetIdentity);
-            establishSelection(result, selection);
+            establishSelection(result, selection, working, mode);
             return Outcome.RECENTERED;
         }
         OptionalDouble widest =
@@ -67,7 +84,7 @@ public final class SearchNavigation {
         if (widest.isPresent()) {
             controller.recenter(result.position(), widest.getAsDouble(),
                     targetLabel, targetIdentity);
-            establishSelection(result, selection);
+            establishSelection(result, selection, working, mode);
             return Outcome.RECENTERED_NARROWER;
         }
         return Outcome.NO_FIT;
@@ -75,25 +92,42 @@ public final class SearchNavigation {
 
     /**
      * The reviewed relationship between search and selection (issue
-     * #170): finding an object by name selects it, so the inspector
-     * can describe what the reader just looked up.
+     * #170, extended by #261): finding an object by name selects it,
+     * so the inspector can describe what the reader just looked up -
+     * and it joins the working selection, replacing the set on an
+     * ordinary search and added to it on an additive one.
      *
-     * <p>Coordinates select nothing: the reader asked for a place,
-     * not for an object, and no object was found there.
+     * <p>Coordinates select nothing and edit nothing: the reader
+     * asked for a place, not for an object, and no object was found
+     * there - the working selection is not an answer to be cleared.
      */
     private static void establishSelection(SearchResult result,
-                                           SelectionModel selection) {
-        if (selection == null) {
+                                           SelectionModel selection,
+                                           juranometria.chart.WorkingSelection
+                                                   working,
+                                           juranometria.chart.SelectionMode
+                                                   mode) {
+        if (result.kind() != SearchResult.Kind.STAR
+                && result.kind() != SearchResult.Kind.DEEP_SKY_OBJECT) {
+            if (selection != null) {
+                selection.clear();
+            }
             return;
         }
-        switch (result.kind()) {
-            case STAR -> selection.select(new Selection.Object(
-                    Selection.Object.Kind.STAR, result.identity(),
-                    result.position()));
-            case DEEP_SKY_OBJECT -> selection.select(new Selection.Object(
-                    Selection.Object.Kind.DEEP_SKY, result.identity(),
-                    result.position()));
-            default -> selection.clear();
+        if (working != null) {
+            if (mode != null && mode.accumulate()) {
+                working.add(result.identity());
+            } else {
+                working.replaceWith(java.util.List.of(result.identity()),
+                        result.identity());
+            }
+        }
+        if (selection != null) {
+            selection.select(new Selection.Object(
+                    result.kind() == SearchResult.Kind.STAR
+                            ? Selection.Object.Kind.STAR
+                            : Selection.Object.Kind.DEEP_SKY,
+                    result.identity(), result.position()));
         }
     }
 }

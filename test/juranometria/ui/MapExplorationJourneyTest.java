@@ -89,7 +89,9 @@ class MapExplorationJourneyTest {
             PanInteraction.install(chart, navigation);
             ZoomInteraction.install(chart, navigation);
             selection = new SelectionModel();
-            SelectInteraction.install(chart, selection);
+            SelectInteraction.install(chart, selection,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
             inspector = new InspectorPanel(selection, chart::currentScene,
                     () -> options.options(),
                     chosen -> navigation.recenter(chosen.position()));

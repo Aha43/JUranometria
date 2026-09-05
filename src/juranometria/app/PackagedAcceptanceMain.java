@@ -426,7 +426,7 @@ public final class PackagedAcceptanceMain {
         int added;
         try {
 
-        host.workingMarks().replaceWith(java.util.List.of(drawn.identity(),
+        host.workingSelection().replaceWith(java.util.List.of(drawn.identity(),
                 invisible.identity()), invisible.identity());
 
         // What the chart was actually given to ink, by the module.
@@ -451,7 +451,7 @@ public final class PackagedAcceptanceMain {
                 "and it is drawn where the object is, at "
                         + Math.round(at[0]) + "," + Math.round(at[1]));
 
-        host.workingMarks().clear();
+        host.workingSelection().clear();
         require(chart.overlays().collect().isEmpty(),
                 "clearing withdraws the ink");
         require(differingPixels(unmarked, paint(chart)) == 0,
@@ -503,8 +503,8 @@ public final class PackagedAcceptanceMain {
                     second.attach(
                             new juranometria.ui.onthispage.OnThisPageModule());
             try {
-                require(second.workingMarks().marks().isEmpty()
-                                && second.workingMarks().lead() == null,
+                require(second.workingSelection().members().isEmpty()
+                                && second.workingSelection().lead() == null,
                         "the new session begins with nothing marked");
                 require(restarted.overlays().collect().isEmpty(),
                         "and nothing inked");
@@ -542,7 +542,8 @@ public final class PackagedAcceptanceMain {
                 + " entries, " + listed
                 + " rows, marked " + invisible.identity()
                 + " which the page does not draw, " + added
-                + " pixels of cross drawn at its own position,"
+                + " pixels of selection ink - its cross at its own"
+                + " position, the drawn member's ring - laid down,"
                 + " cleared to the byte, and a second session begins"
                 + " empty while wearing the reader's stored choice,"
                 + " with " + hidden + " objects hidden by it)");

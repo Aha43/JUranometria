@@ -30,7 +30,7 @@ import juranometria.module.NavigationRequest;
 import juranometria.page.PageContents;
 import juranometria.page.PageEntry;
 import juranometria.page.PageVisibility;
-import juranometria.page.WorkingMarksModel;
+import juranometria.chart.WorkingSelection;
 import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
 import juranometria.render.SymbolFamily;
@@ -102,7 +102,6 @@ class SprintTwentyFourJourneyTest {
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
             selection = new SelectionModel();
-            SelectInteraction.install(chart, selection);
             selection.onChange(change ->
                     heardSelections.add(change.selection()));
             options = new ChartOptionsController(
@@ -116,6 +115,10 @@ class SprintTwentyFourJourneyTest {
                 requests.add(request);
                 navigation.recenter(request.centre());
             });
+            // The application's own wiring (#261): one working
+            // selection, the host's, drives clicks, ink and table.
+            SelectInteraction.install(chart, selection,
+                    modules.workingSelection(), modules.selectionMode());
             page = modules.attach(new OnThisPageModule()).panel();
             inspector.showPageView(page);
             table = page.tableComponent();
@@ -177,11 +180,11 @@ class SprintTwentyFourJourneyTest {
 
         // Walked and extended by keyboard alone, on the sorted view.
         press(KeyEvent.VK_DOWN, 0);
-        assertEquals(List.of(viewOrder().get(0)), marks().marks(),
+        assertEquals(List.of(viewOrder().get(0)), marks().members(),
                 "the keyboard walks the sorted view");
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
         press(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK);
-        assertEquals(viewOrder().subList(0, 3), marks().marks(),
+        assertEquals(viewOrder().subList(0, 3), marks().members(),
                 "and shift-Down extends the marked set without a"
                         + " pointer at all");
         assertEquals(viewOrder().get(2), marks().lead(),
@@ -222,12 +225,12 @@ class SprintTwentyFourJourneyTest {
         for (String identity : invisible) {
             clickRow(viewRowOf(identity), toggleModifier());
         }
-        assertEquals(4, marks().marks().size(),
-                "four rows marked by pointer alone: " + marks().marks());
-        assertTrue(marks().marks().contains(stillDrawn)
-                        && marks().marks().containsAll(invisible),
+        assertEquals(4, marks().members().size(),
+                "four rows marked by pointer alone: " + marks().members());
+        assertTrue(marks().members().contains(stillDrawn)
+                        && marks().members().containsAll(invisible),
                 "the drawn one and the three that are not: "
-                        + marks().marks());
+                        + marks().members());
 
         // As a set: the marks follow the order the rows are shown
         // in, and the reader has sorted the table by magnitude, so
@@ -250,14 +253,18 @@ class SprintTwentyFourJourneyTest {
         heardSelections.clear();
         clickRow(viewRowOf(invisible.get(2)), 0);
         flush();
-        assertEquals(List.of(invisible.get(2)), marks().marks(),
+        assertEquals(List.of(invisible.get(2)), marks().members(),
                 "a plain click is a change of mind: one row marked");
         assertEquals(invisible.get(2),
                 assertInstanceOf(Selection.Object.class,
                         selection.selection()).catalogueId(),
                 "the chart's own selection follows the lead");
-        assertEquals(1, heardSelections.size(),
-                "once, not once per marked object");
+        assertEquals(0, heardSelections.size(),
+                "and is not re-told at all: the lead was already the"
+                        + " answer - it led the marks the reader just"
+                        + " replaced - and a transition nobody could"
+                        + " observe is not delivered (#260's no-op"
+                        + " rule, at the lead bridge)");
 
         // The limit goes back up, which is a page change - so it is
         // counted after the assertion above rather than folded into
@@ -289,19 +296,24 @@ class SprintTwentyFourJourneyTest {
         assertNotEquals(where, chart.viewState().centre(),
                 "and the chart went there");
 
-        // 7. Across the RA seam and into a dense field: what leaves
-        //    the page is pruned once, what stays is still exact.
-        List<WorkingMarksModel.Change> pruning = new ArrayList<>();
-        marks().onChange(pruning::add);
-        pruning.clear();
+        // 7. Across the RA seam and into a dense field: the set is
+        //    the reader's, and navigation never edits it (#258/#261)
+        //    - what the new page cannot show simply leaves no ink.
+        List<WorkingSelection.Change> transitions = new ArrayList<>();
+        marks().onChange(transitions::add);
+        transitions.clear();
+        List<String> carried = marks().members();
         SwingUtilities.invokeAndWait(() -> navigation.recenter(
                 new SkyPosition(359.6, 0.4)));
         flush();
-        assertTrue(marks().marks().isEmpty(),
-                "the marks belonged to a page the reader has left");
-        assertEquals(1, pruning.size(),
-                "and they went in one transition, not one event per"
-                        + " mark: " + pruning);
+        assertEquals(carried, marks().members(),
+                "the page changed and the membership did not: there is"
+                        + " no pruning for navigation to call");
+        assertEquals(List.of(), transitions,
+                "no transition at all - a page change is not an edit");
+        assertTrue(inkedIdentities().isEmpty(),
+                "while the page a reader is looking at carries no"
+                        + " cross for what it does not hold");
 
         SwingUtilities.invokeAndWait(() -> navigation.recenter(
                 new SkyPosition(186.6, 12.7)));
@@ -338,7 +350,7 @@ class SprintTwentyFourJourneyTest {
         // 9. Cleared, and home to the released page.
         ReaderInput.click(page.clearMarksButton());
         flush();
-        assertTrue(marks().marks().isEmpty() && inkedIdentities().isEmpty(),
+        assertTrue(marks().members().isEmpty() && inkedIdentities().isEmpty(),
                 "nothing marked, nothing inked");
         SwingUtilities.invokeAndWait(navigation::reset);
         flush();
@@ -359,7 +371,7 @@ class SprintTwentyFourJourneyTest {
 
         // 10. A new session begins with nothing marked, because
         //     there was nowhere for a mark to be kept.
-        assertTrue(new WorkingMarksModel().marks().isEmpty());
+        assertTrue(new WorkingSelection().members().isEmpty());
         java.util.prefs.Preferences store = java.util.prefs.Preferences
                 .userRoot().node("juranometria-sprint24-journey");
         store.flush();
@@ -373,8 +385,8 @@ class SprintTwentyFourJourneyTest {
 
     // ----------------------------------------------------------------
 
-    private WorkingMarksModel marks() {
-        return modules.workingMarks();
+    private WorkingSelection marks() {
+        return modules.workingSelection();
     }
 
     private static PageEntry firstWith(PageContents page, boolean isDrawn) {
@@ -535,8 +547,7 @@ class SprintTwentyFourJourneyTest {
 
     /** The platform's own add-to-selection modifier. */
     private static int toggleModifier() {
-        return java.awt.Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMaskEx();
+        return SelectInteraction.toggleModifierMask();
     }
 
     private int viewRowOf(String identity) throws Exception {

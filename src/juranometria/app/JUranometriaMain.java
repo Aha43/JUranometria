@@ -87,17 +87,22 @@ public final class JUranometriaMain {
         // and neither knows about the other.
         juranometria.chart.SelectionModel selection =
                 new juranometria.chart.SelectionModel();
-        juranometria.ui.SelectInteraction.install(chart, selection);
+        // The host holds the chart-level selection services - the
+        // working selection and its accumulate mode live here, in
+        // the core's own seam, whether or not any module attaches -
+        // and wires the membership to the chart's ink: one ring per
+        // selected drawn member, the crosses' lead treatment, and
+        // the lead fed to the answering model (issue #261).
+        juranometria.ui.ChartModuleHost modules =
+                new juranometria.ui.ChartModuleHost(chart, selection,
+                        request -> controller.recenter(request.centre()));
+        juranometria.ui.SelectInteraction.install(chart, selection,
+                modules.workingSelection(), modules.selectionMode());
         InspectorPanel inspector = new InspectorPanel(selection,
                 chart::currentScene, chartOptions::options,
                 chosen -> centreOn(controller, chosen));
-        // A second consumer of the same state, marking the chart:
-        // proof in the running application that the seam carries
-        // more than one reader.
-        selection.onChange(change -> chart.setHighlightedObject(
-                change.selection()
-                        instanceof juranometria.chart.Selection.Object object
-                        ? object.catalogueId() : null));
+        inspector.showWorkingSet(modules.workingSelection(),
+                modules::inventory);
         // A page the reader navigated to may no longer draw what they
         // selected; the panel re-reads it rather than going on
         // describing something that has gone.
@@ -105,11 +110,8 @@ public final class JUranometriaMain {
 
         // The first module (issue #216). The chart offers services;
         // this asks for them and gives back a table and some crosses.
-        // Nothing above this line knows it exists, and the atlas
-        // draws its ordinary page if these three lines are deleted.
-        juranometria.ui.ChartModuleHost modules =
-                new juranometria.ui.ChartModuleHost(chart, selection,
-                        request -> controller.recenter(request.centre()));
+        // The atlas draws its ordinary page, with its selection
+        // working, if these lines are deleted.
         juranometria.ui.onthispage.OnThisPageModule onThisPage =
                 modules.attach(
                         new juranometria.ui.onthispage.OnThisPageModule());
@@ -176,8 +178,11 @@ public final class JUranometriaMain {
         juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
                 Atlas.search(), Atlas.assembler(), controller);
         // Finding an object by name selects it, so a reader with no
-        // pointer can reach the inspector at all.
+        // pointer can reach the inspector at all - and it joins the
+        // working selection under the decided search semantics.
         searchField.setSelectionModel(selection);
+        searchField.setWorkingSelection(modules.workingSelection(),
+                modules.selectionMode());
 
         // One way out, whichever surface asks (issue #198). The
         // toolbar button, the window's close box and the platform's
@@ -207,7 +212,8 @@ public final class JUranometriaMain {
         // The same AppInfo.version() About prints, handed over
         // rather than looked up twice.
         AtlasToolbar toolbar = new AtlasToolbar(controller, searchField,
-                inspectorToggle, AppInfo.version(), shutdown::request);
+                inspectorToggle, AppInfo.version(), shutdown::request,
+                modules.selectionMode());
         frame.setLayout(new BorderLayout());
         frame.add(toolbar, BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);

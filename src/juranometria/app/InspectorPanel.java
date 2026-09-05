@@ -95,6 +95,19 @@ public final class InspectorPanel extends JPanel {
     private Runnable returnFocus = () -> { };
     private final Supplier<juranometria.render.ChartOptions> options;
 
+    /** The working-set section (issue #261), empty until wired. */
+    private final JPanel workingSet = new JPanel();
+    private juranometria.chart.WorkingSelection working;
+    private Supplier<juranometria.page.PageContents> pageContents;
+    private Runnable unsubscribeWorking = () -> { };
+    /** What the rows say, for tests; rebuilt with the section. */
+    private final List<String> workingSetTexts = new java.util.ArrayList<>();
+    private final java.util.Map<String, JButton> memberButtons =
+            new java.util.HashMap<>();
+    private final java.util.Map<String, JButton> removeButtons =
+            new java.util.HashMap<>();
+    private final JButton clearSelection = new JButton("Clear selection");
+
     public InspectorPanel(SelectionModel selection,
                           Supplier<ChartScene> currentScene,
                           Supplier<juranometria.render.ChartOptions> options,
@@ -196,6 +209,15 @@ public final class InspectorPanel extends JPanel {
         selectedMode.add(candidateScroll);
         selectedMode.add(gap(10));
         selectedMode.add(facts);
+        selectedMode.add(gap(12));
+        workingSet.setLayout(new BoxLayout(workingSet, BoxLayout.Y_AXIS));
+        workingSet.setAlignmentX(0.0f);
+        workingSet.setVisible(false);
+        workingSet.getAccessibleContext().setAccessibleName("Working set");
+        workingSet.getAccessibleContext().setAccessibleDescription(
+                "Every object in the working selection, across pages,"
+                        + " in the order they joined");
+        selectedMode.add(workingSet);
         selectedMode.add(stretch());
         selectedMode.add(centreHere);
         modes.add(selectedMode, SELECTED_MODE);
@@ -369,6 +391,9 @@ public final class InspectorPanel extends JPanel {
     public void refresh() {
         show(new SelectionModel.Change(selection.selection(),
                 selection.candidates(), selection.currentIndex()));
+        // The membership has not changed, but which members this
+        // page holds has - the off-page words follow the page.
+        rebuildWorkingSet();
     }
 
     /**
@@ -422,6 +447,161 @@ public final class InspectorPanel extends JPanel {
         modes.add(view, PAGE_MODE);
         modeSwitch.setVisible(true);
         revalidate();
+    }
+
+    /**
+     * Wires the <strong>Working set</strong> section (issue #261,
+     * mock-ups reviewed by the #258 gate): every member across
+     * pages, in joining order, the lead marked and bold, off-page
+     * members labelled in words rather than colour alone, a
+     * per-member remove, and Clear selection. Choosing a member
+     * makes it the lead; the section never drops a member because
+     * the chart moved.
+     *
+     * <p>Handed in like the page view: the panel observes the model
+     * and asks the page only which members it holds, so the
+     * Inspector keeps working - without the section - when nothing
+     * wires it.
+     */
+    public void showWorkingSet(
+            juranometria.chart.WorkingSelection working,
+            Supplier<juranometria.page.PageContents> pageContents) {
+        if (working == null || pageContents == null) {
+            throw new IllegalArgumentException(
+                    "the section needs the working selection and the"
+                            + " page it is judged against");
+        }
+        if (this.working != null) {
+            throw new IllegalStateException(
+                    "the working set is wired once: a second wiring"
+                            + " would double every control's action");
+        }
+        this.working = working;
+        this.pageContents = pageContents;
+        clearSelection.getAccessibleContext().setAccessibleName(
+                "Clear selection");
+        clearSelection.getAccessibleContext().setAccessibleDescription(
+                "Empty the whole working selection. The page and your"
+                        + " place in it are unchanged.");
+        clearSelection.addActionListener(event -> working.clear());
+        this.unsubscribeWorking =
+                working.onChange(change -> rebuildWorkingSet());
+    }
+
+    /**
+     * The section, rebuilt whole from the model and the current
+     * page: membership and order from the one truth, on-page or not
+     * from the inventory - never a private copy of either.
+     */
+    private void rebuildWorkingSet() {
+        if (working == null) {
+            return;
+        }
+        workingSet.removeAll();
+        workingSetTexts.clear();
+        memberButtons.clear();
+        removeButtons.clear();
+        List<String> members = working.members();
+        workingSet.setVisible(!members.isEmpty());
+        if (!members.isEmpty()) {
+            JLabel title = new JLabel(String.format(Locale.ROOT,
+                    "Working set · %d %s", members.size(),
+                    members.size() == 1 ? "object" : "objects"));
+            title.putClientProperty("FlatLaf.styleClass", "h4");
+            title.setAlignmentX(0.0f);
+            workingSet.add(title);
+            juranometria.page.PageContents page = pageContents.get();
+            for (String member : members) {
+                boolean leads = member.equals(working.lead());
+                // The inventory is the one page boundary (review):
+                // it carries an entry for every on-paper object,
+                // unnamed stars included - only the table's listing
+                // filters them - while the scene deliberately holds
+                // a query margin beyond the paper, so asking the
+                // scene would call a star "on this page" that is
+                // not.
+                boolean offPage = page == null
+                        || page.find(member).isEmpty();
+                workingSet.add(memberRow(member, leads, offPage));
+                workingSetTexts.add((leads ? "◉ " : "") + member
+                        + (offPage ? " — off this page" : ""));
+            }
+            clearSelection.setAlignmentX(0.0f);
+            workingSet.add(Box.createVerticalStrut(6));
+            workingSet.add(clearSelection);
+        }
+        workingSet.revalidate();
+        workingSet.repaint();
+        revalidate();
+        repaint();
+    }
+
+    /** One member's row: lead mark, name, off-page word, remove. */
+    private JComponent memberRow(String member, boolean leads,
+                                 boolean offPage) {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        row.setAlignmentX(0.0f);
+        JLabel leadMark = new JLabel(leads ? "◉ " : "   ");
+        row.add(leadMark);
+        JButton name = new JButton(member);
+        name.putClientProperty("JButton.buttonType", "toolBarButton");
+        name.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
+        if (leads) {
+            name.setFont(name.getFont().deriveFont(java.awt.Font.BOLD));
+        }
+        name.getAccessibleContext().setAccessibleName(member
+                + (leads ? ", lead" : "")
+                + (offPage ? ", off this page" : ""));
+        name.getAccessibleContext().setAccessibleDescription(
+                "Show this member's facts: it becomes the lead."
+                        + " Membership is unchanged.");
+        name.addActionListener(event -> working.lead(member));
+        row.add(name);
+        if (offPage) {
+            JLabel off = new JLabel(" off this page");
+            off.setFont(off.getFont().deriveFont(java.awt.Font.ITALIC));
+            off.setEnabled(false);
+            row.add(off);
+        }
+        row.add(Box.createHorizontalGlue());
+        JButton remove = new JButton("✕");
+        remove.putClientProperty("JButton.buttonType", "toolBarButton");
+        remove.getAccessibleContext().setAccessibleName(
+                "Remove " + member);
+        remove.getAccessibleContext().setAccessibleDescription(
+                "Remove " + member + " from the working selection."
+                        + " The rest stay.");
+        remove.addActionListener(event -> working.remove(member));
+        row.add(remove);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                Math.max(name.getPreferredSize().height,
+                        remove.getPreferredSize().height)));
+        memberButtons.put(member, name);
+        removeButtons.put(member, remove);
+        return row;
+    }
+
+    /** The section's rows as words, top to bottom; for tests. */
+    public List<String> workingSetLines() {
+        return List.copyOf(workingSetTexts);
+    }
+
+    /** Whether the section is on screen at all. */
+    public boolean workingSetShown() {
+        return workingSet.isVisible();
+    }
+
+    public JButton clearSelectionButton() {
+        return clearSelection;
+    }
+
+    public JButton workingSetMemberButton(String identity) {
+        return memberButtons.get(identity);
+    }
+
+    public JButton workingSetRemoveButton(String identity) {
+        return removeButtons.get(identity);
     }
 
     /**
@@ -555,6 +735,7 @@ public final class InspectorPanel extends JPanel {
     /** Stops observing - the panel can be discarded safely. */
     public void dispose() {
         unsubscribe.run();
+        unsubscribeWorking.run();
     }
 
     /** The panel's current text, top to bottom; for tests. */

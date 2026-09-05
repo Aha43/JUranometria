@@ -21,10 +21,10 @@ import javax.swing.table.TableRowSorter;
 
 import juranometria.module.ChartServices;
 import juranometria.module.NavigationRequest;
+import juranometria.chart.WorkingSelection;
 import juranometria.page.PageContents;
 import juranometria.page.PageEntry;
 import juranometria.page.PageVisibility;
-import juranometria.page.WorkingMarksModel;
 
 /**
  * The <strong>On this page</strong> table (Sprint 24, issue #216).
@@ -73,6 +73,28 @@ public final class OnThisPageTable extends JPanel {
      * stays reachable.
      */
     private final JTable table = new JTable(model) {
+        // The gesture is noted BEFORE Swing acts on it (#261): a
+        // listener added to the table runs after the look and feel's
+        // own, whose selection events would arrive while the flags
+        // still described the previous gesture. Overriding the
+        // processing step is the one place that is guaranteed to see
+        // the event first.
+        @Override
+        protected void processMouseEvent(java.awt.event.MouseEvent event) {
+            if (event.getID() == java.awt.event.MouseEvent.MOUSE_PRESSED) {
+                noteGesture(event.getModifiersEx());
+            }
+            super.processMouseEvent(event);
+        }
+
+        @Override
+        protected void processKeyEvent(java.awt.event.KeyEvent event) {
+            if (event.getID() == java.awt.event.KeyEvent.KEY_PRESSED) {
+                noteGesture(event.getModifiersEx());
+            }
+            super.processKeyEvent(event);
+        }
+
         @Override
         protected javax.swing.table.JTableHeader createDefaultTableHeader() {
             javax.swing.table.JTableHeader header =
@@ -114,6 +136,29 @@ public final class OnThisPageTable extends JPanel {
     private boolean following;
     /** True while the table is telling the model what a reader did. */
     private boolean publishing;
+
+    /**
+     * The reader's gesture, noted at the press and consumed by the
+     * selection event it produces (#261). A selection event with no
+     * gesture behind it - a sorter restoring the selection, a page
+     * rebuild - is display maintenance, never a decision, so it may
+     * resynchronise the rows but must not touch the model: sorting
+     * and column movement never mutate the set.
+     */
+    private record Gesture(boolean shift, boolean toggle) {
+    }
+
+    private Gesture pendingGesture;
+
+    /**
+     * The additive range's captured transaction (#258): the
+     * membership and lead when the first shift-gesture arrived.
+     * Every extension and retraction recomputes membership as
+     * snapshot ∪ current range, delivered whole, so a retraction
+     * removes exactly what the range itself added and an off-page or
+     * pre-existing member can never be dropped by a table gesture.
+     */
+    private List<String> rangeSnapshotMembers;
 
     public OnThisPageTable(ChartServices services) {
         if (services == null) {
@@ -211,6 +256,12 @@ public final class OnThisPageTable extends JPanel {
         sorter.setComparator(3, java.util.Comparator.comparingInt(
                 (Row row) -> row.state().ordinal()));
         table.setRowSorter(sorter);
+        // Sorting is a distinct, non-range gesture (review): it ends
+        // any captured range transaction - without editing anything -
+        // so the next shift gesture snapshots the membership that
+        // actually exists, in the order the reader is now looking at,
+        // rather than replaying a set captured before the rows moved.
+        sorter.addRowSorterListener(event -> rangeSnapshotMembers = null);
         table.getSelectionModel().addListSelectionListener(event -> {
             if (following || event.getValueIsAdjusting()) {
                 return;
@@ -232,7 +283,8 @@ public final class OnThisPageTable extends JPanel {
         clearMarks.getAccessibleContext().setAccessibleDescription(
                 "Remove every working mark. The page and your place in"
                         + " it are unchanged.");
-        clearMarks.addActionListener(event -> services.workingMarks().clear());
+        clearMarks.addActionListener(event ->
+                services.workingSelection().clear());
         clearMarks.setEnabled(false);
 
         counted.setAlignmentX(0.0f);
@@ -273,7 +325,8 @@ public final class OnThisPageTable extends JPanel {
                 sizeColumns();
             }
         });
-        this.unsubscribe = services.workingMarks().onChange(this::marksChanged);
+        this.unsubscribe = services.workingSelection()
+                .onChange(this::selectionChanged);
         pageChanged(services.inventory());
     }
 
@@ -448,9 +501,14 @@ public final class OnThisPageTable extends JPanel {
         }
         sizeColumns();
         following = false;
-        marksChanged(new WorkingMarksModel.Change(
-                services.workingMarks().marks(),
-                services.workingMarks().lead()));
+        // A new page ends any range transaction and never edits the
+        // set: the rows the page holds show their membership - the
+        // intersection with the working set - and nothing more.
+        rangeSnapshotMembers = null;
+        pendingGesture = null;
+        selectionChanged(new WorkingSelection.Change(
+                services.workingSelection().members(),
+                services.workingSelection().lead()));
     }
 
     /**
@@ -486,71 +544,223 @@ public final class OnThisPageTable extends JPanel {
 
     // ----------------------------------------------------------------
 
+    /** Notes what kind of gesture the reader just began. */
+    private void noteGesture(int modifiersEx) {
+        pendingGesture = new Gesture(
+                (modifiersEx & java.awt.event.InputEvent.SHIFT_DOWN_MASK)
+                        != 0,
+                (modifiersEx & juranometria.ui.SelectInteraction
+                        .toggleModifierMask()) != 0);
+    }
+
+    /**
+     * Turns the reader's gesture into the decided transition
+     * (#258/#261). The table's own selection is Swing's, and Swing's
+     * idea of what a gesture did - replace, extend, toggle - is only
+     * the starting point: the working selection holds members this
+     * page does not, and only an additive gesture may leave them
+     * alone while an ordinary one replaces the whole set.
+     */
     private void markWhatIsSelected() {
+        Gesture gesture = pendingGesture;
+        pendingGesture = null;
+        WorkingSelection working = services.workingSelection();
+        List<String> shown = selectedIdentities();
+        String shownLead = leadIdentity(shown);
+        if (gesture == null) {
+            // No reader gesture produced this event: the sorter
+            // restored a selection, or a rebuild echoed. Display
+            // maintenance resynchronises; it never edits the set.
+            if (!sameAsSelection(working.members())) {
+                followTheModel(working.members());
+            }
+            return;
+        }
+        // A gesture whose selection already agrees with the model
+        // decides nothing - and a noted press that changed no
+        // selection leaves its note behind, so without this a later
+        // sorter restore would be read as that gesture and sorting
+        // could rewrite the set's joining order (a named mutation).
+        String modelLead = working.lead();
+        boolean leadAgrees = modelLead == null
+                || !pageHolds(modelLead)
+                || modelLead.equals(leadRowIdentity());
+        if (sameAsSelection(working.members()) && leadAgrees) {
+            return;
+        }
+        boolean additive = services.selectionMode().accumulate()
+                || gesture.toggle();
+        publishing = true;
+        try {
+            if (gesture.shift()) {
+                if (rangeSnapshotMembers == null) {
+                    // The transaction opens on the first shift
+                    // gesture; the model still holds the pre-gesture
+                    // set, because only this method writes it for
+                    // table gestures.
+                    rangeSnapshotMembers = working.members();
+                }
+                // The range is anchor to active end, not whatever
+                // Swing left selected: resynchronising the display
+                // re-selects members outside the range, and a
+                // modifier-extend preserves them too - neither makes
+                // them part of the range the reader is sweeping.
+                List<String> range = anchorToLead();
+                String lead = leadRowIdentity();
+                if (lead == null || !range.contains(lead)) {
+                    lead = range.isEmpty() ? null
+                            : range.get(range.size() - 1);
+                }
+                if (additive) {
+                    working.replaceWith(
+                            orderedUnion(rangeSnapshotMembers, range),
+                            lead);
+                } else {
+                    working.replaceWith(range, lead);
+                }
+            } else {
+                rangeSnapshotMembers = null;
+                if (additive) {
+                    // The additive verb is toggle, and the row the
+                    // gesture addressed is the selection's lead -
+                    // Swing moves it there whether the row was
+                    // selected or unselected.
+                    String addressed = leadRowIdentity();
+                    if (addressed != null) {
+                        working.toggle(addressed);
+                    }
+                } else {
+                    working.replaceWith(shown, shownLead);
+                }
+            }
+        } finally {
+            publishing = false;
+        }
+        // And the table follows the outcome now - a toggle that
+        // removed a row, members on this page the gesture's Swing
+        // selection dropped - rather than being left describing a
+        // set nobody holds.
+        if (!sameAsSelection(services.workingSelection().members())) {
+            followTheModel(services.workingSelection().members());
+        }
+    }
+
+    /** Whether this page lists the identity as a row. */
+    private boolean pageHolds(String identity) {
+        for (Row row : model.rows) {
+            if (row.identity().equals(identity)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** The range's rows, anchor to active end, in view order. */
+    private List<String> anchorToLead() {
+        int anchor = table.getSelectionModel().getAnchorSelectionIndex();
+        int lead = table.getSelectionModel().getLeadSelectionIndex();
+        if (anchor < 0 || lead < 0 || anchor >= table.getRowCount()
+                || lead >= table.getRowCount()) {
+            return selectedIdentities();
+        }
+        List<String> range = new ArrayList<>();
+        for (int viewRow = Math.min(anchor, lead);
+                viewRow <= Math.max(anchor, lead); viewRow++) {
+            range.add(model.rows.get(table.convertRowIndexToModel(viewRow))
+                    .identity());
+        }
+        return range;
+    }
+
+    /** The selected identities, in view order. */
+    private List<String> selectedIdentities() {
         List<String> chosen = new ArrayList<>();
         for (int viewRow : table.getSelectedRows()) {
             chosen.add(model.rows.get(table.convertRowIndexToModel(viewRow))
                     .identity());
         }
-        String lead = null;
+        return chosen;
+    }
+
+    /** The gesture's active end, constrained to the chosen rows. */
+    private String leadIdentity(List<String> chosen) {
+        String lead = leadRowIdentity();
+        if (lead != null && chosen.contains(lead)) {
+            return lead;
+        }
+        return chosen.isEmpty() ? null : chosen.get(chosen.size() - 1);
+    }
+
+    /** The identity of the selection's lead row, selected or not. */
+    private String leadRowIdentity() {
         int leadView = table.getSelectionModel().getLeadSelectionIndex();
         if (leadView >= 0 && leadView < table.getRowCount()) {
-            Row row = model.rows.get(table.convertRowIndexToModel(leadView));
-            if (chosen.contains(row.identity())) {
-                lead = row.identity();
+            return model.rows.get(table.convertRowIndexToModel(leadView))
+                    .identity();
+        }
+        return null;
+    }
+
+    /**
+     * The decided order for the additive range: the snapshot's
+     * members first, then the range's newcomers in view order -
+     * recomputed whole, so it cannot depend on the path the range
+     * took.
+     */
+    private static List<String> orderedUnion(List<String> snapshot,
+                                             List<String> range) {
+        List<String> union = new ArrayList<>(snapshot);
+        for (String identity : range) {
+            if (!union.contains(identity)) {
+                union.add(identity);
             }
         }
-        if (lead == null && !chosen.isEmpty()) {
-            lead = chosen.get(chosen.size() - 1);
-        }
-        // One transition for one gesture: a shift-click over five
-        // rows is one change of mind, not five.
-        publishing = true;
-        try {
-            services.workingMarks().replaceWith(chosen, lead);
-        } finally {
-            publishing = false;
-        }
-        // And if something else changed the marks while that was
-        // being delivered, the table follows now rather than being
-        // left describing a set nobody holds.
-        if (!sameAsSelection(services.workingMarks().marks())) {
-            followTheModel(services.workingMarks().marks());
-        }
+        return union;
     }
 
-    /** Whether the table already shows exactly these marks. */
+    /** Whether the table already shows exactly these members. */
     private boolean sameAsSelection(List<String> wanted) {
-        List<String> shown = new ArrayList<>();
-        for (int viewRow : table.getSelectedRows()) {
-            shown.add(model.rows.get(table.convertRowIndexToModel(viewRow))
-                    .identity());
+        List<String> onPage = new ArrayList<>();
+        for (Row row : model.rows) {
+            if (wanted.contains(row.identity())) {
+                onPage.add(row.identity());
+            }
         }
-        return new java.util.HashSet<>(shown)
-                .equals(new java.util.HashSet<>(wanted));
+        return new java.util.HashSet<>(selectedIdentities())
+                .equals(new java.util.HashSet<>(onPage));
     }
 
-    private void marksChanged(WorkingMarksModel.Change change) {
+    private void selectionChanged(WorkingSelection.Change change) {
         // Not while the reader is the one doing it. Rewriting the
         // selection here would clear it and put it back, and Swing
         // keeps the anchor a shift-extension grows from in the
         // selection - so the second shift-Down would extend from the
         // wrong row. The journey caught it doing exactly that.
         if (!publishing) {
-            followTheModel(change.marks());
+            // A transition from any other surface ends the range
+            // transaction: its snapshot no longer describes the set
+            // the next extension would build on.
+            rangeSnapshotMembers = null;
+            followTheModel(change.members());
         }
         centreHere.setEnabled(change.lead() != null);
         clearMarks.setEnabled(!change.isEmpty());
     }
 
-    private void followTheModel(List<String> marks) {
+    private void followTheModel(List<String> members) {
         following = true;
         try {
-            table.getSelectionModel().setValueIsAdjusting(true);
+            // The rows change; the anchor and lead a shift-range
+            // grows from must not, or resynchronising after an
+            // additive gesture would break the very range it serves.
+            javax.swing.ListSelectionModel rows = table.getSelectionModel();
+            int anchor = rows.getAnchorSelectionIndex();
+            int lead = rows.getLeadSelectionIndex();
+            rows.setValueIsAdjusting(true);
             table.clearSelection();
             for (int modelRow = 0; modelRow < model.rows.size(); modelRow++) {
                 Row row = model.rows.get(modelRow);
-                if (!marks.contains(row.identity())) {
+                if (!members.contains(row.identity())) {
                     continue;
                 }
                 int viewRow = table.convertRowIndexToView(modelRow);
@@ -558,14 +768,22 @@ public final class OnThisPageTable extends JPanel {
                     table.addRowSelectionInterval(viewRow, viewRow);
                 }
             }
-            table.getSelectionModel().setValueIsAdjusting(false);
+            if (anchor >= 0 && anchor < table.getRowCount()) {
+                rows.setAnchorSelectionIndex(anchor);
+            }
+            if (lead >= 0 && lead < table.getRowCount()
+                    && rows instanceof javax.swing.DefaultListSelectionModel
+                            plain) {
+                plain.moveLeadSelectionIndex(lead);
+            }
+            rows.setValueIsAdjusting(false);
         } finally {
             following = false;
         }
     }
 
     private void centreOnLead() {
-        String lead = services.workingMarks().lead();
+        String lead = services.workingSelection().lead();
         if (lead == null) {
             return;
         }
