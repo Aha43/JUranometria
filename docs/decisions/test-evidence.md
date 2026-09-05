@@ -76,9 +76,9 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **40 files** touch process-wide state —
-**19** use the shared guard, **20** restore locally,
-**0 flagged unprotected** — and **23 files** depend on a display,
+this document to them: **41 files** touch process-wide state —
+**20** use the shared guard, **20** restore locally,
+**0 flagged unprotected** — and **24 files** depend on a display,
 of which **15** state a focus premise and **16** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -86,7 +86,11 @@ test and its journey — and the journey to the display corpus,
 premises stated; #261 added the surfaces journey, through the
 shared routes with both premises, and the table-gesture tests,
 display-dependent because Swing's own table UI asks the toolkit
-for the platform modifier while handling a press.)
+for the platform modifier while handling a press; #274 added the
+ecliptic menu surface, a guard-protected look-and-feel toucher and
+display-dependent because it shows a real popup — the gate's own
+control images were arrangement mock-ups, since a popup paints
+nothing until it is shown.)
 
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).

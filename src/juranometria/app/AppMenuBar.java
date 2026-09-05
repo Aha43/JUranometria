@@ -27,15 +27,33 @@ public final class AppMenuBar {
     /** The inspector item's name, so callers can keep it in step. */
     public static final String INSPECTOR_ITEM = "inspectorItem";
 
+    /** The ecliptic item's name, for the same reason (issue #274). */
+    public static final String ECLIPTIC_ITEM = "eclipticItem";
+
     /** The inspector's menu item within a bar, or null. */
     public static javax.swing.JCheckBoxMenuItem inspectorItem(
             javax.swing.JMenuBar bar) {
+        return checkBoxItem(bar, INSPECTOR_ITEM);
+    }
+
+    /**
+     * The ecliptic's menu item within a bar, or null when no
+     * ecliptic module is loaded - which is what an atlas without it
+     * shows: no control for something that cannot be drawn.
+     */
+    public static javax.swing.JCheckBoxMenuItem eclipticItem(
+            javax.swing.JMenuBar bar) {
+        return checkBoxItem(bar, ECLIPTIC_ITEM);
+    }
+
+    private static javax.swing.JCheckBoxMenuItem checkBoxItem(
+            javax.swing.JMenuBar bar, String name) {
         for (int i = 0; i < bar.getMenuCount(); i++) {
             JMenu menu = bar.getMenu(i);
             for (int j = 0; j < menu.getItemCount(); j++) {
                 JMenuItem item = menu.getItem(j);
                 if (item instanceof javax.swing.JCheckBoxMenuItem box
-                        && INSPECTOR_ITEM.equals(box.getName())) {
+                        && name.equals(box.getName())) {
                     return box;
                 }
             }
@@ -101,6 +119,33 @@ public final class AppMenuBar {
                                   Runnable openAbout,
                                   Runnable toggleInspector,
                                   Runnable openPlaceAndTime) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, null);
+    }
+
+    /**
+     * The menu bar with the ecliptic switch (Sprint 28, issue #274).
+     *
+     * <p>A checkbox item, because a reader must be able to see
+     * whether the ecliptic is showing without looking at the chart
+     * and guessing - the same reason the Inspector's item is one.
+     * The gate chose the View menu over a dialog and over Chart
+     * Options: the ecliptic has no settings at all, so a dialog
+     * would be a window built around a single checkbox, and Chart
+     * Options is the chart's own drawing rather than an optional
+     * module's.
+     *
+     * @param toggleEcliptic runs on the View menu's Ecliptic item
+     *     (may be null, omitting the item - which is what an atlas
+     *     without the ecliptic module shows)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic) {
         if (openAbout == null) {
             throw new IllegalArgumentException("about action is required");
         }
@@ -159,6 +204,23 @@ public final class AppMenuBar {
                                 + " chart mark");
                 inspector.addActionListener(event -> toggleInspector.run());
                 view.add(inspector);
+            }
+            if (toggleEcliptic != null) {
+                // Below the Inspector's, as the gate drew it. Its
+                // full astronomical name, so nothing here depends on
+                // a glyph, a zodiac sign or a colour to say what it
+                // is.
+                javax.swing.JCheckBoxMenuItem ecliptic =
+                        new javax.swing.JCheckBoxMenuItem("Ecliptic");
+                ecliptic.setName(ECLIPTIC_ITEM);
+                ecliptic.setMnemonic('E');
+                ecliptic.getAccessibleContext().setAccessibleName(
+                        "Ecliptic");
+                ecliptic.getAccessibleContext().setAccessibleDescription(
+                        "Show or hide the ecliptic and its equinox and"
+                                + " solstice marks");
+                ecliptic.addActionListener(event -> toggleEcliptic.run());
+                view.add(ecliptic);
             }
             if (navigation != null) {
                 // Centre-preserving zoom, exactly the toolbar's
