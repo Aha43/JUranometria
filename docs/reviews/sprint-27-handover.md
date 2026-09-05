@@ -99,25 +99,36 @@ component evidence, in one committed display journey —
 `WorkingSelectionSurfacesJourneyTest` — through real reader
 routes, failing if any transition is removed:
 
-- an ordinary chart click and an Accumulate table click build a
-  set holding a **drawn and an undrawn member**; the undrawn
-  member's **single cross** is proven from the chart's own
-  registry and the projection's own pixel, with every surface
-  agreeing;
+- an ordinary chart click and an Accumulate table click — the
+  table reached through the Inspector's own mode chooser, because
+  a card the chooser has not raised is not on screen — build a set
+  holding a **drawn and an undrawn member**; the treatments are
+  proven **on the component's own painted pixels** against the
+  untouched page: the drawn member's ring on its own
+  circumference with no cross arm at its centre, the undrawn
+  member's cross on both arms with the diagonal a ring would
+  cross clean — once each — with the registry and projection
+  checks kept beneath as diagnostics;
 - the Chart column is **sorted and then dragged to the front at
-  its real header**, and holds its measured width by model
-  identity wherever it sits; under **enlarged application text**
-  (20 pt, on the shared guard) the width rule holds again after a
-  real resize — whole words, never cut — with membership, order
-  and lead fixed throughout;
+  its real header, through the shared `ReaderInput` routes** —
+  the click, and a new premise-proving drag whose endpoints must
+  both lie inside the visible header — and holds its measured
+  width by model identity wherever it sits; under **enlarged
+  application text** (20 pt, on the shared guard) the width rule
+  holds again after a real resize — whole words, never cut — with
+  membership, order and lead fixed throughout;
 - search **carries the undrawn member off-page** as a member, not
   as ink (no contribution of either kind remains), the working
   set labelling both absentees in words;
-- under that same live set, the real Chart Options dialog hides
-  and restores an ordinary family (the member moves ring → cross
-  → ring; the set never moves), **Black sky** is chosen and OK
-  persists it, and the application theme is applied **both
-  directions** on the shared guard — membership, order and lead
+- under that same live set, the window carries the **production
+  `AppMenuBar`**: Chart Options opens from its real View-menu
+  item (the recorded menu-item convention) and its real checkbox
+  hides and restores an ordinary family — the member's **ring
+  leaves the painted page and the cross arrives, then back**, the
+  set never moving; **Black sky** is chosen and OK persists it;
+  and the theme is changed **both directions through the real
+  File-menu Settings item**, the dialog's own appearance controls
+  and OK, on the shared guard — membership, order and lead
   identical after every one of these presentation changes;
 - **Clear selection** through the real control empties every
   surface, and a **second session** built from the same store
@@ -196,7 +207,7 @@ last four `test`-workflow runs and the approved head's
 | CI `display` | 98 s avg, worst 117 (n=4) | 102 s avg, worst 115 (n=4) | three gesture/journey classes added |
 | CI `image` cells | 82–139 s | 75–117 s (n=1 each) | flat within variance |
 | CI `dist` verify | 43–46 s each | 39–42 s each | flat |
-| local clean checkout, cold | 45.2 s / 783 | 46.9 s / 824 | ≈57 ms per test, unchanged |
+| local clean checkout, cold | 45.2 s / 783 | 47.8 s / 824 | ≈58 ms per test, unchanged |
 
 No causation is claimed from these samples; runner variance spans
 the gaps. The suite grew by forty-one tests — most of them real-window

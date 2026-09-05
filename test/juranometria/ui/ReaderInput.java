@@ -115,6 +115,59 @@ public final class ReaderInput {
     }
 
     /**
+     * A pointer drag from one point of a control to another - a
+     * column header carried to a new place - with the clicks' own
+     * premises proven for <strong>both endpoints</strong> before
+     * anything is dispatched: the control is showing in a window,
+     * it has a size, and each end of the drag lies inside its
+     * visible rectangle. The rectangle is convex, so a straight
+     * path between two reachable points is reachable throughout;
+     * the path is then walked in steps a hand would make.
+     */
+    public static void drag(JComponent control, int fromX, int fromY,
+                            int toX, int toY) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            assertTrue(control.isShowing(),
+                    name(control) + " is on screen, in a window a"
+                            + " reader can see");
+            assertTrue(control.getWidth() > 0 && control.getHeight() > 0,
+                    name(control) + " has a size a pointer could hit: "
+                            + control.getWidth() + "x"
+                            + control.getHeight());
+            assertTrue(control.getVisibleRect().contains(fromX, fromY),
+                    "the press point of the drag on " + name(control)
+                            + " is one a reader could reach: " + fromX
+                            + "," + fromY + " within "
+                            + control.getVisibleRect());
+            assertTrue(control.getVisibleRect().contains(toX, toY),
+                    "the release point of the drag on " + name(control)
+                            + " is one a reader could reach: " + toX
+                            + "," + toY + " within "
+                            + control.getVisibleRect());
+            control.dispatchEvent(new MouseEvent(control,
+                    MouseEvent.MOUSE_PRESSED,
+                    System.nanoTime() / 1_000_000,
+                    java.awt.event.InputEvent.BUTTON1_DOWN_MASK,
+                    fromX, fromY, 1, false, MouseEvent.BUTTON1));
+            int steps = 12;
+            for (int i = 1; i <= steps; i++) {
+                control.dispatchEvent(new MouseEvent(control,
+                        MouseEvent.MOUSE_DRAGGED,
+                        System.nanoTime() / 1_000_000,
+                        java.awt.event.InputEvent.BUTTON1_DOWN_MASK,
+                        fromX + (toX - fromX) * i / steps,
+                        fromY + (toY - fromY) * i / steps, 1, false,
+                        MouseEvent.BUTTON1));
+            }
+            control.dispatchEvent(new MouseEvent(control,
+                    MouseEvent.MOUSE_RELEASED,
+                    System.nanoTime() / 1_000_000, 0, toX, toY, 1,
+                    false, MouseEvent.BUTTON1));
+        });
+        flush();
+    }
+
+    /**
      * Types into a field the way a reader does: click in, prove the
      * keyboard arrived, platform select-all, the characters, Enter.
      * Aborts honestly where the desktop refuses the field focus.

@@ -57,6 +57,7 @@ class WorkingSelectionSurfacesJourneyTest {
     private SearchField search;
     private AtlasToolbar toolbar;
     private juranometria.app.ChartOptionsController chartOptions;
+    private juranometria.app.AppearanceSession appearance;
     private final List<juranometria.module.NavigationRequest> requests =
             new ArrayList<>();
     /** Every inventory rebuild: the catalogue-traffic meter. */
@@ -77,22 +78,27 @@ class WorkingSelectionSurfacesJourneyTest {
 
     /** The application's own wiring, in a window a reader could use. */
     private void openTheAtlas(int width) throws Exception {
-        openTheAtlas(width, null);
+        openTheAtlas(width, null, null);
     }
 
     /**
-     * The same wiring with the reader's chart options attached the
-     * way the application attaches them - the controller, the
-     * production {@code TargetRetirement} seam, and the dialog the
-     * View menu opens - so the closing journey can change an
-     * ordinary option, the palette and the theme under a live set.
+     * The same wiring with the reader's chart options and appearance
+     * attached the way the application attaches them - the
+     * controllers, the production {@code TargetRetirement} seam, and
+     * the real menu bar whose File menu opens Settings and whose
+     * View menu opens Chart Options - so the closing journey reaches
+     * an ordinary option, the palette and the theme through the
+     * public routes, under a live set.
      */
     private void openTheAtlas(int width,
                               juranometria.app.ChartOptionsController
-                                      options) throws Exception {
+                                      options,
+                              juranometria.app.AppearanceSession
+                                      appearanceSession) throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "a reader's keys and clicks need a display");
         this.chartOptions = options;
+        this.appearance = appearanceSession;
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
             chart = new ChartComponent(Atlas.assembler());
@@ -130,6 +136,23 @@ class WorkingSelectionSurfacesJourneyTest {
                     modules.selectionMode());
 
             window = new JFrame(AppInfo.NAME + " " + AppInfo.version());
+            if (options != null) {
+                // The production menu wiring (closing review): the
+                // journey reaches Settings and Chart Options only
+                // through the items a reader can see.
+                window.setJMenuBar(juranometria.app.AppMenuBar.create(
+                        () -> juranometria.app.SettingsDialog.open(
+                                window, appearanceSession,
+                                effectiveDark -> {
+                                    juranometria.app.UiTheme.apply(
+                                            effectiveDark);
+                                    com.formdev.flatlaf.FlatLaf
+                                            .updateUI();
+                                }),
+                        () -> juranometria.app.ChartOptionsDialog.open(
+                                window, options),
+                        () -> { }));
+            }
             window.setLayout(new BorderLayout());
             window.add(toolbar, BorderLayout.NORTH);
             window.add(chart, BorderLayout.CENTER);
@@ -164,9 +187,14 @@ class WorkingSelectionSurfacesJourneyTest {
         ReaderInput.click(toolbar.accumulateButton());
         assertTrue(modules.selectionMode().accumulate(),
                 "the toolbar control writes the one shared mode");
+        // The table lives in the Inspector's second mode: the
+        // reader opens it through the chooser before clicking rows
+        // - a card the chooser has not raised is not on screen.
+        ReaderInput.click(inspector.pageModeButton());
         String second = anyOtherDrawnRow(first);
         clickRow(viewRowOf(second), 0);
         assertEverySurfaceAgrees(List.of(first, second), second);
+        ReaderInput.click(inspector.selectedModeButton());
 
         // ---- Page two: search carries the reader to Orion. --------
         int rebuildsBefore = rebuilds;
@@ -313,13 +341,21 @@ class WorkingSelectionSurfacesJourneyTest {
         try {
             juranometria.app.ChartOptionsStore store =
                     juranometria.app.ChartOptionsStore.forNode(node);
+            juranometria.app.AppearanceStore looks =
+                    juranometria.app.AppearanceStore.forNode(node);
             openTheAtlas(1300,
-                    new juranometria.app.ChartOptionsController(store));
+                    new juranometria.app.ChartOptionsController(store),
+                    new juranometria.app.AppearanceSession(looks, false));
+
+            // The page before any gesture: the before of every
+            // painted-pixel accounting below.
+            java.awt.image.BufferedImage untouched = paintChart();
 
             // ---- Drawn and undrawn members, from chart and table.
             String drawn = anotherDrawnObjectOnThisPage("");
             clickChartOn(drawn, 0);
             ReaderInput.click(toolbar.accumulateButton());
+            ReaderInput.click(inspector.pageModeButton());
             String undrawn = firstUndrawnRow();
             clickRow(viewRowOf(undrawn), 0);
             assertEverySurfaceAgrees(List.of(drawn, undrawn), undrawn);
@@ -328,17 +364,58 @@ class WorkingSelectionSurfacesJourneyTest {
                             + " contribution, none for the drawn one");
             assertCrossLandsOn(undrawn);
 
+            // The component's own paint, accounted at the production
+            // positions (closing re-review): the drawn member has
+            // its ring and no cross, the undrawn member its cross
+            // and no ring - once each. The lead is moved to the
+            // drawn member first, whose lead treatment is the plain
+            // ring, so the undrawn member's cross is the plain
+            // cross and any ring at its position would be a defect.
+            ReaderInput.click(inspector.selectedModeButton());
+            ReaderInput.click(inspector.workingSetMemberButton(drawn));
+            assertEverySurfaceAgrees(List.of(drawn, undrawn), drawn);
+            java.awt.image.BufferedImage marked = paintChart();
+            double[] ring = drawnMarkOf(drawn);
+            int offsetY = pageOffset();
+            double reach = ring[2] / Math.sqrt(2.0);
+            assertTrue(changedNear(untouched, marked,
+                            (int) Math.round(ring[0] + reach),
+                            (int) Math.round(ring[1] + reach) + offsetY,
+                            2),
+                    "the drawn member's ring is painted, on its own"
+                            + " circumference");
+            assertTrue(!changedNear(untouched, marked,
+                            (int) Math.round(ring[0]) + 4,
+                            (int) Math.round(ring[1]) + offsetY, 0)
+                            && !changedNear(untouched, marked,
+                                    (int) Math.round(ring[0]),
+                                    (int) Math.round(ring[1]) + 4
+                                            + offsetY, 0),
+                    "and no cross arm is painted at the drawn member");
+            double[] at = projectedOf(undrawn);
+            int ux = (int) Math.round(at[0]);
+            int uy = (int) Math.round(at[1]) + offsetY;
+            assertTrue(changedNear(untouched, marked, ux + 5, uy, 1)
+                            && changedNear(untouched, marked, ux,
+                                    uy + 5, 1),
+                    "the undrawn member's cross is painted, both arms");
+            assertTrue(!changedNear(untouched, marked, ux + 6, uy + 6, 1),
+                    "and no ring of either kind is painted around it -"
+                            + " the diagonal a ring would cross is"
+                            + " clean");
+
             // ---- The compact table, manipulated at its real header.
+            ReaderInput.click(inspector.pageModeButton());
             clickColumnHeader(3);
             assertTrue(!page.sortKeys().isEmpty(),
                     "the header click sorted the Chart column");
-            assertEverySurfaceAgrees(List.of(drawn, undrawn), undrawn);
+            assertEverySurfaceAgrees(List.of(drawn, undrawn), drawn);
             dragColumnHeader(3, 0);
             assertEquals(0, chartColumnViewIndex(),
                     "the Chart column was dragged to the front by its"
                             + " real header");
             assertStateColumnKeepsItsMeasuredWidth();
-            assertEverySurfaceAgrees(List.of(drawn, undrawn), undrawn);
+            assertEverySurfaceAgrees(List.of(drawn, undrawn), drawn);
 
             // ---- Enlarged text: the honest fallback, the set held.
             // The font override is JVM-wide state on the shared
@@ -356,7 +433,7 @@ class WorkingSelectionSurfacesJourneyTest {
                 flush();
                 assertStateColumnKeepsItsMeasuredWidth();
                 assertEverySurfaceAgrees(List.of(drawn, undrawn),
-                        undrawn);
+                        drawn);
             });
             SwingUtilities.invokeAndWait(() -> {
                 SwingUtilities.updateComponentTreeUI(window);
@@ -380,15 +457,22 @@ class WorkingSelectionSurfacesJourneyTest {
                     inspector.workingSetLines());
 
             // ---- An ordinary option, under the live set: the real
-            // dialog, the real checkbox. M 42's family hidden moves
-            // the member from ring to cross; membership never moves.
-            SwingUtilities.invokeAndWait(() ->
-                    juranometria.app.ChartOptionsDialog.open(window,
-                            chartOptions));
-            flush();
-            javax.swing.JDialog dialog = optionsDialog();
-            assertTrue(dialog != null, "the Chart Options dialog is"
-                    + " open in front of the reader");
+            // View menu, the real dialog, the real checkbox (the
+            // recorded menu-item convention). M 42's family hidden
+            // moves the member from ring to cross on the painted
+            // page itself; membership never moves.
+            double[] m42Mark = drawnMarkOf(m42);
+            int m42OffsetY = pageOffset();
+            double m42Reach = m42Mark[2] / Math.sqrt(2.0);
+            int rx = (int) Math.round(m42Mark[0] + m42Reach);
+            int ry = (int) Math.round(m42Mark[1] + m42Reach) + m42OffsetY;
+            int ax = (int) Math.round(m42Mark[0]) + 5;
+            int ay = (int) Math.round(m42Mark[1]) + m42OffsetY;
+            java.awt.image.BufferedImage ringed = paintChart();
+            clickMenuItem("Chart Options...");
+            javax.swing.JDialog dialog = titledDialog("Chart Options");
+            assertTrue(dialog != null, "the View menu opened the"
+                    + " Chart Options dialog in front of the reader");
             ReaderInput.click(box(dialog.getContentPane(), "Nebulae"));
             flush();
             assertEquals(held, working().members(),
@@ -397,9 +481,21 @@ class WorkingSelectionSurfacesJourneyTest {
             assertEquals(m42, working().lead());
             assertEquals(List.of(m42), inked(),
                     "the hidden member moved from ring to cross");
+            java.awt.image.BufferedImage crossed = paintChart();
+            assertTrue(changedNear(ringed, crossed, rx, ry, 2),
+                    "the painted ring left the page with its family");
+            assertTrue(changedNear(ringed, crossed, ax, ay, 1),
+                    "and the painted cross arrived at the member's"
+                            + " own position");
             ReaderInput.click(box(dialog.getContentPane(), "Nebulae"));
             flush();
             assertTrue(inked().isEmpty(), "and back to its ring");
+            java.awt.image.BufferedImage restored = paintChart();
+            assertTrue(!changedNear(ringed, restored, rx, ry, 2)
+                            && !changedNear(ringed, restored, ax, ay, 1),
+                    "restoring the family paints the ring again and"
+                            + " takes the cross away - the observable"
+                            + " ring, cross, ring transition");
 
             // ---- The palette, kept for the restart: Black sky, OK.
             ReaderInput.chooseTab(tabsIn(dialog.getContentPane()),
@@ -416,21 +512,37 @@ class WorkingSelectionSurfacesJourneyTest {
                     "OK persisted the reader's sky");
             assertEquals(held, working().members());
 
-            // ---- The theme, both directions, under the same set.
-            // Look-and-feel is process-wide state on the shared
-            // guard (#224).
+            // ---- The theme, both directions, through the real
+            // File menu and the real Settings dialog's own controls
+            // and OK. Look-and-feel is process-wide state on the
+            // shared guard (#224).
             juranometria.app.SwingSession.restoring(() -> {
-                for (boolean dark : new boolean[] {true, false}) {
-                    SwingUtilities.invokeAndWait(() -> {
-                        juranometria.app.UiTheme.apply(dark);
-                        com.formdev.flatlaf.FlatLaf.updateUI();
-                    });
+                for (String choice : new String[] {"Dark appearance",
+                        "Light appearance"}) {
+                    clickMenuItem("Settings...");
+                    javax.swing.JDialog settings =
+                            titledDialog("Settings");
+                    assertTrue(settings != null,
+                            "the File menu opened Settings in front"
+                                    + " of the reader");
+                    ReaderInput.click(radio(settings.getContentPane(),
+                            choice));
+                    ReaderInput.click(button(settings.getContentPane(),
+                            "OK"));
                     flush();
+                    assertTrue(!settings.isDisplayable(),
+                            "OK closed the dialog");
+                    boolean dark = choice.startsWith("Dark");
+                    assertEquals(dark, javax.swing.UIManager
+                                    .getLookAndFeel().getName()
+                                    .toLowerCase(java.util.Locale.ROOT)
+                                    .contains("dark"),
+                            "the confirmed appearance applied: "
+                                    + choice);
                     assertEquals(held, working().members(),
                             "application chrome is presentation:"
-                                    + " membership holds under a "
-                                    + (dark ? "dark" : "light")
-                                    + " theme");
+                                    + " membership holds under "
+                                    + choice);
                     assertEquals(m42, working().lead());
                     assertEquals(List.of(m42), selectedRows(),
                             "and the table still shows the"
@@ -439,6 +551,7 @@ class WorkingSelectionSurfacesJourneyTest {
             });
 
             // ---- Cleared through the real control; restarted clean.
+            ReaderInput.click(inspector.selectedModeButton());
             ReaderInput.click(inspector.clearSelectionButton());
             assertTrue(working().members().isEmpty(),
                     "Clear selection empties the whole set");
@@ -447,7 +560,8 @@ class WorkingSelectionSurfacesJourneyTest {
             closeTheWindow();
 
             openTheAtlas(1300,
-                    new juranometria.app.ChartOptionsController(store));
+                    new juranometria.app.ChartOptionsController(store),
+                    new juranometria.app.AppearanceSession(looks, false));
             assertTrue(working().members().isEmpty(),
                     "a new session begins with no working selection");
             assertEquals(Selection.NOTHING, selection.selection());
@@ -607,33 +721,19 @@ class WorkingSelectionSurfacesJourneyTest {
         return row[0];
     }
 
-    /** A real click, where a reader would put the pointer. */
+    /**
+     * A real click on a real row, through the shared route whose
+     * premises prove the table is on screen - which also proves the
+     * reader has opened the On-this-page mode, because a card the
+     * chooser has not raised is not on screen at all.
+     */
     private void clickRow(int viewRow, int modifiers) throws Exception {
         SwingUtilities.invokeAndWait(() -> table.scrollRectToVisible(
                 table.getCellRect(viewRow, 0, true)));
         flush();
-        SwingUtilities.invokeAndWait(() -> {
-            java.awt.Rectangle cell = table.getCellRect(viewRow, 0, true);
-            int x = cell.x + cell.width / 2;
-            int y = cell.y + cell.height / 2;
-            assertTrue(table.getVisibleRect().contains(x, y),
-                    "the point clicked on row " + viewRow + " is one a"
-                            + " reader could reach");
-            for (int id : new int[] {
-                    java.awt.event.MouseEvent.MOUSE_PRESSED,
-                    java.awt.event.MouseEvent.MOUSE_RELEASED,
-                    java.awt.event.MouseEvent.MOUSE_CLICKED}) {
-                table.dispatchEvent(new java.awt.event.MouseEvent(table,
-                        id, System.nanoTime() / 1_000_000,
-                        id == java.awt.event.MouseEvent.MOUSE_PRESSED
-                                ? java.awt.event.InputEvent
-                                        .BUTTON1_DOWN_MASK | modifiers
-                                : modifiers,
-                        x, y, 1, false,
-                        java.awt.event.MouseEvent.BUTTON1));
-            }
-        });
-        flush();
+        java.awt.Rectangle cell = table.getCellRect(viewRow, 0, true);
+        ReaderInput.click(table, (int) cell.getCenterX(),
+                (int) cell.getCenterY(), modifiers);
     }
 
     /** The platform's own add-to-selection modifier. */
@@ -690,64 +790,32 @@ class WorkingSelectionSurfacesJourneyTest {
                 identity + " lands on the paper");
     }
 
-    /** A real click on the real column header, as a reader sorts. */
+    /**
+     * A real click on the real column header, through the shared
+     * route that proves the header is showing and the point
+     * reachable before anything is dispatched.
+     */
     private void clickColumnHeader(int viewColumn) throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            java.awt.Rectangle bounds =
-                    table.getTableHeader().getHeaderRect(viewColumn);
-            int x = bounds.x + bounds.width / 2;
-            int y = bounds.y + bounds.height / 2;
-            for (int id : new int[] {
-                    java.awt.event.MouseEvent.MOUSE_PRESSED,
-                    java.awt.event.MouseEvent.MOUSE_RELEASED,
-                    java.awt.event.MouseEvent.MOUSE_CLICKED}) {
-                table.getTableHeader().dispatchEvent(
-                        new java.awt.event.MouseEvent(
-                                table.getTableHeader(), id,
-                                System.nanoTime() / 1_000_000, 0, x, y,
-                                1, false,
-                                java.awt.event.MouseEvent.BUTTON1));
-            }
-        });
-        flush();
+        java.awt.Rectangle bounds =
+                table.getTableHeader().getHeaderRect(viewColumn);
+        ReaderInput.click(table.getTableHeader(),
+                (int) bounds.getCenterX(), (int) bounds.getCenterY(), 0);
     }
 
     /**
-     * A real drag on the real column header: pressed at one header
-     * cell, moved in steps a hand would make, released where the
-     * reader wants the column - Swing's own reordering in the loop.
+     * A real drag on the real column header, through the shared
+     * route whose premises prove both endpoints reachable - Swing's
+     * own reordering in the loop.
      */
     private void dragColumnHeader(int fromView, int toView)
             throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            var header = table.getTableHeader();
-            java.awt.Rectangle from = header.getHeaderRect(fromView);
-            java.awt.Rectangle to = header.getHeaderRect(toView);
-            int y = from.y + from.height / 2;
-            int startX = from.x + from.width / 2;
-            int endX = to.x + to.width / 2;
-            header.dispatchEvent(new java.awt.event.MouseEvent(header,
-                    java.awt.event.MouseEvent.MOUSE_PRESSED,
-                    System.nanoTime() / 1_000_000,
-                    java.awt.event.InputEvent.BUTTON1_DOWN_MASK,
-                    startX, y, 1, false,
-                    java.awt.event.MouseEvent.BUTTON1));
-            int steps = 12;
-            for (int i = 1; i <= steps; i++) {
-                int x = startX + (endX - startX) * i / steps;
-                header.dispatchEvent(new java.awt.event.MouseEvent(header,
-                        java.awt.event.MouseEvent.MOUSE_DRAGGED,
-                        System.nanoTime() / 1_000_000,
-                        java.awt.event.InputEvent.BUTTON1_DOWN_MASK,
-                        x, y, 1, false,
-                        java.awt.event.MouseEvent.BUTTON1));
-            }
-            header.dispatchEvent(new java.awt.event.MouseEvent(header,
-                    java.awt.event.MouseEvent.MOUSE_RELEASED,
-                    System.nanoTime() / 1_000_000, 0, endX, y, 1, false,
-                    java.awt.event.MouseEvent.BUTTON1));
-        });
-        flush();
+        java.awt.Rectangle from =
+                table.getTableHeader().getHeaderRect(fromView);
+        java.awt.Rectangle to =
+                table.getTableHeader().getHeaderRect(toView);
+        ReaderInput.drag(table.getTableHeader(),
+                (int) from.getCenterX(), (int) from.getCenterY(),
+                (int) to.getCenterX(), (int) to.getCenterY());
     }
 
     /** Where the Chart column sits now, by its model identity. */
@@ -795,12 +863,119 @@ class WorkingSelectionSurfacesJourneyTest {
         });
     }
 
-    private static javax.swing.JDialog optionsDialog() {
+    private static javax.swing.JDialog titledDialog(String title) {
         for (java.awt.Window open : java.awt.Window.getWindows()) {
             if (open instanceof javax.swing.JDialog dialog
                     && dialog.isDisplayable()
-                    && "Chart Options".equals(dialog.getTitle())) {
+                    && title.equals(dialog.getTitle())) {
                 return dialog;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The real menu item with this text, pressed under the recorded
+     * menu-item convention: an item's action is its whole surface.
+     */
+    private void clickMenuItem(String text) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            javax.swing.JMenuBar bar = window.getJMenuBar();
+            assertTrue(bar != null, "the window carries the"
+                    + " production menu bar");
+            for (int m = 0; m < bar.getMenuCount(); m++) {
+                javax.swing.JMenu menu = bar.getMenu(m);
+                for (int i = 0; i < menu.getItemCount(); i++) {
+                    javax.swing.JMenuItem item = menu.getItem(i);
+                    if (item != null && text.equals(item.getText())) {
+                        item.doClick();
+                        return;
+                    }
+                }
+            }
+            throw new AssertionError(
+                    "no menu offers the item " + text);
+        });
+        flush();
+    }
+
+    /** The component's own painting, into an image. */
+    private java.awt.image.BufferedImage paintChart() throws Exception {
+        java.awt.image.BufferedImage[] shot =
+                new java.awt.image.BufferedImage[1];
+        SwingUtilities.invokeAndWait(() -> {
+            shot[0] = new java.awt.image.BufferedImage(chart.getWidth(),
+                    chart.getHeight(),
+                    java.awt.image.BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics2D g = shot[0].createGraphics();
+            try {
+                chart.paint(g);
+            } finally {
+                g.dispose();
+            }
+        });
+        return shot[0];
+    }
+
+    /** Whether any pixel within reach of a point differs. */
+    private static boolean changedNear(java.awt.image.BufferedImage a,
+                                       java.awt.image.BufferedImage b,
+                                       int cx, int cy, int reach) {
+        for (int y = Math.max(0, cy - reach);
+                y <= Math.min(a.getHeight() - 1, cy + reach); y++) {
+            for (int x = Math.max(0, cx - reach);
+                    x <= Math.min(a.getWidth() - 1, cx + reach); x++) {
+                if (a.getRGB(x, y) != b.getRGB(x, y)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** This drawn object's centre and ring radius, {x, y, radius}. */
+    private double[] drawnMarkOf(String identity) throws Exception {
+        double[] found = new double[3];
+        SwingUtilities.invokeAndWait(() -> {
+            ChartRenderer.DrawnMark mark = RENDERER
+                    .drawnMarks(chart.currentScene(), chart.chartOptions())
+                    .stream()
+                    .filter(m -> identity.equals(m.star() != null
+                            ? m.star().id() : m.deepSky().id()))
+                    .findFirst().orElseThrow();
+            found[0] = mark.centre().x();
+            found[1] = mark.centre().y();
+            found[2] = Math.max(mark.reach() + 5.0, 7.0);
+        });
+        return found;
+    }
+
+    /** This identity's page position, by the production projection. */
+    private double[] projectedOf(String identity) throws Exception {
+        return modules.projection().toPage(modules.inventory()
+                .find(identity).orElseThrow().position()).orElseThrow();
+    }
+
+    private int pageOffset() throws Exception {
+        int[] offset = new int[1];
+        SwingUtilities.invokeAndWait(() ->
+                offset[0] = chart.pageOffsetY());
+        return offset[0];
+    }
+
+    private static javax.swing.JRadioButton radio(
+            java.awt.Component component, String accessibleName) {
+        if (component instanceof javax.swing.JRadioButton candidate
+                && accessibleName.equals(candidate.getAccessibleContext()
+                        .getAccessibleName())) {
+            return candidate;
+        }
+        if (component instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                var found = radio(child, accessibleName);
+                if (found != null) {
+                    return found;
+                }
             }
         }
         return null;

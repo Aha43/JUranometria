@@ -425,17 +425,20 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 25,
+        assertTrue(doClick <= 26,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
                         + " (#246) added one file whose only doClick"
-                        + " is the recorded View-menu convention, and"
-                        + " the reader surfaces (#261) added two"
+                        + " is the recorded View-menu convention, the"
+                        + " reader surfaces (#261) added two"
                         + " control-mechanism files (the Accumulate"
                         + " toggle, the working-set rows) whose"
                         + " journeys drive the same controls with"
-                        + " real pointer events: " + doClick);
+                        + " real pointer events, and the #262 closing"
+                        + " journey reaches Settings and Chart"
+                        + " Options through the same recorded"
+                        + " menu-item convention: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);
