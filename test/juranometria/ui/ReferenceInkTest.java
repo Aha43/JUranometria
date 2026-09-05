@@ -520,40 +520,40 @@ class ReferenceInkTest {
      */
     private static List<int[]> runsAlongTheLine(ChartScene scene,
             OverlayContribution.Reference reference) {
-        BufferedImage plain = pageOf(scene, List.of());
-        BufferedImage drawn = pageOf(scene, offered("m", List.of(
-                new OverlayContribution.GreatCircle("x", "X",
+        BufferedImage drawn = inkOnBlankGround(scene, offered("m",
+                List.of(new OverlayContribution.GreatCircle("x", "X",
                         new SkyPosition(0.0, 90.0), reference,
                         InkRole.REFERENCE_LINE))));
         int row = -1;
         int most = 0;
-        for (int y = 0; y < plain.getHeight(); y++) {
-            int changed = 0;
-            for (int x = 0; x < plain.getWidth(); x++) {
-                if (plain.getRGB(x, y) != drawn.getRGB(x, y)) {
-                    changed++;
+        for (int y = 0; y < drawn.getHeight(); y++) {
+            int marked = 0;
+            for (int x = 0; x < drawn.getWidth(); x++) {
+                if (inked(drawn, x, y)) {
+                    marked++;
                 }
             }
-            if (changed > most) {
-                most = changed;
+            if (marked > most) {
+                most = marked;
                 row = y;
             }
         }
         assertTrue(most > 100,
                 "the equator is drawn across this page");
 
-        // The whole line, not a chosen window. A first version read a
-        // fixed span picked because it was clear of catalogue ink,
-        // which would have broken on an unrelated catalogue change
-        // (PR #278 round 2). Catalogue marks painted over the line
-        // hide some of it, so some runs are interrupted; the caller
-        // asks for a number of intact cycles anywhere along the row
-        // rather than for an unbroken pattern everywhere.
+        // The whole line, on blank ground. Two earlier versions read
+        // a full page: the first through a fixed window chosen
+        // because it was clear of catalogue ink, the second through
+        // the whole row while still differencing two catalogued
+        // pages. Both made the oracle for this stroke depend on what
+        // the catalogue paints near it - it can hide a run, and it
+        // could in principle contribute to one (PR #278 rounds 2 and
+        // 3). Here the only thing on the page is the line.
         List<int[]> runs = new java.util.ArrayList<>();
         int current = -1;
         int length = 0;
-        for (int x = 2; x < plain.getWidth() - 2; x++) {
-            int ink = plain.getRGB(x, row) != drawn.getRGB(x, row) ? 1 : 0;
+        for (int x = 2; x < drawn.getWidth() - 2; x++) {
+            int ink = inked(drawn, x, row) ? 1 : 0;
             if (ink == current) {
                 length++;
             } else {
@@ -565,6 +565,70 @@ class ReferenceInkTest {
             }
         }
         return runs;
+    }
+
+    /**
+     * The real {@link ReferenceInk} on blank ground.
+     *
+     * <p>For the two tests that hold the exact approved shapes. Those
+     * read the raster directly, and on a full page the catalogue is
+     * painted over the reference layer: it can hide part of a stroke
+     * and, in principle, contribute ink of its own to a run - so the
+     * oracle for a shape would depend on what the bundled catalogue
+     * happens to put near it (PR #278 round 3). The painter is
+     * production's; only the ground is empty.
+     *
+     * <p>The full-page tests above and below are unchanged, and they
+     * are where layering and readability are held.
+     */
+    private static BufferedImage inkOnBlankGround(ChartScene scene,
+            List<OverlayRegistry.Owned> ink) {
+        BufferedImage image = new BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        try {
+            // The renderer's own hints, because the stroke must
+            // rasterise the way it does on a page: without pure
+            // stroke control and antialiasing the same geometry lands
+            // on different pixels, and the shape being held would be
+            // this test's rather than production's.
+            g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(
+                    java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setRenderingHint(
+                    java.awt.RenderingHints.KEY_STROKE_CONTROL,
+                    java.awt.RenderingHints.VALUE_STROKE_PURE);
+            g.setColor(ChartOptions.DEFAULTS.palette().ground());
+            g.fillRect(0, 0, image.getWidth(), image.getHeight());
+            g.clip(new java.awt.Rectangle(1, 1, image.getWidth() - 2,
+                    image.getHeight() - 2));
+            ReferenceInk.paint(g, scene, ink,
+                    ChartOptions.DEFAULTS.palette());
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    /** Whether this pixel carries ink, on blank ground. */
+    private static boolean inked(BufferedImage image, int x, int y) {
+        return image.getRGB(x, y)
+                != ChartOptions.DEFAULTS.palette().ground().getRGB();
+    }
+
+    private static boolean inkedWithin(BufferedImage image, int x, int y,
+                                       int radius) {
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                if (inked(image, x + dx, y + dy)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static BufferedImage pageOf(ChartScene scene,
@@ -591,34 +655,37 @@ class ReferenceInkTest {
         SkyPosition at = new SkyPosition(
                 SCENE.viewport().centre().raDegrees(),
                 SCENE.viewport().centre().decDegrees() + 1.0);
-        BufferedImage drawn = page(offered("m", List.of(
-                new OverlayContribution.Point("p", "P", at,
+        // On blank ground, for the same reason as the stroke above:
+        // this reads the raster to hold an exact shape, and nothing
+        // but the shape should be able to decide the answer. The
+        // painter is production's.
+        BufferedImage drawn = inkOnBlankGround(SCENE, offered("m",
+                List.of(new OverlayContribution.Point("p", "P", at,
                         OverlayContribution.Mark.LANDMARK,
                         InkRole.REFERENCE_LINE))));
-        BufferedImage plain = ordinaryPage();
         double[] pixel = pixelOf(at);
         int cx = (int) Math.round(pixel[0]);
         int cy = (int) Math.round(pixel[1]);
 
         // Four vertices, on the axes through its centre.
-        assertTrue(inkWithin(plain, drawn, cx, cy - 6, 1),
+        assertTrue(inkedWithin(drawn, cx, cy - 6, 1),
                 "the diamond has a vertex above its centre");
-        assertTrue(inkWithin(plain, drawn, cx, cy + 6, 1),
+        assertTrue(inkedWithin(drawn, cx, cy + 6, 1),
                 "and below");
-        assertTrue(inkWithin(plain, drawn, cx - 6, cy, 1),
+        assertTrue(inkedWithin(drawn, cx - 6, cy, 1),
                 "and to one side");
-        assertTrue(inkWithin(plain, drawn, cx + 6, cy, 1),
+        assertTrue(inkedWithin(drawn, cx + 6, cy, 1),
                 "and to the other");
 
         // Open, not filled.
-        assertEquals(plain.getRGB(cx, cy), drawn.getRGB(cx, cy),
+        assertFalse(inked(drawn, cx, cy),
                 "and its centre is open");
 
         // The diagonals are cut away: a circle or a square of this
         // size would put ink at the corners, and a diamond cannot.
         for (int dx : new int[] {-5, 5}) {
             for (int dy : new int[] {-5, 5}) {
-                assertFalse(inkWithin(plain, drawn, cx + dx, cy + dy, 0),
+                assertFalse(inked(drawn, cx + dx, cy + dy),
                         "no ink at the corner " + dx + "," + dy
                                 + ": the edges run diagonally, which is"
                                 + " what makes it a diamond and not a"
@@ -637,7 +704,7 @@ class ReferenceInkTest {
             int dy = 6 - step;
             for (int sx : new int[] {-1, 1}) {
                 for (int sy : new int[] {-1, 1}) {
-                    assertTrue(inkWithin(plain, drawn, cx + sx * dx,
+                    assertTrue(inkedWithin(drawn, cx + sx * dx,
                                     cy + sy * dy, 1),
                             "the edge from one vertex to the next"
                                     + " carries ink at " + (sx * dx)
@@ -649,7 +716,7 @@ class ReferenceInkTest {
         }
 
         // And nothing above it: a landmark points nowhere.
-        assertFalse(inkWithin(plain, drawn, cx, cy - 9, 1),
+        assertFalse(inkedWithin(drawn, cx, cy - 9, 1),
                 "and it carries no upward tick");
     }
 
