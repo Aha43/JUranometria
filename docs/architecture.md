@@ -128,6 +128,18 @@ and not a window's shape, and the **ground**, because printing a black sky
 asks a reader to lay down a sheet of toner. Both are decided in
 [the printable-chart decision](decisions/printable-chart.md).
 
+**The projection boundary** is where that sheet stops being possible
+to draw honestly. The chart is gnomonic at every field it offers,
+including the 42-degree sheet step Sprint 29 added, because a
+gnomonic projection maps a great circle to a straight line *exactly* —
+which is what lets the meridian, the horizon and the ecliptic be
+clipped to the paper analytically rather than sampled. Sprint 6
+declared the boundary as a corner radial scale of 1.25, near a
+44-degree field; 42 degrees sits at 1.236, and a test holds it
+there. Past it the chart would need a different projection and would
+lose the analytic clipping three modules depend on, which is the
+trade the printable-chart gate measured and refused.
+
 Three writers sit on the far side of that boundary — SVG, PDF and
 PNG — and one recording feeds all of them, so a reader who exports
 the same chart three times gets the same chart three times. The

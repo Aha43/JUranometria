@@ -17,6 +17,8 @@ zoom-where-you-point. The 1.0 promise is recorded in
 
 - [Product vision](docs/product-vision.md)
 - [Chart conventions](docs/chart-conventions.md)
+- [Taking the chart away with you](docs/exporting.md) — the three
+  export formats, the paper, and when to use each
 - [Application appearance](docs/application-appearance.md)
 - [Technical architecture](docs/architecture.md)
 - [Catalogue strategy](docs/catalogues.md)

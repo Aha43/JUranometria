@@ -42,6 +42,9 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   for a machine whose fonts are unknown.
 - Module ink travels to paper when the chart is carrying it, and the
   sheet never goes looking for a module it was not handed.
+- [Taking the chart away with you](docs/exporting.md) - what the
+  three formats are for, what the paper is, and why the PDF's labels
+  cannot be edited.
 
 - **A 42-degree field step**, the widest page the atlas offers. It
   is reached the way every other step is - Zoom out, the View menu,

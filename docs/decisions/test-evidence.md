@@ -78,8 +78,8 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **43 files** touch process-wide state —
 **21** use the shared guard, **21** restore locally,
-**0 flagged unprotected** — and **27 files** depend on a display,
-of which **15** state a focus premise and **19** a reachability
+**0 flagged unprotected** — and **28 files** depend on a display,
+of which **16** state a focus premise and **20** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -97,7 +97,8 @@ sheet-page journey, which shows the toolbar for the same reason —
 the zoom-out control has to be pressed to prove the new step is
 reachable by pressing it; and #286's export dialog, laid out on
 both grounds at two text sizes and pressed through the shared route
-helper.)
+helper; and #287's closing journey, which shows the window a club
+member exports from.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -172,8 +173,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **338
-reads of live chart state** against **537 explicit hand-offs**
+own premise capture). The measurements count the traffic: **343
+reads of live chart state** against **545 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline, and again
 for #275's closing journey, which reads the page's own objects and

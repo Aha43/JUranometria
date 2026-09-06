@@ -40,6 +40,27 @@ reader has cannot spell the chart's own notation; the PNG is the whole sheet
 at 300 dpi with a `pHYs` chunk stating that, so a printer sizes it rather
 than fitting it. All three come from one recording of one render.
 
+## What to measure on paper
+
+Print `sheet-a4.pdf` at **actual size** - not fit-to-page, which
+shrinks it by a few per cent - and measure these with a ruler under
+ordinary light. Every figure is taken from the sheet itself, not from
+the gate's candidate numbers.
+
+| measure | expect |
+|---|---:|
+| the sheet, edge to edge | 297.0 x 210.0 mm |
+| the margin, paper edge to chart frame | 12.7 mm |
+| the chart frame, inside edge to inside edge | 271.6 x 184.6 mm |
+| the thinnest line on the sheet | 0.353 mm (1.00 pt) |
+| the faintest star's disc, across | 1.83 mm (5.20 pt) |
+| the smallest label's capital height | about 2.47 mm (10 pt type) |
+
+A sheet that measures right and cannot be read is still a failure.
+The last two rows are the ones that decide whether this works at an observing
+table: a faint star has to be a mark rather than a speck, and a label has to
+be a word rather than a smudge, by torchlight, at arm's length.
+
 ## What is not settled here
 
 **Nothing on this page has been printed.** The sizes above are arithmetic
