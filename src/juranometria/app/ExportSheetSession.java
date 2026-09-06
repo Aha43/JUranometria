@@ -47,34 +47,65 @@ public final class ExportSheetSession {
                             ChartComponent chart,
                             ChartOptionsController options,
                             WorkingSelection working) {
-        ExportSheetDialog.open(owner, defaults(), request ->
-                choosePlace(owner, navigation, chart, options, working,
-                        request));
+        ExportSheetDialog.open(owner, defaults(), request -> {
+            File chosen = choosePlace(owner, navigation, chart, request);
+            if (chosen == null) {
+                return;  // cancelled: nothing made, nothing written
+            }
+            report(owner, exportTo(chosen, request, navigation, chart,
+                    options, working, replaceDecision(owner)));
+        });
     }
 
-    private static void choosePlace(Frame owner,
+    /** Where the reader wants it, or null if they changed their mind. */
+    private static File choosePlace(Frame owner,
                                     ChartViewController navigation,
                                     ChartComponent chart,
-                                    ChartOptionsController options,
-                                    WorkingSelection working,
                                     ExportSheet.Request request) {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Export chart sheet");
         chooser.setSelectedFile(new File(SheetFileName.suggest(
                 navigation.state(), chart.currentScene(),
                 request.format())));
-        if (chooser.showSaveDialog(owner) != JFileChooser.APPROVE_OPTION) {
-            return;  // cancelled: nothing made, nothing written
-        }
+        return chooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION
+                ? chooser.getSelectedFile() : null;
+    }
 
-        ExportSheet.Outcome outcome = ExportSheet.write(
+    /**
+     * The export itself, with the chart asked what it is showing.
+     *
+     * <p>Separated from the two dialogs so that the wiring between
+     * them is a thing a test can drive: which chart is exported,
+     * which ink goes on it, and - the one that would otherwise be
+     * invisible - that the reader is asked before anything of theirs
+     * is replaced (PR #291 round 2).
+     */
+    static ExportSheet.Outcome exportTo(File destination,
+                                        ExportSheet.Request request,
+                                        ChartViewController navigation,
+                                        ChartComponent chart,
+                                        ChartOptionsController options,
+                                        WorkingSelection working,
+                                        ExportSheet.ReplaceDecision replace) {
+        return ExportSheet.write(
                 juranometria.app.Atlas.assembler()::assemble,
                 navigation.state(), options.options(),
                 SheetInk.of(chart, working.lead(),
                         request.workingSelection()),
-                request, chooser.getSelectedFile(),
-                existing -> askToReplace(owner, existing));
-        report(owner, outcome);
+                request, destination, replace);
+    }
+
+    /**
+     * How the reader is asked, in the running application: a dialog.
+     *
+     * <p>Never a constant. A decision that always said yes would
+     * replace a reader's file without a word, and would look exactly
+     * like this from the outside - so it is a named thing that puts
+     * a question on the screen, and refuses to answer at all where
+     * there is no screen to put it on.
+     */
+    static ExportSheet.ReplaceDecision replaceDecision(Frame owner) {
+        return existing -> askToReplace(owner, existing);
     }
 
     /**

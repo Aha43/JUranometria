@@ -240,6 +240,52 @@ class ExportSheetTest {
     }
 
     @Test
+    void aFailedWriteInAReadOnlyFolderPutsTheFileBack(
+            @TempDir Path folder) throws Exception {
+        // The fallback path has nowhere beside the destination to
+        // write, so it writes the destination itself - which can be
+        // interrupted (PR #291 round 2). What was there is held and
+        // put back.
+        Path existing = Files.writeString(folder.resolve("orion.svg"),
+                "a chart the reader already had");
+        Path readOnly = Files.createDirectory(folder.resolve("locked"));
+        Path inside = Files.writeString(readOnly.resolve("orion.svg"),
+                "a chart the reader already had");
+        assertTrue(readOnly.toFile().setWritable(false),
+                "the test can make the folder read-only");
+        try {
+            assertThrows(IOException.class, () -> ExportSheet.place(
+                            "a whole sheet".getBytes(), inside, readOnly,
+                            new ExportSheet.ByteSink() {
+                                private int calls;
+
+                                @Override
+                                public void write(Path file, byte[] bytes)
+                                        throws IOException {
+                                    if (calls++ == 0) {
+                                        Files.write(file,
+                                                "half a sh".getBytes());
+                                        throw new IOException(
+                                                "the disk filled up");
+                                    }
+                                    Files.write(file, bytes);
+                                }
+                            }),
+                    "the failure still reaches the caller");
+            assertEquals("a chart the reader already had",
+                    Files.readString(inside),
+                    "and the reader's own file is put back exactly as"
+                            + " it was, not left as the half a sheet"
+                            + " the failure wrote");
+        } finally {
+            readOnly.toFile().setWritable(true);
+        }
+        assertEquals("a chart the reader already had",
+                Files.readString(existing),
+                "and nothing else was touched");
+    }
+
+    @Test
     void aReplacementInAReadOnlyFolderStillWorks(@TempDir Path folder)
             throws Exception {
         // Replacing a writable file inside a folder that is not

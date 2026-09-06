@@ -180,22 +180,47 @@ public final class ExportSheet {
      *
      * <p>Written beside the destination and moved onto it where the
      * folder allows that, so a failure cannot truncate what is
-     * already there. Where the folder does not allow it - a
-     * read-only directory holding a writable file, which is a
-     * legitimate thing to replace - the destination is written
-     * directly, because refusing would take away something the
-     * reader could do before.
+     * already there.
      *
-     * <p>What is never done, in either path, is <strong>deleting the
+     * <p>Where the folder does not allow it - a read-only directory
+     * holding a writable file, which is a legitimate thing to
+     * replace - there is nowhere beside the destination to write, so
+     * the destination is written directly. That can be interrupted,
+     * so what was in it is <strong>held first and put back</strong>
+     * if the write fails. A chart sheet is a few hundred kilobytes;
+     * holding one for the length of a write is cheaper than losing
+     * the reader's own file (PR #291 round 2).
+     *
+     * <p>What is never done, in any path, is <strong>deleting the
      * destination</strong>. An earlier version removed it when the
      * write failed, on the reasoning that a partial file should not
      * be left looking finished; the file it removed was the reader's
-     * own chart (PR #291 review).
+     * own chart.
      */
     static void place(byte[] bytes, Path file, Path parent, ByteSink sink)
             throws IOException {
         if (!java.nio.file.Files.isWritable(parent)) {
-            sink.write(file, bytes);
+            byte[] wasThere = Files.exists(file)
+                    ? Files.readAllBytes(file) : null;
+            try {
+                sink.write(file, bytes);
+            } catch (IOException failure) {
+                if (wasThere == null) {
+                    throw failure;
+                }
+                try {
+                    sink.write(file, wasThere);
+                } catch (IOException lost) {
+                    IOException both = new IOException(
+                            "the export failed and what was in "
+                                    + file.getFileName()
+                                    + " could not be put back",
+                            failure);
+                    both.addSuppressed(lost);
+                    throw both;
+                }
+                throw failure;
+            }
             return;
         }
         Path partial = Files.createTempFile(parent,
