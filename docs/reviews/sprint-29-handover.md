@@ -1,6 +1,6 @@
 # Sprint 29 handover — Take the chart to the observing table
 
-Five issues, five pull requests, nineteen rounds of independent
+Five issues, five pull requests, twenty rounds of independent
 review. This is what the sprint did, what it got wrong on the way,
 what is still owed, and what version it should be.
 
@@ -55,7 +55,7 @@ Reader documentation is in [docs/exporting.md](../exporting.md).
 
 ## Every review correction
 
-Nineteen rounds. The production designs were called sound early in
+Twenty rounds. The production designs were called sound early in
 each issue; almost everything below is a correction to **evidence** —
 tests that looked like proof and were not.
 
@@ -162,6 +162,17 @@ tests that looked like proof and were not.
     and not the PDF — which is the one a club member prints. Its
     content stream is now read for the same marks, in the chart's own
     coordinates.
+45. The journey still wrote to `WorkingSelection` directly rather
+    than selecting through the chart, and its end-to-end export
+    carried only drawn members, so the crosses were proved by a
+    hand-built fixture alone. The reader now clicks both objects on
+    the chart and then asks for fewer stars, which leaves one of them
+    on the page and no longer drawn — the case that gets a cross.
+46. The PDF oracle accepted any nearby coordinate as a mark: with
+    every star disc removed it still reported 70 of 743 present. Both
+    vector oracles now match a mark by its own shape — centred on the
+    object and the size the renderer drew it — and the same mutation
+    now reports 742 of 743 absent.
 
 ### What CI found that review did not
 
