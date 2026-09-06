@@ -93,22 +93,26 @@ public final class WiderFieldStudyMain {
         out.append("**marks** is what the renderer decided to draw and"
                 + " where: every star\nand deep-sky mark, its subject,"
                 + " its centre and its reach.\n\n");
-        out.append("**ink** is every vector operation it then"
-                + " performed - each shape's own\ncoordinates, fill,"
-                + " colour and stroke width, and each label's text,"
-                + " font\nand colour. It sees the grid, the"
-                + " constellation boundaries and figures,\nthe"
-                + " furniture and the chart ground, which marks cannot"
-                + " reach. Label\npositions are excluded: the renderer"
-                + " places them with font metrics.\n\n");
+        out.append("**ink** is every shape it then drew or filled,"
+                + " with that shape's own\ncoordinates, its colour and"
+                + " its stroke width. It sees the grid, the"
+                + "\nconstellation boundaries and figures, and the"
+                + " chart ground - none of which\nmarks can reach."
+                + " It stops at text, and the boundary is font"
+                + " metrics:\nthey place a label and decide whether it"
+                + " fits, so both where the labels\nare and which ones"
+                + " there are may legitimately differ between"
+                + " machines.\n\n");
         out.append("Both of those are arithmetic, so they hold on any"
                 + " machine, and the test\nchecks them everywhere."
-                + " **pixels** is the rasterised page, which depends"
-                + " on\nthe font stack and the JDK's own 2D pipeline."
-                + " It is an oracle only on the\nexact platform named"
-                + " below - OS and version, architecture, and JDK"
-                + " build -\nand the test skips it out loud anywhere"
-                + " else rather than pretending.\n\n");
+                + " **pixels** is the rasterised page - every label"
+                + " the\nother two leave out, and every pixel of"
+                + " everything they cover. It depends\non the font"
+                + " stack and the JDK's own 2D pipeline, so it is an"
+                + " oracle only\non the exact platform named below -"
+                + " OS and version, architecture, and JDK\nbuild - and"
+                + " the test skips it out loud anywhere else rather"
+                + " than\npretending.\n\n");
         out.append("Recorded on: `" + platform() + "`\n\n");
         out.append("Every released field step, at four centres that"
                 + " exercise the cases\nthe atlas treats differently -"
@@ -150,17 +154,20 @@ public final class WiderFieldStudyMain {
 
     /**
      * The first eight bytes of a page's <em>ink</em> digest: every
-     * vector operation the renderer performed - each shape's own
-     * coordinates, whether it was filled, its colour and its stroke
-     * width - plus each label's text, font and colour.
+     * shape the renderer drew or filled, with its own coordinates,
+     * its colour and its stroke width.
      *
      * <p>This is what the pixel digest was reaching for, taken
      * before rasterisation instead of after, so it holds on any
      * machine. It sees the grid, the constellation boundaries and
-     * figures, the furniture and the chart ground, none of which the
-     * mark digest can reach. Label <em>positions</em> are left out:
-     * the renderer places them with font metrics, which is the one
-     * part of drawing that genuinely differs between machines.
+     * figures and the chart ground, none of which the mark digest
+     * can reach.
+     *
+     * <p>It stops at text, and the boundary is font metrics: they
+     * place a label and they decide whether it fits, so both where
+     * the labels are and which ones there are can differ between
+     * machines. Anything a metric touched belongs to the pixel
+     * digest, on the one platform where pixels mean anything.
      */
     public static String inkFingerprint(double[] centre, double field,
                                         boolean black) throws Exception {
@@ -182,13 +189,12 @@ public final class WiderFieldStudyMain {
                     .append(pathOf(drawn.shape()))
                     .append('\n');
         }
-        for (ChartSheetRecorder.Text text : recorder.text()) {
-            ink.append("text ").append(text.text()).append(' ')
-                    .append(text.font().getName()).append(' ')
-                    .append(text.font().getSize()).append(' ')
-                    .append(Integer.toHexString(text.colour().getRGB()))
-                    .append('\n');
-        }
+        // Text is deliberately absent. Not only its placement: which
+        // labels a page carries is decided partly by what fits, and
+        // what fits is a font-metrics question, so the set of runs
+        // can legitimately differ between machines (CI on PR #289).
+        // Labels are covered by the pixel digest, on the one platform
+        // where pixels mean anything.
         return digest(ink.toString()
                 .getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }

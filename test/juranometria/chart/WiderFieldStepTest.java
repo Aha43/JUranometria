@@ -149,9 +149,8 @@ class WiderFieldStepTest {
                 "widening the sequence changed what no released page"
                         + " draws, or where");
         assertEquals(List.of(), reinked,
-                "nor one vector operation any of them performed - the"
-                        + " grid, the boundaries, the figures, the"
-                        + " furniture, the ground and the labels"
+                "nor one shape any of them drew - the grid, the"
+                        + " boundaries, the figures and the ground"
                         + " included");
         assertEquals(List.of(), rasterised,
                 "nor, on the platform the rows were recorded on, a"

@@ -15,17 +15,20 @@ Each row carries three digests, and they are not interchangeable.
 **marks** is what the renderer decided to draw and where: every star
 and deep-sky mark, its subject, its centre and its reach.
 
-**ink** is every vector operation it then performed - each shape's own
-coordinates, fill, colour and stroke width, and each label's text, font
-and colour. It sees the grid, the constellation boundaries and figures,
-the furniture and the chart ground, which marks cannot reach. Label
-positions are excluded: the renderer places them with font metrics.
+**ink** is every shape it then drew or filled, with that shape's own
+coordinates, its colour and its stroke width. It sees the grid, the
+constellation boundaries and figures, and the chart ground - none of which
+marks can reach. It stops at text, and the boundary is font metrics:
+they place a label and decide whether it fits, so both where the labels
+are and which ones there are may legitimately differ between machines.
 
 Both of those are arithmetic, so they hold on any machine, and the test
-checks them everywhere. **pixels** is the rasterised page, which depends on
-the font stack and the JDK's own 2D pipeline. It is an oracle only on the
-exact platform named below - OS and version, architecture, and JDK build -
-and the test skips it out loud anywhere else rather than pretending.
+checks them everywhere. **pixels** is the rasterised page - every label the
+other two leave out, and every pixel of everything they cover. It depends
+on the font stack and the JDK's own 2D pipeline, so it is an oracle only
+on the exact platform named below - OS and version, architecture, and JDK
+build - and the test skips it out loud anywhere else rather than
+pretending.
 
 Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
 
@@ -45,83 +48,83 @@ released page that has changed.
 ## The rows
 
 field  ra           dec          ground  marks             ink               pixels
-36     10.684708    41.268750    paper   127d060e8df6b6c6  d65a68e48cef3e98  4ab9c4b046e78ba5
-36     10.684708    41.268750    black   127d060e8df6b6c6  ab4da29422fd252f  cdfd7eac8665399a
-36     83.000000    0.000000     paper   777c6b909a467220  b77ec7c4468b6982  724b53ad629f3d20
-36     83.000000    0.000000     black   777c6b909a467220  d8ffa139dd2de6ee  16da392b062d3f9f
-36     0.000000     89.000000    paper   754f056a364d1370  6a6c32069ab224fc  c41958825ee489f9
-36     0.000000     89.000000    black   754f056a364d1370  da4fe1abc4b9e1df  8ea0d8d2c8cf205a
-36     359.900000   0.000000     paper   f3fac0150af303aa  5ac717452dfde157  931624fb4f45784c
-36     359.900000   0.000000     black   f3fac0150af303aa  a590e2d0d1db9964  6d6c1eea4ba558dd
-24     10.684708    41.268750    paper   9e829628a9cebcda  07de7b214b6a4dce  215fe5619643bc17
-24     10.684708    41.268750    black   9e829628a9cebcda  a2266acbf2f9185d  adf4cbeefb1ea041
-24     83.000000    0.000000     paper   7e0786fbfbb8f82c  e309dd84a4a85c10  ee6c7bff43ebced9
-24     83.000000    0.000000     black   7e0786fbfbb8f82c  59168c60d4da12c2  f1f32d034db213a0
-24     0.000000     89.000000    paper   ca86305662bb9587  2b5aae89d0a92e21  0f3a3b243700e855
-24     0.000000     89.000000    black   ca86305662bb9587  ff2f262c1b968e6d  feed7cf089419592
-24     359.900000   0.000000     paper   10515b878355309d  e7d074beb691916b  18d12d7efa1f4e42
-24     359.900000   0.000000     black   10515b878355309d  f6a364c9518cb3ad  44970e317ca7600d
-18     10.684708    41.268750    paper   5a96fd0318f421b4  dbd01ff6baebd6eb  8b0c029a2769672e
-18     10.684708    41.268750    black   5a96fd0318f421b4  8c1d56e814cc05cc  559b49424072d3bf
-18     83.000000    0.000000     paper   bc0c720b59d551e3  a9e92d14c850272b  b34d907d848bbcf8
-18     83.000000    0.000000     black   bc0c720b59d551e3  a79ce6e64aa8ea11  85d7050bdbdaca38
-18     0.000000     89.000000    paper   4a5e7c6542724b25  4f03fadd3fde3b6e  1025137c03c9d236
-18     0.000000     89.000000    black   4a5e7c6542724b25  03845baeb4dd3c40  0986f7ef6599aaf4
-18     359.900000   0.000000     paper   03996d29635a0ab9  93f643b084ccda6b  229bb180e9ab834c
-18     359.900000   0.000000     black   03996d29635a0ab9  9b1ce31eb9cde5cf  c08caefb999d5546
-12     10.684708    41.268750    paper   15d246d8b45ee080  4b335ef335c7c909  4f9cbe4aa6ce248c
-12     10.684708    41.268750    black   15d246d8b45ee080  2a725bd14cd40a5d  bcb1194f78f6bb56
-12     83.000000    0.000000     paper   a75d110a4a60dc04  8dbd787283946808  39e0ade0c202e415
-12     83.000000    0.000000     black   a75d110a4a60dc04  85dfa3b421a54642  77ac00f57bdb6ad6
-12     0.000000     89.000000    paper   a0f26753b7e10b62  736e2852ecbf807d  cebcffb2d10a67cf
-12     0.000000     89.000000    black   a0f26753b7e10b62  b655d8155cd497e8  874bdf2b8a596eb2
-12     359.900000   0.000000     paper   2763940fd6dfbe71  3941846331f4fe5f  6dc308385d99e17c
-12     359.900000   0.000000     black   2763940fd6dfbe71  3be27049c7a6e96a  21998a0edcafb6d3
-8      10.684708    41.268750    paper   51890a3a71e3304d  2f43072012dfb084  01d4d82255d02f13
-8      10.684708    41.268750    black   51890a3a71e3304d  6fbb68f84e33f1a6  efb37d101665ad2e
-8      83.000000    0.000000     paper   9157551a6cf30b4d  a39a9005f3e15778  2d38f40ef0e97f9f
-8      83.000000    0.000000     black   9157551a6cf30b4d  b2dccecca97a0687  d09e9e48e4729cd0
-8      0.000000     89.000000    paper   f88fc52063c7dff6  45e7f05e0dc49ab3  1974075ddaccdfe2
-8      0.000000     89.000000    black   f88fc52063c7dff6  5e4c443473beff6a  671cb4f5cd3246e7
-8      359.900000   0.000000     paper   6007b06ac1fec0c8  47da8d7a076e1462  bfe36f976538eec9
-8      359.900000   0.000000     black   6007b06ac1fec0c8  8340cbad7954b8e6  0d235219f56009f1
-6      10.684708    41.268750    paper   aab1bc9b29020e92  d979bca1c2da440d  a22a8ac8a733dbbc
-6      10.684708    41.268750    black   aab1bc9b29020e92  32038cdb90bbac31  d9fc971750c24588
-6      83.000000    0.000000     paper   29dc5800df8cf5ef  98f3172040458498  8e2a9b61d3ae3178
-6      83.000000    0.000000     black   29dc5800df8cf5ef  7df1cf75d6fb512d  a507852fe037c068
-6      0.000000     89.000000    paper   ee3a2f775365b8be  6df29884927df3f5  6f702900aef0b35a
-6      0.000000     89.000000    black   ee3a2f775365b8be  a0b5e3d7f139969b  2ddfb0059b6dd86c
-6      359.900000   0.000000     paper   c424bfaa12f75635  763ff957466ca573  931815d6bc2a810c
-6      359.900000   0.000000     black   c424bfaa12f75635  13240324881cfb47  92cac52eaabb485d
-4      10.684708    41.268750    paper   d71c8df55201321a  2868f4cca395f80a  0bbaaf9caf6f4c61
-4      10.684708    41.268750    black   d71c8df55201321a  e678fd0f5577162b  f6124c49347a7201
-4      83.000000    0.000000     paper   382ac5a0cf88e2ab  76f13e207d83a148  4eafee0517e1874f
-4      83.000000    0.000000     black   382ac5a0cf88e2ab  c38e754b5c478677  3f89bb32d3dd5924
-4      0.000000     89.000000    paper   7115cdddf8d43899  7bfb44d9de43e82a  5591840a7d651865
-4      0.000000     89.000000    black   7115cdddf8d43899  f6ee5afddf027c1a  4614093a6931beaf
-4      359.900000   0.000000     paper   304c878c3f24fc23  b582400453125adf  4b9f25e816fbe8da
-4      359.900000   0.000000     black   304c878c3f24fc23  88e162b5dd5e91ff  f066857e89b22500
-3      10.684708    41.268750    paper   e3d7d4f02e488071  1b2639d9f438f5e4  c6c23edde1c67d0f
-3      10.684708    41.268750    black   e3d7d4f02e488071  b74819828498e518  df580ecc516040b9
-3      83.000000    0.000000     paper   8d984a9b3860f383  eacb1cc56374c5e7  6f76922f891a6733
-3      83.000000    0.000000     black   8d984a9b3860f383  085c2686e9645041  52ad523e3495a5c9
-3      0.000000     89.000000    paper   3e67931a0943136e  350f4ebe45b2010c  63eabfe850870afd
-3      0.000000     89.000000    black   3e67931a0943136e  9b28d4fadff737b4  ae70f738f98c21af
-3      359.900000   0.000000     paper   2f7736d3d2275c61  3da547e35725b31f  e6a88996d5374484
-3      359.900000   0.000000     black   2f7736d3d2275c61  a6df6988b197f49b  b1c7245d1b221c1c
-2      10.684708    41.268750    paper   647bf9ca932c4499  790746cde2f1fcf4  0709f410d7bb5cb9
-2      10.684708    41.268750    black   647bf9ca932c4499  584d6a219e899b54  92466bd3aebe5a51
-2      83.000000    0.000000     paper   f8d9cd67d1911e8b  d70f91a7342ffe4a  9c4a2281da2a553f
-2      83.000000    0.000000     black   f8d9cd67d1911e8b  b56def8908f5e940  9c4b3cd31c481e15
-2      0.000000     89.000000    paper   dc6e480ba912e87f  c3d49c1d72d28367  731555d2fca989f2
-2      0.000000     89.000000    black   dc6e480ba912e87f  ff044c675fd596c3  ba512160fc7d26ce
-2      359.900000   0.000000     paper   01d35fbd06576d8f  5abd7543671eb386  333771415f5cc31a
-2      359.900000   0.000000     black   01d35fbd06576d8f  98e067939908ba87  7b251c2fbd95cce8
-1      10.684708    41.268750    paper   63dd3275db3055ea  14c9a8dceef8e0ad  354ba3b61a8b80b2
-1      10.684708    41.268750    black   63dd3275db3055ea  57a4d2fec9516008  597679db3b9e655c
-1      83.000000    0.000000     paper   ad90bb32edb921da  1f8b4b74b9367d8e  ef11382ccd025401
-1      83.000000    0.000000     black   ad90bb32edb921da  0e901d9e7fdd68c1  f67c4ceac68ffb40
-1      0.000000     89.000000    paper   b01a7f87001dbf40  b5df543f5d5bcd56  d5adcb657b6686ff
-1      0.000000     89.000000    black   b01a7f87001dbf40  9f33afe60d6fce0b  db628b443502a652
-1      359.900000   0.000000     paper   921ce6f6933bae46  25f6c6329223a888  2849905aac576185
-1      359.900000   0.000000     black   921ce6f6933bae46  22935a165d1c35e0  1008e0aa3ff6a9cd
+36     10.684708    41.268750    paper   127d060e8df6b6c6  e8e267512280dbbe  4ab9c4b046e78ba5
+36     10.684708    41.268750    black   127d060e8df6b6c6  ab73205bdb06b57a  cdfd7eac8665399a
+36     83.000000    0.000000     paper   777c6b909a467220  13104638dc1addd3  724b53ad629f3d20
+36     83.000000    0.000000     black   777c6b909a467220  ca3154dbf18cd70e  16da392b062d3f9f
+36     0.000000     89.000000    paper   754f056a364d1370  c9eec96f57efb664  c41958825ee489f9
+36     0.000000     89.000000    black   754f056a364d1370  83d6a4d2a13878bc  8ea0d8d2c8cf205a
+36     359.900000   0.000000     paper   f3fac0150af303aa  b47fc7f9d2b4060f  931624fb4f45784c
+36     359.900000   0.000000     black   f3fac0150af303aa  3e43108cfb32cca0  6d6c1eea4ba558dd
+24     10.684708    41.268750    paper   9e829628a9cebcda  52f43ecbe2a1a872  215fe5619643bc17
+24     10.684708    41.268750    black   9e829628a9cebcda  4a1a0e36f5def1e8  adf4cbeefb1ea041
+24     83.000000    0.000000     paper   7e0786fbfbb8f82c  1bd661f5d447c308  ee6c7bff43ebced9
+24     83.000000    0.000000     black   7e0786fbfbb8f82c  a2cef7efd49f4bc1  f1f32d034db213a0
+24     0.000000     89.000000    paper   ca86305662bb9587  70eb27274fc7c8a4  0f3a3b243700e855
+24     0.000000     89.000000    black   ca86305662bb9587  e3a92bb83877e562  feed7cf089419592
+24     359.900000   0.000000     paper   10515b878355309d  33edde57b29ad0a9  18d12d7efa1f4e42
+24     359.900000   0.000000     black   10515b878355309d  e655b8a262122209  44970e317ca7600d
+18     10.684708    41.268750    paper   5a96fd0318f421b4  ef374b76e6e58426  8b0c029a2769672e
+18     10.684708    41.268750    black   5a96fd0318f421b4  54d5ffcd9524d060  559b49424072d3bf
+18     83.000000    0.000000     paper   bc0c720b59d551e3  76544d409a5a4a7e  b34d907d848bbcf8
+18     83.000000    0.000000     black   bc0c720b59d551e3  023cc3cd5a1a1a83  85d7050bdbdaca38
+18     0.000000     89.000000    paper   4a5e7c6542724b25  73f93cfe30e3251f  1025137c03c9d236
+18     0.000000     89.000000    black   4a5e7c6542724b25  4017ddcde91da35e  0986f7ef6599aaf4
+18     359.900000   0.000000     paper   03996d29635a0ab9  5a67b28765d29e7c  229bb180e9ab834c
+18     359.900000   0.000000     black   03996d29635a0ab9  e00461fbd8be4f51  c08caefb999d5546
+12     10.684708    41.268750    paper   15d246d8b45ee080  51689ab68447284e  4f9cbe4aa6ce248c
+12     10.684708    41.268750    black   15d246d8b45ee080  5a79ce2e9c8edcb2  bcb1194f78f6bb56
+12     83.000000    0.000000     paper   a75d110a4a60dc04  8cc48e4ddd8ed1d7  39e0ade0c202e415
+12     83.000000    0.000000     black   a75d110a4a60dc04  7102e3be7a1abc92  77ac00f57bdb6ad6
+12     0.000000     89.000000    paper   a0f26753b7e10b62  3286e5d987e79c13  cebcffb2d10a67cf
+12     0.000000     89.000000    black   a0f26753b7e10b62  3eac9fb8a7424e3c  874bdf2b8a596eb2
+12     359.900000   0.000000     paper   2763940fd6dfbe71  62075e23ee2f38c6  6dc308385d99e17c
+12     359.900000   0.000000     black   2763940fd6dfbe71  7279dff6151546d3  21998a0edcafb6d3
+8      10.684708    41.268750    paper   51890a3a71e3304d  28868ace4146f924  01d4d82255d02f13
+8      10.684708    41.268750    black   51890a3a71e3304d  b06c4aa1907c11af  efb37d101665ad2e
+8      83.000000    0.000000     paper   9157551a6cf30b4d  977f8876037b40b7  2d38f40ef0e97f9f
+8      83.000000    0.000000     black   9157551a6cf30b4d  b4fd26b11254dd10  d09e9e48e4729cd0
+8      0.000000     89.000000    paper   f88fc52063c7dff6  b8ae20b854cbdbfd  1974075ddaccdfe2
+8      0.000000     89.000000    black   f88fc52063c7dff6  3cd9233276a591d4  671cb4f5cd3246e7
+8      359.900000   0.000000     paper   6007b06ac1fec0c8  2215f774f0a1d163  bfe36f976538eec9
+8      359.900000   0.000000     black   6007b06ac1fec0c8  009ca13309af50b7  0d235219f56009f1
+6      10.684708    41.268750    paper   aab1bc9b29020e92  c80ae03b5acddfc1  a22a8ac8a733dbbc
+6      10.684708    41.268750    black   aab1bc9b29020e92  9d4c47912781c24c  d9fc971750c24588
+6      83.000000    0.000000     paper   29dc5800df8cf5ef  dbf017e0a13b5e40  8e2a9b61d3ae3178
+6      83.000000    0.000000     black   29dc5800df8cf5ef  59acdbd71eed7a27  a507852fe037c068
+6      0.000000     89.000000    paper   ee3a2f775365b8be  d02fc36ba8318153  6f702900aef0b35a
+6      0.000000     89.000000    black   ee3a2f775365b8be  0cca8d1a0582f715  2ddfb0059b6dd86c
+6      359.900000   0.000000     paper   c424bfaa12f75635  8138f2c66951ba63  931815d6bc2a810c
+6      359.900000   0.000000     black   c424bfaa12f75635  3271dbe168a7e602  92cac52eaabb485d
+4      10.684708    41.268750    paper   d71c8df55201321a  66e3b72c702ef3c5  0bbaaf9caf6f4c61
+4      10.684708    41.268750    black   d71c8df55201321a  77cd7718bbba3179  f6124c49347a7201
+4      83.000000    0.000000     paper   382ac5a0cf88e2ab  19d8c319ec3c59a1  4eafee0517e1874f
+4      83.000000    0.000000     black   382ac5a0cf88e2ab  f6e807b8a9f3c6df  3f89bb32d3dd5924
+4      0.000000     89.000000    paper   7115cdddf8d43899  d867a19f67d4ae7d  5591840a7d651865
+4      0.000000     89.000000    black   7115cdddf8d43899  fd7b8eddae0c9feb  4614093a6931beaf
+4      359.900000   0.000000     paper   304c878c3f24fc23  81fa87ee7ce5c9e4  4b9f25e816fbe8da
+4      359.900000   0.000000     black   304c878c3f24fc23  b87b056513c876d6  f066857e89b22500
+3      10.684708    41.268750    paper   e3d7d4f02e488071  09fdb9487665ed58  c6c23edde1c67d0f
+3      10.684708    41.268750    black   e3d7d4f02e488071  9e968fd642e51abf  df580ecc516040b9
+3      83.000000    0.000000     paper   8d984a9b3860f383  3991a0a62b3091ea  6f76922f891a6733
+3      83.000000    0.000000     black   8d984a9b3860f383  079b55d89c377d4d  52ad523e3495a5c9
+3      0.000000     89.000000    paper   3e67931a0943136e  c29ca37b190de19b  63eabfe850870afd
+3      0.000000     89.000000    black   3e67931a0943136e  998a465256c187a7  ae70f738f98c21af
+3      359.900000   0.000000     paper   2f7736d3d2275c61  4143147965ca6f66  e6a88996d5374484
+3      359.900000   0.000000     black   2f7736d3d2275c61  477c6598390c17eb  b1c7245d1b221c1c
+2      10.684708    41.268750    paper   647bf9ca932c4499  84cc4a10f7b9fd8d  0709f410d7bb5cb9
+2      10.684708    41.268750    black   647bf9ca932c4499  c3d5966ffcbfff9f  92466bd3aebe5a51
+2      83.000000    0.000000     paper   f8d9cd67d1911e8b  b8d9ccfeb8fa18da  9c4a2281da2a553f
+2      83.000000    0.000000     black   f8d9cd67d1911e8b  28d987e4653d7af7  9c4b3cd31c481e15
+2      0.000000     89.000000    paper   dc6e480ba912e87f  d92aa5de63967de7  731555d2fca989f2
+2      0.000000     89.000000    black   dc6e480ba912e87f  aa8d4bec2627d143  ba512160fc7d26ce
+2      359.900000   0.000000     paper   01d35fbd06576d8f  66b498917c91d2f0  333771415f5cc31a
+2      359.900000   0.000000     black   01d35fbd06576d8f  0b6b1e33c0476b5d  7b251c2fbd95cce8
+1      10.684708    41.268750    paper   63dd3275db3055ea  c55db682760486cd  354ba3b61a8b80b2
+1      10.684708    41.268750    black   63dd3275db3055ea  80c71b91e8ea2684  597679db3b9e655c
+1      83.000000    0.000000     paper   ad90bb32edb921da  3c8bcd5e93234b76  ef11382ccd025401
+1      83.000000    0.000000     black   ad90bb32edb921da  417f6c9b7788100d  f67c4ceac68ffb40
+1      0.000000     89.000000    paper   b01a7f87001dbf40  f51629fe715ec20a  d5adcb657b6686ff
+1      0.000000     89.000000    black   b01a7f87001dbf40  ce95766c18ec37c1  db628b443502a652
+1      359.900000   0.000000     paper   921ce6f6933bae46  3c1531ebc14ee813  2849905aac576185
+1      359.900000   0.000000     black   921ce6f6933bae46  e04a38ee302c9fb8  1008e0aa3ff6a9cd
