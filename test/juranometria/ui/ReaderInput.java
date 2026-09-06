@@ -115,6 +115,57 @@ public final class ReaderInput {
     }
 
     /**
+     * A pointer click at a point the caller chooses <strong>on the
+     * event thread, in the same turn as the dispatch</strong>, with
+     * the same premises proven for whatever point that turns out to
+     * be.
+     *
+     * <p>The overload above needs its point before the call, which
+     * forces a caller whose point comes from live state - a star on
+     * the current page - to read that state in an earlier turn. The
+     * page can be reassembled in between, and then the press lands
+     * on a different chart from the one the point was taken from:
+     * the stale-scene race of #220. Choosing inside this turn closes
+     * it, and there is no longer any reason for such a caller to
+     * dispatch its own events and skip the premises (#284 review).
+     *
+     * @return the point that was clicked
+     */
+    public static java.awt.Point click(JComponent control,
+            java.util.function.Supplier<java.awt.Point> where,
+            int modifiersEx) throws Exception {
+        java.awt.Point[] clicked = new java.awt.Point[1];
+        SwingUtilities.invokeAndWait(() -> {
+            assertTrue(control.isShowing(),
+                    name(control) + " is on screen, in a window a"
+                            + " reader can see");
+            assertTrue(control.getWidth() > 0 && control.getHeight() > 0,
+                    name(control) + " has a size a pointer could hit: "
+                            + control.getWidth() + "x"
+                            + control.getHeight());
+            java.awt.Point at = where.get();
+            assertTrue(control.getVisibleRect().contains(at),
+                    "the point clicked on " + name(control)
+                            + " is one a reader could reach: " + at.x
+                            + "," + at.y + " within "
+                            + control.getVisibleRect());
+            clicked[0] = at;
+            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
+                    MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED}) {
+                control.dispatchEvent(new MouseEvent(control, id,
+                        System.nanoTime() / 1_000_000,
+                        id == MouseEvent.MOUSE_PRESSED
+                                ? java.awt.event.InputEvent
+                                        .BUTTON1_DOWN_MASK | modifiersEx
+                                : modifiersEx,
+                        at.x, at.y, 1, false, MouseEvent.BUTTON1));
+            }
+        });
+        flush();
+        return clicked[0];
+    }
+
+    /**
      * A pointer drag from one point of a control to another - a
      * column header carried to a new place - with the clicks' own
      * premises proven for <strong>both endpoints</strong> before

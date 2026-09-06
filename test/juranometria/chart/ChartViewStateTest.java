@@ -31,9 +31,11 @@ class ChartViewStateTest {
     }
 
     @Test
-    void zoomingOutStopsAtThirtySixDegrees() {
+    void zoomingOutStopsAtFortyTwoDegrees() {
         ChartViewState state = ChartViewState.DEFAULT;
-        double[] expected = {12.0, 18.0, 24.0, 36.0};
+        // 42 is the sheet step docs/decisions/printable-chart.md
+        // measured; 36 is now a stop on the way rather than the end.
+        double[] expected = {12.0, 18.0, 24.0, 36.0, 42.0};
         for (double fieldWidth : expected) {
             assertTrue(state.canZoomOut());
             state = state.zoomOut();
@@ -157,7 +159,7 @@ class ChartViewStateTest {
 
     @Test
     void fieldWidthStepsAreExposedWidestFirst() {
-        assertEquals(java.util.List.of(36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
+        assertEquals(java.util.List.of(42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
                 ChartViewState.fieldWidthSteps());
     }
 }

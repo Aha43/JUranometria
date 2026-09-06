@@ -115,7 +115,14 @@ class DirectZoomJourneyTest {
             wheel(px, py, 1.0);
             assertEquals(36.0, navigation.state().fieldWidthDegrees());
             assertTrue(pointerDrift(anchor, px, py) < DRIFT_TOLERANCE_PX,
-                    "the widest page still holds the anchor");
+                    "the released widest page still holds the anchor");
+            wheel(px, py, 1.0);
+            assertEquals(42.0, navigation.state().fieldWidthDegrees(),
+                    "and one more notch reaches the sheet page");
+            assertTrue(pointerDrift(anchor, px, py) < DRIFT_TOLERANCE_PX,
+                    "which holds the anchor as every step before it"
+                            + " did - the widening changes the page,"
+                            + " not the pointer contract");
 
             // A further notch at the widest page: consumed by the
             // chart, refused by the sequence, and the very same scene
@@ -123,15 +130,15 @@ class DirectZoomJourneyTest {
             var sceneAtBound = chart.scene();
             MouseWheelEvent beyond = wheel(px, py, 1.0);
             assertTrue(beyond.isConsumed());
-            assertEquals(36.0, navigation.state().fieldWidthDegrees());
+            assertEquals(42.0, navigation.state().fieldWidthDegrees());
             assertSame(sceneAtBound, chart.scene(),
                     "a refused notch assembles nothing");
 
-            // Reverse the four steps at the same pointer: the sky
+            // Reverse the five steps at the same pointer: the sky
             // stays put and the pre-burst view returns within the
             // reviewed tolerance - compared against the centre
             // captured BEFORE zooming out, never the final view.
-            wheel(px, py, -4.0);
+            wheel(px, py, -5.0);
             assertEquals(8.0, navigation.state().fieldWidthDegrees());
             assertTrue(pointerDrift(anchor, px, py) < DRIFT_TOLERANCE_PX,
                     "the anchor survives the reverse burst");

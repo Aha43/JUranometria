@@ -951,12 +951,24 @@ public final class PackagedAcceptanceMain {
         }
         require(navigation.state().fieldWidthDegrees() == 1.0,
                 "zoom reaches the 1-degree page");
-        while (navigation.state().fieldWidthDegrees() < 36.0) {
+        while (navigation.state().fieldWidthDegrees() < 42.0) {
             navigation.zoomOut();
         }
-        require(navigation.state().fieldWidthDegrees() == 36.0
+        require(navigation.state().fieldWidthDegrees() == 42.0
                         && navigation.state().targetIdentity() != null,
-                "and the 36-degree page, target intact");
+                "and the 42-degree sheet page, target intact");
+        // The widened page is a real page in the packaged image, not
+        // only a reachable number: it draws, and it draws more sky
+        // than the released widest did (Sprint 29, issue #284).
+        int sheetInk = ink(page(renderer, navigation, ChartOptions.DEFAULTS));
+        navigation.zoomIn();
+        require(navigation.state().fieldWidthDegrees() == 36.0,
+                "and steps back to the released widest");
+        int releasedInk = ink(page(renderer, navigation, ChartOptions.DEFAULTS));
+        require(sheetInk > 200 && releasedInk > 200,
+                "both widest pages draw: " + sheetInk + " and "
+                        + releasedInk);
+        navigation.zoomOut();
 
         // Pointer zoom, where the reader points. Chosen in open
         // sky at a field where the step is ACCEPTED, and required
