@@ -72,8 +72,19 @@ public final class SheetRecorder extends Graphics2D {
                        Color colour, Shape clip) {
     }
 
-    /** The parts of a stroke a sheet can carry. */
-    public record BasicStrokeSpec(float width, float[] dash) {
+    /**
+     * A stroke, whole.
+     *
+     * <p>Width and dash alone are not the stroke. A cap decides
+     * whether a one-point line ends square or flush, a join decides
+     * what a corner looks like, and a sheet that keeps neither draws
+     * a subtly different chart from the one on screen - and a raster
+     * replay of it draws a third (issue #286). So all of it is
+     * carried, and each writer says as much of it as its format can.
+     */
+    public record BasicStrokeSpec(float width, int cap, int join,
+                                  float miterLimit, float[] dash,
+                                  float dashPhase) {
     }
 
     private final List<Drawn> drawn;
@@ -291,7 +302,9 @@ public final class SheetRecorder extends Graphics2D {
     private BasicStrokeSpec strokeSpec() {
         if (stroke instanceof java.awt.BasicStroke basic) {
             return new BasicStrokeSpec(basic.getLineWidth(),
-                    basic.getDashArray());
+                    basic.getEndCap(), basic.getLineJoin(),
+                    basic.getMiterLimit(), basic.getDashArray(),
+                    basic.getDashPhase());
         }
         throw new UnsupportedOperationException(
                 "a chart sheet carries basic strokes: " + stroke);

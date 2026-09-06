@@ -313,15 +313,14 @@ place-and-time-study: classes
 # The printable chart and the modest wider field
 # (docs/decisions/printable-chart.md, issue #283): what each degree
 # past 36 costs, the candidate pages drawn by the production
-# renderer, and one chart state written to SVG, PDF and PNG from a
-# single recording of that same render.
+# renderer. The gate's own SVG, PDF and PNG prototypes were retired
+# in #286, when production gained writers of its own; the sheets now
+# live in docs/studies/chart-sheet, made by make chart-sheet-study.
 printable-chart-study: classes
 	mkdir -p docs/studies/printable-chart
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PrintableChartStudyMain \
 		> docs/studies/printable-chart/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WiderFieldPageMain
-	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartSheetExportStudyMain \
-		> docs/studies/printable-chart/formats.md
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic

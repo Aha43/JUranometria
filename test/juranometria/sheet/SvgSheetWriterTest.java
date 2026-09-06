@@ -280,6 +280,48 @@ class SvgSheetWriterTest {
     }
 
     @Test
+    void theWholeStrokeReachesTheFileAndNotJustItsWidth() {
+        // A stroke is width, cap, join, miter limit, dash and dash
+        // phase. Dropping any of them draws a subtly different chart
+        // from the one on screen, and the miter limit and the phase
+        // were still being dropped after the cap and join were fixed
+        // (PR #291 review).
+        SheetRecorder recorder = new SheetRecorder(
+                PaperSize.A4.chartWideUnits(),
+                PaperSize.A4.chartHighUnits());
+        java.awt.Graphics2D g = (java.awt.Graphics2D) recorder.create();
+        g.setColor(java.awt.Color.BLACK);
+        g.setStroke(new java.awt.BasicStroke(1.5f,
+                java.awt.BasicStroke.CAP_ROUND,
+                java.awt.BasicStroke.JOIN_BEVEL, 7.5f,
+                new float[] {4.0f, 2.0f}, 1.25f));
+        g.draw(new java.awt.geom.Line2D.Double(10, 10, 200, 120));
+        g.dispose();
+
+        SheetRecording page = ChartSheet.record(
+                Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+        String svg = SvgSheetWriter.write(new SheetRecording(recorder,
+                        PaperSize.A4, page.scene(), page.options(),
+                        page.metadata()),
+                SvgSheetWriter.Text.EDITABLE);
+
+        assertTrue(svg.contains("stroke-width=\"1.50\""), "the width");
+        assertTrue(svg.contains("stroke-linecap=\"round\""), "the cap");
+        assertTrue(svg.contains("stroke-linejoin=\"bevel\""), "the join");
+        assertTrue(svg.contains("stroke-miterlimit=\"7.50\""),
+                "the miter limit, which decides where a sharp corner"
+                        + " turns into a cut one");
+        assertTrue(svg.contains("stroke-dasharray=\"4.00,2.00\""),
+                "the dash");
+        assertTrue(svg.contains("stroke-dashoffset=\"1.25\""),
+                "and the phase, which decides where the dashes start"
+                        + " - a reference line drawn from its middle"
+                        + " looks different from one drawn from its"
+                        + " end");
+    }
+
+    @Test
     void theOutlineVariantIsForAMachineWhoseFontsAreUnknown() {
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,

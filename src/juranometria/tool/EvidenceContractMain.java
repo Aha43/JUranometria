@@ -90,8 +90,6 @@ public final class EvidenceContractMain {
                 "docs/studies/ecliptic/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
-        REPORT_MAINS.put("juranometria.tool.ChartSheetExportStudyMain",
-                "docs/studies/printable-chart/formats.md");
         // Not prose but an oracle: the released pages' own pixels
         // (issue #284). Holding it to the same byte contract is what
         // makes "the 1-36 degree atlas is untouched" a standing
