@@ -96,33 +96,47 @@ public final class ExportSheetSession {
     }
 
     /**
-     * How the reader is asked, in the running application: a dialog.
+     * How a yes-or-no question reaches the reader.
      *
-     * <p>Never a constant. A decision that always said yes would
-     * replace a reader's file without a word, and would look exactly
-     * like this from the outside - so it is a named thing that puts
-     * a question on the screen, and refuses to answer at all where
-     * there is no screen to put it on.
+     * <p>A seam of exactly one method, so that what the application
+     * asks - and whether it asks at all - is something a test can
+     * watch without a modal dialog appearing on someone's screen
+     * (PR #291 round 2).
      */
-    static ExportSheet.ReplaceDecision replaceDecision(Frame owner) {
-        return existing -> askToReplace(owner, existing);
+    @FunctionalInterface
+    interface Confirmer {
+
+        /** The reader's answer: a {@code JOptionPane} option value. */
+        int ask(Frame owner, String question, String title);
+    }
+
+    /** The real one: a dialog, owned by and centred on the atlas. */
+    static int confirmOnScreen(Frame owner, String question,
+                               String title) {
+        return JOptionPane.showConfirmDialog(owner, question, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
     }
 
     /**
-     * Asks before replacing something that is already there.
+     * How the reader is asked, in the running application: a dialog.
      *
-     * <p>The file chooser cannot ask this for us: it approved a name
-     * before the format's extension was added to it, so the file
-     * about to be replaced may be one the chooser never showed.
+     * <p>Never a constant. A decision that always said yes would
+     * replace a reader's file without a word and would look exactly
+     * like this from the outside, so it is a named thing that asks.
      */
-    static boolean askToReplace(Frame owner, java.io.File existing) {
-        return JOptionPane.showConfirmDialog(owner,
+    static ExportSheet.ReplaceDecision replaceDecision(Frame owner) {
+        return replaceDecision(owner, ExportSheetSession::confirmOnScreen);
+    }
+
+    /** The same decision, asking however it is told to ask. */
+    static ExportSheet.ReplaceDecision replaceDecision(Frame owner,
+                                                       Confirmer confirmer) {
+        return existing -> confirmer.ask(owner,
                 existing.getName() + " already exists in "
                         + existing.getAbsoluteFile().getParent()
                         + ".\nReplace it?",
-                "Replace the existing file?",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
+                "Replace the existing file?")
+                == JOptionPane.YES_OPTION;
     }
 
     /** Says what happened, in the reader's own terms. */

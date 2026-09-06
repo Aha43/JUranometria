@@ -1,6 +1,5 @@
 package juranometria.app;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,7 +8,6 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,7 +20,6 @@ import juranometria.ui.ChartViewController;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -105,23 +102,44 @@ class ExportSheetSessionTest {
     }
 
     @Test
-    void theDecisionTheApplicationUsesPutsTheQuestionOnAScreen() {
-        // The bypass this closes is a quiet one: replacing
-        // ExportSheetSession's decision with a constant yes would
-        // leave every policy test passing and every reader's file
-        // silently overwritten. What distinguishes a real decision
-        // from a constant is that it needs a person - so, asked
-        // where there is no screen, it must fail rather than answer.
-        Assumptions.assumeTrue(GraphicsEnvironment.isHeadless(),
-                "this asks what happens when there is no display");
+    void theDecisionTheApplicationUsesAsksAndObeysTheAnswer() {
+        // The bypass this closes is a quiet one: replacing the
+        // session's decision with a constant yes would leave every
+        // policy test passing and every reader's file silently
+        // overwritten. So the asking itself is watched - the
+        // question that would go on the screen, and what is done
+        // with each answer.
+        List<String> asked = new ArrayList<>();
+        File existing = new File("charts/orion.svg");
 
-        ExportSheet.ReplaceDecision decision =
-                ExportSheetSession.replaceDecision(null);
-        assertThrows(java.awt.HeadlessException.class,
-                () -> decision.mayReplace(new File("orion.svg")),
-                "the application's own decision asks a person, and"
-                        + " cannot answer without one - a constant"
-                        + " would have returned quietly here");
+        ExportSheet.ReplaceDecision yes =
+                ExportSheetSession.replaceDecision(null,
+                        (owner, question, title) -> {
+                            asked.add(title + " | " + question);
+                            return javax.swing.JOptionPane.YES_OPTION;
+                        });
+        assertTrue(yes.mayReplace(existing),
+                "a reader who says yes replaces their file");
+        assertEquals(1, asked.size(), "having been asked once");
+        assertTrue(asked.get(0).contains("orion.svg")
+                        && asked.get(0).contains("Replace"),
+                "about that file, by name: " + asked.get(0));
+        assertTrue(asked.get(0).contains(existing.getAbsoluteFile()
+                        .getParent()),
+                "and where it is, because two folders can hold the"
+                        + " same name: " + asked.get(0));
+
+        for (int answer : new int[] {
+                javax.swing.JOptionPane.NO_OPTION,
+                javax.swing.JOptionPane.CANCEL_OPTION,
+                javax.swing.JOptionPane.CLOSED_OPTION}) {
+            assertTrue(!ExportSheetSession.replaceDecision(null,
+                            (owner, question, title) -> answer)
+                    .mayReplace(existing),
+                    "and anything other than yes - including closing"
+                            + " the question unanswered - leaves the"
+                            + " file alone: " + answer);
+        }
     }
 
     @Test
