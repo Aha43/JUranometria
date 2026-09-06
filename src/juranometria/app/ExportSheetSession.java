@@ -7,6 +7,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import juranometria.chart.WorkingSelection;
+import juranometria.render.ChartRenderer;
 import juranometria.sheet.PaperSize;
 import juranometria.sheet.PngSheetWriter;
 import juranometria.sheet.SheetFileName;
@@ -42,33 +43,91 @@ public final class ExportSheetSession {
                 PngSheetWriter.DEFAULT_RESOLUTION, false);
     }
 
+    /**
+     * Everything this session asks a person, in one place.
+     *
+     * <p>Named so that the whole route - item, dialog, destination,
+     * replace, report - can be driven end to end rather than
+     * reassembled from its parts by a test that then proves only
+     * that the parts exist (PR #292 review). Production supplies
+     * dialogs; a journey supplies the same dialog with its buttons
+     * pressed.
+     */
+    public interface Surfaces {
+
+        /** What kind of sheet, or empty if the reader changes their mind. */
+        java.util.Optional<ExportSheet.Request> chooseWhat(Frame owner,
+                ExportSheet.Request initial);
+
+        /** Where to put it, or empty if they change their mind. */
+        java.util.Optional<File> chooseWhere(Frame owner,
+                String suggestedName);
+
+        /** Whether to replace something already there. */
+        ExportSheet.ReplaceDecision replace(Frame owner);
+
+        /** What happened. */
+        void report(Frame owner, ExportSheet.Outcome outcome);
+    }
+
+    /** The surfaces the running application uses: real windows. */
+    public static Surfaces onScreen() {
+        return new Surfaces() {
+
+            @Override
+            public java.util.Optional<ExportSheet.Request> chooseWhat(
+                    Frame owner, ExportSheet.Request initial) {
+                java.util.List<ExportSheet.Request> chosen =
+                        new java.util.ArrayList<>();
+                ExportSheetDialog.open(owner, initial, chosen::add);
+                return chosen.stream().findFirst();
+            }
+
+            @Override
+            public java.util.Optional<File> chooseWhere(Frame owner,
+                    String suggestedName) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setDialogTitle("Export chart sheet");
+                chooser.setSelectedFile(new File(suggestedName));
+                return chooser.showSaveDialog(owner)
+                        == JFileChooser.APPROVE_OPTION
+                        ? java.util.Optional.of(chooser.getSelectedFile())
+                        : java.util.Optional.empty();
+            }
+
+            @Override
+            public ExportSheet.ReplaceDecision replace(Frame owner) {
+                return replaceDecision(owner);
+            }
+
+            @Override
+            public void report(Frame owner, ExportSheet.Outcome outcome) {
+                ExportSheetSession.report(owner, outcome);
+            }
+        };
+    }
+
     /** Opens the dialog, and on Export, the file chooser. */
     public static void open(Frame owner, ChartViewController navigation,
                             ChartComponent chart,
                             ChartOptionsController options,
                             WorkingSelection working) {
-        ExportSheetDialog.open(owner, defaults(), request -> {
-            File chosen = choosePlace(owner, navigation, chart, request);
-            if (chosen == null) {
-                return;  // cancelled: nothing made, nothing written
-            }
-            report(owner, exportTo(chosen, request, navigation, chart,
-                    options, working, replaceDecision(owner)));
-        });
+        open(owner, navigation, chart, options, working, onScreen());
     }
 
-    /** Where the reader wants it, or null if they changed their mind. */
-    private static File choosePlace(Frame owner,
-                                    ChartViewController navigation,
-                                    ChartComponent chart,
-                                    ExportSheet.Request request) {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Export chart sheet");
-        chooser.setSelectedFile(new File(SheetFileName.suggest(
-                navigation.state(), chart.currentScene(),
-                request.format())));
-        return chooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION
-                ? chooser.getSelectedFile() : null;
+    /** The same route, asking through whatever surfaces it is given. */
+    public static void open(Frame owner, ChartViewController navigation,
+                            ChartComponent chart,
+                            ChartOptionsController options,
+                            WorkingSelection working, Surfaces surfaces) {
+        surfaces.chooseWhat(owner, defaults()).ifPresent(request ->
+                surfaces.chooseWhere(owner, SheetFileName.suggest(
+                                navigation.state(), chart.currentScene(),
+                                request.format()))
+                        .ifPresent(destination -> surfaces.report(owner,
+                                exportTo(destination, request, navigation,
+                                        chart, options, working,
+                                        surfaces.replace(owner)))));
     }
 
     /**
@@ -90,8 +149,11 @@ public final class ExportSheetSession {
         return ExportSheet.write(
                 juranometria.app.Atlas.assembler()::assemble,
                 navigation.state(), options.options(),
-                SheetInk.of(chart, working.lead(),
-                        request.workingSelection()),
+                SheetInk.reference(chart),
+                request.workingSelection()
+                        ? SheetInk.working(chart, working.members(),
+                                working.lead(), options.options())
+                        : ChartRenderer.ReferenceLayer.NONE,
                 request, destination, replace);
     }
 

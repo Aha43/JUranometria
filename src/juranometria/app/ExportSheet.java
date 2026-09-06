@@ -102,14 +102,27 @@ public final class ExportSheet {
                                 ChartRenderer.ReferenceLayer ink,
                                 Request request, File destination,
                                 ReplaceDecision replace) {
-        return write(pages, state, options, ink, request, destination,
+        return write(pages, state, options, ink,
+                ChartRenderer.ReferenceLayer.NONE, request, destination,
                 replace, SINK);
+    }
+
+    /** The same, with the reader's own marks over the chart. */
+    public static Outcome write(ChartSheet.Pages pages,
+                                ChartViewState state, ChartOptions options,
+                                ChartRenderer.ReferenceLayer ink,
+                                ChartRenderer.ReferenceLayer overChart,
+                                Request request, File destination,
+                                ReplaceDecision replace) {
+        return write(pages, state, options, ink, overChart, request,
+                destination, replace, SINK);
     }
 
     /** The same, writing however it is told to - a seam for tests. */
     static Outcome write(ChartSheet.Pages pages,
                          ChartViewState state, ChartOptions options,
                          ChartRenderer.ReferenceLayer ink,
+                         ChartRenderer.ReferenceLayer overChart,
                          Request request, File destination,
                          ReplaceDecision replace, ByteSink sink) {
         if (destination == null) {
@@ -160,7 +173,7 @@ public final class ExportSheet {
         byte[] bytes;
         try {
             SheetRecording sheet = ChartSheet.record(pages, state, options,
-                    ink, request.paper());
+                    ink, overChart, request.paper());
             bytes = SheetWriters.write(sheet, request.format(),
                     request.dpi());
         } catch (IOException | RuntimeException failure) {

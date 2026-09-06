@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -257,42 +258,92 @@ class SprintTwentyNineJourneyTest {
                     "and the catalogue, the grid and the furniture are"
                             + " untouched by them");
 
-            // ---- 4. the export surface, where a reader looks -------
-            List<String> opened = new ArrayList<>();
-            JMenuBar bar = onEdt(() -> AppMenuBar.create(navigation,
-                    () -> { }, () -> { }, () -> { }, () -> { },
-                    () -> { }, () -> { }, () -> opened.add("export")));
-            JMenuItem export = AppMenuBar.exportItem(bar);
-            assertTrue(export != null && export.isEnabled(),
-                    "4. File carries the export item");
-            SwingUtilities.invokeAndWait(export::doClick);
-            assertEquals(List.of("export"), opened,
-                    "and it opens the export surface");
-
-            // ---- 5. three files, one chart state -------------------
+            // ---- 4/5. the export surface, driven end to end -------
+            // Not the item, then separately the dialog, then
+            // separately the export: the menu item runs the real
+            // route, and the route asks its questions through the
+            // real dialog with its Export button pressed (PR #292
+            // review). Only the file chooser is answered for the
+            // reader, because a platform's save dialog is not this
+            // application's to drive.
             ChartViewState exporting = onEdt(navigation::state);
             List<Path> written = new ArrayList<>();
+            List<SheetFormat> chose = new ArrayList<>();
             for (SheetFormat format : SheetFormat.values()) {
-                JComponent dialog = ExportSheetDialog.content(
-                        ExportSheetSession.defaults(), request -> {
-                            var outcome = ExportSheetSession.exportTo(
-                                    folder.resolve("orion").toFile(),
-                                    request, navigation, chart, options,
-                                    working, replacing -> true);
-                            written.add(assertInstanceOf(
-                                    ExportSheet.Outcome.Written.class,
-                                    outcome, "5. " + request.format()
-                                            + " is written").file());
-                        }, () -> { });
-                JComboBox<SheetFormat> box =
-                        named(dialog, ExportSheetDialog.FORMAT_BOX);
-                SwingUtilities.invokeAndWait(() -> {
-                    box.setSelectedItem(format);
-                    ((JButton) named(dialog,
-                            ExportSheetDialog.EXPORT_BUTTON)).doClick();
-                });
+                ExportSheetSession.Surfaces surfaces =
+                        new ExportSheetSession.Surfaces() {
+
+                    @Override
+                    public java.util.Optional<ExportSheet.Request>
+                            chooseWhat(java.awt.Frame owner,
+                                    ExportSheet.Request initial) {
+                        // The real dialog content, with the format
+                        // chosen and the real Export button pressed.
+                        List<ExportSheet.Request> chosen =
+                                new ArrayList<>();
+                        JComponent dialog = ExportSheetDialog.content(
+                                initial, chosen::add, () -> { });
+                        JComboBox<SheetFormat> box = named(dialog,
+                                ExportSheetDialog.FORMAT_BOX);
+                        box.setSelectedItem(format);
+                        ((JButton) named(dialog,
+                                ExportSheetDialog.EXPORT_BUTTON))
+                                .doClick();
+                        chosen.stream().findFirst().ifPresent(request ->
+                                chose.add(request.format()));
+                        return chosen.stream().findFirst();
+                    }
+
+                    @Override
+                    public java.util.Optional<File> chooseWhere(
+                            java.awt.Frame owner, String suggestedName) {
+                        assertTrue(suggestedName.startsWith(
+                                        "juranometria-")
+                                        && suggestedName.endsWith("."
+                                                + format.extension()),
+                                "the save dialog is offered a name the"
+                                        + " reader can find again: "
+                                        + suggestedName);
+                        return java.util.Optional.of(
+                                folder.resolve("orion").toFile());
+                    }
+
+                    @Override
+                    public ExportSheet.ReplaceDecision replace(
+                            java.awt.Frame owner) {
+                        return replacing -> true;
+                    }
+
+                    @Override
+                    public void report(java.awt.Frame owner,
+                            ExportSheet.Outcome outcome) {
+                        written.add(assertInstanceOf(
+                                ExportSheet.Outcome.Written.class,
+                                outcome, "5. " + format
+                                        + " is written").file());
+                    }
+                };
+
+                List<String> opened = new ArrayList<>();
+                JMenuBar bar = onEdt(() -> AppMenuBar.create(navigation,
+                        () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> {
+                            opened.add("export");
+                            ExportSheetSession.open(null, navigation,
+                                    chart, options, working, surfaces);
+                        }));
+                JMenuItem export = AppMenuBar.exportItem(bar);
+                assertTrue(export != null && export.isEnabled(),
+                        "4. File carries the export item");
+                SwingUtilities.invokeAndWait(export::doClick);
+                assertEquals(List.of("export"), opened,
+                        "and pressing it runs the export route");
             }
-            assertEquals(3, written.size(), "three sheets");
+            assertEquals(List.of(SheetFormat.SVG, SheetFormat.PDF,
+                            SheetFormat.PNG), chose,
+                    "5. each format is chosen in the real dialog");
+            assertEquals(3, written.size(),
+                    "and each one reported a written sheet");
 
             // ---- 6. each opened by something that did not write it -
             var document = javax.xml.parsers.DocumentBuilderFactory
@@ -338,6 +389,53 @@ class SprintTwentyNineJourneyTest {
             ecliptic.showing(true);
             meridian.showing(true, true, true);
 
+            // ---- 6b. a page the ecliptic actually crosses ---------
+            // Orion is where the issue's journey goes and the
+            // ecliptic passes above it, so its export cannot be
+            // proved there and nothing on that page would fail if it
+            // vanished (PR #292 review). A club member looking for
+            // the zodiac goes where it is; so does this.
+            SwingUtilities.invokeAndWait(() -> navigation.recenter(
+                    new SkyPosition(0.0, 0.0), 42.0));
+            SwingUtilities.invokeAndWait(() -> { });
+            ChartViewState equinox = onEdt(navigation::state);
+            List<Path> zodiac = new ArrayList<>();
+            for (SheetFormat format : SheetFormat.values()) {
+                var outcome = ExportSheetSession.exportTo(
+                        folder.resolve("equinox").toFile(),
+                        new ExportSheet.Request(format, PaperSize.A4,
+                                300, false),
+                        navigation, chart, options, working,
+                        replacing -> true);
+                zodiac.add(assertInstanceOf(
+                        ExportSheet.Outcome.Written.class, outcome,
+                        "6b. the equinox page exports as " + format)
+                        .file());
+            }
+
+            // The ecliptic's own ink, by the dash it alone is drawn
+            // with, in both vector formats - and its landmark
+            // diamonds, which are the thing a reader looks for.
+            String zodiacSvg = Files.readString(zodiac.get(0),
+                    StandardCharsets.UTF_8);
+            assertTrue(zodiacSvg.contains(
+                            "stroke-dasharray=\"12.00,4.00,2.00,4.00\""),
+                    "the ecliptic reaches the SVG as its own dash-dot"
+                            + " line");
+            String zodiacPdf = Files.readString(zodiac.get(1),
+                    StandardCharsets.ISO_8859_1);
+            assertTrue(zodiacPdf.contains("[12.00 4.00 2.00 4.00]"),
+                    "and the PDF with the same dash");
+            assertTrue(zodiacSvg.contains("March equinox")
+                            || landmarkDiamonds(zodiacSvg) > 0,
+                    "with the landmark the page is centred on");
+
+            // And the same chart in all three, through the sky: what
+            // production drew is where the sky says it goes, in the
+            // SVG's paths and in the PNG's pixels alike.
+            assertEquals(List.of(), formatsThatDisagree(zodiac, equinox),
+                    "6b. the three formats carry the same chart");
+
             // ---- 7. the SVG is a file a reader can work on ---------
             Path edited = folder.resolve("orion-edited.svg");
             editTheTitle(written.get(0), edited,
@@ -354,8 +452,14 @@ class SprintTwentyNineJourneyTest {
                     "and the chart itself is untouched by the edit");
 
             // ---- 9. Home, and an atlas nothing happened to ---------
-            assertEquals(exporting, onEdt(navigation::state),
+            // Against the state the last export was made from: the
+            // reader moved the chart to the equinox themselves, and
+            // that is navigation rather than anything the export did.
+            assertEquals(equinox, onEdt(navigation::state),
                     "9. exporting changed nothing about the chart");
+            assertEquals(42.0, exporting.fieldWidthDegrees(),
+                    "and the Orion sheets were made from the page the"
+                            + " reader was on");
             ecliptic.showing(false);
             meridian.showing(false, false, false);
             ReaderInput.click(button(toolbar, "Reset view"));
@@ -536,6 +640,191 @@ class SprintTwentyNineJourneyTest {
         return Math.hypot(numbers.get(2) - numbers.get(0),
                 numbers.get(3) - numbers.get(1))
                 > PaperSize.A4.chartHighUnits() / 2.0;
+    }
+
+    /** How many of the ecliptic's open diamonds the sheet carries. */
+    private static int landmarkDiamonds(String svg) {
+        int found = 0;
+        var each = java.util.regex.Pattern.compile("<path d=\"([^\"]+)\"")
+                .matcher(svg);
+        while (each.find()) {
+            List<Double> numbers = new ArrayList<>();
+            var number = java.util.regex.Pattern
+                    .compile("-?\\d+(?:\\.\\d+)?")
+                    .matcher(each.group(1));
+            while (number.find()) {
+                numbers.add(Double.parseDouble(number.group()));
+            }
+            if (numbers.size() != 8) {
+                continue;  // four vertices, closed
+            }
+            double minX = numbers.get(0);
+            double maxX = minX;
+            double minY = numbers.get(1);
+            double maxY = minY;
+            for (int i = 0; i + 1 < numbers.size(); i += 2) {
+                minX = Math.min(minX, numbers.get(i));
+                maxX = Math.max(maxX, numbers.get(i));
+                minY = Math.min(minY, numbers.get(i + 1));
+                maxY = Math.max(maxY, numbers.get(i + 1));
+            }
+            if (Math.abs(maxX - minX - 12.0) < 0.5
+                    && Math.abs(maxY - minY - 12.0) < 0.5) {
+                found++;
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Which formats disagree with production about where the chart
+     * is: every mark the renderer drew for this sheet, projected the
+     * way the sheet projects it, looked for in the SVG's own paths
+     * and in the PNG's own pixels.
+     */
+    private static List<String> formatsThatDisagree(List<Path> sheets,
+                                                    ChartViewState state)
+            throws Exception {
+        juranometria.sheet.SheetRecording sheet =
+                juranometria.sheet.ChartSheet.record(
+                        Atlas.assembler()::assemble, state,
+                        ChartOptions.DEFAULTS,
+                        ChartRenderer.ReferenceLayer.NONE,
+                        PaperSize.A4);
+        String svg = Files.readString(sheets.get(0),
+                StandardCharsets.UTF_8);
+        BufferedImage png = javax.imageio.ImageIO.read(
+                sheets.get(2).toFile());
+        List<double[]> inSvg = pathCentres(svg);
+
+        GnomonicProjection projection = new GnomonicProjection(
+                sheet.scene().viewport().centre());
+        ViewportMapping onPaper = new ViewportMapping(
+                sheet.scene().viewport());
+        double scale = 300 / 72.0;
+        double margin = PaperSize.A4.marginPoints();
+
+        int checked = 0;
+        int missingFromSvg = 0;
+        int blankInPng = 0;
+        for (ChartRenderer.DrawnMark mark
+                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                        .drawnMarks(sheet.scene(), sheet.options())) {
+            var at = projection.project(mark.star() != null
+                            ? mark.star().position()
+                            : mark.deepSky().position())
+                    .map(onPaper::toPixel);
+            if (at.isEmpty() || at.get().x() < 30 || at.get().y() < 30
+                    || at.get().x() > PaperSize.A4.chartWideUnits() - 30
+                    || at.get().y() > PaperSize.A4.chartHighUnits() - 30) {
+                continue;
+            }
+            double x = at.get().x();
+            double y = at.get().y();
+            if (inSvg.stream().noneMatch(centre ->
+                    Math.hypot(centre[0] - x, centre[1] - y) < 1.0)) {
+                missingFromSvg++;
+            }
+            // The furniture is opaque and drawn last: the title block
+            // owns the lower left and the magnitude key the upper
+            // right, and a mark underneath one of them is hidden on
+            // any raster while its path is still there in the vector
+            // formats, beneath the panel, exactly as a viewer will
+            // draw it. So the recording is asked whether production
+            // painted over this mark before its ink is demanded.
+            if (paintedOver(sheet, x, y)) {
+                continue;
+            }
+            checked++;
+            int reach = (int) Math.ceil(
+                    Math.max(mark.reach(), 1.5) * scale) + 4;
+            if (!inkNear(png, (int) Math.round((x + margin) * scale),
+                    (int) Math.round((y + margin) * scale), reach)) {
+                blankInPng++;
+            }
+        }
+
+        List<String> disagree = new ArrayList<>();
+        if (checked < 50) {
+            disagree.add("too few marks to compare: " + checked);
+        }
+        if (missingFromSvg > 0) {
+            disagree.add("SVG (" + missingFromSvg + " of " + checked
+                    + " marks absent)");
+        }
+        if (blankInPng > 0) {
+            disagree.add("PNG (" + blankInPng + " of " + checked
+                    + " marks with no ink)");
+        }
+        return disagree;
+    }
+
+    /** Whether an opaque panel covers this point, drawn after it. */
+    private static boolean paintedOver(
+            juranometria.sheet.SheetRecording sheet, double x, double y) {
+        boolean seenTheMark = false;
+        for (var drawn : sheet.recorder().drawn()) {
+            java.awt.geom.Rectangle2D box = drawn.shape().getBounds2D();
+            if (!seenTheMark && box.getWidth() < 20
+                    && Math.hypot(box.getCenterX() - x,
+                            box.getCenterY() - y) < 1.0) {
+                seenTheMark = true;
+                continue;
+            }
+            if (seenTheMark && drawn.filled() && box.getWidth() > 20
+                    && drawn.shape().contains(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<double[]> pathCentres(String svg) {
+        List<double[]> centres = new ArrayList<>();
+        var each = java.util.regex.Pattern.compile("<path d=\"([^\"]+)\"")
+                .matcher(svg.substring(svg.indexOf("<g id=\"ink\"")));
+        while (each.find()) {
+            List<Double> numbers = new ArrayList<>();
+            var number = java.util.regex.Pattern
+                    .compile("-?\\d+(?:\\.\\d+)?")
+                    .matcher(each.group(1));
+            while (number.find()) {
+                numbers.add(Double.parseDouble(number.group()));
+            }
+            double minX = Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
+            double maxX = -Double.MAX_VALUE;
+            double maxY = -Double.MAX_VALUE;
+            for (int i = 0; i + 1 < numbers.size(); i += 2) {
+                minX = Math.min(minX, numbers.get(i));
+                maxX = Math.max(maxX, numbers.get(i));
+                minY = Math.min(minY, numbers.get(i + 1));
+                maxY = Math.max(maxY, numbers.get(i + 1));
+            }
+            centres.add(new double[] {(minX + maxX) / 2.0,
+                    (minY + maxY) / 2.0});
+        }
+        return centres;
+    }
+
+    private static boolean inkNear(BufferedImage image, int x, int y,
+                                   int radius) {
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                int px = x + dx;
+                int py = y + dy;
+                if (px < 0 || py < 0 || px >= image.getWidth()
+                        || py >= image.getHeight()) {
+                    continue;
+                }
+                int rgb = image.getRGB(px, py) & 0xffffff;
+                if (((rgb >> 16) & 0xff) + ((rgb >> 8) & 0xff)
+                        + (rgb & 0xff) < 3 * 250) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

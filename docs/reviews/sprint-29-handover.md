@@ -1,6 +1,6 @@
 # Sprint 29 handover — Take the chart to the observing table
 
-Five issues, five pull requests, seventeen rounds of independent
+Five issues, five pull requests, eighteen rounds of independent
 review. This is what the sprint did, what it got wrong on the way,
 what is still owed, and what version it should be.
 
@@ -131,6 +131,28 @@ tests that looked like proof and were not.
 38. The final destination could still receive partial output, through
     the direct write or a non-atomic move.
 
+### #287, the sprint close (PR #292, final review)
+
+39. The working-selection export omitted the **rings** around marked
+    objects the page draws — it carried only the crosses for the ones
+    it does not — and painted the reader's marks inside the reference
+    layer, which put them underneath the stars they were marking.
+    The screen paints them over the finished chart, and the sheet now
+    does the same, in the same order.
+40. The closing journey stitched the menu item, the dialog and the
+    export together rather than driving them as one route. The
+    session's surfaces are named now, and the journey presses the
+    real item, which runs the real route, which asks through the real
+    dialog with its Export button pressed.
+41. The ecliptic is off Orion's page, so its export could have
+    disappeared without failing anything, and the cross-format
+    comparison was too thin. The journey now goes on to a page the
+    ecliptic crosses and holds all three formats against production's
+    own marks through the sky.
+42. **The physical print and ruler inspection has not happened.**
+    See below; it is the one thing in this sprint that cannot be
+    done from here.
+
 ### What CI found that review did not
 
 - The released-page oracle was not portable, and I answered that with
@@ -175,7 +197,11 @@ times a container answered it in minutes.
 **Owed, and not done:**
 
 - **A printed sheet measured with a ruler.** Nothing in this sprint
-  has been on paper. The expected measurements are in
+  has been on paper. The final review named this as a P1, and it is
+  correct to: it is the only evidence that can settle legibility, and
+  no amount of arithmetic substitutes for it. **This is the one item
+  in Sprint 29 that cannot be done from here at all** - it needs a
+  printer, a sheet of A4 and a ruler. The expected measurements are in
   [docs/studies/chart-sheet/measurements.md](../studies/chart-sheet/measurements.md)
   under *What to measure on paper*, taken from the sheet's own ink:
   the frame at 271.6 × 184.6 mm, the thinnest line at 0.353 mm, the
