@@ -128,6 +128,14 @@ class PrintableChartGateTest {
             assertTrue(decision.contains(quoted),
                     "and the decision quotes it: " + quoted);
         }
+        assertTrue(formats.contains("3508 × 2480"),
+                "the format report states the sheet actually written");
+        assertTrue(decision.contains("3508 × 2480"),
+                "and the decision states the same one");
+        assertFalse(formats.contains("3208"),
+                "and neither still specifies the rejected PNG");
+        assertFalse(decision.contains("3208"),
+                "in either place");
         assertTrue(formats.contains("2268 shapes"),
                 "the format study recorded the production render");
         assertTrue(decision.contains("2268 shapes"),
@@ -214,108 +222,270 @@ class PrintableChartGateTest {
                         + c2x + "," + c2y);
     }
 
+    /** The chart rectangle a sheet's ink must stay inside, in points. */
+    private static final double A4_CHART_WIDE = 841.89 - 72.0;
+    private static final double A4_CHART_HIGH = 595.28 - 72.0;
+    private static final double LETTER_CHART_WIDE = 792.0 - 72.0;
+    private static final double LETTER_CHART_HIGH = 612.0 - 72.0;
+
     @Test
-    void bothVectorSheetsCarryTheProductionClip() throws IOException {
-        // The recorder captured production's clip and a first version
-        // of both writers discarded it, so ink production cut at the
-        // paper bled into the sheet margin.
+    void theEmittedClipIsProductionsOwnAndItActuallyCutsInk()
+            throws IOException {
+        // Counting clip attributes proves clipping syntax. Replacing
+        // every clip with a full-sheet rectangle keeps the count and
+        // restores the margin bleed (PR #288 round 2), so this holds
+        // the clip's own geometry and proves it does work.
         String svg = Files.readString(Path.of(
                 "docs/studies/printable-chart/sheet-a4.svg"));
-        assertTrue(svg.contains("<clipPath id=\"clip0\""),
-                "the SVG defines the clip production had in force");
-        assertTrue(svg.split("clip-path=\"url", -1).length - 1 > 1000,
-                "and applies it to the ink rather than defining it and"
-                        + " forgetting it");
 
-        String pdf = Files.readString(Path.of(
-                        "docs/studies/printable-chart/sheet-a4.pdf"),
-                java.nio.charset.StandardCharsets.ISO_8859_1);
-        assertTrue(pdf.split("W n", -1).length - 1 > 1000,
-                "and the PDF clips too, with the same operations"
-                        + " bracketed by q/Q");
-        assertTrue(pdf.contains("q\n"), "pushing the graphics state");
-        assertTrue(pdf.contains("Q\n"), "and popping it");
+        // The chart clip is production's: the renderer sets it to the
+        // paper inset by one pixel on each side.
+        java.util.List<double[]> clipBoxes = new java.util.ArrayList<>();
+        java.util.regex.Matcher clips = java.util.regex.Pattern.compile(
+                        "<clipPath id=\"clip\\d+\"><path d=\"([^\"]+)\"")
+                .matcher(svg);
+        while (clips.find()) {
+            clipBoxes.add(boundsOf(clips.group(1)));
+        }
+        assertFalse(clipBoxes.isEmpty(), "the sheet defines clips");
+
+        boolean chartClip = false;
+        for (double[] box : clipBoxes) {
+            if (Math.abs(box[0] - 1.0) < 1.5
+                    && Math.abs(box[1] - 1.0) < 1.5
+                    && Math.abs(box[2] - (A4_CHART_WIDE - 1.0)) < 2.5
+                    && Math.abs(box[3] - (A4_CHART_HIGH - 1.0)) < 2.5) {
+                chartClip = true;
+            }
+            assertTrue(box[2] <= A4_CHART_WIDE + 1.0
+                            && box[3] <= A4_CHART_HIGH + 1.0,
+                    "no clip is wider than the chart rectangle, which"
+                            + " is how a wrong clip would restore the"
+                            + " bleed: " + java.util.Arrays.toString(box));
+        }
+        assertTrue(chartClip,
+                "one clip is production's own paper rectangle,"
+                        + " roughly " + A4_CHART_WIDE + " x "
+                        + A4_CHART_HIGH + " pt");
+
+        // And it is doing work: ink whose own geometry crosses the
+        // boundary exists, and every such path carries a clip.
+        int escaping = 0;
+        java.util.regex.Matcher paths = java.util.regex.Pattern.compile(
+                        "<path d=\"([^\"]+)\"([^/]*)/>")
+                .matcher(svg);
+        while (paths.find()) {
+            double[] box = boundsOf(paths.group(1));
+            boolean outside = box[0] < -0.5 || box[1] < -0.5
+                    || box[2] > A4_CHART_WIDE + 0.5
+                    || box[3] > A4_CHART_HIGH + 0.5;
+            if (!outside) {
+                continue;
+            }
+            escaping++;
+            assertTrue(paths.group(2).contains("clip-path=\"url(#clip"),
+                    "ink crossing the chart boundary is clipped rather"
+                            + " than left to bleed into the margin: "
+                            + java.util.Arrays.toString(box));
+        }
+        assertTrue(escaping > 0,
+                "some ink genuinely crosses the boundary, so the"
+                        + " clipping above could have failed: "
+                        + escaping + " paths");
     }
 
     @Test
-    void thePngIsTheWholeSheetAtItsStatedResolution() throws IOException {
-        // A first version re-rendered the chart into a bigger pixel
-        // grid, which shrank every label relative to the paper, held
-        // only the chart rectangle, and stated its resolution
-        // nowhere.
-        javax.imageio.stream.ImageInputStream in =
-                javax.imageio.ImageIO.createImageInputStream(
-                        Path.of("docs/studies/printable-chart",
-                                "sheet-a4-300dpi.png").toFile());
-        javax.imageio.ImageReader reader =
-                javax.imageio.ImageIO.getImageReaders(in).next();
-        try {
-            reader.setInput(in);
-            // A4 at 300 dpi, the WHOLE sheet.
-            assertEquals(3508, reader.getWidth(0),
-                    "the PNG is A4 wide at 300 dpi, margins included");
-            assertEquals(2480, reader.getHeight(0),
-                    "and A4 high");
+    void theLetterChartIsLaidOutInsideLettersOwnRectangle()
+            throws IOException {
+        // Differing root widths and file lengths were already true of
+        // the defect this replaces: the original wrote both page
+        // sizes while reusing A4's recording (PR #288 round 2). What
+        // distinguishes them is the rectangle the ink is laid out in,
+        // read after clipping, which is what reaches the paper.
+        double[] a4 = inkBounds(Files.readString(Path.of(
+                "docs/studies/printable-chart/sheet-a4.svg")));
+        double[] letter = inkBounds(Files.readString(Path.of(
+                "docs/studies/printable-chart/sheet-letter.svg")));
 
-            javax.imageio.metadata.IIOMetadata metadata =
-                    reader.getImageMetadata(0);
-            org.w3c.dom.Node root = metadata.getAsTree(
-                    "javax_imageio_png_1.0");
-            assertTrue(physicalResolution(root),
-                    "and states its own resolution, so a reader's"
-                            + " software can place it on paper");
-        } finally {
-            reader.dispose();
-            in.close();
-        }
+        // Letter's ink occupies Letter's own chart rectangle: half
+        // inch margins all round, 720 x 540 pt of chart.
+        assertEquals(0.0, letter[0], 2.0, "Letter's ink starts at the"
+                + " left margin");
+        assertEquals(0.0, letter[1], 2.0, "and at the top one");
+        assertEquals(LETTER_CHART_WIDE, letter[2], 2.0,
+                "and reaches Letter's own chart width");
+        assertEquals(LETTER_CHART_HIGH, letter[3], 2.0,
+                "and its own chart height - an A4 layout dropped in"
+                        + " here would stop " + String.format(
+                        java.util.Locale.ROOT, "%.0f",
+                        LETTER_CHART_HIGH - (A4_CHART_HIGH))
+                        + " pt short of the bottom");
+
+        // Which is a different rectangle from A4's, so the assertions
+        // above could have failed: A4's chart is wider and shorter.
+        assertEquals(A4_CHART_WIDE, a4[2], 2.0,
+                "A4's ink fills A4's own width");
+        assertEquals(A4_CHART_HIGH, a4[3], 2.0, "and its own height");
+        assertTrue(a4[2] - letter[2] > 40.0,
+                "the two rectangles differ in width: " + a4[2]
+                        + " against " + letter[2]);
+        assertTrue(letter[3] - a4[3] > 10.0,
+                "and in height, the direction that catches a reused"
+                        + " A4 recording: " + letter[3] + " against "
+                        + a4[3]);
     }
 
-    /** Whether a PNG metadata tree carries a metre-based pHYs. */
-    private static boolean physicalResolution(org.w3c.dom.Node node) {
-        if ("pHYs".equals(node.getNodeName())) {
-            org.w3c.dom.NamedNodeMap attributes = node.getAttributes();
-            org.w3c.dom.Node unit =
-                    attributes.getNamedItem("unitSpecifier");
-            org.w3c.dom.Node perAxis =
-                    attributes.getNamedItem("pixelsPerUnitXAxis");
-            // 300 dpi is 11811 pixels per metre.
-            return unit != null && "meter".equals(unit.getNodeValue())
-                    && perAxis != null
-                    && Math.abs(Long.parseLong(perAxis.getNodeValue())
-                            - 11811L) <= 1;
-        }
-        for (org.w3c.dom.Node child = node.getFirstChild();
-                child != null; child = child.getNextSibling()) {
-            if (physicalResolution(child)) {
-                return true;
+    @Test
+    void thePngIsAPhysicalSheetAndNotALargeCanvasOfScreenInk()
+            throws IOException {
+        // The original defect was not the canvas size or the missing
+        // metadata; it was that every label and stroke shrank
+        // fourfold against the paper. Deleting the dpi/72 transform
+        // keeps the dimensions and the pHYs chunk (PR #288 round 2),
+        // so this measures the ink.
+        int dpi = 300;
+        double scale = dpi / 72.0;
+        java.awt.image.BufferedImage sheet = javax.imageio.ImageIO.read(
+                Path.of("docs/studies/printable-chart",
+                        "sheet-a4-300dpi.png").toFile());
+
+        assertEquals(3508, sheet.getWidth(),
+                "the whole A4 sheet at 300 dpi");
+        assertEquals(2480, sheet.getHeight(), "in both directions");
+
+        // Where the ink is: the half-inch margins must be clear and
+        // the chart must fill the rectangle inside them. Under the
+        // old defect the chart occupied only the top-left 770x523 px.
+        int marginPx = (int) Math.round(36.0 * scale);
+        int[] bounds = inkBoundsOf(sheet);
+        assertEquals(marginPx, bounds[0], 3,
+                "ink starts at the half-inch margin, " + marginPx
+                        + " px in");
+        assertEquals(marginPx, bounds[1], 3, "at the top too");
+        assertEquals(sheet.getWidth() - marginPx, bounds[2], 3,
+                "and stops at the far margin, which the old"
+                        + " pixel-sized render never reached");
+        assertEquals(sheet.getHeight() - marginPx, bounds[3], 3,
+                "and at the bottom");
+
+        // And the ink itself is physically sized: the chart frame is
+        // a one-point stroke, which at 300 dpi is about 4.2 px and
+        // under the old pixel-sized render was one. Read down the
+        // frame's whole length and take the commonest run, so a band
+        // of chart ink crossing a single row cannot set the answer.
+        java.util.Map<Integer, Integer> runs = new java.util.HashMap<>();
+        for (int y = bounds[1] + 20; y < bounds[3] - 20; y += 7) {
+            int run = 0;
+            for (int x = bounds[0]; x < bounds[0] + 40; x++) {
+                if (isInk(sheet, x, y)) {
+                    run++;
+                } else if (run > 0) {
+                    break;
+                }
+            }
+            if (run > 0) {
+                runs.merge(run, 1, Integer::sum);
             }
         }
-        return false;
+        int frameThickness = runs.entrySet().stream()
+                .max(java.util.Map.Entry.comparingByValue())
+                .orElseThrow().getKey();
+        assertEquals(1.0 * scale, frameThickness, 1.5,
+                "a one-point frame is about " + String.format(
+                        java.util.Locale.ROOT, "%.1f", scale)
+                        + " px at 300 dpi, not one pixel: measured "
+                        + frameThickness + " from " + runs);
     }
 
-    @Test
-    void theLetterSheetIsItsOwnChartAndNotAnA4OneCutDown()
-            throws IOException {
-        // Reusing A4's recording would run the chart past Letter's
-        // right margin and let the viewport cut it.
-        String letter = Files.readString(Path.of(
-                "docs/studies/printable-chart/sheet-letter.svg"));
-        String a4 = Files.readString(Path.of(
-                "docs/studies/printable-chart/sheet-a4.svg"));
+    /** The bounding box of every non-white pixel: minX minY maxX maxY. */
+    private static int[] inkBoundsOf(java.awt.image.BufferedImage image) {
+        int minX = image.getWidth();
+        int minY = image.getHeight();
+        int maxX = 0;
+        int maxY = 0;
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (isInk(image, x, y)) {
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                }
+            }
+        }
+        return new int[] {minX, minY, maxX + 1, maxY + 1};
+    }
 
-        assertTrue(letter.contains("width=\"792.00pt\""),
-                "the Letter sheet is Letter wide");
-        assertTrue(a4.contains("width=\"841.89pt\""),
-                "and the A4 sheet is A4 wide");
-        assertNotEquals(a4.length(), letter.length(),
-                "and they are different renders, not one file wearing"
-                        + " two page sizes");
+    private static boolean isInk(java.awt.image.BufferedImage image,
+                                 int x, int y) {
+        int rgb = image.getRGB(x, y) & 0xffffff;
+        int r = (rgb >> 16) & 0xff;
+        int g = (rgb >> 8) & 0xff;
+        int b = rgb & 0xff;
+        return r + g + b < 3 * 250;
+    }
 
-        String formats = Files.readString(Path.of(
-                "docs/studies/printable-chart/formats.md"));
-        assertTrue(formats.contains("US Letter"),
-                "and the report says both were recorded at their own"
-                        + " chart rectangle");
+    /** The bounding box of every coordinate in an SVG path. */
+    private static double[] boundsOf(String d) {
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        java.util.List<Double> numbers = new java.util.ArrayList<>();
+        java.util.regex.Matcher each = java.util.regex.Pattern.compile(
+                "-?\\d+(?:\\.\\d+)?").matcher(d);
+        while (each.find()) {
+            numbers.add(Double.parseDouble(each.group()));
+        }
+        for (int i = 0; i + 1 < numbers.size(); i += 2) {
+            minX = Math.min(minX, numbers.get(i));
+            maxX = Math.max(maxX, numbers.get(i));
+            minY = Math.min(minY, numbers.get(i + 1));
+            maxY = Math.max(maxY, numbers.get(i + 1));
+        }
+        return new double[] {minX, minY, maxX, maxY};
+    }
+
+    /**
+     * Where an SVG's ink actually reaches on paper: every drawn
+     * path's own bounds cut down by the clip it carries, which is
+     * what a reader sees rather than what the recorder captured.
+     */
+    private static double[] inkBounds(String svg) {
+        java.util.Map<String, double[]> clips = new java.util.HashMap<>();
+        java.util.regex.Matcher defined = java.util.regex.Pattern.compile(
+                        "<clipPath id=\"(clip\\d+)\"><path d=\"([^\"]+)\"")
+                .matcher(svg);
+        while (defined.find()) {
+            clips.put(defined.group(1), boundsOf(defined.group(2)));
+        }
+
+        double[] ink = {Double.MAX_VALUE, Double.MAX_VALUE,
+                -Double.MAX_VALUE, -Double.MAX_VALUE};
+        java.util.regex.Matcher paths = java.util.regex.Pattern.compile(
+                "<path d=\"([^\"]+)\"([^/]*)/>").matcher(svg);
+        while (paths.find()) {
+            if (svg.lastIndexOf("<clipPath", paths.start())
+                    > svg.lastIndexOf("</clipPath>", paths.start())) {
+                continue;  // a clip definition, not ink
+            }
+            double[] box = boundsOf(paths.group(1));
+            java.util.regex.Matcher carried = java.util.regex.Pattern
+                    .compile("url\\(#(clip\\d+)\\)")
+                    .matcher(paths.group(2));
+            if (carried.find()) {
+                double[] clip = clips.get(carried.group(1));
+                box = new double[] {Math.max(box[0], clip[0]),
+                        Math.max(box[1], clip[1]),
+                        Math.min(box[2], clip[2]),
+                        Math.min(box[3], clip[3])};
+            }
+            ink[0] = Math.min(ink[0], box[0]);
+            ink[1] = Math.min(ink[1], box[1]);
+            ink[2] = Math.max(ink[2], box[2]);
+            ink[3] = Math.max(ink[3], box[3]);
+        }
+        return ink;
     }
 
     // ---- the same readings the study takes ---------------------------

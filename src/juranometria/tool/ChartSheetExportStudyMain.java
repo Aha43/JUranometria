@@ -790,11 +790,31 @@ public final class ChartSheetExportStudyMain {
         p("");
         p("### PNG states what it is");
         p("");
-        p("`sheet-a4-300dpi.png` is 3208 × 2180 px — the chart"
-                + " rectangle at 300 dpi, which is exactly 10.7 × 7.3"
-                + " inches. The dimensions are computed from the"
-                + " physical sheet and the stated resolution rather"
-                + " than inherited from a window.");
+        int dpi = 300;
+        int pngWide = (int) Math.round(a4.widePt() * dpi / 72.0);
+        int pngHigh = (int) Math.round(a4.highPt() * dpi / 72.0);
+        int marginPx = (int) Math.round(MARGIN_PT * dpi / 72.0);
+        p(String.format(Locale.ROOT,
+                "`sheet-a4-300dpi.png` is **%d × %d px** — the **whole"
+                        + " A4 sheet** at %d dpi, margins included,"
+                        + " which is %.1f × %.1f inches. The half-inch"
+                        + " margins are %d px each, and the file"
+                        + " carries a `pHYs` chunk stating the"
+                        + " resolution so a reader's software can"
+                        + " place it on paper.",
+                pngWide, pngHigh, dpi, a4.widePt() / 72.0,
+                a4.highPt() / 72.0, marginPx));
+        p("");
+        p("The ink is the **point-sized** geometry drawn through a"
+                + " `dpi/72` transform, so a 1 pt stroke is about 4.2"
+                + " px and a 10 pt label about 42 px. A first version"
+                + " re-rendered the chart into a larger pixel grid"
+                + " instead, which sized every label and stroke in"
+                + " *pixels* and shrank them fourfold against the"
+                + " paper while looking entirely plausible on screen"
+                + " (PR #288 review). Dimensions are computed from the"
+                + " physical sheet and the stated resolution, never"
+                + " inherited from a window.");
         p("");
     }
 

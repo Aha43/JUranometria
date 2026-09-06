@@ -65,5 +65,7 @@ Both are self-contained: no external stylesheet, script, font or image, and no n
 
 ### PNG states what it is
 
-`sheet-a4-300dpi.png` is 3208 × 2180 px — the chart rectangle at 300 dpi, which is exactly 10.7 × 7.3 inches. The dimensions are computed from the physical sheet and the stated resolution rather than inherited from a window.
+`sheet-a4-300dpi.png` is **3508 × 2480 px** — the **whole A4 sheet** at 300 dpi, margins included, which is 11.7 × 8.3 inches. The half-inch margins are 150 px each, and the file carries a `pHYs` chunk stating the resolution so a reader's software can place it on paper.
+
+The ink is the **point-sized** geometry drawn through a `dpi/72` transform, so a 1 pt stroke is about 4.2 px and a 10 pt label about 42 px. A first version re-rendered the chart into a larger pixel grid instead, which sized every label and stroke in *pixels* and shrank them fourfold against the paper while looking entirely plausible on screen (PR #288 review). Dimensions are computed from the physical sheet and the stated resolution, never inherited from a window.
 
