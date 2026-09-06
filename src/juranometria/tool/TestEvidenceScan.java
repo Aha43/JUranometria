@@ -203,10 +203,17 @@ public final class TestEvidenceScan {
         List<String> touched = new ArrayList<>();
         List<String> unprotected = new ArrayList<>();
         boolean anyShared = false;
+        // Matched against the source with its whitespace collapsed,
+        // because a call can be wrapped: "Preferences\n.userRoot()"
+        // does not contain "Preferences.userRoot", and a test that
+        // opened a real preferences node that way went unseen
+        // (PR #291 round 3).
+        String joined = source.replaceAll("\\s+", "");
         for (SharedState state : GLOBAL_STATE) {
             boolean touches = false;
             for (String touch : state.touches()) {
-                touches |= source.contains(touch);
+                touches |= source.contains(touch)
+                        || joined.contains(touch.replaceAll("\\s+", ""));
             }
             // The read-only witnesses, exempted by pinned name
             // rather than by shape: an earlier rule exempted every

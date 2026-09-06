@@ -56,14 +56,24 @@ class ExportSheetSessionTest {
     @Test
     void theSessionAsksBeforeReplacingAndHonoursTheAnswer(
             @TempDir Path folder) throws Exception {
+        // Through the shared scratch node, which removes itself and
+        // flushes the parent. An earlier version made its own node
+        // off userRoot and left it behind on every run - and did it
+        // in wrapped syntax the scanner could not see (PR #291
+        // round 3).
+        SwingSession.scratchPreferences("export-session", node ->
+                sessionAsksBeforeReplacing(folder, node));
+    }
+
+    private void sessionAsksBeforeReplacing(Path folder,
+                                            java.util.prefs.Preferences node)
+            throws Exception {
         Path existing = Files.writeString(folder.resolve("orion.svg"),
                 "a chart the reader already had");
         ChartViewController navigation = navigation();
         ChartComponent chart = chart(navigation);
         ChartOptionsController options = new ChartOptionsController(
-                ChartOptionsStore.forNode(java.util.prefs.Preferences
-                        .userRoot().node("juranometria-export-session-"
-                                + System.nanoTime())));
+                ChartOptionsStore.forNode(node));
 
         List<String> asked = new ArrayList<>();
         var refused = assertInstanceOf(ExportSheet.Outcome.Refused.class,

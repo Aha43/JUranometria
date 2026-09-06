@@ -286,6 +286,87 @@ class ExportSheetTest {
     }
 
     @Test
+    void aRestoreThatFailsIsSaidPlainlyAndTheBytesAreKept(
+            @TempDir Path folder) throws Exception {
+        // The failure inside the failure. Putting the original back
+        // can itself fail, and the earlier version still reported
+        // "What was already there is unchanged" - which is the one
+        // thing it could not know (PR #291 round 3).
+        Path readOnly = Files.createDirectory(folder.resolve("locked"));
+        Path inside = Files.writeString(readOnly.resolve("orion.svg"),
+                "a chart the reader already had");
+        assertTrue(readOnly.toFile().setWritable(false),
+                "the test can make the folder read-only");
+        try {
+            var lost = assertThrows(ExportSheet.OriginalLostException.class,
+                    () -> ExportSheet.place("a whole sheet".getBytes(),
+                            inside, readOnly,
+                            (file, bytes) -> {
+                                Files.write(file, "half a sh".getBytes());
+                                throw new IOException("the disk filled up");
+                            }),
+                    "a write that fails and cannot be undone says so"
+                            + " as its own kind of failure");
+
+            assertTrue(lost.getMessage().contains("could not be put back"),
+                    "in words: " + lost.getMessage());
+            assertTrue(lost.rescue() != null
+                            && Files.exists(lost.rescue()),
+                    "and the reader's own bytes are kept somewhere the"
+                            + " folder's permissions cannot reach");
+            assertEquals("a chart the reader already had",
+                    Files.readString(lost.rescue()),
+                    "exactly as they were");
+            assertTrue(lost.getMessage().contains(lost.rescue().toString()),
+                    "with the message saying where: "
+                            + lost.getMessage());
+            Files.deleteIfExists(lost.rescue());
+        } finally {
+            readOnly.toFile().setWritable(true);
+        }
+    }
+
+    @Test
+    void anExportThatCannotBeUndoneNeverClaimsTheFileIsUnchanged(
+            @TempDir Path folder) throws Exception {
+        // The same thing seen from where a reader sees it: the
+        // sentence they are shown.
+        Path readOnly = Files.createDirectory(folder.resolve("locked"));
+        Files.writeString(readOnly.resolve("orion.svg"),
+                "a chart the reader already had");
+        assertTrue(readOnly.toFile().setWritable(false),
+                "the test can make the folder read-only");
+        try {
+            var refused = assertInstanceOf(
+                    ExportSheet.Outcome.Refused.class,
+                    ExportSheet.write(Atlas.assembler()::assemble, ORION,
+                            ChartOptions.DEFAULTS,
+                            ChartRenderer.ReferenceLayer.NONE,
+                            new ExportSheet.Request(SheetFormat.SVG,
+                                    PaperSize.A4, 150, false),
+                            readOnly.resolve("orion.svg").toFile(),
+                            existing -> true,
+                            (file, bytes) -> {
+                                Files.write(file, "half a sh".getBytes());
+                                throw new IOException("the disk filled up");
+                            }),
+                    "the export is refused");
+
+            assertTrue(refused.reason().contains("could not be put back"),
+                    "and says what actually happened: "
+                            + refused.reason());
+            assertFalse(refused.reason().contains("unchanged"),
+                    "never calling the reader's file unchanged when it"
+                            + " is not: " + refused.reason());
+            assertTrue(refused.reason().contains("juranometria-original-"),
+                    "and telling them where their own bytes are: "
+                            + refused.reason());
+        } finally {
+            readOnly.toFile().setWritable(true);
+        }
+    }
+
+    @Test
     void aReplacementInAReadOnlyFolderStillWorks(@TempDir Path folder)
             throws Exception {
         // Replacing a writable file inside a folder that is not

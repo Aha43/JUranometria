@@ -102,6 +102,16 @@ public final class ExportSheet {
                                 ChartRenderer.ReferenceLayer ink,
                                 Request request, File destination,
                                 ReplaceDecision replace) {
+        return write(pages, state, options, ink, request, destination,
+                replace, SINK);
+    }
+
+    /** The same, writing however it is told to - a seam for tests. */
+    static Outcome write(ChartSheet.Pages pages,
+                         ChartViewState state, ChartOptions options,
+                         ChartRenderer.ReferenceLayer ink,
+                         Request request, File destination,
+                         ReplaceDecision replace, ByteSink sink) {
         if (destination == null) {
             return new Outcome.Refused("No file was chosen.");
         }
@@ -151,17 +161,51 @@ public final class ExportSheet {
                     + failure.getMessage());
         }
 
+        boolean replacing = file.exists();
         try {
-            place(bytes, file.toPath(), parent.toPath(), SINK);
+            place(bytes, file.toPath(), parent.toPath(), sink);
+        } catch (OriginalLostException lost) {
+            // Never "unchanged" here. This is the one path where the
+            // reader's own file did not survive, and saying anything
+            // reassuring about it would be a lie (PR #291 round 3).
+            return new Outcome.Refused(file.getName()
+                    + " could not be written, and " + lost.getMessage()
+                    + ".");
         } catch (IOException failure) {
             return new Outcome.Refused(file.getName()
                     + " could not be written: " + failure.getMessage()
-                    + (file.exists()
+                    + (replacing
                             ? " What was already there is unchanged."
                             : ""));
         }
         return new Outcome.Written(file.toPath(), bytes.length,
                 request.format());
+    }
+
+    /**
+     * Thrown when a write failed <em>and</em> what was there could
+     * not be put back.
+     *
+     * <p>The one outcome an export must never report vaguely. It
+     * carries where the original's bytes were set aside, so the
+     * reader is told something they can act on rather than only that
+     * something went wrong (PR #291 round 3).
+     */
+    static final class OriginalLostException extends IOException {
+
+        private static final long serialVersionUID = 1L;
+
+        private final transient Path rescue;
+
+        OriginalLostException(String message, Path rescue,
+                              Throwable cause) {
+            super(message, cause);
+            this.rescue = rescue;
+        }
+
+        Path rescue() {
+            return rescue;
+        }
     }
 
     /** How bytes reach a path; a seam so a failure can be tried. */
@@ -200,26 +244,44 @@ public final class ExportSheet {
     static void place(byte[] bytes, Path file, Path parent, ByteSink sink)
             throws IOException {
         if (!java.nio.file.Files.isWritable(parent)) {
-            byte[] wasThere = Files.exists(file)
-                    ? Files.readAllBytes(file) : null;
+            if (!Files.exists(file)) {
+                // Nothing to lose: a folder that cannot be written
+                // to has no new file to give, and the sink will say
+                // so.
+                sink.write(file, bytes);
+                return;
+            }
+            // A copy of the reader's own bytes, kept somewhere the
+            // folder's permissions cannot reach, so that a failed
+            // restore is recoverable rather than final.
+            Path rescue = Files.createTempFile("juranometria-original-",
+                    "-" + file.getFileName());
+            Files.copy(file, rescue,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            boolean rescueIsTheOnlyCopy = false;
             try {
                 sink.write(file, bytes);
             } catch (IOException failure) {
-                if (wasThere == null) {
-                    throw failure;
-                }
                 try {
-                    sink.write(file, wasThere);
+                    sink.write(file, Files.readAllBytes(rescue));
                 } catch (IOException lost) {
-                    IOException both = new IOException(
-                            "the export failed and what was in "
-                                    + file.getFileName()
-                                    + " could not be put back",
-                            failure);
-                    both.addSuppressed(lost);
-                    throw both;
+                    rescueIsTheOnlyCopy = true;
+                    throw new OriginalLostException(
+                            "the export failed and " + file.getFileName()
+                                    + " could not be put back as it"
+                                    + " was; a copy of what was in it"
+                                    + " is at " + rescue,
+                            rescue, failure);
                 }
                 throw failure;
+            } finally {
+                // Never a return in here: one swallowed the very
+                // exception this path exists to report, in the first
+                // version of it. The copy goes unless it is the only
+                // one left of the reader's bytes.
+                if (!rescueIsTheOnlyCopy) {
+                    Files.deleteIfExists(rescue);
+                }
             }
             return;
         }

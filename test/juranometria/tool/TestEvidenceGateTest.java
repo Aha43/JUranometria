@@ -114,6 +114,40 @@ class TestEvidenceGateTest {
     // ---- guard G1: global state is protected ------------------------
 
     @Test
+    void aTouchSplitAcrossTwoLinesIsStillATouch() {
+        // The scanner matched its markers against the source as
+        // written, so a wrapped call was invisible to it - and one
+        // was: a test opened a real preferences node as
+        // "Preferences\n.userRoot()" and left it behind on every run
+        // (PR #291 round 3). A line break is formatting, not
+        // permission.
+        TestEvidenceScan.File wrapped = TestEvidenceScan.classify(
+                "Fixture.java",
+                "class Fixture { void go() {"
+                        + " var node = java.util.prefs.Preferences\n"
+                        + "        .userRoot().node(\"scratch\"); } }");
+        assertTrue(wrapped.globalState().contains("preferences"),
+                "a wrapped call reaches process-wide state exactly as"
+                        + " an unwrapped one does: "
+                        + wrapped.globalState());
+        assertTrue(wrapped.stateClass().contains("UNPROTECTED"),
+                "and is unprotected when nothing puts it back: "
+                        + wrapped.stateClass());
+
+        TestEvidenceScan.File onOneLine = TestEvidenceScan.classify(
+                "Fixture.java",
+                "class Fixture { void go() {"
+                        // Split so that this file, which the same
+                        // scanner reads, does not read as a test that
+                        // opens preferences itself.
+                        + " var node = Preferences.user"
+                        + "Root().node(\"scratch\"); } }");
+        assertEquals(onOneLine.globalState(), wrapped.globalState(),
+                "the two are the same call and are classified the"
+                        + " same way");
+    }
+
+    @Test
     void aTouchWithNoRestoreIsCaughtAndTheDebtIsPinned()
             throws IOException {
         // The mechanism, proven on fixtures that do the wrong
