@@ -43,8 +43,13 @@ public final class SwingSession {
      * standing rule, which the first version of these guards got
      * backwards by letting a failing restore replace the failure a
      * reader actually needed to see (review).
+     *
+     * <p>Public since #275, so a test that must put a window away
+     * whatever happens uses this rule rather than writing a second
+     * copy of it. A window left showing by a failing assertion is a
+     * window the next display test inherits.
      */
-    static void guarded(Body body, Body cleanup) throws Exception {
+    public static void guarded(Body body, Body cleanup) throws Exception {
         Throwable primary = null;
         try {
             body.run();

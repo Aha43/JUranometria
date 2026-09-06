@@ -200,7 +200,7 @@ chart would not need to change to accept them.
 
 ## Every review correction, by round
 
-Twenty-eight findings across five gated issues. **Not one touched the
+Twenty-nine findings across five gated issues. **Not one touched the
 astronomy, the module design, the layering or the lifecycle** — the
 geometry was right from the first push of each issue. Every finding
 was about evidence.
@@ -245,7 +245,7 @@ fail; two statements the test repeated by hand; and a `null` the
 test found convenient, which allowed a loaded module with no
 control.
 
-**#275, this close — four rounds.** Four assertions in the closing
+**#275, this close — five rounds.** Four assertions in the closing
 journey that looked like they walked the journey and did not: it
 checked landmark geometry through the *static model* rather than
 the module's contributed and painted landmark; it counted the
@@ -279,6 +279,13 @@ Reset view through the shared `ReaderInput.click`, which proves the
 control is showing, has a size, and that the point pressed lies
 inside its visible rectangle before it dispatches anything. That
 makes the journey display-dependent, and it says so.
+
+And a fifth: the window was disposed only after every assertion
+passed, so a failing walk would have left it showing for the next
+display test to inherit. The walk is now wrapped in the shared
+`SwingSession.guarded`, which runs the cleanup on the event thread
+and keeps the primary failure primary — the same rule the packaged
+acceptance uses when it restores a reader's preferences.
 
 ### What I got wrong about my own process
 
