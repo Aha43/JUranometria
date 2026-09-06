@@ -208,7 +208,7 @@ class SheetGeometryTest {
      * recorder by sharing it.
      */
     private static List<double[]> pathCentres(String svg) {
-        String ink = svg.substring(svg.indexOf("<g id=\"ink\""));
+        String ink = svg.substring(svg.indexOf("<g id=\"chart\""));
         List<double[]> centres = new ArrayList<>();
         Matcher each = Pattern.compile("<path d=\"([^\"]+)\"")
                 .matcher(ink);

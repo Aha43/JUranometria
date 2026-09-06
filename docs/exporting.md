@@ -12,7 +12,10 @@ on. Nothing is added and nothing is left out.
 
 ## The three formats
 
-**SVG** — a drawing you can open and change. Every line is a line and
+**SVG** — a drawing you can open and change. Ink and labels carry
+their own classes, so an editor can still select one kind at a time;
+they are written in the order the chart drew them, which is what
+keeps the title box opaque over the map beneath it. Every line is a line and
 every label is text, so you can retype a name, delete a label that is
 in your way, change a colour, or add your own note, in Inkscape or
 any other vector editor. It is the smallest of the three.

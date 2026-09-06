@@ -1136,7 +1136,7 @@ class SprintTwentyNineJourneyTest {
         List<double[]> boxes = new ArrayList<>();
         var each = java.util.regex.Pattern.compile(
                         "<path d=\"([^\"]+)\"([^/]*)/>")
-                .matcher(svg.substring(svg.indexOf("<g id=\"ink\"")));
+                .matcher(svg.substring(svg.indexOf("<g id=\"chart\"")));
         while (each.find()) {
             List<Double> numbers = new ArrayList<>();
             var number = java.util.regex.Pattern
@@ -1165,7 +1165,7 @@ class SprintTwentyNineJourneyTest {
     private static List<double[]> pathCentres(String svg) {
         List<double[]> centres = new ArrayList<>();
         var each = java.util.regex.Pattern.compile("<path d=\"([^\"]+)\"")
-                .matcher(svg.substring(svg.indexOf("<g id=\"ink\"")));
+                .matcher(svg.substring(svg.indexOf("<g id=\"chart\"")));
         while (each.find()) {
             List<Double> numbers = new ArrayList<>();
             var number = java.util.regex.Pattern

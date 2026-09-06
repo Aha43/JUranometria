@@ -177,6 +177,18 @@ tests that looked like proof and were not.
     object is an outline. The same mutation now reports 743 of 743
     absent, in both vector formats.
 
+### #287, the physical inspection (PR #292)
+
+47. **A constellation name printed through the title box.** The
+    recorder kept shapes and text apart and every writer emitted all
+    of one and then all of the other, which is not the order the
+    chart draws in. "CANIS MAJOR" read straight through the title
+    box of every exported Orion sheet, in SVG, PDF and PNG alike.
+    Found by **printing a sheet and looking at it** — twenty rounds
+    of review and nine hundred automated checks had all passed over
+    it. There is one operation sequence now, and the writers walk it
+    in order.
+
 ### What CI found that review did not
 
 - The released-page oracle was not portable, and I answered that with
@@ -217,6 +229,13 @@ times a container answered it in minutes.
   transform" form.
 - The packaged native image writes all three formats and reads them
   back, on every platform in the matrix.
+
+**Done by the owner, and it found something:** the printed sheet
+showed a constellation name reading through the title box — a defect
+in all three formats that no automated evidence had caught, and the
+reason the gate insisted on this step. It is fixed and regressed;
+the ruler measurements and the legibility judgment are still to come
+against the corrected sheet.
 
 **Owed, and not done:**
 
