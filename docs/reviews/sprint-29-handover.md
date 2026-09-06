@@ -169,10 +169,13 @@ tests that looked like proof and were not.
     the chart and then asks for fewer stars, which leaves one of them
     on the page and no longer drawn — the case that gets a cross.
 46. The PDF oracle accepted any nearby coordinate as a mark: with
-    every star disc removed it still reported 70 of 743 present. Both
-    vector oracles now match a mark by its own shape — centred on the
-    object and the size the renderer drew it — and the same mutation
-    now reports 742 of 743 absent.
+    every star disc removed it still reported 70 of 743 present.
+    Matching by place and size cut that to one, and one is still a
+    false accept — a stroked shape of the same width in the same
+    spot answering for a filled disc. The oracles now match by
+    place, size **and kind**: a star is a filled disc, a deep-sky
+    object is an outline. The same mutation now reports 743 of 743
+    absent, in both vector formats.
 
 ### What CI found that review did not
 

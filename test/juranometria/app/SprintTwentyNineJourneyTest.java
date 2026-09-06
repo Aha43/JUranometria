@@ -986,14 +986,20 @@ class SprintTwentyNineJourneyTest {
             }
             checked++;
             double across = 2.0 * mark.reach();
-            if (!drawnAt(inSvg, x, y, across)) {
+            // A star is a filled disc and a deep-sky object is an
+            // outline, so the kind is part of the mark's identity.
+            // Without it a stroked line of the right length at the
+            // right place answers for a disc, and one still did
+            // after the size check was added (PR #292 re-review).
+            boolean filled = mark.kind() == ChartRenderer.DrawnMark.Kind.STAR;
+            if (!drawnAt(inSvg, x, y, across, filled)) {
                 missingFromSvg++;
             }
             // The PDF's own coordinates are the chart's, after the
             // one flip at the top of its content stream, so a mark
             // is looked for where the sky puts it and at the size
             // the renderer gave it, just as in the SVG.
-            if (!drawnAt(inPdf, x, y, across)) {
+            if (!drawnAt(inPdf, x, y, across, filled)) {
                 missingFromPdf++;
             }
             // The furniture is opaque and drawn last - the title
@@ -1048,12 +1054,20 @@ class SprintTwentyNineJourneyTest {
         return false;
     }
 
-    /** Whether a shape of this size is drawn at this place. */
+    /**
+     * Whether a shape of this size and kind is drawn at this place.
+     *
+     * <p>Place, size and kind together. Two of the three were not
+     * enough: with every star disc removed, one mark was still
+     * answered for by other ink of the same width in the same spot.
+     */
     private static boolean drawnAt(List<double[]> boxes, double x,
-                                   double y, double across) {
+                                   double y, double across,
+                                   boolean filled) {
         return boxes.stream().anyMatch(box ->
                 Math.hypot(box[0] - x, box[1] - y) < 0.51
-                        && Math.abs(box[2] - across) < 0.6);
+                        && Math.abs(box[2] - across) < 0.6
+                        && (box[3] > 0.5) == filled);
     }
 
     /**
@@ -1105,7 +1119,8 @@ class SprintTwentyNineJourneyTest {
                 open = false;
             } else if (open && (line.equals("f") || line.equals("S"))) {
                 boxes.add(new double[] {(minX + maxX) / 2.0,
-                        (minY + maxY) / 2.0, maxX - minX});
+                        (minY + maxY) / 2.0, maxX - minX,
+                        line.equals("f") ? 1.0 : 0.0});
                 minX = Double.MAX_VALUE;
                 minY = Double.MAX_VALUE;
                 maxX = -Double.MAX_VALUE;
@@ -1116,10 +1131,11 @@ class SprintTwentyNineJourneyTest {
         return boxes;
     }
 
-    /** Each drawn path as centre x, centre y, width. */
+    /** Each drawn path as centre x, centre y, width, filled. */
     private static List<double[]> pathBoxes(String svg) {
         List<double[]> boxes = new ArrayList<>();
-        var each = java.util.regex.Pattern.compile("<path d=\"([^\"]+)\"")
+        var each = java.util.regex.Pattern.compile(
+                        "<path d=\"([^\"]+)\"([^/]*)/>")
                 .matcher(svg.substring(svg.indexOf("<g id=\"ink\"")));
         while (each.find()) {
             List<Double> numbers = new ArrayList<>();
@@ -1140,7 +1156,8 @@ class SprintTwentyNineJourneyTest {
                 maxY = Math.max(maxY, numbers.get(i + 1));
             }
             boxes.add(new double[] {(minX + maxX) / 2.0,
-                    (minY + maxY) / 2.0, maxX - minX});
+                    (minY + maxY) / 2.0, maxX - minX,
+                    each.group(2).contains(" fill=\"#") ? 1.0 : 0.0});
         }
         return boxes;
     }
