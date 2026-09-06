@@ -90,8 +90,12 @@ public final class ExportSheetDialog extends JDialog {
         format.setName(FORMAT_BOX);
         format.setSelectedItem(initial.format());
         format.getAccessibleContext().setAccessibleName("Format");
-        format.setRenderer(described(each ->
-                each.readableName() + " - " + each.explanation()));
+        // The name only. The explanation used to live in here, and
+        // a combo is as wide as its widest entry: on a machine with
+        // wider fonts at enlarged text the dialog grew past the
+        // narrowest window the atlas supports (CI on PR #291). It is
+        // a line of its own below now, where it can wrap.
+        format.setRenderer(described(SheetFormat::readableName));
 
         JComboBox<PaperSize> paper = new JComboBox<>(PaperSize.values());
         paper.setName(PAPER_BOX);
@@ -108,8 +112,9 @@ public final class ExportSheetDialog extends JDialog {
         resolution.getAccessibleContext().setAccessibleName("Resolution");
         resolution.setRenderer(described(dpi -> dpi + " dots per inch"));
 
-        JCheckBox working = new JCheckBox(
-                "Include the working selection's marks");
+        JCheckBox working = new JCheckBox("<html><body"
+                + " style='width:260px'>Include the working"
+                + " selection's marks</body></html>");
         working.setName(WORKING_BOX);
         working.setSelected(initial.workingSelection());
         working.getAccessibleContext().setAccessibleName(
@@ -119,6 +124,14 @@ public final class ExportSheetDialog extends JDialog {
                         + " Off by default: a sheet outlives the"
                         + " session that made it.");
 
+        JLabel explanation = new JLabel();
+        explanation.setName("export.explanation");
+        Runnable explain = () -> explanation.setText("<html><body"
+                + " style='width:220px'>"
+                + ((SheetFormat) format.getSelectedItem()).explanation()
+                + "</body></html>");
+        explain.run();
+
         JLabel resolutionLabel = new JLabel("Resolution:");
         resolutionLabel.setLabelFor(resolution);
         Runnable followFormat = () -> {
@@ -127,7 +140,10 @@ public final class ExportSheetDialog extends JDialog {
             resolution.setEnabled(pixels);
             resolutionLabel.setEnabled(pixels);
         };
-        format.addActionListener(event -> followFormat.run());
+        format.addActionListener(event -> {
+            followFormat.run();
+            explain.run();
+        });
         followFormat.run();
 
         JPanel fields = new JPanel(new GridBagLayout());
@@ -144,8 +160,13 @@ public final class ExportSheetDialog extends JDialog {
         at.weightx = 1.0;
         fields.add(format, at);
 
-        at.gridx = 0;
+        at.gridx = 1;
         at.gridy = 1;
+        at.fill = GridBagConstraints.HORIZONTAL;
+        fields.add(explanation, at);
+
+        at.gridx = 0;
+        at.gridy = 2;
         at.fill = GridBagConstraints.NONE;
         at.weightx = 0;
         JLabel paperLabel = new JLabel("Paper:");
@@ -157,7 +178,7 @@ public final class ExportSheetDialog extends JDialog {
         fields.add(paper, at);
 
         at.gridx = 0;
-        at.gridy = 2;
+        at.gridy = 3;
         at.fill = GridBagConstraints.NONE;
         at.weightx = 0;
         fields.add(resolutionLabel, at);
@@ -166,8 +187,14 @@ public final class ExportSheetDialog extends JDialog {
         at.weightx = 1.0;
         fields.add(resolution, at);
 
-        at.gridx = 0;
+        at.gridx = 1;
         at.gridy = 3;
+        at.fill = GridBagConstraints.HORIZONTAL;
+        at.weightx = 1.0;
+        fields.add(resolution, at);
+
+        at.gridx = 0;
+        at.gridy = 4;
         at.gridwidth = 2;
         at.fill = GridBagConstraints.NONE;
         fields.add(working, at);

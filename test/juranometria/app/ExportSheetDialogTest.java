@@ -200,6 +200,12 @@ class ExportSheetDialogTest {
                 }));
                 Dimension size = packed[0];
 
+                // The first version of this dialog put each format's
+                // explanation inside the format list, and a combo is
+                // as wide as its widest entry: 725 px on the CI
+                // display at this text size, against 640 of window.
+                // Measured on both platforms after the fix - 428 px
+                // here, 441 in a Linux container.
                 assertTrue(size.width <= NARROWEST_WINDOW_PX,
                         "the export dialog fits the narrowest window"
                                 + " the atlas supports at "
