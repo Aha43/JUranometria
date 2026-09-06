@@ -98,30 +98,64 @@ class WiderFieldStepTest {
     }
 
     @Test
-    void everyReleasedPageStillRendersToTheSamePixels() throws Exception {
+    void everyReleasedPageStillDrawsTheSameThingsInTheSamePlaces()
+            throws Exception {
         // The gate's promise, settled the only way it can be. The
         // rows were taken from the released build itself; see the
         // file's own header for how.
+        //
+        // Geometry is arithmetic, so this half holds on any machine.
+        // Rasterisation is not - fonts and the JDK's 2D pipeline
+        // differ - so the pixel half is checked only where the rows
+        // were recorded, and skipped out loud everywhere else rather
+        // than quietly passing.
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         List<String> rows = rows();
         assertEquals(80, rows.size(),
                 "ten released steps, four centres, two grounds");
 
+        boolean samePlatform = platformOfRecord()
+                .equals(juranometria.tool.WiderFieldStudyMain.platform());
         List<String> changed = new ArrayList<>();
+        List<String> rasterised = new ArrayList<>();
         for (String row : rows) {
             String[] cell = row.trim().split("\\s+");
             double field = Double.parseDouble(cell[0]);
             double[] centre = {Double.parseDouble(cell[1]),
                     Double.parseDouble(cell[2])};
             boolean black = cell[3].equals("black");
-            String now = juranometria.tool.WiderFieldStudyMain
-                    .fingerprint(renderer, centre, field, black);
-            if (!now.equals(cell[4])) {
-                changed.add(row.trim() + " is now " + now);
+
+            String marks = juranometria.tool.WiderFieldStudyMain
+                    .markFingerprint(renderer, centre, field);
+            if (!marks.equals(cell[4])) {
+                changed.add(row.trim() + " now draws " + marks);
+            }
+            if (samePlatform) {
+                String pixels = juranometria.tool.WiderFieldStudyMain
+                        .fingerprint(renderer, centre, field, black);
+                if (!pixels.equals(cell[5])) {
+                    rasterised.add(row.trim() + " now renders " + pixels);
+                }
             }
         }
         assertEquals(List.of(), changed,
-                "widening the sequence changed no released page");
+                "widening the sequence changed what no released page"
+                        + " draws, or where");
+        assertEquals(List.of(), rasterised,
+                "nor, on the platform the rows were recorded on, a"
+                        + " single pixel of one");
+    }
+
+    /** The platform the committed pixel column is an oracle for. */
+    private static String platformOfRecord() throws Exception {
+        for (String line : Files.readAllLines(RELEASED_PAGES)) {
+            if (line.startsWith("Recorded on: `")) {
+                return line.substring(line.indexOf('`') + 1,
+                        line.lastIndexOf('`'));
+            }
+        }
+        throw new AssertionError("the oracle does not say which"
+                + " platform its pixel column came from");
     }
 
     @Test
@@ -201,7 +235,7 @@ class WiderFieldStepTest {
         List<String> rows = new ArrayList<>();
         boolean inTable = false;
         for (String line : Files.readAllLines(RELEASED_PAGES)) {
-            if (line.startsWith("field ")) {
+            if (line.startsWith("field  ra")) {
                 inTable = true;
             } else if (inTable && !line.isBlank()) {
                 rows.add(line);

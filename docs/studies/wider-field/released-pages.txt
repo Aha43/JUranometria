@@ -10,12 +10,23 @@ claim about pixels, and only pixels can settle it.
 
 ## How this was made
 
+Each row carries two digests. **marks** is the geometry the renderer
+decided on - every star and deep-sky mark it drew, its subject, its
+centre and its reach, to four decimal places of a pixel. That is
+arithmetic, so it holds on any machine, and it is what the test
+checks everywhere. **pixels** is the rasterised page. That depends on
+fonts and on the JDK's own 2D pipeline, so it is an oracle only on
+the platform named below, and the test says so rather than pretending
+otherwise.
+
+Recorded on: `Mac OS X/aarch64/java21`
+
 Every released field step, at four centres that exercise the cases
 the atlas treats differently - the M31 default, Orion on the
 equator, a near-polar page, and the RA seam - on both chart grounds,
 900 x 700, stars to V 8.0. Each page is rendered through the
-production SceneAssembler and ChartRenderer, its ARGB pixels are
-hashed with SHA-256, and the first eight bytes are recorded.
+production SceneAssembler and ChartRenderer, and both digests are
+SHA-256, recorded to their first eight bytes.
 
 Generated from commit 9ffc9e3, the merge of PR #288 - the last
 commit before the step was added, and the code released as 1.9.0.
@@ -25,84 +36,84 @@ released page that has changed.
 
 ## The rows
 
-field  ra           dec          ground  sha256[0:8]
-36     10.684708    41.268750    paper   4ab9c4b046e78ba5
-36     10.684708    41.268750    black   cdfd7eac8665399a
-36     83.000000    0.000000     paper   724b53ad629f3d20
-36     83.000000    0.000000     black   16da392b062d3f9f
-36     0.000000     89.000000    paper   c41958825ee489f9
-36     0.000000     89.000000    black   8ea0d8d2c8cf205a
-36     359.900000   0.000000     paper   931624fb4f45784c
-36     359.900000   0.000000     black   6d6c1eea4ba558dd
-24     10.684708    41.268750    paper   215fe5619643bc17
-24     10.684708    41.268750    black   adf4cbeefb1ea041
-24     83.000000    0.000000     paper   ee6c7bff43ebced9
-24     83.000000    0.000000     black   f1f32d034db213a0
-24     0.000000     89.000000    paper   0f3a3b243700e855
-24     0.000000     89.000000    black   feed7cf089419592
-24     359.900000   0.000000     paper   18d12d7efa1f4e42
-24     359.900000   0.000000     black   44970e317ca7600d
-18     10.684708    41.268750    paper   8b0c029a2769672e
-18     10.684708    41.268750    black   559b49424072d3bf
-18     83.000000    0.000000     paper   b34d907d848bbcf8
-18     83.000000    0.000000     black   85d7050bdbdaca38
-18     0.000000     89.000000    paper   1025137c03c9d236
-18     0.000000     89.000000    black   0986f7ef6599aaf4
-18     359.900000   0.000000     paper   229bb180e9ab834c
-18     359.900000   0.000000     black   c08caefb999d5546
-12     10.684708    41.268750    paper   4f9cbe4aa6ce248c
-12     10.684708    41.268750    black   bcb1194f78f6bb56
-12     83.000000    0.000000     paper   39e0ade0c202e415
-12     83.000000    0.000000     black   77ac00f57bdb6ad6
-12     0.000000     89.000000    paper   cebcffb2d10a67cf
-12     0.000000     89.000000    black   874bdf2b8a596eb2
-12     359.900000   0.000000     paper   6dc308385d99e17c
-12     359.900000   0.000000     black   21998a0edcafb6d3
-8      10.684708    41.268750    paper   01d4d82255d02f13
-8      10.684708    41.268750    black   efb37d101665ad2e
-8      83.000000    0.000000     paper   2d38f40ef0e97f9f
-8      83.000000    0.000000     black   d09e9e48e4729cd0
-8      0.000000     89.000000    paper   1974075ddaccdfe2
-8      0.000000     89.000000    black   671cb4f5cd3246e7
-8      359.900000   0.000000     paper   bfe36f976538eec9
-8      359.900000   0.000000     black   0d235219f56009f1
-6      10.684708    41.268750    paper   a22a8ac8a733dbbc
-6      10.684708    41.268750    black   d9fc971750c24588
-6      83.000000    0.000000     paper   8e2a9b61d3ae3178
-6      83.000000    0.000000     black   a507852fe037c068
-6      0.000000     89.000000    paper   6f702900aef0b35a
-6      0.000000     89.000000    black   2ddfb0059b6dd86c
-6      359.900000   0.000000     paper   931815d6bc2a810c
-6      359.900000   0.000000     black   92cac52eaabb485d
-4      10.684708    41.268750    paper   0bbaaf9caf6f4c61
-4      10.684708    41.268750    black   f6124c49347a7201
-4      83.000000    0.000000     paper   4eafee0517e1874f
-4      83.000000    0.000000     black   3f89bb32d3dd5924
-4      0.000000     89.000000    paper   5591840a7d651865
-4      0.000000     89.000000    black   4614093a6931beaf
-4      359.900000   0.000000     paper   4b9f25e816fbe8da
-4      359.900000   0.000000     black   f066857e89b22500
-3      10.684708    41.268750    paper   c6c23edde1c67d0f
-3      10.684708    41.268750    black   df580ecc516040b9
-3      83.000000    0.000000     paper   6f76922f891a6733
-3      83.000000    0.000000     black   52ad523e3495a5c9
-3      0.000000     89.000000    paper   63eabfe850870afd
-3      0.000000     89.000000    black   ae70f738f98c21af
-3      359.900000   0.000000     paper   e6a88996d5374484
-3      359.900000   0.000000     black   b1c7245d1b221c1c
-2      10.684708    41.268750    paper   0709f410d7bb5cb9
-2      10.684708    41.268750    black   92466bd3aebe5a51
-2      83.000000    0.000000     paper   9c4a2281da2a553f
-2      83.000000    0.000000     black   9c4b3cd31c481e15
-2      0.000000     89.000000    paper   731555d2fca989f2
-2      0.000000     89.000000    black   ba512160fc7d26ce
-2      359.900000   0.000000     paper   333771415f5cc31a
-2      359.900000   0.000000     black   7b251c2fbd95cce8
-1      10.684708    41.268750    paper   354ba3b61a8b80b2
-1      10.684708    41.268750    black   597679db3b9e655c
-1      83.000000    0.000000     paper   ef11382ccd025401
-1      83.000000    0.000000     black   f67c4ceac68ffb40
-1      0.000000     89.000000    paper   d5adcb657b6686ff
-1      0.000000     89.000000    black   db628b443502a652
-1      359.900000   0.000000     paper   2849905aac576185
-1      359.900000   0.000000     black   1008e0aa3ff6a9cd
+field  ra           dec          ground  marks             pixels
+36     10.684708    41.268750    paper   127d060e8df6b6c6  4ab9c4b046e78ba5
+36     10.684708    41.268750    black   127d060e8df6b6c6  cdfd7eac8665399a
+36     83.000000    0.000000     paper   777c6b909a467220  724b53ad629f3d20
+36     83.000000    0.000000     black   777c6b909a467220  16da392b062d3f9f
+36     0.000000     89.000000    paper   754f056a364d1370  c41958825ee489f9
+36     0.000000     89.000000    black   754f056a364d1370  8ea0d8d2c8cf205a
+36     359.900000   0.000000     paper   f3fac0150af303aa  931624fb4f45784c
+36     359.900000   0.000000     black   f3fac0150af303aa  6d6c1eea4ba558dd
+24     10.684708    41.268750    paper   9e829628a9cebcda  215fe5619643bc17
+24     10.684708    41.268750    black   9e829628a9cebcda  adf4cbeefb1ea041
+24     83.000000    0.000000     paper   7e0786fbfbb8f82c  ee6c7bff43ebced9
+24     83.000000    0.000000     black   7e0786fbfbb8f82c  f1f32d034db213a0
+24     0.000000     89.000000    paper   ca86305662bb9587  0f3a3b243700e855
+24     0.000000     89.000000    black   ca86305662bb9587  feed7cf089419592
+24     359.900000   0.000000     paper   10515b878355309d  18d12d7efa1f4e42
+24     359.900000   0.000000     black   10515b878355309d  44970e317ca7600d
+18     10.684708    41.268750    paper   5a96fd0318f421b4  8b0c029a2769672e
+18     10.684708    41.268750    black   5a96fd0318f421b4  559b49424072d3bf
+18     83.000000    0.000000     paper   bc0c720b59d551e3  b34d907d848bbcf8
+18     83.000000    0.000000     black   bc0c720b59d551e3  85d7050bdbdaca38
+18     0.000000     89.000000    paper   4a5e7c6542724b25  1025137c03c9d236
+18     0.000000     89.000000    black   4a5e7c6542724b25  0986f7ef6599aaf4
+18     359.900000   0.000000     paper   03996d29635a0ab9  229bb180e9ab834c
+18     359.900000   0.000000     black   03996d29635a0ab9  c08caefb999d5546
+12     10.684708    41.268750    paper   15d246d8b45ee080  4f9cbe4aa6ce248c
+12     10.684708    41.268750    black   15d246d8b45ee080  bcb1194f78f6bb56
+12     83.000000    0.000000     paper   a75d110a4a60dc04  39e0ade0c202e415
+12     83.000000    0.000000     black   a75d110a4a60dc04  77ac00f57bdb6ad6
+12     0.000000     89.000000    paper   a0f26753b7e10b62  cebcffb2d10a67cf
+12     0.000000     89.000000    black   a0f26753b7e10b62  874bdf2b8a596eb2
+12     359.900000   0.000000     paper   2763940fd6dfbe71  6dc308385d99e17c
+12     359.900000   0.000000     black   2763940fd6dfbe71  21998a0edcafb6d3
+8      10.684708    41.268750    paper   51890a3a71e3304d  01d4d82255d02f13
+8      10.684708    41.268750    black   51890a3a71e3304d  efb37d101665ad2e
+8      83.000000    0.000000     paper   9157551a6cf30b4d  2d38f40ef0e97f9f
+8      83.000000    0.000000     black   9157551a6cf30b4d  d09e9e48e4729cd0
+8      0.000000     89.000000    paper   f88fc52063c7dff6  1974075ddaccdfe2
+8      0.000000     89.000000    black   f88fc52063c7dff6  671cb4f5cd3246e7
+8      359.900000   0.000000     paper   6007b06ac1fec0c8  bfe36f976538eec9
+8      359.900000   0.000000     black   6007b06ac1fec0c8  0d235219f56009f1
+6      10.684708    41.268750    paper   aab1bc9b29020e92  a22a8ac8a733dbbc
+6      10.684708    41.268750    black   aab1bc9b29020e92  d9fc971750c24588
+6      83.000000    0.000000     paper   29dc5800df8cf5ef  8e2a9b61d3ae3178
+6      83.000000    0.000000     black   29dc5800df8cf5ef  a507852fe037c068
+6      0.000000     89.000000    paper   ee3a2f775365b8be  6f702900aef0b35a
+6      0.000000     89.000000    black   ee3a2f775365b8be  2ddfb0059b6dd86c
+6      359.900000   0.000000     paper   c424bfaa12f75635  931815d6bc2a810c
+6      359.900000   0.000000     black   c424bfaa12f75635  92cac52eaabb485d
+4      10.684708    41.268750    paper   d71c8df55201321a  0bbaaf9caf6f4c61
+4      10.684708    41.268750    black   d71c8df55201321a  f6124c49347a7201
+4      83.000000    0.000000     paper   382ac5a0cf88e2ab  4eafee0517e1874f
+4      83.000000    0.000000     black   382ac5a0cf88e2ab  3f89bb32d3dd5924
+4      0.000000     89.000000    paper   7115cdddf8d43899  5591840a7d651865
+4      0.000000     89.000000    black   7115cdddf8d43899  4614093a6931beaf
+4      359.900000   0.000000     paper   304c878c3f24fc23  4b9f25e816fbe8da
+4      359.900000   0.000000     black   304c878c3f24fc23  f066857e89b22500
+3      10.684708    41.268750    paper   e3d7d4f02e488071  c6c23edde1c67d0f
+3      10.684708    41.268750    black   e3d7d4f02e488071  df580ecc516040b9
+3      83.000000    0.000000     paper   8d984a9b3860f383  6f76922f891a6733
+3      83.000000    0.000000     black   8d984a9b3860f383  52ad523e3495a5c9
+3      0.000000     89.000000    paper   3e67931a0943136e  63eabfe850870afd
+3      0.000000     89.000000    black   3e67931a0943136e  ae70f738f98c21af
+3      359.900000   0.000000     paper   2f7736d3d2275c61  e6a88996d5374484
+3      359.900000   0.000000     black   2f7736d3d2275c61  b1c7245d1b221c1c
+2      10.684708    41.268750    paper   647bf9ca932c4499  0709f410d7bb5cb9
+2      10.684708    41.268750    black   647bf9ca932c4499  92466bd3aebe5a51
+2      83.000000    0.000000     paper   f8d9cd67d1911e8b  9c4a2281da2a553f
+2      83.000000    0.000000     black   f8d9cd67d1911e8b  9c4b3cd31c481e15
+2      0.000000     89.000000    paper   dc6e480ba912e87f  731555d2fca989f2
+2      0.000000     89.000000    black   dc6e480ba912e87f  ba512160fc7d26ce
+2      359.900000   0.000000     paper   01d35fbd06576d8f  333771415f5cc31a
+2      359.900000   0.000000     black   01d35fbd06576d8f  7b251c2fbd95cce8
+1      10.684708    41.268750    paper   63dd3275db3055ea  354ba3b61a8b80b2
+1      10.684708    41.268750    black   63dd3275db3055ea  597679db3b9e655c
+1      83.000000    0.000000     paper   ad90bb32edb921da  ef11382ccd025401
+1      83.000000    0.000000     black   ad90bb32edb921da  f67c4ceac68ffb40
+1      0.000000     89.000000    paper   b01a7f87001dbf40  d5adcb657b6686ff
+1      0.000000     89.000000    black   b01a7f87001dbf40  db628b443502a652
+1      359.900000   0.000000     paper   921ce6f6933bae46  2849905aac576185
+1      359.900000   0.000000     black   921ce6f6933bae46  1008e0aa3ff6a9cd

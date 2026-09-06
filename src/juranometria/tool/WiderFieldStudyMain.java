@@ -54,6 +54,19 @@ public final class WiderFieldStudyMain {
     /** The commit the rows were first taken from. */
     private static final String RELEASED_AT = "9ffc9e3";
 
+    /**
+     * What a page's pixels depend on besides this repository. Two
+     * machines rasterise the same geometry differently - fonts,
+     * antialiasing, the JDK's own 2D pipeline - so the pixel column
+     * is only an oracle on the platform that recorded it, and says
+     * which one that was.
+     */
+    public static String platform() {
+        return System.getProperty("os.name") + "/"
+                + System.getProperty("os.arch") + "/java"
+                + System.getProperty("java.specification.version");
+    }
+
     public static void main(String[] args) throws Exception {
         StringBuilder out = new StringBuilder();
         out.append("# Released page renders, hashed\n\n");
@@ -67,15 +80,26 @@ public final class WiderFieldStudyMain {
                 + " is a\nclaim about pixels, and only pixels can"
                 + " settle it.\n\n");
         out.append("## How this was made\n\n");
+        out.append("Each row carries two digests. **marks** is the"
+                + " geometry the renderer\ndecided on - every star and"
+                + " deep-sky mark it drew, its subject, its\ncentre and"
+                + " its reach, to four decimal places of a pixel. That"
+                + " is\narithmetic, so it holds on any machine, and it"
+                + " is what the test\nchecks everywhere. **pixels** is"
+                + " the rasterised page. That depends on\nfonts and on"
+                + " the JDK's own 2D pipeline, so it is an oracle only"
+                + " on\nthe platform named below, and the test says so"
+                + " rather than pretending\notherwise.\n\n");
+        out.append("Recorded on: `" + platform() + "`\n\n");
         out.append("Every released field step, at four centres that"
                 + " exercise the cases\nthe atlas treats differently -"
                 + " the M31 default, Orion on the\nequator, a"
                 + " near-polar page, and the RA seam - on both chart"
                 + " grounds,\n" + WIDE + " x " + HIGH + ", stars to V"
                 + " 8.0. Each page is rendered through the\nproduction"
-                + " SceneAssembler and ChartRenderer, its ARGB pixels"
-                + " are\nhashed with SHA-256, and the first eight bytes"
-                + " are recorded.\n\n");
+                + " SceneAssembler and ChartRenderer, and both digests"
+                + " are\nSHA-256, recorded to their first eight"
+                + " bytes.\n\n");
         out.append("Generated from commit " + RELEASED_AT + ", the"
                 + " merge of PR #288 - the last\ncommit before the step"
                 + " was added, and the code released as 1.9.0.\n"
@@ -85,16 +109,17 @@ public final class WiderFieldStudyMain {
                 + " changed.\n\n");
         out.append("## The rows\n\n");
         out.append("field  ra           dec          ground "
-                + " sha256[0:8]\n");
+                + " marks             pixels\n");
 
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         for (double field : RELEASED_FIELDS) {
             for (double[] centre : CENTRES) {
                 for (boolean black : new boolean[] {false, true}) {
                     out.append(String.format(Locale.ROOT,
-                            "%-6.0f %-12.6f %-12.6f %-7s %s%n",
+                            "%-6.0f %-12.6f %-12.6f %-7s %-17s %s%n",
                             field, centre[0], centre[1],
                             black ? "black" : "paper",
+                            markFingerprint(renderer, centre, field),
                             fingerprint(renderer, centre, field, black)));
                 }
             }
@@ -102,14 +127,40 @@ public final class WiderFieldStudyMain {
         System.out.print(out);
     }
 
+    /**
+     * The first eight bytes of a page's <em>geometry</em> digest:
+     * what the renderer decided to draw and where, before anything
+     * was rasterised.
+     */
+    public static String markFingerprint(ChartRenderer renderer,
+                                         double[] centre, double field)
+            throws Exception {
+        StringBuilder marks = new StringBuilder();
+        for (ChartRenderer.DrawnMark mark
+                : renderer.drawnMarks(scene(centre, field),
+                        ChartOptions.DEFAULTS)) {
+            marks.append(String.format(Locale.ROOT, "%s %s %.4f %.4f %.4f%n",
+                    mark.kind(),
+                    mark.star() != null ? mark.star().id()
+                            : mark.deepSky().id(),
+                    mark.centre().x(), mark.centre().y(), mark.reach()));
+        }
+        return digest(marks.toString()
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    private static ChartScene scene(double[] centre, double field) {
+        return Atlas.assembler().assemble(
+                new ChartViewState(
+                        new SkyPosition(centre[0], centre[1]), field, 8.0),
+                WIDE, HIGH);
+    }
+
     /** The first eight bytes of a page's pixel digest. */
     public static String fingerprint(ChartRenderer renderer, double[] centre,
                               double field, boolean black)
             throws Exception {
-        ChartScene scene = Atlas.assembler().assemble(
-                new ChartViewState(
-                        new SkyPosition(centre[0], centre[1]), field, 8.0),
-                WIDE, HIGH);
+        ChartScene scene = scene(centre, field);
         ChartOptions options = black
                 ? ChartOptions.DEFAULTS.withPalette(ChartPalette.BLACK_SKY)
                 : ChartOptions.DEFAULTS;
@@ -128,8 +179,11 @@ public final class WiderFieldStudyMain {
         for (int pixel : pixels) {
             buffer.putInt(pixel);
         }
-        byte[] digest = MessageDigest.getInstance("SHA-256")
-                .digest(buffer.array());
+        return digest(buffer.array());
+    }
+
+    private static String digest(byte[] bytes) throws Exception {
+        byte[] digest = MessageDigest.getInstance("SHA-256").digest(bytes);
         StringBuilder hex = new StringBuilder();
         for (int i = 0; i < 8; i++) {
             hex.append(String.format(Locale.ROOT, "%02x", digest[i]));
