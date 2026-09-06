@@ -184,10 +184,11 @@ tests that looked like proof and were not.
     of one and then all of the other, which is not the order the
     chart draws in. "CANIS MAJOR" read straight through the title
     box of every exported Orion sheet, in SVG, PDF and PNG alike.
-    Found by **printing a sheet and looking at it** — twenty rounds
-    of review and nine hundred automated checks had all passed over
-    it. There is one operation sequence now, and the writers walk it
-    in order.
+    Found by **opening an exported sheet and looking at it** — the
+    SVG directly, and the PDF through an independent renderer.
+    Twenty rounds of review and nine hundred automated checks had
+    all passed over it. There is one operation sequence now, and the
+    writers walk it in order.
 
 ### What CI found that review did not
 
@@ -230,12 +231,13 @@ times a container answered it in minutes.
 - The packaged native image writes all three formats and reads them
   back, on every platform in the matrix.
 
-**Done by the owner, and it found something:** the printed sheet
-showed a constellation name reading through the title box — a defect
-in all three formats that no automated evidence had caught, and the
-reason the gate insisted on this step. It is fixed and regressed;
-the ruler measurements and the legibility judgment are still to come
-against the corrected sheet.
+**Done by the owner, and it found something:** an exported sheet was
+opened and looked at — the SVG directly, the PDF through an
+independent renderer — and showed a constellation name reading
+through the title box, a defect in all three formats that no
+automated evidence had caught. That is not yet the printed
+inspection this issue owes; it is what looking at the output at all
+turned up before anything reached paper. It is fixed and regressed.
 
 **Owed, and not done:**
 
@@ -252,9 +254,12 @@ against the corrected sheet.
   2.47 mm of capital height. Print `sheet-a4.pdf` at actual size.
   The gate said this observation "can accept or revise these
   numbers", and it still can.
-- **Opening a sheet in a browser and in a vector editor.** Not
-  possible from this environment: the browser here cannot reach a
-  local file or the loopback address, and no vector editor is
+- **Opening a sheet in a vector editor.** The owner has now viewed
+  the SVG and rendered the PDF independently, which is what found
+  the paint-order defect; opening one in an editor and changing
+  something is still owed. Not possible from this environment: the
+  browser here cannot reach a local file or the loopback address,
+  and no vector editor is
   available. `docs/studies/chart-sheet/` holds four SVGs, two PDFs
   and a PNG for exactly this.
 

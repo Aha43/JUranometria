@@ -68,7 +68,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- **Constellation names no longer print through the title box.** The
+- **Constellation names no longer read through the title box.** The
   recorder kept shapes and text in two lists and every writer emitted
   all of one and then all of the other, which is not the order the
   chart draws in: it draws a name, fills the title panel over it, and
@@ -76,7 +76,9 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   back above the panel, and "CANIS MAJOR" read straight through the
   title box of every exported Orion sheet, in all three formats.
   There is one sequence now and the writers walk it in order. Found
-  by printing a sheet and looking at it.
+  by opening an exported sheet and looking at it - the SVG directly,
+  and the PDF through an independent renderer - which is what no
+  automated check in this repository had done.
 
 ### Changed
 
@@ -255,18 +257,6 @@ reader keeps every choice they had.
   in the gallery test. UI photographs appear only labelled
   "Application UI". Publication followed as issue #253
   (docs/decisions/gallery.md).
-
-### Fixed
-
-- **Constellation names no longer print through the title box.** The
-  recorder kept shapes and text in two lists and every writer emitted
-  all of one and then all of the other, which is not the order the
-  chart draws in: it draws a name, fills the title panel over it, and
-  writes the title on top. Replaying shapes-then-text lifted the name
-  back above the panel, and "CANIS MAJOR" read straight through the
-  title box of every exported Orion sheet, in all three formats.
-  There is one sequence now and the writers walk it in order. Found
-  by printing a sheet and looking at it.
 
 ### Changed
 
@@ -497,18 +487,6 @@ and its working crosses, and the closing journey.
   services nor the seam, and the atlas builds and draws its ordinary
   chart with every module absent.
 
-### Fixed
-
-- **Constellation names no longer print through the title box.** The
-  recorder kept shapes and text in two lists and every writer emitted
-  all of one and then all of the other, which is not the order the
-  chart draws in: it draws a name, fills the title panel over it, and
-  writes the title on top. Replaying shapes-then-text lifted the name
-  back above the panel, and "CANIS MAJOR" read straight through the
-  title box of every exported Orion sheet, in all three formats.
-  There is one sequence now and the writers walk it in order. Found
-  by printing a sheet and looking at it.
-
 ### Changed
 
 - The renderer's paper rectangle is now published as
@@ -680,18 +658,6 @@ over all 13,371 bundled deep-sky rows, and reviewed at every step.
   control: every family shows the mark the chart actually draws for
   it, with a sentence saying what the family holds and objects you
   may know.
-
-### Fixed
-
-- **Constellation names no longer print through the title box.** The
-  recorder kept shapes and text in two lists and every writer emitted
-  all of one and then all of the other, which is not the order the
-  chart draws in: it draws a name, fills the title panel over it, and
-  writes the title on top. Replaying shapes-then-text lifted the name
-  back above the panel, and "CANIS MAJOR" read straight through the
-  title box of every exported Orion sheet, in all three formats.
-  There is one sequence now and the writers walk it in order. Found
-  by printing a sheet and looking at it.
 
 ### Changed
 
@@ -967,18 +933,6 @@ before release; the review trail lives in `docs/reviews/`.
 Sprint 10 — Refresh the foundations. A maintenance release; reviewed
 by Codex before release, the trail lives in `docs/reviews/`.
 
-### Fixed
-
-- **Constellation names no longer print through the title box.** The
-  recorder kept shapes and text in two lists and every writer emitted
-  all of one and then all of the other, which is not the order the
-  chart draws in: it draws a name, fills the title panel over it, and
-  writes the title on top. Replaying shapes-then-text lifted the name
-  back above the panel, and "CANIS MAJOR" read straight through the
-  title box of every exported Orion sheet, in all three formats.
-  There is one sequence now and the writers walk it in order. Found
-  by printing a sheet and looking at it.
-
 ### Changed
 
 - Dependencies refreshed to current releases: FlatLaf and FlatLaf
@@ -1159,18 +1113,6 @@ review trail lives in `docs/reviews/`.
 
 Sprint 3 — Local catalogue foundation. Reviewed by Codex before release;
 the review trail lives in `docs/reviews/`.
-
-### Fixed
-
-- **Constellation names no longer print through the title box.** The
-  recorder kept shapes and text in two lists and every writer emitted
-  all of one and then all of the other, which is not the order the
-  chart draws in: it draws a name, fills the title panel over it, and
-  writes the title on top. Replaying shapes-then-text lifted the name
-  back above the panel, and "CANIS MAJOR" read straight through the
-  title box of every exported Orion sheet, in all three formats.
-  There is one sequence now and the writers walk it in order. Found
-  by printing a sheet and looking at it.
 
 ### Changed
 

@@ -30,9 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * above the panel, and <strong>CANIS MAJOR read straight through the
  * title box</strong> of every exported Orion sheet.
  *
- * <p>No automated check caught it. It was found by printing a sheet
- * and looking at it, which is what the physical inspection this
- * issue owed is for.
+ * <p>No automated check caught it. It was found by opening an
+ * exported sheet and looking at it - the SVG directly, and the PDF
+ * through an independent renderer - which nothing in this repository
+ * had done. The printed inspection this issue owes is still owed.
  *
  * <p>So this holds the one overlap it was found in, in all three
  * formats: the part of the name under the panel is hidden, the part

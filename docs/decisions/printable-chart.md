@@ -210,7 +210,10 @@ unknown.
 > and writes the title on top, and putting every label after every
 > shape lifted the name back above the panel. **CANIS MAJOR read
 > straight through the title box of every exported Orion sheet.** No
-> automated check saw it; the printed sheet did. Operations are
+> automated check saw it. It was found by opening an exported sheet
+> and looking at it — the SVG directly, and the PDF through an
+> independent renderer — which is a thing nothing in this repository
+> had ever done. Operations are
 > written in the order the renderer performed them, and consecutive
 > runs of a kind carry a class so an editor can still select ink and
 > labels apart — grouping follows the order rather than deciding it.
