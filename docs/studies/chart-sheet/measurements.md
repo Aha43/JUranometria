@@ -19,10 +19,10 @@ Regenerate with `make chart-sheet-study`.
 
 | file | paper | shapes | labels | bytes |
 |---|---|---:|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 27 | 394700 |
-| `sheet-letter.svg` | US Letter | 2472 | 28 | 431109 |
-| `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 461510 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 332269 |
+| `sheet-a4.svg` | A4 | 2267 | 27 | 461202 |
+| `sheet-letter.svg` | US Letter | 2472 | 28 | 504342 |
+| `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 528012 |
+| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 391850 |
 | `sheet-a4.pdf` | A4 | 2267 | 27 as outlines | 504179 |
 | `sheet-a4-modules.pdf` | A4 | 1966 | 16 as outlines | 409173 |
 | `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 27 | 426482 |

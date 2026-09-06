@@ -145,7 +145,7 @@ class ExportJourneyTest {
                     ExportSheet.Outcome.Written.class,
                     ExportSheet.write(Atlas.assembler()::assemble, EQUINOX,
                             ChartOptions.DEFAULTS, modules(), request,
-                            destination),
+                            destination, existing -> true),
                     "3. " + request.format() + " is written");
             written.add(outcome.file());
         }

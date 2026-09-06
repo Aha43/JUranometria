@@ -1480,7 +1480,11 @@ public final class PackagedAcceptanceMain {
                         new juranometria.app.ExportSheet.Request(format,
                                 juranometria.sheet.PaperSize.A4, 150,
                                 false),
-                        file.toFile());
+                        file.toFile(),
+                        // The acceptance writes into a temporary file
+                        // it made itself, so replacing it is the
+                        // whole point rather than a question.
+                        existing -> true);
                 require(outcome
                                 instanceof ExportSheet.Outcome.Written,
                         "the packaged application writes " + format

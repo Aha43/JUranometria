@@ -128,11 +128,17 @@ public final class SvgSheetWriter {
                         .append(" stroke-linecap=\"")
                         .append(capName(stroke.cap())).append('"')
                         .append(" stroke-linejoin=\"")
-                        .append(joinName(stroke.join())).append('"');
+                        .append(joinName(stroke.join())).append('"')
+                        .append(String.format(Locale.ROOT,
+                                " stroke-miterlimit=\"%.2f\"",
+                                stroke.miterLimit()));
                 if (stroke.dash() != null) {
                     svg.append(" stroke-dasharray=\"")
                             .append(dash(stroke.dash()))
-                            .append('"');
+                            .append('"')
+                            .append(String.format(Locale.ROOT,
+                                    " stroke-dashoffset=\"%.2f\"",
+                                    stroke.dashPhase()));
                 }
             }
             svg.append("/>\n");

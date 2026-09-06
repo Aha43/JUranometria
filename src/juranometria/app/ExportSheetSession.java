@@ -72,8 +72,26 @@ public final class ExportSheetSession {
                 navigation.state(), options.options(),
                 SheetInk.of(chart, working.lead(),
                         request.workingSelection()),
-                request, chooser.getSelectedFile());
+                request, chooser.getSelectedFile(),
+                existing -> askToReplace(owner, existing));
         report(owner, outcome);
+    }
+
+    /**
+     * Asks before replacing something that is already there.
+     *
+     * <p>The file chooser cannot ask this for us: it approved a name
+     * before the format's extension was added to it, so the file
+     * about to be replaced may be one the chooser never showed.
+     */
+    static boolean askToReplace(Frame owner, java.io.File existing) {
+        return JOptionPane.showConfirmDialog(owner,
+                existing.getName() + " already exists in "
+                        + existing.getAbsoluteFile().getParent()
+                        + ".\nReplace it?",
+                "Replace the existing file?",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
     }
 
     /** Says what happened, in the reader's own terms. */

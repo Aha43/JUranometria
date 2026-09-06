@@ -1,8 +1,10 @@
 package juranometria.app;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import juranometria.sheet.SheetFormat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -39,10 +42,16 @@ class ExportSheetTest {
 
     private static ExportSheet.Outcome export(SheetFormat format,
                                               File destination) {
+        return export(format, destination, existing -> true);
+    }
+
+    private static ExportSheet.Outcome export(
+            SheetFormat format, File destination,
+            ExportSheet.ReplaceDecision replace) {
         return ExportSheet.write(Atlas.assembler()::assemble, ORION,
                 ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
                 new ExportSheet.Request(format, PaperSize.A4, 150, false),
-                destination);
+                destination, replace);
     }
 
     @Test
@@ -150,6 +159,124 @@ class ExportSheetTest {
                     listing.map(each -> each.getFileName().toString())
                             .sorted().toList(),
                     "a refused export leaves the folder as it found it");
+        }
+    }
+
+    @Test
+    void nothingIsReplacedWithoutAskingTheReader(@TempDir Path folder)
+            throws Exception {
+        // The chooser cannot ask this. It approves a name before the
+        // format's extension is added, so the file about to be
+        // replaced can be one the reader was never shown: choosing
+        // "orion" with SVG selected writes "orion.svg" (PR #291
+        // review).
+        Path existing = Files.writeString(folder.resolve("orion.svg"),
+                "a chart the reader already had");
+        List<String> asked = new ArrayList<>();
+
+        var refused = assertInstanceOf(ExportSheet.Outcome.Refused.class,
+                export(SheetFormat.SVG,
+                        folder.resolve("orion").toFile(),
+                        replacing -> {
+                            asked.add(replacing.getName());
+                            return false;
+                        }),
+                "a reader who says no gets no export");
+        assertEquals(List.of("orion.svg"), asked,
+                "and is asked about the file that would actually be"
+                        + " replaced, extension and all");
+        assertTrue(refused.reason().contains("left as it was"),
+                "told plainly: " + refused.reason());
+        assertEquals("a chart the reader already had",
+                Files.readString(existing),
+                "with their own file untouched");
+
+        // And a reader who says yes gets the export.
+        assertInstanceOf(ExportSheet.Outcome.Written.class,
+                export(SheetFormat.SVG,
+                        folder.resolve("orion").toFile(),
+                        replacing -> true),
+                "a reader who says yes gets one");
+        assertTrue(Files.readString(existing).startsWith("<svg"),
+                "and it is the chart");
+    }
+
+    @Test
+    void aFailedWriteLeavesTheReadersOwnFileExactlyAsItWas(
+            @TempDir Path folder) throws Exception {
+        // The worst thing an export can do is destroy what it was
+        // asked to replace. An earlier version wrote over the
+        // destination and deleted it when the write failed, which is
+        // exactly that (PR #291 review).
+        Path existing = Files.writeString(folder.resolve("orion.svg"),
+                "a chart the reader already had");
+
+        // A write that fails part way, which no permission bit can
+        // arrange portably, so the sink is asked to fail - and to
+        // fail the way a disk filling up does, with some bytes
+        // already down. A sink that throws before writing anything
+        // would leave the destination intact whether or not the
+        // export takes any care at all.
+        assertThrows(IOException.class, () -> ExportSheet.place(
+                        "a whole sheet".getBytes(), existing, folder,
+                        (file, bytes) -> {
+                            Files.write(file, "half a sh".getBytes());
+                            throw new IOException("the disk filled up");
+                        }),
+                "the failure reaches the caller rather than being"
+                        + " swallowed");
+
+        assertTrue(Files.exists(existing),
+                "and the reader's file is still there");
+        assertEquals("a chart the reader already had",
+                Files.readString(existing),
+                "with exactly what was in it");
+        try (var listing = Files.list(folder)) {
+            assertEquals(List.of("orion.svg"),
+                    listing.map(each -> each.getFileName().toString())
+                            .toList(),
+                    "and nothing partial was left beside it");
+        }
+    }
+
+    @Test
+    void aReplacementInAReadOnlyFolderStillWorks(@TempDir Path folder)
+            throws Exception {
+        // Replacing a writable file inside a folder that is not
+        // writable is a legitimate thing to do, and the reader could
+        // do it before. Writing beside the destination cannot, so
+        // that path falls back rather than taking the ability away.
+        Path existing = Files.writeString(folder.resolve("orion.svg"),
+                "a chart the reader already had");
+        assertTrue(folder.toFile().setWritable(false),
+                "the test can make the folder read-only");
+        try {
+            assertInstanceOf(ExportSheet.Outcome.Written.class,
+                    export(SheetFormat.SVG, existing.toFile(),
+                            replacing -> true),
+                    "the export still happens");
+            assertTrue(Files.readString(existing).startsWith("<svg"),
+                    "and the chart is there");
+        } finally {
+            folder.toFile().setWritable(true);
+        }
+    }
+
+    @Test
+    void aFinishedExportLeavesNothingHalfWrittenBesideIt(
+            @TempDir Path folder) {
+        assertInstanceOf(ExportSheet.Outcome.Written.class,
+                export(SheetFormat.PNG,
+                        folder.resolve("orion").toFile()),
+                "the export happens");
+        try (var listing = Files.list(folder)) {
+            assertEquals(List.of("orion.png"),
+                    listing.map(each -> each.getFileName().toString())
+                            .toList(),
+                    "and the working file it wrote beside the"
+                            + " destination is gone");
+        } catch (java.io.IOException failure) {
+            throw new AssertionError(failure);
         }
     }
 

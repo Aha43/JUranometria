@@ -69,6 +69,25 @@ public final class ExportSheet {
     }
 
     /**
+     * Whether the reader agrees to replace a file that is already
+     * there.
+     *
+     * <p>A separate decision from choosing the destination, because
+     * the destination a reader chooses and the file that gets written
+     * are not always the same name: a chooser that approved "orion"
+     * has approved nothing about the "orion.svg" already sitting
+     * beside it (PR #291 review).
+     */
+    @FunctionalInterface
+    public interface ReplaceDecision {
+
+        /** Never replaces: the answer for a caller with no reader. */
+        ReplaceDecision REFUSE = existing -> false;
+
+        boolean mayReplace(File existing);
+    }
+
+    /**
      * Records the sheet and writes it.
      *
      * @param pages the production assembler
@@ -81,7 +100,8 @@ public final class ExportSheet {
     public static Outcome write(ChartSheet.Pages pages,
                                 ChartViewState state, ChartOptions options,
                                 ChartRenderer.ReferenceLayer ink,
-                                Request request, File destination) {
+                                Request request, File destination,
+                                ReplaceDecision replace) {
         if (destination == null) {
             return new Outcome.Refused("No file was chosen.");
         }
@@ -105,6 +125,14 @@ public final class ExportSheet {
             return new Outcome.Refused(file.getName()
                     + " cannot be replaced: it is not writable.");
         }
+        // Asked here rather than left to the file chooser, because
+        // the name the chooser approved is not always the name that
+        // gets written: choosing "orion" with SVG selected writes
+        // "orion.svg", and the chooser never saw that one.
+        if (file.exists() && !replace.mayReplace(file)) {
+            return new Outcome.Refused(file.getName()
+                    + " was left as it was.");
+        }
         if (!file.exists() && !parent.canWrite()) {
             return new Outcome.Refused("That folder cannot be written"
                     + " to: " + parent.getPath());
@@ -124,22 +152,68 @@ public final class ExportSheet {
         }
 
         try {
-            Files.write(file.toPath(), bytes);
+            place(bytes, file.toPath(), parent.toPath(), SINK);
         } catch (IOException failure) {
-            // A write that failed part way leaves a file that looks
-            // like an export and is not one. It goes.
-            try {
-                Files.deleteIfExists(file.toPath());
-            } catch (IOException ignored) {
-                return new Outcome.Refused(file.getName()
-                        + " could not be written, and the partial file"
-                        + " could not be removed: " + failure.getMessage());
-            }
             return new Outcome.Refused(file.getName()
-                    + " could not be written: " + failure.getMessage());
+                    + " could not be written: " + failure.getMessage()
+                    + (file.exists()
+                            ? " What was already there is unchanged."
+                            : ""));
         }
         return new Outcome.Written(file.toPath(), bytes.length,
                 request.format());
+    }
+
+    /** How bytes reach a path; a seam so a failure can be tried. */
+    @FunctionalInterface
+    interface ByteSink {
+
+        void write(Path file, byte[] bytes) throws IOException;
+    }
+
+    /** The real one. */
+    static final ByteSink SINK = Files::write;
+
+    /**
+     * Puts the finished bytes at the destination without ever
+     * putting unfinished ones there.
+     *
+     * <p>Written beside the destination and moved onto it where the
+     * folder allows that, so a failure cannot truncate what is
+     * already there. Where the folder does not allow it - a
+     * read-only directory holding a writable file, which is a
+     * legitimate thing to replace - the destination is written
+     * directly, because refusing would take away something the
+     * reader could do before.
+     *
+     * <p>What is never done, in either path, is <strong>deleting the
+     * destination</strong>. An earlier version removed it when the
+     * write failed, on the reasoning that a partial file should not
+     * be left looking finished; the file it removed was the reader's
+     * own chart (PR #291 review).
+     */
+    static void place(byte[] bytes, Path file, Path parent, ByteSink sink)
+            throws IOException {
+        if (!java.nio.file.Files.isWritable(parent)) {
+            sink.write(file, bytes);
+            return;
+        }
+        Path partial = Files.createTempFile(parent,
+                file.getFileName() + ".", ".part");
+        try {
+            sink.write(partial, bytes);
+            try {
+                Files.move(partial, file,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException
+                    unsupported) {
+                Files.move(partial, file,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(partial);
+        }
     }
 
     /**
