@@ -177,8 +177,24 @@ public final class WiderFieldStudyMain {
                 black ? ChartOptions.DEFAULTS.withPalette(
                         ChartPalette.BLACK_SKY) : ChartOptions.DEFAULTS);
 
+        // The title block is a panel sized to its own text, so its
+        // rectangle is a font-metrics measurement wearing a shape's
+        // clothes: 258 px wide here, 284 px on the CI image, for the
+        // same chart (PR #289, third round). It is named and skipped
+        // rather than quietly widening the tolerance - the pixel
+        // digest still covers it where pixels mean anything.
+        java.awt.Rectangle titleBlock = ChartRenderer.titleBlockBounds(
+                new BufferedImage(WIDE, HIGH, BufferedImage.TYPE_INT_RGB)
+                        .createGraphics(), scene(centre, field));
+
         StringBuilder ink = new StringBuilder();
+        int skipped = 0;
         for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+            if (titleBlock != null && drawn.shape().getBounds2D()
+                    .getBounds().equals(titleBlock)) {
+                skipped++;
+                continue;
+            }
             ink.append(drawn.filled() ? "fill " : "draw ")
                     .append(Integer.toHexString(drawn.colour().getRGB()))
                     .append(' ')
@@ -189,6 +205,15 @@ public final class WiderFieldStudyMain {
                     .append(pathOf(drawn.shape()))
                     .append('\n');
         }
+        if (skipped != 2) {
+            // The fill and the outline, and nothing else. If the
+            // title block stops being two shapes this digest has
+            // started skipping something it was not told to.
+            throw new IllegalStateException("expected to skip the"
+                    + " title block's fill and outline, skipped "
+                    + skipped);
+        }
+
         // Text is deliberately absent. Not only its placement: which
         // labels a page carries is decided partly by what fits, and
         // what fits is a font-metrics question, so the set of runs
