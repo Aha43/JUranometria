@@ -77,6 +77,31 @@ class SheetPageJourneyTest {
         return count;
     }
 
+    /**
+     * Read live state on the event thread, which is where it lives.
+     * Every reading in this journey - the view state, the assembled
+     * page, what the selection holds - goes through here, so none of
+     * them races the thread that produces them (#284 review).
+     */
+    private static <T> T onEdt(java.util.concurrent.Callable<T> read)
+            throws Exception {
+        Object[] held = new Object[1];
+        Exception[] failed = new Exception[1];
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                held[0] = read.call();
+            } catch (Exception thrown) {
+                failed[0] = thrown;
+            }
+        });
+        if (failed[0] != null) {
+            throw failed[0];
+        }
+        @SuppressWarnings("unchecked")
+        T value = (T) held[0];
+        return value;
+    }
+
     private static JButton button(AtlasToolbar toolbar, String name) {
         for (java.awt.Component each : toolbar.getComponents()) {
             if (each instanceof JButton press
@@ -130,10 +155,11 @@ class SheetPageJourneyTest {
             AtlasToolbar toolbar = toolbarHolder[0];
 
             // ---- 1. the released Home page ---------------------------
-            assertEquals(ChartViewState.DEFAULT, navigation.state(),
+            assertEquals(ChartViewState.DEFAULT,
+                    onEdt(navigation::state),
                     "1. the reader starts where the atlas opens");
             BufferedImage home = paint(chart);
-            int homeStars = chart.currentScene().stars().size();
+            int homeStars = onEdt(() -> chart.currentScene().stars().size());
 
             // ---- 2. out to the sheet page, one control ---------------
             // Zoom out is the control a reader already has. Five
@@ -145,7 +171,8 @@ class SheetPageJourneyTest {
                         "2. zoom out is live on the way to " + expected);
                 ReaderInput.click(out);
                 assertEquals(expected,
-                        navigation.state().fieldWidthDegrees(),
+                        onEdt(() -> navigation.state()
+                                .fieldWidthDegrees()),
                         "and the press lands on " + expected);
             }
             assertFalse(out.isEnabled(),
@@ -153,7 +180,7 @@ class SheetPageJourneyTest {
                             + " the control says so rather than sitting"
                             + " there dead");
 
-            ChartScene sheet = chart.currentScene();
+            ChartScene sheet = onEdt(chart::currentScene);
             assertEquals(42.0, sheet.viewport().fieldWidthDegrees(),
                     "2. the page the reader is on is the sheet page");
             assertTrue(sheet.stars().size() > homeStars,
@@ -165,15 +192,15 @@ class SheetPageJourneyTest {
                     "which is a different page, drawn");
 
             // ---- 3. panning still works out here ---------------------
-            SkyPosition beforePan = navigation.state().centre();
+            SkyPosition beforePan = onEdt(() -> navigation.state().centre());
             ReaderInput.drag(chart, 500, 380, 380, 300);
-            SwingUtilities.invokeAndWait(() -> { });
-            SkyPosition afterPan = navigation.state().centre();
+            SkyPosition afterPan = onEdt(() -> navigation.state().centre());
             assertTrue(afterPan.separationDegrees(beforePan) > 1.0,
                     "3. grab-to-pan moves the sheet page: "
                             + afterPan.separationDegrees(beforePan)
                             + " degrees");
-            assertEquals(42.0, navigation.state().fieldWidthDegrees(),
+            assertEquals(42.0,
+                    onEdt(() -> navigation.state().fieldWidthDegrees()),
                     "and panning does not change the field");
 
             // ---- 4. identify, out here, on the widened page ----------
@@ -185,7 +212,7 @@ class SheetPageJourneyTest {
             ChartRenderer.DrawnMark star = clickOn(chart, 0,
                     SheetPageJourneyTest::firstStar);
             Selection.Object identified = assertInstanceOf(
-                    Selection.Object.class, selection.selection(),
+                    Selection.Object.class, onEdt(selection::selection),
                     "4. a star on the sheet page identifies like a star"
                             + " on any other page");
             assertEquals(star.star().id(), identified.catalogueId(),
@@ -202,7 +229,7 @@ class SheetPageJourneyTest {
             // WorkingSelection here would have passed with the
             // chart-to-selection wiring severed (PR #289 review).
             assertEquals(List.of(identified.catalogueId()),
-                    working.members(),
+                    onEdt(working::members),
                     "5. the same click that identified the star put it"
                             + " in the working selection");
 
@@ -211,17 +238,16 @@ class SheetPageJourneyTest {
                     scene -> otherStar(scene, star));
             assertEquals(List.of(identified.catalogueId(),
                             second.star().id()),
-                    working.members(),
+                    onEdt(working::members),
                     "and the additive modifier toggles a second one in"
                             + " beside it, on this page as on any"
                             + " other");
-            assertEquals(second.star().id(), working.lead(),
+            assertEquals(second.star().id(), onEdt(working::lead),
                     "with the newcomer leading");
 
             // ---- 6. Home, pressed, exact ----------------------------
             ReaderInput.click(button(toolbar, "Reset view"));
-            SwingUtilities.invokeAndWait(() -> { });
-            assertEquals(ChartViewState.DEFAULT, navigation.state(),
+            assertEquals(ChartViewState.DEFAULT, onEdt(navigation::state),
                     "6. Reset view comes all the way home from the new"
                             + " step, as it does from every old one");
             assertEquals(0, differences(home, paint(chart)),
@@ -247,21 +273,13 @@ class SheetPageJourneyTest {
             java.util.function.Function<ChartScene,
                     ChartRenderer.DrawnMark> choose) throws Exception {
         ChartRenderer.DrawnMark[] chosen = new ChartRenderer.DrawnMark[1];
-        SwingUtilities.invokeAndWait(() -> {
-            ChartScene scene = chart.currentScene();
-            chosen[0] = choose.apply(scene);
-            int x = (int) Math.round(chosen[0].centre().x());
-            int y = (int) Math.round(chosen[0].centre().y())
-                    + chart.pageOffsetY();
-            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
-                    MouseEvent.MOUSE_RELEASED}) {
-                chart.dispatchEvent(new MouseEvent(chart, id,
-                        System.nanoTime() / 1_000_000,
-                        MouseEvent.BUTTON1_DOWN_MASK | modifiers,
-                        x, y, 1, false, MouseEvent.BUTTON1));
-            }
-        });
-        SwingUtilities.invokeAndWait(() -> { });
+        ReaderInput.click(chart, () -> {
+            chosen[0] = choose.apply(chart.currentScene());
+            return new java.awt.Point(
+                    (int) Math.round(chosen[0].centre().x()),
+                    (int) Math.round(chosen[0].centre().y())
+                            + chart.pageOffsetY());
+        }, modifiers);
         return chosen[0];
     }
 
