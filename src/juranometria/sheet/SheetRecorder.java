@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.sheet;
 
 import java.awt.Color;
 import java.awt.Composite;
@@ -29,7 +29,13 @@ import java.util.Map;
 
 /**
  * A {@link Graphics2D} that records what the cartography draws
- * instead of rasterising it (Sprint 29, issue #283).
+ * instead of rasterising it (Sprint 29, issues #283 and #285).
+ *
+ * <p>Written for the gate that asked whether the atlas's renderer
+ * could serve paper; production since #285, which made SVG a real
+ * writer against it. It is the one place a chart becomes something
+ * other than pixels, and it is deliberately not in a celestial
+ * package: a module contributes geometry and never learns paper.
  *
  * <p>The gate's architectural question is whether the atlas's one
  * Java2D renderer can serve paper honestly, or whether a second,
@@ -54,7 +60,7 @@ import java.util.Map;
  * transform already applied, so a writer needs no transform model of
  * its own.
  */
-public final class ChartSheetRecorder extends Graphics2D {
+public final class SheetRecorder extends Graphics2D {
 
     /** One stroked or filled shape, as it lands on the sheet. */
     public record Drawn(Shape shape, boolean filled, Color colour,
@@ -80,13 +86,13 @@ public final class ChartSheetRecorder extends Graphics2D {
     private Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
     private Shape clip;
 
-    public ChartSheetRecorder(int widthPx, int heightPx) {
+    public SheetRecorder(int widthPx, int heightPx) {
         this(new ArrayList<>(), new ArrayList<>(),
                 new BufferedImage(Math.max(1, widthPx),
                         Math.max(1, heightPx), BufferedImage.TYPE_INT_RGB));
     }
 
-    private ChartSheetRecorder(List<Drawn> drawn, List<Text> text,
+    private SheetRecorder(List<Drawn> drawn, List<Text> text,
                                BufferedImage metricsSource) {
         this.drawn = drawn;
         this.text = text;
@@ -107,8 +113,8 @@ public final class ChartSheetRecorder extends Graphics2D {
 
     @Override
     public Graphics create() {
-        ChartSheetRecorder copy =
-                new ChartSheetRecorder(drawn, text, metricsSource);
+        SheetRecorder copy =
+                new SheetRecorder(drawn, text, metricsSource);
         copy.transform = new AffineTransform(transform);
         copy.colour = colour;
         copy.stroke = stroke;

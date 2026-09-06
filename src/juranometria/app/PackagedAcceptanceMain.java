@@ -1451,6 +1451,65 @@ public final class PackagedAcceptanceMain {
                         + " pixel");
         System.out.println("reader journey OK (ends on the reviewed"
                 + " default page)");
+
+        exportJourney(navigation);
+    }
+
+    /**
+     * A chart sheet, written by the packaged application itself
+     * (Sprint 29, issue #285).
+     *
+     * <p>The point of running this inside the native image is that a
+     * reader printing for a club evening has no build tools and no
+     * system Java. If the export needs either, it does not work, and
+     * finding that out here is the whole reason this exists.
+     */
+    private static void exportJourney(ChartViewController navigation)
+            throws Exception {
+        juranometria.sheet.SheetRecording sheet =
+                juranometria.sheet.ChartSheet.record(
+                        Atlas.assembler()::assemble, navigation.state(),
+                        ChartOptions.DEFAULTS,
+                        ChartRenderer.ReferenceLayer.NONE,
+                        juranometria.sheet.PaperSize.A4);
+        String svg = juranometria.sheet.SvgSheetWriter.write(sheet,
+                juranometria.sheet.SvgSheetWriter.Text.EDITABLE);
+
+        require(svg.startsWith("<svg")
+                        && svg.contains("width=\"841.89pt\""),
+                "the packaged application writes an A4 sheet at A4's"
+                        + " own size");
+        require(sheet.shapeCount() > 500 && sheet.textCount() > 0,
+                "carrying the chart it is showing: "
+                        + sheet.shapeCount() + " shapes, "
+                        + sheet.textCount() + " labels");
+        require(!svg.contains("<image") && !svg.contains("xlink:href"),
+                "with nothing raster and nothing fetched in it");
+
+        // And it reaches a file, which is what a reader actually
+        // does with it. Written where the platform puts temporary
+        // files, read back, and removed.
+        java.nio.file.Path written = java.nio.file.Files.createTempFile(
+                "juranometria-acceptance-", ".svg");
+        try {
+            java.nio.file.Files.writeString(written, svg,
+                    java.nio.charset.StandardCharsets.UTF_8);
+            String readBack = java.nio.file.Files.readString(written,
+                    java.nio.charset.StandardCharsets.UTF_8);
+            require(readBack.equals(svg),
+                    "and survives the round trip to a file: "
+                            + java.nio.file.Files.size(written)
+                            + " bytes");
+            require(readBack.contains("\u03b1")
+                            || readBack.contains("\u00b0"),
+                    "with the chart's own notation intact through"
+                            + " UTF-8");
+        } finally {
+            java.nio.file.Files.deleteIfExists(written);
+        }
+        System.out.println("chart sheet export OK (A4 SVG written and"
+                + " read back, " + sheet.shapeCount() + " shapes, no"
+                + " build tools involved)");
     }
 
     /** Whether the page's named target is a mark of this family. */

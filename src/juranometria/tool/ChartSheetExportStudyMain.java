@@ -15,6 +15,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 
 import juranometria.catalog.TiledCatalogue;
+import juranometria.sheet.SheetRecorder;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SceneGeography;
@@ -89,7 +90,7 @@ public final class ChartSheetExportStudyMain {
     /** A sheet, its chart rectangle, and the render recorded on it. */
     private record Sheet(String name, double widePt, double highPt,
                          double chartWidePt, double chartHighPt,
-                         ChartSheetRecorder recorder) {
+                         SheetRecorder recorder) {
     }
 
     private static Sheet sheet(String name, double widePt,
@@ -98,7 +99,7 @@ public final class ChartSheetExportStudyMain {
         double chartHigh = highPt - 2 * MARGIN_PT;
         ChartScene scene = scene(new SkyPosition(83.0, 0.0), 42.0, 6.0,
                 (int) Math.round(chartWide), (int) Math.round(chartHigh));
-        ChartSheetRecorder recorder = new ChartSheetRecorder(
+        SheetRecorder recorder = new SheetRecorder(
                 (int) Math.round(chartWide), (int) Math.round(chartHigh));
         record(scene, recorder);
         System.err.printf(Locale.ROOT,
@@ -131,7 +132,7 @@ public final class ChartSheetExportStudyMain {
 
     private static void writeSvg(File file, Sheet sheet,
                                  boolean textAsPaths) throws IOException {
-        ChartSheetRecorder recorder = sheet.recorder();
+        SheetRecorder recorder = sheet.recorder();
         StringBuilder svg = new StringBuilder();
         svg.append("<svg xmlns=\"http://www.w3.org/2000/svg\"")
                 .append(String.format(Locale.ROOT,
@@ -180,7 +181,7 @@ public final class ChartSheetExportStudyMain {
 
         svg.append("    <g id=\"ink\" fill=\"none\""
                 + " stroke-linecap=\"butt\">\n");
-        for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+        for (SheetRecorder.Drawn drawn : recorder.drawn()) {
             svg.append("      <path d=\"").append(path(drawn.shape()))
                     .append("\"").append(clipAttribute(clips,
                             drawn.clip()));
@@ -203,7 +204,7 @@ public final class ChartSheetExportStudyMain {
         svg.append("    </g>\n");
 
         svg.append("    <g id=\"labels\">\n");
-        for (ChartSheetRecorder.Text text : recorder.text()) {
+        for (SheetRecorder.Text text : recorder.text()) {
             String clip = clipAttribute(clips, text.clip());
             if (textAsPaths) {
                 java.awt.font.GlyphVector glyphs = text.font()
@@ -240,13 +241,13 @@ public final class ChartSheetExportStudyMain {
 
     /** Every distinct clip the recording carries, in first-seen order. */
     private static List<java.awt.Shape> distinctClips(
-            ChartSheetRecorder recorder) {
+            SheetRecorder recorder) {
         List<java.awt.Shape> clips = new ArrayList<>();
         List<String> seen = new ArrayList<>();
-        for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+        for (SheetRecorder.Drawn drawn : recorder.drawn()) {
             remember(clips, seen, drawn.clip());
         }
-        for (ChartSheetRecorder.Text text : recorder.text()) {
+        for (SheetRecorder.Text text : recorder.text()) {
             remember(clips, seen, text.clip());
         }
         return clips;
@@ -326,14 +327,14 @@ public final class ChartSheetExportStudyMain {
 
     private static void writePdf(File file, Sheet sheet,
                                  boolean textAsPaths) throws IOException {
-        ChartSheetRecorder recorder = sheet.recorder();
+        SheetRecorder recorder = sheet.recorder();
         StringBuilder content = new StringBuilder();
         // PDF's origin is bottom-left; the chart's is top-left.
         content.append(String.format(Locale.ROOT, "1 0 0 -1 %.2f %.2f cm%n",
                 MARGIN_PT, sheet.highPt() - MARGIN_PT));
         content.append("1 J 1 j\n");
 
-        for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+        for (SheetRecorder.Drawn drawn : recorder.drawn()) {
             content.append(open(drawn.clip()));
             Color colour = drawn.colour();
             content.append(String.format(Locale.ROOT, "%.3f %.3f %.3f %s%n",
@@ -350,7 +351,7 @@ public final class ChartSheetExportStudyMain {
             content.append(close(drawn.clip()));
         }
 
-        for (ChartSheetRecorder.Text text : recorder.text()) {
+        for (SheetRecorder.Text text : recorder.text()) {
             content.append(open(text.clip()));
             Color colour = text.colour();
             if (textAsPaths) {
@@ -611,13 +612,13 @@ public final class ChartSheetExportStudyMain {
     // ---- what the prototypes measured ---------------------------------
 
     private static void report(Sheet a4, Sheet letter) {
-        ChartSheetRecorder recorder = a4.recorder();
+        SheetRecorder recorder = a4.recorder();
         double chartWide = a4.chartWidePt();
         double chartHigh = a4.chartHighPt();
         int fills = 0;
         double thinnest = Double.MAX_VALUE;
         double smallestFill = Double.MAX_VALUE;
-        for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+        for (SheetRecorder.Drawn drawn : recorder.drawn()) {
             if (drawn.filled()) {
                 fills++;
                 java.awt.geom.Rectangle2D bounds =
@@ -630,7 +631,7 @@ public final class ChartSheetExportStudyMain {
         }
         int smallestFont = Integer.MAX_VALUE;
         java.util.TreeSet<Character> beyondAscii = new java.util.TreeSet<>();
-        for (ChartSheetRecorder.Text text : recorder.text()) {
+        for (SheetRecorder.Text text : recorder.text()) {
             smallestFont = Math.min(smallestFont, text.font().getSize());
             for (char each : text.text().toCharArray()) {
                 if (each > 126) {

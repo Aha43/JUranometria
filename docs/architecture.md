@@ -116,6 +116,18 @@ a **landmark** on a line. Both are statements about what the geometry is,
 and neither is named for the ecliptic — a galactic-equator module would
 use the same two words.
 
+**The chart sheet** (`juranometria.sheet`, Sprint 29) is the one place a
+chart stops being a thing on a screen. It plays the *production* render —
+the same renderer, over a scene from the same assembler, at the same view
+state, with the same module ink — into a recording `Graphics2D` that
+refuses every method the cartography does not use. A writer takes that
+recording and knows nothing about the sky; a module contributes geometry
+and learns nothing about paper. Two things legitimately differ from the
+screen and only two: the **extent**, because a chart rectangle is 271.6 mm
+and not a window's shape, and the **ground**, because printing a black sky
+asks a reader to lay down a sheet of toner. Both are decided in
+[the printable-chart decision](decisions/printable-chart.md).
+
 **The Solar System road.** The ecliptic is the frame the Solar System is
 described in, so this module is the frame arriving without any of the
 bodies. A future module drawing the Sun, the Moon or a planet can express
