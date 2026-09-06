@@ -49,7 +49,7 @@ Measured numerically, by projecting small offsets and comparing pixel distances 
 
 The atlas draws its reference circles — the meridian, the mathematical horizon, the ecliptic — by clipping an **infinite great circle to the paper analytically**, with no sampling and no tolerance. That is possible because a gnomonic projection maps every great circle to a straight line exactly. `GreatCirclePage.clip` is built on it, and so is the Sprint 25 finding that a polyline cannot answer a page lying between its own vertices.
 
-A stereographic projection maps great circles to **circles**. The straightness is not approximately lost; it is lost. Measured as the greatest departure of the projected ecliptic from the straight chord joining where it leaves the paper:
+A stereographic projection maps great circles to **circles**. The straightness is not approximately lost; it is lost. Measured as the greatest departure of a projected great circle from the straight chord joining where it leaves the paper:
 
 | field | chord measured | gnomonic | stereographic |
 |---:|---:|---:|---:|
@@ -59,7 +59,7 @@ A stereographic projection maps great circles to **circles**. The straightness i
 | 45° | 896 px | 0.0000 px | **9.3 px** |
 | 48° | 897 px | 0.0000 px | **9.9 px** |
 
-So adopting stereographic is not a change of formula. It is the end of analytic clipping, and either a new arc geometry through the module seam or a sampled polyline the Sprint 25 gate already rejected by measurement.
+So adopting stereographic is not a change of formula. **It does not end analytic clipping**: a circle and a rectangle intersect exactly too. What it ends is the existing *straight-line* clipper, which returns a chord between two page crossings, and an arc is not a chord. The cost is an exact arc representation and clipper carried through the module seam - a new geometry kind every reference-ink consumer must learn - not a forced return to sampled polylines.
 
 ## What a reader would mis-measure
 

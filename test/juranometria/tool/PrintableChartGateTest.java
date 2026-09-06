@@ -18,6 +18,7 @@ import juranometria.sky.GreatCircle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -157,6 +158,164 @@ class PrintableChartGateTest {
                 "and references nothing outside itself");
         assertTrue(svg.contains("α"),
                 "and keeps the chart's own notation as text");
+    }
+
+    @Test
+    void aQuadraticReachesThePdfAsTheSameCurve() {
+        // The review's own check: a deliberately ASYMMETRIC quadratic,
+        // compared as geometry rather than by opening the file. An
+        // earlier version emitted the quadratic's control point twice
+        // as both cubic controls, which is a different curve and
+        // changed the page silently.
+        java.awt.geom.Path2D.Double quadratic =
+                new java.awt.geom.Path2D.Double();
+        quadratic.moveTo(10.0, 20.0);
+        quadratic.quadTo(90.0, 30.0, 40.0, 110.0);
+
+        String pdf = ChartSheetExportStudyMain.pdfPath(quadratic);
+        java.util.List<Double> numbers = new java.util.ArrayList<>();
+        for (String token : pdf.replace("m", " ").replace("c", " ")
+                .trim().split("\\s+")) {
+            numbers.add(Double.parseDouble(token));
+        }
+        assertEquals(8, numbers.size(),
+                "a move and one cubic: " + pdf);
+
+        double p0x = numbers.get(0);
+        double p0y = numbers.get(1);
+        double c1x = numbers.get(2);
+        double c1y = numbers.get(3);
+        double c2x = numbers.get(4);
+        double c2y = numbers.get(5);
+        double p2x = numbers.get(6);
+        double p2y = numbers.get(7);
+
+        // Sampled along the curve, the emitted cubic must BE the
+        // quadratic - not merely start and end where it does.
+        for (double t = 0.0; t <= 1.0; t += 0.05) {
+            double u = 1.0 - t;
+            double qx = u * u * 10.0 + 2 * u * t * 90.0 + t * t * 40.0;
+            double qy = u * u * 20.0 + 2 * u * t * 30.0 + t * t * 110.0;
+            double cx = u * u * u * p0x + 3 * u * u * t * c1x
+                    + 3 * u * t * t * c2x + t * t * t * p2x;
+            double cy = u * u * u * p0y + 3 * u * u * t * c1y
+                    + 3 * u * t * t * c2y + t * t * t * p2y;
+            assertEquals(qx, cx, 0.02,
+                    "the PDF curve is the source curve at t=" + t);
+            assertEquals(qy, cy, 0.02,
+                    "in both directions, at t=" + t);
+        }
+
+        // And the control points are genuinely different from each
+        // other, so the check above could have failed.
+        assertTrue(Math.hypot(c1x - c2x, c1y - c2y) > 1.0,
+                "an asymmetric quadratic has two distinct cubic"
+                        + " controls: " + c1x + "," + c1y + " and "
+                        + c2x + "," + c2y);
+    }
+
+    @Test
+    void bothVectorSheetsCarryTheProductionClip() throws IOException {
+        // The recorder captured production's clip and a first version
+        // of both writers discarded it, so ink production cut at the
+        // paper bled into the sheet margin.
+        String svg = Files.readString(Path.of(
+                "docs/studies/printable-chart/sheet-a4.svg"));
+        assertTrue(svg.contains("<clipPath id=\"clip0\""),
+                "the SVG defines the clip production had in force");
+        assertTrue(svg.split("clip-path=\"url", -1).length - 1 > 1000,
+                "and applies it to the ink rather than defining it and"
+                        + " forgetting it");
+
+        String pdf = Files.readString(Path.of(
+                        "docs/studies/printable-chart/sheet-a4.pdf"),
+                java.nio.charset.StandardCharsets.ISO_8859_1);
+        assertTrue(pdf.split("W n", -1).length - 1 > 1000,
+                "and the PDF clips too, with the same operations"
+                        + " bracketed by q/Q");
+        assertTrue(pdf.contains("q\n"), "pushing the graphics state");
+        assertTrue(pdf.contains("Q\n"), "and popping it");
+    }
+
+    @Test
+    void thePngIsTheWholeSheetAtItsStatedResolution() throws IOException {
+        // A first version re-rendered the chart into a bigger pixel
+        // grid, which shrank every label relative to the paper, held
+        // only the chart rectangle, and stated its resolution
+        // nowhere.
+        javax.imageio.stream.ImageInputStream in =
+                javax.imageio.ImageIO.createImageInputStream(
+                        Path.of("docs/studies/printable-chart",
+                                "sheet-a4-300dpi.png").toFile());
+        javax.imageio.ImageReader reader =
+                javax.imageio.ImageIO.getImageReaders(in).next();
+        try {
+            reader.setInput(in);
+            // A4 at 300 dpi, the WHOLE sheet.
+            assertEquals(3508, reader.getWidth(0),
+                    "the PNG is A4 wide at 300 dpi, margins included");
+            assertEquals(2480, reader.getHeight(0),
+                    "and A4 high");
+
+            javax.imageio.metadata.IIOMetadata metadata =
+                    reader.getImageMetadata(0);
+            org.w3c.dom.Node root = metadata.getAsTree(
+                    "javax_imageio_png_1.0");
+            assertTrue(physicalResolution(root),
+                    "and states its own resolution, so a reader's"
+                            + " software can place it on paper");
+        } finally {
+            reader.dispose();
+            in.close();
+        }
+    }
+
+    /** Whether a PNG metadata tree carries a metre-based pHYs. */
+    private static boolean physicalResolution(org.w3c.dom.Node node) {
+        if ("pHYs".equals(node.getNodeName())) {
+            org.w3c.dom.NamedNodeMap attributes = node.getAttributes();
+            org.w3c.dom.Node unit =
+                    attributes.getNamedItem("unitSpecifier");
+            org.w3c.dom.Node perAxis =
+                    attributes.getNamedItem("pixelsPerUnitXAxis");
+            // 300 dpi is 11811 pixels per metre.
+            return unit != null && "meter".equals(unit.getNodeValue())
+                    && perAxis != null
+                    && Math.abs(Long.parseLong(perAxis.getNodeValue())
+                            - 11811L) <= 1;
+        }
+        for (org.w3c.dom.Node child = node.getFirstChild();
+                child != null; child = child.getNextSibling()) {
+            if (physicalResolution(child)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Test
+    void theLetterSheetIsItsOwnChartAndNotAnA4OneCutDown()
+            throws IOException {
+        // Reusing A4's recording would run the chart past Letter's
+        // right margin and let the viewport cut it.
+        String letter = Files.readString(Path.of(
+                "docs/studies/printable-chart/sheet-letter.svg"));
+        String a4 = Files.readString(Path.of(
+                "docs/studies/printable-chart/sheet-a4.svg"));
+
+        assertTrue(letter.contains("width=\"792.00pt\""),
+                "the Letter sheet is Letter wide");
+        assertTrue(a4.contains("width=\"841.89pt\""),
+                "and the A4 sheet is A4 wide");
+        assertNotEquals(a4.length(), letter.length(),
+                "and they are different renders, not one file wearing"
+                        + " two page sizes");
+
+        String formats = Files.readString(Path.of(
+                "docs/studies/printable-chart/formats.md"));
+        assertTrue(formats.contains("US Letter"),
+                "and the report says both were recorded at their own"
+                        + " chart rectangle");
     }
 
     // ---- the same readings the study takes ---------------------------

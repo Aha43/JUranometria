@@ -7,7 +7,7 @@ study's, and its reports and images reproduce byte for byte.
 ## Why this exists
 
 The atlas's first external reader had already solved this problem
-himself, badly, in Python:
+himself, in Python, before asking us for anything:
 
 > Jeg laget egne stjernekart for print til Fanafjellet sist. Da
 > kodet eg noe i python og det var mye knot, dette med en eksport til
@@ -17,10 +17,16 @@ himself, badly, in Python:
 I coded something in Python and it was a lot of hassle; an export to
 SVG would have been very useful.")*
 
-That is a reader who wanted what the atlas already draws, on paper,
-and could not get it — so he rebuilt a worse atlas to print from.
+He wanted what the atlas already draws, on paper, and the atlas
+could not give it to him — so he wrote the code himself and printed
+his charts. That work is why this sprint exists and why it is shaped
+the way it is: it identified the need, named the format, and told us
+that the friction was real rather than hypothetical. We are grateful
+for it.
+
 Every decision below is measured against that evening: a club at
-Fanafjellet, a printed sheet, and nobody writing Python.
+Fanafjellet, a printed sheet, and an atlas that should have been
+able to produce one.
 
 He asked for one other thing: to go **a little** past 36°, not
 dramatically, accepting more projection error for a practical
@@ -57,10 +63,19 @@ chord:
 | 42° | 0.0000 px | 8.6 px |
 | 48° | 0.0000 px | 9.9 px |
 
-Adopting stereographic is therefore not a change of formula. It ends
-analytic clipping and demands either a new arc geometry through the
-module seam or the sampled polyline already rejected — to buy a
-conformality the measurements below show a reader cannot see.
+Adopting stereographic is therefore not a change of formula. **It
+does not end analytic clipping** — a stereographic great circle is a
+circle (or a line through the projection centre), and a
+circle–rectangle intersection is exactly solvable too. What it ends
+is the existing **straight-line** clipper: `GreatCirclePage` returns
+a chord between two page crossings, and an arc is not a chord.
+
+The real cost is therefore an exact arc representation and clipper
+carried through the module seam — a new geometry kind that every
+reference-ink consumer must learn — to buy a conformality the
+measurements below show a reader cannot see at these fields. That is
+a proportionate reason to decline it for one modest step, and it is
+not the same claim as "sampling would be required".
 
 **The issue's own warning applies in the reverse direction too:** do
 not assume 36.1° requires a new projection. It does not. Nothing
@@ -124,12 +139,17 @@ the 14.8%.
 | smallest filled mark | 5.20 pt = 1.834 mm |
 | smallest label | 10 pt ≈ 2.47 mm cap height |
 
-**The chart is legible on paper at its natural size.** A 1 pt stroke
-is comfortably above the hairline an office printer drops, and the
-faintest star is nearly two millimetres across. No print-specific
-rescaling of the ink is required for a sheet this size — which is
-the finding, because a sheet that needed its cartography retuned
-would be a second cartography.
+**These are candidate sizes, not a legibility finding.** A 1 pt
+stroke is 0.353 mm and the faintest star is nearly two millimetres,
+which are promising numbers — but **nothing here has been printed**,
+and this branch's own first PNG shrank every label relative to the
+paper while still looking entirely plausible on screen. Arithmetic
+and an independent renderer cannot settle legibility on paper.
+
+The provisional reading is that no print-specific rescaling of the
+ink is needed at this sheet size. **#287 owes a printed sheet
+measured with a ruler**, and that observation can accept or revise
+these numbers.
 
 **Palette: white paper only.** Black sky is a screen decision about
 a dark-adapted eye; printing it would ask a reader to lay down a

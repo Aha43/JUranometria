@@ -240,7 +240,7 @@ public final class PrintableChartStudyMain {
         p("A stereographic projection maps great circles to"
                 + " **circles**. The straightness is not approximately"
                 + " lost; it is lost. Measured as the greatest"
-                + " departure of the projected ecliptic from the"
+                + " departure of a projected great circle from the"
                 + " straight chord joining where it leaves the paper:");
         p("");
         p("| field | chord measured | gnomonic | stereographic |");
@@ -252,11 +252,16 @@ public final class PrintableChartStudyMain {
                     sagitta(field, false)));
         }
         p("");
-        p("So adopting stereographic is not a change of formula. It"
-                + " is the end of analytic clipping, and either a new"
-                + " arc geometry through the module seam or a sampled"
-                + " polyline the Sprint 25 gate already rejected by"
-                + " measurement.");
+        p("So adopting stereographic is not a change of formula."
+                + " **It does not end analytic clipping**: a circle"
+                + " and a rectangle intersect exactly too. What it"
+                + " ends is the existing *straight-line* clipper,"
+                + " which returns a chord between two page crossings,"
+                + " and an arc is not a chord. The cost is an exact"
+                + " arc representation and clipper carried through the"
+                + " module seam - a new geometry kind every"
+                + " reference-ink consumer must learn - not a forced"
+                + " return to sampled polylines.");
         p("");
     }
 

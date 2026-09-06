@@ -33,7 +33,15 @@ A4 landscape, half-inch margins:
 | smallest label | 10 pt ≈ 2.47 mm cap height |
 | filled marks on the sheet | 240 |
 
-A one-point stroke is 0.353 mm — comfortably above the hairline any office printer loses, and the smallest star is nearly two millimetres across. **The chart is legible on paper at its natural size**, which is the finding that matters: no print-specific scaling of the ink is required for a sheet this size.
+US Letter is recorded separately, at its own chart rectangle, because reusing A4's geometry would run the chart past Letter's right margin and let the viewport cut it. That is not a Letter chart, and naming two page sizes is not evidence that both work:
+
+| | A4 | US Letter |
+|---|---:|---:|
+| sheet | 297.0 × 210.0 mm | 279.4 × 215.9 mm |
+| chart rectangle | 271.6 × 184.6 mm | 254.0 × 190.5 mm |
+| shapes recorded | 2268 | 2473 |
+
+A one-point stroke is 0.353 mm and the smallest star is nearly two millimetres across. Those are **candidate** sizes, not a legibility finding: nothing here has been printed, and this branch's own first PNG shrank every label relative to the paper while still looking plausible. Issue #287 owes a printed sheet measured with a ruler, and that is the observation which can accept or revise these numbers.
 
 ## What the prototypes exposed
 

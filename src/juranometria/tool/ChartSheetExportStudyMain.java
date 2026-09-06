@@ -68,39 +68,45 @@ public final class ChartSheetExportStudyMain {
         DIR.mkdirs();
         System.err.println("chart-sheet export prototypes:");
 
-        double chartWide = A4_WIDE_PT - 2 * MARGIN_PT;
-        double chartHigh = A4_HIGH_PT - 2 * MARGIN_PT;
+        // One recording PER SHEET, at that sheet's own chart
+        // rectangle. Reusing A4's geometry for Letter would run the
+        // chart past Letter's right margin and let the viewport cut
+        // it, which is not a Letter chart (PR #288 review).
+        Sheet a4 = sheet("a4", A4_WIDE_PT, A4_HIGH_PT);
+        Sheet letter = sheet("letter", LETTER_WIDE_PT, LETTER_HIGH_PT);
 
-        // One scene, at the candidate wider field, carrying the
-        // reference ink a club sheet would want.
+        writeSvg(new File(DIR, "sheet-a4.svg"), a4, false);
+        writeSvg(new File(DIR, "sheet-a4-text-as-paths.svg"), a4, true);
+        writeSvg(new File(DIR, "sheet-letter.svg"), letter, false);
+        writePdf(new File(DIR, "sheet-a4-base14-font.pdf"), a4, false);
+        writePdf(new File(DIR, "sheet-a4.pdf"), a4, true);
+        writePng(new File(DIR, "sheet-a4-300dpi.png"), a4, 300);
+
+        report(a4, letter);
+        System.err.println("written to " + DIR.getPath());
+    }
+
+    /** A sheet, its chart rectangle, and the render recorded on it. */
+    private record Sheet(String name, double widePt, double highPt,
+                         double chartWidePt, double chartHighPt,
+                         ChartSheetRecorder recorder) {
+    }
+
+    private static Sheet sheet(String name, double widePt,
+                               double highPt) {
+        double chartWide = widePt - 2 * MARGIN_PT;
+        double chartHigh = highPt - 2 * MARGIN_PT;
         ChartScene scene = scene(new SkyPosition(83.0, 0.0), 42.0, 6.0,
                 (int) Math.round(chartWide), (int) Math.round(chartHigh));
-
         ChartSheetRecorder recorder = new ChartSheetRecorder(
                 (int) Math.round(chartWide), (int) Math.round(chartHigh));
         record(scene, recorder);
-
         System.err.printf(Locale.ROOT,
-                "  recorded %d shapes and %d text runs from one"
-                        + " production render%n",
-                recorder.drawn().size(), recorder.text().size());
-
-        writeSvg(new File(DIR, "sheet-a4.svg"), recorder,
-                A4_WIDE_PT, A4_HIGH_PT, chartWide, chartHigh, false);
-        writeSvg(new File(DIR, "sheet-a4-text-as-paths.svg"), recorder,
-                A4_WIDE_PT, A4_HIGH_PT, chartWide, chartHigh, true);
-        writeSvg(new File(DIR, "sheet-letter.svg"), recorder,
-                LETTER_WIDE_PT, LETTER_HIGH_PT,
-                LETTER_WIDE_PT - 2 * MARGIN_PT,
-                LETTER_HIGH_PT - 2 * MARGIN_PT, false);
-        writePdf(new File(DIR, "sheet-a4-base14-font.pdf"), recorder,
-                A4_WIDE_PT, A4_HIGH_PT, chartWide, chartHigh, false);
-        writePdf(new File(DIR, "sheet-a4.pdf"), recorder,
-                A4_WIDE_PT, A4_HIGH_PT, chartWide, chartHigh, true);
-        writePng(new File(DIR, "sheet-a4-300dpi.png"), scene, 300);
-
-        report(recorder, chartWide, chartHigh);
-        System.err.println("written to " + DIR.getPath());
+                "  %s: chart %.0f x %.0f pt, %d shapes, %d text runs%n",
+                name, chartWide, chartHigh, recorder.drawn().size(),
+                recorder.text().size());
+        return new Sheet(name, widePt, highPt, chartWide, chartHigh,
+                recorder);
     }
 
     /** The production render, played into the recorder. */
@@ -123,38 +129,61 @@ public final class ChartSheetExportStudyMain {
 
     // ---- SVG: the editable vector master ------------------------------
 
-    private static void writeSvg(File file, ChartSheetRecorder recorder,
-                                 double sheetWide, double sheetHigh,
-                                 double chartWide, double chartHigh,
+    private static void writeSvg(File file, Sheet sheet,
                                  boolean textAsPaths) throws IOException {
+        ChartSheetRecorder recorder = sheet.recorder();
         StringBuilder svg = new StringBuilder();
         svg.append("<svg xmlns=\"http://www.w3.org/2000/svg\"")
                 .append(String.format(Locale.ROOT,
                         " width=\"%.2fpt\" height=\"%.2fpt\""
                                 + " viewBox=\"0 0 %.2f %.2f\"",
-                        sheetWide, sheetHigh, sheetWide, sheetHigh))
+                        sheet.widePt(), sheet.highPt(), sheet.widePt(),
+                        sheet.highPt()))
                 .append(" version=\"1.1\">\n");
-        // Provenance, in the file a reader will edit.
         svg.append("  <title>JUranometria chart sheet</title>\n");
-        svg.append("  <desc>Orion, 42 degree field, ICRS/J2000,"
-                + " stars to V 6.0. Produced by JUranometria from its"
-                + " own renderer; no external resources.</desc>\n");
+        svg.append(String.format(Locale.ROOT,
+                "  <desc>Orion, 42 degree field, ICRS/J2000, stars to"
+                        + " V 6.0. Chart rectangle %.1f x %.1f mm on a"
+                        + " %.1f x %.1f mm sheet. Produced by"
+                        + " JUranometria from its own renderer; no"
+                        + " external resources.</desc>%n",
+                sheet.chartWidePt() / 72.0 * 25.4,
+                sheet.chartHighPt() / 72.0 * 25.4,
+                sheet.widePt() / 72.0 * 25.4,
+                sheet.highPt() / 72.0 * 25.4));
         svg.append("  <metadata>JUranometria chart sheet prototype"
                 + " (Sprint 29 gate, issue #283). Self-contained: no"
                 + " external stylesheet, script, font or image."
                 + "</metadata>\n");
+
+        // The clips production had in force, as real clip paths. The
+        // recorder captured them and a first version threw them away,
+        // so ink production had cut at the paper bled into the sheet
+        // margin (PR #288 review).
+        List<java.awt.Shape> clips = distinctClips(recorder);
+        svg.append("  <defs>\n");
+        for (int i = 0; i < clips.size(); i++) {
+            svg.append(String.format(Locale.ROOT,
+                            "    <clipPath id=\"clip%d\"><path d=\"%s\"/>"
+                                    + "</clipPath>%n", i,
+                    path(clips.get(i))));
+        }
+        svg.append("  </defs>\n");
+
         svg.append(String.format(Locale.ROOT,
                 "  <rect x=\"0\" y=\"0\" width=\"%.2f\" height=\"%.2f\""
-                        + " fill=\"#ffffff\"/>\n", sheetWide, sheetHigh));
+                        + " fill=\"#ffffff\"/>%n",
+                sheet.widePt(), sheet.highPt()));
         svg.append(String.format(Locale.ROOT,
-                "  <g id=\"chart\" transform=\"translate(%.2f,%.2f)\">\n",
+                "  <g id=\"chart\" transform=\"translate(%.2f,%.2f)\">%n",
                 MARGIN_PT, MARGIN_PT));
 
         svg.append("    <g id=\"ink\" fill=\"none\""
                 + " stroke-linecap=\"butt\">\n");
         for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
             svg.append("      <path d=\"").append(path(drawn.shape()))
-                    .append("\"");
+                    .append("\"").append(clipAttribute(clips,
+                            drawn.clip()));
             if (drawn.filled()) {
                 svg.append(" fill=\"").append(hex(drawn.colour()))
                         .append("\"");
@@ -175,24 +204,26 @@ public final class ChartSheetExportStudyMain {
 
         svg.append("    <g id=\"labels\">\n");
         for (ChartSheetRecorder.Text text : recorder.text()) {
+            String clip = clipAttribute(clips, text.clip());
             if (textAsPaths) {
                 java.awt.font.GlyphVector glyphs = text.font()
                         .createGlyphVector(
                                 new java.awt.font.FontRenderContext(null,
                                         true, true), text.text());
-                java.awt.Shape outline = glyphs.getOutline(
-                        (float) text.x(), (float) text.y());
-                svg.append("      <path d=\"").append(path(outline))
-                        .append("\" fill=\"").append(hex(text.colour()))
+                svg.append("      <path d=\"")
+                        .append(path(glyphs.getOutline((float) text.x(),
+                                (float) text.y())))
+                        .append("\"").append(clip)
+                        .append(" fill=\"").append(hex(text.colour()))
                         .append("\"/>\n");
             } else {
                 svg.append(String.format(Locale.ROOT,
-                                "      <text x=\"%.2f\" y=\"%.2f\""
+                                "      <text x=\"%.2f\" y=\"%.2f\"%s"
                                         + " font-family=\"%s\""
                                         + " font-size=\"%d\""
                                         + " fill=\"%s\">",
-                                text.x(), text.y(),
-                                "sans-serif", text.font().getSize(),
+                                text.x(), text.y(), clip, "sans-serif",
+                                text.font().getSize(),
                                 hex(text.colour())))
                         .append(escape(text.text()))
                         .append("</text>\n");
@@ -205,6 +236,47 @@ public final class ChartSheetExportStudyMain {
         System.err.printf(Locale.ROOT, "  %s (%d bytes, text as %s)%n",
                 file.getName(), file.length(),
                 textAsPaths ? "paths" : "text");
+    }
+
+    /** Every distinct clip the recording carries, in first-seen order. */
+    private static List<java.awt.Shape> distinctClips(
+            ChartSheetRecorder recorder) {
+        List<java.awt.Shape> clips = new ArrayList<>();
+        List<String> seen = new ArrayList<>();
+        for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+            remember(clips, seen, drawn.clip());
+        }
+        for (ChartSheetRecorder.Text text : recorder.text()) {
+            remember(clips, seen, text.clip());
+        }
+        return clips;
+    }
+
+    private static void remember(List<java.awt.Shape> clips,
+                                 List<String> seen,
+                                 java.awt.Shape clip) {
+        if (clip == null) {
+            return;
+        }
+        String key = path(clip);
+        if (!seen.contains(key)) {
+            seen.add(key);
+            clips.add(clip);
+        }
+    }
+
+    private static String clipAttribute(List<java.awt.Shape> clips,
+                                        java.awt.Shape clip) {
+        if (clip == null) {
+            return "";
+        }
+        String key = path(clip);
+        for (int i = 0; i < clips.size(); i++) {
+            if (path(clips.get(i)).equals(key)) {
+                return " clip-path=\"url(#clip" + i + ")\"";
+            }
+        }
+        return "";
     }
 
     /** An SVG path for any Java2D shape, flattened only where curved. */
@@ -252,70 +324,63 @@ public final class ChartSheetExportStudyMain {
 
     // ---- PDF: genuine vector, written by hand -------------------------
 
-    private static void writePdf(File file, ChartSheetRecorder recorder,
-                                 double sheetWide, double sheetHigh,
-                                 double chartWide, double chartHigh)
-            throws IOException {
-        writePdf(file, recorder, sheetWide, sheetHigh, chartWide,
-                chartHigh, false);
-    }
-
-    private static void writePdf(File file, ChartSheetRecorder recorder,
-                                 double sheetWide, double sheetHigh,
-                                 double chartWide, double chartHigh,
-                                 boolean textAsPaths)
-            throws IOException {
+    private static void writePdf(File file, Sheet sheet,
+                                 boolean textAsPaths) throws IOException {
+        ChartSheetRecorder recorder = sheet.recorder();
         StringBuilder content = new StringBuilder();
         // PDF's origin is bottom-left; the chart's is top-left.
-        content.append(String.format(Locale.ROOT, "1 0 0 -1 %.2f %.2f cm\n",
-                MARGIN_PT, sheetHigh - MARGIN_PT));
+        content.append(String.format(Locale.ROOT, "1 0 0 -1 %.2f %.2f cm%n",
+                MARGIN_PT, sheet.highPt() - MARGIN_PT));
         content.append("1 J 1 j\n");
 
         for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+            content.append(open(drawn.clip()));
             Color colour = drawn.colour();
-            content.append(String.format(Locale.ROOT, "%.3f %.3f %.3f %s\n",
+            content.append(String.format(Locale.ROOT, "%.3f %.3f %.3f %s%n",
                     colour.getRed() / 255.0, colour.getGreen() / 255.0,
                     colour.getBlue() / 255.0,
                     drawn.filled() ? "rg" : "RG"));
             if (!drawn.filled()) {
-                content.append(String.format(Locale.ROOT, "%.2f w\n",
+                content.append(String.format(Locale.ROOT, "%.2f w%n",
                         drawn.stroke().width()));
                 content.append(dashOperator(drawn.stroke().dash()));
             }
             content.append(pdfPath(drawn.shape()));
             content.append(drawn.filled() ? "f\n" : "S\n");
+            content.append(close(drawn.clip()));
         }
 
         for (ChartSheetRecorder.Text text : recorder.text()) {
+            content.append(open(text.clip()));
             Color colour = text.colour();
             if (textAsPaths) {
-                // Outlines: every glyph the chart uses reaches the
-                // page, whatever fonts the reader's viewer has and
-                // whatever a base-14 encoding can name.
                 java.awt.font.GlyphVector glyphs = text.font()
                         .createGlyphVector(
                                 new java.awt.font.FontRenderContext(null,
                                         true, true), text.text());
                 content.append(String.format(Locale.ROOT,
-                        "%.3f %.3f %.3f rg\n",
+                        "%.3f %.3f %.3f rg%n",
                         colour.getRed() / 255.0,
                         colour.getGreen() / 255.0,
                         colour.getBlue() / 255.0));
                 content.append(pdfPath(glyphs.getOutline((float) text.x(),
                         (float) text.y())));
                 content.append("f\n");
-                continue;
+            } else {
+                content.append(String.format(Locale.ROOT,
+                        "BT /F1 %d Tf %.3f %.3f %.3f rg"
+                                + " 1 0 0 -1 %.2f %.2f Tm (%s) Tj ET%n",
+                        text.font().getSize(),
+                        colour.getRed() / 255.0,
+                        colour.getGreen() / 255.0,
+                        colour.getBlue() / 255.0,
+                        text.x(), text.y(), pdfString(text.text())));
             }
-            content.append(String.format(Locale.ROOT,
-                    "BT /F1 %d Tf %.3f %.3f %.3f rg"
-                            + " 1 0 0 -1 %.2f %.2f Tm (%s) Tj ET\n",
-                    text.font().getSize(),
-                    colour.getRed() / 255.0, colour.getGreen() / 255.0,
-                    colour.getBlue() / 255.0,
-                    text.x(), text.y(), pdfString(text.text())));
+            content.append(close(text.clip()));
         }
 
-        byte[] stream = content.toString().getBytes(StandardCharsets.ISO_8859_1);
+        byte[] stream = content.toString()
+                .getBytes(StandardCharsets.ISO_8859_1);
         List<byte[]> objects = new ArrayList<>();
         objects.add(("<< /Type /Catalog /Pages 2 0 R >>")
                 .getBytes(StandardCharsets.ISO_8859_1));
@@ -324,7 +389,8 @@ public final class ChartSheetExportStudyMain {
         objects.add((String.format(Locale.ROOT,
                 "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %.2f %.2f]"
                         + " /Resources << /Font << /F1 5 0 R >> >>"
-                        + " /Contents 4 0 R >>", sheetWide, sheetHigh))
+                        + " /Contents 4 0 R >>", sheet.widePt(),
+                sheet.highPt()))
                 .getBytes(StandardCharsets.ISO_8859_1));
         objects.add((String.format(Locale.ROOT,
                 "<< /Length %d >>\nstream\n", stream.length)
@@ -334,7 +400,8 @@ public final class ChartSheetExportStudyMain {
                 + " /Encoding /WinAnsiEncoding >>")
                 .getBytes(StandardCharsets.ISO_8859_1));
 
-        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+        java.io.ByteArrayOutputStream out =
+                new java.io.ByteArrayOutputStream();
         out.write("%PDF-1.4\n".getBytes(StandardCharsets.ISO_8859_1));
         int[] offsets = new int[objects.size() + 1];
         for (int i = 0; i < objects.size(); i++) {
@@ -361,6 +428,18 @@ public final class ChartSheetExportStudyMain {
                 file.length());
     }
 
+    /** Push the graphics state and clip, when there is a clip. */
+    private static String open(java.awt.Shape clip) {
+        if (clip == null) {
+            return "";
+        }
+        return "q\n" + pdfPath(clip) + "W n\n";
+    }
+
+    private static String close(java.awt.Shape clip) {
+        return clip == null ? "" : "Q\n";
+    }
+
     private static String dashOperator(float[] pattern) {
         if (pattern == null) {
             return "[] 0 d\n";
@@ -373,23 +452,59 @@ public final class ChartSheetExportStudyMain {
         return text.append("] 0 d\n").toString();
     }
 
-    private static String pdfPath(java.awt.Shape shape) {
+    static String pdfPath(java.awt.Shape shape) {
         StringBuilder d = new StringBuilder();
         double[] c = new double[6];
+        // PDF has no quadratic operator, so a quadratic must be
+        // converted rather than approximated. The equivalent cubic
+        // controls depend on the CURRENT point: P0 + 2/3(Q - P0) and
+        // P2 + 2/3(Q - P2). A first version emitted the quadratic's
+        // own control point twice, which is a different curve and
+        // changed the geometry silently (PR #288 review).
+        double currentX = 0;
+        double currentY = 0;
+        double startX = 0;
+        double startY = 0;
         for (PathIterator it = shape.getPathIterator(null); !it.isDone();
                 it.next()) {
             switch (it.currentSegment(c)) {
-                case PathIterator.SEG_MOVETO -> d.append(String.format(
-                        Locale.ROOT, "%.2f %.2f m%n", c[0], c[1]));
-                case PathIterator.SEG_LINETO -> d.append(String.format(
-                        Locale.ROOT, "%.2f %.2f l%n", c[0], c[1]));
-                case PathIterator.SEG_QUADTO -> d.append(String.format(
-                        Locale.ROOT, "%.2f %.2f %.2f %.2f %.2f %.2f c%n",
-                        c[0], c[1], c[0], c[1], c[2], c[3]));
-                case PathIterator.SEG_CUBICTO -> d.append(String.format(
-                        Locale.ROOT, "%.2f %.2f %.2f %.2f %.2f %.2f c%n",
-                        c[0], c[1], c[2], c[3], c[4], c[5]));
-                case PathIterator.SEG_CLOSE -> d.append("h\n");
+                case PathIterator.SEG_MOVETO -> {
+                    d.append(String.format(Locale.ROOT, "%.2f %.2f m%n",
+                            c[0], c[1]));
+                    currentX = c[0];
+                    currentY = c[1];
+                    startX = c[0];
+                    startY = c[1];
+                }
+                case PathIterator.SEG_LINETO -> {
+                    d.append(String.format(Locale.ROOT, "%.2f %.2f l%n",
+                            c[0], c[1]));
+                    currentX = c[0];
+                    currentY = c[1];
+                }
+                case PathIterator.SEG_QUADTO -> {
+                    double c1x = currentX + 2.0 / 3.0 * (c[0] - currentX);
+                    double c1y = currentY + 2.0 / 3.0 * (c[1] - currentY);
+                    double c2x = c[2] + 2.0 / 3.0 * (c[0] - c[2]);
+                    double c2y = c[3] + 2.0 / 3.0 * (c[1] - c[3]);
+                    d.append(String.format(Locale.ROOT,
+                            "%.2f %.2f %.2f %.2f %.2f %.2f c%n",
+                            c1x, c1y, c2x, c2y, c[2], c[3]));
+                    currentX = c[2];
+                    currentY = c[3];
+                }
+                case PathIterator.SEG_CUBICTO -> {
+                    d.append(String.format(Locale.ROOT,
+                            "%.2f %.2f %.2f %.2f %.2f %.2f c%n",
+                            c[0], c[1], c[2], c[3], c[4], c[5]));
+                    currentX = c[4];
+                    currentY = c[5];
+                }
+                case PathIterator.SEG_CLOSE -> {
+                    d.append("h\n");
+                    currentX = startX;
+                    currentY = startY;
+                }
                 default -> throw new IllegalStateException("path segment");
             }
         }
@@ -403,41 +518,102 @@ public final class ChartSheetExportStudyMain {
 
     // ---- PNG: explicit dimensions and resolution ----------------------
 
-    private static void writePng(File file, ChartScene scene, int dpi)
+    private static void writePng(File file, Sheet sheet, int dpi)
             throws IOException {
-        double chartWideInches =
-                (A4_WIDE_PT - 2 * MARGIN_PT) / 72.0;
-        double chartHighInches =
-                (A4_HIGH_PT - 2 * MARGIN_PT) / 72.0;
-        int wide = (int) Math.round(chartWideInches * dpi);
-        int high = (int) Math.round(chartHighInches * dpi);
+        // The WHOLE sheet, at the stated resolution, with the ink at
+        // its point size scaled up - not the chart re-rendered into a
+        // bigger pixel grid, which shrinks every label and stroke
+        // relative to the paper (PR #288 review).
+        double scale = dpi / 72.0;
+        int wide = (int) Math.round(sheet.widePt() * scale);
+        int high = (int) Math.round(sheet.highPt() * scale);
 
-        ChartScene atResolution = new ChartScene(
-                new ChartViewport(scene.viewport().centre(),
-                        scene.viewport().fieldWidthDegrees(), wide, high),
-                scene.stars(), scene.deepSkyObjects(), scene.title(),
-                scene.limitingMagnitude(), scene.targetIdentity(),
-                scene.geography());
-        BufferedImage image = new BufferedImage(wide, high,
-                BufferedImage.TYPE_INT_RGB);
+        BufferedImage image =
+                new BufferedImage(wide, high, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            record(atResolution, g);
+            g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(
+                    java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setRenderingHint(
+                    java.awt.RenderingHints.KEY_STROKE_CONTROL,
+                    java.awt.RenderingHints.VALUE_STROKE_PURE);
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, wide, high);
+            g.scale(scale, scale);
+            g.translate(MARGIN_PT, MARGIN_PT);
+            record(scene(new SkyPosition(83.0, 0.0), 42.0, 6.0,
+                    (int) Math.round(sheet.chartWidePt()),
+                    (int) Math.round(sheet.chartHighPt())), g);
         } finally {
             g.dispose();
         }
-        ImageIO.write(image, "png", file);
+        writePngWithResolution(file, image, dpi);
         System.err.printf(Locale.ROOT,
-                "  %s (%d x %d px at %d dpi = %.1f x %.1f inches,"
-                        + " %d bytes)%n",
-                file.getName(), wide, high, dpi, chartWideInches,
-                chartHighInches, file.length());
+                "  %s (%d x %d px, whole sheet at %d dpi = %.1f x %.1f"
+                        + " inches, %d bytes)%n",
+                file.getName(), wide, high, dpi,
+                sheet.widePt() / 72.0, sheet.highPt() / 72.0,
+                file.length());
+    }
+
+    /**
+     * A PNG that states its own resolution.
+     *
+     * <p>{@code ImageIO.write} alone emits no {@code pHYs} chunk, so
+     * a reader's software has no way to place the image on paper and
+     * a stated dpi lives only in a filename (PR #288 review).
+     */
+    private static void writePngWithResolution(File file,
+                                               BufferedImage image,
+                                               int dpi)
+            throws IOException {
+        javax.imageio.ImageWriter writer =
+                javax.imageio.ImageIO.getImageWritersByFormatName("png")
+                        .next();
+        javax.imageio.ImageWriteParam params =
+                writer.getDefaultWriteParam();
+        javax.imageio.metadata.IIOMetadata metadata =
+                writer.getDefaultImageMetadata(
+                        new javax.imageio.ImageTypeSpecifier(image),
+                        params);
+        String format = "javax_imageio_png_1.0";
+        javax.imageio.metadata.IIOMetadataNode physical =
+                new javax.imageio.metadata.IIOMetadataNode("pHYs");
+        long perMetre = Math.round(dpi / 0.0254);
+        physical.setAttribute("pixelsPerUnitXAxis",
+                Long.toString(perMetre));
+        physical.setAttribute("pixelsPerUnitYAxis",
+                Long.toString(perMetre));
+        physical.setAttribute("unitSpecifier", "meter");
+        javax.imageio.metadata.IIOMetadataNode root =
+                new javax.imageio.metadata.IIOMetadataNode(format);
+        root.appendChild(physical);
+        try {
+            metadata.mergeTree(format, root);
+            try (javax.imageio.stream.ImageOutputStream out =
+                         javax.imageio.ImageIO.createImageOutputStream(
+                                 file)) {
+                writer.setOutput(out);
+                writer.write(null, new javax.imageio.IIOImage(image, null,
+                        metadata), params);
+            }
+        } catch (javax.imageio.metadata.IIOInvalidTreeException failure) {
+            throw new IOException("the PNG could not state its"
+                    + " resolution", failure);
+        } finally {
+            writer.dispose();
+        }
     }
 
     // ---- what the prototypes measured ---------------------------------
 
-    private static void report(ChartSheetRecorder recorder,
-                               double chartWide, double chartHigh) {
+    private static void report(Sheet a4, Sheet letter) {
+        ChartSheetRecorder recorder = a4.recorder();
+        double chartWide = a4.chartWidePt();
+        double chartHigh = a4.chartHighPt();
         int fills = 0;
         double thinnest = Double.MAX_VALUE;
         double smallestFill = Double.MAX_VALUE;
@@ -532,13 +708,39 @@ public final class ChartSheetExportStudyMain {
         p(String.format(Locale.ROOT, "| filled marks on the sheet | %d |",
                 fills));
         p("");
-        p("A one-point stroke is 0.353 mm — comfortably above the"
-                + " hairline any office printer loses, and the"
-                + " smallest star is nearly two millimetres across."
-                + " **The chart is legible on paper at its natural"
-                + " size**, which is the finding that matters: no"
-                + " print-specific scaling of the ink is required for"
-                + " a sheet this size.");
+        p("US Letter is recorded separately, at its own chart"
+                + " rectangle, because reusing A4's geometry would run"
+                + " the chart past Letter's right margin and let the"
+                + " viewport cut it. That is not a Letter chart, and"
+                + " naming two page sizes is not evidence that both"
+                + " work:");
+        p("");
+        p("| | A4 | US Letter |");
+        p("|---|---:|---:|");
+        p(String.format(Locale.ROOT, "| sheet | %.1f × %.1f mm | %.1f × %.1f mm |",
+                a4.widePt() / 72.0 * 25.4, a4.highPt() / 72.0 * 25.4,
+                letter.widePt() / 72.0 * 25.4,
+                letter.highPt() / 72.0 * 25.4));
+        p(String.format(Locale.ROOT,
+                "| chart rectangle | %.1f × %.1f mm | %.1f × %.1f mm |",
+                a4.chartWidePt() / 72.0 * 25.4,
+                a4.chartHighPt() / 72.0 * 25.4,
+                letter.chartWidePt() / 72.0 * 25.4,
+                letter.chartHighPt() / 72.0 * 25.4));
+        p(String.format(Locale.ROOT,
+                "| shapes recorded | %d | %d |",
+                a4.recorder().drawn().size(),
+                letter.recorder().drawn().size()));
+        p("");
+        p("A one-point stroke is 0.353 mm and the smallest star is"
+                + " nearly two millimetres across. Those are"
+                + " **candidate** sizes, not a legibility finding:"
+                + " nothing here has been printed, and this branch's"
+                + " own first PNG shrank every label relative to the"
+                + " paper while still looking plausible. Issue #287"
+                + " owes a printed sheet measured with a ruler, and"
+                + " that is the observation which can accept or"
+                + " revise these numbers.");
         p("");
 
         p("## What the prototypes exposed");
