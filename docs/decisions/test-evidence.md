@@ -76,10 +76,10 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **41 files** touch process-wide state —
-**20** use the shared guard, **20** restore locally,
-**0 flagged unprotected** — and **26 files** depend on a display,
-of which **15** state a focus premise and **18** a reachability
+this document to them: **42 files** touch process-wide state —
+**21** use the shared guard, **20** restore locally,
+**0 flagged unprotected** — and **27 files** depend on a display,
+of which **15** state a focus premise and **19** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -95,7 +95,9 @@ the real toolbar so its Reset view can be pressed through the
 shared route helper rather than activated in no window; and #284's
 sheet-page journey, which shows the toolbar for the same reason —
 the zoom-out control has to be pressed to prove the new step is
-reachable by pressing it.)
+reachable by pressing it; and #286's export dialog, laid out on
+both grounds at two text sizes and pressed through the shared route
+helper.)
 
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
@@ -162,7 +164,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **337
-reads of live chart state** against **531 explicit hand-offs**
+reads of live chart state** against **535 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline, and again
 for #275's closing journey, which reads the page's own objects and

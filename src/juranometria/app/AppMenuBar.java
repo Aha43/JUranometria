@@ -27,6 +27,28 @@ public final class AppMenuBar {
     /** The inspector item's name, so callers can keep it in step. */
     public static final String INSPECTOR_ITEM = "inspectorItem";
 
+    /** The File menu's export item, for tests and for automation. */
+    public static final String EXPORT_ITEM = "exportSheetItem";
+
+    private static JMenuItem named(JMenuBar bar, String name) {
+        for (int menu = 0; menu < bar.getMenuCount(); menu++) {
+            JMenu each = bar.getMenu(menu);
+            for (int item = 0; item < each.getItemCount(); item++) {
+                JMenuItem candidate = each.getItem(item);
+                if (candidate != null
+                        && name.equals(candidate.getName())) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** The File menu's export item in a built bar, or null. */
+    public static JMenuItem exportItem(JMenuBar bar) {
+        return named(bar, EXPORT_ITEM);
+    }
+
     /** The ecliptic item's name, for the same reason (issue #274). */
     public static final String ECLIPTIC_ITEM = "eclipticItem";
 
@@ -146,21 +168,65 @@ public final class AppMenuBar {
                                   Runnable toggleInspector,
                                   Runnable openPlaceAndTime,
                                   Runnable toggleEcliptic) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic, null);
+    }
+
+    /**
+     * The menu bar with the export item (Sprint 29, issue #286).
+     *
+     * <p>File, because that is where every application a reader has
+     * ever used keeps "make me a file". Not the toolbar, which is
+     * for the chart, and not Chart Options, which is for what the
+     * chart draws.
+     *
+     * @param exportSheet runs on File's Export chart sheet item (may
+     *     be null, omitting the item)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  Runnable exportSheet) {
         if (openAbout == null) {
             throw new IllegalArgumentException("about action is required");
         }
         JMenuBar bar = new JMenuBar();
 
-        if (openSettings != null) {
+        if (openSettings != null || exportSheet != null) {
             JMenu application = new JMenu("File");
             application.getAccessibleContext().setAccessibleName(
                     "File menu");
-            JMenuItem settings = new JMenuItem("Settings...");
-            settings.getAccessibleContext().setAccessibleName("Settings");
-            settings.getAccessibleContext().setAccessibleDescription(
-                    "Application appearance settings");
-            settings.addActionListener(event -> openSettings.run());
-            application.add(settings);
+            if (exportSheet != null) {
+                JMenuItem export =
+                        new JMenuItem("Export Chart Sheet...");
+                export.setName(EXPORT_ITEM);
+                export.setMnemonic('E');
+                export.setAccelerator(KeyStroke.getKeyStroke(
+                        java.awt.event.KeyEvent.VK_E, menuShortcutMask()));
+                export.getAccessibleContext().setAccessibleName(
+                        "Export Chart Sheet");
+                export.getAccessibleContext().setAccessibleDescription(
+                        "Save this chart as a sheet of paper: SVG, PDF"
+                                + " or PNG");
+                export.addActionListener(event -> exportSheet.run());
+                application.add(export);
+                if (openSettings != null) {
+                    application.addSeparator();
+                }
+            }
+            if (openSettings != null) {
+                JMenuItem settings = new JMenuItem("Settings...");
+                settings.getAccessibleContext().setAccessibleName(
+                        "Settings");
+                settings.getAccessibleContext().setAccessibleDescription(
+                        "Application appearance settings");
+                settings.addActionListener(event -> openSettings.run());
+                application.add(settings);
+            }
             bar.add(application);
         }
 

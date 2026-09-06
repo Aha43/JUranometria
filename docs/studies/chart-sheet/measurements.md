@@ -19,18 +19,26 @@ Regenerate with `make chart-sheet-study`.
 
 | file | paper | shapes | labels | bytes |
 |---|---|---:|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 27 | 298530 |
-| `sheet-letter.svg` | US Letter | 2472 | 28 | 326413 |
-| `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 365340 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 244109 |
+| `sheet-a4.svg` | A4 | 2267 | 27 | 394700 |
+| `sheet-letter.svg` | US Letter | 2472 | 28 | 431109 |
+| `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 461510 |
+| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 332269 |
+| `sheet-a4.pdf` | A4 | 2267 | 27 as outlines | 504179 |
+| `sheet-a4-modules.pdf` | A4 | 1966 | 16 as outlines | 409173 |
+| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 27 | 426482 |
 
 `sheet-a4-outlines.svg` is the same chart with every label converted to
 its outline, for a machine whose fonts are unknown. It is larger and it
 cannot be edited as words, which is why it is the variant and not the
 master.
 
-`sheet-a4-modules.svg` carries the meridian, the horizon, the zenith and
+`sheet-a4-modules.svg` and its PDF carry the meridian, the horizon, the zenith and
 the ecliptic - the March equinox page, where the ecliptic's landmarks are.
+
+The PDF draws its labels as outlines, because the base-14 fonts every
+reader has cannot spell the chart's own notation; the PNG is the whole sheet
+at 300 dpi with a `pHYs` chunk stating that, so a printer sizes it rather
+than fitting it. All three come from one recording of one render.
 
 ## What is not settled here
 

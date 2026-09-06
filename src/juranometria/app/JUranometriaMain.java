@@ -164,7 +164,11 @@ public final class JUranometriaMain {
                 // module's own seam so a test can drive exactly what
                 // a reader sets off.
                 juranometria.ui.ecliptic.EclipticSession.toggle(
-                        ecliptic, eclipticStore)));
+                        ecliptic, eclipticStore),
+                // File, Export Chart Sheet: the chart the reader is
+                // looking at, on paper (Sprint 29, issue #286).
+                () -> ExportSheetSession.open(frame, controller, chart,
+                        chartOptions, modules.workingSelection())));
         // One call, so the chart and the tick cannot disagree about
         // what the reader last chose.
         juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,

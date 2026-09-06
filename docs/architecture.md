@@ -128,6 +128,13 @@ and not a window's shape, and the **ground**, because printing a black sky
 asks a reader to lay down a sheet of toner. Both are decided in
 [the printable-chart decision](decisions/printable-chart.md).
 
+Three writers sit on the far side of that boundary — SVG, PDF and
+PNG — and one recording feeds all of them, so a reader who exports
+the same chart three times gets the same chart three times. The
+reader surface is one File-menu item and one dialog, in
+`juranometria.app`; the writers know nothing of Swing, and the
+dialog knows nothing of the sky.
+
 **The Solar System road.** The ecliptic is the frame the Solar System is
 described in, so this module is the frame arriving without any of the
 bodies. A future module drawing the Sun, the Moon or a planet can express

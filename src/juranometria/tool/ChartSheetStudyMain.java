@@ -16,6 +16,8 @@ import juranometria.render.ChartPalette;
 import juranometria.render.ChartRenderer;
 import juranometria.sheet.ChartSheet;
 import juranometria.sheet.PaperSize;
+import juranometria.sheet.PdfSheetWriter;
+import juranometria.sheet.PngSheetWriter;
 import juranometria.sheet.SheetRecording;
 import juranometria.sheet.SvgSheetWriter;
 import juranometria.sky.Observer;
@@ -80,24 +82,36 @@ public final class ChartSheetStudyMain {
         report.append("| file | paper | shapes | labels | bytes |\n");
         report.append("|---|---|---:|---:|---:|\n");
 
-        write(report, "sheet-a4.svg", ORION, PaperSize.A4, false,
+        svg(report, "sheet-a4.svg", ORION, PaperSize.A4, false,
                 SvgSheetWriter.Text.EDITABLE);
-        write(report, "sheet-letter.svg", ORION, PaperSize.LETTER, false,
+        svg(report, "sheet-letter.svg", ORION, PaperSize.LETTER, false,
                 SvgSheetWriter.Text.EDITABLE);
-        write(report, "sheet-a4-outlines.svg", ORION, PaperSize.A4, false,
+        svg(report, "sheet-a4-outlines.svg", ORION, PaperSize.A4, false,
                 SvgSheetWriter.Text.OUTLINES);
-        write(report, "sheet-a4-modules.svg", EQUINOX, PaperSize.A4, true,
+        svg(report, "sheet-a4-modules.svg", EQUINOX, PaperSize.A4, true,
                 SvgSheetWriter.Text.EDITABLE);
+        pdf(report, "sheet-a4.pdf", ORION, PaperSize.A4, false);
+        pdf(report, "sheet-a4-modules.pdf", EQUINOX, PaperSize.A4, true);
+        png(report, "sheet-a4-300dpi.png", ORION, PaperSize.A4,
+                PngSheetWriter.DEFAULT_RESOLUTION);
 
         report.append("\n`sheet-a4-outlines.svg` is the same chart with"
                 + " every label converted to\nits outline, for a"
                 + " machine whose fonts are unknown. It is larger and"
                 + " it\ncannot be edited as words, which is why it is"
                 + " the variant and not the\nmaster.\n\n");
-        report.append("`sheet-a4-modules.svg` carries the meridian, the"
-                + " horizon, the zenith and\nthe ecliptic - the March"
-                + " equinox page, where the ecliptic's landmarks"
-                + " are.\n\n");
+        report.append("`sheet-a4-modules.svg` and its PDF carry the"
+                + " meridian, the horizon, the zenith and"
+                + "\nthe ecliptic - the March equinox page, where the"
+                + " ecliptic's landmarks are.\n\n");
+        report.append("The PDF draws its labels as outlines, because the"
+                + " base-14 fonts every\nreader has cannot spell the"
+                + " chart's own notation; the PNG is the whole"
+                + " sheet\nat "
+                + PngSheetWriter.DEFAULT_RESOLUTION + " dpi with a"
+                + " `pHYs` chunk stating that, so a printer sizes it"
+                + " rather\nthan fitting it. All three come from one"
+                + " recording of one render.\n\n");
 
         report.append("## What is not settled here\n\n");
         report.append("**Nothing on this page has been printed.** The"
@@ -119,14 +133,45 @@ public final class ChartSheetStudyMain {
         System.out.print(report);
     }
 
-    private static void write(StringBuilder report, String name,
+    private static void pdf(StringBuilder report, String name,
+                            ChartViewState state, PaperSize paper,
+                            boolean modules) throws Exception {
+        SheetRecording sheet = record(state, paper, modules);
+        byte[] pdf = PdfSheetWriter.write(sheet);
+        Files.write(new File(DIR, name).toPath(), pdf);
+        report.append(String.format(Locale.ROOT,
+                "| `%s` | %s | %d | %d as outlines | %d |%n", name,
+                paper.readableName(), sheet.shapeCount(),
+                sheet.textCount(), pdf.length));
+    }
+
+    private static void png(StringBuilder report, String name,
+                            ChartViewState state, PaperSize paper,
+                            int dpi) throws Exception {
+        SheetRecording sheet = record(state, paper, false);
+        byte[] png = PngSheetWriter.write(sheet, dpi);
+        Files.write(new File(DIR, name).toPath(), png);
+        report.append(String.format(Locale.ROOT,
+                "| `%s` | %s at %d dpi, %d x %d px | %d | %d | %d |%n",
+                name, paper.readableName(), dpi,
+                PngSheetWriter.widePixels(paper, dpi),
+                PngSheetWriter.highPixels(paper, dpi),
+                sheet.shapeCount(), sheet.textCount(), png.length));
+    }
+
+    private static SheetRecording record(ChartViewState state,
+                                         PaperSize paper, boolean modules) {
+        return ChartSheet.record(Atlas.assembler()::assemble, state,
+                ChartOptions.DEFAULTS,
+                modules ? modules() : ChartRenderer.ReferenceLayer.NONE,
+                paper);
+    }
+
+    private static void svg(StringBuilder report, String name,
                               ChartViewState state, PaperSize paper,
                               boolean modules, SvgSheetWriter.Text text)
             throws Exception {
-        SheetRecording sheet = ChartSheet.record(
-                Atlas.assembler()::assemble, state, ChartOptions.DEFAULTS,
-                modules ? modules() : ChartRenderer.ReferenceLayer.NONE,
-                paper);
+        SheetRecording sheet = record(state, paper, modules);
         String svg = SvgSheetWriter.write(sheet, text);
         File file = new File(DIR, name);
         Files.writeString(file.toPath(), svg, StandardCharsets.UTF_8);

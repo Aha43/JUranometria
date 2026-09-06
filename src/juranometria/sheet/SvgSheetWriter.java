@@ -108,8 +108,11 @@ public final class SvgSheetWriter {
                 "  <g id=\"chart\" transform=\"translate(%.2f,%.2f)\">%n",
                 paper.marginPoints(), paper.marginPoints()));
 
-        svg.append("    <g id=\"ink\" fill=\"none\""
-                + " stroke-linecap=\"butt\">\n");
+        // No blanket cap here. The cartography does not use one cap
+        // throughout - a reference line is drawn butt-capped and an
+        // ordinary line is not - and a group-wide value quietly
+        // redrew half of them (issue #286).
+        svg.append("    <g id=\"ink\" fill=\"none\">\n");
         for (SheetRecorder.Drawn drawn : sheet.recorder().drawn()) {
             svg.append("      <path d=\"").append(path(drawn.shape()))
                     .append('"').append(clipAttribute(clips, drawn.clip()));
@@ -117,13 +120,18 @@ public final class SvgSheetWriter {
                 svg.append(" fill=\"").append(hex(drawn.colour()))
                         .append('"');
             } else {
+                SheetRecorder.BasicStrokeSpec stroke = drawn.stroke();
                 svg.append(" stroke=\"").append(hex(drawn.colour()))
                         .append(String.format(Locale.ROOT,
                                 "\" stroke-width=\"%.2f\"",
-                                drawn.stroke().width()));
-                if (drawn.stroke().dash() != null) {
+                                stroke.width()))
+                        .append(" stroke-linecap=\"")
+                        .append(capName(stroke.cap())).append('"')
+                        .append(" stroke-linejoin=\"")
+                        .append(joinName(stroke.join())).append('"');
+                if (stroke.dash() != null) {
                     svg.append(" stroke-dasharray=\"")
-                            .append(dash(drawn.stroke().dash()))
+                            .append(dash(stroke.dash()))
                             .append('"');
                 }
             }
@@ -238,6 +246,24 @@ public final class SvgSheetWriter {
             }
         }
         return path.toString().trim();
+    }
+
+    /** SVG's name for a Java end cap. */
+    private static String capName(int cap) {
+        return switch (cap) {
+            case java.awt.BasicStroke.CAP_BUTT -> "butt";
+            case java.awt.BasicStroke.CAP_ROUND -> "round";
+            default -> "square";
+        };
+    }
+
+    /** SVG's name for a Java line join. */
+    private static String joinName(int join) {
+        return switch (join) {
+            case java.awt.BasicStroke.JOIN_ROUND -> "round";
+            case java.awt.BasicStroke.JOIN_BEVEL -> "bevel";
+            default -> "miter";
+        };
     }
 
     private static String dash(float[] pattern) {

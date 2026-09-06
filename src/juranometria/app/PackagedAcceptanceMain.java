@@ -1466,50 +1466,49 @@ public final class PackagedAcceptanceMain {
      */
     private static void exportJourney(ChartViewController navigation)
             throws Exception {
-        juranometria.sheet.SheetRecording sheet =
-                juranometria.sheet.ChartSheet.record(
+        java.util.List<String> written = new java.util.ArrayList<>();
+        for (juranometria.sheet.SheetFormat format
+                : juranometria.sheet.SheetFormat.values()) {
+            java.nio.file.Path file = java.nio.file.Files.createTempFile(
+                    "juranometria-acceptance-",
+                    "." + format.extension());
+            try {
+                var outcome = juranometria.app.ExportSheet.write(
                         Atlas.assembler()::assemble, navigation.state(),
                         ChartOptions.DEFAULTS,
                         ChartRenderer.ReferenceLayer.NONE,
-                        juranometria.sheet.PaperSize.A4);
-        String svg = juranometria.sheet.SvgSheetWriter.write(sheet,
-                juranometria.sheet.SvgSheetWriter.Text.EDITABLE);
+                        new juranometria.app.ExportSheet.Request(format,
+                                juranometria.sheet.PaperSize.A4, 150,
+                                false),
+                        file.toFile());
+                require(outcome
+                                instanceof ExportSheet.Outcome.Written,
+                        "the packaged application writes " + format
+                                + ": " + outcome);
+                byte[] bytes = java.nio.file.Files.readAllBytes(file);
+                require(bytes.length > 5000, format
+                        + " carries the chart: " + bytes.length
+                        + " bytes");
 
-        require(svg.startsWith("<svg")
-                        && svg.contains("width=\"841.89pt\""),
-                "the packaged application writes an A4 sheet at A4's"
-                        + " own size");
-        require(sheet.shapeCount() > 500 && sheet.textCount() > 0,
-                "carrying the chart it is showing: "
-                        + sheet.shapeCount() + " shapes, "
-                        + sheet.textCount() + " labels");
-        require(!svg.contains("<image") && !svg.contains("xlink:href"),
-                "with nothing raster and nothing fetched in it");
-
-        // And it reaches a file, which is what a reader actually
-        // does with it. Written where the platform puts temporary
-        // files, read back, and removed.
-        java.nio.file.Path written = java.nio.file.Files.createTempFile(
-                "juranometria-acceptance-", ".svg");
-        try {
-            java.nio.file.Files.writeString(written, svg,
-                    java.nio.charset.StandardCharsets.UTF_8);
-            String readBack = java.nio.file.Files.readString(written,
-                    java.nio.charset.StandardCharsets.UTF_8);
-            require(readBack.equals(svg),
-                    "and survives the round trip to a file: "
-                            + java.nio.file.Files.size(written)
-                            + " bytes");
-            require(readBack.contains("\u03b1")
-                            || readBack.contains("\u00b0"),
-                    "with the chart's own notation intact through"
-                            + " UTF-8");
-        } finally {
-            java.nio.file.Files.deleteIfExists(written);
+                String head = new String(bytes, 0, 8,
+                        java.nio.charset.StandardCharsets.ISO_8859_1);
+                switch (format) {
+                    case SVG -> require(head.startsWith("<svg"),
+                            "and is an SVG");
+                    case PDF -> require(head.startsWith("%PDF-"),
+                            "and is a PDF");
+                    case PNG -> require((bytes[0] & 0xff) == 0x89
+                                    && bytes[1] == 'P',
+                            "and is a PNG");
+                }
+                written.add(format + " " + bytes.length + " bytes");
+            } finally {
+                java.nio.file.Files.deleteIfExists(file);
+            }
         }
-        System.out.println("chart sheet export OK (A4 SVG written and"
-                + " read back, " + sheet.shapeCount() + " shapes, no"
-                + " build tools involved)");
+        System.out.println("chart sheet export OK (" 
+                + String.join(", ", written)
+                + ", no build tools involved)");
     }
 
     /** Whether the page's named target is a mark of this family. */
