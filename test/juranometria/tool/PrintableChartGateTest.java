@@ -32,24 +32,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PrintableChartGateTest {
 
     @Test
-    void theWiderFieldIsNotReachableFromTheApplicationYet() {
-        // The gate decided 42 degrees; #284 implements it. Until then
-        // the released step sequence is exactly what it was, and a
-        // reader cannot reach a field the atlas has not yet decided
-        // how to draw honestly.
-        assertThrows(IllegalArgumentException.class,
-                () -> new ChartViewState(new SkyPosition(83.0, 0.0),
-                        42.0, 6.0),
-                "42 degrees is not a released step during the gate");
+    void theApplicationGainedTheFieldTheGateChoseAndNoOther() {
+        // While the gate was open this said the wider field was not
+        // reachable at all. #284 made the chosen one reachable, which
+        // is the only way this assertion should ever have changed -
+        // so it now holds the same line from the other side.
+        ChartViewState sheet = new ChartViewState(
+                new SkyPosition(83.0, 0.0), 42.0, 6.0);
+        assertEquals(42.0, sheet.fieldWidthDegrees(),
+                "42 degrees is the step the gate chose, and the atlas"
+                        + " has it");
+
         assertThrows(IllegalArgumentException.class,
                 () -> new ChartViewState(new SkyPosition(83.0, 0.0),
                         48.0, 6.0),
-                "and neither is the field the gate rejected");
-
-        ChartViewState widest = new ChartViewState(
-                new SkyPosition(83.0, 0.0), 36.0, 6.0);
-        assertEquals(36.0, widest.fieldWidthDegrees(),
-                "36 degrees is still the atlas's widest");
+                "and 48 - the tempting one, at 14.8% anisotropy - is"
+                        + " still not a page this atlas will draw");
+        assertThrows(IllegalArgumentException.class,
+                () -> new ChartViewState(new SkyPosition(83.0, 0.0),
+                        45.0, 6.0),
+                "nor 45, at 12.9%, which is what the 12% budget"
+                        + " excludes");
     }
 
     @Test

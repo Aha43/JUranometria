@@ -66,9 +66,9 @@ class AtlasToolbarTest {
         while (controller.state().canZoomOut()) {
             controller.zoomOut();
         }
-        assertEquals("Field 36° · Stars to V 8.0", readout(toolbar).getText());
+        assertEquals("Field 42° · Stars to V 8.0", readout(toolbar).getText());
         assertFalse(button(toolbar, "Zoom out").isEnabled(),
-                "zoom out is disabled at the 36-degree bound");
+                "zoom out is disabled at the 42-degree bound");
         controller.reset();
 
         while (controller.state().canZoomIn()) {

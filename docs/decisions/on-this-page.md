@@ -127,7 +127,7 @@ the atlas offers, the tallest page the assembler will build reaches
 declared **5.39°** object margin; and nothing it returns extends
 more than that same 5.39° from its own centre. So the furthest any
 boundary can lie from a page centre is **60.0 + 5.39 + 5.39 =
-70.77°**, short of the 90° horizon. The largest object the pack
+70.76°**, short of the 90° horizon. The largest object the pack
 actually records is 5.38°.
 
 **Neither number is written down twice.** The margin is read from

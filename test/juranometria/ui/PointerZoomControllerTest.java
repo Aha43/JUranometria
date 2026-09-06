@@ -119,7 +119,7 @@ class PointerZoomControllerTest {
     void refusalsChangeNothingAndNotifyNobody() {
         // At-bound: the widest page cannot zoom out.
         ChartViewController atBound = controllerAt(
-                new SkyPosition(83.818667, -5.389667), 36.0);
+                new SkyPosition(83.818667, -5.389667), 42.0);
         ChartViewState before = atBound.state();
         int[] notified = {0};
         atBound.onChange(state -> notified[0]++);

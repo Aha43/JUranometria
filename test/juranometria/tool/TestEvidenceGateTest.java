@@ -377,7 +377,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(25, display.size(),
+        assertEquals(26, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -387,7 +387,11 @@ class TestEvidenceGateTest {
                         + " popup because the gate's own control"
                         + " images were arrangement mock-ups and a"
                         + " popup paints nothing until it is shown;"
-                        + " each with its premises stated");
+                        + " and #284's sheet-page journey, which shows"
+                        + " the toolbar because a zoom-out control has"
+                        + " to be pressed to prove the new step is"
+                        + " reachable by pressing it; each with its"
+                        + " premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

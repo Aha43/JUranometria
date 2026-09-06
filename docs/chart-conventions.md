@@ -201,7 +201,10 @@ range for this table's wider bands is decided, from rendered evidence,
 in [the regional zoom decision](decisions/regional-zoom.md): fields to
 36 degrees on the gnomonic chart, with the user's magnitude limit
 preserved at every scale and a detail policy for deep-sky symbols
-beyond 18 degrees.
+beyond 18 degrees. One step wider was added for the observing table,
+at 42 degrees, on a distortion budget measured in
+[the printable-chart decision](decisions/printable-chart.md); the
+projection does not change with it.
 
 ## Title block
 

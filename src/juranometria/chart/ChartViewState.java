@@ -9,8 +9,8 @@ package juranometria.chart;
  * bundled data, which is a product promise: the chart may show a smaller
  * field or hide faint stars, but it may never claim deeper or wider
  * coverage than the data holds. The bounds live here and nowhere else:
- * field width 8° (default) down to 1°, limiting magnitude V 8.0 (default)
- * down to V 4.0.
+ * field width 42° down to 1°, 8° the default, limiting magnitude V 8.0
+ * (default) down to V 4.0.
  *
  * The centre is a free sky position; whether a centre/field combination
  * fits inside the bundled data's coverage is the scene assembler's rule,
@@ -26,9 +26,12 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
                              String targetIdentity) {
 
     /** Zoom sequence, widest first; zooming in walks toward 1 degree.
-     *  The regional steps above 8 come from docs/decisions/regional-zoom.md. */
+     *  The regional steps above 8 come from docs/decisions/regional-zoom.md;
+     *  the 42-degree sheet step comes from
+     *  docs/decisions/printable-chart.md, which measured the distortion
+     *  budget that admits it and excludes anything wider. */
     private static final double[] FIELD_WIDTH_STEPS =
-            {36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
+            {42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
 
     /** Magnitude-limit sequence, brightest first; fainter walks toward 8. */
     private static final double[] MAGNITUDE_LIMIT_STEPS = {4.0, 5.0, 6.0, 7.0, 8.0};
@@ -105,7 +108,7 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
                 : this;
     }
 
-    /** The next wider field, or this state at the 8-degree bound. */
+    /** The next wider field, or this state at the 42-degree bound. */
     public ChartViewState zoomOut() {
         return canZoomOut()
                 ? new ChartViewState(centre,

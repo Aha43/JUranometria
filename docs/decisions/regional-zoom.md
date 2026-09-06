@@ -49,6 +49,15 @@ beyond which the gnomonic chart may not honestly go; wider "sky
 quarter" views require a different projection (the alternative the
 architecture deferred since Sprint 1). 36° stays comfortably inside.
 
+> **Sprint 29 (issue #284) added one step above this sequence: 42°.**
+> It was chosen on a different budget — corner *anisotropy* no worse
+> than 12%, measured in
+> [the printable-chart decision](printable-chart.md) — for a reader
+> who asked to take the chart to an observing table. The two budgets
+> agree: 42° puts the corner radial scale at **1.236**, inside the
+> 1.25 threshold declared here, and a test holds it there. The
+> projection is unchanged, and so is every page at 36° and below.
+
 ### Star depth: the user's limit is preserved at every scale
 
 The user's limiting magnitude carries unchanged through every zoom

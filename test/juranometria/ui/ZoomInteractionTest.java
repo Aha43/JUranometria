@@ -154,7 +154,7 @@ class ZoomInteractionTest {
         Fixture fixture = new Fixture();
         // Out to the widest page, then one more: consumed, unchanged.
         fixture.wheel(450, 350, 5.0);
-        assertEquals(36.0, fixture.controller.state().fieldWidthDegrees());
+        assertEquals(42.0, fixture.controller.state().fieldWidthDegrees());
         ChartViewState atBound = fixture.controller.state();
         MouseWheelEvent beyond = fixture.wheel(450, 350, 1.0);
         assertTrue(beyond.isConsumed(),
