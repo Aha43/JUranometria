@@ -19,10 +19,10 @@ Regenerate with `make chart-sheet-study`.
 
 | file | paper | shapes | labels | bytes |
 |---|---|---:|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 27 | 298511 |
-| `sheet-letter.svg` | US Letter | 2472 | 28 | 326394 |
+| `sheet-a4.svg` | A4 | 2267 | 27 | 298530 |
+| `sheet-letter.svg` | US Letter | 2472 | 28 | 326413 |
 | `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 365340 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 244090 |
+| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 244109 |
 
 `sheet-a4-outlines.svg` is the same chart with every label converted to
 its outline, for a machine whose fonts are unknown. It is larger and it

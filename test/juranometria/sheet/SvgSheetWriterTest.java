@@ -202,6 +202,39 @@ class SvgSheetWriterTest {
     }
 
     @Test
+    void aBoldLabelIsStillBoldWhenSomeoneElseDrawsIt() {
+        // The title block is bold because it is the title. An
+        // editable label carries a family and a size; without the
+        // weight a viewer draws it as body text, and the sheet's own
+        // hierarchy is gone (PR #290 review).
+        SheetRecording sheet = ChartSheet.record(
+                Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+        String svg = SvgSheetWriter.write(sheet,
+                SvgSheetWriter.Text.EDITABLE);
+
+        long boldRuns = sheet.recorder().text().stream()
+                .filter(run -> run.font().isBold()).count();
+        assertTrue(boldRuns > 0,
+                "the page has bold text on it to lose: " + boldRuns
+                        + " runs");
+        assertEquals(boldRuns, count(svg, "font-weight=\"bold\""),
+                "and every one of them says so in the file");
+
+        long italicRuns = sheet.recorder().text().stream()
+                .filter(run -> run.font().isItalic()).count();
+        assertEquals(italicRuns, count(svg, "font-style=\"italic\""),
+                "with slant carried the same way, however much of it"
+                        + " there is: " + italicRuns + " runs");
+
+        // Weight belongs to the runs that have it and to no others.
+        long plainRuns = sheet.recorder().text().size() - boldRuns;
+        assertEquals(plainRuns,
+                count(svg, "<text ") - count(svg, "font-weight=\"bold\""),
+                "and the labels that are not bold are not made bold");
+    }
+
+    @Test
     void theOutlineVariantIsForAMachineWhoseFontsAreUnknown() {
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,

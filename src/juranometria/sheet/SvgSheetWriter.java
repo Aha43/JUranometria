@@ -145,13 +145,22 @@ public final class SvgSheetWriter {
                         .append(" fill=\"").append(hex(label.colour()))
                         .append("\"/>\n");
             } else {
+                // The weight and the slant are the label's meaning,
+                // not its decoration: the title block is bold
+                // because it is the title, and a viewer given only a
+                // family and a size would draw it as body text
+                // (PR #290 review).
                 svg.append(String.format(Locale.ROOT,
                                 "      <text x=\"%.2f\" y=\"%.2f\"%s"
                                         + " font-family=\"sans-serif\""
-                                        + " font-size=\"%d\""
+                                        + " font-size=\"%d\"%s%s"
                                         + " fill=\"%s\">",
                                 label.x(), label.y(), clip,
                                 label.font().getSize(),
+                                label.font().isBold()
+                                        ? " font-weight=\"bold\"" : "",
+                                label.font().isItalic()
+                                        ? " font-style=\"italic\"" : "",
                                 hex(label.colour())))
                         .append(escape(label.text()))
                         .append("</text>\n");

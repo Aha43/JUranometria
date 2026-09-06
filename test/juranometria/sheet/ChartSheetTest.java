@@ -37,6 +37,20 @@ class ChartSheetTest {
     static final ChartViewState ORION = new ChartViewState(
             new SkyPosition(83.0, 0.0), 42.0, 6.0);
 
+    /** How many points a path visits, so a diamond is not a line. */
+    private static int corners(java.awt.Shape shape) {
+        int points = 0;
+        double[] segment = new double[6];
+        for (var each = shape.getPathIterator(null); !each.isDone();
+                each.next()) {
+            if (each.currentSegment(segment)
+                    != java.awt.geom.PathIterator.SEG_CLOSE) {
+                points++;
+            }
+        }
+        return points;
+    }
+
     /** A sheet with nothing switched on, on A4. */
     static SheetRecording bare(ChartViewState state) {
         return ChartSheet.record(Atlas.assembler()::assemble, state,
@@ -172,12 +186,25 @@ class ChartSheetTest {
                 continue;  // not on this page, so nothing is owed
             }
             onPaper++;
+            // The ecliptic's own line passes exactly through its
+            // landmarks, so "some shape centred here" would be
+            // satisfied by a segment of the line and the diamond
+            // could go missing unnoticed (PR #290 review). What is
+            // owed is the open diamond: a closed four-sided path
+            // about twelve units across, centred on the landmark.
             boolean found = with.recorder().drawn().stream()
+                    .filter(drawn -> !drawn.filled())
+                    .filter(drawn -> corners(drawn.shape()) == 4)
+                    .filter(drawn -> {
+                        var box = drawn.shape().getBounds2D();
+                        return Math.abs(box.getWidth() - 12.0) < 0.5
+                                && Math.abs(box.getHeight() - 12.0) < 0.5;
+                    })
                     .anyMatch(drawn -> Math.hypot(
                             drawn.shape().getBounds2D().getCenterX()
                                     - at.get().x(),
                             drawn.shape().getBounds2D().getCenterY()
-                                    - at.get().y()) < 2.0);
+                                    - at.get().y()) < 0.51);
             if (!found) {
                 absent.add(landmark.accessibleName() + " at " + at.get());
             }
@@ -187,7 +214,9 @@ class ChartSheetTest {
                         + " ink to look for: " + onPaper);
         assertEquals(List.of(), absent,
                 "and every landmark the module contributed is on the"
-                        + " paper");
+                        + " paper as its own open diamond, not merely"
+                        + " somewhere the ecliptic's line happens to"
+                        + " pass");
 
         // The sheet is handed the ink; it never goes looking. Given
         // no reference layer it draws the chart an atlas with every
@@ -197,6 +226,21 @@ class ChartSheetTest {
                         < with.recorder().drawn().size(),
                 "a sheet given no reference layer carries no module"
                         + " ink at all");
+    }
+
+    @Test
+    void aSheetWillNotGuessWhetherAChartHasModulesOnIt() {
+        // NONE is a chart with nothing switched on. Null is a caller
+        // that has not decided, and a sheet that quietly read it as
+        // NONE would turn a miswired export - one that meant to
+        // carry the ecliptic and lost it - into a sheet that looks
+        // entirely correct (PR #290 review).
+        assertThrows(IllegalArgumentException.class,
+                () -> ChartSheet.record(Atlas.assembler()::assemble,
+                        ORION, ChartOptions.DEFAULTS, null,
+                        PaperSize.A4),
+                "an undecided reference layer is refused rather than"
+                        + " defaulted");
     }
 
     @Test

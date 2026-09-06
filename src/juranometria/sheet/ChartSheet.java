@@ -75,7 +75,8 @@ public final class ChartSheet {
      *     production reference layer. {@link
      *     ChartRenderer.ReferenceLayer#NONE} for a chart with no
      *     module showing - the caller passes what the chart has, and
-     *     the sheet does not go looking
+     *     the sheet does not go looking. Never null: a caller that
+     *     has not decided is a defect, not a chart without modules
      * @param paper which sheet, and therefore which rectangle
      */
     public static SheetRecording record(Pages pages,
@@ -88,8 +89,17 @@ public final class ChartSheet {
             throw new IllegalArgumentException(
                     "pages, state, options and paper are required");
         }
-        ChartRenderer.ReferenceLayer modules = reference == null
-                ? ChartRenderer.ReferenceLayer.NONE : reference;
+        // A chart with no module showing is a real thing and says so
+        // by passing NONE. Null is a caller that has not decided, and
+        // treating it as "no modules" would turn a miswired export -
+        // one that meant to carry the ecliptic and lost it - into a
+        // sheet that looks perfectly correct (PR #290 review).
+        if (reference == null) {
+            throw new IllegalArgumentException(
+                    "a reference layer is required; pass"
+                            + " ChartRenderer.ReferenceLayer.NONE for a"
+                            + " chart carrying no module ink");
+        }
 
         ChartScene scene = pages.assemble(state,
                 paper.chartWideUnits(), paper.chartHighUnits());
@@ -100,7 +110,7 @@ public final class ChartSheet {
         Graphics2D g = (Graphics2D) recorder.create();
         try {
             new ChartRenderer(StarSizePolicy.DEFAULT)
-                    .render(g, scene, onPaper, modules);
+                    .render(g, scene, onPaper, reference);
         } finally {
             g.dispose();
         }
