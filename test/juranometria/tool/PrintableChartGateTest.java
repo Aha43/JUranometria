@@ -238,13 +238,14 @@ class PrintableChartGateTest {
         // hold the clip's own rectangle, in both vector formats, and
         // prove it does work.
         for (String[] sheet : new String[][] {
-                {"sheet-a4.svg", "770", "523"},
-                {"sheet-a4-text-as-paths.svg", "770", "523"},
-                {"sheet-letter.svg", "720", "540"},
-                {"sheet-a4.pdf", "770", "523"}}) {
+                {"sheet-a4.svg", "770", "523", "text"},
+                {"sheet-a4-text-as-paths.svg", "770", "523", "paths"},
+                {"sheet-letter.svg", "720", "540", "text"},
+                {"sheet-a4.pdf", "770", "523", "paths"}}) {
             String name = sheet[0];
             double chartWide = Double.parseDouble(sheet[1]);
             double chartHigh = Double.parseDouble(sheet[2]);
+            boolean editableText = sheet[3].equals("text");
             byte[] bytes = Files.readAllBytes(
                     Path.of("docs/studies/printable-chart", name));
             ClipEvidence evidence = name.endsWith(".pdf")
@@ -275,14 +276,50 @@ class PrintableChartGateTest {
             // And the clip is doing work: ink whose own geometry
             // crosses the chart boundary exists, and all of it is
             // drawn inside a clip rather than left to reach paper.
-            assertTrue(evidence.escapingClipped() > 0,
+            assertTrue(evidence.escapingClipped()
+                            + evidence.escapingUnclipped() > 0,
                     name + " has ink crossing the chart boundary, so"
                             + " the check below could have failed");
             assertEquals(0, evidence.escapingUnclipped(),
                     name + " draws none of that ink unclipped, which"
                             + " is what would bleed into the"
                             + " half-inch margin");
+
+            // Labels are ink too, and on the editable sheets they are
+            // text operations rather than paths - which the oracle
+            // did not look at, while two committed constellation
+            // labels are anchored outside the chart (PR #288 round
+            // 4). Their clips are the only thing keeping them off the
+            // margin.
+            if (editableText) {
+                assertTrue(evidence.textEscapingClipped()
+                                + evidence.textEscapingUnclipped() > 0,
+                        name + " has labels anchored outside the chart"
+                                + " rectangle, so the check below"
+                                + " could have failed");
+                assertEquals(0, evidence.textEscapingUnclipped(),
+                        name + " clips every one of them - an"
+                                + " unclipped label is a name printed"
+                                + " out in the half-inch margin");
+            } else {
+                assertEquals(0, evidence.textEscapingClipped()
+                                + evidence.textEscapingUnclipped(),
+                        name + " keeps no text as text, so the paths"
+                                + " above are all of its ink");
+            }
         }
+
+        // Which is the whole of the PDF's ink: it carries no text
+        // operator at all, so nothing in it escapes the path oracle.
+        String pdf = Files.readString(
+                Path.of("docs/studies/printable-chart/sheet-a4.pdf"),
+                java.nio.charset.StandardCharsets.ISO_8859_1);
+        assertFalse(pdf.contains("BT "),
+                "the shipped PDF draws its text as outlines, so the"
+                        + " path reading above covers every mark on"
+                        + " it - the base-14 prototype that does use"
+                        + " text operators is kept only as the record"
+                        + " of why");
     }
 
     /**
@@ -292,7 +329,9 @@ class PrintableChartGateTest {
      */
     private record ClipEvidence(java.util.List<double[]> clips,
                                 int escapingClipped,
-                                int escapingUnclipped) {
+                                int escapingUnclipped,
+                                int textEscapingClipped,
+                                int textEscapingUnclipped) {
     }
 
     private static ClipEvidence svgEvidence(String svg, double chartWide,
@@ -331,7 +370,37 @@ class PrintableChartGateTest {
                 }
             }
         }
-        return new ClipEvidence(used, clipped, unclipped);
+
+        // The same reading of the label operations. A text run's full
+        // extent needs the font to measure, but its anchor does not,
+        // and an anchor outside the chart rectangle is already proof
+        // the run leaves it.
+        int textClipped = 0;
+        int textUnclipped = 0;
+        java.util.regex.Matcher labels = java.util.regex.Pattern.compile(
+                        "<text x=\"(-?[\\d.]+)\" y=\"(-?[\\d.]+)\"([^>]*)>")
+                .matcher(svg);
+        while (labels.find()) {
+            double x = Double.parseDouble(labels.group(1));
+            double y = Double.parseDouble(labels.group(2));
+            java.util.regex.Matcher carried = java.util.regex.Pattern
+                    .compile("url\\(#(clip\\d+)\\)")
+                    .matcher(labels.group(3));
+            double[] clip = carried.find()
+                    ? defined.get(carried.group(1)) : null;
+            if (clip != null && !used.contains(clip)) {
+                used.add(clip);
+            }
+            if (escapes(new double[] {x, y, x, y}, chartWide, chartHigh)) {
+                if (clip == null) {
+                    textUnclipped++;
+                } else {
+                    textClipped++;
+                }
+            }
+        }
+        return new ClipEvidence(used, clipped, unclipped, textClipped,
+                textUnclipped);
     }
 
     /**
@@ -384,7 +453,7 @@ class PrintableChartGateTest {
                 numbers.clear();
             }
         }
-        return new ClipEvidence(used, clipped, unclipped);
+        return new ClipEvidence(used, clipped, unclipped, 0, 0);
     }
 
     /** Whether a bounding box reaches outside the chart rectangle. */
