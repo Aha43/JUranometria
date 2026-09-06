@@ -283,7 +283,7 @@ black-sky-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study printable-chart-study
 evidence-contracts: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 
@@ -299,6 +299,19 @@ place-and-time-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeInkStudyMain
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeControlsMockupMain
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PlaceAndTimeDialogStudyMain
+
+# The printable chart and the modest wider field
+# (docs/decisions/printable-chart.md, issue #283): what each degree
+# past 36 costs, the candidate pages drawn by the production
+# renderer, and one chart state written to SVG, PDF and PNG from a
+# single recording of that same render.
+printable-chart-study: classes
+	mkdir -p docs/studies/printable-chart
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.PrintableChartStudyMain \
+		> docs/studies/printable-chart/measurements.md
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WiderFieldPageMain
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartSheetExportStudyMain \
+		> docs/studies/printable-chart/formats.md
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic
