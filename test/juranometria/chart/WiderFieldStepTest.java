@@ -104,11 +104,12 @@ class WiderFieldStepTest {
         // rows were taken from the released build itself; see the
         // file's own header for how.
         //
-        // Geometry is arithmetic, so this half holds on any machine.
-        // Rasterisation is not - fonts and the JDK's 2D pipeline
-        // differ - so the pixel half is checked only where the rows
-        // were recorded, and skipped out loud everywhere else rather
-        // than quietly passing.
+        // Geometry and ink are arithmetic, so those hold on any
+        // machine and are checked everywhere. Rasterisation is not -
+        // the font stack and the JDK's 2D pipeline differ - so the
+        // pixel column is checked only on the exact platform the file
+        // names, and skipped out loud everywhere else rather than
+        // quietly passing.
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         List<String> rows = rows();
         assertEquals(80, rows.size(),
@@ -117,6 +118,7 @@ class WiderFieldStepTest {
         boolean samePlatform = platformOfRecord()
                 .equals(juranometria.tool.WiderFieldStudyMain.platform());
         List<String> changed = new ArrayList<>();
+        List<String> reinked = new ArrayList<>();
         List<String> rasterised = new ArrayList<>();
         for (String row : rows) {
             String[] cell = row.trim().split("\\s+");
@@ -130,10 +132,15 @@ class WiderFieldStepTest {
             if (!marks.equals(cell[4])) {
                 changed.add(row.trim() + " now draws " + marks);
             }
+            String ink = juranometria.tool.WiderFieldStudyMain
+                    .inkFingerprint(centre, field, black);
+            if (!ink.equals(cell[5])) {
+                reinked.add(row.trim() + " now inks " + ink);
+            }
             if (samePlatform) {
                 String pixels = juranometria.tool.WiderFieldStudyMain
                         .fingerprint(renderer, centre, field, black);
-                if (!pixels.equals(cell[5])) {
+                if (!pixels.equals(cell[6])) {
                     rasterised.add(row.trim() + " now renders " + pixels);
                 }
             }
@@ -141,6 +148,11 @@ class WiderFieldStepTest {
         assertEquals(List.of(), changed,
                 "widening the sequence changed what no released page"
                         + " draws, or where");
+        assertEquals(List.of(), reinked,
+                "nor one vector operation any of them performed - the"
+                        + " grid, the boundaries, the figures, the"
+                        + " furniture, the ground and the labels"
+                        + " included");
         assertEquals(List.of(), rasterised,
                 "nor, on the platform the rows were recorded on, a"
                         + " single pixel of one");

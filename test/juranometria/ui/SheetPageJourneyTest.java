@@ -177,20 +177,13 @@ class SheetPageJourneyTest {
                     "and panning does not change the field");
 
             // ---- 4. identify, out here, on the widened page ----------
-            ChartRenderer.DrawnMark star = markOn(chart);
-            SwingUtilities.invokeAndWait(() -> {
-                int x = (int) Math.round(star.centre().x());
-                int y = (int) Math.round(star.centre().y())
-                        + chart.pageOffsetY();
-                for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
-                        MouseEvent.MOUSE_RELEASED}) {
-                    chart.dispatchEvent(new MouseEvent(chart, id,
-                            System.nanoTime() / 1_000_000,
-                            MouseEvent.BUTTON1_DOWN_MASK, x, y, 1, false,
-                            MouseEvent.BUTTON1));
-                }
-            });
-            SwingUtilities.invokeAndWait(() -> { });
+            // The mark is chosen and clicked inside ONE event-thread
+            // turn. Deriving it in one turn and clicking in the next
+            // resolves the click against whatever page the chart has
+            // by then, which is the stale-scene race #220 was about
+            // (PR #289 review).
+            ChartRenderer.DrawnMark star = clickOn(chart, 0,
+                    SheetPageJourneyTest::firstStar);
             Selection.Object identified = assertInstanceOf(
                     Selection.Object.class, selection.selection(),
                     "4. a star on the sheet page identifies like a star"
@@ -201,11 +194,29 @@ class SheetPageJourneyTest {
                     "and the seam told whoever was listening");
 
             // ---- 5. the working selection, out here -----------------
-            SwingUtilities.invokeAndWait(() ->
-                    working.add(identified.catalogueId()));
-            assertTrue(working.isMember(identified.catalogueId()),
-                    "5. and it can be kept, on this page as on any"
+            // Through the chart, not by writing to the model. An
+            // ordinary click replaces the working selection and the
+            // platform's additive modifier toggles the next one in -
+            // the semantics of docs/decisions/working-selection.md,
+            // reached the way a reader reaches them. Writing to
+            // WorkingSelection here would have passed with the
+            // chart-to-selection wiring severed (PR #289 review).
+            assertEquals(List.of(identified.catalogueId()),
+                    working.members(),
+                    "5. the same click that identified the star put it"
+                            + " in the working selection");
+
+            ChartRenderer.DrawnMark second = clickOn(chart,
+                    SelectInteraction.toggleModifierMask(),
+                    scene -> otherStar(scene, star));
+            assertEquals(List.of(identified.catalogueId(),
+                            second.star().id()),
+                    working.members(),
+                    "and the additive modifier toggles a second one in"
+                            + " beside it, on this page as on any"
                             + " other");
+            assertEquals(second.star().id(), working.lead(),
+                    "with the newcomer leading");
 
             // ---- 6. Home, pressed, exact ----------------------------
             ReaderInput.click(button(toolbar, "Reset view"));
@@ -226,21 +237,66 @@ class SheetPageJourneyTest {
         }));
     }
 
-    /** A star well inside the current page, to click on. */
-    private static ChartRenderer.DrawnMark markOn(ChartComponent chart)
-            throws Exception {
+    /**
+     * Choose a mark from the page and click it <em>in the same
+     * event-thread turn</em>, so nothing can reassemble the scene
+     * between the pixel being derived and the press landing on it.
+     */
+    private static ChartRenderer.DrawnMark clickOn(ChartComponent chart,
+            int modifiers,
+            java.util.function.Function<ChartScene,
+                    ChartRenderer.DrawnMark> choose) throws Exception {
         ChartRenderer.DrawnMark[] chosen = new ChartRenderer.DrawnMark[1];
         SwingUtilities.invokeAndWait(() -> {
             ChartScene scene = chart.currentScene();
-            chosen[0] = RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS)
-                    .stream()
-                    .filter(mark -> mark.star() != null)
-                    .filter(mark -> mark.centre().x() > 150
-                            && mark.centre().x() < scene.viewport().widthPx() - 150
-                            && mark.centre().y() > 120
-                            && mark.centre().y() < scene.viewport().heightPx() - 120)
-                    .findFirst().orElseThrow();
+            chosen[0] = choose.apply(scene);
+            int x = (int) Math.round(chosen[0].centre().x());
+            int y = (int) Math.round(chosen[0].centre().y())
+                    + chart.pageOffsetY();
+            for (int id : new int[] {MouseEvent.MOUSE_PRESSED,
+                    MouseEvent.MOUSE_RELEASED}) {
+                chart.dispatchEvent(new MouseEvent(chart, id,
+                        System.nanoTime() / 1_000_000,
+                        MouseEvent.BUTTON1_DOWN_MASK | modifiers,
+                        x, y, 1, false, MouseEvent.BUTTON1));
+            }
         });
+        SwingUtilities.invokeAndWait(() -> { });
         return chosen[0];
+    }
+
+    /** A star well inside the page, clear of its neighbours. */
+    private static ChartRenderer.DrawnMark firstStar(ChartScene scene) {
+        return wellInside(scene).findFirst().orElseThrow();
+    }
+
+    /** Another one, far enough away that the click cannot land on both. */
+    private static ChartRenderer.DrawnMark otherStar(ChartScene scene,
+            ChartRenderer.DrawnMark first) {
+        return wellInside(scene)
+                .filter(mark -> mark.centre().x() - first.centre().x() > 60
+                        || first.centre().x() - mark.centre().x() > 60)
+                .findFirst().orElseThrow();
+    }
+
+    private static java.util.stream.Stream<ChartRenderer.DrawnMark>
+            wellInside(ChartScene scene) {
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
+                .filter(mark -> mark.star() != null)
+                .filter(mark -> mark.centre().x() > 150
+                        && mark.centre().x() < scene.viewport().widthPx() - 150
+                        && mark.centre().y() > 120
+                        && mark.centre().y() < scene.viewport().heightPx() - 120)
+                .filter(mark -> alone(scene, mark));
+    }
+
+    /** No other mark close enough to be a candidate for the same click. */
+    private static boolean alone(ChartScene scene,
+                                 ChartRenderer.DrawnMark mark) {
+        return RENDERER.drawnMarks(scene, ChartOptions.DEFAULTS).stream()
+                .filter(other -> !other.equals(mark))
+                .noneMatch(other -> Math.hypot(
+                        other.centre().x() - mark.centre().x(),
+                        other.centre().y() - mark.centre().y()) < 12.0);
     }
 }

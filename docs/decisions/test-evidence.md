@@ -79,7 +79,7 @@ The standing counts, quoted from the scanner so the gate can hold
 this document to them: **41 files** touch process-wide state —
 **20** use the shared guard, **20** restore locally,
 **0 flagged unprotected** — and **26 files** depend on a display,
-of which **15** state a focus premise and **17** a reachability
+of which **15** state a focus premise and **18** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -162,7 +162,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **340
-reads of live chart state** against **535 explicit hand-offs**
+reads of live chart state** against **533 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline, and again
 for #275's closing journey, which reads the page's own objects and

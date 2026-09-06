@@ -62,9 +62,17 @@ public final class WiderFieldStudyMain {
      * which one that was.
      */
     public static String platform() {
-        return System.getProperty("os.name") + "/"
-                + System.getProperty("os.arch") + "/java"
-                + System.getProperty("java.specification.version");
+        // Every part of this has been seen to move rasterisation: the
+        // OS and its version (the font stack, font versions, hinting),
+        // the architecture, and the exact JDK build (the 2D pipeline
+        // itself). A coarser key would let a byte comparison run
+        // between environments that legitimately differ - two macOS
+        // releases, or two JDK 21 builds (PR #289 review).
+        return System.getProperty("os.name") + " "
+                + System.getProperty("os.version") + "/"
+                + System.getProperty("os.arch") + "/"
+                + System.getProperty("java.vendor") + " "
+                + System.getProperty("java.runtime.version");
     }
 
     public static void main(String[] args) throws Exception {
@@ -80,16 +88,27 @@ public final class WiderFieldStudyMain {
                 + " is a\nclaim about pixels, and only pixels can"
                 + " settle it.\n\n");
         out.append("## How this was made\n\n");
-        out.append("Each row carries two digests. **marks** is the"
-                + " geometry the renderer\ndecided on - every star and"
-                + " deep-sky mark it drew, its subject, its\ncentre and"
-                + " its reach, to four decimal places of a pixel. That"
-                + " is\narithmetic, so it holds on any machine, and it"
-                + " is what the test\nchecks everywhere. **pixels** is"
-                + " the rasterised page. That depends on\nfonts and on"
-                + " the JDK's own 2D pipeline, so it is an oracle only"
-                + " on\nthe platform named below, and the test says so"
-                + " rather than pretending\notherwise.\n\n");
+        out.append("Each row carries three digests, and they are not"
+                + " interchangeable.\n\n");
+        out.append("**marks** is what the renderer decided to draw and"
+                + " where: every star\nand deep-sky mark, its subject,"
+                + " its centre and its reach.\n\n");
+        out.append("**ink** is every vector operation it then"
+                + " performed - each shape's own\ncoordinates, fill,"
+                + " colour and stroke width, and each label's text,"
+                + " font\nand colour. It sees the grid, the"
+                + " constellation boundaries and figures,\nthe"
+                + " furniture and the chart ground, which marks cannot"
+                + " reach. Label\npositions are excluded: the renderer"
+                + " places them with font metrics.\n\n");
+        out.append("Both of those are arithmetic, so they hold on any"
+                + " machine, and the test\nchecks them everywhere."
+                + " **pixels** is the rasterised page, which depends"
+                + " on\nthe font stack and the JDK's own 2D pipeline."
+                + " It is an oracle only on the\nexact platform named"
+                + " below - OS and version, architecture, and JDK"
+                + " build -\nand the test skips it out loud anywhere"
+                + " else rather than pretending.\n\n");
         out.append("Recorded on: `" + platform() + "`\n\n");
         out.append("Every released field step, at four centres that"
                 + " exercise the cases\nthe atlas treats differently -"
@@ -109,22 +128,91 @@ public final class WiderFieldStudyMain {
                 + " changed.\n\n");
         out.append("## The rows\n\n");
         out.append("field  ra           dec          ground "
-                + " marks             pixels\n");
+                + " marks             ink               pixels\n");
 
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         for (double field : RELEASED_FIELDS) {
             for (double[] centre : CENTRES) {
                 for (boolean black : new boolean[] {false, true}) {
                     out.append(String.format(Locale.ROOT,
-                            "%-6.0f %-12.6f %-12.6f %-7s %-17s %s%n",
+                            "%-6.0f %-12.6f %-12.6f %-7s %-17s %-17s"
+                                    + " %s%n",
                             field, centre[0], centre[1],
                             black ? "black" : "paper",
                             markFingerprint(renderer, centre, field),
+                            inkFingerprint(centre, field, black),
                             fingerprint(renderer, centre, field, black)));
                 }
             }
         }
         System.out.print(out);
+    }
+
+    /**
+     * The first eight bytes of a page's <em>ink</em> digest: every
+     * vector operation the renderer performed - each shape's own
+     * coordinates, whether it was filled, its colour and its stroke
+     * width - plus each label's text, font and colour.
+     *
+     * <p>This is what the pixel digest was reaching for, taken
+     * before rasterisation instead of after, so it holds on any
+     * machine. It sees the grid, the constellation boundaries and
+     * figures, the furniture and the chart ground, none of which the
+     * mark digest can reach. Label <em>positions</em> are left out:
+     * the renderer places them with font metrics, which is the one
+     * part of drawing that genuinely differs between machines.
+     */
+    public static String inkFingerprint(double[] centre, double field,
+                                        boolean black) throws Exception {
+        ChartSheetRecorder recorder = new ChartSheetRecorder(WIDE, HIGH);
+        new ChartRenderer(StarSizePolicy.DEFAULT).render(recorder,
+                scene(centre, field),
+                black ? ChartOptions.DEFAULTS.withPalette(
+                        ChartPalette.BLACK_SKY) : ChartOptions.DEFAULTS);
+
+        StringBuilder ink = new StringBuilder();
+        for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+            ink.append(drawn.filled() ? "fill " : "draw ")
+                    .append(Integer.toHexString(drawn.colour().getRGB()))
+                    .append(' ')
+                    .append(String.format(Locale.ROOT, "%.4f",
+                            drawn.stroke() == null ? 0.0
+                                    : drawn.stroke().width()))
+                    .append(' ')
+                    .append(pathOf(drawn.shape()))
+                    .append('\n');
+        }
+        for (ChartSheetRecorder.Text text : recorder.text()) {
+            ink.append("text ").append(text.text()).append(' ')
+                    .append(text.font().getName()).append(' ')
+                    .append(text.font().getSize()).append(' ')
+                    .append(Integer.toHexString(text.colour().getRGB()))
+                    .append('\n');
+        }
+        return digest(ink.toString()
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    /** A shape as its own coordinates, to four decimals of a pixel. */
+    private static String pathOf(java.awt.Shape shape) {
+        StringBuilder path = new StringBuilder();
+        double[] segment = new double[6];
+        for (java.awt.geom.PathIterator each = shape.getPathIterator(null);
+                !each.isDone(); each.next()) {
+            int kind = each.currentSegment(segment);
+            path.append(kind);
+            int points = switch (kind) {
+                case java.awt.geom.PathIterator.SEG_QUADTO -> 4;
+                case java.awt.geom.PathIterator.SEG_CUBICTO -> 6;
+                case java.awt.geom.PathIterator.SEG_CLOSE -> 0;
+                default -> 2;
+            };
+            for (int i = 0; i < points; i++) {
+                path.append(String.format(Locale.ROOT, " %.4f", segment[i]));
+            }
+            path.append(';');
+        }
+        return path.toString();
     }
 
     /**
