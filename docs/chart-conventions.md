@@ -35,6 +35,66 @@ projection; this is outside the first milestone.
   edge-anchored coordinate labels that yield to the title block
   ([the coordinate-grid decision](decisions/coordinate-grid.md)).
 
+## Reference lines
+
+Some lines on the chart are not objects. They are the frame itself
+drawn where a reader can see it, and the chart inks them in three
+ways, each saying what kind of line it is rather than what it looks
+like.
+
+**A line across the sky — solid.** The *meridian* of the Place and
+Time module: the circle through both celestial poles and the point
+overhead, for one observer at one frozen instant.
+
+**A boundary of what can be seen — evenly dashed.** The
+*mathematical horizon*: where the sky meets a perfectly flat,
+perfectly transparent Earth. A reader's real horizon has hills and
+air in it, which is why the longer name is used on the page.
+
+**A permanent circle of the sphere — dash-dot.** The *ecliptic*: the
+plane of the Earth's orbit, true for every observer and every date
+([the ecliptic decision](decisions/ecliptic.md)). Dash-dot is the
+cartographer's mark for a line that belongs to the frame rather than
+to the terrain, and it keeps the ecliptic distinct from the
+meridian's solid, the horizon's even dash, and the fine dots of the
+constellation boundaries.
+
+Points on those lines are inked by what they are: the zenith, a
+*place* a reader stands under, wears a small ring with an upward
+tick; an equinox or a solstice, a *landmark* on a line, wears an
+open diamond.
+
+### The ecliptic, and what it is not
+
+The ecliptic is the path the Sun appears to trace against the stars
+over a year — which is to say, the plane the Earth's orbit lies in,
+seen from inside it. The Earth's axis is tilted about **23° 26′**
+from that plane; the tilt is called the **obliquity**, and it is why
+the ecliptic leans against the celestial equator instead of lying
+along it.
+
+The two circles cross at the **equinoxes** and are furthest apart at
+the **solstices**. The atlas marks all four, named by month —
+*March equinox*, *June solstice*, *September equinox*, *December
+solstice* — because a southern reader's summer is a northern
+reader's winter and this geometry has no observer to have a season.
+
+The March equinox lands at exactly **0h** of right ascension. That
+is not a coincidence: right ascension is measured *from* it.
+
+**This is a reference circle, not the Sun.** The atlas draws where
+the Sun's yearly path lies; it does not draw the Sun, the Moon, any
+planet, or where any of them is tonight. Nothing here ticks, and
+nothing here needs a date.
+
+**Which ecliptic, and why it matters.** The chart is fixed to the
+J2000 frame, so the circle it draws is the *mean ecliptic of J2000*.
+An ecliptic computed for today would trace a line under two pixels
+from this one — but its equinox would sit degrees away, because
+precession slides the crossing point along the circle at about 50″
+a year. The line would look right and the landmark would be wrong,
+which is the whole reason the frame is stated rather than assumed.
+
 A candidate star-radius function for experimentation is:
 
 ```text

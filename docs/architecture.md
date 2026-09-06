@@ -92,18 +92,39 @@ by their poles — under an ink role, and never receives a graphics context,
 a pixel, a renderer, or the catalogue. The chart owns how each role is
 inked, where it sits in the stack, and whether it draws at all.
 
-Two modules now share the seam, which is the evidence the design asked
+Three modules now share the seam, which is the evidence the design asked
 for: **On this page** (Sprint 24) reads the page inventory and contributes
 interaction crosses; the **meridian module** (Sprint 25) owns an observer
 and a frozen instant and contributes reference lines from the
-UI-independent sky model in `juranometria.sky`. The chart core learned
-neither domain — it still knows nothing of tables, observers, clocks, or
-sidereal time — and either module detaches leaving the released page byte
-for byte, which the packaged acceptance proves inside every native image.
-An architecture test holds the boundaries executable: `juranometria.sky`,
-`juranometria.project`, `juranometria.module`, and `juranometria.meridian`
+UI-independent sky model in `juranometria.sky`; and the **ecliptic
+module** (Sprint 28) owns one display choice and contributes a permanent
+circle with four named landmarks from the same model. The chart core
+learned none of those domains — it still knows nothing of tables,
+observers, clocks, sidereal time, obliquity, seasons or the zodiac — and
+any module detaches leaving the released page byte for byte, which the
+packaged acceptance proves inside every native image. An architecture test
+holds the boundaries executable: `juranometria.sky`, `juranometria.project`,
+`juranometria.module`, `juranometria.meridian` and `juranometria.ecliptic`
 are scanned at the class-file level for toolkit, preferences, file, and
 network dependencies.
+
+The third module also widened the vocabulary rather than the seam's
+powers. A contributed great circle now says whether it is a line across
+the sky, a boundary of what can be seen, or a **permanent circle of the
+sphere**; a contributed point says whether it is a **place** with an up or
+a **landmark** on a line. Both are statements about what the geometry is,
+and neither is named for the ecliptic — a galactic-equator module would
+use the same two words.
+
+**The Solar System road.** The ecliptic is the frame the Solar System is
+described in, so this module is the frame arriving without any of the
+bodies. A future module drawing the Sun, the Moon or a planet can express
+its positions in ecliptic coordinates through `juranometria.sky.Ecliptic`
+and contribute them as ordinary points and paths, while the chart stays
+fixed to J2000 and learns no ephemeris. The transformation is already
+here, held to an authority; what such a module would add is its own
+ephemeris data and its own lifecycle, both removable, and the chart would
+not need to change to accept them.
 
 ## Decisions deliberately deferred
 

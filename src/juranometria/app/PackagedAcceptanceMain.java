@@ -462,6 +462,104 @@ public final class PackagedAcceptanceMain {
         module.detach();
         require(differingPixels(withoutOnEclipticPage, paint(chart)) == 0,
                 "and with both gone the atlas is the atlas again");
+
+        // The reviewed restart semantics, as a second application
+        // session (issue #275): the choice is saved through the
+        // bundled preference backend, and the whole wiring is built
+        // again the way JUranometriaMain builds it - a fresh chart,
+        // a fresh host, a fresh module, a fresh store, and the
+        // production restore that sets both the chart and the tick
+        // from one read. Against a dedicated node, never the
+        // reader's real preferences.
+        java.util.prefs.Preferences eclipticNode =
+                java.util.prefs.Preferences.userRoot().node(
+                        "juranometria-packaged-ecliptic");
+        try {
+            juranometria.ui.ecliptic.EclipticStore fresh =
+                    juranometria.ui.ecliptic.EclipticStore
+                            .forNode(eclipticNode);
+            require(fresh.shown().isEmpty(),
+                    "a reader who has never chosen has nothing"
+                            + " remembered");
+            require(!fresh.shownOrDefault(),
+                    "and gets the released default, hidden");
+
+            juranometria.ui.ChartComponent nextSession =
+                    new juranometria.ui.ChartComponent(Atlas.assembler());
+            nextSession.setSize(900, 700);
+            nextSession.setViewState(eclipticPage);
+            juranometria.ui.ChartModuleHost nextHost =
+                    new juranometria.ui.ChartModuleHost(nextSession,
+                            new juranometria.chart.SelectionModel(),
+                            asked::add);
+            java.awt.image.BufferedImage nextWithout =
+                    paint(nextSession);
+
+            juranometria.ecliptic.EclipticModule remembered =
+                    juranometria.ui.ecliptic.EclipticSession.begin(
+                            nextHost);
+            javax.swing.JMenuBar nextBar = AppMenuBar.create(null, null,
+                    () -> { }, () -> { }, () -> { }, () -> { },
+                    juranometria.ui.ecliptic.EclipticSession.toggle(
+                            remembered, fresh));
+            javax.swing.JCheckBoxMenuItem nextItem =
+                    AppMenuBar.eclipticItem(nextBar);
+            juranometria.ui.ecliptic.EclipticSession.restore(remembered,
+                    fresh, nextItem);
+            require(!remembered.showing() && !nextItem.isSelected(),
+                    "a first session opens hidden, chart and tick"
+                            + " agreeing");
+            require(differingPixels(nextWithout, paint(nextSession)) == 0,
+                    "and draws the page the atlas draws without it");
+
+            // The reader asks, through the item.
+            nextItem.doClick();
+            fresh.flush();
+            require(remembered.showing() && nextItem.isSelected(),
+                    "asking for it shows it, and the tick says so");
+            require(differingPixels(nextWithout, paint(nextSession)) > 100,
+                    "and the ecliptic reaches the page");
+
+            // A genuine second session reads it back.
+            juranometria.ui.ecliptic.EclipticStore reopened =
+                    juranometria.ui.ecliptic.EclipticStore
+                            .forNode(eclipticNode);
+            require(reopened.shown().orElse(false),
+                    "a fresh store reads the choice back");
+            juranometria.ui.ChartComponent secondSession =
+                    new juranometria.ui.ChartComponent(Atlas.assembler());
+            secondSession.setSize(900, 700);
+            secondSession.setViewState(eclipticPage);
+            juranometria.ui.ChartModuleHost secondHost =
+                    new juranometria.ui.ChartModuleHost(secondSession,
+                            new juranometria.chart.SelectionModel(),
+                            asked::add);
+            java.awt.image.BufferedImage secondWithout =
+                    paint(secondSession);
+            juranometria.ecliptic.EclipticModule secondModule =
+                    juranometria.ui.ecliptic.EclipticSession.begin(
+                            secondHost);
+            javax.swing.JMenuBar secondBar = AppMenuBar.create(null, null,
+                    () -> { }, () -> { }, () -> { }, () -> { },
+                    juranometria.ui.ecliptic.EclipticSession.toggle(
+                            secondModule, reopened));
+            javax.swing.JCheckBoxMenuItem secondItem =
+                    AppMenuBar.eclipticItem(secondBar);
+            juranometria.ui.ecliptic.EclipticSession.restore(secondModule,
+                    reopened, secondItem);
+            require(secondModule.showing() && secondItem.isSelected(),
+                    "and the next session opens with the ecliptic"
+                            + " drawn and its tick set, from one read");
+            require(differingPixels(secondWithout,
+                            paint(secondSession)) > 100,
+                    "with the line actually on the page");
+        } finally {
+            java.util.prefs.Preferences parentOfEcliptic =
+                    eclipticNode.parent();
+            eclipticNode.removeNode();
+            parentOfEcliptic.flush();
+        }
+
         chart.setViewState(ChartViewState.DEFAULT);
 
         // The stored-state restart, as a second application session
@@ -547,8 +645,10 @@ public final class PackagedAcceptanceMain {
                 + " degrees with " + landmarksSeen + " landmark(s)"
                 + " inked where the model puts them - " + landmarkInk
                 + " px in a box at the mark against " + lineInk
-                + " on bare line - composed with the meridian and"
-                + " withdrawn without touching it)");
+                + " on bare line - composed with the meridian,"
+                + " withdrawn without touching it, and a second"
+                + " session opening with the reader's choice on the"
+                + " chart and on its tick)");
     }
 
     private static void onThisPageJourney() throws Exception {

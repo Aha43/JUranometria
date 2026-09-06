@@ -377,7 +377,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(24, display.size(),
+        assertEquals(25, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -440,7 +440,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 27,
+        assertTrue(doClick <= 28,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -458,7 +458,9 @@ class TestEvidenceGateTest {
                         + " it too - a checkbox menu item, which is"
                         + " what that convention is for, with the"
                         + " shown popup exercised separately on a"
-                        + " display: " + doClick);
+                        + " display - and #275's closing journey walks"
+                        + " the reader to the same item by the same"
+                        + " convention: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

@@ -93,7 +93,34 @@ public final class GalleryPageMain {
         slide(new ChartViewState(sky.horizon().around(72).get(9), 24.0,
                 8.0, null, null), "place-and-time-horizon");
 
+        // --- The Ecliptic: the third module's ink ------------------
+        // The crossing, where the ecliptic meets the equator at the
+        // March equinox - the point right ascension is measured from,
+        // which is why it lands exactly at 0h on a J2000 chart.
+        eclipticSlide(new ChartViewState(new SkyPosition(0.0, 0.0),
+                24.0, 8.0, null, null), "ecliptic-equinox");
+        // The northern extreme, an obliquity above the equator, where
+        // the June solstice sits in Gemini.
+        eclipticSlide(new ChartViewState(new SkyPosition(90.0,
+                juranometria.sky.Ecliptic.OBLIQUITY_DEGREES), 24.0, 8.0,
+                null, null), "ecliptic-solstice");
+
         System.out.println("gallery slides written to " + DIR.getPath());
+    }
+
+    /** One ecliptic slide through the production composition. */
+    private static void eclipticSlide(ChartViewState state, String name)
+            throws Exception {
+        ChartComponent chart = component(state);
+        SwingUtilities.invokeAndWait(() -> {
+            juranometria.ecliptic.EclipticModule ecliptic =
+                    new juranometria.ecliptic.EclipticModule();
+            ecliptic.showing(true);
+            chart.overlays().offer(
+                    juranometria.ecliptic.EclipticModule.ID,
+                    ecliptic::contributedGeometry);
+        });
+        write(chart, name);
     }
 
     /** One place-and-time slide through the production composition. */

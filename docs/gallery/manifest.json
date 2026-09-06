@@ -19,6 +19,11 @@
       "id": "place-and-time",
       "name": "Place and Time",
       "lead": "A removable module that lays one observer's meridian, zenith and mathematical horizon over the fixed chart, for one frozen instant at one stated place. Nothing ticks."
+    },
+    {
+      "id": "ecliptic",
+      "name": "The Ecliptic",
+      "lead": "A removable module that lays one permanent circle over the fixed chart: the plane the Earth's orbit defines, with the two equinoxes and two solstices marked where they sit in J2000. It has no date and no observer, and it draws no Sun."
     }
   ],
   "slides": [
@@ -138,6 +143,32 @@
       "source": "docs/studies/place-and-time/dialog-real.png",
       "produced": "Session photograph of the real dialog on a display; held unchanged by make evidence-contracts. v1.7.0 tree (8820a6d).",
       "alt": "A small dialog with fields Latitude 59.913, Longitude east positive 10.752, Instant UTC 2026-03-20 21:33:00, a note reading the chart is drawn for that instant and stays there, nothing ticks, three checkboxes for Meridian, Mathematical horizon and Zenith, and buttons Now and Center on zenith."
+    },
+    {
+      "slug": "ecliptic-equinox",
+      "room": "ecliptic",
+      "kind": "chart",
+      "title": "Where the year is measured from",
+      "caption": "The ecliptic crosses the celestial equator at the March equinox, in Pisces. Right ascension is measured from this point, which is why on a J2000 chart it falls at exactly 0h — not near it.",
+      "region": "Pisces",
+      "field": "24°",
+      "ink": "The dash-dot circle and the open diamond are Ecliptic module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/ecliptic-equinox.png",
+      "produced": "Composed by the production chart component with the real ecliptic module and reference-ink painter (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 28 tree (d9be561).",
+      "alt": "A star chart of Pisces with a dash-dot line labelled Ecliptic running diagonally across it, crossing a horizontal grid line at a small open diamond labelled March equinox."
+    },
+    {
+      "slug": "ecliptic-solstice",
+      "room": "ecliptic",
+      "kind": "chart",
+      "title": "The northern extreme",
+      "caption": "A quarter turn along, the ecliptic reaches its furthest north — 23° 26' above the equator, the obliquity itself — on the Gemini and Taurus border beside the cluster M 35, with Orion below.",
+      "region": "Gemini and Taurus",
+      "field": "24°",
+      "ink": "The dash-dot circle and the open diamond are Ecliptic module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/ecliptic-solstice.png",
+      "produced": "Composed by the production chart component with the real ecliptic module and reference-ink painter (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 28 tree (d9be561).",
+      "alt": "A star chart on the Gemini and Taurus border with a dash-dot line labelled Ecliptic running horizontally through a small open diamond labelled June solstice, the cluster M 35 above it and Orion below."
     }
   ]
 }
