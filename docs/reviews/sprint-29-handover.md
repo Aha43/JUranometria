@@ -55,7 +55,7 @@ Reader documentation is in [docs/exporting.md](../exporting.md).
 
 ## Every review correction
 
-Seventeen rounds. The production designs were called sound early in
+Eighteen rounds. The production designs were called sound early in
 each issue; almost everything below is a correction to **evidence** —
 tests that looked like proof and were not.
 
