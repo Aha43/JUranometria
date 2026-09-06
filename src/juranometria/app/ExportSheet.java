@@ -143,9 +143,18 @@ public final class ExportSheet {
             return new Outcome.Refused(file.getName()
                     + " was left as it was.");
         }
-        if (!file.exists() && !parent.canWrite()) {
-            return new Outcome.Refused("That folder cannot be written"
-                    + " to: " + parent.getPath());
+        // A sheet is written completely or not at all, and that
+        // needs somewhere beside the destination to write it. A
+        // folder that cannot hold a working file cannot hold a safe
+        // export, so it is refused rather than written to directly:
+        // a direct write is interruptible, and a rescue copy only
+        // helps a process that lives long enough to use it. A crash
+        // does not grant that (PR #291 round 4).
+        if (!parent.canWrite()) {
+            return new Outcome.Refused(parent.getPath()
+                    + " cannot be written to, so the sheet cannot be"
+                    + " written there safely. Choose another folder,"
+                    + " or make that one writable.");
         }
 
         byte[] bytes;
@@ -164,13 +173,6 @@ public final class ExportSheet {
         boolean replacing = file.exists();
         try {
             place(bytes, file.toPath(), parent.toPath(), sink);
-        } catch (OriginalLostException lost) {
-            // Never "unchanged" here. This is the one path where the
-            // reader's own file did not survive, and saying anything
-            // reassuring about it would be a lie (PR #291 round 3).
-            return new Outcome.Refused(file.getName()
-                    + " could not be written, and " + lost.getMessage()
-                    + ".");
         } catch (IOException failure) {
             return new Outcome.Refused(file.getName()
                     + " could not be written: " + failure.getMessage()
@@ -180,32 +182,6 @@ public final class ExportSheet {
         }
         return new Outcome.Written(file.toPath(), bytes.length,
                 request.format());
-    }
-
-    /**
-     * Thrown when a write failed <em>and</em> what was there could
-     * not be put back.
-     *
-     * <p>The one outcome an export must never report vaguely. It
-     * carries where the original's bytes were set aside, so the
-     * reader is told something they can act on rather than only that
-     * something went wrong (PR #291 round 3).
-     */
-    static final class OriginalLostException extends IOException {
-
-        private static final long serialVersionUID = 1L;
-
-        private final transient Path rescue;
-
-        OriginalLostException(String message, Path rescue,
-                              Throwable cause) {
-            super(message, cause);
-            this.rescue = rescue;
-        }
-
-        Path rescue() {
-            return rescue;
-        }
     }
 
     /** How bytes reach a path; a seam so a failure can be tried. */
@@ -222,20 +198,15 @@ public final class ExportSheet {
      * Puts the finished bytes at the destination without ever
      * putting unfinished ones there.
      *
-     * <p>Written beside the destination and moved onto it where the
-     * folder allows that, so a failure cannot truncate what is
-     * already there.
+     * <p>Written beside the destination and moved onto it in one
+     * step. There is no other path: a direct write can be
+     * interrupted, and everything that could be done about that
+     * afterwards - putting the old bytes back, keeping a rescue copy
+     * - needs a process that survives to do it. A crash does not
+     * grant that, so the case where a working file cannot be made is
+     * refused before anything is written (PR #291 round 4).
      *
-     * <p>Where the folder does not allow it - a read-only directory
-     * holding a writable file, which is a legitimate thing to
-     * replace - there is nowhere beside the destination to write, so
-     * the destination is written directly. That can be interrupted,
-     * so what was in it is <strong>held first and put back</strong>
-     * if the write fails. A chart sheet is a few hundred kilobytes;
-     * holding one for the length of a write is cheaper than losing
-     * the reader's own file (PR #291 round 2).
-     *
-     * <p>What is never done, in any path, is <strong>deleting the
+     * <p>What is never done is <strong>deleting the
      * destination</strong>. An earlier version removed it when the
      * write failed, on the reasoning that a partial file should not
      * be left looking finished; the file it removed was the reader's
@@ -243,63 +214,49 @@ public final class ExportSheet {
      */
     static void place(byte[] bytes, Path file, Path parent, ByteSink sink)
             throws IOException {
-        if (!java.nio.file.Files.isWritable(parent)) {
-            if (!Files.exists(file)) {
-                // Nothing to lose: a folder that cannot be written
-                // to has no new file to give, and the sink will say
-                // so.
-                sink.write(file, bytes);
-                return;
-            }
-            // A copy of the reader's own bytes, kept somewhere the
-            // folder's permissions cannot reach, so that a failed
-            // restore is recoverable rather than final.
-            Path rescue = Files.createTempFile("juranometria-original-",
-                    "-" + file.getFileName());
-            Files.copy(file, rescue,
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            boolean rescueIsTheOnlyCopy = false;
-            try {
-                sink.write(file, bytes);
-            } catch (IOException failure) {
-                try {
-                    sink.write(file, Files.readAllBytes(rescue));
-                } catch (IOException lost) {
-                    rescueIsTheOnlyCopy = true;
-                    throw new OriginalLostException(
-                            "the export failed and " + file.getFileName()
-                                    + " could not be put back as it"
-                                    + " was; a copy of what was in it"
-                                    + " is at " + rescue,
-                            rescue, failure);
-                }
-                throw failure;
-            } finally {
-                // Never a return in here: one swallowed the very
-                // exception this path exists to report, in the first
-                // version of it. The copy goes unless it is the only
-                // one left of the reader's bytes.
-                if (!rescueIsTheOnlyCopy) {
-                    Files.deleteIfExists(rescue);
-                }
-            }
-            return;
-        }
+        place(bytes, file, parent, sink, ExportSheet::moveOnto);
+    }
+
+    /** The same, moving however it is told to - a seam for tests. */
+    static void place(byte[] bytes, Path file, Path parent, ByteSink sink,
+                      Mover mover) throws IOException {
         Path partial = Files.createTempFile(parent,
                 file.getFileName() + ".", ".part");
         try {
             sink.write(partial, bytes);
-            try {
-                Files.move(partial, file,
-                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
-                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
-            } catch (java.nio.file.AtomicMoveNotSupportedException
-                    unsupported) {
-                Files.move(partial, file,
-                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            }
+            mover.move(partial, file);
         } finally {
             Files.deleteIfExists(partial);
+        }
+    }
+
+    /** How a finished working file becomes the destination. */
+    @FunctionalInterface
+    interface Mover {
+
+        void move(Path from, Path to) throws IOException;
+    }
+
+    /**
+     * One step, or none.
+     *
+     * <p>A move that is not atomic is a copy and a delete, and a
+     * copy can be interrupted - which would put half a sheet at the
+     * destination under the name of a whole one. Where the file
+     * system will not promise atomicity, the export says so and
+     * writes nothing, because "written completely or not at all" is
+     * either true or it is not worth saying.
+     */
+    static void moveOnto(Path from, Path to) throws IOException {
+        try {
+            Files.move(from, to,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+        } catch (java.nio.file.AtomicMoveNotSupportedException cannot) {
+            throw new IOException(to.getFileName()
+                    + " could not be replaced in one step on this file"
+                    + " system, and a sheet is written completely or"
+                    + " not at all", cannot);
         }
     }
 

@@ -240,153 +240,98 @@ class ExportSheetTest {
     }
 
     @Test
-    void aFailedWriteInAReadOnlyFolderPutsTheFileBack(
+    void aFolderThatCannotHoldAWorkingFileIsRefusedNotWrittenTo(
             @TempDir Path folder) throws Exception {
-        // The fallback path has nowhere beside the destination to
-        // write, so it writes the destination itself - which can be
-        // interrupted (PR #291 round 2). What was there is held and
-        // put back.
-        Path existing = Files.writeString(folder.resolve("orion.svg"),
-                "a chart the reader already had");
+        // A sheet is written completely or not at all, and that needs
+        // somewhere beside the destination to write it. Writing the
+        // destination directly was the alternative, and everything
+        // that could be done about an interrupted direct write -
+        // putting the old bytes back, keeping a rescue copy - needs a
+        // process that lives long enough to do it. A crash does not
+        // (PR #291 round 4), so the case is refused.
         Path readOnly = Files.createDirectory(folder.resolve("locked"));
         Path inside = Files.writeString(readOnly.resolve("orion.svg"),
-                "a chart the reader already had");
-        assertTrue(readOnly.toFile().setWritable(false),
-                "the test can make the folder read-only");
-        try {
-            assertThrows(IOException.class, () -> ExportSheet.place(
-                            "a whole sheet".getBytes(), inside, readOnly,
-                            new ExportSheet.ByteSink() {
-                                private int calls;
-
-                                @Override
-                                public void write(Path file, byte[] bytes)
-                                        throws IOException {
-                                    if (calls++ == 0) {
-                                        Files.write(file,
-                                                "half a sh".getBytes());
-                                        throw new IOException(
-                                                "the disk filled up");
-                                    }
-                                    Files.write(file, bytes);
-                                }
-                            }),
-                    "the failure still reaches the caller");
-            assertEquals("a chart the reader already had",
-                    Files.readString(inside),
-                    "and the reader's own file is put back exactly as"
-                            + " it was, not left as the half a sheet"
-                            + " the failure wrote");
-        } finally {
-            readOnly.toFile().setWritable(true);
-        }
-        assertEquals("a chart the reader already had",
-                Files.readString(existing),
-                "and nothing else was touched");
-    }
-
-    @Test
-    void aRestoreThatFailsIsSaidPlainlyAndTheBytesAreKept(
-            @TempDir Path folder) throws Exception {
-        // The failure inside the failure. Putting the original back
-        // can itself fail, and the earlier version still reported
-        // "What was already there is unchanged" - which is the one
-        // thing it could not know (PR #291 round 3).
-        Path readOnly = Files.createDirectory(folder.resolve("locked"));
-        Path inside = Files.writeString(readOnly.resolve("orion.svg"),
-                "a chart the reader already had");
-        assertTrue(readOnly.toFile().setWritable(false),
-                "the test can make the folder read-only");
-        try {
-            var lost = assertThrows(ExportSheet.OriginalLostException.class,
-                    () -> ExportSheet.place("a whole sheet".getBytes(),
-                            inside, readOnly,
-                            (file, bytes) -> {
-                                Files.write(file, "half a sh".getBytes());
-                                throw new IOException("the disk filled up");
-                            }),
-                    "a write that fails and cannot be undone says so"
-                            + " as its own kind of failure");
-
-            assertTrue(lost.getMessage().contains("could not be put back"),
-                    "in words: " + lost.getMessage());
-            assertTrue(lost.rescue() != null
-                            && Files.exists(lost.rescue()),
-                    "and the reader's own bytes are kept somewhere the"
-                            + " folder's permissions cannot reach");
-            assertEquals("a chart the reader already had",
-                    Files.readString(lost.rescue()),
-                    "exactly as they were");
-            assertTrue(lost.getMessage().contains(lost.rescue().toString()),
-                    "with the message saying where: "
-                            + lost.getMessage());
-            Files.deleteIfExists(lost.rescue());
-        } finally {
-            readOnly.toFile().setWritable(true);
-        }
-    }
-
-    @Test
-    void anExportThatCannotBeUndoneNeverClaimsTheFileIsUnchanged(
-            @TempDir Path folder) throws Exception {
-        // The same thing seen from where a reader sees it: the
-        // sentence they are shown.
-        Path readOnly = Files.createDirectory(folder.resolve("locked"));
-        Files.writeString(readOnly.resolve("orion.svg"),
                 "a chart the reader already had");
         assertTrue(readOnly.toFile().setWritable(false),
                 "the test can make the folder read-only");
         try {
             var refused = assertInstanceOf(
                     ExportSheet.Outcome.Refused.class,
-                    ExportSheet.write(Atlas.assembler()::assemble, ORION,
-                            ChartOptions.DEFAULTS,
-                            ChartRenderer.ReferenceLayer.NONE,
-                            new ExportSheet.Request(SheetFormat.SVG,
-                                    PaperSize.A4, 150, false),
-                            readOnly.resolve("orion.svg").toFile(),
-                            existing -> true,
-                            (file, bytes) -> {
-                                Files.write(file, "half a sh".getBytes());
-                                throw new IOException("the disk filled up");
-                            }),
-                    "the export is refused");
-
-            assertTrue(refused.reason().contains("could not be put back"),
-                    "and says what actually happened: "
-                            + refused.reason());
-            assertFalse(refused.reason().contains("unchanged"),
-                    "never calling the reader's file unchanged when it"
-                            + " is not: " + refused.reason());
-            assertTrue(refused.reason().contains("juranometria-original-"),
-                    "and telling them where their own bytes are: "
-                            + refused.reason());
+                    export(SheetFormat.SVG, inside.toFile(),
+                            replacing -> true),
+                    "the export is refused rather than written"
+                            + " unsafely");
+            assertTrue(refused.reason().contains("cannot be written to"),
+                    "and says why: " + refused.reason());
+            assertTrue(refused.reason().contains("Choose another"),
+                    "and what to do about it: " + refused.reason());
+            assertEquals("a chart the reader already had",
+                    Files.readString(inside),
+                    "with the reader's own file untouched");
         } finally {
             readOnly.toFile().setWritable(true);
         }
     }
 
     @Test
-    void aReplacementInAReadOnlyFolderStillWorks(@TempDir Path folder)
-            throws Exception {
-        // Replacing a writable file inside a folder that is not
-        // writable is a legitimate thing to do, and the reader could
-        // do it before. Writing beside the destination cannot, so
-        // that path falls back rather than taking the ability away.
+    void aMoveThatCannotBeOneStepIsRefusedRatherThanCopied(
+            @TempDir Path folder) throws Exception {
+        // The other way a partial sheet could reach the destination:
+        // a move that is really a copy and a delete. Where the file
+        // system will not promise one step, the export says so and
+        // writes nothing.
         Path existing = Files.writeString(folder.resolve("orion.svg"),
                 "a chart the reader already had");
-        assertTrue(folder.toFile().setWritable(false),
-                "the test can make the folder read-only");
-        try {
-            assertInstanceOf(ExportSheet.Outcome.Written.class,
-                    export(SheetFormat.SVG, existing.toFile(),
-                            replacing -> true),
-                    "the export still happens");
-            assertTrue(Files.readString(existing).startsWith("<svg"),
-                    "and the chart is there");
-        } finally {
-            folder.toFile().setWritable(true);
+
+        IOException refused = assertThrows(IOException.class,
+                () -> ExportSheet.place("a whole sheet".getBytes(),
+                        existing, folder, ExportSheet.SINK,
+                        (from, to) -> {
+                            throw new java.nio.file
+                                    .AtomicMoveNotSupportedException(
+                                    from.toString(), to.toString(),
+                                    "this file system will not");
+                        }),
+                "a move that cannot be one step is a failure, not a"
+                        + " copy");
+        assertEquals("a chart the reader already had",
+                Files.readString(existing),
+                "and the reader's file is exactly as it was");
+
+        assertTrue(refused.getMessage().contains("this file system"
+                        + " will not")
+                        || refused.getMessage().contains("one step"),
+                "carrying why: " + refused.getMessage());
+        try (var listing = Files.list(folder)) {
+            assertEquals(List.of("orion.svg"),
+                    listing.map(each -> each.getFileName().toString())
+                            .toList(),
+                    "and the working file it had written is gone");
         }
+    }
+
+    @Test
+    void theOnlyMoveTheExportMakesIsTheOneStepKind() throws Exception {
+        // The policy above is tested through an injected mover, so
+        // the production one is the place a copy-and-delete could
+        // quietly return. No file system available here refuses an
+        // atomic move within a folder, so this reads the method: one
+        // move, carrying ATOMIC_MOVE, and nothing after the refusal.
+        String source = Files.readString(Path.of(
+                "src/juranometria/app/ExportSheet.java"));
+        String mover = source.substring(
+                source.indexOf("static void moveOnto("),
+                source.indexOf("/**", source.indexOf(
+                        "static void moveOnto(")));
+
+        assertEquals(1, mover.split("Files\\.move\\(", -1).length - 1,
+                "the mover moves once:\n" + mover);
+        assertTrue(mover.contains("ATOMIC_MOVE"),
+                "in one step");
+        assertTrue(mover.contains("throw new IOException"),
+                "and refuses when it cannot: a second move here would"
+                        + " be the copy-and-delete this exists to"
+                        + " avoid");
     }
 
     @Test

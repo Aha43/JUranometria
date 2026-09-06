@@ -72,6 +72,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Removed
 
+- **Exporting into a folder that cannot be written to.** A sheet is
+  written beside its destination and moved onto it in one step, so
+  that a failure or a crash can never leave half a chart wearing a
+  whole chart's name. A folder that cannot hold that working file
+  cannot hold a safe export, so the atlas says so and writes
+  nothing, rather than writing the destination directly and hoping.
+  Replacing a file in a read-only folder used to work; what it
+  worked at was a risk nobody had asked for.
 - The gate's SVG, PDF and PNG prototypes, and the sheets they made.
   Production has writers of its own now, so the prototypes would have
   been a second set of the same thing - the fork the gate forbade.
