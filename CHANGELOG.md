@@ -7,6 +7,42 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-09-06
+
+Sprint 28 — Put the ecliptic on the fixed sky. The sprint the atlas
+gained its third removable module, and its first line that belongs
+to nobody, cut as a minor release. The **meridian** belongs to a
+place and a moment; the **ecliptic** belongs to the frame itself.
+
+A reader who wants it turns on **Ecliptic** in the View menu and
+gets one permanent circle — the mean ecliptic of J2000 — with the
+**March equinox**, **June solstice**, **September equinox** and
+**December solstice** marked where they sit in the chart's own fixed
+frame. Named by month, because the geometry has no observer to have
+a season. The March equinox falls at exactly 0h of right ascension,
+which is not a coincidence: right ascension is measured from it.
+
+This is a reference circle and **not the Sun**. The atlas draws
+where the Sun's yearly path lies; it draws no Sun, no Moon, no
+planet, and nothing's position tonight. Nothing ticks and nothing
+needs a date.
+
+The chart learned two new ways to ink geometry it is handed, and no
+astronomy: a **permanent circle of the sphere** is drawn dash-dot,
+distinct from the meridian's solid and the horizon's dash, and a
+**landmark** on a line is drawn as an open diamond, distinct from
+the zenith's ring and tick. Neither is named for the ecliptic — a
+module drawing the galactic equator would use the same words.
+
+The geometry is held to **IAU SOFA** at 0.06 arcseconds, against a
+measured residual of 0.0403; the atlas ships no dependency on it.
+The gallery gains an **Ecliptic** room with two slides.
+
+Hidden by default: installing the module changes no reader's page,
+and the ordinary chart is byte-identical with it absent, hidden or
+detached. Only one preference is kept, and only if a reader uses the
+control.
+
 ## [1.8.0] - 2026-09-05
 
 Sprint 27 — Sirius: Use the atlas. The sprint the atlas went
