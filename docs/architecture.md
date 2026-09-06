@@ -134,7 +134,11 @@ not need to change to accept them.
 - Catalogue binary format and sky-index scheme.
 - SVG/PDF export libraries.
 - Network client and caching policy.
-- A projection for fields too wide for gnomonic rendering.
+- A cartographic regime for fields too wide for gnomonic rendering — with
+  stereographic overview as the first practical candidate and an explicit
+  orthographic globe as an early teaching view, recorded without scheduling or
+  choosing their production contracts in
+  [the future celestial-cartography direction](future-celestial-cartography.md).
 
 These decisions should be made when a small working slice provides evidence,
 not embedded in the initial specification.
