@@ -229,69 +229,169 @@ class PrintableChartGateTest {
     private static final double LETTER_CHART_HIGH = 612.0 - 72.0;
 
     @Test
-    void theEmittedClipIsProductionsOwnAndItActuallyCutsInk()
+    void everyVectorFormatClipsToProductionsOwnRectangleAndItCutsInk()
             throws IOException {
         // Counting clip attributes proves clipping syntax. Replacing
-        // every clip with a full-sheet rectangle keeps the count and
-        // restores the margin bleed (PR #288 round 2), so this holds
-        // the clip's own geometry and proves it does work.
-        String svg = Files.readString(Path.of(
-                "docs/studies/printable-chart/sheet-a4.svg"));
+        // every clip with a wrong one keeps the count and restores
+        // the margin bleed, and a narrower clip than production's
+        // would crop the chart instead (PR #288 rounds 2 and 3). So
+        // hold the clip's own rectangle, in both vector formats, and
+        // prove it does work.
+        for (String[] sheet : new String[][] {
+                {"sheet-a4.svg", "770", "523"},
+                {"sheet-a4-text-as-paths.svg", "770", "523"},
+                {"sheet-letter.svg", "720", "540"},
+                {"sheet-a4.pdf", "770", "523"}}) {
+            String name = sheet[0];
+            double chartWide = Double.parseDouble(sheet[1]);
+            double chartHigh = Double.parseDouble(sheet[2]);
+            byte[] bytes = Files.readAllBytes(
+                    Path.of("docs/studies/printable-chart", name));
+            ClipEvidence evidence = name.endsWith(".pdf")
+                    ? pdfEvidence(bytes, chartWide, chartHigh)
+                    : svgEvidence(new String(bytes,
+                            java.nio.charset.StandardCharsets.UTF_8),
+                            chartWide, chartHigh);
 
-        // The chart clip is production's: the renderer sets it to the
-        // paper inset by one pixel on each side.
-        java.util.List<double[]> clipBoxes = new java.util.ArrayList<>();
-        java.util.regex.Matcher clips = java.util.regex.Pattern.compile(
-                        "<clipPath id=\"clip\\d+\"><path d=\"([^\"]+)\"")
-                .matcher(svg);
-        while (clips.find()) {
-            clipBoxes.add(boundsOf(clips.group(1)));
-        }
-        assertFalse(clipBoxes.isEmpty(), "the sheet defines clips");
-
-        boolean chartClip = false;
-        for (double[] box : clipBoxes) {
-            if (Math.abs(box[0] - 1.0) < 1.5
-                    && Math.abs(box[1] - 1.0) < 1.5
-                    && Math.abs(box[2] - (A4_CHART_WIDE - 1.0)) < 2.5
-                    && Math.abs(box[3] - (A4_CHART_HIGH - 1.0)) < 2.5) {
-                chartClip = true;
+            // Production sets the chart clip to the paper inset by a
+            // pixel on each side. Every clip the file carries is that
+            // rectangle: not a wider one, which would bleed into the
+            // margin, and not a narrower one, which would crop.
+            assertFalse(evidence.clips().isEmpty(),
+                    name + " carries clips at all");
+            for (double[] clip : evidence.clips()) {
+                assertEquals(1.0, clip[0], 0.6,
+                        name + " clips from production's own left"
+                                + " edge: " + java.util.Arrays
+                                .toString(clip));
+                assertEquals(1.0, clip[1], 0.6,
+                        name + " and its own top edge");
+                assertEquals(chartWide - 1.0, clip[2], 0.6,
+                        name + " to its own right edge");
+                assertEquals(chartHigh - 1.0, clip[3], 0.6,
+                        name + " and its own bottom edge");
             }
-            assertTrue(box[2] <= A4_CHART_WIDE + 1.0
-                            && box[3] <= A4_CHART_HIGH + 1.0,
-                    "no clip is wider than the chart rectangle, which"
-                            + " is how a wrong clip would restore the"
-                            + " bleed: " + java.util.Arrays.toString(box));
-        }
-        assertTrue(chartClip,
-                "one clip is production's own paper rectangle,"
-                        + " roughly " + A4_CHART_WIDE + " x "
-                        + A4_CHART_HIGH + " pt");
 
-        // And it is doing work: ink whose own geometry crosses the
-        // boundary exists, and every such path carries a clip.
-        int escaping = 0;
+            // And the clip is doing work: ink whose own geometry
+            // crosses the chart boundary exists, and all of it is
+            // drawn inside a clip rather than left to reach paper.
+            assertTrue(evidence.escapingClipped() > 0,
+                    name + " has ink crossing the chart boundary, so"
+                            + " the check below could have failed");
+            assertEquals(0, evidence.escapingUnclipped(),
+                    name + " draws none of that ink unclipped, which"
+                            + " is what would bleed into the"
+                            + " half-inch margin");
+        }
+    }
+
+    /**
+     * What a vector sheet says about clipping: the distinct clip
+     * rectangles it carries, and how much of the ink that crosses the
+     * chart boundary is drawn inside a clip and how much is not.
+     */
+    private record ClipEvidence(java.util.List<double[]> clips,
+                                int escapingClipped,
+                                int escapingUnclipped) {
+    }
+
+    private static ClipEvidence svgEvidence(String svg, double chartWide,
+                                            double chartHigh) {
+        java.util.Map<String, double[]> defined = new java.util.HashMap<>();
+        java.util.regex.Matcher declares = java.util.regex.Pattern.compile(
+                        "<clipPath id=\"(clip\\d+)\"><path d=\"([^\"]+)\"")
+                .matcher(svg);
+        while (declares.find()) {
+            defined.put(declares.group(1), boundsOf(declares.group(2)));
+        }
+
+        java.util.List<double[]> used = new java.util.ArrayList<>();
+        int clipped = 0;
+        int unclipped = 0;
         java.util.regex.Matcher paths = java.util.regex.Pattern.compile(
-                        "<path d=\"([^\"]+)\"([^/]*)/>")
-                .matcher(svg);
+                "<path d=\"([^\"]+)\"([^/]*)/>").matcher(svg);
         while (paths.find()) {
-            double[] box = boundsOf(paths.group(1));
-            boolean outside = box[0] < -0.5 || box[1] < -0.5
-                    || box[2] > A4_CHART_WIDE + 0.5
-                    || box[3] > A4_CHART_HIGH + 0.5;
-            if (!outside) {
-                continue;
+            if (svg.lastIndexOf("<clipPath", paths.start())
+                    > svg.lastIndexOf("</clipPath>", paths.start())) {
+                continue;  // a clip definition, not ink
             }
-            escaping++;
-            assertTrue(paths.group(2).contains("clip-path=\"url(#clip"),
-                    "ink crossing the chart boundary is clipped rather"
-                            + " than left to bleed into the margin: "
-                            + java.util.Arrays.toString(box));
+            java.util.regex.Matcher carried = java.util.regex.Pattern
+                    .compile("url\\(#(clip\\d+)\\)")
+                    .matcher(paths.group(2));
+            double[] clip = carried.find()
+                    ? defined.get(carried.group(1)) : null;
+            if (clip != null && !used.contains(clip)) {
+                used.add(clip);
+            }
+            if (escapes(boundsOf(paths.group(1)), chartWide, chartHigh)) {
+                if (clip == null) {
+                    unclipped++;
+                } else {
+                    clipped++;
+                }
+            }
         }
-        assertTrue(escaping > 0,
-                "some ink genuinely crosses the boundary, so the"
-                        + " clipping above could have failed: "
-                        + escaping + " paths");
+        return new ClipEvidence(used, clipped, unclipped);
+    }
+
+    /**
+     * The same reading of a PDF, taken from its content stream. The
+     * stream is written uncompressed, one operator to a line, in the
+     * chart's own top-left space, so a clip reads as the {@code q}
+     * … {@code W n} … {@code Q} block it is.
+     */
+    private static ClipEvidence pdfEvidence(byte[] pdf, double chartWide,
+                                            double chartHigh) {
+        String file = new String(pdf,
+                java.nio.charset.StandardCharsets.ISO_8859_1);
+        String stream = file.substring(file.indexOf("stream\n") + 7,
+                file.indexOf("endstream"));
+
+        java.util.List<double[]> used = new java.util.ArrayList<>();
+        java.util.List<Double> numbers = new java.util.ArrayList<>();
+        double[] active = null;
+        int clipped = 0;
+        int unclipped = 0;
+        for (String line : stream.split("\n")) {
+            if (line.equals("q")) {
+                numbers.clear();
+            } else if (line.equals("W n")) {
+                double[] clip = boundsOfNumbers(numbers);
+                active = clip;
+                if (!used.contains(clip)) {
+                    used.add(clip);
+                }
+                numbers.clear();
+            } else if (line.equals("Q")) {
+                active = null;
+                numbers.clear();
+            } else if (line.endsWith(" m") || line.endsWith(" l")
+                    || line.endsWith(" c")) {
+                java.util.regex.Matcher each = java.util.regex.Pattern
+                        .compile("-?\\d+(?:\\.\\d+)?").matcher(line);
+                while (each.find()) {
+                    numbers.add(Double.parseDouble(each.group()));
+                }
+            } else if (line.equals("f") || line.equals("S")) {
+                if (!numbers.isEmpty() && escapes(
+                        boundsOfNumbers(numbers), chartWide, chartHigh)) {
+                    if (active == null) {
+                        unclipped++;
+                    } else {
+                        clipped++;
+                    }
+                }
+                numbers.clear();
+            }
+        }
+        return new ClipEvidence(used, clipped, unclipped);
+    }
+
+    /** Whether a bounding box reaches outside the chart rectangle. */
+    private static boolean escapes(double[] box, double chartWide,
+                                   double chartHigh) {
+        return box[0] < -0.5 || box[1] < -0.5
+                || box[2] > chartWide + 0.5 || box[3] > chartHigh + 0.5;
     }
 
     @Test
@@ -353,6 +453,22 @@ class PrintableChartGateTest {
                 "the whole A4 sheet at 300 dpi");
         assertEquals(2480, sheet.getHeight(), "in both directions");
 
+        // It also says so to whatever opens it: without the pHYs
+        // chunk a printer has only pixels and will fit them to the
+        // page, which is the whole reason the file is this size
+        // (PR #288 round 3).
+        int[] physical = pngPhysicalResolution(Files.readAllBytes(
+                Path.of("docs/studies/printable-chart",
+                        "sheet-a4-300dpi.png")));
+        assertEquals(1, physical[2],
+                "the pHYs chunk states its unit as the metre, which is"
+                        + " the only unit that fixes a physical size");
+        int perMetre = (int) Math.round(dpi / 0.0254);
+        assertEquals(perMetre, physical[0],
+                "and " + perMetre + " px/m across, which is " + dpi
+                        + " dpi");
+        assertEquals(perMetre, physical[1], "and the same down");
+
         // Where the ink is: the half-inch margins must be clear and
         // the chart must fill the rectangle inside them. Under the
         // old defect the chart occupied only the top-left 770x523 px.
@@ -397,6 +513,33 @@ class PrintableChartGateTest {
                         + frameThickness + " from " + runs);
     }
 
+    /**
+     * A PNG's declared physical resolution: pixels per unit across,
+     * pixels per unit down, and the unit specifier (1 is the metre).
+     * Absent the chunk, the file is pixels and nothing else.
+     */
+    private static int[] pngPhysicalResolution(byte[] png) {
+        for (int i = 8; i + 12 < png.length; ) {
+            int length = ((png[i] & 0xff) << 24) | ((png[i + 1] & 0xff) << 16)
+                    | ((png[i + 2] & 0xff) << 8) | (png[i + 3] & 0xff);
+            String type = new String(png, i + 4, 4,
+                    java.nio.charset.StandardCharsets.US_ASCII);
+            if (type.equals("pHYs")) {
+                int at = i + 8;
+                return new int[] {readInt(png, at), readInt(png, at + 4),
+                        png[at + 8] & 0xff};
+            }
+            i += 12 + length;
+        }
+        throw new AssertionError("the sheet carries no pHYs chunk, so it"
+                + " states no physical size at all");
+    }
+
+    private static int readInt(byte[] bytes, int at) {
+        return ((bytes[at] & 0xff) << 24) | ((bytes[at + 1] & 0xff) << 16)
+                | ((bytes[at + 2] & 0xff) << 8) | (bytes[at + 3] & 0xff);
+    }
+
     /** The bounding box of every non-white pixel: minX minY maxX maxY. */
     private static int[] inkBoundsOf(java.awt.image.BufferedImage image) {
         int minX = image.getWidth();
@@ -427,16 +570,21 @@ class PrintableChartGateTest {
 
     /** The bounding box of every coordinate in an SVG path. */
     private static double[] boundsOf(String d) {
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE;
-        double maxY = -Double.MAX_VALUE;
         java.util.List<Double> numbers = new java.util.ArrayList<>();
         java.util.regex.Matcher each = java.util.regex.Pattern.compile(
                 "-?\\d+(?:\\.\\d+)?").matcher(d);
         while (each.find()) {
             numbers.add(Double.parseDouble(each.group()));
         }
+        return boundsOfNumbers(numbers);
+    }
+
+    /** The bounding box of a flat list of x y x y coordinates. */
+    private static double[] boundsOfNumbers(java.util.List<Double> numbers) {
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
         for (int i = 0; i + 1 < numbers.size(); i += 2) {
             minX = Math.min(minX, numbers.get(i));
             maxX = Math.max(maxX, numbers.get(i));
