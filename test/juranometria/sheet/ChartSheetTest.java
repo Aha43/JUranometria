@@ -37,18 +37,64 @@ class ChartSheetTest {
     static final ChartViewState ORION = new ChartViewState(
             new SkyPosition(83.0, 0.0), 42.0, 6.0);
 
-    /** How many points a path visits, so a diamond is not a line. */
-    private static int corners(java.awt.Shape shape) {
-        int points = 0;
+    /**
+     * Whether a shape is the landmark's own open diamond about a
+     * point: four vertices, each on an axis through the centre,
+     * equidistant from it, and the path closed.
+     *
+     * <p>Counting four corners is not enough - a box has four
+     * corners too, and an unclosed path has four points and no
+     * fourth side (PR #290 round 2). What distinguishes a diamond is
+     * where the vertices sit: on the axes, not at the corners of the
+     * box that bounds them.
+     */
+    private static boolean isDiamondAbout(java.awt.Shape shape,
+                                          double x, double y) {
+        List<double[]> vertices = new java.util.ArrayList<>();
+        boolean closed = false;
         double[] segment = new double[6];
         for (var each = shape.getPathIterator(null); !each.isDone();
                 each.next()) {
-            if (each.currentSegment(segment)
-                    != java.awt.geom.PathIterator.SEG_CLOSE) {
-                points++;
+            int kind = each.currentSegment(segment);
+            if (kind == java.awt.geom.PathIterator.SEG_CLOSE) {
+                closed = true;
+            } else if (kind == java.awt.geom.PathIterator.SEG_MOVETO
+                    || kind == java.awt.geom.PathIterator.SEG_LINETO) {
+                vertices.add(new double[] {segment[0], segment[1]});
+            } else {
+                return false;  // a curve is not this diamond
             }
         }
-        return points;
+        if (!closed || vertices.size() != 4) {
+            return false;
+        }
+
+        double reach = -1.0;
+        boolean up = false;
+        boolean down = false;
+        boolean left = false;
+        boolean right = false;
+        for (double[] vertex : vertices) {
+            double dx = vertex[0] - x;
+            double dy = vertex[1] - y;
+            // Exactly one offset is zero: the vertex is on an axis
+            // through the centre, which a box's corner never is.
+            boolean onAxis = Math.abs(dx) < 0.01 ^ Math.abs(dy) < 0.01;
+            if (!onAxis) {
+                return false;
+            }
+            double distance = Math.hypot(dx, dy);
+            if (reach < 0) {
+                reach = distance;
+            } else if (Math.abs(distance - reach) > 0.01) {
+                return false;  // not equidistant, so not this diamond
+            }
+            up |= dy < -0.01;
+            down |= dy > 0.01;
+            left |= dx < -0.01;
+            right |= dx > 0.01;
+        }
+        return up && down && left && right && Math.abs(reach - 6.0) < 0.5;
     }
 
     /** A sheet with nothing switched on, on A4. */
@@ -194,17 +240,8 @@ class ChartSheetTest {
             // about twelve units across, centred on the landmark.
             boolean found = with.recorder().drawn().stream()
                     .filter(drawn -> !drawn.filled())
-                    .filter(drawn -> corners(drawn.shape()) == 4)
-                    .filter(drawn -> {
-                        var box = drawn.shape().getBounds2D();
-                        return Math.abs(box.getWidth() - 12.0) < 0.5
-                                && Math.abs(box.getHeight() - 12.0) < 0.5;
-                    })
-                    .anyMatch(drawn -> Math.hypot(
-                            drawn.shape().getBounds2D().getCenterX()
-                                    - at.get().x(),
-                            drawn.shape().getBounds2D().getCenterY()
-                                    - at.get().y()) < 0.51);
+                    .anyMatch(drawn -> isDiamondAbout(drawn.shape(),
+                            at.get().x(), at.get().y()));
             if (!found) {
                 absent.add(landmark.accessibleName() + " at " + at.get());
             }

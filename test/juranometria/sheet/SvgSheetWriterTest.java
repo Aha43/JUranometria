@@ -221,17 +221,62 @@ class SvgSheetWriterTest {
         assertEquals(boldRuns, count(svg, "font-weight=\"bold\""),
                 "and every one of them says so in the file");
 
-        long italicRuns = sheet.recorder().text().stream()
-                .filter(run -> run.font().isItalic()).count();
-        assertEquals(italicRuns, count(svg, "font-style=\"italic\""),
-                "with slant carried the same way, however much of it"
-                        + " there is: " + italicRuns + " runs");
-
         // Weight belongs to the runs that have it and to no others.
         long plainRuns = sheet.recorder().text().size() - boldRuns;
         assertEquals(plainRuns,
                 count(svg, "<text ") - count(svg, "font-weight=\"bold\""),
                 "and the labels that are not bold are not made bold");
+    }
+
+    @Test
+    void slantIsCarriedTooAndThatIsProvedRatherThanAssumed() {
+        // The chart records no italic today, so asking the real
+        // sheet about slant asks nothing: removing the export
+        // entirely would still pass (PR #290 round 2). So the writer
+        // is given a recording that does contain one, and asked.
+        SheetRecording page = ChartSheet.record(
+                Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+        assertEquals(0, page.recorder().text().stream()
+                        .filter(run -> run.font().isItalic()).count(),
+                "the chart itself draws no italic - which is why this"
+                        + " test builds its own recording rather than"
+                        + " asking the chart");
+
+        SheetRecorder recorder = new SheetRecorder(
+                PaperSize.A4.chartWideUnits(),
+                PaperSize.A4.chartHighUnits());
+        java.awt.Graphics2D g = (java.awt.Graphics2D) recorder.create();
+        g.setColor(java.awt.Color.BLACK);
+        for (int style : new int[] {java.awt.Font.PLAIN,
+                java.awt.Font.BOLD, java.awt.Font.ITALIC,
+                java.awt.Font.BOLD | java.awt.Font.ITALIC}) {
+            g.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, style, 10));
+            g.drawString("Perseus", 40, 40 + style * 20);
+        }
+        g.dispose();
+
+        String svg = SvgSheetWriter.write(new SheetRecording(recorder,
+                        PaperSize.A4, page.scene(), page.options(),
+                        page.metadata()),
+                SvgSheetWriter.Text.EDITABLE);
+
+        assertEquals(4, count(svg, "<text "), "four runs written");
+        assertEquals(2, count(svg, "font-style=\"italic\""),
+                "the two slanted ones say so");
+        assertEquals(2, count(svg, "font-weight=\"bold\""),
+                "and the two heavy ones");
+        assertEquals(1, count(svg, "font-weight=\"bold\""
+                        + " font-style=\"italic\""),
+                "with the one that is both carrying both");
+
+        // And the plain run carries neither, so the attributes belong
+        // to the runs that earned them.
+        Matcher plain = Pattern.compile(
+                "<text [^>]*font-size=\"10\" fill=[^>]*>Perseus</text>")
+                .matcher(svg);
+        assertTrue(plain.find(),
+                "the plain run is written with no weight and no slant");
     }
 
     @Test
