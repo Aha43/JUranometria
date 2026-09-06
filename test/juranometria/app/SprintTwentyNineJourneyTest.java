@@ -169,6 +169,13 @@ class SprintTwentyNineJourneyTest {
                 ChartComponent chart = new ChartComponent(Atlas.assembler());
                 navigation.onChange(chart::setViewState);
                 options.onChange(chart::setChartOptions);
+                // The reader can mark objects, which is what the
+                // export's own switch is about.
+                juranometria.ui.SelectInteraction.install(chart,
+                        new juranometria.chart.SelectionModel(), working,
+                        new juranometria.chart.SelectionMode());
+                working.onChange(change -> chart.setWorkingSelection(
+                        change.members(), change.lead()));
                 chart.setViewState(ChartViewState.DEFAULT);
                 chart.setPreferredSize(new java.awt.Dimension(900, 700));
                 searchHolder[0] = new SearchField(Atlas.search(),
@@ -388,6 +395,100 @@ class SprintTwentyNineJourneyTest {
                             + " carrying");
             ecliptic.showing(true);
             meridian.showing(true, true, true);
+
+            // ---- 5b. the marks a reader made, on the sheet -------
+            // The export switch is off by default, so a journey that
+            // never marks anything and never ticks the box exercises
+            // none of it (PR #292 re-review). Here the reader marks
+            // two objects on the chart itself and asks for them.
+            List<String> marked = onEdt(() ->
+                    new ChartRenderer(StarSizePolicy.DEFAULT)
+                            .drawnMarks(chart.currentScene(),
+                                    ChartOptions.DEFAULTS).stream()
+                            .filter(mark -> mark.star() != null)
+                            .filter(mark -> mark.centre().x() > 200
+                                    && mark.centre().x() < 600)
+                            .limit(2)
+                            .map(mark -> mark.star().id()).toList());
+            assertEquals(2, marked.size(),
+                    "5b. the page has objects to mark");
+            SwingUtilities.invokeAndWait(() ->
+                    working.replaceWith(marked, marked.get(1)));
+            assertEquals(marked, onEdt(working::members),
+                    "and the reader has marked them");
+
+            List<Path> withMarks = new ArrayList<>();
+            List<Boolean> boxTicked = new ArrayList<>();
+            ExportSheetSession.Surfaces asking =
+                    new ExportSheetSession.Surfaces() {
+
+                @Override
+                public java.util.Optional<ExportSheet.Request> chooseWhat(
+                        java.awt.Frame owner, ExportSheet.Request initial) {
+                    List<ExportSheet.Request> chosen = new ArrayList<>();
+                    JComponent dialog = ExportSheetDialog.content(
+                            initial, chosen::add, () -> { });
+                    javax.swing.JCheckBox box = named(dialog,
+                            ExportSheetDialog.WORKING_BOX);
+                    assertFalse(box.isSelected(),
+                            "5b. the switch starts off, as the gate"
+                                    + " decided");
+                    box.setSelected(true);
+                    boxTicked.add(true);
+                    ((JButton) named(dialog,
+                            ExportSheetDialog.EXPORT_BUTTON)).doClick();
+                    return chosen.stream().findFirst();
+                }
+
+                @Override
+                public java.util.Optional<File> chooseWhere(
+                        java.awt.Frame owner, String suggestedName) {
+                    return java.util.Optional.of(
+                            folder.resolve("marked").toFile());
+                }
+
+                @Override
+                public ExportSheet.ReplaceDecision replace(
+                        java.awt.Frame owner) {
+                    return replacing -> true;
+                }
+
+                @Override
+                public void report(java.awt.Frame owner,
+                        ExportSheet.Outcome outcome) {
+                    withMarks.add(assertInstanceOf(
+                            ExportSheet.Outcome.Written.class, outcome,
+                            "5b. the marked sheet is written").file());
+                }
+            };
+            SwingUtilities.invokeAndWait(() -> ExportSheetSession.open(
+                    null, navigation, chart, options, working, asking));
+            assertEquals(List.of(true), boxTicked,
+                    "5b. the reader ticked the switch in the real"
+                            + " dialog");
+
+            // Both marks are on that sheet, as rings, where the sky
+            // puts the objects they mark.
+            assertEquals(List.of(), marksMissingFrom(withMarks.get(0),
+                            onEdt(navigation::state), marked),
+                    "5b. every object the reader marked is ringed on"
+                            + " the sheet");
+
+            // And the sheet made without the switch has none of them.
+            Path unmarked = assertInstanceOf(
+                    ExportSheet.Outcome.Written.class,
+                    ExportSheetSession.exportTo(
+                            folder.resolve("unmarked").toFile(),
+                            new ExportSheet.Request(SheetFormat.SVG,
+                                    PaperSize.A4, 300, false),
+                            navigation, chart, options, working,
+                            replacing -> true),
+                    "an unticked export is written too").file();
+            assertEquals(marked.size(), marksMissingFrom(unmarked,
+                            onEdt(navigation::state), marked).size(),
+                    "and carries none of the reader's marks, because"
+                            + " they did not ask for them");
+            SwingUtilities.invokeAndWait(working::clear);
 
             // ---- 6b. a page the ecliptic actually crosses ---------
             // Orion is where the issue's journey goes and the
@@ -642,6 +743,50 @@ class SprintTwentyNineJourneyTest {
                 > PaperSize.A4.chartHighUnits() / 2.0;
     }
 
+    /**
+     * Which of the marked objects have no ring on this sheet, where
+     * the sky puts them.
+     */
+    private static List<String> marksMissingFrom(Path sheet,
+            ChartViewState state, List<String> marked) throws Exception {
+        juranometria.sheet.SheetRecording page =
+                juranometria.sheet.ChartSheet.record(
+                        Atlas.assembler()::assemble, state,
+                        ChartOptions.DEFAULTS,
+                        ChartRenderer.ReferenceLayer.NONE,
+                        PaperSize.A4);
+        String svg = Files.readString(sheet, StandardCharsets.UTF_8);
+        // Centre and width together: a star's own disc is centred on
+        // the object too, so ink at the right place proves nothing.
+        // A ring is bigger than the mark it rings, and that is what
+        // distinguishes a marked sheet from a plain one.
+        List<double[]> ink = pathBoxes(svg);
+        GnomonicProjection projection = new GnomonicProjection(
+                page.scene().viewport().centre());
+        ViewportMapping mapping = new ViewportMapping(
+                page.scene().viewport());
+
+        List<String> missing = new ArrayList<>();
+        for (ChartRenderer.DrawnMark mark
+                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                        .drawnMarks(page.scene(), page.options())) {
+            if (mark.star() == null
+                    || !marked.contains(mark.star().id())) {
+                continue;
+            }
+            var at = projection.project(mark.star().position())
+                    .map(mapping::toPixel).orElseThrow();
+            double ring = 2.0 * Math.max(mark.reach() + 5.0, 7.0);
+            boolean ringed = ink.stream().anyMatch(box ->
+                    Math.hypot(box[0] - at.x(), box[1] - at.y()) < 0.51
+                            && Math.abs(box[2] - ring) < 1.0);
+            if (!ringed) {
+                missing.add(mark.star().id());
+            }
+        }
+        return missing;
+    }
+
     /** How many of the ecliptic's open diamonds the sheet carries. */
     private static int landmarkDiamonds(String svg) {
         int found = 0;
@@ -696,6 +841,11 @@ class SprintTwentyNineJourneyTest {
         BufferedImage png = javax.imageio.ImageIO.read(
                 sheets.get(2).toFile());
         List<double[]> inSvg = pathCentres(svg);
+        // The PDF too. Comparing two of three formats and calling it
+        // "all three" was the gap here (PR #292 re-review): the PDF
+        // is the one a club member prints, and its ordinary chart
+        // marks had never been looked at.
+        List<double[]> inPdf = pdfPathPoints(sheets.get(1));
 
         GnomonicProjection projection = new GnomonicProjection(
                 sheet.scene().viewport().centre());
@@ -706,6 +856,7 @@ class SprintTwentyNineJourneyTest {
 
         int checked = 0;
         int missingFromSvg = 0;
+        int missingFromPdf = 0;
         int blankInPng = 0;
         for (ChartRenderer.DrawnMark mark
                 : new ChartRenderer(StarSizePolicy.DEFAULT)
@@ -724,6 +875,14 @@ class SprintTwentyNineJourneyTest {
             if (inSvg.stream().noneMatch(centre ->
                     Math.hypot(centre[0] - x, centre[1] - y) < 1.0)) {
                 missingFromSvg++;
+            }
+            // The PDF's own coordinates are the chart's, after the
+            // one flip at the top of its content stream, so a mark
+            // is looked for where the sky puts it just as in the SVG.
+            if (inPdf.stream().noneMatch(point ->
+                    Math.hypot(point[0] - x, point[1] - y)
+                            < Math.max(mark.reach(), 1.0) + 0.5)) {
+                missingFromPdf++;
             }
             // The furniture is opaque and drawn last: the title block
             // owns the lower left and the magnitude key the upper
@@ -752,6 +911,10 @@ class SprintTwentyNineJourneyTest {
             disagree.add("SVG (" + missingFromSvg + " of " + checked
                     + " marks absent)");
         }
+        if (missingFromPdf > 0) {
+            disagree.add("PDF (" + missingFromPdf + " of " + checked
+                    + " marks absent)");
+        }
         if (blankInPng > 0) {
             disagree.add("PNG (" + blankInPng + " of " + checked
                     + " marks with no ink)");
@@ -777,6 +940,69 @@ class SprintTwentyNineJourneyTest {
             }
         }
         return false;
+    }
+
+    /**
+     * Every point the PDF's content stream draws through, in the
+     * chart's own coordinates.
+     *
+     * <p>The stream is written uncompressed, one operator to a line,
+     * and flipped once at the top - so an {@code m} or {@code l}
+     * carries the same numbers the SVG does.
+     */
+    private static List<double[]> pdfPathPoints(Path pdf)
+            throws Exception {
+        String file = Files.readString(pdf,
+                StandardCharsets.ISO_8859_1);
+        String stream = file.substring(file.indexOf("stream\n") + 7,
+                file.indexOf("endstream"));
+        List<double[]> points = new ArrayList<>();
+        for (String line : stream.split("\n")) {
+            if (!line.endsWith(" m") && !line.endsWith(" l")
+                    && !line.endsWith(" c")) {
+                continue;
+            }
+            List<Double> numbers = new ArrayList<>();
+            var number = java.util.regex.Pattern
+                    .compile("-?\\d+(?:\\.\\d+)?").matcher(line);
+            while (number.find()) {
+                numbers.add(Double.parseDouble(number.group()));
+            }
+            for (int i = 0; i + 1 < numbers.size(); i += 2) {
+                points.add(new double[] {numbers.get(i),
+                        numbers.get(i + 1)});
+            }
+        }
+        return points;
+    }
+
+    /** Each drawn path as centre x, centre y, width. */
+    private static List<double[]> pathBoxes(String svg) {
+        List<double[]> boxes = new ArrayList<>();
+        var each = java.util.regex.Pattern.compile("<path d=\"([^\"]+)\"")
+                .matcher(svg.substring(svg.indexOf("<g id=\"ink\"")));
+        while (each.find()) {
+            List<Double> numbers = new ArrayList<>();
+            var number = java.util.regex.Pattern
+                    .compile("-?\\d+(?:\\.\\d+)?")
+                    .matcher(each.group(1));
+            while (number.find()) {
+                numbers.add(Double.parseDouble(number.group()));
+            }
+            double minX = Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
+            double maxX = -Double.MAX_VALUE;
+            double maxY = -Double.MAX_VALUE;
+            for (int i = 0; i + 1 < numbers.size(); i += 2) {
+                minX = Math.min(minX, numbers.get(i));
+                maxX = Math.max(maxX, numbers.get(i));
+                minY = Math.min(minY, numbers.get(i + 1));
+                maxY = Math.max(maxY, numbers.get(i + 1));
+            }
+            boxes.add(new double[] {(minX + maxX) / 2.0,
+                    (minY + maxY) / 2.0, maxX - minX});
+        }
+        return boxes;
     }
 
     private static List<double[]> pathCentres(String svg) {

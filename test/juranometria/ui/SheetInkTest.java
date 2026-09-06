@@ -102,6 +102,75 @@ class SheetInkTest {
     }
 
     @Test
+    void everyMarkedObjectThePageDoesNotDrawGetsItsCross()
+            throws Exception {
+        // The other half. A marked object the page holds but does not
+        // draw - too faint for the limit, or hidden under a symbol -
+        // is given a cross instead of a ring, so that a reader never
+        // sees both treatments for one object and never neither. The
+        // ring test alone left this uncovered (PR #292 re-review).
+        ChartScene scene = Atlas.assembler().assemble(ORION,
+                PaperSize.A4.chartWideUnits(),
+                PaperSize.A4.chartHighUnits());
+        ChartComponent chart = chart();
+
+        // A chart carrying an interaction mark, which is what a
+        // module contributes for an undrawn member.
+        SkyPosition undrawn = new SkyPosition(
+                scene.viewport().centre().raDegrees() + 3.0,
+                scene.viewport().centre().decDegrees() + 2.0);
+        chart.overlays().offer("on-this-page", () -> List.of(
+                new juranometria.module.OverlayContribution.Point(
+                        "TYC undrawn", "working mark on TYC undrawn,"
+                                + " on this page but not drawn",
+                        undrawn,
+                        juranometria.module.InkRole.INTERACTION)));
+
+        SheetRecorder recorder = new SheetRecorder(
+                PaperSize.A4.chartWideUnits(),
+                PaperSize.A4.chartHighUnits());
+        Graphics2D g = (Graphics2D) recorder.create();
+        SheetInk.working(chart, List.of(), null, ChartOptions.DEFAULTS)
+                .paint(g, scene);
+        g.dispose();
+
+        var at = new juranometria.project.GnomonicProjection(
+                        scene.viewport().centre()).project(undrawn)
+                .map(new juranometria.project.ViewportMapping(
+                        scene.viewport())::toPixel).orElseThrow();
+        // The cross is four ticks with a gap in the middle, so the
+        // object itself stays visible through its own mark. None of
+        // them is centred on it; the four together are.
+        List<SheetRecorder.Drawn> ticks = recorder.drawn().stream()
+                .filter(drawn -> drawn.colour().equals(
+                        ChartPalette.WHITE_PAPER.interactionInk()))
+                .toList();
+        assertEquals(4, ticks.size(),
+                "the undrawn member's cross is on the sheet, as its"
+                        + " four arms: " + recorder.drawn().size()
+                        + " shapes drawn in all");
+
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        for (SheetRecorder.Drawn tick : ticks) {
+            var box = tick.shape().getBounds2D();
+            minX = Math.min(minX, box.getMinX());
+            maxX = Math.max(maxX, box.getMaxX());
+            minY = Math.min(minY, box.getMinY());
+            maxY = Math.max(maxY, box.getMaxY());
+        }
+        assertEquals(at.x(), (minX + maxX) / 2.0, 0.51,
+                "centred on the object it marks");
+        assertEquals(at.y(), (minY + maxY) / 2.0, 0.51,
+                "in both directions");
+        assertTrue(maxX - minX > 8.0 && maxY - minY > 8.0,
+                "and big enough to see: " + (maxX - minX) + " x "
+                        + (maxY - minY));
+    }
+
+    @Test
     void aChartWithNothingMarkedPutsNothingOnTheSheet() throws Exception {
         ChartScene scene = Atlas.assembler().assemble(ORION,
                 PaperSize.A4.chartWideUnits(),

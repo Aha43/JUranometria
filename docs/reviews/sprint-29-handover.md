@@ -1,6 +1,6 @@
 # Sprint 29 handover — Take the chart to the observing table
 
-Five issues, five pull requests, eighteen rounds of independent
+Five issues, five pull requests, nineteen rounds of independent
 review. This is what the sprint did, what it got wrong on the way,
 what is still owed, and what version it should be.
 
@@ -55,7 +55,7 @@ Reader documentation is in [docs/exporting.md](../exporting.md).
 
 ## Every review correction
 
-Eighteen rounds. The production designs were called sound early in
+Nineteen rounds. The production designs were called sound early in
 each issue; almost everything below is a correction to **evidence** —
 tests that looked like proof and were not.
 
@@ -152,6 +152,16 @@ tests that looked like proof and were not.
 42. **The physical print and ruler inspection has not happened.**
     See below; it is the one thing in this sprint that cannot be
     done from here.
+43. The real export route ran with an empty working selection and the
+    inclusion switch unticked, so none of that path was exercised;
+    and the new ink tests proved the rings without proving the
+    crosses. The journey now marks two objects on the chart and ticks
+    the switch in the real dialog, and the crosses have a test of
+    their own.
+44. The "all three formats" comparison inspected the SVG and the PNG
+    and not the PDF — which is the one a club member prints. Its
+    content stream is now read for the same marks, in the chart's own
+    coordinates.
 
 ### What CI found that review did not
 
