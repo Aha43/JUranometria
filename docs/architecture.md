@@ -15,6 +15,12 @@ only when the charting problem demonstrates a need for it.
 The renderer must not depend on a Swing component. Screen display, printing,
 and image export should call the same chart-rendering boundary.
 
+Future platform signing and notarisation are recorded separately in
+[the distribution-identity road](future-distribution-identity.md). The work is
+deliberately split into a shared gate, a macOS sprint and a Windows sprint;
+printing and the modest wider-field chart requested by an observing-club reader
+come first.
+
 ## Proposed boundaries
 
 ```text
