@@ -9,6 +9,25 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A chart sheet, and SVG that writes it.** `juranometria.sheet` is the
+  boundary where a chart becomes paper: it plays the production render
+  into a recording `Graphics2D` and hands what the renderer did to a
+  writer. Not a screenshot - it reads no pixels - and not a second
+  description of a chart assembled from parallel rules, which is the
+  fork the sprint's gate forbade.
+- **A4 and US Letter**, landscape, half-inch margins, in millimetres:
+  chart rectangles of 271.6 x 184.6 mm and 254.0 x 190.5 mm. Both
+  papers, because guessing one from a locale would be guessing.
+- **SVG, self-contained.** No stylesheet, script, font, image or network
+  reference of any kind; text stays text in a generic family so a label
+  can be retyped in Inkscape; `paper`, `chart`, `ink` and `labels` are
+  named groups so ink and labels can be selected apart. The sheet states
+  its own centre, field, frame, magnitude limit, paper and version - and
+  nothing about the machine that made it. An outline variant is offered
+  for a machine whose fonts are unknown.
+- Module ink travels to paper when the chart is carrying it, and the
+  sheet never goes looking for a module it was not handed.
+
 - **A 42-degree field step**, the widest page the atlas offers. It
   is reached the way every other step is - Zoom out, the View menu,
   the keyboard - and it is the end of the sequence. The number comes

@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -231,6 +231,11 @@ icons: classes
 # What is on a page (docs/decisions/on-this-page.md, issue #214):
 # inventory sizes, why present objects cannot be seen, the ordering,
 # and what asking costs.
+chart-sheet-study: classes
+	@echo "  chart sheets"
+	@$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartSheetStudyMain > /dev/null
+	@echo "written to docs/studies/chart-sheet"
+
 wider-field-study: classes
 	@echo "  the released pages, hashed"
 	@$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WiderFieldStudyMain > docs/studies/wider-field/released-pages.txt

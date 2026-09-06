@@ -96,6 +96,11 @@ public final class EvidenceContractMain {
         // (issue #284). Holding it to the same byte contract is what
         // makes "the 1-36 degree atlas is untouched" a standing
         // claim rather than a one-off check.
+        // Writes the sheets beside the report as it runs (#285),
+        // the black-sky pattern: capturing the report regenerates
+        // the documents it describes.
+        REPORT_MAINS.put("juranometria.tool.ChartSheetStudyMain",
+                "docs/studies/chart-sheet/measurements.md");
         REPORT_MAINS.put("juranometria.tool.WiderFieldStudyMain",
                 "docs/studies/wider-field/released-pages.txt");
     }

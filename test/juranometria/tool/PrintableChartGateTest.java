@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import juranometria.sheet.SheetRecorder;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
 import juranometria.project.GnomonicProjection;
@@ -85,7 +86,7 @@ class PrintableChartGateTest {
         // throws on everything outside the seventeen vector methods,
         // so a render that completes through it is a render a vector
         // sheet can hold entirely.
-        ChartSheetRecorder recorder = new ChartSheetRecorder(400, 300);
+        SheetRecorder recorder = new SheetRecorder(400, 300);
         Graphics2D g = (Graphics2D) recorder.create();
         g.setColor(Color.BLACK);
         g.setStroke(new java.awt.BasicStroke(1.0f));

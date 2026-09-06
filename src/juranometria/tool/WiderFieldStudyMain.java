@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.util.Locale;
 
 import juranometria.app.Atlas;
+import juranometria.sheet.SheetRecorder;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
@@ -171,7 +172,7 @@ public final class WiderFieldStudyMain {
      */
     public static String inkFingerprint(double[] centre, double field,
                                         boolean black) throws Exception {
-        ChartSheetRecorder recorder = new ChartSheetRecorder(WIDE, HIGH);
+        SheetRecorder recorder = new SheetRecorder(WIDE, HIGH);
         new ChartRenderer(StarSizePolicy.DEFAULT).render(recorder,
                 scene(centre, field),
                 black ? ChartOptions.DEFAULTS.withPalette(
@@ -189,7 +190,7 @@ public final class WiderFieldStudyMain {
 
         StringBuilder ink = new StringBuilder();
         int skipped = 0;
-        for (ChartSheetRecorder.Drawn drawn : recorder.drawn()) {
+        for (SheetRecorder.Drawn drawn : recorder.drawn()) {
             if (titleBlock != null && drawn.shape().getBounds2D()
                     .getBounds().equals(titleBlock)) {
                 skipped++;
