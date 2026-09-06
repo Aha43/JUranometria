@@ -35,7 +35,8 @@ the zenith's ring and tick. Neither is named for the ecliptic — a
 module drawing the galactic equator would use the same words.
 
 The geometry is held to **IAU SOFA** at 0.06 arcseconds, against a
-measured residual of 0.0403; the atlas ships no dependency on it.
+measured residual of 0.0403 arcseconds; the atlas ships no
+dependency on it.
 The gallery gains an **Ecliptic** room with two slides.
 
 Hidden by default: installing the module changes no reader's page,
