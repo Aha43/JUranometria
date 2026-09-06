@@ -88,6 +88,10 @@ public final class EvidenceContractMain {
                 "docs/studies/working-selection/measurements.md");
         REPORT_MAINS.put("juranometria.tool.EclipticStudyMain",
                 "docs/studies/ecliptic/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
+                "docs/studies/printable-chart/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.ChartSheetExportStudyMain",
+                "docs/studies/printable-chart/formats.md");
     }
 
     /**
