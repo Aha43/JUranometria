@@ -160,6 +160,20 @@ three milliarcseconds the cosine discarded - and that
 width is the resolution of the input rather than a
 property of the arithmetic.
 
+Half a turn of right ascension is not the whole rule.
+At a pole the right ascension means nothing, so the
+same point can be written a thousand ways: centred on
+the north pole, the south pole was refused when it
+happened to be written 180 degrees round and placed
+at a radius of thirty quadrillion otherwise. The
+cause is the same residue - cos(toRadians(90)) is
+6.1e-17, not zero, and only the exact zero makes
+right ascension drop out - so a declination of ninety
+degrees is recognised in degrees too. One principle:
+a coordinate's degeneracies are exact facts about
+what the caller wrote, and have to be answered before
+any trigonometry leaves a residue behind.
+
 ## Pointing at something
 
 A reader points at a mark and the atlas says what it
@@ -222,7 +236,7 @@ is further down, and it is not this.
 | stereographic | a circle through the page centre | 399 | 0.0e+00 | degenerate | 0.0e+00 |
 | orthographic | the celestial equator | 200 | 7.4e-18 | degenerate | 1.4e-17 |
 | orthographic | the ecliptic | 200 | 3.9e-01 | 5.6e-02 | 8.9e-16 |
-| orthographic | a circle through the page centre | 200 | 0.0e+00 | degenerate | 0.0e+00 |
+| orthographic | a circle through the page centre | 201 | 0.0e+00 | degenerate | 0.0e+00 |
 
 So the vocabulary is three words, and all three are
 exact:
@@ -405,9 +419,9 @@ about it:
 | stereographic | Orion | 180° | the ecliptic | circular | 4.5e-13 | 1 | two per run |
 | stereographic | Orion | 180° | a meridian | circular | 2.3e-13 | 1 | two per run |
 | stereographic | Orion | 180° | a horizon | circular | 1.1e-12 | 1 | two per run |
-| stereographic | the north pole | 42° | a meridian | straight | 9.1e-13 | 1 | two per run |
+| stereographic | the north pole | 42° | a meridian | straight | 8.0e-13 | 1 | two per run |
 | stereographic | the north pole | 42° | a horizon | circular | 9.1e-13 | 1 | two per run |
-| stereographic | the north pole | 60° | a meridian | straight | 6.8e-13 | 1 | two per run |
+| stereographic | the north pole | 60° | a meridian | straight | 5.7e-13 | 1 | two per run |
 | stereographic | the north pole | 60° | a horizon | circular | 9.1e-13 | 1 | two per run |
 | stereographic | the north pole | 90° | a meridian | straight | 8.0e-13 | 1 | two per run |
 | stereographic | the north pole | 90° | a horizon | circular | 9.1e-13 | 1 | two per run |
@@ -446,10 +460,10 @@ about it:
 | orthographic | Orion | 120° | the ecliptic | elliptical | 3.4e-13 | 2 | two per run |
 | orthographic | Orion | 120° | a meridian | elliptical | 3.4e-13 | 2 | two per run |
 | orthographic | Orion | 120° | a horizon | elliptical | 3.4e-13 | 4 | two per run |
-| orthographic | the north pole | 42° | a meridian | straight | 8.0e-13 | 1 | two per run |
+| orthographic | the north pole | 42° | a meridian | straight | 6.8e-13 | 1 | two per run |
 | orthographic | the north pole | 42° | a horizon | elliptical | 8.2e-13 | 2 | two per run |
 | orthographic | the north pole | 60° | a meridian | straight | 6.8e-13 | 1 | two per run |
-| orthographic | the north pole | 60° | a horizon | elliptical | 8.7e-13 | 2 | two per run |
+| orthographic | the north pole | 60° | a horizon | elliptical | 8.9e-13 | 2 | two per run |
 | orthographic | the north pole | 90° | a meridian | straight | 3.4e-13 | 1 | two per run |
 | orthographic | the north pole | 90° | a horizon | elliptical | 7.6e-13 | 2 | two per run |
 | orthographic | the north pole | 120° | the celestial equator | circular | 1.1e-13 | 4 | two per run |

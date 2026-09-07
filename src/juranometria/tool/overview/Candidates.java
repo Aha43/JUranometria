@@ -135,9 +135,9 @@ final class Candidates {
                                              double visibleRadius,
                                              CircleForm circleForm) {
         double centreRa = Math.toRadians(centre.raDegrees());
-        double centreDec = Math.toRadians(centre.decDegrees());
-        double sinCentreDec = Math.sin(centreDec);
-        double cosCentreDec = Math.cos(centreDec);
+        double[] centreDec = sineAndCosineOf(centre.decDegrees());
+        double sinCentreDec = centreDec[0];
+        double cosCentreDec = centreDec[1];
         // Compared in radians, because the limb is exactly where the
         // comparison happens: a point ninety degrees out gives an
         // angle of pi/2 to the last bit, and converting that to
@@ -159,9 +159,10 @@ final class Candidates {
 
             @Override
             public Optional<PlanePoint> project(SkyPosition position) {
-                double dec = Math.toRadians(position.decDegrees());
-                double sinDec = Math.sin(dec);
-                double cosDec = Math.cos(dec);
+                double[] declination =
+                        sineAndCosineOf(position.decDegrees());
+                double sinDec = declination[0];
+                double cosDec = declination[1];
 
                 // Half a turn of right ascension is recognised in
                 // degrees, where the caller wrote it, and answered
@@ -328,6 +329,30 @@ final class Candidates {
      * known - and it is a statement about the error it allows rather
      * than about the size of a number.
      */
+    /**
+     * The sine and cosine of a declination, exact at the poles.
+     *
+     * <p>Ninety degrees is recognised in degrees, where the caller
+     * wrote it, because {@code cos(toRadians(90))} is 6.1e-17 rather
+     * than zero. That residue is harmless as a coordinate and not
+     * harmless as a <em>degeneracy</em>: at a pole the right
+     * ascension means nothing, and it is only the exact zero that
+     * makes it drop out of the arithmetic. Left as 6.1e-17 the south
+     * pole was a different point for every right ascension it was
+     * written with, and the north pole was the origin only when its
+     * right ascension happened to match the centre's.
+     */
+    static double[] sineAndCosineOf(double declinationDegrees) {
+        if (declinationDegrees == 90.0) {
+            return new double[] {1.0, 0.0};
+        }
+        if (declinationDegrees == -90.0) {
+            return new double[] {-1.0, 0.0};
+        }
+        double radians = Math.toRadians(declinationDegrees);
+        return new double[] {Math.sin(radians), Math.cos(radians)};
+    }
+
     /** A projection's own answer, from the pole in its own frame. */
     private interface CircleForm {
         Optional<PlaneConic> of(double[] pole);

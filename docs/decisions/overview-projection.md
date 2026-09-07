@@ -250,8 +250,26 @@ at a radius of thirty quadrillion, because `sin(toRadians(180))` is
 
 Half a turn of right ascension is therefore recognised **in degrees,
 where the caller wrote it**, and answered exactly; every other offset
-takes the ordinary path unchanged. The refused set is then exactly
-one representable position:
+takes the ordinary path unchanged.
+
+A half turn of right ascension is not the whole of the rule, though,
+and a fifth round found the rest. **At a pole the right ascension
+means nothing**, so the same point can be written a thousand ways.
+Centred on the north pole, the south pole was refused when it
+happened to be written 180° round and placed at a radius of thirty
+quadrillion otherwise, and the north pole was the origin only when
+its own right ascension matched the centre's. The cause is the same
+kind of residue: `cos(toRadians(90))` is 6.1e-17 rather than zero, and
+it is only the exact zero that makes right ascension drop out of the
+arithmetic. So a declination of ±90 is recognised in degrees too.
+
+**The principle is one principle**: a coordinate's degeneracies are
+exact facts about what the caller wrote, and they have to be answered
+where they were written, in degrees, before any trigonometry has a
+chance to leave a residue behind. Both places this bit are the same
+mistake.
+
+The refused set is then exactly one representable position:
 
 | | region refused |
 |---|---:|

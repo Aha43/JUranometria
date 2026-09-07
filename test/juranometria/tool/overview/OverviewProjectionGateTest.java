@@ -259,6 +259,38 @@ class OverviewProjectionGateTest {
     }
 
     @Test
+    void everyWayOfWritingAPoleIsTheSamePole() {
+        // At a pole the right ascension means nothing, so the same
+        // point can be written a thousand ways and all of them are
+        // that point. Recognising the antipode by a half turn of
+        // right ascension is therefore the wrong invariant there:
+        // the south pole was refused when it happened to be written
+        // 180 degrees round from the centre and placed at a radius
+        // of thirty quadrillion otherwise, and the north pole was
+        // the origin only when its right ascension matched.
+        double[] anyRightAscension = {0.0, 37.0, 90.0, 180.0, 271.5,
+                359.9};
+        for (double poleDec : new double[] {90.0, -90.0}) {
+            StudyProjection centred = Candidates.stereographic(
+                    new SkyPosition(0.0, poleDec));
+            for (double ra : anyRightAscension) {
+                var itself = centred.project(new SkyPosition(ra, poleDec))
+                        .orElseThrow(() -> new AssertionError(
+                                "the centre is on the page"));
+                assertEquals(0.0, Math.hypot(itself.xiEast(),
+                        itself.etaNorth()),
+                        "the pole written at right ascension " + ra
+                                + " is the centre itself, exactly");
+                assertTrue(centred.project(new SkyPosition(ra, -poleDec))
+                                .isEmpty(),
+                        "and the opposite pole written at right"
+                                + " ascension " + ra + " is the antipode,"
+                                + " whatever right ascension it carries");
+            }
+        }
+    }
+
+    @Test
     void whatIsRefusedNearTheAntipodeIsOneRepresentablePosition() {
         // The other half, and the reason the fix is not simply the
         // old fault at a smaller scale. The refused set is now the

@@ -363,6 +363,20 @@ public final class OverviewStudyMain {
                 width is the resolution of the input rather than a
                 property of the arithmetic.
 
+                Half a turn of right ascension is not the whole rule.
+                At a pole the right ascension means nothing, so the
+                same point can be written a thousand ways: centred on
+                the north pole, the south pole was refused when it
+                happened to be written 180 degrees round and placed
+                at a radius of thirty quadrillion otherwise. The
+                cause is the same residue - cos(toRadians(90)) is
+                6.1e-17, not zero, and only the exact zero makes
+                right ascension drop out - so a declination of ninety
+                degrees is recognised in degrees too. One principle:
+                a coordinate's degeneracies are exact facts about
+                what the caller wrote, and have to be answered before
+                any trigonometry leaves a residue behind.
+
                 ## Pointing at something
 
                 A reader points at a mark and the atlas says what it
