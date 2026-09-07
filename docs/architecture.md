@@ -71,6 +71,26 @@ Projection converts celestial coordinates into a chart plane. Layout decides
 which labels and symbols deserve space. These are separate concerns: the same
 projected position may be drawn differently at different chart scales.
 
+**A module says what belongs on the sky. A projection says how the sky
+becomes a page.** (Sprint 30, `docs/decisions/overview-projection.md`.)
+
+The two halves of that sentence are different kinds of thing, and the
+distinction is why a projection is not a module. A module contributes
+domain knowledge as sky geometry — a pole, a position, a path — and must
+not know, ask, or depend on how any of it lands on paper. A projection
+decides the placement, the visibility, the curvature, the inverse lookup,
+the navigation and the export of *everything* contributed, the modules'
+geometry and the catalogue's alike. A module can be detached and the page
+is the same page with less on it; change the projection and every mark
+moves. One is an addition to a chart. The other is what a chart is.
+
+This matters most where the two meet. A module names a great circle by
+its pole and says what kind of line it is; it does not know whether that
+circle will be drawn straight, as a circular arc, or as an ellipse,
+because that is the projection's answer and it differs by projection for
+the same pole. The seam is already shaped this way, and the Sprint 30
+gate measured that it survives being asked a second projection.
+
 ### Rendering
 
 The renderer consumes a complete chart description and a drawing target. It

@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -70,6 +70,7 @@ help:
 	@echo "  zoom-study        Measure the Sprint 14 pointer-centred zoom geometry"
 	@echo "  grid-study        Measure and render the Sprint 15 coordinate-grid candidates"
 	@echo "  bayer-study       Measure and render the Sprint 17 Bayer-Flamsteed candidates"
+	@echo "  overview-study    Measure and render the Sprint 30 overview-projection candidates"
 	@echo "  dist              Build and verify the portable fallback ZIP"
 	@echo "  app-image         Build and verify this platform's native application image"
 	@echo "  clean        Delete build output"
@@ -235,6 +236,14 @@ chart-sheet-study: classes
 	@echo "  chart sheets"
 	@$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartSheetStudyMain > /dev/null
 	@echo "written to docs/studies/chart-sheet"
+
+# The Sprint 30 gate (issue #296): the overview candidates drawn over
+# real scenes, and what each one costs in shape, scale, domain, curve
+# form and page density. Writes docs/studies/overview-projection.
+overview-study: classes
+	@echo "  overview projections"
+	@$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.overview.OverviewStudyMain > /dev/null
+	@echo "written to docs/studies/overview-projection"
 
 wider-field-study: classes
 	@echo "  the released pages, hashed"
