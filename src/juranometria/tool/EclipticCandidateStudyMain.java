@@ -304,26 +304,27 @@ public final class EclipticCandidateStudyMain {
         ViewportMapping mapping = new ViewportMapping(viewport);
         Rectangle2D paper = new Rectangle2D.Double(1, 1,
                 viewport.widthPx() - 2, viewport.heightPx() - 2);
-        GreatCirclePage.Page page = new GreatCirclePage.Page(
-                paper.getMinX(), paper.getMinY(),
-                paper.getMaxX(), paper.getMaxY());
 
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             g2.clip(paper);
-            Optional<GreatCirclePage.Arc> arc = GreatCirclePage.clip(
-                    projection, mapping, page, ECLIPTIC_POLE);
-            if (arc.isPresent()) {
+            var runs = GreatCirclePage.clip(projection, mapping,
+                    juranometria.project.PageRegion.paper(paper.getMinX(),
+                            paper.getMinY(), paper.getMaxX(),
+                            paper.getMaxY()),
+                    ECLIPTIC_POLE);
+            if (!runs.isEmpty()) {
                 g2.setColor(palette.figureInk());
                 g2.setStroke(line.stroke());
-                g2.draw(new Line2D.Double(arc.get().from().x(),
-                        arc.get().from().y(), arc.get().to().x(),
-                        arc.get().to().y()));
+                for (var run : runs) {
+                    g2.draw(ReferenceInk.shapeOf(run));
+                }
                 g2.setColor(palette.gridLabelInk());
                 g2.setFont(EquatorialGrid.GRID_LABEL_FONT);
-                Rectangle2D box = ReferenceInk.labelBox(paper, arc.get(),
+                Rectangle2D box = ReferenceInk.labelBox(paper,
+                        ReferenceInk.labelAnchor(runs),
                         "Ecliptic", g2.getFontMetrics());
                 g2.drawString("Ecliptic", (float) box.getMinX(),
                         (float) (box.getMaxY()
@@ -374,7 +375,7 @@ public final class EclipticCandidateStudyMain {
         g.setColor(palette.gridLabelInk());
         g.setFont(EquatorialGrid.GRID_LABEL_FONT);
         Rectangle2D box = ReferenceInk.labelBox(paper,
-                new GreatCirclePage.Arc(p, p), name, g.getFontMetrics());
+                p, name, g.getFontMetrics());
         g.drawString(name, (float) box.getMinX(),
                 (float) (box.getMaxY() - g.getFontMetrics().getDescent()));
     }

@@ -343,7 +343,7 @@ class ReferenceInkTest {
                     var arc = juranometria.project.GreatCirclePage.clip(
                             new GnomonicProjection(scene.viewport().centre()),
                             new ViewportMapping(scene.viewport()),
-                            new juranometria.project.GreatCirclePage.Page(
+                            juranometria.project.PageRegion.paper(
                                     paper.getMinX(), paper.getMinY(),
                                     paper.getMaxX(), paper.getMaxY()),
                             circle.pole());
@@ -351,7 +351,9 @@ class ReferenceInkTest {
                         continue;
                     }
                     drawn++;
-                    for (var end : List.of(arc.get().from(), arc.get().to())) {
+                    for (var run : arc) {
+                    for (var end : List.of(run.from().orElseThrow(),
+                            run.to().orElseThrow())) {
                         SkyPosition sky = ChartHitTest.skyAt(scene, end.x(),
                                 end.y());
                         assertTrue(sky != null,
@@ -361,6 +363,7 @@ class ReferenceInkTest {
                                 circle.identity() + " at " + centre + ", "
                                         + field + "°: the drawn end is on"
                                         + " the circle it belongs to");
+                    }
                     }
                 }
             }

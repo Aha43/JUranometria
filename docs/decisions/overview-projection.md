@@ -585,6 +585,78 @@ projection on the shared frame and making its domain rule exact.
   or badly. They would be absent, in the corners, where nothing looks
   wrong.
 
+### What building the curve seam changed (#298)
+
+- **All three words, and the third one nearly went missing.** The
+  first build carried straight and circular and refused an ellipse,
+  naming #301, on the argument that no page the atlas ships crosses
+  one and a word nothing can exercise is a word no test can defend.
+  The review pointed at this document: the gate assigned all three
+  forms to #298 and left #301 owing only the ellipse-meets-circle
+  quartic. That was right, and the argument was wrong twice. The
+  form *is* exercisable - on the hemisphere's page the gate itself
+  measured it on, built from the projection's own closed form - and
+  leaving it out would have put back exactly the redesign the gate
+  spent seventeen pages of measurement to avoid. Deferring a
+  decision this document had already made, and editing this document
+  to agree, is the fault worth remembering.
+- **The visible half of a hemisphere's circle is #301's, and is
+  named as such.** A great circle's far half projects onto the same
+  ellipse as its near half, so the conic cannot tell them apart.
+  That is a policy about a globe - and #301 already lists the hidden
+  hemisphere among the things it decides. The seam says what the
+  curve is; it does not pretend to know which half a reader sees.
+- **The claim that lets an ellipse ignore the limb is checked, not
+  trusted.** The gate measured that every orthographic great circle
+  lies inside its own limb, so no ellipse-meets-circle quartic is
+  needed. Production tests the containment rather than assuming it:
+  an ellipse that would leave the visible region refuses and names
+  the quartic, instead of being drawn through a boundary the
+  clipping never looked at.
+- **The curve had to be numbers.** `juranometria.project` is held by
+  a class-file scan to no `java.awt`, so the vocabulary could not be
+  built on `Shape` as the study's was. The chart turns a run into
+  ink. That is the older rule anyway: a module says where, a
+  projection says where that lands, the chart decides what it looks
+  like.
+- **At every field the atlas offers, the two projections agree to
+  0.08 page units.** The widest an overview arc stands off its own
+  chord is a twelfth of a pixel at 42 degrees, against 14, 37 and 71
+  at the overview's own rungs. That is why the released atlas came
+  through byte for byte identical — and why a test of curves using
+  only the offered fields would have proved nothing, since a chord
+  would have passed it.
+- **A whole sheet of a curved page was reachable after all.** The
+  first build stopped at a recorder filled by hand and recorded that
+  the end-to-end sheet belonged to #299, because a view state will
+  not take a field off the ladder. It does not have to: the ladder
+  constrains the *field*, not the projection, and a great circle
+  that misses the page centre is classified curved at 42 degrees as
+  surely as at 120. The sheet is now the atlas's own assembler, the
+  production renderer and all three writers, over **one** recording -
+  a claim that four things agree is not tested by making four of
+  them. SVG and PDF are asked for the recorded shape's own path text
+  rather than for any curve at all; the PNG is asked where its ink
+  is, along the band the recorded curve runs through, against the
+  same band of the same page with **that one circle switched off**
+  and every other contribution drawn (3,055 dark samples against
+  864). Getting that control right took two corrections and both
+  were the same mistake - changing more than one thing. It began by
+  removing *both* modules, so the extra ink could have been the
+  observer's lines; then by switching off the ecliptic module, which
+  takes the circle's four landmarks and its name with it. What is
+  compared now is the band with everything the module draws *except
+  the circle* taken out of it, found by asking what the two renders
+  differ by rather than by guessing where a diamond or a word might
+  be. On this page that is the name, which sits on the band; the
+  landmarks are off the paper. Paint order is read in all four: the circle
+  is drawn before the title panel in the recording and written
+  before it in both vector files, and in the raster the panel hides
+  the part of the circle it covers - 44 dark samples of 1,948 under
+  it, against 3,157 of 7,441 beside it. What none of them can show
+  at 42 degrees is a curve a reader would *see* bending; that is
+  measured on the wider pages, and stays measured there.
+
 - **#298 — the curve vocabulary.** Replace `GreatCirclePage.clip`'s
   `Optional<Arc>` with the three exact forms and a list of runs with
   optional ends. The forms come from `Projection.greatCircle(pole)`

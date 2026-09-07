@@ -23,6 +23,18 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   while a projection says how the sky becomes a page
   (`docs/decisions/overview-projection.md`, `docs/architecture.md`).
 
+- **Reference circles are carried as curves** (issue #298). The atlas
+  drew a great circle as a straight line between two page edges,
+  which is true of a tangent plane and of no other projection. The
+  seam now asks the projection what the circle is, asks the page what
+  shape that is there, and draws it — a line, or an exact circular or
+  elliptical arc, in as many runs as the page cuts it into, and
+  clipped to where there is sky rather than only to where there is
+  paper. Screen, SVG, PDF and PNG carry the same curve, because they
+  all replay one recording of one render. Still nothing a reader can
+  see: at every field the atlas offers, the two answers differ by
+  less than a tenth of a pixel.
+
 - **Projection is a core strategy now** (issue #297), with the atlas's
   gnomonic projection and the overview's stereographic one as two real
   implementations behind one boundary. Still nothing a reader can see:

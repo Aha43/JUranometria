@@ -40,4 +40,18 @@ public record PlaneConic(double a, double b, double c, double d,
     public double curvatureOver(double reach) {
         return (Math.abs(a) + Math.abs(b) + Math.abs(c)) * reach * reach;
     }
+
+    /**
+     * The same conic in page coordinates, where
+     * {@code x = intoX - scale * xi} and
+     * {@code y = intoY - scale * eta}.
+     */
+    public PlaneConic mapped(double scale, double intoX, double intoY) {
+        return new PlaneConic(a, b, c,
+                -2.0 * a * intoX - b * intoY - scale * d,
+                -b * intoX - 2.0 * c * intoY - scale * e,
+                a * intoX * intoX + b * intoX * intoY + c * intoY * intoY
+                        + scale * d * intoX + scale * e * intoY
+                        + scale * scale * f);
+    }
 }

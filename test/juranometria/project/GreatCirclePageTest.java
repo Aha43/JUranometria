@@ -43,15 +43,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GreatCirclePageTest {
 
     /** The clipping, asked the way the chart will ask it. */
-    private static java.util.Optional<GreatCirclePage.Arc> clip(
+    private static java.util.List<CurveRun> clip(
             ChartScene scene, SkyPosition pole) {
         java.awt.geom.Rectangle2D paper = ChartRenderer.paperOf(scene);
         return GreatCirclePage.clip(
                 new GnomonicProjection(scene.viewport().centre()),
                 new ViewportMapping(scene.viewport()),
-                new GreatCirclePage.Page(paper.getMinX(), paper.getMinY(),
+                PageRegion.paper(paper.getMinX(), paper.getMinY(),
                         paper.getMaxX(), paper.getMaxY()),
                 pole);
+    }
+
+    /** The one run a tangent plane ever makes of a great circle. */
+    private static java.util.Optional<CurveRun.Segment> segment(
+            ChartScene scene, SkyPosition pole) {
+        var runs = clip(scene, pole);
+        return runs.isEmpty() ? java.util.Optional.empty()
+                : java.util.Optional.of((CurveRun.Segment) runs.get(0));
     }
 
     private static ChartScene page(SkyPosition centre, double field) {
@@ -69,8 +77,8 @@ class GreatCirclePageTest {
 
     private static void assertLandsOnTheCircle(ChartScene scene,
                                                SkyPosition pole,
-                                               GreatCirclePage.Arc arc) {
-        for (PixelPoint end : List.of(arc.from(), arc.to())) {
+                                               CurveRun.Segment arc) {
+        for (PixelPoint end : List.of(arc.start(), arc.end())) {
             assertTrue(offTheCircle(scene, pole, end) < 1e-6,
                     "an end of the drawn arc is on the great circle:"
                             + " off by " + offTheCircle(scene, pole, end)
@@ -110,7 +118,7 @@ class GreatCirclePageTest {
         assertEquals(0, onPaper,
                 "the premise: no supplied vertex is on this page");
 
-        GreatCirclePage.Arc arc = clip(scene, pole)
+        CurveRun.Segment arc = segment(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "the circle crosses this page and must be found"));
         assertLandsOnTheCircle(scene, pole, arc);
@@ -126,7 +134,7 @@ class GreatCirclePageTest {
         SkyPosition between = midpoint(coarse.get(0), coarse.get(1));
         ChartScene scene = page(between, 1.0);
 
-        GreatCirclePage.Arc arc = clip(scene, pole)
+        CurveRun.Segment arc = segment(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "a page between samples is still crossed"));
         assertLandsOnTheCircle(scene, pole, arc);
@@ -143,24 +151,24 @@ class GreatCirclePageTest {
         for (double bad : new double[] {Double.POSITIVE_INFINITY,
                 Double.NEGATIVE_INFINITY, Double.NaN}) {
             assertThrows(IllegalArgumentException.class,
-                    () -> new GreatCirclePage.Page(0, 0, bad, 700),
+                    () -> PageRegion.paper(0, 0, bad, 700),
                     "an edge that is not a pixel: " + bad);
             assertThrows(IllegalArgumentException.class,
-                    () -> new GreatCirclePage.Page(bad, 0, 900, 700),
+                    () -> PageRegion.paper(bad, 0, 900, 700),
                     "on either side: " + bad);
             assertThrows(IllegalArgumentException.class,
-                    () -> new GreatCirclePage.Page(0, bad, 900, 700),
+                    () -> PageRegion.paper(0, bad, 900, 700),
                     "and in either direction: " + bad);
             assertThrows(IllegalArgumentException.class,
-                    () -> new GreatCirclePage.Page(0, 0, 900, bad),
+                    () -> PageRegion.paper(0, 0, 900, bad),
                     "or the far one: " + bad);
         }
         assertThrows(IllegalArgumentException.class,
-                () -> new GreatCirclePage.Page(0, 0, 0, 700),
+                () -> PageRegion.paper(0, 0, 0, 700),
                 "and a page of no width is not a page either");
 
         // Not vacuous: the same rectangle with real edges is fine.
-        GreatCirclePage.Page page = new GreatCirclePage.Page(0, 0, 900, 700);
+        PageRegion page = PageRegion.paper(0, 0, 900, 700);
         assertEquals(900.0, page.maxX(), 0.0);
         assertTrue(page.contains(450, 350) && !page.contains(450, 701),
                 "and it knows what is on it");
@@ -173,7 +181,7 @@ class GreatCirclePageTest {
         SkyPosition centre = new SkyPosition(10.684, 41.269);
         ChartScene scene = page(centre, 8.0);
 
-        assertEquals(Optional.empty(), clip(scene, centre),
+        assertEquals(List.of(), clip(scene, centre),
                 "the circle of a pole at the page centre is ninety"
                         + " degrees away, and the honest answer is"
                         + " nothing");
@@ -205,7 +213,7 @@ class GreatCirclePageTest {
         }
         assertEquals(0, onPaper, "and no point of it is on the paper");
 
-        assertEquals(Optional.empty(), clip(scene, pole),
+        assertEquals(List.of(), clip(scene, pole),
                 "so the answer is nothing, rather than a line drawn"
                         + " off the edge of the page");
     }
@@ -226,11 +234,11 @@ class GreatCirclePageTest {
                 ChartHitTest.skyAt(wide, paper.getMaxX() - 60,
                         paper.getMaxY() - 5));
 
-        GreatCirclePage.Arc corner = clip(wide, pole).orElseThrow(
+        CurveRun.Segment corner = segment(wide, pole).orElseThrow(
                 () -> new AssertionError("the premise: at this field"
                         + " the circle does clip the corner"));
-        double dx = Math.abs(corner.to().x() - corner.from().x());
-        double dy = Math.abs(corner.to().y() - corner.from().y());
+        double dx = Math.abs(corner.end().x() - corner.start().x());
+        double dy = Math.abs(corner.end().y() - corner.start().y());
         assertTrue(dx > 1 && dy > 1,
                 "and it is slanted, so neither the horizontal nor the"
                         + " vertical edges can answer alone: " + dx
@@ -238,7 +246,7 @@ class GreatCirclePageTest {
 
         // The same circle, the same centre, half the field: the page
         // has zoomed in past the corner the line went through.
-        assertEquals(Optional.empty(), clip(page(centre, 4.0), pole),
+        assertEquals(List.of(), clip(page(centre, 4.0), pole),
                 "the line now goes by outside the corner, and the"
                         + " honest answer is nothing");
     }
@@ -254,7 +262,7 @@ class GreatCirclePageTest {
         SkyPosition origin = new SkyPosition(0.0, 0.0);
         ChartScene scene = page(origin, 8.0);
 
-        assertEquals(Optional.empty(), clip(scene, origin),
+        assertEquals(List.of(), clip(scene, origin),
                 "the projection's own horizon is on no page");
     }
 
@@ -277,7 +285,7 @@ class GreatCirclePageTest {
                 "the premise: much of this circle is behind the"
                         + " projection - " + refused + " of 360");
 
-        GreatCirclePage.Arc arc = clip(scene, pole)
+        CurveRun.Segment arc = segment(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "the visible half crosses this page"));
         assertLandsOnTheCircle(scene, pole, arc);
@@ -303,12 +311,12 @@ class GreatCirclePageTest {
                 paper.getMaxX() - 60, paper.getMaxY() - 5);
         SkyPosition pole = poleThrough(acrossOneWay, acrossTheOther);
 
-        GreatCirclePage.Arc arc = clip(scene, pole)
+        CurveRun.Segment arc = segment(scene, pole)
                 .orElseThrow(() -> new AssertionError(
                         "a circle clipping the corner is on the page"));
         assertLandsOnTheCircle(scene, pole, arc);
-        double length = Math.hypot(arc.to().x() - arc.from().x(),
-                arc.to().y() - arc.from().y());
+        double length = Math.hypot(arc.end().x() - arc.start().x(),
+                arc.end().y() - arc.start().y());
         assertTrue(length < 150, "and it is a corner, not a diagonal: "
                 + length + " px");
         assertTrue(length > 1, "but it is a real crossing: " + length
@@ -329,7 +337,7 @@ class GreatCirclePageTest {
             for (double field : new double[] {36.0, 4.0, 1.0}) {
                 ChartScene scene = page(centre, field);
                 for (SkyPosition pole : List.of(meridian, horizon)) {
-                    clip(scene, pole).ifPresent(arc ->
+                    segment(scene, pole).ifPresent(arc ->
                             assertLandsOnTheCircle(scene, pole, arc));
                 }
             }
@@ -348,8 +356,8 @@ class GreatCirclePageTest {
 
         for (double field : new double[] {36.0, 8.0, 1.0}) {
             ChartScene scene = page(zenith, field);
-            GreatCirclePage.Arc arc =
-                    clip(scene, pole).orElseThrow();
+            CurveRun.Segment arc =
+                    segment(scene, pole).orElseThrow();
 
             for (SkyPosition point : new GreatCircle(pole).around(200000)) {
                 PixelPoint at = pixel(scene, point);
@@ -357,8 +365,8 @@ class GreatCirclePageTest {
                         .contains(at.x(), at.y())) {
                     continue;
                 }
-                assertTrue(java.awt.geom.Line2D.ptSegDist(arc.from().x(),
-                                arc.from().y(), arc.to().x(), arc.to().y(),
+                assertTrue(java.awt.geom.Line2D.ptSegDist(arc.start().x(),
+                                arc.start().y(), arc.end().x(), arc.end().y(),
                                 at.x(), at.y()) < 0.01,
                         "every point of the circle that lands on the"
                                 + " paper lies on the drawn arc, at a "
