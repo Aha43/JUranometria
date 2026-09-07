@@ -638,8 +638,13 @@ projection on the shared frame and making its domain rule exact.
   them. SVG and PDF are asked for the recorded shape's own path text
   rather than for any curve at all; the PNG is asked where its ink
   is, along the band the recorded curve runs through, against the
-  same band of the same page with no module showing (3,681 dark
-  samples against 864). Paint order is read in all four: the circle
+  same band of the same page with **that one circle switched off**
+  and every other contribution drawn (3,681 dark samples against
+  864). The first control removed both modules, which could not
+  attribute the difference to the circle rather than to the
+  observer's lines running through the same band - on this page it
+  gives the same 864, and a control that is only accidentally right
+  is one the next page breaks. Paint order is read in all four: the circle
   is drawn before the title panel in the recording and written
   before it in both vector files, and in the raster the panel hides
   the part of the circle it covers - 44 dark samples of 1,948 under

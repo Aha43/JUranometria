@@ -71,15 +71,29 @@ class ProjectedCurveOnASheetTest {
 
     private static final int DPI = 300;
 
-    /** The meridian and the ecliptic, as the screen carries them. */
-    private static ChartRenderer.ReferenceLayer modules() {
+    /**
+     * The meridian and the ecliptic, as the screen carries them,
+     * with the permanent circle showing or not.
+     *
+     * <p>The switch is the reader's own, and it is the whole of the
+     * control: both modules are attached either way and the
+     * observer's lines are contributed identically, so a page drawn
+     * with {@code false} differs from one drawn with {@code true} by
+     * the permanent circle and by nothing else. A control that
+     * removed <em>every</em> module - which is what this asked for
+     * first - could not attribute the extra ink to the circle rather
+     * than to the meridian or the horizon running through the same
+     * band.
+     */
+    private static ChartRenderer.ReferenceLayer modules(
+            boolean permanentCircleShowing) {
         OverlayRegistry registry = new OverlayRegistry();
         MeridianModule meridian = new MeridianModule(new Observer(59.9, 10.7,
                 java.time.Instant.parse("2026-03-20T21:33:00Z")));
         meridian.showing(true, true, true);
         registry.offer(MeridianModule.ID, meridian::contributedGeometry);
         EclipticModule ecliptic = new EclipticModule();
-        ecliptic.showing(true);
+        ecliptic.showing(permanentCircleShowing);
         registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
         return (g, painted) -> ReferenceInk.paint(g, painted,
                 registry.collect(), ChartPalette.WHITE_PAPER);
@@ -95,7 +109,7 @@ class ProjectedCurveOnASheetTest {
     }
 
     private static SheetRecording sheet(ChartProjection kind) {
-        return sheet(kind, modules());
+        return sheet(kind, modules(true));
     }
 
     /** Where in the render something happened, and what it was. */
@@ -234,8 +248,10 @@ class ProjectedCurveOnASheetTest {
         // A raster cannot be asked what shape it holds, so it is
         // asked where its ink is: along the band the recorded curve
         // runs through, against the same band of the same page drawn
-        // with no module showing. Everything else on the page - the
-        // grid, the stars, the constellation lines - is in both.
+        // with the permanent circle switched off and everything else
+        // - the grid, the stars, the constellation lines, and the
+        // observer's own meridian and horizon - drawn exactly as
+        // before. The two pages differ by this one curve.
         SheetRecording sheet = sheet(ChartProjection.STEREOGRAPHIC);
         Area band = bandOf(permanentInk(sheet).shape());
 
@@ -243,7 +259,7 @@ class ProjectedCurveOnASheetTest {
                 PngSheetWriter.write(sheet, DPI)));
         BufferedImage without = ImageIO.read(new ByteArrayInputStream(
                 PngSheetWriter.write(sheet(ChartProjection.STEREOGRAPHIC,
-                        ChartRenderer.ReferenceLayer.NONE), DPI)));
+                        modules(false)), DPI)));
 
         int[] withCircle = inkIn(drawn, band);
         int[] withoutCircle = inkIn(without, band);
