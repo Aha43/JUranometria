@@ -566,13 +566,41 @@ class FigureAnchorTest {
             assertEquals(nodesBefore, nodesOf(deeper),
                     "the same stars define the figures at either limit");
 
-            // The field came in, counted as ink rather than as marks:
-            // the two paintings are the same page at two limits, so
-            // every pixel that changed is a star the control admitted.
-            long changed = differing(before, after);
-            assertTrue(changed > 10000, "and the surrounding field came"
-                    + " in: " + changed + " pixels of the page changed,"
-                    + " where the two limits differ by 35876");
+            // The field came in, counted as ink rather than as marks.
+            // The two paintings are the same page at two limits, so a
+            // pixel that changed is a star the control admitted - with
+            // one exception, which is not a star and is not sky: the
+            // title block states the limiting magnitude and the key
+            // draws its rows down to it, so both restate themselves.
+            // The furniture's own region is measured rather than
+            // guessed - it is where switching the furniture off
+            // changes the page - and counted apart from the sky.
+            boolean[] furniture = furnitureMask(bright, deeper);
+            int offset = onEdt(chart[0]::pageOffsetY);
+            long sky = 0;
+            long block = 0;
+            for (int y = 0; y < bright.viewport().heightPx(); y++) {
+                for (int x = 0; x < bright.viewport().widthPx(); x++) {
+                    if (before.getRGB(x, y + offset)
+                            == after.getRGB(x, y + offset)) {
+                        continue;
+                    }
+                    if (furniture[y * bright.viewport().widthPx() + x]) {
+                        block++;
+                    } else {
+                        sky++;
+                    }
+                }
+            }
+            assertTrue(sky > 10000, "and the surrounding field came in:"
+                    + " " + sky + " pixels of sky changed, against"
+                    + " 35691 when this was measured");
+            assertTrue(block > 0 && block < sky / 100, "while the"
+                    + " furniture restates the limit it now draws to,"
+                    + " which is neither a star nor sky: " + block
+                    + " pixels, against 185 when this was measured -"
+                    + " inside the blocks' own region and nowhere"
+                    + " else");
         }, () -> javax.swing.SwingUtilities.invokeAndWait(() -> {
             if (window[0] != null) {
                 window[0].dispose();
@@ -628,6 +656,51 @@ class FigureAnchorTest {
             g.dispose();
         }
         return image;
+    }
+
+    /**
+     * Where the page's own furniture lands, in page pixels.
+     *
+     * <p>Measured, not taken from the blocks' published bounds: what
+     * matters here is which pixels the furniture is answerable for,
+     * and that is exactly where switching it off changes the page.
+     * Grown by two pixels so an antialiased edge belongs to the block
+     * that drew it rather than to the sky.
+     */
+    private static boolean[] furnitureMask(ChartScene... scenes) {
+        int wide = scenes[0].viewport().widthPx();
+        int high = scenes[0].viewport().heightPx();
+        boolean[] drawn = new boolean[wide * high];
+        for (ChartScene scene : scenes) {
+            var page = paint(scene, ChartOptions.DEFAULTS);
+            var bare = paint(scene, withoutFurniture());
+            for (int y = 0; y < high; y++) {
+                for (int x = 0; x < wide; x++) {
+                    if (page.getRGB(x, y) != bare.getRGB(x, y)) {
+                        drawn[y * wide + x] = true;
+                    }
+                }
+            }
+        }
+        boolean[] grown = new boolean[wide * high];
+        for (int y = 0; y < high; y++) {
+            for (int x = 0; x < wide; x++) {
+                if (!drawn[y * wide + x]) {
+                    continue;
+                }
+                for (int dy = -2; dy <= 2; dy++) {
+                    for (int dx = -2; dx <= 2; dx++) {
+                        int at = x + dx;
+                        int down = y + dy;
+                        if (at >= 0 && down >= 0 && at < wide
+                                && down < high) {
+                            grown[down * wide + at] = true;
+                        }
+                    }
+                }
+            }
+        }
+        return grown;
     }
 
     private static long differing(java.awt.image.BufferedImage one,
