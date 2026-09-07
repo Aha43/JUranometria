@@ -279,10 +279,24 @@ at all.
 
 The fix is not a third patch. **A pole is a direction like any
 other**, and the three components `greatCircle` needs are the same
-three `project` needs, computed by the same method — so there is now
-one of it. Computing them twice was computing them twice differently,
-which is what let the rule be stated in one place and broken in
-another.
+three `project` needs. Computing them twice was computing them twice
+differently, which is what let the rule be stated in one place and
+broken in another.
+
+That was written here before it was true, and a seventh round said
+so. `greatCircle` had been moved onto a shared calculation and
+`project` had not: two copies of the same three dot products, already
+differing in a branch and in the sign of a zero, with the drift route
+that produced the three preceding defects still open. **A claim that
+something is now single is worth exactly as much as the second caller
+that was checked**, and I had checked none. The calculation is now
+prepared once about a centre and everything that needs a direction
+asks it — `project`, `greatCircle`, and all three candidates.
+
+Unifying them changed nothing measurable: the study's output is byte
+for byte what it was, and no page moved. That is the honest value of
+it. The two copies agreed on every input this study asks for; what
+has gone is their ability to stop agreeing.
 
 One detail is worth keeping: equivalent inputs now give **bit-identical**
 outputs, not merely equal ones. A component that came out as negative

@@ -40,6 +40,7 @@ final class Candidates {
 
     static StudyProjection gnomonic(SkyPosition centre) {
         GnomonicProjection production = new GnomonicProjection(centre);
+        Frame frame = Frame.about(centre);
         return new StudyProjection() {
 
             @Override
@@ -79,7 +80,7 @@ final class Candidates {
 
             @Override
             public Optional<PlaneConic> greatCircle(SkyPosition pole) {
-                return gnomonicCircle(inFrame(centre, pole));
+                return gnomonicCircle(frame.directionTo(pole));
             }
         };
     }
@@ -135,9 +136,9 @@ final class Candidates {
                                              double visibleRadius,
                                              CircleForm circleForm) {
         double centreRa = Math.toRadians(centre.raDegrees());
-        double[] centreDec = sineAndCosineOf(centre.decDegrees());
-        double sinCentreDec = centreDec[0];
-        double cosCentreDec = centreDec[1];
+        Frame frame = Frame.about(centre);
+        double sinCentreDec = frame.sinCentreDec();
+        double cosCentreDec = frame.cosCentreDec();
         // Compared in radians, because the limb is exactly where the
         // comparison happens: a point ninety degrees out gives an
         // angle of pi/2 to the last bit, and converting that to
@@ -159,46 +160,15 @@ final class Candidates {
 
             @Override
             public Optional<PlanePoint> project(SkyPosition position) {
-                double[] declination =
-                        sineAndCosineOf(position.decDegrees());
-                double sinDec = declination[0];
-                double cosDec = declination[1];
-
-                // Half a turn of right ascension is recognised in
-                // degrees, where the caller wrote it, and answered
-                // exactly. Converted to radians first it is not
-                // exact at all: sin(toRadians(180)) is 1.22e-16, not
-                // zero, so a position diametrically opposite the
-                // centre kept a transverse component it does not
-                // have, the antipode never looked like the antipode,
-                // and the projection placed the one point it cannot
-                // place at a radius of thirty quadrillion. Every
-                // other offset takes the ordinary path unchanged.
-                double turn = position.raDegrees() - centre.raDegrees();
-                double half = turn - 360.0 * Math.rint(turn / 360.0);
-                double sinOffset;
-                double cosOffset;
-                if (half == 180.0 || half == -180.0) {
-                    sinOffset = 0.0;
-                    cosOffset = -1.0;
-                } else {
-                    double raOffset =
-                            Math.toRadians(position.raDegrees()) - centreRa;
-                    sinOffset = Math.sin(raOffset);
-                    cosOffset = Math.cos(raOffset);
-                }
-
-                // The east and north parts of the direction from the
-                // centre. Their length is the sine of the angular
-                // distance, computed here rather than derived from
-                // its cosine, and that is the whole reason the angle
-                // below is found the way it is.
-                double east = cosDec * sinOffset;
-                double north = cosCentreDec * sinDec
-                        - sinCentreDec * cosDec * cosOffset;
+                // The one frame calculation. What was here instead
+                // was a second copy of it, which is how the same
+                // rule came to be right in one place and wrong in
+                // another three times running.
+                double[] direction = frame.directionTo(position);
+                double cosDistance = direction[0];
+                double east = direction[1];
+                double north = direction[2];
                 double length = Math.hypot(east, north);
-                double cosDistance = sinCentreDec * sinDec
-                        + cosCentreDec * cosDec * cosOffset;
 
                 // From both parts, never from the cosine alone.
                 // Inverting a cosine is ill conditioned at both ends
@@ -280,7 +250,7 @@ final class Candidates {
 
             @Override
             public Optional<PlaneConic> greatCircle(SkyPosition pole) {
-                return circleForm.of(inFrame(centre, pole));
+                return circleForm.of(frame.directionTo(pole));
             }
         };
     }
@@ -359,61 +329,83 @@ final class Candidates {
     }
 
     /**
-     * The direction to a position, in a centre's own frame: how far
-     * along the centre direction, how far east, how far north.
+     * A centre's own frame, prepared once.
      *
-     * <p>These are the three dot products every azimuthal projection
-     * is made of, and there is one of this method because there is
-     * one rule. A pole handed to {@code greatCircle} is a direction
-     * like any other, and the components it needs are the same three
-     * a position needs to be placed on the page, so computing them
-     * twice was computing them twice differently: {@code project}
-     * learned to answer the coordinate degeneracies exactly and this
-     * did not, so the same great circle written with two different
-     * right ascensions at a pole gave two different conics, and the
-     * one circle a gnomonic projection cannot draw came back as a
-     * line ten quadrillion units away instead of as nothing at all.
+     * <p>Every azimuthal projection is made of the same three dot
+     * products - how far a direction lies along the centre, how far
+     * east, how far north - and there is one of this because there
+     * is one rule.
      *
-     * <p>Both degeneracies are answered here, in degrees, where the
-     * caller wrote them. A declination of ninety degrees has a
-     * cosine of exactly zero, so a pole's right ascension drops out
-     * of the arithmetic rather than leaving 6.1e-17 of itself
-     * behind; and half a turn of right ascension has a sine of
-     * exactly zero, so a position opposite the centre has no
-     * transverse part rather than 1.22e-16 of one.
+     * <p>Saying that was not the same as doing it. The rule was
+     * written here for the poles a great circle is named by, and
+     * {@code project} kept its own copy of the arithmetic for the
+     * positions it places: two computations of the same three
+     * numbers, differing already in a branch and in the sign of a
+     * zero. A review pointed out that this is not one calculation
+     * with two callers but the same drift route that produced the
+     * three defects before it, still open. So the calculation lives
+     * here, once, and everything that needs a direction asks for
+     * one.
+     *
+     * <p>Both coordinate degeneracies are answered in degrees, where
+     * the caller wrote them, before any trigonometry can leave a
+     * residue behind. A declination of ninety degrees has a cosine
+     * of exactly zero, so a pole's right ascension drops out of the
+     * arithmetic rather than leaving 6.1e-17 of itself behind; half
+     * a turn of right ascension has a sine of exactly zero, so a
+     * direction opposite the centre has no transverse part rather
+     * than 1.22e-16 of one.
      */
-    static double[] inFrame(SkyPosition centre, SkyPosition position) {
-        double[] centreDec = sineAndCosineOf(centre.decDegrees());
-        double[] dec = sineAndCosineOf(position.decDegrees());
-        double turn = position.raDegrees() - centre.raDegrees();
-        double half = turn - 360.0 * Math.rint(turn / 360.0);
-        double sinOffset;
-        double cosOffset;
-        if (half == 180.0 || half == -180.0) {
-            sinOffset = 0.0;
-            cosOffset = -1.0;
-        } else if (half == 0.0) {
-            sinOffset = 0.0;
-            cosOffset = 1.0;
-        } else {
-            double offset = Math.toRadians(position.raDegrees())
-                    - Math.toRadians(centre.raDegrees());
-            sinOffset = Math.sin(offset);
-            cosOffset = Math.cos(offset);
+    record Frame(double sinCentreDec, double cosCentreDec,
+                 double centreRaDegrees, double centreRaRadians) {
+
+        static Frame about(SkyPosition centre) {
+            double[] dec = sineAndCosineOf(centre.decDegrees());
+            return new Frame(dec[0], dec[1], centre.raDegrees(),
+                    Math.toRadians(centre.raDegrees()));
         }
-        // Adding zero, which changes no value and removes one
-        // distinction: a component that came out as negative zero is
-        // numerically equal to positive zero but not identical to
-        // it, and equivalent ways of writing the same pole were
-        // producing conics that differed in nothing else. Anything
-        // downstream that compares, caches or takes an atan2 of
-        // these should not be able to tell them apart either.
-        return new double[] {
-                centreDec[0] * dec[0] + centreDec[1] * dec[1] * cosOffset
-                        + 0.0,
-                dec[1] * sinOffset + 0.0,
-                centreDec[1] * dec[0] - centreDec[0] * dec[1] * cosOffset
-                        + 0.0};
+
+        /**
+         * How far the direction to a position lies along the centre,
+         * east, and north.
+         */
+        double[] directionTo(SkyPosition position) {
+            double[] dec = sineAndCosineOf(position.decDegrees());
+            double turn = position.raDegrees() - centreRaDegrees;
+            double half = turn - 360.0 * Math.rint(turn / 360.0);
+            double sinOffset;
+            double cosOffset;
+            if (half == 180.0 || half == -180.0) {
+                sinOffset = 0.0;
+                cosOffset = -1.0;
+            } else if (half == 0.0) {
+                sinOffset = 0.0;
+                cosOffset = 1.0;
+            } else {
+                double offset = Math.toRadians(position.raDegrees())
+                        - centreRaRadians;
+                sinOffset = Math.sin(offset);
+                cosOffset = Math.cos(offset);
+            }
+            // Adding zero, which changes no value and removes one
+            // distinction: a component that came out as negative
+            // zero is numerically equal to positive zero but not
+            // identical to it, and equivalent ways of writing the
+            // same direction differed in nothing else. Anything
+            // downstream that compares, caches or takes an atan2 of
+            // these should not be able to tell them apart either.
+            return new double[] {
+                    sinCentreDec * dec[0]
+                            + cosCentreDec * dec[1] * cosOffset + 0.0,
+                    dec[1] * sinOffset + 0.0,
+                    cosCentreDec * dec[0]
+                            - sinCentreDec * dec[1] * cosOffset + 0.0};
+        }
+    }
+
+    /** The one frame calculation, for a caller that has no frame yet. */
+    static double[] inFrame(SkyPosition centre, SkyPosition position) {
+        return Frame.about(centre).directionTo(position);
     }
 
     /**

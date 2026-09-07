@@ -292,6 +292,69 @@ class OverviewProjectionGateTest {
     }
 
     @Test
+    void placingAPositionAndNamingACircleUseTheSameDirection() {
+        // The drift route itself, rather than another of its
+        // symptoms. project() and greatCircle() need the same three
+        // dot products, and for three rounds they each computed
+        // their own - which is how the same rule came to be right in
+        // one place and wrong in another, three times. This holds
+        // them to one answer: the direction the projection places a
+        // position by must be the direction the frame reports for
+        // it, bit for bit, including the ones that are hard to agree
+        // on.
+        for (SkyPosition centre : List.of(new SkyPosition(83.0, 0.0),
+                new SkyPosition(0.0, 41.0),
+                new SkyPosition(217.25, 90.0),
+                new SkyPosition(310.0, -90.0))) {
+            StudyProjection projection = Candidates.stereographic(centre);
+            int checked = 0;
+            for (double ra = 0.0; ra < 360.0; ra += 23.0) {
+                for (double dec : new double[] {-90.0, -66.5, -41.0, 0.0,
+                        17.25, 41.0, 90.0}) {
+                    SkyPosition position = new SkyPosition(ra, dec);
+                    double[] direction =
+                            Candidates.inFrame(centre, position);
+                    double length = Math.hypot(direction[1], direction[2]);
+                    var plane = projection.project(position);
+                    if (plane.isEmpty() || length == 0.0) {
+                        continue;
+                    }
+                    checked++;
+                    double radius = Math.hypot(plane.get().xiEast(),
+                            plane.get().etaNorth());
+                    // Compared by sign and by value, not bit for
+                    // bit: the plane point has been through a
+                    // multiply and a divide that the frame has not,
+                    // so demanding identical bits would be measuring
+                    // arithmetic rather than agreement. The sign is
+                    // the part that matters and is carried exactly -
+                    // it is where the two copies differed, a
+                    // component that came out as negative zero in
+                    // one and positive zero in the other.
+                    assertEquals(
+                            Math.copySign(1.0, direction[1]),
+                            Math.copySign(1.0, plane.get().xiEast()),
+                            "the east part of " + position + " seen from "
+                                    + centre + " has one sign, zero"
+                                    + " included");
+                    assertEquals(
+                            Math.copySign(1.0, direction[2]),
+                            Math.copySign(1.0, plane.get().etaNorth()),
+                            "and so does the north part");
+                    assertEquals(direction[1] / length,
+                            plane.get().xiEast() / radius, 1.0e-15,
+                            "and one value");
+                    assertEquals(direction[2] / length,
+                            plane.get().etaNorth() / radius, 1.0e-15,
+                            "in both directions");
+                }
+            }
+            assertTrue(checked > 50, "a grid worth checking from "
+                    + centre + ": " + checked + " positions");
+        }
+    }
+
+    @Test
     void aPoleWrittenAnyWayGivesTheSameGreatCircle() {
         // The same fault a third time, in the third place it could
         // hide. project() learned to answer the coordinate

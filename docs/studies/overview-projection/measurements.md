@@ -183,9 +183,17 @@ conic for every way of writing it, and the one circle
 a gnomonic page cannot draw came back as a line ten
 quadrillion units away rather than as nothing. A pole
 is a direction like any other and needs the same
-three components a position does, so there is now one
-method that computes them. Computing them twice was
-computing them twice differently.
+three components a position does. Computing them
+twice was computing them twice differently.
+
+A seventh round found that sentence written before it
+was true: the great-circle answer had been moved onto
+a shared calculation and the projection had not, so
+two copies remained and the drift route with them. A
+claim that something is single is worth as much as
+the second caller that was checked. The calculation
+is now prepared once about a centre, and everything
+that needs a direction asks it.
 
 ## Pointing at something
 
