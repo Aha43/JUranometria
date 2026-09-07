@@ -82,6 +82,27 @@ public interface Projection {
     double limitDegrees();
 
     /**
+     * How far from the centre a page corner may usefully reach, in
+     * degrees.
+     *
+     * <p>Not the same question as {@link #limitDegrees}, which is
+     * where the projection stops working at all. This is where it
+     * stops being worth reading, and the answer differs by
+     * projection because what degrades differs by projection: a
+     * tangent plane draws a circle as an ellipse half as wide again
+     * as it is tall by 90 degrees out, while a conformal projection
+     * draws it round however far out it goes and pays in scale
+     * instead.
+     *
+     * <p>Issue #297 found this by building. The cap was a constant in
+     * the scene assembler, written for the tangent plane and applied
+     * through whichever projection was drawing - which made a
+     * 120-degree overview page zero pixels tall, and every other
+     * overview page shorter than the tangent plane's.
+     */
+    double usefulCornerDegrees();
+
+    /**
      * How far ink may reach from the centre, in plane units, or
      * infinite when the plane has no edge.
      *

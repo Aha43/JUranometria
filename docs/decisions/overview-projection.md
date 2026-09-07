@@ -541,6 +541,21 @@ decided is a document nobody can check against what was done.
   that built a gnomonic projection or a viewport mapping.
   `PanSolver.planeFromPixel` had the mapping's tangent inlined
   instead, so it was never counted.
+- **The corner cap belonged to the projection.** The scene assembler
+  capped a page corner at 60 degrees, with the comment *"Gnomonic
+  charts degrade far from the centre; cap the page there"* — a
+  statement about one projection, applied through whichever was
+  drawing. A 120-degree overview page came out **zero pixels tall**,
+  because at that field the overview's half-field and that cap are
+  the same plane distance; and every overview page came out shorter
+  than a tangent-plane page of the same field, which is backwards.
+  It is `Projection.usefulCornerDegrees` now: 60 for the tangent
+  plane, unchanged, and 120 for the overview, from the same budget —
+  a tangent plane's cap admits a corner degree four times a centre
+  degree, its radial scale being `sec²` of the angle out, and the
+  overview's is `sec²` of half the angle and reaches four at 120.
+  The two allow the same distortion of distance and the overview
+  throws in exact shape.
 - **A quarter turn.** Replacing gnomonic's `cos < 1e-12` domain rule
   with the exact condition broke the atlas's oldest projection test:
   `cos(toRadians(90))` is 6.1e-17, so a position exactly ninety

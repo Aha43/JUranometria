@@ -92,7 +92,7 @@ public final class SceneAssembler {
      * An assembler over complete all-sky coverage: every centre fits at
      * every supported field, there is no data centre to be offset from,
      * and the page height is bounded only by projection sanity (chart
-     * corners stay within {@link #PROJECTION_CORNER_LIMIT_DEGREES} of the
+     * corners stay within the projection's own useful corner of the
      * centre, far beyond any realistic window).
      *
      * @param objectExtentMarginDegrees the pack's declared maximum object
@@ -127,8 +127,12 @@ public final class SceneAssembler {
         return objectExtentMarginDegrees;
     }
 
-    /** Gnomonic charts degrade far from the centre; cap the page there. */
-    static final double PROJECTION_CORNER_LIMIT_DEGREES = 60.0;
+    // The corner cap used to live here as a constant, written for
+    // the tangent plane and applied through whichever projection was
+    // drawing. It is Projection.usefulCornerDegrees now: a statement
+    // about how far a projection may be pushed belongs to the
+    // projection, and this one made a 120-degree overview page zero
+    // pixels tall (issue #297).
 
     /**
      * Queries the catalogue around the state's centre and builds the scene
@@ -286,7 +290,7 @@ public final class SceneAssembler {
                 projection.planeRadius(fieldWidthDegrees / 2.0);
         if (allSky) {
             double limitPlane = projection.planeRadius(
-                    PROJECTION_CORNER_LIMIT_DEGREES);
+                    projection.usefulCornerDegrees());
             double halfHeightPlane = Math.sqrt(
                     limitPlane * limitPlane - halfWidthPlane * halfWidthPlane);
             return (int) Math.floor(widthPx * halfHeightPlane / halfWidthPlane);

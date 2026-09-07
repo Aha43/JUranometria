@@ -18,6 +18,7 @@ import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
+import juranometria.ui.SceneAssembler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -129,6 +130,80 @@ class ProjectionCarriedThroughTest {
         assertEquals(ChartProjection.GNOMONIC, overview.reset().projection(),
                 "Home returns the atlas's own chart, projection and"
                         + " all");
+    }
+
+    @Test
+    void anOverviewPageIsNotCappedByTheTangentPlanesOwnCorner() {
+        // A review found a 120-degree overview page calculating to
+        // zero pixels tall. The corner cap was a constant written for
+        // the tangent plane and applied through whichever projection
+        // was drawing, and at 120 degrees the overview's half-field
+        // and that cap are the same plane distance - so the height
+        // came out as the square root of nothing.
+        //
+        // It was tighter everywhere, not only broken at 120: every
+        // overview page came out shorter than a tangent-plane page
+        // of the same field, which is backwards, since the whole
+        // reason for this projection is that it holds up further out.
+        SceneAssembler assembler = Atlas.assembler();
+        SkyPosition centre = ORION;
+        for (double field : new double[] {42.0, 60.0, 90.0, 120.0}) {
+            int overview = assembler.maxPageHeightPx(
+                    ChartProjection.STEREOGRAPHIC, centre, field, 900);
+            assertTrue(overview >= 700,
+                    "an overview page at " + field + " degrees is at"
+                            + " least a window tall: " + overview + " px");
+            int tangent = assembler.maxPageHeightPx(
+                    ChartProjection.GNOMONIC, centre, field, 900);
+            assertTrue(overview > tangent,
+                    "and taller than the tangent plane's at the same"
+                            + " field, which is the point of it: "
+                            + overview + " against " + tangent);
+        }
+
+        // The tangent plane keeps its own answer, unchanged: 120
+        // degrees is past where it stops being worth reading, and it
+        // still says so.
+        assertEquals(0, assembler.maxPageHeightPx(
+                        ChartProjection.GNOMONIC, centre, 120.0, 900),
+                "a 120-degree tangent-plane page is still refused");
+    }
+
+    @Test
+    void eachProjectionSaysHowFarItIsWorthReading() {
+        // The two caps allow the same distortion of distance - a
+        // corner degree four times a centre degree - and the
+        // conformal one throws in exact shape. That is the
+        // derivation, not a preference.
+        assertEquals(60.0, Projections.of(ChartProjection.GNOMONIC, ORION)
+                        .usefulCornerDegrees(),
+                "the tangent plane's corner, unchanged since the atlas"
+                        + " began");
+        assertEquals(120.0, Projections
+                        .of(ChartProjection.STEREOGRAPHIC, ORION)
+                        .usefulCornerDegrees(),
+                "and the overview's, at the same scale budget");
+
+        for (ChartProjection kind : ChartProjection.values()) {
+            Projection projection = Projections.of(kind, ORION);
+            double corner = projection.usefulCornerDegrees();
+            double centreScale = radialScaleAt(projection, 1.0e-4);
+            double cornerScale = radialScaleAt(projection, corner);
+            assertEquals(4.0, cornerScale / centreScale, 0.01,
+                    kind + ": a corner degree is four times a centre"
+                            + " degree at the cap");
+            assertTrue(corner <= projection.limitDegrees(),
+                    kind + ": and the cap is inside what it can show");
+        }
+    }
+
+    /** How fast the plane stretches, radially, at an angle out. */
+    private static double radialScaleAt(Projection projection,
+                                        double degrees) {
+        double step = 1.0e-6;
+        return (projection.planeRadius(degrees + step)
+                - projection.planeRadius(degrees - step))
+                / (2.0 * Math.toRadians(step));
     }
 
     @Test

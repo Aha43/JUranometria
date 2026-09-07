@@ -71,6 +71,20 @@ public final class GnomonicProjection extends AzimuthalProjection {
     }
 
     /**
+     * Sixty degrees: a tangent plane degrades far from its centre,
+     * and this is where the atlas has always stopped a page.
+     *
+     * <p>At that corner a degree is four times the size it is at the
+     * centre, and a circle is drawn twice as wide as it is tall. The
+     * number is the one the scene assembler has carried since the
+     * beginning, unchanged and now stated where it belongs.
+     */
+    @Override
+    public double usefulCornerDegrees() {
+        return 60.0;
+    }
+
+    /**
      * Every gnomonic great circle is a straight line.
      *
      * <p>A point at angle {@code t} and position angle {@code f}

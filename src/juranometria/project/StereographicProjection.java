@@ -78,6 +78,28 @@ public final class StereographicProjection extends AzimuthalProjection {
     }
 
     /**
+     * A hundred and twenty degrees, from the tangent plane's own
+     * budget rather than from taste.
+     *
+     * <p>Shape is exact here at every corner - that is what
+     * conformal means, and it is why this projection was chosen - so
+     * the only cost worth capping is scale. A tangent plane's corner
+     * cap admits a corner degree four times the size of a centre
+     * degree, its radial scale being {@code sec^2} of the angle out;
+     * this one's is {@code sec^2} of half the angle, and reaches the
+     * same factor of four at a hundred and twenty degrees.
+     *
+     * <p>So the two caps allow the same distortion of distance, and
+     * this one throws in exact shape. What a reader is actually
+     * offered is narrower still, and is the field ladder's business
+     * rather than this one's.
+     */
+    @Override
+    public double usefulCornerDegrees() {
+        return 120.0;
+    }
+
+    /**
      * A stereographic great circle, as one conic for every case.
      *
      * <p>Substituting {@code r = 2 tan(t/2)} into
