@@ -151,7 +151,7 @@ class OverviewPageTest {
             frame[0].setSize(1280, 820);
             frame[0].setVisible(true);
         });
-        try {
+        juranometria.app.SwingSession.guarded(() -> {
             flush();
             javax.swing.JButton out = button(frame[0].getContentPane(),
                     "Zoom out");
@@ -187,32 +187,22 @@ class OverviewPageTest {
 
             // 2. A star of the overview, chosen by pointing at it.
             //
-            // Read and clicked in one event-thread turn. Choosing the
-            // mark from a scene fetched on this thread and clicking
-            // in a later turn is the stale-scene race #220 was made
-            // of: the page can be reassembled in between, and the
-            // pointer then lands on whatever moved into that pixel.
-            // The page's own offset comes from the same turn, so a
-            // letterboxed page is clicked where the reader would
-            // click it.
+            // Through the shared helper's choosing form, which reads
+            // the page and dispatches in one event-thread turn and
+            // proves the same premises for whatever point that turns
+            // out to be. Choosing from a scene fetched on this thread
+            // and clicking in a later turn is the stale-scene race
+            // #220 was made of; dispatching the events here instead
+            // would close that race and give up the premises, which
+            // is the trade the helper exists to refuse.
             ChartRenderer.DrawnMark[] chosen = new ChartRenderer.DrawnMark[1];
-            javax.swing.SwingUtilities.invokeAndWait(() -> {
-                ChartScene showing = chart[0].currentScene();
-                chosen[0] = aStarWellOffTheCentre(showing);
-                int x = (int) Math.round(chosen[0].centre().x());
-                int y = (int) Math.round(chosen[0].centre().y())
-                        + chart[0].pageOffsetY();
-                for (int id : new int[] {
-                        java.awt.event.MouseEvent.MOUSE_PRESSED,
-                        java.awt.event.MouseEvent.MOUSE_RELEASED}) {
-                    chart[0].dispatchEvent(new java.awt.event.MouseEvent(
-                            chart[0], id, System.nanoTime() / 1_000_000,
-                            java.awt.event.MouseEvent.BUTTON1_DOWN_MASK,
-                            x, y, 1, false,
-                            java.awt.event.MouseEvent.BUTTON1));
-                }
-            });
-            flush();
+            ReaderInput.click(chart[0], () -> {
+                chosen[0] = aStarWellOffTheCentre(chart[0].currentScene());
+                return new java.awt.Point(
+                        (int) Math.round(chosen[0].centre().x()),
+                        (int) Math.round(chosen[0].centre().y())
+                                + chart[0].pageOffsetY());
+            }, 0);
             ChartRenderer.DrawnMark star = chosen[0];
             assertTrue(selection.selection()
                             instanceof juranometria.chart.Selection.Object,
@@ -272,12 +262,10 @@ class OverviewPageTest {
                             < 1.0e-6,
                     "still centred on what the reader picked out of"
                             + " the wide view");
-        } finally {
-            javax.swing.SwingUtilities.invokeAndWait(() -> {
-                inspector[0].dispose();
-                frame[0].dispose();
-            });
-        }
+        }, () -> javax.swing.SwingUtilities.invokeAndWait(() -> {
+            inspector[0].dispose();
+            frame[0].dispose();
+        }));
     }
 
     private static void flush() throws Exception {
