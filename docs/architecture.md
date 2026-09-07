@@ -113,6 +113,15 @@ who had been told about a problem they do not have. Zoom, pan,
 pointer zoom, recentre, the modules and every export cross the seam
 between the two without knowing there is one.
 
+**A page says which projection drew it** (Sprint 30, issue #300), in
+the exported sheet's metadata and the chart's accessible description
+always, and in the title block where it is not the atlas's own. Two
+sheets of the same centre and field drawn differently are different
+documents, and one that could not say which it was could not be
+checked — which the sheet metadata could not, because it stated
+"gnomonic" as a constant from the sprint before there was anything
+else to be.
+
 The package is geometry and nothing else: no toolkit, no preferences,
 no files, no network, and — added with the strategy — no module seam
 and no catalogue. A projection that named a module would invert the

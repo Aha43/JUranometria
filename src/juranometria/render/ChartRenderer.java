@@ -1322,15 +1322,39 @@ public final class ChartRenderer {
                 .orElse(dso.id());
     }
 
+    /**
+     * The title block's own words.
+     *
+     * <p>The third line names the projection, on every page (Sprint
+     * 30, issue #300). Two sheets of the same centre and field drawn
+     * differently are different documents, and this is the surface
+     * where a printed sheet says which it is to someone who was not
+     * there when it was made.
+     *
+     * <p>It named only the wide pages first, to keep every released
+     * page byte for byte as it was. A review was right that this
+     * contradicts the gate's contract, which is unconditional - and
+     * measuring what the compromise was buying showed it was buying
+     * almost nothing. The released pages' <em>marks</em> and
+     * <em>ink</em> digests are identical either way, because no
+     * geometry changes and the ink digest stops at text; only the
+     * rasterised pixel column moves, and that column is an oracle on
+     * one platform rather than a promise about the atlas. What the
+     * change actually costs is one phrase in the title block of every
+     * printed page, which is the thing the gate asked for.
+     */
     private static String[] titleLines(ChartScene scene) {
+        String shape = " · "
+                + scene.viewport().projection().displayName();
         return new String[] {
                 scene.title(),
                 "Centre " + formatRa(scene.viewport().centre().raDegrees())
                         + ", " + formatDec(scene.viewport().centre().decDegrees())
                         + " · ICRS J2000",
                 String.format(Locale.ROOT,
-                        "Field %.1f° · Stars to V %.1f · North up, east left",
-                        scene.viewport().fieldWidthDegrees(), scene.limitingMagnitude()),
+                        "Field %.1f° · Stars to V %.1f · North up, east left%s",
+                        scene.viewport().fieldWidthDegrees(),
+                        scene.limitingMagnitude(), shape),
         };
     }
 

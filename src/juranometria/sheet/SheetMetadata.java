@@ -18,6 +18,12 @@ import juranometria.render.ChartOptions;
  * <p>It answers nothing else. There is no filename, no user name and
  * no directory here: a reader sending a chart to a mailing list is
  * not offering to send their home directory with it.
+ *
+ * <p>"What part of the sky, how wide" includes <strong>which
+ * projection drew it</strong> (Sprint 30, issue #300). Two sheets of
+ * the same centre and field drawn differently are different
+ * documents, and a sheet that could not say which one it was could
+ * not be checked.
  */
 public record SheetMetadata(String title, String description,
                             String producedBy) {
@@ -39,12 +45,21 @@ public record SheetMetadata(String title, String description,
                 AppInfo.NAME + " chart sheet: " + subject,
                 String.format(Locale.ROOT,
                         "%s. Centre RA %.4f, Dec %+.4f (ICRS/J2000)."
-                                + " Field %.0f degrees wide, gnomonic."
+                                + " Field %.0f degrees wide, %s."
                                 + " Stars to V %.1f. %s. Ground: %s.",
                         subject,
                         scene.viewport().centre().raDegrees(),
                         scene.viewport().centre().decDegrees(),
                         state.fieldWidthDegrees(),
+                        // Asked, not asserted. This said "gnomonic"
+                        // in every sheet the atlas had ever written,
+                        // which was true of every page it could draw
+                        // until #299 put three rungs on the ladder
+                        // that another projection draws - and then it
+                        // was a sheet claiming to be something it was
+                        // not, which is worse than a sheet that says
+                        // nothing (Sprint 30, issue #300).
+                        scene.viewport().projection().displayName(),
                         state.limitingMagnitude(),
                         paper.describe(),
                         options.palette().storedAs()),

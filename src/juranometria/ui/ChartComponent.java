@@ -170,6 +170,7 @@ public final class ChartComponent extends JComponent {
                 viewState.projection(), viewState.centre(),
                 viewState.fieldWidthDegrees(), getWidth()));
         scene = assembler.assemble(viewState, getWidth(), pageHeight);
+        getAccessibleContext().setAccessibleDescription(describe(scene));
         // Consumers that describe the page - the inspector - need to
         // know it changed, because what the page can say about the
         // selection changes with it (issue #170).
@@ -177,6 +178,36 @@ public final class ChartComponent extends JComponent {
             listener.run();
         }
         repaint();
+    }
+
+    /**
+     * What this page is, for a reader who cannot see it (Sprint 30,
+     * issue #300).
+     *
+     * <p>The same four things the title block states and the exported
+     * sheet's metadata states, in the same order: what part of the
+     * sky, where its centre is, how wide it is, and
+     * <strong>which projection drew it</strong>. A page had an
+     * accessible name and nothing else before this - "Star chart",
+     * which is true of every page the atlas can draw and therefore
+     * says nothing about the one being read.
+     *
+     * <p>The projection is named on every page, not only the wide
+     * ones. A description is read aloud rather than looked at, so
+     * there is no page whose silence a reader could compare against
+     * another page's word.
+     */
+    private static String describe(ChartScene scene) {
+        return String.format(java.util.Locale.ROOT,
+                "%s. Centre RA %.4f, Dec %+.4f (ICRS J2000)."
+                        + " Field %.1f degrees wide, %s projection."
+                        + " Stars to V %.1f. North up, east left.",
+                scene.title(),
+                scene.viewport().centre().raDegrees(),
+                scene.viewport().centre().decDegrees(),
+                scene.viewport().fieldWidthDegrees(),
+                scene.viewport().projection().displayName(),
+                scene.limitingMagnitude());
     }
 
     /** Top of the paper page inside the (possibly letterboxed) canvas. */
