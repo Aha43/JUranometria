@@ -317,12 +317,27 @@ class ProjectionCarriedThroughTest {
                                 pointer)
                         .orElseThrow(() -> new AssertionError(
                                 "a reversible pointer zoom"));
-                assertEquals(0.0, under.separationDegrees(
-                                juranometria.project.PanSolver
-                                        .skyFromPlane(kind, moved, after)),
-                        1.0e-9,
+                // Measured in pixels, which is the unit the atlas
+                // makes this promise in and the reason it can keep
+                // it: the pan solver accepts a centre whose
+                // reprojection lands within 1e-6 plane units, so a
+                // residual of about a millionth of a degree is the
+                // solver's own tolerance rather than noise. Asserted
+                // in degrees at 1e-9 this passed on one platform and
+                // failed on another - a stricter promise than the
+                // atlas makes, which is not a better test but a
+                // flakier one. PointerZoomControllerTest holds the
+                // released path to a hundredth of a pixel; so does
+                // this.
+                double driftDegrees = under.separationDegrees(
+                        juranometria.project.PanSolver
+                                .skyFromPlane(kind, moved, after));
+                double driftPixels = narrowMapping.pixelsPerPlaneUnit()
+                        * Math.toRadians(driftDegrees);
+                assertTrue(driftPixels < 1.0e-2,
                         "the star under the pointer is still under it"
-                                + " after the zoom");
+                                + " after the zoom: " + driftPixels
+                                + " px (" + driftDegrees + " degrees)");
             } else {
                 // The pan centre solver solves the tangent plane's
                 // own equations, and says so rather than returning
