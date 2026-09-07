@@ -165,36 +165,38 @@ class OverviewPageTest {
                 frame[0].setVisible(true);
             });
             flush();
-            javax.swing.JButton out = button(frame[0].getContentPane(),
-                    "Zoom out");
-            javax.swing.JButton in = button(frame[0].getContentPane(),
-                    "Zoom in");
+            javax.swing.JButton out = onEdt(() ->
+                    button(frame[0].getContentPane(), "Zoom out"));
+            javax.swing.JButton in = onEdt(() ->
+                    button(frame[0].getContentPane(), "Zoom in"));
 
             // 1. The control that enters the overview says where it
             // leads, and then takes the reader there when pressed.
-            assertTrue(out.getToolTipText().contains("overview"),
+            String saysOut = onEdt(out::getToolTipText);
+            assertTrue(saysOut.contains("overview"),
                     "at the sheet page zoom out says where it goes: "
-                            + out.getToolTipText());
-            assertEquals(out.getToolTipText(),
-                    out.getAccessibleContext().getAccessibleDescription(),
+                            + saysOut);
+            assertEquals(saysOut, onEdt(() -> out.getAccessibleContext()
+                            .getAccessibleDescription()),
                     "in the same words to assistive technology");
             ReaderInput.click(out);
-            flush();
-            assertEquals(60.0, navigation[0].state().fieldWidthDegrees(),
+            assertEquals(60.0,
+                    onEdt(() -> navigation[0].state().fieldWidthDegrees()),
                     "the press made the step");
             assertEquals(ChartProjection.STEREOGRAPHIC,
-                    navigation[0].state().projection(),
+                    onEdt(() -> navigation[0].state().projection()),
                     "onto a page the overview draws");
             assertEquals(ChartProjection.STEREOGRAPHIC,
-                    chart[0].currentScene().viewport().projection(),
+                    onEdt(() -> chart[0].currentScene().viewport()
+                            .projection()),
                     "and the chart is showing that page");
 
             ReaderInput.click(out);
             ReaderInput.click(out);
-            flush();
-            assertEquals(120.0, navigation[0].state().fieldWidthDegrees(),
+            assertEquals(120.0,
+                    onEdt(() -> navigation[0].state().fieldWidthDegrees()),
                     "three presses reach the widest rung");
-            assertFalse(out.isEnabled(),
+            assertFalse(onEdt(out::isEnabled),
                     "and the control says the ladder ends there");
 
             // 2. A star of the overview, chosen by pointing at it.
@@ -216,13 +218,14 @@ class OverviewPageTest {
                                 + chart[0].pageOffsetY());
             }, 0);
             ChartRenderer.DrawnMark star = chosen[0];
-            assertTrue(selection.selection()
-                            instanceof juranometria.chart.Selection.Object,
-                    "the click on the overview selected an object");
-            juranometria.chart.Selection.Object picked =
-                    (juranometria.chart.Selection.Object)
-                            selection.selection();
-            assertEquals(star.star().id(), picked.catalogueId(),
+            juranometria.chart.Selection held =
+                    onEdt(selection::selection);
+            assertTrue(held instanceof juranometria.chart.Selection.Object,
+                    "the click on the overview selected an object: "
+                            + held);
+            assertEquals(star.star().id(),
+                    ((juranometria.chart.Selection.Object) held)
+                            .catalogueId(),
                     "the one that was under the pointer, read back"
                             + " through the overview's own projection");
 
@@ -233,20 +236,19 @@ class OverviewPageTest {
                     juranometria.app.AppMenuBar.inspectorItem(
                             frame[0].getJMenuBar()).doClick());
             flush();
-            ReaderInput.click(centreButton(inspector[0]));
-            flush();
-            assertTrue(navigation[0].state().centre()
-                            .separationDegrees(star.star().position())
+            ReaderInput.click(onEdt(() -> centreButton(inspector[0])));
+            assertTrue(onEdt(() -> navigation[0].state().centre()
+                            .separationDegrees(star.star().position()))
                             < 1.0e-6,
                     "the chart is centred on the object that was"
                             + " selected on the overview");
 
             ReaderInput.click(in);
             ReaderInput.click(in);
-            flush();
-            assertEquals(60.0, navigation[0].state().fieldWidthDegrees(),
+            assertEquals(60.0,
+                    onEdt(() -> navigation[0].state().fieldWidthDegrees()),
                     "two presses back down the overview's own rungs");
-            assertTrue(navigation[0].state().overview(),
+            assertTrue(onEdt(() -> navigation[0].state().overview()),
                     "still a wide page");
 
             // The control that leaves the overview says so while the
@@ -254,25 +256,27 @@ class OverviewPageTest {
             // actually leaves - 90 to 60 is one wide page to another,
             // and a control that announced a departure there would be
             // announcing something that does not happen.
-            assertTrue(in.getToolTipText().contains("detailed atlas"),
+            String saysIn = onEdt(in::getToolTipText);
+            assertTrue(saysIn.contains("detailed atlas"),
                     "at the last wide rung, zoom in says how to get"
-                            + " back: " + in.getToolTipText());
-            assertEquals(in.getToolTipText(),
-                    in.getAccessibleContext().getAccessibleDescription(),
+                            + " back: " + saysIn);
+            assertEquals(saysIn, onEdt(() -> in.getAccessibleContext()
+                            .getAccessibleDescription()),
                     "in the same words to assistive technology");
 
             ReaderInput.click(in);
-            flush();
-            assertEquals(42.0, navigation[0].state().fieldWidthDegrees(),
+            assertEquals(42.0,
+                    onEdt(() -> navigation[0].state().fieldWidthDegrees()),
                     "and the press it describes makes the step");
             assertEquals(ChartProjection.GNOMONIC,
-                    navigation[0].state().projection(),
+                    onEdt(() -> navigation[0].state().projection()),
                     "into the detailed atlas");
             assertEquals(ChartProjection.GNOMONIC,
-                    chart[0].currentScene().viewport().projection());
-            assertTrue(chart[0].currentScene().viewport().centre()
-                            .separationDegrees(star.star().position())
-                            < 1.0e-6,
+                    onEdt(() -> chart[0].currentScene().viewport()
+                            .projection()));
+            assertTrue(onEdt(() -> chart[0].currentScene().viewport()
+                            .centre().separationDegrees(
+                                    star.star().position())) < 1.0e-6,
                     "still centred on what the reader picked out of"
                             + " the wide view");
         // Whatever exists by the time these run: a setup that failed
@@ -292,6 +296,36 @@ class OverviewPageTest {
 
     private static void flush() throws Exception {
         javax.swing.SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    /**
+     * Read live state on the event thread, which is where it lives.
+     *
+     * <p>Every reading in this journey - the view state, the
+     * assembled page, what the selection holds, what a control says -
+     * goes through here, so none of them races the thread that
+     * produces them. A review found the first version reading all
+     * four kinds from the test thread, which is the same race the
+     * click already had to be repaired for, in the half of the
+     * journey that only looks.
+     */
+    private static <T> T onEdt(java.util.concurrent.Callable<T> read)
+            throws Exception {
+        Object[] held = new Object[1];
+        Exception[] failed = new Exception[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            try {
+                held[0] = read.call();
+            } catch (Exception thrown) {
+                failed[0] = thrown;
+            }
+        });
+        if (failed[0] != null) {
+            throw failed[0];
+        }
+        @SuppressWarnings("unchecked")
+        T value = (T) held[0];
+        return value;
     }
 
     /** A star far enough off centre that the projection matters. */
