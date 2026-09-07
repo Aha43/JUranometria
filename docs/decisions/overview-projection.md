@@ -639,12 +639,17 @@ projection on the shared frame and making its domain rule exact.
   rather than for any curve at all; the PNG is asked where its ink
   is, along the band the recorded curve runs through, against the
   same band of the same page with **that one circle switched off**
-  and every other contribution drawn (3,681 dark samples against
-  864). The first control removed both modules, which could not
-  attribute the difference to the circle rather than to the
-  observer's lines running through the same band - on this page it
-  gives the same 864, and a control that is only accidentally right
-  is one the next page breaks. Paint order is read in all four: the circle
+  and every other contribution drawn (3,055 dark samples against
+  864). Getting that control right took two corrections and both
+  were the same mistake - changing more than one thing. It began by
+  removing *both* modules, so the extra ink could have been the
+  observer's lines; then by switching off the ecliptic module, which
+  takes the circle's four landmarks and its name with it. What is
+  compared now is the band with everything the module draws *except
+  the circle* taken out of it, found by asking what the two renders
+  differ by rather than by guessing where a diamond or a word might
+  be. On this page that is the name, which sits on the band; the
+  landmarks are off the paper. Paint order is read in all four: the circle
   is drawn before the title panel in the recording and written
   before it in both vector files, and in the raster the panel hides
   the part of the circle it covers - 44 dark samples of 1,948 under

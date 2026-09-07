@@ -203,6 +203,83 @@ class ProjectedCurveOnASheetTest {
                 .createStrokedShape(circle));
     }
 
+    /** One drawn shape or one label, as the thing it puts on paper. */
+    private static String markOf(SheetRecorder.Operation operation) {
+        if (operation instanceof SheetRecorder.Drawn drawn) {
+            return "shape " + SvgSheetWriter.path(drawn.shape());
+        }
+        SheetRecorder.Text text = (SheetRecorder.Text) operation;
+        return "text " + text.text() + " at " + text.x() + "," + text.y();
+    }
+
+    /** A label's letters, as the ink they actually lay down. */
+    private static Shape lettersOf(SheetRecorder.Text text) {
+        return text.font()
+                .createGlyphVector(new java.awt.font.FontRenderContext(
+                        null, true, true), text.text())
+                .getOutline((float) text.x(), (float) text.y());
+    }
+
+    /**
+     * Everything the module puts on the page except the circle.
+     *
+     * <p>Derived rather than guessed: whatever the two renders
+     * differ by, with the circle itself set aside, is the rest of
+     * what the module contributed - here its four landmarks and
+     * their words, one of which sits on the circle. Taking it from
+     * both sides of the comparison leaves a region the two pages
+     * differ in by one curve.
+     *
+     * <p>The difference is taken both ways. Ink that appeared only
+     * when the circle was hidden would be as much a second variable
+     * as ink that appeared only when it was shown.
+     */
+    private static Area everythingElseTheModuleDraws(
+            SheetRecording shown, SheetRecording hidden, Shape circle) {
+        java.util.Set<String> common = new java.util.HashSet<>();
+        for (SheetRecorder.Operation operation
+                : hidden.recorder().operations()) {
+            common.add(markOf(operation));
+        }
+        java.util.Set<String> onlyShown = new java.util.HashSet<>();
+        for (SheetRecorder.Operation operation
+                : shown.recorder().operations()) {
+            onlyShown.add(markOf(operation));
+        }
+        java.util.Set<String> different = new java.util.HashSet<>();
+        different.addAll(onlyShown);
+        different.removeAll(common);
+        java.util.Set<String> onlyHidden = new java.util.HashSet<>(common);
+        onlyHidden.removeAll(onlyShown);
+
+        String itself = "shape " + SvgSheetWriter.path(circle);
+        assertTrue(different.contains(itself),
+                "the control page is the one without this circle, which"
+                        + " is the whole of what makes it a control");
+        Area others = new Area();
+        for (SheetRecording each : java.util.List.of(shown, hidden)) {
+            for (SheetRecorder.Operation operation
+                    : each.recorder().operations()) {
+                String mark = markOf(operation);
+                if (mark.equals(itself)
+                        || !(different.contains(mark)
+                                || onlyHidden.contains(mark))) {
+                    continue;
+                }
+                Shape ink = operation instanceof SheetRecorder.Drawn drawn
+                        ? drawn.shape()
+                        : lettersOf((SheetRecorder.Text) operation);
+                // Generously: a mark's ink is wider than its
+                // geometry, and a landmark half excluded would leave
+                // the half that mattered.
+                others.add(new Area(new java.awt.BasicStroke(8.0f)
+                        .createStrokedShape(ink)));
+                others.add(new Area(ink));
+            }
+        }
+        return others;
+    }
+
     @Test
     void theRenderKeepsTheCurveAndTheTangentPlanesLine() {
         // One contribution, two projections, and the difference is
@@ -247,19 +324,30 @@ class ProjectedCurveOnASheetTest {
     void thePngShowsTheCurveWhereTheRecordingPutIt() throws Exception {
         // A raster cannot be asked what shape it holds, so it is
         // asked where its ink is: along the band the recorded curve
-        // runs through, against the same band of the same page drawn
-        // with the permanent circle switched off and everything else
-        // - the grid, the stars, the constellation lines, and the
-        // observer's own meridian and horizon - drawn exactly as
-        // before. The two pages differ by this one curve.
+        // runs through, against the same band of the same page with
+        // the permanent circle switched off. The grid, the stars,
+        // the constellation lines and the observer's own meridian
+        // and horizon are drawn identically on both.
+        //
+        // One thing that switch does not leave alone: the module
+        // contributes the circle *and* its four landmarks, and the
+        // March equinox sits on this very band. So the landmarks'
+        // ink is taken out of the region before either page is
+        // sampled - found by asking what the two renders differ by
+        // and setting the circle itself aside, rather than by
+        // guessing where a diamond or its word might be. What is
+        // left differs by one curve.
         SheetRecording sheet = sheet(ChartProjection.STEREOGRAPHIC);
-        Area band = bandOf(permanentInk(sheet).shape());
+        SheetRecording bare = sheet(ChartProjection.STEREOGRAPHIC,
+                modules(false));
+        Shape circle = permanentInk(sheet).shape();
+        Area band = bandOf(circle);
+        band.subtract(everythingElseTheModuleDraws(sheet, bare, circle));
 
         BufferedImage drawn = ImageIO.read(new ByteArrayInputStream(
                 PngSheetWriter.write(sheet, DPI)));
         BufferedImage without = ImageIO.read(new ByteArrayInputStream(
-                PngSheetWriter.write(sheet(ChartProjection.STEREOGRAPHIC,
-                        modules(false)), DPI)));
+                PngSheetWriter.write(bare, DPI)));
 
         int[] withCircle = inkIn(drawn, band);
         int[] withoutCircle = inkIn(without, band);
@@ -269,7 +357,7 @@ class ProjectedCurveOnASheetTest {
                 "the PNG carries the circle's ink along it: "
                         + withCircle[1] + " of " + withCircle[0]
                         + " samples are dark");
-        assertTrue(withCircle[1] > 3 * withoutCircle[1],
+        assertTrue(withCircle[1] > 5 * withoutCircle[1] / 2,
                 "and that ink is the circle's own, not the page's: "
                         + withCircle[1] + " dark with the module"
                         + " showing against " + withoutCircle[1]
