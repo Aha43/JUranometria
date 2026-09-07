@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -19,7 +22,9 @@ import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
+import juranometria.project.CurveRun;
 import juranometria.project.GreatCirclePage;
+import juranometria.project.PageRegion;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 import juranometria.render.ChartRenderer;
@@ -129,8 +134,10 @@ public final class ReferenceInk {
                 Projections.forViewport(scene.viewport());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         Rectangle2D paper = ChartRenderer.paperOf(scene);
-        GreatCirclePage.Page page = new GreatCirclePage.Page(paper.getMinX(),
-                paper.getMinY(), paper.getMaxX(), paper.getMaxY());
+        // The paper, and the limb if this projection has one: a
+        // curve is clipped to where there is sky, not only to where
+        // there is paper.
+        PageRegion region = mapping.regionFor(scene.viewport(), projection);
 
         Graphics2D g2 = (Graphics2D) g.create();
         try {
@@ -140,8 +147,8 @@ public final class ReferenceInk {
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.GreatCircle circle) {
-                    drawCircle(g2, projection, mapping, page, paper, circle,
-                            palette);
+                    drawCircle(g2, projection, mapping, region, paper,
+                            circle, palette);
                 }
             }
             for (OverlayRegistry.Owned owned : reference) {
@@ -159,24 +166,58 @@ public final class ReferenceInk {
     private static void drawCircle(Graphics2D g,
                                    Projection projection,
                                    ViewportMapping mapping,
-                                   GreatCirclePage.Page page,
+                                   PageRegion region,
                                    Rectangle2D paper,
                                    OverlayContribution.GreatCircle circle,
                                    juranometria.render.ChartPalette palette) {
-        Optional<GreatCirclePage.Arc> crossing = GreatCirclePage.clip(
-                projection, mapping, page, circle.pole());
-        if (crossing.isEmpty()) {
+        List<CurveRun> runs = GreatCirclePage.clip(projection, mapping,
+                region, circle.pole());
+        if (runs.isEmpty()) {
             // Silence. The circle does not cross this page, and a
             // line drawn anyway would be a promise the sky has not
             // made.
             return;
         }
-        GreatCirclePage.Arc arc = crossing.get();
         g.setColor(palette.figureInk());
         g.setStroke(strokeFor(circle.reference()));
-        g.draw(new Line2D.Double(arc.from().x(), arc.from().y(),
-                arc.to().x(), arc.to().y()));
-        label(g, paper, arc, circle.accessibleName(), palette);
+        for (CurveRun run : runs) {
+            g.draw(shapeOf(run));
+        }
+        // Named once, at one end, however many runs the page cut it
+        // into - a line has one name and repeating it at every gap
+        // would be the chart talking about its own paper.
+        label(g, paper, runs, circle.accessibleName(), palette);
+    }
+
+    /**
+     * A run, as something Java2D can draw.
+     *
+     * <p>The projection package says where the ink goes in numbers
+     * and never in shapes: it draws nothing, and a scan of its
+     * compiled classes holds it to that. Turning a run into a shape
+     * is the chart's, which is the older rule as well - a module says
+     * where, a projection says where that lands, and the chart
+     * decides what it looks like.
+     */
+    public static Shape shapeOf(CurveRun run) {
+        if (run instanceof CurveRun.Segment segment) {
+            return new Line2D.Double(segment.start().x(),
+                    segment.start().y(), segment.end().x(),
+                    segment.end().y());
+        }
+        CurveRun.Arc arc = (CurveRun.Arc) run;
+        // Java2D measures its arcs anticlockwise from the positive x
+        // axis, and a page's y runs down, so the same angles arrive
+        // negated.
+        Arc2D.Double drawn = new Arc2D.Double(
+                -arc.radiusAlong(), -arc.radiusAcross(),
+                2.0 * arc.radiusAlong(), 2.0 * arc.radiusAcross(),
+                Math.toDegrees(-arc.startRadians()),
+                Math.toDegrees(-arc.spanRadians()), Arc2D.OPEN);
+        AffineTransform onto = new AffineTransform();
+        onto.translate(arc.centreX(), arc.centreY());
+        onto.rotate(arc.tiltRadians());
+        return onto.createTransformedShape(drawn);
     }
 
     /**
@@ -209,14 +250,52 @@ public final class ReferenceInk {
      * chart's own furniture.
      */
     private static void label(Graphics2D g, Rectangle2D paper,
-                              GreatCirclePage.Arc arc, String name,
+                              List<CurveRun> runs, String name,
+                              juranometria.render.ChartPalette palette) {
+        PixelPoint anchor = labelAnchor(runs);
+        if (anchor == null) {
+            // Every run closed on itself, so the line has no end on
+            // this page to hang a name on. A curve wholly inside the
+            // paper is the case the old two-endpoint answer could
+            // not even describe.
+            return;
+        }
+        label(g, paper, anchor, name, palette);
+    }
+
+    private static void label(Graphics2D g, Rectangle2D paper,
+                              PixelPoint anchor, String name,
                               juranometria.render.ChartPalette palette) {
         g.setColor(palette.gridLabelInk());
         g.setFont(EquatorialGrid.GRID_LABEL_FONT);
-        Rectangle2D box = labelBox(paper, arc, name,
+        Rectangle2D box = labelBox(paper, anchor, name,
                 g.getFontMetrics());
         g.drawString(name, (float) box.getMinX(),
                 (float) (box.getMaxY() - g.getFontMetrics().getDescent()));
+    }
+
+    /**
+     * The end a name hangs on: the upper one, and the right one if
+     * they are level, across every run the page cut the curve into.
+     *
+     * <p>Null when the curve closed on itself and has no ends at all.
+     */
+    public static PixelPoint labelAnchor(List<CurveRun> runs) {
+        PixelPoint best = null;
+        for (CurveRun run : runs) {
+            for (Optional<PixelPoint> end
+                    : List.of(run.from(), run.to())) {
+                if (end.isEmpty()) {
+                    continue;
+                }
+                PixelPoint at = end.get();
+                if (best == null || at.y() < best.y()
+                        || (at.y() == best.y() && at.x() > best.x())) {
+                    best = at;
+                }
+            }
+        }
+        return best;
     }
 
     /**
@@ -230,12 +309,8 @@ public final class ReferenceInk {
      * the catchment.
      */
     public static Rectangle2D labelBox(Rectangle2D paper,
-                                       GreatCirclePage.Arc arc,
+                                       PixelPoint end,
                                        String name, FontMetrics metrics) {
-        PixelPoint end = arc.to().y() < arc.from().y()
-                || (arc.to().y() == arc.from().y()
-                        && arc.to().x() > arc.from().x())
-                ? arc.to() : arc.from();
         double width = metrics.stringWidth(name);
         double x = Math.min(Math.max(end.x() + LABEL_INSET,
                         paper.getMinX() + LABEL_INSET),
@@ -279,7 +354,7 @@ public final class ReferenceInk {
             // a line rather than as a place or an object.
             case LANDMARK -> g.draw(diamond(at));
         }
-        label(g, paper, new GreatCirclePage.Arc(at, at),
+        label(g, paper, at,
                 point.accessibleName(), palette);
     }
 

@@ -202,57 +202,54 @@ class ProjectionStrategyTest {
     }
 
     @Test
-    void aCircleThisCannotClipIsRefusedAndNotCalledOffThePage() {
-        // Empty from the clipper means "the circle does not cross
-        // this page", and the chart draws nothing on that basis -
-        // which is right, and is why a curved circle must not be
-        // answered that way. A review pointed out the result: a page
-        // silently missing its ecliptic and its horizon, looking in
-        // every respect like a page that has none. It refuses
-        // loudly instead, and issue #298 is what makes it drawable.
+    void aCurvedCircleIsDrawnAsACurveAndNotRefused() {
+        // Issue #297 left this refusing, loudly, and named #298 as
+        // what would draw it. This is #298: the seam carries the
+        // curve now, so the refusal is gone and its absence is the
+        // thing to hold. A page whose ecliptic curves must come back
+        // with a curve on it - not with nothing, which would be the
+        // page silently short of a line it promised.
         ChartViewport viewport = new ChartViewport(ORION, 42.0, 900, 700,
                 ChartProjection.STEREOGRAPHIC);
         SkyPosition eclipticPole = new SkyPosition(270.0, 66.5607);
-        GreatCirclePage.Page paper =
-                new GreatCirclePage.Page(0, 0, 900, 700);
+        PageRegion paper = PageRegion.paper(0, 0, 900, 700);
+        ViewportMapping mapping = new ViewportMapping(viewport);
+        Projection projection = Projections.forViewport(viewport);
 
-        IllegalStateException refused = assertThrows(
-                IllegalStateException.class,
-                () -> GreatCirclePage.clip(
-                        Projections.forViewport(viewport),
-                        new ViewportMapping(viewport), paper,
-                        eclipticPole));
-        assertTrue(refused.getMessage().contains("#298"),
-                "and says what would draw it: " + refused.getMessage());
+        PlaneCurve curve = mapping.onPage(
+                projection.greatCircle(eclipticPole).orElseThrow(), paper);
+        assertEquals("circular", curve.form(),
+                "the overview curves this circle");
 
         // A circle this page really does carry, drawn straight by
         // both projections because it runs through the page centre -
-        // so the refusal above is about the shape a circle takes and
-        // not about the projection's name. The ecliptic is not this
-        // control: it misses a 42-degree page over Orion entirely,
-        // which is the silence the next test is about.
+        // so the form above is about the shape a circle takes and not
+        // about the projection's name.
         SkyPosition equatorPole = new SkyPosition(0.0, 90.0);
         for (ChartProjection kind : ChartProjection.values()) {
             ChartViewport carrying = new ChartViewport(ORION, 42.0,
                     900, 700, kind);
-            assertTrue(GreatCirclePage.clip(
-                            Projections.forViewport(carrying),
-                            new ViewportMapping(carrying), paper,
-                            equatorPole).isPresent(),
+            List<CurveRun> runs = GreatCirclePage.clip(
+                    Projections.forViewport(carrying),
+                    new ViewportMapping(carrying), paper, equatorPole);
+            assertFalse(runs.isEmpty(),
                     kind + " draws the celestial equator across a"
                             + " chart centred on it");
+            assertTrue(runs.get(0) instanceof CurveRun.Segment,
+                    kind + " draws it straight, because it runs through"
+                            + " the page centre");
         }
     }
 
     @Test
     void aCircleGenuinelyOffThePageIsStillSilence() {
-        // The distinction the refusal above must not blur. Off the
-        // page is silence: the chart draws nothing rather than
-        // promising a line the sky has not made.
+        // The distinction the curve above must not blur. Off the page
+        // is silence: the chart draws nothing rather than promising a
+        // line the sky has not made.
         ChartViewport viewport = new ChartViewport(ORION, 1.0, 900, 700);
         assertTrue(GreatCirclePage.clip(Projections.forViewport(viewport),
                         new ViewportMapping(viewport),
-                        new GreatCirclePage.Page(0, 0, 900, 700),
+                        PageRegion.paper(0, 0, 900, 700),
                         new SkyPosition(83.0, 89.0))
                         .isEmpty(),
                 "a circle that misses a one-degree page is simply not"

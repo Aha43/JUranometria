@@ -60,4 +60,124 @@ public final class ViewportMapping {
                 centreX - point.xiEast() * pixelsPerPlaneUnit,
                 centreY - point.etaNorth() * pixelsPerPlaneUnit);
     }
+
+    /**
+     * How far a substituted curve may lie from the true one, in page
+     * units - a page unit being the width of the thinnest line the
+     * atlas draws.
+     *
+     * <p>Measured, not chosen. Substituting too eagerly leaves a
+     * visible gap; substituting too late keeps a conic whose centre
+     * and radius are so large that working them out loses every digit
+     * that matters. The gate swept this and found a cliff: at a
+     * thousandth of a page unit the error near a degeneracy tracks
+     * the allowance, and one step tighter it jumps seven orders of
+     * magnitude (docs/decisions/overview-projection.md).
+     */
+    public static final double ALLOWED_PAGE_UNITS = 1.0e-3;
+
+    /**
+     * The simplest drawable form of a projection's conic that is
+     * right on this page.
+     *
+     * <p>This is the decision a projection cannot make, and not for
+     * tidiness: whether a circle is a line is a question about a
+     * page. The same great circle is plainly curved across a
+     * hemisphere and plainly straight across a telescope field, and
+     * only the page knows which is being drawn. So the test is not
+     * how large a radius is but how far the simpler curve would lie
+     * from the true one <strong>over this paper</strong>.
+     */
+    public PlaneCurve onPage(PlaneConic conic, PageRegion region) {
+        PlaneConic here = conic.mapped(pixelsPerPlaneUnit, centreX, centreY);
+        double reach = region.reach();
+        double[] slope = here.gradientAt(centreX, centreY);
+        double steepness = Math.hypot(slope[0], slope[1]);
+
+        // Dropping the quadratic part moves the curve by at most its
+        // own size over the page, divided by how fast the conic
+        // changes - which turns a value into a distance.
+        if (steepness > 0.0
+                && here.curvatureOver(reach) / steepness
+                        < ALLOWED_PAGE_UNITS) {
+            return tangentAtTheCentre(here, slope);
+        }
+
+        double determinant = 4.0 * here.a() * here.c() - here.b() * here.b();
+        if (determinant == 0.0) {
+            return tangentAtTheCentre(here, slope);
+        }
+        double middleX = (here.b() * here.e() - 2.0 * here.c() * here.d())
+                / determinant;
+        double middleY = (here.b() * here.d() - 2.0 * here.a() * here.e())
+                / determinant;
+        double atMiddle = here.at(middleX, middleY);
+        double tilt = 0.5 * Math.atan2(here.b(), here.a() - here.c());
+        double cos = Math.cos(tilt);
+        double sin = Math.sin(tilt);
+        double along = here.a() * cos * cos + here.b() * cos * sin
+                + here.c() * sin * sin;
+        double across = here.a() * sin * sin - here.b() * sin * cos
+                + here.c() * cos * cos;
+        if (-atMiddle / along <= 0.0 || -atMiddle / across <= 0.0) {
+            return tangentAtTheCentre(here, slope);
+        }
+        double radiusAlong = Math.sqrt(-atMiddle / along);
+        double radiusAcross = Math.sqrt(-atMiddle / across);
+
+        // An ellipse thinner than the page can see is the line it has
+        // collapsed towards. Left as an ellipse it is a shape with no
+        // interior, and the frame that clips it cannot be inverted.
+        if (Math.min(radiusAlong, radiusAcross) < ALLOWED_PAGE_UNITS) {
+            double majorTilt = radiusAlong > radiusAcross
+                    ? tilt : tilt + Math.PI / 2.0;
+            double normalX = -Math.sin(majorTilt);
+            double normalY = Math.cos(majorTilt);
+            return PlaneCurve.Straight.of(
+                    -(normalX * middleX + normalY * middleY),
+                    normalX, normalY);
+        }
+        // Two radii the page cannot tell apart are a circle, which is
+        // the simpler of two true names for the same curve.
+        if (Math.abs(radiusAlong - radiusAcross) < ALLOWED_PAGE_UNITS) {
+            return new PlaneCurve.Circular(middleX, middleY,
+                    (radiusAlong + radiusAcross) / 2.0);
+        }
+        // An ellipse, which neither of the atlas's projections makes
+        // of a great circle. The gate measured this form exactly and
+        // left it out of the vocabulary on purpose: a word no page
+        // can exercise is a word no test can defend. Reaching here
+        // means a projection has arrived whose curves this cannot
+        // draw, and saying so is better than drawing the wrong one -
+        // it is issue #301 that brings such a projection, and the
+        // ellipse with it.
+        throw new IllegalStateException(String.format(
+                java.util.Locale.ROOT,
+                "this page's great circle is an ellipse of %.3f by"
+                        + " %.3f page units, which the curve vocabulary"
+                        + " does not carry: the gate measured that form"
+                        + " and issue #301 is what brings a projection"
+                        + " that needs it",
+                radiusAlong, radiusAcross));
+    }
+
+    /** The conic's own tangent where the page is. */
+    private PlaneCurve tangentAtTheCentre(PlaneConic here, double[] slope) {
+        return PlaneCurve.Straight.of(
+                here.at(centreX, centreY) - slope[0] * centreX
+                        - slope[1] * centreY,
+                slope[0], slope[1]);
+    }
+
+    /** The region this mapping draws into, limb and all. */
+    public PageRegion regionFor(ChartViewport viewport,
+                                Projection projection) {
+        double visible = projection.visiblePlaneRadius();
+        return Double.isFinite(visible)
+                ? PageRegion.within(0, 0, viewport.widthPx(),
+                        viewport.heightPx(), centreX, centreY,
+                        visible * pixelsPerPlaneUnit)
+                : PageRegion.paper(0, 0, viewport.widthPx(),
+                        viewport.heightPx());
+    }
 }

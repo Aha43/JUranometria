@@ -343,7 +343,7 @@ class SprintTwentyFiveJourneyTest {
     // ---- asking the page itself --------------------------------------
 
     /** Where the production seam clips this circle on this page. */
-    private java.util.Optional<juranometria.project.GreatCirclePage.Arc>
+    private java.util.List<juranometria.project.CurveRun>
             predictedArc(SkyPosition pole) {
         ChartScene scene = chart.currentScene();
         var paper = ChartRenderer.paperOf(scene);
@@ -351,7 +351,7 @@ class SprintTwentyFiveJourneyTest {
                 new juranometria.project.GnomonicProjection(
                         scene.viewport().centre()),
                 new juranometria.project.ViewportMapping(scene.viewport()),
-                new juranometria.project.GreatCirclePage.Page(
+                juranometria.project.PageRegion.paper(
                         paper.getMinX(), paper.getMinY(),
                         paper.getMaxX(), paper.getMaxY()),
                 pole);
@@ -371,8 +371,9 @@ class SprintTwentyFiveJourneyTest {
      */
     private void assertOnCircle(BufferedImage inked, BufferedImage bare,
                                 SkyPosition pole) throws Exception {
-        var arc = predictedArc(pole).orElseThrow(() -> new AssertionError(
-                "the circle crosses this page"));
+        var runs = predictedArc(pole);
+        assertTrue(!runs.isEmpty(), "the circle crosses this page");
+        var arc = (juranometria.project.CurveRun.Segment) runs.get(0);
         ChartScene scene = chart.currentScene();
         int along = 0, checked = 0;
         for (int y = 0; y < inked.getHeight(); y++) {
@@ -381,8 +382,8 @@ class SprintTwentyFiveJourneyTest {
                     continue;
                 }
                 double toArc = java.awt.geom.Line2D.ptSegDist(
-                        arc.from().x(), arc.from().y(),
-                        arc.to().x(), arc.to().y(),
+                        arc.start().x(), arc.start().y(),
+                        arc.end().x(), arc.end().y(),
                         x, y - pageOffset());
                 if (toArc > 1.5) {
                     continue;
@@ -441,20 +442,20 @@ class SprintTwentyFiveJourneyTest {
                         juranometria.render.EquatorialGrid
                                 .GRID_LABEL_FONT);
         List<java.awt.geom.Rectangle2D> labels = new ArrayList<>();
-        if (meridianArc.isPresent()) {
-            labels.add(ReferenceInk.labelBox(paper, meridianArc.get(),
+        if (!meridianArc.isEmpty()) {
+            labels.add(ReferenceInk.labelBox(paper,
+                    ReferenceInk.labelAnchor(meridianArc),
                     "Meridian", metrics));
         }
-        if (horizonArc.isPresent()) {
-            labels.add(ReferenceInk.labelBox(paper, horizonArc.get(),
+        if (!horizonArc.isEmpty()) {
+            labels.add(ReferenceInk.labelBox(paper,
+                    ReferenceInk.labelAnchor(horizonArc),
                     "Mathematical horizon", metrics));
         }
         if (zenithAt != null) {
             var zenithPoint = new juranometria.project.PixelPoint(
                     zenithAt[0], zenithAt[1] - pageOffset());
-            labels.add(ReferenceInk.labelBox(paper,
-                    new juranometria.project.GreatCirclePage.Arc(
-                            zenithPoint, zenithPoint),
+            labels.add(ReferenceInk.labelBox(paper, zenithPoint,
                     "Zenith", metrics));
         }
         int inspected = 0;
@@ -465,13 +466,15 @@ class SprintTwentyFiveJourneyTest {
                 }
                 double px = x, py = y - pageOffset();
                 boolean accounted = false;
-                for (var arc : List.of(meridianArc, horizonArc)) {
-                    accounted |= arc.isPresent()
-                            && java.awt.geom.Line2D.ptSegDist(
-                                    arc.get().from().x(),
-                                    arc.get().from().y(),
-                                    arc.get().to().x(),
-                                    arc.get().to().y(), px, py) <= 2.5;
+                for (var each : List.of(meridianArc, horizonArc)) {
+                    for (var run : each) {
+                        var segment =
+                                (juranometria.project.CurveRun.Segment) run;
+                        accounted |= java.awt.geom.Line2D.ptSegDist(
+                                segment.start().x(), segment.start().y(),
+                                segment.end().x(), segment.end().y(),
+                                px, py) <= 2.5;
+                    }
                 }
                 // The zenith ring and its tick: RING 5 + TICK 4 px,
                 // antialiased.

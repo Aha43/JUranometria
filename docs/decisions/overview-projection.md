@@ -585,6 +585,30 @@ projection on the shared frame and making its domain rule exact.
   or badly. They would be absent, in the corners, where nothing looks
   wrong.
 
+### What building the curve seam changed (#298)
+
+- **Two words, not three.** The gate decided a vocabulary of three -
+  straight, circular, elliptical - and measured all three exactly.
+  Production carries two. Neither of the atlas's projections makes an
+  ellipse of a great circle, and #298's acceptance requires each kind
+  to fail a test *on a page it actually crosses*: a word nothing can
+  exercise is a word no test can defend. The classification refuses
+  loudly if it ever meets one, naming #301, and the gate's
+  measurement stands as the evidence that adding it is an addition.
+- **The curve had to be numbers.** `juranometria.project` is held by
+  a class-file scan to no `java.awt`, so the vocabulary could not be
+  built on `Shape` as the study's was. The chart turns a run into
+  ink. That is the older rule anyway: a module says where, a
+  projection says where that lands, the chart decides what it looks
+  like.
+- **At every field the atlas offers, the two projections agree to
+  0.08 page units.** The widest an overview arc stands off its own
+  chord is a twelfth of a pixel at 42 degrees, against 14, 37 and 71
+  at the overview's own rungs. That is why the released atlas came
+  through byte for byte identical — and why a test of curves using
+  only the offered fields would have proved nothing, since a chord
+  would have passed it.
+
 - **#298 — the curve vocabulary.** Replace `GreatCirclePage.clip`'s
   `Optional<Arc>` with the three exact forms and a list of runs with
   optional ends. The forms come from `Projection.greatCircle(pole)`
