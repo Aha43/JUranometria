@@ -140,6 +140,15 @@ public interface Projection {
 Eight methods, and each earned its place by something in the study
 being impossible without it.
 
+**Issue #297 found a ninth.** `angleAtPlaneRadius`, the other way
+round from `planeRadius`: a scene assembler has to know what angle a
+page corner stands for *before* it fetches any sky, and the corner is
+a plane distance. The study had bisected `planeRadius` to get it,
+which is fine for a measurement and not for a chart. It is the actual
+fix for the under-fetch below, and a gate that measured everything
+else about this interface did not notice it — which is the ordinary
+reason to build a thing after deciding it.
+
 The last one was absent from this gate's first proposal, and a review
 was right that its absence was the whole problem. A projection that
 only maps points cannot tell #298 what a great circle became. The
@@ -516,6 +525,32 @@ are different documents, and a sheet that did not say which one it
 was would be a sheet that could not be checked.
 
 ## Contracts for the rest of Sprint 30
+
+### What building it changed
+
+Recorded here because a decision document that only says what was
+decided is a document nobody can check against what was done.
+
+- **A ninth method**, above.
+- **A third copy of the frame arithmetic**, in `GreatCirclePage`: its
+  own basis vectors, its own dot products, and a threshold of 1e-24
+  where the condition is exact. It now takes the conic from the
+  projection, and decides whether it can clip it by asking the conic
+  whether it is straight — not by asking which projection it holds.
+- **A twenty-sixth construction site.** The gate counted 25 places
+  that built a gnomonic projection or a viewport mapping.
+  `PanSolver.planeFromPixel` had the mapping's tangent inlined
+  instead, so it was never counted.
+- **A quarter turn.** Replacing gnomonic's `cos < 1e-12` domain rule
+  with the exact condition broke the atlas's oldest projection test:
+  `cos(toRadians(90))` is 6.1e-17, so a position exactly ninety
+  degrees east was being placed 1.6e16 units out rather than refused.
+  The same family as the gate's half turn and its poles, and the
+  frame now answers all four quarter turns exactly.
+
+Everything else held. The released atlas renders byte for byte
+identically at every step of the move, including putting the gnomonic
+projection on the shared frame and making its domain rule exact.
 
 - **#297 — the projection seam.** Introduce the interface above with
   gnomonic as its only implementation, and move the 25 in-place

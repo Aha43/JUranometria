@@ -67,9 +67,11 @@ public final class PanSolver {
     /** The tangent-plane point under a pixel; the mapping's inverse. */
     public static PlanePoint planeFromPixel(ChartViewport viewport,
                                             PixelPoint pixel) {
-        double half = Math.toRadians(viewport.fieldWidthDegrees()) / 2.0;
+        // The viewport's own scale, not a second copy of the rule
+        // that computes it - this held the same inlined tangent
+        // ViewportMapping did.
         double pixelsPerPlaneUnit =
-                viewport.widthPx() / (2.0 * Math.tan(half));
+                new ViewportMapping(viewport).pixelsPerPlaneUnit();
         return new PlanePoint(
                 (viewport.widthPx() / 2.0 - pixel.x()) / pixelsPerPlaneUnit,
                 (viewport.heightPx() / 2.0 - pixel.y()) / pixelsPerPlaneUnit);
@@ -81,24 +83,9 @@ public final class PanSolver {
      * {@code centre}. Every finite plane point has a pre-image.
      */
     public static SkyPosition skyFromPlane(SkyPosition centre, PlanePoint plane) {
-        double xi = plane.xiEast();
-        double eta = plane.etaNorth();
-        double rho = Math.hypot(xi, eta);
-        double alpha0 = Math.toRadians(centre.raDegrees());
-        double delta0 = Math.toRadians(centre.decDegrees());
-        if (rho == 0.0) {
-            return centre;
-        }
-        double c = Math.atan(rho);
-        double sinC = Math.sin(c);
-        double cosC = Math.cos(c);
-        double dec = Math.asin(cosC * Math.sin(delta0)
-                + eta * sinC * Math.cos(delta0) / rho);
-        double ra = alpha0 + Math.atan2(xi * sinC,
-                rho * Math.cos(delta0) * cosC - eta * Math.sin(delta0) * sinC);
-        return new SkyPosition((Math.toDegrees(ra) % 360.0 + 360.0) % 360.0,
-                Math.toDegrees(dec));
+        return new GnomonicProjection(centre).unproject(plane).orElseThrow();
     }
+
 
     /**
      * The grab invariant, solved exactly: find the chart centre for

@@ -63,12 +63,30 @@ class RemovableModelBoundaryTest {
     private static final List<String> ALLOWED_IN_THE_SEAM =
             List.of("juranometria/render");
 
+    /**
+     * Two more the projection owes, from issue #297: it must not
+     * know the module seam or the catalogue.
+     *
+     * <p>A projection that named a module would make the very
+     * inversion Sprint 30's rule forbids - a module says what
+     * belongs on the sky, a projection says how the sky becomes a
+     * page - and one that named the catalogue would be a projection
+     * with opinions about what is worth drawing.
+     */
+    private static final List<String> FORBIDDEN_TO_THE_PROJECTION =
+            List.of("juranometria/module", "juranometria/catalog");
+
     private static List<String> forbiddenIn(String pkg) {
-        return pkg.equals("juranometria/module")
-                ? FORBIDDEN.stream()
-                        .filter(name -> !ALLOWED_IN_THE_SEAM.contains(name))
-                        .toList()
-                : FORBIDDEN;
+        if (pkg.equals("juranometria/module")) {
+            return FORBIDDEN.stream()
+                    .filter(name -> !ALLOWED_IN_THE_SEAM.contains(name))
+                    .toList();
+        }
+        if (pkg.equals("juranometria/project")) {
+            return Stream.concat(FORBIDDEN.stream(),
+                    FORBIDDEN_TO_THE_PROJECTION.stream()).toList();
+        }
+        return FORBIDDEN;
     }
 
     private static final Path CLASSES = Path.of("build/classes");
@@ -106,6 +124,16 @@ class RemovableModelBoundaryTest {
                 "a class that does draw is caught by the same scan,"
                         + " so the clean answer above is an answer and"
                         + " not a silence");
+
+        // And the two the projection alone is held to: a class that
+        // really does know the catalogue is caught by that list, so
+        // the projection's clean answer is an answer too.
+        Path assembler = CLASSES.resolve(
+                "juranometria/ui/SceneAssembler.class");
+        assertTrue(Files.exists(assembler), "the assembler is compiled");
+        assertTrue(refersTo(assembler, FORBIDDEN_TO_THE_PROJECTION)
+                        .contains("juranometria/catalog"),
+                "and something that does know the catalogue is caught");
     }
 
     @Test
@@ -114,8 +142,9 @@ class RemovableModelBoundaryTest {
         // moved, leaving the walk with nothing to inspect.
         assertTrue(classesIn("juranometria/sky").size() >= 4,
                 "the sky model's classes are where this looks");
-        assertTrue(classesIn("juranometria/project").size() >= 6,
-                "and so are the projection's");
+        assertTrue(classesIn("juranometria/project").size() >= 10,
+                "and so are the projection's, which grew a strategy"
+                        + " and a second implementation in #297");
         assertTrue(classesIn("juranometria/meridian").size() >= 1,
                 "and the module's");
         assertTrue(classesIn("juranometria/ecliptic").size() >= 1,

@@ -10,7 +10,8 @@ import java.util.List;
 
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
-import juranometria.project.GnomonicProjection;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 
@@ -144,8 +145,8 @@ public final class EquatorialGrid {
     public static Grid gridFor(ChartViewport viewport,
                                java.awt.Rectangle... furniture) {
         GridSpec spec = spec(viewport);
-        GnomonicProjection projection =
-                new GnomonicProjection(viewport.centre());
+        Projection projection =
+                Projections.forViewport(viewport);
         ViewportMapping mapping = new ViewportMapping(viewport);
         double sampleStep = viewport.fieldWidthDegrees() / 180.0;
         SkyBounds bounds = boundsFor(viewport);
@@ -267,7 +268,7 @@ public final class EquatorialGrid {
     }
 
     public static SkyBounds boundsFor(ChartViewport viewport) {
-        var projection = new GnomonicProjection(viewport.centre());
+        var projection = Projections.forViewport(viewport);
         var mapping = new ViewportMapping(viewport);
         double centreRa = viewport.centre().raDegrees();
         double decMin = 90.0;
@@ -325,7 +326,7 @@ public final class EquatorialGrid {
      * grid is projection-correct, never a straight screen-space chord.
      */
     private static List<List<PixelPoint>> sampleCurve(
-            CurvePoint curve, int steps, GnomonicProjection projection,
+            CurvePoint curve, int steps, Projection projection,
             ViewportMapping mapping, ChartViewport viewport,
             int[] samples, double[] worstError) {
         List<List<PixelPoint>> pieces = new ArrayList<>();

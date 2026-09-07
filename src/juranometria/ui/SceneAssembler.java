@@ -9,6 +9,8 @@ import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.SkyRegion;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 
 /**
  * Assembles complete immutable chart scenes by querying the local
@@ -134,7 +136,10 @@ public final class SceneAssembler {
      * coverage is an error, never a silently sparse chart.
      */
     public ChartScene assemble(ChartViewState state, int widthPx, int heightPx) {
-        double radius = queryRadiusDegrees(state.fieldWidthDegrees(), widthPx, heightPx);
+        Projection projection = Projections.of(state.projection(),
+                state.centre());
+        double radius = queryRadiusDegrees(projection,
+                state.fieldWidthDegrees(), widthPx, heightPx);
         if (allSky) {
             return assembleScene(state, widthPx, heightPx, radius);
         }
@@ -151,8 +156,11 @@ public final class SceneAssembler {
 
     private ChartScene assembleScene(ChartViewState state, int widthPx, int heightPx,
                                      double radius) {
+        // The scene carries the projection the state chose, so the
+        // renderer and everything after it draws by the same one.
         ChartViewport viewport = new ChartViewport(
-                state.centre(), state.fieldWidthDegrees(), widthPx, heightPx);
+                state.centre(), state.fieldWidthDegrees(), widthPx, heightPx,
+                state.projection());
         SkyRegion query = new SkyRegion(state.centre(), Math.min(radius, 180.0));
         return new ChartScene(viewport,
                 catalogue.starsIn(query),
@@ -284,11 +292,27 @@ public final class SceneAssembler {
      * extent margin — so no eligible object is silently clipped even in
      * tall or wide windows.
      */
-    double queryRadiusDegrees(double fieldWidthDegrees, int widthPx, int heightPx) {
-        double halfWidthPlane = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
+    /**
+     * How much sky a page of this shape reaches, plus the margin an
+     * object's own extent needs.
+     *
+     * <p>Asked of the projection, in both directions: how far out the
+     * page corner is on its plane, and what angle that stands for.
+     * Written with a tangent this was one projection's answer given
+     * for all of them, and the Sprint 30 gate measured the cost - a
+     * 120-degree stereographic page over Orion reaches 72.4 degrees
+     * where the gnomonic rule fetches 65.5, leaving <strong>2,402
+     * catalogue objects</strong> out of the corners, where nothing
+     * looks wrong (docs/decisions/overview-projection.md).
+     */
+    double queryRadiusDegrees(Projection projection,
+                              double fieldWidthDegrees,
+                              int widthPx, int heightPx) {
+        double halfWidthPlane =
+                projection.planeRadius(fieldWidthDegrees / 2.0);
         double halfHeightPlane = halfWidthPlane * heightPx / (double) widthPx;
-        double cornerDegrees = Math.toDegrees(
-                Math.atan(Math.hypot(halfWidthPlane, halfHeightPlane)));
+        double cornerDegrees = projection.angleAtPlaneRadius(
+                Math.hypot(halfWidthPlane, halfHeightPlane));
         return cornerDegrees + objectExtentMarginDegrees;
     }
 }

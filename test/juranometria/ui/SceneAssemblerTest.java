@@ -10,6 +10,8 @@ import juranometria.chart.ChartViewState;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.SkyRegion;
+import juranometria.project.GnomonicProjection;
+import juranometria.project.StereographicProjection;
 import juranometria.chart.Star;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +49,8 @@ class SceneAssemblerTest {
         // 8-degree field at 900x700: the corners sit 5.06 degrees out.
         SceneAssembler assembler = new SceneAssembler(
                 new CountingCatalogue(), M31, 10.0, TEST_MARGIN);
-        assertEquals(5.06 + TEST_MARGIN, assembler.queryRadiusDegrees(8.0, 900, 700), 0.01);
+        assertEquals(5.06 + TEST_MARGIN, assembler.queryRadiusDegrees(
+                new GnomonicProjection(M31), 8.0, 900, 700), 0.01);
     }
 
     @Test
@@ -56,7 +59,32 @@ class SceneAssemblerTest {
         // its corners sit 8.89 degrees from the centre.
         SceneAssembler assembler = new SceneAssembler(
                 new CountingCatalogue(), M31, 10.0, TEST_MARGIN);
-        assertEquals(8.89 + TEST_MARGIN, assembler.queryRadiusDegrees(8.0, 500, 1000), 0.01);
+        assertEquals(8.89 + TEST_MARGIN, assembler.queryRadiusDegrees(
+                new GnomonicProjection(M31), 8.0, 500, 1000), 0.01);
+    }
+
+    @Test
+    void aWidePageIsAskedOfItsOwnProjectionAndNotOfTheTangentPlane() {
+        // The Sprint 30 gate measured this rather than reasoning it:
+        // a 120-degree page reaches further under the overview
+        // projection than under the tangent plane, and a query
+        // radius worked out with a tangent leaves the objects in the
+        // ring between out of the corners, where nothing looks
+        // wrong - 2,402 of them over Orion
+        // (docs/decisions/overview-projection.md).
+        SceneAssembler assembler = new SceneAssembler(
+                new CountingCatalogue(), M31, 180.0, TEST_MARGIN);
+        double gnomonic = assembler.queryRadiusDegrees(
+                new GnomonicProjection(M31), 120.0, 900, 700);
+        double stereographic = assembler.queryRadiusDegrees(
+                new StereographicProjection(M31), 120.0, 900, 700);
+        assertEquals(65.5 + TEST_MARGIN, gnomonic, 0.1,
+                "the tangent plane's own corner");
+        assertEquals(72.4 + TEST_MARGIN, stereographic, 0.1,
+                "and the overview's, which is further out");
+        assertTrue(stereographic > gnomonic + 5.0,
+                "so a page asked the wrong one is short of sky: "
+                        + gnomonic + " against " + stereographic);
     }
 
     @Test

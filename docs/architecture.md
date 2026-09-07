@@ -91,6 +91,31 @@ because that is the projection's answer and it differs by projection for
 the same pole. The seam is already shaped this way, and the Sprint 30
 gate measured that it survives being asked a second projection.
 
+**`juranometria.project` is that strategy** (Sprint 30, issue #297).
+`Projection` is the boundary; `GnomonicProjection` and
+`StereographicProjection` are the two real implementations behind it;
+`Projections` is the only place in the atlas that turns a name into
+one, so nothing else switches on which it holds. Which projection
+draws a chart is part of the chart's own immutable state
+(`ChartProjection` on the view state and the viewport), because two
+charts of the same centre and field drawn differently are different
+pages and a page that could not say which it was could not be
+checked.
+
+The package is geometry and nothing else: no toolkit, no preferences,
+no files, no network, and — added with the strategy — no module seam
+and no catalogue. A projection that named a module would invert the
+rule above; one that named the catalogue would have opinions about
+what is worth drawing. `RemovableModelBoundaryTest` reads the
+compiled classes and holds all of it.
+
+One calculation underlies both projections: `CentreFrame` answers
+where a position lies relative to a centre, and both the placing of
+positions and the naming of great circles ask it. That is not tidiness.
+Sprint 30 spent five review rounds on the consequences of the same
+arithmetic existing twice, and every one of them was a coordinate
+degeneracy answered after the trigonometry instead of before it.
+
 ### Rendering
 
 The renderer consumes a complete chart description and a drawing target. It

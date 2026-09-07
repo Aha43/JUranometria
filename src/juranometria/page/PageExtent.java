@@ -9,7 +9,8 @@ import java.util.Locale;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.ChartScene;
 import juranometria.chart.SkyPosition;
-import juranometria.project.GnomonicProjection;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 import juranometria.render.ChartRenderer;
@@ -74,8 +75,8 @@ public final class PageExtent {
      *     projection, which nothing the atlas bundles can do
      */
     public static boolean onPage(ChartScene scene, DeepSkyObject dso) {
-        GnomonicProjection projection =
-                new GnomonicProjection(scene.viewport().centre());
+        Projection projection =
+                Projections.forViewport(scene.viewport());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         Rectangle2D paper = ChartRenderer.paperOf(scene);
 
@@ -132,7 +133,7 @@ public final class PageExtent {
             return false;
         }
         Path2D.Double outline = outlineOf(
-                new GnomonicProjection(scene.viewport().centre()),
+                Projections.forViewport(scene.viewport()),
                 new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, MAX_DEPTH);
         if (outline.getCurrentPoint() == null) {
@@ -176,7 +177,7 @@ public final class PageExtent {
      * towards its horizon. So each arc is halved until its midpoint
      * lies within {@code FLATNESS_PX} of the chord that replaces it.
      */
-    static Path2D.Double outlineOf(GnomonicProjection projection,
+    static Path2D.Double outlineOf(Projection projection,
                                    ViewportMapping mapping,
                                    SkyPosition centre, double semiMajorDeg,
                                    double semiMinorDeg,
@@ -209,7 +210,7 @@ public final class PageExtent {
         return outline;
     }
 
-    private static void subdivide(GnomonicProjection projection,
+    private static void subdivide(Projection projection,
                                   ViewportMapping mapping, SkyPosition centre,
                                   double semiMajorDeg, double semiMinorDeg,
                                   double positionAngleDeg,
@@ -247,7 +248,7 @@ public final class PageExtent {
      * The boundary point at parameter {@code t}, projected onto the
      * page. Null where the projection has nothing to say.
      */
-    static Point2D.Double boundaryPixel(GnomonicProjection projection,
+    static Point2D.Double boundaryPixel(Projection projection,
                                         ViewportMapping mapping,
                                         SkyPosition centre,
                                         double semiMajorDeg,
@@ -276,7 +277,7 @@ public final class PageExtent {
     static Path2D.Double outlineOn(ChartScene scene, SkyPosition centre,
                                    double semiMajorDeg, double semiMinorDeg,
                                    double positionAngleDeg, int maxDepth) {
-        return outlineOf(new GnomonicProjection(scene.viewport().centre()),
+        return outlineOf(Projections.forViewport(scene.viewport()),
                 new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, maxDepth);
     }
@@ -287,7 +288,7 @@ public final class PageExtent {
                                           double semiMajorDeg,
                                           double semiMinorDeg,
                                           double positionAngleDeg, double t) {
-        return boundaryPixel(new GnomonicProjection(scene.viewport().centre()),
+        return boundaryPixel(Projections.forViewport(scene.viewport()),
                 new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, t);
     }

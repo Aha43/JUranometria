@@ -23,7 +23,8 @@ package juranometria.chart;
  */
 public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
                              double limitingMagnitude, String targetLabel,
-                             String targetIdentity) {
+                             String targetIdentity,
+                             ChartProjection projection) {
 
     /** Zoom sequence, widest first; zooming in walks toward 1 degree.
      *  The regional steps above 8 come from docs/decisions/regional-zoom.md;
@@ -47,9 +48,27 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         this(centre, fieldWidthDegrees, limitingMagnitude, null, null);
     }
 
+    /**
+     * A view drawn by the atlas's own projection.
+     *
+     * <p>Every released state is one of these, and says so by
+     * omission rather than by repeating the same word in a hundred
+     * places.
+     */
+    public ChartViewState(SkyPosition centre, double fieldWidthDegrees,
+                          double limitingMagnitude, String targetLabel,
+                          String targetIdentity) {
+        this(centre, fieldWidthDegrees, limitingMagnitude, targetLabel,
+                targetIdentity, ChartProjection.GNOMONIC);
+    }
+
     public ChartViewState {
         if (centre == null) {
             throw new IllegalArgumentException("centre must not be null");
+        }
+        if (projection == null) {
+            throw new IllegalArgumentException(
+                    "projection must not be null");
         }
         if (indexOf(FIELD_WIDTH_STEPS, fieldWidthDegrees) < 0) {
             throw new IllegalArgumentException(

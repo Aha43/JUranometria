@@ -23,6 +23,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   while a projection says how the sky becomes a page
   (`docs/decisions/overview-projection.md`, `docs/architecture.md`).
 
+- **Projection is a core strategy now** (issue #297), with the atlas's
+  gnomonic projection and the overview's stereographic one as two real
+  implementations behind one boundary. Still nothing a reader can see:
+  every released page from 1° to 42° renders byte for byte as before,
+  and no reader can choose the overview yet. What changed is that
+  nothing outside `juranometria.project` names a projection any more —
+  a chart asks its own for an answer.
+
 ## [1.10.0] - 2026-09-07
 
 Sprint 29 — Take the chart to the observing table. The sprint the

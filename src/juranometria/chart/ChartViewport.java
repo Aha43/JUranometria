@@ -5,13 +5,28 @@ package juranometria.chart;
  * horizontal angular extent of the chart in degrees, and the pixel
  * dimensions of the drawing surface.
  *
- * The viewport carries no projection knowledge; upper bounds on the field
- * width are left to projection work.
+ * The viewport says which projection draws it (Sprint 30, issue #297).
+ * It says nothing about what that projection does: it carries a name,
+ * and {@code juranometria.project} turns the name into an answer. Upper
+ * bounds on the field width belong to the projection, which knows how
+ * far it reaches.
  */
 public record ChartViewport(SkyPosition centre, double fieldWidthDegrees,
-                            int widthPx, int heightPx) {
+                            int widthPx, int heightPx,
+                            ChartProjection projection) {
+
+    /** A viewport drawn by the atlas's own projection. */
+    public ChartViewport(SkyPosition centre, double fieldWidthDegrees,
+                         int widthPx, int heightPx) {
+        this(centre, fieldWidthDegrees, widthPx, heightPx,
+                ChartProjection.GNOMONIC);
+    }
 
     public ChartViewport {
+        if (projection == null) {
+            throw new IllegalArgumentException(
+                    "projection must not be null");
+        }
         if (centre == null) {
             throw new IllegalArgumentException("centre must not be null");
         }

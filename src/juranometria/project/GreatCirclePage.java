@@ -114,26 +114,35 @@ public final class GreatCirclePage {
      * @param pole a direction perpendicular to every point of the
      *     circle - the whole of what this needs to be told
      */
-    public static Optional<Arc> clip(GnomonicProjection projection,
+    public static Optional<Arc> clip(Projection projection,
                                      ViewportMapping mapping,
                                      Page paper,
                                      SkyPosition pole) {
-        double[] axis = unit(pole);
-        double[] centre = unit(projection.centre());
-        double ra = Math.toRadians(projection.centre().raDegrees());
-        double dec = Math.toRadians(projection.centre().decDegrees());
-        double[] east = {-Math.sin(ra), Math.cos(ra), 0};
-        double[] north = {-Math.sin(dec) * Math.cos(ra),
-                -Math.sin(dec) * Math.sin(ra), Math.cos(dec)};
+        // The projection says what the circle is. This used to work
+        // the same three dot products out for itself, from its own
+        // basis vectors, which made it the third copy of that
+        // arithmetic in the atlas - and it carried a threshold of
+        // 1e-24 where the condition it stands for is exact.
+        Optional<PlaneConic> stated = projection.greatCircle(pole);
+        if (stated.isEmpty()) {
+            // The circle has no image at all: under a tangent plane,
+            // the one ninety degrees from the centre.
+            return Optional.empty();
+        }
+        PlaneConic conic = stated.get();
+        if (conic.a() != 0.0 || conic.b() != 0.0 || conic.c() != 0.0) {
+            // Curved on this plane. Straight is the only shape this
+            // can clip, and asking the conic is how it knows -
+            // nothing here asks which projection it was handed. The
+            // curve seam that draws the others is issue #298.
+            return Optional.empty();
+        }
 
-        double a = dot(axis, east);
-        double b = dot(axis, north);
-        double c = dot(axis, centre);
+        double a = conic.d();
+        double b = conic.e();
+        double c = conic.f();
         double gradient = a * a + b * b;
-        if (gradient < 1e-24) {
-            // The pole is the page's own centre: the circle is the
-            // projection's horizon, ninety degrees away in every
-            // direction, and no point of it has an image at all.
+        if (gradient == 0.0) {
             return Optional.empty();
         }
         // The point of the line closest to the plane's origin, and

@@ -12,7 +12,8 @@ import juranometria.chart.ChartScene;
 import juranometria.module.InkRole;
 import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
-import juranometria.project.GnomonicProjection;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 
@@ -63,8 +64,8 @@ final class WorkingCrossInk {
         if (contributions.isEmpty()) {
             return;
         }
-        GnomonicProjection projection =
-                new GnomonicProjection(scene.viewport().centre());
+        Projection projection =
+                Projections.forViewport(scene.viewport());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         java.awt.geom.Rectangle2D paper =
                 juranometria.render.ChartRenderer.paperOf(scene);
