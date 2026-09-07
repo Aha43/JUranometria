@@ -530,169 +530,12 @@ class ProjectedCurveSeamTest {
                 arc.centreY() + along * sin + across * cos);
     }
 
-    /** The ecliptic's own stroke: long dash, short dot. */
-    private static final float[] PERMANENT = {12.0f, 4.0f, 2.0f, 4.0f};
-
-    /** The meridian and the ecliptic, as the screen carries them. */
-    private static juranometria.render.ChartRenderer.ReferenceLayer modules() {
-        juranometria.module.OverlayRegistry registry =
-                new juranometria.module.OverlayRegistry();
-        juranometria.meridian.MeridianModule meridian =
-                new juranometria.meridian.MeridianModule(
-                        new juranometria.sky.Observer(59.9, 10.7,
-                                java.time.Instant.parse(
-                                        "2026-03-20T21:33:00Z")));
-        meridian.showing(true, true, true);
-        registry.offer(juranometria.meridian.MeridianModule.ID,
-                meridian::contributedGeometry);
-        juranometria.ecliptic.EclipticModule ecliptic =
-                new juranometria.ecliptic.EclipticModule();
-        ecliptic.showing(true);
-        registry.offer(juranometria.ecliptic.EclipticModule.ID,
-                ecliptic::contributedGeometry);
-        return (g, painted) -> juranometria.ui.ReferenceInk.paint(g, painted,
-                registry.collect(),
-                juranometria.render.ChartPalette.WHITE_PAPER);
-    }
-
     /**
-     * A page the permanent circle crosses without running through
-     * its centre.
-     *
-     * <p>Both halves of that matter. A circle off the page cannot be
-     * measured at all, and a circle <em>through</em> the centre is
-     * straight under every projection - it is the gate's own third
-     * row - so a page centred on the equinox would have proved
-     * nothing about a curve. This is twelve degrees north of the
-     * ecliptic's crossing, which puts it well inside a
-     * 42-degree page and off its middle.
+     * The whole sheet of a curved page - the atlas's own
+     * assembler, the production renderer and all three writers -
+     * is held in {@code juranometria.sheet.ProjectedCurveOnASheetTest},
+     * where a test can name the very path each writer emitted.
      */
-    private static final SkyPosition ABOVE_THE_CROSSING =
-            new SkyPosition(0.0, 12.0);
-
-    /** A whole production sheet of this page, on A4. */
-    private static juranometria.sheet.SheetRecording sheet(
-            ChartProjection kind) {
-        return juranometria.sheet.ChartSheet.record(
-                juranometria.app.Atlas.assembler()::assemble,
-                new juranometria.chart.ChartViewState(ABOVE_THE_CROSSING,
-                        42.0, 6.0, null, null, kind),
-                juranometria.render.ChartOptions.DEFAULTS, modules(),
-                juranometria.sheet.PaperSize.A4);
-    }
-
-    /** The permanent circle's own ink, as the renderer laid it down. */
-    private static java.awt.Shape permanentInk(
-            juranometria.sheet.SheetRecording recorded) {
-        for (var operation : recorded.recorder().operations()) {
-            if (operation instanceof juranometria.sheet.SheetRecorder.Drawn drawn
-                    && !drawn.filled() && drawn.stroke() != null
-                    && java.util.Arrays.equals(drawn.stroke().dash(),
-                            PERMANENT)) {
-                return drawn.shape();
-            }
-        }
-        throw new AssertionError("this sheet carries the permanent circle");
-    }
-
-    /** How many curved segments a shape is drawn from. */
-    private static int curvedSegmentsOf(java.awt.Shape shape) {
-        int curves = 0;
-        double[] point = new double[6];
-        for (var each = shape.getPathIterator(null); !each.isDone();
-                each.next()) {
-            int segment = each.currentSegment(point);
-            if (segment == java.awt.geom.PathIterator.SEG_CUBICTO
-                    || segment == java.awt.geom.PathIterator.SEG_QUADTO) {
-                curves++;
-            }
-        }
-        return curves;
-    }
-
-    @Test
-    void aCurveReachesEverySheetAsACurveAndNotAsAChord() throws Exception {
-        // The acceptance's last geometry clause, over the whole
-        // production path rather than over a recorder filled by hand:
-        // the atlas's own assembler, the production renderer, the
-        // sheet, and the three writers.
-        //
-        // The page is one a reader can ask for. At 42 degrees the
-        // arc stands a twentieth of a page unit off its own chord,
-        // which is why the released atlas is byte-identical and why
-        // this asks whether the curve is *carried* rather than
-        // whether it is visibly bent. Being visibly bent is measured
-        // on the wider pages above, where the seam has to serve them.
-        java.awt.Shape curved = permanentInk(
-                sheet(ChartProjection.STEREOGRAPHIC));
-        java.awt.Shape flat = permanentInk(
-                sheet(ChartProjection.GNOMONIC));
-        assertTrue(curvedSegmentsOf(curved) > 0,
-                "the sheet's own ink for the circle is curved: "
-                        + curvedSegmentsOf(curved) + " curved segments");
-        assertEquals(0, curvedSegmentsOf(flat),
-                "and the tangent plane's is straight, so the difference"
-                        + " is the projection and not the drawing");
-
-        // What each file holds of it. The dash pattern is the
-        // circle's own, so this reads the very ink that was drawn
-        // rather than any curve on the page.
-        String svg = new String(juranometria.sheet.SheetWriters.write(
-                sheet(ChartProjection.STEREOGRAPHIC),
-                juranometria.sheet.SheetFormat.SVG, 300),
-                java.nio.charset.StandardCharsets.UTF_8);
-        String path = attributeBefore(svg, "d=\"", "12.00,4.00,2.00,4.00");
-        assertTrue(path.contains("C"), "the SVG draws the circle with"
-                + " curve commands: " + summarise(path));
-
-        byte[] pdf = juranometria.sheet.SheetWriters.write(
-                sheet(ChartProjection.STEREOGRAPHIC),
-                juranometria.sheet.SheetFormat.PDF, 300);
-        String content = new String(pdf,
-                java.nio.charset.StandardCharsets.ISO_8859_1);
-        String drawn = between(content,
-                "[12.00 4.00 2.00 4.00] 0.00 d", " d\n");
-        assertTrue(drawn.contains(" c\n"), "and the PDF with curve"
-                + " operators: " + summarise(drawn));
-
-        // PNG is a raster of the same recording, so what it can show
-        // is that the page it rasterises is this one: the writers do
-        // not re-derive geometry, they replay what the recorder kept,
-        // and the two files above measure what that was.
-        byte[] png = juranometria.sheet.SheetWriters.write(
-                sheet(ChartProjection.STEREOGRAPHIC),
-                juranometria.sheet.SheetFormat.PNG, 150);
-        java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(
-                new java.io.ByteArrayInputStream(png));
-        assertTrue(image != null && image.getWidth() > 0,
-                "and the PNG is written from the same sheet");
-    }
-
-    /** The value of the attribute nearest before a marker. */
-    private static String attributeBefore(String text, String name,
-                                          String marker) {
-        int at = text.indexOf(marker);
-        assertTrue(at > 0, "the file carries the circle's own stroke");
-        int opens = text.lastIndexOf(name, at);
-        assertTrue(opens > 0, "and the shape it was used on");
-        int closes = text.indexOf('"', opens + name.length());
-        return text.substring(opens + name.length(), closes);
-    }
-
-    /** What lies between a marker and the next of something. */
-    private static String between(String text, String from, String to) {
-        int at = text.indexOf(from);
-        assertTrue(at > 0, "the file carries the circle's own stroke");
-        int ends = text.indexOf(to, at + from.length());
-        return text.substring(at + from.length(),
-                ends < 0 ? text.length() : ends);
-    }
-
-    private static String summarise(String drawn) {
-        return drawn.length() < 200 ? drawn
-                : drawn.substring(0, 200) + "...";
-    }
-
     @Test
     void aModuleSaysWhereAndNeverWhatItLooksLike() {
         // The boundary this issue must preserve. The same pole, the
@@ -782,6 +625,15 @@ class ProjectedCurveSeamTest {
                 () -> new CurveRun.Arc(0, 0, 10, 10, 0, 0, 1.0,
                         null, null),
                 "and only a whole turn closes");
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Arc(0, 0, 10, 10, 0, 0,
+                        CurveRun.Arc.WHOLE_TURN, here, here),
+                "and a whole turn is closed, so it has nowhere to"
+                        + " hang a name");
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Arc(0, 0, 10, 10, 0, 0, 1.0, here,
+                        new PixelPoint(Double.NaN, 0.0)),
+                "an arc ends at pixels a renderer can draw");
         assertThrows(IllegalArgumentException.class,
                 () -> new CurveRun.Segment(here,
                         new PixelPoint(Double.POSITIVE_INFINITY, 0.0)),

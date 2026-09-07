@@ -109,10 +109,24 @@ public sealed interface CurveRun {
                         "an arc has both ends or neither: " + start
                                 + " to " + end);
             }
-            if (start == null && spanRadians != WHOLE_TURN) {
+            // The ends and the span say the same thing, so they must
+            // say it together: a run that closes has no ends, and a
+            // run with ends does not close. A whole turn carrying
+            // ends is the second half of that going unchecked - a
+            // closed curve with a place for a name on it, which is
+            // the distinction the ends exist to make.
+            if ((start == null) != (spanRadians == WHOLE_TURN)) {
                 throw new IllegalArgumentException(
-                        "a run with no ends is one that closes, and this"
-                                + " spans " + spanRadians);
+                        "a run that closes has no ends and a run with"
+                                + " ends does not close: " + start
+                                + " through " + spanRadians);
+            }
+            if (start != null && (!Double.isFinite(start.x())
+                    || !Double.isFinite(start.y())
+                    || !Double.isFinite(end.x())
+                    || !Double.isFinite(end.y()))) {
+                throw new IllegalArgumentException(
+                        "a run ends at pixels: " + start + " to " + end);
             }
         }
 

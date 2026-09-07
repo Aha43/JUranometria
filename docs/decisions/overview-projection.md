@@ -633,11 +633,19 @@ projection on the shared frame and making its domain rule exact.
   constrains the *field*, not the projection, and a great circle
   that misses the page centre is classified curved at 42 degrees as
   surely as at 120. The sheet is now the atlas's own assembler, the
-  production renderer and all three writers, and what it shows is
-  that SVG and PDF carry the circle as curve commands where the same
-  page under the tangent plane carries it as a line. What it cannot
-  show at 42 degrees is a curve a reader would *see* bending; that
-  is measured on the wider pages, and stays measured there.
+  production renderer and all three writers, over **one** recording -
+  a claim that four things agree is not tested by making four of
+  them. SVG and PDF are asked for the recorded shape's own path text
+  rather than for any curve at all; the PNG is asked where its ink
+  is, along the band the recorded curve runs through, against the
+  same band of the same page with no module showing (3,681 dark
+  samples against 864). Paint order is read in all four: the circle
+  is drawn before the title panel in the recording and written
+  before it in both vector files, and in the raster the panel hides
+  the part of the circle it covers - 44 dark samples of 1,948 under
+  it, against 3,157 of 7,441 beside it. What none of them can show
+  at 42 degrees is a curve a reader would *see* bending; that is
+  measured on the wider pages, and stays measured there.
 
 - **#298 — the curve vocabulary.** Replace `GreatCirclePage.clip`'s
   `Optional<Arc>` with the three exact forms and a list of runs with
