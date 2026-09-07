@@ -26,8 +26,20 @@ import juranometria.project.PlanePoint;
  *       every other, so a viewport cannot keep assuming it;
  *   <li>{@link #limitDegrees} - what the projection can show at all,
  *       which is a hemisphere for two of the three and everything but
- *       one point for the other.
+ *       one point for the other;
+ *   <li>{@link #greatCircle} - what a great circle <em>becomes</em>,
+ *       stated by the projection in closed form.
  * </ul>
+ *
+ * <p>That last one was missing from the gate's first proposal, and a
+ * review was right that its absence was the whole problem. Without
+ * it a caller can only find out what a curve became by projecting a
+ * few hundred points and fitting a form to them - which is sampling,
+ * which the issue refuses; then asking which form it got, which is a
+ * type check; and then discovering that a projection nobody had
+ * studied needed a form nobody had written, which is widening the
+ * vocabulary later. A projection knows the answer analytically. It
+ * should be asked for it.
  */
 public interface StudyProjection {
 
@@ -62,4 +74,16 @@ public interface StudyProjection {
      * that only loses the antipode.
      */
     double limitDegrees();
+
+    /**
+     * What the great circle with this pole becomes on the plane.
+     *
+     * <p>In closed form, from the projection's own geometry - not
+     * fitted to projected points. Empty when the circle does not
+     * appear on this projection at all, which happens under the
+     * gnomonic projection when the pole is the centre: that circle
+     * lies entirely at ninety degrees, where the tangent plane is
+     * infinitely far away.
+     */
+    Optional<PlaneCurve> greatCircle(SkyPosition pole);
 }

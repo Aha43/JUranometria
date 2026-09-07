@@ -287,20 +287,20 @@ final class StudyPage {
             if (built.isEmpty()) {
                 continue;
             }
-            List<PageCurve.Run> runs = built.get().curve().clipTo(page);
+            List<PlaneCurve.Run> runs = built.get().curve().clipTo(page);
             if (runs.isEmpty()) {
                 continue;  // off the page is silence
             }
             g.setStroke(circle.name().equals("the ecliptic")
                     ? DASH_DOT : REFERENCE);
-            for (PageCurve.Run run : runs) {
+            for (PlaneCurve.Run run : runs) {
                 g.draw(run.shape());
             }
             notes.add(String.format(Locale.ROOT,
                     "%s: %s, %d run%s, %s", circle.name(),
                     built.get().curve().form(), runs.size(),
                     runs.size() == 1 ? "" : "s",
-                    runs.stream().anyMatch(PageCurve.Run::closed)
+                    runs.stream().anyMatch(PlaneCurve.Run::closed)
                             ? "closed - no end to hang a name on"
                             : "named at the upper end"));
             label(g, runs, circle.name());
@@ -311,9 +311,9 @@ final class StudyPage {
     private final List<Rectangle2D> placed = new ArrayList<>();
 
     /** Production's label rule, applied to whichever run offers an end. */
-    private void label(Graphics2D g, List<PageCurve.Run> runs, String name) {
+    private void label(Graphics2D g, List<PlaneCurve.Run> runs, String name) {
         Point2D best = null;
-        for (PageCurve.Run run : runs) {
+        for (PlaneCurve.Run run : runs) {
             if (run.closed()) {
                 continue;
             }

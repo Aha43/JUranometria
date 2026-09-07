@@ -9,21 +9,21 @@ import java.util.Optional;
 import juranometria.chart.SkyPosition;
 
 /**
- * Builds a great circle's page curve, and proves the form it chose
+ * A great circle on the page, and the evidence that it is right
  * (issue #296).
  *
- * <p>The choice is not made by asking which projection is in use. It
- * is made by <strong>determining</strong> a candidate form from the
- * fewest points that fix it - two for a line, three for a circle,
- * five for an ellipse - and then <strong>measuring</strong> that form
- * against a great many more. A projection that quietly stopped being
- * what it says it is would fail the measurement rather than draw a
- * wrong curve.
+ * <p>The curve comes from the projection, which states it in closed
+ * form. Nothing here decides what form a curve takes and nothing here
+ * samples the sky to find out - that was the gate's first proposal,
+ * and a review was right that it amounted to sampling, a type check
+ * and a promise to widen the vocabulary later.
  *
- * <p>The measurement is made against the curve that would actually be
- * <em>drawn</em>, not against the equation it was fitted from. A form
- * whose coefficients were right and whose shape came out rotated a
- * quarter turn would satisfy the fit and fail this.
+ * <p>What is here is the <strong>check</strong>: the stated curve is
+ * measured against a few hundred genuinely projected points, and
+ * measured against the curve that would actually be <em>drawn</em>
+ * rather than against any equation. A projection whose arithmetic
+ * had drifted from its name, or a form that came out rotated a
+ * quarter turn, fails this rather than reaching a page.
  */
 final class PageCurves {
 
@@ -40,12 +40,47 @@ final class PageCurves {
     private PageCurves() {
     }
 
-    /** What was built, and the evidence for it. */
-    record Built(PageCurve curve, double residual, int points,
-                 int samples) {
+    /** The curve the projection stated, and how well it holds. */
+    record Built(PlaneCurve curve, double residual, int samples) {
     }
 
     static Optional<Built> greatCircle(StudyMapping mapping,
+                                       SkyPosition pole, int samples) {
+        // The projection is asked what the curve is. Nothing here
+        // fits one, and nothing here samples the sky to find out -
+        // the sampling below is the check, not the method.
+        Optional<PlaneCurve> stated =
+                mapping.projection().greatCircle(pole);
+        if (stated.isEmpty()) {
+            return Optional.empty();
+        }
+        PlaneCurve onPage = mapping.onPage(stated.get());
+
+        List<Point2D> page = new ArrayList<>(samples);
+        for (SkyPosition position : CurveForm.around(pole, samples)) {
+            mapping.pageOf(position).ifPresent(page::add);
+        }
+        if (page.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Built(onPage, missOf(onPage, page),
+                page.size()));
+    }
+
+    /**
+     * The same curve found the other way: determined from the fewest
+     * points that fix a form - two for a line, three for a circle,
+     * five for an ellipse - and measured against every projected
+     * point there is.
+     *
+     * <p>This is not how a page is drawn. It is how the closed forms
+     * are checked, and it is deliberately a different method of
+     * arriving at the answer: a projection whose stated curve and
+     * whose projected points disagreed would be caught by one
+     * contradicting the other, where a single derivation used for
+     * both could be wrong in the same way twice.
+     */
+    static Optional<PlaneCurve> fitted(StudyMapping mapping,
                                        SkyPosition pole, int samples) {
         List<Point2D> page = new ArrayList<>(samples);
         for (SkyPosition position : CurveForm.around(pole, samples)) {
@@ -56,43 +91,27 @@ final class PageCurves {
         }
         Point2D[] spread = spread(page);
 
-        // Each candidate is determined from the fewest points that
-        // fix it, and then measured against every point there is -
-        // and measured against the curve that would actually be
-        // drawn, not against the equation it was fitted from. A form
-        // whose arithmetic was right and whose shape came out
-        // rotated a quarter turn would pass the second check only by
-        // being correct.
-        PageCurve straight = through(spread[0], spread[1]);
-        double miss = missOf(straight, page);
-        if (miss < EXACT) {
-            return Optional.of(new Built(straight, miss, 2, page.size()));
+        PlaneCurve straight = through(spread[0], spread[1]);
+        if (missOf(straight, page) < EXACT) {
+            return Optional.of(straight);
         }
         if (page.size() >= 3) {
             double[] circle = circleThrough(spread[0], spread[1], spread[2]);
             if (circle != null) {
-                PageCurve curve = new PageCurve.Circular(circle[0],
+                PlaneCurve curve = new PlaneCurve.Circular(circle[0],
                         circle[1], circle[2]);
-                miss = missOf(curve, page);
-                if (miss < EXACT) {
-                    return Optional.of(
-                            new Built(curve, miss, 3, page.size()));
+                if (missOf(curve, page) < EXACT) {
+                    return Optional.of(curve);
                 }
             }
         }
         if (page.size() >= 5) {
-            PageCurve ellipse = ellipseThrough(page);
-            if (ellipse != null) {
-                miss = missOf(ellipse, page);
-                if (miss < EXACT) {
-                    return Optional.of(
-                            new Built(ellipse, miss, 5, page.size()));
-                }
+            PlaneCurve ellipse = ellipseThrough(page);
+            if (ellipse != null && missOf(ellipse, page) < EXACT) {
+                return Optional.of(ellipse);
             }
         }
-        return Optional.of(new Built(
-                new PageCurve.Sampled(page, 360.0 / samples),
-                Double.NaN, page.size(), page.size()));
+        return Optional.empty();
     }
 
     /**
@@ -104,7 +123,7 @@ final class PageCurves {
      * safe direction for a number that decides whether a form is
      * exact.
      */
-    static double missOf(PageCurve curve, List<Point2D> points) {
+    static double missOf(PlaneCurve curve, List<Point2D> points) {
         double worst = 0.0;
         for (Point2D point : points) {
             worst = Math.max(worst, missAt(curve, point));
@@ -112,9 +131,9 @@ final class PageCurves {
         return worst;
     }
 
-    private static double missAt(PageCurve curve, Point2D point) {
+    private static double missAt(PlaneCurve curve, Point2D point) {
         return switch (curve) {
-            case PageCurve.Straight line -> {
+            case PlaneCurve.Straight line -> {
                 double dx = line.line().x2 - line.line().x1;
                 double dy = line.line().y2 - line.line().y1;
                 double length = Math.hypot(dx, dy);
@@ -123,11 +142,11 @@ final class PageCurves {
                                 - dy * (line.line().x1 - point.getX()))
                                 / length;
             }
-            case PageCurve.Circular circle -> Math.abs(
+            case PlaneCurve.Circular circle -> Math.abs(
                     Math.hypot(point.getX() - circle.centreX(),
                             point.getY() - circle.centreY())
                             - circle.radius());
-            case PageCurve.Elliptical ellipse -> {
+            case PlaneCurve.Elliptical ellipse -> {
                 java.awt.geom.AffineTransform onto =
                         new java.awt.geom.AffineTransform();
                 onto.translate(ellipse.centreX(), ellipse.centreY());
@@ -148,7 +167,6 @@ final class PageCurves {
                     yield Double.MAX_VALUE;
                 }
             }
-            case PageCurve.Sampled sampled -> 0.0;
         };
     }
 
@@ -166,12 +184,12 @@ final class PageCurves {
     }
 
     /** A line long enough to cross any page, through two of its points. */
-    private static PageCurve through(Point2D a, Point2D b) {
+    private static PlaneCurve through(Point2D a, Point2D b) {
         double dx = b.getX() - a.getX();
         double dy = b.getY() - a.getY();
         double length = Math.hypot(dx, dy);
         double far = 1.0e6 / length;
-        return new PageCurve.Straight(new Line2D.Double(
+        return new PlaneCurve.Straight(new Line2D.Double(
                 a.getX() - far * dx, a.getY() - far * dy,
                 a.getX() + far * dx, a.getY() + far * dy));
     }
@@ -203,7 +221,7 @@ final class PageCurves {
      * parabola or a hyperbola is not a great circle on a page, it is
      * a sign that the points were not on one curve.
      */
-    private static PageCurve ellipseThrough(List<Point2D> page) {
+    private static PlaneCurve ellipseThrough(List<Point2D> page) {
         // Fitted about the points' own centre, at their own scale.
         // Page coordinates run to several hundred, so the squared
         // terms of a conic reach a million against a constant term
@@ -269,7 +287,7 @@ final class PageCurves {
         if (-atCentre / along <= 0.0 || -atCentre / across <= 0.0) {
             return null;
         }
-        return new PageCurve.Elliptical(centreX * spread + meanX,
+        return new PlaneCurve.Elliptical(centreX * spread + meanX,
                 centreY * spread + meanY,
                 spread * Math.sqrt(-atCentre / along),
                 spread * Math.sqrt(-atCentre / across), tilt);

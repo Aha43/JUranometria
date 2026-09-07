@@ -359,7 +359,9 @@ public final class OverviewStudyMain {
                 **determined** by the fewest points that fix a form -
                 two for a line, three for a circle, five for a conic
                 - and then **measured** against 200 to 400 more,
-                worst miss in plane units.
+                worst miss in plane units. This table is how the
+                question was first asked; what a page actually uses
+                is further down, and it is not this.
 
                 """);
         out.append(CurveFormReport.of(orion));
@@ -376,42 +378,77 @@ public final class OverviewStudyMain {
                 - an **elliptical** run - every orthographic great
                   circle, and nothing else needs it.
 
-                Nothing is sampled.""");
-        out.append(String.format(Locale.ROOT, """
-                 Every one of the %d page-and-circle combinations
-                measured below is drawn by one of these three, and
-                the worst any of them misses its own projected points
-                by is **%.1e page units**, against an acceptance
-                threshold of 1e-3 - itself a thousandth of the
-                thinnest line the atlas draws. Nothing sits near the
-                threshold; it separates "exact" from "not this form
-                at all".""",
-                combinations, worstMiss));
+                ## The projection states its own curve
+
+                Fitting a form to projected points is how the
+                question above was investigated. It is not how a page
+                should be drawn, and a review of the gate's first
+                proposal was right to say so: a caller that has to
+                project a few hundred points and fit a curve to them
+                is sampling, which this issue refuses; then asking
+                which form came back, which is a type check; and then
+                one day meeting a projection whose form nobody had
+                written, which is widening the vocabulary later.
+
+                A projection knows the answer without being asked
+                twice. Write the pole in the projection's own frame -
+                the same three dot products `project` already takes -
+                as its components along the centre, east and north
+                directions, and the condition that a point lies on the
+                circle becomes an equation in the page coordinates:
+
+                | projection | substituting its own radius | leaves |
+                |---|---|---|
+                | gnomonic | `r = tan t` | `a + b xi + c eta = 0`, a line |
+                | stereographic | `r = 2 tan(t/2)` | `a(1 - (xi^2 + eta^2)/4) + b xi + c eta = 0`, a circle of centre `(2b/a, 2c/a)` and radius `2/|a|` - a line when `a` is zero |
+                | orthographic | `r = sin t` | `(a^2 + b^2) xi^2 + 2bc xi eta + (a^2 + c^2) eta^2 = a^2`, an ellipse of radii `|a|` and 1 |
+
+                So `greatCircle(pole)` belongs on the projection
+                interface, and the three forms are returned by
+                arithmetic rather than found by search. Each
+                projection returns the **simplest form that is
+                exact**, so one curve has one name: the stereographic
+                circle of infinite radius is a line, and the
+                orthographic ellipse with equal axes is a circle.
+
+                The fit is kept, and it has become the check. Two
+                independent routes to the same curve - one from the
+                projection's algebra, one from several hundred points
+                it actually projected - must arrive at the same form,
+                and the drawn curve must pass through those points:
+
+                """);
+        out.append(String.format(java.util.Locale.ROOT, """
+                | measured over | stated form agrees with fitted form | worst the drawn curve misses a projected point |
+                |---:|---:|---:|
+                | %d combinations | %d, and %d disagree | %.1e page units |
+
+                """, PageCurveReport.rows,
+                PageCurveReport.agreed, PageCurveReport.disagreed,
+                PageCurveReport.worstMiss));
         out.append("""
+                The disagreement that this check did find is worth
+                recording, because it was not an error. Centred on
+                the pole, the orthographic image of the celestial
+                equator is the limb: an ellipse whose two radii are
+                equal, which is to say a circle. The algebra said
+                ellipse and the fit said circle and both were right,
+                which is what made the rule above - the simplest form
+                that is exact - a rule rather than a preference.
 
-                The third word is what makes the globe an addition
-                rather than a redesign, and writing it was the way to
-                find out. It is one record and one clipping rule, and
-                the clipping rule is not new geometry: an ellipse is
-                a circle under one affine change of variables, so the
-                page's own edges are carried into the frame where the
-                curve is a unit circle, cut there with the same
-                arithmetic, and the answers carried back. Neither the
-                other two words nor anything that uses them changed
-                to admit it.
+                Two other things this check caught, neither of which
+                the arithmetic on paper suggested. The orthographic
+                closed form returns a degenerate ellipse when the
+                circle runs through the page centre, and a degenerate
+                ellipse has no interior and an affine frame that
+                cannot be inverted, so it must be returned as the line
+                it is. And a line carried a million plane units out
+                from the origin becomes a billion page units, where
+                measuring a point's distance from it loses seven
+                digits: the straight form's worst miss read 1.1e-07
+                where the circles were reading 1e-11.
 
-                The measurement is deliberately made against the
-                curve that would be **drawn**, not against the
-                equation it was fitted from - a form whose
-                coefficients were right and whose shape came out
-                rotated a quarter turn would satisfy a fit and fail
-                this. It caught a real error: the ellipse's centre
-                was divided by the discriminant where it belonged
-                over the determinant, which is the same number
-                negated, and every orthographic page quietly fell
-                back to sampling instead of drawing wrongly.
-
-                ## What one page asks of the vocabulary
+                ## What one page asks of the vocabulary                ## What one page asks of the vocabulary
 
                 Two things production's `Optional<Arc>` cannot say,
                 found by clipping real pages rather than by thinking
@@ -422,10 +459,11 @@ public final class OverviewStudyMain {
         out.append("""
 
                 **A curve can cross one page more than once.** A
-                circle and a rectangle meet in up to four points, so
-                a great circle can leave and re-enter the paper -
-                seven of the pages measured here do, and the
-                pole-centred orthographic equator does it twice.
+                circle and a rectangle meet in up to eight points -
+                two per edge - which is up to four separate runs of
+                curve on the paper. Twenty-one of the combinations
+                measured here leave the page and come back, and four
+                of them come back in four runs.
                 `Optional<Arc>` can only answer "once" or "not at
                 all", so it would draw one run and silently drop the
                 rest.

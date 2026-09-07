@@ -71,6 +71,11 @@ final class Candidates {
             public double limitDegrees() {
                 return 90.0;
             }
+
+            @Override
+            public Optional<PlaneCurve> greatCircle(SkyPosition pole) {
+                return gnomonicCircle(inFrame(centre, pole));
+            }
         };
     }
 
@@ -79,7 +84,7 @@ final class Candidates {
         return azimuthal(centre, "stereographic",
                 angle -> 2.0 * Math.tan(angle / 2.0),
                 radius -> 2.0 * Math.atan(radius / 2.0),
-                179.999);
+                179.999, Candidates::stereographicCircle);
     }
 
     /** r = sin(theta): the globe's own outline, one hemisphere. */
@@ -87,7 +92,7 @@ final class Candidates {
         return azimuthal(centre, "orthographic",
                 Math::sin,
                 radius -> radius >= 1.0 ? Double.NaN : Math.asin(radius),
-                90.0);
+                90.0, Candidates::orthographicCircle);
     }
 
     /**
@@ -104,7 +109,8 @@ final class Candidates {
                                              String name,
                                              java.util.function.DoubleUnaryOperator radiusOf,
                                              java.util.function.DoubleUnaryOperator angleOf,
-                                             double limitDegrees) {
+                                             double limitDegrees,
+                                             CircleForm circleForm) {
         double centreRa = Math.toRadians(centre.raDegrees());
         double centreDec = Math.toRadians(centre.decDegrees());
         double sinCentreDec = Math.sin(centreDec);
@@ -187,6 +193,119 @@ final class Candidates {
             public double limitDegrees() {
                 return limitDegrees;
             }
+
+            @Override
+            public Optional<PlaneCurve> greatCircle(SkyPosition pole) {
+                return circleForm.of(inFrame(centre, pole));
+            }
         };
+    }
+
+    /** A projection's own answer, from the pole in its own frame. */
+    private interface CircleForm {
+        Optional<PlaneCurve> of(double[] pole);
+    }
+
+    /**
+     * The pole, in the projection's own frame: how far along the
+     * centre direction, the east direction, and the north direction.
+     *
+     * <p>These are the same three dot products {@code project} takes
+     * of a position, which is why a great circle's form falls out of
+     * the projection's arithmetic rather than out of a fit.
+     */
+    static double[] inFrame(SkyPosition centre, SkyPosition pole) {
+        double centreRa = Math.toRadians(centre.raDegrees());
+        double centreDec = Math.toRadians(centre.decDegrees());
+        double poleDec = Math.toRadians(pole.decDegrees());
+        double offset = Math.toRadians(pole.raDegrees()) - centreRa;
+        double sinCentreDec = Math.sin(centreDec);
+        double cosCentreDec = Math.cos(centreDec);
+        double sinPoleDec = Math.sin(poleDec);
+        double cosPoleDec = Math.cos(poleDec);
+        return new double[] {
+                sinCentreDec * sinPoleDec
+                        + cosCentreDec * cosPoleDec * Math.cos(offset),
+                cosPoleDec * Math.sin(offset),
+                cosCentreDec * sinPoleDec
+                        - sinCentreDec * cosPoleDec * Math.cos(offset)};
+    }
+
+    /**
+     * Every gnomonic great circle is a straight line.
+     *
+     * <p>A point at angle {@code t} and position angle {@code f}
+     * lands at {@code (tan t sin f, tan t cos f)}, so
+     * {@code sin t / r = cos t}; putting that into
+     * {@code pole . point = 0} gives
+     * {@code cos t (a + b xi + c eta) = 0}, and the cosine is
+     * positive everywhere the projection reaches.
+     */
+    private static Optional<PlaneCurve> gnomonicCircle(double[] pole) {
+        if (Math.hypot(pole[1], pole[2]) < 1.0e-12) {
+            // The circle lies entirely at ninety degrees from the
+            // centre, where this projection is infinitely far away.
+            return Optional.empty();
+        }
+        return Optional.of(
+                PlaneCurve.Straight.of(pole[0], pole[1], pole[2]));
+    }
+
+    /**
+     * A stereographic great circle is a circle, or a line when it
+     * passes through the centre.
+     *
+     * <p>With {@code r = 2 tan(t/2)} the same substitution gives
+     * {@code a (1 - (xi^2 + eta^2)/4) + b xi + c eta = 0}: a circle
+     * of centre {@code (2b/a, 2c/a)} and radius {@code 2/|a|}, and a
+     * line through the origin when {@code a} is zero - which is
+     * exactly when the pole is ninety degrees from the centre, so
+     * the circle runs through the centre of the page.
+     */
+    private static Optional<PlaneCurve> stereographicCircle(double[] pole) {
+        if (Math.abs(pole[0]) < 1.0e-12) {
+            return Optional.of(
+                    PlaneCurve.Straight.of(0.0, pole[1], pole[2]));
+        }
+        return Optional.of(new PlaneCurve.Circular(
+                2.0 * pole[1] / pole[0], 2.0 * pole[2] / pole[0],
+                2.0 / Math.abs(pole[0])));
+    }
+
+    /**
+     * An orthographic great circle is an ellipse centred on the page
+     * centre, one radius wide and {@code |a|} deep.
+     *
+     * <p>With {@code r = sin t} the substitution gives
+     * {@code (a^2 + b^2) xi^2 + 2bc xi eta + (a^2 + c^2) eta^2 = a^2},
+     * whose axes are {@code |a|} along the direction of the pole's
+     * own tangential part and exactly 1 - the limb - across it. When
+     * the pole is the centre the two are equal and the ellipse is
+     * the limb itself, which is the right answer: the great circle
+     * square to the line of sight is the edge of the globe.
+     */
+    private static Optional<PlaneCurve> orthographicCircle(double[] pole) {
+        if (Math.abs(pole[0]) < 1.0e-12) {
+            // The ellipse has collapsed: with the pole square to the
+            // centre the conic reads (b xi + c eta)^2 = 0, which is a
+            // line through the centre and not a very thin ellipse.
+            // Left as an ellipse it is a shape with no interior, and
+            // the affine frame that clips it cannot be inverted.
+            return Optional.of(
+                    PlaneCurve.Straight.of(0.0, pole[1], pole[2]));
+        }
+        double along = Math.abs(pole[0]);
+        if (Math.abs(along - 1.0) < 1.0e-12) {
+            // Equal axes. The pole is the centre, so this circle is
+            // the limb itself - and a circle is the simpler of two
+            // true names for it. Each projection returns the
+            // simplest form that is exact, so that one curve has one
+            // name and a count of forms means something.
+            return Optional.of(new PlaneCurve.Circular(0.0, 0.0, 1.0));
+        }
+        double tilt = Math.hypot(pole[1], pole[2]) < 1.0e-12
+                ? 0.0 : Math.atan2(pole[2], pole[1]);
+        return Optional.of(new PlaneCurve.Elliptical(0.0, 0.0,
+                along, 1.0, tilt));
     }
 }

@@ -65,10 +65,34 @@ great circle on a straight line and every telescope field where the
 telescope will find it. This is a second projection, not a
 replacement.
 
-### Its field is **60, 90 and 120 degrees**, continuing the ladder
+### Its field is **60, 90 and 120 degrees**, continuing the ladder — provisionally
 
 Not a range, not a new control: three more rungs on the field ladder
 the atlas already has, after 42.
+
+**The rungs and the magnitudes below are provisional targets for
+#299, not settled numbers.** A review was right that this gate cannot
+settle them: the study's pages carry no star labels and use production's
+stroke policy nowhere, so they cannot establish how dense a *finished*
+overview page reads. What the ink measure below is, honestly, is a
+comparative index between projections and between fields on pages
+drawn the same way — not an absolute readability threshold.
+
+Two things about it do survive that limitation, and they are the two
+ends of the range:
+
+- **Labels can only add ink.** So the 180-degree refusal holds however
+  the renderer draws: a page already a third ink before a single name
+  is placed does not become readable when the names arrive.
+- **60 degrees sits beside the released control.** 5.2% at magnitude
+  5.0 against the released page's 5.0% is a like-for-like comparison
+  on pages drawn by the same painter, which is what that measure can
+  support.
+
+It is 90 and 120, and every magnitude number, that #299 owes a
+renderer-drawn confirmation or a revision. **#299 must publish the
+same ink measure over real rendered pages with labels, and either
+adopt these rungs and defaults or say what it changed them to.**
 
 The upper limit is not the projection's — the stereographic
 projection would draw 180 degrees, and the study did. It is the
@@ -91,9 +115,11 @@ not stars: it is constellation figures, boundaries and grid, which
 magnitude does not thin. At 120 degrees the furniture alone approaches
 twice the released page's entire ink.
 
-**Contract for the implementing issue:** the default limiting
-magnitude follows the field — about 5.0 at 60 degrees and 4.0 at 90
-and 120 — so that an overview arrives readable. The reader's existing
+**Provisional contract for #299:** the default limiting magnitude
+follows the field — about 5.0 at 60 degrees and 4.0 at 90 and 120 —
+so that an overview arrives readable rather than arriving at the
+default and needing rescue. These are starting points to be measured
+against, not constants to be copied in. The reader's existing
 magnitude control is unchanged and still wins.
 
 ### The projection interface
@@ -106,11 +132,41 @@ public interface Projection {
     Optional<SkyPosition> unproject(PlanePoint point);
     double planeRadius(double angleDegrees);
     double limitDegrees();
+    Optional<PlaneCurve> greatCircle(SkyPosition pole);
 }
 ```
 
-Six methods, and each earned its place by something in the study
+Seven methods, and each earned its place by something in the study
 being impossible without it.
+
+The last one was absent from this gate's first proposal, and a review
+was right that its absence was the whole problem. A projection that
+only maps points cannot tell #298 what a great circle became. The
+caller would have to project a few hundred points and fit a form to
+them — which is **sampling**, the compromise this issue refuses —
+then ask which form came back, which is a **type check**, and then
+one day meet a projection needing a form nobody had written, which is
+**widening the vocabulary later**.
+
+A projection knows the answer analytically. Write the pole in the
+projection's own frame, as its components `a`, `b`, `c` along the
+centre, east and north directions — the same three dot products
+`project` already takes — and the condition that a point lies on the
+circle becomes an equation in page coordinates:
+
+| projection | substituting its own radius | leaves |
+|---|---|---|
+| gnomonic | `r = tan t` | `a + b·ξ + c·η = 0`, a line |
+| stereographic | `r = 2 tan(t/2)` | a circle of centre `(2b/a, 2c/a)` and radius `2/|a|`; a line when `a` is zero |
+| orthographic | `r = sin t` | `(a²+b²)ξ² + 2bc·ξη + (a²+c²)η² = a²`, an ellipse of radii `|a|` and 1 |
+
+Each projection returns the **simplest form that is exact**, so one
+curve has one name: a stereographic circle of infinite radius is a
+line, and an orthographic ellipse with equal axes is a circle.
+
+`PlaneCurve` is used polymorphically — the caller draws `shape()` and
+clips with `clipTo(rectangle)` and never asks which of the three it
+holds. Because all three forms exist now, #301 adds none.
 
 `project` and `unproject` are `Optional` because a projection has a
 domain: the orthographic hemisphere and the gnomonic 90-degree limit
@@ -151,18 +207,24 @@ Three words, all exact, no sampling:
 | **circular** | every other stereographic great circle |
 | **elliptical** | every orthographic great circle, and nothing else |
 
-Over the 109 page-and-circle combinations measured, every one is
-drawn by one of these three, and the worst any of them misses its own
-projected points by is 3.1e-08 page units against an acceptance
-threshold of 1e-3.
+Over the 108 page-and-circle combinations measured, every one is
+drawn by one of these three — 66 straight, 25 circular, 17 elliptical
+— stated by the projection and never fitted.
+
+The fit is kept as the **check**. Two independent routes to the same
+curve, one from the projection's algebra and one from several hundred
+points it actually projected, agree on the form in **108 of 108**
+cases, and the drawn curve passes through those points to within
+3.1e-08 page units against an acceptance threshold of 1e-3.
 
 Two things this vocabulary can say that production's cannot, both
 found by clipping real pages rather than by reasoning about them:
 
 **A curve can cross a page more than once.** A circle and a rectangle
-meet in up to four points, so a great circle can leave the paper and
-come back. Twenty-one of the 109 combinations do it, and four of
-them come back in four separate runs. Production's
+meet in up to **eight** points — two per edge — which is up to four
+separate runs of curve on the paper. Twenty-one of the 108
+combinations leave the page and come back, and four of them come back
+in four runs. Production's
 `GreatCirclePage.clip` returns `Optional<Arc>`, which can only answer
 "once" or "not at all", so it would draw one piece and silently drop
 the rest. **The replacement returns a list of runs.**
@@ -210,7 +272,7 @@ on either side.
 
 What the study bought by taking it seriously anyway is the third
 word. The elliptical run is written, measured and drawn on 17 of the
-study's 109 combinations, so #301 is an **addition** rather
+study's 108 combinations, so #301 is an **addition** rather
 than a redesign of it — one record and one clipping rule, with
 nothing that already existed changed to admit it. That is what the
 milestone meant by studying the globe from the beginning so the seam
@@ -280,13 +342,19 @@ was would be a sheet that could not be checked.
 
 - **#298 — the curve vocabulary.** Replace `GreatCirclePage.clip`'s
   `Optional<Arc>` with the three exact forms and a list of runs with
-  optional ends. `ReferenceInk` draws each run's own shape and names
-  the curve at an end when it has one.
+  optional ends. The forms come from `Projection.greatCircle(pole)`
+  in closed form — no sampling, and no caller asking which form it
+  got. `ReferenceInk` draws each run's own shape and names the curve
+  at an end when it has one.
 
 - **#299 — the overview page.** Stereographic at 60, 90 and 120
   degrees as three more rungs, with the field-linked default
   magnitude above. Recentre, pan and the transition back to a
-  detailed page, all through `unproject`.
+  detailed page, all through `unproject`. **It also owes the
+  confirmation this gate could not give**: the same ink measure over
+  real renderer-drawn pages, with labels and the renderer's own
+  stroke policy, either adopting the rungs and defaults above or
+  stating what it changed them to and why.
 
 - **#300 — identity.** The projection's name in the title block, the
   accessible description and the sheet metadata.

@@ -49,6 +49,19 @@ final class StudyMapping {
         return projection.project(position).map(this::toPage);
     }
 
+    /**
+     * A curve from the projection's plane onto the page.
+     *
+     * <p>The mapping is a similarity - scale, half a turn, move - so
+     * each of the three forms stays the form it was, and this is why
+     * one vocabulary serves in both places. The half turn is the
+     * atlas's own convention arriving: east to the left and north
+     * up, on a page whose y runs down.
+     */
+    PlaneCurve onPage(PlaneCurve curve) {
+        return curve.mapped(pageUnitsPerPlaneUnit, centreX, centreY);
+    }
+
     /** The other way, for identifying what a reader points at. */
     Optional<SkyPosition> skyAt(Point2D page) {
         return projection.unproject(new PlanePoint(

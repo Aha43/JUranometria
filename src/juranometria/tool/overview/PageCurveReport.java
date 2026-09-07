@@ -55,9 +55,19 @@ final class PageCurveReport {
     static int rows;
     static double worstMiss;
 
+    /**
+     * How often the form the projection stated was also the form an
+     * independent fit to projected points arrived at, and how often
+     * it was not.
+     */
+    static int agreed;
+    static int disagreed;
+
     static String of(double[] widths, double wide, double high) {
         rows = 0;
         worstMiss = 0.0;
+        agreed = 0;
+        disagreed = 0;
         Rectangle2D page = new Rectangle2D.Double(0, 0, wide, high);
         StringBuilder out = new StringBuilder();
         out.append("| projection | centre | field | circle | form |"
@@ -81,14 +91,23 @@ final class PageCurveReport {
                         if (built.isEmpty()) {
                             continue;
                         }
-                        List<PageCurve.Run> runs =
+                        List<PlaneCurve.Run> runs =
                                 built.get().curve().clipTo(page);
                         if (runs.isEmpty()) {
                             continue;  // off the page is silence
                         }
                         boolean closed = runs.stream()
-                                .anyMatch(PageCurve.Run::closed);
+                                .anyMatch(PlaneCurve.Run::closed);
                         rows++;
+                        // The same curve, arrived at the other way.
+                        String fitted = PageCurves
+                                .fitted(mapping, circle.pole(), 720)
+                                .map(PlaneCurve::form).orElse("none");
+                        if (fitted.equals(built.get().curve().form())) {
+                            agreed++;
+                        } else {
+                            disagreed++;
+                        }
                         if (!Double.isNaN(built.get().residual())) {
                             worstMiss = Math.max(worstMiss,
                                     built.get().residual());

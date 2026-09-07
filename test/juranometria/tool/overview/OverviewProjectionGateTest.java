@@ -72,13 +72,88 @@ class OverviewProjectionGateTest {
 
     @Test
     void everyGreatCircleOnEveryStudiedPageTakesAnExactForm() {
-        // The issue refuses a sampled-polyline compromise. This is
-        // that refusal, measured: over the whole grid the study
-        // reports, no combination falls back to sampling and none
-        // misses its own projected points by more than the
-        // acceptance threshold.
+        // The issue refuses a sampled-polyline compromise, and the
+        // vocabulary has no sampled member to fall back to, so this
+        // asks the two questions that are left: that the projection
+        // states a form at all, and that the curve it states passes
+        // through points the projection genuinely produced.
         Rectangle2D page = new Rectangle2D.Double(0, 0, 900, 700);
         int checked = 0;
+        for (Case each : grid()) {
+            var built = PageCurves.greatCircle(each.mapping(),
+                    each.pole(), 720);
+            if (built.isEmpty()
+                    || built.get().curve().clipTo(page).isEmpty()) {
+                continue;
+            }
+            checked++;
+            assertTrue(built.get().residual() < PageCurves.EXACT,
+                    each + " misses its own projected points by "
+                            + built.get().residual());
+        }
+        assertTrue(checked > 100, "the grid the decision quotes is the"
+                + " grid measured here: " + checked + " combinations");
+    }
+
+    @Test
+    void theProjectionStatesTheCurveAndDoesNotHaveToBeAskedTwice() {
+        // The finding a review made of this gate's first proposal.
+        // An interface that only maps points forces its caller to
+        // sample and then to type-check; this one answers. The check
+        // is that the closed form and an independent fit to several
+        // hundred projected points name the same form every time -
+        // two derivations that could not plausibly be wrong in the
+        // same way.
+        int agreed = 0;
+        for (Case each : grid()) {
+            String stated = each.mapping().projection()
+                    .greatCircle(each.pole()).map(PlaneCurve::form)
+                    .orElse("none");
+            String fitted = PageCurves
+                    .fitted(each.mapping(), each.pole(), 720)
+                    .map(PlaneCurve::form).orElse("none");
+            assertEquals(fitted, stated, each + ": the form the"
+                    + " projection states and the form fitted to the"
+                    + " points it projected");
+            if (!"none".equals(stated)) {
+                agreed++;
+            }
+        }
+        assertTrue(agreed > 100,
+                "over a grid worth quoting: " + agreed + " curves");
+    }
+
+    @Test
+    void theVocabularyHasThreeWordsAndAllOfThemAreUsed() {
+        // If a form were never reached, it would be a word in the
+        // vocabulary that nothing had checked - and #301 is only an
+        // addition rather than a redesign because the elliptical form
+        // is written and exercised now.
+        java.util.Set<String> forms = new java.util.TreeSet<>();
+        for (Case each : grid()) {
+            each.mapping().projection().greatCircle(each.pole())
+                    .ifPresent(curve -> forms.add(curve.form()));
+        }
+        assertEquals(java.util.Set.of("circular", "elliptical",
+                "straight"), forms,
+                "the three forms the decision names, all reached");
+    }
+
+    /** One projection, one field, one great circle. */
+    private record Case(String projection, String field,
+                        StudyMapping mapping, SkyPosition pole,
+                        String circle, double width) {
+
+        @Override
+        public String toString() {
+            return projection + " " + circle + " over " + field + " at "
+                    + width + " degrees";
+        }
+    }
+
+    /** The grid the study reports, as the tests read it. */
+    private static List<Case> grid() {
+        List<Case> cases = new java.util.ArrayList<>();
         for (String name : List.of("gnomonic", "stereographic",
                 "orthographic")) {
             for (PageCurveReport.Field field : PageCurveReport.FIELDS) {
@@ -92,30 +167,13 @@ class OverviewProjectionGateTest {
                             width, 900, 700);
                     for (PageCurveReport.Circle circle
                             : PageCurveReport.CIRCLES) {
-                        var built = PageCurves.greatCircle(mapping,
-                                circle.pole(), 720);
-                        if (built.isEmpty()
-                                || built.get().curve().clipTo(page)
-                                        .isEmpty()) {
-                            continue;
-                        }
-                        checked++;
-                        assertFalse(
-                                built.get().curve()
-                                        instanceof PageCurve.Sampled,
-                                name + " draws " + circle.name() + " at "
-                                        + width + " degrees exactly, not"
-                                        + " by sampling it");
-                        assertTrue(built.get().residual() < PageCurves.EXACT,
-                                name + " " + circle.name() + " at " + width
-                                        + " degrees misses its own points"
-                                        + " by " + built.get().residual());
+                        cases.add(new Case(name, field.name(), mapping,
+                                circle.pole(), circle.name(), width));
                     }
                 }
             }
         }
-        assertTrue(checked > 100, "the grid the decision quotes is the"
-                + " grid measured here: " + checked + " combinations");
+        return cases;
     }
 
     @Test
@@ -123,44 +181,26 @@ class OverviewProjectionGateTest {
         // Production's Optional<Arc> can say "once" or "not at all".
         // Both halves matter: that more than one run really happens,
         // so the wider return type is earned, and that the clipper
-        // never reports more pieces than a curve and a rectangle can
-        // make - four - which an earlier version of it did, by
-        // counting a grazing touch as a way in.
+        // never reports more runs than a curve and a rectangle can
+        // make. They meet in up to eight points - two per edge - so
+        // four runs is the ceiling, and an earlier version of the
+        // clipper passed it by counting a grazing touch as a way in.
         Rectangle2D page = new Rectangle2D.Double(0, 0, 900, 700);
         int severalRuns = 0;
-        for (String name : List.of("gnomonic", "stereographic",
-                "orthographic")) {
-            for (PageCurveReport.Field field : PageCurveReport.FIELDS) {
-                StudyProjection projection =
-                        Candidates.named(name, field.centre());
-                for (double width : new double[] {42, 60, 90, 120, 180}) {
-                    if (width / 2.0 >= projection.limitDegrees()) {
-                        continue;
-                    }
-                    StudyMapping mapping = new StudyMapping(projection,
-                            width, 900, 700);
-                    for (PageCurveReport.Circle circle
-                            : PageCurveReport.CIRCLES) {
-                        var built = PageCurves.greatCircle(mapping,
-                                circle.pole(), 720);
-                        if (built.isEmpty()) {
-                            continue;
-                        }
-                        List<PageCurve.Run> runs =
-                                built.get().curve().clipTo(page);
-                        int most = built.get().curve()
-                                instanceof PageCurve.Straight ? 1 : 4;
-                        assertTrue(runs.size() <= most,
-                                name + " " + circle.name() + " at " + width
-                                        + " degrees comes back in "
-                                        + runs.size() + " runs, where "
-                                        + most + " is the most the"
-                                        + " geometry allows");
-                        if (runs.size() > 1) {
-                            severalRuns++;
-                        }
-                    }
-                }
+        for (Case each : grid()) {
+            var built = PageCurves.greatCircle(each.mapping(),
+                    each.pole(), 720);
+            if (built.isEmpty()) {
+                continue;
+            }
+            List<PlaneCurve.Run> runs = built.get().curve().clipTo(page);
+            int most = built.get().curve()
+                    instanceof PlaneCurve.Straight ? 1 : 4;
+            assertTrue(runs.size() <= most, each + " comes back in "
+                    + runs.size() + " runs, where " + most + " is the"
+                    + " most the geometry allows");
+            if (runs.size() > 1) {
+                severalRuns++;
             }
         }
         assertTrue(severalRuns > 0, "real pages do ask for more than one"
@@ -185,7 +225,7 @@ class OverviewProjectionGateTest {
         Rectangle2D page = new Rectangle2D.Double(0, 0, 900, 700);
         StudyMapping mapping = new StudyMapping(
                 Candidates.stereographic(POLE), 180.0, 900, 700);
-        List<PageCurve.Run> runs = PageCurves
+        List<PlaneCurve.Run> runs = PageCurves
                 .greatCircle(mapping, POLE, 720).orElseThrow()
                 .curve().clipTo(page);
 
@@ -212,7 +252,7 @@ class OverviewProjectionGateTest {
         StudyMapping mapping = new StudyMapping(
                 Candidates.stereographic(POLE), 240.0, 900, 700);
         var built = PageCurves.greatCircle(mapping, POLE, 720).orElseThrow();
-        List<PageCurve.Run> runs = built.curve()
+        List<PlaneCurve.Run> runs = built.curve()
                 .clipTo(new Rectangle2D.Double(0, 0, 900, 700));
         assertEquals(1, runs.size(), "a closed curve is one run");
         assertTrue(runs.get(0).closed(),
@@ -226,7 +266,7 @@ class OverviewProjectionGateTest {
         var onPage = PageCurves.greatCircle(narrower, POLE, 720)
                 .orElseThrow().curve()
                 .clipTo(new Rectangle2D.Double(0, 0, 900, 700));
-        assertTrue(onPage.stream().noneMatch(PageCurve.Run::closed),
+        assertTrue(onPage.stream().noneMatch(PlaneCurve.Run::closed),
                 "at 120 degrees the same circle leaves the page");
     }
 

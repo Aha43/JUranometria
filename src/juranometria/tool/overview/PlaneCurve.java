@@ -2,62 +2,57 @@ package juranometria.tool.overview;
 
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The proposed vocabulary for a great circle on a page (issue #296).
+ * What a great circle becomes on a plane (issue #296).
  *
  * <p>Production has one word for this, and it is
  * {@code GreatCirclePage.Arc}: two endpoints, drawn as a
  * {@link Line2D}, because a great circle is straight under the
- * gnomonic projection and under no other. {@link CurveForm}'s
- * measurements say what the smallest honest replacement is:
+ * gnomonic projection and under no other. These are the three words
+ * that cover all three candidates, and there is no fourth:
  *
  * <ul>
- *   <li>a <strong>straight</strong> run - gnomonic always, and either
- *       of the others when the circle passes through the page
- *       centre;</li>
- *   <li>a <strong>circular</strong> run - stereographic otherwise,
- *       exactly, to about 1e-14 of a page unit;</li>
+ *   <li>a <strong>straight</strong> run - every gnomonic great circle,
+ *       and any circle through the centre under the other two;</li>
+ *   <li>a <strong>circular</strong> run - every other stereographic
+ *       great circle;</li>
  *   <li>an <strong>elliptical</strong> run - every orthographic great
- *       circle, exactly, and nothing else needs it;</li>
- *   <li>a <strong>sampled</strong> run - a last resort that no page
- *       measured in this study fell back to, kept so that a
- *       projection nobody has thought of yet is drawn coarsely
- *       rather than wrongly.</li>
+ *       circle, and nothing else needs it.</li>
  * </ul>
  *
- * <p>Two things here are not in production's vocabulary at all, and
- * both are found by drawing rather than by reasoning:
+ * <p>There is deliberately no sampled member. A projection states its
+ * own curve in closed form (`StudyProjection.greatCircle`), so no
+ * caller ever samples one, and because all three forms exist now,
+ * adding the orthographic globe in issue #301 widens nothing. A
+ * caller draws {@link #shape()} and clips with {@link #clipTo}
+ * without asking which of the three it holds.
  *
- * <ol>
- *   <li>a curve can cross one page in <strong>more than one
- *       run</strong> - a circle meets a rectangle in up to four
- *       points - where production's {@code Optional<Arc>} can only
- *       say "once" or "not at all";</li>
- *   <li>a curve can be <strong>closed</strong> on the page, wholly
- *       inside the paper with no ends at all, which is what the
- *       celestial equator does on a pole-centred overview. The label
- *       rule "where the line leaves the paper" has no anchor for
- *       it.</li>
- * </ol>
+ * <p>The same three words serve in the projection's plane and on the
+ * page, because {@link StudyMapping#onPage} is a similarity: it
+ * scales, turns through half a turn, and moves. A line stays a line,
+ * a circle stays a circle, and an ellipse keeps its axes.
  */
-sealed interface PageCurve {
+sealed interface PlaneCurve {
 
-    /** The whole projected curve, for handing to a Graphics2D. */
+    /** The whole curve, for handing to a Graphics2D. */
     Shape shape();
 
-    /** What this run is, for the report. */
+    /** What this curve is, for the report. */
     String form();
 
-    /** The visible runs of this curve on a page, in drawing order. */
+    /** The visible runs of this curve inside a rectangle. */
     List<Run> clipTo(Rectangle2D page);
+
+    /** The same curve after a similarity: scale, half turn, move. */
+    PlaneCurve mapped(double scale, double centreX, double centreY);
 
     /**
      * One visible run: what to draw, and the two ends a label may
@@ -70,8 +65,33 @@ sealed interface PageCurve {
         }
     }
 
-    /** A great circle through the page centre, and every gnomonic one. */
-    record Straight(Line2D.Double line) implements PageCurve {
+    /** A great circle through the centre, and every gnomonic one. */
+    record Straight(Line2D.Double line) implements PlaneCurve {
+
+        /**
+         * The line {@code a + b xi + c eta = 0}, as two points far
+         * enough apart to cross any page.
+         */
+        static Straight of(double a, double b, double c) {
+            double length = Math.hypot(b, c);
+            // Nearest point to the origin, then a long way each way
+            // along the perpendicular.
+            double nearestX = -a * b / (length * length);
+            double nearestY = -a * c / (length * length);
+            double alongX = -c / length;
+            double alongY = b / length;
+            // Far enough to cross any page at any scale the atlas
+            // uses, and no further: a line carried out to a million
+            // plane units becomes a billion page units, where the
+            // arithmetic that measures a point's distance from it
+            // loses seven digits to cancellation. It showed up as a
+            // worst miss of 1.1e-07 where the circles were reading
+            // 1e-11.
+            double far = 1.0e3;
+            return new Straight(new Line2D.Double(
+                    nearestX - far * alongX, nearestY - far * alongY,
+                    nearestX + far * alongX, nearestY + far * alongY));
+        }
 
         @Override
         public Shape shape() {
@@ -81,6 +101,14 @@ sealed interface PageCurve {
         @Override
         public String form() {
             return "straight";
+        }
+
+        @Override
+        public PlaneCurve mapped(double scale, double centreX,
+                                 double centreY) {
+            return new Straight(new Line2D.Double(
+                    centreX - scale * line.x1, centreY - scale * line.y1,
+                    centreX - scale * line.x2, centreY - scale * line.y2));
         }
 
         @Override
@@ -102,11 +130,11 @@ sealed interface PageCurve {
                     }
                     continue;
                 }
-                double t = q[edge] / p[edge];
+                double at = q[edge] / p[edge];
                 if (p[edge] < 0.0) {
-                    window[0] = Math.max(window[0], t);
+                    window[0] = Math.max(window[0], at);
                 } else {
-                    window[1] = Math.min(window[1], t);
+                    window[1] = Math.min(window[1], at);
                 }
             }
             if (window[0] >= window[1]) {
@@ -120,9 +148,9 @@ sealed interface PageCurve {
         }
     }
 
-    /** A great circle under stereographic that misses the page centre. */
+    /** A great circle under stereographic that misses the centre. */
     record Circular(double centreX, double centreY, double radius)
-            implements PageCurve {
+            implements PlaneCurve {
 
         @Override
         public Shape shape() {
@@ -133,6 +161,12 @@ sealed interface PageCurve {
         @Override
         public String form() {
             return "circular";
+        }
+
+        @Override
+        public PlaneCurve mapped(double scale, double intoX, double intoY) {
+            return new Circular(intoX - scale * centreX,
+                    intoY - scale * centreY, scale * radius);
         }
 
         @Override
@@ -147,11 +181,10 @@ sealed interface PageCurve {
             crossings.addAll(meets(page.getMaxX(), page.getMinY(),
                     page.getMaxY(), false));
             return CurveRuns.of(crossings, this::at,
-                    (from, span) -> new java.awt.geom.Arc2D.Double(
-                            centreX - radius, centreY - radius,
-                            2.0 * radius, 2.0 * radius,
+                    (from, span) -> new Arc2D.Double(centreX - radius,
+                            centreY - radius, 2.0 * radius, 2.0 * radius,
                             Math.toDegrees(-from), Math.toDegrees(-span),
-                            java.awt.geom.Arc2D.OPEN),
+                            Arc2D.OPEN),
                     page, shape());
         }
 
@@ -189,20 +222,21 @@ sealed interface PageCurve {
      * <p>The third word, and the one issue #301 would need. It is
      * here because the alternative was a sampled polyline, which
      * this gate is not allowed to compromise on - and because a
-     * vocabulary that can be extended by writing one more record is
-     * a different thing from one that has to be redesigned.
+     * vocabulary written whole today is one #301 does not have to
+     * widen.
      *
      * <p>Clipping needs no new geometry either. An ellipse is a
      * circle under one affine change of variables, so the page's own
      * edges are carried into the frame where the curve is a unit
-     * circle, cut there, and the answers carried back.
+     * circle, cut there with the same arithmetic, and the answers
+     * carried back.
      */
     record Elliptical(double centreX, double centreY, double radiusAlong,
                       double radiusAcross, double tiltRadians)
-            implements PageCurve {
+            implements PlaneCurve {
 
-        /** Unit circle to page. */
-        private AffineTransform toPage() {
+        /** Unit circle to this ellipse. */
+        private AffineTransform onto() {
             AffineTransform onto = new AffineTransform();
             onto.translate(centreX, centreY);
             onto.rotate(tiltRadians);
@@ -212,7 +246,7 @@ sealed interface PageCurve {
 
         @Override
         public Shape shape() {
-            return toPage().createTransformedShape(
+            return onto().createTransformedShape(
                     new Ellipse2D.Double(-1, -1, 2, 2));
         }
 
@@ -222,8 +256,17 @@ sealed interface PageCurve {
         }
 
         @Override
+        public PlaneCurve mapped(double scale, double intoX, double intoY) {
+            // Half a turn leaves an axis on the same line, so only
+            // the centre and the two radii move.
+            return new Elliptical(intoX - scale * centreX,
+                    intoY - scale * centreY, scale * radiusAlong,
+                    scale * radiusAcross, tiltRadians);
+        }
+
+        @Override
         public List<Run> clipTo(Rectangle2D page) {
-            AffineTransform onto = toPage();
+            AffineTransform onto = onto();
             AffineTransform back;
             try {
                 back = onto.createInverse();
@@ -242,10 +285,9 @@ sealed interface PageCurve {
             }
             return CurveRuns.of(crossings, angle -> at(onto, angle),
                     (from, span) -> onto.createTransformedShape(
-                            new java.awt.geom.Arc2D.Double(-1, -1, 2, 2,
+                            new Arc2D.Double(-1, -1, 2, 2,
                                     Math.toDegrees(-from),
-                                    Math.toDegrees(-span),
-                                    java.awt.geom.Arc2D.OPEN)),
+                                    Math.toDegrees(-span), Arc2D.OPEN)),
                     page, shape());
         }
 
@@ -280,58 +322,6 @@ sealed interface PageCurve {
                         from.getX() + along * dx));
             }
             return found;
-        }
-    }
-
-    /** Anything the two exact forms cannot hold, at a stated step. */
-    record Sampled(List<Point2D> points, double stepDegrees)
-            implements PageCurve {
-
-        @Override
-        public Shape shape() {
-            Path2D.Double path = new Path2D.Double();
-            boolean started = false;
-            for (Point2D point : points) {
-                if (!started) {
-                    path.moveTo(point.getX(), point.getY());
-                    started = true;
-                } else {
-                    path.lineTo(point.getX(), point.getY());
-                }
-            }
-            return path;
-        }
-
-        @Override
-        public String form() {
-            return "sampled";
-        }
-
-        @Override
-        public List<Run> clipTo(Rectangle2D page) {
-            List<Run> runs = new ArrayList<>();
-            Path2D.Double open = null;
-            Point2D first = null;
-            Point2D last = null;
-            for (Point2D point : points) {
-                if (page.contains(point)) {
-                    if (open == null) {
-                        open = new Path2D.Double();
-                        open.moveTo(point.getX(), point.getY());
-                        first = point;
-                    } else {
-                        open.lineTo(point.getX(), point.getY());
-                    }
-                    last = point;
-                } else if (open != null) {
-                    runs.add(new Run(open, first, last));
-                    open = null;
-                }
-            }
-            if (open != null) {
-                runs.add(new Run(open, first, last));
-            }
-            return runs;
         }
     }
 }

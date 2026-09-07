@@ -36,14 +36,14 @@ final class CurveRuns {
      * @param arc       the curve's arc from an angle through a span
      * @param whole     the entire closed curve, for a run with no ends
      */
-    static List<PageCurve.Run> of(List<Double> crossings,
+    static List<PlaneCurve.Run> of(List<Double> crossings,
                                   DoubleFunction<Point2D> at,
                                   Arc arc, Rectangle2D page, Shape whole) {
         if (crossings.isEmpty()) {
             // Either the curve lies wholly on the paper, or nowhere
             // near it. One point on it decides which.
             return page.contains(at.apply(0.0))
-                    ? List.of(new PageCurve.Run(whole, null, null))
+                    ? List.of(new PlaneCurve.Run(whole, null, null))
                     : List.of();
         }
         crossings = new ArrayList<>(crossings);
@@ -70,10 +70,10 @@ final class CurveRuns {
             all &= each;
         }
         if (all) {
-            return List.of(new PageCurve.Run(whole, null, null));
+            return List.of(new PlaneCurve.Run(whole, null, null));
         }
 
-        List<PageCurve.Run> runs = new ArrayList<>();
+        List<PlaneCurve.Run> runs = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             if (!inside[i] || inside[(i - 1 + count) % count]) {
                 continue;  // not the start of a run
@@ -84,7 +84,7 @@ final class CurveRuns {
             }
             double start = crossings.get(i);
             double through = span(crossings.get((last + 1) % count), start);
-            runs.add(new PageCurve.Run(arc.from(start, through),
+            runs.add(new PlaneCurve.Run(arc.from(start, through),
                     at.apply(start), at.apply(start + through)));
         }
         return runs;
