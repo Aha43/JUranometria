@@ -86,6 +86,14 @@ chart.
 
 ## Printing
 
+**This has not been checked on paper yet, and we would like your
+help.** The sheet's sizes are worked out exactly, but nobody has held
+a printed one against a ruler or read one by torchlight at a
+telescope. If you print one, [issue #293](https://github.com/Aha43/JUranometria/issues/293)
+says what is worth reporting — your printer, your settings, a few
+measurements, and whether the faintest stars and smallest labels are
+actually readable.
+
 Open the PDF and print it. In the print dialog, choose **actual
 size** — not "fit to page", which is usually the default and will
 shrink the sheet by a few per cent to fit inside your printer's own

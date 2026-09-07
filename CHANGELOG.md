@@ -104,6 +104,36 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   What they proved is proved against the sheets a reader actually
   gets, in `docs/studies/chart-sheet`.
 
+### Not yet verified on paper
+
+- **The PDF has not been printed and measured**, and nothing here
+  claims otherwise. The sheets have automated evidence for their
+  geometry, their physical dimensions, their metadata, their
+  clipping, the order they are painted in, and for being readable by
+  parsers and decoders that did not write them — but no sheet from
+  this sprint has been on paper, held against a ruler, or read by
+  torchlight at an observing table.
+
+  **If you print one, please tell us what you find** on
+  [issue #293](https://github.com/Aha43/JUranometria/issues/293).
+  What is useful:
+
+  - your printer model;
+  - that you used **A4** at **Actual size / 100%**;
+  - that **Fit to page**, **Shrink oversized pages**, **borderless**
+    and any **scale to fit** were switched off;
+  - the measured margin from paper edge to chart frame, and the
+    chart frame itself;
+  - whether the faintest star reads as a **mark rather than a
+    speck**;
+  - whether the smallest label reads as a **word rather than a
+    smudge**, under a torch at arm's length.
+
+  The expected figures in `docs/studies/chart-sheet/measurements.md`
+  are provisional targets taken from the sheet's own ink. Paper
+  evidence outranks them: if a printed sheet disagrees, the sheet is
+  what changes.
+
 ### Unchanged
 
 - **The projection.** The chart is gnomonic at 42 degrees exactly as

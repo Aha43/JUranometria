@@ -120,6 +120,12 @@ public final class ChartSheetStudyMain {
                 + " light. Every figure is taken from the sheet"
                 + " itself, not from\nthe gate's candidate"
                 + " numbers.\n\n");
+        report.append("They are **provisional targets, not"
+                + " findings**. Nothing here has been\nprinted."
+                + " Issue #293 owns the paper check, and paper"
+                + " evidence outranks\nthis table: if a printed sheet"
+                + " disagrees, the sheet is what"
+                + " changes.\n\n");
         report.append(printChecks());
         report.append("\nA sheet that measures right and cannot be"
                 + " read is still a failure.\nThe last two rows are"
@@ -133,7 +139,7 @@ public final class ChartSheetStudyMain {
         report.append("**Nothing on this page has been printed.** The"
                 + " sizes above are arithmetic\nand the tests are"
                 + " arithmetic; legibility on paper is neither."
-                + " Issue #287\nowes a printed sheet measured with a"
+                + " Issue #293\nowns a printed sheet measured with a"
                 + " ruler, and that measurement can\nrevise these"
                 + " numbers.\n\n");
         report.append("**Label positions are this machine's.** The"
@@ -170,7 +176,7 @@ public final class ChartSheetStudyMain {
         }
 
         StringBuilder checks = new StringBuilder();
-        checks.append("| measure | expect |\n|---|---:|\n");
+        checks.append("| measure | provisional target |\n|---|---:|\n");
         checks.append(String.format(Locale.ROOT,
                 "| the sheet, edge to edge | %.1f x %.1f mm |%n",
                 PaperSize.A4.wideMm(), PaperSize.A4.highMm()));

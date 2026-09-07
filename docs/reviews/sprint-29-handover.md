@@ -242,26 +242,22 @@ turned up before anything reached paper. It is fixed and regressed.
 **Owed, and not done:**
 
 - **A printed sheet measured with a ruler.** Nothing in this sprint
-  has been on paper. The final review named this as a P1, and it is
-  correct to: it is the only evidence that can settle legibility, and
-  no amount of arithmetic substitutes for it. **This is the one item
-  in Sprint 29 that cannot be done from here at all** - it needs a
-  printer, a sheet of A4 and a ruler. The expected measurements are in
-  [docs/studies/chart-sheet/measurements.md](../studies/chart-sheet/measurements.md)
-  under *What to measure on paper*, taken from the sheet's own ink:
-  the frame at 271.6 × 184.6 mm, the thinnest line at 0.353 mm, the
-  faintest star's disc at 1.83 mm, the smallest label at about
-  2.47 mm of capital height. Print `sheet-a4.pdf` at actual size.
-  The gate said this observation "can accept or revise these
-  numbers", and it still can.
-- **Opening a sheet in a vector editor.** The owner has now viewed
-  the SVG and rendered the PDF independently, which is what found
-  the paint-order defect; opening one in an editor and changing
-  something is still owed. Not possible from this environment: the
-  browser here cannot reach a local file or the loopback address,
-  and no vector editor is
-  available. `docs/studies/chart-sheet/` holds four SVGs, two PDFs
-  and a PNG for exactly this.
+  has been on paper, and nothing in this repository says otherwise.
+  The printer was not available, and the owner decided on 2026-09-07
+  that a release should not wait on one — several club members'
+  printers will be better evidence than one local sheet. It is
+  **deferred to [#293](https://github.com/Aha43/JUranometria/issues/293)**,
+  which owns the print, the measurements, the torchlight judgement,
+  and any stroke-width or type-size change they call for. The
+  figures in
+  [the chart-sheet study](../studies/chart-sheet/measurements.md) are
+  **provisional targets**, not findings; paper evidence is
+  authoritative when it arrives. The 1.10.0 release notes say all of
+  this and ask readers to help.
+
+- **Opening a sheet in a vector editor and changing something.**
+  Also #293's, for the same reason: not reachable from this
+  environment.
 
 Neither is a formality. The first is the only thing that can settle
 legibility, and the second is the only thing that can settle whether
@@ -269,8 +265,11 @@ the file a club member opens looks like a chart.
 
 ## Remaining risks
 
-- **Legibility on paper is unproven.** Every number is arithmetic.
-  A 1 pt line is 0.353 mm whether or not a printer resolves it.
+- **Legibility on paper is unproven**, and is now
+  [#293](https://github.com/Aha43/JUranometria/issues/293)'s to
+  settle. Every number is arithmetic: a 1 pt line is 0.353 mm
+  whether or not a printer resolves it. This is the sprint's largest
+  open risk and it ships stated rather than hidden.
 - **The 42° corner is 11.2% anisotropic** — a round cluster becomes
   an ellipse aimed at the page centre. That is inside the stated
   budget and has not been looked at on paper.

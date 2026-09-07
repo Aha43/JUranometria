@@ -47,7 +47,11 @@ shrinks it by a few per cent - and measure these with a ruler under
 ordinary light. Every figure is taken from the sheet itself, not from
 the gate's candidate numbers.
 
-| measure | expect |
+They are **provisional targets, not findings**. Nothing here has been
+printed. Issue #293 owns the paper check, and paper evidence outranks
+this table: if a printed sheet disagrees, the sheet is what changes.
+
+| measure | provisional target |
 |---|---:|
 | the sheet, edge to edge | 297.0 x 210.0 mm |
 | the margin, paper edge to chart frame | 12.7 mm |
@@ -64,8 +68,8 @@ be a word rather than a smudge, by torchlight, at arm's length.
 ## What is not settled here
 
 **Nothing on this page has been printed.** The sizes above are arithmetic
-and the tests are arithmetic; legibility on paper is neither. Issue #287
-owes a printed sheet measured with a ruler, and that measurement can
+and the tests are arithmetic; legibility on paper is neither. Issue #293
+owns a printed sheet measured with a ruler, and that measurement can
 revise these numbers.
 
 **Label positions are this machine's.** The renderer places a label with
