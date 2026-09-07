@@ -180,6 +180,20 @@ final class StudyMapping {
                 slope[0], slope[1]);
     }
 
+    /**
+     * Where this page may carry ink: the paper, and the limb if the
+     * projection has one.
+     */
+    PageRegion region() {
+        Rectangle2D paper = new Rectangle2D.Double(0, 0,
+                2.0 * centreX, 2.0 * centreY);
+        double visible = projection.visiblePlaneRadius();
+        return Double.isFinite(visible)
+                ? PageRegion.of(paper, centreX, centreY,
+                        visible * pageUnitsPerPlaneUnit)
+                : PageRegion.of(paper);
+    }
+
     /** The other way, for identifying what a reader points at. */    /** The other way, for identifying what a reader points at. */
     Optional<SkyPosition> skyAt(Point2D page) {
         return projection.unproject(new PlanePoint(

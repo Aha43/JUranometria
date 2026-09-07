@@ -73,6 +73,11 @@ final class Candidates {
             }
 
             @Override
+            public double visiblePlaneRadius() {
+                return Double.POSITIVE_INFINITY;
+            }
+
+            @Override
             public Optional<PlaneConic> greatCircle(SkyPosition pole) {
                 return gnomonicCircle(inFrame(centre, pole));
             }
@@ -92,7 +97,8 @@ final class Candidates {
                 // a different projection from the documented one.
                 // The antipode is excluded where it actually fails,
                 // by its radius not being finite, and nowhere else.
-                180.0, Candidates::stereographicCircle);
+                180.0, Double.POSITIVE_INFINITY,
+                Candidates::stereographicCircle);
     }
 
     /** r = sin(theta): the globe's own outline, one hemisphere. */
@@ -105,7 +111,10 @@ final class Candidates {
                 // draws best, and disagreed with project(), which
                 // places a point at ninety degrees quite happily.
                 radius -> radius > 1.0 ? Double.NaN : Math.asin(radius),
-                90.0, Candidates::orthographicCircle);
+                // A globe has an edge, and it is at a plane radius
+                // of one: a point ninety degrees from the centre
+                // lands at sin(90) and there is nothing beyond it.
+                90.0, 1.0, Candidates::orthographicCircle);
     }
 
     /**
@@ -123,11 +132,18 @@ final class Candidates {
                                              java.util.function.DoubleUnaryOperator radiusOf,
                                              java.util.function.DoubleUnaryOperator angleOf,
                                              double limitDegrees,
+                                             double visibleRadius,
                                              CircleForm circleForm) {
         double centreRa = Math.toRadians(centre.raDegrees());
         double centreDec = Math.toRadians(centre.decDegrees());
         double sinCentreDec = Math.sin(centreDec);
         double cosCentreDec = Math.cos(centreDec);
+        // Compared in radians, because the limb is exactly where the
+        // comparison happens: a point ninety degrees out gives an
+        // angle of pi/2 to the last bit, and converting that to
+        // degrees and back can land a hair above 90.0 and refuse the
+        // one circle a globe draws best.
+        double limitRadians = Math.toRadians(limitDegrees);
 
         return new StudyProjection() {
 
@@ -149,37 +165,49 @@ final class Candidates {
                 double sinDec = Math.sin(dec);
                 double cosDec = Math.cos(dec);
 
-                double cosDistance = sinCentreDec * sinDec
-                        + cosCentreDec * cosDec * Math.cos(raOffset);
-                double distance = Math.acos(Math.clamp(cosDistance, -1.0, 1.0));
-                if (Math.toDegrees(distance) > limitDegrees) {
-                    return Optional.empty();
-                }
-                if (distance >= Math.PI
-                        || !Double.isFinite(
-                                radiusOf.applyAsDouble(distance))) {
-                    // The antipode is the one point no azimuthal
-                    // projection places, and it has to be refused by
-                    // its geometry rather than by its arithmetic:
-                    // tan(pi/2) comes back from a double as
-                    // 1.6e16, not as infinity, so a projection that
-                    // waited for an overflow would place the
-                    // unplaceable point at a radius of thirty
-                    // quadrillion and call it a success.
-                    return Optional.empty();
-                }
-                if (distance < 1e-12) {
-                    return Optional.of(new PlanePoint(0.0, 0.0));
-                }
-
-                // The same east/north directions the gnomonic
-                // projection uses, scaled to this projection's radius
-                // instead of the tangent plane's.
+                // The east and north parts of the direction from the
+                // centre. Their length is the sine of the angular
+                // distance, computed here rather than derived from
+                // its cosine, and that is the whole reason the angle
+                // below is found the way it is.
                 double east = cosDec * Math.sin(raOffset);
                 double north = cosCentreDec * sinDec
                         - sinCentreDec * cosDec * Math.cos(raOffset);
                 double length = Math.hypot(east, north);
+                double cosDistance = sinCentreDec * sinDec
+                        + cosCentreDec * cosDec * Math.cos(raOffset);
+
+                // From both parts, never from the cosine alone.
+                // Inverting a cosine is ill conditioned at both ends
+                // of its range - near zero and near a half turn a
+                // double's cosine has already lost the small
+                // difference the angle is made of - so acos there is
+                // accurate to about 1.5e-08 radians whatever it is
+                // given, and rounds a whole disc of sky three
+                // milliarcseconds across onto the antipode itself,
+                // where it was then refused as unplaceable. A review
+                // found that region. atan2 of the two parts is
+                // accurate at both ends, because the small part is
+                // measured rather than reconstructed.
+                double distance = Math.atan2(length, cosDistance);
+                if (distance > limitRadians) {
+                    return Optional.empty();
+                }
+                if (length == 0.0) {
+                    // On the axis: the centre itself, or the one
+                    // point opposite it that no azimuthal projection
+                    // places. An exact test for an exact condition,
+                    // where the old threshold quietly coalesced
+                    // everything within a fifth of a microarcsecond
+                    // of the centre.
+                    return cosDistance > 0.0
+                            ? Optional.of(new PlanePoint(0.0, 0.0))
+                            : Optional.empty();
+                }
                 double radius = radiusOf.applyAsDouble(distance);
+                if (!Double.isFinite(radius)) {
+                    return Optional.empty();
+                }
                 return Optional.of(new PlanePoint(radius * east / length,
                         radius * north / length));
             }
@@ -187,7 +215,9 @@ final class Candidates {
             @Override
             public Optional<SkyPosition> unproject(PlanePoint point) {
                 double radius = Math.hypot(point.xiEast(), point.etaNorth());
-                if (radius < 1e-15) {
+                if (radius == 0.0) {
+                    // The only radius with no direction to it. Every
+                    // other one divides safely below, however small.
                     return Optional.of(centre);
                 }
                 double distance = angleOf.applyAsDouble(radius);
@@ -218,6 +248,11 @@ final class Candidates {
             @Override
             public double limitDegrees() {
                 return limitDegrees;
+            }
+
+            @Override
+            public double visiblePlaneRadius() {
+                return visibleRadius;
             }
 
             @Override

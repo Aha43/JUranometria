@@ -25,7 +25,7 @@ is one a reader could not point at.
 | candidate | checked against | worst difference | round trip | reaches |
 |---|---|---:|---:|---:|
 | gnomonic | production's `GnomonicProjection` | 0.000e+00 | 7.7e-14° | 420 of 840 |
-| stereographic | Sprint 29's `StereographicCandidate` | 1.137e-13 | 7.8e-14° | 840 of 840 |
+| stereographic | Sprint 29's `StereographicCandidate` | 2.111e-13 | 7.8e-14° | 840 of 840 |
 | orthographic | its own definition, `sin(theta)` | 0.000e+00 | 3.3e-13° | 420 of 840 |
 
 The gnomonic candidate is not merely close to
@@ -118,6 +118,34 @@ and a whole hemisphere fits inside a radius of 2.0.
 The orthographic projection stops at a limb it can
 draw, which is why it makes a globe and not a chart.
 
+## Finding the angle
+
+Every measurement here rests on how far a position is
+from the page centre, and there are two ways to work
+that out. The obvious one inverts the cosine that
+falls out of the spherical triangle. It is wrong at
+both ends of its range: near zero and near a half
+turn a double's cosine has already lost the small
+difference the angle is made of, so `acos` there is
+accurate to about 1.5e-08 radians whatever it is
+given.
+
+What that cost was a disc of sky three
+milliarcseconds across around the antipode, rounded
+onto the antipode itself and then refused as
+unplaceable - a finite region of sky silently absent
+from a projection documented as showing everything
+but one point. At the other end it coalesced
+everything within a fifth of a microarcsecond of the
+centre onto the centre.
+
+The angle is now found from both parts of the
+direction at once, which is accurate at both ends
+because the small part is measured rather than
+reconstructed. Production's own gnomonic projection
+never forms an angle at all - it divides by the
+cosine directly - and is not affected.
+
 ## Pointing at something
 
 A reader points at a mark and the atlas says what it
@@ -176,10 +204,10 @@ is further down, and it is not this.
 | gnomonic | the ecliptic | 200 | 1.5e-14 | degenerate | 8.5e-14 |
 | gnomonic | a circle through the page centre | 199 | 0.0e+00 | degenerate | 0.0e+00 |
 | stereographic | the celestial equator | 400 | 2.6e-12 | degenerate | 9.8e-14 |
-| stereographic | the ecliptic | 400 | 1.0e+01 | 1.4e-14 | 2.5e-14 |
-| stereographic | a circle through the page centre | 399 | 5.2e-12 | 0.0e+00 | 3.6e-12 |
+| stereographic | the ecliptic | 400 | 1.0e+01 | 7.1e-15 | 2.1e-14 |
+| stereographic | a circle through the page centre | 400 | 5.1e+02 | 4.0e+00 | 4.0e+00 |
 | orthographic | the celestial equator | 200 | 7.4e-18 | degenerate | 1.4e-17 |
-| orthographic | the ecliptic | 200 | 3.9e-01 | 5.6e-02 | 1.5e-15 |
+| orthographic | the ecliptic | 200 | 3.9e-01 | 5.6e-02 | 8.9e-16 |
 | orthographic | a circle through the page centre | 200 | 0.0e+00 | degenerate | 0.0e+00 |
 
 So the vocabulary is three words, and all three are
@@ -289,9 +317,9 @@ are too large to work out at all:
 | 1e-01 | 6.36e-02 | 2.73e-12 |
 | 1e-02 | 6.36e-03 | 2.73e-12 |
 | 1e-03 **(chosen)** | 1.28e-03 | 2.73e-12 |
-| 1e-04 | 5.16e+04 | 2.73e-12 |
-| 1e-05 | 5.16e+04 | 2.73e-12 |
-| 1e-06 | 1.80e+308 | 2.73e-12 |
+| 1e-04 | 1.46e-01 | 2.73e-12 |
+| 1e-05 | 3.63e+01 | 2.73e-12 |
+| 1e-06 | 3.13e+02 | 2.73e-12 |
 
 Read the left column downwards. Curves near a
 degeneracy track the allowance exactly, as they
@@ -361,7 +389,7 @@ about it:
 | stereographic | Orion | 120° | a horizon | circular | 9.1e-13 | 1 | two per run |
 | stereographic | Orion | 180° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | stereographic | Orion | 180° | the ecliptic | circular | 4.5e-13 | 1 | two per run |
-| stereographic | Orion | 180° | a meridian | circular | 4.5e-13 | 1 | two per run |
+| stereographic | Orion | 180° | a meridian | circular | 2.3e-13 | 1 | two per run |
 | stereographic | Orion | 180° | a horizon | circular | 1.1e-12 | 1 | two per run |
 | stereographic | the north pole | 42° | a meridian | straight | 9.1e-13 | 1 | two per run |
 | stereographic | the north pole | 42° | a horizon | circular | 9.1e-13 | 1 | two per run |
@@ -372,40 +400,40 @@ about it:
 | stereographic | the north pole | 120° | the ecliptic | circular | 5.7e-13 | 2 | two per run |
 | stereographic | the north pole | 120° | a meridian | straight | 8.0e-13 | 1 | two per run |
 | stereographic | the north pole | 120° | a horizon | circular | 1.1e-12 | 1 | two per run |
-| stereographic | the north pole | 180° | the celestial equator | circular | 1.7e-13 | 2 | two per run |
-| stereographic | the north pole | 180° | the ecliptic | circular | 5.7e-13 | 1 | two per run |
+| stereographic | the north pole | 180° | the celestial equator | circular | 2.3e-13 | 2 | two per run |
+| stereographic | the north pole | 180° | the ecliptic | circular | 5.1e-13 | 1 | two per run |
 | stereographic | the north pole | 180° | a meridian | straight | 8.0e-13 | 1 | two per run |
 | stereographic | the north pole | 180° | a horizon | circular | 6.8e-13 | 1 | two per run |
-| stereographic | the vernal equinox | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | the vernal equinox | 42° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
 | stereographic | the vernal equinox | 42° | the ecliptic | straight | 4.8e-13 | 1 | two per run |
-| stereographic | the vernal equinox | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | the vernal equinox | 60° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
 | stereographic | the vernal equinox | 60° | the ecliptic | straight | 3.1e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 60° | a horizon | circular | 9.1e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | stereographic | the vernal equinox | 90° | the ecliptic | straight | 2.6e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 90° | a horizon | circular | 9.1e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 120° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
-| stereographic | the vernal equinox | 120° | the ecliptic | straight | 2.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | the ecliptic | straight | 3.4e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 120° | a meridian | circular | 3.4e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 120° | a horizon | circular | 6.8e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 180° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | stereographic | the vernal equinox | 180° | the ecliptic | straight | 3.4e-13 | 1 | two per run |
-| stereographic | the vernal equinox | 180° | a meridian | circular | 6.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | a meridian | circular | 8.0e-13 | 1 | two per run |
 | stereographic | the vernal equinox | 180° | a horizon | circular | 1.0e-12 | 1 | two per run |
 | orthographic | Orion | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | orthographic | Orion | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | Orion | 60° | the ecliptic | elliptical | 5.1e-13 | 4 | two per run |
-| orthographic | Orion | 60° | a meridian | elliptical | 3.6e-13 | 2 | two per run |
+| orthographic | Orion | 60° | the ecliptic | elliptical | 4.8e-13 | 4 | two per run |
+| orthographic | Orion | 60° | a meridian | elliptical | 3.4e-13 | 2 | two per run |
 | orthographic | Orion | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | orthographic | Orion | 90° | the ecliptic | elliptical | 4.7e-13 | 2 | two per run |
-| orthographic | Orion | 90° | a meridian | elliptical | 2.8e-13 | 2 | two per run |
-| orthographic | Orion | 90° | a horizon | elliptical | 5.2e-13 | 2 | two per run |
+| orthographic | Orion | 90° | a meridian | elliptical | 2.3e-13 | 2 | two per run |
+| orthographic | Orion | 90° | a horizon | elliptical | 4.7e-13 | 2 | two per run |
 | orthographic | Orion | 120° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | orthographic | Orion | 120° | the ecliptic | elliptical | 3.4e-13 | 2 | two per run |
 | orthographic | Orion | 120° | a meridian | elliptical | 3.4e-13 | 2 | two per run |
-| orthographic | Orion | 120° | a horizon | elliptical | 3.6e-13 | 4 | two per run |
+| orthographic | Orion | 120° | a horizon | elliptical | 3.4e-13 | 4 | two per run |
 | orthographic | the north pole | 42° | a meridian | straight | 8.0e-13 | 1 | two per run |
-| orthographic | the north pole | 42° | a horizon | elliptical | 9.6e-13 | 2 | two per run |
+| orthographic | the north pole | 42° | a horizon | elliptical | 8.2e-13 | 2 | two per run |
 | orthographic | the north pole | 60° | a meridian | straight | 6.8e-13 | 1 | two per run |
 | orthographic | the north pole | 60° | a horizon | elliptical | 8.7e-13 | 2 | two per run |
 | orthographic | the north pole | 90° | a meridian | straight | 3.4e-13 | 1 | two per run |
@@ -417,15 +445,15 @@ about it:
 | orthographic | the vernal equinox | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | orthographic | the vernal equinox | 42° | the ecliptic | straight | 6.0e-13 | 1 | two per run |
 | orthographic | the vernal equinox | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | the vernal equinox | 60° | the ecliptic | straight | 4.0e-13 | 1 | two per run |
-| orthographic | the vernal equinox | 60° | a horizon | elliptical | 9.2e-13 | 2 | two per run |
+| orthographic | the vernal equinox | 60° | the ecliptic | straight | 3.7e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 60° | a horizon | elliptical | 1.0e-12 | 2 | two per run |
 | orthographic | the vernal equinox | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | the vernal equinox | 90° | the ecliptic | straight | 2.6e-13 | 1 | two per run |
-| orthographic | the vernal equinox | 90° | a horizon | elliptical | 6.0e-13 | 2 | two per run |
+| orthographic | the vernal equinox | 90° | the ecliptic | straight | 3.1e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 90° | a horizon | elliptical | 8.0e-13 | 2 | two per run |
 | orthographic | the vernal equinox | 120° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | the vernal equinox | 120° | the ecliptic | straight | 2.0e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 120° | the ecliptic | straight | 2.6e-13 | 1 | two per run |
 | orthographic | the vernal equinox | 120° | a meridian | elliptical | 2.0e-13 | 2 | two per run |
-| orthographic | the vernal equinox | 120° | a horizon | elliptical | 6.0e-13 | 2 | two per run |
+| orthographic | the vernal equinox | 120° | a horizon | elliptical | 6.8e-13 | 2 | two per run |
 
 **A curve can cross one page more than once.** A
 circle and a rectangle meet in up to eight points -
@@ -451,6 +479,37 @@ circle in three pieces on one side of the page and
 one on the other. The vocabulary should be able to
 say "closed" even though nothing in Sprint 30 asks it
 to.
+
+## Where the sky stops
+
+A chart page is bounded by its paper. A globe page is
+bounded by the paper **and by the limb**, and beyond
+the limb there is no sky at all rather than empty sky.
+
+Leaving that out of the seam does not look like an
+omission on a page, which is what makes it worth
+recording. Every mark stopped at the limb by itself,
+because a mark is a projected point and a point off
+the hemisphere has no projection. Other ink did not,
+because it is drawn from its own equation, and the
+only thing clipping it was the rectangle: on a
+120-degree orthographic page, **379 pixels of ink lay
+beyond the globe's edge**, and none once the visible
+region is part of the clip.
+
+So a projection states how far ink may reach from the
+centre - infinite for the two chart projections, one
+for the globe - and every user of the seam clips to
+the paper and to that. Cutting a curve at a circular
+boundary needs no new machinery: a line meets a
+circle at the roots of one quadratic, two circles
+meet on their radical line. An ellipse meets a circle
+at the roots of a quartic, which this vocabulary does
+not have and does not need: every orthographic great
+circle lies inside its own limb, because a point an
+angle t from the centre lands at sin(t) and the limb
+is at one, so the two touch and never cross. That is
+measured over every page here rather than assumed.
 
 ## Where the atlas assumes one projection
 

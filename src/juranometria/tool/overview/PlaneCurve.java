@@ -48,8 +48,13 @@ sealed interface PlaneCurve {
     /** What this curve is, for the report. */
     String form();
 
-    /** The visible runs of this curve inside a rectangle. */
-    List<Run> clipTo(Rectangle2D page);
+    /** The visible runs of this curve inside a region. */
+    List<Run> clipTo(PageRegion region);
+
+    /** On a page with no edge to the sky. */
+    default List<Run> clipTo(Rectangle2D paper) {
+        return clipTo(PageRegion.of(paper));
+    }
 
     /** The same curve after a similarity: scale, half turn, move. */
     PlaneCurve mapped(double scale, double centreX, double centreY);
@@ -110,6 +115,32 @@ sealed interface PlaneCurve {
             return across(new Rectangle2D.Double(-1000, -1000, 2000, 2000));
         }
 
+        /**
+         * The part of a clipped segment that is inside the limb.
+         *
+         * <p>A line meets a circle at the roots of one quadratic, so
+         * this is exact and needs no sampling. Null when the segment
+         * is wholly outside.
+         */
+        private static double[] withinLimb(Line2D.Double line, double dx,
+                                           double dy, double[] window,
+                                           PageRegion region) {
+            double offsetX = line.x1 - region.limbX();
+            double offsetY = line.y1 - region.limbY();
+            double a = dx * dx + dy * dy;
+            double b = 2.0 * (offsetX * dx + offsetY * dy);
+            double c = offsetX * offsetX + offsetY * offsetY
+                    - region.limbRadius() * region.limbRadius();
+            double discriminant = b * b - 4.0 * a * c;
+            if (discriminant <= 0.0) {
+                return null;  // the line misses the globe entirely
+            }
+            double root = Math.sqrt(discriminant);
+            double lo = Math.max(window[0], (-b - root) / (2.0 * a));
+            double hi = Math.min(window[1], (-b + root) / (2.0 * a));
+            return lo >= hi ? null : new double[] {lo, hi};
+        }
+
         @Override
         public String form() {
             return "straight";
@@ -125,7 +156,8 @@ sealed interface PlaneCurve {
         }
 
         @Override
-        public List<Run> clipTo(Rectangle2D page) {
+        public List<Run> clipTo(PageRegion region) {
+            Rectangle2D page = region.paper();
             Line2D.Double line = across(page);
             double dx = line.x2 - line.x1;
             double dy = line.y2 - line.y1;
@@ -151,6 +183,18 @@ sealed interface PlaneCurve {
             }
             if (window[0] >= window[1]) {
                 return List.of();
+            }
+            if (region.bounded()) {
+                // And then to the limb, which cuts the same segment
+                // a second time. A straight run is where the ink left
+                // the globe: the equator on a committed orthographic
+                // page ran clean across the corners of the paper,
+                // outside the hemisphere it belongs to.
+                double[] cut = withinLimb(line, dx, dy, window, region);
+                if (cut == null) {
+                    return List.of();
+                }
+                window = cut;
             }
             Point2D from = new Point2D.Double(line.x1 + window[0] * dx,
                     line.y1 + window[0] * dy);
@@ -182,8 +226,10 @@ sealed interface PlaneCurve {
         }
 
         @Override
-        public List<Run> clipTo(Rectangle2D page) {
+        public List<Run> clipTo(PageRegion region) {
+            Rectangle2D page = region.paper();
             List<Double> crossings = new ArrayList<>();
+            crossings.addAll(meetsLimb(region));
             crossings.addAll(meets(page.getMinY(), page.getMinX(),
                     page.getMaxX(), true));
             crossings.addAll(meets(page.getMaxY(), page.getMinX(),
@@ -197,7 +243,42 @@ sealed interface PlaneCurve {
                             centreY - radius, 2.0 * radius, 2.0 * radius,
                             Math.toDegrees(-from), Math.toDegrees(-span),
                             Arc2D.OPEN),
-                    page, shape());
+                    region, shape());
+        }
+
+        /**
+         * Angles where this circle crosses the limb.
+         *
+         * <p>Two circles meet on their radical line, which is exact
+         * arithmetic and no more work than meeting an edge.
+         */
+        private List<Double> meetsLimb(PageRegion region) {
+            if (!region.bounded()) {
+                return List.of();
+            }
+            double apartX = region.limbX() - centreX;
+            double apartY = region.limbY() - centreY;
+            double apart = Math.hypot(apartX, apartY);
+            if (apart == 0.0) {
+                return List.of();  // concentric: never crosses
+            }
+            double along = (apart * apart + radius * radius
+                    - region.limbRadius() * region.limbRadius())
+                    / (2.0 * apart);
+            double square = radius * radius - along * along;
+            if (square <= 0.0) {
+                return List.of();
+            }
+            double off = Math.sqrt(square);
+            double unitX = apartX / apart;
+            double unitY = apartY / apart;
+            double footX = centreX + along * unitX;
+            double footY = centreY + along * unitY;
+            return List.of(
+                    CurveRuns.angle(footY - off * unitX - centreY,
+                            footX + off * unitY - centreX),
+                    CurveRuns.angle(footY + off * unitX - centreY,
+                            footX - off * unitY - centreX));
         }
 
         private Point2D at(double angle) {
@@ -277,7 +358,8 @@ sealed interface PlaneCurve {
         }
 
         @Override
-        public List<Run> clipTo(Rectangle2D page) {
+        public List<Run> clipTo(PageRegion region) {
+            Rectangle2D page = region.paper();
             AffineTransform onto = onto();
             AffineTransform back;
             try {
@@ -295,12 +377,21 @@ sealed interface PlaneCurve {
                 crossings.addAll(meets(back.transform(corners[at], null),
                         back.transform(corners[(at + 1) % 4], null)));
             }
+            // No limb crossings are collected here, and that is a
+            // claim rather than an omission: the only projection with
+            // a limb is orthographic, and every orthographic great
+            // circle lies inside its own limb, because a point an
+            // angle t from the centre lands at sin(t) and the limb is
+            // at one. The two touch and never cross. It is measured
+            // in OverviewProjectionGateTest; a projection with both a
+            // limb and elliptical curves that left it would need the
+            // ellipse-meets-circle quartic this does not have.
             return CurveRuns.of(crossings, angle -> at(onto, angle),
                     (from, span) -> onto.createTransformedShape(
                             new Arc2D.Double(-1, -1, 2, 2,
                                     Math.toDegrees(-from),
                                     Math.toDegrees(-span), Arc2D.OPEN)),
-                    page, shape());
+                    region, shape());
         }
 
         private static Point2D at(AffineTransform onto, double angle) {

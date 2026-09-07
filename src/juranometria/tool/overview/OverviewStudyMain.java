@@ -321,6 +321,34 @@ public final class OverviewStudyMain {
                 The orthographic projection stops at a limb it can
                 draw, which is why it makes a globe and not a chart.
 
+                ## Finding the angle
+
+                Every measurement here rests on how far a position is
+                from the page centre, and there are two ways to work
+                that out. The obvious one inverts the cosine that
+                falls out of the spherical triangle. It is wrong at
+                both ends of its range: near zero and near a half
+                turn a double's cosine has already lost the small
+                difference the angle is made of, so `acos` there is
+                accurate to about 1.5e-08 radians whatever it is
+                given.
+
+                What that cost was a disc of sky three
+                milliarcseconds across around the antipode, rounded
+                onto the antipode itself and then refused as
+                unplaceable - a finite region of sky silently absent
+                from a projection documented as showing everything
+                but one point. At the other end it coalesced
+                everything within a fifth of a microarcsecond of the
+                centre onto the centre.
+
+                The angle is now found from both parts of the
+                direction at once, which is accurate at both ends
+                because the small part is measured rather than
+                reconstructed. Production's own gnomonic projection
+                never forms an angle at all - it divides by the
+                cosine directly - and is not affected.
+
                 ## Pointing at something
 
                 A reader points at a mark and the atlas says what it
@@ -530,6 +558,37 @@ public final class OverviewStudyMain {
                 one on the other. The vocabulary should be able to
                 say "closed" even though nothing in Sprint 30 asks it
                 to.
+
+                ## Where the sky stops
+
+                A chart page is bounded by its paper. A globe page is
+                bounded by the paper **and by the limb**, and beyond
+                the limb there is no sky at all rather than empty sky.
+
+                Leaving that out of the seam does not look like an
+                omission on a page, which is what makes it worth
+                recording. Every mark stopped at the limb by itself,
+                because a mark is a projected point and a point off
+                the hemisphere has no projection. Other ink did not,
+                because it is drawn from its own equation, and the
+                only thing clipping it was the rectangle: on a
+                120-degree orthographic page, **379 pixels of ink lay
+                beyond the globe's edge**, and none once the visible
+                region is part of the clip.
+
+                So a projection states how far ink may reach from the
+                centre - infinite for the two chart projections, one
+                for the globe - and every user of the seam clips to
+                the paper and to that. Cutting a curve at a circular
+                boundary needs no new machinery: a line meets a
+                circle at the roots of one quadratic, two circles
+                meet on their radical line. An ellipse meets a circle
+                at the roots of a quartic, which this vocabulary does
+                not have and does not need: every orthographic great
+                circle lies inside its own limb, because a point an
+                angle t from the centre lands at sin(t) and the limb
+                is at one, so the two touch and never cross. That is
+                measured over every page here rather than assumed.
 
                 ## Where the atlas assumes one projection
 

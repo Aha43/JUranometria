@@ -1,5 +1,6 @@
 package juranometria.tool.overview;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.SkyPosition;
+import juranometria.render.ChartPalette;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -116,8 +118,14 @@ class OverviewProjectionGateTest {
             String fitted = PageCurves
                     .fitted(each.mapping(), each.pole(), 720)
                     .map(PlaneCurve::form).orElse("none");
-            if ("none".equals(stated)) {
-                continue;  // not on this page at all
+            // Only where the page actually draws it. A projection
+            // states a curve whether or not this page shows any of
+            // it, and a fit has nothing to work from when it does
+            // not.
+            if ("none".equals(stated)
+                    || PageCurves.greatCircle(each.mapping(),
+                            each.pole(), 720).isEmpty()) {
+                continue;
             }
             assertEquals(fitted, stated, each + ": the form the"
                     + " projection states and the form fitted to the"
@@ -175,10 +183,11 @@ class OverviewProjectionGateTest {
     }
 
     @Test
-    void theOrthographicLimbIsOnTheGlobeAndTheAntipodeIsNotOnThePlane() {
-        // The two edges named above, at the exact angles where they
-        // were wrong, so a re-introduction is caught at the point it
-        // would be made.
+    void theOrthographicLimbIsOnTheGlobe() {
+        // Written as ">=" the inverse refused a radius of exactly
+        // one - the limb, the one circle a globe draws best - while
+        // the forward projection placed a point at ninety degrees
+        // quite happily.
         StudyProjection orthographic = Candidates.orthographic(ORION);
         var limb = orthographic.project(along(ORION, 90.0));
         assertTrue(limb.isPresent(), "the limb is on the globe");
@@ -187,18 +196,61 @@ class OverviewProjectionGateTest {
                 "at a radius of exactly one");
         assertTrue(orthographic.unproject(limb.get()).isPresent(),
                 "and the inverse accepts it");
+        assertTrue(orthographic.project(along(ORION, 90.001)).isEmpty(),
+                "and a thousandth of a degree past it is off the world");
+    }
 
+    @Test
+    void noFiniteRegionOfSkyIsRefusedNearTheAntipode() {
+        // The projection reaches everything but one point, and that
+        // has to mean one point. Inverting a cosine to find the angle
+        // rounded a disc three milliarcseconds across onto the
+        // antipode itself, where it was then refused: a finite region
+        // of sky, silently absent.
         StudyProjection stereographic = Candidates.stereographic(ORION);
         assertEquals(180.0, stereographic.limitDegrees(),
                 "stereographic reaches everything but one point");
-        assertTrue(stereographic.project(along(ORION, 179.999)).isPresent(),
-                "a thousandth of a degree from the antipode is sky, and"
-                        + " is drawn");
-        assertTrue(stereographic.project(along(ORION, 180.0)).isEmpty(),
-                "the antipode itself is the one point it has no answer"
-                        + " for - and tan(pi/2) is 1.6e16 in a double,"
-                        + " not infinity, so this cannot be left to an"
-                        + " overflow");
+        double previous = 0.0;
+        for (double away : new double[] {1.0e-3, 1.0e-5, 1.0e-7,
+                1.0e-9, 1.0e-11, 1.0e-13}) {
+            var plane = stereographic.project(along(ORION, 180.0 - away));
+            assertTrue(plane.isPresent(), away + " degrees from the"
+                    + " antipode is sky, and has a place on the plane");
+            double radius = Math.hypot(plane.get().xiEast(),
+                    plane.get().etaNorth());
+            assertTrue(Double.isFinite(radius) && radius > previous,
+                    "and the nearer it is the further out it lands: "
+                            + radius + " after " + previous);
+            previous = radius;
+        }
+    }
+
+    @Test
+    void positionsNearTheCentreKeepTheirOwnPlaces() {
+        // The other end of the same fault. Inverting a cosine is
+        // ill conditioned near zero too, and a threshold beneath it
+        // coalesced everything within a fifth of a microarcsecond of
+        // the centre onto the centre itself.
+        StudyProjection stereographic =
+                Candidates.stereographic(new SkyPosition(0.0, 0.0));
+        double previous = 0.0;
+        for (double away : new double[] {1.0e-6, 1.0e-9, 1.0e-11,
+                1.0e-13, 1.0e-15}) {
+            var plane = stereographic.project(new SkyPosition(away, 0.0))
+                    .orElseThrow();
+            double radius = Math.hypot(plane.xiEast(), plane.etaNorth());
+            assertTrue(radius > 0.0 && (previous == 0.0
+                            || radius < previous),
+                    away + " degrees from the centre is not the centre: "
+                            + radius);
+            previous = radius;
+        }
+        assertEquals(0.0, Math.hypot(
+                        stereographic.project(new SkyPosition(0.0, 0.0))
+                                .orElseThrow().xiEast(),
+                        stereographic.project(new SkyPosition(0.0, 0.0))
+                                .orElseThrow().etaNorth()),
+                "and the centre itself is the centre");
     }
 
     @Test
@@ -275,6 +327,181 @@ class OverviewProjectionGateTest {
         }
         return new SkyPosition((centre.raDegrees() + 180.0) % 360.0,
                 180.0 - dec);
+    }
+
+    @Test
+    void noChartInkReachesPastTheGlobesEdge() {
+        // The finding, held by the thing a reader would see. Beyond
+        // an orthographic limb there is no sky at all - not empty
+        // sky - and every mark was already inside it, because a mark
+        // is a projected point and a point off the hemisphere has no
+        // projection. A curve is drawn from its own equation, and
+        // the celestial equator ran clean across the corners of a
+        // committed page.
+        StudyProjection orthographic = Candidates.orthographic(ORION);
+        java.awt.image.BufferedImage drawn = render(orthographic, 120.0);
+        PageRegion region = new StudyMapping(orthographic, 120.0, 900, 700)
+                .region();
+        assertTrue(region.bounded(), "a globe has an edge");
+        assertTrue(region.limbRadius() < Math.hypot(450.0, 350.0),
+                "and on this page the edge is inside the corners, so"
+                        + " there is somewhere for ink to leak to");
+
+        int ground = ChartPalette.WHITE_PAPER.ground().getRGB() & 0xffffff;
+        int beyond = 0;
+        int inked = 0;
+        for (int y = 4; y < 696; y++) {
+            for (int x = 4; x < 896; x++) {
+                if (y > 670 && x < 320) {
+                    continue;  // the study's own title line
+                }
+                double away = Math.hypot(x - region.limbX(),
+                        y - region.limbY());
+                if (away <= region.limbRadius() + 1.5) {
+                    continue;  // inside, or the limb's own stroke
+                }
+                beyond++;
+                if ((drawn.getRGB(x, y) & 0xffffff) != ground) {
+                    inked++;
+                }
+            }
+        }
+        assertTrue(beyond > 5000, "the page has a real region beyond the"
+                + " globe to check: " + beyond + " pixels");
+        assertEquals(0, inked, inked + " of " + beyond + " pixels beyond"
+                + " the globe's edge carry ink");
+    }
+
+    @Test
+    void aRunEndsWhereTheSkyEndsAndNotWhereThePaperDoes() {
+        // Clipping the drawing to the globe is not enough, and the
+        // pixel check above cannot tell: a graphics context masks
+        // whatever is painted outside the limb whether or not the
+        // run knew about it. What the run's own ends decide is where
+        // the line is NAMED - production's rule is "where the line
+        // leaves the paper" - and a name placed off the world would
+        // be a label pointing at nothing.
+        StudyProjection orthographic = Candidates.orthographic(ORION);
+        StudyMapping mapping = new StudyMapping(orthographic, 120.0,
+                900, 700);
+        PageRegion region = mapping.region();
+        int ends = 0;
+        for (PageCurveReport.Circle circle : PageCurveReport.CIRCLES) {
+            var built = PageCurves.greatCircle(mapping, circle.pole(), 720);
+            if (built.isEmpty()) {
+                continue;
+            }
+            for (PlaneCurve.Run run : built.get().curve().clipTo(region)) {
+                if (run.closed()) {
+                    continue;
+                }
+                for (Point2D end : new Point2D[] {run.from(), run.to()}) {
+                    ends++;
+                    double away = Math.hypot(
+                            end.getX() - region.limbX(),
+                            end.getY() - region.limbY());
+                    assertTrue(away <= region.limbRadius() + 1.0e-6,
+                            circle.name() + " ends at " + away
+                                    + " from the centre, where the globe"
+                                    + " stops at " + region.limbRadius());
+                }
+            }
+        }
+        assertTrue(ends > 0, "this page has runs with ends to check");
+    }
+
+    @Test
+    void aStraightRunIsCutByTheLimbAndNotOnlyByThePaper() {
+        // None of the three projections can produce this case, and
+        // the reason is worth knowing rather than trusting: the only
+        // one with a limb is orthographic, its only straight curves
+        // are great circles through the page centre, and the limb is
+        // never nearer than half the page width, so such a line
+        // always leaves the paper first. The vocabulary still has to
+        // be able to cut a line at the sky's edge, because a
+        // projection that placed one off-centre would otherwise draw
+        // past the world - so the case is built here directly.
+        PageRegion region = PageRegion.of(
+                new Rectangle2D.Double(0, 0, 900, 700), 450, 350, 200);
+        // y = 450: a horizontal line well inside the paper, crossing
+        // a globe of radius 200 centred at (450, 350).
+        PlaneCurve.Straight line = PlaneCurve.Straight.of(-450.0, 0.0, 1.0);
+
+        var onPaper = line.clipTo(new Rectangle2D.Double(0, 0, 900, 700));
+        assertEquals(1, onPaper.size(), "it crosses the whole paper");
+        assertEquals(0.0, Math.min(onPaper.get(0).from().getX(),
+                onPaper.get(0).to().getX()), 1.0e-9, "from one edge");
+        assertEquals(900.0, Math.max(onPaper.get(0).from().getX(),
+                onPaper.get(0).to().getX()), 1.0e-9, "to the other");
+
+        var onGlobe = line.clipTo(region);
+        assertEquals(1, onGlobe.size(), "and one run on the globe");
+        double half = Math.sqrt(200.0 * 200.0 - 100.0 * 100.0);
+        assertEquals(450.0 - half, Math.min(onGlobe.get(0).from().getX(),
+                        onGlobe.get(0).to().getX()), 1.0e-9,
+                "cut where the line meets the limb, not where it meets"
+                        + " the paper");
+        assertEquals(450.0 + half, Math.max(onGlobe.get(0).from().getX(),
+                        onGlobe.get(0).to().getX()), 1.0e-9,
+                "at both ends");
+
+        // And a line that misses the globe entirely draws nothing,
+        // rather than drawing right across the paper.
+        assertTrue(PlaneCurve.Straight.of(-600.0, 0.0, 1.0)
+                .clipTo(region).isEmpty(),
+                "a line that misses the globe is not drawn at all");
+    }
+
+    @Test
+    void everyOrthographicGreatCircleStaysInsideItsOwnLimb() {
+        // The claim that lets the elliptical form skip the
+        // ellipse-meets-circle quartic: a point an angle t from the
+        // centre lands at sin(t), and the limb is at one, so a great
+        // circle touches the limb and never crosses it. Asserted
+        // nowhere; measured here, over every page the study draws.
+        for (PageCurveReport.Field field : PageCurveReport.FIELDS) {
+            StudyProjection orthographic =
+                    Candidates.orthographic(field.centre());
+            for (double width : new double[] {42, 60, 90, 120}) {
+                StudyMapping mapping = new StudyMapping(orthographic,
+                        width, 900, 700);
+                double limb = mapping.region().limbRadius();
+                for (PageCurveReport.Circle circle
+                        : PageCurveReport.CIRCLES) {
+                    for (SkyPosition on
+                            : CurveForm.around(circle.pole(), 720)) {
+                        var at = mapping.pageOf(on);
+                        if (at.isEmpty()) {
+                            continue;
+                        }
+                        double away = Math.hypot(
+                                at.get().getX() - mapping.pageCentreX(),
+                                at.get().getY() - mapping.pageCentreY());
+                        assertTrue(away <= limb + 1.0e-9,
+                                circle.name() + " at " + width
+                                        + " degrees reaches " + away
+                                        + " where the limb is at " + limb);
+                    }
+                }
+            }
+        }
+    }
+
+    /** One page, drawn as the study draws it. */
+    private static java.awt.image.BufferedImage render(
+            StudyProjection projection, double field) {
+        var scene = new StudyScenes().of(projection, field, 900, 700,
+                "Orion");
+        var image = new java.awt.image.BufferedImage(900, 700,
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            new StudyPage(projection, scene, ChartPalette.WHITE_PAPER)
+                    .paint(g, PageCurveReport.CIRCLES);
+        } finally {
+            g.dispose();
+        }
+        return image;
     }
 
     /** One projection, one field, one great circle. */

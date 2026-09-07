@@ -2,7 +2,6 @@ package juranometria.tool.overview;
 
 import java.awt.Shape;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
@@ -38,11 +37,12 @@ final class CurveRuns {
      */
     static List<PlaneCurve.Run> of(List<Double> crossings,
                                   DoubleFunction<Point2D> at,
-                                  Arc arc, Rectangle2D page, Shape whole) {
+                                  Arc arc, PageRegion region,
+                                  Shape whole) {
         if (crossings.isEmpty()) {
             // Either the curve lies wholly on the paper, or nowhere
             // near it. One point on it decides which.
-            return page.contains(at.apply(0.0))
+            return region.contains(at.apply(0.0))
                     ? List.of(new PlaneCurve.Run(whole, null, null))
                     : List.of();
         }
@@ -62,7 +62,7 @@ final class CurveRuns {
         boolean[] inside = new boolean[count];
         for (int i = 0; i < count; i++) {
             double start = crossings.get(i);
-            inside[i] = page.contains(at.apply(start
+            inside[i] = region.contains(at.apply(start
                     + span(crossings.get((i + 1) % count), start) / 2.0));
         }
         boolean all = true;

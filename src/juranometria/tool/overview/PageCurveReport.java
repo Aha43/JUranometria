@@ -91,8 +91,8 @@ final class PageCurveReport {
                         if (built.isEmpty()) {
                             continue;
                         }
-                        List<PlaneCurve.Run> runs =
-                                built.get().curve().clipTo(page);
+                        List<PlaneCurve.Run> runs = built.get().curve()
+                                .clipTo(mapping.region());
                         if (runs.isEmpty()) {
                             continue;  // off the page is silence
                         }

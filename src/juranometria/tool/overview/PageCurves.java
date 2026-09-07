@@ -79,10 +79,12 @@ final class PageCurves {
      */
     static Optional<PlaneCurve> fitted(StudyMapping mapping,
                                        SkyPosition pole, int samples) {
-        List<Point2D> page = new ArrayList<>(samples);
-        for (SkyPosition position : CurveForm.around(pole, samples)) {
-            mapping.pageOf(position).ifPresent(page::add);
-        }
+        // The same points the stated curve is measured against, and
+        // for the same reason: a stereographic circle running out
+        // towards the antipode has points two thousand million page
+        // units away, and a form fitted to include them is a form
+        // fitted to a place no drawing happens.
+        List<Point2D> page = onOrNearThePage(mapping, pole, samples);
         if (page.size() < 2) {
             return Optional.empty();
         }

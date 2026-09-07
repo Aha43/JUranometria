@@ -86,4 +86,25 @@ public interface StudyProjection {
      * infinitely far away.
      */
     Optional<PlaneConic> greatCircle(SkyPosition pole);
+
+    /**
+     * How far ink may reach from the centre, in plane units, or
+     * infinite when the plane has no edge.
+     *
+     * <p>A chart projection has no answer but infinity: every
+     * direction it can show, it shows somewhere on the plane, and
+     * the only thing that bounds a page is the paper. A globe does
+     * have an answer, and it is one - the limb, where the hemisphere
+     * ends and there is no sky at all beyond, rather than empty sky.
+     *
+     * <p>This is on the interface rather than in issue #301 because
+     * a review found the consequence of leaving it out: on an
+     * orthographic page the stars stopped at the limb, since a star
+     * is a projected point and a point off the hemisphere has no
+     * projection, while the celestial equator ran straight on across
+     * the corners of the paper, since a curve is drawn from its own
+     * equation. The seam has to be able to say where the sky ends,
+     * or every future user of it draws past that edge.
+     */
+    double visiblePlaneRadius();
 }

@@ -132,11 +132,12 @@ public interface Projection {
     Optional<SkyPosition> unproject(PlanePoint point);
     double planeRadius(double angleDegrees);
     double limitDegrees();
+    double visiblePlaneRadius();
     Optional<PlaneConic> greatCircle(SkyPosition pole);
 }
 ```
 
-Seven methods, and each earned its place by something in the study
+Eight methods, and each earned its place by something in the study
 being impossible without it.
 
 The last one was absent from this gate's first proposal, and a review
@@ -160,7 +161,25 @@ circle becomes an equation in page coordinates:
 | stereographic | `r = 2 tan(t/2)` | a circle of centre `(2b/a, 2c/a)` and radius `2/|a|`; a line when `a` is zero |
 | orthographic | `r = sin t` | `(a²+b²)ξ² + 2bc·ξη + (a²+c²)η² = a²`, an ellipse of radii `|a|` and 1 |
 
-**It returns a conic, not a drawable curve**, and that is the second
+`visiblePlaneRadius` is how far ink may reach from the centre, or
+infinite when the plane has no edge. A chart projection answers
+infinity — every direction it can show, it shows somewhere, and the
+only thing bounding a page is the paper. **A globe answers one**, and
+that is the limb: beyond it there is no sky at all, rather than empty
+sky.
+
+It is on the interface rather than left to #301 because a review
+found what leaving it out did, by looking at a committed page. The
+stars stopped at the limb — a star is a projected point, and a point
+off the hemisphere has no projection — while other ink ran on into
+the corners of the paper, because it is drawn from its own equation
+and the only thing clipping it was the rectangle. Measured on a
+120-degree orthographic page: **379 pixels of ink beyond the globe's
+edge**, and none once the visible region is part of the clip. This is
+precisely the seam accidentally fitting stereographic alone, which
+the milestone set out to prevent.
+
+**greatCircle returns a conic, not a drawable curve**, and that is the second
 review finding rather than a detail. Written as a centre and a
 radius, a stereographic great circle whose pole is nearly square to
 the page centre has radius `2/|a|` — for the ecliptic seen from the
@@ -249,6 +268,30 @@ curve, one from the projection's algebra and one from several hundred
 points it actually projected, agree on the form in **108 of 108**
 cases, and the drawn curve passes through those points to within
 **2.7e-12 page units**.
+
+### Where the sky stops
+
+The visible region is the paper **and** the limb, and every user of
+the seam clips to both. Cutting a curve at a circular boundary needs
+no new machinery: a line meets a circle at the roots of one
+quadratic, and two circles meet on their radical line.
+
+One case is left unimplemented and it is stated rather than hidden.
+An ellipse meets a circle at the roots of a quartic, which this
+vocabulary does not have — and does not need, because the only
+projection with a limb is orthographic and **every orthographic great
+circle lies inside its own limb**: a point an angle `t` from the
+centre lands at `sin t` and the limb is at one, so the two touch and
+never cross. That is measured over every page the study draws, not
+asserted. A projection with both a limb and elliptical curves that
+left it would need the quartic.
+
+The straight case is likewise measured to be unreachable for these
+three — an orthographic straight curve is a great circle through the
+page centre, and the limb is never nearer than half the page width,
+so such a line always leaves the paper first — but it is implemented
+and tested directly, because a vocabulary that could not cut a line
+at the sky's edge would be one #301 had to widen.
 
 ### Where a curve stops being one thing
 
@@ -430,7 +473,11 @@ was would be a sheet that could not be checked.
   accessible description and the sheet metadata.
 
 - **#301 — the globe.** Unchanged, and now known to be an addition
-  rather than a redesign.
+  rather than a redesign: the visible boundary it needs is in the
+  seam from the start, and the three curve forms are written. What it
+  would still owe is the ellipse-meets-circle quartic, and only if a
+  projection arrives with both a limb and elliptical curves that
+  leave it.
 
 ## What this gate did not settle
 

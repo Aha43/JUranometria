@@ -132,6 +132,18 @@ final class StudyPage {
         Graphics2D chart = (Graphics2D) g.create();
         try {
             chart.clip(page);
+            // And to the limb, if this projection has one. Every mark
+            // is already inside it - a point off the hemisphere has
+            // no projection - but a curve is drawn from its own
+            // equation and would otherwise run past the globe's edge.
+            PageRegion region = mapping.region();
+            if (region.bounded()) {
+                chart.clip(new Ellipse2D.Double(
+                        region.limbX() - region.limbRadius(),
+                        region.limbY() - region.limbRadius(),
+                        2.0 * region.limbRadius(),
+                        2.0 * region.limbRadius()));
+            }
             graticule(chart);
             geography(chart);
             reference(chart, reference);
@@ -287,7 +299,8 @@ final class StudyPage {
             if (built.isEmpty()) {
                 continue;
             }
-            List<PlaneCurve.Run> runs = built.get().curve().clipTo(page);
+            List<PlaneCurve.Run> runs =
+                    built.get().curve().clipTo(mapping.region());
             if (runs.isEmpty()) {
                 continue;  // off the page is silence
             }
@@ -399,8 +412,27 @@ final class StudyPage {
         }
     }
 
-    /** The frame, and one line saying what this page is. */
+    /** The frame, the globe's edge, and one line saying what this is. */
     private void furniture(Graphics2D g) {
+        PageRegion region = mapping.region();
+        if (region.bounded()) {
+            // The limb is furniture, not sky: it is where the globe
+            // stops, and a reader who cannot see it cannot tell an
+            // empty corner from one that is off the world.
+            Graphics2D edge = (Graphics2D) g.create();
+            try {
+                edge.clip(page);
+                edge.setColor(palette.frameInk());
+                edge.setStroke(FIGURE);
+                edge.draw(new Ellipse2D.Double(
+                        region.limbX() - region.limbRadius(),
+                        region.limbY() - region.limbRadius(),
+                        2.0 * region.limbRadius(),
+                        2.0 * region.limbRadius()));
+            } finally {
+                edge.dispose();
+            }
+        }
         g.setColor(palette.frameInk());
         g.setStroke(FIGURE);
         g.draw(new Rectangle2D.Double(0.5, 0.5, page.getWidth() - 1.0,
