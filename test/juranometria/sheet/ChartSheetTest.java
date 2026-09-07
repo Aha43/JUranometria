@@ -309,6 +309,55 @@ class ChartSheetTest {
     }
 
     @Test
+    void theReadersOwnMarksGoOverTheChartAndNotIntoIt() {
+        // Two halves and one order. A ring around every marked
+        // object the page draws, a cross for every one it does not,
+        // and both of them after the whole chart - because they are
+        // an interaction overlay and not catalogue symbols. An
+        // earlier version drew only the crosses and drew them inside
+        // the reference layer, which put a reader's rings underneath
+        // the stars they were marking (PR #292 review).
+        SheetRecording plain = bare(ORION);
+        var renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        // From what the renderer draws, not from what the scene
+        // holds: a scene carries objects whose symbols reach the page
+        // from outside it, and a ring is only drawn for a mark that
+        // is on the page.
+        String marked = renderer.drawnMarks(plain.scene(),
+                        plain.options()).stream()
+                .filter(mark -> mark.star() != null)
+                .findFirst().orElseThrow().star().id();
+        SheetRecording withMarks = ChartSheet.record(
+                Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
+                ChartRenderer.ReferenceLayer.NONE,
+                (g, scene) -> renderer.drawSelectionHighlight(g, scene,
+                        ChartOptions.DEFAULTS, marked),
+                PaperSize.A4);
+
+        assertTrue(withMarks.shapeCount() > plain.shapeCount(),
+                "the ring reaches the sheet: " + withMarks.shapeCount()
+                        + " against " + plain.shapeCount());
+
+        // Over the chart, which on a recording means last: nothing
+        // the chart drew comes after a mark the reader made.
+        int lastPlainShape = plain.shapeCount();
+        assertTrue(withMarks.recorder().drawn().size() > lastPlainShape,
+                "and it is drawn after everything the chart drew,"
+                        + " where an overlay belongs");
+        var ring = withMarks.recorder().drawn()
+                .get(withMarks.recorder().drawn().size() - 1);
+        var star = plain.recorder().drawn().stream()
+                .filter(each -> each.filled())
+                .filter(each -> each.shape().getBounds2D().getWidth() < 20)
+                .toList();
+        assertFalse(star.isEmpty(), "the page has star discs on it");
+        assertTrue(ring.shape().getBounds2D().getWidth() > 4.0,
+                "the last thing on the sheet is the reader's own ring,"
+                        + " not a star: "
+                        + ring.shape().getBounds2D());
+    }
+
+    @Test
     void aSheetRefusesWhatPaperCannotHold() {
         // The recorder is the boundary's guard, and it is production
         // now rather than a study prop: if the cartography ever

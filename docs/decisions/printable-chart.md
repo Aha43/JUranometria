@@ -196,12 +196,27 @@ this gate exists to prevent.
 Self-contained: no external stylesheet, script, font or image, and
 no network reference. **Text stays text**, UTF-8, `font-family:
 sans-serif`, so a reader can retype a label in Inkscape. Layers are
-grouped (`#chart`, `#ink`, `#labels`) so ink and labels can be
+grouped (`#chart`, and runs of `class="ink"` and `class="labels"`)
+so ink and labels can be
 selected separately. Metadata carries the field, centre, frame,
 magnitude limit and the fact that JUranometria produced it.
 
 A `text-as-paths` variant is offered for a machine whose fonts are
 unknown.
+
+> **Corrected in #287.** This section first said one container for
+> all the ink and one for all the labels. That is a reordering: the
+> chart draws a constellation name, fills the title panel over it,
+> and writes the title on top, and putting every label after every
+> shape lifted the name back above the panel. **CANIS MAJOR read
+> straight through the title box of every exported Orion sheet.** No
+> automated check saw it. It was found by opening an exported sheet
+> and looking at it — the SVG directly, and the PDF through an
+> independent renderer — which is a thing nothing in this repository
+> had ever done. Operations are
+> written in the order the renderer performed them, and consecutive
+> runs of a kind carry a class so an editor can still select ink and
+> labels apart — grouping follows the order rather than deciding it.
 
 ### PDF — genuine vector, text as outlines
 

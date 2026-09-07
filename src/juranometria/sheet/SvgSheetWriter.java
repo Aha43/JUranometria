@@ -112,78 +112,112 @@ public final class SvgSheetWriter {
         // throughout - a reference line is drawn butt-capped and an
         // ordinary line is not - and a group-wide value quietly
         // redrew half of them (issue #286).
-        svg.append("    <g id=\"ink\" fill=\"none\">\n");
-        for (SheetRecorder.Drawn drawn : sheet.recorder().drawn()) {
-            svg.append("      <path d=\"").append(path(drawn.shape()))
-                    .append('"').append(clipAttribute(clips, drawn.clip()));
-            if (drawn.filled()) {
-                svg.append(" fill=\"").append(hex(drawn.colour()))
-                        .append('"');
-            } else {
-                SheetRecorder.BasicStrokeSpec stroke = drawn.stroke();
-                svg.append(" stroke=\"").append(hex(drawn.colour()))
-                        .append(String.format(Locale.ROOT,
-                                "\" stroke-width=\"%.2f\"",
-                                stroke.width()))
-                        .append(" stroke-linecap=\"")
-                        .append(capName(stroke.cap())).append('"')
-                        .append(" stroke-linejoin=\"")
-                        .append(joinName(stroke.join())).append('"')
-                        .append(String.format(Locale.ROOT,
-                                " stroke-miterlimit=\"%.2f\"",
-                                stroke.miterLimit()));
-                if (stroke.dash() != null) {
-                    svg.append(" stroke-dasharray=\"")
-                            .append(dash(stroke.dash()))
-                            .append('"')
-                            .append(String.format(Locale.ROOT,
-                                    " stroke-dashoffset=\"%.2f\"",
-                                    stroke.dashPhase()));
+        // One pass, in the order the renderer drew: the constellation
+        // name, then the panel that covers it, then the title. Two
+        // groups - all shapes, then all text - is a reordering, and
+        // it put "CANIS MAJOR" through the title box of every sheet
+        // - found by opening an exported sheet and looking at it
+        // (PR #292). Consecutive operations of a
+        // kind are still grouped, so ink and labels can be selected
+        // apart in an editor; the grouping follows the order rather
+        // than deciding it.
+        String open = null;
+        for (SheetRecorder.Operation operation
+                : sheet.recorder().operations()) {
+            String kind = operation instanceof SheetRecorder.Drawn
+                    ? "ink" : "labels";
+            if (!kind.equals(open)) {
+                if (open != null) {
+                    svg.append("    </g>\n");
                 }
+                svg.append("    <g class=\"").append(kind).append('"')
+                        .append(kind.equals("ink")
+                                ? " fill=\"none\"" : "")
+                        .append(">\n");
+                open = kind;
             }
-            svg.append("/>\n");
-        }
-        svg.append("    </g>\n");
-
-        svg.append("    <g id=\"labels\">\n");
-        for (SheetRecorder.Text label : sheet.recorder().text()) {
-            String clip = clipAttribute(clips, label.clip());
-            if (text == Text.OUTLINES) {
-                GlyphVector glyphs = label.font().createGlyphVector(
-                        new FontRenderContext(null, true, true),
-                        label.text());
-                svg.append("      <path d=\"")
-                        .append(path(glyphs.getOutline(
-                                (float) label.x(), (float) label.y())))
-                        .append('"').append(clip)
-                        .append(" fill=\"").append(hex(label.colour()))
-                        .append("\"/>\n");
+            if (operation instanceof SheetRecorder.Drawn drawn) {
+                writeShape(svg, drawn, clips);
             } else {
-                // The weight and the slant are the label's meaning,
-                // not its decoration: the title block is bold
-                // because it is the title, and a viewer given only a
-                // family and a size would draw it as body text
-                // (PR #290 review).
-                svg.append(String.format(Locale.ROOT,
-                                "      <text x=\"%.2f\" y=\"%.2f\"%s"
-                                        + " font-family=\"sans-serif\""
-                                        + " font-size=\"%d\"%s%s"
-                                        + " fill=\"%s\">",
-                                label.x(), label.y(), clip,
-                                label.font().getSize(),
-                                label.font().isBold()
-                                        ? " font-weight=\"bold\"" : "",
-                                label.font().isItalic()
-                                        ? " font-style=\"italic\"" : "",
-                                hex(label.colour())))
-                        .append(escape(label.text()))
-                        .append("</text>\n");
+                writeText(svg, (SheetRecorder.Text) operation, clips,
+                        text);
             }
         }
-        svg.append("    </g>\n");
+        if (open != null) {
+            svg.append("    </g>\n");
+        }
 
         svg.append("  </g>\n</svg>\n");
         return svg.toString();
+    }
+
+    /** One shape, as a path. */
+    private static void writeShape(StringBuilder svg,
+                                   SheetRecorder.Drawn drawn,
+                                   List<Shape> clips) {
+        svg.append("      <path d=\"").append(path(drawn.shape()))
+                .append('"').append(clipAttribute(clips, drawn.clip()));
+        if (drawn.filled()) {
+            svg.append(" fill=\"").append(hex(drawn.colour()))
+                    .append('"');
+        } else {
+            SheetRecorder.BasicStrokeSpec stroke = drawn.stroke();
+            svg.append(" stroke=\"").append(hex(drawn.colour()))
+                    .append(String.format(Locale.ROOT,
+                            "\" stroke-width=\"%.2f\"", stroke.width()))
+                    .append(" stroke-linecap=\"")
+                    .append(capName(stroke.cap())).append('"')
+                    .append(" stroke-linejoin=\"")
+                    .append(joinName(stroke.join())).append('"')
+                    .append(String.format(Locale.ROOT,
+                            " stroke-miterlimit=\"%.2f\"",
+                            stroke.miterLimit()));
+            if (stroke.dash() != null) {
+                svg.append(" stroke-dasharray=\"")
+                        .append(dash(stroke.dash())).append('"')
+                        .append(String.format(Locale.ROOT,
+                                " stroke-dashoffset=\"%.2f\"",
+                                stroke.dashPhase()));
+            }
+        }
+        svg.append("/>\n");
+    }
+
+    /** One run of text, as characters or as its outline. */
+    private static void writeText(StringBuilder svg,
+                                  SheetRecorder.Text label,
+                                  List<Shape> clips, Text text) {
+        String clip = clipAttribute(clips, label.clip());
+        if (text == Text.OUTLINES) {
+            GlyphVector glyphs = label.font().createGlyphVector(
+                    new FontRenderContext(null, true, true),
+                    label.text());
+            svg.append("      <path d=\"")
+                    .append(path(glyphs.getOutline((float) label.x(),
+                            (float) label.y())))
+                    .append('"').append(clip)
+                    .append(" fill=\"").append(hex(label.colour()))
+                    .append("\"/>\n");
+            return;
+        }
+        // The weight and the slant are the label's meaning, not its
+        // decoration: the title block is bold because it is the
+        // title, and a viewer given only a family and a size would
+        // draw it as body text (PR #290 review).
+        svg.append(String.format(Locale.ROOT,
+                        "      <text x=\"%.2f\" y=\"%.2f\"%s"
+                                + " font-family=\"sans-serif\""
+                                + " font-size=\"%d\"%s%s"
+                                + " fill=\"%s\">",
+                        label.x(), label.y(), clip,
+                        label.font().getSize(),
+                        label.font().isBold()
+                                ? " font-weight=\"bold\"" : "",
+                        label.font().isItalic()
+                                ? " font-style=\"italic\"" : "",
+                        hex(label.colour())))
+                .append(escape(label.text()))
+                .append("</text>\n");
     }
 
     /**

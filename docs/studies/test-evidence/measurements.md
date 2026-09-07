@@ -80,6 +80,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/app/ExportSheetDialogTest.java | point-reachable, control-showing | back-door-click |
 | juranometria/app/InspectorCloseButtonTest.java | control-showing | pointer-events |
 | juranometria/app/PublicFaceJourneyTest.java | point-reachable, control-showing | back-door-click |
+| juranometria/app/SprintTwentyNineJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
 | juranometria/app/SwingSessionTest.java | none | none |
 | juranometria/ui/BlackSkyJourneyTest.java | point-reachable, control-showing | back-door-click |
 | juranometria/ui/ChartFurnitureJourneyTest.java | point-reachable, control-showing | pointer-events, back-door-click |
@@ -103,13 +104,13 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/ecliptic/EclipticMenuSurfaceTest.java | control-showing | none |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
-**27 display-dependent files.** 15 state a focused-window or focus-owner premise, 19 state a reachability premise, and 16 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**28 display-dependent files.** 16 state a focused-window or focus-owner premise, 20 state a reachability premise, and 17 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 
 - files dispatching real pointer events: 17
 - files dispatching real keyboard events: 2
-- files using doClick somewhere: 30
+- files using doClick somewhere: 31
 - files using postActionEvent somewhere: 3
 
 ## Platform assumptions written into tests
@@ -124,8 +125,8 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
-- reads of live chart state (currentScene, pageOffsetY, navigation.state): **338** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **537**
+- reads of live chart state (currentScene, pageOffsetY, navigation.state): **347** across the suite
+- explicit event-thread hand-offs (invokeAndWait): **550**
 
 ## Generated evidence, classified
 

@@ -113,11 +113,33 @@ public final class ChartSheetStudyMain {
                 + " rather\nthan fitting it. All three come from one"
                 + " recording of one render.\n\n");
 
+        report.append("## What to measure on paper\n\n");
+        report.append("Print `sheet-a4.pdf` at **actual size** - not"
+                + " fit-to-page, which\nshrinks it by a few per cent"
+                + " - and measure these with a ruler under\nordinary"
+                + " light. Every figure is taken from the sheet"
+                + " itself, not from\nthe gate's candidate"
+                + " numbers.\n\n");
+        report.append("They are **provisional targets, not"
+                + " findings**. Nothing here has been\nprinted."
+                + " Issue #293 owns the paper check, and paper"
+                + " evidence outranks\nthis table: if a printed sheet"
+                + " disagrees, the sheet is what"
+                + " changes.\n\n");
+        report.append(printChecks());
+        report.append("\nA sheet that measures right and cannot be"
+                + " read is still a failure.\nThe last two rows are"
+                + " the ones that decide whether this works at an"
+                + " observing\ntable: a faint star has to be a mark"
+                + " rather than a speck, and a label has to\nbe a"
+                + " word rather than a smudge, by torchlight, at"
+                + " arm's length.\n\n");
+
         report.append("## What is not settled here\n\n");
         report.append("**Nothing on this page has been printed.** The"
                 + " sizes above are arithmetic\nand the tests are"
                 + " arithmetic; legibility on paper is neither."
-                + " Issue #287\nowes a printed sheet measured with a"
+                + " Issue #293\nowns a printed sheet measured with a"
                 + " ruler, and that measurement can\nrevise these"
                 + " numbers.\n\n");
         report.append("**Label positions are this machine's.** The"
@@ -131,6 +153,53 @@ public final class ChartSheetStudyMain {
         Files.writeString(new File(DIR, "measurements.md").toPath(),
                 report.toString(), StandardCharsets.UTF_8);
         System.out.print(report);
+    }
+
+    /** The ruler check, in millimetres, from the sheet's own ink. */
+    private static String printChecks() {
+        SheetRecording sheet = record(ORION, PaperSize.A4, false);
+        double thinnest = Double.MAX_VALUE;
+        double smallestMark = Double.MAX_VALUE;
+        for (var drawn : sheet.recorder().drawn()) {
+            if (!drawn.filled()) {
+                thinnest = Math.min(thinnest, drawn.stroke().width());
+            } else if (drawn.shape().getBounds2D().getWidth() > 0.5
+                    && drawn.shape().getBounds2D().getWidth() < 20) {
+                smallestMark = Math.min(smallestMark,
+                        drawn.shape().getBounds2D().getWidth());
+            }
+        }
+        int smallestLabel = Integer.MAX_VALUE;
+        for (var text : sheet.recorder().text()) {
+            smallestLabel = Math.min(smallestLabel,
+                    text.font().getSize());
+        }
+
+        StringBuilder checks = new StringBuilder();
+        checks.append("| measure | provisional target |\n|---|---:|\n");
+        checks.append(String.format(Locale.ROOT,
+                "| the sheet, edge to edge | %.1f x %.1f mm |%n",
+                PaperSize.A4.wideMm(), PaperSize.A4.highMm()));
+        checks.append(String.format(Locale.ROOT,
+                "| the margin, paper edge to chart frame | %.1f mm |%n",
+                PaperSize.A4.marginMm()));
+        checks.append(String.format(Locale.ROOT,
+                "| the chart frame, inside edge to inside edge |"
+                        + " %.1f x %.1f mm |%n",
+                PaperSize.A4.chartWideMm(), PaperSize.A4.chartHighMm()));
+        checks.append(String.format(Locale.ROOT,
+                "| the thinnest line on the sheet | %.3f mm"
+                        + " (%.2f pt) |%n",
+                PaperSize.mmOf(thinnest), thinnest));
+        checks.append(String.format(Locale.ROOT,
+                "| the faintest star's disc, across | %.2f mm"
+                        + " (%.2f pt) |%n",
+                PaperSize.mmOf(smallestMark), smallestMark));
+        checks.append(String.format(Locale.ROOT,
+                "| the smallest label's capital height | about"
+                        + " %.2f mm (%d pt type) |%n",
+                PaperSize.mmOf(smallestLabel * 0.7), smallestLabel));
+        return checks.toString();
     }
 
     private static void pdf(StringBuilder report, String name,

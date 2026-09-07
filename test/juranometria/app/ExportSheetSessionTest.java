@@ -163,22 +163,23 @@ class ExportSheetSessionTest {
         // guarding against is a one-line edit that this sees.
         String source = Files.readString(Path.of(
                 "src/juranometria/app/ExportSheetSession.java"));
-        String open = source.substring(
-                source.indexOf("public static void open("),
-                source.indexOf("/** Where the reader wants it"));
+        String surfaces = source.substring(
+                source.indexOf("public static Surfaces onScreen()"),
+                source.indexOf("/** Opens the dialog"));
 
-        assertTrue(open.contains("replaceDecision(owner)"),
-                "the reader's own route asks through the decision"
+        assertTrue(surfaces.contains("replaceDecision(owner)"),
+                "the running application asks through the decision"
                         + " that puts a question on the screen:\n"
-                        + open);
+                        + surfaces);
         for (String constant : List.of("-> true", "->true",
                 "mayReplace(existing) || true")) {
-            assertTrue(!open.contains(constant),
+            assertTrue(!surfaces.contains(constant),
                     "and never answers the question itself: " + constant);
         }
-        assertTrue(open.contains("exportTo("),
-                "through the path this class drives, so what is tested"
-                        + " above is what runs");
+        assertTrue(surfaces.contains("ExportSheetDialog.open(")
+                        && surfaces.contains("JFileChooser"),
+                "asking what and where through real windows: "
+                        + surfaces);
     }
 
     @Test

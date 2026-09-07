@@ -84,6 +84,28 @@ public final class ChartSheet {
                                         ChartOptions options,
                                         ChartRenderer.ReferenceLayer reference,
                                         PaperSize paper) {
+        return record(pages, state, options, reference,
+                ChartRenderer.ReferenceLayer.NONE, paper);
+    }
+
+    /**
+     * The same, with ink that belongs <em>over</em> the chart.
+     *
+     * <p>Two layers, because the chart has two. A line of reference
+     * goes above the grid and below every mark, which is inside the
+     * render and the only moment it can be laid down. A reader's own
+     * marks - the rings and crosses of a working selection - go
+     * after the whole chart, because they are an interaction overlay
+     * and not catalogue symbols. Folding the second into the first
+     * put a reader's rings underneath the stars they were marking
+     * (PR #292 review).
+     */
+    public static SheetRecording record(Pages pages,
+                                        ChartViewState state,
+                                        ChartOptions options,
+                                        ChartRenderer.ReferenceLayer reference,
+                                        ChartRenderer.ReferenceLayer overChart,
+                                        PaperSize paper) {
         if (pages == null || state == null || options == null
                 || paper == null) {
             throw new IllegalArgumentException(
@@ -94,11 +116,12 @@ public final class ChartSheet {
         // treating it as "no modules" would turn a miswired export -
         // one that meant to carry the ecliptic and lost it - into a
         // sheet that looks perfectly correct (PR #290 review).
-        if (reference == null) {
+        if (reference == null || overChart == null) {
             throw new IllegalArgumentException(
-                    "a reference layer is required; pass"
+                    "both layers are required; pass"
                             + " ChartRenderer.ReferenceLayer.NONE for a"
-                            + " chart carrying no module ink");
+                            + " chart carrying no module ink and none"
+                            + " of the reader's own marks");
         }
 
         ChartScene scene = pages.assemble(state,
@@ -111,6 +134,8 @@ public final class ChartSheet {
         try {
             new ChartRenderer(StarSizePolicy.DEFAULT)
                     .render(g, scene, onPaper, reference);
+            // After the chart, in the order the screen paints it.
+            overChart.paint(g, scene);
         } finally {
             g.dispose();
         }

@@ -27,24 +27,31 @@ final class SheetReplay {
     /** Draws the recording into a graphics already scaled and placed. */
     static void into(Graphics2D g, SheetRecorder recorder) {
         Shape original = g.getClip();
-        for (SheetRecorder.Drawn drawn : recorder.drawn()) {
-            g.setClip(drawn.clip() == null ? original : drawn.clip());
-            g.setColor(drawn.colour());
-            if (drawn.filled()) {
-                g.fill(drawn.shape());
+        // In the order it happened. Replaying every shape and then
+        // every label puts a constellation name back on top of the
+        // panel that was drawn to cover it (PR #292).
+        for (SheetRecorder.Operation operation : recorder.operations()) {
+            g.setClip(operation.clip() == null ? original
+                    : operation.clip());
+            if (operation instanceof SheetRecorder.Drawn drawn) {
+                g.setColor(drawn.colour());
+                if (drawn.filled()) {
+                    g.fill(drawn.shape());
+                } else {
+                    SheetRecorder.BasicStrokeSpec stroke = drawn.stroke();
+                    g.setStroke(new BasicStroke(stroke.width(),
+                            stroke.cap(), stroke.join(),
+                            stroke.miterLimit(), stroke.dash(),
+                            stroke.dashPhase()));
+                    g.draw(drawn.shape());
+                }
             } else {
-                SheetRecorder.BasicStrokeSpec stroke = drawn.stroke();
-                g.setStroke(new BasicStroke(stroke.width(), stroke.cap(),
-                        stroke.join(), stroke.miterLimit(), stroke.dash(),
-                        stroke.dashPhase()));
-                g.draw(drawn.shape());
+                SheetRecorder.Text text = (SheetRecorder.Text) operation;
+                g.setColor(text.colour());
+                g.setFont(text.font());
+                g.drawString(text.text(), (float) text.x(),
+                        (float) text.y());
             }
-        }
-        for (SheetRecorder.Text text : recorder.text()) {
-            g.setClip(text.clip() == null ? original : text.clip());
-            g.setColor(text.colour());
-            g.setFont(text.font());
-            g.drawString(text.text(), (float) text.x(), (float) text.y());
         }
         g.setClip(original);
     }

@@ -62,14 +62,37 @@ import java.util.Map;
  */
 public final class SheetRecorder extends Graphics2D {
 
+    /**
+     * One thing the cartography did, in the order it did it.
+     *
+     * <p>Shapes and text used to be kept in two lists, and every
+     * writer emitted all of one and then all of the other. That is
+     * not what the renderer did: it draws a constellation name,
+     * fills the title panel over it, and writes the title on top.
+     * Replaying shapes-then-text put the constellation name back
+     * above the panel, and "CANIS MAJOR" read straight through the
+     * title box of every exported Orion sheet - found by opening an
+     * exported sheet and looking at it, which nothing in this
+     * repository had done (PR #292).
+     *
+     * <p>So there is one sequence now, and a writer that walks it in
+     * order cannot make that mistake again.
+     */
+    public sealed interface Operation permits Drawn, Text {
+
+        /** The clip in force when this happened, or null. */
+        Shape clip();
+    }
+
     /** One stroked or filled shape, as it lands on the sheet. */
     public record Drawn(Shape shape, boolean filled, Color colour,
-                        BasicStrokeSpec stroke, Shape clip) {
+                        BasicStrokeSpec stroke, Shape clip)
+            implements Operation {
     }
 
     /** One run of text, at its device position. */
     public record Text(String text, double x, double y, Font font,
-                       Color colour, Shape clip) {
+                       Color colour, Shape clip) implements Operation {
     }
 
     /**
@@ -87,8 +110,8 @@ public final class SheetRecorder extends Graphics2D {
                                   float dashPhase) {
     }
 
-    private final List<Drawn> drawn;
-    private final List<Text> text;
+    /** Everything the render did, in the order it did it. */
+    private final List<Operation> operations;
     private final BufferedImage metricsSource;
 
     private AffineTransform transform = new AffineTransform();
@@ -98,26 +121,38 @@ public final class SheetRecorder extends Graphics2D {
     private Shape clip;
 
     public SheetRecorder(int widthPx, int heightPx) {
-        this(new ArrayList<>(), new ArrayList<>(),
+        this(new ArrayList<>(),
                 new BufferedImage(Math.max(1, widthPx),
                         Math.max(1, heightPx), BufferedImage.TYPE_INT_RGB));
     }
 
-    private SheetRecorder(List<Drawn> drawn, List<Text> text,
+    private SheetRecorder(List<Operation> operations,
                                BufferedImage metricsSource) {
-        this.drawn = drawn;
-        this.text = text;
+        this.operations = operations;
         this.metricsSource = metricsSource;
+    }
+
+    /**
+     * Everything the render did, in the order it did it. This is
+     * what a writer replays; the two views below are for asking
+     * questions about one kind of operation, never for emitting.
+     */
+    public List<Operation> operations() {
+        return operations;
     }
 
     /** Everything stroked or filled, in the order it was drawn. */
     public List<Drawn> drawn() {
-        return drawn;
+        return operations.stream()
+                .filter(each -> each instanceof Drawn)
+                .map(each -> (Drawn) each).toList();
     }
 
     /** Every run of text, in the order it was drawn. */
     public List<Text> text() {
-        return text;
+        return operations.stream()
+                .filter(each -> each instanceof Text)
+                .map(each -> (Text) each).toList();
     }
 
     // ---- the seventeen the cartography uses --------------------------
@@ -125,7 +160,7 @@ public final class SheetRecorder extends Graphics2D {
     @Override
     public Graphics create() {
         SheetRecorder copy =
-                new SheetRecorder(drawn, text, metricsSource);
+                new SheetRecorder(operations, metricsSource);
         copy.transform = new AffineTransform(transform);
         copy.colour = colour;
         copy.stroke = stroke;
@@ -141,13 +176,13 @@ public final class SheetRecorder extends Graphics2D {
 
     @Override
     public void draw(Shape shape) {
-        drawn.add(new Drawn(transform.createTransformedShape(shape), false,
+        operations.add(new Drawn(transform.createTransformedShape(shape), false,
                 colour, strokeSpec(), clip));
     }
 
     @Override
     public void fill(Shape shape) {
-        drawn.add(new Drawn(transform.createTransformedShape(shape), true,
+        operations.add(new Drawn(transform.createTransformedShape(shape), true,
                 colour, strokeSpec(), clip));
     }
 
@@ -170,7 +205,8 @@ public final class SheetRecorder extends Graphics2D {
     public void drawString(String string, float x, float y) {
         java.awt.geom.Point2D at = transform.transform(
                 new java.awt.geom.Point2D.Float(x, y), null);
-        text.add(new Text(string, at.getX(), at.getY(), font, colour, clip));
+        operations.add(new Text(string, at.getX(), at.getY(), font,
+                colour, clip));
     }
 
     @Override

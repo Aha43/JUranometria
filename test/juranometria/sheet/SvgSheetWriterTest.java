@@ -137,10 +137,14 @@ class SvgSheetWriterTest {
                 SvgSheetWriter.Text.EDITABLE);
 
         for (String group : List.of("id=\"paper\"", "id=\"chart\"",
-                "id=\"ink\"", "id=\"labels\"")) {
+                "class=\"ink\"", "class=\"labels\"")) {
             assertTrue(svg.contains(group),
-                    "ink and labels can be selected apart in an"
-                            + " editor: " + group);
+                    "ink and labels can still be selected apart in an"
+                            + " editor - by class rather than by one"
+                            + " container each, because a container"
+                            + " per kind is a reordering and it hid"
+                            + " nothing while showing a constellation"
+                            + " name through the title box: " + group);
         }
         assertTrue(svg.contains("transform=\"translate(36.00,36.00)\""),
                 "and the chart sits inside the half-inch margin");
@@ -336,7 +340,7 @@ class SvgSheetWriterTest {
         assertEquals(sheet.shapeCount() + sheet.textCount(),
                 count(outlined, "<path d=") - count(outlined, "<clipPath"),
                 "every label became a path of its own, one for one");
-        assertTrue(outlined.contains("id=\"labels\""),
+        assertTrue(outlined.contains("class=\"labels\""),
                 "still grouped as labels, so they can be found again");
     }
 
@@ -392,7 +396,7 @@ class SvgSheetWriterTest {
         int escaping = 0;
         int unclipped = 0;
         Matcher paths = Pattern.compile("<path d=\"([^\"]+)\"([^/]*)/>")
-                .matcher(svg.substring(svg.indexOf("<g id=\"ink\"")));
+                .matcher(svg.substring(svg.indexOf("<g id=\"chart\"")));
         while (paths.find()) {
             double[] box = bounds(paths.group(1));
             if (box[0] >= -0.5 && box[1] >= -0.5
@@ -477,17 +481,35 @@ class SvgSheetWriterTest {
                         "http://www.w3.org/2000/svg", "path").getLength(),
                 "and every shape");
 
-        // The groups an editor offers a reader, found by identity.
-        for (String id : List.of("paper", "chart", "ink", "labels")) {
-            assertTrue(document.getElementById(id) != null
-                            || hasIdAttribute(document, id),
-                    "an editor finds the " + id + " layer by name");
+        // The groups an editor offers a reader, found by identity:
+        // the sheet and the chart by id, ink and labels by class -
+        // one container per kind would be a reordering, and that is
+        // what put a constellation name through the title box.
+        for (String id : List.of("paper", "chart")) {
+            assertTrue(hasIdAttribute(document, id),
+                    "an editor finds the " + id + " by name");
+        }
+        for (String kind : List.of("ink", "labels")) {
+            assertTrue(hasClass(document, kind),
+                    "and every run of " + kind + " by class");
         }
     }
 
     private static int countClipPaths(org.w3c.dom.Document document) {
         return document.getElementsByTagNameNS(
                 "http://www.w3.org/2000/svg", "clipPath").getLength();
+    }
+
+    private static boolean hasClass(org.w3c.dom.Document document,
+                                    String kind) {
+        var all = document.getElementsByTagName("*");
+        for (int i = 0; i < all.getLength(); i++) {
+            if (kind.equals(((org.w3c.dom.Element) all.item(i))
+                    .getAttribute("class"))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean hasIdAttribute(org.w3c.dom.Document document,

@@ -59,3 +59,8 @@ replay_pid*
 
 # Raw catalogue import inputs (large, re-downloadable)
 /imports/
+
+# Scratch renders and working files. A stray Poppler rendering was
+# swept into a commit by "git add -A" (PR #292); this makes the
+# careless case harmless as well as the careful one.
+tmp/

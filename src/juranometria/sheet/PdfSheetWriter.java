@@ -68,38 +68,46 @@ public final class PdfSheetWriter {
                 -paper.marginPoints(),
                 paper.highPoints() - paper.marginPoints()));
 
-        for (SheetRecorder.Drawn drawn : sheet.recorder().drawn()) {
-            content.append(open(drawn.clip()));
-            Color colour = drawn.colour();
-            content.append(String.format(Locale.ROOT, "%.3f %.3f %.3f %s%n",
-                    colour.getRed() / 255.0, colour.getGreen() / 255.0,
-                    colour.getBlue() / 255.0,
-                    drawn.filled() ? "rg" : "RG"));
-            if (!drawn.filled()) {
-                SheetRecorder.BasicStrokeSpec stroke = drawn.stroke();
+        // In the order the renderer drew, not shapes then text: the
+        // second is a reordering, and it printed "CANIS MAJOR"
+        // through the title box - found by opening an exported sheet
+        // and looking at it (PR #292).
+        for (SheetRecorder.Operation operation
+                : sheet.recorder().operations()) {
+            content.append(open(operation.clip()));
+            if (operation instanceof SheetRecorder.Drawn drawn) {
+                Color colour = drawn.colour();
                 content.append(String.format(Locale.ROOT,
-                        "%.2f w %d J %d j %.2f M%n", stroke.width(),
-                        pdfCap(stroke.cap()), pdfJoin(stroke.join()),
-                        stroke.miterLimit()));
-                content.append(dash(stroke.dash(), stroke.dashPhase()));
+                        "%.3f %.3f %.3f %s%n",
+                        colour.getRed() / 255.0, colour.getGreen() / 255.0,
+                        colour.getBlue() / 255.0,
+                        drawn.filled() ? "rg" : "RG"));
+                if (!drawn.filled()) {
+                    SheetRecorder.BasicStrokeSpec stroke = drawn.stroke();
+                    content.append(String.format(Locale.ROOT,
+                            "%.2f w %d J %d j %.2f M%n", stroke.width(),
+                            pdfCap(stroke.cap()), pdfJoin(stroke.join()),
+                            stroke.miterLimit()));
+                    content.append(dash(stroke.dash(),
+                            stroke.dashPhase()));
+                }
+                content.append(path(drawn.shape()));
+                content.append(drawn.filled() ? "f\n" : "S\n");
+            } else {
+                SheetRecorder.Text label = (SheetRecorder.Text) operation;
+                Color colour = label.colour();
+                content.append(String.format(Locale.ROOT,
+                        "%.3f %.3f %.3f rg%n",
+                        colour.getRed() / 255.0, colour.getGreen() / 255.0,
+                        colour.getBlue() / 255.0));
+                GlyphVector glyphs = label.font().createGlyphVector(
+                        new FontRenderContext(null, true, true),
+                        label.text());
+                content.append(path(glyphs.getOutline((float) label.x(),
+                        (float) label.y())));
+                content.append("f\n");
             }
-            content.append(path(drawn.shape()));
-            content.append(drawn.filled() ? "f\n" : "S\n");
-            content.append(close(drawn.clip()));
-        }
-
-        for (SheetRecorder.Text label : sheet.recorder().text()) {
-            content.append(open(label.clip()));
-            Color colour = label.colour();
-            content.append(String.format(Locale.ROOT, "%.3f %.3f %.3f rg%n",
-                    colour.getRed() / 255.0, colour.getGreen() / 255.0,
-                    colour.getBlue() / 255.0));
-            GlyphVector glyphs = label.font().createGlyphVector(
-                    new FontRenderContext(null, true, true), label.text());
-            content.append(path(glyphs.getOutline((float) label.x(),
-                    (float) label.y())));
-            content.append("f\n");
-            content.append(close(label.clip()));
+            content.append(close(operation.clip()));
         }
 
         return document(content.toString(), sheet);
