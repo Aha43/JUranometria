@@ -71,8 +71,9 @@ public final class SheetRecorder extends Graphics2D {
      * fills the title panel over it, and writes the title on top.
      * Replaying shapes-then-text put the constellation name back
      * above the panel, and "CANIS MAJOR" read straight through the
-     * title box of every exported Orion sheet - found on paper, by
-     * the physical inspection #287 owed (PR #292).
+     * title box of every exported Orion sheet - found by opening an
+     * exported sheet and looking at it, which nothing in this
+     * repository had done (PR #292).
      *
      * <p>So there is one sequence now, and a writer that walks it in
      * order cannot make that mistake again.

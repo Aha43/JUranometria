@@ -116,7 +116,8 @@ public final class SvgSheetWriter {
         // name, then the panel that covers it, then the title. Two
         // groups - all shapes, then all text - is a reordering, and
         // it put "CANIS MAJOR" through the title box of every sheet
-        // (PR #292, found on paper). Consecutive operations of a
+        // - found by opening an exported sheet and looking at it
+        // (PR #292). Consecutive operations of a
         // kind are still grouped, so ink and labels can be selected
         // apart in an editor; the grouping follows the order rather
         // than deciding it.

@@ -70,7 +70,8 @@ public final class PdfSheetWriter {
 
         // In the order the renderer drew, not shapes then text: the
         // second is a reordering, and it printed "CANIS MAJOR"
-        // through the title box (PR #292, found on paper).
+        // through the title box - found by opening an exported sheet
+        // and looking at it (PR #292).
         for (SheetRecorder.Operation operation
                 : sheet.recorder().operations()) {
             content.append(open(operation.clip()));

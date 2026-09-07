@@ -21,7 +21,7 @@ import juranometria.render.ChartRenderer;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The order the renderer drew in, kept (issue #287, found on paper).
+ * The order the renderer drew in, kept (issue #287).
  *
  * <p>The chart draws a constellation name, then fills the title
  * panel over whatever is beneath it, then writes the title on top.
