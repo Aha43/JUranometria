@@ -146,6 +146,20 @@ reconstructed. Production's own gnomonic projection
 never forms an angle at all - it divides by the
 cosine directly - and is not affected.
 
+That left the opposite fault, and a review found it:
+accurate near the antipode, the projection then
+placed the antipode itself, because
+`sin(toRadians(180))` is 1.22e-16 and the transverse
+part never quite reached zero. So half a turn of
+right ascension is recognised in degrees, where the
+caller wrote it, and answered exactly; every other
+offset takes the ordinary path unchanged. What is
+refused is now one representable position - 2.8e-14
+degrees, a ten-billionth of an arcsecond, against the
+three milliarcseconds the cosine discarded - and that
+width is the resolution of the input rather than a
+property of the arithmetic.
+
 ## Pointing at something
 
 A reader points at a mark and the atlas says what it
@@ -205,7 +219,7 @@ is further down, and it is not this.
 | gnomonic | a circle through the page centre | 199 | 0.0e+00 | degenerate | 0.0e+00 |
 | stereographic | the celestial equator | 400 | 2.6e-12 | degenerate | 9.8e-14 |
 | stereographic | the ecliptic | 400 | 1.0e+01 | 7.1e-15 | 2.1e-14 |
-| stereographic | a circle through the page centre | 400 | 5.1e+02 | 4.0e+00 | 4.0e+00 |
+| stereographic | a circle through the page centre | 399 | 0.0e+00 | degenerate | 0.0e+00 |
 | orthographic | the celestial equator | 200 | 7.4e-18 | degenerate | 1.4e-17 |
 | orthographic | the ecliptic | 200 | 3.9e-01 | 5.6e-02 | 8.9e-16 |
 | orthographic | a circle through the page centre | 200 | 0.0e+00 | degenerate | 0.0e+00 |

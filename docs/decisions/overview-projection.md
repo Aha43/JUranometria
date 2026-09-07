@@ -235,10 +235,38 @@ placed a point at exactly 90° quite happily, so the two disagreed
 about the projection's own edge. Stereographic carried a limit of
 179.999°, which is not a rounding guard but a different projection
 from the documented one: it silently dropped a finite region of sky
-near the antipode. The antipode is now refused where it actually
-fails, by its geometry, and nowhere else — and by its geometry rather
-than by waiting for its arithmetic to overflow, because `tan(π/2)`
-comes back from a double as 1.6e16, not as infinity.
+near the antipode.
+
+Getting that edge right took three attempts and each failure is worth
+keeping, because they fail in opposite directions. Waiting for the
+arithmetic to overflow does not work — `tan(π/2)` comes back from a
+double as 1.6e16, not as infinity — so the antipode has to be refused
+by its geometry. Finding the angle by inverting a cosine does not
+work either: it rounded a disc three milliarcseconds across onto the
+antipode and refused all of it. And finding the angle from both parts
+of the direction, which fixed that, then placed the antipode itself
+at a radius of thirty quadrillion, because `sin(toRadians(180))` is
+1.22e-16 and the transverse part never quite reached zero.
+
+Half a turn of right ascension is therefore recognised **in degrees,
+where the caller wrote it**, and answered exactly; every other offset
+takes the ordinary path unchanged. The refused set is then exactly
+one representable position:
+
+| | region refused |
+|---|---:|
+| the `acos` fault | 8.3e-07° (3 milliarcseconds) |
+| now | 2.8e-14° — one ulp of 180°, or 0.1 nanoarcseconds |
+
+Twenty-nine million times smaller, and no longer a property of the
+arithmetic: it is the resolution of the input. A position one
+representable step from the antipode is placed.
+
+That fix also repaired a measurement. A great circle through the page
+centre passes through the antipode too, so one of its sampled points
+was landing at a huge radius and wrecking its own straight-line fit,
+which read 5.1e+02 where it should have read zero. It now reads
+**0.0e+00**.
 
 The study's `StudyProjection` is this interface, and all three
 candidates implement it. The gnomonic one delegates to production's

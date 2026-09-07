@@ -159,23 +159,45 @@ final class Candidates {
 
             @Override
             public Optional<PlanePoint> project(SkyPosition position) {
-                double raOffset =
-                        Math.toRadians(position.raDegrees()) - centreRa;
                 double dec = Math.toRadians(position.decDegrees());
                 double sinDec = Math.sin(dec);
                 double cosDec = Math.cos(dec);
+
+                // Half a turn of right ascension is recognised in
+                // degrees, where the caller wrote it, and answered
+                // exactly. Converted to radians first it is not
+                // exact at all: sin(toRadians(180)) is 1.22e-16, not
+                // zero, so a position diametrically opposite the
+                // centre kept a transverse component it does not
+                // have, the antipode never looked like the antipode,
+                // and the projection placed the one point it cannot
+                // place at a radius of thirty quadrillion. Every
+                // other offset takes the ordinary path unchanged.
+                double turn = position.raDegrees() - centre.raDegrees();
+                double half = turn - 360.0 * Math.rint(turn / 360.0);
+                double sinOffset;
+                double cosOffset;
+                if (half == 180.0 || half == -180.0) {
+                    sinOffset = 0.0;
+                    cosOffset = -1.0;
+                } else {
+                    double raOffset =
+                            Math.toRadians(position.raDegrees()) - centreRa;
+                    sinOffset = Math.sin(raOffset);
+                    cosOffset = Math.cos(raOffset);
+                }
 
                 // The east and north parts of the direction from the
                 // centre. Their length is the sine of the angular
                 // distance, computed here rather than derived from
                 // its cosine, and that is the whole reason the angle
                 // below is found the way it is.
-                double east = cosDec * Math.sin(raOffset);
+                double east = cosDec * sinOffset;
                 double north = cosCentreDec * sinDec
-                        - sinCentreDec * cosDec * Math.cos(raOffset);
+                        - sinCentreDec * cosDec * cosOffset;
                 double length = Math.hypot(east, north);
                 double cosDistance = sinCentreDec * sinDec
-                        + cosCentreDec * cosDec * Math.cos(raOffset);
+                        + cosCentreDec * cosDec * cosOffset;
 
                 // From both parts, never from the cosine alone.
                 // Inverting a cosine is ill conditioned at both ends

@@ -349,6 +349,20 @@ public final class OverviewStudyMain {
                 never forms an angle at all - it divides by the
                 cosine directly - and is not affected.
 
+                That left the opposite fault, and a review found it:
+                accurate near the antipode, the projection then
+                placed the antipode itself, because
+                `sin(toRadians(180))` is 1.22e-16 and the transverse
+                part never quite reached zero. So half a turn of
+                right ascension is recognised in degrees, where the
+                caller wrote it, and answered exactly; every other
+                offset takes the ordinary path unchanged. What is
+                refused is now one representable position - 2.8e-14
+                degrees, a ten-billionth of an arcsecond, against the
+                three milliarcseconds the cosine discarded - and that
+                width is the resolution of the input rather than a
+                property of the arithmetic.
+
                 ## Pointing at something
 
                 A reader points at a mark and the atlas says what it

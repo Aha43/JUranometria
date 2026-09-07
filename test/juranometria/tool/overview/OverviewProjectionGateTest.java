@@ -226,6 +226,59 @@ class OverviewProjectionGateTest {
     }
 
     @Test
+    void theAntipodeItselfIsTheOnePointWithNoPlaceOnThePlane() {
+        // This assertion existed, and I deleted it when a fix made
+        // it fail, which is the wrong way round: the oracle was
+        // right and the code was wrong. Finding the angle from both
+        // parts of the direction cured the region the cosine had
+        // discarded, and then placed the antipode itself at a radius
+        // of thirty quadrillion, because sin(toRadians(180)) is
+        // 1.22e-16 and the transverse part never quite reached zero.
+        StudyProjection stereographic =
+                Candidates.stereographic(new SkyPosition(0.0, 0.0));
+        assertTrue(stereographic.project(new SkyPosition(180.0, 0.0))
+                        .isEmpty(),
+                "the antipode of the centre has no place on the plane");
+
+        // And not only for one tidy centre.
+        int refused = 0;
+        int pairs = 0;
+        for (double ra = 0.0; ra < 360.0; ra += 37.0) {
+            for (double dec = -80.0; dec <= 80.0; dec += 17.0) {
+                pairs++;
+                if (Candidates.stereographic(new SkyPosition(ra, dec))
+                        .project(new SkyPosition((ra + 180.0) % 360.0,
+                                -dec))
+                        .isEmpty()) {
+                    refused++;
+                }
+            }
+        }
+        assertEquals(pairs, refused, "every centre's own antipode, not"
+                + " only the ones with round numbers in them");
+    }
+
+    @Test
+    void whatIsRefusedNearTheAntipodeIsOneRepresentablePosition() {
+        // The other half, and the reason the fix is not simply the
+        // old fault at a smaller scale. The refused set is now the
+        // width of the input's own resolution rather than of the
+        // arithmetic's: one step away is placed.
+        StudyProjection stereographic =
+                Candidates.stereographic(new SkyPosition(0.0, 0.0));
+        assertTrue(stereographic
+                        .project(new SkyPosition(Math.nextDown(180.0), 0.0))
+                        .isPresent(),
+                "one representable step from the antipode is sky, and is"
+                        + " placed - " + Math.ulp(180.0) + " degrees, a"
+                        + " ten-billionth of an arcsecond");
+        assertTrue(stereographic
+                        .project(new SkyPosition(Math.nextUp(180.0), 0.0))
+                        .isPresent(),
+                "and so is the step the other way");
+    }
+
+    @Test
     void positionsNearTheCentreKeepTheirOwnPlaces() {
         // The other end of the same fault. Inverting a cosine is
         // ill conditioned near zero too, and a threshold beneath it
