@@ -65,37 +65,49 @@ sealed interface PlaneCurve {
         }
     }
 
-    /** A great circle through the centre, and every gnomonic one. */
-    record Straight(Line2D.Double line) implements PlaneCurve {
+    /**
+     * A great circle through the centre, and every gnomonic one.
+     *
+     * <p>Held as the equation {@code b x + c y + a = 0} with
+     * {@code b} and {@code c} a unit vector, so {@code a} is the
+     * signed distance from the origin and evaluating the equation at
+     * a point gives that point's distance from the line. Two far
+     * apart points would be the obvious representation and it is the
+     * wrong one: a line carried far enough out to cross any page
+     * loses digits to cancellation when anything is measured against
+     * it, and how far is far enough depends on a scale the curve
+     * does not know.
+     */
+    record Straight(double a, double b, double c) implements PlaneCurve {
 
-        /**
-         * The line {@code a + b xi + c eta = 0}, as two points far
-         * enough apart to cross any page.
-         */
+        /** Normalised, so that the coefficients mean a distance. */
         static Straight of(double a, double b, double c) {
             double length = Math.hypot(b, c);
-            // Nearest point to the origin, then a long way each way
-            // along the perpendicular.
-            double nearestX = -a * b / (length * length);
-            double nearestY = -a * c / (length * length);
-            double alongX = -c / length;
-            double alongY = b / length;
-            // Far enough to cross any page at any scale the atlas
-            // uses, and no further: a line carried out to a million
-            // plane units becomes a billion page units, where the
-            // arithmetic that measures a point's distance from it
-            // loses seven digits to cancellation. It showed up as a
-            // worst miss of 1.1e-07 where the circles were reading
-            // 1e-11.
-            double far = 1.0e3;
-            return new Straight(new Line2D.Double(
-                    nearestX - far * alongX, nearestY - far * alongY,
-                    nearestX + far * alongX, nearestY + far * alongY));
+            return new Straight(a / length, b / length, c / length);
+        }
+
+        /** How far a point lies off this line. */
+        double distanceFrom(double x, double y) {
+            return Math.abs(b * x + c * y + a);
+        }
+
+        /** A segment of this line long enough to cross a rectangle. */
+        private Line2D.Double across(Rectangle2D page) {
+            // Built about the page rather than about the origin, so
+            // the numbers stay the size of the page.
+            double middleX = page.getCenterX();
+            double middleY = page.getCenterY();
+            double off = b * middleX + c * middleY + a;
+            double nearX = middleX - off * b;
+            double nearY = middleY - off * c;
+            double reach = Math.hypot(page.getWidth(), page.getHeight());
+            return new Line2D.Double(nearX + reach * c, nearY - reach * b,
+                    nearX - reach * c, nearY + reach * b);
         }
 
         @Override
         public Shape shape() {
-            return line;
+            return across(new Rectangle2D.Double(-1000, -1000, 2000, 2000));
         }
 
         @Override
@@ -104,17 +116,17 @@ sealed interface PlaneCurve {
         }
 
         @Override
-        public PlaneCurve mapped(double scale, double centreX,
-                                 double centreY) {
-            return new Straight(new Line2D.Double(
-                    centreX - scale * line.x1, centreY - scale * line.y1,
-                    centreX - scale * line.x2, centreY - scale * line.y2));
+        public PlaneCurve mapped(double scale, double intoX, double intoY) {
+            // x = intoX - scale * xi and y = intoY - scale * eta, so
+            // substituting and clearing the scale leaves the same
+            // line with its normal turned about.
+            return new Straight(b * intoX + c * intoY + a * scale,
+                    -b, -c);
         }
 
         @Override
         public List<Run> clipTo(Rectangle2D page) {
-            // Liang-Barsky: one run or none, which is exactly what
-            // production's analytic clipper already promises.
+            Line2D.Double line = across(page);
             double dx = line.x2 - line.x1;
             double dy = line.y2 - line.y1;
             double[] window = {0.0, 1.0};

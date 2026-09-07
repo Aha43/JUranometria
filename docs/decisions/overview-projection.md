@@ -132,7 +132,7 @@ public interface Projection {
     Optional<SkyPosition> unproject(PlanePoint point);
     double planeRadius(double angleDegrees);
     double limitDegrees();
-    Optional<PlaneCurve> greatCircle(SkyPosition pole);
+    Optional<PlaneConic> greatCircle(SkyPosition pole);
 }
 ```
 
@@ -160,9 +160,26 @@ circle becomes an equation in page coordinates:
 | stereographic | `r = 2 tan(t/2)` | a circle of centre `(2b/a, 2c/a)` and radius `2/|a|`; a line when `a` is zero |
 | orthographic | `r = sin t` | `(a²+b²)ξ² + 2bc·ξη + (a²+c²)η² = a²`, an ellipse of radii `|a|` and 1 |
 
-Each projection returns the **simplest form that is exact**, so one
-curve has one name: a stereographic circle of infinite radius is a
-line, and an orthographic ellipse with equal axes is a circle.
+**It returns a conic, not a drawable curve**, and that is the second
+review finding rather than a detail. Written as a centre and a
+radius, a stereographic great circle whose pole is nearly square to
+the page centre has radius `2/|a|` — for the ecliptic seen from the
+vernal equinox that is 2.8e16, because `cos(270°)` is not zero in a
+double, it is −1.8e-16. Every rescue for that is worse than the
+disease: a tolerance is an unjustified epsilon, and an exact equality
+never fires because the degenerate case almost never arrives exactly.
+
+The six conic coefficients stay finite and well conditioned straight
+through the degeneracy — nothing divides by the quantity going to
+zero — and the passage from circle to line is the `x²` coefficient
+passing through zero, which needs no special case at all.
+
+Which drawable form to use is then **the page's decision, not the
+projection's**, because it is a question about a page: the same great
+circle is plainly curved across a hemisphere and plainly straight
+across a telescope field. The mapping picks the simplest of the three
+whose distance from the true curve, over that paper, is under one
+stated allowance — measured below.
 
 `PlaneCurve` is used polymorphically — the caller draws `shape()` and
 clips with `clipTo(rectangle)` and never asks which of the three it
@@ -187,6 +204,22 @@ but because `tan` cannot.
 `limitDegrees` is how far the projection reaches at all — 90 for
 gnomonic and orthographic, 180 for stereographic — and it is what
 lets a page ask whether a field is possible before trying to draw it.
+It is the **supremum**, and whether it is attained differs and is
+part of each projection's statement about itself: the orthographic
+limb at exactly 90° is on the globe and is drawn, while the gnomonic
+90° and the stereographic antipode are not reached at all.
+
+That distinction had to be corrected, and it is worth recording why.
+The orthographic inverse refused a radius of exactly one — the limb,
+the one circle a globe draws best — while its forward projection
+placed a point at exactly 90° quite happily, so the two disagreed
+about the projection's own edge. Stereographic carried a limit of
+179.999°, which is not a rounding guard but a different projection
+from the documented one: it silently dropped a finite region of sky
+near the antipode. The antipode is now refused where it actually
+fails, by its geometry, and nowhere else — and by its geometry rather
+than by waiting for its arithmetic to overflow, because `tan(π/2)`
+comes back from a double as 1.6e16, not as infinity.
 
 The study's `StudyProjection` is this interface, and all three
 candidates implement it. The gnomonic one delegates to production's
@@ -215,7 +248,41 @@ The fit is kept as the **check**. Two independent routes to the same
 curve, one from the projection's algebra and one from several hundred
 points it actually projected, agree on the form in **108 of 108**
 cases, and the drawn curve passes through those points to within
-3.1e-08 page units against an acceptance threshold of 1e-3.
+**2.7e-12 page units**.
+
+### Where a curve stops being one thing
+
+One allowance governs the substitutions, and it is measured rather
+than chosen. Curves near a degeneracy track it exactly; below a
+thousandth of a page unit the page starts keeping conics too
+ill-conditioned to work out, and the error jumps seven orders of
+magnitude:
+
+| allowed page units | worst miss, curves near a degeneracy | worst miss, every curve the study draws |
+|---:|---:|---:|
+| 1e-01 | 6.36e-02 | 2.73e-12 |
+| 1e-02 | 6.36e-03 | 2.73e-12 |
+| **1e-03 (chosen)** | **1.28e-03** | **2.73e-12** |
+| 1e-04 | 5.16e+04 | 2.73e-12 |
+| 1e-05 | 5.16e+04 | 2.73e-12 |
+| 1e-06 | 1.80e+308 | 2.73e-12 |
+
+The allowance is a thousandth of the thinnest line the atlas draws,
+and it sits at the edge of the cliff rather than near it by luck.
+Ordinary pages are untouched by the choice at every value of it,
+which is the other thing worth knowing: this is a decision about the
+degenerate cases and about nothing else.
+
+One degeneracy cannot be left to the page, and it is recorded rather
+than hidden. An orthographic great circle through the page centre has
+a conic that genuinely *factors* — its quadratic part is a perfect
+square — so the arithmetic that finds a centre and two radii divides
+by a determinant that is zero in exact arithmetic and rounding noise
+in a double. There is nothing there for a page to measure, so the
+projection answers it, at a threshold derived from the atlas's
+largest scale: the substituted line lies at most 5.2e-04 page units
+from the true curve on the narrowest field the atlas offers, and less
+on every other.
 
 Two things this vocabulary can say that production's cannot, both
 found by clipping real pages rather than by reasoning about them:
@@ -331,7 +398,10 @@ was would be a sheet that could not be checked.
   out byte for byte identical; the study already measures the
   gnomonic study projection against production at 0.000e+00.
   `ViewportMapping`'s scale becomes `width / (2 · planeRadius(field/2))`
-  and its 180-degree refusal moves to the projection.
+  and its 180-degree refusal moves to the projection. Every domain
+  edge must be stated by the projection and must agree between
+  `project` and `unproject`; a test should hold that agreement at and
+  either side of each limit.
   `SceneAssembler.queryRadiusDegrees` must ask the projection for its
   page corner rather than computing a gnomonic one.
   Measured over Orion, a 120-degree stereographic page reaches 72.4

@@ -106,12 +106,19 @@ class OverviewProjectionGateTest {
         // same way.
         int agreed = 0;
         for (Case each : grid()) {
+            // Through the page, because which drawable form a conic
+            // becomes is the page's decision and not the
+            // projection's.
             String stated = each.mapping().projection()
-                    .greatCircle(each.pole()).map(PlaneCurve::form)
+                    .greatCircle(each.pole())
+                    .map(conic -> each.mapping().onPage(conic).form())
                     .orElse("none");
             String fitted = PageCurves
                     .fitted(each.mapping(), each.pole(), 720)
                     .map(PlaneCurve::form).orElse("none");
+            if ("none".equals(stated)) {
+                continue;  // not on this page at all
+            }
             assertEquals(fitted, stated, each + ": the form the"
                     + " projection states and the form fitted to the"
                     + " points it projected");
@@ -132,11 +139,142 @@ class OverviewProjectionGateTest {
         java.util.Set<String> forms = new java.util.TreeSet<>();
         for (Case each : grid()) {
             each.mapping().projection().greatCircle(each.pole())
-                    .ifPresent(curve -> forms.add(curve.form()));
+                    .ifPresent(conic -> forms.add(
+                            each.mapping().onPage(conic).form()));
         }
         assertEquals(java.util.Set.of("circular", "elliptical",
                 "straight"), forms,
                 "the three forms the decision names, all reached");
+    }
+
+    @Test
+    void eachProjectionAgreesWithItselfAboutItsOwnEdge() {
+        // A domain stated one way by project() and another by
+        // unproject() is a projection that does not know where it
+        // stops. Both halves were wrong once: the orthographic
+        // inverse refused a radius of exactly one - the limb, which
+        // its forward projection places quite happily - and the
+        // stereographic limit was written 179.999, which is not a
+        // rounding guard but a finite region of sky silently
+        // dropped.
+        for (String name : List.of("gnomonic", "stereographic",
+                "orthographic")) {
+            StudyProjection projection = Candidates.named(name, ORION);
+            for (double away = 0.0; away <= 180.0; away += 0.25) {
+                SkyPosition out = along(ORION, away);
+                var plane = projection.project(out);
+                if (plane.isEmpty()) {
+                    continue;
+                }
+                assertTrue(projection.unproject(plane.get()).isPresent(),
+                        name + " places a point " + away + " degrees"
+                                + " from its centre and must be able to"
+                                + " take it back");
+            }
+        }
+    }
+
+    @Test
+    void theOrthographicLimbIsOnTheGlobeAndTheAntipodeIsNotOnThePlane() {
+        // The two edges named above, at the exact angles where they
+        // were wrong, so a re-introduction is caught at the point it
+        // would be made.
+        StudyProjection orthographic = Candidates.orthographic(ORION);
+        var limb = orthographic.project(along(ORION, 90.0));
+        assertTrue(limb.isPresent(), "the limb is on the globe");
+        assertEquals(1.0, Math.hypot(limb.get().xiEast(),
+                limb.get().etaNorth()), 1.0e-12,
+                "at a radius of exactly one");
+        assertTrue(orthographic.unproject(limb.get()).isPresent(),
+                "and the inverse accepts it");
+
+        StudyProjection stereographic = Candidates.stereographic(ORION);
+        assertEquals(180.0, stereographic.limitDegrees(),
+                "stereographic reaches everything but one point");
+        assertTrue(stereographic.project(along(ORION, 179.999)).isPresent(),
+                "a thousandth of a degree from the antipode is sky, and"
+                        + " is drawn");
+        assertTrue(stereographic.project(along(ORION, 180.0)).isEmpty(),
+                "the antipode itself is the one point it has no answer"
+                        + " for - and tan(pi/2) is 1.6e16 in a double,"
+                        + " not infinity, so this cannot be left to an"
+                        + " overflow");
+    }
+
+    @Test
+    void aCurveNearlyDegenerateIsStillRightWhereItIsDrawn() {
+        // The case no epsilon survived. A pole a hundred-millionth of
+        // a degree from square to the page centre gives a circle a
+        // hundred million pages wide, which is a line for every
+        // purpose a reader has. Measured at the allowance the study
+        // chose, over the narrowest and widest pages it draws.
+        // The allowance is the one the sweep chose, not one that
+        // drifted afterwards. Without this the check below passes
+        // for any allowance at all, because a looser allowance is
+        // honoured just as faithfully as a tighter one - it simply
+        // permits a worse curve.
+        assertEquals(SubstitutionReport.CHOSEN,
+                StudyMapping.DEFAULT_ALLOWED_PAGE_UNITS,
+                "the page allowance is the one the measured sweep"
+                        + " settled on");
+
+        for (double offset : new double[] {1.0e-3, 1.0e-6, 1.0e-9,
+                1.0e-12, 1.0e-15}) {
+            SkyPosition pole = new SkyPosition(
+                    90.0 - Math.toDegrees(offset), 0.0);
+            for (double field : new double[] {1.0, 42.0, 180.0}) {
+                StudyMapping mapping = new StudyMapping(
+                        Candidates.stereographic(new SkyPosition(0, 0)),
+                        field, 900, 700);
+                var built = PageCurves.greatCircle(mapping, pole, 720);
+                if (built.isEmpty()
+                        || Double.isNaN(built.get().residual())) {
+                    continue;
+                }
+                assertTrue(built.get().residual()
+                                < 2.0 * StudyMapping
+                                        .DEFAULT_ALLOWED_PAGE_UNITS,
+                        "a pole " + offset + " from square, on a "
+                                + field + " degree page, is drawn to "
+                                + built.get().residual()
+                                + " page units, against an allowance of "
+                                + StudyMapping.DEFAULT_ALLOWED_PAGE_UNITS);
+            }
+        }
+    }
+
+    @Test
+    void theEclipticSeenFromTheEquinoxIsDrawnAtAll() {
+        // The case that broke every attempt to special-case the
+        // degeneracy by an equality. The ecliptic passes through the
+        // vernal equinox, so its pole is square to that page centre -
+        // but cos(270 degrees) is -1.8e-16 in a double, not zero, so
+        // the exactly degenerate case does not arrive exactly. Held
+        // by what a reader would notice: the line is on the page.
+        StudyMapping mapping = new StudyMapping(
+                Candidates.stereographic(new SkyPosition(0.0, 0.0)),
+                60.0, 900, 700);
+        var built = PageCurves.greatCircle(mapping,
+                new SkyPosition(270.0, 66.5607), 720).orElseThrow();
+        assertEquals("straight", built.curve().form(),
+                "a great circle through the page centre is straight");
+        assertTrue(built.curve()
+                        .clipTo(new Rectangle2D.Double(0, 0, 900, 700))
+                        .size() == 1,
+                "and it crosses the page");
+        assertTrue(built.residual() < PageCurves.EXACT,
+                "and lands where the projected points are: "
+                        + built.residual());
+    }
+
+    /** A position a given angle from the centre, due north of it. */
+    private static SkyPosition along(SkyPosition centre, double degrees) {
+        double dec = centre.decDegrees() + degrees;
+        if (dec <= 90.0) {
+            return new SkyPosition(centre.raDegrees(), dec);
+        }
+        return new SkyPosition((centre.raDegrees() + 180.0) % 360.0,
+                180.0 - dec);
     }
 
     /** One projection, one field, one great circle. */

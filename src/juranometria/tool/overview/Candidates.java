@@ -73,7 +73,7 @@ final class Candidates {
             }
 
             @Override
-            public Optional<PlaneCurve> greatCircle(SkyPosition pole) {
+            public Optional<PlaneConic> greatCircle(SkyPosition pole) {
                 return gnomonicCircle(inFrame(centre, pole));
             }
         };
@@ -84,14 +84,27 @@ final class Candidates {
         return azimuthal(centre, "stereographic",
                 angle -> 2.0 * Math.tan(angle / 2.0),
                 radius -> 2.0 * Math.atan(radius / 2.0),
-                179.999, Candidates::stereographicCircle);
+                // Everything but the antipode, which is the
+                // projection's own statement about itself. An earlier
+                // draft wrote 179.999 here, which quietly refused a
+                // finite region of sky - a thousandth of a degree
+                // across the whole sky is not a rounding guard, it is
+                // a different projection from the documented one.
+                // The antipode is excluded where it actually fails,
+                // by its radius not being finite, and nowhere else.
+                180.0, Candidates::stereographicCircle);
     }
 
     /** r = sin(theta): the globe's own outline, one hemisphere. */
     static StudyProjection orthographic(SkyPosition centre) {
         return azimuthal(centre, "orthographic",
                 Math::sin,
-                radius -> radius >= 1.0 ? Double.NaN : Math.asin(radius),
+                // A radius of exactly one is the limb, and the limb
+                // is on the globe: asin(1) is ninety degrees. Written
+                // as ">=" this refused the one circle the projection
+                // draws best, and disagreed with project(), which
+                // places a point at ninety degrees quite happily.
+                radius -> radius > 1.0 ? Double.NaN : Math.asin(radius),
                 90.0, Candidates::orthographicCircle);
     }
 
@@ -140,6 +153,19 @@ final class Candidates {
                         + cosCentreDec * cosDec * Math.cos(raOffset);
                 double distance = Math.acos(Math.clamp(cosDistance, -1.0, 1.0));
                 if (Math.toDegrees(distance) > limitDegrees) {
+                    return Optional.empty();
+                }
+                if (distance >= Math.PI
+                        || !Double.isFinite(
+                                radiusOf.applyAsDouble(distance))) {
+                    // The antipode is the one point no azimuthal
+                    // projection places, and it has to be refused by
+                    // its geometry rather than by its arithmetic:
+                    // tan(pi/2) comes back from a double as
+                    // 1.6e16, not as infinity, so a projection that
+                    // waited for an overflow would place the
+                    // unplaceable point at a radius of thirty
+                    // quadrillion and call it a success.
                     return Optional.empty();
                 }
                 if (distance < 1e-12) {
@@ -195,15 +221,59 @@ final class Candidates {
             }
 
             @Override
-            public Optional<PlaneCurve> greatCircle(SkyPosition pole) {
+            public Optional<PlaneConic> greatCircle(SkyPosition pole) {
                 return circleForm.of(inFrame(centre, pole));
             }
         };
     }
 
+    /**
+     * How thin an orthographic ellipse may be before it is a line.
+     *
+     * <p>{@code a} is a direction cosine and the ellipse's thin
+     * radius is {@code |a|} in plane units, so the substituted line
+     * lies at most {@code |a| x (page units per plane unit)} from
+     * the true curve. The atlas's largest scale is its narrowest
+     * field, one degree, at 5.16e4 page units per plane unit - so at
+     * this threshold the substitution costs at most
+     * <strong>5.2e-04 page units</strong> on the worst page it can
+     * ever be asked for, and less on every other. That is the
+     * derivation; {@link SubstitutionReport} is the measurement.
+     */
+    private static final double FLAT = 1.0e-8;
+
+    /**
+     * The projections substitute nothing else.
+     *
+     * <p>Each returns the exact curve, and the only special cases
+     * are exact ones: a stereographic circle of unbounded radius
+     * <em>is</em> a line when the pole is exactly square to the
+     * centre, and an orthographic ellipse <em>is</em> a circle when
+     * its radii are exactly equal. Both are equalities, not
+     * tolerances.
+     *
+     * <p>An earlier draft substituted the simpler form <em>near</em>
+     * those cases, on a bare epsilon of 1e-12, and a review was
+     * right to refuse it. Measuring what it cost showed something
+     * worse than an unjustified threshold: it was in the wrong
+     * place. Between a pole component of 1e-3 and 1e-12 the exact
+     * circle has a radius so large that asking where it crosses a
+     * page loses every digit that matters - the measured error
+     * peaked at <strong>8e+08 page units</strong> - so the whole
+     * band the epsilon was protecting was the band it left
+     * unprotected.
+     *
+     * <p>The decision cannot be made here in any case. Whether a
+     * circle is distinguishable from a line is a question about a
+     * page: the same curve is one or the other depending on how much
+     * of it a page shows and at what scale. So it is made in
+     * {@link StudyMapping#onPage}, in page units, where the page is
+     * known - and it is a statement about the error it allows rather
+     * than about the size of a number.
+     */
     /** A projection's own answer, from the pole in its own frame. */
     private interface CircleForm {
-        Optional<PlaneCurve> of(double[] pole);
+        Optional<PlaneConic> of(double[] pole);
     }
 
     /**
@@ -241,40 +311,37 @@ final class Candidates {
      * {@code cos t (a + b xi + c eta) = 0}, and the cosine is
      * positive everywhere the projection reaches.
      */
-    private static Optional<PlaneCurve> gnomonicCircle(double[] pole) {
-        if (Math.hypot(pole[1], pole[2]) < 1.0e-12) {
+    private static Optional<PlaneConic> gnomonicCircle(double[] pole) {
+        if (pole[1] == 0.0 && pole[2] == 0.0) {
             // The circle lies entirely at ninety degrees from the
             // centre, where this projection is infinitely far away.
+            // An exact test, because it is an exact condition: the
+            // line has no direction at all, not merely a distant one.
             return Optional.empty();
         }
-        return Optional.of(
-                PlaneCurve.Straight.of(pole[0], pole[1], pole[2]));
+        return Optional.of(PlaneConic.line(pole[0], pole[1], pole[2]));
     }
 
     /**
-     * A stereographic great circle is a circle, or a line when it
-     * passes through the centre.
+     * A stereographic great circle, as one conic for every case.
      *
-     * <p>With {@code r = 2 tan(t/2)} the same substitution gives
-     * {@code a (1 - (xi^2 + eta^2)/4) + b xi + c eta = 0}: a circle
-     * of centre {@code (2b/a, 2c/a)} and radius {@code 2/|a|}, and a
-     * line through the origin when {@code a} is zero - which is
-     * exactly when the pole is ninety degrees from the centre, so
-     * the circle runs through the centre of the page.
+     * <p>With {@code r = 2 tan(t/2)} the substitution gives
+     * {@code a (1 - (xi^2 + eta^2)/4) + b xi + c eta = 0}, which is
+     * written out below without ever dividing by {@code a}. Divided
+     * through it would be a circle of centre {@code (2b/a, 2c/a)}
+     * and radius {@code 2/|a|}, and that division is the whole
+     * trouble: it is a circle for most poles, a line for one, and a
+     * pile of overflow either side of it. Left undivided the same
+     * six numbers say all three, and the passage from circle to line
+     * is the coefficient of {@code x^2} passing through zero.
      */
-    private static Optional<PlaneCurve> stereographicCircle(double[] pole) {
-        if (Math.abs(pole[0]) < 1.0e-12) {
-            return Optional.of(
-                    PlaneCurve.Straight.of(0.0, pole[1], pole[2]));
-        }
-        return Optional.of(new PlaneCurve.Circular(
-                2.0 * pole[1] / pole[0], 2.0 * pole[2] / pole[0],
-                2.0 / Math.abs(pole[0])));
+    private static Optional<PlaneConic> stereographicCircle(double[] pole) {
+        return Optional.of(new PlaneConic(-pole[0] / 4.0, 0.0,
+                -pole[0] / 4.0, pole[1], pole[2], pole[0]));
     }
 
     /**
-     * An orthographic great circle is an ellipse centred on the page
-     * centre, one radius wide and {@code |a|} deep.
+     * An orthographic great circle is an ellipse about the centre.
      *
      * <p>With {@code r = sin t} the substitution gives
      * {@code (a^2 + b^2) xi^2 + 2bc xi eta + (a^2 + c^2) eta^2 = a^2},
@@ -284,28 +351,28 @@ final class Candidates {
      * the limb itself, which is the right answer: the great circle
      * square to the line of sight is the edge of the globe.
      */
-    private static Optional<PlaneCurve> orthographicCircle(double[] pole) {
-        if (Math.abs(pole[0]) < 1.0e-12) {
-            // The ellipse has collapsed: with the pole square to the
-            // centre the conic reads (b xi + c eta)^2 = 0, which is a
-            // line through the centre and not a very thin ellipse.
-            // Left as an ellipse it is a shape with no interior, and
-            // the affine frame that clips it cannot be inverted.
-            return Optional.of(
-                    PlaneCurve.Straight.of(0.0, pole[1], pole[2]));
+    private static Optional<PlaneConic> orthographicCircle(double[] pole) {
+        double a = pole[0];
+        double b = pole[1];
+        double c = pole[2];
+        if (Math.abs(a) < FLAT) {
+            // The conic factors: with the pole square to the centre
+            // it reads (b xi + c eta)^2 = 0, a line drawn twice
+            // rather than an ellipse of no width. A great circle
+            // through the centre of an orthographic page crosses it
+            // straight, and that is the answer wanted.
+            //
+            // This one case cannot be left to the page, and the
+            // reason is worth stating. Everywhere else a projection
+            // hands over a conic and the page decides what to draw;
+            // here the conic is degenerate, its quadratic part is a
+            // perfect square, and the arithmetic that would find a
+            // centre and two radii divides by a determinant that is
+            // zero in exact arithmetic and rounding noise in a
+            // double. There is nothing for the page to measure.
+            return Optional.of(PlaneConic.line(0.0, b, c));
         }
-        double along = Math.abs(pole[0]);
-        if (Math.abs(along - 1.0) < 1.0e-12) {
-            // Equal axes. The pole is the centre, so this circle is
-            // the limb itself - and a circle is the simpler of two
-            // true names for it. Each projection returns the
-            // simplest form that is exact, so that one curve has one
-            // name and a count of forms means something.
-            return Optional.of(new PlaneCurve.Circular(0.0, 0.0, 1.0));
-        }
-        double tilt = Math.hypot(pole[1], pole[2]) < 1.0e-12
-                ? 0.0 : Math.atan2(pole[2], pole[1]);
-        return Optional.of(new PlaneCurve.Elliptical(0.0, 0.0,
-                along, 1.0, tilt));
+        return Optional.of(new PlaneConic(a * a + b * b, 2.0 * b * c,
+                a * a + c * c, 0.0, 0.0, -a * a));
     }
 }

@@ -49,17 +49,14 @@ final class PageCurves {
         // The projection is asked what the curve is. Nothing here
         // fits one, and nothing here samples the sky to find out -
         // the sampling below is the check, not the method.
-        Optional<PlaneCurve> stated =
+        Optional<PlaneConic> stated =
                 mapping.projection().greatCircle(pole);
         if (stated.isEmpty()) {
             return Optional.empty();
         }
         PlaneCurve onPage = mapping.onPage(stated.get());
 
-        List<Point2D> page = new ArrayList<>(samples);
-        for (SkyPosition position : CurveForm.around(pole, samples)) {
-            mapping.pageOf(position).ifPresent(page::add);
-        }
+        List<Point2D> page = onOrNearThePage(mapping, pole, samples);
         if (page.isEmpty()) {
             return Optional.empty();
         }
@@ -115,6 +112,35 @@ final class PageCurves {
     }
 
     /**
+     * Projected points on the page, or within a page of it.
+     *
+     * <p>Points far off the paper are excluded, and the reason is
+     * not tidiness. A stereographic great circle whose pole is
+     * nearly square to the centre runs out towards the antipode, and
+     * one of its sampled points lands two thousand million page
+     * units away: measuring a curve against that point asks whether
+     * the drawing is right in a place no drawing happens, and it
+     * dominated every number in the degenerate band until it was
+     * noticed. What the atlas owes is a curve that is right where it
+     * is drawn.
+     */
+    private static List<Point2D> onOrNearThePage(StudyMapping mapping,
+                                                 SkyPosition pole,
+                                                 int samples) {
+        double wide = 2.0 * mapping.pageCentreX();
+        double high = 2.0 * mapping.pageCentreY();
+        java.awt.geom.Rectangle2D near = new java.awt.geom.Rectangle2D
+                .Double(-wide / 2.0, -high / 2.0, 2.0 * wide, 2.0 * high);
+        List<Point2D> page = new ArrayList<>(samples);
+        for (SkyPosition position : CurveForm.around(pole, samples)) {
+            mapping.pageOf(position)
+                    .filter(near::contains)
+                    .ifPresent(page::add);
+        }
+        return page;
+    }
+
+    /**
      * The worst distance from a projected point to the curve that
      * would be drawn through it.
      *
@@ -133,15 +159,8 @@ final class PageCurves {
 
     private static double missAt(PlaneCurve curve, Point2D point) {
         return switch (curve) {
-            case PlaneCurve.Straight line -> {
-                double dx = line.line().x2 - line.line().x1;
-                double dy = line.line().y2 - line.line().y1;
-                double length = Math.hypot(dx, dy);
-                yield length == 0.0 ? Double.MAX_VALUE
-                        : Math.abs(dx * (line.line().y1 - point.getY())
-                                - dy * (line.line().x1 - point.getX()))
-                                / length;
-            }
+            case PlaneCurve.Straight line ->
+                    line.distanceFrom(point.getX(), point.getY());
             case PlaneCurve.Circular circle -> Math.abs(
                     Math.hypot(point.getX() - circle.centreX(),
                             point.getY() - circle.centreY())
@@ -183,15 +202,12 @@ final class PageCurves {
                         : page.get(page.size() - 1)};
     }
 
-    /** A line long enough to cross any page, through two of its points. */
+    /** The line through two points, as its own equation. */
     private static PlaneCurve through(Point2D a, Point2D b) {
         double dx = b.getX() - a.getX();
         double dy = b.getY() - a.getY();
-        double length = Math.hypot(dx, dy);
-        double far = 1.0e6 / length;
-        return new PlaneCurve.Straight(new Line2D.Double(
-                a.getX() - far * dx, a.getY() - far * dy,
-                a.getX() + far * dx, a.getY() + far * dy));
+        return PlaneCurve.Straight.of(dy * a.getX() - dx * a.getY(),
+                -dy, dx);
     }
 
     /** Centre and radius of the circle through three points. */

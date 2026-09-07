@@ -234,7 +234,7 @@ and the drawn curve must pass through those points:
 
 | measured over | stated form agrees with fitted form | worst the drawn curve misses a projected point |
 |---:|---:|---:|
-| 108 combinations | 108, and 0 disagree | 3.1e-08 page units |
+| 108 combinations | 108, and 0 disagree | 2.7e-12 page units |
 
 The disagreement that this check did find is worth
 recording, because it was not an error. Centred on
@@ -257,7 +257,60 @@ measuring a point's distance from it loses seven
 digits: the straight form's worst miss read 1.1e-07
 where the circles were reading 1e-11.
 
-## What one page asks of the vocabulary                ## What one page asks of the vocabulary
+## Where a curve stops being one thing
+
+A great circle can pass arbitrarily near a degenerate
+case, and nothing in the sky forbids it: a pole a
+hundred-millionth of a degree from square to the page
+centre gives a stereographic circle whose radius is
+a hundred million pages wide. It is a line for every
+purpose a reader has, and the atlas has to say so
+without a magic number.
+
+Where that decision is made matters more than what
+the number is. It cannot be made by the projection,
+which has no page: the same great circle is plainly
+curved across a hemisphere and plainly straight
+across a telescope field. So the projection states a
+conic - which stays finite through every degeneracy,
+because nothing divides by the quantity going to zero
+- and the page picks the simplest drawable form whose
+distance from the true curve, **over that paper**, is
+below one allowance.
+
+That leaves one number to choose, and it is measured
+rather than asserted. Too generous and a substituted
+curve visibly departs from the true one; too strict
+and the page keeps a conic whose centre and radius
+are too large to work out at all:
+
+| allowed page units | worst miss, curves near a degeneracy | worst miss, every curve the study draws |
+|---:|---:|---:|
+| 1e-01 | 6.36e-02 | 2.73e-12 |
+| 1e-02 | 6.36e-03 | 2.73e-12 |
+| 1e-03 **(chosen)** | 1.28e-03 | 2.73e-12 |
+| 1e-04 | 5.16e+04 | 2.73e-12 |
+| 1e-05 | 5.16e+04 | 2.73e-12 |
+| 1e-06 | 1.80e+308 | 2.73e-12 |
+
+Read the left column downwards. Curves near a
+degeneracy track the allowance exactly, as they
+should - the substitution is doing what it promises -
+until the allowance passes below a thousandth of a
+page unit, whereupon the page keeps conics it cannot
+work out and the error jumps by seven orders of
+magnitude. The right column shows that ordinary pages
+are untouched by the choice at every value of it,
+which is the other thing worth knowing: this is a
+decision about the degenerate cases and about nothing
+else.
+
+So the allowance is **a thousandth of a page unit**,
+which is a thousandth of the thinnest line the atlas
+draws, and it is chosen at the edge of the cliff
+rather than near it by luck.
+
+## What one page asks of the vocabulary
 
 Two things production's `Optional<Arc>` cannot say,
 found by clipping real pages rather than by thinking
@@ -265,114 +318,114 @@ about it:
 
 | projection | centre | field | circle | form | worst miss | runs | ends |
 |---|---|---:|---|---|---:|---:|---|
-| gnomonic | Orion | 42° | the celestial equator | straight | 4.8e-14 | 1 | two per run |
-| gnomonic | Orion | 60° | the celestial equator | straight | 3.4e-14 | 1 | two per run |
-| gnomonic | Orion | 60° | the ecliptic | straight | 1.3e-10 | 1 | two per run |
-| gnomonic | Orion | 60° | a meridian | straight | 2.3e-13 | 1 | two per run |
-| gnomonic | Orion | 90° | the celestial equator | straight | 3.1e-14 | 1 | two per run |
-| gnomonic | Orion | 90° | the ecliptic | straight | 6.4e-11 | 1 | two per run |
+| gnomonic | Orion | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| gnomonic | Orion | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| gnomonic | Orion | 60° | the ecliptic | straight | 2.7e-13 | 1 | two per run |
+| gnomonic | Orion | 60° | a meridian | straight | 3.4e-13 | 1 | two per run |
+| gnomonic | Orion | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| gnomonic | Orion | 90° | the ecliptic | straight | 2.6e-13 | 1 | two per run |
 | gnomonic | Orion | 90° | a meridian | straight | 1.1e-13 | 1 | two per run |
-| gnomonic | Orion | 120° | the celestial equator | straight | 3.0e-14 | 1 | two per run |
-| gnomonic | Orion | 120° | the ecliptic | straight | 3.7e-11 | 1 | two per run |
+| gnomonic | Orion | 120° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| gnomonic | Orion | 120° | the ecliptic | straight | 4.5e-13 | 1 | two per run |
 | gnomonic | Orion | 120° | a meridian | straight | 1.1e-13 | 1 | two per run |
-| gnomonic | Orion | 120° | a horizon | straight | 2.6e-10 | 1 | two per run |
-| gnomonic | the north pole | 42° | a meridian | straight | 1.0e-10 | 1 | two per run |
-| gnomonic | the north pole | 42° | a horizon | straight | 1.0e-10 | 1 | two per run |
-| gnomonic | the north pole | 60° | a meridian | straight | 7.8e-11 | 1 | two per run |
-| gnomonic | the north pole | 60° | a horizon | straight | 1.2e-10 | 1 | two per run |
-| gnomonic | the north pole | 90° | a meridian | straight | 3.4e-11 | 1 | two per run |
-| gnomonic | the north pole | 90° | a horizon | straight | 6.8e-11 | 1 | two per run |
-| gnomonic | the north pole | 120° | a meridian | straight | 2.9e-11 | 1 | two per run |
-| gnomonic | the north pole | 120° | a horizon | straight | 4.4e-11 | 1 | two per run |
+| gnomonic | Orion | 120° | a horizon | straight | 2.3e-12 | 1 | two per run |
+| gnomonic | the north pole | 42° | a meridian | straight | 6.8e-13 | 1 | two per run |
+| gnomonic | the north pole | 42° | a horizon | straight | 9.1e-13 | 1 | two per run |
+| gnomonic | the north pole | 60° | a meridian | straight | 8.0e-13 | 1 | two per run |
+| gnomonic | the north pole | 60° | a horizon | straight | 6.8e-13 | 1 | two per run |
+| gnomonic | the north pole | 90° | a meridian | straight | 6.8e-13 | 1 | two per run |
+| gnomonic | the north pole | 90° | a horizon | straight | 1.0e-12 | 1 | two per run |
+| gnomonic | the north pole | 120° | a meridian | straight | 6.8e-13 | 1 | two per run |
+| gnomonic | the north pole | 120° | a horizon | straight | 6.8e-13 | 1 | two per run |
 | gnomonic | the vernal equinox | 42° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
-| gnomonic | the vernal equinox | 42° | the ecliptic | straight | 1.0e-10 | 1 | two per run |
+| gnomonic | the vernal equinox | 42° | the ecliptic | straight | 5.1e-13 | 1 | two per run |
 | gnomonic | the vernal equinox | 60° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
-| gnomonic | the vernal equinox | 60° | the ecliptic | straight | 7.8e-11 | 1 | two per run |
-| gnomonic | the vernal equinox | 60° | a horizon | straight | 7.8e-11 | 1 | two per run |
+| gnomonic | the vernal equinox | 60° | the ecliptic | straight | 4.0e-13 | 1 | two per run |
+| gnomonic | the vernal equinox | 60° | a horizon | straight | 9.1e-13 | 1 | two per run |
 | gnomonic | the vernal equinox | 90° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
-| gnomonic | the vernal equinox | 90° | the ecliptic | straight | 3.4e-11 | 1 | two per run |
-| gnomonic | the vernal equinox | 90° | a horizon | straight | 6.8e-11 | 1 | two per run |
+| gnomonic | the vernal equinox | 90° | the ecliptic | straight | 3.1e-13 | 1 | two per run |
+| gnomonic | the vernal equinox | 90° | a horizon | straight | 5.7e-13 | 1 | two per run |
 | gnomonic | the vernal equinox | 120° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
-| gnomonic | the vernal equinox | 120° | the ecliptic | straight | 1.5e-11 | 1 | two per run |
-| gnomonic | the vernal equinox | 120° | a horizon | straight | 2.9e-11 | 1 | two per run |
-| stereographic | Orion | 42° | the celestial equator | straight | 4.8e-10 | 1 | two per run |
-| stereographic | Orion | 60° | the celestial equator | straight | 3.3e-10 | 1 | two per run |
-| stereographic | Orion | 60° | the ecliptic | circular | 9.1e-12 | 2 | two per run |
-| stereographic | Orion | 60° | a meridian | circular | 1.7e-11 | 1 | two per run |
-| stereographic | Orion | 90° | the celestial equator | straight | 2.1e-10 | 1 | two per run |
-| stereographic | Orion | 90° | the ecliptic | circular | 6.4e-12 | 1 | two per run |
-| stereographic | Orion | 90° | a meridian | circular | 1.1e-11 | 1 | two per run |
-| stereographic | Orion | 120° | the celestial equator | straight | 1.5e-10 | 1 | two per run |
-| stereographic | Orion | 120° | the ecliptic | circular | 4.1e-12 | 1 | two per run |
-| stereographic | Orion | 120° | a meridian | circular | 7.5e-12 | 1 | two per run |
-| stereographic | Orion | 120° | a horizon | circular | 1.9e-12 | 1 | two per run |
-| stereographic | Orion | 180° | the celestial equator | straight | 8.8e-11 | 1 | two per run |
-| stereographic | Orion | 180° | the ecliptic | circular | 2.7e-12 | 1 | two per run |
-| stereographic | Orion | 180° | a meridian | circular | 4.3e-12 | 1 | two per run |
-| stereographic | Orion | 180° | a horizon | circular | 1.0e-12 | 1 | two per run |
-| stereographic | the north pole | 42° | a meridian | straight | 3.5e-09 | 1 | two per run |
-| stereographic | the north pole | 42° | a horizon | circular | 1.5e-11 | 1 | two per run |
-| stereographic | the north pole | 60° | a meridian | straight | 2.4e-09 | 1 | two per run |
-| stereographic | the north pole | 60° | a horizon | circular | 1.0e-11 | 1 | two per run |
-| stereographic | the north pole | 90° | a meridian | straight | 1.6e-09 | 1 | two per run |
-| stereographic | the north pole | 90° | a horizon | circular | 6.4e-12 | 1 | two per run |
+| gnomonic | the vernal equinox | 120° | the ecliptic | straight | 2.3e-13 | 1 | two per run |
+| gnomonic | the vernal equinox | 120° | a horizon | straight | 3.4e-13 | 1 | two per run |
+| stereographic | Orion | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | Orion | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | Orion | 60° | the ecliptic | circular | 2.7e-12 | 2 | two per run |
+| stereographic | Orion | 60° | a meridian | circular | 9.1e-13 | 1 | two per run |
+| stereographic | Orion | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | Orion | 90° | the ecliptic | circular | 4.5e-13 | 1 | two per run |
+| stereographic | Orion | 90° | a meridian | circular | 4.5e-13 | 1 | two per run |
+| stereographic | Orion | 120° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | Orion | 120° | the ecliptic | circular | 4.5e-13 | 1 | two per run |
+| stereographic | Orion | 120° | a meridian | circular | 4.5e-13 | 1 | two per run |
+| stereographic | Orion | 120° | a horizon | circular | 9.1e-13 | 1 | two per run |
+| stereographic | Orion | 180° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | Orion | 180° | the ecliptic | circular | 4.5e-13 | 1 | two per run |
+| stereographic | Orion | 180° | a meridian | circular | 4.5e-13 | 1 | two per run |
+| stereographic | Orion | 180° | a horizon | circular | 1.1e-12 | 1 | two per run |
+| stereographic | the north pole | 42° | a meridian | straight | 9.1e-13 | 1 | two per run |
+| stereographic | the north pole | 42° | a horizon | circular | 9.1e-13 | 1 | two per run |
+| stereographic | the north pole | 60° | a meridian | straight | 6.8e-13 | 1 | two per run |
+| stereographic | the north pole | 60° | a horizon | circular | 9.1e-13 | 1 | two per run |
+| stereographic | the north pole | 90° | a meridian | straight | 8.0e-13 | 1 | two per run |
+| stereographic | the north pole | 90° | a horizon | circular | 9.1e-13 | 1 | two per run |
 | stereographic | the north pole | 120° | the ecliptic | circular | 5.7e-13 | 2 | two per run |
-| stereographic | the north pole | 120° | a meridian | straight | 1.1e-09 | 1 | two per run |
-| stereographic | the north pole | 120° | a horizon | circular | 4.8e-12 | 1 | two per run |
+| stereographic | the north pole | 120° | a meridian | straight | 8.0e-13 | 1 | two per run |
+| stereographic | the north pole | 120° | a horizon | circular | 1.1e-12 | 1 | two per run |
 | stereographic | the north pole | 180° | the celestial equator | circular | 1.7e-13 | 2 | two per run |
-| stereographic | the north pole | 180° | the ecliptic | circular | 3.4e-13 | 1 | two per run |
-| stereographic | the north pole | 180° | a meridian | straight | 6.5e-10 | 1 | two per run |
-| stereographic | the north pole | 180° | a horizon | circular | 3.0e-12 | 1 | two per run |
-| stereographic | the vernal equinox | 42° | the celestial equator | straight | 3.9e-09 | 1 | two per run |
-| stereographic | the vernal equinox | 42° | the ecliptic | straight | 3.1e-08 | 1 | two per run |
-| stereographic | the vernal equinox | 60° | the celestial equator | straight | 2.7e-09 | 1 | two per run |
-| stereographic | the vernal equinox | 60° | the ecliptic | straight | 2.1e-08 | 1 | two per run |
-| stereographic | the vernal equinox | 60° | a horizon | circular | 2.0e-11 | 1 | two per run |
-| stereographic | the vernal equinox | 90° | the celestial equator | straight | 1.7e-09 | 1 | two per run |
-| stereographic | the vernal equinox | 90° | the ecliptic | straight | 1.4e-08 | 1 | two per run |
-| stereographic | the vernal equinox | 90° | a horizon | circular | 1.4e-11 | 1 | two per run |
-| stereographic | the vernal equinox | 120° | the celestial equator | straight | 1.3e-09 | 1 | two per run |
-| stereographic | the vernal equinox | 120° | the ecliptic | straight | 1.0e-08 | 1 | two per run |
-| stereographic | the vernal equinox | 120° | a meridian | circular | 1.5e-12 | 1 | two per run |
-| stereographic | the vernal equinox | 120° | a horizon | circular | 9.8e-12 | 1 | two per run |
-| stereographic | the vernal equinox | 180° | the celestial equator | straight | 7.2e-10 | 1 | two per run |
-| stereographic | the vernal equinox | 180° | the ecliptic | straight | 5.7e-09 | 1 | two per run |
-| stereographic | the vernal equinox | 180° | a meridian | circular | 8.0e-13 | 1 | two per run |
-| stereographic | the vernal equinox | 180° | a horizon | circular | 5.7e-12 | 1 | two per run |
-| orthographic | Orion | 42° | the celestial equator | straight | 3.7e-14 | 1 | two per run |
-| orthographic | Orion | 60° | the celestial equator | straight | 3.4e-14 | 1 | two per run |
-| orthographic | Orion | 60° | the ecliptic | elliptical | 4.6e-13 | 4 | two per run |
-| orthographic | Orion | 60° | a meridian | elliptical | 4.5e-13 | 2 | two per run |
-| orthographic | Orion | 90° | the celestial equator | straight | 3.2e-14 | 1 | two per run |
-| orthographic | Orion | 90° | the ecliptic | elliptical | 3.4e-13 | 2 | two per run |
-| orthographic | Orion | 90° | a meridian | elliptical | 2.5e-13 | 2 | two per run |
-| orthographic | Orion | 90° | a horizon | elliptical | 4.1e-13 | 2 | two per run |
-| orthographic | Orion | 120° | the celestial equator | straight | 3.0e-14 | 1 | two per run |
+| stereographic | the north pole | 180° | the ecliptic | circular | 5.7e-13 | 1 | two per run |
+| stereographic | the north pole | 180° | a meridian | straight | 8.0e-13 | 1 | two per run |
+| stereographic | the north pole | 180° | a horizon | circular | 6.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | the vernal equinox | 42° | the ecliptic | straight | 4.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | the vernal equinox | 60° | the ecliptic | straight | 3.1e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 60° | a horizon | circular | 9.1e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | the vernal equinox | 90° | the ecliptic | straight | 2.6e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 90° | a horizon | circular | 9.1e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | the ecliptic | straight | 2.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | a meridian | circular | 3.4e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | a horizon | circular | 6.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | the ecliptic | straight | 3.4e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | a meridian | circular | 6.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | a horizon | circular | 1.0e-12 | 1 | two per run |
+| orthographic | Orion | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| orthographic | Orion | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| orthographic | Orion | 60° | the ecliptic | elliptical | 5.1e-13 | 4 | two per run |
+| orthographic | Orion | 60° | a meridian | elliptical | 3.6e-13 | 2 | two per run |
+| orthographic | Orion | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| orthographic | Orion | 90° | the ecliptic | elliptical | 4.7e-13 | 2 | two per run |
+| orthographic | Orion | 90° | a meridian | elliptical | 2.8e-13 | 2 | two per run |
+| orthographic | Orion | 90° | a horizon | elliptical | 5.2e-13 | 2 | two per run |
+| orthographic | Orion | 120° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | orthographic | Orion | 120° | the ecliptic | elliptical | 3.4e-13 | 2 | two per run |
-| orthographic | Orion | 120° | a meridian | elliptical | 2.7e-13 | 2 | two per run |
-| orthographic | Orion | 120° | a horizon | elliptical | 3.4e-13 | 4 | two per run |
-| orthographic | the north pole | 42° | a meridian | straight | 1.9e-10 | 1 | two per run |
-| orthographic | the north pole | 42° | a horizon | elliptical | 1.6e-12 | 2 | two per run |
-| orthographic | the north pole | 60° | a meridian | straight | 6.8e-11 | 1 | two per run |
-| orthographic | the north pole | 60° | a horizon | elliptical | 1.2e-12 | 2 | two per run |
-| orthographic | the north pole | 90° | a meridian | straight | 4.8e-11 | 1 | two per run |
-| orthographic | the north pole | 90° | a horizon | elliptical | 9.3e-13 | 2 | two per run |
+| orthographic | Orion | 120° | a meridian | elliptical | 3.4e-13 | 2 | two per run |
+| orthographic | Orion | 120° | a horizon | elliptical | 3.6e-13 | 4 | two per run |
+| orthographic | the north pole | 42° | a meridian | straight | 8.0e-13 | 1 | two per run |
+| orthographic | the north pole | 42° | a horizon | elliptical | 9.6e-13 | 2 | two per run |
+| orthographic | the north pole | 60° | a meridian | straight | 6.8e-13 | 1 | two per run |
+| orthographic | the north pole | 60° | a horizon | elliptical | 8.7e-13 | 2 | two per run |
+| orthographic | the north pole | 90° | a meridian | straight | 3.4e-13 | 1 | two per run |
+| orthographic | the north pole | 90° | a horizon | elliptical | 7.6e-13 | 2 | two per run |
 | orthographic | the north pole | 120° | the celestial equator | circular | 1.1e-13 | 4 | two per run |
 | orthographic | the north pole | 120° | the ecliptic | elliptical | 2.5e-13 | 4 | two per run |
-| orthographic | the north pole | 120° | a meridian | straight | 2.9e-11 | 1 | two per run |
-| orthographic | the north pole | 120° | a horizon | elliptical | 8.1e-13 | 2 | two per run |
+| orthographic | the north pole | 120° | a meridian | straight | 4.5e-13 | 1 | two per run |
+| orthographic | the north pole | 120° | a horizon | elliptical | 7.3e-13 | 2 | two per run |
 | orthographic | the vernal equinox | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | the vernal equinox | 42° | the ecliptic | straight | 9.7e-11 | 1 | two per run |
+| orthographic | the vernal equinox | 42° | the ecliptic | straight | 6.0e-13 | 1 | two per run |
 | orthographic | the vernal equinox | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | the vernal equinox | 60° | the ecliptic | straight | 6.8e-11 | 1 | two per run |
-| orthographic | the vernal equinox | 60° | a horizon | elliptical | 8.0e-13 | 2 | two per run |
+| orthographic | the vernal equinox | 60° | the ecliptic | straight | 4.0e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 60° | a horizon | elliptical | 9.2e-13 | 2 | two per run |
 | orthographic | the vernal equinox | 90° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | the vernal equinox | 90° | the ecliptic | straight | 4.8e-11 | 1 | two per run |
-| orthographic | the vernal equinox | 90° | a horizon | elliptical | 6.9e-13 | 2 | two per run |
+| orthographic | the vernal equinox | 90° | the ecliptic | straight | 2.6e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 90° | a horizon | elliptical | 6.0e-13 | 2 | two per run |
 | orthographic | the vernal equinox | 120° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
-| orthographic | the vernal equinox | 120° | the ecliptic | straight | 2.9e-11 | 1 | two per run |
+| orthographic | the vernal equinox | 120° | the ecliptic | straight | 2.0e-13 | 1 | two per run |
 | orthographic | the vernal equinox | 120° | a meridian | elliptical | 2.0e-13 | 2 | two per run |
-| orthographic | the vernal equinox | 120° | a horizon | elliptical | 4.7e-13 | 2 | two per run |
+| orthographic | the vernal equinox | 120° | a horizon | elliptical | 6.0e-13 | 2 | two per run |
 
 **A curve can cross one page more than once.** A
 circle and a rectangle meet in up to eight points -

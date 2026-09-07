@@ -85,5 +85,5 @@ public interface StudyProjection {
      * lies entirely at ninety degrees, where the tangent plane is
      * infinitely far away.
      */
-    Optional<PlaneCurve> greatCircle(SkyPosition pole);
+    Optional<PlaneConic> greatCircle(SkyPosition pole);
 }

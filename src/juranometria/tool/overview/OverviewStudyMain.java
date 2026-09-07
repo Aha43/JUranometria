@@ -448,7 +448,55 @@ public final class OverviewStudyMain {
                 digits: the straight form's worst miss read 1.1e-07
                 where the circles were reading 1e-11.
 
-                ## What one page asks of the vocabulary                ## What one page asks of the vocabulary
+                ## Where a curve stops being one thing
+
+                A great circle can pass arbitrarily near a degenerate
+                case, and nothing in the sky forbids it: a pole a
+                hundred-millionth of a degree from square to the page
+                centre gives a stereographic circle whose radius is
+                a hundred million pages wide. It is a line for every
+                purpose a reader has, and the atlas has to say so
+                without a magic number.
+
+                Where that decision is made matters more than what
+                the number is. It cannot be made by the projection,
+                which has no page: the same great circle is plainly
+                curved across a hemisphere and plainly straight
+                across a telescope field. So the projection states a
+                conic - which stays finite through every degeneracy,
+                because nothing divides by the quantity going to zero
+                - and the page picks the simplest drawable form whose
+                distance from the true curve, **over that paper**, is
+                below one allowance.
+
+                That leaves one number to choose, and it is measured
+                rather than asserted. Too generous and a substituted
+                curve visibly departs from the true one; too strict
+                and the page keeps a conic whose centre and radius
+                are too large to work out at all:
+
+                """);
+        out.append(SubstitutionReport.of());
+        out.append("""
+
+                Read the left column downwards. Curves near a
+                degeneracy track the allowance exactly, as they
+                should - the substitution is doing what it promises -
+                until the allowance passes below a thousandth of a
+                page unit, whereupon the page keeps conics it cannot
+                work out and the error jumps by seven orders of
+                magnitude. The right column shows that ordinary pages
+                are untouched by the choice at every value of it,
+                which is the other thing worth knowing: this is a
+                decision about the degenerate cases and about nothing
+                else.
+
+                So the allowance is **a thousandth of a page unit**,
+                which is a thousandth of the thinnest line the atlas
+                draws, and it is chosen at the edge of the cliff
+                rather than near it by luck.
+
+                ## What one page asks of the vocabulary
 
                 Two things production's `Optional<Arc>` cannot say,
                 found by clipping real pages rather than by thinking
