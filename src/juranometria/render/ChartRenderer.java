@@ -303,8 +303,18 @@ public final class ChartRenderer {
         }
         deepSky.sort(stackingOrder(policy, mapping.pixelsPerPlaneUnit()));
         marks.addAll(deepSky);
+        // The page's own limit, excepting the stars its figures are
+        // drawn to (issue #307). A limit says how crowded the page
+        // should be; it does not get to decide which stars a
+        // constellation is made of, and on the overview's brighter
+        // defaults it was removing them - lines drawn to nodes that
+        // were not there.
+        FigureAnchors anchors = FigureAnchors.of(scene, options,
+                new GeographyDetailPolicy(
+                        scene.viewport().fieldWidthDegrees()));
         for (Star star : scene.stars()) {
-            if (star.magnitude() > scene.limitingMagnitude()) {
+            if (star.magnitude() > scene.limitingMagnitude()
+                    && !anchors.holds(star)) {
                 continue;
             }
             projection.project(star.position()).ifPresent(plane -> {
