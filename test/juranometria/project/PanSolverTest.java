@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import juranometria.chart.ChartViewport;
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyPosition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +25,7 @@ class PanSolverTest {
             for (double xi : new double[] {-0.3, 0.0, 0.17}) {
                 for (double eta : new double[] {-0.22, 0.0, 0.3}) {
                     PlanePoint plane = new PlanePoint(xi, eta);
-                    SkyPosition sky = PanSolver.skyFromPlane(centre, plane);
+                    SkyPosition sky = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre, plane);
                     PlanePoint back = projection.project(sky).orElseThrow();
                     assertEquals(xi, back.xiEast(), 1e-12);
                     assertEquals(eta, back.etaNorth(), 1e-12);
@@ -55,9 +56,9 @@ class PanSolverTest {
                     PixelPoint press = new PixelPoint(drag[0], drag[1]);
                     PixelPoint release = new PixelPoint(
                             drag[0] + drag[2], drag[1] + drag[3]);
-                    SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+                    SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                             PanSolver.planeFromPixel(viewport, press));
-                    PanSolver.PanSolution solution = PanSolver.solveCentre(
+                    PanSolver.PanSolution solution = PanSolver.solveCentre(ChartProjection.GNOMONIC, 
                             grabbed,
                             PanSolver.planeFromPixel(viewport, release),
                             centre);
@@ -112,12 +113,12 @@ class PanSolverTest {
         // press-time grab, so out-and-back inside one gesture closes.
         ChartViewport viewport = new ChartViewport(RA_WRAP, 36.0, 900, 700);
         PixelPoint press = new PixelPoint(300, 500);
-        SkyPosition grabbed = PanSolver.skyFromPlane(RA_WRAP,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, RA_WRAP,
                 PanSolver.planeFromPixel(viewport, press));
         SkyPosition current = RA_WRAP;
         int[][] waypoints = {{700, 100}, {120, 640}, {880, 350}, {300, 500}};
         for (int[] w : waypoints) {
-            current = PanSolver.solveCentre(grabbed,
+            current = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                             PanSolver.planeFromPixel(viewport,
                                     new PixelPoint(w[0], w[1])), current)
                     .centre().orElseThrow();
@@ -130,9 +131,9 @@ class PanSolverTest {
     void zeroMovementSolvesToTheSameCentre() {
         ChartViewport viewport = new ChartViewport(M42, 18.0, 900, 700);
         PixelPoint press = new PixelPoint(600, 200);
-        SkyPosition grabbed = PanSolver.skyFromPlane(M42,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, M42,
                 PanSolver.planeFromPixel(viewport, press));
-        SkyPosition solved = PanSolver.solveCentre(grabbed,
+        SkyPosition solved = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                         PanSolver.planeFromPixel(viewport, press), M42)
                 .centre().orElseThrow();
         assertEquals(M42.raDegrees(), solved.raDegrees(), 1e-9);
@@ -148,9 +149,9 @@ class PanSolverTest {
         ChartViewport viewport = new ChartViewport(POLAR_N, 18.0, 900, 700);
         PlanePoint requested = PanSolver.planeFromPixel(viewport,
                 new PixelPoint(650, 350));
-        SkyPosition grabbed = PanSolver.skyFromPlane(POLAR_N,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, POLAR_N,
                 PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
-        PanSolver.PanSolution polar = PanSolver.solveCentre(grabbed,
+        PanSolver.PanSolution polar = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                 requested, POLAR_N);
         assertTrue(polar.constrained(),
                 "the solver classifies the polar follow as constrained");
@@ -165,9 +166,9 @@ class PanSolverTest {
                 "the follow is partial, not frozen");
 
         // Grabbing any less extreme point pans the polar page freely.
-        SkyPosition offCentre = PanSolver.skyFromPlane(POLAR_N,
+        SkyPosition offCentre = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, POLAR_N,
                 PanSolver.planeFromPixel(viewport, new PixelPoint(200, 550)));
-        assertTrue(PanSolver.solveCentre(offCentre,
+        assertTrue(PanSolver.solveCentre(ChartProjection.GNOMONIC, offCentre,
                         PanSolver.planeFromPixel(viewport,
                                 new PixelPoint(400, 550)), POLAR_N)
                 .centre().isPresent(), "off-centre grabs pan the polar page");
@@ -178,9 +179,9 @@ class PanSolverTest {
         // Dragging the near-south-pole point far downward would carry
         // the centre beyond the pole; no valid centre exists.
         ChartViewport viewport = new ChartViewport(POLAR_S, 36.0, 900, 700);
-        SkyPosition grabbed = PanSolver.skyFromPlane(POLAR_S,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, POLAR_S,
                 PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
-        PanSolver.PanSolution pastPole = PanSolver.solveCentre(grabbed,
+        PanSolver.PanSolution pastPole = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                 PanSolver.planeFromPixel(viewport,
                         new PixelPoint(450, 170)), POLAR_S);
         assertTrue(pastPole.centre().isEmpty(),

@@ -299,7 +299,8 @@ class DirectZoomJourneyTest {
 
     private SkyPosition anchorAtPointer(int x, int y) {
         var viewport = chart.scene().viewport();
-        return PanSolver.skyFromPlane(navigation.state().centre(),
+        return PanSolver.skyFromPlane(navigation.state().projection(),
+                navigation.state().centre(),
                 PanSolver.planeFromPixel(new ChartViewport(
                                 navigation.state().centre(),
                                 navigation.state().fieldWidthDegrees(),

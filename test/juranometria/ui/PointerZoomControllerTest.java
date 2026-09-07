@@ -6,6 +6,7 @@ import java.util.List;
 
 import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyPosition;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PanSolver;
@@ -76,6 +77,7 @@ class PointerZoomControllerTest {
                         ChartViewController controller =
                                 controllerAt(centre, from);
                         SkyPosition anchor = PanSolver.skyFromPlane(
+                                controller.state().projection(),
                                 controller.state().centre(),
                                 plane(controller.state(), pointer));
                         int[] notified = {0};
@@ -238,7 +240,7 @@ class PointerZoomControllerTest {
         PixelPoint pixel = new PixelPoint(300.0, paperHeight - 100.0);
         PlanePoint pointer = PanSolver.planeFromPixel(new ChartViewport(
                 centre, 36.0, WIDTH, paperHeight), pixel);
-        SkyPosition anchor = PanSolver.skyFromPlane(centre, pointer);
+        SkyPosition anchor = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre, pointer);
         assertEquals(PointerZoomOutcome.ACCEPTED,
                 controller.zoomAt(pointer, true));
         ChartViewport zoomed = new ChartViewport(

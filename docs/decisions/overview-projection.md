@@ -580,7 +580,22 @@ projection on the shared frame and making its domain rule exact.
 - **#299 — the overview page.** Stereographic at 60, 90 and 120
   degrees as three more rungs, with the field-linked default
   magnitude above. Recentre, pan and the transition back to a
-  detailed page, all through `unproject`. **It also owes the
+  detailed page, all through `unproject`. **It also owes the pan
+  centre solver.** Issue #297 found that `PanSolver.solveCentre`
+  solves the tangent plane's own equations — the quantity it writes
+  `1/N` is the cosine of the angle from the centre, and `xi/N` its
+  eastward part, which are true of a tangent plane and of nothing
+  else. It refuses any other projection rather than returning "no
+  solution", which a chart would read as a pan that could not be
+  made rather than as a solver that cannot do this. Generalising it
+  belongs to the issue that first makes such a page pannable, and the
+  clamp keeping a high-declination pan feasible is woven into the same
+  equations and is a feature rather than an artefact.
+
+  It also owes the field/projection pairing itself. #297 deliberately
+  does not couple them: every field on the ladder is drawn by the
+  atlas's own projection, and the overview's rungs are not on the
+  ladder at all. **It also owes the
   confirmation this gate could not give**: the same ink measure over
   real renderer-drawn pages, with labels and the renderer's own
   stroke policy, either adopting the rungs and defaults above or

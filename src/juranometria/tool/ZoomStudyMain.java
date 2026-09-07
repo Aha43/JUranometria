@@ -7,6 +7,7 @@ import juranometria.app.Atlas;
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.StarSizePolicy;
 import juranometria.project.GnomonicProjection;
@@ -52,12 +53,12 @@ public final class ZoomStudyMain {
                       double newFieldDegrees, PixelPoint pointer) {
         ChartViewport current = new ChartViewport(
                 centre, fieldDegrees, WIDTH, HEIGHT);
-        SkyPosition anchor = PanSolver.skyFromPlane(centre,
+        SkyPosition anchor = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                 PanSolver.planeFromPixel(current, pointer));
         ChartViewport zoomed = new ChartViewport(
                 centre, newFieldDegrees, WIDTH, HEIGHT);
         PlanePoint target = PanSolver.planeFromPixel(zoomed, pointer);
-        return new Step(PanSolver.solveCentre(anchor, target, centre),
+        return new Step(PanSolver.solveCentre(ChartProjection.GNOMONIC, anchor, target, centre),
                 anchor, target);
     }
 
@@ -102,12 +103,12 @@ public final class ZoomStudyMain {
                         int heightPx) {
         ChartViewport current = new ChartViewport(
                 centre, fieldDegrees, WIDTH, heightPx);
-        SkyPosition anchor = PanSolver.skyFromPlane(centre,
+        SkyPosition anchor = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                 PanSolver.planeFromPixel(current, pointer));
         ChartViewport zoomed = new ChartViewport(
                 centre, newFieldDegrees, WIDTH, heightPx);
         PlanePoint target = PanSolver.planeFromPixel(zoomed, pointer);
-        return new Step(PanSolver.solveCentre(anchor, target, centre),
+        return new Step(PanSolver.solveCentre(ChartProjection.GNOMONIC, anchor, target, centre),
                 anchor, target);
     }
 

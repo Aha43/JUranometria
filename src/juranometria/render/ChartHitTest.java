@@ -155,7 +155,7 @@ public final class ChartHitTest {
         // centre on if the reader asked it to.
         PlanePoint plane = PanSolver.planeFromPixel(scene.viewport(),
                 new PixelPoint(x, y));
-        return PanSolver.skyFromPlane(scene.viewport().centre(), plane);
+        return PanSolver.skyFromPlane(scene.viewport(), plane);
     }
 
     private static boolean onPaper(ChartScene scene, double x, double y) {

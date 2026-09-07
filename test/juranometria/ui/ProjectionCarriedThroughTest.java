@@ -21,6 +21,7 @@ import juranometria.render.ChartRenderer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -84,6 +85,19 @@ class ProjectionCarriedThroughTest {
         // and none of these asked. A chart that reverted on a zoom
         // would still draw a page, still be centred where the reader
         // left it, and still be wrong.
+        //
+        // The state below is a mechanism, not a chart anyone is
+        // offered. The gate decided that which projection draws a
+        // page is a property of the field, and the fields it pairs
+        // the overview with - 60, 90 and 120 degrees - are not on
+        // the ladder until issue #299 puts them there. A second
+        // review was right that asserting an overview at eight
+        // degrees reads as a claim that such a page is legitimate.
+        // It is not one: what is asserted here is only that a
+        // transition preserves the state it was handed, whatever
+        // that state is, which is a property of the transition and
+        // not of the pairing. #299 owes the pairing, and until it
+        // arrives nothing constructs one of these but a test.
         ChartViewState overview = new ChartViewState(ORION, 8.0, 6.0,
                 null, null, ChartProjection.STEREOGRAPHIC);
 
@@ -115,6 +129,24 @@ class ProjectionCarriedThroughTest {
         assertEquals(ChartProjection.GNOMONIC, overview.reset().projection(),
                 "Home returns the atlas's own chart, projection and"
                         + " all");
+    }
+
+    @Test
+    void nothingInTheAtlasPairsAFieldWithAProjectionYet() {
+        // Said out loud, so that the state above cannot be mistaken
+        // for a policy. Every field on the ladder is drawn by the
+        // atlas's own projection, and the overview's rungs are not
+        // on the ladder at all: issue #299 adds them and pairs them.
+        for (double field : ChartViewState.fieldWidthSteps()) {
+            assertEquals(ChartProjection.GNOMONIC,
+                    new ChartViewState(ORION, field, 6.0).projection(),
+                    field + " degrees is drawn by the atlas's own"
+                            + " projection, as every released field is");
+        }
+        assertTrue(ChartViewState.fieldWidthSteps().stream()
+                        .allMatch(field -> field <= 42.0),
+                "and the ladder stops at 42 degrees until #299 widens"
+                        + " it: " + ChartViewState.fieldWidthSteps());
     }
 
     @Test
@@ -188,6 +220,125 @@ class ProjectionCarriedThroughTest {
         }
         assertTrue(checked > 100,
                 "a page's worth of marks: " + checked);
+    }
+
+    @Test
+    void pointingAtThePageReadsItBackThroughTheSameProjection() {
+        // A review found the pointer scaled by one projection and
+        // inverted by another: the plane point came from the
+        // viewport's own scale, and the sky position came back
+        // through a tangent plane whatever page the reader was
+        // looking at. Hit testing, pan press and pointer zoom all
+        // read the wrong sky, and none of them looked wrong.
+        //
+        // Held as a round trip through the chart: what the projection
+        // puts at a pixel is what pointing at that pixel returns.
+        for (ChartProjection kind : ChartProjection.values()) {
+            ChartScene scene = sceneDrawnBy(kind, 42.0);
+            Projection projection =
+                    Projections.forViewport(scene.viewport());
+            var mapping = new juranometria.project.ViewportMapping(
+                    scene.viewport());
+            int checked = 0;
+            for (int x = 150; x <= 750; x += 150) {
+                for (int y = 100; y <= 600; y += 125) {
+                    SkyPosition pointed =
+                            juranometria.render.ChartHitTest.skyAt(scene,
+                                    x, y);
+                    var back = mapping.toPixel(projection
+                            .project(pointed).orElseThrow());
+                    assertEquals(x, back.x(), 1.0e-6,
+                            kind + ": pointing at " + x + "," + y
+                                    + " reads back the sky this page"
+                                    + " draws there");
+                    assertEquals(y, back.y(), 1.0e-6, "and its row");
+                    checked++;
+                }
+            }
+            assertTrue(checked >= 25, "a grid of pointings: " + checked);
+        }
+    }
+
+    @Test
+    void pointerZoomKeepsTheStarUnderThePointerOnEitherProjection() {
+        // The pointer-zoom scale was a ratio of tangents, which is
+        // the tangent plane's answer given for every projection - in
+        // the one place a reader notices most, because that ratio is
+        // exactly what keeps the star under the pointer while the
+        // field changes. Held by the promise itself rather than by
+        // the formula.
+        for (ChartProjection kind : ChartProjection.values()) {
+            Projection projection = Projections.of(kind, ORION);
+            double from = 24.0;
+            double to = 12.0;
+            // The controller's own number, checked the other way
+            // round: the ratio of the scales two viewports actually
+            // draw at. A wrong formula agrees with itself; it does
+            // not agree with the pages.
+            double scale = ChartViewController.zoomScale(projection,
+                    from, to);
+
+            // A star a third of the way out on the wider page, and
+            // where it must sit on the narrower one for the pointer
+            // to have held it.
+            var wide = new ChartViewport(ORION, from, 900, 700, kind);
+            var narrow = new ChartViewport(ORION, to, 900, 700, kind);
+            var wideMapping =
+                    new juranometria.project.ViewportMapping(wide);
+            var narrowMapping =
+                    new juranometria.project.ViewportMapping(narrow);
+            assertEquals(wideMapping.pixelsPerPlaneUnit()
+                            / narrowMapping.pixelsPerPlaneUnit(),
+                    scale, 1.0e-12,
+                    kind + ": the zoom scale is the ratio of the scales"
+                            + " the two pages are drawn at");
+            PlanePoint pointer = new PlanePoint(
+                    projection.planeRadius(from / 2.0) / 3.0, 0.0);
+            assertEquals(
+                    wideMapping.toPixel(pointer).x(),
+                    narrowMapping.toPixel(new PlanePoint(
+                            pointer.xiEast() * scale, 0.0)).x(),
+                    1.0e-6,
+                    kind + ": the scale between two fields is the one"
+                            + " that leaves a point where it was");
+
+            // And the controller's own solver uses it, where it can
+            // be asked. Asserting the formula on its own would only
+            // say the formula is right, not that the thing which
+            // zooms employs it - the same tautology as checking a
+            // renderer against the factory it used.
+            SkyPosition under = juranometria.project.PanSolver
+                    .skyFromPlane(kind, ORION, pointer);
+            PlanePoint after = new PlanePoint(
+                    pointer.xiEast() * scale, pointer.etaNorth() * scale);
+            if (kind == ChartProjection.GNOMONIC) {
+                SkyPosition moved = ChartViewController
+                        .solveExactReversible(kind, ORION, from, to,
+                                pointer)
+                        .orElseThrow(() -> new AssertionError(
+                                "a reversible pointer zoom"));
+                assertEquals(0.0, under.separationDegrees(
+                                juranometria.project.PanSolver
+                                        .skyFromPlane(kind, moved, after)),
+                        1.0e-9,
+                        "the star under the pointer is still under it"
+                                + " after the zoom");
+            } else {
+                // The pan centre solver solves the tangent plane's
+                // own equations, and says so rather than returning
+                // "no solution" - which the chart would read as a pan
+                // that could not be made rather than as a solver that
+                // cannot do this. Generalising it belongs to #299,
+                // the issue that first makes such a page pannable.
+                IllegalStateException refused = assertThrows(
+                        IllegalStateException.class,
+                        () -> ChartViewController.solveExactReversible(
+                                kind, ORION, from, to, pointer));
+                assertTrue(refused.getMessage().contains("#299"),
+                        "and names what would generalise it: "
+                                + refused.getMessage());
+            }
+        }
     }
 
     @Test

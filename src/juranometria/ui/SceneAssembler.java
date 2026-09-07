@@ -8,6 +8,7 @@ import juranometria.chart.SceneGeography;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyRegion;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
@@ -263,10 +264,29 @@ public final class SceneAssembler {
      * width. A taller window letterboxes the page rather than promising
      * sky the data does not hold; an offset centre allows less height.
      */
-    public int maxPageHeightPx(SkyPosition centre, double fieldWidthDegrees, int widthPx) {
-        double halfWidthPlane = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
+    public int maxPageHeightPx(SkyPosition centre, double fieldWidthDegrees,
+                               int widthPx) {
+        return maxPageHeightPx(ChartProjection.GNOMONIC, centre,
+                fieldWidthDegrees, widthPx);
+    }
+
+    /**
+     * The same, measured on the plane the page is actually drawn on.
+     *
+     * <p>Every distance here is a plane distance, and how far out an
+     * angle lies on the plane is the projection's answer, not a
+     * tangent's. The corner limit is the projection's too: it exists
+     * because a tangent plane degrades far from its centre, and how
+     * far is far depends on which projection is degrading.
+     */
+    public int maxPageHeightPx(ChartProjection kind, SkyPosition centre,
+                               double fieldWidthDegrees, int widthPx) {
+        Projection projection = Projections.of(kind, centre);
+        double halfWidthPlane =
+                projection.planeRadius(fieldWidthDegrees / 2.0);
         if (allSky) {
-            double limitPlane = Math.tan(Math.toRadians(PROJECTION_CORNER_LIMIT_DEGREES));
+            double limitPlane = projection.planeRadius(
+                    PROJECTION_CORNER_LIMIT_DEGREES);
             double halfHeightPlane = Math.sqrt(
                     limitPlane * limitPlane - halfWidthPlane * halfWidthPlane);
             return (int) Math.floor(widthPx * halfHeightPlane / halfWidthPlane);
@@ -277,7 +297,8 @@ public final class SceneAssembler {
         if (allowedCornerDegrees <= 0) {
             return 0;
         }
-        double maxCornerPlane = Math.tan(Math.toRadians(allowedCornerDegrees));
+        double maxCornerPlane =
+                projection.planeRadius(allowedCornerDegrees);
         if (maxCornerPlane <= halfWidthPlane) {
             return 0;
         }

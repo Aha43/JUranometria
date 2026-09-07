@@ -167,7 +167,8 @@ public final class ChartComponent extends JComponent {
             return;
         }
         int pageHeight = Math.min(getHeight(), assembler.maxPageHeightPx(
-                viewState.centre(), viewState.fieldWidthDegrees(), getWidth()));
+                viewState.projection(), viewState.centre(),
+                viewState.fieldWidthDegrees(), getWidth()));
         scene = assembler.assemble(viewState, getWidth(), pageHeight);
         // Consumers that describe the page - the inspector - need to
         // know it changed, because what the page can say about the
@@ -227,8 +228,10 @@ public final class ChartComponent extends JComponent {
     protected void paintComponent(Graphics g) {
         if (scene == null || scene.viewport().widthPx() != getWidth()
                 || scene.viewport().heightPx() != Math.min(getHeight(),
-                        assembler.maxPageHeightPx(viewState.centre(),
-                                viewState.fieldWidthDegrees(), getWidth()))) {
+                        assembler.maxPageHeightPx(viewState.projection(),
+                                viewState.centre(),
+                                viewState.fieldWidthDegrees(),
+                                getWidth()))) {
             // A resize event is already on its way for this geometry; skip
             // the stale frame rather than querying inside painting.
             return;

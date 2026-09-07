@@ -406,14 +406,14 @@ about it:
 | gnomonic | Orion | 120° | the ecliptic | straight | 4.5e-13 | 1 | two per run |
 | gnomonic | Orion | 120° | a meridian | straight | 1.1e-13 | 1 | two per run |
 | gnomonic | Orion | 120° | a horizon | straight | 2.3e-12 | 1 | two per run |
-| gnomonic | the north pole | 42° | a meridian | straight | 9.1e-13 | 1 | two per run |
+| gnomonic | the north pole | 42° | a meridian | straight | 8.0e-13 | 1 | two per run |
 | gnomonic | the north pole | 42° | a horizon | straight | 9.1e-13 | 1 | two per run |
-| gnomonic | the north pole | 60° | a meridian | straight | 8.0e-13 | 1 | two per run |
+| gnomonic | the north pole | 60° | a meridian | straight | 6.8e-13 | 1 | two per run |
 | gnomonic | the north pole | 60° | a horizon | straight | 6.8e-13 | 1 | two per run |
 | gnomonic | the north pole | 90° | a meridian | straight | 6.8e-13 | 1 | two per run |
 | gnomonic | the north pole | 90° | a horizon | straight | 1.0e-12 | 1 | two per run |
 | gnomonic | the north pole | 120° | a meridian | straight | 6.8e-13 | 1 | two per run |
-| gnomonic | the north pole | 120° | a horizon | straight | 6.8e-13 | 1 | two per run |
+| gnomonic | the north pole | 120° | a horizon | straight | 7.4e-13 | 1 | two per run |
 | gnomonic | the vernal equinox | 42° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
 | gnomonic | the vernal equinox | 42° | the ecliptic | straight | 5.1e-13 | 1 | two per run |
 | gnomonic | the vernal equinox | 60° | the celestial equator | straight | 5.7e-14 | 1 | two per run |

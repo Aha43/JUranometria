@@ -123,7 +123,7 @@ public final class PanInteraction extends MouseAdapter {
             return;
         }
         pressPoint = event.getPoint();
-        grabbed = PanSolver.skyFromPlane(scene.viewport().centre(),
+        grabbed = PanSolver.skyFromPlane(scene.viewport(),
                 PanSolver.planeFromPixel(scene.viewport(),
                         pagePixel(event.getPoint())));
         dragging = false;

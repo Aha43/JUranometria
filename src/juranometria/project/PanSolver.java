@@ -2,6 +2,7 @@ package juranometria.project;
 
 import java.util.Optional;
 
+import juranometria.chart.ChartProjection;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
 
@@ -82,8 +83,28 @@ public final class PanSolver {
      * image is the given tangent-plane point, for a chart centred at
      * {@code centre}. Every finite plane point has a pre-image.
      */
-    public static SkyPosition skyFromPlane(SkyPosition centre, PlanePoint plane) {
-        return new GnomonicProjection(centre).unproject(plane).orElseThrow();
+    /**
+     * Which position a point on the plane came from, under the
+     * projection the chart is drawn by.
+     *
+     * <p>The kind is asked for rather than assumed, and the old form
+     * that took only a centre is gone. It read the plane back through
+     * a tangent plane whatever page the reader was looking at, so an
+     * overview chart scaled its pointer one way and inverted it
+     * another - hit testing, pan press and pointer zoom all silently
+     * on the wrong sky. A review found it. There is nothing left that
+     * can make that mistake by omission.
+     */
+    public static SkyPosition skyFromPlane(ChartProjection kind,
+                                           SkyPosition centre,
+                                           PlanePoint plane) {
+        return Projections.of(kind, centre).unproject(plane).orElseThrow();
+    }
+
+    /** The same, for a caller that has the page it is pointing at. */
+    public static SkyPosition skyFromPlane(ChartViewport viewport,
+                                           PlanePoint plane) {
+        return skyFromPlane(viewport.projection(), viewport.centre(), plane);
     }
 
 
@@ -110,9 +131,35 @@ public final class PanSolver {
      * inside the valid declination range - panning past the pole -
      * which is an explicit hold, never NaN state.
      */
-    public static PanSolution solveCentre(SkyPosition grabbed,
+    public static PanSolution solveCentre(ChartProjection kind,
+                                          SkyPosition grabbed,
                                           PlanePoint target,
                                           SkyPosition previousCentre) {
+        if (kind != ChartProjection.GNOMONIC) {
+            // The equations below are the tangent plane's own. The
+            // quantity written 1/N is the cosine of the angle from
+            // the centre and xi/N is its eastward part, and both of
+            // those are true of a tangent plane and of nothing else.
+            //
+            // Threading the projection through here and leaving the
+            // algebra alone would be worse than not threading it: the
+            // verification step would reject every candidate and the
+            // solver would return "no solution", which the chart
+            // reads as a pan that could not be made rather than as a
+            // solver that cannot do this. It says so instead.
+            //
+            // Generalising it is real work and belongs with the issue
+            // that first makes an overview page pannable. The
+            // clamp that keeps a high-declination pan feasible is
+            // woven into these same equations, and it is a feature
+            // rather than an artefact.
+            throw new IllegalStateException(
+                    "the pan centre solver solves the tangent plane's"
+                            + " equations and was asked about the "
+                            + kind.displayName() + " projection:"
+                            + " generalising it is issue #299, which is"
+                            + " what first makes such a page pannable");
+        }
         double xi = target.xiEast();
         double eta = target.etaNorth();
 
@@ -181,7 +228,7 @@ public final class PanSolver {
                 SkyPosition candidate = new SkyPosition(
                         (Math.toDegrees(alpha) % 360.0 + 360.0) % 360.0,
                         Math.toDegrees(delta));
-                if (!reprojects(candidate, grabbed, xi, eta)) {
+                if (!reprojects(kind, candidate, grabbed, xi, eta)) {
                     continue;
                 }
                 verified.add(candidate);
@@ -218,9 +265,10 @@ public final class PanSolver {
     }
 
     /** Full-projection verification of a candidate centre. */
-    private static boolean reprojects(SkyPosition centre, SkyPosition grabbed,
+    private static boolean reprojects(ChartProjection kind,
+                                      SkyPosition centre, SkyPosition grabbed,
                                       double xi, double eta) {
-        var projection = new GnomonicProjection(centre);
+        var projection = Projections.of(kind, centre);
         var plane = projection.project(grabbed);
         return plane.isPresent()
                 && Math.abs(plane.get().xiEast() - xi) <= PLANE_TOLERANCE

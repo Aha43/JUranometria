@@ -284,7 +284,7 @@ public final class EquatorialGrid {
                     new PixelPoint(0, fy),
                     new PixelPoint(viewport.widthPx() - 1, fy)}) {
                 SkyPosition sky = juranometria.project.PanSolver
-                        .skyFromPlane(viewport.centre(),
+                        .skyFromPlane(viewport,
                                 juranometria.project.PanSolver
                                         .planeFromPixel(viewport, pixel));
                 decMin = Math.min(decMin, sky.decDegrees());

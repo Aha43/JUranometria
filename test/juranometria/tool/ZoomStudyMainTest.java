@@ -2,6 +2,7 @@ package juranometria.tool;
 
 import org.junit.jupiter.api.Test;
 
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyPosition;
 import juranometria.project.PanSolver;
 import juranometria.project.PixelPoint;
@@ -197,7 +198,7 @@ class ZoomStudyMainTest {
         var viewport = new juranometria.chart.ChartViewport(
                 centre, 18.0, 900, 700);
         PixelPoint pixel = new PixelPoint(123.0, 456.0);
-        SkyPosition anchor = PanSolver.skyFromPlane(centre,
+        SkyPosition anchor = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                 PanSolver.planeFromPixel(viewport, pixel));
         var landed = new juranometria.project.ViewportMapping(viewport)
                 .toPixel(new juranometria.project.GnomonicProjection(centre)
