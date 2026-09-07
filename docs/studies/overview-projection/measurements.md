@@ -1,0 +1,548 @@
+# Seeing more sky at once
+
+Measurements for issue #296, the Sprint 30 gate. Every
+number here was produced by `make overview-study` from
+the code in `src/juranometria/tool/overview`, over the
+bundled catalogue and the real constellation geography.
+Nothing in the atlas was changed to produce them.
+
+The question is not which projection is prettiest. It
+is which one an observer can read a 60-degree page of
+at a telescope, and what the atlas would have to grow
+to draw it.
+
+## Are these the projections they say they are
+
+Three candidates built by one shared factory that
+differs only in a radius function is what makes them
+comparable, and is also how a study measures the
+wrong thing convincingly. So each is checked against
+something written independently and reviewed before
+this issue existed - and the round trip is measured
+too, because a projection that could not be inverted
+is one a reader could not point at.
+
+| candidate | checked against | worst difference | round trip | reaches |
+|---|---|---:|---:|---:|
+| gnomonic | production's `GnomonicProjection` | 0.000e+00 | 7.7e-14° | 420 of 840 |
+| stereographic | Sprint 29's `StereographicCandidate` | 1.137e-13 | 7.8e-14° | 840 of 840 |
+| orthographic | its own definition, `sin(theta)` | 0.000e+00 | 3.3e-13° | 420 of 840 |
+
+The gnomonic candidate is not merely close to
+production's: it is the same plane point. It delegates
+to `GnomonicProjection` and `PanSolver`, so every
+gnomonic row in every table below is a measurement of
+the released atlas, not of a study's imitation of it.
+
+The stereographic candidate agrees with the one the
+Sprint 29 gate wrote from the projection's closed
+form, which is a different derivation reaching the
+same numbers.
+
+The last column is the domain, and it is the whole
+difference between a chart and an overview: two of
+these can hold half the sky and one of them can hold
+all but a point of it.
+
+## What a page costs, by field
+
+A page has a centre, where every projection is
+perfect, and it has corners. The corner is where the
+cost lives, so it is what is measured: how far from
+the centre the corner of a 900x700 page reaches, and
+what the projection is doing to the sky there.
+
+**Scale** is how much bigger a degree has become -
+distances read wrong. **Shape** is the difference
+between the two directions - a round cluster is drawn
+as an ellipse, and shape is what a reader matches
+against the sky.
+
+| projection | field | corner | scale at the corner | shape at the corner |
+|---|---:|---:|---:|---:|
+| gnomonic | 36° | 22.4° | +16.9% | +8.1% |
+| gnomonic | 42° | 25.9° | +23.6% | +11.2% |
+| gnomonic | 48° | 29.4° | +31.8% | +14.8% |
+| gnomonic | 60° | 36.2° | +53.5% | +23.9% |
+| gnomonic | 90° | 51.7° | +160.5% | +61.4% |
+| gnomonic | 120° | 65.5° | +481.5% | +141.1% |
+| gnomonic | 180° | — | — | the page leaves the projection |
+| stereographic | 36° | 22.7° | +4.0% | +0.0% |
+| stereographic | 42° | 26.4° | +5.5% | +0.0% |
+| stereographic | 48° | 30.1° | +7.3% | +0.0% |
+| stereographic | 60° | 37.5° | +11.5% | +0.0% |
+| stereographic | 90° | 55.4° | +27.5% | +0.0% |
+| stereographic | 120° | 72.4° | +53.5% | +0.0% |
+| stereographic | 180° | 103.4° | +160.5% | +0.0% |
+| orthographic | 36° | 23.0° | -8.0% | +8.7% |
+| orthographic | 42° | 27.0° | -10.9% | +12.2% |
+| orthographic | 48° | 31.0° | -14.3% | +16.7% |
+| orthographic | 60° | 39.3° | -22.6% | +29.2% |
+| orthographic | 90° | 63.6° | -55.6% | +125.0% |
+| orthographic | 120° | — | — | the page leaves the projection |
+| orthographic | 180° | — | — | the page leaves the projection |
+
+Read down the shape column. The gnomonic projection
+is exact at the centre and nowhere else, and by 90
+degrees it is drawing a circle as an ellipse half as
+wide again as it is tall. The stereographic
+projection's shape column is zero at every field, at
+every corner, to the precision of the arithmetic:
+that is what conformal means, and it is the whole
+argument. It pays for it in scale, and the price is
+mild - at 120 degrees a corner degree is half as big
+again as a centre degree, where the gnomonic
+projection's is nearly six times.
+
+The orthographic projection is worse than both at
+every field. It is not a chart projection and this is
+not a criticism of it: it is a picture of a ball, and
+a ball seen from outside is exactly what it should
+look like.
+
+## What each projection can show at all
+
+| projection | shows | radius at 80° | at 89.9° | at its own limit | edge |
+|---|---|---:|---:|---:|---|
+| gnomonic | out to 90° | 5.67 | 573.0 | unbounded | grows without bound as the edge is approached |
+| stereographic | out to 180° | 1.68 | 2.0 | unbounded | grows without bound as the edge is approached |
+| orthographic | out to 90° | 0.98 | 1.0 | 1.00 | a closed limb the whole domain fits inside |
+
+The gnomonic projection's edge is a hard one: a point
+90 degrees from the centre is infinitely far away on
+the paper, and one at 89.9 degrees is 573 plane units
+out when the whole 42-degree page is 0.77 wide. The
+stereographic projection's edge is the antipode and
+nothing else - it draws the entire sky but one point,
+and a whole hemisphere fits inside a radius of 2.0.
+The orthographic projection stops at a limb it can
+draw, which is why it makes a globe and not a chart.
+
+## Pointing at something
+
+A reader points at a mark and the atlas says what it
+is. What one page unit is worth in the sky decides
+whether that is possible, and it is worth different
+things in different parts of a wide page:
+
+| projection | field | at the centre | at the corner |
+|---|---:|---:|---:|
+| gnomonic | 42° | 176" | 158" |
+| gnomonic | 60° | 265" | 214" |
+| gnomonic | 90° | 458" | 284" |
+| gnomonic | 120° | 794" | 329" |
+| stereographic | 42° | 170" | 161" |
+| stereographic | 60° | 246" | 220" |
+| stereographic | 90° | 380" | 298" |
+| stereographic | 120° | 529" | 345" |
+| stereographic | 180° | 917" | 352" |
+| orthographic | 42° | 164" | 184" |
+| orthographic | 60° | 229" | 296" |
+| orthographic | 90° | 324" | 729" |
+
+The two chart projections magnify their corners, so a
+page unit there covers *less* sky than at the centre
+and pointing gets no harder as the page widens. The
+orthographic projection compresses its corners
+instead: on a 90-degree globe a page unit at the
+corner covers twelve arcminutes, four times what the
+same page's centre covers, and near the limb two
+stars a finger-width apart in the sky are the same
+pixel. A globe is a thing to look at. It is not a
+thing to point at, and that is a second reason to
+keep it apart from the chart rather than a reason to
+draw it badly.
+
+## The shape a great circle takes
+
+The atlas draws great circles: the celestial equator,
+the ecliptic, an observer's meridian and horizon.
+Under the gnomonic projection every one of them is a
+straight line, which is why `GreatCirclePage` clips
+two endpoints and `ReferenceInk` draws a `Line2D`
+between them.
+
+Here is what they become. Each curve is
+**determined** by the fewest points that fix a form -
+two for a line, three for a circle, five for a conic
+- and then **measured** against 200 to 400 more,
+worst miss in plane units.
+
+| projection | great circle | points | as a line | as a circle | as a conic |
+|---|---|---:|---:|---:|---:|
+| gnomonic | the celestial equator | 200 | 1.1e-30 | degenerate | 6.8e-15 |
+| gnomonic | the ecliptic | 200 | 1.5e-14 | degenerate | 8.5e-14 |
+| gnomonic | a circle through the page centre | 199 | 0.0e+00 | degenerate | 0.0e+00 |
+| stereographic | the celestial equator | 400 | 2.6e-12 | degenerate | 9.8e-14 |
+| stereographic | the ecliptic | 400 | 1.0e+01 | 1.4e-14 | 2.5e-14 |
+| stereographic | a circle through the page centre | 399 | 5.2e-12 | 0.0e+00 | 3.6e-12 |
+| orthographic | the celestial equator | 200 | 7.4e-18 | degenerate | 1.4e-17 |
+| orthographic | the ecliptic | 200 | 3.9e-01 | 5.6e-02 | 1.5e-15 |
+| orthographic | a circle through the page centre | 200 | 0.0e+00 | degenerate | 0.0e+00 |
+
+So the vocabulary is three words, and all three are
+exact:
+
+- a **straight** run - every gnomonic great circle,
+  and any circle through the page centre under the
+  other two;
+- a **circular** run - every other stereographic
+  great circle;
+- an **elliptical** run - every orthographic great
+  circle, and nothing else needs it.
+
+Nothing is sampled. Every one of the 109 page-and-circle combinations
+measured below is drawn by one of these three, and
+the worst any of them misses its own projected points
+by is **3.1e-08 page units**, against an acceptance
+threshold of 1e-3 - itself a thousandth of the
+thinnest line the atlas draws. Nothing sits near the
+threshold; it separates "exact" from "not this form
+at all".
+The third word is what makes the globe an addition
+rather than a redesign, and writing it was the way to
+find out. It is one record and one clipping rule, and
+the clipping rule is not new geometry: an ellipse is
+a circle under one affine change of variables, so the
+page's own edges are carried into the frame where the
+curve is a unit circle, cut there with the same
+arithmetic, and the answers carried back. Neither the
+other two words nor anything that uses them changed
+to admit it.
+
+The measurement is deliberately made against the
+curve that would be **drawn**, not against the
+equation it was fitted from - a form whose
+coefficients were right and whose shape came out
+rotated a quarter turn would satisfy a fit and fail
+this. It caught a real error: the ellipse's centre
+was divided by the discriminant where it belonged
+over the determinant, which is the same number
+negated, and every orthographic page quietly fell
+back to sampling instead of drawing wrongly.
+
+## What one page asks of the vocabulary
+
+Two things production's `Optional<Arc>` cannot say,
+found by clipping real pages rather than by thinking
+about it:
+
+| projection | centre | field | circle | form | worst miss | runs | ends |
+|---|---|---:|---|---|---:|---:|---|
+| gnomonic | Orion | 42° | the celestial equator | straight | 3.5e-14 | 1 | two per run |
+| gnomonic | Orion | 60° | the celestial equator | straight | 5.2e-14 | 1 | two per run |
+| gnomonic | Orion | 60° | the ecliptic | straight | 6.1e-11 | 1 | two per run |
+| gnomonic | Orion | 60° | a meridian | straight | 2.3e-13 | 1 | two per run |
+| gnomonic | Orion | 90° | the celestial equator | straight | 4.7e-14 | 1 | two per run |
+| gnomonic | Orion | 90° | the ecliptic | straight | 3.1e-11 | 1 | two per run |
+| gnomonic | Orion | 90° | a meridian | straight | 0.0e+00 | 1 | two per run |
+| gnomonic | Orion | 120° | the celestial equator | straight | 4.1e-14 | 1 | two per run |
+| gnomonic | Orion | 120° | the ecliptic | straight | 2.3e-11 | 1 | two per run |
+| gnomonic | Orion | 120° | a meridian | straight | 1.1e-13 | 1 | two per run |
+| gnomonic | Orion | 120° | a horizon | straight | 3.7e-10 | 1 | two per run |
+| gnomonic | the north pole | 42° | a meridian | straight | 1.2e-10 | 1 | two per run |
+| gnomonic | the north pole | 42° | a horizon | straight | 1.2e-10 | 1 | two per run |
+| gnomonic | the north pole | 60° | a meridian | straight | 1.2e-10 | 1 | two per run |
+| gnomonic | the north pole | 60° | a horizon | straight | 1.2e-10 | 1 | two per run |
+| gnomonic | the north pole | 90° | a meridian | straight | 1.2e-10 | 1 | two per run |
+| gnomonic | the north pole | 90° | a horizon | straight | 1.8e-10 | 1 | two per run |
+| gnomonic | the north pole | 120° | a meridian | straight | 6.1e-11 | 1 | two per run |
+| gnomonic | the north pole | 120° | a horizon | straight | 6.1e-11 | 1 | two per run |
+| gnomonic | the vernal equinox | 42° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
+| gnomonic | the vernal equinox | 42° | the ecliptic | straight | 6.1e-11 | 1 | two per run |
+| gnomonic | the vernal equinox | 60° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
+| gnomonic | the vernal equinox | 60° | the ecliptic | straight | 6.1e-11 | 1 | two per run |
+| gnomonic | the vernal equinox | 60° | a horizon | straight | 1.8e-10 | 1 | two per run |
+| gnomonic | the vernal equinox | 90° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
+| gnomonic | the vernal equinox | 90° | the ecliptic | straight | 6.1e-11 | 1 | two per run |
+| gnomonic | the vernal equinox | 90° | a horizon | straight | 1.2e-10 | 1 | two per run |
+| gnomonic | the vernal equinox | 120° | the celestial equator | straight | 0.0e+00 | 1 | two per run |
+| gnomonic | the vernal equinox | 120° | the ecliptic | straight | 6.1e-11 | 1 | two per run |
+| gnomonic | the vernal equinox | 120° | a meridian | straight | 1.1e-13 | 1 | two per run |
+| gnomonic | the vernal equinox | 120° | a horizon | straight | 1.2e-10 | 1 | two per run |
+| stereographic | Orion | 42° | the celestial equator | straight | 5.1e-10 | 1 | two per run |
+| stereographic | Orion | 60° | the celestial equator | straight | 3.5e-10 | 1 | two per run |
+| stereographic | Orion | 60° | the ecliptic | circular | 1.3e-11 | 2 | two per run |
+| stereographic | Orion | 60° | a meridian | circular | 8.2e-12 | 1 | two per run |
+| stereographic | Orion | 90° | the celestial equator | straight | 2.3e-10 | 1 | two per run |
+| stereographic | Orion | 90° | the ecliptic | circular | 8.6e-12 | 1 | two per run |
+| stereographic | Orion | 90° | a meridian | circular | 5.0e-12 | 1 | two per run |
+| stereographic | Orion | 120° | the celestial equator | straight | 1.6e-10 | 1 | two per run |
+| stereographic | Orion | 120° | the ecliptic | circular | 6.1e-12 | 1 | two per run |
+| stereographic | Orion | 120° | a meridian | circular | 3.6e-12 | 1 | two per run |
+| stereographic | Orion | 120° | a horizon | circular | 2.5e-12 | 1 | two per run |
+| stereographic | Orion | 180° | the celestial equator | straight | 9.4e-11 | 1 | two per run |
+| stereographic | Orion | 180° | the ecliptic | circular | 3.2e-12 | 1 | two per run |
+| stereographic | Orion | 180° | a meridian | circular | 2.0e-12 | 1 | two per run |
+| stereographic | Orion | 180° | a horizon | circular | 1.4e-12 | 1 | two per run |
+| stereographic | the north pole | 42° | a meridian | straight | 3.4e-09 | 1 | two per run |
+| stereographic | the north pole | 42° | a horizon | circular | 1.2e-11 | 1 | two per run |
+| stereographic | the north pole | 60° | a meridian | straight | 2.3e-09 | 1 | two per run |
+| stereographic | the north pole | 60° | a horizon | circular | 8.2e-12 | 1 | two per run |
+| stereographic | the north pole | 90° | a meridian | straight | 1.5e-09 | 1 | two per run |
+| stereographic | the north pole | 90° | a horizon | circular | 5.9e-12 | 1 | two per run |
+| stereographic | the north pole | 120° | the ecliptic | circular | 6.8e-13 | 2 | two per run |
+| stereographic | the north pole | 120° | a meridian | straight | 1.1e-09 | 1 | two per run |
+| stereographic | the north pole | 120° | a horizon | circular | 3.6e-12 | 1 | two per run |
+| stereographic | the north pole | 180° | the celestial equator | circular | 1.7e-13 | 2 | two per run |
+| stereographic | the north pole | 180° | the ecliptic | circular | 4.5e-13 | 1 | two per run |
+| stereographic | the north pole | 180° | a meridian | straight | 6.7e-10 | 1 | two per run |
+| stereographic | the north pole | 180° | a horizon | circular | 2.5e-12 | 1 | two per run |
+| stereographic | the vernal equinox | 42° | the celestial equator | straight | 3.9e-09 | 1 | two per run |
+| stereographic | the vernal equinox | 42° | the ecliptic | straight | 3.1e-08 | 1 | two per run |
+| stereographic | the vernal equinox | 60° | the celestial equator | straight | 2.7e-09 | 1 | two per run |
+| stereographic | the vernal equinox | 60° | the ecliptic | straight | 2.1e-08 | 1 | two per run |
+| stereographic | the vernal equinox | 60° | a horizon | circular | 1.9e-11 | 1 | two per run |
+| stereographic | the vernal equinox | 90° | the celestial equator | straight | 1.8e-09 | 1 | two per run |
+| stereographic | the vernal equinox | 90° | the ecliptic | straight | 1.4e-08 | 1 | two per run |
+| stereographic | the vernal equinox | 90° | a horizon | circular | 1.4e-11 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | the celestial equator | straight | 1.3e-09 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | the ecliptic | straight | 9.9e-09 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | a meridian | circular | 1.1e-12 | 1 | two per run |
+| stereographic | the vernal equinox | 120° | a horizon | circular | 8.9e-12 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | the celestial equator | straight | 7.2e-10 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | the ecliptic | straight | 5.7e-09 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | a meridian | circular | 6.8e-13 | 1 | two per run |
+| stereographic | the vernal equinox | 180° | a horizon | circular | 5.0e-12 | 1 | two per run |
+| orthographic | Orion | 42° | the celestial equator | straight | 1.1e-13 | 1 | two per run |
+| orthographic | Orion | 60° | the celestial equator | straight | 1.1e-13 | 1 | two per run |
+| orthographic | Orion | 60° | the ecliptic | elliptical | 7.7e-13 | 4 | two per run |
+| orthographic | Orion | 60° | a meridian | elliptical | 4.7e-13 | 2 | two per run |
+| orthographic | Orion | 90° | the celestial equator | straight | 1.5e-13 | 1 | two per run |
+| orthographic | Orion | 90° | the ecliptic | elliptical | 4.6e-13 | 2 | two per run |
+| orthographic | Orion | 90° | a meridian | elliptical | 3.6e-13 | 2 | two per run |
+| orthographic | Orion | 90° | a horizon | elliptical | 5.2e-11 | 2 | two per run |
+| orthographic | Orion | 120° | the celestial equator | straight | 1.6e-13 | 1 | two per run |
+| orthographic | Orion | 120° | the ecliptic | elliptical | 4.1e-13 | 2 | two per run |
+| orthographic | Orion | 120° | a meridian | elliptical | 2.3e-13 | 2 | two per run |
+| orthographic | Orion | 120° | a horizon | elliptical | 8.2e-12 | 4 | two per run |
+| orthographic | the north pole | 42° | a meridian | straight | 6.1e-11 | 1 | two per run |
+| orthographic | the north pole | 42° | a horizon | elliptical | 2.9e-12 | 2 | two per run |
+| orthographic | the north pole | 60° | a meridian | straight | 6.1e-11 | 1 | two per run |
+| orthographic | the north pole | 60° | a horizon | elliptical | 2.7e-12 | 2 | two per run |
+| orthographic | the north pole | 90° | a meridian | straight | 1.2e-10 | 1 | two per run |
+| orthographic | the north pole | 90° | a horizon | elliptical | 1.5e-12 | 2 | two per run |
+| orthographic | the north pole | 120° | the celestial equator | circular | 5.7e-13 | 4 | two per run |
+| orthographic | the north pole | 120° | the ecliptic | elliptical | 2.5e-13 | 4 | two per run |
+| orthographic | the north pole | 120° | a meridian | straight | 6.1e-11 | 1 | two per run |
+| orthographic | the north pole | 120° | a horizon | elliptical | 1.3e-12 | 2 | two per run |
+| orthographic | the vernal equinox | 42° | the celestial equator | straight | 2.2e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 42° | the ecliptic | straight | 1.2e-10 | 1 | two per run |
+| orthographic | the vernal equinox | 60° | the celestial equator | straight | 2.2e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 60° | the ecliptic | straight | 6.1e-11 | 1 | two per run |
+| orthographic | the vernal equinox | 60° | a horizon | elliptical | 1.0e-12 | 2 | two per run |
+| orthographic | the vernal equinox | 90° | the celestial equator | straight | 2.2e-13 | 1 | two per run |
+| orthographic | the vernal equinox | 90° | the ecliptic | straight | 6.1e-11 | 1 | two per run |
+| orthographic | the vernal equinox | 90° | a horizon | elliptical | 7.9e-13 | 2 | two per run |
+| orthographic | the vernal equinox | 120° | the celestial equator | straight | 5.7e-14 | 1 | two per run |
+| orthographic | the vernal equinox | 120° | the ecliptic | straight | 1.2e-10 | 1 | two per run |
+| orthographic | the vernal equinox | 120° | a meridian | elliptical | 3.1e-13 | 3 | two per run |
+| orthographic | the vernal equinox | 120° | a horizon | elliptical | 5.4e-13 | 2 | two per run |
+
+**A curve can cross one page more than once.** A
+circle and a rectangle meet in up to four points, so
+a great circle can leave and re-enter the paper -
+seven of the pages measured here do, and the
+pole-centred orthographic equator does it twice.
+`Optional<Arc>` can only answer "once" or "not at
+all", so it would draw one run and silently drop the
+rest.
+
+**A curve can close.** A great circle wholly inside
+the paper has no ends, and the rule that names a line
+"where it leaves the page" has nothing to hang on. No
+page at or below a 180-degree field closes: the
+pole-centred equator under the stereographic
+projection first closes at a field of
+**208.5 degrees**, and at 180 degrees it is exactly
+tangent to the left and right edges, which is one
+rounding error away and was enough to make an early
+version of the clipper in this study report the same
+circle in three pieces on one side of the page and
+one on the other. The vocabulary should be able to
+say "closed" even though nothing in Sprint 30 asks it
+to.
+
+## Where the atlas assumes one projection
+
+The gnomonic projection is not a setting. It is
+constructed in place, twenty-five times, in seven
+files:
+
+| file | constructions |
+|---|---:|
+| `page/PageExtent.java` | 8 |
+| `render/ChartRenderer.java` | 6 |
+| `render/EquatorialGrid.java` | 4 |
+| `ui/ReferenceInk.java` | 2 |
+| `ui/WorkingCrossInk.java` | 2 |
+| `page/PageInventory.java` | 2 |
+| `project/PanSolver.java` | 1 |
+
+Three of those are not merely construction sites but
+gnomonic arithmetic written into a rule that reads as
+if it were general:
+
+**The mapping.** `ViewportMapping` sets its scale to
+`width / (2 tan(field/2))` and refuses a field of 180
+degrees or more. The tangent is the gnomonic radius
+function; the refusal is not about pages, it is about
+`tan`. The general rule is the same sentence with the
+projection's own radius in it, and it agrees with
+production exactly wherever production works.
+
+**The query.** `SceneAssembler.queryRadiusDegrees`
+works out how much sky to fetch from
+`atan(hypot(tan(field/2), ...))` - the gnomonic page
+corner. A stereographic page of the same field
+reaches further:
+
+| centre | field | gnomonic corner | stereographic corner | objects not fetched |
+|---|---:|---:|---:|---:|
+| Orion | 60° | 36.2° | 37.5° | 349 |
+| Orion | 90° | 51.7° | 55.4° | 1208 |
+| Orion | 120° | 65.5° | 72.4° | 2402 |
+| the Milky Way in Sagittarius | 60° | 36.2° | 37.5° | 381 |
+| the Milky Way in Sagittarius | 90° | 51.7° | 55.4° | 1297 |
+| the Milky Way in Sagittarius | 120° | 65.5° | 72.4° | 2535 |
+
+Those are catalogue objects the page has room for and
+would not have been given. They would not look wrong.
+They would be missing, in the corners.
+
+**The cap.** `SceneAssembler` already refuses to let
+a page corner pass 60 degrees, with the comment
+*"Gnomonic charts degrade far from the centre; cap
+the page there"*. That cap is correct and it is the
+end of the road for wider gnomonic fields: on a
+900x700 page it is reached at a field of about
+**108 degrees**. A wider overview is not a wider field step. It is a
+different projection.
+
+## A globe is sized differently
+
+A page shows half its field across half its width -
+production's rule, and the general one. A hemisphere
+under the orthographic projection is a disc, and on a
+landscape page a disc sized by the width runs off the
+top and bottom at every field:
+
+| field | limb radius on a 900x700 page | the disc |
+|---:|---:|---|
+| 90° | 636 units | runs off the top and bottom |
+| 120° | 520 units | runs off the top and bottom |
+| 150° | 466 units | runs off the top and bottom |
+| 180° | 450 units | runs off the top and bottom |
+
+A whole hemisphere only fits if the scale is set by
+the page's short side, which leaves 200 units of a
+900-wide page empty on either side. That is a
+different rule from the one every other page uses,
+and it is a reason to keep the globe as issue #301
+rather than to fold it into an overview chart.
+
+## The pages
+
+Real scenes: the bundled catalogue, the real
+constellation figures and boundaries, production's
+detail policy, production's star sizes, production's
+naming rule, and the reference circles drawn in the
+vocabulary proposed above. Star names are not drawn -
+the label collision policy is unchanged by any of
+this, and a name is placed beside a mark whatever put
+the mark there. What does change is how many marks
+compete, which is counted.
+
+| page | projection | field | stars drawn | off the projection | ink | reference ink |
+|---|---|---:|---:|---:|---:|---|
+| orion-036-gnomonic.png | gnomonic | 36° | 204 | 242 | 4.3% | the celestial equator: straight, 1 run, named at the upper end |
+| orion-036-stereographic.png | stereographic | 36° | 203 | 251 | 4.2% | the celestial equator: straight, 1 run, named at the upper end |
+| orion-036-orthographic.png | orthographic | 36° | 203 | 260 | 4.1% | the celestial equator: straight, 1 run, named at the upper end |
+| orion-042-gnomonic.png | gnomonic | 42° | 283 | 242 | 5.2% | the celestial equator: straight, 1 run, named at the upper end |
+| orion-042-stereographic.png | stereographic | 42° | 282 | 246 | 5.0% | the celestial equator: straight, 1 run, named at the upper end |
+| orion-042-orthographic.png | orthographic | 42° | 279 | 265 | 4.9% | the celestial equator: straight, 1 run, named at the upper end |
+| orion-048-gnomonic.png | gnomonic | 48° | 351 | 262 | 5.9% | the celestial equator: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-048-stereographic.png | stereographic | 48° | 352 | 294 | 5.6% | the celestial equator: straight, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-048-orthographic.png | orthographic | 48° | 350 | 326 | 5.4% | the celestial equator: straight, 1 run, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
+| orion-060-gnomonic.png | gnomonic | 60° | 497 | 331 | 7.5% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-060-stereographic.png | stereographic | 60° | 502 | 363 | 7.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 2 runs, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-060-orthographic.png | orthographic | 60° | 512 | 418 | 6.8% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 4 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
+| orion-090-gnomonic.png | gnomonic | 90° | 928 | 424 | 13.7% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-090-stereographic.png | stereographic | 90° | 922 | 546 | 12.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-090-orthographic.png | orthographic | 90° | 934 | 847 | 9.6% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| orion-120-gnomonic.png | gnomonic | 120° | 1406 | 448 | 23.7% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| orion-120-stereographic.png | stereographic | 120° | 1382 | 722 | 18.5% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| orion-120-orthographic.png | orthographic | 120° | 1485 | 1331 | 13.7% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 4 runs, named at the upper end |
+| orion-180-stereographic.png | stereographic | 180° | 2507 | 855 | 32.3% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| ursa-major-060-gnomonic.png | gnomonic | 60° | 259 | 241 | 6.7% | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| ursa-major-060-stereographic.png | stereographic | 60° | 263 | 262 | 6.4% | a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| ursa-major-060-orthographic.png | orthographic | 60° | 264 | 305 | 6.7% | a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| ursa-major-090-gnomonic.png | gnomonic | 90° | 565 | 374 | 10.9% | the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| ursa-major-090-stereographic.png | stereographic | 90° | 567 | 487 | 9.7% | the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| ursa-major-090-orthographic.png | orthographic | 90° | 592 | 798 | 8.9% | the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| sagittarius-060-gnomonic.png | gnomonic | 60° | 369 | 298 | 7.7% | the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| sagittarius-060-stereographic.png | stereographic | 60° | 370 | 348 | 7.2% | the celestial equator: circular, 2 runs, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| sagittarius-060-orthographic.png | orthographic | 60° | 374 | 396 | 7.2% | the celestial equator: elliptical, 4 runs, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
+| sagittarius-090-gnomonic.png | gnomonic | 90° | 763 | 428 | 13.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| sagittarius-090-stereographic.png | stereographic | 90° | 772 | 551 | 10.9% | the celestial equator: circular, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| sagittarius-090-orthographic.png | orthographic | 90° | 809 | 847 | 9.8% | the celestial equator: elliptical, 2 runs, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| pole-090-gnomonic.png | gnomonic | 90° | 739 | 400 | 12.4% | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| pole-090-stereographic.png | stereographic | 90° | 760 | 504 | 10.4% | a meridian: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| pole-090-orthographic.png | orthographic | 90° | 795 | 796 | 8.9% | a meridian: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| pole-120-gnomonic.png | gnomonic | 120° | 1245 | 431 | 23.3% | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| pole-120-stereographic.png | stereographic | 120° | 1272 | 672 | 16.6% | the ecliptic: circular, 2 runs, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| pole-120-orthographic.png | orthographic | 120° | 1408 | 1208 | 12.2% | the celestial equator: circular, 4 runs, named at the upper end; the ecliptic: elliptical, 4 runs, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| equinox-060-gnomonic.png | gnomonic | 60° | 258 | 214 | 5.3% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| equinox-060-stereographic.png | stereographic | 60° | 254 | 246 | 5.1% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| equinox-060-orthographic.png | orthographic | 60° | 258 | 295 | 4.4% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| equinox-120-gnomonic.png | gnomonic | 120° | 1034 | 517 | 17.9% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| equinox-120-stereographic.png | stereographic | 120° | 1050 | 821 | 12.0% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| equinox-120-orthographic.png | orthographic | 120° | 1237 | 1489 | 8.5% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: elliptical, 3 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| orion-090-gnomonic-black.png | gnomonic | 90° | 928 | 424 | 13.6% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-090-gnomonic-sheet.png | gnomonic | 90° | 854 | 498 | 18.3% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-090-stereographic-black.png | stereographic | 90° | 922 | 546 | 12.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-090-stereographic-sheet.png | stereographic | 90° | 831 | 637 | 15.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-090-orthographic-black.png | orthographic | 90° | 934 | 847 | 9.6% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| orion-090-orthographic-sheet.png | orthographic | 90° | 834 | 947 | 12.0% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+
+## How faint an overview can afford to be
+
+The released 42-degree page is the control: it is
+readable, people have used it, and its middle half is
+**5.0% ink** at the chart's default magnitude of 6. A
+90-degree page at the same magnitude is more than
+twice that, and a 180-degree page is a third of the
+paper. Density is not a projection's fault - it is
+the sky's - but an overview that arrives at the
+default magnitude arrives unreadable, so what the
+default should be is a measurement and not a taste:
+
+| field | mag 6.0 | mag 5.5 | mag 5.0 | mag 4.5 | mag 4.0 |
+|---:|---:|---:|---:|---:|---:|
+| 60° | 7.2% | 6.0% | 5.2% | 4.7% | 4.3% |
+| 90° | 12.2% | 9.6% | 7.8% | 6.8% | 6.1% |
+| 120° | 18.5% | 14.4% | 11.8% | 10.3% | 9.1% |
+| 180° | 32.3% | 25.0% | 20.3% | 17.2% | 15.3% |
+
+Read across each row to the column nearest the
+control. This is a contract for the issue that builds
+the overview, not a control for a reader to find: the
+magnitude slider already exists and does not change.
+
+## What the study does not settle
+
+These pages were drawn by a study painter, not by
+`ChartRenderer`, because the renderer cannot be
+asked for another projection - which is the finding,
+not a shortcut. They are therefore evidence about
+**geometry**: what the sky looks like under each
+projection, what a curve becomes, what a page asks
+for. They are not evidence about the finished chart's
+ink weights, label density or legibility at an
+overview field, because the study does not draw
+labels and does not use the renderer's own stroke
+policy. Those belong to the issue that changes the
+renderer.
+
+Nor has any of this been read at a telescope, or on
+paper. Issue #293 still owns the paper.

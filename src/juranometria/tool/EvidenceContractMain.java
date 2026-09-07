@@ -101,6 +101,11 @@ public final class EvidenceContractMain {
                 "docs/studies/chart-sheet/measurements.md");
         REPORT_MAINS.put("juranometria.tool.WiderFieldStudyMain",
                 "docs/studies/wider-field/released-pages.txt");
+        // Writes its 49 candidate pages beside the report as it runs
+        // (issue #296), the black-sky pattern: capturing the report
+        // regenerates the pages the gate was decided from.
+        REPORT_MAINS.put("juranometria.tool.overview.OverviewStudyMain",
+                "docs/studies/overview-projection/measurements.md");
     }
 
     /**

@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A study of what lies beyond 42°** (issue #296, the Sprint 30 gate):
+  49 candidate pages of the real sky under the gnomonic, stereographic
+  and orthographic projections, with what each costs in shape, scale,
+  domain, curve form and page density. `make overview-study`.
+
+### Changed
+
+- Nothing a reader can see. The gate changed no production behaviour:
+  it decided that the first overview projection is stereographic, at
+  60°, 90° and 120° as three more rungs on the existing field ladder,
+  and recorded the rule that a module says what belongs on the sky
+  while a projection says how the sky becomes a page
+  (`docs/decisions/overview-projection.md`, `docs/architecture.md`).
+
 ## [1.10.0] - 2026-09-07
 
 Sprint 29 — Take the chart to the observing table. The sprint the
