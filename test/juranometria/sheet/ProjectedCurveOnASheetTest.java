@@ -225,10 +225,11 @@ class ProjectedCurveOnASheetTest {
      *
      * <p>Derived rather than guessed: whatever the two renders
      * differ by, with the circle itself set aside, is the rest of
-     * what the module contributed - here its four landmarks and
-     * their words, one of which sits on the circle. Taking it from
-     * both sides of the comparison leaves a region the two pages
-     * differ in by one curve.
+     * what the module contributed - its name here, its landmarks on
+     * a page that carries them. Taking that from both sides of the
+     * comparison leaves a region the two pages differ in by one
+     * curve. Naming the parts instead would make this test true of
+     * the module as it stands rather than of the module.
      *
      * <p>The difference is taken both ways. Ink that appeared only
      * when the circle was hidden would be as much a second variable
@@ -329,14 +330,21 @@ class ProjectedCurveOnASheetTest {
         // the constellation lines and the observer's own meridian
         // and horizon are drawn identically on both.
         //
-        // One thing that switch does not leave alone: the module
-        // contributes the circle *and* its four landmarks, and the
-        // March equinox sits on this very band. So the landmarks'
-        // ink is taken out of the region before either page is
-        // sampled - found by asking what the two renders differ by
-        // and setting the circle itself aside, rather than by
-        // guessing where a diamond or its word might be. What is
-        // left differs by one curve.
+        // One thing that switch does not leave alone: a module
+        // contributes the circle *and* everything else it draws, so
+        // whatever that is comes away with it. Rather than name
+        // those things, the region is the band with whatever the two
+        // renders differ by taken out of it, the circle itself set
+        // aside. What is left differs by one curve.
+        //
+        // On this page that difference is two operations: the circle
+        // and the word "Ecliptic", which lies on the band and was
+        // real second-variable ink. The module's four landmarks are
+        // off this paper - the page is centred sixteen degrees north
+        // and the nearest of them falls below its bottom edge - so
+        // no landmark is in the measurement. The exclusion is
+        // derived rather than written down, so it holds a page that
+        // does carry one.
         SheetRecording sheet = sheet(ChartProjection.STEREOGRAPHIC);
         SheetRecording bare = sheet(ChartProjection.STEREOGRAPHIC,
                 modules(false));
