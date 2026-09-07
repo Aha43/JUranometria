@@ -98,47 +98,180 @@ class OverviewPageTest {
                 "with the centre the reader kept throughout");
     }
 
+    /**
+     * The reader's own route, driven through the real window.
+     *
+     * <p>The first version of this asked the toolbar buttons what
+     * their descriptions said and then called the controller
+     * directly, and asked the hit test for a sky position and then
+     * recentred by hand. A review was right that neither drove the
+     * thing it was about: a Zoom out button wired to nothing, and a
+     * chart with no route from a selected object to a detailed page,
+     * both passed. So this presses the controls.
+     */
     @Test
-    void theControlThatEntersAndLeavesTheOverviewSaysSo() throws Exception {
-        // The issue asks for one explicit, accessible control that
-        // enters and leaves the overview; the gate ruled out a mode
-        // and a projection menu. Both are satisfied by the control
-        // that already makes the step saying where it goes - and
-        // only at the step where the kind of chart changes, because a
-        // button that renamed itself at every rung would be a readout
-        // pretending to be a control.
-        ChartViewController controller = new ChartViewController();
-        controller.recenter(ORION, 42.0);
-        java.util.concurrent.atomic.AtomicReference<AtlasToolbar> made =
-                new java.util.concurrent.atomic.AtomicReference<>();
-        javax.swing.SwingUtilities.invokeAndWait(() -> made.set(
-                new AtlasToolbar(controller, new SearchField(
-                        new juranometria.search.LocalSearch(List.of(),
-                                List.of()),
-                        Atlas.assembler(), controller))));
-        AtlasToolbar toolbar = made.get();
+    void theReaderZoomsOutToTheOverviewPicksAnObjectAndEntersDetail()
+            throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeFalse(
+                java.awt.GraphicsEnvironment.isHeadless(),
+                "this journey drives a real window");
 
-        javax.swing.JButton out = button(toolbar, "Zoom out");
-        javax.swing.JButton in = button(toolbar, "Zoom in");
-        assertTrue(out.getToolTipText().contains("overview"),
-                "at the sheet page, zoom out says where it leads: "
-                        + out.getToolTipText());
-        assertEquals(out.getToolTipText(),
-                out.getAccessibleContext().getAccessibleDescription(),
-                "and says it to assistive technology in the same words");
-        assertFalse(in.getToolTipText().contains("overview"),
-                "the other direction is an ordinary step here");
+        javax.swing.JFrame[] frame = new javax.swing.JFrame[1];
+        ChartViewController[] navigation = new ChartViewController[1];
+        ChartComponent[] chart = new ChartComponent[1];
+        juranometria.app.InspectorPanel[] inspector =
+                new juranometria.app.InspectorPanel[1];
+        juranometria.chart.SelectionModel selection =
+                new juranometria.chart.SelectionModel();
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            navigation[0] = new ChartViewController(Atlas.assembler()::fits);
+            chart[0] = new ChartComponent(Atlas.assembler());
+            navigation[0].onChange(chart[0]::setViewState);
+            SelectInteraction.install(chart[0], selection,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
+            inspector[0] = new juranometria.app.InspectorPanel(selection,
+                    chart[0]::currentScene, () -> ChartOptions.DEFAULTS,
+                    chosen -> navigation[0].recenter(chosen.position()));
+            chart[0].onSceneChange(inspector[0]::refresh);
+            navigation[0].recenter(ORION, 42.0);
 
-        javax.swing.SwingUtilities.invokeAndWait(controller::zoomOut);
-        assertTrue(button(toolbar, "Zoom in").getToolTipText()
-                        .contains("detailed atlas"),
-                "and on the overview, zoom in says how to get back: "
-                        + button(toolbar, "Zoom in").getToolTipText());
-        assertFalse(button(toolbar, "Zoom out").getToolTipText()
-                        .contains("overview"),
-                "while a wider rung is an ordinary step again");
+            frame[0] = new javax.swing.JFrame("overview journey");
+            frame[0].setLayout(new java.awt.BorderLayout());
+            frame[0].add(new AtlasToolbar(navigation[0], new SearchField(
+                            Atlas.search(), Atlas.assembler(),
+                            navigation[0])),
+                    java.awt.BorderLayout.NORTH);
+            frame[0].add(chart[0], java.awt.BorderLayout.CENTER);
+            frame[0].add(inspector[0], java.awt.BorderLayout.EAST);
+            frame[0].setJMenuBar(juranometria.app.AppMenuBar.create(
+                    navigation[0], () -> { }, () -> { }, () -> { },
+                    () -> inspector[0].setRequestedVisible(
+                            !inspector[0].isRequestedVisible())));
+            frame[0].setSize(1280, 820);
+            frame[0].setVisible(true);
+        });
+        try {
+            flush();
+            javax.swing.JButton out = button(frame[0].getContentPane(),
+                    "Zoom out");
+            javax.swing.JButton in = button(frame[0].getContentPane(),
+                    "Zoom in");
+
+            // 1. The control that enters the overview says where it
+            // leads, and then takes the reader there when pressed.
+            assertTrue(out.getToolTipText().contains("overview"),
+                    "at the sheet page zoom out says where it goes: "
+                            + out.getToolTipText());
+            assertEquals(out.getToolTipText(),
+                    out.getAccessibleContext().getAccessibleDescription(),
+                    "in the same words to assistive technology");
+            ReaderInput.click(out);
+            flush();
+            assertEquals(60.0, navigation[0].state().fieldWidthDegrees(),
+                    "the press made the step");
+            assertEquals(ChartProjection.STEREOGRAPHIC,
+                    navigation[0].state().projection(),
+                    "onto a page the overview draws");
+            assertEquals(ChartProjection.STEREOGRAPHIC,
+                    chart[0].currentScene().viewport().projection(),
+                    "and the chart is showing that page");
+
+            ReaderInput.click(out);
+            ReaderInput.click(out);
+            flush();
+            assertEquals(120.0, navigation[0].state().fieldWidthDegrees(),
+                    "three presses reach the widest rung");
+            assertFalse(out.isEnabled(),
+                    "and the control says the ladder ends there");
+
+            // 2. A star of the overview, chosen by pointing at it.
+            ChartRenderer.DrawnMark star = aStarWellOffTheCentre(
+                    chart[0].currentScene());
+            ReaderInput.click(chart[0], (int) Math.round(star.centre().x()),
+                    (int) Math.round(star.centre().y()), 0);
+            flush();
+            assertTrue(selection.selection()
+                            instanceof juranometria.chart.Selection.Object,
+                    "the click on the overview selected an object");
+            juranometria.chart.Selection.Object picked =
+                    (juranometria.chart.Selection.Object) selection.selection();
+            assertEquals(star.star().id(), picked.catalogueId(),
+                    "the one that was under the pointer, read back"
+                            + " through the overview's own projection");
+
+            // 3. Center here, then back down the ladder into the
+            // detailed atlas - both through the controls a reader has.
+            // The Inspector is opened the way a reader opens it.
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    juranometria.app.AppMenuBar.inspectorItem(
+                            frame[0].getJMenuBar()).doClick());
+            flush();
+            ReaderInput.click(centreButton(inspector[0]));
+            flush();
+            assertTrue(navigation[0].state().centre()
+                            .separationDegrees(star.star().position())
+                            < 1.0e-6,
+                    "the chart is centred on the object that was"
+                            + " selected on the overview");
+
+            ReaderInput.click(in);
+            ReaderInput.click(in);
+            ReaderInput.click(in);
+            flush();
+            assertEquals(42.0, navigation[0].state().fieldWidthDegrees(),
+                    "and the way back is the same three presses");
+            assertEquals(ChartProjection.GNOMONIC,
+                    navigation[0].state().projection(),
+                    "into the detailed atlas");
+            assertEquals(ChartProjection.GNOMONIC,
+                    chart[0].currentScene().viewport().projection());
+            assertTrue(chart[0].currentScene().viewport().centre()
+                            .separationDegrees(star.star().position())
+                            < 1.0e-6,
+                    "still centred on what the reader picked out of"
+                            + " the wide view");
+            assertTrue(in.getToolTipText().contains("detailed atlas")
+                            || !navigation[0].state().overview(),
+                    "and the control that brought them back said so");
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(
+                    () -> frame[0].dispose());
+        }
     }
 
+    private static void flush() throws Exception {
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    /** A star far enough off centre that the projection matters. */
+    private static ChartRenderer.DrawnMark aStarWellOffTheCentre(
+            ChartScene scene) {
+        ChartRenderer.DrawnMark best = null;
+        double furthest = 0.0;
+        for (ChartRenderer.DrawnMark mark : new ChartRenderer(
+                StarSizePolicy.DEFAULT)
+                .drawnMarks(scene, ChartOptions.DEFAULTS)) {
+            if (mark.star() == null || mark.centre().x() < 40
+                    || mark.centre().x() > scene.viewport().widthPx() - 40
+                    || mark.centre().y() < 40
+                    || mark.centre().y() > scene.viewport().heightPx() - 40) {
+                continue;
+            }
+            double out = Math.hypot(
+                    mark.centre().x() - scene.viewport().widthPx() / 2.0,
+                    mark.centre().y() - scene.viewport().heightPx() / 2.0);
+            if (out > furthest) {
+                furthest = out;
+                best = mark;
+            }
+        }
+        assertTrue(best != null, "the overview page carries stars");
+        return best;
+    }
+
+    /** A toolbar control, found by the name a reader's screen reader
+     *  would announce. */
     private static javax.swing.JButton button(java.awt.Container root,
                                               String name) {
         for (java.awt.Component child : root.getComponents()) {
@@ -149,6 +282,23 @@ class OverviewPageTest {
             }
             if (child instanceof java.awt.Container inner) {
                 javax.swing.JButton found = button(inner, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static javax.swing.JButton centreButton(
+            java.awt.Container root) {
+        for (java.awt.Component child : root.getComponents()) {
+            if (child instanceof javax.swing.JButton candidate
+                    && "Center here".equals(candidate.getText())) {
+                return candidate;
+            }
+            if (child instanceof java.awt.Container inner) {
+                javax.swing.JButton found = centreButton(inner);
                 if (found != null) {
                     return found;
                 }
@@ -251,17 +401,24 @@ class OverviewPageTest {
         assertNotEquals(ORION, solved.centre().get(), "the page moved");
     }
 
+    /**
+     * Every layer of ink, on the widest page there is.
+     *
+     * <p>The first version of this invoked the reference layer and
+     * then asserted things about the renderer's catalogue marks,
+     * which the layer cannot touch: deleting the layer left it
+     * green. A review was right. So each layer is now found the way
+     * the sheet finds a difference - by recording the page with it
+     * and without it, and reading what changed - and no layer is
+     * named by guessing where its ink might be.
+     */
     @Test
     void everyLayerOfInkComposesOnAnOverviewPage() {
-        // Catalogue marks, the chart's own furniture and three
-        // modules' reference geometry, on the widest page there is.
-        // The claim is not that it looks a particular way - that is
-        // the study's - but that nothing along the way refuses or
-        // draws somewhere else.
-        ChartScene scene = sceneAt(120.0, 4.0);
-        assertTrue(scene.stars().size() > 100,
-                "the widest page holds a sky: " + scene.stars().size());
-
+        ChartViewState state = new ChartViewState(ORION, 120.0, 4.0);
+        // Three module lines and a reader's own marks. The meridian
+        // module contributes a line and a boundary; the ecliptic
+        // contributes a permanent circle; the working selection is
+        // two members of this page.
         OverlayRegistry registry = new OverlayRegistry();
         MeridianModule meridian = new MeridianModule(new Observer(59.9, 10.7,
                 java.time.Instant.parse("2026-03-20T21:33:00Z")));
@@ -271,38 +428,156 @@ class OverviewPageTest {
         ecliptic.showing(true);
         registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
 
-        BufferedImage image = new BufferedImage(WIDE, HIGH,
-                BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
-        try {
-            new ChartRenderer(StarSizePolicy.DEFAULT).render(g, scene,
-                    ChartOptions.DEFAULTS,
-                    (into, painted) -> ReferenceInk.paint(into, painted,
-                            registry.collect(), ChartPalette.WHITE_PAPER));
-        } finally {
-            g.dispose();
-        }
-
-        // Every mark the renderer decided on is on the page it was
-        // drawn for, which is the composition claim in one line.
-        List<ChartRenderer.DrawnMark> marks =
-                new ChartRenderer(StarSizePolicy.DEFAULT)
-                        .drawnMarks(scene, ChartOptions.DEFAULTS);
-        assertFalse(marks.isEmpty(), "the renderer drew marks");
-        int onThePaper = 0;
-        for (ChartRenderer.DrawnMark mark : marks) {
-            assertTrue(Double.isFinite(mark.centre().x())
-                            && Double.isFinite(mark.centre().y()),
-                    "a mark at a place rather than at infinity: " + mark);
-            if (mark.centre().x() >= 0 && mark.centre().x() <= WIDE
-                    && mark.centre().y() >= 0
-                    && mark.centre().y() <= HIGH) {
-                onThePaper++;
+        ChartScene page = Atlas.assembler().assemble(state, WIDE, HIGH);
+        List<String> marked = new java.util.ArrayList<>();
+        for (ChartRenderer.DrawnMark mark : new ChartRenderer(
+                StarSizePolicy.DEFAULT)
+                .drawnMarks(page, ChartOptions.DEFAULTS)) {
+            if (mark.star() != null && marked.size() < 2) {
+                marked.add(mark.star().id());
             }
         }
-        assertTrue(onThePaper > 50,
-                "and most of them on the paper: " + onThePaper
-                        + " of " + marks.size());
+        assertEquals(2, marked.size(), "two objects to mark");
+
+        ChartRenderer.ReferenceLayer modules = (g, scene) ->
+                ReferenceInk.paint(g, scene, registry.collect(),
+                        ChartPalette.WHITE_PAPER);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer.ReferenceLayer working = (g, scene) -> {
+            for (String member : marked) {
+                renderer.drawSelectionHighlight(g, scene,
+                        ChartOptions.DEFAULTS, member);
+            }
+        };
+
+        List<juranometria.sheet.SheetRecorder.Drawn> bare =
+                inkOf(state, ChartRenderer.ReferenceLayer.NONE,
+                        ChartRenderer.ReferenceLayer.NONE);
+        List<juranometria.sheet.SheetRecorder.Drawn> withModules =
+                inkOf(state, modules, ChartRenderer.ReferenceLayer.NONE);
+        List<juranometria.sheet.SheetRecorder.Drawn> whole =
+                inkOf(state, modules, working);
+
+        // The chart's own ink is there either way: catalogue marks
+        // and the furniture around them.
+        assertTrue(filled(bare) > 100,
+                "the widest page carries catalogue ink: " + filled(bare));
+        assertEquals(filled(bare), filled(withModules),
+                "and the modules add none of it");
+
+        // Each module's line, by the stroke the chart gives that kind
+        // of geometry - a line across the sky, a boundary of what can
+        // be seen, and a permanent circle of the sphere. Each is
+        // present, and each is ink the bare page does not have.
+        for (float[] dash : new float[][] {null, {6.0f, 4.0f},
+                {12.0f, 4.0f, 2.0f, 4.0f}}) {
+            assertTrue(strokedWith(withModules, dash) > strokedWith(bare, dash),
+                    "the page gains ink of its own kind: "
+                            + java.util.Arrays.toString(dash) + " went from "
+                            + strokedWith(bare, dash) + " to "
+                            + strokedWith(withModules, dash));
+        }
+
+        // And the reader's own marks, over the finished chart.
+        assertTrue(whole.size() > withModules.size(),
+                "the working selection puts marks on the page: "
+                        + (whole.size() - withModules.size()));
+
+        // Composition, which is the claim: a line of reference goes
+        // below every catalogue mark, and a reader's own marks go
+        // above the whole chart.
+        int firstMark = firstFilledIndex(withModules);
+        int lastReference = lastDashDotIndex(withModules);
+        assertTrue(lastReference >= 0 && firstMark >= 0,
+                "the page has both to compare");
+        assertTrue(lastReference < firstMark,
+                "the permanent circle is drawn before the marks it"
+                        + " passes behind: " + lastReference + " then "
+                        + firstMark);
+        assertTrue(firstFilledIndex(whole) < whole.size() - 1,
+                "and the reader's marks are last of all");
+    }
+
+    /** Everything one render of this page drew, in order. */
+    private static List<juranometria.sheet.SheetRecorder.Drawn> inkOf(
+            ChartViewState state, ChartRenderer.ReferenceLayer reference,
+            ChartRenderer.ReferenceLayer overChart) {
+        juranometria.sheet.SheetRecorder recorder =
+                new juranometria.sheet.SheetRecorder(WIDE, HIGH);
+        ChartScene scene = Atlas.assembler().assemble(state, WIDE, HIGH);
+        new ChartRenderer(StarSizePolicy.DEFAULT).render(recorder, scene,
+                ChartOptions.DEFAULTS, reference);
+        Graphics2D over = (Graphics2D) recorder.create();
+        try {
+            overChart.paint(over, scene);
+        } finally {
+            over.dispose();
+        }
+        return recorder.drawn();
+    }
+
+    /**
+     * Catalogue ink: a filled mark small enough to be an object.
+     *
+     * <p>Not every fill - the chart's own ground is a filled
+     * rectangle the size of the page, and the title block lays down
+     * another. A star is a disc a few pixels across.
+     */
+    private static int filled(
+            List<juranometria.sheet.SheetRecorder.Drawn> ink) {
+        int count = 0;
+        for (var drawn : ink) {
+            if (isMark(drawn)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static boolean isMark(
+            juranometria.sheet.SheetRecorder.Drawn drawn) {
+        if (!drawn.filled()) {
+            return false;
+        }
+        java.awt.geom.Rectangle2D box = drawn.shape().getBounds2D();
+        return box.getWidth() < 40.0 && box.getHeight() < 40.0;
+    }
+
+    private static int strokedWith(
+            List<juranometria.sheet.SheetRecorder.Drawn> ink, float[] dash) {
+        int count = 0;
+        for (var drawn : ink) {
+            if (!drawn.filled() && drawn.stroke() != null
+                    && java.util.Arrays.equals(drawn.stroke().dash(), dash)
+                    && drawn.stroke().width() == 1.0f) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static int firstFilledIndex(
+            List<juranometria.sheet.SheetRecorder.Drawn> ink) {
+        for (int at = 0; at < ink.size(); at++) {
+            if (isMark(ink.get(at))) {
+                return at;
+            }
+        }
+        return -1;
+    }
+
+    private static int lastDashDotIndex(
+            List<juranometria.sheet.SheetRecorder.Drawn> ink) {
+        int found = -1;
+        for (int at = 0; at < ink.size(); at++) {
+            var drawn = ink.get(at);
+            if (!drawn.filled() && drawn.stroke() != null
+                    && java.util.Arrays.equals(drawn.stroke().dash(),
+                            new float[] {12.0f, 4.0f, 2.0f, 4.0f})) {
+                found = at;
+            }
+        }
+        return found;
     }
 
     @Test

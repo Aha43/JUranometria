@@ -729,11 +729,18 @@ projection on the shared frame and making its domain rule exact.
   the pole; at 120 degrees a corner pointer anchors sky 72 degrees
   out and almost every off-centre pointer is ambiguous, so the rule
   would have quietly stopped the wheel working on the pages this
-  issue adds. It now refuses the thing it was standing in for: a
-  centre further from the previous one than the anchor is is the
-  other branch. Over 1,248 steps, 31 overview steps and **24 steps at
+  issue adds. It now bounds the *length* of the step instead: the
+  accepted centre must be no further from the previous one than the
+  anchor is, which is the distance the centre would travel if the
+  pointer ended at the page's middle. A first draft claimed more than
+  that - that the centre "moves towards the anchor and never past
+  it" - and a review was right that the code does not enforce
+  direction and could not usefully, because every candidate the
+  solver returns has already been verified to put the anchor exactly
+  where the target asks. A wrong root is wrong about where the *page*
+  ends up. Over 1,248 steps, 31 overview steps and **24 steps at
   released fields** change from refused to accepted, and 3 are still
-  refused as branch switches. The released-field change is set out in
+  refused. The released-field change is set out in
   `docs/decisions/pointer-zoom.md`; no page's pixels change.
 
 - **Four reference lines leave an overview page near one corner**, as

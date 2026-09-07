@@ -221,6 +221,59 @@ class PointerZoomControllerTest {
     }
 
     @Test
+    void aTwoBranchStepIsRefusedWhenItsCentreIsAJumpRatherThanAZoom() {
+        // The rule that replaced the blanket ambiguity refusal
+        // (#299): a two-branch solve is accepted only when the centre
+        // it returns is no further from the previous one than the
+        // anchor is. That is a bound on the length of the step, which
+        // is what separates a zoom from a jump - the direction cannot
+        // separate them, because every candidate the solver returns
+        // has been verified to put the anchor exactly where the
+        // target asks.
+        //
+        // Both sides are held here, because a predicate that refused
+        // everything and a predicate that refused nothing would each
+        // pass half of it.
+        // A page over Crux at 60 degrees, zooming out with a pointer
+        // low on the paper: the solve is exact, unconstrained, and
+        // its reverse restores the centre - every other condition of
+        // the acceptance contract passes - and the root it returns is
+        // further from the previous centre than the anchor is. This
+        // step is refused by the branch rule and by nothing else,
+        // which is what makes it a check of the rule.
+        ChartViewController jump = controllerAt(
+                new SkyPosition(186.649563, -63.099093), 60.0);
+        ChartViewState before = jump.state();
+        assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
+                jump.zoomAt(plane(before, new PixelPoint(597.0, 581.0)),
+                        false),
+                "a root the step could not have reached is refused");
+        assertEquals(before, jump.state(), "and nothing moved");
+
+        // And an ordinary two-branch step - a corner of the widest
+        // overview page, where the second root is on the far side of
+        // the sky and the nearest one is a few degrees away - is
+        // taken, which is the whole reason the rule changed.
+        ChartViewController wide = controllerAt(
+                new SkyPosition(83.818667, -5.389667), 120.0);
+        SkyPosition anchor = PanSolver.skyFromPlane(
+                wide.state().projection(), wide.state().centre(),
+                plane(wide.state(), new PixelPoint(899.0, 699.0)));
+        assertTrue(anchor.separationDegrees(wide.state().centre()) > 60.0,
+                "the corner of this page anchors sky a long way out: "
+                        + anchor.separationDegrees(wide.state().centre()));
+        assertEquals(PointerZoomOutcome.ACCEPTED,
+                wide.zoomAt(plane(wide.state(),
+                        new PixelPoint(899.0, 699.0)), true));
+        assertTrue(wide.state().centre().separationDegrees(
+                        new SkyPosition(83.818667, -5.389667))
+                        <= anchor.separationDegrees(
+                                new SkyPosition(83.818667, -5.389667)),
+                "and the step it took is no longer than the anchor's"
+                        + " own offset, which is the rule");
+    }
+
+    @Test
     void aWideSouthernCornerRefusesByTheContractNotByAccident() {
         // A near-polar page whose corner pointer anchors sky past
         // the north-up feasibility bound: the reviewed contract

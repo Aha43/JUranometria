@@ -66,14 +66,26 @@ would have quietly stopped the wheel working on exactly the pages
 #299 adds, while the projection gate's whole navigation decision is
 that the overview is *the same operations* on another rung.
 
-So the refusal now tests the thing it was standing in for. A
-pointer-anchored zoom moves the centre **towards the anchor**, and
-never past it: the anchor is pinned, and the furthest the centre can
-travel is onto the anchor itself, when the pointer ends at the page's
-middle. **A root further from the previous centre than the anchor is
-is the other branch, and is refused.** That is geometry rather than a
-tolerance, and it still refuses the near-polar case this decision was
-written for, where the two roots straddle the pole.
+So the refusal now tests a property of the step rather than the
+existence of a second root. **The accepted centre must be no further
+from the previous one than the anchor is.** The anchor's own offset
+is the distance the centre would travel if the pointer ended at the
+page's middle, so it is the largest honest step this gesture has: a
+root beyond it is a jump, not a zoom.
+
+That is a bound on the step's **length**, and it is stated that
+narrowly on purpose. A first draft of this claimed the centre "moves
+towards the anchor and never past it", and a review was right that
+the code does not enforce direction. It cannot usefully: every
+candidate the solver returns has already been verified by full
+reprojection, so *every* one of them puts the anchor at exactly the
+offset the target asks for. A wrong root is wrong about where the
+page ends up, not about where the anchor lands — and how far the
+centre had to travel is the one thing that separates them.
+
+It still refuses the near-polar case this decision was written for,
+where the two roots straddle the pole and the far one lies beyond
+it.
 
 Measured over 1,248 steps — every adjacent rung, in both directions,
 at eight centres and seven pointers:

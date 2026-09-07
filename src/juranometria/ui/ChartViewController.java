@@ -342,7 +342,8 @@ public final class ChartViewController {
     }
 
     /**
-     * Whether a two-branch solve took the branch it should not have.
+     * Whether a two-branch solve returned a centre the step cannot
+     * have reached: a jump rather than a zoom.
      *
      * <p>The centre equation has two exact roots on a page whose
      * pointer anchors sky far from the centre, and the solver returns
@@ -361,16 +362,29 @@ public final class ChartViewController {
      * working on exactly the pages #299 adds, while the gate promised
      * that navigation keeps working because it is the same operation.
      *
-     * <p>So the refusal now tests the thing it was standing in for. A
-     * pointer-anchored zoom moves the centre <em>towards the
-     * anchor</em>, and never past it: the anchor is pinned, and the
-     * furthest the centre can travel is onto the anchor itself, when
-     * the pointer ends at the page's middle. A root further from the
-     * previous centre than the anchor is is the other branch, and it
-     * is refused. This is geometry rather than a tolerance, and it
-     * refuses the near-polar case the reviewed rule was written for -
-     * where the two roots straddle the pole and the far one is
-     * further out than the anchor.
+     * <p><strong>What this enforces, exactly:</strong> the accepted
+     * centre is no further from the previous one than the anchor is.
+     * That is a bound on the <em>length</em> of the step and nothing
+     * more - it is a rule against teleporting, not a rule about
+     * direction.
+     *
+     * <p>It is stated that narrowly on purpose, because a review
+     * found the wider claim it first carried - that the centre moves
+     * "towards the anchor and never past it" - to be either unenforced
+     * or unenforceable here. The direction is not available to
+     * discriminate: every candidate the solver returns has already
+     * been verified by full reprojection, so <em>every</em> one of
+     * them puts the anchor at exactly the offset the target asks for.
+     * A wrong root is wrong about where the page ends up, not about
+     * where the anchor lands. What separates it from the right one is
+     * how far the centre had to travel, which is what is measured.
+     *
+     * <p>The bound is not a tolerance: the anchor's own offset is the
+     * distance the centre would move if the pointer ended at the
+     * page's middle, so it is the largest honest step this gesture
+     * has. It refuses the near-polar case the reviewed rule was
+     * written for, where the two roots straddle the pole and the far
+     * one lies beyond it.
      */
     private static boolean switchedBranch(
             juranometria.project.PanSolver.PanSolution solved,
