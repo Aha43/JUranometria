@@ -186,11 +186,34 @@ class OverviewPageTest {
                     "and the control says the ladder ends there");
 
             // 2. A star of the overview, chosen by pointing at it.
-            ChartRenderer.DrawnMark star = aStarWellOffTheCentre(
-                    chart[0].currentScene());
-            ReaderInput.click(chart[0], (int) Math.round(star.centre().x()),
-                    (int) Math.round(star.centre().y()), 0);
+            //
+            // Read and clicked in one event-thread turn. Choosing the
+            // mark from a scene fetched on this thread and clicking
+            // in a later turn is the stale-scene race #220 was made
+            // of: the page can be reassembled in between, and the
+            // pointer then lands on whatever moved into that pixel.
+            // The page's own offset comes from the same turn, so a
+            // letterboxed page is clicked where the reader would
+            // click it.
+            ChartRenderer.DrawnMark[] chosen = new ChartRenderer.DrawnMark[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                ChartScene showing = chart[0].currentScene();
+                chosen[0] = aStarWellOffTheCentre(showing);
+                int x = (int) Math.round(chosen[0].centre().x());
+                int y = (int) Math.round(chosen[0].centre().y())
+                        + chart[0].pageOffsetY();
+                for (int id : new int[] {
+                        java.awt.event.MouseEvent.MOUSE_PRESSED,
+                        java.awt.event.MouseEvent.MOUSE_RELEASED}) {
+                    chart[0].dispatchEvent(new java.awt.event.MouseEvent(
+                            chart[0], id, System.nanoTime() / 1_000_000,
+                            java.awt.event.MouseEvent.BUTTON1_DOWN_MASK,
+                            x, y, 1, false,
+                            java.awt.event.MouseEvent.BUTTON1));
+                }
+            });
             flush();
+            ChartRenderer.DrawnMark star = chosen[0];
             assertTrue(selection.selection()
                             instanceof juranometria.chart.Selection.Object,
                     "the click on the overview selected an object");
@@ -217,10 +240,28 @@ class OverviewPageTest {
 
             ReaderInput.click(in);
             ReaderInput.click(in);
+            flush();
+            assertEquals(60.0, navigation[0].state().fieldWidthDegrees(),
+                    "two presses back down the overview's own rungs");
+            assertTrue(navigation[0].state().overview(),
+                    "still a wide page");
+
+            // The control that leaves the overview says so while the
+            // reader is still on it, and at the rung where the step
+            // actually leaves - 90 to 60 is one wide page to another,
+            // and a control that announced a departure there would be
+            // announcing something that does not happen.
+            assertTrue(in.getToolTipText().contains("detailed atlas"),
+                    "at the last wide rung, zoom in says how to get"
+                            + " back: " + in.getToolTipText());
+            assertEquals(in.getToolTipText(),
+                    in.getAccessibleContext().getAccessibleDescription(),
+                    "in the same words to assistive technology");
+
             ReaderInput.click(in);
             flush();
             assertEquals(42.0, navigation[0].state().fieldWidthDegrees(),
-                    "and the way back is the same three presses");
+                    "and the press it describes makes the step");
             assertEquals(ChartProjection.GNOMONIC,
                     navigation[0].state().projection(),
                     "into the detailed atlas");
@@ -231,12 +272,11 @@ class OverviewPageTest {
                             < 1.0e-6,
                     "still centred on what the reader picked out of"
                             + " the wide view");
-            assertTrue(in.getToolTipText().contains("detailed atlas")
-                            || !navigation[0].state().overview(),
-                    "and the control that brought them back said so");
         } finally {
-            javax.swing.SwingUtilities.invokeAndWait(
-                    () -> frame[0].dispose());
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                inspector[0].dispose();
+                frame[0].dispose();
+            });
         }
     }
 
@@ -478,10 +518,39 @@ class OverviewPageTest {
                             + strokedWith(withModules, dash));
         }
 
-        // And the reader's own marks, over the finished chart.
-        assertTrue(whole.size() > withModules.size(),
-                "the working selection puts marks on the page: "
-                        + (whole.size() - withModules.size()));
+        // And the reader's own marks - both of them, each around the
+        // object it belongs to. Counting the extra ink would only say
+        // that something more was drawn; a highlight around one
+        // member and nothing around the other would pass that, and so
+        // would two rings in the wrong place.
+        List<juranometria.sheet.SheetRecorder.Drawn> added =
+                new java.util.ArrayList<>(whole.subList(
+                        withModules.size(), whole.size()));
+        assertFalse(added.isEmpty(), "the working selection drew");
+        for (String member : marked) {
+            juranometria.project.PixelPoint at = null;
+            for (ChartRenderer.DrawnMark mark : new ChartRenderer(
+                    StarSizePolicy.DEFAULT)
+                    .drawnMarks(page, ChartOptions.DEFAULTS)) {
+                if (mark.star() != null && member.equals(mark.star().id())) {
+                    at = mark.centre();
+                }
+            }
+            assertTrue(at != null, member + " is drawn on this page");
+            boolean ringed = false;
+            for (var drawn : added) {
+                java.awt.geom.Rectangle2D box =
+                        drawn.shape().getBounds2D();
+                if (Math.hypot(box.getCenterX() - at.x(),
+                        box.getCenterY() - at.y()) < 2.0
+                        && box.getWidth() > 4.0) {
+                    ringed = true;
+                }
+            }
+            assertTrue(ringed, "the reader's mark is around " + member
+                    + ", at " + at + ", and not merely somewhere on"
+                    + " the page: " + added.size() + " marks drawn");
+        }
 
         // Composition, which is the claim: a line of reference goes
         // below every catalogue mark, and a reader's own marks go
