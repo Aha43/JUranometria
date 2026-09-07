@@ -31,18 +31,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * gate measured and which are right about density - were removing
  * stars that figure segments are drawn to.
  *
- * <p>Measured before anything was changed, on the Orion pages at the
- * defaults #299 settled:
+ * <p>Measured on the painted page, before anything was changed, on
+ * the Orion pages at the defaults #299 settled:
  *
  * <pre>
  * 60 degrees at V 5.0    72 endpoints on the page,   0 with no star
- * 90 degrees at V 4.0   121 endpoints on the page,  43 with no star
- * 120 degrees at V 4.0  190 endpoints on the page,  76 with no star
+ * 90 degrees at V 4.0   120 endpoints on the page,  42 with no star
+ * 120 degrees at V 4.0  189 endpoints on the page,  74 with no star
  * </pre>
  *
- * <p>Sixty degrees never had the defect: at V 5.0 every figure star
- * of that page is already admitted. It is kept here anyway, because a
- * rung that is right by accident is worth watching.
+ * <p>Orion at 60 degrees never had the defect: at V 5.0 every figure
+ * star of that page is already admitted. It is kept here anyway,
+ * because a rung that is right by accident is worth watching - and
+ * this one is right by accident, the same rung centred on Sagittarius
+ * being four endpoints short
+ * (docs/studies/figure-anchors/measurements.md).
  *
  * <p>What this must not do is as important as what it must. The
  * density the gate measured stands; nothing below the limit comes in
@@ -66,6 +69,28 @@ class FigureAnchorTest {
         return page(field, ChartViewState.defaultMagnitudeFor(field));
     }
 
+    /**
+     * Every endpoint of every figure segment this scene carries.
+     *
+     * <p>Which is more than the page shows: the geography reaches
+     * past the paper, and the policy anchors a segment's stars
+     * whether or not the segment's end falls on it. A star kept for a
+     * figure just off the edge is a star kept for a figure.
+     */
+    private static List<SkyPosition> endpointsIn(ChartScene scene) {
+        List<SkyPosition> found = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (GeoSegment segment : scene.geography().figureSegments()) {
+            for (SkyPosition end
+                    : List.of(segment.from(), segment.to())) {
+                if (seen.add(end.raDegrees() + "," + end.decDegrees())) {
+                    found.add(end);
+                }
+            }
+        }
+        return found;
+    }
+
     /** Every figure endpoint this page actually draws on its paper. */
     private static List<SkyPosition> endpointsOn(ChartScene scene) {
         var mapping = new ViewportMapping(scene.viewport());
@@ -80,8 +105,12 @@ class FigureAnchorTest {
                     continue;
                 }
                 PixelPoint at = mapping.toPixel(plane.get());
-                if (at.x() < 0 || at.y() < 0 || at.x() > WIDE
-                        || at.y() > HIGH) {
+                // Inside the area the chart draws in, which is its own
+                // clip: an endpoint on the border itself is under the
+                // frame, where the page paints no star either.
+                if (at.x() < 1.0 || at.y() < 1.0
+                        || at.x() > scene.viewport().widthPx() - 2.0
+                        || at.y() > scene.viewport().heightPx() - 2.0) {
                     continue;
                 }
                 if (seen.add(end.raDegrees() + "," + end.decDegrees())) {
@@ -131,28 +160,171 @@ class FigureAnchorTest {
         return RENDERER.drawnMarks(scene, options);
     }
 
+    /**
+     * A page as painted, beside the same page with the stars that can
+     * ink its figure endpoints withheld.
+     *
+     * <p>Ink at an endpoint proves nothing on its own: the figure's
+     * own line ends there, under the marks, and would answer for the
+     * star it was drawn to - the defect reporting itself repaired. The
+     * two paintings differ in one thing, so the lines, the grid, the
+     * boundaries and the furniture are laid down identically and a
+     * pixel that changes is a star.
+     *
+     * <p>What the pixels cannot say is <em>which</em> star: on a
+     * 120-degree page a companion a hundredth of a degree away paints
+     * the same disc in the same place. Identity is read from the
+     * renderer's published placements, which is not a second opinion
+     * about the page but the geometry the page is painted from
+     * (issue #168).
+     */
+    private record Painted(ChartScene scene, java.awt.image.BufferedImage page,
+                           java.awt.image.BufferedImage withheld) {
+
+        boolean nodeAt(SkyPosition endpoint) {
+            var mapping = new ViewportMapping(scene.viewport());
+            var plane = Projections.forViewport(scene.viewport())
+                    .project(endpoint);
+            if (plane.isEmpty()) {
+                return false;
+            }
+            PixelPoint at = mapping.toPixel(plane.get());
+            int centreX = (int) Math.round(at.x());
+            int centreY = (int) Math.round(at.y());
+            for (int y = centreY - 1; y <= centreY + 1; y++) {
+                for (int x = centreX - 1; x <= centreX + 1; x++) {
+                    if (x < 0 || y < 0 || x >= page.getWidth()
+                            || y >= page.getHeight()) {
+                        continue;
+                    }
+                    if (page.getRGB(x, y) != withheld.getRGB(x, y)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    private static Painted painted(ChartScene scene, ChartOptions options) {
+        Set<String> ids = inkingNear(scene, endpointsOn(scene));
+        return new Painted(scene, paint(scene, options),
+                paint(without(scene, ids), options));
+    }
+
+    private static java.awt.image.BufferedImage paint(ChartScene scene,
+                                                      ChartOptions options) {
+        var image = new java.awt.image.BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            RENDERER.render(g, scene, options);
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    /** The same page with these stars withheld, and nothing else. */
+    private static ChartScene without(ChartScene scene, Set<String> ids) {
+        List<Star> kept = new ArrayList<>();
+        for (Star star : scene.stars()) {
+            if (!ids.contains(star.id())) {
+                kept.add(star);
+            }
+        }
+        return new ChartScene(scene.viewport(), kept,
+                scene.deepSkyObjects(), scene.title(),
+                scene.limitingMagnitude(), scene.targetIdentity(),
+                scene.geography());
+    }
+
+    /**
+     * Every star whose own disc, at its own size, can reach the pixels
+     * a node is read from - not merely the star an endpoint is. A
+     * neighbour that shares the endpoint's pixels would otherwise go
+     * on painting a node after the node was withheld.
+     */
+    private static Set<String> inkingNear(ChartScene scene,
+                                          List<SkyPosition> endpoints) {
+        var mapping = new ViewportMapping(scene.viewport());
+        var projection = Projections.forViewport(scene.viewport());
+        List<PixelPoint> at = new ArrayList<>();
+        for (SkyPosition endpoint : endpoints) {
+            projection.project(endpoint)
+                    .ifPresent(plane -> at.add(mapping.toPixel(plane)));
+        }
+        Set<String> ids = new HashSet<>();
+        for (Star star : scene.stars()) {
+            var plane = projection.project(star.position());
+            if (plane.isEmpty()) {
+                continue;
+            }
+            PixelPoint drawn = mapping.toPixel(plane.get());
+            double reach = StarSizePolicy.DEFAULT
+                    .radiusFor(star.magnitude()) + 2.0;
+            for (PixelPoint endpoint : at) {
+                if (Math.hypot(drawn.x() - endpoint.x(),
+                        drawn.y() - endpoint.y()) <= reach) {
+                    ids.add(star.id());
+                    break;
+                }
+            }
+        }
+        return ids;
+    }
+
+    /** The same options with the page's own furniture switched off. */
+    private static ChartOptions withoutFurniture() {
+        ChartOptions on = ChartOptions.DEFAULTS;
+        return new ChartOptions(on.deepSkyObjects(), on.deepSkyLabels(),
+                on.constellationFigures(), on.constellationBoundaries(),
+                on.constellationNames(), on.starNames(), on.bayerLetters(),
+                on.flamsteedNumbers(), on.equatorialGrid(), false, false,
+                on.galaxies(), on.openClusters(), on.globularClusters(),
+                on.nebulae(), on.planetaryNebulae(), on.palette());
+    }
+
     @Test
     void everyFigureEndpointOnThePageHasItsStar() {
         // The defect, in the terms it was found in: a drawn segment
-        // whose end is a place where no star is drawn.
+        // whose end is a place where no star is drawn - and read off
+        // the painted page, because that is where it was found.
+        //
+        // With the exception removed and nothing else changed, the
+        // painted count returns to 42 of 120 endpoints at 90 degrees
+        // and 74 of 189 at 120
+        // (docs/studies/figure-anchors/measurements.md).
         for (double field : new double[] {60.0, 90.0, 120.0}) {
             ChartScene scene = page(field);
-            var marks = marksOf(scene, ChartOptions.DEFAULTS);
             List<SkyPosition> endpoints = endpointsOn(scene);
             assertTrue(endpoints.size() > 60,
                     field + " degrees: the page carries figures to"
                             + " check: " + endpoints.size());
-            List<SkyPosition> missing = new ArrayList<>();
+            Painted reader = painted(scene, ChartOptions.DEFAULTS);
+            Painted bare = painted(scene, withoutFurniture());
+            int covered = 0;
             for (SkyPosition endpoint : endpoints) {
-                if (nodeAt(marks, endpoint) == null) {
-                    missing.add(endpoint);
+                if (reader.nodeAt(endpoint)) {
+                    continue;
                 }
+                // The one thing that legitimately hides a drawn star:
+                // the chart's own furniture, painted opaque over the
+                // sky and switched off here to see underneath. It
+                // happens on the released 42-degree page too, where
+                // no star is held back for a figure at all.
+                covered++;
+                assertTrue(bare.nodeAt(endpoint),
+                        field + " degrees at V "
+                                + ChartViewState.defaultMagnitudeFor(field)
+                                + ": the endpoint at " + endpoint
+                                + " has no star painted at it, with the"
+                                + " page's furniture off");
             }
-            assertEquals(List.of(), missing,
-                    field + " degrees at V "
-                            + ChartViewState.defaultMagnitudeFor(field)
-                            + ": every endpoint of a drawn figure has"
-                            + " its star");
+            assertTrue(covered <= 6, field + " degrees: the furniture"
+                    + " covers a handful of nodes, not a page of them: "
+                    + covered);
         }
     }
 
@@ -164,7 +336,7 @@ class FigureAnchorTest {
         for (double field : new double[] {60.0, 90.0, 120.0}) {
             ChartScene scene = page(field);
             double limit = ChartViewState.defaultMagnitudeFor(field);
-            List<SkyPosition> endpoints = endpointsOn(scene);
+            List<SkyPosition> endpoints = endpointsIn(scene);
             int kept = 0;
             for (ChartRenderer.DrawnMark mark
                     : marksOf(scene, ChartOptions.DEFAULTS)) {
@@ -361,8 +533,17 @@ class FigureAnchorTest {
             assertEquals(ChartViewState.defaultMagnitudeFor(120.0),
                     bright.limitingMagnitude(),
                     "the wide page arrives at its own limit");
+            // What the window puts on the screen, painted by the
+            // window: the evidence below is read from these pixels
+            // rather than from a page rendered beside them.
+            java.awt.image.BufferedImage before =
+                    onEdt(() -> paintOf(chart[0]));
+            assertEquals(0L, differing(before,
+                            onEdt(() -> referenceOf(chart[0]))),
+                    "the window paints this scene and nothing else, so"
+                            + " what is measured of the page is measured"
+                            + " of what the reader is looking at");
             Set<String> nodesBefore = nodesOf(bright);
-            int starsBefore = starsOn(bright);
 
             // Two presses of the control a reader has.
             javax.swing.JButton more = onEdt(() -> button(
@@ -377,11 +558,21 @@ class FigureAnchorTest {
                     "and pressing it reached fainter: V "
                             + bright.limitingMagnitude() + " to V "
                             + deeper.limitingMagnitude());
+            java.awt.image.BufferedImage after =
+                    onEdt(() -> paintOf(chart[0]));
+            assertEquals(0L, differing(after,
+                            onEdt(() -> referenceOf(chart[0]))),
+                    "and the deeper page too");
             assertEquals(nodesBefore, nodesOf(deeper),
                     "the same stars define the figures at either limit");
-            assertTrue(starsOn(deeper) > starsBefore * 2,
-                    "and the surrounding field came in: " + starsBefore
-                            + " stars became " + starsOn(deeper));
+
+            // The field came in, counted as ink rather than as marks:
+            // the two paintings are the same page at two limits, so
+            // every pixel that changed is a star the control admitted.
+            long changed = differing(before, after);
+            assertTrue(changed > 10000, "and the surrounding field came"
+                    + " in: " + changed + " pixels of the page changed,"
+                    + " where the two limits differ by 35876");
         }, () -> javax.swing.SwingUtilities.invokeAndWait(() -> {
             if (window[0] != null) {
                 window[0].dispose();
@@ -389,23 +580,67 @@ class FigureAnchorTest {
         }));
     }
 
-    /** Which stars this page's figures are drawn to. */
+    /** Which stars this page's figures are drawn to, and painted at. */
     private static Set<String> nodesOf(ChartScene scene) {
         Set<String> nodes = new HashSet<>();
         var marks = marksOf(scene, ChartOptions.DEFAULTS);
+        Painted reader = painted(scene, ChartOptions.DEFAULTS);
+        Painted bare = painted(scene, withoutFurniture());
         for (SkyPosition endpoint : endpointsOn(scene)) {
             ChartRenderer.DrawnMark node = nodeAt(marks, endpoint);
             assertTrue(node != null, "every endpoint has its node");
+            assertTrue(reader.nodeAt(endpoint) || bare.nodeAt(endpoint),
+                    "and the page paints it: " + node.star().id()
+                            + " at V " + node.star().magnitude());
             nodes.add(node.star().id());
         }
         return nodes;
     }
 
-    private static int starsOn(ChartScene scene) {
-        int count = 0;
-        for (var mark : marksOf(scene, ChartOptions.DEFAULTS)) {
-            if (mark.star() != null) {
-                count++;
+    /** The component's own painting, as it puts it on the screen. */
+    private static java.awt.image.BufferedImage paintOf(
+            javax.swing.JComponent component) {
+        var image = new java.awt.image.BufferedImage(
+                component.getWidth(), component.getHeight(),
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            component.paint(g);
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    /** The same picture, made by the renderer instead of the window. */
+    private static java.awt.image.BufferedImage referenceOf(
+            juranometria.ui.ChartComponent chart) {
+        var image = new java.awt.image.BufferedImage(chart.getWidth(),
+                chart.getHeight(),
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            g.setColor(chart.getBackground());
+            g.fillRect(0, 0, chart.getWidth(), chart.getHeight());
+            g.translate(0, chart.pageOffsetY());
+            RENDERER.render(g, chart.currentScene(), chart.chartOptions());
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    private static long differing(java.awt.image.BufferedImage one,
+                                  java.awt.image.BufferedImage other) {
+        assertEquals(one.getWidth() + "x" + one.getHeight(),
+                other.getWidth() + "x" + other.getHeight(),
+                "two paintings of the same page");
+        long count = 0;
+        for (int y = 0; y < one.getHeight(); y++) {
+            for (int x = 0; x < one.getWidth(); x++) {
+                if (one.getRGB(x, y) != other.getRGB(x, y)) {
+                    count++;
+                }
             }
         }
         return count;
@@ -465,7 +700,7 @@ class FigureAnchorTest {
         for (double field : new double[] {90.0, 120.0}) {
             ChartScene scene = page(field);
             double limit = ChartViewState.defaultMagnitudeFor(field);
-            List<SkyPosition> endpoints = endpointsOn(scene);
+            List<SkyPosition> endpoints = endpointsIn(scene);
             for (var mark : marksOf(scene, ChartOptions.DEFAULTS)) {
                 if (mark.star() == null
                         || mark.star().magnitude() <= limit) {

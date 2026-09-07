@@ -19,11 +19,11 @@ import juranometria.geo.GeoSegment;
  * first must not cut holes in the second - and it did: the overview's
  * brighter default limits removed stars that figure segments are
  * drawn to, leaving the lines and losing the node. On a 120-degree
- * page at V 4.0, <strong>76 of 190</strong> figure endpoints on the
- * paper had no star; at 90 degrees, 43 of 121. Found by looking at
- * the finished page, which is the only thing that could have found
- * it: the density the gate measured was right, and nothing about it
- * says which stars a figure needs.
+ * page at V 4.0, <strong>74 of 189</strong> figure endpoints on the
+ * paper had no star painted at them; at 90 degrees, 42 of 120. Found
+ * by looking at the finished page, which is the only thing that could
+ * have found it: the density the gate measured was right, and nothing
+ * about it says which stars a figure needs.
  *
  * <p>So a star that a visible figure is drawn to is kept, however
  * faint, and nothing else is. It keeps its own size, because its size

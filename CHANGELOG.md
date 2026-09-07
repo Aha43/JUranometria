@@ -26,8 +26,9 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **A constellation keeps its own stars** (issue #307). The
   overview's brighter default magnitude limits were removing stars
   that constellation figures are drawn to: the lines stayed and the
-  familiar shape lost a node — 76 of 190 figure endpoints on a
-  120° page. A star a visible figure is drawn to is now kept however
+  familiar shape lost a node — 74 of 189 figure endpoints on a 120°
+  page, counted on the painted page and not on the renderer's list of
+  marks. A star a visible figure is drawn to is now kept however
   faint, at the size its own brightness asks for, without a label it
   had not earned and without any other faint star coming with it; it
   goes away again with the figures. Found by looking at a finished

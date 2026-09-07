@@ -40,6 +40,14 @@ import juranometria.render.StarLabelPolicy;
  * different question: a mark can be decided and never painted, and
  * the defect this issue is about is one a reader saw. Whether it
  * reads well on paper is #293's, which still owns the ruler.
+ *
+ * <p>And the ink at an endpoint is attributed rather than assumed. A
+ * figure's own line ends there, so ink alone would let the line
+ * answer for the star it was drawn to - the defect reporting itself
+ * repaired. Every page is therefore painted twice, the second time
+ * with the figures' own stars withheld and nothing else changed, and
+ * an endpoint has a node only where the two paintings differ. The
+ * lines are identical in both, so a difference is the star.
  */
 public final class FigureAnchorStudyMain {
 
@@ -90,15 +98,22 @@ public final class FigureAnchorStudyMain {
             for (double field : FIELDS) {
                 ChartScene scene = pageOf(CENTRES[at], field);
                 List<SkyPosition> endpoints = endpointsOn(scene);
-                BufferedImage painted = paint(scene);
+                ChartScene withheld = without(scene, figureStarsOf(scene,
+                        endpoints));
+                BufferedImage page = paint(scene, ChartOptions.DEFAULTS);
+                BufferedImage pageWithout =
+                        paint(withheld, ChartOptions.DEFAULTS);
+                BufferedImage bare = paint(scene, NO_FURNITURE);
+                BufferedImage bareWithout = paint(withheld, NO_FURNITURE);
                 java.awt.Rectangle titleBlock = titleBlockOf(scene);
                 int missing = 0;
                 int covered = 0;
                 for (SkyPosition endpoint : endpoints) {
-                    if (inkAt(painted, scene, endpoint)) {
+                    if (nodeAt(page, pageWithout, scene, endpoint)) {
                         continue;
                     }
-                    if (under(titleBlock, scene, endpoint)) {
+                    if (under(titleBlock, scene, endpoint)
+                            && nodeAt(bare, bareWithout, scene, endpoint)) {
                         covered++;
                     } else {
                         missing++;
@@ -111,17 +126,39 @@ public final class FigureAnchorStudyMain {
                         endpoints.size(), missing, covered));
             }
         }
-        out.append("\nBefore the repair the same column read 0, 43"
-                + " and 76 at Orion for 60, 90\nand 120 degrees. Sixty"
-                + " degrees never had the defect: at V 5.0 every figure"
-                + " star\nof that page is already admitted.\n\n");
+        out.append("\nWith the exception removed and the page otherwise"
+                + " unchanged, the same column\nreads:\n\n");
+        out.append("```\n");
+        out.append("               42°     60°     90°    120°\n");
+        out.append("Orion            0       0      42      74\n");
+        out.append("Sagittarius      0       4      52      80\n");
+        out.append("M31              0       1      58      84\n");
+        out.append("```\n\n");
+        out.append("The 42-degree sheet page is clean without it, which"
+                + " is why this was a matter\nfor the overview: at V 8.0"
+                + " every figure star is admitted anyway. Sixty degrees"
+                + "\nis nearly so and not quite - Orion's page is whole"
+                + " at V 5.0, Sagittarius's is\nfour endpoints short and"
+                + " M31's one - which is worth knowing, because the"
+                + " rung\nthat looked safe was safe at one centre and not"
+                + " at the others.\n\n");
+        out.append("A node here is not ink at the endpoint: it is ink"
+                + " that goes away when the\nstars are withheld from the"
+                + " page and nothing else is changed. A figure's"
+                + " line\nends at its endpoint, so ink alone would let"
+                + " the line answer for the star it\nwas drawn to. The"
+                + " lines, the grid, the boundaries and the furniture are"
+                + " laid\ndown identically in both paintings; a pixel"
+                + " that changes is a star.\n\n");
         out.append("The last column is the chart's own furniture, not"
                 + " a missing star. The title\nblock is painted over"
                 + " the sky, and a node beneath it is covered like"
                 + " anything\nelse there - it happens on the released"
-                + " 42-degree page too, where no star is\nheld back"
-                + " for a figure at all. Every one of them has its star"
-                + " drawn; the\nblock is simply on top.\n\n");
+                + " 42-degree page too, where no star is\nheld back for"
+                + " a figure at all. Each one is counted there only if"
+                + " it falls\ninside the block's own bounds and its node"
+                + " reappears when the furniture is\nswitched off:"
+                + " painted, and then painted over.\n\n");
 
         out.append("## What it costs\n\n");
         out.append("| centre | field | stars at the limit | kept below"
@@ -268,8 +305,12 @@ public final class FigureAnchorStudyMain {
                     continue;
                 }
                 PixelPoint at = mapping.toPixel(plane.get());
-                if (at.x() < 0 || at.y() < 0 || at.x() > WIDE
-                        || at.y() > HIGH) {
+                // Inside the area the chart draws in, which is its own
+                // clip: an endpoint on the border itself is under the
+                // frame, where the page paints no star either.
+                if (at.x() < 1.0 || at.y() < 1.0
+                        || at.x() > scene.viewport().widthPx() - 2.0
+                        || at.y() > scene.viewport().heightPx() - 2.0) {
                     continue;
                 }
                 if (seen.add(end.raDegrees() + "," + end.decDegrees())) {
@@ -305,18 +346,98 @@ public final class FigureAnchorStudyMain {
                 (int) Math.round(mapping.toPixel(plane.get()).y()));
     }
 
+    /** How far either way a node is read from, in pixels. */
+    private static final int READ_PIXELS = 1;
+
+    /** The same page with its own furniture switched off. */
+    private static final ChartOptions NO_FURNITURE = furnitureOff();
+
+    private static ChartOptions furnitureOff() {
+        ChartOptions on = ChartOptions.DEFAULTS;
+        return new ChartOptions(on.deepSkyObjects(), on.deepSkyLabels(),
+                on.constellationFigures(), on.constellationBoundaries(),
+                on.constellationNames(), on.starNames(), on.bayerLetters(),
+                on.flamsteedNumbers(), on.equatorialGrid(), false, false,
+                on.galaxies(), on.openClusters(), on.globularClusters(),
+                on.nebulae(), on.planetaryNebulae(), on.palette());
+    }
+
     /** The page as a reader sees it. */
-    private static BufferedImage paint(ChartScene scene) {
+    private static BufferedImage paint(ChartScene scene,
+                                       ChartOptions options) {
         BufferedImage image = new BufferedImage(WIDE, HIGH,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
             new ChartRenderer(StarSizePolicy.DEFAULT).render(g, scene,
-                    ChartOptions.DEFAULTS);
+                    options);
         } finally {
             g.dispose();
         }
         return image;
+    }
+
+    /** The same page with these stars withheld, and nothing else. */
+    private static ChartScene without(ChartScene scene, Set<String> ids) {
+        List<Star> kept = new ArrayList<>();
+        for (Star star : scene.stars()) {
+            if (!ids.contains(star.id())) {
+                kept.add(star);
+            }
+        }
+        return new ChartScene(scene.viewport(), kept,
+                scene.deepSkyObjects(), scene.title(),
+                scene.limitingMagnitude(), scene.targetIdentity(),
+                scene.geography());
+    }
+
+    /**
+     * Every star whose ink can reach one of these endpoints.
+     *
+     * <p>Not the star the policy keeps, and not even every star inside
+     * the matching tolerance: every star whose own disc, at its own
+     * size, touches the pixels the node is read from. The question the
+     * difference answers is whether a <em>star</em> is painted at the
+     * endpoint rather than a line, so the control must be a page with
+     * no star ink there at all.
+     *
+     * <p>Two earlier drafts of this were too narrow and reported
+     * missing nodes on pages where nothing was wrong. Withholding only
+     * the node left its companion - thirty endpoints have one within
+     * the tolerance - painting an identical disc in its place.
+     * Widening that to the whole tolerance still left a neighbouring
+     * star, a tenth of a degree off and a wide page's fraction of a
+     * pixel away, covering the same three by three box. Which star an
+     * endpoint is, and that it is only one, are asked separately and
+     * exactly.
+     */
+    private static Set<String> figureStarsOf(ChartScene scene,
+                                             List<SkyPosition> endpoints) {
+        var mapping = new ViewportMapping(scene.viewport());
+        var projection = Projections.forViewport(scene.viewport());
+        List<PixelPoint> at = new ArrayList<>();
+        for (SkyPosition endpoint : endpoints) {
+            projection.project(endpoint)
+                    .ifPresent(plane -> at.add(mapping.toPixel(plane)));
+        }
+        Set<String> ids = new HashSet<>();
+        for (Star star : scene.stars()) {
+            var plane = projection.project(star.position());
+            if (plane.isEmpty()) {
+                continue;
+            }
+            PixelPoint drawn = mapping.toPixel(plane.get());
+            double reach = StarSizePolicy.DEFAULT
+                    .radiusFor(star.magnitude()) + READ_PIXELS + 1.0;
+            for (PixelPoint endpoint : at) {
+                if (Math.hypot(drawn.x() - endpoint.x(),
+                        drawn.y() - endpoint.y()) <= reach) {
+                    ids.add(star.id());
+                    break;
+                }
+            }
+        }
+        return ids;
     }
 
     /**
@@ -327,14 +448,21 @@ public final class FigureAnchorStudyMain {
      * satisfy the list and leave the reader looking at the hole this
      * issue is about.
      *
-     * <p>A node is ink at the endpoint itself, and the smallest star
-     * the atlas draws is about two and a half pixels across, so a
-     * couple of pixels either way is the whole of the mark rather
-     * than a neighbourhood that might catch a figure line passing
-     * through.
+     * <p>And read as a <em>difference</em> rather than as ink. The
+     * figure's own line ends here, drawn beneath the marks, so ink at
+     * an endpoint proves only that something is there. The second
+     * painting differs from the first in one thing - the figures'
+     * stars are withheld - so the lines, the grid, the boundaries and
+     * every other star are laid down identically in both, and a pixel
+     * that changes is the node itself.
+     *
+     * <p>The smallest star the atlas draws is about two and a half
+     * pixels across, so a couple of pixels either way is the whole of
+     * the mark rather than a neighbourhood.
      */
-    private static boolean inkAt(BufferedImage painted, ChartScene scene,
-                                 SkyPosition endpoint) {
+    private static boolean nodeAt(BufferedImage page,
+                                  BufferedImage withheld,
+                                  ChartScene scene, SkyPosition endpoint) {
         var mapping = new ViewportMapping(scene.viewport());
         var projection = Projections.forViewport(scene.viewport());
         var plane = projection.project(endpoint);
@@ -344,37 +472,18 @@ public final class FigureAnchorStudyMain {
         PixelPoint at = mapping.toPixel(plane.get());
         int centreX = (int) Math.round(at.x());
         int centreY = (int) Math.round(at.y());
-        int ground = ChartOptions.DEFAULTS.palette().ground().getRGB()
-                & 0xffffff;
-        for (int y = centreY - 1; y <= centreY + 1; y++) {
-            for (int x = centreX - 1; x <= centreX + 1; x++) {
+        int reach = READ_PIXELS;
+        for (int y = centreY - reach; y <= centreY + reach; y++) {
+            for (int x = centreX - reach; x <= centreX + reach; x++) {
                 if (x < 0 || y < 0 || x >= WIDE || y >= HIGH) {
                     continue;
                 }
-                if ((painted.getRGB(x, y) & 0xffffff) != ground) {
+                if (page.getRGB(x, y) != withheld.getRGB(x, y)) {
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    private static ChartRenderer.DrawnMark nodeAt(
-            List<ChartRenderer.DrawnMark> marks, SkyPosition endpoint) {
-        ChartRenderer.DrawnMark best = null;
-        double closest = FigureAnchors.SAME_STAR_DEGREES;
-        for (ChartRenderer.DrawnMark mark : marks) {
-            if (mark.star() == null) {
-                continue;
-            }
-            double apart =
-                    mark.star().position().separationDegrees(endpoint);
-            if (apart <= closest) {
-                closest = apart;
-                best = mark;
-            }
-        }
-        return best;
     }
 
     /** How far every figure endpoint is from its nearest star. */

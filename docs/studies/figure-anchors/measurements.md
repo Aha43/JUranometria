@@ -22,26 +22,45 @@ Figure endpoints that land on the paper, and how many of them had no star.
 |---|---:|---:|---:|---:|---:|
 | Orion | 42° | V 8.0 | 41 | 0 | 0 |
 | Orion | 60° | V 5.0 | 72 | 0 | 0 |
-| Orion | 90° | V 4.0 | 121 | 0 | 3 |
-| Orion | 120° | V 4.0 | 190 | 0 | 1 |
-| Sagittarius | 42° | V 8.0 | 46 | 0 | 3 |
-| Sagittarius | 60° | V 5.0 | 82 | 0 | 0 |
-| Sagittarius | 90° | V 4.0 | 133 | 0 | 1 |
-| Sagittarius | 120° | V 4.0 | 207 | 0 | 1 |
+| Orion | 90° | V 4.0 | 120 | 0 | 4 |
+| Orion | 120° | V 4.0 | 189 | 0 | 3 |
+| Sagittarius | 42° | V 8.0 | 45 | 0 | 4 |
+| Sagittarius | 60° | V 5.0 | 81 | 0 | 0 |
+| Sagittarius | 90° | V 4.0 | 133 | 0 | 2 |
+| Sagittarius | 120° | V 4.0 | 206 | 0 | 3 |
 | M31 | 42° | V 8.0 | 27 | 0 | 0 |
-| M31 | 60° | V 5.0 | 64 | 0 | 1 |
-| M31 | 90° | V 4.0 | 119 | 0 | 1 |
-| M31 | 120° | V 4.0 | 179 | 0 | 2 |
+| M31 | 60° | V 5.0 | 64 | 0 | 2 |
+| M31 | 90° | V 4.0 | 118 | 0 | 3 |
+| M31 | 120° | V 4.0 | 179 | 0 | 3 |
 
-Before the repair the same column read 0, 43 and 76 at Orion for 60, 90
-and 120 degrees. Sixty degrees never had the defect: at V 5.0 every figure star
-of that page is already admitted.
+With the exception removed and the page otherwise unchanged, the same column
+reads:
+
+```
+               42°     60°     90°    120°
+Orion            0       0      42      74
+Sagittarius      0       4      52      80
+M31              0       1      58      84
+```
+
+The 42-degree sheet page is clean without it, which is why this was a matter
+for the overview: at V 8.0 every figure star is admitted anyway. Sixty degrees
+is nearly so and not quite - Orion's page is whole at V 5.0, Sagittarius's is
+four endpoints short and M31's one - which is worth knowing, because the rung
+that looked safe was safe at one centre and not at the others.
+
+A node here is not ink at the endpoint: it is ink that goes away when the
+stars are withheld from the page and nothing else is changed. A figure's line
+ends at its endpoint, so ink alone would let the line answer for the star it
+was drawn to. The lines, the grid, the boundaries and the furniture are laid
+down identically in both paintings; a pixel that changes is a star.
 
 The last column is the chart's own furniture, not a missing star. The title
 block is painted over the sky, and a node beneath it is covered like anything
 else there - it happens on the released 42-degree page too, where no star is
-held back for a figure at all. Every one of them has its star drawn; the
-block is simply on top.
+held back for a figure at all. Each one is counted there only if it falls
+inside the block's own bounds and its node reappears when the furniture is
+switched off: painted, and then painted over.
 
 ## What it costs
 
