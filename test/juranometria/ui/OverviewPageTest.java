@@ -123,11 +123,18 @@ class OverviewPageTest {
                 new juranometria.app.InspectorPanel[1];
         juranometria.chart.SelectionModel selection =
                 new juranometria.chart.SelectionModel();
-        // Built inside the guard, not before it. A window shown by a
-        // setup that then fails is a window the next display test
-        // inherits, and the guard cannot put away what it did not
-        // see created.
-        juranometria.app.SwingSession.guarded(() -> {
+        // Two guards, one for each thing that has to be put away.
+        //
+        // Built inside them, not before: a window shown by a setup
+        // that then fails is a window the next display test
+        // inherits, and a guard cannot put away what it did not see
+        // created. And nested rather than disposed together, because
+        // one cleanup that throws must not take the other with it -
+        // the frame is the one that leaves a window on the desktop,
+        // and it is disposed whatever the panel did. Composing the
+        // shared rule twice rather than writing a third copy of it.
+        juranometria.app.SwingSession.guarded(() ->
+                juranometria.app.SwingSession.guarded(() -> {
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 navigation[0] = new ChartViewController(
                         Atlas.assembler()::fits);
@@ -268,18 +275,19 @@ class OverviewPageTest {
                             < 1.0e-6,
                     "still centred on what the reader picked out of"
                             + " the wide view");
+        // Whatever exists by the time these run: a setup that failed
+        // halfway leaves some of it null, and a cleanup that threw on
+        // a null would replace the failure that mattered.
         }, () -> javax.swing.SwingUtilities.invokeAndWait(() -> {
-            // Whatever exists by the time this runs. A setup that
-            // failed halfway leaves some of these null, and a cleanup
-            // that threw on one of them would replace the failure
-            // that mattered.
-            if (inspector[0] != null) {
-                inspector[0].dispose();
-            }
-            if (frame[0] != null) {
-                frame[0].dispose();
-            }
-        }));
+                    if (inspector[0] != null) {
+                        inspector[0].dispose();
+                    }
+                })),
+                () -> javax.swing.SwingUtilities.invokeAndWait(() -> {
+                    if (frame[0] != null) {
+                        frame[0].dispose();
+                    }
+                }));
     }
 
     private static void flush() throws Exception {
