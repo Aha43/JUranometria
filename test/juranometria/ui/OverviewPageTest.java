@@ -123,35 +123,40 @@ class OverviewPageTest {
                 new juranometria.app.InspectorPanel[1];
         juranometria.chart.SelectionModel selection =
                 new juranometria.chart.SelectionModel();
-        javax.swing.SwingUtilities.invokeAndWait(() -> {
-            navigation[0] = new ChartViewController(Atlas.assembler()::fits);
-            chart[0] = new ChartComponent(Atlas.assembler());
-            navigation[0].onChange(chart[0]::setViewState);
-            SelectInteraction.install(chart[0], selection,
-                    new juranometria.chart.WorkingSelection(),
-                    new juranometria.chart.SelectionMode());
-            inspector[0] = new juranometria.app.InspectorPanel(selection,
-                    chart[0]::currentScene, () -> ChartOptions.DEFAULTS,
-                    chosen -> navigation[0].recenter(chosen.position()));
-            chart[0].onSceneChange(inspector[0]::refresh);
-            navigation[0].recenter(ORION, 42.0);
-
-            frame[0] = new javax.swing.JFrame("overview journey");
-            frame[0].setLayout(new java.awt.BorderLayout());
-            frame[0].add(new AtlasToolbar(navigation[0], new SearchField(
-                            Atlas.search(), Atlas.assembler(),
-                            navigation[0])),
-                    java.awt.BorderLayout.NORTH);
-            frame[0].add(chart[0], java.awt.BorderLayout.CENTER);
-            frame[0].add(inspector[0], java.awt.BorderLayout.EAST);
-            frame[0].setJMenuBar(juranometria.app.AppMenuBar.create(
-                    navigation[0], () -> { }, () -> { }, () -> { },
-                    () -> inspector[0].setRequestedVisible(
-                            !inspector[0].isRequestedVisible())));
-            frame[0].setSize(1280, 820);
-            frame[0].setVisible(true);
-        });
+        // Built inside the guard, not before it. A window shown by a
+        // setup that then fails is a window the next display test
+        // inherits, and the guard cannot put away what it did not
+        // see created.
         juranometria.app.SwingSession.guarded(() -> {
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                navigation[0] = new ChartViewController(
+                        Atlas.assembler()::fits);
+                chart[0] = new ChartComponent(Atlas.assembler());
+                navigation[0].onChange(chart[0]::setViewState);
+                SelectInteraction.install(chart[0], selection,
+                        new juranometria.chart.WorkingSelection(),
+                        new juranometria.chart.SelectionMode());
+                inspector[0] = new juranometria.app.InspectorPanel(selection,
+                        chart[0]::currentScene, () -> ChartOptions.DEFAULTS,
+                        chosen -> navigation[0].recenter(chosen.position()));
+                chart[0].onSceneChange(inspector[0]::refresh);
+                navigation[0].recenter(ORION, 42.0);
+
+                frame[0] = new javax.swing.JFrame("overview journey");
+                frame[0].setLayout(new java.awt.BorderLayout());
+                frame[0].add(new AtlasToolbar(navigation[0], new SearchField(
+                                Atlas.search(), Atlas.assembler(),
+                                navigation[0])),
+                        java.awt.BorderLayout.NORTH);
+                frame[0].add(chart[0], java.awt.BorderLayout.CENTER);
+                frame[0].add(inspector[0], java.awt.BorderLayout.EAST);
+                frame[0].setJMenuBar(juranometria.app.AppMenuBar.create(
+                        navigation[0], () -> { }, () -> { }, () -> { },
+                        () -> inspector[0].setRequestedVisible(
+                                !inspector[0].isRequestedVisible())));
+                frame[0].setSize(1280, 820);
+                frame[0].setVisible(true);
+            });
             flush();
             javax.swing.JButton out = button(frame[0].getContentPane(),
                     "Zoom out");
@@ -208,7 +213,8 @@ class OverviewPageTest {
                             instanceof juranometria.chart.Selection.Object,
                     "the click on the overview selected an object");
             juranometria.chart.Selection.Object picked =
-                    (juranometria.chart.Selection.Object) selection.selection();
+                    (juranometria.chart.Selection.Object)
+                            selection.selection();
             assertEquals(star.star().id(), picked.catalogueId(),
                     "the one that was under the pointer, read back"
                             + " through the overview's own projection");
@@ -263,8 +269,16 @@ class OverviewPageTest {
                     "still centred on what the reader picked out of"
                             + " the wide view");
         }, () -> javax.swing.SwingUtilities.invokeAndWait(() -> {
-            inspector[0].dispose();
-            frame[0].dispose();
+            // Whatever exists by the time this runs. A setup that
+            // failed halfway leaves some of these null, and a cleanup
+            // that threw on one of them would replace the failure
+            // that mattered.
+            if (inspector[0] != null) {
+                inspector[0].dispose();
+            }
+            if (frame[0] != null) {
+                frame[0].dispose();
+            }
         }));
     }
 
@@ -499,7 +513,8 @@ class OverviewPageTest {
         // present, and each is ink the bare page does not have.
         for (float[] dash : new float[][] {null, {6.0f, 4.0f},
                 {12.0f, 4.0f, 2.0f, 4.0f}}) {
-            assertTrue(strokedWith(withModules, dash) > strokedWith(bare, dash),
+            assertTrue(strokedWith(withModules, dash)
+                            > strokedWith(bare, dash),
                     "the page gains ink of its own kind: "
                             + java.util.Arrays.toString(dash) + " went from "
                             + strokedWith(bare, dash) + " to "
