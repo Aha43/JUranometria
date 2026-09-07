@@ -23,7 +23,8 @@ package juranometria.chart;
  */
 public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
                              double limitingMagnitude, String targetLabel,
-                             String targetIdentity) {
+                             String targetIdentity,
+                             ChartProjection projection) {
 
     /** Zoom sequence, widest first; zooming in walks toward 1 degree.
      *  The regional steps above 8 come from docs/decisions/regional-zoom.md;
@@ -47,9 +48,27 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         this(centre, fieldWidthDegrees, limitingMagnitude, null, null);
     }
 
+    /**
+     * A view drawn by the atlas's own projection.
+     *
+     * <p>Every released state is one of these, and says so by
+     * omission rather than by repeating the same word in a hundred
+     * places.
+     */
+    public ChartViewState(SkyPosition centre, double fieldWidthDegrees,
+                          double limitingMagnitude, String targetLabel,
+                          String targetIdentity) {
+        this(centre, fieldWidthDegrees, limitingMagnitude, targetLabel,
+                targetIdentity, ChartProjection.GNOMONIC);
+    }
+
     public ChartViewState {
         if (centre == null) {
             throw new IllegalArgumentException("centre must not be null");
+        }
+        if (projection == null) {
+            throw new IllegalArgumentException(
+                    "projection must not be null");
         }
         if (indexOf(FIELD_WIDTH_STEPS, fieldWidthDegrees) < 0) {
             throw new IllegalArgumentException(
@@ -99,12 +118,21 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         return magnitudeIndex() < MAGNITUDE_LIMIT_STEPS.length - 1;
     }
 
+    // Every transition below carries the projection through, and
+    // the reason is that not carrying it is invisible. A chart that
+    // reverted to the atlas's own projection on a zoom would still
+    // draw a page, still be centred where the reader left it, and
+    // still be wrong - a review found exactly that, because the
+    // defaulting constructor these were written against says
+    // "gnomonic" when it is not told otherwise, and none of them
+    // told it.
+
     /** The next narrower field, or this state at the 1-degree bound. */
     public ChartViewState zoomIn() {
         return canZoomIn()
                 ? new ChartViewState(centre,
                         FIELD_WIDTH_STEPS[fieldWidthIndex() + 1], limitingMagnitude,
-                        targetLabel, targetIdentity)
+                        targetLabel, targetIdentity, projection)
                 : this;
     }
 
@@ -113,7 +141,7 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         return canZoomOut()
                 ? new ChartViewState(centre,
                         FIELD_WIDTH_STEPS[fieldWidthIndex() - 1], limitingMagnitude,
-                        targetLabel, targetIdentity)
+                        targetLabel, targetIdentity, projection)
                 : this;
     }
 
@@ -121,7 +149,8 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState decreaseMagnitudeLimit() {
         return canDecreaseMagnitudeLimit()
                 ? new ChartViewState(centre, fieldWidthDegrees,
-                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() - 1], targetLabel, targetIdentity)
+                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() - 1], targetLabel,
+                        targetIdentity, projection)
                 : this;
     }
 
@@ -129,7 +158,8 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     public ChartViewState increaseMagnitudeLimit() {
         return canIncreaseMagnitudeLimit()
                 ? new ChartViewState(centre, fieldWidthDegrees,
-                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() + 1], targetLabel, targetIdentity)
+                        MAGNITUDE_LIMIT_STEPS[magnitudeIndex() + 1], targetLabel,
+                        targetIdentity, projection)
                 : this;
     }
 
@@ -152,13 +182,13 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
             throw new IllegalArgumentException("centre must not be null");
         }
         return new ChartViewState(newCentre, fieldWidthDegrees, limitingMagnitude,
-                newTargetLabel, newTargetIdentity);
+                newTargetLabel, newTargetIdentity, projection);
     }
 
     /** This centre, target, and limit at another supported field width. */
     public ChartViewState withFieldWidth(double newFieldWidthDegrees) {
         return new ChartViewState(centre, newFieldWidthDegrees, limitingMagnitude,
-                targetLabel, targetIdentity);
+                targetLabel, targetIdentity, projection);
     }
 
     /** The complete default state: M31, 8-degree field, stars to V 8.0. */

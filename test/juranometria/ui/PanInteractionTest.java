@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import juranometria.chart.ChartViewState;
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyPosition;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PanSolver;
@@ -100,7 +101,8 @@ class PanInteractionTest {
             }
             Fixture.flush();
             SkyPosition grabbed = PanSolver.skyFromPlane(
-                    fixture.controller.state().centre(),
+                    fixture.controller.state().projection(),
+                fixture.controller.state().centre(),
                     PanSolver.planeFromPixel(fixture.chart.scene().viewport(),
                             new PixelPoint(450, 350)));
 
@@ -266,6 +268,7 @@ class PanInteractionTest {
                 new SkyPosition(37.946619, 89.264135)));
         Fixture.flush();
         SkyPosition grabbed = PanSolver.skyFromPlane(
+                fixture.controller.state().projection(),
                 fixture.controller.state().centre(),
                 PanSolver.planeFromPixel(fixture.chart.scene().viewport(),
                         new PixelPoint(200, 550)));
@@ -288,7 +291,7 @@ class PanInteractionTest {
         Fixture.flush();
         SkyPosition before = fixture.controller.state().centre();
         var viewport = fixture.chart.scene().viewport();
-        SkyPosition grabbed = PanSolver.skyFromPlane(before,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, before,
                 PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
 
         // A diagonal pull on the near-polar grab: the horizontal
@@ -312,7 +315,7 @@ class PanInteractionTest {
                         < Math.abs(requested.xiEast()),
                 "the horizontal component stops at the feasibility boundary");
         // The solver itself classifies the event as a constrained follow.
-        assertTrue(PanSolver.solveCentre(grabbed, requested, before)
+        assertTrue(PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed, requested, before)
                         .constrained(),
                 "the solver classifies the diagonal event as constrained");
 
@@ -331,7 +334,7 @@ class PanInteractionTest {
         SkyPosition saturatedFrom = fixture.controller.state().centre();
         var saturatedTarget = PanSolver.planeFromPixel(viewport,
                 new PixelPoint(850, 310));
-        var saturated = PanSolver.solveCentre(grabbed, saturatedTarget,
+        var saturated = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed, saturatedTarget,
                 saturatedFrom);
         assertFalse(saturated.pastPole(),
                 "saturation is not a past-pole hold");
@@ -345,7 +348,7 @@ class PanInteractionTest {
         // solver classifies past-pole - while upward resumes the follow.
         var heldTarget = PanSolver.planeFromPixel(viewport,
                 new PixelPoint(850, 420));
-        assertTrue(PanSolver.solveCentre(grabbed, heldTarget,
+        assertTrue(PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed, heldTarget,
                         fixture.controller.state().centre()).pastPole(),
                 "the solver classifies the downward pull as past-pole");
         fixture.drag(850, 420);
@@ -374,6 +377,7 @@ class PanInteractionTest {
 
         var viewport = fixture.chart.scene().viewport();
         SkyPosition grabbed = PanSolver.skyFromPlane(
+                fixture.controller.state().projection(),
                 fixture.controller.state().centre(),
                 PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
         fixture.press(450, 350);
@@ -382,7 +386,7 @@ class PanInteractionTest {
         int armedQueries = fixture.catalogue.starQueries;
         // The solver itself classifies this exact event as past-pole -
         // the no-op is a hold, not saturation or a coverage refusal.
-        assertTrue(PanSolver.solveCentre(grabbed,
+        assertTrue(PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                         PanSolver.planeFromPixel(viewport,
                                 new PixelPoint(450, 170)),
                         afterArm.centre()).pastPole(),

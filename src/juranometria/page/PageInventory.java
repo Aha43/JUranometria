@@ -8,7 +8,8 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
-import juranometria.project.GnomonicProjection;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 import juranometria.render.ChartOptions;
@@ -56,8 +57,8 @@ public final class PageInventory {
             throw new IllegalArgumentException(
                     "an inventory is of a scene under options");
         }
-        GnomonicProjection projection =
-                new GnomonicProjection(scene.viewport().centre());
+        Projection projection =
+                Projections.forViewport(scene.viewport());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
@@ -218,7 +219,7 @@ public final class PageInventory {
      * Whether a position lands on the paper. A star has no recorded
      * extent, so its centre is the whole question.
      */
-    private static boolean onPaper(GnomonicProjection projection,
+    private static boolean onPaper(Projection projection,
                                    ViewportMapping mapping, ChartScene scene,
                                    SkyPosition position) {
         PixelPoint pixel = projection.project(position)

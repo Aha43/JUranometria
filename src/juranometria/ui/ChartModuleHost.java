@@ -144,8 +144,11 @@ public final class ChartModuleHost implements ChartServices {
                 if (scene == null) {
                     return Optional.empty();
                 }
-                return new juranometria.project.GnomonicProjection(
-                        scene.viewport().centre()).project(position)
+                // The chart's own projection, whichever it is. A
+                // module is told where a position lands on the page
+                // and never which projection put it there.
+                return juranometria.project.Projections
+                        .forViewport(scene.viewport()).project(position)
                         .map(plane -> {
                             var pixel = new juranometria.project
                                     .ViewportMapping(scene.viewport())

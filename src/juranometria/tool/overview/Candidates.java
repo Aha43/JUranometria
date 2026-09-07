@@ -60,7 +60,7 @@ final class Candidates {
 
             @Override
             public Optional<SkyPosition> unproject(PlanePoint point) {
-                return Optional.of(PanSolver.skyFromPlane(centre, point));
+                return Optional.of(PanSolver.skyFromPlane(juranometria.chart.ChartProjection.GNOMONIC, centre, point));
             }
 
             @Override

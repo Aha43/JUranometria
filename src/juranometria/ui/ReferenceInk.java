@@ -17,7 +17,8 @@ import juranometria.chart.ChartScene;
 import juranometria.module.InkRole;
 import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
-import juranometria.project.GnomonicProjection;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 import juranometria.project.GreatCirclePage;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -124,8 +125,8 @@ public final class ReferenceInk {
         }
         reference.sort(Comparator.comparing(OverlayRegistry.Owned::key));
 
-        GnomonicProjection projection =
-                new GnomonicProjection(scene.viewport().centre());
+        Projection projection =
+                Projections.forViewport(scene.viewport());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         Rectangle2D paper = ChartRenderer.paperOf(scene);
         GreatCirclePage.Page page = new GreatCirclePage.Page(paper.getMinX(),
@@ -156,7 +157,7 @@ public final class ReferenceInk {
     }
 
     private static void drawCircle(Graphics2D g,
-                                   GnomonicProjection projection,
+                                   Projection projection,
                                    ViewportMapping mapping,
                                    GreatCirclePage.Page page,
                                    Rectangle2D paper,
@@ -249,7 +250,7 @@ public final class ReferenceInk {
     }
 
     private static void drawPoint(Graphics2D g,
-                                  GnomonicProjection projection,
+                                  Projection projection,
                                   ViewportMapping mapping,
                                   Rectangle2D paper,
                                   OverlayContribution.Point point,

@@ -79,7 +79,7 @@ class ZoomInteractionTest {
 
     private static SkyPosition anchorAt(ChartViewState state, int x, int y,
                                         int width, int height) {
-        return PanSolver.skyFromPlane(state.centre(),
+        return PanSolver.skyFromPlane(state.projection(), state.centre(),
                 PanSolver.planeFromPixel(new ChartViewport(state.centre(),
                         state.fieldWidthDegrees(), width, height),
                         new PixelPoint(x, y)));

@@ -8,7 +8,10 @@ import juranometria.chart.SceneGeography;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyRegion;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 
 /**
  * Assembles complete immutable chart scenes by querying the local
@@ -89,7 +92,7 @@ public final class SceneAssembler {
      * An assembler over complete all-sky coverage: every centre fits at
      * every supported field, there is no data centre to be offset from,
      * and the page height is bounded only by projection sanity (chart
-     * corners stay within {@link #PROJECTION_CORNER_LIMIT_DEGREES} of the
+     * corners stay within the projection's own useful corner of the
      * centre, far beyond any realistic window).
      *
      * @param objectExtentMarginDegrees the pack's declared maximum object
@@ -124,8 +127,12 @@ public final class SceneAssembler {
         return objectExtentMarginDegrees;
     }
 
-    /** Gnomonic charts degrade far from the centre; cap the page there. */
-    static final double PROJECTION_CORNER_LIMIT_DEGREES = 60.0;
+    // The corner cap used to live here as a constant, written for
+    // the tangent plane and applied through whichever projection was
+    // drawing. It is Projection.usefulCornerDegrees now: a statement
+    // about how far a projection may be pushed belongs to the
+    // projection, and this one made a 120-degree overview page zero
+    // pixels tall (issue #297).
 
     /**
      * Queries the catalogue around the state's centre and builds the scene
@@ -134,7 +141,10 @@ public final class SceneAssembler {
      * coverage is an error, never a silently sparse chart.
      */
     public ChartScene assemble(ChartViewState state, int widthPx, int heightPx) {
-        double radius = queryRadiusDegrees(state.fieldWidthDegrees(), widthPx, heightPx);
+        Projection projection = Projections.of(state.projection(),
+                state.centre());
+        double radius = queryRadiusDegrees(projection,
+                state.fieldWidthDegrees(), widthPx, heightPx);
         if (allSky) {
             return assembleScene(state, widthPx, heightPx, radius);
         }
@@ -151,8 +161,11 @@ public final class SceneAssembler {
 
     private ChartScene assembleScene(ChartViewState state, int widthPx, int heightPx,
                                      double radius) {
+        // The scene carries the projection the state chose, so the
+        // renderer and everything after it draws by the same one.
         ChartViewport viewport = new ChartViewport(
-                state.centre(), state.fieldWidthDegrees(), widthPx, heightPx);
+                state.centre(), state.fieldWidthDegrees(), widthPx, heightPx,
+                state.projection());
         SkyRegion query = new SkyRegion(state.centre(), Math.min(radius, 180.0));
         return new ChartScene(viewport,
                 catalogue.starsIn(query),
@@ -255,10 +268,29 @@ public final class SceneAssembler {
      * width. A taller window letterboxes the page rather than promising
      * sky the data does not hold; an offset centre allows less height.
      */
-    public int maxPageHeightPx(SkyPosition centre, double fieldWidthDegrees, int widthPx) {
-        double halfWidthPlane = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
+    public int maxPageHeightPx(SkyPosition centre, double fieldWidthDegrees,
+                               int widthPx) {
+        return maxPageHeightPx(ChartProjection.GNOMONIC, centre,
+                fieldWidthDegrees, widthPx);
+    }
+
+    /**
+     * The same, measured on the plane the page is actually drawn on.
+     *
+     * <p>Every distance here is a plane distance, and how far out an
+     * angle lies on the plane is the projection's answer, not a
+     * tangent's. The corner limit is the projection's too: it exists
+     * because a tangent plane degrades far from its centre, and how
+     * far is far depends on which projection is degrading.
+     */
+    public int maxPageHeightPx(ChartProjection kind, SkyPosition centre,
+                               double fieldWidthDegrees, int widthPx) {
+        Projection projection = Projections.of(kind, centre);
+        double halfWidthPlane =
+                projection.planeRadius(fieldWidthDegrees / 2.0);
         if (allSky) {
-            double limitPlane = Math.tan(Math.toRadians(PROJECTION_CORNER_LIMIT_DEGREES));
+            double limitPlane = projection.planeRadius(
+                    projection.usefulCornerDegrees());
             double halfHeightPlane = Math.sqrt(
                     limitPlane * limitPlane - halfWidthPlane * halfWidthPlane);
             return (int) Math.floor(widthPx * halfHeightPlane / halfWidthPlane);
@@ -269,7 +301,8 @@ public final class SceneAssembler {
         if (allowedCornerDegrees <= 0) {
             return 0;
         }
-        double maxCornerPlane = Math.tan(Math.toRadians(allowedCornerDegrees));
+        double maxCornerPlane =
+                projection.planeRadius(allowedCornerDegrees);
         if (maxCornerPlane <= halfWidthPlane) {
             return 0;
         }
@@ -284,11 +317,27 @@ public final class SceneAssembler {
      * extent margin — so no eligible object is silently clipped even in
      * tall or wide windows.
      */
-    double queryRadiusDegrees(double fieldWidthDegrees, int widthPx, int heightPx) {
-        double halfWidthPlane = Math.tan(Math.toRadians(fieldWidthDegrees) / 2.0);
+    /**
+     * How much sky a page of this shape reaches, plus the margin an
+     * object's own extent needs.
+     *
+     * <p>Asked of the projection, in both directions: how far out the
+     * page corner is on its plane, and what angle that stands for.
+     * Written with a tangent this was one projection's answer given
+     * for all of them, and the Sprint 30 gate measured the cost - a
+     * 120-degree stereographic page over Orion reaches 72.4 degrees
+     * where the gnomonic rule fetches 65.5, leaving <strong>2,402
+     * catalogue objects</strong> out of the corners, where nothing
+     * looks wrong (docs/decisions/overview-projection.md).
+     */
+    double queryRadiusDegrees(Projection projection,
+                              double fieldWidthDegrees,
+                              int widthPx, int heightPx) {
+        double halfWidthPlane =
+                projection.planeRadius(fieldWidthDegrees / 2.0);
         double halfHeightPlane = halfWidthPlane * heightPx / (double) widthPx;
-        double cornerDegrees = Math.toDegrees(
-                Math.atan(Math.hypot(halfWidthPlane, halfHeightPlane)));
+        double cornerDegrees = projection.angleAtPlaneRadius(
+                Math.hypot(halfWidthPlane, halfHeightPlane));
         return cornerDegrees + objectExtentMarginDegrees;
     }
 }

@@ -66,6 +66,7 @@ class ExplorationJourneyTest {
 
         // Grab the paper and pan along the constellation.
         SkyPosition grabbed = PanSolver.skyFromPlane(
+                controller.state().projection(),
                 controller.state().centre(),
                 PanSolver.planeFromPixel(chart.scene().viewport(),
                         new PixelPoint(450, 350)));

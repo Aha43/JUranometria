@@ -185,7 +185,7 @@ class WiderFieldStepTest {
         int corners = 0;
         for (int[] pixel : new int[][] {{1, 1}, {898, 1}, {1, 698},
                 {898, 698}}) {
-            SkyPosition corner = PanSolver.skyFromPlane(viewport.centre(),
+            SkyPosition corner = PanSolver.skyFromPlane(viewport,
                     PanSolver.planeFromPixel(viewport,
                             new PixelPoint(pixel[0], pixel[1])));
             for (Star near : catalogue.starsIn(new SkyRegion(corner, 1.0))) {

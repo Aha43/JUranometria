@@ -53,7 +53,8 @@ class GridRenderingTest {
                 scene(List.of()).viewport());
         // Recover the sky under that grid pixel and put a star there.
         SkyPosition under = juranometria.project.PanSolver.skyFromPlane(
-                CENTRE, juranometria.project.PanSolver.planeFromPixel(
+                juranometria.chart.ChartProjection.GNOMONIC, CENTRE,
+                juranometria.project.PanSolver.planeFromPixel(
                         scene(List.of()).viewport(), on));
         BufferedImage image = RENDERER.renderToImage(
                 scene(List.of(new Star("TYC 1-1-1", under, 0.5))));

@@ -7,6 +7,7 @@ import java.util.Optional;
 import juranometria.catalog.TiledCatalogue;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.ChartViewport;
+import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.StarSizePolicy;
 import juranometria.geo.ConstellationGeography;
@@ -94,7 +95,7 @@ public final class PanStudyMain {
     private static void microBenchmarks() {
         SkyPosition centre = new SkyPosition(83.818667, -5.389667);
         ChartViewport viewport = new ChartViewport(centre, 36.0, WIDTH, HEIGHT);
-        SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                 PanSolver.planeFromPixel(viewport, new PixelPoint(450, 350)));
 
         long[] solve = new long[10_000];
@@ -103,7 +104,7 @@ public final class PanStudyMain {
             var target = PanSolver.planeFromPixel(viewport, new PixelPoint(
                     450 + (i % 200), 350 + (i % 140)));
             long t0 = System.nanoTime();
-            var solution = PanSolver.solveCentre(grabbed, target, current);
+            var solution = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed, target, current);
             solve[i] = System.nanoTime() - t0;
             current = solution.centre().orElse(current);
         }
@@ -147,7 +148,7 @@ public final class PanStudyMain {
     private static double withinGesture(SkyPosition centre, double field) {
         ChartViewport viewport = new ChartViewport(centre, field, WIDTH, HEIGHT);
         PixelPoint press = new PixelPoint(450, 350);
-        SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                 PanSolver.planeFromPixel(viewport, press));
         SkyPosition current = centre;
         java.util.Random random = new java.util.Random(43);
@@ -155,12 +156,12 @@ public final class PanStudyMain {
             PixelPoint waypoint = new PixelPoint(
                     450 + random.nextInt(-260, 261),
                     350 + random.nextInt(-260, 261));
-            current = PanSolver.solveCentre(grabbed,
+            current = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                             PanSolver.planeFromPixel(viewport, waypoint),
                             current)
                     .centre().orElse(current);
         }
-        SkyPosition back = PanSolver.solveCentre(grabbed,
+        SkyPosition back = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                         PanSolver.planeFromPixel(viewport, press), current)
                 .centre().orElse(current);
         var plane = new GnomonicProjection(centre).project(back);
@@ -179,9 +180,9 @@ public final class PanStudyMain {
             PixelPoint press = new PixelPoint(drag[0], drag[1]);
             PixelPoint release = new PixelPoint(
                     drag[0] + drag[2], drag[1] + drag[3]);
-            SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+            SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                     PanSolver.planeFromPixel(viewport, press));
-            PanSolver.PanSolution solved = PanSolver.solveCentre(grabbed,
+            PanSolver.PanSolution solved = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                     PanSolver.planeFromPixel(viewport, release), centre);
             if (solved.centre().isEmpty()) {
                 // The solver classified this itself; any unexplained
@@ -234,9 +235,9 @@ public final class PanStudyMain {
                                       int dx, int dy) {
         ChartViewport viewport = new ChartViewport(centre, field, WIDTH, HEIGHT);
         PixelPoint press = new PixelPoint(450, 350);
-        SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+        SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                 PanSolver.planeFromPixel(viewport, press));
-        return PanSolver.solveCentre(grabbed,
+        return PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                         PanSolver.planeFromPixel(viewport,
                                 new PixelPoint(450 + dx, 350 + dy)), centre)
                 .centre().orElse(centre);
@@ -266,7 +267,7 @@ public final class PanStudyMain {
             // the pointer 4 px further and solves against that same grab.
             ChartViewport viewport = new ChartViewport(
                     centre, field, WIDTH, HEIGHT);
-            SkyPosition grabbed = PanSolver.skyFromPlane(centre,
+            SkyPosition grabbed = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                     PanSolver.planeFromPixel(viewport,
                             new PixelPoint(450, 350)));
             long[] times = new long[120];
@@ -274,7 +275,7 @@ public final class PanStudyMain {
                 long t0 = System.nanoTime();
                 PixelPoint pointer = new PixelPoint(
                         450 + 4 * (i + 1), 350 + 3 * (i + 1));
-                SkyPosition moved = PanSolver.solveCentre(grabbed,
+                SkyPosition moved = PanSolver.solveCentre(ChartProjection.GNOMONIC, grabbed,
                                 PanSolver.planeFromPixel(viewport, pointer),
                                 state.centre())
                         .centre().orElse(state.centre());

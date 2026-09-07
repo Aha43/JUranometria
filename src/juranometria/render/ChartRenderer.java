@@ -19,7 +19,8 @@ import juranometria.chart.SkyPosition;
 import juranometria.geo.GeoSegment;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
-import juranometria.project.GnomonicProjection;
+import juranometria.project.Projection;
+import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 
@@ -260,8 +261,8 @@ public final class ChartRenderer {
 
     public java.util.List<DrawnMark> drawnMarks(ChartScene scene,
                                                 ChartOptions options) {
-        GnomonicProjection projection =
-                new GnomonicProjection(scene.viewport().centre());
+        Projection projection =
+                Projections.forViewport(scene.viewport());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
@@ -270,7 +271,7 @@ public final class ChartRenderer {
 
     private java.util.List<DrawnMark> drawnMarks(
             ChartScene scene, ChartOptions options,
-            RegionalDetailPolicy policy, GnomonicProjection projection,
+            RegionalDetailPolicy policy, Projection projection,
             ViewportMapping mapping) {
         // Only what the page actually shows (gate review, P1). The
         // renderer clips to the paper, so a mark whose ink falls
@@ -406,7 +407,7 @@ public final class ChartRenderer {
         g.setColor(palette.ground());
         g.fillRect(0, 0, width, height);
 
-        GnomonicProjection projection = new GnomonicProjection(scene.viewport().centre());
+        Projection projection = Projections.forViewport(scene.viewport());
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
@@ -488,7 +489,7 @@ public final class ChartRenderer {
      */
     private static void drawGeography(Graphics2D g, ChartScene scene,
                                       ChartOptions options,
-                                      GnomonicProjection projection,
+                                      Projection projection,
                                       ViewportMapping mapping) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
@@ -519,7 +520,7 @@ public final class ChartRenderer {
 
     private static void drawGeographySegment(Graphics2D g, GeoSegment segment,
                                              ChartScene scene,
-                                             GnomonicProjection projection,
+                                             Projection projection,
                                              ViewportMapping mapping,
                                              java.util.Map<String, double[]> visibleInk) {
         int width = scene.viewport().widthPx();
@@ -661,7 +662,7 @@ public final class ChartRenderer {
     public java.util.List<StarLabelPlacement> starLabelPlacements(
             FontMetrics metrics, ChartScene scene, ChartOptions options,
             RegionalDetailPolicy detailPolicy,
-            GnomonicProjection projection, ViewportMapping mapping) {
+            Projection projection, ViewportMapping mapping) {
         StarLabelPolicy policy = new StarLabelPolicy(
                 scene.viewport().fieldWidthDegrees());
         java.util.List<StarLabelPlacement> placed = new java.util.ArrayList<>();
@@ -737,7 +738,7 @@ public final class ChartRenderer {
     private void consider(java.util.List<StarLabelPlacement> placed,
                           java.util.List<Rectangle2D> occupied,
                           FontMetrics metrics,
-                          ChartScene scene, GnomonicProjection projection,
+                          ChartScene scene, Projection projection,
                           ViewportMapping mapping, Star star, String text,
                           boolean guaranteed) {
         var plane = projection.project(star.position());
@@ -766,7 +767,7 @@ public final class ChartRenderer {
     private void drawStarLabels(Graphics2D g, ChartScene scene,
                                 ChartOptions options,
                                 RegionalDetailPolicy detailPolicy,
-                                GnomonicProjection projection,
+                                Projection projection,
                                 ViewportMapping mapping) {
         g.setFont(LABEL_FONT);
         g.setColor(options.palette().textInk());

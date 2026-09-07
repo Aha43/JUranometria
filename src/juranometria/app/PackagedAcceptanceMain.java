@@ -976,10 +976,11 @@ public final class PackagedAcceptanceMain {
         // this leg by skipping it).
         navigation.recenter(new SkyPosition(83.8, -5.4), 18.0);
         var viewport = new ChartViewport(navigation.state().centre(),
-                navigation.state().fieldWidthDegrees(), 900, 700);
+                navigation.state().fieldWidthDegrees(), 900, 700,
+                navigation.state().projection());
         var pointer = PanSolver.planeFromPixel(viewport,
                 new PixelPoint(700, 250));
-        var under = PanSolver.skyFromPlane(viewport.centre(), pointer);
+        var under = PanSolver.skyFromPlane(viewport, pointer);
         var outcome = navigation.zoomAt(pointer, true);
         require(outcome == ChartViewController.PointerZoomOutcome.ACCEPTED,
                 "a pointer zoom in open sky is accepted: " + outcome);
@@ -987,8 +988,9 @@ public final class PackagedAcceptanceMain {
                 "and steps 18 to 12 degrees: "
                         + navigation.state().fieldWidthDegrees());
         var after = new ChartViewport(navigation.state().centre(),
-                navigation.state().fieldWidthDegrees(), 900, 700);
-        var stillUnder = PanSolver.skyFromPlane(after.centre(),
+                navigation.state().fieldWidthDegrees(), 900, 700,
+                navigation.state().projection());
+        var stillUnder = PanSolver.skyFromPlane(after,
                 PanSolver.planeFromPixel(after, new PixelPoint(700, 250)));
         double adrift = under.separationDegrees(stillUnder);
         require(adrift < 1.0e-9,
@@ -1019,9 +1021,10 @@ public final class PackagedAcceptanceMain {
                 "just east of RA 0, so a westward drag must cross it: "
                         + raBefore);
         var wrap = new ChartViewport(navigation.state().centre(),
-                navigation.state().fieldWidthDegrees(), 900, 700);
+                navigation.state().fieldWidthDegrees(), 900, 700,
+                navigation.state().projection());
         require(navigation.pan(
-                        PanSolver.skyFromPlane(wrap.centre(),
+                        PanSolver.skyFromPlane(wrap,
                                 PanSolver.planeFromPixel(wrap,
                                         new PixelPoint(700, 350))),
                         PanSolver.planeFromPixel(wrap,
@@ -1049,7 +1052,7 @@ public final class PackagedAcceptanceMain {
         SkyPosition atPole = navigation.state().centre();
         var polar = new ChartViewport(atPole, 18.0, 900, 700);
         require(navigation.pan(
-                        PanSolver.skyFromPlane(polar.centre(),
+                        PanSolver.skyFromPlane(polar,
                                 PanSolver.planeFromPixel(polar,
                                         new PixelPoint(450, 300))),
                         PanSolver.planeFromPixel(polar,
@@ -1063,7 +1066,7 @@ public final class PackagedAcceptanceMain {
         SkyPosition unmoved = navigation.state().centre();
         var overPole = new ChartViewport(unmoved, 18.0, 900, 700);
         require(!navigation.pan(
-                        PanSolver.skyFromPlane(overPole.centre(),
+                        PanSolver.skyFromPlane(overPole,
                                 PanSolver.planeFromPixel(overPole,
                                         new PixelPoint(450, 250))),
                         PanSolver.planeFromPixel(overPole,

@@ -140,6 +140,15 @@ public interface Projection {
 Eight methods, and each earned its place by something in the study
 being impossible without it.
 
+**Issue #297 found a ninth.** `angleAtPlaneRadius`, the other way
+round from `planeRadius`: a scene assembler has to know what angle a
+page corner stands for *before* it fetches any sky, and the corner is
+a plane distance. The study had bisected `planeRadius` to get it,
+which is fine for a measurement and not for a chart. It is the actual
+fix for the under-fetch below, and a gate that measured everything
+else about this interface did not notice it — which is the ordinary
+reason to build a thing after deciding it.
+
 The last one was absent from this gate's first proposal, and a review
 was right that its absence was the whole problem. A projection that
 only maps points cannot tell #298 what a great circle became. The
@@ -517,6 +526,47 @@ was would be a sheet that could not be checked.
 
 ## Contracts for the rest of Sprint 30
 
+### What building it changed
+
+Recorded here because a decision document that only says what was
+decided is a document nobody can check against what was done.
+
+- **A ninth method**, above.
+- **A third copy of the frame arithmetic**, in `GreatCirclePage`: its
+  own basis vectors, its own dot products, and a threshold of 1e-24
+  where the condition is exact. It now takes the conic from the
+  projection, and decides whether it can clip it by asking the conic
+  whether it is straight — not by asking which projection it holds.
+- **A twenty-sixth construction site.** The gate counted 25 places
+  that built a gnomonic projection or a viewport mapping.
+  `PanSolver.planeFromPixel` had the mapping's tangent inlined
+  instead, so it was never counted.
+- **The corner cap belonged to the projection.** The scene assembler
+  capped a page corner at 60 degrees, with the comment *"Gnomonic
+  charts degrade far from the centre; cap the page there"* — a
+  statement about one projection, applied through whichever was
+  drawing. A 120-degree overview page came out **zero pixels tall**,
+  because at that field the overview's half-field and that cap are
+  the same plane distance; and every overview page came out shorter
+  than a tangent-plane page of the same field, which is backwards.
+  It is `Projection.usefulCornerDegrees` now: 60 for the tangent
+  plane, unchanged, and 120 for the overview, from the same budget —
+  a tangent plane's cap admits a corner degree four times a centre
+  degree, its radial scale being `sec²` of the angle out, and the
+  overview's is `sec²` of half the angle and reaches four at 120.
+  The two allow the same distortion of distance and the overview
+  throws in exact shape.
+- **A quarter turn.** Replacing gnomonic's `cos < 1e-12` domain rule
+  with the exact condition broke the atlas's oldest projection test:
+  `cos(toRadians(90))` is 6.1e-17, so a position exactly ninety
+  degrees east was being placed 1.6e16 units out rather than refused.
+  The same family as the gate's half turn and its poles, and the
+  frame now answers all four quarter turns exactly.
+
+Everything else held. The released atlas renders byte for byte
+identically at every step of the move, including putting the gnomonic
+projection on the shared frame and making its domain rule exact.
+
 - **#297 — the projection seam.** Introduce the interface above with
   gnomonic as its only implementation, and move the 25 in-place
   constructions across 7 files behind it. Production pages must come
@@ -545,7 +595,22 @@ was would be a sheet that could not be checked.
 - **#299 — the overview page.** Stereographic at 60, 90 and 120
   degrees as three more rungs, with the field-linked default
   magnitude above. Recentre, pan and the transition back to a
-  detailed page, all through `unproject`. **It also owes the
+  detailed page, all through `unproject`. **It also owes the pan
+  centre solver.** Issue #297 found that `PanSolver.solveCentre`
+  solves the tangent plane's own equations — the quantity it writes
+  `1/N` is the cosine of the angle from the centre, and `xi/N` its
+  eastward part, which are true of a tangent plane and of nothing
+  else. It refuses any other projection rather than returning "no
+  solution", which a chart would read as a pan that could not be
+  made rather than as a solver that cannot do this. Generalising it
+  belongs to the issue that first makes such a page pannable, and the
+  clamp keeping a high-declination pan feasible is woven into the same
+  equations and is a feature rather than an artefact.
+
+  It also owes the field/projection pairing itself. #297 deliberately
+  does not couple them: every field on the ladder is drawn by the
+  atlas's own projection, and the overview's rungs are not on the
+  ladder at all. **It also owes the
   confirmation this gate could not give**: the same ink measure over
   real renderer-drawn pages, with labels and the renderer's own
   stroke policy, either adopting the rungs and defaults above or

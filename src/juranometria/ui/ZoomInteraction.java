@@ -89,10 +89,15 @@ public final class ZoomInteraction implements MouseWheelListener {
             var viewport = chart.scene().viewport();
             PixelPoint pixel = new PixelPoint(event.getPoint().x,
                     event.getPoint().y - chart.pageOffsetY());
+            // The state's own projection, not the default one. Built
+            // without it, this asked where the pointer was on a
+            // gnomonic page while the reader was looking at another,
+            // and the chart zoomed towards the wrong star.
             PlanePoint pointer = PanSolver.planeFromPixel(new ChartViewport(
                     controller.state().centre(),
                     controller.state().fieldWidthDegrees(),
-                    viewport.widthPx(), viewport.heightPx()), pixel);
+                    viewport.widthPx(), viewport.heightPx(),
+                    controller.state().projection()), pixel);
             controller.zoomAt(pointer, zoomIn);
             // A refusal (bound, infeasible pointer, coverage) consumes
             // the notch like any other: the wheel visibly does nothing

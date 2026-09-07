@@ -114,26 +114,50 @@ public final class GreatCirclePage {
      * @param pole a direction perpendicular to every point of the
      *     circle - the whole of what this needs to be told
      */
-    public static Optional<Arc> clip(GnomonicProjection projection,
+    public static Optional<Arc> clip(Projection projection,
                                      ViewportMapping mapping,
                                      Page paper,
                                      SkyPosition pole) {
-        double[] axis = unit(pole);
-        double[] centre = unit(projection.centre());
-        double ra = Math.toRadians(projection.centre().raDegrees());
-        double dec = Math.toRadians(projection.centre().decDegrees());
-        double[] east = {-Math.sin(ra), Math.cos(ra), 0};
-        double[] north = {-Math.sin(dec) * Math.cos(ra),
-                -Math.sin(dec) * Math.sin(ra), Math.cos(dec)};
+        // The projection says what the circle is. This used to work
+        // the same three dot products out for itself, from its own
+        // basis vectors, which made it the third copy of that
+        // arithmetic in the atlas - and it carried a threshold of
+        // 1e-24 where the condition it stands for is exact.
+        Optional<PlaneConic> stated = projection.greatCircle(pole);
+        if (stated.isEmpty()) {
+            // The circle has no image at all: under a tangent plane,
+            // the one ninety degrees from the centre.
+            return Optional.empty();
+        }
+        PlaneConic conic = stated.get();
+        if (conic.a() != 0.0 || conic.b() != 0.0 || conic.c() != 0.0) {
+            // Curved on this plane, and this can only clip a
+            // straight run - so it says so, loudly.
+            //
+            // Returning empty would be the wrong silence. Empty here
+            // means "the circle does not cross this page", which the
+            // chart is entitled to act on by drawing nothing: a
+            // review pointed out that a curved circle answered that
+            // way produces a page missing its ecliptic and its
+            // horizon, looking in every respect like a page that
+            // simply has none. A chart quietly short of the lines it
+            // promised is worse than a chart that refuses to be
+            // drawn, and this cannot reach a reader in any case -
+            // nothing offers a projection whose circles curve until
+            // issue #298 draws them and #299 offers it.
+            throw new IllegalStateException(
+                    "the " + projection.name() + " projection draws this"
+                            + " great circle as a curve, and clipping a"
+                            + " curve is issue #298: this can clip a"
+                            + " straight run and must not pretend a"
+                            + " curved one is off the page");
+        }
 
-        double a = dot(axis, east);
-        double b = dot(axis, north);
-        double c = dot(axis, centre);
+        double a = conic.d();
+        double b = conic.e();
+        double c = conic.f();
         double gradient = a * a + b * b;
-        if (gradient < 1e-24) {
-            // The pole is the page's own centre: the circle is the
-            // projection's horizon, ninety degrees away in every
-            // direction, and no point of it has an image at all.
+        if (gradient == 0.0) {
             return Optional.empty();
         }
         // The point of the line closest to the plane's origin, and

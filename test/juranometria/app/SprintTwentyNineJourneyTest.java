@@ -657,7 +657,7 @@ class SprintTwentyNineJourneyTest {
                 {scene.viewport().widthPx() - 2,
                         scene.viewport().heightPx() - 2}}) {
             SkyPosition corner = juranometria.project.PanSolver
-                    .skyFromPlane(scene.viewport().centre(),
+                    .skyFromPlane(scene.viewport(),
                             juranometria.project.PanSolver.planeFromPixel(
                                     scene.viewport(),
                                     new juranometria.project.PixelPoint(

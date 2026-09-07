@@ -150,7 +150,8 @@ public final class ChartViewController {
                        juranometria.project.PlanePoint target) {
         juranometria.project.PanSolver.PanSolution solution =
                 juranometria.project.PanSolver.solveCentre(
-                        grabbed, target, state.centre());
+                        state.projection(), grabbed, target,
+                        state.centre());
         if (solution.centre().isEmpty()) {
             return false;
         }
@@ -221,7 +222,7 @@ public final class ChartViewController {
             return PointerZoomOutcome.ACCEPTED;
         }
         java.util.Optional<juranometria.chart.SkyPosition> solved =
-                solveExactReversible(state.centre(),
+                solveExactReversible(state.projection(), state.centre(),
                         state.fieldWidthDegrees(),
                         centred.fieldWidthDegrees(), pointer);
         if (solved.isEmpty()) {
@@ -245,27 +246,61 @@ public final class ChartViewController {
      * fixed pixel scales by tan(f'/2)/tan(f/2)), solve the centre
      * exactly, and preflight the exact reverse.
      */
-    private static java.util.Optional<juranometria.chart.SkyPosition>
-            solveExactReversible(juranometria.chart.SkyPosition centre,
+    /**
+     * How the plane stretches between two fields.
+     *
+     * <p>Asked of the projection. Written as a ratio of tangents this
+     * was the tangent plane's answer given for every projection, in
+     * the one place a reader notices most: this ratio is exactly what
+     * keeps the star under the pointer while the field changes.
+     *
+     * <p>Package-private so that it can be checked the other way
+     * round - against the scales two viewports actually draw at,
+     * which is a different route to the same number and does not
+     * agree with a wrong one.
+     */
+    static double zoomScale(juranometria.project.Projection projection,
+                            double fieldDegrees, double newFieldDegrees) {
+        return projection.planeRadius(newFieldDegrees / 2.0)
+                / projection.planeRadius(fieldDegrees / 2.0);
+    }
+
+    /**
+     * Package-private, so that a test can ask it about a projection
+     * no reader can reach yet.
+     *
+     * <p>Nothing offers the overview until issue #299, so the pointer
+     * zoom cannot be driven with one through the controller's own
+     * surface - and the scale this works out is exactly where a
+     * review found the tangent plane's answer given for every
+     * projection. A promise that cannot be checked is a promise
+     * waiting to be broken, so it is checked here directly.
+     */
+    static java.util.Optional<juranometria.chart.SkyPosition>
+            solveExactReversible(juranometria.chart.ChartProjection kind,
+                                 juranometria.chart.SkyPosition centre,
                                  double fieldDegrees, double newFieldDegrees,
                                  juranometria.project.PlanePoint pointer) {
+        juranometria.project.Projection projection =
+                juranometria.project.Projections.of(kind, centre);
         juranometria.chart.SkyPosition anchor =
-                juranometria.project.PanSolver.skyFromPlane(centre, pointer);
-        double scale = Math.tan(Math.toRadians(newFieldDegrees) / 2.0)
-                / Math.tan(Math.toRadians(fieldDegrees) / 2.0);
+                juranometria.project.PanSolver.skyFromPlane(kind, centre,
+                        pointer);
+        double scale = zoomScale(projection, fieldDegrees, newFieldDegrees);
         juranometria.project.PlanePoint target =
                 new juranometria.project.PlanePoint(
                         pointer.xiEast() * scale, pointer.etaNorth() * scale);
         var out = juranometria.project.PanSolver.solveCentre(
-                anchor, target, centre);
+                kind, anchor, target, centre);
         if (out.centre().isEmpty() || out.constrained() || out.ambiguous()) {
             return java.util.Optional.empty();
         }
         juranometria.chart.SkyPosition mid = out.centre().get();
         juranometria.chart.SkyPosition anchorAgain =
-                juranometria.project.PanSolver.skyFromPlane(mid, target);
+                juranometria.project.PanSolver.skyFromPlane(kind, mid,
+                        target);
         var back = juranometria.project.PanSolver.solveCentre(
-                anchorAgain, pointer, mid);
+                kind, anchorAgain, pointer, mid);
         if (back.centre().isEmpty() || back.constrained()
                 || back.ambiguous()
                 || back.centre().get().separationDegrees(centre)
