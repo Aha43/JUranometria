@@ -19,12 +19,12 @@ Regenerate with `make chart-sheet-study`.
 
 | file | paper | shapes | labels | bytes |
 |---|---|---:|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 27 | 461468 |
-| `sheet-letter.svg` | US Letter | 2472 | 28 | 504608 |
-| `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 528278 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 392262 |
-| `sheet-a4.pdf` | A4 | 2267 | 27 as outlines | 504179 |
-| `sheet-a4-modules.pdf` | A4 | 1966 | 16 as outlines | 409173 |
+| `sheet-a4.svg` | A4 | 2267 | 27 | 461469 |
+| `sheet-letter.svg` | US Letter | 2472 | 28 | 504609 |
+| `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 528279 |
+| `sheet-a4-modules.svg` | A4 | 1966 | 16 | 392263 |
+| `sheet-a4.pdf` | A4 | 2267 | 27 as outlines | 504180 |
+| `sheet-a4-modules.pdf` | A4 | 1966 | 16 as outlines | 409174 |
 | `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 27 | 423713 |
 
 `sheet-a4-outlines.svg` is the same chart with every label converted to

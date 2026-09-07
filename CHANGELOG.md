@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-09-07
+
+Sprint 29 — Take the chart to the observing table. The sprint the
+atlas learned to make something a reader can carry outside, cut as a
+minor release.
+
+It exists because a club member printed his own star charts for an
+evening at Fanafjellet, having written the code himself in Python
+because the atlas could not give him one. He asked for an SVG export
+and for a field a little wider than 36°. Both are here.
+
 ### Added
 
 - **File, Export Chart Sheet.** One item, one dialog, three formats:
