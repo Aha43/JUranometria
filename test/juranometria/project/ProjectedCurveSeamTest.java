@@ -135,9 +135,22 @@ class ProjectedCurveSeamTest {
         if (curve instanceof PlaneCurve.Straight line) {
             return line.distanceFrom(at.x(), at.y());
         }
-        PlaneCurve.Circular circle = (PlaneCurve.Circular) curve;
-        return Math.abs(Math.hypot(at.x() - circle.centreX(),
-                at.y() - circle.centreY()) - circle.radius());
+        if (curve instanceof PlaneCurve.Circular circle) {
+            return Math.abs(Math.hypot(at.x() - circle.centreX(),
+                    at.y() - circle.centreY()) - circle.radius());
+        }
+        PlaneCurve.Elliptical ellipse = (PlaneCurve.Elliptical) curve;
+        // How far off the unit circle the point is in the ellipse's
+        // own frame, brought back out by the larger radius - which
+        // cannot understate the distance on the page.
+        double cos = Math.cos(ellipse.tiltRadians());
+        double sin = Math.sin(ellipse.tiltRadians());
+        double dx = at.x() - ellipse.centreX();
+        double dy = at.y() - ellipse.centreY();
+        double u = (dx * cos + dy * sin) / ellipse.radiusAlong();
+        double v = (-dx * sin + dy * cos) / ellipse.radiusAcross();
+        return Math.abs(Math.hypot(u, v) - 1.0)
+                * Math.max(ellipse.radiusAlong(), ellipse.radiusAcross());
     }
 
     @Test
@@ -298,13 +311,7 @@ class ProjectedCurveSeamTest {
     }
 
     @Test
-    void theVocabularyCarriesTwoWordsAndRefusesToInventAThird() {
-        // The smallest vocabulary the atlas's two projections
-        // demonstrate. The gate measured a third - an ellipse, which
-        // is what a projection showing a hemisphere makes of a great
-        // circle - and it is deliberately not here: no page the atlas
-        // can draw crosses one, and a word nothing can exercise is a
-        // word no test can defend.
+    void theTwoShippedProjectionsUseTheFirstTwoWordsAndInventNoOther() {
         java.util.Set<String> forms = new java.util.TreeSet<>();
         for (Page page : pages()) {
             for (SkyPosition pole : POLES) {
@@ -314,89 +321,376 @@ class ProjectedCurveSeamTest {
             }
         }
         assertEquals(java.util.Set.of("circular", "straight"), forms,
-                "both words are used, and no third is invented");
+                "both words are used, and neither page invents another");
+    }
 
-        // And meeting one says so rather than drawing the wrong
-        // curve. An ellipse of unequal radii is what #301 brings.
-        ViewportMapping mapping =
-                new ViewportMapping(new ChartViewport(ORION, 42.0,
-                        900, 700));
-        PlaneConic ellipse = new PlaneConic(4.0, 0.0, 1.0, 0.0, 0.0, -1.0);
-        IllegalStateException refused = assertThrows(
-                IllegalStateException.class,
-                () -> mapping.onPage(ellipse,
-                        PageRegion.paper(0, 0, 900, 700)));
-        assertTrue(refused.getMessage().contains("#301"),
-                "and names what brings it: " + refused.getMessage());
+    /**
+     * A page of the third word, built from the projection's own
+     * closed form rather than from a shipped projection.
+     *
+     * <p>A hemisphere seen orthographically: a direction an angle
+     * {@code t} from the centre lands at {@code sin t}, so the sky
+     * stops at one plane unit and a great circle with pole
+     * {@code (a, b, c)} in the centre's frame satisfies
+     * {@code (a² + b²)ξ² + 2bc·ξη + (a² + c²)η² = a²} - the pole
+     * being square to every point of its own circle, with the
+     * remaining component of a unit direction put back in.
+     *
+     * <p>The frame, the conic and the sample points are all worked
+     * out here, from vectors, so that what production is asked is
+     * only the two things this issue built: which word this is, and
+     * where it crosses. A disc is taller than a landscape page at
+     * the scale that makes it wide enough, which the gate measured
+     * and which is why this one is cut at top and bottom.
+     */
+    private record Hemisphere(SkyPosition centre, ViewportMapping mapping) {
+
+        static Hemisphere over(SkyPosition centre) {
+            return new Hemisphere(centre, new ViewportMapping(
+                    new ChartViewport(centre, 90.0, 900, 700,
+                            ChartProjection.STEREOGRAPHIC)));
+        }
+
+        /** One plane unit in page units: the limb's own radius. */
+        double limbRadius() {
+            return mapping.pixelsPerPlaneUnit();
+        }
+
+        PageRegion region() {
+            PixelPoint middle = mapping.toPixel(new PlanePoint(0.0, 0.0));
+            double r = limbRadius();
+            return PageRegion.within(middle.x() - 1.2 * r,
+                    middle.y() - 0.95 * r, middle.x() + 1.2 * r,
+                    middle.y() + 0.95 * r, middle.x(), middle.y(), r);
+        }
+
+        /** The centre's frame: towards it, east of it, north of it. */
+        double[][] frame() {
+            double[] along = towards(centre);
+            double[] north = normalise(new double[] {
+                    -along[2] * along[0], -along[2] * along[1],
+                    1.0 - along[2] * along[2]});
+            return new double[][] {along, cross(north, along), north};
+        }
+
+        /** Where a direction lands, at {@code sin t} from the centre. */
+        PlanePoint project(SkyPosition position) {
+            double[][] frame = frame();
+            double[] to = towards(position);
+            return new PlanePoint(dot(to, frame[1]), dot(to, frame[2]));
+        }
+
+        boolean visible(SkyPosition position) {
+            return dot(towards(position), frame()[0]) > 0.0;
+        }
+
+        PlaneConic greatCircle(SkyPosition pole) {
+            double[][] frame = frame();
+            double[] to = towards(pole);
+            double a = dot(to, frame[0]);
+            double b = dot(to, frame[1]);
+            double c = dot(to, frame[2]);
+            return new PlaneConic(a * a + b * b, 2.0 * b * c,
+                    a * a + c * c, 0.0, 0.0, -a * a);
+        }
+    }
+
+    private static double[] towards(SkyPosition position) {
+        double ra = Math.toRadians(position.raDegrees());
+        double dec = Math.toRadians(position.decDegrees());
+        return new double[] {Math.cos(dec) * Math.cos(ra),
+                Math.cos(dec) * Math.sin(ra), Math.sin(dec)};
+    }
+
+    private static double dot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
     }
 
     @Test
-    void aCurveReachesASheetAsACurveAndNotAsAChord() {
-        // The acceptance's last geometry clause: screen, SVG, PDF and
-        // PNG carry the same curve. They do because a sheet replays
-        // the production render - the recorder keeps the Shape the
-        // chart drew and the writers walk its own path - so what has
-        // to be shown is that the shape being kept is curved, and
-        // that the writers put a curve in the file rather than a line
-        // between the same two ends.
-        ChartViewport viewport = new ChartViewport(ORION, 90.0, 900, 700,
-                ChartProjection.STEREOGRAPHIC);
-        ViewportMapping mapping = new ViewportMapping(viewport);
-        PageRegion region = mapping.regionFor(viewport,
-                Projections.forViewport(viewport));
-        List<CurveRun> runs = GreatCirclePage.clip(
-                Projections.forViewport(viewport), mapping, region,
-                new SkyPosition(270.0, 66.5607));
-        assertFalse(runs.isEmpty(), "this page carries the circle");
+    void theThirdWordIsCarriedAndDrawsAHemispheresGreatCircleExactly() {
+        // The gate measured this form over seventeen real pages and
+        // gave all three words to this issue, so that the globe would
+        // be an addition rather than a redesign of the seam. It is
+        // exercised on the page it actually crosses - a hemisphere's,
+        // from the projection's own closed form - because no page the
+        // atlas ships reaches one yet.
+        Hemisphere globe = Hemisphere.over(ORION);
+        PageRegion region = globe.region();
+        double worst = 0.0;
+        int elliptical = 0;
+        int straight = 0;
+        for (SkyPosition pole : POLES) {
+            PlaneCurve curve = globe.mapping()
+                    .onPage(globe.greatCircle(pole), region);
+            if (curve instanceof PlaneCurve.Elliptical ellipse) {
+                elliptical++;
+                assertTrue(ellipse.radiusAlong() != ellipse.radiusAcross(),
+                        "a real ellipse, not a circle by another name");
+            } else {
+                // The gate's own third row: a great circle through
+                // the page centre is straight under every one of the
+                // three, because the centre is on it and a projection
+                // about that centre cannot bend a curve through it.
+                // Orion sits on the celestial equator, so the
+                // equator's is that circle here.
+                straight++;
+                assertEquals("straight", curve.form(),
+                        "a circle through the centre is a line, and"
+                                + " nothing else is: " + pole);
+            }
 
-        java.awt.Shape drawn =
-                juranometria.ui.ReferenceInk.shapeOf(runs.get(0));
-        int curves = 0;
-        int lines = 0;
-        double[] point = new double[6];
-        for (var each = drawn.getPathIterator(null); !each.isDone();
-                each.next()) {
-            switch (each.currentSegment(point)) {
-                case java.awt.geom.PathIterator.SEG_CUBICTO,
-                     java.awt.geom.PathIterator.SEG_QUADTO -> curves++;
-                case java.awt.geom.PathIterator.SEG_LINETO -> lines++;
-                default -> { }
+            // Where the sky says the circle is, worked out here.
+            for (SkyPosition on : around(pole, 720)) {
+                if (!globe.visible(on)) {
+                    continue;
+                }
+                PixelPoint at =
+                        globe.mapping().toPixel(globe.project(on));
+                if (!region.contains(at.x(), at.y())) {
+                    continue;
+                }
+                worst = Math.max(worst, missOf(curve, at));
             }
         }
-        assertTrue(curves > 0, "the shape the chart draws is curved:"
-                + " " + curves + " curved segments against " + lines
-                + " straight ones");
+        assertEquals(3, elliptical,
+                "three of these circles miss the page centre, and a"
+                        + " hemisphere makes an ellipse of every one");
+        assertEquals(1, straight, "and the fourth runs through it");
+        assertTrue(worst < 1.0e-9, "the drawn curve passes through the"
+                + " positions the sky projects to, worst miss " + worst
+                + " page units");
+    }
 
-        // And what a sheet keeps of it. Every writer walks the path
-        // of the shape the recorder kept, so the question that
-        // decides whether SVG, PDF and PNG carry the curve is whether
-        // the recorder keeps a curve - a recorder that flattened to
-        // segments would hand all three of them a chord.
-        juranometria.sheet.SheetRecorder recorder =
-                new juranometria.sheet.SheetRecorder(900, 700);
-        java.awt.Graphics2D g = (java.awt.Graphics2D) recorder.create();
-        try {
-            g.draw(drawn);
-        } finally {
-            g.dispose();
+    @Test
+    void aHemispheresCurveIsCutByThePaperAndStopsAtTheSky() {
+        Hemisphere globe = Hemisphere.over(ORION);
+        PageRegion region = globe.region();
+        // A disc wider than the page is tall: the equator's own
+        // circle leaves the paper at the top and the bottom, so this
+        // page cuts the ellipse into runs rather than keeping it
+        // whole.
+        List<CurveRun> runs = globe.mapping()
+                .onPage(globe.greatCircle(new SkyPosition(150.0, 0.0)),
+                        region)
+                .clipTo(region);
+        assertFalse(runs.isEmpty(), "this page carries the circle");
+        for (CurveRun run : runs) {
+            CurveRun.Arc arc = (CurveRun.Arc) run;
+            assertTrue(arc.radiusAlong() != arc.radiusAcross(),
+                    "each run keeps the ellipse's two radii");
+            assertTrue(onTheBoundary(region, arc.from().orElseThrow()),
+                    "and begins where the page cut it, not inside it");
+            assertTrue(onTheBoundary(region, arc.to().orElseThrow()),
+                    "and ends there too");
+            for (int step = 1; step < 40; step++) {
+                PixelPoint on = pointOn(arc,
+                        arc.startRadians()
+                                + arc.spanRadians() * step / 40.0);
+                assertTrue(region.contains(on.x(), on.y()),
+                        "and no part of a run leaves the page: " + on);
+            }
         }
-        int kept = 0;
-        for (var each = recorder.drawn().get(0).shape()
-                .getPathIterator(null); !each.isDone(); each.next()) {
+
+        // And the claim that lets an ellipse ignore the limb is
+        // checked rather than trusted. One that would leave the
+        // visible region says so, and names the quartic that cutting
+        // it there would need.
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> new PlaneCurve.Elliptical(region.limbX(),
+                        region.limbY(), 2.0 * region.limbRadius(),
+                        0.5 * region.limbRadius(), 0.0).clipTo(region));
+        assertTrue(refused.getMessage().contains("#301"),
+                "and says whose it is: " + refused.getMessage());
+    }
+
+    /** Whether a point sits on an edge of the page, or on the limb. */
+    private static boolean onTheBoundary(PageRegion region, PixelPoint at) {
+        double nearest = Math.min(
+                Math.min(Math.abs(at.x() - region.minX()),
+                        Math.abs(region.maxX() - at.x())),
+                Math.min(Math.abs(at.y() - region.minY()),
+                        Math.abs(region.maxY() - at.y())));
+        if (region.bounded()) {
+            nearest = Math.min(nearest, Math.abs(
+                    Math.hypot(at.x() - region.limbX(),
+                            at.y() - region.limbY())
+                            - region.limbRadius()));
+        }
+        return nearest < 1.0e-6;
+    }
+
+    /** A point of an arc, at an angle in the arc's own frame. */
+    private static PixelPoint pointOn(CurveRun.Arc arc, double angle) {
+        double cos = Math.cos(arc.tiltRadians());
+        double sin = Math.sin(arc.tiltRadians());
+        double along = arc.radiusAlong() * Math.cos(angle);
+        double across = arc.radiusAcross() * Math.sin(angle);
+        return new PixelPoint(arc.centreX() + along * cos - across * sin,
+                arc.centreY() + along * sin + across * cos);
+    }
+
+    /** The ecliptic's own stroke: long dash, short dot. */
+    private static final float[] PERMANENT = {12.0f, 4.0f, 2.0f, 4.0f};
+
+    /** The meridian and the ecliptic, as the screen carries them. */
+    private static juranometria.render.ChartRenderer.ReferenceLayer modules() {
+        juranometria.module.OverlayRegistry registry =
+                new juranometria.module.OverlayRegistry();
+        juranometria.meridian.MeridianModule meridian =
+                new juranometria.meridian.MeridianModule(
+                        new juranometria.sky.Observer(59.9, 10.7,
+                                java.time.Instant.parse(
+                                        "2026-03-20T21:33:00Z")));
+        meridian.showing(true, true, true);
+        registry.offer(juranometria.meridian.MeridianModule.ID,
+                meridian::contributedGeometry);
+        juranometria.ecliptic.EclipticModule ecliptic =
+                new juranometria.ecliptic.EclipticModule();
+        ecliptic.showing(true);
+        registry.offer(juranometria.ecliptic.EclipticModule.ID,
+                ecliptic::contributedGeometry);
+        return (g, painted) -> juranometria.ui.ReferenceInk.paint(g, painted,
+                registry.collect(),
+                juranometria.render.ChartPalette.WHITE_PAPER);
+    }
+
+    /**
+     * A page the permanent circle crosses without running through
+     * its centre.
+     *
+     * <p>Both halves of that matter. A circle off the page cannot be
+     * measured at all, and a circle <em>through</em> the centre is
+     * straight under every projection - it is the gate's own third
+     * row - so a page centred on the equinox would have proved
+     * nothing about a curve. This is twelve degrees north of the
+     * ecliptic's crossing, which puts it well inside a
+     * 42-degree page and off its middle.
+     */
+    private static final SkyPosition ABOVE_THE_CROSSING =
+            new SkyPosition(0.0, 12.0);
+
+    /** A whole production sheet of this page, on A4. */
+    private static juranometria.sheet.SheetRecording sheet(
+            ChartProjection kind) {
+        return juranometria.sheet.ChartSheet.record(
+                juranometria.app.Atlas.assembler()::assemble,
+                new juranometria.chart.ChartViewState(ABOVE_THE_CROSSING,
+                        42.0, 6.0, null, null, kind),
+                juranometria.render.ChartOptions.DEFAULTS, modules(),
+                juranometria.sheet.PaperSize.A4);
+    }
+
+    /** The permanent circle's own ink, as the renderer laid it down. */
+    private static java.awt.Shape permanentInk(
+            juranometria.sheet.SheetRecording recorded) {
+        for (var operation : recorded.recorder().operations()) {
+            if (operation instanceof juranometria.sheet.SheetRecorder.Drawn drawn
+                    && !drawn.filled() && drawn.stroke() != null
+                    && java.util.Arrays.equals(drawn.stroke().dash(),
+                            PERMANENT)) {
+                return drawn.shape();
+            }
+        }
+        throw new AssertionError("this sheet carries the permanent circle");
+    }
+
+    /** How many curved segments a shape is drawn from. */
+    private static int curvedSegmentsOf(java.awt.Shape shape) {
+        int curves = 0;
+        double[] point = new double[6];
+        for (var each = shape.getPathIterator(null); !each.isDone();
+                each.next()) {
             int segment = each.currentSegment(point);
             if (segment == java.awt.geom.PathIterator.SEG_CUBICTO
                     || segment == java.awt.geom.PathIterator.SEG_QUADTO) {
-                kept++;
+                curves++;
             }
         }
-        assertEquals(curves, kept, "the sheet keeps every curved segment"
-                + " the chart drew, which is what puts the same curve in"
-                + " SVG, PDF and PNG");
+        return curves;
+    }
 
-        // A whole sheet of a curved page is not reachable yet: a view
-        // state will not take a field the ladder does not carry, and
-        // this issue does not widen the ladder. Issue #299 does, and
-        // owes the end-to-end sheet.
+    @Test
+    void aCurveReachesEverySheetAsACurveAndNotAsAChord() throws Exception {
+        // The acceptance's last geometry clause, over the whole
+        // production path rather than over a recorder filled by hand:
+        // the atlas's own assembler, the production renderer, the
+        // sheet, and the three writers.
+        //
+        // The page is one a reader can ask for. At 42 degrees the
+        // arc stands a twentieth of a page unit off its own chord,
+        // which is why the released atlas is byte-identical and why
+        // this asks whether the curve is *carried* rather than
+        // whether it is visibly bent. Being visibly bent is measured
+        // on the wider pages above, where the seam has to serve them.
+        java.awt.Shape curved = permanentInk(
+                sheet(ChartProjection.STEREOGRAPHIC));
+        java.awt.Shape flat = permanentInk(
+                sheet(ChartProjection.GNOMONIC));
+        assertTrue(curvedSegmentsOf(curved) > 0,
+                "the sheet's own ink for the circle is curved: "
+                        + curvedSegmentsOf(curved) + " curved segments");
+        assertEquals(0, curvedSegmentsOf(flat),
+                "and the tangent plane's is straight, so the difference"
+                        + " is the projection and not the drawing");
+
+        // What each file holds of it. The dash pattern is the
+        // circle's own, so this reads the very ink that was drawn
+        // rather than any curve on the page.
+        String svg = new String(juranometria.sheet.SheetWriters.write(
+                sheet(ChartProjection.STEREOGRAPHIC),
+                juranometria.sheet.SheetFormat.SVG, 300),
+                java.nio.charset.StandardCharsets.UTF_8);
+        String path = attributeBefore(svg, "d=\"", "12.00,4.00,2.00,4.00");
+        assertTrue(path.contains("C"), "the SVG draws the circle with"
+                + " curve commands: " + summarise(path));
+
+        byte[] pdf = juranometria.sheet.SheetWriters.write(
+                sheet(ChartProjection.STEREOGRAPHIC),
+                juranometria.sheet.SheetFormat.PDF, 300);
+        String content = new String(pdf,
+                java.nio.charset.StandardCharsets.ISO_8859_1);
+        String drawn = between(content,
+                "[12.00 4.00 2.00 4.00] 0.00 d", " d\n");
+        assertTrue(drawn.contains(" c\n"), "and the PDF with curve"
+                + " operators: " + summarise(drawn));
+
+        // PNG is a raster of the same recording, so what it can show
+        // is that the page it rasterises is this one: the writers do
+        // not re-derive geometry, they replay what the recorder kept,
+        // and the two files above measure what that was.
+        byte[] png = juranometria.sheet.SheetWriters.write(
+                sheet(ChartProjection.STEREOGRAPHIC),
+                juranometria.sheet.SheetFormat.PNG, 150);
+        java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(
+                new java.io.ByteArrayInputStream(png));
+        assertTrue(image != null && image.getWidth() > 0,
+                "and the PNG is written from the same sheet");
+    }
+
+    /** The value of the attribute nearest before a marker. */
+    private static String attributeBefore(String text, String name,
+                                          String marker) {
+        int at = text.indexOf(marker);
+        assertTrue(at > 0, "the file carries the circle's own stroke");
+        int opens = text.lastIndexOf(name, at);
+        assertTrue(opens > 0, "and the shape it was used on");
+        int closes = text.indexOf('"', opens + name.length());
+        return text.substring(opens + name.length(), closes);
+    }
+
+    /** What lies between a marker and the next of something. */
+    private static String between(String text, String from, String to) {
+        int at = text.indexOf(from);
+        assertTrue(at > 0, "the file carries the circle's own stroke");
+        int ends = text.indexOf(to, at + from.length());
+        return text.substring(at + from.length(),
+                ends < 0 ? text.length() : ends);
+    }
+
+    private static String summarise(String drawn) {
+        return drawn.length() < 200 ? drawn
+                : drawn.substring(0, 200) + "...";
     }
 
     @Test
@@ -420,5 +714,91 @@ class ProjectedCurveSeamTest {
         assertEquals("circular", curved, "and the overview curves it");
         assertFalse(straight.equals(curved),
                 "from one contribution, which named neither");
+    }
+
+    @Test
+    void aPageRefusesALimbThatWouldQuietlyStopClipping() {
+        // The limb is the only thing that stops ink at the sky's
+        // edge, and both ways of losing it are silent. A centre that
+        // is not a place makes every distance from it infinite, so
+        // the comparison against the radius answers the same way
+        // everywhere and no test of a curve notices. And a "within"
+        // whose radius is infinite is a bounded page that is not
+        // bounded - which is the fault the gate found by looking at
+        // a committed page, ink running off the globe onto the
+        // corners of the paper.
+        assertThrows(IllegalArgumentException.class,
+                () -> PageRegion.within(0, 0, 900, 700,
+                        Double.POSITIVE_INFINITY, 350, 300),
+                "a limb centred nowhere is not a limb");
+        assertThrows(IllegalArgumentException.class,
+                () -> PageRegion.within(0, 0, 900, 700, 450, 350,
+                        Double.NaN),
+                "nor is one with no radius");
+        IllegalArgumentException endless = assertThrows(
+                IllegalArgumentException.class,
+                () -> PageRegion.within(0, 0, 900, 700, 450, 350,
+                        Double.POSITIVE_INFINITY),
+                "nor one that reaches for ever");
+        assertTrue(endless.getMessage().contains("paper()"),
+                "and it says how a page with no limb is written: "
+                        + endless.getMessage());
+
+        // Which is a page that says so by name, and clips to its
+        // paper alone.
+        PageRegion unbounded = PageRegion.paper(0, 0, 900, 700);
+        assertFalse(unbounded.bounded(), "paper has no edge to the sky");
+        assertTrue(unbounded.contains(899.0, 699.0),
+                "and carries ink to its own corner");
+    }
+
+    @Test
+    void aRunRefusesToBeMalformedWhereARendererWouldNotNotice() {
+        PixelPoint here = new PixelPoint(100.0, 100.0);
+        // A span of nothing is not a short run, it is a mark drawn
+        // where a reference line should be - and the clipping never
+        // produces one.
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Arc(0, 0, 10, 10, 0, 0, 0.0,
+                        here, here),
+                "an arc that spans nothing is not an arc");
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Arc(0, 0, 10, 10, 0, 0,
+                        3.0 * Math.PI, here, here),
+                "nor is one drawn twice round");
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Arc(0, 0, 0.0, 10, 0, 0, 1.0,
+                        here, here),
+                "nor one with no radius");
+        // The ends are what a label hangs on, and the rule that hangs
+        // it reads one of them: half a pair is a run no rule can
+        // name, and a closed run with ends is one named at a join it
+        // does not have.
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Arc(0, 0, 10, 10, 0, 0, 1.0,
+                        here, null),
+                "an arc has both ends or neither");
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Arc(0, 0, 10, 10, 0, 0, 1.0,
+                        null, null),
+                "and only a whole turn closes");
+        assertThrows(IllegalArgumentException.class,
+                () -> new CurveRun.Segment(here,
+                        new PixelPoint(Double.POSITIVE_INFINITY, 0.0)),
+                "a run ends at pixels a renderer can draw");
+
+        // And a line whose direction is not a unit vector measures
+        // distances in units of nothing, which is the whole meaning
+        // of the record.
+        assertThrows(IllegalArgumentException.class,
+                () -> new PlaneCurve.Straight(1.0, 3.0, 4.0),
+                "a line's direction is normalised");
+        assertEquals(1.0,
+                Math.hypot(PlaneCurve.Straight.of(1.0, 3.0, 4.0).b(),
+                        PlaneCurve.Straight.of(1.0, 3.0, 4.0).c()),
+                1.0e-12, "which is what of() is for");
+        assertThrows(IllegalArgumentException.class,
+                () -> new PlaneCurve.Circular(0.0, 0.0, 0.0),
+                "and a circle has a radius");
     }
 }

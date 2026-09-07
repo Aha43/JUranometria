@@ -39,8 +39,22 @@ public record PageRegion(double minX, double minY, double maxX,
                     "a page needs a width and a height: " + minX + ","
                             + minY + " to " + maxX + "," + maxY);
         }
-        if (Double.isNaN(limbX) || Double.isNaN(limbY)
-                || Double.isNaN(limbRadius) || limbRadius <= 0.0) {
+        // The limb's centre is a place on the paper, so it is a
+        // pixel like any other. An infinite one is worse than a
+        // wrong one: every distance measured from it is infinite,
+        // every comparison against the radius goes the same way, and
+        // the clipping then agrees that nothing is on the page or
+        // that everything is, without any test of a curve noticing.
+        if (!Double.isFinite(limbX) || !Double.isFinite(limbY)) {
+            throw new IllegalArgumentException(
+                    "a limb's centre is a place on the paper: " + limbX
+                            + "," + limbY);
+        }
+        // The radius may be infinite, and that is the one meaning it
+        // has: paper() uses it to say this page has no edge to the
+        // sky. Anything else - not-a-number, zero, negative - is a
+        // limb that would silently stop clipping.
+        if (Double.isNaN(limbRadius) || limbRadius <= 0.0) {
             throw new IllegalArgumentException(
                     "a limb is a circle with a radius: " + limbX + ","
                             + limbY + " r " + limbRadius);
@@ -54,11 +68,26 @@ public record PageRegion(double minX, double minY, double maxX,
                 Double.POSITIVE_INFINITY);
     }
 
-    /** A page showing a hemisphere, and where that hemisphere ends. */
+    /**
+     * A page showing a hemisphere, and where that hemisphere ends.
+     *
+     * <p>The radius must be a real one. Saying "within" and handing
+     * an infinite radius is how a page that meant to stop at the
+     * sky's edge would quietly become a page with no edge at all -
+     * ink running off the globe onto the corners of the paper, which
+     * is the exact fault the gate found by looking at a committed
+     * page. A caller with no limb says so by name, in
+     * {@link #paper}.
+     */
     public static PageRegion within(double minX, double minY,
                                     double maxX, double maxY,
                                     double limbX, double limbY,
                                     double limbRadius) {
+        if (!Double.isFinite(limbRadius)) {
+            throw new IllegalArgumentException(
+                    "a page bounded by a limb needs a real radius, and a"
+                            + " page with no limb is paper(): " + limbRadius);
+        }
         return new PageRegion(minX, minY, maxX, maxY, limbX, limbY,
                 limbRadius);
     }

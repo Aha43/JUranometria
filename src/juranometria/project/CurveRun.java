@@ -35,6 +35,19 @@ public sealed interface CurveRun {
     /** A straight run: two points and the line between them. */
     record Segment(PixelPoint start, PixelPoint end) implements CurveRun {
 
+        public Segment {
+            if (start == null || end == null) {
+                throw new IllegalArgumentException(
+                        "a straight run has both of its ends");
+            }
+            if (!Double.isFinite(start.x()) || !Double.isFinite(start.y())
+                    || !Double.isFinite(end.x())
+                    || !Double.isFinite(end.y())) {
+                throw new IllegalArgumentException(
+                        "a run ends at pixels: " + start + " to " + end);
+            }
+        }
+
         @Override
         public Optional<PixelPoint> from() {
             return Optional.of(start);
@@ -59,6 +72,49 @@ public sealed interface CurveRun {
                double radiusAcross, double tiltRadians,
                double startRadians, double spanRadians,
                PixelPoint start, PixelPoint end) implements CurveRun {
+
+        /** A whole turn: the span of a run that closes on itself. */
+        public static final double WHOLE_TURN = 2.0 * Math.PI;
+
+        public Arc {
+            if (!Double.isFinite(centreX) || !Double.isFinite(centreY)
+                    || !Double.isFinite(tiltRadians)
+                    || !Double.isFinite(radiusAlong)
+                    || !Double.isFinite(radiusAcross)
+                    || radiusAlong <= 0.0 || radiusAcross <= 0.0) {
+                throw new IllegalArgumentException(
+                        "an arc turns about a centre at two radii: "
+                                + centreX + "," + centreY + " "
+                                + radiusAlong + " by " + radiusAcross);
+            }
+            // A span of nothing is not a short run, it is no run: the
+            // clipping never produces one, and a renderer handed one
+            // draws an invisible mark where a reference line should
+            // be. More than a whole turn is a run drawn twice.
+            if (!Double.isFinite(startRadians)
+                    || !Double.isFinite(spanRadians)
+                    || spanRadians <= 0.0 || spanRadians > WHOLE_TURN) {
+                throw new IllegalArgumentException(
+                        "an arc runs from an angle through a span within"
+                                + " one turn: " + startRadians + " through "
+                                + spanRadians);
+            }
+            // The ends are what a label hangs on, and the rule that
+            // hangs it reads one of them. One end present and the
+            // other absent is a run no rule can name, and a closed
+            // run with ends is one that would be named at a join it
+            // does not have.
+            if ((start == null) != (end == null)) {
+                throw new IllegalArgumentException(
+                        "an arc has both ends or neither: " + start
+                                + " to " + end);
+            }
+            if (start == null && spanRadians != WHOLE_TURN) {
+                throw new IllegalArgumentException(
+                        "a run with no ends is one that closes, and this"
+                                + " spans " + spanRadians);
+            }
+        }
 
         @Override
         public Optional<PixelPoint> from() {

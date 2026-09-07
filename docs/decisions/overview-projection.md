@@ -587,14 +587,32 @@ projection on the shared frame and making its domain rule exact.
 
 ### What building the curve seam changed (#298)
 
-- **Two words, not three.** The gate decided a vocabulary of three -
-  straight, circular, elliptical - and measured all three exactly.
-  Production carries two. Neither of the atlas's projections makes an
-  ellipse of a great circle, and #298's acceptance requires each kind
-  to fail a test *on a page it actually crosses*: a word nothing can
-  exercise is a word no test can defend. The classification refuses
-  loudly if it ever meets one, naming #301, and the gate's
-  measurement stands as the evidence that adding it is an addition.
+- **All three words, and the third one nearly went missing.** The
+  first build carried straight and circular and refused an ellipse,
+  naming #301, on the argument that no page the atlas ships crosses
+  one and a word nothing can exercise is a word no test can defend.
+  The review pointed at this document: the gate assigned all three
+  forms to #298 and left #301 owing only the ellipse-meets-circle
+  quartic. That was right, and the argument was wrong twice. The
+  form *is* exercisable - on the hemisphere's page the gate itself
+  measured it on, built from the projection's own closed form - and
+  leaving it out would have put back exactly the redesign the gate
+  spent seventeen pages of measurement to avoid. Deferring a
+  decision this document had already made, and editing this document
+  to agree, is the fault worth remembering.
+- **The visible half of a hemisphere's circle is #301's, and is
+  named as such.** A great circle's far half projects onto the same
+  ellipse as its near half, so the conic cannot tell them apart.
+  That is a policy about a globe - and #301 already lists the hidden
+  hemisphere among the things it decides. The seam says what the
+  curve is; it does not pretend to know which half a reader sees.
+- **The claim that lets an ellipse ignore the limb is checked, not
+  trusted.** The gate measured that every orthographic great circle
+  lies inside its own limb, so no ellipse-meets-circle quartic is
+  needed. Production tests the containment rather than assuming it:
+  an ellipse that would leave the visible region refuses and names
+  the quartic, instead of being drawn through a boundary the
+  clipping never looked at.
 - **The curve had to be numbers.** `juranometria.project` is held by
   a class-file scan to no `java.awt`, so the vocabulary could not be
   built on `Shape` as the study's was. The chart turns a run into
@@ -608,6 +626,18 @@ projection on the shared frame and making its domain rule exact.
   through byte for byte identical — and why a test of curves using
   only the offered fields would have proved nothing, since a chord
   would have passed it.
+- **A whole sheet of a curved page was reachable after all.** The
+  first build stopped at a recorder filled by hand and recorded that
+  the end-to-end sheet belonged to #299, because a view state will
+  not take a field off the ladder. It does not have to: the ladder
+  constrains the *field*, not the projection, and a great circle
+  that misses the page centre is classified curved at 42 degrees as
+  surely as at 120. The sheet is now the atlas's own assembler, the
+  production renderer and all three writers, and what it shows is
+  that SVG and PDF carry the circle as curve commands where the same
+  page under the tangent plane carries it as a line. What it cannot
+  show at 42 degrees is a curve a reader would *see* bending; that
+  is measured on the wider pages, and stays measured there.
 
 - **#298 — the curve vocabulary.** Replace `GreatCirclePage.clip`'s
   `Optional<Arc>` with the three exact forms and a list of runs with

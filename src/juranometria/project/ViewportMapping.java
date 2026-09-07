@@ -143,22 +143,15 @@ public final class ViewportMapping {
             return new PlaneCurve.Circular(middleX, middleY,
                     (radiusAlong + radiusAcross) / 2.0);
         }
-        // An ellipse, which neither of the atlas's projections makes
-        // of a great circle. The gate measured this form exactly and
-        // left it out of the vocabulary on purpose: a word no page
-        // can exercise is a word no test can defend. Reaching here
-        // means a projection has arrived whose curves this cannot
-        // draw, and saying so is better than drawing the wrong one -
-        // it is issue #301 that brings such a projection, and the
-        // ellipse with it.
-        throw new IllegalStateException(String.format(
-                java.util.Locale.ROOT,
-                "this page's great circle is an ellipse of %.3f by"
-                        + " %.3f page units, which the curve vocabulary"
-                        + " does not carry: the gate measured that form"
-                        + " and issue #301 is what brings a projection"
-                        + " that needs it",
-                radiusAlong, radiusAcross));
+        // An ellipse, which is what a projection showing a hemisphere
+        // makes of a great circle. Neither projection the atlas ships
+        // reaches here, and the word is carried anyway: the gate
+        // measured this form exactly over seventeen real pages and
+        // assigned all three words to issue #298, precisely so that
+        // #301 would be an addition rather than a redesign of the
+        // seam. Leaving it out would have put the redesign back.
+        return new PlaneCurve.Elliptical(middleX, middleY, radiusAlong,
+                radiusAcross, tilt);
     }
 
     /** The conic's own tangent where the page is. */
