@@ -256,8 +256,13 @@ turned up before anything reached paper. It is fixed and regressed.
   this and ask readers to help.
 
 - **Opening a sheet in a vector editor and changing something.**
-  Also #293's, for the same reason: not reachable from this
-  environment.
+  The SVG is meant to be a file a reader can work on, and nobody has
+  tried. Not reachable from this environment, so it is
+  [#293](https://github.com/Aha43/JUranometria/issues/293)'s too -
+  the issue asks whether it opens, whether ink and labels are
+  separable, whether a label can be retyped or deleted with the
+  chart surviving it, and whether the title box still covers what it
+  should.
 
 Neither is a formality. The first is the only thing that can settle
 legibility, and the second is the only thing that can settle whether
