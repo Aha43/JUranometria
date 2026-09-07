@@ -215,6 +215,19 @@ page arrives at a brighter star limit than the atlas's own, because a
 decided, from rendered evidence, in
 [the overview-projection decision](decisions/overview-projection.md).
 
+One exception to the limiting magnitude is worth stating plainly,
+because a reader can see it and would otherwise have to guess. **A
+star may be drawn although it is fainter than the page's stated
+limit, when a constellation figure is drawn to it.** A magnitude
+limit answers how crowded the page should be; a constellation figure
+answers which stars define its shape, and the first must not cut
+holes in the second. Such a star is drawn at the size its own
+brightness asks for, is not given a name it would not otherwise have,
+and disappears with the figures when a reader switches them off. The
+title block's stated limit remains the limit for every other star on
+the page. Measured in
+[the figure-anchor study](studies/figure-anchors/measurements.md).
+
 ## Title block
 
 A printed or exported chart should state at least:

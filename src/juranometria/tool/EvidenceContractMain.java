@@ -111,6 +111,10 @@ public final class EvidenceContractMain {
         // renderer drew, with labels and its own stroke policy.
         REPORT_MAINS.put("juranometria.tool.OverviewInkStudyMain",
                 "docs/studies/overview-ink/measurements.md");
+        // What that density was doing to the constellation figures,
+        // found by looking at a page rather than by any test (#307).
+        REPORT_MAINS.put("juranometria.tool.FigureAnchorStudyMain",
+                "docs/studies/figure-anchors/measurements.md");
     }
 
     /**
