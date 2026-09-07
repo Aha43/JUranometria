@@ -102,6 +102,17 @@ charts of the same centre and field drawn differently are different
 pages and a page that could not say which it was could not be
 checked.
 
+**Which projection draws a page is a property of its field** (Sprint
+30, issue #299), not a setting and not a mode. The field ladder runs
+from 1° to 120°; everything from 42° down is the atlas's own tangent
+plane, and the three rungs above it are the overview's. A view state
+whose projection disagrees with its own field is refused where it is
+made, so there is nowhere for a projection menu to appear by accident
+— and a reader who wanted "the stereographic view" would be a reader
+who had been told about a problem they do not have. Zoom, pan,
+pointer zoom, recentre, the modules and every export cross the seam
+between the two without knowing there is one.
+
 The package is geometry and nothing else: no toolkit, no preferences,
 no files, no network, and — added with the strategy — no module seam
 and no catalogue. A projection that named a module would invert the

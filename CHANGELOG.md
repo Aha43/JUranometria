@@ -23,6 +23,18 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   while a projection says how the sky becomes a page
   (`docs/decisions/overview-projection.md`, `docs/architecture.md`).
 
+- **The sky has a wide view** (issue #299). Zooming out past the
+  42° sheet page now continues onto three more rungs — 60°, 90° and
+  120° — drawn by the overview's own projection, where shape survives
+  and a constellation is still the shape a reader knows. It is not a
+  mode and there is no projection menu: which projection draws a page
+  is a property of its field, so zoom, pan, pointer zoom, recentre
+  and every module carry across unchanged. A wide page arrives at a
+  brighter star limit than the atlas's own, because a 120° page with
+  every star to V 8.0 is half ink; the magnitude control still wins,
+  and Home restores everything. The detailed atlas from 1° to 42° is
+  untouched, byte for byte.
+
 - **Reference circles are carried as curves** (issue #298). The atlas
   drew a great circle as a straight line between two page edges,
   which is true of a tangent plane and of no other projection. The

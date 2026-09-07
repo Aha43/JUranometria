@@ -10,6 +10,7 @@ import juranometria.chart.ChartProjection;
 import juranometria.chart.SkyPosition;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PanSolver;
+import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
 import juranometria.project.PlanePoint;
 import juranometria.project.ViewportMapping;
@@ -43,13 +44,22 @@ class PointerZoomControllerTest {
                 pixel);
     }
 
-    /** Where the given sky position lands on the state's page. */
+    /**
+     * Where the given sky position lands on the state's page.
+     *
+     * <p>Through the page's own projection. This asked a tangent
+     * plane whatever page it was measuring until #299 put rungs on
+     * the ladder that another one draws, at which point it began
+     * reporting that pointer zoom had lost the sky when what it had
+     * lost was the projection - the same fault, in a test, that the
+     * projection strategy was built to make impossible in
+     * production.
+     */
     private static PixelPoint pixelOf(ChartViewState state, SkyPosition sky) {
         ChartViewport viewport = new ChartViewport(
                 state.centre(), state.fieldWidthDegrees(), WIDTH, HEIGHT);
         return new ViewportMapping(viewport).toPixel(
-                new GnomonicProjection(state.centre())
-                        .project(sky).orElseThrow());
+                Projections.forViewport(viewport).project(sky).orElseThrow());
     }
 
     private static ChartViewController controllerAt(SkyPosition centre,
@@ -119,9 +129,12 @@ class PointerZoomControllerTest {
 
     @Test
     void refusalsChangeNothingAndNotifyNobody() {
-        // At-bound: the widest page cannot zoom out.
+        // At-bound: the widest page cannot zoom out. That is the
+        // widest overview rung now, not the sheet page - the ladder
+        // did not stop at 42 degrees once a projection arrived that
+        // could carry further (#299).
         ChartViewController atBound = controllerAt(
-                new SkyPosition(83.818667, -5.389667), 42.0);
+                new SkyPosition(83.818667, -5.389667), 120.0);
         ChartViewState before = atBound.state();
         int[] notified = {0};
         atBound.onChange(state -> notified[0]++);
@@ -209,19 +222,30 @@ class PointerZoomControllerTest {
 
     @Test
     void aWideSouthernCornerRefusesByTheContractNotByAccident() {
-        // Crux at 36 degrees, corner pointer: the anchor sits near
-        // dec -83, past the north-up feasibility bound - the reviewed
-        // contract refuses constrained steps rather than miss the
-        // pointer visibly. The same page zooms freely at regional
-        // fields where the anchor stays feasible.
-        SkyPosition crux = new SkyPosition(186.649563, -63.099093);
-        ChartViewController wide = controllerAt(crux, 36.0);
+        // A near-polar page whose corner pointer anchors sky past
+        // the north-up feasibility bound: the reviewed contract
+        // refuses constrained steps rather than miss the pointer
+        // visibly. The same page zooms freely where the anchor stays
+        // feasible.
+        //
+        // The Crux page this used to hold is no longer one of these.
+        // It refused because its reverse solve was *ambiguous* - a
+        // second exact root existed - rather than because anything
+        // was constrained, and #299 replaced the blanket ambiguity
+        // refusal with the branch test it was standing in for. The
+        // step is exact, reversible to 1e-14 degrees, and taken now.
+        // The comment here said "constrained"; the code was refusing
+        // for a different reason, and only the overview's fields made
+        // the difference visible.
+        SkyPosition nearPole = new SkyPosition(0.0, 89.9);
+        ChartViewController wide = controllerAt(nearPole, 36.0);
         ChartViewState before = wide.state();
         assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
-                wide.zoomAt(plane(before, new PixelPoint(899.0, 699.0)),
+                wide.zoomAt(plane(before, new PixelPoint(899.0, 1.0)),
                         true));
         assertEquals(before, wide.state());
 
+        SkyPosition crux = new SkyPosition(186.649563, -63.099093);
         ChartViewController regional = controllerAt(crux, 18.0);
         assertEquals(PointerZoomOutcome.ACCEPTED,
                 regional.zoomAt(plane(regional.state(),

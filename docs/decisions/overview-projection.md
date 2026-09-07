@@ -664,6 +664,90 @@ projection on the shared frame and making its domain rule exact.
   got. `ReferenceInk` draws each run's own shape and names the curve
   at an end when it has one.
 
+### What building the overview page changed (#299)
+
+- **The rungs and the defaults are adopted, and now measured on
+  pages the renderer drew.** This gate proposed 60, 90 and 120
+  degrees with default limits of V 5.0, V 4.0 and V 4.0, said plainly
+  that its own pages could not settle them - no star labels, none of
+  production's stroke policy - and required #299 to publish the same
+  measure over real rendered pages. It did
+  (`docs/studies/overview-ink/measurements.md`), and the numbers hold:
+
+  | field | default limit | ink at Orion |
+  |---:|---:|---:|
+  | 42° (the released control, at V 8.0) | — | 13.1% |
+  | 60° | V 5.0 | 9.5% |
+  | 90° | V 4.0 | 10.6% |
+  | 120° | V 4.0 | 13.7% |
+
+  Every overview rung arrives at or below the ink of the page a
+  reader already reads. What the same table shows about the defaults
+  is that they are not cosmetic: a 120-degree page at the atlas's own
+  V 8.0 is **47.9 per cent ink**, half the paper marked, with no
+  shapes left to pick out.
+
+- **The limit follows the field, and only ever brighter.** A wider
+  rung takes its field's limit when that is brighter; a narrower one
+  keeps what the reader has. So zooming out can hide a faint star and
+  can never bring back one the reader chose to hide, and every field
+  from 42 degrees down is untouched, because their default is the
+  atlas's own. It does not remember: zooming out and back leaves the
+  brighter limit, and the reader's own control - or Home - restores
+  it. A second copy of a choice the reader can see and change would
+  be a worse thing to own than the asymmetry.
+
+- **The pairing is an invariant, not a policy applied by surfaces.**
+  A state whose projection disagrees with its own field is refused
+  where it is made. There is no projection menu, now or later, and
+  now there is nowhere to add one by accident.
+
+- **The pan centre solver generalised in about twenty lines, having
+  refused everything for an issue.** It solved the tangent plane's
+  own equations because two quantities were written in its units: the
+  cosine of the angle from the centre, and that offset's eastward
+  part. Every azimuthal projection can be asked for both - it places
+  a direction at a plane radius that depends on the angle alone,
+  along the true bearing - so the equations became spherical geometry
+  that knows no projection at all, and reduce to exactly the old
+  arithmetic for the tangent plane. What did *not* generalise for
+  free was the polar clamp: it tracks the page's own vertical, and
+  clamping the offset's northward component instead moves the point
+  the reader is dragging. A test caught that, and the test was right.
+
+- **Pointer zoom had to read each page by its own projection.** The
+  step from 42 to 60 degrees is the one rung where the projection
+  changes, and the plane point of a fixed pixel is different on the
+  two pages. Using one projection for both lands the sky **up to 21
+  pixels** from the pointer that asked for it - which is not subtle,
+  and was invisible until a rung existed where the two differ.
+
+- **A reviewed refusal had to be amended, and it changes released
+  behaviour.** Pointer zoom refused every *ambiguous* solve - one
+  where a second exact centre also satisfies the grab. That rule was
+  measured on pages up to 36 degrees, where ambiguity only arose near
+  the pole; at 120 degrees a corner pointer anchors sky 72 degrees
+  out and almost every off-centre pointer is ambiguous, so the rule
+  would have quietly stopped the wheel working on the pages this
+  issue adds. It now refuses the thing it was standing in for: a
+  centre further from the previous one than the anchor is is the
+  other branch. Over 1,248 steps, 31 overview steps and **24 steps at
+  released fields** change from refused to accepted, and 3 are still
+  refused as branch switches. The released-field change is set out in
+  `docs/decisions/pointer-zoom.md`; no page's pixels change.
+
+- **Four reference lines leave an overview page near one corner**, as
+  this gate said they would, so the names are placed against each
+  other and stack downwards. Production had never needed the rule -
+  at 42 degrees no page carries more than two - and it is written so
+  that nothing on a released page moves, which the released-page
+  oracle confirms byte for byte.
+
+- **The last place that assumed a projection was a page's own
+  height.** `SceneAssembler.maxPageHeightPx` took the tangent plane
+  when it was not told otherwise, so the widest rung computed a page
+  **zero pixels tall**. It asks the field now, like everything else.
+
 - **#299 — the overview page.** Stereographic at 60, 90 and 120
   degrees as three more rungs, with the field-linked default
   magnitude above. Recentre, pan and the transition back to a

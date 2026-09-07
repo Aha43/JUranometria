@@ -193,7 +193,7 @@ detail:
 | 1–3° | Detailed stellar field and close companions |
 | 6–10° | Target neighbourhood and finder stars |
 | 20–30° | Constellation-scale relationships and notable DSOs |
-| 60°+ | Broad celestial geography; deferred |
+| 60–120° | Broad celestial geography, on the overview's own projection |
 
 Automatic magnitude limits, label priorities, and grid intervals will be
 specified after the first chart can be judged visually. The regional
@@ -205,6 +205,15 @@ beyond 18 degrees. One step wider was added for the observing table,
 at 42 degrees, on a distortion budget measured in
 [the printable-chart decision](decisions/printable-chart.md); the
 projection does not change with it.
+
+Above that the ladder continues onto three overview rungs — 60, 90 and
+120 degrees — and there the projection **does** change, because past 42
+degrees the tangent plane has nothing left to offer. Which projection
+draws a page is a property of its field and not a setting, and a wide
+page arrives at a brighter star limit than the atlas's own, because a
+120-degree page showing every star to V 8.0 is half ink. Both are
+decided, from rendered evidence, in
+[the overview-projection decision](decisions/overview-projection.md).
 
 ## Title block
 

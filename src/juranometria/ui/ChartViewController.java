@@ -222,7 +222,8 @@ public final class ChartViewController {
             return PointerZoomOutcome.ACCEPTED;
         }
         java.util.Optional<juranometria.chart.SkyPosition> solved =
-                solveExactReversible(state.projection(), state.centre(),
+                solveExactReversible(state.projection(),
+                        centred.projection(), state.centre(),
                         state.fieldWidthDegrees(),
                         centred.fieldWidthDegrees(), pointer);
         if (solved.isEmpty()) {
@@ -261,8 +262,27 @@ public final class ChartViewController {
      */
     static double zoomScale(juranometria.project.Projection projection,
                             double fieldDegrees, double newFieldDegrees) {
-        return projection.planeRadius(newFieldDegrees / 2.0)
-                / projection.planeRadius(fieldDegrees / 2.0);
+        return zoomScale(projection, projection, fieldDegrees,
+                newFieldDegrees);
+    }
+
+    /**
+     * The same, between two pages that are not drawn by the same
+     * projection.
+     *
+     * <p>Which is one step of the ladder: 42 degrees is the tangent
+     * plane's widest and 60 is the overview's narrowest, so a reader
+     * zooming out of the sheet page crosses it. Each half of the
+     * ratio belongs to the page it describes - how far out the old
+     * page put that pixel, and how far out the new page puts it -
+     * and using one projection for both is a step that lands the sky
+     * up to twenty pixels from the pointer that asked for it.
+     */
+    static double zoomScale(juranometria.project.Projection from,
+                            juranometria.project.Projection to,
+                            double fieldDegrees, double newFieldDegrees) {
+        return to.planeRadius(newFieldDegrees / 2.0)
+                / from.planeRadius(fieldDegrees / 2.0);
     }
 
     /**
@@ -277,37 +297,92 @@ public final class ChartViewController {
      * waiting to be broken, so it is checked here directly.
      */
     static java.util.Optional<juranometria.chart.SkyPosition>
-            solveExactReversible(juranometria.chart.ChartProjection kind,
+            solveExactReversible(juranometria.chart.ChartProjection fromKind,
+                                 juranometria.chart.ChartProjection toKind,
                                  juranometria.chart.SkyPosition centre,
                                  double fieldDegrees, double newFieldDegrees,
                                  juranometria.project.PlanePoint pointer) {
-        juranometria.project.Projection projection =
-                juranometria.project.Projections.of(kind, centre);
+        // Two pages, each read by its own projection. The pointer is
+        // a plane point on the page being left; the target is the
+        // same pixel on the page being entered, which is a different
+        // plane point whenever the two are drawn differently. Reading
+        // both through one of them is the fault this whole package
+        // exists to prevent, and it survived here until the ladder
+        // had a rung where the projection changes.
+        juranometria.project.Projection from =
+                juranometria.project.Projections.of(fromKind, centre);
+        juranometria.project.Projection to =
+                juranometria.project.Projections.of(toKind, centre);
         juranometria.chart.SkyPosition anchor =
-                juranometria.project.PanSolver.skyFromPlane(kind, centre,
+                juranometria.project.PanSolver.skyFromPlane(fromKind, centre,
                         pointer);
-        double scale = zoomScale(projection, fieldDegrees, newFieldDegrees);
+        double scale = zoomScale(from, to, fieldDegrees, newFieldDegrees);
         juranometria.project.PlanePoint target =
                 new juranometria.project.PlanePoint(
                         pointer.xiEast() * scale, pointer.etaNorth() * scale);
         var out = juranometria.project.PanSolver.solveCentre(
-                kind, anchor, target, centre);
-        if (out.centre().isEmpty() || out.constrained() || out.ambiguous()) {
+                toKind, anchor, target, centre);
+        if (out.centre().isEmpty() || out.constrained()
+                || switchedBranch(out, centre, anchor)) {
             return java.util.Optional.empty();
         }
         juranometria.chart.SkyPosition mid = out.centre().get();
         juranometria.chart.SkyPosition anchorAgain =
-                juranometria.project.PanSolver.skyFromPlane(kind, mid,
+                juranometria.project.PanSolver.skyFromPlane(toKind, mid,
                         target);
         var back = juranometria.project.PanSolver.solveCentre(
-                kind, anchorAgain, pointer, mid);
+                fromKind, anchorAgain, pointer, mid);
         if (back.centre().isEmpty() || back.constrained()
-                || back.ambiguous()
+                || switchedBranch(back, mid, anchorAgain)
                 || back.centre().get().separationDegrees(centre)
                         > POINTER_ZOOM_REVERSAL_TOLERANCE_DEGREES) {
             return java.util.Optional.empty();
         }
         return java.util.Optional.of(mid);
+    }
+
+    /**
+     * Whether a two-branch solve took the branch it should not have.
+     *
+     * <p>The centre equation has two exact roots on a page whose
+     * pointer anchors sky far from the centre, and the solver returns
+     * the one nearest the previous centre. For a drag's small
+     * increments that continuity tie-break is right and panning keeps
+     * it; a zoom step is a large jump on which it could silently
+     * switch branches, and the reviewed rule was to refuse every
+     * ambiguous step outright (docs/decisions/pointer-zoom.md).
+     *
+     * <p>That rule was measured on pages up to 36 degrees wide, where
+     * the only ambiguous pointers were near-polar ones anchoring sky
+     * beyond the pole. At the overview's fields it fires on ordinary
+     * pointers - a corner of a 120-degree page anchors sky 72 degrees
+     * from the centre, and the second root is on the far side of the
+     * sky - so keeping it would have quietly stopped the wheel
+     * working on exactly the pages #299 adds, while the gate promised
+     * that navigation keeps working because it is the same operation.
+     *
+     * <p>So the refusal now tests the thing it was standing in for. A
+     * pointer-anchored zoom moves the centre <em>towards the
+     * anchor</em>, and never past it: the anchor is pinned, and the
+     * furthest the centre can travel is onto the anchor itself, when
+     * the pointer ends at the page's middle. A root further from the
+     * previous centre than the anchor is is the other branch, and it
+     * is refused. This is geometry rather than a tolerance, and it
+     * refuses the near-polar case the reviewed rule was written for -
+     * where the two roots straddle the pole and the far one is
+     * further out than the anchor.
+     */
+    private static boolean switchedBranch(
+            juranometria.project.PanSolver.PanSolution solved,
+            juranometria.chart.SkyPosition from,
+            juranometria.chart.SkyPosition anchor) {
+        if (!solved.ambiguous() || solved.centre().isEmpty()) {
+            return false;
+        }
+        return solved.centre().get().separationDegrees(from)
+                > anchor.separationDegrees(from)
+                        + juranometria.project.PanSolver
+                                .AMBIGUITY_SEPARATION_DEGREES;
     }
 
     public void reset() {

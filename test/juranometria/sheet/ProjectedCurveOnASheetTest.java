@@ -40,22 +40,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * writers - reading <em>one</em> recording, because a claim that four
  * things agree is not tested by making four of them.
  *
- * <p>The page is one a reader can ask for, and its centre is chosen
- * for two reasons that both matter. A great circle <em>through</em>
- * the page centre is straight under every projection, so a page
- * centred on the ecliptic's own crossing would have proved nothing
- * about a curve; and the permanent circle has to meet the title
- * panel somewhere, because paint order in a raster is only visible
- * where two things overlap.
+ * <p>The pages are ones a reader can ask for - the two rungs either
+ * side of the ladder's one projection seam - and the centre is
+ * chosen for two reasons that both matter. A great circle
+ * <em>through</em> the page centre is straight under every
+ * projection, so a page centred on the ecliptic's own crossing would
+ * have proved nothing about a curve; and the permanent circle has to
+ * meet the title panel somewhere, because paint order in a raster is
+ * only visible where two things overlap.
  *
  * <p>What this cannot show is a curve a reader would <em>see</em>
- * bending. At 42 degrees the arc stands about a twentieth of a page
- * unit off its own chord - which is why the released atlas is byte
- * for byte identical through this issue - so what is asked here is
- * whether the curve is carried, exactly, and unchanged from one
- * format to the next. Whether it is visibly a curve is measured on
- * the wider pages, in {@code ProjectedCurveSeamTest}, where the seam
- * has to serve them.
+ * bending. At 60 degrees the arc still stands well under a page unit
+ * off its own chord, so what is asked here is whether the curve is
+ * carried, exactly, and unchanged from one format to the next.
+ * Whether it is visibly a curve is measured on the widest pages, in
+ * {@code ProjectedCurveSeamTest}, where the seam has to serve them.
  */
 class ProjectedCurveOnASheetTest {
 
@@ -64,7 +63,20 @@ class ProjectedCurveOnASheetTest {
      * runs under the title panel.
      */
     private static final SkyPosition ABOVE_THE_CROSSING =
-            new SkyPosition(0.0, 16.0);
+            new SkyPosition(10.0, 28.0);
+
+    /**
+     * The two pages either side of the ladder's one seam.
+     *
+     * <p>They were the same page under two projections until #299
+     * paired a rung with its projection, which is a better test and
+     * not a worse one: this is the step a reader actually makes.
+     * Zooming out of the sheet page onto the first overview rung
+     * changes what the circle is, and zooming back in changes it
+     * back.
+     */
+    private static final double OVERVIEW = 60.0;
+    private static final double SHEET = 42.0;
 
     /** The permanent circle's own stroke: long dash, short dot. */
     private static final float[] PERMANENT = {12.0f, 4.0f, 2.0f, 4.0f};
@@ -99,12 +111,13 @@ class ProjectedCurveOnASheetTest {
                 registry.collect(), ChartPalette.WHITE_PAPER);
     }
 
-    /** One whole production sheet of this page, on A4. */
+    /** One whole production sheet of this rung, on A4. */
     private static SheetRecording sheet(ChartProjection kind,
                                         ChartRenderer.ReferenceLayer ink) {
         return ChartSheet.record(Atlas.assembler()::assemble,
-                new ChartViewState(ABOVE_THE_CROSSING, 42.0, 6.0, null,
-                        null, kind),
+                new ChartViewState(ABOVE_THE_CROSSING,
+                        kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW,
+                        6.0),
                 ChartOptions.DEFAULTS, ink, PaperSize.A4);
     }
 

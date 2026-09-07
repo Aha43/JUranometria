@@ -153,8 +153,10 @@ class ZoomInteractionTest {
     void boundsAndRefusedPointersConsumeWithoutMoving() throws Exception {
         Fixture fixture = new Fixture();
         // Out to the widest page, then one more: consumed, unchanged.
-        fixture.wheel(450, 350, 5.0);
-        assertEquals(42.0, fixture.controller.state().fieldWidthDegrees());
+        // Three more notches than before #299 put the overview's
+        // rungs above the sheet page.
+        fixture.wheel(450, 350, 8.0);
+        assertEquals(120.0, fixture.controller.state().fieldWidthDegrees());
         ChartViewState atBound = fixture.controller.state();
         MouseWheelEvent beyond = fixture.wheel(450, 350, 1.0);
         assertTrue(beyond.isConsumed(),
@@ -239,14 +241,18 @@ class ZoomInteractionTest {
                 "the pre-burst sky is still beneath the pointer after"
                         + " the re-cap");
 
-        // And the stranding case cannot arise at all: a pointer close
-        // enough to the window edge to be letterboxed by the 24-degree
-        // re-cap anchors sky at plane offsets whose reverse has a
-        // second exact root, so the acceptance contract refuses the
-        // very first step - the state never moves and no notch can
-        // anchor into chrome. (The in-loop paper check remains as
-        // defence in depth for that reason, not because it is
-        // reachable.)
+        // And the stranding case: a pointer close enough to the
+        // window edge to be letterboxed by the 24-degree re-cap.
+        //
+        // This used to be unreachable, because such a pointer anchors
+        // sky whose reverse solve has a second exact root and the
+        // acceptance contract refused every ambiguous step outright.
+        // #299 replaced that blanket refusal with the branch test it
+        // was standing in for, so these steps are taken now - and the
+        // in-loop paper check, kept as defence in depth against
+        // exactly this, is what ends the burst. The invariant is
+        // unchanged and is what is asserted: no notch ever anchors
+        // into chrome.
         Fixture edge = new Fixture(900, 8000);
         SwingUtilities.invokeAndWait(() -> edge.controller.recenter(
                 new SkyPosition(10.684708, 0.0), 12.0));
@@ -257,9 +263,16 @@ class ZoomInteractionTest {
         ChartViewState edgeBefore = edge.controller.state();
         MouseWheelEvent strand = edge.wheel(450, edgeY, 3.0);
         assertTrue(strand.isConsumed(), "the paper wheel is consumed");
-        assertEquals(edgeBefore, edge.controller.state(),
-                "every notch refuses (ambiguous anchor) before any step"
-                        + " could strand the pointer in chrome");
+        assertEquals(24.0, edge.controller.state().fieldWidthDegrees(),
+                "two of the three notches are taken, and the third is"
+                        + " not: the second letterboxed the paper out"
+                        + " from under the pointer, and the burst ends"
+                        + " there rather than anchoring the next step"
+                        + " in chrome");
+        assertFalse(edge.chart.isOnPaper(new java.awt.Point(450, edgeY)),
+                "which is why it ends there - the pointer is over"
+                        + " chrome now, and nothing was anchored from"
+                        + " it while it was");
     }
 
     @Test

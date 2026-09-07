@@ -31,18 +31,60 @@ class ChartViewStateTest {
     }
 
     @Test
-    void zoomingOutStopsAtFortyTwoDegrees() {
+    void zoomingOutWalksThroughTheSheetPageOntoTheOverviewAndStops() {
         ChartViewState state = ChartViewState.DEFAULT;
         // 42 is the sheet step docs/decisions/printable-chart.md
-        // measured; 36 is now a stop on the way rather than the end.
-        double[] expected = {12.0, 18.0, 24.0, 36.0, 42.0};
-        for (double fieldWidth : expected) {
+        // measured, and it is no longer the end: the three rungs
+        // above it are the overview's, and the projection changes
+        // with the rung rather than with a setting
+        // (docs/decisions/overview-projection.md).
+        double[] expected = {12.0, 18.0, 24.0, 36.0, 42.0, 60.0, 90.0, 120.0};
+        ChartProjection[] drawnBy = {
+                ChartProjection.GNOMONIC, ChartProjection.GNOMONIC,
+                ChartProjection.GNOMONIC, ChartProjection.GNOMONIC,
+                ChartProjection.GNOMONIC, ChartProjection.STEREOGRAPHIC,
+                ChartProjection.STEREOGRAPHIC, ChartProjection.STEREOGRAPHIC};
+        for (int step = 0; step < expected.length; step++) {
             assertTrue(state.canZoomOut());
             state = state.zoomOut();
-            assertEquals(fieldWidth, state.fieldWidthDegrees());
+            assertEquals(expected[step], state.fieldWidthDegrees());
+            assertEquals(drawnBy[step], state.projection(),
+                    "a " + expected[step] + "-degree page is drawn by"
+                            + " its own field's projection");
         }
         assertFalse(state.canZoomOut());
         assertSame(state, state.zoomOut(), "zooming out at the bound is a clean no-op");
+
+        // And back down again, which is the transition a reader makes
+        // to read something closely. Nothing they chose is lost and
+        // nothing tells them the projection changed.
+        assertEquals(ChartProjection.GNOMONIC,
+                state.zoomIn().zoomIn().zoomIn().projection(),
+                "the way back is the same ladder");
+        assertEquals(42.0, state.zoomIn().zoomIn().zoomIn()
+                .fieldWidthDegrees());
+    }
+
+    @Test
+    void aStateMayNotDisagreeWithItsOwnFieldAboutWhoDrawsIt() {
+        // Which projection draws which rung is a property of the
+        // field and not a setting: there is no projection menu, now
+        // or later.
+        assertThrows(IllegalArgumentException.class,
+                () -> new ChartViewState(new SkyPosition(0.0, 0.0), 120.0,
+                        6.0, null, null, ChartProjection.GNOMONIC),
+                "the tangent plane cannot reach 90 degrees from its"
+                        + " centre at any price");
+        assertThrows(IllegalArgumentException.class,
+                () -> new ChartViewState(new SkyPosition(0.0, 0.0), 8.0,
+                        6.0, null, null, ChartProjection.STEREOGRAPHIC),
+                "and the atlas's own is right for the fields it serves");
+        assertEquals(ChartProjection.GNOMONIC,
+                ChartProjection.forField(42.0),
+                "the sheet page is the widest the tangent plane draws");
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                ChartProjection.forField(60.0),
+                "and the first overview rung is the other's");
     }
 
     @Test
@@ -159,7 +201,8 @@ class ChartViewStateTest {
 
     @Test
     void fieldWidthStepsAreExposedWidestFirst() {
-        assertEquals(java.util.List.of(42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
+        assertEquals(java.util.List.of(120.0, 90.0, 60.0, 42.0, 36.0, 24.0,
+                        18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
                 ChartViewState.fieldWidthSteps());
     }
 }

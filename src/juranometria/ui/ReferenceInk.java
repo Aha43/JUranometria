@@ -144,18 +144,34 @@ public final class ReferenceInk {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             g2.clip(paper);
+            // Circles first, then their names, then the points.
+            //
+            // The names are placed together rather than each with its
+            // own line, because at an overview's fields four
+            // reference lines leave the paper near the same corner
+            // and a name written where the last one already is is not
+            // a name. Production has never needed the rule - at 42
+            // degrees no page carries more than two - so it is
+            // written to change nothing there, and the released pages
+            // are the check that it does not
+            // (docs/decisions/overview-projection.md).
+            List<Named> names = new ArrayList<>();
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.GreatCircle circle) {
-                    drawCircle(g2, projection, mapping, region, paper,
-                            circle, palette);
+                    Named named = drawCircle(g2, projection, mapping,
+                            region, paper, circle, palette);
+                    if (named != null) {
+                        names.add(named);
+                    }
                 }
             }
+            List<Rectangle2D> taken = place(g2, paper, names, palette);
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.Point point) {
                     drawPoint(g2, projection, mapping, paper, point,
-                            palette);
+                            taken, palette);
                 }
             }
         } finally {
@@ -163,20 +179,24 @@ public final class ReferenceInk {
         }
     }
 
-    private static void drawCircle(Graphics2D g,
-                                   Projection projection,
-                                   ViewportMapping mapping,
-                                   PageRegion region,
-                                   Rectangle2D paper,
-                                   OverlayContribution.GreatCircle circle,
-                                   juranometria.render.ChartPalette palette) {
+    /** A line's name, and the end of it the name belongs to. */
+    private record Named(PixelPoint anchor, String name) {
+    }
+
+    private static Named drawCircle(Graphics2D g,
+                                    Projection projection,
+                                    ViewportMapping mapping,
+                                    PageRegion region,
+                                    Rectangle2D paper,
+                                    OverlayContribution.GreatCircle circle,
+                                    juranometria.render.ChartPalette palette) {
         List<CurveRun> runs = GreatCirclePage.clip(projection, mapping,
                 region, circle.pole());
         if (runs.isEmpty()) {
             // Silence. The circle does not cross this page, and a
             // line drawn anyway would be a promise the sky has not
             // made.
-            return;
+            return null;
         }
         g.setColor(palette.figureInk());
         g.setStroke(strokeFor(circle.reference()));
@@ -186,7 +206,78 @@ public final class ReferenceInk {
         // Named once, at one end, however many runs the page cut it
         // into - a line has one name and repeating it at every gap
         // would be the chart talking about its own paper.
-        label(g, paper, runs, circle.accessibleName(), palette);
+        PixelPoint anchor = labelAnchor(runs);
+        // Null when every run closed on itself, so the line has no
+        // end on this page to hang a name on. A curve wholly inside
+        // the paper is the case the old two-endpoint answer could not
+        // even describe.
+        return anchor == null ? null
+                : new Named(anchor, circle.accessibleName());
+    }
+
+    /**
+     * Every line's name, none of them on top of another.
+     *
+     * <p>A name goes where its own line leaves the paper. When that
+     * place is taken, it goes below the name already there - down
+     * rather than aside, because the rule that put it at the upper
+     * end is a rule about where a reader looks, and a word moved
+     * sideways along an edge stops being at the end of anything.
+     *
+     * <p>Down only as far as the paper: a name that cannot be placed
+     * inside the page is not written at all, which is the same answer
+     * the chart gives a line it cannot draw.
+     */
+    private static List<Rectangle2D> place(
+            Graphics2D g, Rectangle2D paper, List<Named> names,
+            juranometria.render.ChartPalette palette) {
+        List<Rectangle2D> taken = new ArrayList<>();
+        for (Named named : names) {
+            write(g, paper, named.anchor(), named.name(), taken, palette);
+        }
+        return taken;
+    }
+
+    /**
+     * One name, below any already written rather than over it.
+     *
+     * <p>Down rather than aside, because the rule that put it at the
+     * line's upper end is a rule about where a reader looks, and a
+     * word moved sideways along an edge stops being at the end of
+     * anything. Down only as far as the paper: a name with nowhere
+     * on the page to go is not written, which is the same answer the
+     * chart gives a line it cannot draw.
+     */
+    private static void write(Graphics2D g, Rectangle2D paper,
+                              PixelPoint anchor, String name,
+                              List<Rectangle2D> taken,
+                              juranometria.render.ChartPalette palette) {
+        g.setColor(palette.gridLabelInk());
+        g.setFont(EquatorialGrid.GRID_LABEL_FONT);
+        FontMetrics metrics = g.getFontMetrics();
+        double line = metrics.getHeight();
+        Rectangle2D box = labelBox(paper, anchor, name, metrics);
+        while (overlaps(box, taken)
+                && box.getMaxY() + line <= paper.getMaxY()) {
+            box = new Rectangle2D.Double(box.getX(), box.getY() + line,
+                    box.getWidth(), box.getHeight());
+        }
+        if (overlaps(box, taken)) {
+            return;
+        }
+        taken.add(box);
+        g.drawString(name, (float) box.getMinX(),
+                (float) (box.getMaxY() - metrics.getDescent()));
+    }
+
+    private static boolean overlaps(Rectangle2D box,
+                                    List<Rectangle2D> taken) {
+        for (Rectangle2D each : taken) {
+            if (each.intersects(box)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -237,7 +328,7 @@ public final class ReferenceInk {
     }
 
     /**
-     * The line's own name, once, where it leaves the paper.
+     * A line's own name goes where the line leaves the paper.
      *
      * <p>At the <strong>upper</strong> end, and at the right one if
      * they are level. A rule, so that two runs of the same page put
@@ -249,30 +340,6 @@ public final class ReferenceInk {
      * sky; it is no argument for printing a word on top of the
      * chart's own furniture.
      */
-    private static void label(Graphics2D g, Rectangle2D paper,
-                              List<CurveRun> runs, String name,
-                              juranometria.render.ChartPalette palette) {
-        PixelPoint anchor = labelAnchor(runs);
-        if (anchor == null) {
-            // Every run closed on itself, so the line has no end on
-            // this page to hang a name on. A curve wholly inside the
-            // paper is the case the old two-endpoint answer could
-            // not even describe.
-            return;
-        }
-        label(g, paper, anchor, name, palette);
-    }
-
-    private static void label(Graphics2D g, Rectangle2D paper,
-                              PixelPoint anchor, String name,
-                              juranometria.render.ChartPalette palette) {
-        g.setColor(palette.gridLabelInk());
-        g.setFont(EquatorialGrid.GRID_LABEL_FONT);
-        Rectangle2D box = labelBox(paper, anchor, name,
-                g.getFontMetrics());
-        g.drawString(name, (float) box.getMinX(),
-                (float) (box.getMaxY() - g.getFontMetrics().getDescent()));
-    }
 
     /**
      * The end a name hangs on: the upper one, and the right one if
@@ -329,6 +396,7 @@ public final class ReferenceInk {
                                   ViewportMapping mapping,
                                   Rectangle2D paper,
                                   OverlayContribution.Point point,
+                                  List<Rectangle2D> taken,
                                   juranometria.render.ChartPalette palette) {
         PixelPoint at = projection.project(point.at())
                 .map(mapping::toPixel).orElse(null);
@@ -354,8 +422,11 @@ public final class ReferenceInk {
             // a line rather than as a place or an object.
             case LANDMARK -> g.draw(diamond(at));
         }
-        label(g, paper, at,
-                point.accessibleName(), palette);
+        // A landmark's name keeps clear of the lines' names as well
+        // as of the other landmarks': the marks are drawn in their
+        // own order and only the words are placed against what is
+        // already written.
+        write(g, paper, at, point.accessibleName(), taken, palette);
     }
 
     /** A landmark's open diamond, about its position. */

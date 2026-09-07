@@ -366,6 +366,40 @@ public final class AtlasToolbar extends JToolBar {
         readout.setText(String.format(Locale.ROOT,
                 "Field %.0f° · Stars to V %.1f",
                 state.fieldWidthDegrees(), state.limitingMagnitude()));
+        say(zoomOut, "Zoom out", controller.canZoomOut()
+                ? state.zoomOut() : null, state);
+        say(zoomIn, "Zoom in", controller.canZoomIn()
+                ? state.zoomIn() : null, state);
+    }
+
+    /**
+     * What a zoom control leads to, when it leads somewhere new.
+     *
+     * <p>The overview is another rung of the same ladder rather than
+     * a mode with a switch, which is the gate's decision and not a
+     * shortcut: a reader who had to be told which projection was
+     * drawing would be a reader being told about a problem they do
+     * not have (docs/decisions/overview-projection.md). But the
+     * <em>step</em> that leaves the detailed atlas is worth
+     * announcing, because it is the one step of the ladder where a
+     * reader gets a different kind of chart - wide, whole, and not
+     * for pointing a telescope at.
+     *
+     * <p>So the control says where it goes, and only at that step. A
+     * button that renamed itself at every rung would be a readout
+     * pretending to be a control.
+     */
+    private static void say(JButton button, String plain,
+                            ChartViewState next, ChartViewState state) {
+        String said = plain;
+        if (next != null && next.overview() != state.overview()) {
+            said = next.overview()
+                    ? "Zoom out to the overview: the whole sky's shape,"
+                            + " wider than a detailed page"
+                    : "Zoom in to the detailed atlas";
+        }
+        button.setToolTipText(said);
+        button.getAccessibleContext().setAccessibleDescription(said);
     }
 
     private static JButton iconButton(String icon, String name, String tooltip,

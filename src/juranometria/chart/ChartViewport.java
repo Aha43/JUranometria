@@ -15,11 +15,19 @@ public record ChartViewport(SkyPosition centre, double fieldWidthDegrees,
                             int widthPx, int heightPx,
                             ChartProjection projection) {
 
-    /** A viewport drawn by the atlas's own projection. */
+    /**
+     * A viewport drawn by its own field's projection.
+     *
+     * <p>The five-argument form stays free, because a viewport is
+     * where a measurement can ask what a projection would do with a
+     * page the ladder does not offer. A page that does not say gets
+     * the one the field belongs to, so no caller can reach a wide
+     * field through the atlas's own projection by saying nothing.
+     */
     public ChartViewport(SkyPosition centre, double fieldWidthDegrees,
                          int widthPx, int heightPx) {
         this(centre, fieldWidthDegrees, widthPx, heightPx,
-                ChartProjection.GNOMONIC);
+                ChartProjection.forField(fieldWidthDegrees));
     }
 
     public ChartViewport {
