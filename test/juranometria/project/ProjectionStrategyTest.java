@@ -11,6 +11,7 @@ import juranometria.chart.SkyPosition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -198,6 +199,64 @@ class ProjectionStrategyTest {
                     + " says the ecliptic is where it puts it, to "
                     + worst + " plane units");
         }
+    }
+
+    @Test
+    void aCircleThisCannotClipIsRefusedAndNotCalledOffThePage() {
+        // Empty from the clipper means "the circle does not cross
+        // this page", and the chart draws nothing on that basis -
+        // which is right, and is why a curved circle must not be
+        // answered that way. A review pointed out the result: a page
+        // silently missing its ecliptic and its horizon, looking in
+        // every respect like a page that has none. It refuses
+        // loudly instead, and issue #298 is what makes it drawable.
+        ChartViewport viewport = new ChartViewport(ORION, 42.0, 900, 700,
+                ChartProjection.STEREOGRAPHIC);
+        SkyPosition eclipticPole = new SkyPosition(270.0, 66.5607);
+        GreatCirclePage.Page paper =
+                new GreatCirclePage.Page(0, 0, 900, 700);
+
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> GreatCirclePage.clip(
+                        Projections.forViewport(viewport),
+                        new ViewportMapping(viewport), paper,
+                        eclipticPole));
+        assertTrue(refused.getMessage().contains("#298"),
+                "and says what would draw it: " + refused.getMessage());
+
+        // A circle this page really does carry, drawn straight by
+        // both projections because it runs through the page centre -
+        // so the refusal above is about the shape a circle takes and
+        // not about the projection's name. The ecliptic is not this
+        // control: it misses a 42-degree page over Orion entirely,
+        // which is the silence the next test is about.
+        SkyPosition equatorPole = new SkyPosition(0.0, 90.0);
+        for (ChartProjection kind : ChartProjection.values()) {
+            ChartViewport carrying = new ChartViewport(ORION, 42.0,
+                    900, 700, kind);
+            assertTrue(GreatCirclePage.clip(
+                            Projections.forViewport(carrying),
+                            new ViewportMapping(carrying), paper,
+                            equatorPole).isPresent(),
+                    kind + " draws the celestial equator across a"
+                            + " chart centred on it");
+        }
+    }
+
+    @Test
+    void aCircleGenuinelyOffThePageIsStillSilence() {
+        // The distinction the refusal above must not blur. Off the
+        // page is silence: the chart draws nothing rather than
+        // promising a line the sky has not made.
+        ChartViewport viewport = new ChartViewport(ORION, 1.0, 900, 700);
+        assertTrue(GreatCirclePage.clip(Projections.forViewport(viewport),
+                        new ViewportMapping(viewport),
+                        new GreatCirclePage.Page(0, 0, 900, 700),
+                        new SkyPosition(83.0, 89.0))
+                        .isEmpty(),
+                "a circle that misses a one-degree page is simply not"
+                        + " drawn");
     }
 
     @Test

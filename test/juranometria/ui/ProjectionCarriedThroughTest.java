@@ -77,6 +77,63 @@ class ProjectionCarriedThroughTest {
     }
 
     @Test
+    void everyOrdinaryTransitionKeepsTheProjectionTheReaderIsLookingAt() {
+        // A review found this, and it is the sharp edge of the
+        // defaulting constructor: a transition written against the
+        // five-argument form says "gnomonic" without being asked,
+        // and none of these asked. A chart that reverted on a zoom
+        // would still draw a page, still be centred where the reader
+        // left it, and still be wrong.
+        ChartViewState overview = new ChartViewState(ORION, 8.0, 6.0,
+                null, null, ChartProjection.STEREOGRAPHIC);
+
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.zoomIn().projection(), "zooming in");
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.zoomOut().projection(), "zooming out");
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.increaseMagnitudeLimit().projection(),
+                "reaching fainter");
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.decreaseMagnitudeLimit().projection(),
+                "and brighter");
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.recenteredAt(new SkyPosition(90.0, 10.0))
+                        .projection(),
+                "recentring on a position");
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.recenteredAt(new SkyPosition(90.0, 10.0),
+                        "a target", "NGC 1").projection(),
+                "recentring on a target");
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.withFieldWidth(24.0).projection(),
+                "and changing field outright");
+
+        // Home is the one transition that is meant to change it,
+        // because Home is not a transition from this chart at all -
+        // it is the chart the atlas opens with.
+        assertEquals(ChartProjection.GNOMONIC, overview.reset().projection(),
+                "Home returns the atlas's own chart, projection and"
+                        + " all");
+    }
+
+    @Test
+    void aTransitionOfAGnomonicChartStaysGnomonic() {
+        // The other half, and the one every released page depends
+        // on: nothing above turned a released chart into an overview
+        // by accident either.
+        ChartViewState released = ChartViewState.DEFAULT;
+        for (ChartViewState after : List.of(released.zoomIn(),
+                released.zoomOut(), released.increaseMagnitudeLimit(),
+                released.decreaseMagnitudeLimit(),
+                released.withFieldWidth(24.0),
+                released.recenteredAt(ORION))) {
+            assertEquals(ChartProjection.GNOMONIC, after.projection(),
+                    "a released chart stays the atlas's own");
+        }
+    }
+
+    @Test
     void theRendererDrawsADifferentPageForADifferentProjection() {
         // The point of the whole issue, put as a reader would see it:
         // two charts of the same centre, field and sky, drawn by

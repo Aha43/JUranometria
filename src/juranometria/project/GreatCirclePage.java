@@ -131,11 +131,26 @@ public final class GreatCirclePage {
         }
         PlaneConic conic = stated.get();
         if (conic.a() != 0.0 || conic.b() != 0.0 || conic.c() != 0.0) {
-            // Curved on this plane. Straight is the only shape this
-            // can clip, and asking the conic is how it knows -
-            // nothing here asks which projection it was handed. The
-            // curve seam that draws the others is issue #298.
-            return Optional.empty();
+            // Curved on this plane, and this can only clip a
+            // straight run - so it says so, loudly.
+            //
+            // Returning empty would be the wrong silence. Empty here
+            // means "the circle does not cross this page", which the
+            // chart is entitled to act on by drawing nothing: a
+            // review pointed out that a curved circle answered that
+            // way produces a page missing its ecliptic and its
+            // horizon, looking in every respect like a page that
+            // simply has none. A chart quietly short of the lines it
+            // promised is worse than a chart that refuses to be
+            // drawn, and this cannot reach a reader in any case -
+            // nothing offers a projection whose circles curve until
+            // issue #298 draws them and #299 offers it.
+            throw new IllegalStateException(
+                    "the " + projection.name() + " projection draws this"
+                            + " great circle as a curve, and clipping a"
+                            + " curve is issue #298: this can clip a"
+                            + " straight run and must not pretend a"
+                            + " curved one is off the page");
         }
 
         double a = conic.d();

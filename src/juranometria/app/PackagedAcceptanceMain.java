@@ -976,7 +976,8 @@ public final class PackagedAcceptanceMain {
         // this leg by skipping it).
         navigation.recenter(new SkyPosition(83.8, -5.4), 18.0);
         var viewport = new ChartViewport(navigation.state().centre(),
-                navigation.state().fieldWidthDegrees(), 900, 700);
+                navigation.state().fieldWidthDegrees(), 900, 700,
+                navigation.state().projection());
         var pointer = PanSolver.planeFromPixel(viewport,
                 new PixelPoint(700, 250));
         var under = PanSolver.skyFromPlane(viewport.centre(), pointer);
@@ -987,7 +988,8 @@ public final class PackagedAcceptanceMain {
                 "and steps 18 to 12 degrees: "
                         + navigation.state().fieldWidthDegrees());
         var after = new ChartViewport(navigation.state().centre(),
-                navigation.state().fieldWidthDegrees(), 900, 700);
+                navigation.state().fieldWidthDegrees(), 900, 700,
+                navigation.state().projection());
         var stillUnder = PanSolver.skyFromPlane(after.centre(),
                 PanSolver.planeFromPixel(after, new PixelPoint(700, 250)));
         double adrift = under.separationDegrees(stillUnder);
@@ -1019,7 +1021,8 @@ public final class PackagedAcceptanceMain {
                 "just east of RA 0, so a westward drag must cross it: "
                         + raBefore);
         var wrap = new ChartViewport(navigation.state().centre(),
-                navigation.state().fieldWidthDegrees(), 900, 700);
+                navigation.state().fieldWidthDegrees(), 900, 700,
+                navigation.state().projection());
         require(navigation.pan(
                         PanSolver.skyFromPlane(wrap.centre(),
                                 PanSolver.planeFromPixel(wrap,

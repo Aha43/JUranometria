@@ -23,7 +23,18 @@ public final class ViewportMapping {
         this(viewport, Projections.forViewport(viewport));
     }
 
-    public ViewportMapping(ChartViewport viewport, Projection projection) {
+    /**
+     * Private, and it matters that it is.
+     *
+     * <p>A mapping and the projection it maps by must be the same
+     * projection about the same centre, and there is no way to say
+     * that with two arguments except by trusting the caller - a
+     * review pointed out that this overload let a caller hand in a
+     * projection disagreeing with the viewport in either. There is
+     * one viewport, it names one projection, and this asks it.
+     */
+    private ViewportMapping(ChartViewport viewport,
+                            Projection projection) {
         double half = viewport.fieldWidthDegrees() / 2.0;
         if (half >= projection.limitDegrees()) {
             throw new IllegalArgumentException(
