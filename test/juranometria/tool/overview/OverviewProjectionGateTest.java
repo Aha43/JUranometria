@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -288,6 +289,87 @@ class OverviewProjectionGateTest {
                                 + " whatever right ascension it carries");
             }
         }
+    }
+
+    @Test
+    void aPoleWrittenAnyWayGivesTheSameGreatCircle() {
+        // The same fault a third time, in the third place it could
+        // hide. project() learned to answer the coordinate
+        // degeneracies exactly and greatCircle() did not, so a pole
+        // handed to it went through raw trigonometry: the celestial
+        // equator's own pole is at declination ninety, where the
+        // right ascension means nothing, and writing it two ways
+        // produced two different conics.
+        for (SkyPosition centre : List.of(new SkyPosition(0.0, 0.0),
+                new SkyPosition(83.0, 41.0),
+                new SkyPosition(217.25, 90.0))) {
+            for (double poleDec : new double[] {90.0, -90.0}) {
+                Set<String> stated = new java.util.LinkedHashSet<>();
+                for (double ra : new double[] {0.0, 37.0, 90.0, 180.0,
+                        271.5, 359.9}) {
+                    SkyPosition pole = new SkyPosition(ra, poleDec);
+                    stated.add(Candidates.stereographic(centre)
+                            .greatCircle(pole).map(Object::toString)
+                            .orElse("none")
+                            + " / " + Candidates.orthographic(centre)
+                            .greatCircle(pole).map(Object::toString)
+                            .orElse("none")
+                            + " / " + Candidates.gnomonic(centre)
+                            .greatCircle(pole).map(Object::toString)
+                            .orElse("none"));
+                }
+                assertEquals(1, stated.size(), "a pole at declination "
+                        + poleDec + " seen from " + centre + " is one"
+                        + " great circle however its right ascension is"
+                        + " written, and gives one conic: " + stated);
+            }
+        }
+    }
+
+    @Test
+    void aGnomonicPageRefusesTheOneCircleItCannotDraw() {
+        // The great circle ninety degrees from the centre lies where
+        // the tangent plane is infinitely far away, so there is no
+        // curve - not a line very far off. Through raw trigonometry
+        // the pole's transverse part came out as 1e-17 rather than
+        // zero and the answer was a line ten quadrillion units away,
+        // which is the same thing said in a way that draws.
+        for (double ra : new double[] {0.0, 37.0, 180.0, 271.5}) {
+            assertTrue(Candidates.gnomonic(new SkyPosition(ra, 90.0))
+                            .greatCircle(new SkyPosition(0.0, 90.0))
+                            .isEmpty(),
+                    "a pole-centred gnomonic page cannot draw its own"
+                            + " pole's great circle, whatever right"
+                            + " ascension the centre carries");
+        }
+        // The same circle named by its other pole. A great circle
+        // has two, opposite each other, and naming it by the one
+        // antipodal to the page centre is the same undrawable
+        // circle - which needs the half turn of right ascension to
+        // be exact, not only the declination.
+        for (SkyPosition centre : List.of(new SkyPosition(83.0, 0.0),
+                new SkyPosition(0.0, 41.0),
+                new SkyPosition(217.25, -12.5))) {
+            SkyPosition itsOwn = new SkyPosition(centre.raDegrees(),
+                    centre.decDegrees());
+            SkyPosition opposite = new SkyPosition(
+                    (centre.raDegrees() + 180.0) % 360.0,
+                    -centre.decDegrees());
+            assertTrue(Candidates.gnomonic(centre).greatCircle(itsOwn)
+                            .isEmpty(),
+                    "named by the pole at the page centre");
+            assertTrue(Candidates.gnomonic(centre).greatCircle(opposite)
+                            .isEmpty(),
+                    "and by the opposite pole, which is the same circle");
+        }
+
+        // And the same circle seen from anywhere else is a line it
+        // can draw, so the refusal is about the geometry rather than
+        // about the declination.
+        assertTrue(Candidates.gnomonic(new SkyPosition(83.0, 0.0))
+                        .greatCircle(new SkyPosition(0.0, 90.0))
+                        .isPresent(),
+                "while from the equator the same circle is drawable");
     }
 
     @Test

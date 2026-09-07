@@ -377,6 +377,19 @@ public final class OverviewStudyMain {
                 what the caller wrote, and have to be answered before
                 any trigonometry leaves a residue behind.
 
+                Stating that was not the same as doing it. A sixth
+                round found the third place it hid: the projection
+                had learned the rule and the great-circle answer had
+                not, so a pole at declination ninety - where the
+                right ascension means nothing - gave a different
+                conic for every way of writing it, and the one circle
+                a gnomonic page cannot draw came back as a line ten
+                quadrillion units away rather than as nothing. A pole
+                is a direction like any other and needs the same
+                three components a position does, so there is now one
+                method that computes them. Computing them twice was
+                computing them twice differently.
+
                 ## Pointing at something
 
                 A reader points at a mark and the atlas says what it

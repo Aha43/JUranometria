@@ -359,28 +359,61 @@ final class Candidates {
     }
 
     /**
-     * The pole, in the projection's own frame: how far along the
-     * centre direction, the east direction, and the north direction.
+     * The direction to a position, in a centre's own frame: how far
+     * along the centre direction, how far east, how far north.
      *
-     * <p>These are the same three dot products {@code project} takes
-     * of a position, which is why a great circle's form falls out of
-     * the projection's arithmetic rather than out of a fit.
+     * <p>These are the three dot products every azimuthal projection
+     * is made of, and there is one of this method because there is
+     * one rule. A pole handed to {@code greatCircle} is a direction
+     * like any other, and the components it needs are the same three
+     * a position needs to be placed on the page, so computing them
+     * twice was computing them twice differently: {@code project}
+     * learned to answer the coordinate degeneracies exactly and this
+     * did not, so the same great circle written with two different
+     * right ascensions at a pole gave two different conics, and the
+     * one circle a gnomonic projection cannot draw came back as a
+     * line ten quadrillion units away instead of as nothing at all.
+     *
+     * <p>Both degeneracies are answered here, in degrees, where the
+     * caller wrote them. A declination of ninety degrees has a
+     * cosine of exactly zero, so a pole's right ascension drops out
+     * of the arithmetic rather than leaving 6.1e-17 of itself
+     * behind; and half a turn of right ascension has a sine of
+     * exactly zero, so a position opposite the centre has no
+     * transverse part rather than 1.22e-16 of one.
      */
-    static double[] inFrame(SkyPosition centre, SkyPosition pole) {
-        double centreRa = Math.toRadians(centre.raDegrees());
-        double centreDec = Math.toRadians(centre.decDegrees());
-        double poleDec = Math.toRadians(pole.decDegrees());
-        double offset = Math.toRadians(pole.raDegrees()) - centreRa;
-        double sinCentreDec = Math.sin(centreDec);
-        double cosCentreDec = Math.cos(centreDec);
-        double sinPoleDec = Math.sin(poleDec);
-        double cosPoleDec = Math.cos(poleDec);
+    static double[] inFrame(SkyPosition centre, SkyPosition position) {
+        double[] centreDec = sineAndCosineOf(centre.decDegrees());
+        double[] dec = sineAndCosineOf(position.decDegrees());
+        double turn = position.raDegrees() - centre.raDegrees();
+        double half = turn - 360.0 * Math.rint(turn / 360.0);
+        double sinOffset;
+        double cosOffset;
+        if (half == 180.0 || half == -180.0) {
+            sinOffset = 0.0;
+            cosOffset = -1.0;
+        } else if (half == 0.0) {
+            sinOffset = 0.0;
+            cosOffset = 1.0;
+        } else {
+            double offset = Math.toRadians(position.raDegrees())
+                    - Math.toRadians(centre.raDegrees());
+            sinOffset = Math.sin(offset);
+            cosOffset = Math.cos(offset);
+        }
+        // Adding zero, which changes no value and removes one
+        // distinction: a component that came out as negative zero is
+        // numerically equal to positive zero but not identical to
+        // it, and equivalent ways of writing the same pole were
+        // producing conics that differed in nothing else. Anything
+        // downstream that compares, caches or takes an atan2 of
+        // these should not be able to tell them apart either.
         return new double[] {
-                sinCentreDec * sinPoleDec
-                        + cosCentreDec * cosPoleDec * Math.cos(offset),
-                cosPoleDec * Math.sin(offset),
-                cosCentreDec * sinPoleDec
-                        - sinCentreDec * cosPoleDec * Math.cos(offset)};
+                centreDec[0] * dec[0] + centreDec[1] * dec[1] * cosOffset
+                        + 0.0,
+                dec[1] * sinOffset + 0.0,
+                centreDec[1] * dec[0] - centreDec[0] * dec[1] * cosOffset
+                        + 0.0};
     }
 
     /**

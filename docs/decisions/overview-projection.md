@@ -266,8 +266,30 @@ arithmetic. So a declination of ±90 is recognised in degrees too.
 **The principle is one principle**: a coordinate's degeneracies are
 exact facts about what the caller wrote, and they have to be answered
 where they were written, in degrees, before any trigonometry has a
-chance to leave a residue behind. Both places this bit are the same
-mistake.
+chance to leave a residue behind.
+
+Saying that was not the same as doing it, and a sixth round found the
+third place it hid. `project` had learned the rule; `greatCircle` had
+not, and a pole handed to it went through raw trigonometry of its
+own. So the celestial equator's pole — declination ninety, where the
+right ascension means nothing — gave a different conic for every way
+of writing it, and the one great circle a gnomonic page cannot draw
+came back as a line ten quadrillion units away instead of as nothing
+at all.
+
+The fix is not a third patch. **A pole is a direction like any
+other**, and the three components `greatCircle` needs are the same
+three `project` needs, computed by the same method — so there is now
+one of it. Computing them twice was computing them twice differently,
+which is what let the rule be stated in one place and broken in
+another.
+
+One detail is worth keeping: equivalent inputs now give **bit-identical**
+outputs, not merely equal ones. A component that came out as negative
+zero is numerically equal to positive zero and not identical to it,
+and the conics for a pole written six ways differed in nothing else.
+Anything downstream that compares, caches or takes an `atan2` of them
+should not be able to tell them apart either.
 
 The refused set is then exactly one representable position:
 
