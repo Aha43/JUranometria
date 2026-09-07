@@ -106,6 +106,11 @@ public final class EvidenceContractMain {
         // regenerates the pages the gate was decided from.
         REPORT_MAINS.put("juranometria.tool.overview.OverviewStudyMain",
                 "docs/studies/overview-projection/measurements.md");
+        // The confirmation the gate above could not give and required
+        // of #299: the same ink measure over pages the production
+        // renderer drew, with labels and its own stroke policy.
+        REPORT_MAINS.put("juranometria.tool.OverviewInkStudyMain",
+                "docs/studies/overview-ink/measurements.md");
     }
 
     /**

@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -71,6 +71,7 @@ help:
 	@echo "  grid-study        Measure and render the Sprint 15 coordinate-grid candidates"
 	@echo "  bayer-study       Measure and render the Sprint 17 Bayer-Flamsteed candidates"
 	@echo "  overview-study    Measure and render the Sprint 30 overview-projection candidates"
+	@echo "  overview-ink-study  Measure overview ink on pages the production renderer drew"
 	@echo "  dist              Build and verify the portable fallback ZIP"
 	@echo "  app-image         Build and verify this platform's native application image"
 	@echo "  clean        Delete build output"
@@ -244,6 +245,14 @@ overview-study: classes
 	@echo "  overview projections"
 	@$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.overview.OverviewStudyMain > /dev/null
 	@echo "written to docs/studies/overview-projection"
+
+# The confirmation the overview gate could not give and required of
+# #299: the same ink measure over pages the production renderer drew,
+# with labels and its own stroke policy.
+overview-ink-study: classes
+	@echo "  overview ink, on rendered pages"
+	@$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.OverviewInkStudyMain > docs/studies/overview-ink/measurements.md
+	@echo "written to docs/studies/overview-ink/measurements.md"
 
 wider-field-study: classes
 	@echo "  the released pages, hashed"

@@ -270,8 +270,8 @@ public final class SceneAssembler {
      */
     public int maxPageHeightPx(SkyPosition centre, double fieldWidthDegrees,
                                int widthPx) {
-        return maxPageHeightPx(ChartProjection.GNOMONIC, centre,
-                fieldWidthDegrees, widthPx);
+        return maxPageHeightPx(ChartProjection.forField(fieldWidthDegrees),
+                centre, fieldWidthDegrees, widthPx);
     }
 
     /**

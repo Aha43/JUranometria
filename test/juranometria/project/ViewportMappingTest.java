@@ -54,7 +54,11 @@ class ViewportMappingTest {
 
     @Test
     void rejectsFieldsTooWideForGnomonicCharts() {
+        // Named, because a viewport that says nothing now takes its
+        // field's own projection and 180 degrees is the overview's -
+        // which draws it, and is refused for a different reason.
         assertThrows(IllegalArgumentException.class,
-                () -> new ViewportMapping(new ChartViewport(M31, 180.0, 800, 600)));
+                () -> new ViewportMapping(new ChartViewport(M31, 180.0,
+                        800, 600, juranometria.chart.ChartProjection.GNOMONIC)));
     }
 }

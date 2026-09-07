@@ -124,21 +124,31 @@ class DirectZoomJourneyTest {
                             + " did - the widening changes the page,"
                             + " not the pointer contract");
 
-            // A further notch at the widest page: consumed by the
-            // chart, refused by the sequence, and the very same scene
-            // object remains - no assembly, no query, no stale frame.
+            // Three more notches to the widest page there is, and
+            // then one beyond it: consumed by the chart, refused by
+            // the sequence, and the very same scene object remains -
+            // no assembly, no query, no stale frame. The sheet page
+            // stopped being the end of the sequence when #299 put
+            // the overview's rungs above it.
+            wheel(px, py, 3.0);
+            assertEquals(120.0, navigation.state().fieldWidthDegrees(),
+                    "three notches past the sheet page is the"
+                            + " overview's widest rung");
             var sceneAtBound = chart.scene();
             MouseWheelEvent beyond = wheel(px, py, 1.0);
             assertTrue(beyond.isConsumed());
-            assertEquals(42.0, navigation.state().fieldWidthDegrees());
+            assertEquals(120.0, navigation.state().fieldWidthDegrees());
             assertSame(sceneAtBound, chart.scene(),
                     "a refused notch assembles nothing");
 
-            // Reverse the five steps at the same pointer: the sky
+            // Reverse all eight steps at the same pointer: the sky
             // stays put and the pre-burst view returns within the
             // reviewed tolerance - compared against the centre
-            // captured BEFORE zooming out, never the final view.
-            wheel(px, py, -5.0);
+            // captured BEFORE zooming out, never the final view. The
+            // reverse crosses the rung where the projection changes,
+            // which is the step no single-projection arithmetic can
+            // make (#299).
+            wheel(px, py, -8.0);
             assertEquals(8.0, navigation.state().fieldWidthDegrees());
             assertTrue(pointerDrift(anchor, px, py) < DRIFT_TOLERANCE_PX,
                     "the anchor survives the reverse burst");
@@ -190,9 +200,17 @@ class DirectZoomJourneyTest {
             mouse(MouseEvent.MOUSE_RELEASED, 490, 405);
             assertTrue(!beforePan.equals(navigation.state().centre()),
                     "the drag panned");
+            // The burst out to the overview and back brightened the
+            // limit on the way out and did not put it back: a wide
+            // rung arrives at its own limit, and coming home down the
+            // ladder can only keep what the reader has (#299). So the
+            // reader's own control is how they get their faint stars
+            // again - and Home, below, restores everything at once.
+            assertEquals(4.0, navigation.state().limitingMagnitude(),
+                    "the widest rungs left the limit at its brightest");
             ReaderInput.click(button(frame[0].getContentPane(),
-                    "Fewer stars"));
-            assertEquals(7.0, navigation.state().limitingMagnitude());
+                    "More stars"));
+            assertEquals(5.0, navigation.state().limitingMagnitude());
             wheel(300, 300, -1.0);
             assertEquals(6.0, navigation.state().fieldWidthDegrees());
 

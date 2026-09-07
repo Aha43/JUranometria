@@ -49,7 +49,11 @@ class OnThisPagePackBoundTest {
         //
         // What holds regardless of which page is opened is a sum:
         // page reach + query margin + object radius, against the
-        // 90° horizon.
+        // horizon - and the horizon belongs to whichever projection
+        // draws the widest page, which is not the tangent plane's 90
+        // degrees any more. #299 put three rungs above the sheet
+        // page and the overview's projection draws them; its only
+        // singular point is the antipode of the centre.
         double margin = OnThisPageStudyMain.declaredObjectMarginDegrees();
         double reach = OnThisPageStudyMain.widestPageReachDegrees();
 
@@ -59,11 +63,18 @@ class OnThisPagePackBoundTest {
                         + " own manifest declares: "
                         + OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
                         + " vs " + margin);
-        assertTrue(reach + margin + margin < 90.0, String.format(
+        double horizon = juranometria.project.Projections.of(
+                        juranometria.chart.ChartProjection.forField(
+                                juranometria.chart.ChartViewState
+                                        .fieldWidthSteps().get(0)),
+                        new juranometria.chart.SkyPosition(0.0, 0.0))
+                .limitDegrees();
+        assertTrue(reach + margin + margin < horizon, String.format(
                 "%.2f° of page reach, %.2f° of query margin and %.2f°"
                         + " of object radius come to %.2f°, which must"
-                        + " stay short of the 90° horizon",
-                reach, margin, margin, reach + margin + margin));
+                        + " stay short of the %.0f° horizon of the"
+                        + " projection that draws the widest page",
+                reach, margin, margin, reach + margin + margin, horizon));
 
         // And the reach is the assembler's, not a second copy of it
         // kept here (gate review). What holds it down is real

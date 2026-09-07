@@ -135,34 +135,6 @@ public final class PanSolver {
                                           SkyPosition grabbed,
                                           PlanePoint target,
                                           SkyPosition previousCentre) {
-        if (kind != ChartProjection.GNOMONIC) {
-            // The equations below are the tangent plane's own. The
-            // quantity written 1/N is the cosine of the angle from
-            // the centre and xi/N is its eastward part, and both of
-            // those are true of a tangent plane and of nothing else.
-            //
-            // Threading the projection through here and leaving the
-            // algebra alone would be worse than not threading it: the
-            // verification step would reject every candidate and the
-            // solver would return "no solution", which the chart
-            // reads as a pan that could not be made rather than as a
-            // solver that cannot do this. It says so instead.
-            //
-            // Generalising it is real work and belongs with the issue
-            // that first makes an overview page pannable. The
-            // clamp that keeps a high-declination pan feasible is
-            // woven into these same equations, and it is a feature
-            // rather than an artefact.
-            throw new IllegalStateException(
-                    "the pan centre solver solves the tangent plane's"
-                            + " equations and was asked about the "
-                            + kind.displayName() + " projection:"
-                            + " generalising it is issue #299, which is"
-                            + " what first makes such a page pannable");
-        }
-        double xi = target.xiEast();
-        double eta = target.etaNorth();
-
         double raS = Math.toRadians(grabbed.raDegrees());
         double decS = Math.toRadians(grabbed.decDegrees());
         double sx = Math.cos(decS) * Math.cos(raS);
@@ -170,25 +142,65 @@ public final class PanSolver {
         double sz = Math.sin(decS);
         double cosDecS = Math.cos(decS);
 
-        // Feasibility: |s . e| <= cos(decS) with e depending on RA alone
-        // requires |xi| <= cot|decS| * sqrt(1 + eta^2). Clamp an
-        // infeasible request onto the boundary (with a margin keeping
-        // the declination equation strictly solvable) and solve there.
-        double margin = 1.0 - 1e-9;
-        double bound = margin * (cosDecS / Math.abs(sz))
-                * Math.sqrt(1.0 + eta * eta);
-        boolean constrained = Math.abs(sz) > 1e-15 && Math.abs(xi) > bound;
-        if (constrained) {
-            xi = Math.copySign(bound, xi);
-        }
-        double n = Math.sqrt(1.0 + xi * xi + eta * eta);
+        // What the page asks for, in the sky rather than on the
+        // paper. Everything below this line is spherical geometry
+        // and knows no projection at all.
+        //
+        // This is the whole generalisation, and it is smaller than
+        // the refusal it replaced. The equations were the tangent
+        // plane's only because two quantities were written in its
+        // units: 1/N is the cosine of the angle from the centre, and
+        // xi/N is that offset's eastward part. Every azimuthal
+        // projection has both - it places a direction at a plane
+        // radius that depends on the angle alone, and along the true
+        // bearing - so asking the projection for the angle at a
+        // plane radius says them in any of them. For the tangent
+        // plane the numbers below are exactly 1/N and xi/N again,
+        // which is why nothing about panning a 42-degree page
+        // changed.
+        Offset asked = offsetOf(kind, target);
+        double along = asked.along();
+        double east = asked.east();
+        double north = asked.north();
 
-        // s . e = xi/N with e = (-sin a, cos a, 0):
-        // cos(decS) * sin(raS - a) = xi/N.
-        double sinOffset = xi / (n * cosDecS);
+        // Feasibility: |s . e| <= cos(decS), because e depends on the
+        // centre's right ascension alone and cannot reach further
+        // east of a near-polar grab than that. An infeasible request
+        // has its horizontal component clamped to the boundary - with
+        // a margin keeping the declination equation strictly solvable
+        // - and is solved exactly there, so the sky follows the hand
+        // as far as the chart's geometry allows and tracks the
+        // vertical component in full (PR #76 review).
+        //
+        // The vertical that is tracked in full is the *page's*, so
+        // the clamp holds eta and moves xi, exactly as it always did.
+        // Clamping the offset's northward part instead looks like the
+        // same thing and is not: the along part then takes up the
+        // difference, which moves the page point the reader is
+        // dragging vertically as well. It cost a test to find out,
+        // and the test was right.
+        double margin = 1.0 - 1e-9;
+        double bound = margin * cosDecS;
+        boolean constrained = Math.abs(sz) > 1e-15
+                && Math.abs(east) > bound;
+        PlanePoint request = target;
+        if (constrained) {
+            request = new PlanePoint(
+                    feasibleAcross(kind, target, bound),
+                    target.etaNorth());
+            Offset held = offsetOf(kind, request);
+            along = held.along();
+            east = held.east();
+            north = held.north();
+        }
+
+        // s . e = east with e = (-sin a, cos a, 0):
+        // cos(decS) * sin(raS - a) = east.
+        double sinOffset = east / cosDecS;
         // After the feasibility clamp above this cannot exceed 1 beyond
-        // floating-point rounding (|xi|/N < 1 always holds off the polar
-        // path); anything larger is a solver invariant violation, never
+        // floating-point rounding (an offset's eastward part is at
+        // most one off the polar path); anything larger is a solver
+        // invariant violation, never
         // a quiet no-op. The clamp below absorbs pure rounding at the
         // boundary, where a grab on the horizontal axis lands at exactly
         // 1; every surviving candidate is verified by full reprojection.
@@ -202,21 +214,26 @@ public final class PanSolver {
         double offset = Math.asin(Math.clamp(sinOffset, -1.0, 1.0));
         double[] alphaCandidates = {raS - offset, raS - (Math.PI - offset)};
 
+        // What every candidate is verified against: the page point
+        // actually being solved for, which is the one asked for
+        // unless the clamp moved it.
+        PlanePoint solved = request;
+
         SkyPosition best = null;
         double bestSeparation = Double.MAX_VALUE;
         boolean sawOutOfRangeDeclination = false;
         java.util.List<SkyPosition> verified = new java.util.ArrayList<>(4);
         for (double alpha : alphaCandidates) {
-            // s . c = 1/N: p cos d + sz sin d = 1/N with
+            // s . c = along: p cos d + sz sin d = along with
             // p = sx cos a + sy sin a.
             double p = sx * Math.cos(alpha) + sy * Math.sin(alpha);
             double amplitude = Math.hypot(p, sz);
             if (amplitude < 1e-15
-                    || Math.abs(1.0 / n) > amplitude * (1.0 + 1e-9)) {
+                    || Math.abs(along) > amplitude * (1.0 + 1e-9)) {
                 continue;
             }
             double phase = Math.atan2(sz, p);
-            double acos = Math.acos(Math.clamp((1.0 / n) / amplitude,
+            double acos = Math.acos(Math.clamp(along / amplitude,
                     -1.0, 1.0));
             for (double delta : new double[] {phase + acos, phase - acos}) {
                 if (Math.abs(delta) >= Math.PI / 2.0) {
@@ -228,7 +245,7 @@ public final class PanSolver {
                 SkyPosition candidate = new SkyPosition(
                         (Math.toDegrees(alpha) % 360.0 + 360.0) % 360.0,
                         Math.toDegrees(delta));
-                if (!reprojects(kind, candidate, grabbed, xi, eta)) {
+                if (!reprojects(kind, candidate, grabbed, solved)) {
                     continue;
                 }
                 verified.add(candidate);
@@ -247,7 +264,8 @@ public final class PanSolver {
                         java.util.Locale.ROOT,
                         "pan solver invariant violated: no centre for grab"
                                 + " %s at plane (%.9f, %.9f) and no past-pole"
-                                + " evidence", grabbed, xi, eta));
+                                + " evidence", grabbed, solved.xiEast(),
+                        solved.etaNorth()));
             }
             return new PanSolution(Optional.empty(), constrained, true,
                     false);
@@ -267,11 +285,96 @@ public final class PanSolver {
     /** Full-projection verification of a candidate centre. */
     private static boolean reprojects(ChartProjection kind,
                                       SkyPosition centre, SkyPosition grabbed,
-                                      double xi, double eta) {
+                                      PlanePoint target) {
         var projection = Projections.of(kind, centre);
         var plane = projection.project(grabbed);
         return plane.isPresent()
-                && Math.abs(plane.get().xiEast() - xi) <= PLANE_TOLERANCE
-                && Math.abs(plane.get().etaNorth() - eta) <= PLANE_TOLERANCE;
+                && Math.abs(plane.get().xiEast() - target.xiEast())
+                        <= PLANE_TOLERANCE
+                && Math.abs(plane.get().etaNorth() - target.etaNorth())
+                        <= PLANE_TOLERANCE;
+    }
+
+    /**
+     * A direction from the chart's centre, in the centre's own frame:
+     * how far along the line of sight, how far east, how far north.
+     *
+     * <p>A unit vector, and the one thing a page and the sky can both
+     * say. The plane point is the projection's account of it and the
+     * spherical equations are the sky's, so this is where the two
+     * meet - and it is why the solver below knows no projection.
+     */
+    private record Offset(double along, double east, double north) {
+    }
+
+    /**
+     * The radial law, which belongs to the projection and not to
+     * where it is pointed.
+     *
+     * <p>An azimuthal projection places a direction at a plane radius
+     * that depends on the angle from the centre alone, along the true
+     * bearing. Neither half of that mentions the centre, so any
+     * centre answers - and asking one is how this stays a question
+     * for the projection rather than a formula copied out of it.
+     */
+    private static Projection radially(ChartProjection kind) {
+        return Projections.of(kind, new SkyPosition(0.0, 0.0));
+    }
+
+    /** Which direction from the centre a page point is asking for. */
+    private static Offset offsetOf(ChartProjection kind, PlanePoint target) {
+        double radius = Math.hypot(target.xiEast(), target.etaNorth());
+        if (radius == 0.0) {
+            return new Offset(1.0, 0.0, 0.0);
+        }
+        double angle = Math.toRadians(
+                radially(kind).angleAtPlaneRadius(radius));
+        double across = Math.sin(angle);
+        return new Offset(Math.cos(angle),
+                across * target.xiEast() / radius,
+                across * target.etaNorth() / radius);
+    }
+
+    /**
+     * The furthest across the page this row can ask for: the
+     * horizontal component whose offset is exactly at the feasibility
+     * bound, at the vertical the reader is holding.
+     *
+     * <p>Found by bisection, and that is a smaller admission than it
+     * looks. The bound is a statement about the sky - how far east of
+     * a near-polar grab a centre can put its own east vector - and
+     * where it falls on the paper is whatever the projection's radial
+     * law says. For the tangent plane the answer is
+     * {@code cot|dec| * sqrt(1 + eta^2)}, which is the closed form
+     * this replaced and which it reproduces to the last bit; for the
+     * next projection it would be different algebra for the same
+     * sentence, which is exactly the copying the projection boundary
+     * exists to stop.
+     *
+     * <p>What is solved afterwards is closed form, and every
+     * candidate is verified by full reprojection against the clamped
+     * point. This only decides where the boundary is.
+     *
+     * <p>The eastward part rises with the horizontal component over
+     * every page the atlas draws - it turns over only past two plane
+     * units under the overview's projection, where the widest rung
+     * reaches 1.16 - so the interval below brackets the boundary.
+     */
+    private static double feasibleAcross(ChartProjection kind,
+                                         PlanePoint target, double bound) {
+        double wanted = Math.abs(target.xiEast());
+        double low = 0.0;
+        double high = wanted;
+        for (int step = 0; step < 100; step++) {
+            double middle = 0.5 * (low + high);
+            double east = Math.abs(offsetOf(kind, new PlanePoint(middle,
+                    target.etaNorth())).east());
+            if (east > bound) {
+                high = middle;
+            } else {
+                low = middle;
+            }
+        }
+        return Math.copySign(low, target.xiEast());
     }
 }

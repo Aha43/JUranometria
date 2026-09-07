@@ -175,10 +175,13 @@ class SheetPageJourneyTest {
                                 .fieldWidthDegrees()),
                         "and the press lands on " + expected);
             }
-            assertFalse(out.isEnabled(),
-                    "2. the sheet page is the end of the sequence, and"
-                            + " the control says so rather than sitting"
-                            + " there dead");
+            // The sheet page was the end of the sequence until #299
+            // put the overview's three rungs above it. The reader
+            // stops here because this is the page they came for, not
+            // because the control ran out.
+            assertTrue(out.isEnabled(),
+                    "2. there is more sky beyond the sheet page now,"
+                            + " and the control says so");
 
             ChartScene sheet = onEdt(chart::currentScene);
             assertEquals(42.0, sheet.viewport().fieldWidthDegrees(),

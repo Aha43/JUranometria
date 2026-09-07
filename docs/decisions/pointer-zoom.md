@@ -43,12 +43,66 @@ A pointer-zoom step is accepted **only when it is exact and
 immediately reversible at the same pointer** (PR #127 review):
 
 1. the forward solve must be **exact** — not constrained, not
-   past-pole, not ambiguous;
+   past-pole, and not a **branch switch** (below);
 2. the **reverse is preflighted**: the opposite step at the same
    pixel must be equally exact and must restore the original centre
    within the stated tolerance (one extra ~2 µs solve);
 3. the candidate state must pass the same coverage predicate as
    every navigation.
+
+### Amended by #299: ambiguity, and what it was standing in for
+
+The rule above read **not ambiguous** until Sprint 30. That was
+measured on pages up to 36° wide, where the only ambiguous pointers
+were near-polar ones anchoring sky beyond the pole — and on those
+pages, refusing every ambiguous step and refusing every wrong branch
+are the same rule.
+
+They stop being the same rule at the overview's fields. A corner of a
+120° page anchors sky **72° from the centre**, and the centre
+equation has a second exact root on the far side of the sky for
+almost every off-centre pointer there. Keeping the blanket refusal
+would have quietly stopped the wheel working on exactly the pages
+#299 adds, while the projection gate's whole navigation decision is
+that the overview is *the same operations* on another rung.
+
+So the refusal now tests a property of the step rather than the
+existence of a second root. **The accepted centre must be no further
+from the previous one than the anchor is.** The anchor's own offset
+is the distance the centre would travel if the pointer ended at the
+page's middle, so it is the largest honest step this gesture has: a
+root beyond it is a jump, not a zoom.
+
+That is a bound on the step's **length**, and it is stated that
+narrowly on purpose. A first draft of this claimed the centre "moves
+towards the anchor and never past it", and a review was right that
+the code does not enforce direction. It cannot usefully: every
+candidate the solver returns has already been verified by full
+reprojection, so *every* one of them puts the anchor at exactly the
+offset the target asks for. A wrong root is wrong about where the
+page ends up, not about where the anchor lands — and how far the
+centre had to travel is the one thing that separates them.
+
+It still refuses the near-polar case this decision was written for,
+where the two roots straddle the pole and the far one lies beyond
+it.
+
+Measured over 1,248 steps — every adjacent rung, in both directions,
+at eight centres and seven pointers:
+
+| | steps |
+|---|---:|
+| refused before, accepted now — **overview rungs** | 31 |
+| refused before, accepted now — **released fields** | 24 |
+| still refused as a branch switch | 3 |
+
+The 24 are a **change to released behaviour** and are named here
+rather than buried: at fields a reader has today, 24 of these wheel
+notches did nothing and now zoom. Every one of them keeps the sky
+under the pointer and passes the same reversal preflight as any other
+accepted step; what changed is that "a second root exists somewhere"
+is no longer read as "this step is unsafe". No page's pixels change,
+and the released-page oracle is byte-identical.
 
 Anything else **refuses**: chart unchanged, wheel inert at that
 pointer, and toolbar/keyboard centre zoom always available. The

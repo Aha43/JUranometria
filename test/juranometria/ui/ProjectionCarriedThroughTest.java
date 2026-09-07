@@ -43,6 +43,11 @@ class ProjectionCarriedThroughTest {
 
     private static final SkyPosition ORION = new SkyPosition(83.0, 0.0);
 
+    /** The narrowest rung the overview draws, and the widest the
+     *  atlas's own does: the two sides of the ladder's one seam. */
+    private static final double OVERVIEW = 60.0;
+    private static final double SHEET = 42.0;
+
     private static ChartScene sceneDrawnBy(ChartProjection kind,
                                            double field) {
         return Atlas.assembler().assemble(
@@ -53,7 +58,7 @@ class ProjectionCarriedThroughTest {
     @Test
     void theStateCarriesItsProjectionIntoTheScene() {
         assertEquals(ChartProjection.STEREOGRAPHIC,
-                sceneDrawnBy(ChartProjection.STEREOGRAPHIC, 42.0)
+                sceneDrawnBy(ChartProjection.STEREOGRAPHIC, OVERVIEW)
                         .viewport().projection(),
                 "the scene is drawn by the projection the state chose");
         assertEquals(ChartProjection.GNOMONIC,
@@ -87,25 +92,15 @@ class ProjectionCarriedThroughTest {
         // would still draw a page, still be centred where the reader
         // left it, and still be wrong.
         //
-        // The state below is a mechanism, not a chart anyone is
-        // offered. The gate decided that which projection draws a
-        // page is a property of the field, and the fields it pairs
-        // the overview with - 60, 90 and 120 degrees - are not on
-        // the ladder until issue #299 puts them there. A second
-        // review was right that asserting an overview at eight
-        // degrees reads as a claim that such a page is legitimate.
-        // It is not one: what is asserted here is only that a
-        // transition preserves the state it was handed, whatever
-        // that state is, which is a property of the transition and
-        // not of the pairing. #299 owes the pairing, and until it
-        // arrives nothing constructs one of these but a test.
-        ChartViewState overview = new ChartViewState(ORION, 8.0, 6.0,
-                null, null, ChartProjection.STEREOGRAPHIC);
+        // The overview is a page a reader can reach now (#299), so
+        // this is no longer a mechanism held up for inspection. What
+        // it holds is the rule read twice: a transition that keeps
+        // the field keeps the projection, and a transition that
+        // changes the field takes the new field's.
+        ChartViewState overview = new ChartViewState(ORION, 90.0, 6.0);
+        assertEquals(ChartProjection.STEREOGRAPHIC, overview.projection(),
+                "a 90-degree page is the overview's");
 
-        assertEquals(ChartProjection.STEREOGRAPHIC,
-                overview.zoomIn().projection(), "zooming in");
-        assertEquals(ChartProjection.STEREOGRAPHIC,
-                overview.zoomOut().projection(), "zooming out");
         assertEquals(ChartProjection.STEREOGRAPHIC,
                 overview.increaseMagnitudeLimit().projection(),
                 "reaching fainter");
@@ -121,8 +116,20 @@ class ProjectionCarriedThroughTest {
                         "a target", "NGC 1").projection(),
                 "recentring on a target");
         assertEquals(ChartProjection.STEREOGRAPHIC,
+                overview.zoomOut().projection(),
+                "and a wider rung is still the overview's");
+
+        // And the seam of the ladder, which is the one step where it
+        // changes: 60 degrees is the overview's narrowest and 42 is
+        // the atlas's own widest.
+        assertEquals(ChartProjection.GNOMONIC,
+                overview.zoomIn().zoomIn().projection(),
+                "zooming in through 60 reaches the sheet page");
+        assertEquals(SHEET,
+                overview.zoomIn().zoomIn().fieldWidthDegrees());
+        assertEquals(ChartProjection.GNOMONIC,
                 overview.withFieldWidth(24.0).projection(),
-                "and changing field outright");
+                "and changing field outright takes the new field's");
 
         // Home is the one transition that is meant to change it,
         // because Home is not a transition from this chart at all -
@@ -207,21 +214,24 @@ class ProjectionCarriedThroughTest {
     }
 
     @Test
-    void nothingInTheAtlasPairsAFieldWithAProjectionYet() {
-        // Said out loud, so that the state above cannot be mistaken
-        // for a policy. Every field on the ladder is drawn by the
-        // atlas's own projection, and the overview's rungs are not
-        // on the ladder at all: issue #299 adds them and pairs them.
+    void everyRungIsPairedWithTheProjectionThatDrawsIt() {
+        // The pairing #297 deliberately did not make, because the
+        // rungs that need a second projection did not exist. Every
+        // released field is still the atlas's own, and the three
+        // rungs above the sheet page are the overview's.
         for (double field : ChartViewState.fieldWidthSteps()) {
-            assertEquals(ChartProjection.GNOMONIC,
+            ChartProjection expected = field > SHEET
+                    ? ChartProjection.STEREOGRAPHIC
+                    : ChartProjection.GNOMONIC;
+            assertEquals(expected,
                     new ChartViewState(ORION, field, 6.0).projection(),
-                    field + " degrees is drawn by the atlas's own"
-                            + " projection, as every released field is");
+                    field + " degrees");
         }
-        assertTrue(ChartViewState.fieldWidthSteps().stream()
-                        .allMatch(field -> field <= 42.0),
-                "and the ladder stops at 42 degrees until #299 widens"
-                        + " it: " + ChartViewState.fieldWidthSteps());
+        // And it is not a preference a caller can override.
+        assertThrows(IllegalArgumentException.class,
+                () -> new ChartViewState(ORION, 8.0, 6.0, null, null,
+                        ChartProjection.STEREOGRAPHIC),
+                "there is no projection menu, now or later");
     }
 
     @Test
@@ -250,7 +260,7 @@ class ProjectionCarriedThroughTest {
         BufferedImage tangent = draw(sceneDrawnBy(
                 ChartProjection.GNOMONIC, 42.0), options);
         BufferedImage overview = draw(sceneDrawnBy(
-                ChartProjection.STEREOGRAPHIC, 42.0), options);
+                ChartProjection.STEREOGRAPHIC, OVERVIEW), options);
 
         int differing = 0;
         for (int y = 0; y < 700; y += 3) {
@@ -271,7 +281,7 @@ class ProjectionCarriedThroughTest {
         // is checked against the projection the scene names, so a
         // page drawn by one projection and placed by another would
         // fail here rather than merely look odd.
-        ChartScene scene = sceneDrawnBy(ChartProjection.STEREOGRAPHIC, 42.0);
+        ChartScene scene = sceneDrawnBy(ChartProjection.STEREOGRAPHIC, OVERVIEW);
         Projection projection = Projections.forViewport(scene.viewport());
         var mapping = new juranometria.project.ViewportMapping(
                 scene.viewport());
@@ -309,7 +319,8 @@ class ProjectionCarriedThroughTest {
         // Held as a round trip through the chart: what the projection
         // puts at a pixel is what pointing at that pixel returns.
         for (ChartProjection kind : ChartProjection.values()) {
-            ChartScene scene = sceneDrawnBy(kind, 42.0);
+            ChartScene scene = sceneDrawnBy(kind,
+                    kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW);
             Projection projection =
                     Projections.forViewport(scene.viewport());
             var mapping = new juranometria.project.ViewportMapping(
@@ -386,49 +397,77 @@ class ProjectionCarriedThroughTest {
                     .skyFromPlane(kind, ORION, pointer);
             PlanePoint after = new PlanePoint(
                     pointer.xiEast() * scale, pointer.etaNorth() * scale);
-            if (kind == ChartProjection.GNOMONIC) {
-                SkyPosition moved = ChartViewController
-                        .solveExactReversible(kind, ORION, from, to,
-                                pointer)
-                        .orElseThrow(() -> new AssertionError(
-                                "a reversible pointer zoom"));
-                // Measured in pixels, which is the unit the atlas
-                // makes this promise in and the reason it can keep
-                // it: the pan solver accepts a centre whose
-                // reprojection lands within 1e-6 plane units, so a
-                // residual of about a millionth of a degree is the
-                // solver's own tolerance rather than noise. Asserted
-                // in degrees at 1e-9 this passed on one platform and
-                // failed on another - a stricter promise than the
-                // atlas makes, which is not a better test but a
-                // flakier one. PointerZoomControllerTest holds the
-                // released path to a hundredth of a pixel; so does
-                // this.
-                double driftDegrees = under.separationDegrees(
-                        juranometria.project.PanSolver
-                                .skyFromPlane(kind, moved, after));
-                double driftPixels = narrowMapping.pixelsPerPlaneUnit()
-                        * Math.toRadians(driftDegrees);
-                assertTrue(driftPixels < 1.0e-2,
-                        "the star under the pointer is still under it"
-                                + " after the zoom: " + driftPixels
-                                + " px (" + driftDegrees + " degrees)");
-            } else {
-                // The pan centre solver solves the tangent plane's
-                // own equations, and says so rather than returning
-                // "no solution" - which the chart would read as a pan
-                // that could not be made rather than as a solver that
-                // cannot do this. Generalising it belongs to #299,
-                // the issue that first makes such a page pannable.
-                IllegalStateException refused = assertThrows(
-                        IllegalStateException.class,
-                        () -> ChartViewController.solveExactReversible(
-                                kind, ORION, from, to, pointer));
-                assertTrue(refused.getMessage().contains("#299"),
-                        "and names what would generalise it: "
-                                + refused.getMessage());
-            }
+            // The pan centre solver answers for both projections
+            // now (#299). It solved the tangent plane's own
+            // equations and refused everything else, naming this
+            // issue; what generalised it was noticing that the two
+            // quantities written in the tangent plane's units - the
+            // cosine of the angle from the centre, and that offset's
+            // eastward part - are things every azimuthal projection
+            // can be asked for.
+            SkyPosition moved = ChartViewController
+                    .solveExactReversible(kind, kind, ORION, from, to,
+                            pointer)
+                    .orElseThrow(() -> new AssertionError(
+                            kind + ": a reversible pointer zoom"));
+            // Measured in pixels, which is the unit the atlas
+            // makes this promise in and the reason it can keep
+            // it: the pan solver accepts a centre whose
+            // reprojection lands within 1e-6 plane units, so a
+            // residual of about a millionth of a degree is the
+            // solver's own tolerance rather than noise. Asserted
+            // in degrees at 1e-9 this passed on one platform and
+            // failed on another - a stricter promise than the
+            // atlas makes, which is not a better test but a
+            // flakier one. PointerZoomControllerTest holds the
+            // released path to a hundredth of a pixel; so does
+            // this.
+            double driftDegrees = under.separationDegrees(
+                    juranometria.project.PanSolver
+                            .skyFromPlane(kind, moved, after));
+            double driftPixels = narrowMapping.pixelsPerPlaneUnit()
+                    * Math.toRadians(driftDegrees);
+            assertTrue(driftPixels < 1.0e-2,
+                    kind + ": the star under the pointer is still"
+                            + " under it after the zoom: " + driftPixels
+                            + " px (" + driftDegrees + " degrees)");
         }
+
+        // And across the one step where the projection changes,
+        // which no single-projection check can see. Each page is
+        // read by its own: the pointer is a plane point on the page
+        // being left and the target is the same pixel on the page
+        // being entered, and those are different plane points.
+        var sheet = new ChartViewport(ORION, SHEET, 900, 700);
+        var overview = new ChartViewport(ORION, OVERVIEW, 900, 700);
+        var sheetMapping = new juranometria.project.ViewportMapping(sheet);
+        var overviewMapping =
+                new juranometria.project.ViewportMapping(overview);
+        juranometria.project.PixelPoint corner = new juranometria.project.PixelPoint(780.0, 620.0);
+        PlanePoint onSheet = juranometria.project.PanSolver
+                .planeFromPixel(sheet, corner);
+        SkyPosition star = juranometria.project.PanSolver
+                .skyFromPlane(sheet, onSheet);
+        SkyPosition after = ChartViewController.solveExactReversible(
+                        ChartProjection.GNOMONIC,
+                        ChartProjection.STEREOGRAPHIC, ORION, SHEET,
+                        OVERVIEW, onSheet)
+                .orElseThrow(() -> new AssertionError(
+                        "zooming out of the sheet page onto the"
+                                + " overview is a reversible step"));
+        juranometria.project.PixelPoint landed = new juranometria.project.ViewportMapping(
+                new ChartViewport(after, OVERVIEW, 900, 700))
+                .toPixel(Projections.of(ChartProjection.STEREOGRAPHIC,
+                        after).project(star).orElseThrow());
+        assertTrue(Math.hypot(landed.x() - corner.x(),
+                        landed.y() - corner.y()) < 1.0e-2,
+                "the star stays under the pointer across the rung"
+                        + " where the projection changes: " + landed
+                        + " against " + corner);
+        assertTrue(overviewMapping.pixelsPerPlaneUnit()
+                        != sheetMapping.pixelsPerPlaneUnit(),
+                "and the two pages really are drawn at different"
+                        + " scales, so the step is not a no-op");
     }
 
     @Test
@@ -442,7 +481,8 @@ class ProjectionCarriedThroughTest {
         // position at the middle of the chart is at the middle of
         // the page, exactly, whichever projection drew it.
         for (ChartProjection kind : ChartProjection.values()) {
-            ChartScene scene = sceneDrawnBy(kind, 42.0);
+            ChartScene scene = sceneDrawnBy(kind,
+                    kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW);
             Projection projection =
                     Projections.forViewport(scene.viewport());
             var mapping = new juranometria.project.ViewportMapping(
@@ -463,7 +503,7 @@ class ProjectionCarriedThroughTest {
         // on it would be in the wrong place by an amount no eye
         // catches at the centre. They agree there, and must not
         // agree at the edge.
-        ChartScene scene = sceneDrawnBy(ChartProjection.STEREOGRAPHIC, 42.0);
+        ChartScene scene = sceneDrawnBy(ChartProjection.STEREOGRAPHIC, OVERVIEW);
         SkyPosition nearTheEdge = new SkyPosition(
                 ORION.raDegrees() + 20.0, 12.0);
         PlanePoint overview = Projections

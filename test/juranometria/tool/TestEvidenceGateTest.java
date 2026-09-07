@@ -481,7 +481,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 31,
+        assertTrue(doClick <= 32,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -508,7 +508,11 @@ class TestEvidenceGateTest {
                         + " helper with its premises proven, in the"
                         + " same file; and #287's closing journey"
                         + " reaches the export item by the recorded"
-                        + " menu convention: " + doClick);
+                        + " menu convention; and #299's overview"
+                        + " journey reaches the Inspector item by the"
+                        + " same one, on its way to pressing Center"
+                        + " here on an object it selected by clicking"
+                        + " the overview: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

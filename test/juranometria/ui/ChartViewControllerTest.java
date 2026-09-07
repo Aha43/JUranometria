@@ -45,11 +45,15 @@ class ChartViewControllerTest {
         controller.onChange(seen::add);
 
         while (controller.state().canZoomOut()) {
-            controller.zoomOut();             // walk to the 36-degree bound
+            controller.zoomOut();             // walk to the widest rung
         }
         int afterWalk = seen.size();
-        controller.zoomOut();                 // already at 36 degrees
-        controller.increaseMagnitudeLimit();  // already at V 8.0
+        controller.zoomOut();                 // already at 120 degrees
+        // And already at V 4.0, because the widest rung arrives at
+        // its own limit: a 120-degree page at the atlas's own V 8.0
+        // is half ink (#299). Brighter is the bound there, where
+        // fainter used to be.
+        controller.decreaseMagnitudeLimit();
         assertEquals(afterWalk, seen.size(),
                 "bounded no-op transitions notify nobody");
         controller.reset();

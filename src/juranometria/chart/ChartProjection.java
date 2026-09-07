@@ -39,4 +39,37 @@ public enum ChartProjection {
     public String displayName() {
         return displayName;
     }
+
+    /**
+     * The widest field the atlas's own projection draws.
+     *
+     * <p>The 42-degree sheet page, which is where the tangent plane's
+     * corner distortion stops being a price worth paying
+     * (docs/decisions/printable-chart.md). Everything wider is the
+     * overview's.
+     */
+    public static final double WIDEST_TANGENT_FIELD_DEGREES = 42.0;
+
+    /**
+     * Which projection draws a page of this width.
+     *
+     * <p>A property of the field, not a setting: there is no
+     * projection menu, now or later, because a reader who wanted "the
+     * stereographic view" would be a reader who had been told about a
+     * problem they do not have
+     * (docs/decisions/overview-projection.md). The overview is the
+     * field ladder continued, and the projection changes with the
+     * rung because past 42 degrees the tangent plane has nothing left
+     * to offer - at a 90-degree corner it is 61 per cent out of
+     * shape, and it cannot reach 90 degrees from its centre at any
+     * price.
+     *
+     * <p>Sprint 30, issue #299. Issue #297 built the two projections
+     * and deliberately left them uncoupled, because the rungs that
+     * need the second one did not exist yet.
+     */
+    public static ChartProjection forField(double fieldWidthDegrees) {
+        return fieldWidthDegrees > WIDEST_TANGENT_FIELD_DEGREES
+                ? STEREOGRAPHIC : GNOMONIC;
+    }
 }
