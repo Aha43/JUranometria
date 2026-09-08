@@ -199,6 +199,33 @@ class LabelPlacementTest {
     }
 
     @Test
+    void theGuaranteeIsAgainstCollisionsAndNotAgainstThePaper() {
+        // A searched target's label may be written over anything on
+        // the page. It may not be written half off it: a word cut
+        // short is very often another word, and the atlas would be
+        // naming the wrong thing at the edge, where a reader matching
+        // a chart against the sky is most likely to be working.
+        Shape everywhere = new Rectangle2D.Double(0, 0, WIDE, HIGH);
+        LabelPlacement placement = placementWith(mark("all", everywhere));
+
+        LabelPlacement.Placement overEverything = placement.place(
+                new LabelPlacement.Request(LabelPlacement.Family.TARGET,
+                        "target", "target", 50, 50,
+                        List.of(box(40, 40)), null, null, true, 0.0));
+        assertEquals(0, overEverything.candidate(),
+                "it is written over whatever is there");
+
+        LabelPlacement.Placement offThePage = placement.place(
+                new LabelPlacement.Request(LabelPlacement.Family.TARGET,
+                        "edge", "edge", 0, 0,
+                        List.of(new Rectangle2D.Double(WIDE - 5, 10, 20,
+                                10)), null, null, true, 0.0));
+        assertTrue(offThePage.omitted(), "and not half off the page");
+        assertEquals(LabelPlacement.Refusal.PAGE_EDGE,
+                offThePage.refusals().get(0).kind());
+    }
+
+    @Test
     void theGuaranteedLabelTakesItsPlaceAndKeepsIt() {
         // The one label that is promised a position. It is placed
         // before anything else and its box joins the accepted set, so

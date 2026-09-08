@@ -293,7 +293,19 @@ public final class LabelPlacement {
     public Placement place(Request request) {
         List<Refused> refusals = new ArrayList<>();
         if (request.guaranteed()) {
-            return accept(request, 0, refusals, false);
+            // The guarantee is against collisions, not against the
+            // paper. A searched target's name may be written over
+            // anything on the page; it may not be written half off it,
+            // because half a designation is another object's.
+            for (int at = 0; at < request.candidates().size(); at++) {
+                if (!leavesThePaper(request.candidates().get(at))) {
+                    return accept(request, at, refusals, false);
+                }
+                refusals.add(new Refused(at, Refusal.PAGE_EDGE,
+                        "the paper"));
+            }
+            return new Placement(request, null, -1,
+                    List.copyOf(refusals), true);
         }
         for (int at = 0; at < request.candidates().size(); at++) {
             Refused refused = refuse(request, at);
@@ -326,9 +338,7 @@ public final class LabelPlacement {
     /** What refuses this candidate, or null when nothing does. */
     private Refused refuse(Request request, int at) {
         Rectangle2D box = request.candidates().get(at);
-        if (box.getMinX() < EDGE_MARGIN_PX || box.getMinY() < EDGE_MARGIN_PX
-                || box.getMaxX() > paper.getMaxX() - EDGE_MARGIN_PX
-                || box.getMaxY() > paper.getMaxY() - EDGE_MARGIN_PX) {
+        if (leavesThePaper(box)) {
             return new Refused(at, Refusal.PAGE_EDGE, "the paper");
         }
         if (request.owns() != null && !request.owns().intersects(box)) {
@@ -353,6 +363,26 @@ public final class LabelPlacement {
             }
         }
         return null;
+    }
+
+    /**
+     * Whether a box would put text over the paper's edge.
+     *
+     * <p>No text is clipped by the page, whatever family it belongs
+     * to, because a word cut short is very often another word: three
+     * of the constellations the bundled pack draws become a different
+     * constellation when their name is cut - SAGITTARIUS reads
+     * SAGITTA, LEO MINOR reads LEO, TRIANGULUM AUSTRALE reads
+     * TRIANGULUM - and 35,057 truncations of the deep-sky labels the
+     * gate's corpus carries are another object's label. A page that shows half a name is not untidy;
+     * it is a page that says something false
+     * (docs/decisions/label-placement.md).
+     */
+    private boolean leavesThePaper(Rectangle2D box) {
+        return box.getMinX() < EDGE_MARGIN_PX
+                || box.getMinY() < EDGE_MARGIN_PX
+                || box.getMaxX() > paper.getMaxX() - EDGE_MARGIN_PX
+                || box.getMaxY() > paper.getMaxY() - EDGE_MARGIN_PX;
     }
 
     /**

@@ -98,7 +98,7 @@ around the chart and not the chart. What does change placement is the room:
 | searched target | the target's own mark | exempt from every magnitude threshold | no | never omitted; drawn first and reserves its box | page rectangle | 8 | none: a target is always named |
 | star name, letter, number | east of the star's disc at its magnitude radius | `StarLabelPolicy` limits by field band | no | omitted when its box meets an accepted box | refused off-page | 8 | Star names, Bayer letters, Flamsteed numbers |
 | deep-sky label | east of the symbol's own half-extent | `RegionalDetailPolicy` | no | never: it is placed before star labels and they yield to it | none | 9 | Deep-sky labels |
-| constellation name | centroid of the constellation's **visible figure ink** | a figure that leaves ink | no | never omitted | clips at the page edge by decision | 4 | Constellation names, and figures |
+| constellation name | centroid of the constellation's **visible figure ink** | a figure that leaves ink | no | never omitted | clipped at the page edge until #313 | 4 | Constellation names, and figures |
 | equatorial grid notation | the page edge the line leaves by | spacing policy | no | omitted when it meets the title block or key | kept inside the paper | 1 | Equatorial grid |
 | meridian, horizon, ecliptic names | the upper end of the curve's own run | the module's | down the edge, past names already written | omitted when there is no room left below | paper rectangle | 5 | the module's own control |
 | title block, magnitude key | the page's own corners | the reader's switch | no | omitted when the page is too small | none | 10, 11 | Title block, Magnitude key |
@@ -415,6 +415,61 @@ thirty at Sagittarius, seven of twenty-seven at 120 degrees. With it, none does
 anywhere, and the collision count is a little higher. That is the whole trade: the
 rule costs a name the occasional candidate and buys the guarantee that a name is
 written across the thing it names.
+
+## A word cut short is another word
+
+The atlas draws a label whose box runs off the paper and lets the page cut it.
+The rule for constellation names says so in as many words - *honest position over
+pretty placement* - and it treats clipping as a matter of tidiness.
+
+It is not. Of the constellations the bundled pack draws, these become a **different
+constellation** when the page cuts their name:
+
+```
+LEO MINOR              cut short reads   LEO
+SAGITTARIUS            cut short reads   SAGITTA
+TRIANGULUM AUSTRALE    cut short reads   TRIANGULUM
+```
+
+And of the 12635 deep-sky labels these pages carry, **35057 truncations are another
+object's own label** - every `IC 1203` cut to `IC 1`, every `NGC 2024` cut to
+`NGC 202`. A clipped label is not an untidy page. It is a page that names the
+wrong thing, at the edge, where a reader matching a chart against the sky is
+most likely to be working.
+
+How often the atlas does it today, counted over the corpus:
+
+| page | star names | deep-sky labels |
+|---|---:|---:|
+| `home` | 0 | 1 |
+| `orion-08` | 1 | 0 |
+| `orion-18` | 0 | 10 |
+| `orion-36` | 0 | 1 |
+| `orion-42` | 1 | 1 |
+| `orion-60` | 0 | 2 |
+| `orion-90` | 0 | 2 |
+| `orion-120` | 1 | 1 |
+| `sagittarius-90` | 2 | 0 |
+| `sagittarius-120` | 1 | 0 |
+| `cygnus-90` | 1 | 1 |
+| `crux-90` | 2 | 0 |
+| `pole-120` | 2 | 7 |
+| `seam-120` | 2 | 3 |
+| `orion-120-small` | 3 | 1 |
+| `orion-42-a4` | 0 | 1 |
+| `orion-42-letter` | 0 | 1 |
+| `orion-90-black` | 0 | 2 |
+| `sagittarius-90-key` | 2 | 0 |
+| `sagittarius-90-ecliptic` | 2 | 0 |
+| `orion-90-observer` | 0 | 2 |
+| `nunki-searched` | 1 | 0 |
+| `orion-18-selected` | 0 | 10 |
+| **all 23 pages** | **21** | **46** |
+
+So the decision is that no text is clipped by the page, in any family: a label
+that cannot be drawn whole is not drawn, and the placement records which candidates
+the paper refused. The mark is still there, unnamed - which is what the page does to
+every star below its limit, without apology.
 
 ## The seam against this study
 

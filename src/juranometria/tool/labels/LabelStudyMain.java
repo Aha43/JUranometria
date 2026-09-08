@@ -62,6 +62,7 @@ public final class LabelStudyMain {
         observedDefects(out, corpus, censuses);
         fixture(out);
         candidates(out, corpus, censuses);
+        clipping(out, corpus);
         seamAgreement(out, corpus);
         stability(out);
         exportSection(out);
@@ -212,7 +213,7 @@ public final class LabelStudyMain {
         out.append("| constellation name | centroid of the"
                 + " constellation's **visible figure ink** | a figure"
                 + " that leaves ink | no | never omitted |"
-                + " clips at the page edge by decision | 4 |"
+                + " clipped at the page edge until #313 | 4 |"
                 + " Constellation names, and figures |\n");
         out.append("| equatorial grid notation | the page edge the"
                 + " line leaves by | spacing policy | no |"
@@ -961,6 +962,133 @@ public final class LabelStudyMain {
             case DEEP_SKY -> Family.DEEP_SKY_LABEL;
             case CONSTELLATION -> Family.CONSTELLATION_NAME;
         };
+    }
+
+    /**
+     * What clipping a label at the page edge actually costs, which is
+     * not tidiness.
+     */
+    private static void clipping(StringBuilder out,
+                                 List<StudyPages.Look> corpus) {
+        out.append("## A word cut short is another word\n\n");
+        out.append("The atlas draws a label whose box runs off the paper"
+                + " and lets the page cut it.\nThe rule for"
+                + " constellation names says so in as many words -"
+                + " *honest position over\npretty placement* - and it"
+                + " treats clipping as a matter of tidiness.\n\n");
+        out.append("It is not. Of the constellations the bundled pack"
+                + " draws, these become a **different\nconstellation**"
+                + " when the page cuts their name:\n\n");
+        out.append("```\n");
+        java.util.Set<String> names = new java.util.TreeSet<>();
+        for (StudyPages.Look look : corpus) {
+            for (String name
+                    : look.page().scene().geography().latinNames()
+                            .values()) {
+                names.add(name.toUpperCase(Locale.ROOT));
+            }
+        }
+        int nameClashes = 0;
+        for (String name : names) {
+            for (int cut = 3; cut < name.length(); cut++) {
+                String head = name.substring(0, cut).trim();
+                if (names.contains(head) && !head.equals(name)) {
+                    out.append(String.format(Locale.ROOT,
+                            "%-22s cut short reads   %s%n", name, head));
+                    nameClashes++;
+                    break;
+                }
+            }
+        }
+        out.append("```\n\n");
+        java.util.Set<String> labels = new java.util.TreeSet<>();
+        for (StudyPages.Look look : corpus) {
+            for (var dso : look.page().scene().deepSkyObjects()) {
+                labels.add(ChartRenderer.labelTextFor(dso));
+            }
+        }
+        int labelClashes = 0;
+        for (String label : labels) {
+            for (int cut = 4; cut < label.length(); cut++) {
+                if (labels.contains(label.substring(0, cut).trim())) {
+                    labelClashes++;
+                }
+            }
+        }
+        out.append(String.format(Locale.ROOT,
+                "And of the %d deep-sky labels these pages carry, **%d"
+                        + " truncations are another\nobject's own"
+                        + " label** - every `IC 1203` cut to `IC 1`,"
+                        + " every `NGC 2024` cut to\n`NGC 202`. A"
+                        + " clipped label is not an untidy page. It is a"
+                        + " page that names the\nwrong thing, at the"
+                        + " edge, where a reader matching a chart"
+                        + " against the sky is\nmost likely to be"
+                        + " working.\n\n", labels.size(),
+                labelClashes));
+        out.append("How often the atlas does it today, counted over the"
+                + " corpus:\n\n");
+        out.append("| page | star names | deep-sky labels |\n");
+        out.append("|---|---:|---:|\n");
+        var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
+        int stars = 0;
+        int deepSky = 0;
+        for (StudyPages.Look look : corpus) {
+            Page page = look.page();
+            var mapping = new juranometria.project.ViewportMapping(
+                    page.scene().viewport());
+            var projection = juranometria.project.Projections.forViewport(
+                    page.scene().viewport());
+            var detail = new juranometria.render.RegionalDetailPolicy(
+                    page.scene(), mapping.pixelsPerPlaneUnit());
+            int starsHere = 0;
+            for (var placement : Page.renderer().starLabelPlacements(
+                    metrics, page.scene(), page.options(), detail,
+                    projection, mapping)) {
+                if (offThePaper(placement.box(), page)) {
+                    starsHere++;
+                }
+            }
+            int deepSkyHere = 0;
+            for (var mark : Page.renderer().drawnMarks(page.scene(),
+                    page.options())) {
+                if (mark.deepSky() == null) {
+                    continue;
+                }
+                var plane = projection.project(mark.deepSky().position());
+                if (plane.isEmpty()) {
+                    continue;
+                }
+                if (offThePaper(ChartRenderer.labelBounds(metrics,
+                        mark.deepSky(), mapping.toPixel(plane.get()),
+                        mapping.pixelsPerPlaneUnit()), page)) {
+                    deepSkyHere++;
+                }
+            }
+            stars += starsHere;
+            deepSky += deepSkyHere;
+            if (starsHere + deepSkyHere > 0) {
+                out.append(String.format(Locale.ROOT, "| `%s` | %d | %d |%n",
+                        page.slug(), starsHere, deepSkyHere));
+            }
+        }
+        out.append(String.format(Locale.ROOT,
+                "| **all %d pages** | **%d** | **%d** |%n", corpus.size(),
+                stars, deepSky));
+        out.append("\nSo the decision is that no text is clipped by the"
+                + " page, in any family: a label\nthat cannot be drawn"
+                + " whole is not drawn, and the placement records which"
+                + " candidates\nthe paper refused. The mark is still"
+                + " there, unnamed - which is what the page does to"
+                + "\nevery star below its limit, without apology."
+                + "\n\n");
+    }
+
+    private static boolean offThePaper(java.awt.geom.Rectangle2D box,
+                                       Page page) {
+        return box.getMinX() < 0 || box.getMinY() < 0
+                || box.getMaxX() > page.wide()
+                || box.getMaxY() > page.high();
     }
 
     private static void stability(StringBuilder out) {

@@ -231,15 +231,53 @@ least-bad candidate may pay.
 
 Which leaves one case, and it is the only omission this decision has:
 **a request every one of whose candidates leaves the paper or its own
-figure is not drawn.** It is never silent - the placement carries a
+figure is not drawn.** It is never silent — the placement carries a
 refusal for every candidate it had, and says which of the two refused
-it. On a real page it is the edge's business: a star close enough to
-the margin that all eight of its positions fall off the paper, or a
-deep-sky object whose symbol straddles the edge while its label would
-not land on the page at all. The atlas today draws such a label
-clipped by the page; this decision says text keeps two pixels clear of
-the edge, so the seam omits it and reports it. Which of the two a
-reader gets is `#314`'s to settle when the families migrate.
+it.
+
+### Nothing is clipped by the page edge
+
+This one is a change, it applies to **every** family including the
+one that has a rule saying otherwise, and it is a decision rather than
+a preference.
+
+The atlas today draws a label whose box runs off the paper and lets
+the page cut it: measured over five centres and nine fields, that is
+up to one star name, ten deep-sky labels and two constellation names
+per page, and it happens on released pages as well as on the overview.
+The rule for constellation names was written down as *names may clip
+at page edges — honest position over pretty placement*, which treats
+clipping as a matter of tidiness.
+
+It is not. **A word cut short is very often another word.** Of the 88
+constellations the bundled pack draws, three become a different
+constellation when their name is cut:
+
+```
+SAGITTARIUS         cut short reads   SAGITTA
+LEO MINOR           cut short reads   LEO
+TRIANGULUM AUSTRALE cut short reads   TRIANGULUM
+```
+
+and of the 12,635 deep-sky labels the study's corpus carries, **35,057
+truncations are another object's own label** — every `IC 1203` cut to
+`IC 1`, every `NGC 2024` cut to `NGC 202`. A clipped label is
+not an untidy page. It is a page that names the wrong thing, at the
+edge, where a reader matching a chart against the sky is most likely
+to be working.
+
+So: **no text is clipped by the page.** A label that cannot be drawn
+whole is not drawn, and the placement records which candidates the
+paper refused. The mark itself is still there, unnamed — which is what
+the whole page does to every star below its limit, without apology.
+
+The guarantee bends here too, and only here: a searched target's label
+may be written over anything on the page, and may not be written half
+off it.
+
+`#314` applies this when the families migrate, and the released pages
+will change by the counts above. `#315`'s journey walks a page where
+it happens.
 
 This is the load-bearing choice of the whole decision. The three
 policies that omit instead reach zero of the owner's defects and lose
