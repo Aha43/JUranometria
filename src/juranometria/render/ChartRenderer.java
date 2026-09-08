@@ -111,9 +111,30 @@ public final class ChartRenderer {
      * star's dot radius, or half a symbol's larger axis.
      */
     public record DrawnMark(Kind kind, Object subject, PixelPoint centre,
-                            Shape outline, double reach) {
+                            Shape outline, double reach, Shape ink) {
+
+        /** A mark whose ink is its outline, which is every star's. */
+        public DrawnMark(Kind kind, Object subject, PixelPoint centre,
+                         Shape outline, double reach) {
+            this(kind, subject, centre, outline, reach, outline);
+        }
 
         public enum Kind { STAR, DEEP_SKY }
+
+        /**
+         * The geometry this mark actually inks, in page pixels.
+         *
+         * <p>For a star it is the filled disc, which is also its
+         * outline. For a deep-sky symbol it is not: {@code outline} is
+         * the silhouette a reader aims at (#168) and the ink is a
+         * dotted ring, an empty box, or a small circle with spokes.
+         * Published for the placement seam (issue #313), which has to
+         * know what a label would cover rather than what it would
+         * overlap.
+         */
+        public Shape ink() {
+            return ink;
+        }
 
         /** The star this mark draws, or null when it is not a star. */
         public Star star() {
@@ -294,10 +315,15 @@ public final class ChartRenderer {
                 Shape outline = symbolOutline(dso, policy, centre,
                         mapping.pixelsPerPlaneUnit());
                 if (outline != null && outline.intersects(paper)) {
+                    double[] axes = symbolAxesPx(dso, policy,
+                            mapping.pixelsPerPlaneUnit());
                     deepSky.add(new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso,
                             centre, outline,
                             symbolReach(dso, policy,
-                                    mapping.pixelsPerPlaneUnit())));
+                                    mapping.pixelsPerPlaneUnit()),
+                            symbolInk(symbolFor(dso), centre.x(),
+                                    centre.y(), axes[0], axes[1],
+                                    dso.positionAngleDegrees())));
                 }
             });
         }
@@ -433,13 +459,8 @@ public final class ChartRenderer {
             // notation: a reader who switches the title block off
             // gets back the labels it was hiding, and the key
             // suppresses on the same terms (Sprint 20 review).
-            EquatorialGrid.draw(g, EquatorialGrid.gridFor(
-                    scene.viewport(),
-                    options.titleBlock() ? titleBlockBounds(g, scene) : null,
-                    options.magnitudeKey()
-                            ? magnitudeKeyBounds(
-                                    g.getFontMetrics(LABEL_FONT), scene)
-                            : null), palette);
+            EquatorialGrid.draw(g, gridFor(g.getFontMetrics(LABEL_FONT),
+                    scene, options), palette);
         }
         drawGeography(g, scene, options, projection, mapping);
         // Above the grid and the figures, below every mark: a
@@ -657,6 +678,55 @@ public final class ChartRenderer {
      * best identity draws first, exempt from thresholds and
      * collisions and surviving the option toggle, with no new symbol.
      */
+    /**
+     * The graticule this page draws, notation and all.
+     *
+     * <p>The one call, so a study or a placement policy asks the
+     * renderer what the grid decided rather than re-deriving which
+     * furniture it had to yield to (Sprint 31, issue #313). {@link
+     * #render} draws precisely this.
+     */
+    public EquatorialGrid.Grid gridFor(FontMetrics metrics,
+                                       ChartScene scene,
+                                       ChartOptions options) {
+        return EquatorialGrid.gridFor(scene.viewport(),
+                options.titleBlock() ? titleBlockBounds(metrics, scene)
+                        : null,
+                options.magnitudeKey()
+                        ? magnitudeKeyBounds(metrics, scene, starSizePolicy)
+                        : null);
+    }
+
+    /**
+     * The grid notation this page draws, with the box each piece
+     * occupies - the grid's own decisions, published the way the
+     * star-label pass has published its since #154.
+     */
+    public java.util.List<GridLabelPlacement> gridLabelPlacements(
+            FontMetrics metrics, ChartScene scene, ChartOptions options) {
+        if (!options.equatorialGrid()) {
+            return java.util.List.of();
+        }
+        FontMetrics gridMetrics = EquatorialGrid.labelMetrics();
+        java.util.List<GridLabelPlacement> placed =
+                new java.util.ArrayList<>();
+        for (EquatorialGrid.Label label
+                : gridFor(metrics, scene, options).labels()) {
+            placed.add(new GridLabelPlacement(label,
+                    EquatorialGrid.labelBounds(label, gridMetrics)));
+        }
+        return java.util.List.copyOf(placed);
+    }
+
+    /** One piece of grid notation, and the box it occupies. */
+    public record GridLabelPlacement(EquatorialGrid.Label label,
+                                     Rectangle2D box) {
+
+        public String text() {
+            return label.text();
+        }
+    }
+
     /** One placed star label: the text drawn and the box it occupies. */
     public record StarLabelPlacement(String text, Rectangle2D box,
                                      Star star, boolean guaranteed) {
@@ -996,6 +1066,142 @@ public final class ChartRenderer {
      * its own shapes, so a legend cannot come to teach a vocabulary
      * the chart has stopped using.
      */
+    /**
+     * One piece of ink a symbol lays down: a shape in the symbol's own
+     * frame, the stroke it is drawn with, and which ink it is drawn in.
+     *
+     * <p>A null stroke means the piece is filled. Published so that a
+     * placement policy can ask what a symbol actually inks rather than
+     * guess it from the silhouette (Sprint 31, issue #313): a
+     * silhouette is what a reader aims at, and an open cluster is a
+     * dotted ring around nothing.
+     */
+    public record SymbolPiece(Shape shape, java.awt.Stroke stroke,
+                              Ink ink) {
+
+        /** Which of the palette's inks this piece is drawn in. */
+        public enum Ink { GALAXY_FILL, DEEP_SKY_OUTLINE, NEBULA_OUTLINE }
+
+        /** Whether this piece is filled rather than stroked. */
+        public boolean filled() {
+            return stroke == null;
+        }
+
+        /** The geometry this piece inks, in the symbol's own frame. */
+        public Shape inked() {
+            return stroke == null ? shape : stroke.createStrokedShape(shape);
+        }
+    }
+
+    /**
+     * The pieces a symbol draws, in the symbol's own frame.
+     *
+     * <p>One place, so what is painted and what is published cannot
+     * drift: {@link #paintSymbol} draws exactly this list under the
+     * placement below, and {@link #symbolInk} strokes exactly this
+     * list and places the result.
+     */
+    public static java.util.List<SymbolPiece> symbolPieces(Symbol symbol,
+                                                           double majorPx,
+                                                           double minorPx) {
+        return switch (symbol) {
+            case ELLIPSE -> {
+                Shape ellipse = new Ellipse2D.Double(
+                        -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
+                yield java.util.List.of(
+                        new SymbolPiece(ellipse, null,
+                                SymbolPiece.Ink.GALAXY_FILL),
+                        new SymbolPiece(ellipse, OUTLINE_STROKE,
+                                SymbolPiece.Ink.DEEP_SKY_OUTLINE));
+            }
+            case DOTTED_CIRCLE -> java.util.List.of(
+                    new SymbolPiece(new Ellipse2D.Double(
+                            -minorPx / 2.0, -majorPx / 2.0, minorPx,
+                            majorPx), DOTTED_STROKE,
+                            SymbolPiece.Ink.DEEP_SKY_OUTLINE));
+            case CROSSED_CIRCLE -> java.util.List.of(
+                    new SymbolPiece(new Ellipse2D.Double(-majorPx / 2.0,
+                            -majorPx / 2.0, majorPx, majorPx),
+                            OUTLINE_STROKE,
+                            SymbolPiece.Ink.DEEP_SKY_OUTLINE),
+                    new SymbolPiece(new java.awt.geom.Line2D.Double(
+                            -majorPx / 2.0, 0.0, majorPx / 2.0, 0.0),
+                            OUTLINE_STROKE,
+                            SymbolPiece.Ink.DEEP_SKY_OUTLINE),
+                    new SymbolPiece(new java.awt.geom.Line2D.Double(
+                            0.0, -majorPx / 2.0, 0.0, majorPx / 2.0),
+                            OUTLINE_STROKE,
+                            SymbolPiece.Ink.DEEP_SKY_OUTLINE));
+            case BOX -> java.util.List.of(
+                    new SymbolPiece(new Rectangle2D.Double(
+                            -minorPx / 2.0, -majorPx / 2.0, minorPx,
+                            majorPx), OUTLINE_STROKE,
+                            SymbolPiece.Ink.NEBULA_OUTLINE));
+            case PLANETARY -> {
+                // A small crossed circle: four spokes reaching beyond it.
+                double r = Math.max(
+                        RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
+                        majorPx) / 2.0;
+                double spoke = r * 1.7;
+                yield java.util.List.of(
+                        new SymbolPiece(new Ellipse2D.Double(-r / 1.7,
+                                -r / 1.7, 2.0 * r / 1.7, 2.0 * r / 1.7),
+                                OUTLINE_STROKE,
+                                SymbolPiece.Ink.DEEP_SKY_OUTLINE),
+                        new SymbolPiece(new java.awt.geom.Line2D.Double(
+                                -spoke, 0.0, spoke, 0.0), OUTLINE_STROKE,
+                                SymbolPiece.Ink.DEEP_SKY_OUTLINE),
+                        new SymbolPiece(new java.awt.geom.Line2D.Double(
+                                0.0, -spoke, 0.0, spoke), OUTLINE_STROKE,
+                                SymbolPiece.Ink.DEEP_SKY_OUTLINE));
+            }
+            case NONE -> java.util.List.of();
+        };
+    }
+
+    /**
+     * Where a symbol sits on the page: its centre, turned by its own
+     * position angle. East is left on the chart, which is a
+     * clockwise-negative rotation in pixel space.
+     */
+    public static java.awt.geom.AffineTransform symbolPlacement(
+            double centreX, double centreY, double positionAngleDegrees) {
+        java.awt.geom.AffineTransform place =
+                java.awt.geom.AffineTransform.getTranslateInstance(centreX,
+                        centreY);
+        place.rotate(-Math.toRadians(positionAngleDegrees));
+        return place;
+    }
+
+    /**
+     * The ink a symbol lays down, in page pixels.
+     *
+     * <p>Not its silhouette, which is what a reader aims at (#168) and
+     * is mostly air: an open cluster is a dotted ring around nothing, a
+     * nebula an empty box, a planetary a small circle with four spokes
+     * inside a square. A label inside an open cluster's ring covers
+     * nothing, and a placement policy needs to know that.
+     *
+     * <p>Each piece is stroked in the symbol's own frame and then
+     * placed, which is the order the renderer draws in - it matters for
+     * a dash pattern, whose phase runs along the path.
+     */
+    public static java.awt.geom.Area symbolInk(Symbol symbol,
+                                               double centreX,
+                                               double centreY,
+                                               double majorPx,
+                                               double minorPx,
+                                               double positionAngleDegrees) {
+        java.awt.geom.AffineTransform place = symbolPlacement(centreX,
+                centreY, positionAngleDegrees);
+        java.awt.geom.Area ink = new java.awt.geom.Area();
+        for (SymbolPiece piece : symbolPieces(symbol, majorPx, minorPx)) {
+            ink.add(new java.awt.geom.Area(
+                    place.createTransformedShape(piece.inked())));
+        }
+        return ink;
+    }
+
     private static void paintSymbol(Graphics2D g, Symbol symbol,
                                     double centreX, double centreY,
                                     double majorPx, double minorPx,
@@ -1005,54 +1211,20 @@ public final class ChartRenderer {
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.translate(centreX, centreY);
-            // Position angle is east of north; east is left on the chart,
-            // which is a clockwise-negative rotation in pixel space.
-            g2.rotate(-Math.toRadians(positionAngleDegrees));
-            switch (symbol) {
-                case ELLIPSE -> {
-                    Shape ellipse = new Ellipse2D.Double(
-                            -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
-                    g2.setColor(palette.galaxyFill());
-                    g2.fill(ellipse);
-                    g2.setColor(palette.deepSkyOutline());
-                    g2.setStroke(OUTLINE_STROKE);
-                    g2.draw(ellipse);
-                }
-                case DOTTED_CIRCLE -> {
-                    g2.setColor(palette.deepSkyOutline());
-                    g2.setStroke(DOTTED_STROKE);
-                    g2.draw(new Ellipse2D.Double(
-                            -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx));
-                }
-                case CROSSED_CIRCLE -> {
-                    g2.setColor(palette.deepSkyOutline());
-                    g2.setStroke(OUTLINE_STROKE);
-                    g2.draw(new Ellipse2D.Double(
-                            -majorPx / 2.0, -majorPx / 2.0, majorPx, majorPx));
-                    g2.draw(new java.awt.geom.Line2D.Double(
-                            -majorPx / 2.0, 0.0, majorPx / 2.0, 0.0));
-                    g2.draw(new java.awt.geom.Line2D.Double(
-                            0.0, -majorPx / 2.0, 0.0, majorPx / 2.0));
-                }
-                case BOX -> {
-                    g2.setColor(palette.nebulaOutline());
-                    g2.setStroke(OUTLINE_STROKE);
-                    g2.draw(new Rectangle2D.Double(
-                            -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx));
-                }
-                case PLANETARY -> {
-                    // A small crossed circle: four spokes reaching beyond it.
-                    double r = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX, majorPx) / 2.0;
-                    double spoke = r * 1.7;
-                    g2.setColor(palette.deepSkyOutline());
-                    g2.setStroke(OUTLINE_STROKE);
-                    g2.draw(new Ellipse2D.Double(-r / 1.7, -r / 1.7,
-                            2.0 * r / 1.7, 2.0 * r / 1.7));
-                    g2.draw(new java.awt.geom.Line2D.Double(-spoke, 0.0, spoke, 0.0));
-                    g2.draw(new java.awt.geom.Line2D.Double(0.0, -spoke, 0.0, spoke));
-                }
-                case NONE -> {
+            g2.transform(symbolPlacement(centreX, centreY,
+                    positionAngleDegrees));
+            for (SymbolPiece piece
+                    : symbolPieces(symbol, majorPx, minorPx)) {
+                g2.setColor(switch (piece.ink()) {
+                    case GALAXY_FILL -> palette.galaxyFill();
+                    case DEEP_SKY_OUTLINE -> palette.deepSkyOutline();
+                    case NEBULA_OUTLINE -> palette.nebulaOutline();
+                });
+                if (piece.filled()) {
+                    g2.fill(piece.shape());
+                } else {
+                    g2.setStroke(piece.stroke());
+                    g2.draw(piece.shape());
                 }
             }
         } finally {
@@ -1518,6 +1690,12 @@ public final class ChartRenderer {
         return titleBlockBounds(g.getFontMetrics(LABEL_FONT), scene);
     }
 
+    /** The block's layout box, from a graphics context. */
+    public static java.awt.Rectangle titleBlockLayout(Graphics2D g,
+                                                      ChartScene scene) {
+        return titleBlockLayout(g.getFontMetrics(LABEL_FONT), scene);
+    }
+
     /** Title-face metrics derived without a live graphics context. */
     private static FontMetrics titleFontMetrics(FontMetrics labelMetrics) {
         var image = new java.awt.image.BufferedImage(1, 1,
@@ -1530,8 +1708,36 @@ public final class ChartRenderer {
         }
     }
 
-    /** The title block's bounds from label metrics alone. */
+    /**
+     * The title block's bounds from label metrics alone: the rectangle
+     * it <em>covers</em>, which is one pixel wider and one taller than
+     * the box it is laid out in.
+     *
+     * <p>The block is drawn with {@code drawRect(x, y, w, h)}, and that
+     * paints its border at {@code x + w} and {@code y + h} - one pixel
+     * outside the box every other layer was being told about. Two
+     * constellation names on the Sprint 31 corpus are clipped by that
+     * pixel while apparently clear of the block (issue #310). What is
+     * published is what is covered; what the block is laid out in is
+     * {@link #titleBlockBox}, which is what draws it, so no released
+     * page moves.
+     */
     public static java.awt.Rectangle titleBlockBounds(FontMetrics metrics,
+                                                      ChartScene scene) {
+        java.awt.Rectangle box = titleBlockLayout(metrics, scene);
+        return box == null ? null : new java.awt.Rectangle(box.x, box.y,
+                box.width + 1, box.height + 1);
+    }
+
+    /**
+     * The box the block is laid out in, and drawn from - one pixel
+     * narrower and shorter than what it covers.
+     *
+     * <p>For anyone reproducing the drawing rather than avoiding it:
+     * the released-page digest skips exactly the two shapes this
+     * rectangle names.
+     */
+    public static java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
                                                       ChartScene scene) {
         String[] lines = titleLines(scene);
         int lineHeight = metrics.getHeight();
@@ -1556,7 +1762,8 @@ public final class ChartRenderer {
                                 ChartPalette palette) {
         // A viewport too small to hold the block with its margins omits it
         // rather than clipping formal notation (Codex review, PR #12).
-        java.awt.Rectangle box = titleBlockBounds(g, scene);
+        java.awt.Rectangle box = titleBlockLayout(
+                g.getFontMetrics(LABEL_FONT), scene);
         if (box == null) {
             return;
         }
