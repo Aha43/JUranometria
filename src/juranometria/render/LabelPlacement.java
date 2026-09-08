@@ -135,8 +135,25 @@ public final class LabelPlacement {
     public record Refused(int candidate, Refusal kind, String by) {
     }
 
+    /**
+     * How wide a cell of the obstacle index is, in pixels.
+     *
+     * <p>A page's ink is spread over it, so a candidate box asks only
+     * the cells it touches instead of every mark on the chart. The
+     * densest 120-degree page carries a thousand pieces of ink and two
+     * hundred labels, and asking each of the one about each of the
+     * other took 45 ms on the machine this was written on and 154 on
+     * the runner that builds it - inside the gate's budget on one and
+     * not on the other, which is not a budget being met.
+     */
+    private static final double CELL_PX = 64.0;
+
     private final Rectangle2D paper;
     private final List<Obstacle> obstacles = new ArrayList<>();
+    private final Map<Long, List<Obstacle>> byCell = new LinkedHashMap<>();
+    private final double cellPx;
+    private final Map<Obstacle, Area> asAreas = new java.util.HashMap<>();
+    private int comparisons;
     private final List<Rectangle2D> taken = new ArrayList<>();
     private final Map<Rectangle2D, String> takenBy = new LinkedHashMap<>();
 
@@ -148,8 +165,72 @@ public final class LabelPlacement {
      */
     public LabelPlacement(double widthPx, double heightPx,
                           List<Obstacle> ink) {
+        this(widthPx, heightPx, ink, CELL_PX);
+    }
+
+    /**
+     * The same, with the index's cell size stated - for a test that
+     * needs to prove the index changes nothing by making it useless.
+     */
+    LabelPlacement(double widthPx, double heightPx, List<Obstacle> ink,
+                   double cellPx) {
+        this.cellPx = cellPx;
         this.paper = new Rectangle2D.Double(0.0, 0.0, widthPx, heightPx);
         this.obstacles.addAll(ink);
+        for (Obstacle obstacle : this.obstacles) {
+            for (long cell : cellsOf(obstacle.ink().getBounds2D())) {
+                byCell.computeIfAbsent(cell, key -> new ArrayList<>())
+                        .add(obstacle);
+            }
+        }
+    }
+
+    /**
+     * How many obstacle comparisons this placement has made - the
+     * work, counted rather than timed, because a millisecond is a
+     * fact about a machine and this has to mean the same thing on
+     * every one of them.
+     */
+    public int comparisons() {
+        return comparisons;
+    }
+
+    /** The index cells a box touches, in a stated order. */
+    private List<Long> cellsOf(Rectangle2D box) {
+        List<Long> cells = new ArrayList<>();
+        long fromX = (long) Math.floor(box.getMinX() / cellPx);
+        long toX = (long) Math.floor(box.getMaxX() / cellPx);
+        long fromY = (long) Math.floor(box.getMinY() / cellPx);
+        long toY = (long) Math.floor(box.getMaxY() / cellPx);
+        for (long y = fromY; y <= toY; y++) {
+            for (long x = fromX; x <= toX; x++) {
+                cells.add(y * 100_000L + x);
+            }
+        }
+        return cells;
+    }
+
+    /**
+     * The obstacles near a box, in the order they were given.
+     *
+     * <p>The index decides what is asked, never what is answered: the
+     * candidates it returns are filtered by the same intersection test
+     * as before, and a page with one cell gives exactly the answer a
+     * page with no index gives.
+     */
+    private List<Obstacle> near(Rectangle2D box) {
+        java.util.LinkedHashSet<Obstacle> found =
+                new java.util.LinkedHashSet<>();
+        for (long cell : cellsOf(box)) {
+            found.addAll(byCell.getOrDefault(cell, List.of()));
+        }
+        List<Obstacle> ordered = new ArrayList<>();
+        for (Obstacle obstacle : obstacles) {
+            if (found.contains(obstacle)) {
+                ordered.add(obstacle);
+            }
+        }
+        return ordered;
     }
 
     /**
@@ -231,7 +312,8 @@ public final class LabelPlacement {
                 return new Refused(at, Refusal.TEXT, takenBy.get(other));
             }
         }
-        for (Obstacle obstacle : obstacles) {
+        for (Obstacle obstacle : near(box)) {
+            comparisons++;
             if (obstacle.ink() == request.ownMark()) {
                 // The thing it names. A star's name is anchored beside
                 // its own disc by decision, and a policy that treated
@@ -282,9 +364,15 @@ public final class LabelPlacement {
         for (Rectangle2D other : taken) {
             cost += sharedArea(new Area(other), box);
         }
-        for (Obstacle obstacle : obstacles) {
+        for (Obstacle obstacle : near(box)) {
+            comparisons++;
             if (obstacle.ink() != request.ownMark()) {
-                cost += sharedArea(new Area(obstacle.ink()), box);
+                // Built once per obstacle, not once per candidate:
+                // turning a shape into an Area is most of what the
+                // fallback costs, and the fallback is where a crowded
+                // page spends its time.
+                cost += sharedArea(asAreas.computeIfAbsent(obstacle,
+                        key -> new Area(key.ink())), box);
             }
         }
         return cost;

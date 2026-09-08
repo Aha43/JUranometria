@@ -364,8 +364,16 @@ not, will.
 
 | | budget | measured today |
 |---|---|---|
-| placement, 900×700 overview page | **≤ 60 ms** | 45 ms at `orion-120`, 19 ms at `orion-90`, 9 ms at `sagittarius-120` |
+| placement, 900×700 overview page | **≤ 60 ms** | 26 ms at `sagittarius-120`, on the machine named in the study |
 | placement, released detail page | **≤ 20 ms** | 5 ms at `home`, 13 ms at `orion-36` |
+| obstacle comparisons, the same page | **≤ a tenth of every-against-every** | 4,282 against 129,257 |
+
+The wall-clock rows say which machine they were taken on, and no test
+asserts them: the seam's first build placed the densest page in 45 ms
+here and 154 on the runner that builds it, which is a statement about
+two computers. What is held in a test is the **work** — the
+comparisons an indexed pass makes against the product of labels and
+ink — because that number is the same everywhere.
 | labels displaced on a one-step pan | **≤ 15%** | 3 of 84 at `orion-90`, 14 of 124 at `sagittarius-120` |
 | labels displaced on a one-rung zoom | no budget | 20 of 84, 20 of 124 |
 
