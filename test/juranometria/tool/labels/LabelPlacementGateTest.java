@@ -276,6 +276,111 @@ class LabelPlacementGateTest {
                 "the study's page is the renderer's page");
     }
 
+    @Test
+    void aConstellationOwnsTheHullOfItsOwnVisibleInk() {
+        // The region a name may move in is computed from geometry for
+        // speed, so it is checked against ink: every pixel the
+        // renderer actually inks for a constellation's figure must
+        // fall inside that constellation's hull. Geometry that has
+        // drifted from what is drawn would let a name sit where its
+        // figure is not.
+        Page page = fixturePage();
+        FigureRegion owned = FigureRegion.of(page);
+        Attribution attribution = new Attribution(page);
+        assertTrue(owned.constellations().size() > 10,
+                "the page carries figures to check: "
+                        + owned.constellations().size());
+        for (String constellation : new java.util.TreeSet<>(
+                owned.constellations())) {
+            Ink ink = attribution.inkOf(new Participant(
+                    Participant.Family.FIGURE_LINE, constellation,
+                    "its figure"));
+            java.awt.geom.Rectangle2D drawn = ink.bounds();
+            if (drawn == null) {
+                continue;
+            }
+            java.awt.Shape hull = owned.regionOf(constellation);
+            // The hull is over the pieces' midpoints and the ink is
+            // the stroked line through them, so ink stands a stroke's
+            // width outside a hull that is correct; the hull grown by
+            // two pixels is the claim being made.
+            java.awt.geom.Area grown = new java.awt.geom.Area(
+                    new java.awt.BasicStroke(4.0f).createStrokedShape(hull));
+            grown.add(new java.awt.geom.Area(hull));
+            assertTrue(grown.contains(drawn.getCenterX(),
+                            drawn.getCenterY()),
+                    constellation + ": its own figure's ink is centred"
+                            + " inside the region it owns");
+        }
+    }
+
+    @Test
+    void aNameIsAnchoredWhereTheAtlasAnchorsIt() {
+        // The policy's centroid must be the renderer's centroid, or
+        // every constellation number in the study is about a different
+        // page. Measured against the name the released page actually
+        // draws, found by withholding it.
+        Page page = fixturePage();
+        FigureRegion owned = FigureRegion.of(page);
+        Attribution attribution = new Attribution(page);
+        int checked = 0;
+        for (java.util.Map.Entry<String, String> name
+                : page.scene().geography().latinNames().entrySet()) {
+            Ink ink = attribution.inkOf(new Participant(
+                    Participant.Family.CONSTELLATION_NAME, name.getKey(),
+                    name.getValue()));
+            java.awt.geom.Rectangle2D drawn = ink.bounds();
+            double[] centroid = owned.centroidOf(name.getKey());
+            if (drawn == null || centroid == null
+                    || drawn.getMinX() <= 1 || drawn.getMaxX() >= page.wide() - 1) {
+                // A name clipped by the page edge has ink whose
+                // centre is not its own centre; the page's own rule
+                // lets it clip, and this is not the test for that.
+                continue;
+            }
+            checked++;
+            // Eight pixels, not one, and the slack is the subject of
+            // this study rather than sloppiness: a name is drawn
+            // before every mark on the page, so its VISIBLE ink is
+            // what the discs drawn over it have left, and its centre
+            // shifts with them. Pavo's ink sits five pixels right of
+            // its anchor for that reason. What this catches is drift
+            // of a different order - an endpoint-based anchor misses
+            // by tens of pixels, or by the whole page.
+            assertTrue(Math.abs(drawn.getCenterX() - centroid[0]) < 8.0,
+                    name.getKey() + ": the policy anchors the name where"
+                            + " the atlas draws it, x " + centroid[0]
+                            + " against ink centred at "
+                            + drawn.getCenterX());
+        }
+        assertTrue(checked > 8, "on a useful number of names: " + checked);
+    }
+
+    @Test
+    void noNameLeavesItsOwnFigureUnderTheChosenPolicy() {
+        // The decision's rule, held on the policy the decision is
+        // taken from - which an earlier draft did not do, stating the
+        // rule in prose while measuring a policy without it.
+        for (String slug : List.of("sagittarius-120", "crux-90")) {
+            Page page = null;
+            for (StudyPages.Look look : StudyPages.corpus()) {
+                if (look.page().slug().equals(slug)) {
+                    page = look.page();
+                }
+            }
+            assertTrue(page != null, "the corpus carries " + slug);
+            Greedy chosen = new Greedy(page, Greedy.LEAST_BAD);
+            assertEquals(0, chosen.namesOffTheirOwnFigure(),
+                    slug + ": every name overlaps the region its own"
+                            + " figure owns");
+            Greedy unowned = new Greedy(page, Greedy.LEAST_BAD_UNOWNED);
+            assertTrue(unowned.namesOffTheirOwnFigure() > 0,
+                    slug + ": and the rule is doing something - without"
+                            + " it, " + unowned.namesOffTheirOwnFigure()
+                            + " names leave their own figure");
+        }
+    }
+
     private static int defects(Census census) {
         int found = 0;
         for (Attribution.Meeting meeting : census.collisions()) {

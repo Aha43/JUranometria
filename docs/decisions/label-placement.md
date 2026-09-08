@@ -104,7 +104,13 @@ else may move, and nothing else may be promised a position.
 
 ### The candidate vocabulary
 
-Eight positions, in this order, and no others:
+Two lists, both fixed and both ordered. They are stated apart because
+they are not the same length: an earlier draft of this document said
+"eight positions, and no others" while the policy it described gave
+constellation names seventeen.
+
+**A star label or a deep-sky label: eight positions**, around the mark
+it names, in this order:
 
 ```
 east, west, north-east, north-west, south-east, south-west, north, south
@@ -116,13 +122,17 @@ for nothing. Offsets are the anchor's own reach — a star's magnitude
 radius, a symbol's half-extent — plus three pixels, which is the gap
 the renderer already uses.
 
-A constellation name's anchor is the centroid of its **visible figure
-ink**, as today, and its candidates are that point and two rings of
-eight at 20 and 40 pixels.
+**A constellation name: seventeen positions.** Its anchor is the
+centroid of its visible figure ink, as today; its candidates are that
+point, then the same eight directions at 20 pixels, then those eight
+again at 40. A name has no mark to sit beside and a whole figure to
+sit in, so it is given more room — and the room is bounded by the
+region below rather than by the ring.
 
-Ties are impossible: the list is ordered and the first free candidate
-wins. Nothing here searches, samples, iterates to convergence, or
-depends on hash order, floating-point summation order or the platform.
+Ties are impossible in either list: it is ordered and the first free
+candidate wins. Nothing here searches, samples, iterates to
+convergence, or depends on hash order, floating-point summation order
+or the platform.
 
 ### What a label must avoid
 
@@ -149,17 +159,28 @@ as a collision would move every label on the page.
 ### Nothing is silently dropped
 
 A label with no free candidate is **still drawn**, at whichever of its
-eight candidates covers the least ink — least covered area first, and
-only among equals does crossing fewer lines decide. Lexicographic, not
+candidates covers the least ink — least covered area first, and only
+among equals does crossing fewer lines decide. Lexicographic, not
 weighted, because a weight between "covers a mark" and "crosses a
 line" would be a tuning constant nobody could defend.
+
+"Least ink" is the area shared with each obstacle's **own drawn
+outline**, not with its bounding box. A disc in its square is a fifth
+empty at the corners and a galaxy's ellipse far more, and this gate's
+whole argument is that a box is not ink: a fallback that ranked
+candidates by boxes would be ranking them by the very thing the census
+refuses to count. An earlier draft did exactly that.
+
+The ownership rule below is not a cost the fallback may spend. A
+candidate outside its constellation's own region is refused there too,
+whatever it would have covered.
 
 This is the load-bearing choice of the whole decision. The three
 policies that omit instead reach zero of the owner's defects and lose
 between 1 and 116 labels a released page currently draws. The
 least-bad fallback loses **none**, on every page measured, and still
-takes the observed defects from 48 to 3 on the fixture's page and from
-37 to 2 at `orion-120`.
+takes the observed defects from 48 to 7 on the fixture's page, from
+37 to 6 at `orion-120`, and from 19 to 1 at `orion-90`.
 
 Where a label ends up at a candidate that covers something, the
 service records it. `#314` publishes that record; a page whose text is
@@ -167,17 +188,41 @@ placed under duress should be able to say so.
 
 ### Constellation names may move, but not off their own figure
 
-A name may take any of its candidates **whose centre remains inside
-the visible ink of its own figure**. A name outside its own figure is
-naming a different part of the sky, which is worse than the collision
-it was avoiding. The study measured a policy without that rule: at
-`crux-90`, eleven of twenty-seven names strayed off their own figure's
-extent, and at `sagittarius-120`, ten of thirty. `#313`
-implements the rule; the study's own greedy did not, which is how the
-number is known.
+A name may take any of its candidates **whose box overlaps the region
+its own figure owns**. A name outside its own figure is naming a
+different part of the sky, which is worse than the collision it was
+avoiding.
 
-A name that cannot find a candidate on its own ink stays at the
-centroid, where it is today.
+The region is the **convex hull of that figure's visible ink**, and
+every word of that is load-bearing.
+
+*Hull*, not bounding box: the box of Eridanus, which wanders half the
+sky, contains most of Orion, so a name allowed anywhere in that box
+could be written over the wrong constellation and still pass. An
+earlier draft of this document said "visible figure ink" while the
+study measured an axis-aligned extent, which is exactly that mistake.
+
+*Visible ink*, by the renderer's own definition: the midpoints of the
+drawn pieces its half-degree subdivision cuts each segment into,
+counted where the piece **crosses** the paper. Not the segments'
+endpoints — Pyxis on the 90-degree Orion page is drawn with no
+endpoint and no sampled point inside the page at all, and an
+endpoint-based rule left it unnamed on a page the atlas names it on.
+
+*Overlap*, not "its centre is inside": a figure can be smaller than
+its own name. Crater at 90° leaves six pixels by five of visible ink
+and CRATER is fifty pixels wide, so the strict reading would refuse
+every candidate it has. The stricter statistic is measured and
+reported beside the rule so the difference stays visible.
+
+The rule is enforced by the policy this decision is taken from, and
+its cost is measured by running that same policy without it: names
+leave their own figures on every crowded page — eight of thirty at
+`sagittarius-120`, six of twenty-seven at `orion-120` — against none
+anywhere with the rule, for a few more collisions.
+
+A name that cannot find an owned candidate stays at the centroid,
+where it is today.
 
 ### Grid and reference notation stay edge-owned furniture
 
@@ -246,8 +291,8 @@ not, will.
 
 | | budget | measured today |
 |---|---|---|
-| placement, 900×700 overview page | **≤ 60 ms** | 41 ms at `orion-120`, 8 ms at `sagittarius-120` |
-| placement, released detail page | **≤ 15 ms** | 4 ms at `home`, 8 ms at `orion-36` |
+| placement, 900×700 overview page | **≤ 60 ms** | 45 ms at `orion-120`, 19 ms at `orion-90`, 9 ms at `sagittarius-120` |
+| placement, released detail page | **≤ 20 ms** | 5 ms at `home`, 13 ms at `orion-36` |
 | labels displaced on a one-step pan | **≤ 15%** | 3 of 84 at `orion-90`, 14 of 124 at `sagittarius-120` |
 | labels displaced on a one-rung zoom | no budget | 20 of 84, 20 of 124 |
 

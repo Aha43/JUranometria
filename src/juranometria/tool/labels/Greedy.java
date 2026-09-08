@@ -52,38 +52,48 @@ public final class Greedy {
     public record Rules(String name, boolean namesFirst,
                         boolean linesAreObstacles, double nameReachPx,
                         boolean keepWhatItCannotPlace,
-                        boolean leastBadWhenNothingIsFree, String prose) {
+                        boolean leastBadWhenNothingIsFree,
+                        boolean namesStayOnTheirFigure, String prose) {
     }
 
     public static final Rules LABELS_FIRST = new Rules(
             "greedy, star labels first", false, false, 40.0, false,
-            false,
+            false, true,
             "star and deep-sky labels take their pick, constellation"
                     + " names take what is left; a label with no free"
                     + " candidate is omitted");
     public static final Rules NAMES_FIRST = new Rules(
             "greedy, constellation names first", true, false, 40.0,
-            false, false,
+            false, false, true,
             "constellation names take their pick, star labels take what"
                     + " is left");
     public static final Rules AVOIDING_LINES = new Rules(
             "greedy, star labels first, avoiding every line", false, true,
-            40.0, false, false,
+            40.0, false, false, true,
             "as the first, and additionally refusing any candidate that"
                     + " crosses a figure, boundary or grid line");
     public static final Rules KEEPING_EVERYTHING = new Rules(
             "greedy, star labels first, keeping what it cannot place",
-            false, false, 40.0, true, false,
+            false, false, 40.0, true, false, true,
             "as the first, except that a label with no free candidate"
                     + " stays where the atlas draws it today rather than"
                     + " being dropped");
 
     public static final Rules LEAST_BAD = new Rules(
             "greedy, star labels first, least bad when nothing is free",
-            false, false, 40.0, true, true,
+            false, false, 40.0, true, true, true,
             "as the fourth, except that a label with no free candidate"
                     + " takes the candidate that covers the least ink"
                     + " rather than staying where it is");
+
+    /** The chosen policy, with the ownership rule left off. */
+    public static final Rules LEAST_BAD_UNOWNED = new Rules(
+            "the same, with names free to leave their own figure",
+            false, false, 40.0, true, true, false,
+            "as the chosen policy, except that a constellation name may"
+                    + " take any candidate rather than only those its"
+                    + " own figure owns - the measurement the ownership"
+                    + " rule exists because of");
 
     /** The eight positions a label may take around its anchor. */
     private static final double[][] AROUND = {
@@ -106,7 +116,7 @@ public final class Greedy {
     private final List<Rectangle2D> furniture = new ArrayList<>();
     private final Map<String, String> omitted = new LinkedHashMap<>();
     private final Map<String, Double> moved = new LinkedHashMap<>();
-    private final Map<String, Rectangle2D> figureInk = new LinkedHashMap<>();
+    private final FigureRegion owned;
     private final java.util.Set<String> kept = new java.util.LinkedHashSet<>();
     private final List<DeepSkyObject> labelledDeepSky;
     private int candidatesTried;
@@ -122,6 +132,7 @@ public final class Greedy {
         // the released page labels is read off that page, which means
         // painting it, and that is this study's cost rather than a
         // placement policy's. #313 will have the answer in hand.
+        this.owned = FigureRegion.of(page);
         this.labelledDeepSky = labelledOnTheReleasedPage();
         long started = System.nanoTime();
         gatherObstacles();
@@ -193,13 +204,43 @@ public final class Greedy {
             if (text.family() != Participant.Family.CONSTELLATION_NAME) {
                 continue;
             }
-            Rectangle2D ink = figureInk.get(text.id());
-            if (ink != null && !ink.contains(text.x() + text.box().getWidth()
-                    / 2.0, text.baseline())) {
+            // The same test the rule applies, which an earlier draft
+            // of this counter did not use: it measured a different
+            // point of the box and reported names straying under a
+            // policy that was refusing exactly that.
+            if (owned.knows(text.id())
+                    && !owned.ownsBox(text.id(), text.box())) {
                 strayed++;
             }
         }
         return strayed;
+    }
+
+    /** The regions this page's constellations own. */
+    public FigureRegion owned() {
+        return owned;
+    }
+
+    /**
+     * Names whose box overlaps their figure but whose centre is
+     * outside it - written across their own constellation from the
+     * edge of it. The stricter reading of the rule, reported beside
+     * the one the policy enforces so the difference is visible rather
+     * than argued about.
+     */
+    public int namesWhoseCentreIsOffTheirFigure() {
+        int outside = 0;
+        for (PlacedText text : placed) {
+            if (text.family() != Participant.Family.CONSTELLATION_NAME
+                    || !owned.knows(text.id())) {
+                continue;
+            }
+            if (!owned.owns(text.id(), text.box().getCenterX(),
+                    text.box().getCenterY())) {
+                outside++;
+            }
+        }
+        return outside;
     }
 
     private void gatherObstacles() {
@@ -277,10 +318,11 @@ public final class Greedy {
             if (plane.isEmpty()) {
                 continue;
             }
+            // No off-paper test: the released page draws a label for
+            // an object whose own centre is past the edge, and a
+            // candidate that skipped those would be losing labels the
+            // atlas has rather than placing them.
             PixelPoint at = mapping.toPixel(plane.get());
-            if (offPaper(at)) {
-                continue;
-            }
             Rectangle2D home = ChartRenderer.labelBounds(labelMetrics, dso,
                     at, mapping.pixelsPerPlaneUnit());
             double reach = home.getX() - at.x();
@@ -331,53 +373,15 @@ public final class Greedy {
 
     private void placeConstellationNames() {
         ChartScene scene = page.scene();
-        var mapping = new ViewportMapping(scene.viewport());
-        Projection projection = Projections.forViewport(scene.viewport());
-        Map<String, double[]> centroid = new LinkedHashMap<>();
-        for (GeoSegment segment : scene.geography().figureSegments()) {
-            for (SkyPosition end
-                    : List.of(segment.from(), segment.to())) {
-                var plane = projection.project(end);
-                if (plane.isEmpty()) {
-                    continue;
-                }
-                PixelPoint at = mapping.toPixel(plane.get());
-                if (offPaper(at)) {
-                    continue;
-                }
-                double[] sum = centroid.computeIfAbsent(
-                        segment.constellationId(), key -> new double[6]);
-                sum[0] += at.x();
-                sum[1] += at.y();
-                sum[2] += 1.0;
-                sum[3] = sum[2] == 1.0 ? at.x() : Math.min(sum[3], at.x());
-                sum[4] = sum[2] == 1.0 ? at.y() : Math.min(sum[4], at.y());
-                sum[5] += 0.0;
-            }
-        }
-        Map<String, Rectangle2D> extent = new LinkedHashMap<>();
-        for (GeoSegment segment : scene.geography().figureSegments()) {
-            for (SkyPosition end : List.of(segment.from(), segment.to())) {
-                var plane = projection.project(end);
-                if (plane.isEmpty()) {
-                    continue;
-                }
-                PixelPoint at = mapping.toPixel(plane.get());
-                extent.merge(segment.constellationId(),
-                        new Rectangle2D.Double(at.x(), at.y(), 1, 1),
-                        (one, other) -> one.createUnion(other));
-            }
-        }
-        figureInk.putAll(extent);
         for (Map.Entry<String, String> name
                 : scene.geography().latinNames().entrySet()) {
-            double[] sum = centroid.get(name.getKey());
-            if (sum == null || sum[2] == 0.0) {
+            double[] centre = owned.centroidOf(name.getKey());
+            if (centre == null) {
                 continue;
             }
-            PixelPoint at = new PixelPoint(sum[0] / sum[2], sum[1] / sum[2]);
             place(Participant.Family.CONSTELLATION_NAME, name.getKey(),
-                    name.getValue().toUpperCase(Locale.ROOT), at, 0.0,
+                    name.getValue().toUpperCase(Locale.ROOT),
+                    new PixelPoint(centre[0], centre[1]), 0.0,
                     nameMetrics, constellationNameFont(),
                     page.options().palette().constellationNameInk(), false,
                     0.0);
@@ -427,7 +431,7 @@ public final class Greedy {
                     + metrics.getAscent() / 2.0 - 1.0;
             Rectangle2D box = new Rectangle2D.Double(x - 2.0,
                     baseline - metrics.getAscent(), width + 4.0, height);
-            if (!guaranteed && refused(box)) {
+            if (!guaranteed && (refused(box) || disowned(family, id, box))) {
                 continue;
             }
             taken.add(box);
@@ -448,7 +452,8 @@ public final class Greedy {
             // Both are deterministic; the second is strictly better
             // and costs one pass over a list of eight.
             double[] home = rules.leastBadWhenNothingIsFree()
-                    ? leastBad(candidates, anchor, metrics, width, height)
+                    ? leastBad(family, id, candidates, anchor, metrics,
+                            width, height)
                     : candidates.get(0);
             double x = anchor.x() + home[0];
             double baseline = anchor.y() + home[1]
@@ -478,7 +483,8 @@ public final class Greedy {
      * are broken by the candidate order, so the answer is the same on
      * every machine.
      */
-    private double[] leastBad(List<double[]> candidates, PixelPoint anchor,
+    private double[] leastBad(Participant.Family family, String id,
+                              List<double[]> candidates, PixelPoint anchor,
                               FontMetrics metrics, double width,
                               double height) {
         double[] best = candidates.get(0);
@@ -490,6 +496,12 @@ public final class Greedy {
                     + metrics.getAscent() / 2.0 - 1.0;
             Rectangle2D box = new Rectangle2D.Double(x - 2.0,
                     baseline - metrics.getAscent(), width + 4.0, height);
+            if (disowned(family, id, box)) {
+                // The ownership rule is not a preference the fallback
+                // may spend: a name outside its own figure is naming
+                // something else, whatever it would have covered.
+                continue;
+            }
             double cost = costOf(box);
             // Lexicographic, not weighted: least ink covered first,
             // and only among equals does crossing fewer lines decide.
@@ -523,16 +535,81 @@ public final class Greedy {
         }
         for (Shape mark : marks) {
             if (mark.intersects(box)) {
-                cost += shared(box, mark.getBounds2D());
+                // The outline, not its bounding box. A disc in a
+                // square is a fifth empty at the corners and a
+                // galaxy's ellipse far more, and this study's whole
+                // argument is that a box is not ink - a fallback that
+                // ranked candidates by boxes would be ranking them by
+                // the very thing the census refuses to count.
+                java.awt.geom.Area both = new java.awt.geom.Area(mark);
+                both.intersect(new java.awt.geom.Area(box));
+                cost += areaOf(both);
             }
         }
         return cost;
+    }
+
+    /**
+     * The area of a shape, by the shoelace formula over its flattened
+     * outline. Deterministic, and exact for the polygons and
+     * flattened conics the renderer draws.
+     */
+    private static double areaOf(java.awt.geom.Area shape) {
+        if (shape.isEmpty()) {
+            return 0.0;
+        }
+        double twice = 0.0;
+        double[] point = new double[6];
+        double startX = 0.0;
+        double startY = 0.0;
+        double lastX = 0.0;
+        double lastY = 0.0;
+        for (java.awt.geom.PathIterator along = shape.getPathIterator(null,
+                0.1); !along.isDone(); along.next()) {
+            switch (along.currentSegment(point)) {
+                case java.awt.geom.PathIterator.SEG_MOVETO -> {
+                    startX = point[0];
+                    startY = point[1];
+                    lastX = point[0];
+                    lastY = point[1];
+                }
+                case java.awt.geom.PathIterator.SEG_LINETO -> {
+                    twice += lastX * point[1] - point[0] * lastY;
+                    lastX = point[0];
+                    lastY = point[1];
+                }
+                case java.awt.geom.PathIterator.SEG_CLOSE -> {
+                    twice += lastX * startY - startX * lastY;
+                    lastX = startX;
+                    lastY = startY;
+                }
+                default -> {
+                }
+            }
+        }
+        return Math.abs(twice) / 2.0;
     }
 
     private static double shared(Rectangle2D box, Rectangle2D other) {
         Rectangle2D both = box.createIntersection(other);
         return both.getWidth() <= 0 || both.getHeight() <= 0 ? 0.0
                 : both.getWidth() * both.getHeight();
+    }
+
+    /**
+     * Whether this candidate would put a constellation's name outside
+     * the region that constellation owns.
+     *
+     * <p>The rule the decision states, applied by the policy that the
+     * decision is measured from - which an earlier draft did not do,
+     * and which is why {@link #LEAST_BAD_UNOWNED} exists: the cost of
+     * leaving it off is measured rather than asserted.
+     */
+    private boolean disowned(Participant.Family family, String id,
+                             Rectangle2D box) {
+        return rules.namesStayOnTheirFigure()
+                && family == Participant.Family.CONSTELLATION_NAME
+                && owned.knows(id) && !owned.ownsBox(id, box);
     }
 
     /** Whether the page, its furniture or its ink refuses this box. */

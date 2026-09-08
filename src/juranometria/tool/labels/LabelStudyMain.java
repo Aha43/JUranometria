@@ -738,36 +738,74 @@ public final class LabelStudyMain {
                 + " anchor, which is where the released\npage puts it,"
                 + " or to whichever of its eight candidates covers the"
                 + " least ink.\n\n");
-        out.append("### May a constellation name move?\n\n");
-        out.append("| page | names placed | moved | worst move | left"
-                + " their own figure's ink |\n");
-        out.append("|---|---:|---:|---:|---:|\n");
-        for (Map.Entry<String, Greedy> entry : keep.entrySet()) {
-            Greedy greedy = entry.getValue();
-            int names = 0;
-            int movedNames = 0;
-            double worst = 0.0;
-            for (PlacedText text : greedy.placed()) {
-                if (text.family() != Family.CONSTELLATION_NAME) {
-                    continue;
+        out.append("### May a constellation name move, and how far?\n\n");
+        out.append("A name that leaves its own figure is naming the"
+                + " wrong part of the sky, which is\nworse than the"
+                + " collision it was avoiding. The chosen policy"
+                + " therefore refuses any\ncandidate outside the region"
+                + " its constellation owns - the **convex hull of that"
+                + "\nfigure's visible ink**, not its bounding box: the"
+                + " box of Eridanus, which wanders\nhalf the sky,"
+                + " contains most of Orion.\n\n");
+        out.append("What that rule costs and what it buys, measured by"
+                + " running the same policy with\nit and without"
+                + " it:\n\n");
+        out.append("| page | | names placed | moved | worst move |"
+                + " off their own figure | centre outside it |"
+                + " collisions |\n");
+        out.append("|---|---|---:|---:|---:|---:|---:|---:|\n");
+        for (String slug : CANDIDATE_PAGES) {
+            Page page = pageOf(corpus, slug);
+            boolean first = true;
+            for (Greedy.Rules rules : List.of(Greedy.LEAST_BAD,
+                    Greedy.LEAST_BAD_UNOWNED)) {
+                Greedy greedy = rules == Greedy.LEAST_BAD
+                        ? keep.get(slug) : new Greedy(page, rules);
+                int names = 0;
+                int movedNames = 0;
+                double worst = 0.0;
+                for (PlacedText text : greedy.placed()) {
+                    if (text.family() != Family.CONSTELLATION_NAME) {
+                        continue;
+                    }
+                    names++;
+                    Double move = greedy.moved().get(
+                            Family.CONSTELLATION_NAME + ":" + text.id());
+                    if (move != null) {
+                        movedNames++;
+                        worst = Math.max(worst, move);
+                    }
                 }
-                names++;
-                Double move = greedy.moved().get(
-                        Family.CONSTELLATION_NAME + ":" + text.id());
-                if (move != null) {
-                    movedNames++;
-                    worst = Math.max(worst, move);
-                }
+                Census after = new Census(greedy.pageWithPlacements());
+                out.append(String.format(Locale.ROOT,
+                        "| %s | %s | %d | %d | %.0f px | %d | %d | %d |%n",
+                        first ? "`" + slug + "`" : "",
+                        first ? "owned" : "free",
+                        names, movedNames, worst,
+                        greedy.namesOffTheirOwnFigure(),
+                        greedy.namesWhoseCentreIsOffTheirFigure(),
+                        after.collisions().size()));
+                first = false;
             }
-            out.append(String.format(Locale.ROOT,
-                    "| `%s` | %d | %d | %.0f px | %d |%n",
-                    entry.getKey(), names, movedNames, worst,
-                    greedy.namesOffTheirOwnFigure()));
         }
-        out.append("\nA name that leaves its own figure's ink is naming"
-                + " the wrong part of the sky, which\nis worse than"
-                + " sitting on a star. The measurement above is what"
-                + " decides how far a\nname may be allowed to go.\n\n");
+        out.append("\nThe rule the policy enforces is that a name's"
+                + " box **overlaps** the region its own\nfigure owns."
+                + " Overlap rather than \"its centre is inside\","
+                + " because a figure can be\nsmaller than its own name:"
+                + " Crater on a 90-degree page leaves six pixels by five"
+                + " of\nvisible ink and CRATER is fifty pixels wide, so"
+                + " the strict reading would refuse\nevery candidate it"
+                + " has and teach nothing. The stricter statistic is"
+                + " reported\nbeside it so the difference is visible"
+                + " rather than argued about.\n\n");
+        out.append("Without the rule, names leave their own figures on"
+                + " every crowded page - eight of\nthirty at"
+                + " Sagittarius, seven of twenty-seven at 120 degrees."
+                + " With it, none does\nanywhere, and the collision"
+                + " count is a little higher. That is the whole trade:"
+                + " the\nrule costs a name the occasional candidate and"
+                + " buys the guarantee that a name is\nwritten across"
+                + " the thing it names.\n\n");
     }
 
     private static int defects(List<Attribution.Meeting> collisions) {

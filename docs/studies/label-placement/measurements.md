@@ -321,35 +321,35 @@ marking its own work.
 | | greedy, star labels first, keeping what it cannot place | 1 | 0 | 0 | 1 | 1 | 22 px | 19 |
 | | greedy, star labels first, least bad when nothing is free | 1 | 0 | 0 | 1 | 1 | 22 px | 19 |
 | `orion-36` | the atlas today | 32 | 19 | — | — | — | — | — |
-| | greedy, star labels first | 8 | 0 | 7 | 0 | 7 | 72 px | 117 |
-| | greedy, constellation names first | 8 | 0 | 7 | 0 | 7 | 72 px | 117 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 11 | 0 | 5 | 56 px | 145 |
-| | greedy, star labels first, keeping what it cannot place | 27 | 12 | 0 | 0 | 7 | 72 px | 117 |
-| | greedy, star labels first, least bad when nothing is free | 22 | 5 | 0 | 0 | 7 | 72 px | 117 |
+| | greedy, star labels first | 8 | 0 | 9 | 0 | 5 | 47 px | 148 |
+| | greedy, constellation names first | 8 | 0 | 9 | 0 | 5 | 47 px | 148 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 12 | 0 | 4 | 52 px | 163 |
+| | greedy, star labels first, keeping what it cannot place | 36 | 18 | 0 | 1 | 5 | 47 px | 148 |
+| | greedy, star labels first, least bad when nothing is free | 29 | 9 | 0 | 1 | 5 | 47 px | 148 |
 | `orion-90` | the atlas today | 63 | 19 | — | — | — | — | — |
-| | greedy, star labels first | 44 | 0 | 39 | 5 | 28 | 87 px | 306 |
-| | greedy, constellation names first | 44 | 0 | 39 | 8 | 28 | 87 px | 306 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 62 | 2 | 29 | 75 px | 584 |
-| | greedy, star labels first, keeping what it cannot place | 54 | 2 | 23 | 11 | 28 | 87 px | 320 |
-| | greedy, star labels first, least bad when nothing is free | 51 | 0 | 23 | 11 | 28 | 87 px | 329 |
+| | greedy, star labels first | 43 | 0 | 39 | 4 | 25 | 87 px | 523 |
+| | greedy, constellation names first | 42 | 0 | 39 | 7 | 26 | 87 px | 521 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 59 | 2 | 30 | 75 px | 770 |
+| | greedy, star labels first, keeping what it cannot place | 61 | 4 | 0 | 11 | 25 | 87 px | 537 |
+| | greedy, star labels first, least bad when nothing is free | 60 | 1 | 0 | 11 | 24 | 87 px | 549 |
 | `orion-120` | the atlas today | 169 | 37 | — | — | — | — | — |
-| | greedy, star labels first | 86 | 0 | 76 | 8 | 61 | 88 px | 1013 |
-| | greedy, constellation names first | 86 | 0 | 77 | 31 | 62 | 91 px | 1006 |
-| | greedy, star labels first, avoiding every line | 2 | 0 | 116 | 3 | 51 | 89 px | 1438 |
-| | greedy, star labels first, keeping what it cannot place | 113 | 10 | 0 | 15 | 62 | 88 px | 1028 |
-| | greedy, star labels first, least bad when nothing is free | 462 | 2 | 0 | 15 | 53 | 88 px | 1064 |
+| | greedy, star labels first | 88 | 0 | 78 | 8 | 57 | 88 px | 1008 |
+| | greedy, constellation names first | 86 | 0 | 79 | 32 | 57 | 88 px | 983 |
+| | greedy, star labels first, avoiding every line | 2 | 0 | 118 | 3 | 48 | 89 px | 1448 |
+| | greedy, star labels first, keeping what it cannot place | 117 | 10 | 0 | 15 | 58 | 88 px | 1023 |
+| | greedy, star labels first, least bad when nothing is free | 475 | 6 | 0 | 15 | 46 | 88 px | 1071 |
 | `sagittarius-120` | the atlas today | 147 | 48 | — | — | — | — | — |
-| | greedy, star labels first | 87 | 0 | 7 | 14 | 47 | 116 px | 390 |
-| | greedy, constellation names first | 94 | 0 | 5 | 13 | 51 | 116 px | 392 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 44 | 10 | 59 | 92 px | 870 |
-| | greedy, star labels first, keeping what it cannot place | 127 | 13 | 0 | 18 | 48 | 116 px | 401 |
-| | greedy, star labels first, least bad when nothing is free | 111 | 3 | 0 | 18 | 47 | 116 px | 390 |
+| | greedy, star labels first | 82 | 0 | 13 | 14 | 41 | 116 px | 439 |
+| | greedy, constellation names first | 84 | 0 | 10 | 14 | 43 | 116 px | 413 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 49 | 10 | 54 | 71 px | 906 |
+| | greedy, star labels first, keeping what it cannot place | 154 | 28 | 0 | 18 | 42 | 116 px | 450 |
+| | greedy, star labels first, least bad when nothing is free | 128 | 7 | 0 | 18 | 42 | 116 px | 449 |
 | `crux-90` | the atlas today | 74 | 17 | — | — | — | — | — |
-| | greedy, star labels first | 76 | 0 | 1 | 6 | 31 | 93 px | 218 |
-| | greedy, constellation names first | 74 | 0 | 1 | 6 | 30 | 93 px | 198 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 24 | 5 | 38 | 73 px | 510 |
-| | greedy, star labels first, keeping what it cannot place | 78 | 1 | 0 | 6 | 31 | 93 px | 218 |
-| | greedy, star labels first, least bad when nothing is free | 78 | 1 | 0 | 6 | 31 | 93 px | 218 |
+| | greedy, star labels first | 76 | 0 | 4 | 6 | 26 | 92 px | 205 |
+| | greedy, constellation names first | 76 | 0 | 3 | 6 | 26 | 92 px | 199 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 31 | 5 | 34 | 73 px | 577 |
+| | greedy, star labels first, keeping what it cannot place | 85 | 3 | 0 | 6 | 26 | 92 px | 205 |
+| | greedy, star labels first, least bad when nothing is free | 84 | 2 | 0 | 6 | 26 | 92 px | 205 |
 
 "Of the two defects" counts only the owner's two: a constellation name and a
 star label sharing pixels either way up, and a star's name across another
@@ -377,20 +377,44 @@ label with no free candidate is still drawn, so no page loses anything it has.
 They differ in where it goes - back to its own anchor, which is where the released
 page puts it, or to whichever of its eight candidates covers the least ink.
 
-### May a constellation name move?
+### May a constellation name move, and how far?
 
-| page | names placed | moved | worst move | left their own figure's ink |
-|---|---:|---:|---:|---:|
-| `home` | 0 | 0 | 0 px | 0 |
-| `orion-36` | 4 | 2 | 72 px | 1 |
-| `orion-90` | 17 | 11 | 51 px | 6 |
-| `orion-120` | 27 | 20 | 74 px | 7 |
-| `sagittarius-120` | 30 | 20 | 92 px | 10 |
-| `crux-90` | 27 | 18 | 93 px | 11 |
+A name that leaves its own figure is naming the wrong part of the sky, which is
+worse than the collision it was avoiding. The chosen policy therefore refuses any
+candidate outside the region its constellation owns - the **convex hull of that
+figure's visible ink**, not its bounding box: the box of Eridanus, which wanders
+half the sky, contains most of Orion.
 
-A name that leaves its own figure's ink is naming the wrong part of the sky, which
-is worse than sitting on a star. The measurement above is what decides how far a
-name may be allowed to go.
+What that rule costs and what it buys, measured by running the same policy with
+it and without it:
+
+| page | | names placed | moved | worst move | off their own figure | centre outside it | collisions |
+|---|---|---:|---:|---:|---:|---:|---:|
+| `home` | owned | 0 | 0 | 0 px | 0 | 0 | 1 |
+|  | free | 0 | 0 | 0 px | 0 | 0 | 1 |
+| `orion-36` | owned | 5 | 0 | 0 px | 0 | 1 | 29 |
+|  | free | 5 | 0 | 0 px | 1 | 1 | 26 |
+| `orion-90` | owned | 18 | 6 | 45 px | 0 | 5 | 60 |
+|  | free | 18 | 9 | 68 px | 3 | 6 | 56 |
+| `orion-120` | owned | 27 | 15 | 74 px | 0 | 10 | 475 |
+|  | free | 27 | 20 | 91 px | 6 | 10 | 468 |
+| `sagittarius-120` | owned | 30 | 14 | 70 px | 0 | 16 | 128 |
+|  | free | 30 | 19 | 92 px | 8 | 16 | 111 |
+| `crux-90` | owned | 27 | 13 | 50 px | 0 | 12 | 84 |
+|  | free | 27 | 17 | 50 px | 4 | 14 | 86 |
+
+The rule the policy enforces is that a name's box **overlaps** the region its own
+figure owns. Overlap rather than "its centre is inside", because a figure can be
+smaller than its own name: Crater on a 90-degree page leaves six pixels by five of
+visible ink and CRATER is fifty pixels wide, so the strict reading would refuse
+every candidate it has and teach nothing. The stricter statistic is reported
+beside it so the difference is visible rather than argued about.
+
+Without the rule, names leave their own figures on every crowded page - eight of
+thirty at Sagittarius, seven of twenty-seven at 120 degrees. With it, none does
+anywhere, and the collision count is a little higher. That is the whole trade: the
+rule costs a name the occasional candidate and buys the guarantee that a name is
+written across the thing it names.
 
 ## Stability under a small navigation change
 
@@ -402,9 +426,9 @@ counted.
 
 | page | labels | changed after a pan | after a zoom |
 |---|---:|---:|---:|
-| `orion-90` | 84 | 3 | 20 |
-| `sagittarius-120` | 124 | 14 | 20 |
-| `home` | 4 | 1 | 0 |
+| `orion-90` | 107 | 20 | 21 |
+| `sagittarius-120` | 124 | 16 | 20 |
+| `home` | 4 | 0 | 0 |
 
 Counted as: a label that both pages draw, whose offset from its own anchor changed
 sign in x or in y - it moved to the other side of the thing it names.
