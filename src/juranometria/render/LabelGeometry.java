@@ -128,6 +128,14 @@ public final class LabelGeometry {
                 continue;
             }
             PixelPoint at = mapping.toPixel(plane.get());
+            if (at.x() < 0 || at.x() >= scene.viewport().widthPx()
+                    || at.y() < 0 || at.y() >= scene.viewport().heightPx()) {
+                // A star off the paper is not labelled, which is the
+                // star-label pass's own rule. Asking for one and then
+                // reporting it as omitted would count this study's
+                // mistake as the decision's cost.
+                continue;
+            }
             double reach = StarSizePolicyOf(renderer, star);
             asked.add(new LabelPlacement.Request(
                     target ? LabelPlacement.Family.TARGET
@@ -157,12 +165,13 @@ public final class LabelGeometry {
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         Projection projection = Projections.forViewport(scene.viewport());
         List<LabelPlacement.Request> asked = new ArrayList<>();
-        for (ChartRenderer.DrawnMark mark
-                : renderer.drawnMarks(scene, options)) {
-            DeepSkyObject dso = mark.deepSky();
-            if (dso == null) {
-                continue;
-            }
+        // The objects the page labels, from the renderer's own rule.
+        // An earlier version asked for a label for every drawn symbol,
+        // which is not what the atlas draws: it asked for hundreds the
+        // page never names, most of them off its edge, and then
+        // reported them as omissions - a migration cost that was
+        // mostly this mistake.
+        for (DeepSkyObject dso : renderer.labelledDeepSky(scene, options)) {
             var plane = projection.project(dso.position());
             if (plane.isEmpty()) {
                 continue;

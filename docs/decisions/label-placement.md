@@ -275,9 +275,13 @@ The guarantee bends here too, and only here: a searched target's label
 may be written over anything on the page, and may not be written half
 off it.
 
-`#314` applies this when the families migrate, and the released pages
-will change by the counts above. `#315`'s journey walks a page where
-it happens.
+`#314` applies this when the families migrate. What a reader loses is
+**not** the clipping count above — a label whose usual place runs off
+the paper has seven other places to try — so the study counts the two
+apart: text the atlas draws today that the seam would not draw at all
+comes to **0 to 3 labels a page** across the candidate set, mostly
+constellation names whose own figure has nowhere else to put them.
+`#315`'s journey walks a page where it happens.
 
 This is the load-bearing choice of the whole decision. The three
 policies that omit instead reach zero of the owner's defects and lose

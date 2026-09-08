@@ -437,39 +437,46 @@ object's own label** - every `IC 1203` cut to `IC 1`, every `NGC 2024` cut to
 wrong thing, at the edge, where a reader matching a chart against the sky is
 most likely to be working.
 
-How often the atlas does it today, counted over the corpus:
+How often the atlas does it today, counted over the corpus - every family, because
+the decision is every family's:
 
-| page | star names | deep-sky labels |
-|---|---:|---:|
-| `home` | 0 | 1 |
-| `orion-08` | 1 | 0 |
-| `orion-18` | 0 | 10 |
-| `orion-36` | 0 | 1 |
-| `orion-42` | 1 | 1 |
-| `orion-60` | 0 | 2 |
-| `orion-90` | 0 | 2 |
-| `orion-120` | 1 | 1 |
-| `sagittarius-90` | 2 | 0 |
-| `sagittarius-120` | 1 | 0 |
-| `cygnus-90` | 1 | 1 |
-| `crux-90` | 2 | 0 |
-| `pole-120` | 2 | 7 |
-| `seam-120` | 2 | 3 |
-| `orion-120-small` | 3 | 1 |
-| `orion-42-a4` | 0 | 1 |
-| `orion-42-letter` | 0 | 1 |
-| `orion-90-black` | 0 | 2 |
-| `sagittarius-90-key` | 2 | 0 |
-| `sagittarius-90-ecliptic` | 2 | 0 |
-| `orion-90-observer` | 0 | 2 |
-| `nunki-searched` | 1 | 0 |
-| `orion-18-selected` | 0 | 10 |
-| **all 23 pages** | **21** | **46** |
+| page | star names | deep-sky labels | constellation names |
+|---|---:|---:|---:|
+| `home` | 0 | 1 | 0 |
+| `orion-08` | 1 | 0 | 0 |
+| `orion-18` | 0 | 10 | 0 |
+| `orion-36` | 0 | 1 | 1 |
+| `orion-42` | 1 | 1 | 1 |
+| `orion-60` | 0 | 2 | 1 |
+| `orion-90` | 0 | 2 | 3 |
+| `orion-120` | 1 | 1 | 2 |
+| `sagittarius-90` | 2 | 0 | 1 |
+| `sagittarius-120` | 1 | 0 | 0 |
+| `cygnus-90` | 1 | 1 | 1 |
+| `crux-90` | 2 | 0 | 5 |
+| `pole-120` | 2 | 7 | 2 |
+| `seam-120` | 2 | 3 | 3 |
+| `orion-120-small` | 3 | 1 | 2 |
+| `orion-42-a4` | 0 | 1 | 2 |
+| `orion-42-letter` | 0 | 1 | 2 |
+| `orion-90-black` | 0 | 2 | 3 |
+| `sagittarius-90-key` | 2 | 0 | 1 |
+| `sagittarius-90-ecliptic` | 2 | 0 | 1 |
+| `orion-90-observer` | 0 | 2 | 3 |
+| `nunki-searched` | 1 | 0 | 1 |
+| `orion-18-selected` | 0 | 10 | 0 |
+| **all 23 pages** | **21** | **46** | **35** |
 
 So the decision is that no text is clipped by the page, in any family: a label
 that cannot be drawn whole is not drawn, and the placement records which candidates
 the paper refused. The mark is still there, unnamed - which is what the page does to
 every star below its limit, without apology.
+
+**That table is not the cost of the change.** It counts what the atlas clips today,
+which is what the decision is about; what a reader would lose is a different
+question, because a label whose usual place runs off the paper has seven other
+places to try before it is given up on. The two are counted apart, and the
+second is in the next section.
 
 ## The seam against this study
 
@@ -480,12 +487,12 @@ the same question, which is worth more than asking either of them twice.
 
 | page | labels both place | same candidate | same box | placed under duress | omitted by the seam |
 |---|---:|---:|---:|---:|---:|
-| `home` | 4 | 4 | 1 | 2 | 13 |
-| `orion-36` | 16 | 16 | 10 | 15 | 16 |
-| `orion-90` | 66 | 59 | 45 | 13 | 29 |
-| `orion-120` | 101 | 86 | 67 | 20 | 37 |
-| `sagittarius-120` | 118 | 107 | 86 | 27 | 43 |
-| `crux-90` | 78 | 75 | 53 | 4 | 42 |
+| `home` | 4 | 4 | 1 | 2 | 0 |
+| `orion-36` | 16 | 16 | 10 | 6 | 2 |
+| `orion-90` | 64 | 59 | 45 | 8 | 2 |
+| `orion-120` | 98 | 87 | 67 | 12 | 3 |
+| `sagittarius-120` | 118 | 107 | 86 | 14 | 1 |
+| `crux-90` | 78 | 75 | 53 | 4 | 2 |
 
 They do not agree everywhere, and the places they part are worth more than the
 places they meet. Two causes, and neither is the placement rule:
@@ -499,11 +506,33 @@ lower: they choose the same position and draw it a few pixels apart.
 where the other pass put it changes what every later label finds free. One
 disagreement early on a crowded page is worth several late ones.
 
+### What a reader would actually lose
+
+The cost of the clipping decision, counted as the thing it is: text the atlas
+draws today that the seam would not draw at all. Not the same as the clipping
+count above - a label whose usual place runs off the paper has seven other places
+to try - and not the same as the seam's omissions either, which include text
+this study's own pass never asked for.
+
+| page | drawn today | not drawn by the seam | which are |
+|---|---:|---:|---|
+| `home` | 5 | 0 | — |
+| `orion-36` | 18 | 2 | 1 dso label, 1 const. name |
+| `orion-90` | 66 | 2 | 2 const. name |
+| `orion-120` | 101 | 3 | 1 dso label, 2 const. name |
+| `sagittarius-120` | 119 | 1 | 1 const. name |
+| `crux-90` | 80 | 2 | 2 const. name |
+
+Every one of those is at the paper's edge or outside its own figure's region:
+those are the two refusals a fallback may not spend, and the only two that can
+omit anything. #314 applies the rule and the released pages change by these
+counts.
+
 **And the seam omits where this pass does not.** The paper's edge is not a cost the
 fallback may spend, so a label whose every candidate leaves the page is not drawn
-at all - a star at the margin, or a nebula whose symbol straddles it. The greedy
-pass above draws those clipped, which is what the atlas does today. Which of the
-two a reader gets is #314's to settle.
+at all. This study's pass draws those clipped, which is what the atlas does today;
+the section above counts them, and the decision says why the seam is right to
+refuse.
 
 What this does establish is the part worth establishing: on the same page, from
 the same published geometry, two implementations written from one document and

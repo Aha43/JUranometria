@@ -871,17 +871,7 @@ public final class LabelStudyMain {
             }
 
             List<juranometria.render.LabelPlacement.Request> asked =
-                    new ArrayList<>();
-            asked.addAll(juranometria.render.LabelGeometry.starLabels(
-                    Page.renderer(), metrics, page.scene(),
-                    page.options()));
-            asked.addAll(juranometria.render.LabelGeometry.deepSkyLabels(
-                    Page.renderer(), metrics, page.scene(),
-                    page.options()));
-            asked.addAll(
-                    juranometria.render.LabelGeometry.constellationNames(
-                            Page.renderer(), metrics, page.scene(),
-                            page.options()));
+                    seamRequests(page, metrics);
             var seam = new juranometria.render.LabelPlacement(page.wide(),
                     page.high(),
                     juranometria.render.LabelGeometry.obstaclesOn(
@@ -937,14 +927,59 @@ public final class LabelStudyMain {
                 + " other pass put it changes what every later label"
                 + " finds free. One\ndisagreement early on a crowded"
                 + " page is worth several late ones.\n\n");
+        out.append("### What a reader would actually lose\n\n");
+        out.append("The cost of the clipping decision, counted as the"
+                + " thing it is: text the atlas\ndraws today that the"
+                + " seam would not draw at all. Not the same as the"
+                + " clipping\ncount above - a label whose usual place"
+                + " runs off the paper has seven other places\nto try -"
+                + " and not the same as the seam's omissions either,"
+                + " which include text\nthis study's own pass never"
+                + " asked for.\n\n");
+        out.append("| page | drawn today | not drawn by the seam |"
+                + " which are |\n");
+        out.append("|---|---:|---:|---|\n");
+        for (String slug : CANDIDATE_PAGES) {
+            Page page = pageOf(corpus, slug);
+            List<juranometria.render.LabelPlacement.Request> asked =
+                    seamRequests(page, metrics);
+            var seam = new juranometria.render.LabelPlacement(page.wide(),
+                    page.high(),
+                    juranometria.render.LabelGeometry.obstaclesOn(
+                            Page.renderer(), metrics, page.scene(),
+                            page.options()));
+            int lost = 0;
+            Map<Family, Integer> byFamily = new LinkedHashMap<>();
+            for (var placed : seam.placeAll(asked)) {
+                if (!placed.omitted()) {
+                    continue;
+                }
+                lost++;
+                byFamily.merge(familyOf(placed.request().family()), 1,
+                        Integer::sum);
+            }
+            List<String> parts = new ArrayList<>();
+            for (var entry : byFamily.entrySet()) {
+                parts.add(entry.getValue() + " "
+                        + shortName(entry.getKey()));
+            }
+            out.append(String.format(Locale.ROOT,
+                    "| `%s` | %d | %d | %s |%n", slug, asked.size(), lost,
+                    parts.isEmpty() ? "—" : String.join(", ", parts)));
+        }
+        out.append("\nEvery one of those is at the paper's edge or"
+                + " outside its own figure's region:\nthose are the two"
+                + " refusals a fallback may not spend, and the only two"
+                + " that can\nomit anything. #314 applies the rule and"
+                + " the released pages change by these\ncounts.\n\n");
+
         out.append("**And the seam omits where this pass does not.**"
                 + " The paper's edge is not a cost the\nfallback may"
                 + " spend, so a label whose every candidate leaves the"
-                + " page is not drawn\nat all - a star at the margin,"
-                + " or a nebula whose symbol straddles it. The greedy"
-                + "\npass above draws those clipped, which is what the"
-                + " atlas does today. Which of the\ntwo a reader gets"
-                + " is #314's to settle.\n\n");
+                + " page is not drawn\nat all. This study's pass draws"
+                + " those clipped, which is what the atlas does today;"
+                + "\nthe section above counts them, and the decision"
+                + " says why the seam is right to\nrefuse.\n\n");
         out.append("What this does establish is the part worth"
                 + " establishing: on the same page, from\nthe same"
                 + " published geometry, two implementations written"
@@ -953,6 +988,20 @@ public final class LabelStudyMain {
                 + " text.\nThe candidate arithmetic is #314's to make"
                 + " one of, when the families migrate to the\nseam and"
                 + " this pass retires.\n\n");
+    }
+
+    /** Everything this page's text asks the seam for. */
+    private static List<juranometria.render.LabelPlacement.Request>
+            seamRequests(Page page, java.awt.FontMetrics metrics) {
+        List<juranometria.render.LabelPlacement.Request> asked =
+                new ArrayList<>();
+        asked.addAll(juranometria.render.LabelGeometry.starLabels(
+                Page.renderer(), metrics, page.scene(), page.options()));
+        asked.addAll(juranometria.render.LabelGeometry.deepSkyLabels(
+                Page.renderer(), metrics, page.scene(), page.options()));
+        asked.addAll(juranometria.render.LabelGeometry.constellationNames(
+                Page.renderer(), metrics, page.scene(), page.options()));
+        return asked;
     }
 
     private static Family familyOf(
@@ -1026,13 +1075,16 @@ public final class LabelStudyMain {
                         + " against the sky is\nmost likely to be"
                         + " working.\n\n", labels.size(),
                 labelClashes));
-        out.append("How often the atlas does it today, counted over the"
-                + " corpus:\n\n");
-        out.append("| page | star names | deep-sky labels |\n");
-        out.append("|---|---:|---:|\n");
+        out.append("How often the atlas does it today, counted over"
+                + " the corpus - every family, because\nthe decision is"
+                + " every family's:\n\n");
+        out.append("| page | star names | deep-sky labels |"
+                + " constellation names |\n");
+        out.append("|---|---:|---:|---:|\n");
         var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
         int stars = 0;
         int deepSky = 0;
+        int names2 = 0;
         for (StudyPages.Look look : corpus) {
             Page page = look.page();
             var mapping = new juranometria.project.ViewportMapping(
@@ -1065,23 +1117,56 @@ public final class LabelStudyMain {
                     deepSkyHere++;
                 }
             }
+            // And the names, which the first version of this table
+            // left out while its prose counted them: the decision is
+            // every family's, so the evidence has to be.
+            var nameMetrics = Census.Metrics.forFont(
+                    Greedy.constellationNameFont());
+            int namesHere = 0;
+            for (var figure : Page.renderer()
+                    .figureInk(page.scene(), page.options()).entrySet()) {
+                String latin = page.scene().geography().latinNames()
+                        .get(figure.getKey());
+                if (latin == null || figure.getValue().nameAnchor() == null) {
+                    continue;
+                }
+                String text = latin.toUpperCase(Locale.ROOT);
+                double width = nameMetrics.stringWidth(text);
+                var anchor = figure.getValue().nameAnchor();
+                if (offThePaper(new java.awt.geom.Rectangle2D.Double(
+                        anchor.x() - width / 2.0,
+                        anchor.y() - nameMetrics.getAscent(), width,
+                        nameMetrics.getHeight()), page)) {
+                    namesHere++;
+                }
+            }
             stars += starsHere;
             deepSky += deepSkyHere;
-            if (starsHere + deepSkyHere > 0) {
-                out.append(String.format(Locale.ROOT, "| `%s` | %d | %d |%n",
-                        page.slug(), starsHere, deepSkyHere));
+            names2 += namesHere;
+            if (starsHere + deepSkyHere + namesHere > 0) {
+                out.append(String.format(Locale.ROOT,
+                        "| `%s` | %d | %d | %d |%n", page.slug(),
+                        starsHere, deepSkyHere, namesHere));
             }
         }
         out.append(String.format(Locale.ROOT,
-                "| **all %d pages** | **%d** | **%d** |%n", corpus.size(),
-                stars, deepSky));
-        out.append("\nSo the decision is that no text is clipped by the"
-                + " page, in any family: a label\nthat cannot be drawn"
-                + " whole is not drawn, and the placement records which"
-                + " candidates\nthe paper refused. The mark is still"
-                + " there, unnamed - which is what the page does to"
-                + "\nevery star below its limit, without apology."
+                "| **all %d pages** | **%d** | **%d** | **%d** |%n",
+                corpus.size(), stars, deepSky, names2));
+        out.append("\nSo the decision is that no text is clipped by"
+                + " the page, in any family: a label\nthat cannot be"
+                + " drawn whole is not drawn, and the placement records"
+                + " which candidates\nthe paper refused. The mark is"
+                + " still there, unnamed - which is what the page does"
+                + " to\nevery star below its limit, without apology."
                 + "\n\n");
+        out.append("**That table is not the cost of the change.** It"
+                + " counts what the atlas clips today,\nwhich is what"
+                + " the decision is about; what a reader would lose is"
+                + " a different\nquestion, because a label whose usual"
+                + " place runs off the paper has seven other\nplaces to"
+                + " try before it is given up on. The two are counted"
+                + " apart, and the\nsecond is in the next"
+                + " section.\n\n");
     }
 
     private static boolean offThePaper(java.awt.geom.Rectangle2D box,
