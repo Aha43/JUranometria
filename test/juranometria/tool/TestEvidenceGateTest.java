@@ -411,7 +411,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(28, display.size(),
+        assertEquals(29, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -427,7 +427,12 @@ class TestEvidenceGateTest {
                         + " reachable by pressing it; and #286's"
                         + " export dialog, which is laid out on both"
                         + " grounds and pressed through the shared"
-                        + " route helper; each with its premises"
+                        + " route helper; and #299's overview page,"
+                        + " which presses the zoom controls that enter"
+                        + " and leave the wide view and clicks a star"
+                        + " of it, because a projection carried"
+                        + " through the seam is a claim about what a"
+                        + " pointer reaches; each with its premises"
                         + " stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
@@ -481,7 +486,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 32,
+        assertTrue(doClick <= 33,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -512,7 +517,9 @@ class TestEvidenceGateTest {
                         + " journey reaches the Inspector item by the"
                         + " same one, on its way to pressing Center"
                         + " here on an object it selected by clicking"
-                        + " the overview: " + doClick);
+                        + " the overview, and #300's closing journey"
+                        + " walks that same route to close the sprint:"
+                        + " " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

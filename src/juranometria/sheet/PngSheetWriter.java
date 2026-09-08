@@ -96,11 +96,31 @@ public final class PngSheetWriter {
         } finally {
             g.dispose();
         }
-        return encode(image, dpi);
+        return encode(image, dpi, sheet.metadata());
     }
 
-    /** PNG bytes carrying a pHYs chunk that states the resolution. */
-    private static byte[] encode(BufferedImage image, int dpi)
+    /**
+     * PNG bytes carrying a pHYs chunk that states the resolution, and
+     * tEXt chunks that state what the sheet is (Sprint 30, #300).
+     *
+     * <p>A PNG said only how large it was. The other two formats have
+     * carried the sheet's own account of itself since #285 - SVG in
+     * its title, description and metadata elements, PDF in its
+     * information dictionary - and a raster sheet travels further
+     * than either, because it is the one a reader drops into a
+     * message. It could not say what part of the sky it showed, let
+     * alone which projection drew it.
+     *
+     * <p><strong>iTXt</strong> rather than tEXt, and that is the
+     * whole of a review finding. A tEXt chunk is Latin-1 by the
+     * format's definition, and this atlas writes Greek: a sheet
+     * titled for α Orionis came out titled for "? Orionis". iTXt is
+     * PNG's own answer for exactly that - UTF-8 text, uncompressed
+     * here so a reader with any tool can see it - and the keywords
+     * are still the format's registered ones.
+     */
+    private static byte[] encode(BufferedImage image, int dpi,
+                                 SheetMetadata about)
             throws IOException {
         ImageWriter writer =
                 ImageIO.getImageWritersByFormatName("png").next();
@@ -116,6 +136,21 @@ public final class PngSheetWriter {
         physical.setAttribute("unitSpecifier", "meter");
         IIOMetadataNode root = new IIOMetadataNode(format);
         root.appendChild(physical);
+        IIOMetadataNode text = new IIOMetadataNode("iTXt");
+        for (String[] said : new String[][] {
+                {"Title", about.title()},
+                {"Description", about.description()},
+                {"Software", about.producedBy()}}) {
+            IIOMetadataNode entry = new IIOMetadataNode("iTXtEntry");
+            entry.setAttribute("keyword", said[0]);
+            entry.setAttribute("compressionFlag", "FALSE");
+            entry.setAttribute("compressionMethod", "0");
+            entry.setAttribute("languageTag", "");
+            entry.setAttribute("translatedKeyword", said[0]);
+            entry.setAttribute("text", said[1]);
+            text.appendChild(entry);
+        }
+        root.appendChild(text);
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try {

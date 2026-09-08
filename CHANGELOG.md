@@ -23,6 +23,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   while a projection says how the sky becomes a page
   (`docs/decisions/overview-projection.md`, `docs/architecture.md`).
 
+- **A page says which projection drew it** (issue #300), on every
+  page: in the title block, in the chart's accessible description,
+  and in the exported sheet's metadata. The metadata had claimed
+  "gnomonic" on every sheet the atlas ever wrote — true of every page
+  it could draw until the overview arrived, and a false claim from
+  the moment it did. A PNG could not say what it was at all, carrying
+  only its resolution; it now carries the sheet's own account of
+  itself. Every page from 1° to 42° draws the same geometry as
+  before; its title block gains the projection's name.
+
 - **A constellation keeps its own stars** (issue #307). The
   overview's brighter default magnitude limits were removing stars
   that constellation figures are drawn to: the lines stayed and the
