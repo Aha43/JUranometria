@@ -53,16 +53,16 @@ Each page is rendered in both palettes (900x700; committed beside this document 
 
 | page | why | palette px | AA px | AA greys | class agreement | mask agreement | mask differs |
 |---|---|---|---|---|---|---|---|
-| m31-08 | the released reference page: the largest pale fill, labels, grid | 96.78% | 20295 (3.221%) | 243 | 99.594% | 100.000% | 0 |
+| m31-08 | the released reference page: the largest pale fill, labels, grid | 96.79% | 20233 (3.212%) | 243 | 99.552% | 100.000% | 0 |
 
-`m31-08-black`: the galaxy fill is present and itself - 33580 pixels of exact grey 27 inside M31's ellipse.
+`m31-08-black`: the galaxy fill is present and itself - 33578 pixels of exact grey 27 inside M31's ellipse.
 
-| orion-36 | wide and dense: figures, names, boundaries, every symbol family | 91.82% | 51518 (8.177%) | 244 | 99.218% | 99.977% | 145 |
-| polar-36 | polar: converging meridians, name and label crowding | 94.13% | 36953 (5.866%) | 244 | 99.314% | 99.975% | 155 |
-| seam-24 | the 0h right-ascension seam | 94.98% | 31623 (5.020%) | 244 | 99.446% | 99.985% | 94 |
-| m42-01 | narrow: one nebula box near its contrast floor | 97.72% | 14336 (2.276%) | 224 | 99.719% | 100.000% | 0 |
-| sparse-08 | sparse: mostly ground, the frame and grid alone must carry the page | 95.85% | 26118 (4.146%) | 239 | 99.553% | 100.000% | 0 |
-| m31-08-key | the reference page with the stellar-magnitude key: furniture interiors on the dark ground | 96.69% | 20868 (3.312%) | 243 | 99.446% | 100.000% | 0 |
+| orion-36 | wide and dense: figures, names, boundaries, every symbol family | 91.83% | 51479 (8.171%) | 244 | 99.180% | 99.977% | 145 |
+| polar-36 | polar: converging meridians, name and label crowding | 94.12% | 37048 (5.881%) | 244 | 99.272% | 99.975% | 155 |
+| seam-24 | the 0h right-ascension seam | 95.03% | 31336 (4.974%) | 244 | 99.410% | 99.986% | 91 |
+| m42-01 | narrow: one nebula box near its contrast floor | 97.75% | 14151 (2.246%) | 224 | 99.675% | 100.000% | 0 |
+| sparse-08 | sparse: mostly ground, the frame and grid alone must carry the page | 95.84% | 26237 (4.165%) | 239 | 99.509% | 100.000% | 0 |
+| m31-08-key | the reference page with the stellar-magnitude key: furniture interiors on the dark ground | 96.70% | 20806 (3.303%) | 243 | 99.404% | 100.000% | 0 |
 `m31-08-key-black`: furniture interiors are the ground (title-block padding probe grey 0, page corner grey 0) - opaque blocks, no white islands.
 
 

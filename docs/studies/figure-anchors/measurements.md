@@ -20,17 +20,17 @@ Figure endpoints that land on the paper, and how many of them had no star.
 
 | centre | field | limit | endpoints on page | without a node | under the title block |
 |---|---:|---:|---:|---:|---:|
-| Orion | 42° | V 8.0 | 41 | 0 | 0 |
+| Orion | 42° | V 8.0 | 41 | 0 | 2 |
 | Orion | 60° | V 5.0 | 72 | 0 | 0 |
-| Orion | 90° | V 4.0 | 120 | 0 | 4 |
-| Orion | 120° | V 4.0 | 189 | 0 | 3 |
+| Orion | 90° | V 4.0 | 120 | 0 | 6 |
+| Orion | 120° | V 4.0 | 189 | 0 | 4 |
 | Sagittarius | 42° | V 8.0 | 45 | 0 | 4 |
-| Sagittarius | 60° | V 5.0 | 81 | 0 | 0 |
+| Sagittarius | 60° | V 5.0 | 81 | 0 | 1 |
 | Sagittarius | 90° | V 4.0 | 133 | 0 | 2 |
-| Sagittarius | 120° | V 4.0 | 206 | 0 | 3 |
-| M31 | 42° | V 8.0 | 27 | 0 | 0 |
-| M31 | 60° | V 5.0 | 64 | 0 | 2 |
-| M31 | 90° | V 4.0 | 118 | 0 | 3 |
+| Sagittarius | 120° | V 4.0 | 206 | 0 | 6 |
+| M31 | 42° | V 8.0 | 27 | 0 | 1 |
+| M31 | 60° | V 5.0 | 64 | 0 | 3 |
+| M31 | 90° | V 4.0 | 118 | 0 | 4 |
 | M31 | 120° | V 4.0 | 179 | 0 | 3 |
 
 With the exception removed and the page otherwise unchanged, the same column

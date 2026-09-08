@@ -428,7 +428,7 @@ Both were put to the owner and accepted.
   at three centres and four fields. What is *not* covered is the same
   question on paper, which is #293's.
 - **Every promoted study page now falls behind its generator.** The
-  title block gains the projection's name on every page, so the 52
+  title block gains the projection's name on every page, so the 77
   study images pinned in `docs/studies/` — Bayer notation, star
   identity, constellation rendering, the coordinate grid and the
   rest — no longer match what their mains would draw today, and
@@ -437,8 +437,17 @@ Both were put to the owner and accepted.
   Re-promoting them is a mechanical regeneration nobody has asked
   for yet, and doing it silently would lose the record of when each
   was taken. It is named here so the next sprint decides rather than
-  discovers. Measured before and after this branch's rebase onto
-  #307: the same 52, unchanged.
+  discovers.
+
+  The number was first reported as 52, which was wrong, and wrong in
+  the way this sprint's own lesson describes. It came from comparing
+  two contract runs, one of which had skipped two evidence families
+  because their raw sources are gitignored downloads absent from the
+  scratch worktree it ran in — constellation geography, constellation
+  rendering and star identity, 25 images. The run said so, in a line
+  headed VERIFICATION INCOMPLETE, and I read the totals instead. A
+  count taken from an instrument that has announced it did not
+  finish is not a measurement.
 - **No printed overview has been looked at.** Everything about how a
   120° page reads is measured in pixels against a control. #293 is
   still open and unmilestoned.
