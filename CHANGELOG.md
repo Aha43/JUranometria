@@ -35,6 +35,19 @@ anyone who prints one and can say what they find.
 
 ### Added
 
+- **A study of how labels share a page** (issue #310, the Sprint 31
+  gate): what the atlas does with text today, inventoried by
+  measurement rather than by reading the code, and the candidate
+  placement policies for #313 to build against. 23 pages, both
+  grounds, the screen and both paper extents, a searched target and a
+  working selection. Every collision it reports names both pieces of
+  ink and is measured by painting the page with each of them withheld,
+  because a rectangle overlap is not a collision a reader can see and
+  ink at a place is not that thing's ink. `make label-study`, and the
+  decision it settles is in `docs/decisions/label-placement.md`.
+  Nothing a reader can see has changed: production placement is
+  #313's and #314's.
+
 - **A study of what lies beyond 42°** (issue #296, the Sprint 30 gate):
   49 candidate pages of the real sky under the gnomonic, stereographic
   and orthographic projections, with what each costs in shape, scale,

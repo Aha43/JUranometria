@@ -99,6 +99,13 @@ public final class EvidenceContractMain {
         // the documents it describes.
         REPORT_MAINS.put("juranometria.tool.ChartSheetStudyMain",
                 "docs/studies/chart-sheet/measurements.md");
+        // Writes the pages it argues from beside the report (issue
+        // #310), the black-sky pattern. Deliberately free of
+        // wall-clock timings: the placement policies' cost is
+        // reported as candidates examined so the file can reproduce
+        // itself, and the runtime lives in the decision document.
+        REPORT_MAINS.put("juranometria.tool.labels.LabelStudyMain",
+                "docs/studies/label-placement/measurements.md");
         REPORT_MAINS.put("juranometria.tool.WiderFieldStudyMain",
                 "docs/studies/wider-field/released-pages.txt");
         // Writes its 49 candidate pages beside the report as it runs
