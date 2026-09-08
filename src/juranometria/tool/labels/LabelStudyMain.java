@@ -857,8 +857,9 @@ public final class LabelStudyMain {
                 + " question, which is worth more than asking either of"
                 + " them twice.\n\n");
         out.append("| page | labels both place | same candidate |"
-                + " same box | placed under duress |\n");
-        out.append("|---|---:|---:|---:|---:|\n");
+                + " same box | placed under duress | omitted by the"
+                + " seam |\n");
+        out.append("|---|---:|---:|---:|---:|---:|\n");
         var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
         for (String slug : CANDIDATE_PAGES) {
             Page page = pageOf(corpus, slug);
@@ -890,7 +891,12 @@ public final class LabelStudyMain {
             int sameCandidate = 0;
             int sameBox = 0;
             int duress = 0;
+            int omitted = 0;
             for (var placed : seam.placeAll(asked)) {
+                if (placed.omitted()) {
+                    omitted++;
+                    continue;
+                }
                 if (placed.underDuress()) {
                     duress++;
                 }
@@ -911,8 +917,8 @@ public final class LabelStudyMain {
                 }
             }
             out.append(String.format(Locale.ROOT,
-                    "| `%s` | %d | %d | %d | %d |%n", slug, both,
-                    sameCandidate, sameBox, duress));
+                    "| `%s` | %d | %d | %d | %d | %d |%n", slug, both,
+                    sameCandidate, sameBox, duress, omitted));
         }
         out.append("\nThey do not agree everywhere, and the places"
                 + " they part are worth more than the\nplaces they"
@@ -930,6 +936,14 @@ public final class LabelStudyMain {
                 + " other pass put it changes what every later label"
                 + " finds free. One\ndisagreement early on a crowded"
                 + " page is worth several late ones.\n\n");
+        out.append("**And the seam omits where this pass does not.**"
+                + " The paper's edge is not a cost the\nfallback may"
+                + " spend, so a label whose every candidate leaves the"
+                + " page is not drawn\nat all - a star at the margin,"
+                + " or a nebula whose symbol straddles it. The greedy"
+                + "\npass above draws those clipped, which is what the"
+                + " atlas does today. Which of the\ntwo a reader gets"
+                + " is #314's to settle.\n\n");
         out.append("What this does establish is the part worth"
                 + " establishing: on the same page, from\nthe same"
                 + " published geometry, two implementations written"
