@@ -5,7 +5,12 @@ architecture gate. It inventories what the atlas does with text today, measures
 where that goes wrong, and compares the candidate policies for #313 to build
 against. It changes no production behaviour and no released page.
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`, and that matters here. Every
+number below is a count of pixels, so it is reproducible on a machine rather than
+across machines, exactly like the atlas's other renderer-drawn evidence: font
+rasterisation differs, and the same collision that shares 68 pixels here shares
+27 on a Linux runner. What does not differ is which pairs collide and which do
+not, which is what this document is for.
 
 ## What counts as a collision here
 

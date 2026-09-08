@@ -99,7 +99,14 @@ public final class LabelStudyMain {
                 + " It changes no production behaviour and no released"
                 + " page.\n\n");
         out.append("Recorded on: `" + WiderFieldStudyMain.platform()
-                + "`\n\n");
+                + "`, and that matters here. Every\nnumber below is a"
+                + " count of pixels, so it is reproducible on a machine"
+                + " rather than\nacross machines, exactly like the"
+                + " atlas's other renderer-drawn evidence: font\nrasterisation"
+                + " differs, and the same collision that shares 68"
+                + " pixels here shares\n27 on a Linux runner. What does"
+                + " not differ is which pairs collide and which do"
+                + "\nnot, which is what this document is for.\n\n");
         out.append("## What counts as a collision here\n\n");
         out.append("Two rules, and both of them cost this study a"
                 + " rewrite.\n\n");
