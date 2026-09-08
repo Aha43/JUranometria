@@ -164,12 +164,57 @@ among equals does crossing fewer lines decide. Lexicographic, not
 weighted, because a weight between "covers a mark" and "crosses a
 line" would be a tuning constant nobody could defend.
 
-"Least ink" is the area shared with each obstacle's **own drawn
-outline**, not with its bounding box. A disc in its square is a fifth
-empty at the corners and a galaxy's ellipse far more, and this gate's
-whole argument is that a box is not ink: a fallback that ranked
-candidates by boxes would be ranking them by the very thing the census
-refuses to count. An earlier draft did exactly that.
+"Least ink" is the area of ink actually covered, and each family's ink
+is taken as it is drawn.
+
+A star's mark is a **filled disc** and its published outline is that
+disc, so geometry is exact for it — the disc, never its bounding
+square, which is a fifth empty at the corners. A deep-sky symbol's
+published outline is its **silhouette**, what a reader aims at (#168),
+and that is not its ink: an open cluster is a dotted ring around
+nothing, a nebula an empty box, a planetary a small circle with four
+spokes inside a square that is mostly air. A label inside an open
+cluster's ring covers nothing, and a policy that treated the
+silhouette as ink would reserve blank paper.
+
+Four drafts of this got it wrong in four ways, and the third is the
+instructive one: bounding boxes, then filled silhouettes, then
+**rasterised pixels**, then shapes that were not the atlas's. Reading
+the ink off the page is exactly right as a way of judging geometry and
+exactly wrong as an input to placement — a rasterised page is a fact
+about a machine's fonts and antialiasing, and this policy's contract
+is that the same page comes out the same way everywhere. The same
+collision that shares 68 pixels on macOS shares 27 on a Linux runner;
+a policy fed on that would place labels differently on the two, and a
+printed atlas is a promise that it does not.
+
+So placement is decided by **shapes**: what each symbol draws,
+reconstructed from what production publishes about it — which symbol
+the object gets, its silhouette, its centre, its reach and its
+position angle — at the atlas's own stroke of **one** pixel, with the
+open cluster's ring dotted one pixel on and three off as the atlas
+dots it, and the planetary's circle at the spokes' reach divided by
+1.7 **twice**, as the renderer computes it.
+
+Pixels judge those shapes rather than feeding them, and judging is
+two-sided. A containment check alone — "the ink is inside the shapes"
+— is satisfied by any shape big enough, and three were: a solid ring,
+a stroke half again too wide, a planetary's circle 1.7 times too
+large. Each refuses candidates over ink that is not there. So the gate
+test asks, per symbol: that the ink lies in the band its shapes run
+through; that it claims about as much as it inks; that a dotted ring
+is in many pieces covering about half of the same ring drawn solid;
+that a box's area over its perimeter is one pixel; and that nothing is
+claimed between a planetary's circle and its spokes' reach, where the
+renderer inks nothing either. Each of the three faults fails one of
+those and passes the rest, which is why there are five.
+
+One thing the reconstruction cannot match is the dotted ring's **dash
+phase**: the renderer strokes in the symbol's own rotated frame and
+the study strokes the placed silhouette, so the dots are the same size
+at the same spacing in a different place around the ring. It can move
+a refusal by a pixel or two, and it is the sharpest single reason for
+the seam contract below.
 
 The ownership rule below is not a cost the fallback may spend. A
 candidate outside its constellation's own region is refused there too,

@@ -327,17 +327,17 @@ marking its own work.
 | | greedy, star labels first, keeping what it cannot place | 36 | 18 | 0 | 1 | 5 | 47 px | 148 |
 | | greedy, star labels first, least bad when nothing is free | 28 | 9 | 0 | 1 | 5 | 47 px | 148 |
 | `orion-90` | the atlas today | 63 | 19 | — | — | — | — | — |
-| | greedy, star labels first | 42 | 0 | 39 | 5 | 27 | 87 px | 532 |
-| | greedy, constellation names first | 41 | 0 | 35 | 7 | 28 | 87 px | 530 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 60 | 3 | 30 | 75 px | 780 |
-| | greedy, star labels first, keeping what it cannot place | 200 | 3 | 0 | 11 | 28 | 87 px | 550 |
-| | greedy, star labels first, least bad when nothing is free | 57 | 1 | 0 | 11 | 26 | 87 px | 556 |
+| | greedy, star labels first | 43 | 0 | 39 | 5 | 27 | 87 px | 532 |
+| | greedy, constellation names first | 42 | 0 | 39 | 8 | 28 | 87 px | 530 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 60 | 3 | 30 | 75 px | 776 |
+| | greedy, star labels first, keeping what it cannot place | 59 | 3 | 0 | 11 | 27 | 87 px | 546 |
+| | greedy, star labels first, least bad when nothing is free | 57 | 1 | 0 | 11 | 26 | 87 px | 555 |
 | `orion-120` | the atlas today | 169 | 37 | — | — | — | — | — |
-| | greedy, star labels first | 88 | 0 | 78 | 8 | 57 | 88 px | 1006 |
-| | greedy, constellation names first | 86 | 0 | 79 | 32 | 57 | 88 px | 981 |
-| | greedy, star labels first, avoiding every line | 2 | 0 | 118 | 3 | 48 | 89 px | 1448 |
-| | greedy, star labels first, keeping what it cannot place | 117 | 10 | 0 | 15 | 58 | 88 px | 1021 |
-| | greedy, star labels first, least bad when nothing is free | 475 | 6 | 0 | 15 | 46 | 88 px | 1071 |
+| | greedy, star labels first | 88 | 0 | 78 | 9 | 58 | 88 px | 1003 |
+| | greedy, constellation names first | 86 | 0 | 79 | 33 | 58 | 88 px | 978 |
+| | greedy, star labels first, avoiding every line | 2 | 0 | 118 | 4 | 49 | 89 px | 1443 |
+| | greedy, star labels first, keeping what it cannot place | 114 | 9 | 0 | 15 | 59 | 88 px | 1018 |
+| | greedy, star labels first, least bad when nothing is free | 472 | 5 | 0 | 15 | 49 | 88 px | 1055 |
 | `sagittarius-120` | the atlas today | 147 | 48 | — | — | — | — | — |
 | | greedy, star labels first | 82 | 0 | 14 | 14 | 40 | 116 px | 442 |
 | | greedy, constellation names first | 84 | 0 | 10 | 14 | 42 | 116 px | 416 |
@@ -396,10 +396,10 @@ it and without it:
 |  | free | 5 | 0 | 0 px | 1 | 1 | 25 |
 | `orion-90` | owned | 18 | 7 | 82 px | 0 | 5 | 57 |
 |  | free | 18 | 10 | 82 px | 3 | 6 | 53 |
-| `orion-120` | owned | 27 | 15 | 74 px | 0 | 10 | 475 |
-|  | free | 27 | 20 | 91 px | 6 | 10 | 468 |
+| `orion-120` | owned | 27 | 15 | 74 px | 0 | 10 | 472 |
+|  | free | 27 | 20 | 91 px | 6 | 10 | 465 |
 | `sagittarius-120` | owned | 30 | 14 | 70 px | 0 | 16 | 128 |
-|  | free | 30 | 19 | 92 px | 8 | 16 | 111 |
+|  | free | 30 | 19 | 92 px | 9 | 16 | 111 |
 | `crux-90` | owned | 27 | 12 | 50 px | 0 | 13 | 86 |
 |  | free | 27 | 17 | 50 px | 5 | 15 | 86 |
 
@@ -426,7 +426,7 @@ counted.
 
 | page | labels | changed after a pan | after a zoom |
 |---|---:|---:|---:|
-| `orion-90` | 107 | 34 | 21 |
+| `orion-90` | 107 | 26 | 19 |
 | `sagittarius-120` | 124 | 15 | 20 |
 | `home` | 4 | 0 | 0 |
 

@@ -2,6 +2,7 @@ package juranometria.tool.labels;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
@@ -448,54 +449,335 @@ class LabelPlacementGateTest {
     }
 
     @Test
-    void aSymbolsDrawnShapesAreWhereItsInkIs() {
+    void aSymbolsDrawnShapesAreWhereItsInkIsAndNoMore() {
         // The division of labour the placement contract needs: shapes
         // decide placement, because the same page must come out the
         // same way on every machine, and pixels judge the shapes,
-        // because only the render knows what was drawn. An earlier
-        // round had it the other way round and let rasterised ink
-        // decide what a label could sit on.
+        // because only the render knows what was drawn.
+        //
+        // Two-sided, and per symbol. A containment check alone - "the
+        // ink is inside the shapes" - is satisfied by any shape big
+        // enough, and three shapes were: a solid ring where the atlas
+        // dots one pixel on and three off, a stroke half again as wide
+        // as the atlas's, and a planetary's circle 1.7 times too
+        // large. Each refuses candidates over ink that is not there.
+        // An aggregate over a page hides all three behind the symbols
+        // that are right, so each symbol answers for itself.
         int judged = 0;
-        int strayed = 0;
-        int total = 0;
         for (double[] look : new double[][] {{130.1, 19.67, 3.0},
                 {10.684708, 41.268750, 8.0}, {83.0, 0.0, 8.0},
-                {56.75, 24.12, 3.0}}) {
+                {56.75, 24.12, 3.0},
+                // The Helix, for the one symbol the other pages do
+                // not carry, and large enough to measure: a
+                // planetary's circle with its spokes reaching past it.
+                {337.41, -20.84, 3.0}}) {
             Page page = new Page("judged",
                     StudyPages.assemble(new ChartViewState(
                             new SkyPosition(look[0], look[1]), look[2], 8.0),
                             StudyPages.SCREEN_WIDE, StudyPages.SCREEN_HIGH),
                     ChartOptions.DEFAULTS, List.of());
             Attribution attribution = new Attribution(page);
+            var mapping = new juranometria.project.ViewportMapping(
+                    page.scene().viewport());
+            var projection = juranometria.project.Projections.forViewport(
+                    page.scene().viewport());
+            var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
             for (ChartRenderer.DrawnMark mark
                     : Page.renderer().drawnMarks(page.scene(),
                             ChartOptions.DEFAULTS)) {
-                if (mark.deepSky() == null || mark.reach() < 5.0) {
+                if (mark.deepSky() == null || mark.reach() < 3.0) {
                     continue;
                 }
                 java.awt.geom.Area drawn = SymbolInk.of(mark);
-                if (drawn.isEmpty()) {
+                var plane = projection.project(mark.deepSky().position());
+                if (drawn.isEmpty() || plane.isEmpty()) {
                     continue;
                 }
-                Ink inked = attribution.inkOf(new Participant(
+                // Withholding an object takes its label with it, the
+                // same trap as the star and its name; the label's own
+                // published box takes it back out.
+                Participant symbol = new Participant(
                         Participant.Family.DEEP_SKY_SYMBOL,
-                        mark.deepSky().id(), "its symbol"));
-                if (inked.pixels() < 20) {
-                    // Too little left visible to judge a shape by:
-                    // another symbol or a label is drawn over most of
-                    // it, and what is left is somebody else's problem.
+                        mark.deepSky().id(), "its symbol")
+                        .alsoTaking(new Participant(
+                                Participant.Family.DEEP_SKY_LABEL,
+                                mark.deepSky().id(), "its label")
+                                .within(ChartRenderer.labelBounds(metrics,
+                                        mark.deepSky(),
+                                        mapping.toPixel(plane.get()),
+                                        mapping.pixelsPerPlaneUnit())));
+                Ink ink = attribution.inkOf(symbol);
+                boolean[] model = rasterised(drawn, page.wide(),
+                        page.high());
+                int claimedPixels = countOf(model);
+                double claimed = claimedPixels;
+                if (ink.pixels() < 40 || claimedPixels < 40) {
+                    // Too little of it visible or on the paper to
+                    // judge a shape by.
                     continue;
                 }
                 judged++;
-                total += inked.pixels();
-                strayed += inked.strayingFrom(grownBy(drawn, 2.0));
+                String what = mark.deepSky().id() + " ("
+                        + ChartRenderer.symbolFor(mark.deepSky()) + ")";
+
+                // Where: the ink lies in the band the shapes run
+                // through - phase-free, because the dash phase is the
+                // one thing this reconstruction cannot match.
+                assertEquals(0, ink.strayingFrom(
+                                grownBy(SymbolInk.bandOf(mark), 2.0)),
+                        what + ": its ink lies where its shapes are");
+
+                // How much: model and ink rasterised the same way, so
+                // antialiasing and the page's own edge fall on both
+                // sides. A solid ring claims four times its dotted
+                // ink, and is caught here and nowhere else.
+                double ratio = claimed / ink.pixels();
+                assertTrue(ratio > 0.6 && ratio < 1.6, what + ": it"
+                        + " claims about as much as it inks - "
+                        + claimedPixels
+                        + " against " + ink.pixels() + ", a ratio of "
+                        + String.format(Locale.ROOT, "%.2f", ratio));
+
+                // And three checks aimed at the three ways this
+                // reconstruction has actually been wrong, because the
+                // two above are a net rather than a sight: a symbol
+                // partly hidden under another has fewer visible ink
+                // pixels than shape, so the ratio that would catch a
+                // solid ring at 1.48 also fails an honest occluded box
+                // at 1.46. Each of these asks its own question.
+                switch (ChartRenderer.symbolFor(mark.deepSky())) {
+                    // Dotted, one pixel on and three off: the shape
+                    // must be in many pieces and must cover roughly
+                    // half of the same ring drawn solid. Drawn solid,
+                    // it is two pieces and all of it.
+                    case DOTTED_CIRCLE -> {
+                        double solid = countOf(rasterised(
+                                new java.awt.geom.Area(
+                                        new java.awt.BasicStroke(1.0f)
+                                                .createStrokedShape(
+                                                        mark.outline())),
+                                page.wide(), page.high()));
+                        assertTrue(subpathsOf(drawn) > 20, what
+                                + ": its ring is dotted, not solid - "
+                                + subpathsOf(drawn) + " pieces");
+                        double share = claimed / solid;
+                        assertTrue(share > 0.25 && share < 0.75, what
+                                + ": and the dots cover about half of"
+                                + " the ring, not all of it: "
+                                + String.format(Locale.ROOT, "%.2f",
+                                        share));
+                    }
+                    // Stroked along its own boundary at one pixel:
+                    // area over perimeter is the width, whatever else
+                    // is drawn over it.
+                    case BOX -> {
+                        double width = areaOf(drawn)
+                                / perimeterOf(mark.outline());
+                        assertTrue(width > 0.85 && width < 1.2, what
+                                + ": drawn at the atlas's own one-pixel"
+                                + " stroke, not "
+                                + String.format(Locale.ROOT, "%.2f",
+                                        width));
+                    }
+                    // A circle at a fraction of the spokes' reach,
+                    // with nothing between the two. A circle drawn at
+                    // the wrong radius lands in that gap, where the
+                    // renderer inks nothing either.
+                    case PLANETARY -> {
+                        // Between its circle and the reach of its
+                        // spokes there is nothing, and the emptiest
+                        // line through that gap is the diagonal
+                        // between two spokes. A circle drawn at the
+                        // wrong radius lands on it.
+                        double turn = -Math.toRadians(mark.deepSky()
+                                .positionAngleDegrees()) + Math.PI / 4.0;
+                        for (double at : new double[] {
+                                mark.reach() / 1.7, mark.reach() / 2.0}) {
+                            double x = mark.centre().x()
+                                    + at * Math.cos(turn);
+                            double y = mark.centre().y()
+                                    + at * Math.sin(turn);
+                            java.awt.geom.Rectangle2D spot =
+                                    new java.awt.geom.Rectangle2D.Double(
+                                            x - 1.5, y - 1.5, 3.0, 3.0);
+                            assertFalse(drawn.intersects(spot), what
+                                    + ": nothing is drawn between its"
+                                    + " circle and its spokes' reach,"
+                                    + " and nothing is claimed there"
+                                    + " either - " + Math.round(at)
+                                    + " px out along the diagonal");
+                            assertFalse(ink.within(spot).any(), what
+                                    + ": and the renderer inks nothing"
+                                    + " there");
+                        }
+                    }
+                    default -> {
+                    }
+                }
             }
         }
         assertTrue(judged > 8, "the pages draw symbols to judge: "
                 + judged);
-        assertTrue(strayed < total / 20, "the shapes cover the ink: "
-                + strayed + " of " + total + " inked pixels lie more"
-                + " than two pixels outside the shapes drawn for them");
+    }
+
+    /** The shape as pixels, rasterised the way the chart is. */
+    private static boolean[] rasterised(java.awt.geom.Area shape, int wide,
+                                        int high) {
+        BufferedImage image = new BufferedImage(wide, high,
+                BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            g.setColor(java.awt.Color.WHITE);
+            g.fillRect(0, 0, wide, high);
+            g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setColor(java.awt.Color.BLACK);
+            g.fill(shape);
+        } finally {
+            g.dispose();
+        }
+        boolean[] mask = new boolean[wide * high];
+        int[] pixels = ((java.awt.image.DataBufferInt)
+                image.getRaster().getDataBuffer()).getData();
+        for (int at = 0; at < pixels.length; at++) {
+            mask[at] = (pixels[at] & 0xffffff) != 0xffffff;
+        }
+        return mask;
+    }
+
+    /** The area of a shape, by the shoelace formula over its outline. */
+    private static double areaOf(java.awt.geom.Area shape) {
+        double twice = 0.0;
+        double[] point = new double[6];
+        double startX = 0.0;
+        double startY = 0.0;
+        double lastX = 0.0;
+        double lastY = 0.0;
+        for (java.awt.geom.PathIterator along =
+                shape.getPathIterator(null, 0.05); !along.isDone();
+                along.next()) {
+            switch (along.currentSegment(point)) {
+                case java.awt.geom.PathIterator.SEG_MOVETO -> {
+                    startX = point[0];
+                    startY = point[1];
+                    lastX = point[0];
+                    lastY = point[1];
+                }
+                case java.awt.geom.PathIterator.SEG_LINETO -> {
+                    twice += lastX * point[1] - point[0] * lastY;
+                    lastX = point[0];
+                    lastY = point[1];
+                }
+                case java.awt.geom.PathIterator.SEG_CLOSE -> {
+                    twice += lastX * startY - startX * lastY;
+                    lastX = startX;
+                    lastY = startY;
+                }
+                default -> {
+                }
+            }
+        }
+        return Math.abs(twice) / 2.0;
+    }
+
+    /** How many separate pieces a shape is drawn in. */
+    private static int subpathsOf(java.awt.geom.Area shape) {
+        int pieces = 0;
+        double[] point = new double[6];
+        for (java.awt.geom.PathIterator along =
+                shape.getPathIterator(null); !along.isDone();
+                along.next()) {
+            if (along.currentSegment(point)
+                    == java.awt.geom.PathIterator.SEG_MOVETO) {
+                pieces++;
+            }
+        }
+        return pieces;
+    }
+
+    /** The length once round a shape's outline. */
+    private static double perimeterOf(java.awt.Shape shape) {
+        double length = 0.0;
+        double[] point = new double[6];
+        double startX = 0.0;
+        double startY = 0.0;
+        double lastX = 0.0;
+        double lastY = 0.0;
+        for (java.awt.geom.PathIterator along =
+                shape.getPathIterator(null, 0.05); !along.isDone();
+                along.next()) {
+            switch (along.currentSegment(point)) {
+                case java.awt.geom.PathIterator.SEG_MOVETO -> {
+                    startX = point[0];
+                    startY = point[1];
+                    lastX = point[0];
+                    lastY = point[1];
+                }
+                case java.awt.geom.PathIterator.SEG_LINETO -> {
+                    length += Math.hypot(point[0] - lastX,
+                            point[1] - lastY);
+                    lastX = point[0];
+                    lastY = point[1];
+                }
+                case java.awt.geom.PathIterator.SEG_CLOSE -> {
+                    length += Math.hypot(startX - lastX, startY - lastY);
+                    lastX = startX;
+                    lastY = startY;
+                }
+                default -> {
+                }
+            }
+        }
+        return length;
+    }
+
+    private static java.awt.geom.Area annulus(double centreX,
+                                              double centreY, double inner,
+                                              double outer) {
+        java.awt.geom.Area ring = new java.awt.geom.Area(
+                new java.awt.geom.Ellipse2D.Double(centreX - outer,
+                        centreY - outer, 2.0 * outer, 2.0 * outer));
+        ring.subtract(new java.awt.geom.Area(
+                new java.awt.geom.Ellipse2D.Double(centreX - inner,
+                        centreY - inner, 2.0 * inner, 2.0 * inner)));
+        return ring;
+    }
+
+    private static java.awt.geom.Area intersection(java.awt.geom.Area one,
+                                                   java.awt.geom.Area other) {
+        java.awt.geom.Area both = (java.awt.geom.Area) one.clone();
+        both.intersect(other);
+        return both;
+    }
+
+    private static int countOf(boolean[] mask) {
+        int lit = 0;
+        for (boolean one : mask) {
+            if (one) {
+                lit++;
+            }
+        }
+        return lit;
+    }
+
+    /** What share of a shape's pixels have no ink within two of them. */
+    private static double blankShare(boolean[] model, Ink ink, int wide,
+                                     int high) {
+        int claimed = 0;
+        int blank = 0;
+        for (int y = 0; y < high; y++) {
+            for (int x = 0; x < wide; x++) {
+                if (!model[y * wide + x]) {
+                    continue;
+                }
+                claimed++;
+                if (!ink.within(new java.awt.geom.Rectangle2D.Double(
+                        x - 2.0, y - 2.0, 5.0, 5.0)).any()) {
+                    blank++;
+                }
+            }
+        }
+        return claimed == 0 ? 0.0 : (double) blank / claimed;
     }
 
     @Test
