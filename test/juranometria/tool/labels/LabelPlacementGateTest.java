@@ -290,28 +290,83 @@ class LabelPlacementGateTest {
         assertTrue(owned.constellations().size() > 10,
                 "the page carries figures to check: "
                         + owned.constellations().size());
+        // A third thing withholding a figure takes with it, after its
+        // own name: the stars #307 keeps *because* that figure is
+        // drawn to them. Remove Hydra's segments and the faint stars
+        // its lines end on go too, so their discs land in the ink
+        // attributed to the figure - a seven-pixel blob forty pixels
+        // off the end of a hull that was perfectly correct. Star discs
+        // are filled and their outlines are published, so they can be
+        // excluded exactly.
+        java.awt.geom.Area discs = new java.awt.geom.Area();
+        for (ChartRenderer.DrawnMark mark
+                : Page.renderer().drawnMarks(page.scene(),
+                        ChartOptions.DEFAULTS)) {
+            if (mark.star() != null) {
+                discs.add(new java.awt.geom.Area(
+                        new java.awt.BasicStroke(3.0f)
+                                .createStrokedShape(mark.outline())));
+                discs.add(new java.awt.geom.Area(mark.outline()));
+            }
+        }
+        int checked = 0;
+        int strayed = 0;
+        int total = 0;
         for (String constellation : new java.util.TreeSet<>(
                 owned.constellations())) {
+            // Withholding a constellation's figure takes its NAME
+            // with it - the renderer anchors a name on visible figure
+            // ink, and a figure with no ink is not named - so the
+            // name's glyphs have to be subtracted back out. The same
+            // trap as the star and its label, sprung on the same
+            // study, and found by this test failing on eight pixels
+            // of Aquarius that were the letters of AQUARIUS.
             Ink ink = attribution.inkOf(new Participant(
                     Participant.Family.FIGURE_LINE, constellation,
-                    "its figure"));
-            java.awt.geom.Rectangle2D drawn = ink.bounds();
-            if (drawn == null) {
+                    "its figure").alsoTaking(new Participant(
+                            Participant.Family.CONSTELLATION_NAME,
+                            constellation, "its name")));
+            if (!ink.any()) {
                 continue;
             }
             java.awt.Shape hull = owned.regionOf(constellation);
-            // The hull is over the pieces' midpoints and the ink is
-            // the stroked line through them, so ink stands a stroke's
-            // width outside a hull that is correct; the hull grown by
-            // two pixels is the claim being made.
-            java.awt.geom.Area grown = new java.awt.geom.Area(
-                    new java.awt.BasicStroke(4.0f).createStrokedShape(hull));
-            grown.add(new java.awt.geom.Area(hull));
-            assertTrue(grown.contains(drawn.getCenterX(),
-                            drawn.getCenterY()),
-                    constellation + ": its own figure's ink is centred"
-                            + " inside the region it owns");
+            // Two bounds, both over the page rather than tuned per
+            // constellation. The hull is taken over the ends of the
+            // pieces the renderer's subdivision cuts, re-derived here,
+            // and this study's re-derivation is not bit-identical to
+            // the renderer's on a curved 120-degree line: Aquarius
+            // puts eight pixels outside the hull grown by two, Ara one
+            // outside it grown by four. What must hold is that the
+            // region contains the figure - nearly every pixel close in
+            // and no pixel far out - and that is asked of all of them
+            // together. #313 will have the renderer's own geometry and
+            // will not need the slack.
+            java.awt.geom.Area near = grownBy(hull, 4.0);
+            near.add(discs);
+            java.awt.geom.Area far = grownBy(hull, 12.0);
+            far.add(discs);
+            strayed += ink.strayingFrom(near);
+            assertEquals(0, ink.strayingFrom(far),
+                    constellation + ": no pixel of its figure's ink is"
+                            + " far outside the region it owns");
+            total += ink.pixels();
+            checked++;
         }
+        assertTrue(checked > 10, "on a useful number of figures: "
+                + checked);
+        assertTrue(strayed < total / 200, "and all but a handful of the"
+                + " page's " + total + " pixels of figure ink are"
+                + " within four pixels of their own region: " + strayed
+                + " are not");
+    }
+
+    private static java.awt.geom.Area grownBy(java.awt.Shape hull,
+                                              double margin) {
+        java.awt.geom.Area grown = new java.awt.geom.Area(
+                new java.awt.BasicStroke((float) (2.0 * margin))
+                        .createStrokedShape(hull));
+        grown.add(new java.awt.geom.Area(hull));
+        return grown;
     }
 
     @Test
@@ -352,6 +407,17 @@ class LabelPlacementGateTest {
                             + " the atlas draws it, x " + centroid[0]
                             + " against ink centred at "
                             + drawn.getCenterX());
+            // And in y, which the first version of this test did not
+            // ask at all: an anchor can be right across the page and
+            // wrong down it, and half a check is worse than none
+            // because it reads as a whole one. The renderer draws the
+            // string with its baseline AT the centroid, and these
+            // names are capitals with no descender, so the bottom of
+            // the ink is the baseline.
+            assertTrue(Math.abs(drawn.getMaxY() - centroid[1]) < 4.0,
+                    name.getKey() + ": and down the page, baseline "
+                            + centroid[1] + " against ink ending at "
+                            + drawn.getMaxY());
         }
         assertTrue(checked > 8, "on a useful number of names: " + checked);
     }
@@ -379,6 +445,49 @@ class LabelPlacementGateTest {
                             + " it, " + unowned.namesOffTheirOwnFigure()
                             + " names leave their own figure");
         }
+    }
+
+    @Test
+    void anOpenClusterReservesItsRingAndNotItsInterior() {
+        // The obstacle model, held where it was wrong: a deep-sky
+        // symbol's published outline is its silhouette - what a reader
+        // aims at - and an open cluster is a dotted ring around
+        // nothing. Treating the silhouette as ink reserved blank paper
+        // and refused candidates that covered nothing at all.
+        // Praesepe at three degrees: an open cluster drawn as a
+        // dotted ring wider than the page's own margins.
+        Page page = new Page("praesepe-03",
+                StudyPages.assemble(new ChartViewState(
+                        new SkyPosition(130.1, 19.67), 3.0, 8.0),
+                        StudyPages.SCREEN_WIDE, StudyPages.SCREEN_HIGH),
+                ChartOptions.DEFAULTS, List.of());
+        ChartRenderer.DrawnMark widest = null;
+        for (ChartRenderer.DrawnMark mark
+                : Page.renderer().drawnMarks(page.scene(),
+                        ChartOptions.DEFAULTS)) {
+            if (mark.deepSky() != null
+                    && mark.deepSky().type() == juranometria.chart.DsoType
+                            .OPEN_CLUSTER
+                    && (widest == null || mark.reach() > widest.reach())) {
+                widest = mark;
+            }
+        }
+        assertTrue(widest != null && widest.reach() > 20.0,
+                "the page draws an open cluster with room inside it");
+
+        Attribution attribution = new Attribution(page);
+        Ink symbol = attribution.inkOf(new Participant(
+                Participant.Family.DEEP_SKY_SYMBOL, widest.deepSky().id(),
+                "its ring"));
+        java.awt.geom.Rectangle2D middle =
+                new java.awt.geom.Rectangle2D.Double(
+                        widest.centre().x() - 4.0,
+                        widest.centre().y() - 4.0, 8.0, 8.0);
+        assertTrue(widest.outline().intersects(middle),
+                "the silhouette claims the middle of the ring");
+        assertFalse(symbol.within(middle).any(),
+                "and the renderer inks nothing there: "
+                        + symbol.within(middle).pixels() + " px");
     }
 
     private static int defects(Census census) {

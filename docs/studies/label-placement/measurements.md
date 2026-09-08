@@ -315,41 +315,41 @@ marking its own work.
 | page | policy | collisions | of the two defects | lost | gained | moved | worst move | candidates tried |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | `home` | the atlas today | 2 | 1 | — | — | — | — | — |
-| | greedy, star labels first | 0 | 0 | 1 | 0 | 1 | 22 px | 19 |
-| | greedy, constellation names first | 0 | 0 | 1 | 0 | 1 | 22 px | 19 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 1 | 0 | 1 | 22 px | 19 |
-| | greedy, star labels first, keeping what it cannot place | 1 | 0 | 0 | 1 | 1 | 22 px | 19 |
-| | greedy, star labels first, least bad when nothing is free | 1 | 0 | 0 | 1 | 1 | 22 px | 19 |
+| | greedy, star labels first | 0 | 0 | 0 | 0 | 1 | 22 px | 12 |
+| | greedy, constellation names first | 0 | 0 | 0 | 0 | 1 | 22 px | 12 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 0 | 0 | 1 | 22 px | 12 |
+| | greedy, star labels first, keeping what it cannot place | 1 | 0 | 0 | 1 | 1 | 22 px | 12 |
+| | greedy, star labels first, least bad when nothing is free | 1 | 0 | 0 | 1 | 1 | 22 px | 12 |
 | `orion-36` | the atlas today | 32 | 19 | — | — | — | — | — |
 | | greedy, star labels first | 8 | 0 | 9 | 0 | 5 | 47 px | 148 |
 | | greedy, constellation names first | 8 | 0 | 9 | 0 | 5 | 47 px | 148 |
 | | greedy, star labels first, avoiding every line | 0 | 0 | 12 | 0 | 4 | 52 px | 163 |
 | | greedy, star labels first, keeping what it cannot place | 36 | 18 | 0 | 1 | 5 | 47 px | 148 |
-| | greedy, star labels first, least bad when nothing is free | 29 | 9 | 0 | 1 | 5 | 47 px | 148 |
+| | greedy, star labels first, least bad when nothing is free | 28 | 9 | 0 | 1 | 5 | 47 px | 148 |
 | `orion-90` | the atlas today | 63 | 19 | — | — | — | — | — |
-| | greedy, star labels first | 43 | 0 | 39 | 4 | 25 | 87 px | 523 |
-| | greedy, constellation names first | 42 | 0 | 39 | 7 | 26 | 87 px | 521 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 59 | 2 | 30 | 75 px | 770 |
-| | greedy, star labels first, keeping what it cannot place | 61 | 4 | 0 | 11 | 25 | 87 px | 537 |
-| | greedy, star labels first, least bad when nothing is free | 60 | 1 | 0 | 11 | 24 | 87 px | 549 |
+| | greedy, star labels first | 42 | 0 | 39 | 5 | 26 | 87 px | 522 |
+| | greedy, constellation names first | 41 | 0 | 35 | 7 | 27 | 87 px | 520 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 59 | 3 | 31 | 75 px | 769 |
+| | greedy, star labels first, keeping what it cannot place | 200 | 3 | 0 | 11 | 27 | 87 px | 540 |
+| | greedy, star labels first, least bad when nothing is free | 57 | 1 | 0 | 11 | 25 | 87 px | 545 |
 | `orion-120` | the atlas today | 169 | 37 | — | — | — | — | — |
-| | greedy, star labels first | 88 | 0 | 78 | 8 | 57 | 88 px | 1008 |
-| | greedy, constellation names first | 86 | 0 | 79 | 32 | 57 | 88 px | 983 |
-| | greedy, star labels first, avoiding every line | 2 | 0 | 118 | 3 | 48 | 89 px | 1448 |
-| | greedy, star labels first, keeping what it cannot place | 117 | 10 | 0 | 15 | 58 | 88 px | 1023 |
-| | greedy, star labels first, least bad when nothing is free | 475 | 6 | 0 | 15 | 46 | 88 px | 1071 |
+| | greedy, star labels first | 88 | 0 | 78 | 9 | 58 | 88 px | 1005 |
+| | greedy, constellation names first | 86 | 0 | 79 | 33 | 58 | 88 px | 980 |
+| | greedy, star labels first, avoiding every line | 2 | 0 | 118 | 4 | 49 | 89 px | 1445 |
+| | greedy, star labels first, keeping what it cannot place | 114 | 9 | 0 | 15 | 58 | 88 px | 1024 |
+| | greedy, star labels first, least bad when nothing is free | 475 | 6 | 0 | 15 | 47 | 88 px | 1068 |
 | `sagittarius-120` | the atlas today | 147 | 48 | — | — | — | — | — |
-| | greedy, star labels first | 82 | 0 | 13 | 14 | 41 | 116 px | 439 |
-| | greedy, constellation names first | 84 | 0 | 10 | 14 | 43 | 116 px | 413 |
+| | greedy, star labels first | 82 | 0 | 14 | 14 | 40 | 116 px | 442 |
+| | greedy, constellation names first | 84 | 0 | 10 | 14 | 42 | 116 px | 416 |
 | | greedy, star labels first, avoiding every line | 0 | 0 | 49 | 10 | 54 | 71 px | 906 |
-| | greedy, star labels first, keeping what it cannot place | 154 | 28 | 0 | 18 | 42 | 116 px | 450 |
-| | greedy, star labels first, least bad when nothing is free | 128 | 7 | 0 | 18 | 42 | 116 px | 449 |
+| | greedy, star labels first, keeping what it cannot place | 159 | 28 | 0 | 18 | 41 | 116 px | 453 |
+| | greedy, star labels first, least bad when nothing is free | 122 | 7 | 0 | 18 | 41 | 116 px | 452 |
 | `crux-90` | the atlas today | 74 | 17 | — | — | — | — | — |
-| | greedy, star labels first | 76 | 0 | 4 | 6 | 26 | 92 px | 205 |
-| | greedy, constellation names first | 76 | 0 | 3 | 6 | 26 | 92 px | 199 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 31 | 5 | 34 | 73 px | 577 |
-| | greedy, star labels first, keeping what it cannot place | 85 | 3 | 0 | 6 | 26 | 92 px | 205 |
-| | greedy, star labels first, least bad when nothing is free | 84 | 2 | 0 | 6 | 26 | 92 px | 205 |
+| | greedy, star labels first | 75 | 0 | 5 | 6 | 25 | 92 px | 216 |
+| | greedy, constellation names first | 75 | 0 | 4 | 6 | 25 | 92 px | 210 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 32 | 5 | 33 | 73 px | 590 |
+| | greedy, star labels first, keeping what it cannot place | 87 | 4 | 0 | 6 | 25 | 92 px | 216 |
+| | greedy, star labels first, least bad when nothing is free | 86 | 3 | 0 | 6 | 25 | 92 px | 216 |
 
 "Of the two defects" counts only the owner's two: a constellation name and a
 star label sharing pixels either way up, and a star's name across another
@@ -392,16 +392,16 @@ it and without it:
 |---|---|---:|---:|---:|---:|---:|---:|
 | `home` | owned | 0 | 0 | 0 px | 0 | 0 | 1 |
 |  | free | 0 | 0 | 0 px | 0 | 0 | 1 |
-| `orion-36` | owned | 5 | 0 | 0 px | 0 | 1 | 29 |
-|  | free | 5 | 0 | 0 px | 1 | 1 | 26 |
-| `orion-90` | owned | 18 | 6 | 45 px | 0 | 5 | 60 |
-|  | free | 18 | 9 | 68 px | 3 | 6 | 56 |
+| `orion-36` | owned | 5 | 0 | 0 px | 0 | 1 | 28 |
+|  | free | 5 | 0 | 0 px | 1 | 1 | 25 |
+| `orion-90` | owned | 18 | 6 | 45 px | 0 | 5 | 57 |
+|  | free | 18 | 9 | 68 px | 3 | 6 | 53 |
 | `orion-120` | owned | 27 | 15 | 74 px | 0 | 10 | 475 |
 |  | free | 27 | 20 | 91 px | 6 | 10 | 468 |
-| `sagittarius-120` | owned | 30 | 14 | 70 px | 0 | 16 | 128 |
-|  | free | 30 | 19 | 92 px | 8 | 16 | 111 |
-| `crux-90` | owned | 27 | 13 | 50 px | 0 | 12 | 84 |
-|  | free | 27 | 17 | 50 px | 4 | 14 | 86 |
+| `sagittarius-120` | owned | 30 | 14 | 70 px | 0 | 16 | 122 |
+|  | free | 30 | 19 | 92 px | 8 | 16 | 105 |
+| `crux-90` | owned | 27 | 12 | 50 px | 0 | 13 | 86 |
+|  | free | 27 | 17 | 50 px | 5 | 15 | 86 |
 
 The rule the policy enforces is that a name's box **overlaps** the region its own
 figure owns. Overlap rather than "its centre is inside", because a figure can be
@@ -426,9 +426,9 @@ counted.
 
 | page | labels | changed after a pan | after a zoom |
 |---|---:|---:|---:|
-| `orion-90` | 107 | 20 | 21 |
+| `orion-90` | 107 | 30 | 21 |
 | `sagittarius-120` | 124 | 16 | 20 |
-| `home` | 4 | 0 | 0 |
+| `home` | 4 | 1 | 0 |
 
 Counted as: a label that both pages draw, whose offset from its own anchor changed
 sign in x or in y - it moved to the other side of the thing it names.

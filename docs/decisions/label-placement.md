@@ -202,12 +202,20 @@ could be written over the wrong constellation and still pass. An
 earlier draft of this document said "visible figure ink" while the
 study measured an axis-aligned extent, which is exactly that mistake.
 
-*Visible ink*, by the renderer's own definition: the midpoints of the
-drawn pieces its half-degree subdivision cuts each segment into,
-counted where the piece **crosses** the paper. Not the segments'
-endpoints — Pyxis on the 90-degree Orion page is drawn with no
-endpoint and no sampled point inside the page at all, and an
+*Visible ink*, by the renderer's own definition: the drawn pieces its
+half-degree subdivision cuts each segment into, counted where the
+piece **crosses** the paper. The hull is taken over those pieces'
+ends, because it has to contain the ink; the name's anchor is averaged
+over their midpoints, because that is what the renderer averages. Not
+the segments' endpoints — Pyxis on the 90-degree Orion page is drawn
+with no endpoint and no sampled point inside the page at all, and an
 endpoint-based rule left it unnamed on a page the atlas names it on.
+
+The study re-derives that subdivision rather than being handed it, and
+the gate test measures the disagreement: over a 120-degree page's
+figures, all but a handful of pixels of figure ink lie within four
+pixels of their own region and none lies more than twelve. `#313` will
+have the renderer's own geometry and will not need the slack.
 
 *Overlap*, not "its centre is inside": a figure can be smaller than
 its own name. Crater at 90° leaves six pixels by five of visible ink

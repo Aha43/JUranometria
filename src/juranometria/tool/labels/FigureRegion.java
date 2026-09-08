@@ -26,10 +26,12 @@ import juranometria.project.ViewportMapping;
  *
  * <p>So the region is the <strong>convex hull of the figure's visible
  * ink</strong>, and "visible ink" is the renderer's own definition:
- * the midpoints of the drawn pieces its half-degree subdivision cuts
- * each segment into, counted where the piece crosses the paper. That
- * is the same accumulation the renderer anchors the name on, so the
- * centroid here is the centroid there. Convex rather than the ink
+ * the drawn pieces its half-degree subdivision cuts each segment into,
+ * counted where the piece crosses the paper. The hull is taken over
+ * those pieces' ends, because it has to contain the ink and the ink
+ * runs from end to end; the <em>centroid</em> is averaged over their
+ * midpoints, because that is what the renderer averages, so the anchor
+ * here is the anchor there. Convex rather than the ink
  * itself, because a name has to sit <em>among</em> a figure's lines
  * rather than on one: the ink is a few hairlines and nothing but the
  * hairlines would be inside it.
@@ -58,6 +60,7 @@ public final class FigureRegion {
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         Projection projection = Projections.forViewport(scene.viewport());
         Map<String, List<double[]>> points = new LinkedHashMap<>();
+        Map<String, List<double[]>> hullPoints = new LinkedHashMap<>();
         java.awt.geom.Rectangle2D paper = new java.awt.geom.Rectangle2D.Double(
                 0, 0, page.wide(), page.high());
         for (GeoSegment segment : scene.geography().figureSegments()) {
@@ -77,6 +80,18 @@ public final class FigureRegion {
                         && new java.awt.geom.Line2D.Double(previous.x(),
                                 previous.y(), pixel.x(), pixel.y())
                                 .intersects(paper)) {
+                    // The piece's ENDS go into the hull, because the
+                    // hull has to contain the ink and the ink runs
+                    // from end to end. Its midpoint goes into the
+                    // centroid, because that is what the renderer
+                    // averages. An earlier draft built the hull from
+                    // midpoints too, and eight pixels of Aquarius's
+                    // figure fell outside the region Aquarius owns.
+                    hullPoints.computeIfAbsent(segment.constellationId(),
+                            key -> new ArrayList<>())
+                            .add(new double[] {previous.x(), previous.y()});
+                    hullPoints.get(segment.constellationId())
+                            .add(new double[] {pixel.x(), pixel.y()});
                     // The midpoint of a drawn piece, which is what the
                     // renderer accumulates for the name's anchor - and
                     // a piece counts when it CROSSES the paper, not
@@ -96,7 +111,8 @@ public final class FigureRegion {
         Map<String, Path2D.Double> hulls = new LinkedHashMap<>();
         Map<String, double[]> centroids = new LinkedHashMap<>();
         for (Map.Entry<String, List<double[]>> entry : points.entrySet()) {
-            Path2D.Double hull = hullOf(entry.getValue());
+            Path2D.Double hull = hullOf(hullPoints.getOrDefault(
+                    entry.getKey(), entry.getValue()));
             if (hull != null) {
                 hulls.put(entry.getKey(), hull);
             }

@@ -113,6 +113,7 @@ public final class Greedy {
     private final List<PlacedText> placed = new ArrayList<>();
     private final List<Rectangle2D> taken = new ArrayList<>();
     private final List<Shape> marks = new ArrayList<>();
+    private final Ink symbolInk;
     private final List<Rectangle2D> furniture = new ArrayList<>();
     private final Map<String, String> omitted = new LinkedHashMap<>();
     private final Map<String, Double> moved = new LinkedHashMap<>();
@@ -134,6 +135,14 @@ public final class Greedy {
         // placement policy's. #313 will have the answer in hand.
         this.owned = FigureRegion.of(page);
         this.labelledDeepSky = labelledOnTheReleasedPage();
+        // Also before the clock starts: the symbols' ink is read off
+        // the page here because this is a study, and production would
+        // have the shapes in hand as it drew them.
+        ChartOptions noLabels = Participant.Options.deepSkyLabels(
+                page.options(), false);
+        this.symbolInk = Ink.between(page.withOptions(noLabels).paint(),
+                page.withOptions(Participant.Options.deepSkyObjects(
+                        noLabels, false)).paint());
         long started = System.nanoTime();
         gatherObstacles();
         if (rules.namesFirst()) {
@@ -243,11 +252,31 @@ public final class Greedy {
         return outside;
     }
 
+    /**
+     * The ink a label must not cover, measured rather than assumed.
+     *
+     * <p>A star's mark is a filled disc and its published outline is
+     * that disc, so geometry is exact for it. A deep-sky symbol's
+     * published outline is its <em>silhouette</em> - what a reader
+     * aims at, from #168 - and treating that as ink would reserve
+     * blank paper: an open cluster is a dotted ring around nothing, a
+     * nebula an empty box, a planetary a small circle with four
+     * spokes inside a square that is mostly air. A label inside an
+     * open cluster's ring covers no ink at all.
+     *
+     * <p>So the symbols' ink is taken from the page: the same chart
+     * painted with the deep-sky family switched off, differenced
+     * against the same chart with it on and its labels off. Two
+     * renders, and the answer is the pixels the renderer laid down.
+     */
     private void gatherObstacles() {
         for (ChartRenderer.DrawnMark mark
                 : Page.renderer().drawnMarks(page.scene(), page.options())) {
-            marks.add(mark.outline());
+            if (mark.star() != null) {
+                marks.add(mark.outline());
+            }
         }
+
         if (page.options().titleBlock()) {
             Rectangle2D block = Census.Metrics.titleBlockOf(page);
             if (block != null) {
@@ -535,17 +564,19 @@ public final class Greedy {
         }
         for (Shape mark : marks) {
             if (mark.intersects(box)) {
-                // The outline, not its bounding box. A disc in a
-                // square is a fifth empty at the corners and a
-                // galaxy's ellipse far more, and this study's whole
-                // argument is that a box is not ink - a fallback that
-                // ranked candidates by boxes would be ranking them by
-                // the very thing the census refuses to count.
+                // The disc, not its bounding box. A circle in a square
+                // is a fifth empty at the corners, and this study's
+                // whole argument is that a box is not ink - a fallback
+                // that ranked candidates by boxes would be ranking
+                // them by the very thing the census refuses to count.
                 java.awt.geom.Area both = new java.awt.geom.Area(mark);
                 both.intersect(new java.awt.geom.Area(box));
                 cost += areaOf(both);
             }
         }
+        // And the deep-sky symbols by the pixels they actually
+        // inked, which is the same unit: square pixels covered.
+        cost += symbolInk.within(box).pixels();
         return cost;
     }
 
@@ -633,6 +664,9 @@ public final class Greedy {
             if (mark.intersects(box)) {
                 return true;
             }
+        }
+        if (symbolInk.within(box).any()) {
+            return true;
         }
         return rules.linesAreObstacles() && crossesALine(box);
     }

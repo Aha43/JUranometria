@@ -161,6 +161,19 @@ public final class Ink {
                 right - left + 1.0, bottom - top + 1.0);
     }
 
+    /** How many of these pixels lie outside the given shape. */
+    public int strayingFrom(java.awt.Shape shape) {
+        int strayed = 0;
+        for (int index = set.nextSetBit(0); index >= 0;
+                index = set.nextSetBit(index + 1)) {
+            if (!shape.contains(fromX + index % wide + 0.5,
+                    fromY + index / wide + 0.5)) {
+                strayed++;
+            }
+        }
+        return strayed;
+    }
+
     /** A point inside this ink, for saying where a collision is. */
     public java.awt.Point somewhere() {
         int index = set.nextSetBit(0);

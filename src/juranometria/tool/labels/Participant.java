@@ -253,6 +253,16 @@ public record Participant(Family family, String id, String description,
                     on.nebulae(), on.planetaryNebulae(), on.palette());
         }
 
+        static ChartOptions deepSkyObjects(ChartOptions on, boolean value) {
+            return new ChartOptions(value, on.deepSkyLabels(),
+                    on.constellationFigures(), on.constellationBoundaries(),
+                    on.constellationNames(), on.starNames(),
+                    on.bayerLetters(), on.flamsteedNumbers(),
+                    on.equatorialGrid(), on.titleBlock(), on.magnitudeKey(),
+                    on.galaxies(), on.openClusters(), on.globularClusters(),
+                    on.nebulae(), on.planetaryNebulae(), on.palette());
+        }
+
         static ChartOptions boundaries(ChartOptions on, boolean value) {
             return new ChartOptions(on.deepSkyObjects(), on.deepSkyLabels(),
                     on.constellationFigures(), value,
