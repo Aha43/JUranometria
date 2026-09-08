@@ -325,13 +325,13 @@ marking its own work.
 | | greedy, constellation names first | 8 | 0 | 9 | 0 | 5 | 47 px | 148 |
 | | greedy, star labels first, avoiding every line | 0 | 0 | 12 | 0 | 4 | 52 px | 163 |
 | | greedy, star labels first, keeping what it cannot place | 36 | 18 | 0 | 1 | 5 | 47 px | 148 |
-| | greedy, star labels first, least bad when nothing is free | 28 | 9 | 0 | 1 | 5 | 47 px | 148 |
+| | greedy, star labels first, least bad when nothing is free | 25 | 7 | 0 | 1 | 5 | 47 px | 148 |
 | `orion-90` | the atlas today | 63 | 19 | — | — | — | — | — |
-| | greedy, star labels first | 42 | 0 | 39 | 5 | 27 | 87 px | 532 |
-| | greedy, constellation names first | 41 | 0 | 35 | 7 | 28 | 87 px | 530 |
+| | greedy, star labels first | 40 | 0 | 40 | 5 | 26 | 87 px | 545 |
+| | greedy, constellation names first | 39 | 0 | 36 | 7 | 27 | 87 px | 543 |
 | | greedy, star labels first, avoiding every line | 0 | 0 | 60 | 3 | 30 | 75 px | 776 |
-| | greedy, star labels first, keeping what it cannot place | 200 | 3 | 0 | 11 | 28 | 87 px | 550 |
-| | greedy, star labels first, least bad when nothing is free | 57 | 1 | 0 | 11 | 26 | 87 px | 555 |
+| | greedy, star labels first, keeping what it cannot place | 201 | 4 | 0 | 11 | 27 | 87 px | 563 |
+| | greedy, star labels first, least bad when nothing is free | 58 | 2 | 0 | 11 | 25 | 87 px | 568 |
 | `orion-120` | the atlas today | 169 | 37 | — | — | — | — | — |
 | | greedy, star labels first | 88 | 0 | 78 | 8 | 57 | 88 px | 1008 |
 | | greedy, constellation names first | 86 | 0 | 79 | 32 | 57 | 88 px | 983 |
@@ -392,10 +392,10 @@ it and without it:
 |---|---|---:|---:|---:|---:|---:|---:|
 | `home` | owned | 0 | 0 | 0 px | 0 | 0 | 1 |
 |  | free | 0 | 0 | 0 px | 0 | 0 | 1 |
-| `orion-36` | owned | 5 | 0 | 0 px | 0 | 1 | 28 |
-|  | free | 5 | 0 | 0 px | 1 | 1 | 25 |
-| `orion-90` | owned | 18 | 7 | 82 px | 0 | 5 | 57 |
-|  | free | 18 | 10 | 82 px | 3 | 6 | 53 |
+| `orion-36` | owned | 5 | 0 | 0 px | 0 | 2 | 25 |
+|  | free | 5 | 0 | 0 px | 2 | 2 | 25 |
+| `orion-90` | owned | 18 | 6 | 82 px | 0 | 5 | 58 |
+|  | free | 18 | 10 | 82 px | 5 | 8 | 53 |
 | `orion-120` | owned | 27 | 15 | 74 px | 0 | 10 | 472 |
 |  | free | 27 | 20 | 91 px | 6 | 10 | 465 |
 | `sagittarius-120` | owned | 30 | 14 | 70 px | 0 | 16 | 128 |
@@ -416,6 +416,40 @@ anywhere, and the collision count is a little higher. That is the whole trade: t
 rule costs a name the occasional candidate and buys the guarantee that a name is
 written across the thing it names.
 
+## The seam against this study
+
+Issue #313 builds the placement seam production will use. It is a second
+implementation of the decision this document settles, written against the same
+words and sharing no code with the greedy pass above - so the two can be asked
+the same question, which is worth more than asking either of them twice.
+
+| page | labels both place | same candidate | same box | placed under duress |
+|---|---:|---:|---:|---:|
+| `home` | 4 | 4 | 1 | 15 |
+| `orion-36` | 17 | 17 | 10 | 31 |
+| `orion-90` | 68 | 61 | 45 | 42 |
+| `orion-120` | 103 | 88 | 67 | 57 |
+| `sagittarius-120` | 119 | 108 | 86 | 71 |
+| `crux-90` | 80 | 77 | 53 | 46 |
+
+They do not agree everywhere, and the places they part are worth more than the
+places they meet. Two causes, and neither is the placement rule:
+
+**The candidates are built twice.** Both build eight boxes around an anchor from
+the same sentence, and a deep-sky label's reach differs between them by the gap
+itself - three pixels. That is why "same candidate" is high and "same box" is
+lower: they choose the same position and draw it a few pixels apart.
+
+**And a difference cascades.** Placement is sequential: a label three pixels from
+where the other pass put it changes what every later label finds free. One
+disagreement early on a crowded page is worth several late ones.
+
+What this does establish is the part worth establishing: on the same page, from
+the same published geometry, two implementations written from one document and
+sharing no code choose the same candidate for the great majority of a page's text.
+The candidate arithmetic is #314's to make one of, when the families migrate to the
+seam and this pass retires.
+
 ## Stability under a small navigation change
 
 A label that jumps to the other side of its star when the reader nudges the page
@@ -426,7 +460,7 @@ counted.
 
 | page | labels | changed after a pan | after a zoom |
 |---|---:|---:|---:|
-| `orion-90` | 107 | 26 | 19 |
+| `orion-90` | 107 | 25 | 19 |
 | `sagittarius-120` | 124 | 15 | 20 |
 | `home` | 4 | 0 | 0 |
 
@@ -459,7 +493,7 @@ must not get worse.
 
 ## What this cost to measure
 
-23 pages and 17565 painted renders for the census alone. Every collision in this
+23 pages and 17567 painted renders for the census alone. Every collision in this
 document is one of those renders differenced against another, which is what a
 collision nobody can dispute costs.
 

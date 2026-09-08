@@ -268,7 +268,13 @@ public final class Greedy {
             if (mark.star() != null) {
                 marks.add(mark.outline());
             } else if (mark.deepSky() != null) {
-                java.awt.geom.Area ink = SymbolInk.of(mark);
+                // The ink the renderer publishes for it (issue #313),
+                // where this study used to rebuild it from the
+                // silhouette and the symbol's kind - and got the
+                // stroke width, the dash pattern and a radius wrong
+                // in three successive rounds before it agreed.
+                java.awt.geom.Area ink =
+                        new java.awt.geom.Area(mark.ink());
                 if (!ink.isEmpty()) {
                     symbols.add(ink);
                 }

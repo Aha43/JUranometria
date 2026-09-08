@@ -502,7 +502,7 @@ class LabelPlacementGateTest {
                 if (mark.deepSky() == null || mark.reach() < 3.0) {
                     continue;
                 }
-                java.awt.geom.Area drawn = SymbolInk.of(mark);
+                java.awt.geom.Area drawn = new java.awt.geom.Area(mark.ink());
                 var plane = projection.project(mark.deepSky().position());
                 if (drawn.isEmpty() || plane.isEmpty()) {
                     continue;
@@ -538,15 +538,22 @@ class LabelPlacementGateTest {
                 // through - phase-free, because the dash phase is the
                 // one thing this reconstruction cannot match.
                 assertEquals(0, ink.strayingFrom(
-                                grownBy(SymbolInk.bandOf(mark), 2.0)),
+                                grownBy(bandOf(mark), 2.0)),
                         what + ": its ink lies where its shapes are");
 
                 // How much: model and ink rasterised the same way, so
                 // antialiasing and the page's own edge fall on both
                 // sides. A solid ring claims four times its dotted
                 // ink, and is caught here and nowhere else.
+                // Two ends, and the upper one is loose on purpose.
+                // M32's pale fill sits inside M31's pale fill, and the
+                // two are the same grey, so withholding M32 changes
+                // only its outline and the measured ink is half what
+                // is drawn. What this end is for is a symbol claiming
+                // several times its ink - a solid ring claims four -
+                // and it still catches that.
                 double ratio = claimed / ink.pixels();
-                assertTrue(ratio > 0.6 && ratio < 1.6, what + ": it"
+                assertTrue(ratio > 0.6 && ratio < 2.0, what + ": it"
                         + " claims about as much as it inks - "
                         + claimedPixels
                         + " against " + ink.pixels() + ", a ratio of "
@@ -596,14 +603,12 @@ class LabelPlacementGateTest {
                         // How often a dash starts, along the ring.
                         double period = perimeterOf(mark.outline())
                                 / pieces;
-                        assertTrue(Math.abs(period
-                                        - SymbolInk.dashPeriodPx()) < 0.8,
+                        assertTrue(Math.abs(period - 5.0) < 0.8,
                                 what + ": a dash every "
                                         + String.format(Locale.ROOT,
                                                 "%.2f", period)
                                         + " pixels, where the atlas"
-                                        + " starts one every "
-                                        + SymbolInk.dashPeriodPx());
+                                        + " starts one every 5.0");
                         // And how much of each period is the dash.
                         double share = claimed / solid;
                         // Measured: 0.68 for the atlas's own pattern,
@@ -669,6 +674,20 @@ class LabelPlacementGateTest {
         }
         assertTrue(judged > 8, "the pages draw symbols to judge: "
                 + judged);
+    }
+
+    /**
+     * The band a symbol's ink runs in: its dotted ring drawn solid,
+     * so a check about where ink is does not depend on where along
+     * the ring each dot falls. Everything else is its own ink.
+     */
+    private static java.awt.geom.Area bandOf(ChartRenderer.DrawnMark mark) {
+        if (ChartRenderer.symbolFor(mark.deepSky())
+                == ChartRenderer.Symbol.DOTTED_CIRCLE) {
+            return new java.awt.geom.Area(new java.awt.BasicStroke(1.0f)
+                    .createStrokedShape(mark.outline()));
+        }
+        return new java.awt.geom.Area(mark.ink());
     }
 
     /** The shape as pixels, rasterised the way the chart is. */
@@ -843,62 +862,6 @@ class LabelPlacementGateTest {
     }
 
     @Test
-    void theDashesFallWhereTheAtlasPutsThemWhicheverFrameTheyAreCutIn() {
-        // A doubt this gate raised about itself and then had to settle
-        // rather than admit. The renderer dashes the ring in the
-        // symbol's own frame, before placing it; the study has the
-        // placed silhouette. If dash phase depended on which of those
-        // was dashed, a policy refusing a candidate for touching a dot
-        // would refuse a different candidate from the one #313 will.
-        //
-        // It does not. Dashing is measured along arc length, and the
-        // placement is a translation and a rotation, which preserve
-        // it - and the path's first point is the same point of the
-        // page either way. So the dots land in the same places. Held
-        // on the Pleiades, whose ring is turned through 90 degrees and
-        // is 375 pixels across: if any rotation moved the dashes, that
-        // one would.
-        Page page = new Page("pleiades-03",
-                StudyPages.assemble(new ChartViewState(
-                        new SkyPosition(56.75, 24.12), 3.0, 8.0),
-                        StudyPages.SCREEN_WIDE, StudyPages.SCREEN_HIGH),
-                ChartOptions.DEFAULTS, List.of());
-        ChartRenderer.DrawnMark turned = null;
-        for (ChartRenderer.DrawnMark mark
-                : Page.renderer().drawnMarks(page.scene(),
-                        ChartOptions.DEFAULTS)) {
-            if (mark.deepSky() != null
-                    && ChartRenderer.symbolFor(mark.deepSky())
-                            == ChartRenderer.Symbol.DOTTED_CIRCLE
-                    && mark.deepSky().positionAngleDegrees() > 1.0
-                    && mark.reach() > 100.0) {
-                turned = mark;
-            }
-        }
-        assertTrue(turned != null,
-                "the page carries a dotted ring that is turned");
-
-        boolean[] inItsOwnFrame = rasterised(SymbolInk.of(turned),
-                page.wide(), page.high());
-        boolean[] inThePlacedFrame = rasterised(new java.awt.geom.Area(
-                new java.awt.BasicStroke(1.0f, java.awt.BasicStroke.CAP_BUTT,
-                        java.awt.BasicStroke.JOIN_MITER, 10.0f,
-                        new float[] {2.5f, 2.5f}, 0.0f)
-                        .createStrokedShape(turned.outline())),
-                page.wide(), page.high());
-        int differing = 0;
-        for (int at = 0; at < inItsOwnFrame.length; at++) {
-            if (inItsOwnFrame[at] != inThePlacedFrame[at]) {
-                differing++;
-            }
-        }
-        assertEquals(0, differing, turned.deepSky().id() + " at position"
-                + " angle " + turned.deepSky().positionAngleDegrees()
-                + ": the dots fall in the same pixels whichever frame"
-                + " the ring is dashed in");
-    }
-
-    @Test
     void anOpenClusterReservesItsRingAndNotItsInterior() {
         // And the other half: the shapes must not claim what the
         // renderer leaves blank. An open cluster is a dotted ring
@@ -929,7 +892,7 @@ class LabelPlacementGateTest {
                         widest.centre().y() - 4.0, 8.0, 8.0);
         assertTrue(widest.outline().intersects(middle),
                 "the silhouette claims the middle of the ring");
-        assertFalse(SymbolInk.of(widest).intersects(middle),
+        assertFalse(widest.ink().intersects(middle),
                 "the shapes drawn for it do not");
         Attribution attribution = new Attribution(page);
         Ink inked = attribution.inkOf(new Participant(

@@ -549,11 +549,81 @@ public final class ChartRenderer {
         }
     }
 
-    private static void drawGeographySegment(Graphics2D g, GeoSegment segment,
-                                             ChartScene scene,
-                                             Projection projection,
-                                             ViewportMapping mapping,
-                                             java.util.Map<String, double[]> visibleInk) {
+    /**
+     * The ink a page's constellation figures lay down, by constellation
+     * (Sprint 31, issue #313).
+     *
+     * <p>The drawn pieces themselves, and the point the name is
+     * anchored on - which is the mean of those pieces' midpoints, the
+     * renderer's own rule. Published so that a placement policy can ask
+     * what a figure covers and where its name belongs, instead of
+     * re-walking the subdivision: this class cuts a segment into pieces
+     * at half a degree, keeps the ones that cross the paper, and a
+     * study that reproduced that walk agreed with it to within a few
+     * pixels rather than exactly.
+     *
+     * <p>Empty when the page's scale policy keeps figures off it, or
+     * when the reader has switched them off: what is published is what
+     * is drawn.
+     */
+    public java.util.Map<String, FigureInk> figureInk(ChartScene scene,
+                                                      ChartOptions options) {
+        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        GeographyDetailPolicy policy = new GeographyDetailPolicy(
+                scene.viewport().fieldWidthDegrees());
+        if (!options.constellationFigures() || !policy.figuresDrawn()) {
+            return java.util.Map.of();
+        }
+        Projection projection = Projections.forViewport(scene.viewport());
+        java.util.Map<String, java.util.List<java.awt.geom.Line2D>> pieces =
+                new java.util.LinkedHashMap<>();
+        java.util.Map<String, double[]> anchors =
+                new java.util.LinkedHashMap<>();
+        for (GeoSegment segment : scene.geography().figureSegments()) {
+            drawnPieces(segment, scene, projection, mapping,
+                    pieces.computeIfAbsent(segment.constellationId(),
+                            key -> new java.util.ArrayList<>()), anchors);
+        }
+        java.util.Map<String, FigureInk> ink =
+                new java.util.LinkedHashMap<>();
+        for (var entry : pieces.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                continue;
+            }
+            java.awt.geom.Path2D.Double path =
+                    new java.awt.geom.Path2D.Double();
+            for (java.awt.geom.Line2D piece : entry.getValue()) {
+                path.moveTo(piece.getX1(), piece.getY1());
+                path.lineTo(piece.getX2(), piece.getY2());
+            }
+            double[] sum = anchors.get(entry.getKey());
+            ink.put(entry.getKey(), new FigureInk(entry.getKey(), path,
+                    sum == null || sum[2] == 0.0 ? null
+                            : new PixelPoint(sum[0] / sum[2],
+                                    sum[1] / sum[2])));
+        }
+        return java.util.Map.copyOf(ink);
+    }
+
+    /**
+     * One constellation's drawn figure ink, and where its name is
+     * anchored on it.
+     */
+    public record FigureInk(String constellationId, Shape ink,
+                            PixelPoint nameAnchor) {
+    }
+
+    /**
+     * The pieces one segment is drawn in, and its share of the name's
+     * anchor - the single walk that both {@link #drawGeographySegment}
+     * and {@link #figureInk} take, so what is drawn and what is
+     * published are the same pieces.
+     */
+    private static void drawnPieces(GeoSegment segment, ChartScene scene,
+                                    Projection projection,
+                                    ViewportMapping mapping,
+                                    java.util.List<java.awt.geom.Line2D> into,
+                                    java.util.Map<String, double[]> anchors) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
         int steps = Math.max(1, (int) Math.ceil(
@@ -569,13 +639,18 @@ public final class ChartRenderer {
             }
             PixelPoint pixel = mapping.toPixel(plane.get());
             if (previous != null) {
-                java.awt.geom.Line2D.Double piece = new java.awt.geom.Line2D.Double(
-                        previous.x(), previous.y(), pixel.x(), pixel.y());
+                java.awt.geom.Line2D.Double piece =
+                        new java.awt.geom.Line2D.Double(previous.x(),
+                                previous.y(), pixel.x(), pixel.y());
                 if (piece.intersects(0, 0, width, height)) {
-                    g.draw(piece);
-                    if (visibleInk != null) {
-                        double[] sum = visibleInk.computeIfAbsent(
-                                segment.constellationId(), key -> new double[3]);
+                    into.add(piece);
+                    if (anchors != null) {
+                        // Created only when a piece is drawn: a
+                        // constellation whose figure leaves no ink on
+                        // this page has no entry, and is not named.
+                        double[] sum = anchors.computeIfAbsent(
+                                segment.constellationId(),
+                                key -> new double[3]);
                         sum[0] += (previous.x() + pixel.x()) / 2.0;
                         sum[1] += (previous.y() + pixel.y()) / 2.0;
                         sum[2] += 1.0;
@@ -583,6 +658,23 @@ public final class ChartRenderer {
                 }
             }
             previous = pixel;
+        }
+    }
+
+    private static void drawGeographySegment(Graphics2D g, GeoSegment segment,
+                                             ChartScene scene,
+                                             Projection projection,
+                                             ViewportMapping mapping,
+                                             java.util.Map<String, double[]> visibleInk) {
+        // The same walk the published ink takes, so a policy asking
+        // what a figure covers is told about the pieces this draws
+        // and not about a reconstruction of them.
+        java.util.List<java.awt.geom.Line2D> pieces =
+                new java.util.ArrayList<>();
+        drawnPieces(segment, scene, projection, mapping, pieces,
+                visibleInk);
+        for (java.awt.geom.Line2D piece : pieces) {
+            g.draw(piece);
         }
     }
 
@@ -878,6 +970,11 @@ public final class ChartRenderer {
         return new Rectangle2D.Double(x - 2.0,
                 baseline - metrics.getAscent(),
                 metrics.stringWidth(text) + 4.0, metrics.getHeight());
+    }
+
+    /** The size policy this renderer draws its stars at. */
+    public juranometria.chart.StarSizePolicy starSize() {
+        return starSizePolicy;
     }
 
     /** The label font, shared with studies measuring this geometry. */

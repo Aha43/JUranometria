@@ -233,7 +233,12 @@ policies that omit instead reach zero of the owner's defects and lose
 between 1 and 116 labels a released page currently draws. The
 least-bad fallback loses **none**, on every page measured, and still
 takes the observed defects from 48 to 7 on the fixture's page, from
-37 to 6 at `orion-120`, and from 19 to 1 at `orion-90`.
+37 to 6 at `orion-120`, and from 19 to 2 at `orion-90`.
+
+Those counts moved by a label or two when `#313` published the
+geometry this study had been reconstructing: the symbols' ink is now
+the renderer's own, and a policy told exactly what a symbol inks
+refuses slightly different candidates from one told approximately.
 
 Where a label ends up at a candidate that covers something, the
 service records it. `#314` publishes that record; a page whose text is

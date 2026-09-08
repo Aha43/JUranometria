@@ -9,6 +9,18 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A deterministic label-placement seam** (issue #313). One boundary
+  decides where a page's text may go and why a candidate was refused,
+  and it never measures a string: rendering decides what the text and
+  figure geometry is, the seam decides where supplied geometry may go.
+  Nothing a reader can see has changed - no family has been migrated
+  to it, which is #314's - but the atlas now publishes what a
+  placement policy has to ask: each deep-sky symbol's **ink** rather
+  than the silhouette a reader aims at, each constellation figure's
+  drawn ink and the point its name is anchored on, the graticule's
+  notation with its boxes, the reference layer's names, and what the
+  title block covers as distinct from what it is laid out in.
+
 - **A study of how labels share a page** (issue #310, the Sprint 31
   gate): what the atlas does with text today, inventoried by
   measurement rather than by reading the code, and the candidate

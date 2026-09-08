@@ -62,6 +62,7 @@ public final class LabelStudyMain {
         observedDefects(out, corpus, censuses);
         fixture(out);
         candidates(out, corpus, censuses);
+        seamAgreement(out, corpus);
         stability(out);
         exportSection(out);
         pages(out, corpus, censuses);
@@ -833,6 +834,119 @@ public final class LabelStudyMain {
             }
         }
         throw new IllegalArgumentException("no such page: " + slug);
+    }
+
+    /**
+     * The seam's decisions against the gate's own, on the same pages.
+     *
+     * <p>Two implementations of one decision, written from the same
+     * document and from nothing else in common: the gate's greedy pass
+     * lives in this study and has been read by six rounds of review;
+     * the seam is production's, in {@code juranometria.render}. Asking
+     * one of them twice would prove nothing, so this asks both and
+     * reports where they part.
+     */
+    private static void seamAgreement(StringBuilder out,
+                                      List<StudyPages.Look> corpus) {
+        out.append("## The seam against this study\n\n");
+        out.append("Issue #313 builds the placement seam production"
+                + " will use. It is a second\nimplementation of the"
+                + " decision this document settles, written against the"
+                + " same\nwords and sharing no code with the greedy"
+                + " pass above - so the two can be asked\nthe same"
+                + " question, which is worth more than asking either of"
+                + " them twice.\n\n");
+        out.append("| page | labels both place | same candidate |"
+                + " same box | placed under duress |\n");
+        out.append("|---|---:|---:|---:|---:|\n");
+        var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
+        for (String slug : CANDIDATE_PAGES) {
+            Page page = pageOf(corpus, slug);
+            Greedy greedy = new Greedy(page, Greedy.LEAST_BAD);
+            Map<String, PlacedText> mine = new LinkedHashMap<>();
+            for (PlacedText text : greedy.placed()) {
+                mine.put(text.family() + ":" + text.id(), text);
+            }
+
+            List<juranometria.render.LabelPlacement.Request> asked =
+                    new ArrayList<>();
+            asked.addAll(juranometria.render.LabelGeometry.starLabels(
+                    Page.renderer(), metrics, page.scene(),
+                    page.options()));
+            asked.addAll(juranometria.render.LabelGeometry.deepSkyLabels(
+                    Page.renderer(), metrics, page.scene(),
+                    page.options()));
+            asked.addAll(
+                    juranometria.render.LabelGeometry.constellationNames(
+                            Page.renderer(), metrics, page.scene(),
+                            page.options()));
+            var seam = new juranometria.render.LabelPlacement(page.wide(),
+                    page.high(),
+                    juranometria.render.LabelGeometry.obstaclesOn(
+                            Page.renderer(), metrics, page.scene(),
+                            page.options()));
+
+            int both = 0;
+            int sameCandidate = 0;
+            int sameBox = 0;
+            int duress = 0;
+            for (var placed : seam.placeAll(asked)) {
+                if (placed.underDuress()) {
+                    duress++;
+                }
+                PlacedText ours = mine.get(
+                        familyOf(placed.request().family()) + ":"
+                                + placed.request().id());
+                if (ours == null) {
+                    continue;
+                }
+                both++;
+                if (Math.abs(ours.box().getX() - placed.at().getX()) < 0.5
+                        && Math.abs(ours.box().getY()
+                                - placed.at().getY()) < 0.5) {
+                    sameBox++;
+                    sameCandidate++;
+                } else if (ours.box().intersects(placed.at())) {
+                    sameCandidate++;
+                }
+            }
+            out.append(String.format(Locale.ROOT,
+                    "| `%s` | %d | %d | %d | %d |%n", slug, both,
+                    sameCandidate, sameBox, duress));
+        }
+        out.append("\nThey do not agree everywhere, and the places"
+                + " they part are worth more than the\nplaces they"
+                + " meet. Two causes, and neither is the placement"
+                + " rule:\n\n");
+        out.append("**The candidates are built twice.** Both build"
+                + " eight boxes around an anchor from\nthe same"
+                + " sentence, and a deep-sky label's reach differs"
+                + " between them by the gap\nitself - three pixels."
+                + " That is why \"same candidate\" is high and \"same"
+                + " box\" is\nlower: they choose the same position and"
+                + " draw it a few pixels apart.\n\n");
+        out.append("**And a difference cascades.** Placement is"
+                + " sequential: a label three pixels from\nwhere the"
+                + " other pass put it changes what every later label"
+                + " finds free. One\ndisagreement early on a crowded"
+                + " page is worth several late ones.\n\n");
+        out.append("What this does establish is the part worth"
+                + " establishing: on the same page, from\nthe same"
+                + " published geometry, two implementations written"
+                + " from one document and\nsharing no code choose the"
+                + " same candidate for the great majority of a page's"
+                + " text.\nThe candidate arithmetic is #314's to make"
+                + " one of, when the families migrate to the\nseam and"
+                + " this pass retires.\n\n");
+    }
+
+    private static Family familyOf(
+            juranometria.render.LabelPlacement.Family family) {
+        return switch (family) {
+            case TARGET, STAR -> Family.STAR_LABEL;
+            case DEEP_SKY -> Family.DEEP_SKY_LABEL;
+            case CONSTELLATION -> Family.CONSTELLATION_NAME;
+        };
     }
 
     private static void stability(StringBuilder out) {
