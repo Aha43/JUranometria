@@ -314,7 +314,17 @@ should look like one.
 option-free and deterministic, taking anchors and candidate lists and
 returning placements with the reason for each. It publishes decisions
 for **every** text family, the way `starLabelPlacements` publishes the
-star pass's since #154 — including grid notation and reference names.
+star pass's since #154 — including grid notation and reference names —
+and it publishes each deep-sky symbol's **drawn geometry** beside the
+silhouette that already exists, so no policy has to guess which parts
+of a symbol are ink.
+
+Deterministic means what it says: **no rasterised pixel may reach a
+placement decision.** This study's collision oracle is pixels and its
+policy is geometry, and the two must never swap places; one round of
+this gate let them, and a policy fed on rasterised ink would place
+labels differently on macOS and on Linux.
+
 It changes no reader-visible geometry: with the current families,
 priorities and obstacle set reduced to what each family avoids today,
 it must reproduce every released page byte for byte. That is the

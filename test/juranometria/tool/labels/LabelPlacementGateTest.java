@@ -448,14 +448,62 @@ class LabelPlacementGateTest {
     }
 
     @Test
+    void aSymbolsDrawnShapesAreWhereItsInkIs() {
+        // The division of labour the placement contract needs: shapes
+        // decide placement, because the same page must come out the
+        // same way on every machine, and pixels judge the shapes,
+        // because only the render knows what was drawn. An earlier
+        // round had it the other way round and let rasterised ink
+        // decide what a label could sit on.
+        int judged = 0;
+        int strayed = 0;
+        int total = 0;
+        for (double[] look : new double[][] {{130.1, 19.67, 3.0},
+                {10.684708, 41.268750, 8.0}, {83.0, 0.0, 8.0},
+                {56.75, 24.12, 3.0}}) {
+            Page page = new Page("judged",
+                    StudyPages.assemble(new ChartViewState(
+                            new SkyPosition(look[0], look[1]), look[2], 8.0),
+                            StudyPages.SCREEN_WIDE, StudyPages.SCREEN_HIGH),
+                    ChartOptions.DEFAULTS, List.of());
+            Attribution attribution = new Attribution(page);
+            for (ChartRenderer.DrawnMark mark
+                    : Page.renderer().drawnMarks(page.scene(),
+                            ChartOptions.DEFAULTS)) {
+                if (mark.deepSky() == null || mark.reach() < 5.0) {
+                    continue;
+                }
+                java.awt.geom.Area drawn = SymbolInk.of(mark);
+                if (drawn.isEmpty()) {
+                    continue;
+                }
+                Ink inked = attribution.inkOf(new Participant(
+                        Participant.Family.DEEP_SKY_SYMBOL,
+                        mark.deepSky().id(), "its symbol"));
+                if (inked.pixels() < 20) {
+                    // Too little left visible to judge a shape by:
+                    // another symbol or a label is drawn over most of
+                    // it, and what is left is somebody else's problem.
+                    continue;
+                }
+                judged++;
+                total += inked.pixels();
+                strayed += inked.strayingFrom(grownBy(drawn, 2.0));
+            }
+        }
+        assertTrue(judged > 8, "the pages draw symbols to judge: "
+                + judged);
+        assertTrue(strayed < total / 20, "the shapes cover the ink: "
+                + strayed + " of " + total + " inked pixels lie more"
+                + " than two pixels outside the shapes drawn for them");
+    }
+
+    @Test
     void anOpenClusterReservesItsRingAndNotItsInterior() {
-        // The obstacle model, held where it was wrong: a deep-sky
-        // symbol's published outline is its silhouette - what a reader
-        // aims at - and an open cluster is a dotted ring around
-        // nothing. Treating the silhouette as ink reserved blank paper
-        // and refused candidates that covered nothing at all.
-        // Praesepe at three degrees: an open cluster drawn as a
-        // dotted ring wider than the page's own margins.
+        // And the other half: the shapes must not claim what the
+        // renderer leaves blank. An open cluster is a dotted ring
+        // around nothing, and its published silhouette - what a reader
+        // aims at - says otherwise.
         Page page = new Page("praesepe-03",
                 StudyPages.assemble(new ChartViewState(
                         new SkyPosition(130.1, 19.67), 3.0, 8.0),
@@ -475,19 +523,21 @@ class LabelPlacementGateTest {
         assertTrue(widest != null && widest.reach() > 20.0,
                 "the page draws an open cluster with room inside it");
 
-        Attribution attribution = new Attribution(page);
-        Ink symbol = attribution.inkOf(new Participant(
-                Participant.Family.DEEP_SKY_SYMBOL, widest.deepSky().id(),
-                "its ring"));
         java.awt.geom.Rectangle2D middle =
                 new java.awt.geom.Rectangle2D.Double(
                         widest.centre().x() - 4.0,
                         widest.centre().y() - 4.0, 8.0, 8.0);
         assertTrue(widest.outline().intersects(middle),
                 "the silhouette claims the middle of the ring");
-        assertFalse(symbol.within(middle).any(),
-                "and the renderer inks nothing there: "
-                        + symbol.within(middle).pixels() + " px");
+        assertFalse(SymbolInk.of(widest).intersects(middle),
+                "the shapes drawn for it do not");
+        Attribution attribution = new Attribution(page);
+        Ink inked = attribution.inkOf(new Participant(
+                Participant.Family.DEEP_SKY_SYMBOL, widest.deepSky().id(),
+                "its ring"));
+        assertFalse(inked.within(middle).any(),
+                "and neither does the renderer: "
+                        + inked.within(middle).pixels() + " px");
     }
 
     private static int defects(Census census) {

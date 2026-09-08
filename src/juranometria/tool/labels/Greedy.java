@@ -113,7 +113,7 @@ public final class Greedy {
     private final List<PlacedText> placed = new ArrayList<>();
     private final List<Rectangle2D> taken = new ArrayList<>();
     private final List<Shape> marks = new ArrayList<>();
-    private final Ink symbolInk;
+    private final List<java.awt.geom.Area> symbols = new ArrayList<>();
     private final List<Rectangle2D> furniture = new ArrayList<>();
     private final Map<String, String> omitted = new LinkedHashMap<>();
     private final Map<String, Double> moved = new LinkedHashMap<>();
@@ -135,14 +135,6 @@ public final class Greedy {
         // placement policy's. #313 will have the answer in hand.
         this.owned = FigureRegion.of(page);
         this.labelledDeepSky = labelledOnTheReleasedPage();
-        // Also before the clock starts: the symbols' ink is read off
-        // the page here because this is a study, and production would
-        // have the shapes in hand as it drew them.
-        ChartOptions noLabels = Participant.Options.deepSkyLabels(
-                page.options(), false);
-        this.symbolInk = Ink.between(page.withOptions(noLabels).paint(),
-                page.withOptions(Participant.Options.deepSkyObjects(
-                        noLabels, false)).paint());
         long started = System.nanoTime();
         gatherObstacles();
         if (rules.namesFirst()) {
@@ -261,19 +253,25 @@ public final class Greedy {
      * aims at, from #168 - and treating that as ink would reserve
      * blank paper: an open cluster is a dotted ring around nothing, a
      * nebula an empty box, a planetary a small circle with four
-     * spokes inside a square that is mostly air. A label inside an
-     * open cluster's ring covers no ink at all.
+     * spokes inside a square that is mostly air.
      *
-     * <p>So the symbols' ink is taken from the page: the same chart
-     * painted with the deep-sky family switched off, differenced
-     * against the same chart with it on and its labels off. Two
-     * renders, and the answer is the pixels the renderer laid down.
+     * <p>{@link SymbolInk} reconstructs what each symbol draws, from
+     * what production publishes about it. Shapes and not pixels: a
+     * rasterised page is a fact about a machine, and this policy's
+     * contract is that the same page comes out the same way
+     * everywhere. The reconstruction is checked against the render by
+     * the gate test rather than trusted.
      */
     private void gatherObstacles() {
         for (ChartRenderer.DrawnMark mark
                 : Page.renderer().drawnMarks(page.scene(), page.options())) {
             if (mark.star() != null) {
                 marks.add(mark.outline());
+            } else if (mark.deepSky() != null) {
+                java.awt.geom.Area ink = SymbolInk.of(mark);
+                if (!ink.isEmpty()) {
+                    symbols.add(ink);
+                }
             }
         }
 
@@ -574,9 +572,17 @@ public final class Greedy {
                 cost += areaOf(both);
             }
         }
-        // And the deep-sky symbols by the pixels they actually
-        // inked, which is the same unit: square pixels covered.
-        cost += symbolInk.within(box).pixels();
+        // And the deep-sky symbols by the shapes they actually draw,
+        // which for everything but a galaxy is a stroke around a
+        // hollow middle.
+        for (java.awt.geom.Area symbol : symbols) {
+            if (symbol.intersects(box)) {
+                java.awt.geom.Area both =
+                        (java.awt.geom.Area) symbol.clone();
+                both.intersect(new java.awt.geom.Area(box));
+                cost += areaOf(both);
+            }
+        }
         return cost;
     }
 
@@ -665,8 +671,10 @@ public final class Greedy {
                 return true;
             }
         }
-        if (symbolInk.within(box).any()) {
-            return true;
+        for (java.awt.geom.Area symbol : symbols) {
+            if (symbol.intersects(box)) {
+                return true;
+            }
         }
         return rules.linesAreObstacles() && crossesALine(box);
     }
