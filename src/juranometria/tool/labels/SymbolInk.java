@@ -44,18 +44,28 @@ public final class SymbolInk {
     /**
      * The renderer's own strokes, copied value for value.
      *
-     * <p>An earlier draft used 1.5 pixels "and a little for the
-     * edges", which is not what the atlas draws, and drew the open
-     * cluster's ring solid where the atlas dots it one pixel on and
-     * three off. Both made a symbol claim ink it does not lay down,
-     * and a claim like that refuses candidates and skews the
-     * fallback's ranking.
+     * <p>Three drafts of these were wrong in three ways. One used 1.5
+     * pixels "and a little for the edges", which is not what the atlas
+     * draws. One drew the open cluster's ring solid. And one dotted it
+     * one pixel on and three off, which is the <em>boundary</em>
+     * stroke a few lines above this one in the renderer - copied from
+     * the wrong constant and then written into a comment as though it
+     * had been checked. The ring is dotted two and a half on and two
+     * and a half off. Every one of those made a symbol claim ink it
+     * does not lay down, and a claim like that refuses candidates and
+     * skews the fallback's ranking.
      */
     private static final java.awt.Stroke OUTLINE =
             new BasicStroke(1.0f);
+    private static final float DASH_PX = 2.5f;
     private static final java.awt.Stroke DOTTED = new BasicStroke(
             1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
-            new float[] {1.0f, 3.0f}, 0.0f);
+            new float[] {DASH_PX, DASH_PX}, 0.0f);
+
+    /** One dash and the gap after it, along the ring. */
+    public static double dashPeriodPx() {
+        return 2.0 * DASH_PX;
+    }
 
     private SymbolInk() {
     }
@@ -77,8 +87,8 @@ public final class SymbolInk {
             case ELLIPSE -> new Area(outline);
             // Drawn along their own boundary and hollow inside - the
             // open cluster dotted, the nebula's box solid.
-            case DOTTED_CIRCLE -> new Area(
-                    DOTTED.createStrokedShape(outline));
+            case DOTTED_CIRCLE -> dottedInItsOwnFrame(outline, centreX,
+                    centreY, dso.positionAngleDegrees());
             case BOX -> stroked(outline);
             // A ring with two diameters across it, at the object's
             // own position angle.
@@ -106,6 +116,38 @@ public final class SymbolInk {
             }
             case NONE -> new Area();
         };
+    }
+
+    /**
+     * The dotted ring, dashed where the renderer dashes it.
+     *
+     * <p>Dash phase depends on where the path starts and how far along
+     * it each dash falls, so stroking the placed silhouette and
+     * stroking the symbol's own ellipse before it is placed give the
+     * same dots in different places around the ring. The renderer
+     * translates and rotates its context and then draws, so the dashes
+     * are laid out in the symbol's own frame; this undoes the
+     * placement, dashes there, and puts the result back. The dots then
+     * land where the atlas puts them rather than near where it puts
+     * them, which is what a policy that refuses a candidate for
+     * touching one needs.
+     */
+    private static Area dottedInItsOwnFrame(Shape outline, double centreX,
+                                            double centreY,
+                                            double positionAngleDegrees) {
+        java.awt.geom.AffineTransform place =
+                java.awt.geom.AffineTransform.getTranslateInstance(
+                        centreX, centreY);
+        place.rotate(-Math.toRadians(positionAngleDegrees));
+        try {
+            Shape local = place.createInverse()
+                    .createTransformedShape(outline);
+            return new Area(place.createTransformedShape(
+                    DOTTED.createStrokedShape(local)));
+        } catch (java.awt.geom.NoninvertibleTransformException never) {
+            // A translation and a rotation are always invertible.
+            throw new IllegalStateException(never);
+        }
     }
 
     private static Shape arm(double centreX, double centreY, double reach,

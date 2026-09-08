@@ -477,6 +477,20 @@ class LabelPlacementGateTest {
                             StudyPages.SCREEN_WIDE, StudyPages.SCREEN_HIGH),
                     ChartOptions.DEFAULTS, List.of());
             Attribution attribution = new Attribution(page);
+            // The ink of the whole deep-sky family, for asking whether
+            // a shape's own pixels have any symbol under them at all.
+            // Its own is too strict: symbols overlap, and IC 434's box
+            // on the Orion page is a third covered by its neighbours,
+            // so a third of a perfectly correct shape has no ink of
+            // its own beneath it.
+            ChartOptions noLabels = Participant.Options.deepSkyLabels(
+                    ChartOptions.DEFAULTS, false);
+            Ink familyInk = Ink.between(
+                    page.withOptions(noLabels).paint(),
+                    page.withOptions(Participant.Options.deepSkyObjects(
+                            noLabels, false)).paint());
+            java.awt.geom.Rectangle2D furniture =
+                    Census.Metrics.titleBlockOf(page);
             var mapping = new juranometria.project.ViewportMapping(
                     page.scene().viewport());
             var projection = juranometria.project.Projections.forViewport(
@@ -538,6 +552,16 @@ class LabelPlacementGateTest {
                         + " against " + ink.pixels() + ", a ratio of "
                         + String.format(Locale.ROOT, "%.2f", ratio));
 
+                // And where it claims it: the shape's own pixels
+                // must have ink under them. This is what catches a
+                // dash pattern laid out in the wrong frame - same
+                // dots, same spacing, interleaved with the atlas's
+                // instead of on top of them - which an earlier draft
+                // admitted as unavoidable and is not.
+                assertTrue(blankShare(model, familyInk, page.wide(),
+                                page.high(), furniture) < 0.2,
+                        what + ": and what it claims has ink under it");
+
                 // And three checks aimed at the three ways this
                 // reconstruction has actually been wrong, because the
                 // two above are a net rather than a sight: a symbol
@@ -551,19 +575,46 @@ class LabelPlacementGateTest {
                     // half of the same ring drawn solid. Drawn solid,
                     // it is two pieces and all of it.
                     case DOTTED_CIRCLE -> {
+                        // The dash pattern is pinned from both ends,
+                        // because either alone admits the wrong one.
+                        // The atlas dots this ring two and a half
+                        // pixels on and two and a half off; a study
+                        // that dotted it one on and three off - which
+                        // is the boundary stroke, and which this study
+                        // did - has the same "many pieces covering
+                        // about half" as a lot of other patterns.
                         double solid = countOf(rasterised(
                                 new java.awt.geom.Area(
                                         new java.awt.BasicStroke(1.0f)
                                                 .createStrokedShape(
                                                         mark.outline())),
                                 page.wide(), page.high()));
-                        assertTrue(subpathsOf(drawn) > 20, what
-                                + ": its ring is dotted, not solid - "
-                                + subpathsOf(drawn) + " pieces");
+                        int pieces = subpathsOf(drawn);
+                        assertTrue(pieces > 20, what + ": its ring is"
+                                + " dotted, not solid - " + pieces
+                                + " pieces");
+                        // How often a dash starts, along the ring.
+                        double period = perimeterOf(mark.outline())
+                                / pieces;
+                        assertTrue(Math.abs(period
+                                        - SymbolInk.dashPeriodPx()) < 0.8,
+                                what + ": a dash every "
+                                        + String.format(Locale.ROOT,
+                                                "%.2f", period)
+                                        + " pixels, where the atlas"
+                                        + " starts one every "
+                                        + SymbolInk.dashPeriodPx());
+                        // And how much of each period is the dash.
                         double share = claimed / solid;
-                        assertTrue(share > 0.25 && share < 0.75, what
-                                + ": and the dots cover about half of"
-                                + " the ring, not all of it: "
+                        // Measured: 0.68 for the atlas's own pattern,
+                        // 0.48 for one on and three off, 1.00 solid.
+                        // Antialiasing bleeds each dash's ends, which
+                        // is why half the ring inks rather more than
+                        // half of it.
+                        assertTrue(share > 0.58 && share < 0.80, what
+                                + ": and the dots cover half of the"
+                                + " ring rather than a quarter of it"
+                                + " or all of it: "
                                 + String.format(Locale.ROOT, "%.2f",
                                         share));
                     }
@@ -760,24 +811,91 @@ class LabelPlacementGateTest {
         return lit;
     }
 
-    /** What share of a shape's pixels have no ink within two of them. */
+    /**
+     * What share of a shape's pixels have no ink within two of them,
+     * outside the furniture.
+     *
+     * <p>The furniture has to come out: IC 434's box on the Orion page
+     * runs down past the page's edge and under the title block, which
+     * is painted last and opaque, so a third of a perfectly correct
+     * shape has nothing visible beneath it. That is the block covering
+     * a symbol, not a symbol drawn in the wrong place.
+     */
     private static double blankShare(boolean[] model, Ink ink, int wide,
-                                     int high) {
+                                     int high,
+                                     java.awt.geom.Rectangle2D furniture) {
         int claimed = 0;
         int blank = 0;
         for (int y = 0; y < high; y++) {
             for (int x = 0; x < wide; x++) {
-                if (!model[y * wide + x]) {
+                if (!model[y * wide + x]
+                        || furniture != null && furniture.contains(x, y)) {
                     continue;
                 }
                 claimed++;
                 if (!ink.within(new java.awt.geom.Rectangle2D.Double(
-                        x - 2.0, y - 2.0, 5.0, 5.0)).any()) {
+                        x - 1.0, y - 1.0, 3.0, 3.0)).any()) {
                     blank++;
                 }
             }
         }
         return claimed == 0 ? 0.0 : (double) blank / claimed;
+    }
+
+    @Test
+    void theDashesFallWhereTheAtlasPutsThemWhicheverFrameTheyAreCutIn() {
+        // A doubt this gate raised about itself and then had to settle
+        // rather than admit. The renderer dashes the ring in the
+        // symbol's own frame, before placing it; the study has the
+        // placed silhouette. If dash phase depended on which of those
+        // was dashed, a policy refusing a candidate for touching a dot
+        // would refuse a different candidate from the one #313 will.
+        //
+        // It does not. Dashing is measured along arc length, and the
+        // placement is a translation and a rotation, which preserve
+        // it - and the path's first point is the same point of the
+        // page either way. So the dots land in the same places. Held
+        // on the Pleiades, whose ring is turned through 90 degrees and
+        // is 375 pixels across: if any rotation moved the dashes, that
+        // one would.
+        Page page = new Page("pleiades-03",
+                StudyPages.assemble(new ChartViewState(
+                        new SkyPosition(56.75, 24.12), 3.0, 8.0),
+                        StudyPages.SCREEN_WIDE, StudyPages.SCREEN_HIGH),
+                ChartOptions.DEFAULTS, List.of());
+        ChartRenderer.DrawnMark turned = null;
+        for (ChartRenderer.DrawnMark mark
+                : Page.renderer().drawnMarks(page.scene(),
+                        ChartOptions.DEFAULTS)) {
+            if (mark.deepSky() != null
+                    && ChartRenderer.symbolFor(mark.deepSky())
+                            == ChartRenderer.Symbol.DOTTED_CIRCLE
+                    && mark.deepSky().positionAngleDegrees() > 1.0
+                    && mark.reach() > 100.0) {
+                turned = mark;
+            }
+        }
+        assertTrue(turned != null,
+                "the page carries a dotted ring that is turned");
+
+        boolean[] inItsOwnFrame = rasterised(SymbolInk.of(turned),
+                page.wide(), page.high());
+        boolean[] inThePlacedFrame = rasterised(new java.awt.geom.Area(
+                new java.awt.BasicStroke(1.0f, java.awt.BasicStroke.CAP_BUTT,
+                        java.awt.BasicStroke.JOIN_MITER, 10.0f,
+                        new float[] {2.5f, 2.5f}, 0.0f)
+                        .createStrokedShape(turned.outline())),
+                page.wide(), page.high());
+        int differing = 0;
+        for (int at = 0; at < inItsOwnFrame.length; at++) {
+            if (inItsOwnFrame[at] != inThePlacedFrame[at]) {
+                differing++;
+            }
+        }
+        assertEquals(0, differing, turned.deepSky().id() + " at position"
+                + " angle " + turned.deepSky().positionAngleDegrees()
+                + ": the dots fall in the same pixels whichever frame"
+                + " the ring is dashed in");
     }
 
     @Test

@@ -192,9 +192,9 @@ So placement is decided by **shapes**: what each symbol draws,
 reconstructed from what production publishes about it — which symbol
 the object gets, its silhouette, its centre, its reach and its
 position angle — at the atlas's own stroke of **one** pixel, with the
-open cluster's ring dotted one pixel on and three off as the atlas
-dots it, and the planetary's circle at the spokes' reach divided by
-1.7 **twice**, as the renderer computes it.
+open cluster's ring dotted **two and a half on and two and a half
+off** as the atlas dots it, and the planetary's circle at the spokes'
+reach divided by 1.7 **twice**, as the renderer computes it.
 
 Pixels judge those shapes rather than feeding them, and judging is
 two-sided. A containment check alone — "the ink is inside the shapes"
@@ -209,12 +209,20 @@ claimed between a planetary's circle and its spokes' reach, where the
 renderer inks nothing either. Each of the three faults fails one of
 those and passes the rest, which is why there are five.
 
-One thing the reconstruction cannot match is the dotted ring's **dash
-phase**: the renderer strokes in the symbol's own rotated frame and
-the study strokes the placed silhouette, so the dots are the same size
-at the same spacing in a different place around the ring. It can move
-a refusal by a pixel or two, and it is the sharpest single reason for
-the seam contract below.
+The dash pattern is pinned from both ends, because either alone admits
+the wrong one: how often a dash starts along the ring, and what share
+of the ring the dashes cover. A study that dotted the ring one on and
+three off — which is the **boundary** stroke, a few lines above the
+symbol's in the renderer, and which this study did for a round after
+copying the wrong constant — has the same "many pieces covering about
+half" as a dozen other patterns and a different period.
+
+The dots also land in the **same pixels** as the atlas's. That was
+raised here as a caveat and should not have been: the renderer dashes
+in the symbol's own frame and the study has the placed silhouette, but
+dashing is measured along arc length and the placement is a
+translation and a rotation, which preserve it. Held on the Pleiades,
+whose ring is turned through 90° and is 375 pixels across.
 
 The ownership rule below is not a cost the fallback may spend. A
 candidate outside its constellation's own region is refused there too,
@@ -261,6 +269,13 @@ the gate test measures the disagreement: over a 120-degree page's
 figures, all but a handful of pixels of figure ink lie within four
 pixels of their own region and none lies more than twelve. `#313` will
 have the renderer's own geometry and will not need the slack.
+
+That is the case for the seam contract in one line. Everything this
+study had to rebuild — the symbols' drawn shapes, the figures'
+subdivision — it rebuilt from constants sitting a few lines apart in
+one file, and it copied the wrong one once. Publishing the geometry is
+not tidiness; it is the difference between a policy that is measured
+and a policy that is nearly measured.
 
 *Overlap*, not "its centre is inside": a figure can be smaller than
 its own name. Crater at 90° leaves six pixels by five of visible ink
