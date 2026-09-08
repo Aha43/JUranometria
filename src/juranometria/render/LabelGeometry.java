@@ -105,7 +105,6 @@ public final class LabelGeometry {
         Projection projection = Projections.forViewport(scene.viewport());
         StarLabelPolicy policy =
                 new StarLabelPolicy(scene.viewport().fieldWidthDegrees());
-        Map<String, Shape> ink = inkByIdentity(renderer, scene, options);
         List<Star> stars = new ArrayList<>(scene.stars());
         stars.sort(Comparator.comparingDouble(Star::magnitude)
                 .thenComparing(Star::id));
@@ -134,8 +133,8 @@ public final class LabelGeometry {
                     target ? LabelPlacement.Family.TARGET
                             : LabelPlacement.Family.STAR,
                     star.id(), text, at.x(), at.y(),
-                    around(metrics, text, at, reach), ink.get(star.id()),
-                    null, target, star.magnitude()));
+                    around(metrics, text, at, reach), star.id(), null,
+                    target, star.magnitude()));
         }
         return List.copyOf(asked);
     }
@@ -157,7 +156,6 @@ public final class LabelGeometry {
         }
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         Projection projection = Projections.forViewport(scene.viewport());
-        Map<String, Shape> ink = inkByIdentity(renderer, scene, options);
         List<LabelPlacement.Request> asked = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark
                 : renderer.drawnMarks(scene, options)) {
@@ -181,7 +179,7 @@ public final class LabelGeometry {
                     at.y(), around(metrics,
                             ChartRenderer.labelTextFor(dso), at,
                             home.getX() - at.x() - GAP_PX),
-                    ink.get(dso.id()), null, target, dso.labelPriority()));
+                    dso.id(), null, target, dso.labelPriority()));
         }
         return List.copyOf(asked);
     }
@@ -262,18 +260,6 @@ public final class LabelGeometry {
             }
         }
         return candidates;
-    }
-
-    private static Map<String, Shape> inkByIdentity(ChartRenderer renderer,
-                                                    ChartScene scene,
-                                                    ChartOptions options) {
-        Map<String, Shape> ink = new java.util.LinkedHashMap<>();
-        for (ChartRenderer.DrawnMark mark
-                : renderer.drawnMarks(scene, options)) {
-            ink.put(mark.star() != null ? mark.star().id()
-                    : mark.deepSky().id(), mark.ink());
-        }
-        return ink;
     }
 
     /**

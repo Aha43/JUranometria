@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -99,27 +100,88 @@ class LabelPlacementTest {
         // A star's name is anchored beside its own disc by decision.
         // A policy that treated that as a collision would move every
         // label on every page.
+        //
+        // The two shapes here are EQUAL AND NOT THE SAME OBJECT, which
+        // is the whole point: the obstacles and the requests on a real
+        // page are built from separate calls and hold separate shapes.
+        // An earlier version of this test handed one object to both
+        // sides and so passed while production compared them by
+        // reference and never matched - the exemption was dead, and a
+        // star's name could be refused by its own disc.
         Shape own = new Ellipse2D.Double(5, 5, 20, 20);
+        Shape ownAgain = new Ellipse2D.Double(5, 5, 20, 20);
         Shape other = new Ellipse2D.Double(100, 5, 20, 20);
-        LabelPlacement placement = placementWith(mark("its own", own),
+        assertNotSame(own, ownAgain, "two shapes, not one");
+        LabelPlacement placement = placementWith(mark("its own", ownAgain),
                 mark("somebody else's", other));
 
         LabelPlacement.Placement beside = placement.place(
                 new LabelPlacement.Request(LabelPlacement.Family.STAR,
-                        "a", "a", 15.0, 15.0, List.of(box(10, 10)), own,
-                        null, false, 3.0));
+                        "a", "a", 15.0, 15.0, List.of(box(10, 10)),
+                        "its own", null, false, 3.0));
         assertEquals(0, beside.candidate(),
                 "it may sit on the mark it names");
+        assertEquals(List.of(), beside.refusals(),
+                "and nothing refused it");
 
         LabelPlacement.Placement across = placement.place(
                 new LabelPlacement.Request(LabelPlacement.Family.STAR,
                         "b", "b", 15.0, 15.0,
-                        List.of(box(102, 8), box(60, 60)), own, null,
-                        false, 3.0));
+                        List.of(box(102, 8), box(60, 60)), "its own",
+                        null, false, 3.0));
         assertEquals(1, across.candidate(), "and not on another");
         assertEquals("somebody else's", across.refusals().get(0).by());
         assertEquals(LabelPlacement.Refusal.MARK,
                 across.refusals().get(0).kind());
+    }
+
+    @Test
+    void whatCannotBeDrawnAnywhereIsOmittedAndSaysWhy() {
+        // The one outcome that is an omission. The paper's edge and a
+        // constellation's own region are not costs the fallback may
+        // spend, so when every candidate breaks one of them there is
+        // nothing left to choose - and the alternative, which this had
+        // for a round, is worse: taking candidate zero anyway and
+        // writing a name off the page or onto another constellation.
+        LabelPlacement placement = placementWith();
+        LabelPlacement.Placement placed = placement.place(
+                new LabelPlacement.Request(
+                        LabelPlacement.Family.CONSTELLATION, "Ori", "ORION",
+                        30, 30,
+                        List.of(new Rectangle2D.Double(WIDE - 5, 10, 20, 10),
+                                new Rectangle2D.Double(-30, 10, 20, 10)),
+                        null, new Rectangle2D.Double(0, 0, 60, 60), false,
+                        0.0));
+
+        assertTrue(placed.omitted(), "it is not drawn");
+        assertEquals(null, placed.at(), "there is nowhere it could go");
+        assertFalse(placed.moved(), "and it did not move: it is absent");
+        assertEquals(2, placed.refusals().size(),
+                "with a reason for every candidate it had");
+        assertEquals(LabelPlacement.Refusal.PAGE_EDGE,
+                placed.refusals().get(0).kind());
+    }
+
+    @Test
+    void anOmissionIsNeverTheSilentKind() {
+        // Everything a page can draw is drawn: a label with no free
+        // candidate takes the least bad rather than being dropped.
+        // Only the impossible is absent, and this holds the line
+        // between the two on a page where both happen.
+        Shape everywhere = new Rectangle2D.Double(0, 0, WIDE, HIGH);
+        LabelPlacement placement = placementWith(mark("all", everywhere));
+        LabelPlacement.Placement crowded = placement.place(
+                star("crowded", List.of(box(10, 10), box(60, 60))));
+        assertFalse(crowded.omitted(),
+                "a label with nowhere free is still drawn");
+        assertTrue(crowded.underDuress(), "and says it is under duress");
+
+        LabelPlacement.Placement impossible = placement.place(
+                star("impossible",
+                        List.of(new Rectangle2D.Double(WIDE + 10, 10, 20,
+                                10))));
+        assertTrue(impossible.omitted(),
+                "and a label with nowhere at all is not");
     }
 
     @Test

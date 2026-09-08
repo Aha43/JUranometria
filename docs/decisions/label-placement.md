@@ -224,9 +224,22 @@ dashing is measured along arc length and the placement is a
 translation and a rotation, which preserve it. Held on the Pleiades,
 whose ring is turned through 90° and is 375 pixels across.
 
-The ownership rule below is not a cost the fallback may spend. A
-candidate outside its constellation's own region is refused there too,
-whatever it would have covered.
+The paper's edge and the ownership rule below are not costs the
+fallback may spend. A label off the page is not a label and a name
+outside its figure is naming something else, so neither is a price a
+least-bad candidate may pay.
+
+Which leaves one case, and it is the only omission this decision has:
+**a request every one of whose candidates leaves the paper or its own
+figure is not drawn.** It is never silent - the placement carries a
+refusal for every candidate it had, and says which of the two refused
+it. On a real page it is the edge's business: a star close enough to
+the margin that all eight of its positions fall off the paper, or a
+deep-sky object whose symbol straddles the edge while its label would
+not land on the page at all. The atlas today draws such a label
+clipped by the page; this decision says text keeps two pixels clear of
+the edge, so the seam omits it and reports it. Which of the two a
+reader gets is `#314`'s to settle when the families migrate.
 
 This is the load-bearing choice of the whole decision. The three
 policies that omit instead reach zero of the owner's defects and lose

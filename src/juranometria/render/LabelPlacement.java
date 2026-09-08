@@ -81,9 +81,14 @@ public final class LabelPlacement {
      * @param anchorY where the thing being named is
      * @param candidates the boxes it may occupy, in preference order,
      *     already measured by the caller
-     * @param ownMark the ink of the thing it names, which it is
-     *     anchored beside and is allowed to touch; null when it names
-     *     nothing that inks
+     * @param ownId the identity of the thing it names, whose ink it
+     *     is anchored beside and is allowed to touch; null when it
+     *     names nothing that inks. An identity and not a shape: the
+     *     obstacles and the requests are built from separate calls and
+     *     hold separate shape objects, so comparing them by reference
+     *     could never be true and the exemption was dead - a star's
+     *     name refused by its own disc, which is the one thing it is
+     *     supposed to be allowed to sit beside
      * @param owns the region it may not leave, for a constellation
      *     name; null when it may go anywhere it fits
      * @param guaranteed whether it must be placed whatever it covers
@@ -92,7 +97,7 @@ public final class LabelPlacement {
      */
     public record Request(Family family, String id, String text,
                           double anchorX, double anchorY,
-                          List<Rectangle2D> candidates, Shape ownMark,
+                          List<Rectangle2D> candidates, String ownId,
                           Shape owns, boolean guaranteed, double order) {
 
         public Request {
@@ -115,7 +120,10 @@ public final class LabelPlacement {
     /**
      * Where one request ended up, and what it had to give way to.
      *
-     * @param at the box it occupies, never null - nothing is dropped
+     * @param at the box it occupies, or null when there was nowhere
+     *     on the paper its own region would allow - the one outcome
+     *     that is an omission, and it is never silent: the refusals
+     *     say what refused every candidate
      * @param candidate which of its candidates that was, zero being
      *     the one it asked for first
      * @param refusals why each earlier candidate was refused, in order
@@ -127,7 +135,22 @@ public final class LabelPlacement {
 
         /** Whether this text sits where it first asked to. */
         public boolean moved() {
-            return candidate > 0;
+            return at != null && candidate > 0;
+        }
+
+        /**
+         * Whether this text is not drawn at all.
+         *
+         * <p>The decision's rule is that nothing is silently dropped,
+         * and a label with no free candidate takes the one covering
+         * the least ink. But the paper's edge and a constellation's
+         * own region are not costs to be spent - a label off the page
+         * is not a label, and a name outside its figure is naming
+         * something else - so when every candidate breaks one of
+         * those there is nothing left to choose. The refusals say so.
+         */
+        public boolean omitted() {
+            return at == null;
         }
     }
 
@@ -279,7 +302,11 @@ public final class LabelPlacement {
             }
             refusals.add(refused);
         }
-        return accept(request, leastBad(request), refusals, true);
+        int fallback = leastBad(request);
+        return fallback < 0
+                ? new Placement(request, null, -1, List.copyOf(refusals),
+                        true)
+                : accept(request, fallback, refusals, true);
     }
 
     /** The obstacles this placement is deciding against. */
@@ -314,7 +341,7 @@ public final class LabelPlacement {
         }
         for (Obstacle obstacle : near(box)) {
             comparisons++;
-            if (obstacle.ink() == request.ownMark()) {
+            if (obstacle.id().equals(request.ownId())) {
                 // The thing it names. A star's name is anchored beside
                 // its own disc by decision, and a policy that treated
                 // that as a collision would move every label on the
@@ -341,7 +368,7 @@ public final class LabelPlacement {
      * at all: those are not costs to be spent.
      */
     private int leastBad(Request request) {
-        int best = 0;
+        int best = -1;
         double least = Double.MAX_VALUE;
         for (int at = 0; at < request.candidates().size(); at++) {
             Rectangle2D box = request.candidates().get(at);
@@ -366,7 +393,7 @@ public final class LabelPlacement {
         }
         for (Obstacle obstacle : near(box)) {
             comparisons++;
-            if (obstacle.ink() != request.ownMark()) {
+            if (!obstacle.id().equals(request.ownId())) {
                 // Built once per obstacle, not once per candidate:
                 // turning a shape into an Area is most of what the
                 // fallback costs, and the fallback is where a crowded

@@ -250,10 +250,77 @@ class LabelGeometryTest {
                         field + "° at " + extent[0] + "x" + extent[1]
                                 + ": every request is answered, none"
                                 + " dropped");
+                // Real pages do omit, and it is worth knowing exactly
+                // when: a star close enough to the edge that all eight
+                // of its candidates leave the paper. The atlas today
+                // draws such a label clipped by the page; the decision
+                // says text keeps two pixels off the edge, so the seam
+                // refuses it and says so. Which of the two a reader
+                // gets is #314's to settle when the families migrate.
+                int omitted = 0;
                 for (LabelPlacement.Placement one : placed) {
-                    assertTrue(one.at() != null,
-                            one.request().id() + " has somewhere to go");
+                    if (!one.omitted()) {
+                        continue;
+                    }
+                    omitted++;
+                    for (LabelPlacement.Refused refused : one.refusals()) {
+                        // The two things that are not costs: a label
+                        // off the paper is not a label, and a name
+                        // outside its own figure is naming something
+                        // else. A mark, a piece of furniture or another
+                        // label can never omit anything - those the
+                        // fallback pays for.
+                        assertTrue(refused.kind()
+                                        == LabelPlacement.Refusal.PAGE_EDGE
+                                        || refused.kind()
+                                        == LabelPlacement.Refusal.OWNERSHIP,
+                                one.request().id() + " is omitted only"
+                                        + " because every candidate it"
+                                        + " had left the paper or its own"
+                                        + " figure, not because"
+                                        + " something was in the way: "
+                                        + refused.kind());
+                    }
+                    assertEquals(one.request().candidates().size(),
+                            one.refusals().size(),
+                            one.request().id() + ": every candidate"
+                                    + " accounted for");
                 }
+                // Not a rare case at eight degrees: a page of large
+                // nebulae straddling its own edge has many objects
+                // whose symbol shows and whose label would fall off
+                // the paper. What must be true is that omission is
+                // the EDGE's business and nobody else's - nothing
+                // well inside the page is ever absent.
+                for (LabelPlacement.Placement one : placed) {
+                    if (!one.omitted()) {
+                        continue;
+                    }
+                    boolean nearTheEdge =
+                            one.request().anchorX() < 100.0
+                                    || one.request().anchorX()
+                                            > extent[0] - 100.0
+                                    || one.request().anchorY() < 100.0
+                                    || one.request().anchorY()
+                                            > extent[1] - 100.0;
+                    boolean itsOwnFigureRefused = false;
+                    for (LabelPlacement.Refused refused : one.refusals()) {
+                        itsOwnFigureRefused |= refused.kind()
+                                == LabelPlacement.Refusal.OWNERSHIP;
+                    }
+                    assertTrue(nearTheEdge || itsOwnFigureRefused,
+                            one.request().id() + " is omitted at "
+                                    + Math.round(one.request().anchorX())
+                                    + "," + Math.round(
+                                            one.request().anchorY())
+                                    + " - nothing in the middle of a page"
+                                    + " goes missing unless its own"
+                                    + " figure has nowhere to put it");
+                }
+                assertTrue(omitted < placed.size(), field + "° at "
+                        + extent[0] + "x" + extent[1] + ": the page"
+                        + " places most of what it asks for: " + omitted
+                        + " of " + placed.size() + " omitted");
             }
         }
     }
