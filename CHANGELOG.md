@@ -7,6 +7,32 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-09-08
+
+Sprint 30 — See the shape of the sky. The atlas could show a
+telescope field and it could show a printable page, and both are the
+same kind of chart: a tangent plane, centred where the reader is
+looking, true near the middle and degrading outwards. It had no way
+to answer *where is this in the sky?* — the question a reader asks
+before the telescope, standing outside and looking up. This release
+gives it one.
+
+Zooming out past the 42° sheet page now continues onto three wider
+rungs — 60°, 90° and 120° — drawn by a stereographic projection
+chosen against measured alternatives rather than by taste, and every
+page now says in its title block which projection drew it.
+
+Minor, because nothing a reader could do before has been taken away.
+Every page from 1° to 42° draws exactly the same geometry as in
+1.10.0 — held by the released pages' mark and ink digests — and gains
+one phrase in its title block: the name of the projection.
+
+**Still not printed.** No overview page has been looked at on paper.
+Everything about how a 120° page reads is measured in pixels against
+a control, which is not the same thing.
+[#293](https://github.com/Aha43/JUranometria/issues/293) is open for
+anyone who prints one and can say what they find.
+
 ### Added
 
 - **A study of what lies beyond 42°** (issue #296, the Sprint 30 gate):

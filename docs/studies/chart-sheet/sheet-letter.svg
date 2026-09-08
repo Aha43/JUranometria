@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="792.00pt" height="612.00pt" viewBox="0 0 792.00 612.00" version="1.1">
   <title>JUranometria chart sheet: 5h 32.0m, +0° 00′</title>
   <desc>5h 32.0m, +0° 00′. Centre RA 83.0000, Dec +0.0000 (ICRS/J2000). Field 42 degrees wide, gnomonic. Stars to V 6.0. US Letter landscape, 279.4 x 215.9 mm, 12.7 mm margins, chart 254.0 x 190.5 mm. Ground: white-paper.</desc>
-  <metadata>JUranometria 1.10.0, https://github.com/Aha43/JUranometria - drawn by the application&apos;s own chart renderer; no external resources.</metadata>
+  <metadata>JUranometria 1.11.0, https://github.com/Aha43/JUranometria - drawn by the application&apos;s own chart renderer; no external resources.</metadata>
   <defs>
     <clipPath id="clip0"><path d="M1.00 1.00 L719.00 1.00 L719.00 539.00 L1.00 539.00 L1.00 1.00 Z"/></clipPath>
   </defs>
@@ -2514,13 +2514,13 @@
       <text x="215.18" y="-155.32" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">M 35</text>
     </g>
     <g class="ink" fill="none">
-      <path d="M12.00 470.00 L270.00 470.00 L270.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" fill="#ffffff"/>
-      <path d="M12.00 470.00 L270.00 470.00 L270.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" stroke="#333333" stroke-width="1.00" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10.00"/>
+      <path d="M12.00 470.00 L333.00 470.00 L333.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" fill="#ffffff"/>
+      <path d="M12.00 470.00 L333.00 470.00 L333.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" stroke="#333333" stroke-width="1.00" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10.00"/>
     </g>
     <g class="labels">
       <text x="20.00" y="489.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" font-weight="bold" fill="#222222">5h 32.0m, +0° 00′</text>
       <text x="20.00" y="503.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Centre 5h 32.0m, +0° 00′ · ICRS J2000</text>
-      <text x="20.00" y="517.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Field 42.0° · Stars to V 6.0 · North up, east left</text>
+      <text x="20.00" y="517.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Field 42.0° · Stars to V 6.0 · North up, east left · gnomonic</text>
     </g>
     <g class="ink" fill="none">
       <path d="M0.50 0.50 L719.50 0.50 L719.50 539.50 L0.50 539.50 L0.50 0.50 Z" stroke="#333333" stroke-width="1.00" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10.00"/>
