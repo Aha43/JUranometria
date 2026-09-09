@@ -76,10 +76,10 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **45 files** touch process-wide state —
-**23** use the shared guard, **21** restore locally,
-**0 flagged unprotected** — and **31 files** depend on a display,
-of which **17** state a focus premise and **23** a reachability
+this document to them: **46 files** touch process-wide state —
+**24** use the shared guard, **21** restore locally,
+**0 flagged unprotected** — and **32 files** depend on a display,
+of which **17** state a focus premise and **24** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -104,7 +104,10 @@ window guards rather than a lifecycle of its own; and #312 added the
 chart keyboard's pair — its journey, which presses the prefix and its
 letters in a real window beside the reader's own controls, and its
 lifecycle, which counts the listeners a *shown* palette adds and so
-cannot be made without showing one — both under the shared guard.)
+cannot be made without showing one — and its acceptance matrix, which
+drives all twenty switches through the reader's own dialog, the View
+menu and Place and Time as well as through the palette; all three
+under the shared guard.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -184,7 +187,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **373
-reads of live chart state** against **605 explicit hand-offs**
+reads of live chart state** against **627 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its

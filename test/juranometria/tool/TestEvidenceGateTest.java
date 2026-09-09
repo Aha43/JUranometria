@@ -417,7 +417,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(31, display.size(),
+        assertEquals(32, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -444,8 +444,11 @@ class TestEvidenceGateTest {
                         + " window beside the reader's own controls,"
                         + " and its lifecycle, which is a claim about"
                         + " listeners a shown palette adds and so"
-                        + " cannot be made without showing one; each"
-                        + " with its premises stated");
+                        + " cannot be made without showing one, and"
+                        + " its acceptance matrix, which drives every"
+                        + " switch through the reader's own dialog and"
+                        + " menu as well as the palette; each with its"
+                        + " premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
@@ -498,7 +501,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 33,
+        assertTrue(doClick <= 34,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -530,8 +533,11 @@ class TestEvidenceGateTest {
                         + " same one, on its way to pressing Center"
                         + " here on an object it selected by clicking"
                         + " the overview, and #300's closing journey"
-                        + " walks that same route to close the sprint:"
-                        + " " + doClick);
+                        + " walks that same route to close the sprint;"
+                        + " and #312's matrix reaches the View menu's"
+                        + " Ecliptic item by the same convention, on"
+                        + " its way to comparing that route with the"
+                        + " palette's letter: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

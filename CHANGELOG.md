@@ -46,11 +46,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   key), which opens the chart's own keyboard: a panel naming every
   switch, its letter and whether it is on, so the letter is read off
   the screen rather than remembered. It stays open while a reader
-  throws two or three switches together, and says what each press
-  promised - `Galaxies on — saved.` for a layer that will be there
-  tomorrow, `Your meridian on — for this session.` for one that will
-  not, `Constellation names unavailable — enable constellation
-  figures first.` for one whose master is off. The zenith is refused
+  throws two or three switches together - the same key closes it -
+  and says what each press promised - `Galaxies on — saved.` for a
+  layer that will be there tomorrow, `Your meridian on — for this
+  session.` for one that will not, `Constellation names unavailable
+  — enable constellation figures first.` for one whose master is
+  off. The zenith is refused
   and says why on its own line: it is not an independent switch, and
   is turned on with the observer's other lines in Place and Time. The
   prefix will not open over a half-typed star name - the search field

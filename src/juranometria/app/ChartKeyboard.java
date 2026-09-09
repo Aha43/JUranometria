@@ -70,7 +70,8 @@ public final class ChartKeyboard extends JPanel {
         getAccessibleContext().setAccessibleDescription(
                 "Every layer the chart can show, with the letter that"
                         + " switches it and whether it is on. Press a"
-                        + " letter to switch one, or Escape to close.");
+                        + " letter to switch one, or Escape or "
+                        + ChartKeys.prefixText() + " to close.");
 
         JPanel column = new JPanel();
         column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
@@ -79,8 +80,9 @@ public final class ChartKeyboard extends JPanel {
         heading.putClientProperty("FlatLaf.styleClass", "h4");
         heading.setAlignmentX(0.0f);
         column.add(heading);
-        JLabel how = new JLabel("Press a letter. Escape closes without"
-                + " changing anything.");
+        JLabel how = new JLabel("Press a letter. Escape or "
+                + ChartKeys.prefixText() + " closes without changing"
+                + " anything.");
         how.putClientProperty("FlatLaf.styleClass", "small");
         how.setAlignmentX(0.0f);
         column.add(how);
@@ -139,6 +141,13 @@ public final class ChartKeyboard extends JPanel {
      * of editing strokes, and a chart keyboard that opened over a
      * half-typed star name would be taking the reader's own text
      * away from them.
+     *
+     * <p>One palette at a time, and the same key closes it. The
+     * prefix stays live while the palette has the focus, so without
+     * this a second press built a second palette over the first and
+     * the first went on listening to the whole toolkit with nothing
+     * left on screen to close it - a leak a reader makes by pressing
+     * the same key twice (review, #312).
      */
     public static void install(JRootPane root, ChartSwitches switches,
                                Opener opener) {
@@ -147,6 +156,7 @@ public final class ChartKeyboard extends JPanel {
                     "installing the chart keyboard needs a window, the"
                             + " switches and somewhere to show it");
         }
+        ChartKeyboard[] showing = new ChartKeyboard[1];
         root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(ChartKeys.prefix(), "chart.keyboard");
         root.getActionMap().put("chart.keyboard", new AbstractAction() {
@@ -155,7 +165,14 @@ public final class ChartKeyboard extends JPanel {
                 if (typing()) {
                     return;
                 }
-                opener.open(ChartKeyboard.of(switches));
+                if (showing[0] != null && showing[0].isOpen()) {
+                    showing[0].close();
+                    showing[0] = null;
+                    return;
+                }
+                ChartKeyboard keyboard = ChartKeyboard.of(switches);
+                showing[0] = keyboard;
+                opener.open(keyboard);
             }
         });
     }

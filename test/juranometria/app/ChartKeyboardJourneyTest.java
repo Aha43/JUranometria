@@ -195,9 +195,136 @@ class ChartKeyboardJourneyTest {
         });
     }
 
+    @Test
+    void theScopeIsThisWindowAndNotWhateverHasTheFocusInIt()
+            throws Exception {
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "where the focus sits is a thing a desktop decides");
+        SwingSession.restoring(() -> {
+            UiTheme.apply(false);
+            Session session = new Session();
+            try {
+                session.open();
+
+                // A table. The reader is reading what is on this
+                // page, and the chart keyboard is still theirs: a
+                // table answers arrows and letters of its own, and
+                // none of them is the prefix.
+                javax.swing.JTable table = session.table();
+                juranometria.ui.ReaderInput.shortcutOn(table,
+                        KeyEvent.VK_K, AppMenuBar.menuShortcutMask());
+                flush();
+                assertFalse(session.opened().isEmpty(),
+                        "from a table, the prefix opens the keyboard");
+                assertEquals(0, onEdt(table::getSelectedRowCount)
+                                + onEdt(table::getSelectedColumnCount),
+                        "and the table's own selection is untouched");
+                ChartKeyboard fromTheTable = session.opened().get(0);
+                SwingUtilities.invokeAndWait(fromTheTable::close);
+                flush();
+
+                // A dialog. The prefix belongs to the chart's window,
+                // and a reader working in another window is working
+                // in another window - the palette must not appear
+                // behind the dialog they are looking at.
+                int openedBefore = session.opened().size();
+                SwingUtilities.invokeAndWait(() ->
+                        ChartOptionsDialog.open(session.window(),
+                                session.options()));
+                flush();
+                JDialog dialog = dialogTitled("Chart Options");
+                assertTrue(dialog != null, "the reader's own dialog opens");
+                try {
+                    javax.swing.JButton ok =
+                            onEdt(() -> button(dialog, "OK"));
+                    assertTrue(ok != null, "with its own OK to stand on");
+                    juranometria.ui.ReaderInput.shortcutOn(ok,
+                            KeyEvent.VK_K, AppMenuBar.menuShortcutMask());
+                    flush();
+                    assertEquals(openedBefore, session.opened().size(),
+                            "the prefix pressed inside the dialog opens"
+                                    + " nothing behind it - the binding"
+                                    + " is the chart window's, and this"
+                                    + " is not the chart window");
+                } finally {
+                    SwingUtilities.invokeAndWait(dialog::dispose);
+                    flush();
+                }
+
+                // And back on the chart it works, so what was just
+                // shown is a scope and not a broken keystroke.
+                ChartKeyboard again = session.openKeyboard();
+                assertTrue(onEdt(again::isOpen),
+                        "back on the chart, the prefix opens it");
+            } finally {
+                session.close();
+            }
+        });
+    }
+
+    @Test
+    void theSamePrefixTwiceLeavesOnePaletteAndOneSetOfListeners()
+            throws Exception {
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "the palette is shown in a real window");
+        SwingSession.restoring(() -> {
+            UiTheme.apply(false);
+            Session session = new Session();
+            try {
+                session.open();
+                int before = mouseListeners();
+
+                ChartKeyboard first = session.openKeyboard();
+                assertEquals(1, session.opened().size(),
+                        "one press, one palette");
+                int listening = mouseListeners();
+                assertTrue(listening > before,
+                        "which is listening to the toolkit while it is"
+                                + " open");
+
+                // The same key again. Without one owned instance this
+                // built a second palette over the first and left the
+                // first listening with nothing on screen to close it
+                // (review, #312).
+                session.pressThePrefix();
+                assertEquals(1, session.opened().size(),
+                        "the same key again builds no second palette");
+                assertFalse(onEdt(first::isOpen),
+                        "it closes the one that is open");
+                assertEquals(before, mouseListeners(),
+                        "and the toolkit is back where it started -"
+                                + " not " + listening);
+
+                // And it opens again, so closing is a route and not a
+                // keystroke that stopped working.
+                ChartKeyboard second = session.openKeyboard();
+                assertEquals(2, session.opened().size(),
+                        "a third press opens a fresh palette");
+                assertTrue(onEdt(second::isOpen), "and shows it");
+                assertEquals(listening, mouseListeners(),
+                        "listening exactly as much as one palette does");
+                SwingUtilities.invokeAndWait(second::close);
+                flush();
+                assertEquals(before, mouseListeners(),
+                        "and leaving nothing behind when it goes");
+            } finally {
+                session.close();
+            }
+        });
+    }
+
     // ---- the two routes, each walked on its own --------------------
 
-    /** The chart after a reader presses the real checkbox. */
+    /**
+     * The chart after a reader presses the real checkbox <em>and the
+     * dialog's own OK</em>.
+     *
+     * <p>The OK is the point. A checkbox previews and OK commits, so
+     * stopping at the checkbox compares an uncommitted preview with
+     * the keyboard's committed action - two different things, and a
+     * broken OK route would pass (review, #312). What is returned is
+     * read back out of the store by somebody who did not write it.
+     */
     private ChartOptions byTheDialog(String control) throws Exception {
         Session session = new Session();
         try {
@@ -223,7 +350,11 @@ class ChartKeyboardJourneyTest {
             ReaderInput.click(box, () -> new java.awt.Point(
                     box.getWidth() / 2, box.getHeight() / 2), 0);
             flush();
-            return session.options().options();
+            javax.swing.JButton ok = onEdt(() -> button(dialog, "OK"));
+            assertTrue(ok != null, "the dialog's own OK");
+            ReaderInput.click(ok);
+            flush();
+            return session.stored();
         } finally {
             session.close();
         }
@@ -236,7 +367,7 @@ class ChartKeyboardJourneyTest {
             session.open();
             ChartKeyboard keyboard = session.openKeyboard();
             press(keyboard, letter);
-            return session.options().options();
+            return session.stored();
         } finally {
             session.close();
         }
@@ -249,6 +380,7 @@ class ChartKeyboardJourneyTest {
         private JFrame frame;
         private javax.swing.JPanel chart;
         private javax.swing.JTextField search;
+        private javax.swing.JTable table;
         private ChartOptionsController options;
         private final boolean[] ecliptic = {false};
         private final boolean[] lines = {false, false};
@@ -272,6 +404,15 @@ class ChartKeyboardJourneyTest {
                 chart = new javax.swing.JPanel();
                 chart.setFocusable(true);
                 frame.add(chart, BorderLayout.CENTER);
+                // What is on this page, as the reader's own module
+                // shows it: a table is the fourth place a reader's
+                // focus can be sitting when they reach for the chart
+                // keyboard.
+                table = new javax.swing.JTable(
+                        new String[][] {{"M31"}, {"M32"}},
+                        new String[] {"Object"});
+                frame.add(new javax.swing.JScrollPane(table),
+                        BorderLayout.SOUTH);
                 frame.setSize(900, 600);
                 ChartKeyboard.install(frame.getRootPane(), switches(),
                         keyboard -> {
@@ -285,14 +426,19 @@ class ChartKeyboardJourneyTest {
 
         /** The palette, opened the way the prefix opens it. */
         ChartKeyboard openKeyboard() throws Exception {
+            pressThePrefix();
+            assertFalse(opened.isEmpty(),
+                    "the chart keyboard opens on " + ChartKeys.prefixText());
+            return opened.get(opened.size() - 1);
+        }
+
+        /** The prefix, pressed on the chart, whatever it does. */
+        void pressThePrefix() throws Exception {
             SwingUtilities.invokeAndWait(chart::requestFocusInWindow);
             flush();
             ReaderInput.shortcut(chart, KeyEvent.VK_K,
                     AppMenuBar.menuShortcutMask());
             flush();
-            assertFalse(opened.isEmpty(),
-                    "the chart keyboard opens on " + ChartKeys.prefixText());
-            return opened.get(opened.size() - 1);
         }
 
         ChartSwitches switches() {
@@ -332,6 +478,16 @@ class ChartKeyboardJourneyTest {
             return options;
         }
 
+        /** What the store holds, read by somebody who did not write it. */
+        ChartOptions stored() {
+            return new ChartOptionsController(
+                    ChartOptionsStore.forNode(node)).options();
+        }
+
+        javax.swing.JTable table() {
+            return table;
+        }
+
         JFrame window() {
             return frame;
         }
@@ -367,6 +523,12 @@ class ChartKeyboardJourneyTest {
                 node.removeNode();
             }
         }
+    }
+
+    private static int mouseListeners() throws Exception {
+        return onEdt(() -> java.awt.Toolkit.getDefaultToolkit()
+                .getAWTEventListeners(
+                        java.awt.AWTEvent.MOUSE_EVENT_MASK).length);
     }
 
     private static void press(ChartKeyboard keyboard, char letter)
@@ -415,6 +577,22 @@ class ChartKeyboardJourneyTest {
             }
             if (child instanceof Container inside) {
                 JTabbedPane found = tabs(inside);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static javax.swing.JButton button(Container root, String text) {
+        for (Component child : root.getComponents()) {
+            if (child instanceof javax.swing.JButton pressed
+                    && text.equals(pressed.getText())) {
+                return pressed;
+            }
+            if (child instanceof Container inside) {
+                javax.swing.JButton found = button(inside, text);
                 if (found != null) {
                     return found;
                 }

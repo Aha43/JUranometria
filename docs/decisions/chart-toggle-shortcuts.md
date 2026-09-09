@@ -70,8 +70,8 @@ released, not held. While it is open:
   letter made the common case - two or three switches together -
   cost a reopen each time, and hid the very confirmation the panel
   exists to give)*;
-- Escape, a click elsewhere, or losing the window closes it and
-  changes nothing;
+- Escape, a click elsewhere, losing the window, **or the prefix
+  again** closes it and changes nothing;
 - the panel is what makes the prefix teachable: a prefix that shows
   nothing is a prefix nobody discovers.
 
@@ -106,6 +106,15 @@ nothing. So does a click anywhere outside it and the window losing
 the desktop's attention — a mode that can only be left by a key
 nobody remembers is a mode readers get stuck in. A letter that is not
 on the map does nothing at all and says nothing.
+
+**One palette, and the prefix closes it** *(observed)*. The prefix is
+bound to the window, and the window is still focused while the
+palette is on it — so a second press used to build a second palette
+over the first, and the first went on listening to the whole toolkit
+with nothing left on screen to close it. A reader makes that by
+pressing the same key twice. The installation now owns one palette:
+the prefix opens it, and the same key closes it. The panel says so
+where a reader can read it, beside Escape.
 
 The palette listens to the whole toolkit while it is open, so every
 one of those routes is walked repeatedly in a test and the toolkit's
@@ -221,6 +230,31 @@ Twenty switches, seventeen of the chart's own and three of the
 modules', with the letters and the promises in
 [the study](../studies/toggle-shortcuts/measurements.md), which reads
 them from the registry rather than repeating them.
+
+## What the acceptance turned out to need
+
+Three things the first build did not have, all found by review:
+
+**A matrix, not a sample.** Two switches compared through both
+routes proves those two. One registry entry can call the wrong
+transition, persist differently from its own control, or change
+something else as well, and sixteen unwatched switches is where that
+hides. All twenty are now driven both ways, in both directions, from
+the same start, and compared on the effective chart, on what the
+**store** holds when somebody else reads it, and on the drawn page.
+
+**The page each switch is visible on.** A layer draws nothing where
+there is nothing of its kind, so "the picture changed" is measured
+on a small list of real pages and the switch has to change one of
+them. Two of those pages are in the list because the measurement put
+them there: a planetary nebula only appears near one, and a Flamsteed
+number only where a bright star has no name and no letter and the
+field is under 12°.
+
+**OK.** The GUI route presses the dialog's own **OK**. Stopping at
+the checkbox compares an uncommitted preview with the keyboard's
+committed action — the two are different by design, said so in this
+document, and the comparison would have passed with a broken OK.
 
 ## Contract for the implementation
 
