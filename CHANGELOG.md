@@ -40,6 +40,31 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A keyboard route to what the chart shows** (issue #312). Twenty
+  switches that until now could only be reached through a dialog or a
+  menu answer to **⌘K** (Ctrl-K where that is the platform's menu
+  key), which opens the chart's own keyboard: a panel naming every
+  switch, its letter and whether it is on, so the letter is read off
+  the screen rather than remembered. It stays open while a reader
+  throws two or three switches together - the same key closes it -
+  and says what each press promised - `Galaxies on — saved.` for a
+  layer that will be there tomorrow, `Your meridian on — for this
+  session.` for one that will not, `Constellation names unavailable
+  — enable constellation figures first.` for one whose master is
+  off. The zenith is refused
+  and says why on its own line: it is not an independent switch, and
+  is turned on with the observer's other lines in Place and Time. The
+  prefix will not open over a half-typed star name - the search field
+  keeps all 49 of its own editing strokes - and the letters, the
+  keystroke and its reader-facing spelling live in one registry, so
+  no surface spells a key twice. Measured in
+  `docs/studies/toggle-shortcuts/measurements.md`, decided in
+  `docs/decisions/chart-toggle-shortcuts.md`. Held by pressing the
+  keys: every switch through both the reader's own control and the
+  palette letter, in both directions, and the letters pressed at the
+  application's own chart, which repaints without reassembling the
+  page to draw them.
+
 - **A deterministic label-placement seam** (issue #313). One boundary
   decides where a page's text may go and why a candidate was refused,
   and it never measures a string: rendering decides what the text and

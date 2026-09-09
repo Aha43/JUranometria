@@ -329,6 +329,37 @@ public final class ReaderInput {
     }
 
     /**
+     * The window losing the desktop's attention, as it happens when
+     * a reader clicks another application - with the premise that
+     * makes the event mean anything: the window must actually
+     * <strong>hold</strong> the focus first.
+     *
+     * <p>Not decoration. A window that never had the focus cannot
+     * lose it, and the focus manager quietly discards a lost-focus
+     * event aimed at a window it does not consider focused. A test
+     * dispatching one without the premise therefore passes on its
+     * own - where the window happens to be focused - and fails
+     * inside a suite, where an earlier journey's window still is
+     * (#312). Stating the premise makes it the same test either
+     * way.
+     */
+    public static void lookAway(JComponent inWindow) throws Exception {
+        java.awt.Window window =
+                SwingUtilities.getWindowAncestor(inWindow);
+        Assumptions.assumeTrue(window != null,
+                name(inWindow) + " sits in a window a desktop could"
+                        + " focus");
+        Assumptions.assumeTrue(FocusedWindow.tryToFocus(window),
+                "this desktop would not give the window the keyboard"
+                        + " focus, so it has none to lose. "
+                        + FocusedWindow.state(window));
+        SwingUtilities.invokeAndWait(() -> window.dispatchEvent(
+                new java.awt.event.WindowEvent(window,
+                        java.awt.event.WindowEvent.WINDOW_LOST_FOCUS)));
+        flush();
+    }
+
+    /**
      * A key pressed and released at a control - the one raw
      * dispatcher in the whole suite, pinned to this file by the
      * gate, and private (review): a public premise-free press was a

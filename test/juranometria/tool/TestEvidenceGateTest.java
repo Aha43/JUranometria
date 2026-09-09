@@ -288,17 +288,23 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
+                        "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the seven widget photographers, whose font setting"
-                        + " dies with the JVM - benign by"
+                "the eight widget photographers, whose font and theme"
+                        + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
                         + " exactly that route (#258's gate), and the"
                         + " sixth and seventh by #271's - the ecliptic"
                         + " control mock-up, and the candidate study,"
                         + " which sets the font only to show that"
-                        + " enlarged text does not reach the chart");
+                        + " enlarged text does not reach the chart;"
+                        + " the eighth by #312's, the toggle-shortcut"
+                        + " study, which applies the shipped look and"
+                        + " feel because the keystrokes it counts are"
+                        + " the ones a text field answers under that"
+                        + " look and feel and no other");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -411,7 +417,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(29, display.size(),
+        assertEquals(33, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -432,7 +438,19 @@ class TestEvidenceGateTest {
                         + " and leave the wide view and clicks a star"
                         + " of it, because a projection carried"
                         + " through the seam is a claim about what a"
-                        + " pointer reaches; each with its premises"
+                        + " pointer reaches; and #312's pair - the"
+                        + " chart keyboard's journey, which presses"
+                        + " the prefix and its letters in a real"
+                        + " window beside the reader's own controls,"
+                        + " and its lifecycle, which is a claim about"
+                        + " listeners a shown palette adds and so"
+                        + " cannot be made without showing one, and"
+                        + " its acceptance matrix, which drives every"
+                        + " switch through the reader's own dialog and"
+                        + " menu as well as the palette, and its"
+                        + " wiring test, which presses letters at the"
+                        + " application's own chart component and"
+                        + " watches it repaint; each with its premises"
                         + " stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
@@ -486,7 +504,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 33,
+        assertTrue(doClick <= 35,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -518,8 +536,14 @@ class TestEvidenceGateTest {
                         + " same one, on its way to pressing Center"
                         + " here on an object it selected by clicking"
                         + " the overview, and #300's closing journey"
-                        + " walks that same route to close the sprint:"
-                        + " " + doClick);
+                        + " walks that same route to close the sprint;"
+                        + " and #312's matrix reaches the View menu's"
+                        + " Ecliptic item by the same convention, on"
+                        + " its way to comparing that route with the"
+                        + " palette's letter, and #312's wiring test"
+                        + " reaches it by the same convention to"
+                        + " compare what the two routes cost the"
+                        + " running atlas: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

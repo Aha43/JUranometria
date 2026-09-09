@@ -76,10 +76,10 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **43 files** touch process-wide state —
-**21** use the shared guard, **21** restore locally,
-**0 flagged unprotected** — and **29 files** depend on a display,
-of which **16** state a focus premise and **20** a reachability
+this document to them: **47 files** touch process-wide state —
+**25** use the shared guard, **21** restore locally,
+**0 flagged unprotected** — and **33 files** depend on a display,
+of which **17** state a focus premise and **25** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -100,7 +100,16 @@ both grounds at two text sizes and pressed through the shared route
 helper; and #287's closing journey, which shows the window a club
 member exports from — a journey #314 extended to walk the same route
 for a page whose text is placed, through the shared preference and
-window guards rather than a lifecycle of its own.)
+window guards rather than a lifecycle of its own; and #312 added the
+chart keyboard's pair — its journey, which presses the prefix and its
+letters in a real window beside the reader's own controls, and its
+lifecycle, which counts the listeners a *shown* palette adds and so
+cannot be made without showing one — and its acceptance matrix, which
+drives all twenty switches through the reader's own dialog, the View
+menu and Place and Time as well as through the palette, and its
+wiring test, which presses letters at the application's own chart
+component and watches it repaint without reassembling; all four under
+the shared guard.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -121,16 +130,20 @@ The review's first finding: the initial scan looked only under
 single-JVM executables whose look-and-feel dies with the process
 but whose preference writes outlive it. Scanned now (the two
 measuring instruments excluded by pinned name, because their marker
-definitions read exactly like the behaviour they detect): **6**
-touch process-wide state; **5** carry an unpaired touch, and all
-five
+definitions read exactly like the behaviour they detect): **9**
+touch process-wide state; **8** carry an unpaired touch, and all
+eight
 are the widget-photography mains whose FlatLaf and font settings
 are the photograph's subject and die with the JVM — benign **by
 construction, not by silence**, which is why they stay in the
 table rather than being excused from it. Their preference use is
 clean: the dialog study removes its throwaway node in a `finally`,
 and the packaged acceptance restores the reader's store under
-guard and removes its restart node.
+guard and removes its restart node. (#312's toggle-shortcut study
+joined them: it applies the shipped look and feel because the
+editing strokes it counts are the ones a text field answers under
+*that* look and feel and no other — a count taken under Metal would
+be a measurement of a program nobody ships.)
 
 ## Display-dependent tests
 
@@ -176,13 +189,16 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **373
-reads of live chart state** against **580 explicit hand-offs**
+reads of live chart state** against **643 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
 chart Home under it; for #300's sprint journey, which walks the
 projection seam; and for #307, which paints the chart component
-itself and reads its scene and page offset to do so). The discipline
+itself and reads its scene and page offset to do so; and for #312's
+chart keyboard, whose every question of the palette — is it open,
+what does its line say, how many listeners is the toolkit holding —
+is asked on the event thread and nowhere else). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already
