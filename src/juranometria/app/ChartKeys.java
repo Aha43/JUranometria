@@ -154,10 +154,10 @@ public final class ChartKeys {
 
     /** The prefix in the words a reader is shown. */
     public static String prefixText() {
-        String modifiers = java.awt.event.InputEvent.getModifiersExText(
-                prefix().getModifiers());
-        String key = KeyEvent.getKeyText(prefix().getKeyCode());
-        return modifiers.isEmpty() ? key : modifiers + key;
+        // Spelled by the one source that spells every other keystroke
+        // the atlas answers (#311), so a tooltip and a menu can never
+        // disagree about what this platform calls a modifier.
+        return juranometria.ui.Shortcuts.text(prefix());
     }
 
     /**

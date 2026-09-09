@@ -112,6 +112,12 @@ public final class EvidenceContractMain {
         // it fails here.
         REPORT_MAINS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/measurements.md");
+        // The tooltip audit walks the surfaces the application
+        // builds, so a control added without a decision about what it
+        // says changes this document - and a document that did not
+        // change with it fails here (#311).
+        REPORT_MAINS.put("juranometria.tool.ControlExplanationStudyMain",
+                "docs/studies/control-explanations/measurements.md");
         REPORT_MAINS.put("juranometria.tool.WiderFieldStudyMain",
                 "docs/studies/wider-field/released-pages.txt");
         // Writes its 49 candidate pages beside the report as it runs

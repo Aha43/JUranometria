@@ -76,9 +76,9 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **47 files** touch process-wide state —
-**25** use the shared guard, **21** restore locally,
-**0 flagged unprotected** — and **33 files** depend on a display,
+this document to them: **48 files** touch process-wide state —
+**26** use the shared guard, **21** restore locally,
+**0 flagged unprotected** — and **34 files** depend on a display,
 of which **17** state a focus premise and **25** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -109,7 +109,10 @@ drives all twenty switches through the reader's own dialog, the View
 menu and Place and Time as well as through the palette, and its
 wiring test, which presses letters at the application's own chart
 component and watches it repaint without reassembling; all four under
-the shared guard.)
+the shared guard; and #311 added the hover journey, which reads what a
+reader is shown by resting the pointer on a control in a shown window,
+because a tooltip read off a field answers for a control no pointer
+could reach.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -130,9 +133,9 @@ The review's first finding: the initial scan looked only under
 single-JVM executables whose look-and-feel dies with the process
 but whose preference writes outlive it. Scanned now (the two
 measuring instruments excluded by pinned name, because their marker
-definitions read exactly like the behaviour they detect): **9**
-touch process-wide state; **8** carry an unpaired touch, and all
-eight
+definitions read exactly like the behaviour they detect): **10**
+touch process-wide state; **9** carry an unpaired touch, and all
+nine
 are the widget-photography mains whose FlatLaf and font settings
 are the photograph's subject and die with the JVM — benign **by
 construction, not by silence**, which is why they stay in the
@@ -143,7 +146,10 @@ guard and removes its restart node. (#312's toggle-shortcut study
 joined them: it applies the shipped look and feel because the
 editing strokes it counts are the ones a text field answers under
 *that* look and feel and no other — a count taken under Metal would
-be a measurement of a program nobody ships.)
+be a measurement of a program nobody ships. #311's control audit
+joined them for the same reason: it builds every surface the
+application builds, and those surfaces are made of the look and
+feel's own parts.)
 
 ## Display-dependent tests
 

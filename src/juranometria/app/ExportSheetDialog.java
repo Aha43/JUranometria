@@ -82,6 +82,16 @@ public final class ExportSheetDialog extends JDialog {
      * pressed. Cancel, Escape and the window's close button all leave
      * with nothing chosen and nothing written.
      */
+    /**
+     * The dialog's content, for the audit that reads what every
+     * control says (#311). A surface a reader gets, with actions
+     * that do nothing: an inventory is not a session.
+     */
+    public static JComponent contentForStudy() {
+        return content(ExportSheetSession.defaults(), request -> { },
+                () -> { });
+    }
+
     static JComponent content(ExportSheet.Request initial,
                               Consumer<ExportSheet.Request> confirm,
                               Runnable cancel) {
@@ -90,6 +100,15 @@ public final class ExportSheetDialog extends JDialog {
         format.setName(FORMAT_BOX);
         format.setSelectedItem(initial.format());
         format.getAccessibleContext().setAccessibleName("Format");
+        // The combo's own words are a file format's name, which
+        // means nothing about what the file is *for*; the tooltip is
+        // where that fits without widening the box (see below).
+        juranometria.ui.Explain.control(format,
+                "What kind of file to write: vector for printing and"
+                        + " editing, PNG for sharing a picture",
+                "Chooses the file the sheet is written as. SVG and PDF"
+                        + " keep the drawing as lines; PNG is a"
+                        + " picture at a chosen resolution.");
         // The name only. The explanation used to live in here, and
         // a combo is as wide as its widest entry: on a machine with
         // wider fonts at enlarged text the dialog grew past the
@@ -101,6 +120,11 @@ public final class ExportSheetDialog extends JDialog {
         paper.setName(PAPER_BOX);
         paper.setSelectedItem(initial.paper());
         paper.getAccessibleContext().setAccessibleName("Paper");
+        juranometria.ui.Explain.control(paper,
+                "The size of the page the chart is laid out on",
+                "Chooses the paper the sheet is laid out for. The"
+                        + " chart is fitted to it; the page you are"
+                        + " looking at does not move.");
         paper.setRenderer(described(PaperSize::readableName));
 
         JComboBox<Integer> resolution = new JComboBox<>();
@@ -110,6 +134,11 @@ public final class ExportSheetDialog extends JDialog {
         resolution.setName(RESOLUTION_BOX);
         resolution.setSelectedItem(initial.dpi());
         resolution.getAccessibleContext().setAccessibleName("Resolution");
+        juranometria.ui.Explain.control(resolution,
+                "How finely a PNG is drawn; ignored by SVG and PDF",
+                "Chooses how many dots per inch a PNG is drawn at."
+                        + " SVG and PDF keep the drawing as lines and"
+                        + " ignore this.");
         resolution.setRenderer(described(dpi -> dpi + " dots per inch"));
 
         JCheckBox working = new JCheckBox("<html><body"
@@ -119,10 +148,12 @@ public final class ExportSheetDialog extends JDialog {
         working.setSelected(initial.workingSelection());
         working.getAccessibleContext().setAccessibleName(
                 "Include working selection marks");
-        working.getAccessibleContext().setAccessibleDescription(
-                "The rings and crosses on objects you have marked."
-                        + " Off by default: a sheet outlives the"
-                        + " session that made it.");
+        juranometria.ui.Explain.control(working,
+                "Draw the rings and crosses on the objects you have"
+                        + " marked",
+                "When on, the sheet carries the marks you made this"
+                        + " session. Off by default, because a sheet"
+                        + " outlives the session that made it.");
 
         JLabel explanation = new JLabel();
         explanation.setName("export.explanation");
@@ -202,8 +233,10 @@ public final class ExportSheetDialog extends JDialog {
         JButton export = new JButton("Export...");
         export.setName(EXPORT_BUTTON);
         export.getAccessibleContext().setAccessibleName("Export");
-        export.getAccessibleContext().setAccessibleDescription(
-                "Choose where to save the sheet");
+        juranometria.ui.Explain.control(export,
+                "Choose where to save the sheet",
+                "Opens the file chooser, and writes the sheet where"
+                        + " you put it");
         export.addActionListener(event -> confirm.accept(
                 new ExportSheet.Request(
                         (SheetFormat) format.getSelectedItem(),
@@ -214,6 +247,8 @@ public final class ExportSheetDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setName(CANCEL_BUTTON);
         cancelButton.getAccessibleContext().setAccessibleName("Cancel");
+        juranometria.ui.Explain.selfExplanatory(cancelButton,
+                "Closes this window without writing anything");
         cancelButton.addActionListener(event -> cancel.run());
 
         JPanel buttons = new JPanel();
