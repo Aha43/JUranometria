@@ -58,7 +58,8 @@ class ControlExplanationTest {
     @Test
     void everyOperableControlCarriesADecision() throws Exception {
         SwingSession.restoring(() -> {
-            List<Control> controls = ControlExplanationStudyMain.audit().controls();
+            List<Control> controls =
+                    ControlExplanationStudyMain.audit().controls();
             List<Control> undecided = controls.stream()
                     .filter(control -> "UNDECIDED".equals(control.how()))
                     .toList();
@@ -115,7 +116,8 @@ class ControlExplanationTest {
     @Test
     void theDocumentSaysWhatTheWalkFound() throws Exception {
         SwingSession.restoring(() -> {
-            List<Control> controls = ControlExplanationStudyMain.audit().controls();
+            List<Control> controls =
+                    ControlExplanationStudyMain.audit().controls();
             String report = Files.readString(REPORT);
             long hovered = count(controls, "hovered");
             long dynamic = count(controls, "dynamic");
@@ -136,7 +138,8 @@ class ControlExplanationTest {
     @Test
     void nobodySaysTheSameWordsToBothAudiences() throws Exception {
         SwingSession.restoring(() -> {
-            for (Control control : ControlExplanationStudyMain.audit().controls()) {
+            for (Control control
+                    : ControlExplanationStudyMain.audit().controls()) {
                 if (control.hovered() == null) {
                     continue;
                 }
@@ -160,7 +163,8 @@ class ControlExplanationTest {
         // ones, so those are exactly the tooltips that would run off
         // the side of the window - and further at enlarged text.
         SwingSession.restoring(() -> {
-            for (Control control : ControlExplanationStudyMain.audit().controls()) {
+            for (Control control
+                    : ControlExplanationStudyMain.audit().controls()) {
                 String hovered = control.hovered();
                 if (hovered == null
                         || hovered.length() <= Explain.WRAP_OVER) {
@@ -197,7 +201,8 @@ class ControlExplanationTest {
                                     Shortcuts.menuModifierText())
                             + "[^()]*)\\)");
             int found = 0;
-            for (Control control : ControlExplanationStudyMain.audit().controls()) {
+            for (Control control
+                    : ControlExplanationStudyMain.audit().controls()) {
                 for (String text : new String[] {control.hovered(),
                         control.heard()}) {
                     if (text == null) {
