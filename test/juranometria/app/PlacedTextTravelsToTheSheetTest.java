@@ -216,7 +216,7 @@ class PlacedTextTravelsToTheSheetTest {
     // ---- 3. the PNG holds the order it was replayed in --------------
 
     @Test
-    void thePngHoldsTheOrderTheChartDrawsIn() throws Exception {
+    void thePngShowsWhichInkWonEachPixel() throws Exception {
         // A raster keeps no families and no sequence: all it has is
         // which ink won each pixel. So the order is read where the
         // order shows - where two things overlap - and the writer's
@@ -227,7 +227,7 @@ class PlacedTextTravelsToTheSheetTest {
                 SAGITTARIUS, ChartOptions.DEFAULTS,
                 ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
 
-        // (i) A mark is drawn over a constellation name. Taking the
+        // A mark is drawn over a constellation name. Taking the
         // name away changes nothing where the mark covers it - and
         // under a text-last replay it would change everything there.
         String name = coveredName(sheet);
@@ -247,32 +247,135 @@ class PlacedTextTravelsToTheSheetTest {
                         + " last is a different sheet, so the writer is"
                         + " not already doing it");
 
-        // (ii) The furniture is opaque and drawn last. A label under
-        // it is invisible - and under a furniture-first replay it is
-        // not. The page places nothing under the block, so the label
-        // is put there: the operations are the same either way, and
-        // only their order differs.
+    }
+
+    @Test
+    void thePngHidesWhatTheFurnitureCovers() throws Exception {
+        SheetRecording sheet = ChartSheet.record(Atlas.assembler()::assemble,
+                SAGITTARIUS, ChartOptions.DEFAULTS,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+        // The furniture is opaque and drawn last, so a label
+        // under it is not on the paper at all. The page places
+        // nothing under the block, so the label is put there - and
+        // the block's own operations are identified BEFORE it is,
+        // because a predicate that asks where an operation sits would
+        // call the injected run furniture too, move it with the block
+        // and hide it in both orders. Then the difference measured
+        // would be whatever else the moved block uncovered, credited
+        // to an order it had nothing to do with (review).
         Rectangle2D block = ChartRenderer.titleBlockBounds(
                 ChartRenderer.TextMetrics.offscreen().labels(),
                 sheet.scene());
-        SheetRecording hidden = sheetWith(sheet, operations ->
-                operations.add(firstFurniture(operations, block),
-                        textAt("UNDER THE BLOCK", new Rectangle2D.Double(
-                                block.getX() + 20.0, block.getY() + 20.0,
-                                90.0, 15.0))));
-        assertTrue(java.util.Arrays.equals(bytesOf(hidden),
-                        bytesOf(sheetWithout(hidden, "UNDER THE BLOCK"))),
-                "the PNG the writer replays hides text under the title"
-                        + " block completely - the same sheet with and"
-                        + " without it");
+        List<SheetRecorder.Operation> theBlock = new ArrayList<>();
+        for (SheetRecorder.Operation operation
+                : sheet.recorder().operations()) {
+            if (isFurniture(operation, block)) {
+                theBlock.add(operation);
+            }
+        }
+        assertTrue(theBlock.size() > 1, "the page draws a title block: "
+                + theBlock.size() + " operations");
 
-        SheetRecording furnitureFirst = sheetWith(hidden, operations ->
-                furnitureBeforeText(operations, block));
-        assertTrue(differsInside(pngOf(hidden), pngOf(furnitureFirst),
-                        block, sheet) > 20,
-                "and replaying the furniture before the text it covers"
-                        + " puts that text back on the paper, which is"
-                        + " what the order is for");
+        // The box is measured rather than guessed, so that what is
+        // drawn is inside it: a run wider than the box it is compared
+        // against would spill, and the spill would be counted as ink
+        // the moved block uncovered.
+        String hiddenText = "UNDER THE BLOCK";
+        var names = ChartRenderer.TextMetrics.offscreen().names();
+        Rectangle2D under = new Rectangle2D.Double(block.getX() + 12.0,
+                block.getY() + 20.0, names.stringWidth(hiddenText) + 4.0,
+                names.getHeight());
+        assertTrue(block.contains(under), "and the run is under it,"
+                + " which is what makes it invisible: " + under
+                + " inside " + block);
+        SheetRecorder.Text run = textAt(hiddenText, under);
+
+        // Four sheets: the same operations with and without that run,
+        // in the order the chart draws and with the furniture moved
+        // ahead of the text it covers. Only the run differs within
+        // each pair, so only the run can explain what changes.
+        SheetRecording drawnOver = replayed(sheet, theBlock, run, false);
+        SheetRecording drawnOverWithout =
+                replayed(sheet, theBlock, null, false);
+        SheetRecording blockFirst = replayed(sheet, theBlock, run, true);
+        SheetRecording blockFirstWithout =
+                replayed(sheet, theBlock, null, true);
+
+        assertTrue(java.util.Arrays.equals(bytesOf(drawnOver),
+                        bytesOf(drawnOverWithout)),
+                "with the furniture last, a label under the title block"
+                        + " is not on the paper at all: the same sheet"
+                        + " to the byte with and without it");
+        BufferedImage shows = pngOf(blockFirst);
+        BufferedImage showsWithout = pngOf(blockFirstWithout);
+        assertTrue(differsInside(shows, showsWithout, under, sheet) > 20,
+                "and with the furniture replayed before the text it"
+                        + " covers, that same run is on the paper");
+        assertEquals(0, differsOutside(shows, showsWithout, under, sheet),
+                "and nothing else changed, so it is the run that came"
+                        + " back and not something the moved block"
+                        + " uncovered");
+    }
+
+    /**
+     * The page replayed in one of two orders, with or without one run
+     * of text under the furniture.
+     *
+     * <p>The block's operations are given rather than looked for, so
+     * that adding the run cannot change what counts as furniture. In
+     * the chart's own order the block goes last; in the other it goes
+     * ahead of the first run of text, which is the mistake being
+     * tested for.
+     */
+    private static SheetRecording replayed(
+            SheetRecording sheet, List<SheetRecorder.Operation> furniture,
+            SheetRecorder.Text under, boolean furnitureFirst) {
+        return sheetWith(sheet, operations -> {
+            List<SheetRecorder.Operation> rest = new ArrayList<>();
+            for (SheetRecorder.Operation operation : operations) {
+                if (!containsIdentically(furniture, operation)) {
+                    rest.add(operation);
+                }
+            }
+            if (under != null) {
+                // Where a label goes: with the rest of the text, which
+                // is before the furniture in the chart's own order.
+                rest.add(lastText(rest) + 1, under);
+            }
+            operations.clear();
+            operations.addAll(rest);
+            operations.addAll(furnitureFirst
+                    ? firstText(operations) : operations.size(), furniture);
+        });
+    }
+
+    private static boolean containsIdentically(
+            List<SheetRecorder.Operation> operations,
+            SheetRecorder.Operation one) {
+        for (SheetRecorder.Operation each : operations) {
+            if (each == one) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int firstText(List<SheetRecorder.Operation> operations) {
+        for (int at = 0; at < operations.size(); at++) {
+            if (operations.get(at) instanceof SheetRecorder.Text) {
+                return at;
+            }
+        }
+        return operations.size();
+    }
+
+    private static int lastText(List<SheetRecorder.Operation> operations) {
+        for (int at = operations.size() - 1; at >= 0; at--) {
+            if (operations.get(at) instanceof SheetRecorder.Text) {
+                return at;
+            }
+        }
+        return operations.size() - 1;
     }
 
     /**
@@ -334,37 +437,7 @@ class PlacedTextTravelsToTheSheetTest {
         operations.addAll(text);
     }
 
-    /** The same operations, with the furniture replayed before text. */
-    private static void furnitureBeforeText(
-            List<SheetRecorder.Operation> operations, Rectangle2D block) {
-        List<SheetRecorder.Operation> furniture = new ArrayList<>();
-        operations.removeIf(each -> {
-            if (isFurniture(each, block)) {
-                furniture.add(each);
-                return true;
-            }
-            return false;
-        });
-        int first = operations.size();
-        for (int at = 0; at < operations.size(); at++) {
-            if (operations.get(at) instanceof SheetRecorder.Text) {
-                first = at;
-                break;
-            }
-        }
-        operations.addAll(first, furniture);
-    }
 
-    /** Where the title block's own operations begin. */
-    private static int firstFurniture(
-            List<SheetRecorder.Operation> operations, Rectangle2D block) {
-        for (int at = 0; at < operations.size(); at++) {
-            if (isFurniture(operations.get(at), block)) {
-                return at;
-            }
-        }
-        return operations.size();
-    }
 
     /** Whether an operation is the title block drawing itself. */
     private static boolean isFurniture(SheetRecorder.Operation operation,
