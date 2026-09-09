@@ -40,6 +40,36 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Every control explains itself** (issue #311). The atlas had ten
+  tooltips, and five whole surfaces - Place and Time, Export Chart
+  Sheet, Settings, About, and the entire menu bar - had none at all.
+  Now every one of the **96** controls a reader can operate carries a
+  decision: a tooltip, a tooltip that follows the state, or a
+  recorded reason for needing none because the words on it are the
+  whole meaning. A control that nobody has decided about fails the
+  build.
+
+  Two audiences, one meaning, and neither copied into the other: a
+  tooltip is read beside a control you can see, an accessible
+  description is heard by somebody who cannot see it, and the seam
+  refuses a description that is the tooltip word for word. Four
+  controls were doing exactly that, one of them invisibly - the tab
+  strip's own button had a tooltip from the look and feel and no
+  description at all, and Swing was reading the tooltip back to the
+  one reader who could not see it.
+
+  A control that has gone grey now says **why**, not just what it
+  would do. Fields say what they take, with an example. Keys a
+  tooltip names come from the registry that binds them, so no tooltip
+  can promise a stroke the atlas does not answer - and a Chart
+  Options checkbox now quotes the same chart-keyboard sequence the
+  palette does. Long tooltips are laid out in a stated width, so they
+  grow downwards rather than off the side of the screen at enlarged
+  text. Audited in
+  `docs/studies/control-explanations/measurements.md`, decided in
+  `docs/decisions/control-explanations.md`. The chart itself gains no
+  hover behaviour: pointing at it is still answered by the Inspector.
+
 - **A keyboard route to what the chart shows** (issue #312). Twenty
   switches that until now could only be reached through a dialog or a
   menu answer to **⌘K** (Ctrl-K where that is the platform's menu

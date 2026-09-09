@@ -80,9 +80,18 @@ public final class SearchField extends JTextField {
         this.assembler = assembler;
         this.controller = controller;
         putClientProperty("JTextField.placeholderText", "Search");
-        setToolTipText("Find an object or coordinates, e.g. M 31, NGC 224,"
-                + " TYC 2801-2090-1, or 0:42:44 +41:16:09");
         getAccessibleContext().setAccessibleName("Search the atlas");
+        // A field whose expected input is not obvious: the examples
+        // are the explanation, and they belong where a reader who is
+        // about to type can see them. The spoken form gives the same
+        // four shapes without leaning on a placeholder nobody hears.
+        Explain.control(this,
+                "Find an object or coordinates, e.g. M 31, NGC 224,"
+                        + " TYC 2801-2090-1, or 0:42:44 +41:16:09",
+                "Type a Messier or NGC number, a star's catalogue"
+                        + " identity, or a right ascension and"
+                        + " declination, then press Enter; the chart"
+                        + " goes there and marks it");
         setMaximumSize(new Dimension(220, Integer.MAX_VALUE));
         addActionListener(event -> handle(getText()));
     }
@@ -143,6 +152,12 @@ public final class SearchField extends JTextField {
                     showMessage(NO_FIT_MESSAGE);
                 }
             });
+            // The item's own words are the object's name and its
+            // catalogue identity, which is the whole meaning; a
+            // tooltip over a list a reader is walking with the arrow
+            // keys would be in the way of the list.
+            Explain.selfExplanatory(item,
+                    "Goes to " + result.label() + " and marks it");
             menu.add(item);
         }
         return menu;
@@ -158,6 +173,13 @@ public final class SearchField extends JTextField {
         JPopupMenu menu = new JPopupMenu();
         JMenuItem item = new JMenuItem(message);
         item.setEnabled(false);
+        // Disabled, and the one place in the atlas where that is the
+        // whole message rather than a control gone quiet - so it says
+        // what to do next instead of why it cannot be pressed.
+        Explain.selfExplanatory(item,
+                "Nothing to choose: " + message.toLowerCase(
+                        java.util.Locale.ROOT)
+                        + ". Try another name, or coordinates.");
         menu.add(item);
         showPopup(menu);
     }

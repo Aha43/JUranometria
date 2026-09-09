@@ -8,6 +8,7 @@ import juranometria.app.Atlas;
 import juranometria.chart.SelectionMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,12 +68,19 @@ class AccumulateControlTest {
         String description = button.getAccessibleContext()
                 .getAccessibleDescription();
         assertTrue(description.contains("working selection")
-                        && description.contains("instead of replacing"),
+                        && description.contains("added to it"),
                 "the description states the operation, not a vibe: "
                         + description);
-        assertTrue(description.contains("modifier always works"),
+        assertTrue(description.contains("does the same whether this is"),
                 "and says the platform modifier is never disabled by"
                         + " the control being off");
+        String hovered = button.getToolTipText();
+        assertTrue(hovered.contains("instead of replacing"),
+                "a reader who hovers is told the same thing: "
+                        + hovered);
+        assertNotEquals(hovered, description,
+                "in each audience's own words rather than one copied"
+                        + " into the other (#311)");
         assertTrue(button.isFocusable(),
                 "reachable by keyboard, like every control on this bar");
     }

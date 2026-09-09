@@ -176,9 +176,18 @@ class OverviewPageTest {
             assertTrue(saysOut.contains("overview"),
                     "at the sheet page zoom out says where it goes: "
                             + saysOut);
-            assertEquals(saysOut, onEdt(() -> out.getAccessibleContext()
-                            .getAccessibleDescription()),
-                    "in the same words to assistive technology");
+            // The same news to a reader who cannot see the button,
+            // in a sentence written for them rather than the hover
+            // text repeated (#311): the tooltip is read beside a
+            // control that is already on screen, the description is
+            // heard on its own.
+            String heardOut = onEdt(() -> out.getAccessibleContext()
+                    .getAccessibleDescription());
+            assertTrue(heardOut.contains("overview"),
+                    "and says where it leads to assistive technology"
+                            + " too: " + heardOut);
+            assertNotEquals(saysOut, heardOut,
+                    "in its own words, not the tooltip read back");
             ReaderInput.click(out);
             assertEquals(60.0,
                     onEdt(() -> navigation[0].state().fieldWidthDegrees()),
@@ -260,9 +269,13 @@ class OverviewPageTest {
             assertTrue(saysIn.contains("detailed atlas"),
                     "at the last wide rung, zoom in says how to get"
                             + " back: " + saysIn);
-            assertEquals(saysIn, onEdt(() -> in.getAccessibleContext()
-                            .getAccessibleDescription()),
-                    "in the same words to assistive technology");
+            String heardIn = onEdt(() -> in.getAccessibleContext()
+                    .getAccessibleDescription());
+            assertTrue(heardIn.contains("detailed atlas"),
+                    "and says the same to assistive technology: "
+                            + heardIn);
+            assertNotEquals(saysIn, heardIn,
+                    "in its own words, not the tooltip read back");
 
             ReaderInput.click(in);
             assertEquals(42.0,

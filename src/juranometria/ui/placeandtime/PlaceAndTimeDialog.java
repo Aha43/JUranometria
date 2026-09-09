@@ -153,6 +153,16 @@ public final class PlaceAndTimeDialog extends JDialog {
      *     at no other moment - passed in, because a clock the dialog
      *     owned could not be held still by a test
      */
+    /**
+     * The dialog's content, for the audit that reads what every
+     * control says (#311). The clock is the module's own frozen
+     * instant, because an inventory is not a session.
+     */
+    public static JComponent contentForStudy(MeridianModule module,
+                                             PlaceStore store) {
+        return content(module, store, () -> module.observer().instant());
+    }
+
     static JComponent content(MeridianModule module, PlaceStore store,
                               Supplier<Instant> clock) {
         JPanel panel = new JPanel();
@@ -167,17 +177,23 @@ public final class PlaceAndTimeDialog extends JDialog {
                 SHOWN.format(module.observer().instant()));
 
         panel.add(row("Latitude", 'L', latitude,
+                "Degrees north of the equator, e.g. 59.913;"
+                        + " south is negative, -90 to 90",
                 "Degrees north of the equator, negative south,"
                         + " -90 to 90"));
         panel.add(strut(6));
         // East-positive in the label, per the gate: the one easiest
         // thing to get wrong, stated where the number is typed.
         panel.add(row("Longitude, east positive", 'G', longitude,
+                "Degrees east of Greenwich, e.g. 10.752;"
+                        + " west is negative",
                 "Degrees east of Greenwich; west is negative"));
         panel.add(strut(6));
         panel.add(row("Instant (UTC)", 'U', instant,
-                "The frozen moment the lines are drawn for, as"
-                        + " 2026-03-20 21:33:00"));
+                "The moment the lines are drawn for, as"
+                        + " 2026-03-20 21:33:00",
+                "The frozen moment the lines are drawn for; nothing"
+                        + " ticks, so it stays where you put it"));
         panel.add(strut(10));
 
         // A stated width, so the HTML wraps instead of clipping: at
@@ -192,17 +208,36 @@ public final class PlaceAndTimeDialog extends JDialog {
         panel.add(frozen);
         panel.add(strut(12));
 
+        // The keyboard route is quoted from the registry that binds
+        // it, and only for the two lines that have one: the zenith
+        // is drawn with them rather than switched on its own, which
+        // is why the chart keyboard refuses it (#312), and a tooltip
+        // promising it a key would be the promise that decision
+        // deliberately does not make.
         JCheckBox meridian = show("Meridian", 'M',
                 module.meridianShowing(),
                 "Draw the great circle through both celestial poles"
-                        + " and your zenith");
+                        + " and your zenith ("
+                        + juranometria.app.ChartKeys.toggle(
+                                "module.meridian").sequence() + ")",
+                "Draws the line that runs from due north, through the"
+                        + " point overhead, to due south. It lasts as"
+                        + " long as this session.");
         JCheckBox horizon = show("Mathematical horizon", 'H',
                 module.horizonShowing(),
                 "Draw where the sky meets a perfectly flat,"
-                        + " transparent Earth; your real horizon has"
-                        + " hills and air in it");
+                        + " transparent Earth ("
+                        + juranometria.app.ChartKeys.toggle(
+                                "module.horizon").sequence() + ")",
+                "Draws the circle where the sky would meet a flat and"
+                        + " transparent Earth; your own horizon has"
+                        + " hills and air in it. It lasts as long as"
+                        + " this session.");
         JCheckBox zenith = show("Zenith", 'Z', module.zenithShowing(),
-                "Mark the point overhead");
+                "Mark the point overhead",
+                "Marks the point directly above you. It is drawn with"
+                        + " the observer's lines and has no shortcut"
+                        + " of its own.");
         Runnable showing = () -> module.showing(meridian.isSelected(),
                 horizon.isSelected(), zenith.isSelected());
         for (JCheckBox box : new JCheckBox[] {meridian, horizon, zenith}) {
@@ -238,9 +273,11 @@ public final class PlaceAndTimeDialog extends JDialog {
         now.setName("nowButton");
         now.setMnemonic('N');
         now.getAccessibleContext().setAccessibleName("Now");
-        now.getAccessibleContext().setAccessibleDescription(
-                "Freeze on the present moment, read once; nothing"
-                        + " ticks afterwards");
+        juranometria.ui.Explain.control(now,
+                "Read the clock once and freeze on this moment",
+                "Freezes on the present moment, read once; nothing"
+                        + " ticks afterwards, so the lines stay where"
+                        + " this put them");
         now.addActionListener(event -> {
             module.observer(module.observer().at(clock.get()));
             instant.setText(SHOWN.format(module.observer().instant()));
@@ -250,9 +287,11 @@ public final class PlaceAndTimeDialog extends JDialog {
         centre.setMnemonic('C');
         centre.getAccessibleContext().setAccessibleName(
                 "Center on zenith");
-        centre.getAccessibleContext().setAccessibleDescription(
-                "Move the chart to the point overhead - the one action"
-                        + " here that moves the page");
+        juranometria.ui.Explain.control(centre,
+                "Move the chart to the point overhead",
+                "Moves the page to the point directly above you - the"
+                        + " one control in this window that moves the"
+                        + " chart");
         centre.addActionListener(event -> module.centreOnZenith());
 
         JPanel actions = new JPanel(new GridLayout(1, 2, 8, 0));
@@ -345,7 +384,8 @@ public final class PlaceAndTimeDialog extends JDialog {
     }
 
     private static JPanel row(String label, char mnemonic,
-                              JTextField field, String description) {
+                              JTextField field, String hovered,
+                              String description) {
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
         row.setAlignmentX(0.0f);
@@ -353,7 +393,10 @@ public final class PlaceAndTimeDialog extends JDialog {
         name.setLabelFor(field);
         name.setDisplayedMnemonic(mnemonic);
         field.getAccessibleContext().setAccessibleName(label);
-        field.getAccessibleContext().setAccessibleDescription(description);
+        // A field whose expected format is not obvious gets the
+        // format where a reader about to type can see it, without
+        // taking anything away from the visible label beside it.
+        juranometria.ui.Explain.control(field, hovered, description);
         row.add(name);
         row.add(Box.createHorizontalStrut(8));
         row.add(field);
@@ -363,14 +406,14 @@ public final class PlaceAndTimeDialog extends JDialog {
     }
 
     private static JCheckBox show(String what, char mnemonic,
-                                  boolean showing, String description) {
+                                  boolean showing, String hovered,
+                                  String description) {
         JCheckBox box = new JCheckBox(what, showing);
         box.setName("show" + what.replace(" ", ""));
         box.setMnemonic(mnemonic);
         box.setAlignmentX(0.0f);
         box.getAccessibleContext().setAccessibleName("Show " + what);
-        box.getAccessibleContext().setAccessibleDescription(description);
-        return box;
+        return juranometria.ui.Explain.control(box, hovered, description);
     }
 
     private static java.awt.Component strut(int height) {

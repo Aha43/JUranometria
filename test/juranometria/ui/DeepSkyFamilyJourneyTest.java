@@ -192,9 +192,16 @@ class DeepSkyFamilyJourneyTest {
                 assertNotNull(box, family + " has a control");
                 assertEquals(family.label(), box.getText(),
                         "named the way a reader reads it");
-                assertEquals(family.prose(), box.getAccessibleContext()
-                                .getAccessibleDescription(),
-                        family + " explains itself without hovering");
+                String heard = box.getAccessibleContext()
+                        .getAccessibleDescription();
+                assertTrue(heard.startsWith(family.prose()),
+                        family + " explains itself without hovering: "
+                                + heard);
+                assertTrue(heard.contains("Needs deep-sky objects on"),
+                        family + " also says which master it waits"
+                                + " for, because the greying that"
+                                + " tells a sighted reader is not a"
+                                + " sentence (#311): " + heard);
                 assertTrue(visibleProse().contains(family.description()
                                 .substring(0, 20)),
                         family + " explains itself on the page too");

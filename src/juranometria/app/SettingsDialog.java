@@ -57,6 +57,14 @@ public final class SettingsDialog extends JDialog {
      * {@code confirm} callback receives the chosen darkness only when
      * OK is pressed - the only path that applies or persists anything.
      */
+    /**
+     * The dialog's content, for the audit that reads what every
+     * control says (#311).
+     */
+    public static JComponent contentForStudy() {
+        return content(false, false, dark -> { });
+    }
+
     static JComponent content(boolean savedDark, boolean overrideActive,
                               Consumer<Boolean> confirm) {
         JPanel panel = new JPanel();
@@ -71,8 +79,18 @@ public final class SettingsDialog extends JDialog {
 
         JRadioButton light = new JRadioButton("Light", !savedDark);
         light.getAccessibleContext().setAccessibleName("Light appearance");
+        // "Light" and "Dark" are the whole meaning of the words on
+        // them; what is worth saying is what they do *not* change,
+        // which is the chart, and that has nowhere to be seen.
+        juranometria.ui.Explain.selfExplanatory(light,
+                "Draws the window's own chrome light. The chart is"
+                        + " drawn the same either way.");
         JRadioButton dark = new JRadioButton("Dark", savedDark);
         dark.getAccessibleContext().setAccessibleName("Dark appearance");
+        juranometria.ui.Explain.selfExplanatory(dark,
+                "Draws the window's own chrome dark. The chart is"
+                        + " drawn the same either way; the black sky"
+                        + " is a chart option of its own.");
         ButtonGroup group = new ButtonGroup();
         group.add(light);
         group.add(dark);
@@ -95,6 +113,8 @@ public final class SettingsDialog extends JDialog {
 
         JButton cancel = new JButton("Cancel");
         cancel.getAccessibleContext().setAccessibleName("Cancel");
+        juranometria.ui.Explain.selfExplanatory(cancel,
+                "Closes this window and changes nothing");
         cancel.addActionListener(event -> {
             java.awt.Window window =
                     javax.swing.SwingUtilities.getWindowAncestor(cancel);
@@ -104,6 +124,8 @@ public final class SettingsDialog extends JDialog {
         });
         JButton ok = new JButton("OK");
         ok.getAccessibleContext().setAccessibleName("OK");
+        juranometria.ui.Explain.selfExplanatory(ok,
+                "Keeps the chosen appearance and closes this window");
         ok.addActionListener(event -> confirm.accept(dark.isSelected()));
         JPanel buttons = new JPanel(new BorderLayout());
         JPanel right = new JPanel();

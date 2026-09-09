@@ -99,18 +99,31 @@ public final class AtlasToolbar extends JToolBar {
                         juranometria.chart.SelectionMode selectionMode) {
         setFloatable(false);
 
+        // The keys are named from the one registry that binds them,
+        // so a tooltip cannot promise a stroke the menu does not
+        // answer, or spell a modifier this platform does not use.
         zoomIn = iconButton("zoom-in", "Zoom in",
-                "Zoom in", controller::zoomIn);
+                Shortcuts.saying("Zoom in", Shortcuts.ZOOM_IN),
+                "Shows a narrower field, with fainter stars on it",
+                controller::zoomIn);
         zoomOut = iconButton("zoom-out", "Zoom out",
-                "Zoom out", controller::zoomOut);
+                Shortcuts.saying("Zoom out", Shortcuts.ZOOM_OUT),
+                "Shows a wider field, with fewer stars on it",
+                controller::zoomOut);
         fewerStars = iconButton("minus", "Fewer stars",
                 "Fewer stars (brighter magnitude limit)",
+                "Draws only the brighter stars, one step at a time",
                 controller::decreaseMagnitudeLimit);
         moreStars = iconButton("plus", "More stars",
                 "More stars (fainter magnitude limit)",
+                "Draws fainter stars as well, one step at a time",
                 controller::increaseMagnitudeLimit);
         resetView = iconButton("zoom-reset", "Reset view",
-                "Reset view", () -> {
+                "Reset view: back to the atlas's first page",
+                "Returns the chart to where every reader begins, and"
+                        + " clears the search; what the chart draws is"
+                        + " left as you chose it",
+                () -> {
                     controller.reset();
                     searchField.clearSearch();
                 });
@@ -144,13 +157,18 @@ public final class AtlasToolbar extends JToolBar {
             accumulate.setFocusable(true);
             accumulate.getAccessibleContext().setAccessibleName(
                     "Accumulate selection");
-            accumulate.setToolTipText("When on, choosing objects adds"
-                    + " them to the working selection and choosing them"
-                    + " again removes them, instead of replacing the"
-                    + " selection. The platform's add-to-selection"
-                    + " modifier always works.");
-            accumulate.getAccessibleContext().setAccessibleDescription(
-                    accumulate.getToolTipText());
+            Explain.control(accumulate,
+                    "When on, choosing objects adds them to the working"
+                            + " selection and choosing them again"
+                            + " removes them, instead of replacing the"
+                            + " selection. The platform's"
+                            + " add-to-selection modifier always works.",
+                    "Off, each object you choose replaces the working"
+                            + " selection; on, it is added to it, and"
+                            + " choosing it again takes it out. Holding"
+                            + " the platform's add-to-selection"
+                            + " modifier does the same whether this is"
+                            + " on or off.");
             accumulate.addActionListener(event ->
                     selectionMode.accumulate(accumulate.isSelected()));
             // The mode is the truth; the button says what it holds,
@@ -184,7 +202,9 @@ public final class AtlasToolbar extends JToolBar {
         }
         if (requestExit != null) {
             exit = iconButton("door-exit", "Exit JUranometria",
-                    "Exit JUranometria", requestExit);
+                    "Exit JUranometria",
+                    "Closes the atlas; what you chose is remembered",
+                    requestExit);
             add(exit);
         }
 
@@ -350,12 +370,29 @@ public final class AtlasToolbar extends JToolBar {
         }
         inspectorButton.setSelected(state.showing());
         inspectorButton.setEnabled(state.available());
-        inspectorButton.setToolTipText(state.available()
-                ? (state.showing() ? "Hide the Inspector"
-                        : "Show the Inspector: what the selected mark is")
-                : "The window is too narrow to show the Inspector");
-        inspectorButton.getAccessibleContext().setAccessibleDescription(
-                inspectorButton.getToolTipText());
+        // Disabled is the case worth writing: a control that has gone
+        // grey and says nothing leaves a reader to guess whether the
+        // atlas is broken or the window is small.
+        if (!state.available()) {
+            Explain.dynamic(inspectorButton,
+                    "The window is too narrow to show the Inspector",
+                    "Unavailable: widen the window and the Inspector"
+                            + " comes back with whatever it was"
+                            + " showing");
+        } else if (state.showing()) {
+            Explain.dynamic(inspectorButton,
+                    Shortcuts.saying("Hide the Inspector",
+                            Shortcuts.INSPECTOR),
+                    "Showing; press to give the whole window back to"
+                            + " the chart");
+        } else {
+            Explain.dynamic(inspectorButton,
+                    Shortcuts.saying("Show the Inspector: what the"
+                            + " selected mark is", Shortcuts.INSPECTOR),
+                    "Hidden; press to open the panel that names what"
+                            + " you have chosen and what is on this"
+                            + " page");
+        }
     }
 
     private void sync(ChartViewController controller, ChartViewState state) {
@@ -366,10 +403,12 @@ public final class AtlasToolbar extends JToolBar {
         readout.setText(String.format(Locale.ROOT,
                 "Field %.0f° · Stars to V %.1f",
                 state.fieldWidthDegrees(), state.limitingMagnitude()));
-        say(zoomOut, "Zoom out", controller.canZoomOut()
-                ? state.zoomOut() : null, state);
-        say(zoomIn, "Zoom in", controller.canZoomIn()
-                ? state.zoomIn() : null, state);
+        say(zoomOut, "Zoom out", Shortcuts.ZOOM_OUT,
+                "Shows a wider field, with fewer stars on it",
+                controller.canZoomOut() ? state.zoomOut() : null, state);
+        say(zoomIn, "Zoom in", Shortcuts.ZOOM_IN,
+                "Shows a narrower field, with fainter stars on it",
+                controller.canZoomIn() ? state.zoomIn() : null, state);
     }
 
     /**
@@ -389,27 +428,44 @@ public final class AtlasToolbar extends JToolBar {
      * button that renamed itself at every rung would be a readout
      * pretending to be a control.
      */
-    private static void say(JButton button, String plain,
-                            ChartViewState next, ChartViewState state) {
-        String said = plain;
-        if (next != null && next.overview() != state.overview()) {
-            said = next.overview()
+    private static void say(JButton button, String plain, String id,
+                            String spoken, ChartViewState next,
+                            ChartViewState state) {
+        String hovered = Shortcuts.saying(plain, id);
+        String heard = spoken;
+        if (next == null) {
+            heard = "As far as the ladder goes in that direction;"
+                    + " " + plain.toLowerCase(Locale.ROOT)
+                    + " is unavailable here";
+        } else if (next.overview() != state.overview()) {
+            hovered = Shortcuts.saying(next.overview()
                     ? "Zoom out to the overview: the whole sky's shape,"
                             + " wider than a detailed page"
-                    : "Zoom in to the detailed atlas";
+                    : "Zoom in to the detailed atlas", id);
+            heard = next.overview()
+                    ? "The next step out leaves the detailed atlas for"
+                            + " the overview, which shows the sky's"
+                            + " shape rather than a page to point a"
+                            + " telescope at"
+                    : "The next step in returns to the detailed atlas";
         }
-        button.setToolTipText(said);
-        button.getAccessibleContext().setAccessibleDescription(said);
+        Explain.dynamic(button, hovered, heard);
     }
 
-    private static JButton iconButton(String icon, String name, String tooltip,
+    /**
+     * An icon-only control, which is the kind that most needs both
+     * sentences: there are no visible words at all, so the tooltip
+     * is the only thing a sighted reader has and the description is
+     * the only thing anyone else has.
+     */
+    private static JButton iconButton(String icon, String name,
+                                      String hovered, String spoken,
                                       Runnable action) {
         JButton button = new JButton(
                 new FlatSVGIcon("resources/icons/" + icon + ".svg", 16, 16));
-        button.setToolTipText(tooltip);
         button.getAccessibleContext().setAccessibleName(name);
         button.setFocusable(true);
         button.addActionListener(e -> action.run());
-        return button;
+        return Explain.control(button, hovered, spoken);
     }
 }

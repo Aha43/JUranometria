@@ -146,10 +146,12 @@ public final class InspectorPanel extends JPanel {
                 ListSelectionModel.SINGLE_SELECTION);
         candidates.getAccessibleContext().setAccessibleName(
                 "Objects at this point");
-        candidates.getAccessibleContext().setAccessibleDescription(
+        juranometria.ui.Explain.control(candidates,
                 "Several objects lie within reach of that point;"
-                        + " choose one to inspect it. Choosing does not"
-                        + " move the chart.");
+                        + " choose one to inspect it",
+                "A list of everything within reach of the point you"
+                        + " clicked. Choosing one shows its facts here"
+                        + " and does not move the chart.");
         candidates.addListSelectionListener(event -> {
             if (updating || event.getValueIsAdjusting()) {
                 return;
@@ -163,19 +165,22 @@ public final class InspectorPanel extends JPanel {
         candidateScroll.setPreferredSize(new Dimension(280, 96));
 
         centreHere.getAccessibleContext().setAccessibleName("Center here");
-        centreHere.getAccessibleContext().setAccessibleDescription(
-                "Move the chart to put the selected object at the"
-                        + " centre of the page");
+        juranometria.ui.Explain.control(centreHere,
+                "Center the chart on the selected object",
+                "Moves the page so the object shown here sits at the"
+                        + " centre; nothing about what the chart draws"
+                        + " changes");
         centreHere.setAlignmentX(0.0f);
         centreHere.addActionListener(event -> centreOn.accept(
                 selection.selection()));
 
-        close.setToolTipText("Close Inspector");
         close.getAccessibleContext().setAccessibleName("Close Inspector");
-        close.getAccessibleContext().setAccessibleDescription(
-                "Hide the Inspector pane. The chart keeps its place,"
-                        + " its target and your selection, and widens"
-                        + " to use the space.");
+        juranometria.ui.Explain.control(close,
+                juranometria.ui.Shortcuts.saying("Close Inspector",
+                        juranometria.ui.Shortcuts.INSPECTOR),
+                "Hides this pane. The chart keeps its place, its"
+                        + " target and your selection, and widens to"
+                        + " use the space.");
         // Quiet: an icon and its hover, not a bordered button
         // competing with the heading beside it.
         close.putClientProperty("JButton.buttonType", "toolBarButton");
@@ -234,12 +239,19 @@ public final class InspectorPanel extends JPanel {
         modeGroup.add(showSelected);
         modeGroup.add(showPage);
         showSelected.getAccessibleContext().setAccessibleName("Selected");
-        showSelected.getAccessibleContext().setAccessibleDescription(
-                "Show the facts of the object you last chose");
+        juranometria.ui.Explain.control(showSelected,
+                "The facts of the object you last chose",
+                "Shows what the atlas holds on the one object you"
+                        + " chose, rather than everything on the"
+                        + " page");
         showPage.getAccessibleContext().setAccessibleName("On this page");
-        showPage.getAccessibleContext().setAccessibleDescription(
-                "Show everything the atlas holds on the page you are"
-                        + " looking at, drawn or not");
+        juranometria.ui.Explain.control(showPage,
+                "Everything on the page you are looking at, drawn or"
+                        + " not",
+                "Lists every object the atlas holds within this page,"
+                        + " including the ones the chart is not"
+                        + " drawing, and says why each is or is not"
+                        + " drawn");
         showSelected.addActionListener(event -> showMode(SELECTED_MODE));
         showPage.addActionListener(event -> showMode(PAGE_MODE));
         modeSwitch.add(showSelected);
@@ -480,9 +492,10 @@ public final class InspectorPanel extends JPanel {
         this.pageContents = pageContents;
         clearSelection.getAccessibleContext().setAccessibleName(
                 "Clear selection");
-        clearSelection.getAccessibleContext().setAccessibleDescription(
-                "Empty the whole working selection. The page and your"
-                        + " place in it are unchanged.");
+        juranometria.ui.Explain.control(clearSelection,
+                "Remove every working mark",
+                "Empties the whole working selection. The page and"
+                        + " your place in it are left alone.");
         clearSelection.addActionListener(event -> working.clear());
         this.unsubscribeWorking =
                 working.onChange(change -> rebuildWorkingSet());
@@ -553,8 +566,9 @@ public final class InspectorPanel extends JPanel {
         name.getAccessibleContext().setAccessibleName(member
                 + (leads ? ", lead" : "")
                 + (offPage ? ", off this page" : ""));
-        name.getAccessibleContext().setAccessibleDescription(
-                "Show this member's facts: it becomes the lead."
+        juranometria.ui.Explain.control(name,
+                "Show " + member + "'s facts",
+                "Makes this member the lead and shows its facts here."
                         + " Membership is unchanged.");
         name.addActionListener(event -> working.lead(member));
         row.add(name);
@@ -569,9 +583,11 @@ public final class InspectorPanel extends JPanel {
         remove.putClientProperty("JButton.buttonType", "toolBarButton");
         remove.getAccessibleContext().setAccessibleName(
                 "Remove " + member);
-        remove.getAccessibleContext().setAccessibleDescription(
-                "Remove " + member + " from the working selection."
-                        + " The rest stay.");
+        juranometria.ui.Explain.control(remove,
+                "Remove " + member + " from the working selection",
+                "Takes " + member + " out of the working selection."
+                        + " The rest stay, and the page does not"
+                        + " move.");
         remove.addActionListener(event -> working.remove(member));
         row.add(remove);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE,

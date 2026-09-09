@@ -134,6 +134,41 @@ public final class OnThisPageTable extends JPanel {
 
     /** True while the table is following the model rather than leading it. */
     private boolean following;
+
+    /**
+     * What the two buttons can do, and why not when they cannot.
+     *
+     * <p>A control that goes grey and says nothing leaves a reader
+     * to guess whether the atlas is broken or they have simply not
+     * chosen anything yet (#311). These two are grey until a mark
+     * exists, which is most of the time.
+     */
+    private void sayWhatTheMarksAllow(boolean hasLead, boolean noMarks) {
+        centreHere.setEnabled(hasLead);
+        juranometria.ui.Explain.dynamic(centreHere,
+                hasLead
+                        ? "Center the chart on the marked row you are"
+                                + " reading"
+                        : "Choose a row's mark first, and this centres"
+                                + " the chart on it",
+                hasLead
+                        ? "Moves the page so the row you are reading"
+                                + " sits at the centre; nothing else"
+                                + " about the chart changes"
+                        : "Unavailable until a row is marked: mark one"
+                                + " and this moves the page to it");
+        clearMarks.setEnabled(!noMarks);
+        juranometria.ui.Explain.dynamic(clearMarks,
+                noMarks
+                        ? "Nothing is marked yet"
+                        : "Remove every working mark",
+                noMarks
+                        ? "Unavailable: there are no working marks to"
+                                + " remove"
+                        : "Takes every working mark off the chart. The"
+                                + " page and your place in it are left"
+                                + " alone.");
+    }
     /** True while the table is telling the model what a reader did. */
     private boolean publishing;
 
@@ -223,7 +258,7 @@ public final class OnThisPageTable extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setFillsViewportHeight(true);
         table.getAccessibleContext().setAccessibleName("Objects on this page");
-        table.getAccessibleContext().setAccessibleDescription(
+        juranometria.ui.Explain.selfExplanatory(table,
                 "Choose rows to mark them on the chart. Marking does"
                         + " not move the page.");
         // Sortable by any column, and stable: Swing's sorter keeps
@@ -273,19 +308,13 @@ public final class OnThisPageTable extends JPanel {
         empty.setVisible(false);
 
         centreHere.getAccessibleContext().setAccessibleName("Center here");
-        centreHere.getAccessibleContext().setAccessibleDescription(
-                "Move the chart to put the row you are reading at the"
-                        + " centre of the page");
         centreHere.addActionListener(event -> centreOnLead());
-        centreHere.setEnabled(false);
-
         clearMarks.getAccessibleContext().setAccessibleName("Clear marks");
-        clearMarks.getAccessibleContext().setAccessibleDescription(
-                "Remove every working mark. The page and your place in"
-                        + " it are unchanged.");
         clearMarks.addActionListener(event ->
                 services.workingSelection().clear());
-        clearMarks.setEnabled(false);
+        // Both spend most of their life disabled, so both say why -
+        // and say it again when the answer changes.
+        sayWhatTheMarksAllow(false, true);
 
         counted.setAlignmentX(0.0f);
         counted.setVisible(false);
@@ -743,8 +772,7 @@ public final class OnThisPageTable extends JPanel {
             rangeSnapshotMembers = null;
             followTheModel(change.members());
         }
-        centreHere.setEnabled(change.lead() != null);
-        clearMarks.setEnabled(!change.isEmpty());
+        sayWhatTheMarksAllow(change.lead() != null, change.isEmpty());
     }
 
     private void followTheModel(List<String> members) {

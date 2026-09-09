@@ -282,6 +282,7 @@ class TestEvidenceGateTest {
                 .filter(f -> !f.unprotectedState().isEmpty())
                 .map(TestEvidenceScan.File::path).sorted().toList();
         assertEquals(List.of(
+                        "src/juranometria/tool/ControlExplanationStudyMain.java",
                         "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
                         "src/juranometria/tool/EclipticCandidateStudyMain.java",
                         "src/juranometria/tool/EclipticControlStudyMain.java",
@@ -291,7 +292,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the eight widget photographers, whose font and theme"
+                "the nine widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -304,7 +305,11 @@ class TestEvidenceGateTest {
                         + " study, which applies the shipped look and"
                         + " feel because the keystrokes it counts are"
                         + " the ones a text field answers under that"
-                        + " look and feel and no other");
+                        + " look and feel and no other; and the ninth"
+                        + " by #311's control audit, which builds every"
+                        + " surface the application builds and so needs"
+                        + " the look and feel those surfaces are built"
+                        + " under");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -417,7 +422,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(33, display.size(),
+        assertEquals(34, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -450,8 +455,13 @@ class TestEvidenceGateTest {
                         + " menu as well as the palette, and its"
                         + " wiring test, which presses letters at the"
                         + " application's own chart component and"
-                        + " watches it repaint; each with its premises"
-                        + " stated");
+                        + " watches it repaint; and #311's hover"
+                        + " journey, which reads what a reader is"
+                        + " shown by resting the pointer on a control"
+                        + " in a shown window, since a tooltip read"
+                        + " off a field answers for a control no"
+                        + " pointer could reach; each with its"
+                        + " premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

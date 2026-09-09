@@ -81,6 +81,19 @@ public final class AboutDialog extends JDialog {
     }
 
     /** The compact first view; headless-constructible for tests. */
+    /**
+     * The two views' content, for the audit that reads what every
+     * control says (#311).
+     */
+    public static JComponent compactContentForStudy() {
+        return compactContent(() -> { });
+    }
+
+    /** The notices view, for the same audit. */
+    public static JComponent noticesContentForStudy() {
+        return noticesContent();
+    }
+
     static JComponent compactContent(Runnable showNotices) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -119,6 +132,12 @@ public final class AboutDialog extends JDialog {
 
         JTextArea summary = readOnlyText(summaryText(), 14, 46);
         summary.getAccessibleContext().setAccessibleName("Licensing summary");
+        // Read-only prose. Its own words are the whole of it, and a
+        // tooltip over a page of text is a box in the way of reading.
+        juranometria.ui.Explain.selfExplanatory(summary,
+                "The short form of what the atlas is built on and"
+                        + " what that allows; the full texts are"
+                        + " behind the button below");
         JScrollPane summaryScroll = new JScrollPane(summary);
         summaryScroll.setAlignmentX(0.0f);
         panel.add(summaryScroll);
@@ -127,9 +146,14 @@ public final class AboutDialog extends JDialog {
         JButton notices = new JButton("Full notices and licences...");
         notices.getAccessibleContext().setAccessibleName(
                 "Full notices and licences");
+        juranometria.ui.Explain.selfExplanatory(notices,
+                "Opens the complete notices and licence texts for"
+                        + " everything the atlas bundles");
         notices.addActionListener(event -> showNotices.run());
         JButton close = new JButton("Close");
         close.getAccessibleContext().setAccessibleName("Close");
+        juranometria.ui.Explain.selfExplanatory(close,
+                "Closes this window and returns to the chart");
         close.addActionListener(event -> {
             java.awt.Window window =
                     javax.swing.SwingUtilities.getWindowAncestor(close);
@@ -154,11 +178,16 @@ public final class AboutDialog extends JDialog {
         JTextArea text = readOnlyText(noticesText(), 24, 66);
         text.getAccessibleContext().setAccessibleName(
                 "Bundled notices and licence texts");
+        juranometria.ui.Explain.selfExplanatory(text,
+                "The notices and licence texts of everything the"
+                        + " atlas bundles, in full");
         JScrollPane scroll = new JScrollPane(text);
         scroll.setPreferredSize(new Dimension(560, 420));
         panel.add(scroll, BorderLayout.CENTER);
         JButton close = new JButton("Close");
         close.getAccessibleContext().setAccessibleName("Close");
+        juranometria.ui.Explain.selfExplanatory(close,
+                "Closes this window and returns to the chart");
         close.addActionListener(event -> {
             java.awt.Window window =
                     javax.swing.SwingUtilities.getWindowAncestor(close);

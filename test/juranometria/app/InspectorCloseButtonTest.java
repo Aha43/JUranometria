@@ -67,9 +67,15 @@ class InspectorCloseButtonTest {
                 inspector.closeButton().getAccessibleContext()
                         .getAccessibleName(),
                 "assistive technology is told what it does");
-        assertEquals("Close Inspector",
+        assertEquals("Close Inspector ("
+                        + juranometria.ui.Shortcuts.text(
+                                juranometria.ui.Shortcuts.INSPECTOR)
+                        + ")",
                 inspector.closeButton().getToolTipText(),
-                "and so is a reader who hovers");
+                "and so is a reader who hovers, with the key that does"
+                        + " the same thing - named from the registry"
+                        + " that binds it, so this cannot promise a"
+                        + " stroke the atlas does not answer (#311)");
         assertTrue(inspector.closeButton().isFocusable(),
                 "a reader without a pointer must be able to reach it");
     }

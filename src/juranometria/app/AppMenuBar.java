@@ -200,18 +200,24 @@ public final class AppMenuBar {
             JMenu application = new JMenu("File");
             application.getAccessibleContext().setAccessibleName(
                     "File menu");
+            // A menu's own word is the whole of it, and a tooltip
+            // over an open menu is a box between the reader and the
+            // items they came for.
+            juranometria.ui.Explain.selfExplanatory(application,
+                    "Making a file out of the chart, and the"
+                            + " application's own settings");
             if (exportSheet != null) {
                 JMenuItem export =
                         new JMenuItem("Export Chart Sheet...");
                 export.setName(EXPORT_ITEM);
                 export.setMnemonic('E');
-                export.setAccelerator(KeyStroke.getKeyStroke(
-                        java.awt.event.KeyEvent.VK_E, menuShortcutMask()));
+                export.setAccelerator(juranometria.ui.Shortcuts.of(
+                        juranometria.ui.Shortcuts.EXPORT).stroke());
                 export.getAccessibleContext().setAccessibleName(
                         "Export Chart Sheet");
-                export.getAccessibleContext().setAccessibleDescription(
-                        "Save this chart as a sheet of paper: SVG, PDF"
-                                + " or PNG");
+                juranometria.ui.Explain.selfExplanatory(export,
+                        "Saves this chart as a sheet of paper: SVG,"
+                                + " PDF or PNG");
                 export.addActionListener(event -> exportSheet.run());
                 application.add(export);
                 if (openSettings != null) {
@@ -222,8 +228,10 @@ public final class AppMenuBar {
                 JMenuItem settings = new JMenuItem("Settings...");
                 settings.getAccessibleContext().setAccessibleName(
                         "Settings");
-                settings.getAccessibleContext().setAccessibleDescription(
-                        "Application appearance settings");
+                juranometria.ui.Explain.selfExplanatory(settings,
+                        "Opens the window that chooses the"
+                                + " application's light or dark"
+                                + " appearance");
                 settings.addActionListener(event -> openSettings.run());
                 application.add(settings);
             }
@@ -233,12 +241,18 @@ public final class AppMenuBar {
         if (openChartOptions != null) {
             JMenu view = new JMenu("View");
             view.getAccessibleContext().setAccessibleName("View menu");
+            juranometria.ui.Explain.selfExplanatory(view,
+                    "What the chart draws, where you are looking from,"
+                            + " and how far out");
             JMenuItem chartOptions = new JMenuItem("Chart Options...");
             chartOptions.setMnemonic('C');
             chartOptions.getAccessibleContext().setAccessibleName(
                     "Chart Options");
-            chartOptions.getAccessibleContext().setAccessibleDescription(
-                    "Choose which chart content and labels draw");
+            juranometria.ui.Explain.selfExplanatory(chartOptions,
+                    "Opens the window that chooses what the chart"
+                            + " draws and labels; the same switches"
+                            + " answer to " + ChartKeys.prefixText()
+                            + " from the chart itself");
             chartOptions.addActionListener(event -> openChartOptions.run());
             view.add(chartOptions);
             if (openPlaceAndTime != null) {
@@ -246,9 +260,11 @@ public final class AppMenuBar {
                 placeAndTime.setMnemonic('P');
                 placeAndTime.getAccessibleContext().setAccessibleName(
                         "Place and Time");
-                placeAndTime.getAccessibleContext().setAccessibleDescription(
-                        "Set where you are and the frozen instant the"
-                                + " reference lines are drawn for");
+                juranometria.ui.Explain.selfExplanatory(placeAndTime,
+                        "Opens the window that sets where you are and"
+                                + " the frozen instant your meridian,"
+                                + " horizon and zenith are drawn"
+                                + " for");
                 placeAndTime.addActionListener(event ->
                         openPlaceAndTime.run());
                 view.add(placeAndTime);
@@ -261,13 +277,14 @@ public final class AppMenuBar {
                         new javax.swing.JCheckBoxMenuItem("Inspector");
                 inspector.setName(INSPECTOR_ITEM);
                 inspector.setMnemonic('I');
-                inspector.setAccelerator(KeyStroke.getKeyStroke(
-                        java.awt.event.KeyEvent.VK_I, menuShortcutMask()));
+                inspector.setAccelerator(juranometria.ui.Shortcuts.of(
+                        juranometria.ui.Shortcuts.INSPECTOR).stroke());
                 inspector.getAccessibleContext().setAccessibleName(
                         "Inspector");
-                inspector.getAccessibleContext().setAccessibleDescription(
-                        "Show or hide the panel describing the selected"
-                                + " chart mark");
+                juranometria.ui.Explain.selfExplanatory(inspector,
+                        "Shows or hides the panel that describes the"
+                                + " mark you have chosen and what is"
+                                + " on this page");
                 inspector.addActionListener(event -> toggleInspector.run());
                 view.add(inspector);
             }
@@ -282,9 +299,13 @@ public final class AppMenuBar {
                 ecliptic.setMnemonic('E');
                 ecliptic.getAccessibleContext().setAccessibleName(
                         "Ecliptic");
-                ecliptic.getAccessibleContext().setAccessibleDescription(
-                        "Show or hide the ecliptic and its equinox and"
-                                + " solstice marks");
+                juranometria.ui.Explain.selfExplanatory(ecliptic,
+                        "Shows or hides the ecliptic and its equinox"
+                                + " and solstice marks; the same"
+                                + " switch answers to "
+                                + ChartKeys.toggle("module.ecliptic")
+                                        .sequence()
+                                + " from the chart");
                 ecliptic.addActionListener(event -> toggleEcliptic.run());
                 view.add(ecliptic);
             }
@@ -299,8 +320,11 @@ public final class AppMenuBar {
                 view.addSeparator();
                 JMenuItem zoomIn = new JMenuItem("Zoom In");
                 zoomIn.getAccessibleContext().setAccessibleName("Zoom In");
-                zoomIn.setAccelerator(KeyStroke.getKeyStroke(
-                        KeyEvent.VK_EQUALS, menuShortcutMask()));
+                juranometria.ui.Explain.selfExplanatory(zoomIn,
+                        "Shows a narrower field, with fainter stars"
+                                + " on it");
+                zoomIn.setAccelerator(juranometria.ui.Shortcuts.of(
+                        juranometria.ui.Shortcuts.ZOOM_IN).stroke());
                 zoomIn.addActionListener(event -> {
                     if (navigation.canZoomIn()) {
                         navigation.zoomIn();
@@ -308,8 +332,11 @@ public final class AppMenuBar {
                 });
                 JMenuItem zoomOut = new JMenuItem("Zoom Out");
                 zoomOut.getAccessibleContext().setAccessibleName("Zoom Out");
-                zoomOut.setAccelerator(KeyStroke.getKeyStroke(
-                        KeyEvent.VK_MINUS, menuShortcutMask()));
+                juranometria.ui.Explain.selfExplanatory(zoomOut,
+                        "Shows a wider field, with fewer stars on"
+                                + " it");
+                zoomOut.setAccelerator(juranometria.ui.Shortcuts.of(
+                        juranometria.ui.Shortcuts.ZOOM_OUT).stroke());
                 zoomOut.addActionListener(event -> {
                     if (navigation.canZoomOut()) {
                         navigation.zoomOut();
@@ -327,10 +354,14 @@ public final class AppMenuBar {
 
         JMenu help = new JMenu("Help");
         help.getAccessibleContext().setAccessibleName("Help menu");
+        juranometria.ui.Explain.selfExplanatory(help,
+                "What this application is, and what it is built"
+                        + " on");
         JMenuItem about = new JMenuItem("About " + AppInfo.NAME);
         about.getAccessibleContext().setAccessibleName("About " + AppInfo.NAME);
-        about.getAccessibleContext().setAccessibleDescription(
-                "Application identity, version, and licensing");
+        juranometria.ui.Explain.selfExplanatory(about,
+                "Opens the window naming the application, its version"
+                        + " and what it is built on");
         about.addActionListener(event -> openAbout.run());
         help.add(about);
         bar.add(help);
@@ -390,11 +421,6 @@ public final class AppMenuBar {
      * headless tests running where no toolkit mask exists.
      */
     public static int menuShortcutMask() {
-        try {
-            return java.awt.Toolkit.getDefaultToolkit()
-                    .getMenuShortcutKeyMaskEx();
-        } catch (java.awt.HeadlessException e) {
-            return InputEvent.CTRL_DOWN_MASK;
-        }
+        return juranometria.ui.Shortcuts.menuMask();
     }
 }

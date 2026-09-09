@@ -329,6 +329,54 @@ public final class ReaderInput {
     }
 
     /**
+     * What a reader reads by resting the pointer on a control.
+     *
+     * <p>The same premises as a click, and then the question Swing's
+     * own {@code ToolTipManager} asks: {@code getToolTipText(event)}
+     * at the point the pointer is over. Reading the field with
+     * {@code getToolTipText()} instead would answer for a control
+     * that no pointer could reach, and would miss every surface that
+     * decides its tooltip from where the pointer is - the table whose
+     * answer depends on the column (#311).
+     *
+     * @return what the reader is shown, or null if nothing
+     */
+    public static String hover(JComponent control) throws Exception {
+        return hover(control, () -> new java.awt.Point(
+                control.getWidth() / 2, control.getHeight() / 2));
+    }
+
+    /** The same, at a point the caller chooses on the event thread. */
+    public static String hover(JComponent control,
+            java.util.function.Supplier<java.awt.Point> where)
+            throws Exception {
+        String[] said = new String[1];
+        SwingUtilities.invokeAndWait(() -> {
+            assertTrue(control.isShowing(),
+                    name(control) + " is on screen, in a window a"
+                            + " reader can see");
+            assertTrue(control.getWidth() > 0 && control.getHeight() > 0,
+                    name(control) + " has a size a pointer could rest"
+                            + " on: " + control.getWidth() + "x"
+                            + control.getHeight());
+            java.awt.Point at = where.get();
+            assertTrue(control.getVisibleRect().contains(at),
+                    "the point hovered on " + name(control)
+                            + " is one a reader could reach: " + at.x
+                            + "," + at.y + " within "
+                            + control.getVisibleRect());
+            MouseEvent moved = new MouseEvent(control,
+                    MouseEvent.MOUSE_MOVED,
+                    System.nanoTime() / 1_000_000, 0, at.x, at.y, 0,
+                    false);
+            control.dispatchEvent(moved);
+            said[0] = control.getToolTipText(moved);
+        });
+        flush();
+        return said[0];
+    }
+
+    /**
      * The window losing the desktop's attention, as it happens when
      * a reader clicks another application - with the premise that
      * makes the event mean anything: the window must actually

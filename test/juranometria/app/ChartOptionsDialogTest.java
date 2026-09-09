@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import juranometria.render.ChartOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -432,9 +433,20 @@ class ChartOptionsDialogTest {
                 JCheckBox box = box(content, family.label());
                 assertNotNull(box, family + " has a control");
                 assertTrue(box.isSelected(), family + " starts drawn");
-                assertEquals(family.prose(), box.getAccessibleContext()
-                                .getAccessibleDescription(),
-                        family + " explains itself to a screen reader");
+                String heard = box.getAccessibleContext()
+                        .getAccessibleDescription();
+                assertTrue(heard.startsWith(family.prose()),
+                        family + " explains itself to a screen reader:"
+                                + " " + heard);
+                assertTrue(heard.contains(juranometria.app.ChartKeys
+                                .prefixText()),
+                        family + " and names the keyboard route to the"
+                                + " same switch, from the registry"
+                                + " that binds it (#311/#312): "
+                                + heard);
+                assertNotEquals(heard, box.getToolTipText(),
+                        family + " says it in each audience's own"
+                                + " words");
                 assertEquals(family.mnemonic(),
                         (char) box.getMnemonic(),
                         family + " answers to its letter");
