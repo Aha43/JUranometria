@@ -98,7 +98,7 @@ around the chart and not the chart. What does change placement is the room:
 | searched target | the target's own mark | exempt from every magnitude threshold | no | never omitted; drawn first and reserves its box | page rectangle | 8 | none: a target is always named |
 | star name, letter, number | east of the star's disc at its magnitude radius | `StarLabelPolicy` limits by field band | no | omitted when its box meets an accepted box | refused off-page | 8 | Star names, Bayer letters, Flamsteed numbers |
 | deep-sky label | east of the symbol's own half-extent | `RegionalDetailPolicy` | no | never: it is placed before star labels and they yield to it | none | 9 | Deep-sky labels |
-| constellation name | centroid of the constellation's **visible figure ink** | a figure that leaves ink | no | never omitted | clips at the page edge by decision | 4 | Constellation names, and figures |
+| constellation name | centroid of the constellation's **visible figure ink** | a figure that leaves ink | no | never omitted | clipped at the page edge until #313 | 4 | Constellation names, and figures |
 | equatorial grid notation | the page edge the line leaves by | spacing policy | no | omitted when it meets the title block or key | kept inside the paper | 1 | Equatorial grid |
 | meridian, horizon, ecliptic names | the upper end of the curve's own run | the module's | down the edge, past names already written | omitted when there is no room left below | paper rectangle | 5 | the module's own control |
 | title block, magnitude key | the page's own corners | the reader's switch | no | omitted when the page is too small | none | 10, 11 | Title block, Magnitude key |
@@ -325,13 +325,13 @@ marking its own work.
 | | greedy, constellation names first | 8 | 0 | 9 | 0 | 5 | 47 px | 148 |
 | | greedy, star labels first, avoiding every line | 0 | 0 | 12 | 0 | 4 | 52 px | 163 |
 | | greedy, star labels first, keeping what it cannot place | 36 | 18 | 0 | 1 | 5 | 47 px | 148 |
-| | greedy, star labels first, least bad when nothing is free | 28 | 9 | 0 | 1 | 5 | 47 px | 148 |
+| | greedy, star labels first, least bad when nothing is free | 25 | 7 | 0 | 1 | 5 | 47 px | 148 |
 | `orion-90` | the atlas today | 63 | 19 | — | — | — | — | — |
-| | greedy, star labels first | 42 | 0 | 39 | 5 | 27 | 87 px | 532 |
-| | greedy, constellation names first | 41 | 0 | 35 | 7 | 28 | 87 px | 530 |
+| | greedy, star labels first | 40 | 0 | 40 | 5 | 26 | 87 px | 545 |
+| | greedy, constellation names first | 39 | 0 | 36 | 7 | 27 | 87 px | 543 |
 | | greedy, star labels first, avoiding every line | 0 | 0 | 60 | 3 | 30 | 75 px | 776 |
-| | greedy, star labels first, keeping what it cannot place | 200 | 3 | 0 | 11 | 28 | 87 px | 550 |
-| | greedy, star labels first, least bad when nothing is free | 57 | 1 | 0 | 11 | 26 | 87 px | 555 |
+| | greedy, star labels first, keeping what it cannot place | 201 | 4 | 0 | 11 | 27 | 87 px | 563 |
+| | greedy, star labels first, least bad when nothing is free | 58 | 2 | 0 | 11 | 25 | 87 px | 568 |
 | `orion-120` | the atlas today | 169 | 37 | — | — | — | — | — |
 | | greedy, star labels first | 88 | 0 | 78 | 8 | 57 | 88 px | 1008 |
 | | greedy, constellation names first | 86 | 0 | 79 | 32 | 57 | 88 px | 983 |
@@ -392,10 +392,10 @@ it and without it:
 |---|---|---:|---:|---:|---:|---:|---:|
 | `home` | owned | 0 | 0 | 0 px | 0 | 0 | 1 |
 |  | free | 0 | 0 | 0 px | 0 | 0 | 1 |
-| `orion-36` | owned | 5 | 0 | 0 px | 0 | 1 | 28 |
-|  | free | 5 | 0 | 0 px | 1 | 1 | 25 |
-| `orion-90` | owned | 18 | 7 | 82 px | 0 | 5 | 57 |
-|  | free | 18 | 10 | 82 px | 3 | 6 | 53 |
+| `orion-36` | owned | 5 | 0 | 0 px | 0 | 2 | 25 |
+|  | free | 5 | 0 | 0 px | 2 | 2 | 25 |
+| `orion-90` | owned | 18 | 6 | 82 px | 0 | 5 | 58 |
+|  | free | 18 | 10 | 82 px | 5 | 8 | 53 |
 | `orion-120` | owned | 27 | 15 | 74 px | 0 | 10 | 472 |
 |  | free | 27 | 20 | 91 px | 6 | 10 | 465 |
 | `sagittarius-120` | owned | 30 | 14 | 70 px | 0 | 16 | 128 |
@@ -416,6 +416,141 @@ anywhere, and the collision count is a little higher. That is the whole trade: t
 rule costs a name the occasional candidate and buys the guarantee that a name is
 written across the thing it names.
 
+## A word cut short is another word
+
+The atlas draws a label whose box runs off the paper and lets the page cut it.
+The rule for constellation names says so in as many words - *honest position over
+pretty placement* - and it treats clipping as a matter of tidiness.
+
+It is not. Of the constellations the bundled pack draws, these become a **different
+constellation** when the page cuts their name:
+
+```
+LEO MINOR              cut short reads   LEO
+SAGITTARIUS            cut short reads   SAGITTA
+TRIANGULUM AUSTRALE    cut short reads   TRIANGULUM
+```
+
+And of the 12635 deep-sky labels these pages carry, **35057 truncations are another
+object's own label** - every `IC 1203` cut to `IC 1`, every `NGC 2024` cut to
+`NGC 202`. A clipped label is not an untidy page. It is a page that names the
+wrong thing, at the edge, where a reader matching a chart against the sky is
+most likely to be working.
+
+How often the atlas does it today, counted over the corpus - every family, because
+the decision is every family's:
+
+| page | star names | deep-sky labels | constellation names |
+|---|---:|---:|---:|
+| `home` | 0 | 1 | 0 |
+| `orion-08` | 1 | 0 | 0 |
+| `orion-18` | 0 | 10 | 0 |
+| `orion-36` | 0 | 1 | 1 |
+| `orion-42` | 1 | 1 | 1 |
+| `orion-60` | 0 | 2 | 1 |
+| `orion-90` | 0 | 2 | 3 |
+| `orion-120` | 1 | 1 | 2 |
+| `sagittarius-90` | 2 | 0 | 1 |
+| `sagittarius-120` | 1 | 0 | 0 |
+| `cygnus-90` | 1 | 1 | 1 |
+| `crux-90` | 2 | 0 | 5 |
+| `pole-120` | 2 | 7 | 2 |
+| `seam-120` | 2 | 3 | 3 |
+| `orion-120-small` | 3 | 1 | 2 |
+| `orion-42-a4` | 0 | 1 | 2 |
+| `orion-42-letter` | 0 | 1 | 2 |
+| `orion-90-black` | 0 | 2 | 3 |
+| `sagittarius-90-key` | 2 | 0 | 1 |
+| `sagittarius-90-ecliptic` | 2 | 0 | 1 |
+| `orion-90-observer` | 0 | 2 | 3 |
+| `nunki-searched` | 1 | 0 | 1 |
+| `orion-18-selected` | 0 | 10 | 0 |
+| **all 23 pages** | **21** | **46** | **35** |
+
+So the decision is that no text is clipped by the page, in any family: a label
+that cannot be drawn whole is not drawn, and the placement records which candidates
+the paper refused. The mark is still there, unnamed - which is what the page does to
+every star below its limit, without apology.
+
+**That table is not the cost of the change.** It counts what the atlas clips today,
+which is what the decision is about; what a reader would lose is a different
+question, because a label whose usual place runs off the paper has seven other
+places to try before it is given up on. The two are counted apart, and the
+second is in the next section.
+
+## The seam against this study
+
+Issue #313 builds the placement seam production will use. It is a second
+implementation of the decision this document settles, written against the same
+words and sharing no code with the greedy pass above - so the two can be asked
+the same question, which is worth more than asking either of them twice.
+
+| page | labels both place | same candidate | same box | placed under duress | omitted by the seam |
+|---|---:|---:|---:|---:|---:|
+| `home` | 4 | 4 | 1 | 2 | 0 |
+| `orion-36` | 16 | 16 | 10 | 6 | 2 |
+| `orion-90` | 64 | 59 | 45 | 8 | 2 |
+| `orion-120` | 98 | 87 | 67 | 12 | 3 |
+| `sagittarius-120` | 118 | 107 | 86 | 14 | 1 |
+| `crux-90` | 78 | 75 | 53 | 4 | 2 |
+
+They do not agree everywhere, and the places they part are worth more than the
+places they meet. Two causes, and neither is the placement rule:
+
+**The candidates are built twice.** Both build eight boxes around an anchor from
+the same sentence, and a deep-sky label's reach differs between them by the gap
+itself - three pixels. That is why "same candidate" is high and "same box" is
+lower: they choose the same position and draw it a few pixels apart.
+
+**And a difference cascades.** Placement is sequential: a label three pixels from
+where the other pass put it changes what every later label finds free. One
+disagreement early on a crowded page is worth several late ones.
+
+### What a reader would actually lose
+
+The cost of the clipping decision, counted as the thing it is: text the atlas
+draws today that the seam would not draw at all. Not the clipping count above - a
+label whose usual place runs off the paper has seven other places to try - and not
+the seam's omission count either, which counts requests and not drawn text.
+
+So both sides are the decisions themselves. What the atlas draws is what the
+renderer publishes it drawing: the star pass's placements, which are fewer than
+the stars that qualify because that pass drops a label whose box is taken; the
+list of deep-sky objects the page labels; and the constellations whose figures
+left ink. What the seam draws is its placements that are not omitted. The two
+sets are compared by name - this star, that object, that constellation - and the
+table is the difference each way.
+
+| page | drawn today | lost | which are | newly drawn |
+|---|---:|---:|---|---:|
+| `home` | 4 | 0 | — | 1 |
+| `orion-36` | 18 | 2 | 1 dso label, 1 const. name | 0 |
+| `orion-90` | 56 | 2 | 2 const. name | 10 |
+| `orion-120` | 87 | 3 | 1 dso label, 2 const. name | 14 |
+| `sagittarius-120` | 101 | 1 | 1 const. name | 18 |
+| `crux-90` | 75 | 2 | 2 const. name | 5 |
+
+Every loss is at the paper's edge or outside its own figure's region: those are
+the two refusals a fallback may not spend, and the only two that can omit
+anything.
+
+The last column is the same difference the other way, and it is the larger
+number. The atlas drops a star label whose usual box is taken; the seam moves it
+to one of seven other places and draws it. #314 changes the released pages by
+both columns, and by every label that merely moves.
+
+**And the seam omits where this pass does not.** The paper's edge is not a cost the
+fallback may spend, so a label whose every candidate leaves the page is not drawn
+at all. This study's pass draws those clipped, which is what the atlas does today;
+the section above counts them, and the decision says why the seam is right to
+refuse.
+
+What this does establish is the part worth establishing: on the same page, from
+the same published geometry, two implementations written from one document and
+sharing no code choose the same candidate for the great majority of a page's text.
+The candidate arithmetic is #314's to make one of, when the families migrate to the
+seam and this pass retires.
+
 ## Stability under a small navigation change
 
 A label that jumps to the other side of its star when the reader nudges the page
@@ -426,7 +561,7 @@ counted.
 
 | page | labels | changed after a pan | after a zoom |
 |---|---:|---:|---:|
-| `orion-90` | 107 | 26 | 19 |
+| `orion-90` | 107 | 25 | 19 |
 | `sagittarius-120` | 124 | 15 | 20 |
 | `home` | 4 | 0 | 0 |
 
@@ -459,7 +594,7 @@ must not get worse.
 
 ## What this cost to measure
 
-23 pages and 17565 painted renders for the census alone. Every collision in this
+23 pages and 17567 painted renders for the census alone. Every collision in this
 document is one of those renders differenced against another, which is what a
 collision nobody can dispute costs.
 

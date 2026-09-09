@@ -1,18 +1,10 @@
 package juranometria.tool.labels;
 
 import java.awt.geom.Path2D;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-import juranometria.chart.ChartScene;
-import juranometria.chart.SkyPosition;
-import juranometria.geo.GeoSegment;
 import juranometria.project.PixelPoint;
-import juranometria.project.Projection;
-import juranometria.project.Projections;
-import juranometria.project.ViewportMapping;
 
 /**
  * The part of the page a constellation owns (Sprint 31, issue #310).
@@ -42,9 +34,6 @@ import juranometria.project.ViewportMapping;
  */
 public final class FigureRegion {
 
-    /** The renderer's own subdivision step along a segment. */
-    private static final double STEP_DEGREES = 0.5;
-
     private final Map<String, Path2D.Double> hulls;
     private final Map<String, double[]> centroids;
 
@@ -54,77 +43,32 @@ public final class FigureRegion {
         this.centroids = centroids;
     }
 
-    /** The regions this page's constellations own. */
+    /**
+     * The regions this page's constellations own, from the ink the
+     * renderer publishes for each figure (issue #313).
+     *
+     * <p>This class used to re-walk the renderer's subdivision to find
+     * that ink, and agreed with it to within a few pixels rather than
+     * exactly - which is why the gate asked for the geometry to be
+     * published and this asks for it now.
+     */
     public static FigureRegion of(Page page) {
-        ChartScene scene = page.scene();
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
-        Projection projection = Projections.forViewport(scene.viewport());
-        Map<String, List<double[]>> points = new LinkedHashMap<>();
-        Map<String, List<double[]>> hullPoints = new LinkedHashMap<>();
-        java.awt.geom.Rectangle2D paper = new java.awt.geom.Rectangle2D.Double(
-                0, 0, page.wide(), page.high());
-        for (GeoSegment segment : scene.geography().figureSegments()) {
-            int steps = Math.max(1, (int) Math.ceil(
-                    separation(segment.from(), segment.to())
-                            / STEP_DEGREES));
-            PixelPoint previous = null;
-            for (int at = 0; at <= steps; at++) {
-                var plane = projection.project(slerp(segment.from(),
-                        segment.to(), (double) at / steps));
-                if (plane.isEmpty()) {
-                    previous = null;
-                    continue;
-                }
-                PixelPoint pixel = mapping.toPixel(plane.get());
-                if (previous != null
-                        && new java.awt.geom.Line2D.Double(previous.x(),
-                                previous.y(), pixel.x(), pixel.y())
-                                .intersects(paper)) {
-                    // The piece's ENDS go into the hull, because the
-                    // hull has to contain the ink and the ink runs
-                    // from end to end. Its midpoint goes into the
-                    // centroid, because that is what the renderer
-                    // averages. An earlier draft built the hull from
-                    // midpoints too, and eight pixels of Aquarius's
-                    // figure fell outside the region Aquarius owns.
-                    hullPoints.computeIfAbsent(segment.constellationId(),
-                            key -> new ArrayList<>())
-                            .add(new double[] {previous.x(), previous.y()});
-                    hullPoints.get(segment.constellationId())
-                            .add(new double[] {pixel.x(), pixel.y()});
-                    // The midpoint of a drawn piece, which is what the
-                    // renderer accumulates for the name's anchor - and
-                    // a piece counts when it CROSSES the paper, not
-                    // when its ends are on it. Pyxis on the 90-degree
-                    // Orion page is drawn with no sampled point inside
-                    // the page at all, and an inside-only rule left it
-                    // unnamed on a page the atlas names it on.
-                    points.computeIfAbsent(segment.constellationId(),
-                            key -> new ArrayList<>())
-                            .add(new double[] {
-                                    (previous.x() + pixel.x()) / 2.0,
-                                    (previous.y() + pixel.y()) / 2.0});
-                }
-                previous = pixel;
-            }
-        }
         Map<String, Path2D.Double> hulls = new LinkedHashMap<>();
         Map<String, double[]> centroids = new LinkedHashMap<>();
-        for (Map.Entry<String, List<double[]>> entry : points.entrySet()) {
-            Path2D.Double hull = hullOf(hullPoints.getOrDefault(
-                    entry.getKey(), entry.getValue()));
+        for (var entry : Page.renderer()
+                .figureInk(page.scene(), page.options()).entrySet()) {
+            java.awt.Shape hull = juranometria.render.LabelGeometry.hullOf(
+                    entry.getValue().ink());
             if (hull != null) {
-                hulls.put(entry.getKey(), hull);
+                Path2D.Double path = new Path2D.Double();
+                path.append(hull, false);
+                hulls.put(entry.getKey(), path);
             }
-            double x = 0.0;
-            double y = 0.0;
-            for (double[] point : entry.getValue()) {
-                x += point[0];
-                y += point[1];
+            PixelPoint anchor = entry.getValue().nameAnchor();
+            if (anchor != null) {
+                centroids.put(entry.getKey(),
+                        new double[] {anchor.x(), anchor.y()});
             }
-            centroids.put(entry.getKey(), new double[] {
-                    x / entry.getValue().size(),
-                    y / entry.getValue().size()});
         }
         return new FigureRegion(hulls, centroids);
     }
@@ -186,97 +130,4 @@ public final class FigureRegion {
         return java.util.Set.copyOf(hulls.keySet());
     }
 
-    /**
-     * The convex hull, by monotone chain - sorted input, integer-free
-     * cross products, no tolerance and no iteration, so the same
-     * points give the same hull everywhere.
-     */
-    private static Path2D.Double hullOf(List<double[]> points) {
-        if (points.size() < 3) {
-            return null;
-        }
-        List<double[]> sorted = new ArrayList<>(points);
-        sorted.sort((one, other) -> one[0] != other[0]
-                ? Double.compare(one[0], other[0])
-                : Double.compare(one[1], other[1]));
-        List<double[]> lower = new ArrayList<>();
-        for (double[] point : sorted) {
-            while (lower.size() >= 2 && cross(lower.get(lower.size() - 2),
-                    lower.get(lower.size() - 1), point) <= 0) {
-                lower.remove(lower.size() - 1);
-            }
-            lower.add(point);
-        }
-        List<double[]> upper = new ArrayList<>();
-        for (int at = sorted.size() - 1; at >= 0; at--) {
-            double[] point = sorted.get(at);
-            while (upper.size() >= 2 && cross(upper.get(upper.size() - 2),
-                    upper.get(upper.size() - 1), point) <= 0) {
-                upper.remove(upper.size() - 1);
-            }
-            upper.add(point);
-        }
-        lower.remove(lower.size() - 1);
-        upper.remove(upper.size() - 1);
-        lower.addAll(upper);
-        if (lower.size() < 3) {
-            return null;
-        }
-        Path2D.Double hull = new Path2D.Double();
-        hull.moveTo(lower.get(0)[0], lower.get(0)[1]);
-        for (int at = 1; at < lower.size(); at++) {
-            hull.lineTo(lower.get(at)[0], lower.get(at)[1]);
-        }
-        hull.closePath();
-        return hull;
-    }
-
-    private static double cross(double[] origin, double[] one,
-                                double[] other) {
-        return (one[0] - origin[0]) * (other[1] - origin[1])
-                - (one[1] - origin[1]) * (other[0] - origin[0]);
-    }
-
-    private static double separation(SkyPosition from, SkyPosition to) {
-        double[] one = unit(from);
-        double[] other = unit(to);
-        return Math.toDegrees(Math.acos(Math.clamp(
-                one[0] * other[0] + one[1] * other[1] + one[2] * other[2],
-                -1.0, 1.0)));
-    }
-
-    private static SkyPosition slerp(SkyPosition from, SkyPosition to,
-                                     double t) {
-        double[] one = unit(from);
-        double[] other = unit(to);
-        double omega = Math.acos(Math.clamp(
-                one[0] * other[0] + one[1] * other[1] + one[2] * other[2],
-                -1.0, 1.0));
-        double first;
-        double second;
-        if (omega < 1e-9) {
-            first = 1.0 - t;
-            second = t;
-        } else {
-            first = Math.sin((1.0 - t) * omega) / Math.sin(omega);
-            second = Math.sin(t * omega) / Math.sin(omega);
-        }
-        double x = first * one[0] + second * other[0];
-        double y = first * one[1] + second * other[1];
-        double z = first * one[2] + second * other[2];
-        double length = Math.sqrt(x * x + y * y + z * z);
-        return new SkyPosition(
-                Math.toDegrees(Math.atan2(y / length, x / length)) < 0
-                        ? Math.toDegrees(Math.atan2(y / length, x / length))
-                                + 360.0
-                        : Math.toDegrees(Math.atan2(y / length, x / length)),
-                Math.toDegrees(Math.asin(Math.clamp(z / length, -1.0, 1.0))));
-    }
-
-    private static double[] unit(SkyPosition at) {
-        double ra = Math.toRadians(at.raDegrees());
-        double dec = Math.toRadians(at.decDegrees());
-        return new double[] {Math.cos(dec) * Math.cos(ra),
-                Math.cos(dec) * Math.sin(ra), Math.sin(dec)};
-    }
 }

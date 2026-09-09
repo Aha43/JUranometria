@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
@@ -62,6 +64,8 @@ public final class LabelStudyMain {
         observedDefects(out, corpus, censuses);
         fixture(out);
         candidates(out, corpus, censuses);
+        clipping(out, corpus);
+        seamAgreement(out, corpus);
         stability(out);
         exportSection(out);
         pages(out, corpus, censuses);
@@ -211,7 +215,7 @@ public final class LabelStudyMain {
         out.append("| constellation name | centroid of the"
                 + " constellation's **visible figure ink** | a figure"
                 + " that leaves ink | no | never omitted |"
-                + " clips at the page edge by decision | 4 |"
+                + " clipped at the page edge until #313 | 4 |"
                 + " Constellation names, and figures |\n");
         out.append("| equatorial grid notation | the page edge the"
                 + " line leaves by | spacing policy | no |"
@@ -833,6 +837,460 @@ public final class LabelStudyMain {
             }
         }
         throw new IllegalArgumentException("no such page: " + slug);
+    }
+
+    /**
+     * The seam's decisions against the gate's own, on the same pages.
+     *
+     * <p>Two implementations of one decision, written from the same
+     * document and from nothing else in common: the gate's greedy pass
+     * lives in this study and has been read by six rounds of review;
+     * the seam is production's, in {@code juranometria.render}. Asking
+     * one of them twice would prove nothing, so this asks both and
+     * reports where they part.
+     */
+    private static void seamAgreement(StringBuilder out,
+                                      List<StudyPages.Look> corpus) {
+        out.append("## The seam against this study\n\n");
+        out.append("Issue #313 builds the placement seam production"
+                + " will use. It is a second\nimplementation of the"
+                + " decision this document settles, written against the"
+                + " same\nwords and sharing no code with the greedy"
+                + " pass above - so the two can be asked\nthe same"
+                + " question, which is worth more than asking either of"
+                + " them twice.\n\n");
+        out.append("| page | labels both place | same candidate |"
+                + " same box | placed under duress | omitted by the"
+                + " seam |\n");
+        out.append("|---|---:|---:|---:|---:|---:|\n");
+        var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
+        for (String slug : CANDIDATE_PAGES) {
+            Page page = pageOf(corpus, slug);
+            Greedy greedy = new Greedy(page, Greedy.LEAST_BAD);
+            Map<String, PlacedText> mine = new LinkedHashMap<>();
+            for (PlacedText text : greedy.placed()) {
+                mine.put(text.family() + ":" + text.id(), text);
+            }
+
+            List<juranometria.render.LabelPlacement.Request> asked =
+                    seamRequests(page, metrics);
+            var seam = new juranometria.render.LabelPlacement(page.wide(),
+                    page.high(),
+                    juranometria.render.LabelGeometry.obstaclesOn(
+                            Page.renderer(), metrics, page.scene(),
+                            page.options()));
+
+            int both = 0;
+            int sameCandidate = 0;
+            int sameBox = 0;
+            int duress = 0;
+            int omitted = 0;
+            for (var placed : seam.placeAll(asked)) {
+                if (placed.omitted()) {
+                    omitted++;
+                    continue;
+                }
+                if (placed.underDuress()) {
+                    duress++;
+                }
+                PlacedText ours = mine.get(
+                        identityOf(page, placed.request()));
+                if (ours == null) {
+                    continue;
+                }
+                both++;
+                if (Math.abs(ours.box().getX() - placed.at().getX()) < 0.5
+                        && Math.abs(ours.box().getY()
+                                - placed.at().getY()) < 0.5) {
+                    sameBox++;
+                    sameCandidate++;
+                } else if (ours.box().intersects(placed.at())) {
+                    sameCandidate++;
+                }
+            }
+            out.append(String.format(Locale.ROOT,
+                    "| `%s` | %d | %d | %d | %d | %d |%n", slug, both,
+                    sameCandidate, sameBox, duress, omitted));
+        }
+        out.append("\nThey do not agree everywhere, and the places"
+                + " they part are worth more than the\nplaces they"
+                + " meet. Two causes, and neither is the placement"
+                + " rule:\n\n");
+        out.append("**The candidates are built twice.** Both build"
+                + " eight boxes around an anchor from\nthe same"
+                + " sentence, and a deep-sky label's reach differs"
+                + " between them by the gap\nitself - three pixels."
+                + " That is why \"same candidate\" is high and \"same"
+                + " box\" is\nlower: they choose the same position and"
+                + " draw it a few pixels apart.\n\n");
+        out.append("**And a difference cascades.** Placement is"
+                + " sequential: a label three pixels from\nwhere the"
+                + " other pass put it changes what every later label"
+                + " finds free. One\ndisagreement early on a crowded"
+                + " page is worth several late ones.\n\n");
+        out.append("### What a reader would actually lose\n\n");
+        out.append("The cost of the clipping decision, counted as the"
+                + " thing it is: text the atlas\ndraws today that the"
+                + " seam would not draw at all. Not the clipping count"
+                + " above - a\nlabel whose usual place runs off the"
+                + " paper has seven other places to try - and not\nthe"
+                + " seam's omission count either, which counts requests"
+                + " and not drawn text.\n\n");
+        out.append("So both sides are the decisions themselves. What"
+                + " the atlas draws is what the\nrenderer publishes it"
+                + " drawing: the star pass's placements, which are"
+                + " fewer than\nthe stars that qualify because that"
+                + " pass drops a label whose box is taken; the\nlist"
+                + " of deep-sky objects the page labels; and the"
+                + " constellations whose figures\nleft ink. What the"
+                + " seam draws is its placements that are not omitted."
+                + " The two\nsets are compared by name - this star,"
+                + " that object, that constellation - and the\ntable"
+                + " is the difference each way.\n\n");
+        out.append("| page | drawn today | lost | which are |"
+                + " newly drawn |\n");
+        out.append("|---|---:|---:|---|---:|\n");
+        for (String slug : CANDIDATE_PAGES) {
+            Page page = pageOf(corpus, slug);
+            Map<String, Family> today = drawnToday(page, metrics);
+            var seam = new juranometria.render.LabelPlacement(page.wide(),
+                    page.high(),
+                    juranometria.render.LabelGeometry.obstaclesOn(
+                            Page.renderer(), metrics, page.scene(),
+                            page.options()));
+            Set<String> bySeam = new LinkedHashSet<>();
+            Map<String, juranometria.render.LabelPlacement.Placement>
+                    refused = new LinkedHashMap<>();
+            for (var placed : seam.placeAll(seamRequests(page, metrics))) {
+                String identity = identityOf(page, placed.request());
+                if (placed.omitted()) {
+                    refused.put(identity, placed);
+                } else {
+                    bySeam.add(identity);
+                }
+            }
+            int lost = 0;
+            Map<Family, Integer> byFamily = new LinkedHashMap<>();
+            for (var entry : today.entrySet()) {
+                if (bySeam.contains(entry.getKey())) {
+                    continue;
+                }
+                lost++;
+                byFamily.merge(entry.getValue(), 1, Integer::sum);
+                // The sentence under the table is a claim about every
+                // one of these, so it is checked here rather than
+                // written: a label the reader loses is one the seam
+                // was asked for and refused, and refused only for the
+                // two reasons a fallback may not spend.
+                var placement = refused.get(entry.getKey());
+                if (placement == null) {
+                    throw new IllegalStateException(slug + ": "
+                            + entry.getKey() + " is drawn today and the"
+                            + " seam was never asked for it");
+                }
+                for (var refusal : placement.refusals()) {
+                    if (refusal.kind() != juranometria.render
+                            .LabelPlacement.Refusal.PAGE_EDGE
+                            && refusal.kind() != juranometria.render
+                                    .LabelPlacement.Refusal.OWNERSHIP) {
+                        throw new IllegalStateException(slug + ": "
+                                + entry.getKey() + " was refused by "
+                                + refusal.kind());
+                    }
+                }
+            }
+            int gained = 0;
+            for (String identity : bySeam) {
+                if (!today.containsKey(identity)) {
+                    gained++;
+                }
+            }
+            List<String> parts = new ArrayList<>();
+            for (var entry : byFamily.entrySet()) {
+                parts.add(entry.getValue() + " "
+                        + shortName(entry.getKey()));
+            }
+            out.append(String.format(Locale.ROOT,
+                    "| `%s` | %d | %d | %s | %d |%n", slug, today.size(),
+                    lost, parts.isEmpty() ? "\u2014"
+                            : String.join(", ", parts), gained));
+        }
+        out.append("\nEvery loss is at the paper's edge or outside"
+                + " its own figure's region: those are\nthe two"
+                + " refusals a fallback may not spend, and the only two"
+                + " that can omit\nanything.\n\n");
+        out.append("The last column is the same difference the other"
+                + " way, and it is the larger\nnumber. The atlas drops"
+                + " a star label whose usual box is taken; the seam"
+                + " moves it\nto one of seven other places and draws"
+                + " it. #314 changes the released pages by\nboth"
+                + " columns, and by every label that merely moves.\n\n");
+
+        out.append("**And the seam omits where this pass does not.**"
+                + " The paper's edge is not a cost the\nfallback may"
+                + " spend, so a label whose every candidate leaves the"
+                + " page is not drawn\nat all. This study's pass draws"
+                + " those clipped, which is what the atlas does today;"
+                + "\nthe section above counts them, and the decision"
+                + " says why the seam is right to\nrefuse.\n\n");
+        out.append("What this does establish is the part worth"
+                + " establishing: on the same page, from\nthe same"
+                + " published geometry, two implementations written"
+                + " from one document and\nsharing no code choose the"
+                + " same candidate for the great majority of a page's"
+                + " text.\nThe candidate arithmetic is #314's to make"
+                + " one of, when the families migrate to the\nseam and"
+                + " this pass retires.\n\n");
+    }
+
+    /**
+     * The text this page draws today, by name, from the decisions the
+     * renderer publishes rather than from what qualifies.
+     *
+     * <p>The distinction is the whole of it: the star pass omits a
+     * label whose box is already taken, so the stars that qualify are
+     * more than the stars that are named. Counting a request as drawn
+     * text would report a label as lost that the reader never had.
+     */
+    private static Map<String, Family> drawnToday(
+            Page page, java.awt.FontMetrics metrics) {
+        ChartScene scene = page.scene();
+        var options = page.options();
+        var mapping = new juranometria.project.ViewportMapping(
+                scene.viewport());
+        var projection = juranometria.project.Projections.forViewport(
+                scene.viewport());
+        var detail = new juranometria.render.RegionalDetailPolicy(scene,
+                mapping.pixelsPerPlaneUnit());
+        Map<String, Family> drawn = new LinkedHashMap<>();
+        for (var placement : Page.renderer().starLabelPlacements(metrics,
+                scene, options, detail, projection, mapping)) {
+            drawn.put(Family.STAR_LABEL + ":" + placement.star().id(),
+                    Family.STAR_LABEL);
+        }
+        for (var dso : Page.renderer().labelledDeepSky(scene, options)) {
+            if (projection.project(dso.position()).isPresent()) {
+                drawn.put(Family.DEEP_SKY_LABEL + ":" + dso.id(),
+                        Family.DEEP_SKY_LABEL);
+            }
+        }
+        var ink = Page.renderer().figureInk(scene, options);
+        if (options.effectiveConstellationNames()) {
+            for (var name : scene.geography().latinNames().entrySet()) {
+                var figure = ink.get(name.getKey());
+                if (figure != null && figure.nameAnchor() != null) {
+                    drawn.put(Family.CONSTELLATION_NAME + ":"
+                            + name.getKey(), Family.CONSTELLATION_NAME);
+                }
+            }
+        }
+        return drawn;
+    }
+
+    /** Everything this page's text asks the seam for. */
+    private static List<juranometria.render.LabelPlacement.Request>
+            seamRequests(Page page, java.awt.FontMetrics metrics) {
+        List<juranometria.render.LabelPlacement.Request> asked =
+                new ArrayList<>();
+        asked.addAll(juranometria.render.LabelGeometry.starLabels(
+                Page.renderer(), metrics, page.scene(), page.options()));
+        asked.addAll(juranometria.render.LabelGeometry.deepSkyLabels(
+                Page.renderer(), metrics, page.scene(), page.options()));
+        asked.addAll(juranometria.render.LabelGeometry.constellationNames(
+                Page.renderer(), metrics, page.scene(), page.options()));
+        return asked;
+    }
+
+    /**
+     * Which family of text a request is, which is not always which
+     * family the seam sorts it into: the searched object is a family
+     * of its own to the placement rule, and is a star or a nebula to
+     * everyone else. Asking the page settles it.
+     */
+    private static Family familyOf(
+            Page page, juranometria.render.LabelPlacement.Request request) {
+        return switch (request.family()) {
+            case STAR -> Family.STAR_LABEL;
+            case DEEP_SKY -> Family.DEEP_SKY_LABEL;
+            case CONSTELLATION -> Family.CONSTELLATION_NAME;
+            case TARGET -> {
+                for (var dso : page.scene().deepSkyObjects()) {
+                    if (dso.id().equals(request.id())) {
+                        yield Family.DEEP_SKY_LABEL;
+                    }
+                }
+                yield Family.STAR_LABEL;
+            }
+        };
+    }
+
+    /** One piece of text, named the way both passes name it. */
+    private static String identityOf(
+            Page page, juranometria.render.LabelPlacement.Request request) {
+        return familyOf(page, request) + ":" + request.id();
+    }
+
+    /**
+     * What clipping a label at the page edge actually costs, which is
+     * not tidiness.
+     */
+    private static void clipping(StringBuilder out,
+                                 List<StudyPages.Look> corpus) {
+        out.append("## A word cut short is another word\n\n");
+        out.append("The atlas draws a label whose box runs off the paper"
+                + " and lets the page cut it.\nThe rule for"
+                + " constellation names says so in as many words -"
+                + " *honest position over\npretty placement* - and it"
+                + " treats clipping as a matter of tidiness.\n\n");
+        out.append("It is not. Of the constellations the bundled pack"
+                + " draws, these become a **different\nconstellation**"
+                + " when the page cuts their name:\n\n");
+        out.append("```\n");
+        java.util.Set<String> names = new java.util.TreeSet<>();
+        for (StudyPages.Look look : corpus) {
+            for (String name
+                    : look.page().scene().geography().latinNames()
+                            .values()) {
+                names.add(name.toUpperCase(Locale.ROOT));
+            }
+        }
+        int nameClashes = 0;
+        for (String name : names) {
+            for (int cut = 3; cut < name.length(); cut++) {
+                String head = name.substring(0, cut).trim();
+                if (names.contains(head) && !head.equals(name)) {
+                    out.append(String.format(Locale.ROOT,
+                            "%-22s cut short reads   %s%n", name, head));
+                    nameClashes++;
+                    break;
+                }
+            }
+        }
+        out.append("```\n\n");
+        java.util.Set<String> labels = new java.util.TreeSet<>();
+        for (StudyPages.Look look : corpus) {
+            for (var dso : look.page().scene().deepSkyObjects()) {
+                labels.add(ChartRenderer.labelTextFor(dso));
+            }
+        }
+        int labelClashes = 0;
+        for (String label : labels) {
+            for (int cut = 4; cut < label.length(); cut++) {
+                if (labels.contains(label.substring(0, cut).trim())) {
+                    labelClashes++;
+                }
+            }
+        }
+        out.append(String.format(Locale.ROOT,
+                "And of the %d deep-sky labels these pages carry, **%d"
+                        + " truncations are another\nobject's own"
+                        + " label** - every `IC 1203` cut to `IC 1`,"
+                        + " every `NGC 2024` cut to\n`NGC 202`. A"
+                        + " clipped label is not an untidy page. It is a"
+                        + " page that names the\nwrong thing, at the"
+                        + " edge, where a reader matching a chart"
+                        + " against the sky is\nmost likely to be"
+                        + " working.\n\n", labels.size(),
+                labelClashes));
+        out.append("How often the atlas does it today, counted over"
+                + " the corpus - every family, because\nthe decision is"
+                + " every family's:\n\n");
+        out.append("| page | star names | deep-sky labels |"
+                + " constellation names |\n");
+        out.append("|---|---:|---:|---:|\n");
+        var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
+        int stars = 0;
+        int deepSky = 0;
+        int names2 = 0;
+        for (StudyPages.Look look : corpus) {
+            Page page = look.page();
+            var mapping = new juranometria.project.ViewportMapping(
+                    page.scene().viewport());
+            var projection = juranometria.project.Projections.forViewport(
+                    page.scene().viewport());
+            var detail = new juranometria.render.RegionalDetailPolicy(
+                    page.scene(), mapping.pixelsPerPlaneUnit());
+            int starsHere = 0;
+            for (var placement : Page.renderer().starLabelPlacements(
+                    metrics, page.scene(), page.options(), detail,
+                    projection, mapping)) {
+                if (offThePaper(placement.box(), page)) {
+                    starsHere++;
+                }
+            }
+            int deepSkyHere = 0;
+            for (var mark : Page.renderer().drawnMarks(page.scene(),
+                    page.options())) {
+                if (mark.deepSky() == null) {
+                    continue;
+                }
+                var plane = projection.project(mark.deepSky().position());
+                if (plane.isEmpty()) {
+                    continue;
+                }
+                if (offThePaper(ChartRenderer.labelBounds(metrics,
+                        mark.deepSky(), mapping.toPixel(plane.get()),
+                        mapping.pixelsPerPlaneUnit()), page)) {
+                    deepSkyHere++;
+                }
+            }
+            // And the names, which the first version of this table
+            // left out while its prose counted them: the decision is
+            // every family's, so the evidence has to be.
+            var nameMetrics = Census.Metrics.forFont(
+                    Greedy.constellationNameFont());
+            int namesHere = 0;
+            for (var figure : Page.renderer()
+                    .figureInk(page.scene(), page.options()).entrySet()) {
+                String latin = page.scene().geography().latinNames()
+                        .get(figure.getKey());
+                if (latin == null || figure.getValue().nameAnchor() == null) {
+                    continue;
+                }
+                String text = latin.toUpperCase(Locale.ROOT);
+                double width = nameMetrics.stringWidth(text);
+                var anchor = figure.getValue().nameAnchor();
+                if (offThePaper(new java.awt.geom.Rectangle2D.Double(
+                        anchor.x() - width / 2.0,
+                        anchor.y() - nameMetrics.getAscent(), width,
+                        nameMetrics.getHeight()), page)) {
+                    namesHere++;
+                }
+            }
+            stars += starsHere;
+            deepSky += deepSkyHere;
+            names2 += namesHere;
+            if (starsHere + deepSkyHere + namesHere > 0) {
+                out.append(String.format(Locale.ROOT,
+                        "| `%s` | %d | %d | %d |%n", page.slug(),
+                        starsHere, deepSkyHere, namesHere));
+            }
+        }
+        out.append(String.format(Locale.ROOT,
+                "| **all %d pages** | **%d** | **%d** | **%d** |%n",
+                corpus.size(), stars, deepSky, names2));
+        out.append("\nSo the decision is that no text is clipped by"
+                + " the page, in any family: a label\nthat cannot be"
+                + " drawn whole is not drawn, and the placement records"
+                + " which candidates\nthe paper refused. The mark is"
+                + " still there, unnamed - which is what the page does"
+                + " to\nevery star below its limit, without apology."
+                + "\n\n");
+        out.append("**That table is not the cost of the change.** It"
+                + " counts what the atlas clips today,\nwhich is what"
+                + " the decision is about; what a reader would lose is"
+                + " a different\nquestion, because a label whose usual"
+                + " place runs off the paper has seven other\nplaces to"
+                + " try before it is given up on. The two are counted"
+                + " apart, and the\nsecond is in the next"
+                + " section.\n\n");
+    }
+
+    private static boolean offThePaper(java.awt.geom.Rectangle2D box,
+                                       Page page) {
+        return box.getMinX() < 0 || box.getMinY() < 0
+                || box.getMaxX() > page.wide()
+                || box.getMaxY() > page.high();
     }
 
     private static void stability(StringBuilder out) {

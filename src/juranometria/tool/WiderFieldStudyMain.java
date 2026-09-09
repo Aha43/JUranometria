@@ -184,7 +184,7 @@ public final class WiderFieldStudyMain {
         // same chart (PR #289, third round). It is named and skipped
         // rather than quietly widening the tolerance - the pixel
         // digest still covers it where pixels mean anything.
-        java.awt.Rectangle titleBlock = ChartRenderer.titleBlockBounds(
+        java.awt.Rectangle titleBlock = ChartRenderer.titleBlockLayout(
                 new BufferedImage(WIDE, HIGH, BufferedImage.TYPE_INT_RGB)
                         .createGraphics(), scene(centre, field));
 

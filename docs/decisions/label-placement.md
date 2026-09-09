@@ -224,16 +224,82 @@ dashing is measured along arc length and the placement is a
 translation and a rotation, which preserve it. Held on the Pleiades,
 whose ring is turned through 90° and is 375 pixels across.
 
-The ownership rule below is not a cost the fallback may spend. A
-candidate outside its constellation's own region is refused there too,
-whatever it would have covered.
+The paper's edge and the ownership rule below are not costs the
+fallback may spend. A label off the page is not a label and a name
+outside its figure is naming something else, so neither is a price a
+least-bad candidate may pay.
+
+Which leaves one case, and it is the only omission this decision has:
+**a request every one of whose candidates leaves the paper or its own
+figure is not drawn.** It is never silent — the placement carries a
+refusal for every candidate it had, and says which of the two refused
+it.
+
+### Nothing is clipped by the page edge
+
+This one is a change, it applies to **every** family including the
+one that has a rule saying otherwise, and it is a decision rather than
+a preference.
+
+The atlas today draws a label whose box runs off the paper and lets
+the page cut it: measured over five centres and nine fields, that is
+up to one star name, ten deep-sky labels and two constellation names
+per page, and it happens on released pages as well as on the overview.
+The rule for constellation names was written down as *names may clip
+at page edges — honest position over pretty placement*, which treats
+clipping as a matter of tidiness.
+
+It is not. **A word cut short is very often another word.** Of the 88
+constellations the bundled pack draws, three become a different
+constellation when their name is cut:
+
+```
+SAGITTARIUS         cut short reads   SAGITTA
+LEO MINOR           cut short reads   LEO
+TRIANGULUM AUSTRALE cut short reads   TRIANGULUM
+```
+
+and of the 12,635 deep-sky labels the study's corpus carries, **35,057
+truncations are another object's own label** — every `IC 1203` cut to
+`IC 1`, every `NGC 2024` cut to `NGC 202`. A clipped label is
+not an untidy page. It is a page that names the wrong thing, at the
+edge, where a reader matching a chart against the sky is most likely
+to be working.
+
+So: **no text is clipped by the page.** A label that cannot be drawn
+whole is not drawn, and the placement records which candidates the
+paper refused. The mark itself is still there, unnamed — which is what
+the whole page does to every star below its limit, without apology.
+
+The guarantee bends here too, and only here: a searched target's label
+may be written over anything on the page, and may not be written half
+off it.
+
+`#314` applies this when the families migrate. What a reader loses is
+**not** the clipping count above — a label whose usual place runs off
+the paper has seven other places to try — so the study counts the two
+apart, and counts what the atlas *draws* rather than what qualifies for
+a label: the star pass drops a name whose box is taken, so the stars
+that qualify are more than the stars that are named. Set against the
+renderer's own published placements, text the atlas draws today that
+the seam would not draw comes to **0 to 3 labels a page** across the
+candidate set, mostly constellation names whose own figure has nowhere
+else to put them. The difference runs the other way as well and runs
+larger — up to **18 labels a page** the atlas drops today and the seam
+finds room for — because a label refused its usual box moves here
+instead of vanishing. `#315`'s journey walks a page where it happens.
 
 This is the load-bearing choice of the whole decision. The three
 policies that omit instead reach zero of the owner's defects and lose
 between 1 and 116 labels a released page currently draws. The
 least-bad fallback loses **none**, on every page measured, and still
 takes the observed defects from 48 to 7 on the fixture's page, from
-37 to 6 at `orion-120`, and from 19 to 1 at `orion-90`.
+37 to 6 at `orion-120`, and from 19 to 2 at `orion-90`.
+
+Those counts moved by a label or two when `#313` published the
+geometry this study had been reconstructing: the symbols' ink is now
+the renderer's own, and a policy told exactly what a symbol inks
+refuses slightly different candidates from one told approximately.
 
 Where a label ends up at a candidate that covers something, the
 service records it. `#314` publishes that record; a page whose text is
@@ -359,8 +425,16 @@ not, will.
 
 | | budget | measured today |
 |---|---|---|
-| placement, 900×700 overview page | **≤ 60 ms** | 45 ms at `orion-120`, 19 ms at `orion-90`, 9 ms at `sagittarius-120` |
+| placement, 900×700 overview page | **≤ 60 ms** | 26 ms at `sagittarius-120`, on the machine named in the study |
 | placement, released detail page | **≤ 20 ms** | 5 ms at `home`, 13 ms at `orion-36` |
+| obstacle comparisons, the same page | **≤ a tenth of every-against-every** | 4,282 against 129,257 |
+
+The wall-clock rows say which machine they were taken on, and no test
+asserts them: the seam's first build placed the densest page in 45 ms
+here and 154 on the runner that builds it, which is a statement about
+two computers. What is held in a test is the **work** — the
+comparisons an indexed pass makes against the product of labels and
+ink — because that number is the same everywhere.
 | labels displaced on a one-step pan | **≤ 15%** | 3 of 84 at `orion-90`, 14 of 124 at `sagittarius-120` |
 | labels displaced on a one-rung zoom | no budget | 20 of 84, 20 of 124 |
 

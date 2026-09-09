@@ -155,18 +155,28 @@ public final class ReferenceInk {
             // written to change nothing there, and the released pages
             // are the check that it does not
             // (docs/decisions/overview-projection.md).
-            List<Named> names = new ArrayList<>();
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.GreatCircle circle) {
-                    Named named = drawCircle(g2, projection, mapping,
-                            region, paper, circle, palette);
-                    if (named != null) {
-                        names.add(named);
-                    }
+                    drawCircle(g2, projection, mapping, region, circle,
+                            palette);
                 }
             }
-            List<Rectangle2D> taken = place(g2, paper, names, palette);
+            // The names are the published decision, written rather
+            // than decided again here: one placement, drawn by this
+            // and readable by anyone (issue #313).
+            List<Rectangle2D> taken = new ArrayList<>();
+            g2.setColor(palette.gridLabelInk());
+            g2.setFont(EquatorialGrid.GRID_LABEL_FONT);
+            FontMetrics metrics = g2.getFontMetrics();
+            for (NamePlacement placed
+                    : namePlacements(scene, contributions)) {
+                g2.drawString(placed.name(),
+                        (float) placed.box().getMinX(),
+                        (float) (placed.box().getMaxY()
+                                - metrics.getDescent()));
+                taken.add(placed.box());
+            }
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.Point point) {
@@ -180,73 +190,117 @@ public final class ReferenceInk {
     }
 
     /** A line's name, and the end of it the name belongs to. */
-    private record Named(PixelPoint anchor, String name) {
+    private record Named(PixelPoint anchor, String name,
+                         String moduleId) {
     }
 
-    private static Named drawCircle(Graphics2D g,
-                                    Projection projection,
-                                    ViewportMapping mapping,
-                                    PageRegion region,
-                                    Rectangle2D paper,
-                                    OverlayContribution.GreatCircle circle,
-                                    juranometria.render.ChartPalette palette) {
+    private static void drawCircle(Graphics2D g,
+                                   Projection projection,
+                                   ViewportMapping mapping,
+                                   PageRegion region,
+                                   OverlayContribution.GreatCircle circle,
+                                   juranometria.render.ChartPalette palette) {
         List<CurveRun> runs = GreatCirclePage.clip(projection, mapping,
                 region, circle.pole());
         if (runs.isEmpty()) {
             // Silence. The circle does not cross this page, and a
             // line drawn anyway would be a promise the sky has not
             // made.
-            return null;
+            return;
         }
         g.setColor(palette.figureInk());
         g.setStroke(strokeFor(circle.reference()));
         for (CurveRun run : runs) {
             g.draw(shapeOf(run));
         }
-        // Named once, at one end, however many runs the page cut it
-        // into - a line has one name and repeating it at every gap
-        // would be the chart talking about its own paper.
-        PixelPoint anchor = labelAnchor(runs);
-        // Null when every run closed on itself, so the line has no
-        // end on this page to hang a name on. A curve wholly inside
-        // the paper is the case the old two-endpoint answer could not
-        // even describe.
-        return anchor == null ? null
-                : new Named(anchor, circle.accessibleName());
+    }
+
+    /** One reference name, and the box it is written in. */
+    public record NamePlacement(String moduleId, String name,
+                                Rectangle2D box) {
     }
 
     /**
-     * Every line's name, none of them on top of another.
+     * Where this page's reference names go, without drawing them.
      *
-     * <p>A name goes where its own line leaves the paper. When that
-     * place is taken, it goes below the name already there - down
-     * rather than aside, because the rule that put it at the upper
-     * end is a rule about where a reader looks, and a word moved
-     * sideways along an edge stops being at the end of anything.
-     *
-     * <p>Down only as far as the paper: a name that cannot be placed
-     * inside the page is not written at all, which is the same answer
-     * the chart gives a line it cannot draw.
+     * <p>The reference layer draws its curves and their names under
+     * one reader switch, so nothing outside it could tell the two
+     * apart - a study measuring what a name covered got the curve as
+     * well (issue #310). This publishes the names' own decisions, the
+     * way the star-label pass has published its since #154, and
+     * {@link #paint} writes precisely this list.
      */
-    private static List<Rectangle2D> place(
-            Graphics2D g, Rectangle2D paper, List<Named> names,
-            juranometria.render.ChartPalette palette) {
+    public static List<NamePlacement> namePlacements(ChartScene scene,
+            List<OverlayRegistry.Owned> contributions) {
+        List<OverlayRegistry.Owned> reference = referenceOf(contributions);
+        if (reference.isEmpty()) {
+            return List.of();
+        }
+        Projection projection = Projections.forViewport(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        Rectangle2D paper = ChartRenderer.paperOf(scene);
+        PageRegion region = mapping.regionFor(scene.viewport(), projection);
+        List<Named> names = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : reference) {
+            if (owned.geometry()
+                    instanceof OverlayContribution.GreatCircle circle) {
+                PixelPoint anchor = labelAnchor(GreatCirclePage.clip(
+                        projection, mapping, region, circle.pole()));
+                if (anchor != null) {
+                    names.add(new Named(anchor, circle.accessibleName(),
+                            owned.moduleId()));
+                }
+            }
+        }
+        FontMetrics metrics = EquatorialGrid.labelMetrics();
+        List<NamePlacement> placed = new ArrayList<>();
         List<Rectangle2D> taken = new ArrayList<>();
         for (Named named : names) {
-            write(g, paper, named.anchor(), named.name(), taken, palette);
+            Rectangle2D box = boxFor(paper, named.anchor(), named.name(),
+                    metrics, taken);
+            if (box != null) {
+                taken.add(box);
+                placed.add(new NamePlacement(named.moduleId(),
+                        named.name(), box));
+            }
         }
-        return taken;
+        return List.copyOf(placed);
+    }
+
+    private static List<OverlayRegistry.Owned> referenceOf(
+            List<OverlayRegistry.Owned> contributions) {
+        List<OverlayRegistry.Owned> reference = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : contributions) {
+            if (owned.geometry().role() == InkRole.REFERENCE_LINE) {
+                reference.add(owned);
+            }
+        }
+        reference.sort(Comparator.comparing(OverlayRegistry.Owned::key));
+        return reference;
     }
 
     /**
-     * One name, below any already written rather than over it.
-     *
-     * <p>Down rather than aside, because the rule that put it at the
-     * line's upper end is a rule about where a reader looks, and a
-     * word moved sideways along an edge stops being at the end of
-     * anything. Down only as far as the paper: a name with nowhere
-     * on the page to go is not written, which is the same answer the
-     * chart gives a line it cannot draw.
+     * Where one name fits, or null when the page has no room left
+     * below the ones already written. The decision, with no graphics
+     * in it, so it can be published as well as drawn.
+     */
+    private static Rectangle2D boxFor(Rectangle2D paper, PixelPoint anchor,
+                                      String name, FontMetrics metrics,
+                                      List<Rectangle2D> taken) {
+        double line = metrics.getHeight();
+        Rectangle2D box = labelBox(paper, anchor, name, metrics);
+        while (overlaps(box, taken)
+                && box.getMaxY() + line <= paper.getMaxY()) {
+            box = new Rectangle2D.Double(box.getX(), box.getY() + line,
+                    box.getWidth(), box.getHeight());
+        }
+        return overlaps(box, taken) ? null : box;
+    }
+
+    /**
+     * One name written where {@link #boxFor} says it goes, or not
+     * written at all - the placement rule the curves' names publish,
+     * used here for a point's name so there is one rule and not two.
      */
     private static void write(Graphics2D g, Rectangle2D paper,
                               PixelPoint anchor, String name,
@@ -255,14 +309,8 @@ public final class ReferenceInk {
         g.setColor(palette.gridLabelInk());
         g.setFont(EquatorialGrid.GRID_LABEL_FONT);
         FontMetrics metrics = g.getFontMetrics();
-        double line = metrics.getHeight();
-        Rectangle2D box = labelBox(paper, anchor, name, metrics);
-        while (overlaps(box, taken)
-                && box.getMaxY() + line <= paper.getMaxY()) {
-            box = new Rectangle2D.Double(box.getX(), box.getY() + line,
-                    box.getWidth(), box.getHeight());
-        }
-        if (overlaps(box, taken)) {
+        Rectangle2D box = boxFor(paper, anchor, name, metrics, taken);
+        if (box == null) {
             return;
         }
         taken.add(box);
