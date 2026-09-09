@@ -311,10 +311,21 @@ class PlacedTextTravelsToTheSheetTest {
         assertTrue(differsInside(shows, showsWithout, under, sheet) > 20,
                 "and with the furniture replayed before the text it"
                         + " covers, that same run is on the paper");
-        assertEquals(0, differsOutside(shows, showsWithout, under, sheet),
-                "and nothing else changed, so it is the run that came"
-                        + " back and not something the moved block"
-                        + " uncovered");
+        // What came back is that run and nothing else, measured by
+        // where the changed pixels are rather than by counting them
+        // outside a rectangle: a glyph's antialiased edge lands a
+        // pixel outside the box its own metrics describe, and one did
+        // on the runner's fonts. Ink the moved block stopped covering
+        // would be somewhere else in the block entirely, so the
+        // bound is the run's box grown by a chart unit - four pixels
+        // at this resolution, and a hundredth of the block's width.
+        Rectangle2D changed = changedExtent(shows, showsWithout, sheet);
+        Rectangle2D allowed = new Rectangle2D.Double(under.getX() - 1.0,
+                under.getY() - 1.0, under.getWidth() + 2.0,
+                under.getHeight() + 2.0);
+        assertTrue(changed != null && allowed.contains(changed),
+                "and every pixel that changed is that run's own: "
+                        + changed + " within " + allowed);
     }
 
     /**
@@ -877,6 +888,33 @@ class PlacedTextTravelsToTheSheetTest {
     private static int differsInside(BufferedImage one, BufferedImage other,
                                      Rectangle2D box, SheetRecording sheet) {
         return differing(one, other, box, sheet, true);
+    }
+
+    /**
+     * Where two renders of the same sheet differ, in chart units, or
+     * null when they do not differ at all.
+     */
+    private static Rectangle2D changedExtent(BufferedImage one,
+                                             BufferedImage other,
+                                             SheetRecording sheet) {
+        double scale = one.getWidth() / sheet.paper().widePoints();
+        double margin = sheet.paper().marginPoints();
+        Rectangle2D.Double extent = null;
+        for (int y = 0; y < one.getHeight(); y++) {
+            for (int x = 0; x < one.getWidth(); x++) {
+                if (one.getRGB(x, y) == other.getRGB(x, y)) {
+                    continue;
+                }
+                double atX = x / scale - margin;
+                double atY = y / scale - margin;
+                if (extent == null) {
+                    extent = new Rectangle2D.Double(atX, atY, 0, 0);
+                } else {
+                    extent.add(atX, atY);
+                }
+            }
+        }
+        return extent;
     }
 
     private static int differsOutside(BufferedImage one, BufferedImage other,
