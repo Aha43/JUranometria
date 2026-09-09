@@ -378,6 +378,13 @@ class ExportJourneyTest {
     @Test
     void theExportedSheetCarriesThePagesOwnPlacement(@TempDir Path folder)
             throws Exception {
+        // This one shows the window and presses the real controls, so
+        // it needs a display; the format readers it hands the files to
+        // are put to the question headlessly in
+        // PlacedTextTravelsToTheSheetTest.
+        org.junit.jupiter.api.Assumptions.assumeFalse(
+                java.awt.GraphicsEnvironment.isHeadless(),
+                "a reader's export route drives a real window");
         List<LabelPlacement.Placement> drawn = new ArrayList<>();
         List<LabelPlacement.Placement> refused = new ArrayList<>();
         for (LabelPlacement.Placement one : decision()) {
