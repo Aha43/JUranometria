@@ -1,0 +1,238 @@
+# A keyboard route to what the chart shows
+
+Sprint 31, issue #312. The interaction gate for the shortcut map, and
+the source `#311`'s tooltips quote.
+
+Measured in
+[the toggle-shortcut study](../studies/toggle-shortcuts/measurements.md),
+which changed no production behaviour: every table in it is read from
+the surfaces the application builds.
+
+**Agreed and built.** What follows is the decision as taken, with the
+places the building changed it marked *(observed)*.
+
+## The reader-facing rule
+
+> **One key opens the chart's own keyboard, and then one letter says
+> what to show.** The keyboard stays open, showing every switch and
+> its state, so the second key is read off the screen rather than
+> remembered. Escape, a click elsewhere or looking away leaves
+> without changing anything, and nothing fires while you are typing.
+
+## What there is to reach
+
+Seventeen chart-content switches, and three module ones:
+
+| group | switches |
+|---|---|
+| deep sky | objects, labels, and five symbol families |
+| constellations | figures, boundaries, names |
+| stars | names, Bayer letters, Flamsteed numbers |
+| the chart | grid, title block, magnitude key, black sky |
+| modules | the ecliptic, the meridian, the horizon |
+
+Twenty things, against the four keystrokes the whole application has
+today.
+
+## Why not seventeen accelerators
+
+Three reasons, in the order they were found rather than the order
+they convince.
+
+**The letters are not a map.** The dialog's mnemonics are unique on
+their own *tab*, which is all a dialog needs. Across the dialog, `F`
+is both Flamsteed numbers and Constellation figures, and `B` is both
+Constellation boundaries and Black sky. Promoting "the letter already
+on the control" to a global keystroke collides on the way out.
+
+**The keyboard is already spoken for.** Ten strokes are bound
+(Export, Inspector, both zooms and their aliases), and a text field
+under this look and feel answers **49** of its own. Seventeen new
+global strokes would have to fit between them without taking a single
+editing convention away from someone typing a star's name.
+
+**Seventeen strokes are seventeen things to know.** The atlas has
+four. A scheme whose first use requires memorising a table is a
+scheme most readers will never use twice.
+
+## The decision
+
+**A prefix, and a palette that is the same thing.**
+
+`⌘K` (Ctrl-K where that is the platform's menu key) **opens** the
+chart's keyboard, which then stays open on its own - the prefix is
+released, not held. While it is open:
+
+- a small panel names every switch, its letter, and **whether it is
+  on** — so the reader chooses from what is in front of them;
+- pressing a letter toggles that switch, and the panel *stays open*
+  with that line's state redrawn *(observed: closing on the first
+  letter made the common case - two or three switches together -
+  cost a reopen each time, and hid the very confirmation the panel
+  exists to give)*;
+- Escape, a click elsewhere, or losing the window closes it and
+  changes nothing;
+- the panel is what makes the prefix teachable: a prefix that shows
+  nothing is a prefix nobody discovers.
+
+The letters are assigned here rather than inherited, because the
+inherited ones collide:
+
+| switch | letter | | switch | letter |
+|---|---|---|---|---|
+| Deep-sky objects | `D` | | Star names | `S` |
+| Galaxies | `G` | | Bayer letters | `Y` |
+| Open clusters | `O` | | Flamsteed numbers | `M` |
+| Globular clusters | `C` | | Constellation figures | `F` |
+| Nebulae | `U` | | Constellation boundaries | `B` |
+| Planetary nebulae | `P` | | Constellation names | `N` |
+| Deep-sky labels | `L` | | Equatorial grid | `E` |
+| Title block | `T` | | Black sky | `K` |
+| Magnitude key | `J` | | | |
+| the ecliptic | `I` | | the meridian | `R` |
+| the horizon | `H` | | | |
+
+Two are changed from the dialog's own mnemonic and say so on the
+panel: Flamsteed numbers takes `M` because `F` belongs to figures,
+and Black sky takes `K` because `B` belongs to boundaries. The
+magnitude key takes `J` for the same reason. `#311` will show these
+letters on the controls themselves, so the dialog and the palette
+cannot drift.
+
+## What the scheme settles
+
+**Cancelling** *(observed)*. Escape closes the palette and changes
+nothing. So does a click anywhere outside it and the window losing
+the desktop's attention — a mode that can only be left by a key
+nobody remembers is a mode readers get stuck in. A letter that is not
+on the map does nothing at all and says nothing.
+
+The palette listens to the whole toolkit while it is open, so every
+one of those routes is walked repeatedly in a test and the toolkit's
+listener count is compared with what it was before — including the
+route nobody plans for, the window being disposed while the palette
+is still on it.
+
+**Waiting.** The palette does not time out. A prefix that expires
+mid-thought is a keyboard that stopped answering, and the palette is
+visible, so nothing about it is a hidden mode. It is left
+deliberately: Escape, a click elsewhere, or the window losing the
+desktop's attention.
+
+**A field with the caret in it.** The prefix is bound
+`WHEN_IN_FOCUSED_WINDOW` and refuses to open while the focus owner is
+a text component. The search field keeps every one of its 49 editing
+strokes; ⌘K reaches the palette only when a reader is not typing.
+
+**The platform's modifier.** One registry owns the stroke and its
+reader-facing spelling, taken from the platform's own menu mask —
+`⌘K` on macOS, `Ctrl-K` elsewhere — and every surface that names it
+asks the registry. Nothing types a key name into a tooltip.
+
+**What is remembered** *(observed)*. The keyboard route calls the same
+controller transition as the checkbox, and there is no second path to
+the store. But the checkbox alone does not store anything: it
+previews, and the dialog's **OK** commits. The palette has no OK and
+no Cancel, so a letter is the whole gesture - applied and committed in
+one press, exactly as the View menu's Ecliptic item has behaved since
+`#274`. Adding a confirmation step would invent a second interaction
+model and make closing the palette, or looking away from it,
+ambiguous.
+
+So the palette says which promise it just kept:
+
+- a stored layer: `Galaxies on — saved.`
+- a session-only line:
+  `Your meridian on — for this session.`
+- a dependant whose master is off: `Constellation names
+  unavailable — enable constellation figures first.`
+- the zenith, which no letter reaches, on its own greyed line:
+  `Zenith — controlled in Place and Time — no independent shortcut`
+
+**What is stored, and what is not** *(observed)*. Three different
+promises, and the keyboard keeps each exactly as it found it: the
+chart's seventeen layers are stored through the options store; the
+ecliptic is stored by its own session; the observer's meridian and
+horizon are **not stored at all**, because Place and Time saves a
+latitude and a longitude and nothing about what is drawn. A keyboard
+that quietly began saving the meridian would be making a promise
+production does not, so a test watches that no save happens.
+
+**A master and its dependants.** The keyboard means exactly what the
+checkbox means. Switching deep-sky objects off leaves the families'
+stored flags alone and hides what depends on them, as the dialog
+does; switching a hidden dependant is refused with its own line on
+the palette greyed, because a keystroke that changes stored state a
+reader cannot see is a keystroke they cannot undo by looking.
+
+**The searched target.** Unchanged, and stated because it is the
+exception a shortcut could quietly break: a searched object keeps its
+label and its symbol when its family is switched off. The keyboard
+route changes nothing about that.
+
+**The modules.** The ecliptic, the meridian and the horizon are on
+the map, because a reader switching what the chart shows does not
+care which subsystem owns it. Their state lives where it already
+lives; the palette reads it and the keystroke calls the same session
+seam the menu item and the dialog call.
+
+The zenith is **refused, and for one reason**: it is not an
+independent switch. It is part of how the observer's lines are drawn
+and is turned on and off in Place and Time with them. Its persistence
+is *not* the reason - none of the three observer states is stored -
+and the palette says the true one where a reader can read it:
+*controlled in Place and Time — no independent shortcut*.
+
+**What a screen reader hears.** Opening the palette announces its
+name and that it is a list of switches; each line reads as the
+switch's name and its state; a keystroke announces the switch and its
+new state through the same accessible text the checkbox uses. A state
+that changed with no dialog on screen has to say so out loud, or the
+route is only for readers who can see the chart.
+
+**What the tooltips say.** Every surface explaining a switch shows
+the sequence from the registry — the Chart Options checkbox, the menu
+item where one exists, and the palette itself. `#311` consumes this;
+neither issue spells a key twice.
+
+## Rejected
+
+**Seventeen direct accelerators.** Measured above: two letters
+already mean two things, one collides with an existing binding, and
+the memory cost lands on the reader before any benefit does.
+
+**A prefix with no palette.** Cheaper to build and invisible: a
+reader who has not read the documentation never learns the letters
+exist. The palette is the discoverability the issue asks for.
+
+**Direct accelerators for a favoured few, prefix for the rest.**
+Two schemes to learn instead of one, and the choice of *which* few is
+a guess about a reader we have not watched. If use shows that two or
+three switches are worn smooth, adding a direct stroke for them later
+costs nothing and can be decided on evidence.
+
+**A toggle for every option in one modal window.** That is the Chart
+Options dialog, which already exists and is not what a reader wants
+mid-observation.
+
+## What the map turned out to be
+
+Twenty switches, seventeen of the chart's own and three of the
+modules', with the letters and the promises in
+[the study](../studies/toggle-shortcuts/measurements.md), which reads
+them from the registry rather than repeating them.
+
+## Contract for the implementation
+
+- One registry owns action, keystroke and reader-facing text; menu
+  accelerators, the palette, tooltips and tests read it, and nothing
+  keeps a second spelling.
+- An executable conflict audit fails if any two actions claim one
+  stroke in one scope, or if a binding shadows zoom, Inspector,
+  export, a menu accelerator or a text-editing stroke.
+- Every switch is exercised through both routes, in both directions,
+  comparing effective options, stored state and the rendered page.
+- A real-window journey starts with focus in the chart, in the search
+  field, in a table and in a dialog, proving the scope rather than
+  calling the action.
+- Mutating either the binding or the displayed text fails a test.

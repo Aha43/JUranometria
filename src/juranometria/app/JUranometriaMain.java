@@ -174,6 +174,48 @@ public final class JUranometriaMain {
         juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
                 eclipticStore,
                 AppMenuBar.eclipticItem(frame.getJMenuBar()));
+
+        // The chart's own keyboard (issue #312): one key opens a
+        // palette of every layer with its letter and its state, and
+        // every letter reaches the same transition the reader's own
+        // control reaches. The switches are handed the controller and
+        // the modules' own seams, never a second path to the store.
+        Runnable eclipticToggle =
+                juranometria.ui.ecliptic.EclipticSession.toggle(
+                        ecliptic, eclipticStore);
+        ChartKeyboard.install(frame.getRootPane(),
+                ChartSwitches.of(chartOptions,
+                        new ChartSwitches.Ecliptic() {
+                            @Override
+                            public boolean showing() {
+                                return ecliptic.showing();
+                            }
+
+                            @Override
+                            public void toggle() {
+                                eclipticToggle.run();
+                                frame.repaint();
+                            }
+                        },
+                        new ChartSwitches.ObserverLines() {
+                            @Override
+                            public boolean meridianShowing() {
+                                return meridian.meridianShowing();
+                            }
+
+                            @Override
+                            public boolean horizonShowing() {
+                                return meridian.horizonShowing();
+                            }
+
+                            @Override
+                            public void showing(boolean showMeridian,
+                                                boolean showHorizon) {
+                                meridian.showing(showMeridian, showHorizon,
+                                        meridian.zenithShowing());
+                            }
+                        }),
+                keyboard -> keyboard.showIn(frame.getRootPane()));
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

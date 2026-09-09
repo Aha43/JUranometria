@@ -288,17 +288,23 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
+                        "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the seven widget photographers, whose font setting"
-                        + " dies with the JVM - benign by"
+                "the eight widget photographers, whose font and theme"
+                        + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
                         + " exactly that route (#258's gate), and the"
                         + " sixth and seventh by #271's - the ecliptic"
                         + " control mock-up, and the candidate study,"
                         + " which sets the font only to show that"
-                        + " enlarged text does not reach the chart");
+                        + " enlarged text does not reach the chart;"
+                        + " the eighth by #312's, the toggle-shortcut"
+                        + " study, which applies the shipped look and"
+                        + " feel because the keystrokes it counts are"
+                        + " the ones a text field answers under that"
+                        + " look and feel and no other");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -411,7 +417,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(29, display.size(),
+        assertEquals(31, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -432,8 +438,14 @@ class TestEvidenceGateTest {
                         + " and leave the wide view and clicks a star"
                         + " of it, because a projection carried"
                         + " through the seam is a claim about what a"
-                        + " pointer reaches; each with its premises"
-                        + " stated");
+                        + " pointer reaches; and #312's pair - the"
+                        + " chart keyboard's journey, which presses"
+                        + " the prefix and its letters in a real"
+                        + " window beside the reader's own controls,"
+                        + " and its lifecycle, which is a claim about"
+                        + " listeners a shown palette adds and so"
+                        + " cannot be made without showing one; each"
+                        + " with its premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

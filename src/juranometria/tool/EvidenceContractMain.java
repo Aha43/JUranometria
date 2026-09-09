@@ -106,6 +106,12 @@ public final class EvidenceContractMain {
         // itself, and the runtime lives in the decision document.
         REPORT_MAINS.put("juranometria.tool.labels.LabelStudyMain",
                 "docs/studies/label-placement/measurements.md");
+        // The interaction gate for the chart's keyboard (#312), and
+        // the map it was built from: the study reads the registry, so
+        // a keystroke that changed without the document changing with
+        // it fails here.
+        REPORT_MAINS.put("juranometria.tool.ToggleShortcutStudyMain",
+                "docs/studies/toggle-shortcuts/measurements.md");
         REPORT_MAINS.put("juranometria.tool.WiderFieldStudyMain",
                 "docs/studies/wider-field/released-pages.txt");
         // Writes its 49 candidate pages beside the report as it runs
