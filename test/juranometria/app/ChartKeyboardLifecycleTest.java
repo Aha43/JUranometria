@@ -52,6 +52,8 @@ class ChartKeyboardLifecycleTest {
             JButton[] elsewhere = new JButton[1];
             SwingSession.guarded(() -> {
                 int before = mouseListeners();
+                assertEquals(0, before,
+                        "no palette is listening before one is shown");
 
                 // A window per round, and the routes in this order.
                 // Looking away sets the focused window to none, and a
@@ -109,8 +111,9 @@ class ChartKeyboardLifecycleTest {
                 flush();
                 assertTrue(onEdt(open::isOpen),
                         "the palette is open when the window closes");
-                assertTrue(mouseListeners() > before,
-                        "and is listening while it is");
+                assertEquals(before + 1, mouseListeners(),
+                        "and is listening while it is - exactly one"
+                                + " listener of its own");
                 SwingUtilities.invokeAndWait(window[0]::dispose);
                 flush();
                 assertEquals(before, mouseListeners(),
@@ -160,9 +163,28 @@ class ChartKeyboardLifecycleTest {
         void leave(ChartKeyboard keyboard) throws Exception;
     }
 
+    /**
+     * How many of the toolkit's mouse listeners are the palette's.
+     *
+     * <p>The palette's own, and not every listener in the JVM. AWT
+     * gives a window a {@code LightweightDispatcher} of its own,
+     * which is an AWT mouse listener too - it arrives with the
+     * window, goes with the window, and is not ours to leak. Counting
+     * it made this test's answer depend on which test had shown a
+     * window first, which is a measurement of the suite rather than
+     * of the palette (#312). What is counted is what
+     * {@link ChartKeyboard} put there.
+     */
     private static int mouseListeners() throws Exception {
-        return onEdt(() -> Toolkit.getDefaultToolkit()
-                .getAWTEventListeners(AWTEvent.MOUSE_EVENT_MASK).length);
+        return onEdt(() -> (int) java.util.Arrays.stream(
+                        Toolkit.getDefaultToolkit().getAWTEventListeners(
+                                AWTEvent.MOUSE_EVENT_MASK))
+                .map(listener -> listener
+                        instanceof java.awt.event.AWTEventListenerProxy proxy
+                        ? proxy.getListener() : listener)
+                .filter(listener -> listener.getClass().getName()
+                        .startsWith(ChartKeyboard.class.getName()))
+                .count());
     }
 
     private static <T> T onEdt(java.util.concurrent.Callable<T> ask)

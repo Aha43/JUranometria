@@ -583,10 +583,22 @@ class ChartKeyboardJourneyTest {
         }
     }
 
+    /**
+     * How many of the toolkit's mouse listeners are the palette's -
+     * its own, and not AWT's per-window dispatcher, for the reason
+     * {@code ChartKeyboardLifecycleTest} records.
+     */
     private static int mouseListeners() throws Exception {
-        return onEdt(() -> java.awt.Toolkit.getDefaultToolkit()
-                .getAWTEventListeners(
-                        java.awt.AWTEvent.MOUSE_EVENT_MASK).length);
+        return onEdt(() -> (int) java.util.Arrays.stream(
+                        java.awt.Toolkit.getDefaultToolkit()
+                                .getAWTEventListeners(
+                                        java.awt.AWTEvent.MOUSE_EVENT_MASK))
+                .map(listener -> listener
+                        instanceof java.awt.event.AWTEventListenerProxy proxy
+                        ? proxy.getListener() : listener)
+                .filter(listener -> listener.getClass().getName()
+                        .startsWith(ChartKeyboard.class.getName()))
+                .count());
     }
 
     /**

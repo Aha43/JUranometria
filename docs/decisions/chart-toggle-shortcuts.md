@@ -284,6 +284,39 @@ drawn; and each module letter is pressed on a page its own geometry
 crosses, because a line drawn ninety degrees away is still not drawn
 here.
 
+**And the same cost, not merely the same result.** The ecliptic's
+adapter painted the whole window again on top of the module's own
+redraw. Nothing looked wrong: the line appeared, and the extra paint
+was invisible. But it made the letter cost more than the menu item
+for the same change, which is the opposite of what this document
+promises — that a keystroke reaches *the same transition* the
+reader's own control reaches. The adapter now runs the menu's switch
+and nothing else, and the two routes are measured against each other:
+the same number of repaint requests at the chart, nothing at all
+above it, and the same answer to whether the page was reassembled or
+the inventory rebuilt.
+
+Measuring that needed care, and the care is the evidence:
+
+- **The palette is opened before the count starts** and closed after
+  it ends. Opening and closing it dirties the window on its own, and
+  a measurement that spanned all three could be answered by the
+  palette's ink while a module's redraw was missing entirely.
+- **The chart's own repaint is required**, not a dirty root pane.
+- **A repaint aimed at a window is recorded too.** `frame.repaint()`
+  never reaches the recorder's component method, so a recorder
+  watching only components would have called the two routes equal
+  while one of them painted the whole window.
+- **Each route's own control surface is left out**: the palette
+  redraws its own line and the menu redraws its own tick, and neither
+  is a cost the other could have. Nothing *above the chart* belongs
+  to either, which is what makes that count comparable — and is where
+  the extra paint landed.
+
+All three forms are checked by putting the fault back: an extra
+root-pane repaint, an extra window repaint, and a module whose redraw
+has been deleted each fail one of these assertions and no others.
+
 ## Contract for the implementation
 
 - One registry owns action, keystroke and reader-facing text; menu

@@ -184,7 +184,7 @@ public final class JUranometriaMain {
                 ecliptic,
                 juranometria.ui.ecliptic.EclipticSession.toggle(
                         ecliptic, eclipticStore),
-                meridian, frame);
+                meridian);
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

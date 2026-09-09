@@ -504,7 +504,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 34,
+        assertTrue(doClick <= 35,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -540,7 +540,10 @@ class TestEvidenceGateTest {
                         + " and #312's matrix reaches the View menu's"
                         + " Ecliptic item by the same convention, on"
                         + " its way to comparing that route with the"
-                        + " palette's letter: " + doClick);
+                        + " palette's letter, and #312's wiring test"
+                        + " reaches it by the same convention to"
+                        + " compare what the two routes cost the"
+                        + " running atlas: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

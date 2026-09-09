@@ -1,7 +1,5 @@
 package juranometria.app;
 
-import java.awt.Component;
-
 import javax.swing.JRootPane;
 
 import juranometria.ecliptic.EclipticModule;
@@ -40,16 +38,14 @@ public final class ChartKeyboardSession {
      *     where the remembering lives
      * @param observer the attached module whose lines Place and Time
      *     switches
-     * @param repaint the window to paint again after a module change
      */
     public static void install(JRootPane root,
                                ChartOptionsController options,
                                EclipticModule ecliptic,
                                Runnable eclipticToggle,
-                               MeridianModule observer,
-                               Component repaint) {
+                               MeridianModule observer) {
         if (ecliptic == null || eclipticToggle == null
-                || observer == null || repaint == null) {
+                || observer == null) {
             throw new IllegalArgumentException(
                     "the chart keyboard is wired to the modules the"
                             + " atlas is running");
@@ -63,8 +59,14 @@ public final class ChartKeyboardSession {
 
                     @Override
                     public void toggle() {
+                        // The menu item's own switch and nothing
+                        // else. Painting the frame again as well
+                        // looked harmless and was not: it made the
+                        // letter cost more than the menu item for
+                        // the same change, and the module already
+                        // asks the chart to redraw when it starts or
+                        // stops showing (review, #312).
                         eclipticToggle.run();
-                        repaint.repaint();
                     }
                 },
                 new ChartSwitches.ObserverLines() {

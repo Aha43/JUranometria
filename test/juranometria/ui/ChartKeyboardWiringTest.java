@@ -32,6 +32,7 @@ import juranometria.chart.ChartViewState;
 import juranometria.chart.SelectionModel;
 import juranometria.page.PageContents;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -77,10 +78,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartKeyboardWiringTest {
 
-    /** Sees every repaint request in the JVM while installed. */
+    /**
+     * Sees every repaint request in the JVM while installed -
+     * <strong>including the ones aimed at a window</strong>.
+     *
+     * <p>The second overload is not decoration. {@code frame.repaint()}
+     * never reaches the component overload, so a recorder that watched
+     * only components would have counted the two routes as equal while
+     * one of them painted the whole window again (review, #312).
+     */
     private static final class RecordingRepaints extends RepaintManager {
 
         final List<JComponent> asked = new ArrayList<>();
+        final List<java.awt.Window> windows = new ArrayList<>();
 
         @Override
         public synchronized void addDirtyRegion(JComponent component,
@@ -88,6 +98,18 @@ class ChartKeyboardWiringTest {
                                                 int width, int height) {
             asked.add(component);
             super.addDirtyRegion(component, x, y, width, height);
+        }
+
+        @Override
+        public void addDirtyRegion(java.awt.Window window, int x, int y,
+                                   int width, int height) {
+            windows.add(window);
+            super.addDirtyRegion(window, x, y, width, height);
+        }
+
+        void clear() {
+            asked.clear();
+            windows.clear();
         }
     }
 
@@ -100,11 +122,12 @@ class ChartKeyboardWiringTest {
             assertTrue(atlas.options.options().equatorialGrid(),
                     "the grid is on to begin with");
             byte[] before = atlas.painted();
+            atlas.openPalette();
             ChartScene scene = onEdt(atlas.chart::currentScene);
             PageContents inventory = onEdt(atlas.modules::inventory);
-            repaints.asked.clear();
+            repaints.clear();
 
-            atlas.letter('E');
+            atlas.dispatch('E');
 
             assertFalse(atlas.options.options().equatorialGrid(),
                     "the letter reached the chart's own options");
@@ -126,6 +149,7 @@ class ChartKeyboardWiringTest {
                             + " would call a hidden object drawn. So"
                             + " this is evidence the letter reached the"
                             + " host as well as the renderer");
+            atlas.closePalette();
             assertFalse(java.util.Arrays.equals(before, atlas.painted()),
                     "and the page a reader is looking at is different");
         });
@@ -161,33 +185,138 @@ class ChartKeyboardWiringTest {
                     default -> sky.horizon().around(72).get(9);
                 });
                 byte[] before = atlas.painted();
+                atlas.openPalette();
                 ChartScene scene = onEdt(atlas.chart::currentScene);
                 PageContents inventory = onEdt(atlas.modules::inventory);
-                repaints.asked.clear();
+                repaints.clear();
 
-                atlas.letter(letter);
+                atlas.dispatch(letter);
 
                 assertTrue(atlas.showing(letter),
                         what + ": the letter reached the module");
-                assertTrue(repaints.asked.contains(atlas.chart)
-                                || repaints.asked.contains(
-                                        atlas.frame.getRootPane()),
-                        what + ": and something was asked to repaint,"
-                                + " so the lines arrive on the page"
-                                + " rather than at the next thing that"
-                                + " happens to move");
+                assertTrue(repaints.asked.contains(atlas.chart),
+                        what + ": and the chart itself was asked to"
+                                + " repaint, through the module's own"
+                                + " redraw seam - the palette's own ink"
+                                + " is not an answer, which is why it"
+                                + " is opened before the recorder is"
+                                + " cleared: " + repaints.asked);
                 assertSame(scene, onEdt(atlas.chart::currentScene),
                         what + ": on the same scene object - a module"
                                 + " showing its own geometry"
                                 + " reassembles nothing");
                 assertSame(inventory, onEdt(atlas.modules::inventory),
                         what + ": and rebuilds no inventory");
+                atlas.closePalette();
                 assertFalse(java.util.Arrays.equals(before,
                                 atlas.painted()),
                         what + ": and the page is different, which is"
                                 + " the whole point of the letter");
             }
         });
+    }
+
+    @Test
+    void theReadersOwnControlAndTheLetterCostTheSame() throws Exception {
+        // The issue asks for identical rendered effect *and* identical
+        // repaint cost. Two routes that both end up showing the line
+        // can still differ in what they ask the toolkit to do, and one
+        // of them did: the ecliptic's adapter painted the whole frame
+        // again on top of the module's own redraw, so the letter cost
+        // more than the menu item for the same change (review, #312).
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "the reader's own controls are pressed in a window");
+        withTheAtlasRunning((atlas, repaints) -> {
+            for (char letter : new char[] {'I', 'R', 'H'}) {
+                String what = ChartKeys.forKey(letter).label();
+                atlas.goTo(pageFor(atlas, letter));
+
+                atlas.hide(letter);
+                if (letter != 'I') {
+                    atlas.openPlaceAndTime(letter);
+                }
+                Cost byTheControl = atlas.measure(repaints,
+                        () -> atlas.readersControl(letter));
+                assertTrue(atlas.showing(letter),
+                        what + ": the reader's own control showed it");
+                if (letter != 'I') {
+                    atlas.closePlaceAndTime();
+                }
+
+                atlas.hide(letter);
+                atlas.openPalette();
+                Cost byTheLetter = atlas.measure(repaints,
+                        () -> atlas.dispatch(letter));
+                assertTrue(atlas.showing(letter),
+                        what + ": and so did the letter");
+                atlas.closePalette();
+
+                assertEquals(byTheControl.chartRepaints,
+                        byTheLetter.chartRepaints,
+                        what + ": and asked the chart to repaint the"
+                                + " same number of times - " + byTheControl
+                                + " against " + byTheLetter);
+                assertEquals(0, byTheControl.aboveTheChart,
+                        what + ": the reader's own control repaints"
+                                + " nothing above the chart - "
+                                + byTheControl);
+                assertEquals(0, byTheLetter.aboveTheChart,
+                        what + ": and neither does the letter, which"
+                                + " once painted the whole window again"
+                                + " on top of the module's own redraw - "
+                                + byTheLetter);
+                assertEquals(byTheControl.windowRepaints,
+                        byTheLetter.windowRepaints,
+                        what + ": and painted the whole window again"
+                                + " the same number of times - which"
+                                + " for both of them is none, the"
+                                + " module's own redraw being the"
+                                + " route");
+                assertEquals(byTheControl.reassembled,
+                        byTheLetter.reassembled,
+                        what + ": reassembling the page exactly as"
+                                + " often, which is not at all");
+                assertEquals(byTheControl.rebuilt, byTheLetter.rebuilt,
+                        what + ": and rebuilding the inventory as"
+                                + " often");
+            }
+        });
+    }
+
+    /**
+     * What one gesture asked of the atlas.
+     *
+     * <p>Two counts, because the bug this holds asked nothing of the
+     * chart at all: it painted the whole window again on top of the
+     * module's own redraw. So everything <em>above</em> the chart is
+     * counted too - the content pane, the layered pane, the root
+     * pane, the frame - and neither route may touch any of them.
+     *
+     * <p>Each route's own control surface is left out of both counts,
+     * because it is not shared: the palette redraws its own line and
+     * the menu redraws its own tick, and neither is a cost the other
+     * could have. Nothing above the chart is either route's control
+     * surface, which is what makes that count comparable.
+     */
+    private record Cost(int chartRepaints, int aboveTheChart,
+                        int windowRepaints, boolean reassembled,
+                        boolean rebuilt) {
+    }
+
+    /** The page each module's own geometry crosses. */
+    private static juranometria.chart.SkyPosition pageFor(Atlas atlas,
+                                                          char letter) {
+        juranometria.sky.LocalSky sky = new juranometria.sky.LocalSky(
+                atlas.observer.observer());
+        // The vernal equinox is on the ecliptic by definition; the
+        // zenith is on the meridian by definition; and the horizon is
+        // the one line a page at the zenith cannot reach, being ninety
+        // degrees away from it - the study's own "horizon edge".
+        return switch (letter) {
+            case 'I' -> new juranometria.chart.SkyPosition(0.0, 0.0);
+            case 'R' -> sky.zenith();
+            default -> sky.horizon().around(72).get(9);
+        };
     }
 
     @Test
@@ -251,6 +380,7 @@ class ChartKeyboardWiringTest {
         juranometria.meridian.MeridianModule observer;
         juranometria.ecliptic.EclipticModule ecliptic;
         ChartViewController navigation;
+        Runnable eclipticToggle;
         final List<Boolean> eclipticSaved = new ArrayList<>();
         ChartKeyboard palette;
         java.util.prefs.Preferences node;
@@ -282,16 +412,126 @@ class ChartKeyboardWiringTest {
                 frame.setLayout(new java.awt.BorderLayout());
                 frame.add(chart, java.awt.BorderLayout.CENTER);
                 frame.setSize(900, 700);
+                // One switch, handed to both routes, exactly as the
+                // application hands the View menu and the palette the
+                // ecliptic's own session switch.
+                eclipticToggle = juranometria.ui.ecliptic.EclipticSession
+                        .toggle(ecliptic, eclipticStore());
+                frame.setJMenuBar(AppMenuBar.create(null, null, () -> { },
+                        () -> { }, () -> { }, () -> { }, eclipticToggle));
                 ChartKeyboardSession.install(frame.getRootPane(), options,
-                        ecliptic,
-                        juranometria.ui.ecliptic.EclipticSession.toggle(
-                                ecliptic, eclipticStore()),
-                        observer, frame);
+                        ecliptic, eclipticToggle, observer);
                 frame.setVisible(true);
                 chart.setViewState(ChartViewState.DEFAULT);
             });
             flush();
         }
+
+        /** What one gesture cost, and nothing else's. */
+        Cost measure(RecordingRepaints repaints, Gesture gesture)
+                throws Exception {
+            ChartScene scene = onEdt(chart::currentScene);
+            PageContents inventory = onEdt(modules::inventory);
+            repaints.clear();
+            gesture.make();
+            int chartRepaints = (int) repaints.asked.stream()
+                    .filter(asked -> asked == chart).count();
+            int aboveTheChart = (int) repaints.asked.stream()
+                    .filter(asked -> asked != chart)
+                    .filter(asked -> SwingUtilities.isDescendingFrom(
+                            chart, asked))
+                    .count();
+            int windowRepaints = repaints.windows.size();
+            return new Cost(chartRepaints, aboveTheChart,
+                    windowRepaints,
+                    scene != onEdt(chart::currentScene),
+                    inventory != onEdt(modules::inventory));
+        }
+
+        /** Puts a module's line away again, without measuring it. */
+        void hide(char letter) throws Exception {
+            SwingUtilities.invokeAndWait(() -> {
+                switch (letter) {
+                    case 'I' -> ecliptic.showing(false);
+                    case 'R' -> observer.showing(false,
+                            observer.horizonShowing(),
+                            observer.zenithShowing());
+                    default -> observer.showing(
+                            observer.meridianShowing(), false,
+                            observer.zenithShowing());
+                }
+            });
+            flush();
+        }
+
+        /**
+         * The reader's own control for this module: the View menu's
+         * Ecliptic item, or the Place and Time checkbox.
+         */
+        void readersControl(char letter) throws Exception {
+            if (letter == 'I') {
+                javax.swing.JCheckBoxMenuItem item =
+                        AppMenuBar.eclipticItem(frame.getJMenuBar());
+                assertNotNull(item, "the View menu carries it");
+                // A menu item's action is its whole surface, which is
+                // the convention docs/decisions/test-evidence.md
+                // records and the scanner counts.
+                SwingUtilities.invokeAndWait(() -> item.doClick());
+                flush();
+                return;
+            }
+            javax.swing.JCheckBox box = onEdt(() -> checkBox(
+                    placeAndTime, letter == 'R'
+                            ? "Meridian" : "Mathematical horizon"));
+            assertNotNull(box, "Place and Time carries it");
+            ReaderInput.click(box, () -> new java.awt.Point(
+                    box.getWidth() / 2, box.getHeight() / 2), 0);
+            flush();
+        }
+
+        /**
+         * The reader's own Place and Time window, opened before the
+         * measurement starts - for the same reason the palette is.
+         */
+        void openPlaceAndTime(char letter) throws Exception {
+            SwingUtilities.invokeAndWait(() ->
+                    juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
+                            frame, observer, placeStore(),
+                            () -> observer.observer().instant()));
+            flush();
+            placeAndTime = onEdt(() -> {
+                for (java.awt.Window open : java.awt.Window.getWindows()) {
+                    if (open instanceof javax.swing.JDialog dialog
+                            && dialog.isVisible()
+                            && "Place and Time".equals(
+                                    dialog.getTitle())) {
+                        return dialog;
+                    }
+                }
+                return null;
+            });
+            assertNotNull(placeAndTime, "the reader's own dialog opens");
+            // And the caret out of the fields before anything is
+            // counted. A field commits when it is left, and
+            // committing a place asks the chart to redraw - a
+            // second gesture of the reader's, held in the matrix,
+            // and not part of what pressing a checkbox costs.
+            javax.swing.JCheckBox box = onEdt(() -> checkBox(
+                    placeAndTime, letter == 'R'
+                            ? "Meridian" : "Mathematical horizon"));
+            assertNotNull(box, "Place and Time carries it");
+            SwingUtilities.invokeAndWait(box::requestFocusInWindow);
+            flush();
+        }
+
+        void closePlaceAndTime() throws Exception {
+            javax.swing.JDialog open = placeAndTime;
+            SwingUtilities.invokeAndWait(open::dispose);
+            flush();
+            placeAndTime = null;
+        }
+
+        private javax.swing.JDialog placeAndTime;
 
         /** The page a reader navigated to. */
         void goTo(juranometria.chart.SkyPosition centre) throws Exception {
@@ -301,8 +541,16 @@ class ChartKeyboardWiringTest {
             flush();
         }
 
-        /** The prefix, then the letter, both as a reader presses them. */
-        void letter(char key) throws Exception {
+        /**
+         * The prefix, as a reader presses it.
+         *
+         * <p>Separate from the letter on purpose. Opening and closing
+         * the palette dirties the layered pane on its own, so a
+         * measurement that spanned all three could be answered by
+         * palette ink and a deleted module redraw would go unnoticed
+         * (review, #312). What is measured is the letter.
+         */
+        void openPalette() throws Exception {
             palette = null;
             SwingUtilities.invokeAndWait(chart::requestFocusInWindow);
             flush();
@@ -312,12 +560,20 @@ class ChartKeyboardWiringTest {
             palette = shownPalette();
             assertNotNull(palette, "the chart keyboard opens on "
                     + ChartKeys.prefixText());
+        }
+
+        /** One letter on the open palette, and nothing else. */
+        void dispatch(char key) throws Exception {
             ReaderInput.shortcutOn(palette,
                     Character.toUpperCase(key), 0);
             flush();
+        }
+
+        void closePalette() throws Exception {
             ChartKeyboard open = palette;
             SwingUtilities.invokeAndWait(open::close);
             flush();
+            palette = null;
         }
 
         /** The palette the application's own opener put on the window. */
@@ -415,6 +671,28 @@ class ChartKeyboardWiringTest {
                 node.removeNode();
             }
         }
+    }
+
+    /** One thing a reader does, whose cost is being measured. */
+    private interface Gesture {
+        void make() throws Exception;
+    }
+
+    private static javax.swing.JCheckBox checkBox(java.awt.Container root,
+                                                  String text) {
+        for (java.awt.Component child : root.getComponents()) {
+            if (child instanceof javax.swing.JCheckBox box
+                    && text.equals(box.getText())) {
+                return box;
+            }
+            if (child instanceof java.awt.Container inside) {
+                javax.swing.JCheckBox found = checkBox(inside, text);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     private static <T> T onEdt(Callable<T> ask) throws Exception {

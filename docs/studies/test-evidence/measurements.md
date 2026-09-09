@@ -93,7 +93,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/app/SwingSessionTest.java | none | none |
 | juranometria/ui/BlackSkyJourneyTest.java | point-reachable, control-showing | back-door-click |
 | juranometria/ui/ChartFurnitureJourneyTest.java | point-reachable, control-showing | pointer-events, back-door-click |
-| juranometria/ui/ChartKeyboardWiringTest.java | none | none |
+| juranometria/ui/ChartKeyboardWiringTest.java | point-reachable, control-showing | back-door-click |
 | juranometria/ui/ChartOptionsJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
 | juranometria/ui/CoordinateGridJourneyTest.java | focus-owner, point-reachable, control-showing | pointer-events, back-door-click |
 | juranometria/ui/DeepSkyFamilyJourneyTest.java | focus-owner, point-reachable, control-showing | pointer-events, back-door-click |
@@ -114,13 +114,13 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/ecliptic/EclipticMenuSurfaceTest.java | control-showing | none |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
-**33 display-dependent files.** 17 state a focused-window or focus-owner premise, 24 state a reachability premise, and 19 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**33 display-dependent files.** 17 state a focused-window or focus-owner premise, 25 state a reachability premise, and 20 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 
 - files dispatching real pointer events: 17
 - files dispatching real keyboard events: 2
-- files using doClick somewhere: 34
+- files using doClick somewhere: 35
 - files using postActionEvent somewhere: 3
 
 ## Platform assumptions written into tests
@@ -140,7 +140,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **373** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **638**
+- explicit event-thread hand-offs (invokeAndWait): **643**
 
 ## Generated evidence, classified
 
