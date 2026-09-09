@@ -159,18 +159,19 @@ public final class LabelGeometry {
     public static List<LabelPlacement.Request> deepSkyLabels(
             ChartRenderer renderer, FontMetrics metrics, ChartScene scene,
             ChartOptions options) {
-        if (!options.effectiveDeepSkyLabels()) {
-            return List.of();
-        }
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         Projection projection = Projections.forViewport(scene.viewport());
         List<LabelPlacement.Request> asked = new ArrayList<>();
-        // The objects the page labels, from the renderer's own rule.
-        // An earlier version asked for a label for every drawn symbol,
-        // which is not what the atlas draws: it asked for hundreds the
-        // page never names, most of them off its edge, and then
-        // reported them as omissions - a migration cost that was
-        // mostly this mistake.
+        // The objects the page labels, from the renderer's own rule
+        // and from nothing beside it. An earlier version asked for a
+        // label for every drawn symbol, which is not what the atlas
+        // draws: it asked for hundreds the page never names, most of
+        // them off its edge, and then reported them as omissions - a
+        // migration cost that was mostly this mistake. A second
+        // version answered the option itself and so lost the searched
+        // object's label, which the atlas keeps when the reader has
+        // switched deep-sky labels off. Both rules live in the list
+        // below; neither is worth a second copy here.
         for (DeepSkyObject dso : renderer.labelledDeepSky(scene, options)) {
             var plane = projection.project(dso.position());
             if (plane.isEmpty()) {
@@ -207,7 +208,10 @@ public final class LabelGeometry {
     public static List<LabelPlacement.Request> constellationNames(
             ChartRenderer renderer, FontMetrics metrics, ChartScene scene,
             ChartOptions options) {
-        if (!options.effectiveConstellationNames()) {
+        if (!options.effectiveConstellationNames()
+                || !new GeographyDetailPolicy(
+                        scene.viewport().fieldWidthDegrees())
+                        .namesDrawn()) {
             return List.of();
         }
         Map<String, ChartRenderer.FigureInk> ink =

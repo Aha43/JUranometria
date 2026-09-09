@@ -326,6 +326,103 @@ class LabelGeometryTest {
     }
 
     @Test
+    void everyLabelTheAtlasDrawsIsOneTheSeamIsAskedFor() {
+        // Twice now the geometry has asked for text on rules of its
+        // own instead of production's, and both times the study read
+        // the difference as the decision's cost. The two sets are the
+        // same question - what does this page name? - so the renderer
+        // publishing one and the geometry inventing the other is the
+        // defect, and this is where it fails.
+        for (ChartOptions options : List.of(ChartOptions.DEFAULTS,
+                withoutDeepSkyLabels(ChartOptions.DEFAULTS))) {
+            for (double field : new double[] {8.0, 36.0, 120.0}) {
+                ChartScene wide = page(83.0, 0.0, field, 900, 700);
+                ChartScene scene = new ChartScene(wide.viewport(),
+                        wide.stars(), wide.deepSkyObjects(), wide.title(),
+                        wide.limitingMagnitude(), searched(wide),
+                        wide.geography());
+                FontMetrics metrics = metrics();
+                java.util.Set<String> asked = new java.util.HashSet<>();
+                for (LabelPlacement.Request request
+                        : LabelGeometry.starLabels(RENDERER, metrics,
+                                scene, options)) {
+                    asked.add("star:" + request.id());
+                }
+                for (LabelPlacement.Request request
+                        : LabelGeometry.deepSkyLabels(RENDERER, metrics,
+                                scene, options)) {
+                    asked.add("deep sky:" + request.id());
+                }
+                for (LabelPlacement.Request request
+                        : LabelGeometry.constellationNames(RENDERER,
+                                metrics, scene, options)) {
+                    asked.add("name:" + request.id());
+                }
+
+                String where = field + "° with deep-sky labels "
+                        + (options.deepSkyLabels() ? "on" : "off") + ": ";
+                var mapping = new juranometria.project.ViewportMapping(
+                        scene.viewport());
+                var projection = juranometria.project.Projections
+                        .forViewport(scene.viewport());
+                var detail = new RegionalDetailPolicy(scene,
+                        mapping.pixelsPerPlaneUnit());
+                for (ChartRenderer.StarLabelPlacement placement
+                        : RENDERER.starLabelPlacements(metrics, scene,
+                                options, detail, projection, mapping)) {
+                    assertTrue(asked.contains("star:"
+                                    + placement.star().id()),
+                            where + "the page draws "
+                                    + placement.text()
+                                    + " and the seam is asked for it");
+                }
+                for (var dso : RENDERER.labelledDeepSky(scene, options)) {
+                    if (projection.project(dso.position()).isEmpty()) {
+                        continue;
+                    }
+                    assertTrue(asked.contains("deep sky:" + dso.id()),
+                            where + "the page draws "
+                                    + ChartRenderer.labelTextFor(dso)
+                                    + " and the seam is asked for it");
+                }
+                Map<String, ChartRenderer.FigureInk> ink =
+                        RENDERER.figureInk(scene, options);
+                for (Map.Entry<String, String> name
+                        : scene.geography().latinNames().entrySet()) {
+                    ChartRenderer.FigureInk figure = ink.get(name.getKey());
+                    if (figure == null || figure.nameAnchor() == null) {
+                        continue;
+                    }
+                    assertTrue(asked.contains("name:" + name.getKey()),
+                            where + "the page draws " + name.getValue()
+                                    + " and the seam is asked for it");
+                }
+            }
+        }
+    }
+
+    /** The first deep-sky object the page draws a symbol for. */
+    private static String searched(ChartScene scene) {
+        for (var dso : RENDERER.labelledDeepSky(scene,
+                ChartOptions.DEFAULTS)) {
+            return dso.id();
+        }
+        return null;
+    }
+
+    private static ChartOptions withoutDeepSkyLabels(ChartOptions from) {
+        return new ChartOptions(from.deepSkyObjects(), false,
+                from.constellationFigures(),
+                from.constellationBoundaries(),
+                from.constellationNames(), from.starNames(),
+                from.bayerLetters(), from.flamsteedNumbers(),
+                from.equatorialGrid(), from.titleBlock(),
+                from.magnitudeKey(), from.galaxies(), from.openClusters(),
+                from.globularClusters(), from.nebulae(),
+                from.planetaryNebulae(), from.palette());
+    }
+
+    @Test
     void thePagesFurnitureIsAmongTheThingsTextMustAvoid() {
         // The title block is opaque and drawn last, so a label under
         // it is a label nobody reads. It has to reach the seam as an

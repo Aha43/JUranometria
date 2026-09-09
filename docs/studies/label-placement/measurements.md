@@ -509,24 +509,35 @@ disagreement early on a crowded page is worth several late ones.
 ### What a reader would actually lose
 
 The cost of the clipping decision, counted as the thing it is: text the atlas
-draws today that the seam would not draw at all. Not the same as the clipping
-count above - a label whose usual place runs off the paper has seven other places
-to try - and not the same as the seam's omissions either, which include text
-this study's own pass never asked for.
+draws today that the seam would not draw at all. Not the clipping count above - a
+label whose usual place runs off the paper has seven other places to try - and not
+the seam's omission count either, which counts requests and not drawn text.
 
-| page | drawn today | not drawn by the seam | which are |
-|---|---:|---:|---|
-| `home` | 5 | 0 | — |
-| `orion-36` | 18 | 2 | 1 dso label, 1 const. name |
-| `orion-90` | 66 | 2 | 2 const. name |
-| `orion-120` | 101 | 3 | 1 dso label, 2 const. name |
-| `sagittarius-120` | 119 | 1 | 1 const. name |
-| `crux-90` | 80 | 2 | 2 const. name |
+So both sides are the decisions themselves. What the atlas draws is what the
+renderer publishes it drawing: the star pass's placements, which are fewer than
+the stars that qualify because that pass drops a label whose box is taken; the
+list of deep-sky objects the page labels; and the constellations whose figures
+left ink. What the seam draws is its placements that are not omitted. The two
+sets are compared by name - this star, that object, that constellation - and the
+table is the difference each way.
 
-Every one of those is at the paper's edge or outside its own figure's region:
-those are the two refusals a fallback may not spend, and the only two that can
-omit anything. #314 applies the rule and the released pages change by these
-counts.
+| page | drawn today | lost | which are | newly drawn |
+|---|---:|---:|---|---:|
+| `home` | 4 | 0 | — | 1 |
+| `orion-36` | 18 | 2 | 1 dso label, 1 const. name | 0 |
+| `orion-90` | 56 | 2 | 2 const. name | 10 |
+| `orion-120` | 87 | 3 | 1 dso label, 2 const. name | 14 |
+| `sagittarius-120` | 101 | 1 | 1 const. name | 18 |
+| `crux-90` | 75 | 2 | 2 const. name | 5 |
+
+Every loss is at the paper's edge or outside its own figure's region: those are
+the two refusals a fallback may not spend, and the only two that can omit
+anything.
+
+The last column is the same difference the other way, and it is the larger
+number. The atlas drops a star label whose usual box is taken; the seam moves it
+to one of seven other places and draws it. #314 changes the released pages by
+both columns, and by every label that merely moves.
 
 **And the seam omits where this pass does not.** The paper's edge is not a cost the
 fallback may spend, so a label whose every candidate leaves the page is not drawn

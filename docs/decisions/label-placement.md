@@ -278,10 +278,16 @@ off it.
 `#314` applies this when the families migrate. What a reader loses is
 **not** the clipping count above — a label whose usual place runs off
 the paper has seven other places to try — so the study counts the two
-apart: text the atlas draws today that the seam would not draw at all
-comes to **0 to 3 labels a page** across the candidate set, mostly
-constellation names whose own figure has nowhere else to put them.
-`#315`'s journey walks a page where it happens.
+apart, and counts what the atlas *draws* rather than what qualifies for
+a label: the star pass drops a name whose box is taken, so the stars
+that qualify are more than the stars that are named. Set against the
+renderer's own published placements, text the atlas draws today that
+the seam would not draw comes to **0 to 3 labels a page** across the
+candidate set, mostly constellation names whose own figure has nowhere
+else to put them. The difference runs the other way as well and runs
+larger — up to **18 labels a page** the atlas drops today and the seam
+finds room for — because a label refused its usual box moves here
+instead of vanishing. `#315`'s journey walks a page where it happens.
 
 This is the load-bearing choice of the whole decision. The three
 policies that omit instead reach zero of the owner's defects and lose
