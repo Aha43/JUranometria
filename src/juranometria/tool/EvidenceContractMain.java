@@ -493,8 +493,15 @@ public final class EvidenceContractMain {
         return out.toString();
     }
 
-    /** How many differing lines a breach prints before summarising. */
-    private static final int DIFFERENCES_SHOWN = 6;
+    /**
+     * How many differing lines a breach prints before summarising.
+     *
+     * <p>Generous on purpose. Six of forty differing lines is nearly
+     * as unhelpful as none: what a reader of this output has to do
+     * is decide whether the differences are one kind or two, and a
+     * sample cannot answer that.
+     */
+    private static final int DIFFERENCES_SHOWN = 40;
 
     /** A generation step that may fail. */
     interface Generation {
