@@ -112,7 +112,9 @@ component and watches it repaint without reassembling; all four under
 the shared guard; and #311 added the hover journey, which reads what a
 reader is shown by resting the pointer on a control in a shown window,
 because a tooltip read off a field answers for a control no pointer
-could reach.)
+could reach; and #315's closing journey, which shows the window a
+reader reads labels in, presses the families in the real options
+dialog, and exports both papers through the real export dialog.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -302,11 +304,13 @@ suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
 chart Home under it; for #300's sprint journey, which walks the
-projection seam; and for #307, which paints the chart component
-itself and reads its scene and page offset to do so; and for #312's
+projection seam; for #307, which paints the chart component
+itself and reads its scene and page offset to do so; for #312's
 chart keyboard, whose every question of the palette — is it open,
 what does its line say, how many listeners is the toolkit holding —
-is asked on the event thread and nowhere else). The discipline
+is asked on the event thread and nowhere else; and for #315's
+closing journey, which reads the page a reader is looking at on
+every rung it visits). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already
