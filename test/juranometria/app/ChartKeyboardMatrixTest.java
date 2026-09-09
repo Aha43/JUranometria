@@ -312,10 +312,14 @@ class ChartKeyboardMatrixTest {
             assertNotNull(palette, "the chart keyboard opens on "
                     + ChartKeys.prefixText());
             ChartKeyboard open = palette;
-            assertTrue(onEdt(() -> open.press(toggle.key())),
+            boolean was = ChartSwitches.of(options, new NoEcliptic(),
+                    new NoLines()).on(toggle.id());
+            letter(open, toggle.key());
+            assertEquals(!was, ChartSwitches.of(options, new NoEcliptic(),
+                            new NoLines()).on(toggle.id()),
                     toggle.label() + ": the letter " + toggle.key()
-                            + " reaches an available switch");
-            flush();
+                            + " reached its switch through the"
+                            + " palette's own binding");
             SwingUtilities.invokeAndWait(open::close);
             flush();
             return reloaded();
@@ -613,11 +617,8 @@ class ChartKeyboardMatrixTest {
             flush();
             assertNotNull(palette, "the chart keyboard opens on "
                     + ChartKeys.prefixText());
-            ChartKeyboard open = palette;
-            assertTrue(onEdt(() -> open.press(letter)),
-                    "the letter " + letter + " reaches its switch");
-            flush();
-            SwingUtilities.invokeAndWait(open::close);
+            letter(palette, letter);
+            SwingUtilities.invokeAndWait(palette::close);
             flush();
         }
 
@@ -843,6 +844,24 @@ class ChartKeyboardMatrixTest {
             }
         }
         return null;
+    }
+
+    /**
+     * A letter, pressed on the shown palette by a reader.
+     *
+     * <p>Not {@code press(char)}. The palette binds each letter in
+     * its own input map, and a route test that calls the method the
+     * binding calls proves the arithmetic and nothing about the
+     * keyboard: an absent binding, a letter bound to the wrong
+     * action, or a palette that never took the focus would all pass
+     * (review, #312). The shared helper insists this palette is the
+     * focus owner and then dispatches the key.
+     */
+    private static void letter(ChartKeyboard palette, char key)
+            throws Exception {
+        ReaderInput.shortcutOn(palette,
+                Character.toUpperCase(key), 0);
+        flush();
     }
 
     private static <T> T onEdt(Callable<T> ask) throws Exception {

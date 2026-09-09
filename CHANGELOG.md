@@ -59,7 +59,11 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   keystroke and its reader-facing spelling live in one registry, so
   no surface spells a key twice. Measured in
   `docs/studies/toggle-shortcuts/measurements.md`, decided in
-  `docs/decisions/chart-toggle-shortcuts.md`.
+  `docs/decisions/chart-toggle-shortcuts.md`. Held by pressing the
+  keys: every switch through both the reader's own control and the
+  palette letter, in both directions, and the letters pressed at the
+  application's own chart, which repaints without reassembling the
+  page to draw them.
 
 - **A deterministic label-placement seam** (issue #313). One boundary
   decides where a page's text may go and why a candidate was refused,

@@ -180,42 +180,11 @@ public final class JUranometriaMain {
         // every letter reaches the same transition the reader's own
         // control reaches. The switches are handed the controller and
         // the modules' own seams, never a second path to the store.
-        Runnable eclipticToggle =
+        ChartKeyboardSession.install(frame.getRootPane(), chartOptions,
+                ecliptic,
                 juranometria.ui.ecliptic.EclipticSession.toggle(
-                        ecliptic, eclipticStore);
-        ChartKeyboard.install(frame.getRootPane(),
-                ChartSwitches.of(chartOptions,
-                        new ChartSwitches.Ecliptic() {
-                            @Override
-                            public boolean showing() {
-                                return ecliptic.showing();
-                            }
-
-                            @Override
-                            public void toggle() {
-                                eclipticToggle.run();
-                                frame.repaint();
-                            }
-                        },
-                        new ChartSwitches.ObserverLines() {
-                            @Override
-                            public boolean meridianShowing() {
-                                return meridian.meridianShowing();
-                            }
-
-                            @Override
-                            public boolean horizonShowing() {
-                                return meridian.horizonShowing();
-                            }
-
-                            @Override
-                            public void showing(boolean showMeridian,
-                                                boolean showHorizon) {
-                                meridian.showing(showMeridian, showHorizon,
-                                        meridian.zenithShowing());
-                            }
-                        }),
-                keyboard -> keyboard.showIn(frame.getRootPane()));
+                        ecliptic, eclipticStore),
+                meridian, frame);
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

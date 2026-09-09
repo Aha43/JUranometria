@@ -313,6 +313,64 @@ class ChartKeyboardJourneyTest {
         });
     }
 
+    @Test
+    void theLetterRouteWouldNoticeAMissingOrASwappedBinding()
+            throws Exception {
+        // The instrument's own control. Every route test above
+        // presses letters through the palette's input map; this
+        // breaks that map in the two ways it can be broken and shows
+        // the press stops working - so the passes above are evidence
+        // about the binding and not about press(char) (review, #312).
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "the letters are pressed on a shown palette");
+        SwingSession.restoring(() -> {
+            UiTheme.apply(false);
+            Session session = new Session();
+            try {
+                session.open();
+
+                // Absent: the letter is bound to nothing.
+                ChartKeyboard keyboard = session.openKeyboard();
+                SwingUtilities.invokeAndWait(() -> keyboard.getInputMap(
+                        javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW)
+                        .remove(javax.swing.KeyStroke.getKeyStroke(
+                                (int) 'T', 0)));
+                boolean titleBlock =
+                        session.options().options().titleBlock();
+                press(keyboard, 'T');
+                assertEquals(titleBlock,
+                        session.options().options().titleBlock(),
+                        "with the binding gone the letter switches"
+                                + " nothing - which is how the route"
+                                + " tests would fail if bindLetters()"
+                                + " were removed");
+                SwingUtilities.invokeAndWait(keyboard::close);
+                flush();
+
+                // Swapped: the letter is bound to another switch.
+                ChartKeyboard swapped = session.openKeyboard();
+                SwingUtilities.invokeAndWait(() -> swapped.getInputMap(
+                        javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW)
+                        .put(javax.swing.KeyStroke.getKeyStroke(
+                                (int) 'T', 0), "chart.equatorialGrid"));
+                boolean grid = session.options().options().equatorialGrid();
+                titleBlock = session.options().options().titleBlock();
+                press(swapped, 'T');
+                assertEquals(!grid,
+                        session.options().options().equatorialGrid(),
+                        "a swapped binding switches the other thing");
+                assertEquals(titleBlock,
+                        session.options().options().titleBlock(),
+                        "and leaves the one whose letter was pressed"
+                                + " alone - so a registry whose letters"
+                                + " were crossed would fail the matrix"
+                                + " rather than pass it");
+            } finally {
+                session.close();
+            }
+        });
+    }
+
     // ---- the two routes, each walked on its own --------------------
 
     /**
@@ -531,9 +589,20 @@ class ChartKeyboardJourneyTest {
                         java.awt.AWTEvent.MOUSE_EVENT_MASK).length);
     }
 
+    /**
+     * A letter, pressed on the shown palette by a reader.
+     *
+     * <p>Through the palette's own input map, not through the method
+     * the map calls: a route that calls {@code press(char)} directly
+     * proves the arithmetic and nothing about the keyboard, and an
+     * absent or misbound letter would walk straight past it (review,
+     * #312). {@code ChartKeyboardTest} keeps the direct calls, where
+     * they are what is meant.
+     */
     private static void press(ChartKeyboard keyboard, char letter)
             throws Exception {
-        SwingUtilities.invokeAndWait(() -> keyboard.press(letter));
+        ReaderInput.shortcutOn(keyboard,
+                Character.toUpperCase(letter), 0);
         flush();
     }
 

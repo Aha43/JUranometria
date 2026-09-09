@@ -256,11 +256,43 @@ the checkbox compares an uncommitted preview with the keyboard's
 committed action — the two are different by design, said so in this
 document, and the comparison would have passed with a broken OK.
 
+**The letter, not the method the letter calls.** Every route case
+dispatches a bare key at the shown, focused palette and lets its own
+input map find the action. Calling `press(char)` proves the
+arithmetic and nothing about the keyboard: a missing `bindLetters()`,
+a letter bound to the wrong switch, or a palette that never took the
+focus would walk straight past it. The two ways that map can break
+are broken on purpose in a control — the binding removed, and the
+binding crossed — and the press stops working both times.
+
+**The chart, not the options.** A matrix against `ChartOptions`
+proves a switch reaches the same *value* by both routes; a reader
+wants the page to change. So one chart letter and all three module
+letters are pressed at the application's own wiring — the real chart
+component, the real module host, the modules through their own
+session seams, and the same installer `main` calls — with three
+instruments at once: a recording repaint manager for *nothing less
+than a paint*, the scene and inventory compared by identity for
+*nothing more*, and the component painted before and after so the
+claim is about the picture. The control moves all three on a real
+page change, so the silence is evidence rather than deafness.
+
+Two things that reads as surprising and are not: a chart option
+**does** rebuild the page inventory, because what is on this page
+reports what is *drawn* and a stale one would call a hidden object
+drawn; and each module letter is pressed on a page its own geometry
+crosses, because a line drawn ninety degrees away is still not drawn
+here.
+
 ## Contract for the implementation
 
 - One registry owns action, keystroke and reader-facing text; menu
   accelerators, the palette, tooltips and tests read it, and nothing
   keeps a second spelling.
+- The wiring between the palette and the modules is a named seam the
+  application installs, not lines inside `main`: an adapter that can
+  only be reached by starting the whole atlas is an adapter nothing
+  tests.
 - An executable conflict audit fails if any two actions claim one
   stroke in one scope, or if a binding shadows zoom, Inspector,
   export, a menu accelerator or a text-editing stroke.
