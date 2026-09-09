@@ -51,21 +51,22 @@ class ChartKeyboardLifecycleTest {
             JFrame[] window = new JFrame[1];
             JButton[] elsewhere = new JButton[1];
             SwingSession.guarded(() -> {
-                SwingUtilities.invokeAndWait(() -> {
-                    JFrame frame = new JFrame("chart keyboard lifecycle");
-                    elsewhere[0] = new JButton("somewhere else");
-                    frame.add(elsewhere[0]);
-                    frame.setSize(600, 400);
-                    window[0] = frame;
-                    frame.setVisible(true);
-                });
-                flush();
                 int before = mouseListeners();
-                int focusListeners = onEdt(() ->
-                        window[0].getWindowFocusListeners().length);
 
+                // A window per round, and the routes in this order.
+                // Looking away sets the focused window to none, and a
+                // desktop with a window manager hands the focus back
+                // when the reader returns while a bare X server does
+                // not - so the route that needs a focused window is
+                // taken before the route that takes the focus away,
+                // and the next round starts from a window freshly
+                // shown (CI, #312).
                 for (int round = 0; round < 3; round++) {
-                    leaveBy("Escape", window[0], elsewhere[0], keyboard ->
+                    show(window, elsewhere, round);
+                    int focusListeners = onEdt(() ->
+                            window[0].getWindowFocusListeners().length);
+
+                    leaveBy("Escape", window[0], keyboard ->
                             ReaderInput.shortcut(keyboard,
                                     KeyEvent.VK_ESCAPE, 0));
                     assertEquals(before, mouseListeners(),
@@ -75,7 +76,7 @@ class ChartKeyboardLifecycleTest {
                                     .getWindowFocusListeners().length),
                             "and the window too");
 
-                    leaveBy("a click elsewhere", window[0], elsewhere[0],
+                    leaveBy("a click elsewhere", window[0],
                             keyboard -> ReaderInput.click(elsewhere[0]));
                     assertEquals(before, mouseListeners(),
                             "a click elsewhere leaves nothing behind,"
@@ -84,16 +85,23 @@ class ChartKeyboardLifecycleTest {
                                     .getWindowFocusListeners().length),
                             "and nothing on the window");
 
-                    leaveBy("looking away", window[0], elsewhere[0],
+                    leaveBy("looking away", window[0],
                             ReaderInput::lookAway);
                     assertEquals(before, mouseListeners(),
                             "and so does looking away, round " + round);
                     assertEquals(focusListeners, onEdt(() -> window[0]
                                     .getWindowFocusListeners().length),
                             "with the window's own listeners back");
+
+                    SwingUtilities.invokeAndWait(window[0]::dispose);
+                    flush();
+                    assertEquals(before, mouseListeners(),
+                            "and the round ends where it began, round "
+                                    + round);
                 }
 
                 // The way out nobody plans for.
+                show(window, elsewhere, 3);
                 ChartKeyboard open = ChartKeyboard.of(
                         ChartKeysTest.switches(ChartOptions.DEFAULTS));
                 SwingUtilities.invokeAndWait(() ->
@@ -118,21 +126,24 @@ class ChartKeyboardLifecycleTest {
         });
     }
 
-    /** Opens the palette, leaves it the given way, and checks it went. */
-    private void leaveBy(String how, JFrame window, JButton inIt,
-                         Exit exit) throws Exception {
-        // The reader is at their window before they open anything.
-        // Said rather than assumed, because the previous route may
-        // have been the one that took the window's focus away, and a
-        // desktop with a window manager hands it back when the reader
-        // comes back while a bare X server does not - which is how
-        // this test's second round asked for a keystroke in a window
-        // nothing was focused in (CI, #312).
+    /** A window with something in it that is not the palette. */
+    private static void show(JFrame[] window, JButton[] elsewhere,
+                             int round) throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            window.toFront();
-            inIt.requestFocus();
+            JFrame frame = new JFrame(
+                    "chart keyboard lifecycle " + round);
+            elsewhere[0] = new JButton("somewhere else");
+            frame.add(elsewhere[0]);
+            frame.setSize(600, 400);
+            window[0] = frame;
+            frame.setVisible(true);
         });
         flush();
+    }
+
+    /** Opens the palette, leaves it the given way, and checks it went. */
+    private void leaveBy(String how, JFrame window, Exit exit)
+            throws Exception {
         ChartKeyboard keyboard = ChartKeyboard.of(
                 ChartKeysTest.switches(ChartOptions.DEFAULTS));
         SwingUtilities.invokeAndWait(() ->
