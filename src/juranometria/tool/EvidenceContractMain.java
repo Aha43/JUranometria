@@ -444,6 +444,58 @@ public final class EvidenceContractMain {
                 () -> run(committed, failures, verdicts));
     }
 
+    /**
+     * The first few lines that differ, for a breach to be acted on.
+     *
+     * <p>"Did not reproduce" names the file and nothing else, which
+     * is enough to know something is wrong and not enough to know
+     * what kind of wrong. A number that moved with a font is a
+     * different finding from a number that moved with the atlas, and
+     * telling them apart is the whole of the work (#315).
+     */
+    private static String differingLines(byte[] expected,
+                                         byte[] found) {
+        List<String> was = new java.io.BufferedReader(
+                new java.io.StringReader(new String(expected,
+                        java.nio.charset.StandardCharsets.UTF_8)))
+                .lines().toList();
+        List<String> now = new java.io.BufferedReader(
+                new java.io.StringReader(new String(found,
+                        java.nio.charset.StandardCharsets.UTF_8)))
+                .lines().toList();
+        StringBuilder out = new StringBuilder();
+        int shown = 0;
+        int differing = 0;
+        for (int line = 0; line < Math.max(was.size(), now.size());
+                line++) {
+            String before = line < was.size() ? was.get(line) : null;
+            String after = line < now.size() ? now.get(line) : null;
+            if (java.util.Objects.equals(before, after)) {
+                continue;
+            }
+            differing++;
+            if (shown++ < DIFFERENCES_SHOWN) {
+                out.append(System.lineSeparator())
+                        .append("    line ").append(line + 1)
+                        .append(System.lineSeparator())
+                        .append("      committed: ").append(before)
+                        .append(System.lineSeparator())
+                        .append("      here     : ").append(after);
+            }
+        }
+        if (differing > DIFFERENCES_SHOWN) {
+            out.append(System.lineSeparator())
+                    .append("    and ")
+                    .append(differing - DIFFERENCES_SHOWN)
+                    .append(" more differing lines of ")
+                    .append(Math.max(was.size(), now.size()));
+        }
+        return out.toString();
+    }
+
+    /** How many differing lines a breach prints before summarising. */
+    private static final int DIFFERENCES_SHOWN = 6;
+
     /** A generation step that may fail. */
     interface Generation {
         void run() throws Exception;
@@ -572,7 +624,9 @@ public final class EvidenceContractMain {
             } else if (!java.util.Arrays.equals(expected,
                     captured.toByteArray())) {
                 failures.add(report.getValue() + ": deterministic"
-                        + " report did not reproduce byte-for-byte");
+                        + " report did not reproduce byte-for-byte"
+                        + differingLines(expected,
+                                captured.toByteArray()));
             } else {
                 tally(verdicts, "reproduced");
             }
