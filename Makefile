@@ -344,8 +344,13 @@ black-sky-study: classes
 		> docs/studies/black-sky/measurements.md
 
 .PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study printable-chart-study
+# The heap is stated rather than inherited from whatever a machine's
+# ergonomics chose for it: the label study holds one ink set per label
+# per page, and the CI runner's default quarter-of-RAM is not the same
+# number as a developer's. Measured need after #315's fix is under
+# 2 GB; this is twice that.
 evidence-contracts: classes
-	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
+	$(JAVA) -Xmx4g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 
 test-evidence-study: classes
 	mkdir -p docs/studies/test-evidence

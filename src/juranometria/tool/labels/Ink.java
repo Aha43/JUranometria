@@ -119,9 +119,18 @@ public final class Ink {
         return new Ink(wide, high, fromX, fromY, kept);
     }
 
-    /** This ink inside the given box. */
+    /**
+     * This ink inside the given box.
+     *
+     * <p>The set is left to grow to whatever it needs rather than
+     * given the page's whole area up front. A label's ink is a few
+     * hundred pixels of a page's several hundred thousand, and the
+     * study holds one of these per label per page: asking for the
+     * page's area each time cost the evidence gate more heap than a
+     * CI runner has (#315).
+     */
     public Ink within(Rectangle2D box) {
-        BitSet kept = new BitSet(wide * high);
+        BitSet kept = new BitSet();
         for (int index = set.nextSetBit(0); index >= 0;
                 index = set.nextSetBit(index + 1)) {
             if (box.contains(fromX + index % wide, fromY + index / wide)) {
