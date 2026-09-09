@@ -193,27 +193,42 @@ comparing two implementations that were supposed to agree.
 
 ## Keyboard and tooltip coverage
 
-**Sprint 31 added no keyboard shortcut.** The issue's wording implied
-new ones; there are none, and the journey says so rather than
-implying otherwise.
+**This section was written before #312 and #311 landed, and said the
+sprint added no keyboard shortcut and that a tooltip and its
+accessible description should be identical. Both are now wrong, and
+what replaces them is below.** The correction is recorded rather than
+quietly overwritten, because a handover that silently changed its
+mind about a promise is a handover nobody can check.
 
-What a reader has, unchanged by this sprint:
+**Sprint 31 added one keyboard route**, in #312: a prefix that opens
+the chart's own keyboard, and then a letter for the switch.
 
 | route | key |
 |---|---|
+| the chart's own keyboard | ⌘K / Ctrl-K, then one letter (#312) |
 | Export Chart Sheet… | menu accelerator (⌘E / Ctrl-E) |
 | Inspector | menu accelerator (⌘I / Ctrl-I) |
 | Zoom in / out | menu accelerators (⌘= / ⌘− and their variants) |
 | Chart Options… | menu item, mnemonic C |
 | Place & Time… | menu item, mnemonic P |
-| Ecliptic | checkbox menu item, mnemonic E |
-| every label family | its own checkbox mnemonic in Chart Options — Constellation names is Alt-N, star names Alt-S, Bayer letters Alt-Y, Flamsteed numbers Alt-F, deep-sky labels Alt-L |
+| Ecliptic | checkbox menu item, mnemonic E, or the palette's `I` |
+| every label family | its own checkbox mnemonic in Chart Options — Constellation names is Alt-N, star names Alt-S, Bayer letters Alt-Y, Flamsteed numbers Alt-F, deep-sky labels Alt-L — and its own palette letter |
 
-Tooltip coverage: every family checkbox carries a tooltip and the
-same words as its accessible description — the journey asserts the
-two are identical, because a screen reader and a hovering pointer
-should not be told different things. The toolbar's controls carry
-tooltips naming what they do and where they lead.
+Every keystroke above comes from one registry, so no surface can
+promise a stroke the application does not answer
+(`docs/decisions/chart-toggle-shortcuts.md`,
+`docs/decisions/control-explanations.md`).
+
+**Tooltip coverage, as #311 left it.** A tooltip and an accessible
+description are now deliberately *not* identical, and the seam
+refuses it when they are. They have different jobs: a tooltip arrives
+beside a control the reader can see, and a description is heard by
+somebody who can see neither, so it must stand on its own and must
+not read the control's name back. The journey asserts the pair
+differ, that the tooltip names the palette sequence for the same
+switch, and that the description says which master a dependent switch
+waits for — the greying that tells a sighted reader is not a
+sentence.
 
 **Excluded deliberately:** the mnemonic *activation* path is not
 driven by the journey. A dispatched key cannot stand in for the
@@ -230,7 +245,10 @@ arrives through the native queue, so this is the harness meeting the
 platform rather than the atlas. The journey activates those controls
 directly instead — through the dialog's own checkbox and its own
 wiring, never the module behind it — which still fails if the dialog
-is unwired. Finding that out corrected the step: the observer's lines
+is unwired. Since #312 the same two lines are also switched from the
+chart's own keyboard, by a letter dispatched at the shown palette,
+which crosses a second route to the same module without going near
+its flags. Finding that out corrected the step: the observer's lines
 are on by the module's default, so the journey's first version proved
 nothing at all, and it now switches them off through the dialog and
 back on again.

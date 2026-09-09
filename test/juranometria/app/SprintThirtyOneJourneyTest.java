@@ -53,6 +53,7 @@ import juranometria.ui.ReferenceInk;
 import juranometria.ui.SearchField;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -123,7 +124,15 @@ class SprintThirtyOneJourneyTest {
                     ChartOptionsStore.forNode(node));
             SelectionModel selection = new SelectionModel();
             ChartModuleHost[] hostHolder = new ChartModuleHost[1];
+        Runnable[] eclipticToggle = new Runnable[1];
 
+            // The ecliptic's own session switch, handed to the View
+            // menu and to the chart keyboard alike - which is what
+            // the application does, and the only way this journey can
+            // press one route and check the other.
+            eclipticToggle[0] = juranometria.ui.ecliptic.EclipticSession
+                    .toggle(ecliptic, juranometria.ui.ecliptic
+                            .EclipticStore.forNode(node));
             SwingUtilities.invokeAndWait(() -> {
                 ChartComponent chart = new ChartComponent(Atlas.assembler());
                 navigation.onChange(chart::setViewState);
@@ -159,10 +168,7 @@ class SprintThirtyOneJourneyTest {
                                         juranometria.ui.placeandtime.PlaceStore
                                                 .forNode(node),
                                         java.time.Instant::now),
-                        () -> {
-                            ecliptic.showing(!ecliptic.showing());
-                            frame.repaint();
-                        },
+                        eclipticToggle[0],
                         () -> ExportSheetSession.open(frame, navigation,
                                 chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
@@ -171,6 +177,10 @@ class SprintThirtyOneJourneyTest {
                 // next can lose the window.
                 window[0] = frame;
                 chartHolder[0] = chart;
+                // The chart's own keyboard (#312), installed by the
+                // same call the application makes.
+                ChartKeyboardSession.install(frame.getRootPane(), options,
+                        ecliptic, eclipticToggle[0], meridian);
                 frame.pack();
                 frame.setVisible(true);
             });
@@ -280,14 +290,28 @@ class SprintThirtyOneJourneyTest {
             ReaderInput.chooseTab(onEdt(() -> tabs(dialog)),
                     "Constellations");
             JCheckBox names = onEdt(() -> box(dialog, "Constellation names"));
-            assertTrue(onEdt(names::getToolTipText) != null
-                            && !onEdt(names::getToolTipText).isBlank(),
-                    "and every family says what it is: "
-                            + onEdt(names::getToolTipText));
-            assertEquals(onEdt(names::getToolTipText),
-                    onEdt(() -> names.getAccessibleContext()
-                            .getAccessibleDescription()),
-                    "in the same words to a screen reader");
+            // What the control says, read the way a reader reads it -
+            // by resting the pointer on it - and what it says to
+            // somebody who cannot. Two sentences, not one repeated:
+            // #311 made that a rule and this is the surface it was
+            // most obviously broken on.
+            String hovered = ReaderInput.hover(names);
+            assertTrue(hovered != null && !hovered.isBlank(),
+                    "and every family says what it is: " + hovered);
+            assertTrue(hovered.contains(ChartKeys.toggle(
+                            "chart.constellationNames").sequence()),
+                    "4. naming the keys that reach the same switch"
+                            + " from the chart, from the registry that"
+                            + " binds them: " + hovered);
+            String heard = onEdt(() -> names.getAccessibleContext()
+                    .getAccessibleDescription());
+            assertNotEquals(hovered, heard,
+                    "in its own words to a screen reader rather than"
+                            + " the tooltip read back");
+            assertTrue(heard.contains("constellation figures"),
+                    "4. and telling a reader who cannot see the"
+                            + " greying which master this one waits"
+                            + " for: " + heard);
             JMenuItem exportItem = onEdt(() ->
                     AppMenuBar.exportItem(window[0].getJMenuBar()));
             assertTrue(onEdt(() -> exportItem.getAccelerator()) != null,
@@ -297,13 +321,12 @@ class SprintThirtyOneJourneyTest {
                     "as the toolbar's own controls say what they do: "
                             + onEdt(out::getToolTipText));
 
-            // The keyboard route these controls have is the mnemonic
-            // they were built with. Sprint 31 added no shortcut of its
-            // own - the handover says so plainly rather than leaving
-            // the issue's wording to imply one - and a dispatched key
-            // cannot stand in for the platform's mnemonic handling,
-            // so what is asserted here is that the control carries the
-            // route, and it is driven the other way.
+            // Two keyboard routes, and they are different things.
+            // The mnemonic is the one the control was built with, and
+            // a dispatched key cannot stand in for the platform's own
+            // mnemonic handling - so what is asserted for it is that
+            // the control carries the route, and the control is
+            // driven the other way.
             assertEquals(KeyEvent.VK_N, onEdt(names::getMnemonic),
                     "4. and it answers to a key of its own: Alt-N");
             press(names);
@@ -323,6 +346,42 @@ class SprintThirtyOneJourneyTest {
                     "onto the page, where they were");
             press(button(dialog, "OK"));
             flush();
+
+            // ---- 4b. the chart's own keyboard, which this sprint
+            // did add (#312). The other route is a sequence rather
+            // than a stroke, and it is pressed here as a reader
+            // presses it: the prefix on the chart, then the letter on
+            // the palette that opens.
+            assertTrue(onEdt(() -> options.options()
+                            .effectiveConstellationNames()),
+                    "4b. the names are on before the letter");
+            ChartKeyboard palette = openTheChartKeyboard(window[0], chart);
+            assertTrue(onEdt(palette::lines).stream().anyMatch(line ->
+                            line.equals("N   Constellation names — on")),
+                    "4b. and the palette says so, with the letter that"
+                            + " switches it: " + onEdt(palette::lines));
+            ReaderInput.shortcutOn(palette, KeyEvent.VK_N, 0);
+            flush();
+            assertFalse(onEdt(() -> options.options()
+                            .effectiveConstellationNames()),
+                    "4b. the letter reaches the same switch the"
+                            + " checkbox reached");
+            assertTrue(namesDrawn(chart, options).isEmpty(),
+                    "and the page stops naming constellations for it");
+            assertEquals("Constellation names off — saved.",
+                    onEdt(palette::announcement),
+                    "4b. saying what it did and how long it lasts");
+            ReaderInput.shortcutOn(palette, KeyEvent.VK_N, 0);
+            flush();
+            assertTrue(onEdt(() -> options.options()
+                            .effectiveConstellationNames()),
+                    "4b. and back again");
+            assertFalse(namesDrawn(chart, options).isEmpty(),
+                    "onto the page, where they were");
+            SwingUtilities.invokeAndWait(palette::close);
+            flush();
+            nothingIsCutShort("4b. after the keyboard route",
+                    chart, options);
 
             // And the keyboard the atlas does give a reader: the
             // window's own zoom accelerators, which move the page
@@ -353,6 +412,37 @@ class SprintThirtyOneJourneyTest {
             // setting the module's flags from here would pass this
             // journey with the dialog unwired, which is the one thing
             // a closing journey exists to catch.
+            // The observer's two lines, through the chart's own
+            // keyboard, before the window that owns them is opened -
+            // a reader reaching for a letter has not opened anything.
+            // Not the module behind them: a letter that set the flag
+            // directly would pass this journey with the palette
+            // unwired, which is the one thing a closing journey
+            // exists to catch.
+            ChartKeyboard lines = openTheChartKeyboard(window[0], chart);
+            ReaderInput.shortcutOn(lines, KeyEvent.VK_R, 0);
+            flush();
+            assertFalse(meridian.meridianShowing(),
+                    "5. the letter takes the meridian off the chart");
+            assertEquals("Your meridian off — for this session.",
+                    onEdt(lines::announcement),
+                    "5. saying the promise Place and Time makes and"
+                            + " the keyboard may not enlarge");
+            ReaderInput.shortcutOn(lines, KeyEvent.VK_H, 0);
+            flush();
+            assertFalse(meridian.horizonShowing(),
+                    "5. and the horizon with its own letter");
+            assertEquals(null, ChartKeys.forKey('Z'),
+                    "5. while no letter reaches the zenith at all");
+            ReaderInput.shortcutOn(lines, KeyEvent.VK_R, 0);
+            ReaderInput.shortcutOn(lines, KeyEvent.VK_H, 0);
+            flush();
+            assertTrue(meridian.meridianShowing()
+                            && meridian.horizonShowing(),
+                    "5. and both come back the same way");
+            SwingUtilities.invokeAndWait(lines::close);
+            flush();
+
             choose(window[0], "Place and Time...");
             JDialog place = dialogTitled("Place and Time");
             assertTrue(place != null,
@@ -373,7 +463,31 @@ class SprintThirtyOneJourneyTest {
             assertTrue(meridian.meridianShowing() && meridian.horizonShowing(),
                     "and put them back, which is the wiring a journey"
                             + " is here to prove");
-
+            // And what those controls now say. The keys are quoted
+            // for the two lines that have them; the zenith is drawn
+            // with them rather than switched on its own, so it has
+            // none and its tooltip does not invent one (#311/#312).
+            JCheckBox meridianBox = onEdt(() ->
+                    named(place, "showMeridian"));
+            String meridianSaid = ReaderInput.hover(meridianBox);
+            assertTrue(meridianSaid.contains(ChartKeys.toggle(
+                            "module.meridian").sequence()),
+                    "5. the meridian's control names the keys that"
+                            + " reach it: " + meridianSaid);
+            String meridianHeard = onEdt(() -> meridianBox
+                    .getAccessibleContext().getAccessibleDescription());
+            assertNotEquals(meridianSaid, meridianHeard,
+                    "in its own words to a screen reader");
+            assertTrue(meridianHeard.contains("this session"),
+                    "5. and says how long it lasts, which is the one"
+                            + " thing a reader cannot see: "
+                            + meridianHeard);
+            JCheckBox zenithBox = onEdt(() ->
+                    named(place, "showZenith"));
+            String zenithSaid = ReaderInput.hover(zenithBox);
+            assertFalse(zenithSaid.contains(ChartKeys.prefixText()),
+                    "5. and the zenith promises no key of its own,"
+                            + " because it has none: " + zenithSaid);
             List<ReferenceInk.NamePlacement> referenceNames =
                     ReferenceInk.namePlacements(onEdt(chart::currentScene),
                             onEdt(() -> chart.overlays().collect()));
@@ -950,6 +1064,35 @@ class SprintThirtyOneJourneyTest {
         @SuppressWarnings("unchecked")
         T typed = (T) answer[0];
         return typed;
+    }
+
+    /**
+     * The chart keyboard, opened the way a reader opens it.
+     *
+     * <p>The prefix on the chart, and then whatever the application's
+     * own installer put on the window - found there rather than
+     * built here, because a palette this journey constructed would
+     * prove nothing about the one the prefix opens.
+     */
+    private static ChartKeyboard openTheChartKeyboard(JFrame window,
+            ChartComponent chart) throws Exception {
+        SwingUtilities.invokeAndWait(chart::requestFocusInWindow);
+        flush();
+        ReaderInput.shortcut(chart, KeyEvent.VK_K,
+                AppMenuBar.menuShortcutMask());
+        flush();
+        ChartKeyboard found = onEdt(() -> {
+            for (java.awt.Component child : window.getRootPane()
+                    .getLayeredPane().getComponents()) {
+                if (child instanceof ChartKeyboard palette) {
+                    return palette;
+                }
+            }
+            return null;
+        });
+        assertTrue(found != null, "the chart keyboard opens on "
+                + ChartKeys.prefixText());
+        return found;
     }
 
     private static void flush() throws Exception {
