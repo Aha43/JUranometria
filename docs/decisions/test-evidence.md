@@ -114,7 +114,10 @@ reader is shown by resting the pointer on a control in a shown window,
 because a tooltip read off a field answers for a control no pointer
 could reach; and #315's closing journey, which shows the window a
 reader reads labels in, presses the families in the real options
-dialog, and exports both papers through the real export dialog.)
+dialog, and exports both papers through the real export dialog —
+under the application's own look and feel, taken through the shared
+guard, because a journey driving a platform appearance the atlas
+never shows is driving somebody else's controls.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call

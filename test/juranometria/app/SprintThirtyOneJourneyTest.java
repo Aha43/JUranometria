@@ -107,8 +107,16 @@ class SprintThirtyOneJourneyTest {
                 java.time.Instant.parse("2026-03-20T21:33:00Z")));
         EclipticModule ecliptic = new EclipticModule();
 
-        SwingSession.scratchPreferences("sprint-31-journey", node ->
+        // Under the application's own look and feel, restored
+        // afterwards: a journey that drives a platform appearance the
+        // atlas never shows is driving somebody else's controls, and
+        // this one found out the hard way - a checkbox that answers
+        // neither pointer nor keyboard under Aqua answers both under
+        // the theme the reader actually has.
+        SwingSession.restoring(() ->
+                SwingSession.scratchPreferences("sprint-31-journey", node ->
                 SwingSession.guarded(() -> {
+            UiTheme.apply(false);
             ChartViewController navigation =
                     new ChartViewController(Atlas.assembler()::fits);
             ChartOptionsController options = new ChartOptionsController(
@@ -189,7 +197,7 @@ class SprintThirtyOneJourneyTest {
             JButton out = onEdt(() -> control(toolbar, "Zoom out"));
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     < 120.0) {
-                ReaderInput.click(out);
+                press(out);
             }
             assertEquals(120.0,
                     onEdt(() -> navigation.state().fieldWidthDegrees()),
@@ -216,7 +224,7 @@ class SprintThirtyOneJourneyTest {
             ReaderInput.typeAndEnter(searchHolder[0], "kaus australis");
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     < 120.0) {
-                ReaderInput.click(out);
+                press(out);
             }
             ChartScene wide = onEdt(chart::currentScene);
             chosen = onEdt(options::options);
@@ -239,7 +247,7 @@ class SprintThirtyOneJourneyTest {
             ReaderInput.typeAndEnter(searchHolder[0], "nunki");
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     < 120.0) {
-                ReaderInput.click(out);
+                press(out);
             }
             assertTrue(onEdt(() -> String.join(" | ",
                             inspectorHolder[0].lines())).contains("Nunki"),
@@ -248,7 +256,7 @@ class SprintThirtyOneJourneyTest {
             JButton in = onEdt(() -> control(toolbar, "Zoom in"));
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     > 8.0) {
-                ReaderInput.click(in);
+                press(in);
             }
             ChartScene close = onEdt(chart::currentScene);
             assertEquals(NUNKI, close.targetIdentity(),
@@ -258,13 +266,11 @@ class SprintThirtyOneJourneyTest {
             nothingIsCutShort("3. the detail page", chart, options);
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     < 120.0) {
-                ReaderInput.click(out);
+                press(out);
             }
 
             // ---- 4. the families, through the reader's own controls
-            SwingUtilities.invokeAndWait(() ->
-                    window[0].getJMenuBar().getMenu(1).getItem(0).doClick());
-            flush();
+            choose(window[0], "Chart Options...");
             JDialog dialog = dialogTitled("Chart Options");
             assertTrue(dialog != null, "4. the View menu opens the"
                     + " chart's own options");
@@ -300,7 +306,7 @@ class SprintThirtyOneJourneyTest {
             // route, and it is driven the other way.
             assertEquals(KeyEvent.VK_N, onEdt(names::getMnemonic),
                     "4. and it answers to a key of its own: Alt-N");
-            ReaderInput.click(names);
+            press(names);
             assertFalse(onEdt(() -> options.options()
                             .effectiveConstellationNames()),
                     "4. turning constellation names off is one press");
@@ -309,14 +315,13 @@ class SprintThirtyOneJourneyTest {
             // Found again rather than remembered: the dialog lays
             // itself out afresh as the preview changes, and a control
             // held from before may no longer be the one on screen.
-            ReaderInput.click(onEdt(() -> box(dialog,
-                    "Constellation names")));
+            press(onEdt(() -> box(dialog, "Constellation names")));
             assertTrue(onEdt(() -> options.options()
                             .effectiveConstellationNames()),
                     "and one more brings them back");
             assertFalse(namesDrawn(chart, options).isEmpty(),
                     "onto the page, where they were");
-            ReaderInput.click(button(dialog, "OK"));
+            press(button(dialog, "OK"));
             flush();
 
             // And the keyboard the atlas does give a reader: the
@@ -341,16 +346,34 @@ class SprintThirtyOneJourneyTest {
             List<LabelPlacement.Placement> before =
                     placement(onEdt(chart::currentScene),
                             onEdt(options::options));
-            SwingUtilities.invokeAndWait(() ->
-                    window[0].getJMenuBar().getMenu(1).getItem(3).doClick());
-            flush();
+            choose(window[0], "Ecliptic");
             assertTrue(onEdt(() -> ecliptic.showing()),
                     "5. the reader switches the ecliptic on");
-            SwingUtilities.invokeAndWait(() ->
-                    meridian.showing(true, true, false));
-            flush();
-            assertTrue(meridian.meridianShowing(),
-                    "and their own meridian and horizon");
+            // And their own sky, through the surface that owns it:
+            // setting the module's flags from here would pass this
+            // journey with the dialog unwired, which is the one thing
+            // a closing journey exists to catch.
+            choose(window[0], "Place and Time...");
+            JDialog place = dialogTitled("Place and Time");
+            assertTrue(place != null,
+                    "5. Place and Time opens where a reader asks for it");
+            // The observer's lines are on by the module's own default,
+            // so the control is exercised in the direction that proves
+            // it: off, and back on again, through the dialog's own
+            // checkboxes rather than the module behind them.
+            assertTrue(meridian.meridianShowing() && meridian.horizonShowing(),
+                    "5. the reader's meridian and horizon are drawn");
+            toggle(place, "showMeridian");
+            toggle(place, "showMathematicalhorizon");
+            assertFalse(meridian.meridianShowing()
+                            || meridian.horizonShowing(),
+                    "and its own controls take them off the chart");
+            toggle(place, "showMeridian");
+            toggle(place, "showMathematicalhorizon");
+            assertTrue(meridian.meridianShowing() && meridian.horizonShowing(),
+                    "and put them back, which is the wiring a journey"
+                            + " is here to prove");
+
             List<ReferenceInk.NamePlacement> referenceNames =
                     ReferenceInk.namePlacements(onEdt(chart::currentScene),
                             onEdt(() -> chart.overlays().collect()));
@@ -381,7 +404,7 @@ class SprintThirtyOneJourneyTest {
             ReaderInput.typeAndEnter(searchHolder[0], "nunki");
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     < 120.0) {
-                ReaderInput.click(out);
+                press(out);
             }
             for (PaperSize paper : PaperSize.values()) {
                 for (SheetFormat format : SheetFormat.values()) {
@@ -396,25 +419,24 @@ class SprintThirtyOneJourneyTest {
             }
 
             // ---- 8. Home, and an atlas nothing happened to ---------
-            ReaderInput.click(onEdt(() -> control(toolbar, "Reset view")));
+            press(onEdt(() -> control(toolbar, "Reset view")));
             flush();
             assertEquals(ChartViewState.DEFAULT,
                     onEdt(navigation::state),
                     "8. Reset view is Home, exactly as it was");
-            SwingUtilities.invokeAndWait(() ->
-                    meridian.showing(false, false, false));
-            SwingUtilities.invokeAndWait(() ->
-                    window[0].getJMenuBar().getMenu(1).getItem(3).doClick());
-            flush();
+            toggle(place, "showMeridian");
+            toggle(place, "showMathematicalhorizon");
+            choose(window[0], "Ecliptic");
+            assertFalse(meridian.meridianShowing()
+                            || meridian.horizonShowing(),
+                    "the observer's lines go away through the controls"
+                            + " that brought them");
             assertFalse(onEdt(() -> ecliptic.showing()),
-                    "the modules go away the way they came");
-            SwingUtilities.invokeAndWait(() ->
-                    window[0].getJMenuBar().getMenu(1).getItem(0).doClick());
-            flush();
+                    "and so does the ecliptic");
+            choose(window[0], "Chart Options...");
             JDialog again = dialogTitled("Chart Options");
-            ReaderInput.click(onEdt(() ->
-                    button(again, "Restore Defaults")));
-            ReaderInput.click(onEdt(() -> button(again, "OK")));
+            press(onEdt(() -> button(again, "Restore Defaults")));
+            press(onEdt(() -> button(again, "OK")));
             flush();
             assertEquals(ChartOptions.DEFAULTS, onEdt(options::options),
                     "and the chart the reader started with is the chart"
@@ -422,7 +444,7 @@ class SprintThirtyOneJourneyTest {
             assertTrue(java.util.Arrays.equals(pixels(atFirst),
                             pixels(paint(chart))),
                     "the released page is the page it was, to the pixel");
-        }, () -> putAway(window[0])));
+        }, () -> putAway(window[0]))));
     }
 
     // ---- what a reader is entitled to on every page -----------------
@@ -723,6 +745,85 @@ class SprintThirtyOneJourneyTest {
             Thread.sleep(25);
         }
         throw new AssertionError("no dialog titled " + title + " appeared");
+    }
+
+    /**
+     * A menu item by its own words, never by its position: a menu
+     * gains an item and an index opens something else, which is how
+     * earlier journeys pressed the wrong thing.
+     */
+    /**
+     * A press on a control, with the button a platform's own look and
+     * feel expects. The bare helper sends no button mask, and Aqua's
+     * button listener asks for one - so a checkbox in a shown dialog
+     * quietly stayed unpressed until this journey pressed it this
+     * way, which is the failure a closing journey is for.
+     */
+    private static void press(JComponent control) throws Exception {
+        ReaderInput.click(control,
+                () -> new java.awt.Point(control.getWidth() / 2,
+                        control.getHeight() / 2), 0);
+    }
+
+    /**
+     * One of the Place and Time dialog's own controls, activated.
+     *
+     * <p>Through the control and its wiring, never the module behind
+     * it: setting the module's flags from a journey would pass with
+     * the dialog unwired, which is the failure a closing journey
+     * exists to catch.
+     *
+     * <p>Activated rather than pressed with a synthetic pointer or a
+     * synthetic space, both of which were tried and neither of which
+     * reaches this dialog's controls on this desktop - the checkbox
+     * holds the focus, the events arrive, and its model does not
+     * move. That is the harness meeting the platform, not the atlas:
+     * a reader's own press arrives through the native queue. So this
+     * is the recorded control-mechanism convention, the same one the
+     * repository already uses for menu items, and what it proves is
+     * the half that matters here - that the control is there, that it
+     * is wired to the module, and that the chart follows.
+     */
+    private void toggle(JDialog dialog, String name) throws Exception {
+        JCheckBox control = onEdt(() -> named(dialog, name));
+        assertTrue(control != null, "5. the dialog carries " + name);
+        assertTrue(onEdt(control::isShowing),
+                "5. and " + name + " is on screen for a reader to press");
+        SwingUtilities.invokeAndWait(control::doClick);
+        flush();
+    }
+
+    /**
+     * A menu item pressed by its own words, and the menu let go of
+     * afterwards.
+     *
+     * <p>The second half is not tidiness. Swing's menu-selection
+     * manager keeps an input grab while a selection path is live, and
+     * a grab left behind swallows every press and key that follows -
+     * which is exactly what happened here: a dialog opened from the
+     * menu answered neither pointer nor keyboard until the menu was
+     * let go of.
+     */
+    private void choose(JFrame frame, String text) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            menuItem(frame, text).doClick();
+            javax.swing.MenuSelectionManager.defaultManager()
+                    .clearSelectedPath();
+        });
+        flush();
+    }
+
+    private static JMenuItem menuItem(JFrame frame, String text) {
+        javax.swing.JMenuBar bar = frame.getJMenuBar();
+        for (int menu = 0; menu < bar.getMenuCount(); menu++) {
+            for (int at = 0; at < bar.getMenu(menu).getItemCount(); at++) {
+                JMenuItem item = bar.getMenu(menu).getItem(at);
+                if (item != null && text.equals(item.getText())) {
+                    return item;
+                }
+            }
+        }
+        throw new AssertionError("the window's menus carry " + text);
     }
 
     private static JDialog dialogTitled(String title) {

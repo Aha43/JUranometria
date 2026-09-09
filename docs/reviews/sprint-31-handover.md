@@ -219,8 +219,21 @@ tooltips naming what they do and where they lead.
 driven by the journey. A dispatched key cannot stand in for the
 platform's own mnemonic handling, so what is asserted is that the
 control carries the route (`getMnemonic`), and the control is driven
-by pointer. The accelerators that a dispatched key genuinely does
-reach — the zoom pair — are pressed for real.
+another way. The accelerators a dispatched key genuinely does reach —
+the zoom pair — are pressed for real.
+
+**And a harness limit worth recording.** The Place and Time dialog's
+checkboxes answer neither a synthetic pointer nor a synthetic space
+on the desktop this was written on: the control holds the focus, the
+events arrive, and its model does not move. A reader's own press
+arrives through the native queue, so this is the harness meeting the
+platform rather than the atlas. The journey activates those controls
+directly instead — through the dialog's own checkbox and its own
+wiring, never the module behind it — which still fails if the dialog
+is unwired. Finding that out corrected the step: the observer's lines
+are on by the module's default, so the journey's first version proved
+nothing at all, and it now switches them off through the dialog and
+back on again.
 
 ## Screen, sheet and export evidence
 
@@ -273,12 +286,12 @@ reading what it printed - so that report had been unverifiable since
 the sprint that promoted it, and said so every run. It prints the
 report now, like every other study main.
 
-**Two things this leaves for a reader to know.** A study image is
-evidence of what the atlas drew *when it was promoted*; regenerating
-100-odd of them at once is honest only because the contract demands
-it and because what moved is stated here. And the contract is worth
-running in CI: a gate nobody runs is a gate that reports its findings
-to nobody.
+**It runs in CI now** — its own job on a virtual display, added by
+#315, because a gate nobody runs reports its findings to nobody. A
+study image is evidence of what the atlas drew *when it was
+promoted*, and regenerating a hundred of them at once is honest only
+because the contract demanded it and because what moved is stated
+here.
 
 ## Generated artifacts and provenance
 
