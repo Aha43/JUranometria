@@ -946,17 +946,8 @@ class MapExplorationJourneyTest {
         List<String> labelled;
         try {
             labelled = RENDERER.starLabelPlacements(
-                            g.getFontMetrics(ChartRenderer.labelFont()),
-                            scene, ChartOptions.DEFAULTS,
-                            new juranometria.render.RegionalDetailPolicy(
-                                    scene,
-                                    new juranometria.project.ViewportMapping(
-                                            scene.viewport())
-                                            .pixelsPerPlaneUnit()),
-                            new juranometria.project.GnomonicProjection(
-                                    scene.viewport().centre()),
-                            new juranometria.project.ViewportMapping(
-                                    scene.viewport()))
+                    ChartRenderer.TextMetrics.offscreen(),
+                    scene, ChartOptions.DEFAULTS)
                     .stream()
                     .map(placement -> placement.star().id()).toList();
         } finally {

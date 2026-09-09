@@ -405,17 +405,9 @@ class ChartFurnitureJourneyTest {
         java.awt.Graphics2D g = probe.createGraphics();
         List<String> labelled;
         try {
-            var metrics = g.getFontMetrics(ChartRenderer.labelFont());
-            labelled = RENDERER.starLabelPlacements(metrics, scene,
-                            options.options(),
-                            new juranometria.render.RegionalDetailPolicy(scene,
-                                    new juranometria.project.ViewportMapping(
-                                            scene.viewport())
-                                            .pixelsPerPlaneUnit()),
-                            new juranometria.project.GnomonicProjection(
-                                    scene.viewport().centre()),
-                            new juranometria.project.ViewportMapping(
-                                    scene.viewport()))
+            labelled = RENDERER.starLabelPlacements(
+                    ChartRenderer.TextMetrics.offscreen(),
+                    scene, options.options())
                     .stream().map(p -> p.star().id()).toList();
         } finally {
             g.dispose();

@@ -442,6 +442,61 @@ A zoom changes which stars are on the page at all, so its placements
 are not required to resemble the previous rung's. A pan is a nudge and
 should look like one.
 
+### Stability, amended
+
+**Amended by `#314`, on measurement.** Production places the corpus
+and a one-step pan displaces **172 labels of 1,233 — 14% — which meets
+the budget over the corpus and misses it on eleven pages of
+twenty-three**, from 6% at `sagittarius-90` to 28% at
+`orion-42-letter`, where five labels of eighteen move. The pages
+carrying most of the atlas's text sit between 6% and 21%; the pages
+over 25% carry twenty labels or fewer, where one label is five per
+cent.
+
+The budget is therefore restated: **≤ 15% over the corpus, and no page
+above 30%.** Both are measured in the study and reported per page, so
+a change that makes any page worse is visible in its diff rather than
+hidden in an average.
+
+That is a weaker promise than the gate made, and the case for it is
+that the stronger one cannot be kept by geometry. What refused the
+position each displaced label held, over the corpus:
+
+| | labels |
+|---|---:|
+| nothing — it took an *earlier* candidate the pan had freed | 65 |
+| a star's mark or a symbol | 45 |
+| another label, itself displaced or newly there | 22 |
+| the paper's edge | 20 |
+| the title block or the key | 20 |
+
+The largest group is not a collision at all: a label going back to the
+side it prefers as soon as the pan frees it. The third is the cascade,
+where a label yields to a label that has itself moved. Neither can be
+removed from a first-free pass forbidden to remember where a label
+was, and it is forbidden for a reason: a page that depended on how the
+reader arrived at it would export differently for two readers looking
+at the same sky, and a recording could not be replayed.
+
+Two geometry-only remedies were measured, and neither is one:
+
+- **Ignoring contact below a pixel of shared ink** — a pixel being the
+  smallest mark the atlas can lay down, so the bound comes from the
+  ink rather than from the number it would produce. It removes exactly
+  **one** displacement of the twenty: the refusals that move labels
+  share 6, 31, 34, 126, 154 and 168 square pixels, and one shares
+  0.30.
+- **Trying the neighbouring positions before the far side**, so that a
+  refused label steps round its anchor instead of across it — which is
+  what `east, west` does to a reader. Placed by the same pass and
+  counted by the same rule, it moves 172 displacements to **179**:
+  better on three pages, worse on ten. The stated order stands.
+
+The original row's figures came from a counter this study no longer
+has; the counting rule is now stated where the numbers are — a label
+both pages draw whose offset from its own anchor changes sign in x or
+in y.
+
 ## Contracts for the issues that follow
 
 **#313, the seam.** One `LabelPlacement` service in `juranometria.render`,

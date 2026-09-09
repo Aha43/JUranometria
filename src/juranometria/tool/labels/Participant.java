@@ -11,6 +11,7 @@ import juranometria.chart.SceneGeography;
 import juranometria.chart.Star;
 import juranometria.geo.GeoSegment;
 import juranometria.render.ChartOptions;
+import juranometria.render.LabelPlacement;
 
 /**
  * One piece of ink the page draws, and how to take it away again
@@ -138,11 +139,23 @@ public record Participant(Family family, String id, String description,
             // reader's identity pack away from the star.
             return page.withoutPlaced(family, id);
         }
+        // Text is withheld from the page's held decision as well as
+        // from the scene: since #314 one decision places the whole
+        // page, so a name taken out of the scene would otherwise be
+        // drawn from the decision that still remembers it - and every
+        // other label would stay exactly where it was, which is the
+        // point (issue #314).
         return switch (family) {
-            case STAR_LABEL -> page.withScene(anonymous(page.scene(), id));
+            case STAR_LABEL -> page.withScene(anonymous(page.scene(), id))
+                    .withoutText(request -> request.id().equals(id)
+                            && request.family()
+                                    != LabelPlacement.Family.CONSTELLATION);
             case STAR_DISC -> page.withScene(withoutStar(page.scene(), id));
             case CONSTELLATION_NAME ->
-                    page.withScene(withoutName(page.scene(), id));
+                    page.withScene(withoutName(page.scene(), id))
+                            .withoutText(request -> request.family()
+                                    == LabelPlacement.Family.CONSTELLATION
+                                    && request.id().equals(id));
             case DEEP_SKY_SYMBOL ->
                     page.withScene(withoutDeepSky(page.scene(), id));
             case FIGURE_LINE ->
@@ -152,7 +165,9 @@ public record Participant(Family family, String id, String description,
             // these is localised afterwards by the box the renderer
             // publishes for it, so the ink is still one participant's.
             case DEEP_SKY_LABEL -> page.withOptions(
-                    Options.deepSkyLabels(page.options(), false));
+                    Options.deepSkyLabels(page.options(), false))
+                    .withoutText(request -> request.family()
+                            == LabelPlacement.Family.DEEP_SKY);
             case BOUNDARY_LINE -> page.withOptions(
                     Options.boundaries(page.options(), false));
             case GRID_INK -> page.withOptions(

@@ -132,8 +132,6 @@ public final class Census {
         var mapping = new ViewportMapping(page.scene().viewport());
         Projection projection =
                 Projections.forViewport(page.scene().viewport());
-        var detail = new RegionalDetailPolicy(page.scene(),
-                mapping.pixelsPerPlaneUnit());
 
         if (page.isCandidate()) {
             for (PlacedText placed : page.placed()) {
@@ -142,9 +140,9 @@ public final class Census {
             }
         } else {
             for (ChartRenderer.StarLabelPlacement placement
-                    : Page.renderer().starLabelPlacements(metrics,
-                            page.scene(), page.options(), detail,
-                            projection, mapping)) {
+                    : Page.renderer().starLabelPlacements(
+                            ChartRenderer.TextMetrics.offscreen(),
+                            page.scene(), page.options())) {
                 add(new Participant(Participant.Family.STAR_LABEL,
                         placement.star().id(), placement.text()));
             }

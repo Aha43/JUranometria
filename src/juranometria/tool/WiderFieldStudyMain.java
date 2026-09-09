@@ -131,6 +131,15 @@ public final class WiderFieldStudyMain {
                 + " the same table\nfrom whatever is checked out; a row"
                 + " that no longer matches is a\nreleased page that has"
                 + " changed.\n\n");
+        out.append("The pixel column was re-recorded once, at Sprint"
+                + " 31's issue #314, when\nthe label families moved to"
+                + " the shared placement decision: 46 of the 80"
+                + "\nrows draw their text somewhere else. The marks"
+                + " and ink columns did not\nmove at all, which is the"
+                + " useful half of the statement - nothing but text"
+                + "\nchanged on any released page - and"
+                + " `released-text.txt` beside this file lists\nwhich"
+                + " label moved where, one line each.\n\n");
         out.append("## The rows\n\n");
         out.append("field  ra           dec          ground "
                 + " marks             ink               pixels\n");

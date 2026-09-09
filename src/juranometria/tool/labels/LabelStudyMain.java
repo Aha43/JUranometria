@@ -20,6 +20,7 @@ import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
 import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
+import juranometria.render.LabelPlacement;
 import juranometria.tool.WiderFieldStudyMain;
 import juranometria.tool.labels.Participant.Family;
 
@@ -65,8 +66,10 @@ public final class LabelStudyMain {
         fixture(out);
         candidates(out, corpus, censuses);
         clipping(out, corpus);
+        migration(out, corpus);
         seamAgreement(out, corpus);
         stability(out);
+        cost(out);
         exportSection(out);
         pages(out, corpus, censuses);
 
@@ -97,11 +100,21 @@ public final class LabelStudyMain {
         out.append("# How labels share an atlas page\n\n");
         out.append("What this file is: the measurement behind issue"
                 + " #310, Sprint 31's cartography and\narchitecture"
-                + " gate. It inventories what the atlas does with text"
-                + " today, measures\nwhere that goes wrong, and compares"
-                + " the candidate policies for #313 to build\nagainst."
-                + " It changes no production behaviour and no released"
-                + " page.\n\n");
+                + " gate. It inventories what the atlas does with text,"
+                + " measures where\nthat goes wrong, and compares the"
+                + " candidate policies the gate chose"
+                + " between.\n\n");
+        out.append("**It has been measured twice.** The gate measured"
+                + " an atlas in which each family\nplaced its own"
+                + " labels and avoided what it happened to avoid. Issue"
+                + " #314 moved\nthe three families onto one decision,"
+                + " and this file now measures that atlas -\nwith the"
+                + " earlier numbers kept beside the new ones wherever"
+                + " they are the point,\nfrom two records taken before"
+                + " the change: `census-before.tsv` and"
+                + " `text-before.tsv`.\nWhat the migration did to the"
+                + " atlas, page by page and label by label, is its"
+                + " own\nsection below.\n\n");
         out.append("Recorded on: `" + WiderFieldStudyMain.platform()
                 + "`, and that matters here. Every\nnumber below is a"
                 + " count of pixels, so it is reproducible on a machine"
@@ -193,7 +206,14 @@ public final class LabelStudyMain {
 
     private static void inventory(StringBuilder out,
                                   Map<String, Census> censuses) {
-        out.append("## The existing truth, family by family\n\n");
+        out.append("## The truth this began from, family by"
+                + " family\n\n");
+        out.append("How the families worked before #314 - each with"
+                + " its own answer to every\nquestion, which is what"
+                + " the gate was called to settle. The `may move` and"
+                + "\n`omission` columns are the ones #314 changed:"
+                + " every family may now move, and\nomission is one"
+                + " rule for all of them.\n\n");
         out.append("| family | anchor | eligibility | may move |"
                 + " omission | clipping | draw order | option |\n");
         out.append("|---|---|---|---|---|---|---:|---|\n");
@@ -271,22 +291,35 @@ public final class LabelStudyMain {
             out.append('\n');
         }
         out.append("\nA dot is no collision anywhere in the corpus."
-                + " Star labels and deep-sky labels\nnever meet because"
-                + " the star-label pass yields to the deep-sky boxes"
-                + " before it\nplaces anything; star labels never meet"
-                + " each other for the same reason; and\nneither meets"
-                + " the title block or the key, which they both reserve."
-                + " Everything\nelse is a collision nobody is"
-                + " preventing.\n\n");
-        out.append("Two families cannot be separated by this study and"
-                + " should be separable by\n#313. The equatorial grid"
-                + " draws its lines and its edge notation under one"
-                + " reader\nswitch, and the reference layer its curves"
-                + " and their names under another, so\nneither can be"
-                + " withheld apart from the other and this document"
-                + " reports each as\none participant. The star-label"
-                + " pass has published its decisions since #154;"
-                + " the\nother text families have not.\n\n");
+                + " Since #314 one decision places\nall three families,"
+                + " so no two pieces of text share a box: they never"
+                + " meet each\nother, and they do not meet a mark or a"
+                + " symbol either unless nothing was free.\nWhat is"
+                + " left in the table is what the decision permits -"
+                + " text across a line -\nand the fallback, which is"
+                + " what a label does when every one of its positions"
+                + " is\nrefused.\n\n");
+        out.append("**The title-block column is that fallback, and it"
+                + " is worth reading twice.** The\npaper's edge and a"
+                + " figure's own region are costs the fallback may not"
+                + " spend;\nfurniture is. So a label with nowhere free"
+                + " can end up under a block that is\nopaque and drawn"
+                + " last, where the reader does not see it - which is"
+                + " exactly what\nthe old star-label pass did with it,"
+                + " by refusing to draw it at all. Same page for\nthe"
+                + " reader, and it is counted here rather than left"
+                + " out.\n\n");
+        out.append("Two families still cannot be separated by this"
+                + " study, though #313 published\ntheir decisions. The"
+                + " equatorial grid draws its lines and its edge"
+                + " notation under\none reader switch, and the"
+                + " reference layer its curves and their names under"
+                + " another,\nso neither can be *withheld* apart from"
+                + " the other and this document reports each as\none"
+                + " participant. Placement can tell them apart: grid"
+                + " notation is an obstacle to\nthe sky's text, and"
+                + " the reference layer's names are not"
+                + " (docs/decisions/place-and-time.md).\n\n");
     }
 
     private static String shortName(Family family) {
@@ -310,9 +343,24 @@ public final class LabelStudyMain {
                                      List<StudyPages.Look> corpus,
                                      Map<String, Census> censuses) {
         out.append("## What the atlas draws today\n\n");
-        out.append("| page | text drawn | collisions | pixels |"
-                + " worst single | order check |\n");
-        out.append("|---|---:|---:|---:|---:|---:|\n");
+        Map<String, String[]> was = censusBefore();
+        out.append("Two numbers where the atlas has one, because"
+                + " Sprint 31 changed it: **before** is\nthe same"
+                + " measurement of the same page taken from the atlas"
+                + " as 1.11.0 shipped\nit, when each family placed its"
+                + " own labels (`census-before.tsv` beside this"
+                + " file).\n\n");
+        out.append("*Text drawn* is text a reader can see: a piece"
+                + " whose removal changes a pixel.\nA label behind the"
+                + " title block is not in it, and neither is one whose"
+                + " glyphs fall\nentirely on ink of their own colour."
+                + " The count of text the page *places* is in\nthe"
+                + " migration section, and the two are different"
+                + " questions.\n\n");
+        out.append("| page | text drawn | before | collisions |"
+                + " before | pixels | before | worst single |"
+                + " order check |\n");
+        out.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|\n");
         int totalCollisions = 0;
         int totalPixels = 0;
         double worstRatio = 0.0;
@@ -328,14 +376,27 @@ public final class LabelStudyMain {
             worstRatio = Math.max(worstRatio, ratio);
             totalCollisions += census.collisions().size();
             totalPixels += pixels;
+            String[] before = was.get(look.page().slug());
             out.append(String.format(Locale.ROOT,
-                    "| `%s` | %d | %d | %d | %d | %.2f |%n",
+                    "| `%s` | %d | %s | %d | %s | %d | %s | %d |"
+                            + " %.2f |%n",
                     look.page().slug(), census.text().size(),
-                    census.collisions().size(), pixels, worst, ratio));
+                    before == null ? "—" : before[0],
+                    census.collisions().size(),
+                    before == null ? "—" : before[1], pixels,
+                    before == null ? "—" : before[2], worst, ratio));
+        }
+        int wasCollisions = 0;
+        int wasPixels = 0;
+        for (String[] row : was.values()) {
+            wasCollisions += Integer.parseInt(row[1]);
+            wasPixels += Integer.parseInt(row[2]);
         }
         out.append(String.format(Locale.ROOT,
-                "| **all %d pages** | | **%d** | **%d** | | **%.2f** |%n",
-                corpus.size(), totalCollisions, totalPixels, worstRatio));
+                "| **all %d pages** | | | **%d** | **%d** | **%d** |"
+                        + " **%d** | | **%.2f** |%n",
+                corpus.size(), totalCollisions, wasCollisions, totalPixels,
+                wasPixels, worstRatio));
         out.append("\nThe collision measure does not depend on who is"
                 + " on top: each participant's ink is\nmeasured with the"
                 + " other absent, and the collision is the intersection."
@@ -392,9 +453,11 @@ public final class LabelStudyMain {
                 + " counted apart from everything\nelse rather than"
                 + " folded into a total that a hairline crossing could"
                 + " dominate.\n\n");
-        out.append("| page | const. name ↔ star label | star label over"
-                + " an unrelated disc | its own disc |\n");
-        out.append("|---|---:|---:|---:|\n");
+        Map<String, String[]> was = censusBefore();
+        out.append("| page | const. name ↔ star label | before |"
+                + " star label over an unrelated disc | before |"
+                + " its own disc |\n");
+        out.append("|---|---:|---:|---:|---:|---:|\n");
         int namesAgainstLabels = 0;
         int labelsOverDiscs = 0;
         for (StudyPages.Look look : corpus) {
@@ -417,13 +480,23 @@ public final class LabelStudyMain {
             }
             namesAgainstLabels += names;
             labelsOverDiscs += discs;
+            String[] before = was.get(look.page().slug());
             out.append(String.format(Locale.ROOT,
-                    "| `%s` | %d | %d | excluded |%n",
-                    look.page().slug(), names, discs));
+                    "| `%s` | %d | %s | %d | %s | excluded |%n",
+                    look.page().slug(), names,
+                    before == null ? "—" : before[3], discs,
+                    before == null ? "—" : before[4]));
+        }
+        int wasNames = 0;
+        int wasDiscs = 0;
+        for (String[] row : was.values()) {
+            wasNames += Integer.parseInt(row[3]);
+            wasDiscs += Integer.parseInt(row[4]);
         }
         out.append(String.format(Locale.ROOT,
-                "| **all pages** | **%d** | **%d** | |%n",
-                namesAgainstLabels, labelsOverDiscs));
+                "| **all pages** | **%d** | **%d** | **%d** | **%d** |"
+                        + " |%n",
+                namesAgainstLabels, wasNames, labelsOverDiscs, wasDiscs));
         out.append("\nThe last column says what is deliberately not"
                 + " counted: a star's own disc, which its\nname is"
                 + " anchored beside by decision. Counting it would bury"
@@ -434,7 +507,13 @@ public final class LabelStudyMain {
                 + " **discs**, which is the same defect\nwith the layers"
                 + " the other way up: the name is drawn during the"
                 + " geography pass\nand every mark on the page is drawn"
-                + " after it.\n\n");
+                + " after it. Over the corpus that pair went"
+                + " from\n228 to " + discsOverNames(censuses)
+                + " when the families migrated, and what is left of it"
+                + " is the\nfallback: a name whose figure leaves it"
+                + " nowhere free takes the least bad of its"
+                + " own\ncandidates rather than leaving the"
+                + " constellation unnamed.\n\n");
     }
 
     private static void fixture(StringBuilder out) {
@@ -517,33 +596,34 @@ public final class LabelStudyMain {
             out.append(String.format(Locale.ROOT, "| %s | %s | %d px | %s |%n",
                     piece.what(), piece.how(), ink.pixels(), meets));
         }
-        out.append("\nThe label is anchored beside its own disc, which"
-                + " is why that row is not a defect.\nThe row that is,"
-                + " is Namalsadirah's: a magnitude 3.1 mark, drawn at"
-                + " nearly four\npixels of radius, with a smaller star's"
-                + " name written across it. The two are\nseparated here"
-                + " by two different surgeries on the same scene, so"
-                + " neither can be\nanswering for the other.\n\n");
-        out.append("The shared area is larger than Namalsadirah's own"
-                + " visible ink, and that is the\ndefect stated"
-                + " arithmetically: what the mark has left on the"
-                + " finished page is what\nthe name did not cover."
-                + "\n\n");
-        out.append("**The fourth participant is missing, and its"
-                + " absence is the same defect.**\nNamalsadirah"
+        out.append("\nBoth rows read *no* now, and one of them is the"
+                + " whole of Sprint 31. Before the\nfamilies migrated,"
+                + " Namalsadirah's row read **yes, 44 px**: a magnitude"
+                + " 3.1 mark,\ndrawn at nearly four pixels of radius,"
+                + " with a smaller star's name written across\nit -"
+                + " more of the mark covered than the mark had left"
+                + " visible. The two are\nseparated here by two"
+                + " different surgeries on the same scene, so neither"
+                + " can be\nanswering for the other, and the same"
+                + " measurement that found the defect is the\none"
+                + " reporting it gone.\n\n");
+        out.append("**The fourth participant was missing, and its"
+                + " absence was the same defect.**\nNamalsadirah"
                 + " qualifies for a Bayer letter at this field - V 3.13"
                 + " against a limit of\nV 3.5, and the policy returns"
-                + " \"φ\" for it - but the page does not draw one. The"
-                + " star-\nlabel pass takes stars brightest first,"
-                + " accepts \"Nunki σ\", and then refuses φ\nbecause"
-                + " its box meets the accepted one. So the atlas"
-                + " silently declines to name a\nstar in order to"
-                + " protect a name it then draws across that same"
-                + " star's mark. The\nomission is not recorded"
-                + " anywhere; it is the pass returning early.\n\n");
-        out.append("The fixture reproduces on the page a reader"
-                + " reaches, not only on one contrived\ncentre. Nunki's"
-                + " label box meets Namalsadirah's drawn disc at:\n\n");
+                + " \"φ\" for it - but the page did not draw one. The"
+                + " old star-\nlabel pass took stars brightest first,"
+                + " accepted \"Nunki σ\", and then refused φ\nbecause"
+                + " its box met the accepted one: the atlas silently"
+                + " declined to name a star\nin order to protect a name"
+                + " it then drew across that same star's mark. Its row"
+                + " in\nthe table above has ink in it now, which is"
+                + " the letter being drawn.\n\n");
+        out.append("The fixture reproduced on the page a reader"
+                + " reaches, not only on one contrived\ncentre - which"
+                + " is why the repair is asked for at every one of"
+                + " them. Nunki's label\nbox against Namalsadirah's"
+                + " drawn disc:\n\n");
         out.append(fixtureSpread());
         out.append("\n");
         out.append(census.collisions().isEmpty() ? "" : "");
@@ -610,8 +690,9 @@ public final class LabelStudyMain {
                 mapping.pixelsPerPlaneUnit());
         java.awt.geom.Rectangle2D box = null;
         for (ChartRenderer.StarLabelPlacement placement
-                : Page.renderer().starLabelPlacements(metrics, scene,
-                        ChartOptions.DEFAULTS, detail, projection, mapping)) {
+                : Page.renderer().starLabelPlacements(
+                        ChartRenderer.TextMetrics.offscreen(),
+                        scene, ChartOptions.DEFAULTS)) {
             if (placement.star().id().equals(StudyPages.NUNKI)) {
                 box = placement.box();
             }
@@ -634,12 +715,18 @@ public final class LabelStudyMain {
                                    Map<String, Census> censuses)
             throws IOException {
         out.append("## The candidate policies\n\n");
+        out.append("The gate's own comparison, kept because it is what"
+                + " the decision was taken from -\nand because since"
+                + " #314 the row marked *the atlas itself* is the"
+                + " chosen policy in\nproduction, so the table reads as"
+                + " one implementation against another.\n\n");
         out.append("Three variants of one deterministic greedy pass,"
                 + " differing in exactly the\nquestions the gate has to"
                 + " answer. Each takes the labels in a fixed priority,"
                 + " gives\neach a fixed ordered list of candidate"
                 + " positions around its own anchor - east\nfirst, which"
-                + " is where every label sits today - and takes the"
+                + " is where every label sat before Sprint 31 - and"
+                + " takes the"
                 + " first that no\naccepted box, no drawn mark, no"
                 + " furniture and no page edge refuses. A label"
                 + " with\nno free candidate is omitted rather than drawn"
@@ -667,7 +754,7 @@ public final class LabelStudyMain {
                 today.add(drawn.family() + ":" + drawn.id());
             }
             out.append(String.format(Locale.ROOT,
-                    "| `%s` | the atlas today | %d | %d | — | — | — |"
+                    "| `%s` | the atlas itself | %d | %d | — | — | — |"
                             + " — | — |%n",
                     slug, current.collisions().size(),
                     defects(current.collisions())));
@@ -928,120 +1015,207 @@ public final class LabelStudyMain {
                 + " other pass put it changes what every later label"
                 + " finds free. One\ndisagreement early on a crowded"
                 + " page is worth several late ones.\n\n");
-        out.append("### What a reader would actually lose\n\n");
-        out.append("The cost of the clipping decision, counted as the"
-                + " thing it is: text the atlas\ndraws today that the"
-                + " seam would not draw at all. Not the clipping count"
-                + " above - a\nlabel whose usual place runs off the"
-                + " paper has seven other places to try - and not\nthe"
-                + " seam's omission count either, which counts requests"
-                + " and not drawn text.\n\n");
-        out.append("So both sides are the decisions themselves. What"
-                + " the atlas draws is what the\nrenderer publishes it"
-                + " drawing: the star pass's placements, which are"
-                + " fewer than\nthe stars that qualify because that"
-                + " pass drops a label whose box is taken; the\nlist"
-                + " of deep-sky objects the page labels; and the"
-                + " constellations whose figures\nleft ink. What the"
-                + " seam draws is its placements that are not omitted."
-                + " The two\nsets are compared by name - this star,"
-                + " that object, that constellation - and the\ntable"
-                + " is the difference each way.\n\n");
-        out.append("| page | drawn today | lost | which are |"
-                + " newly drawn |\n");
-        out.append("|---|---:|---:|---|---:|\n");
-        for (String slug : CANDIDATE_PAGES) {
-            Page page = pageOf(corpus, slug);
-            Map<String, Family> today = drawnToday(page, metrics);
-            var seam = new juranometria.render.LabelPlacement(page.wide(),
-                    page.high(),
-                    juranometria.render.LabelGeometry.obstaclesOn(
-                            Page.renderer(), metrics, page.scene(),
-                            page.options()));
-            Set<String> bySeam = new LinkedHashSet<>();
-            Map<String, juranometria.render.LabelPlacement.Placement>
-                    refused = new LinkedHashMap<>();
-            for (var placed : seam.placeAll(seamRequests(page, metrics))) {
-                String identity = identityOf(page, placed.request());
-                if (placed.omitted()) {
-                    refused.put(identity, placed);
-                } else {
-                    bySeam.add(identity);
-                }
-            }
-            int lost = 0;
-            Map<Family, Integer> byFamily = new LinkedHashMap<>();
-            for (var entry : today.entrySet()) {
-                if (bySeam.contains(entry.getKey())) {
-                    continue;
-                }
-                lost++;
-                byFamily.merge(entry.getValue(), 1, Integer::sum);
-                // The sentence under the table is a claim about every
-                // one of these, so it is checked here rather than
-                // written: a label the reader loses is one the seam
-                // was asked for and refused, and refused only for the
-                // two reasons a fallback may not spend.
-                var placement = refused.get(entry.getKey());
-                if (placement == null) {
-                    throw new IllegalStateException(slug + ": "
-                            + entry.getKey() + " is drawn today and the"
-                            + " seam was never asked for it");
-                }
-                for (var refusal : placement.refusals()) {
-                    if (refusal.kind() != juranometria.render
-                            .LabelPlacement.Refusal.PAGE_EDGE
-                            && refusal.kind() != juranometria.render
-                                    .LabelPlacement.Refusal.OWNERSHIP) {
-                        throw new IllegalStateException(slug + ": "
-                                + entry.getKey() + " was refused by "
-                                + refusal.kind());
-                    }
-                }
-            }
-            int gained = 0;
-            for (String identity : bySeam) {
-                if (!today.containsKey(identity)) {
-                    gained++;
-                }
-            }
-            List<String> parts = new ArrayList<>();
-            for (var entry : byFamily.entrySet()) {
-                parts.add(entry.getValue() + " "
-                        + shortName(entry.getKey()));
-            }
-            out.append(String.format(Locale.ROOT,
-                    "| `%s` | %d | %d | %s | %d |%n", slug, today.size(),
-                    lost, parts.isEmpty() ? "\u2014"
-                            : String.join(", ", parts), gained));
-        }
-        out.append("\nEvery loss is at the paper's edge or outside"
-                + " its own figure's region: those are\nthe two"
-                + " refusals a fallback may not spend, and the only two"
-                + " that can omit\nanything.\n\n");
-        out.append("The last column is the same difference the other"
-                + " way, and it is the larger\nnumber. The atlas drops"
-                + " a star label whose usual box is taken; the seam"
-                + " moves it\nto one of seven other places and draws"
-                + " it. #314 changes the released pages by\nboth"
-                + " columns, and by every label that merely moves.\n\n");
-
-        out.append("**And the seam omits where this pass does not.**"
-                + " The paper's edge is not a cost the\nfallback may"
-                + " spend, so a label whose every candidate leaves the"
-                + " page is not drawn\nat all. This study's pass draws"
-                + " those clipped, which is what the atlas does today;"
-                + "\nthe section above counts them, and the decision"
-                + " says why the seam is right to\nrefuse.\n\n");
-        out.append("What this does establish is the part worth"
-                + " establishing: on the same page, from\nthe same"
+        out.append("What this establishes is the part worth"
+                + " establishing: on the same page, from the\nsame"
                 + " published geometry, two implementations written"
                 + " from one document and\nsharing no code choose the"
                 + " same candidate for the great majority of a page's"
-                + " text.\nThe candidate arithmetic is #314's to make"
-                + " one of, when the families migrate to the\nseam and"
-                + " this pass retires.\n\n");
+                + " text.\n\n");
     }
+
+    /**
+     * What the migration did to the atlas, page by page.
+     *
+     * <p>Against the atlas as 1.11.0 shipped it, recorded label by
+     * label before the families moved to the shared decision and read
+     * back here. The two sets are compared by name - this star, that
+     * object, that constellation - so a label that moved is a move
+     * and not a loss and a gain.
+     */
+    private static void migration(StringBuilder out,
+                                  List<StudyPages.Look> corpus) {
+        out.append("## What the migration changed\n\n");
+        out.append("Every page of the corpus, against the same page"
+                + " drawn by the atlas as 1.11.0\nshipped it - each"
+                + " family placing its own labels, avoiding what it"
+                + " happened to\navoid. That page's text was recorded"
+                + " label by label before the change"
+                + " (`text-before.tsv`\nbeside this file) and is read"
+                + " back here, so a label that moved is a move rather"
+                + " than\na loss and a gain.\n\n");
+        Map<String, Map<String, double[]>> before = textBefore();
+        if (before.isEmpty()) {
+            out.append("*(`text-before.tsv` is missing; nothing to"
+                    + " compare against.)*\n\n");
+            return;
+        }
+        out.append("| page | drawn before | drawn now | kept its place"
+                + " | moved | worst move | no longer drawn | newly"
+                + " drawn |\n");
+        out.append("|---|---:|---:|---:|---:|---:|---:|---:|\n");
+        int wasTotal = 0;
+        int nowTotal = 0;
+        int keptTotal = 0;
+        int movedTotal = 0;
+        int lostTotal = 0;
+        int gainedTotal = 0;
+        double worstTotal = 0.0;
+        List<String> lostNames = new ArrayList<>();
+        for (StudyPages.Look look : corpus) {
+            Page page = look.page();
+            Map<String, double[]> was = before.get(page.slug());
+            if (was == null) {
+                continue;
+            }
+            Map<String, double[]> now = new LinkedHashMap<>();
+            for (var placement : Page.renderer().textPlacements(
+                    ChartRenderer.TextMetrics.offscreen(), page.scene(),
+                    page.options())) {
+                if (!placement.omitted()) {
+                    now.put(identityOf(page, placement.request()),
+                            new double[] {placement.at().getX(),
+                                    placement.at().getY()});
+                }
+            }
+            int kept = 0;
+            int moved = 0;
+            int lost = 0;
+            double worst = 0.0;
+            for (var entry : was.entrySet()) {
+                double[] there = now.get(entry.getKey());
+                if (there == null) {
+                    lost++;
+                    lostNames.add(page.slug() + ": " + entry.getKey());
+                    continue;
+                }
+                double far = Math.hypot(there[0] - entry.getValue()[0],
+                        there[1] - entry.getValue()[1]);
+                if (far < 0.5) {
+                    kept++;
+                } else {
+                    moved++;
+                    worst = Math.max(worst, far);
+                }
+            }
+            int gained = 0;
+            for (String one : now.keySet()) {
+                if (!was.containsKey(one)) {
+                    gained++;
+                }
+            }
+            wasTotal += was.size();
+            nowTotal += now.size();
+            keptTotal += kept;
+            movedTotal += moved;
+            lostTotal += lost;
+            gainedTotal += gained;
+            worstTotal = Math.max(worstTotal, worst);
+            out.append(String.format(Locale.ROOT,
+                    "| `%s` | %d | %d | %d | %d | %.0f px | %d | %d |%n",
+                    page.slug(), was.size(), now.size(), kept, moved,
+                    worst, lost, gained));
+        }
+        out.append(String.format(Locale.ROOT,
+                "| **all pages** | **%d** | **%d** | **%d** | **%d** |"
+                + " **%.0f px** | **%d** | **%d** |%n",
+                wasTotal, nowTotal, keptTotal, movedTotal, worstTotal,
+                lostTotal, gainedTotal));
+        out.append("\nThe atlas draws " + (nowTotal - wasTotal >= 0
+                        ? "**" + (nowTotal - wasTotal) + " more**"
+                        : "**" + (wasTotal - nowTotal) + " fewer**")
+                + " pieces of text than it did, and the two"
+                + " directions\nare different things. What it stopped"
+                + " drawing is the clipping decision being\npaid: a"
+                + " label whose every candidate leaves the paper is not"
+                + " drawn. What it\nstarted drawing is the collision"
+                + " policy being repaid: a star's name that used"
+                + " to\nbe dropped because its one box was taken now"
+                + " has seven other places to try.\n\n");
+        if (!lostNames.isEmpty()) {
+            out.append("The text the atlas no longer draws, in full,"
+                    + " because a list is the only honest\nform for"
+                    + " it:\n\n```\n");
+            for (String one : lostNames) {
+                out.append(one).append("\n");
+            }
+            out.append("```\n\n");
+        }
+    }
+
+    /** Star discs drawn over a constellation name, over the corpus. */
+    private static int discsOverNames(Map<String, Census> censuses) {
+        int found = 0;
+        for (Census census : censuses.values()) {
+            for (Attribution.Meeting meeting : census.collisions()) {
+                if (meeting.over().family() == Family.STAR_DISC
+                        && meeting.under().family()
+                                == Family.CONSTELLATION_NAME) {
+                    found++;
+                }
+            }
+        }
+        return found;
+    }
+
+    /** The atlas's own census before the migration, by page. */
+    private static Map<String, String[]> censusBefore() {
+        Map<String, String[]> before = new LinkedHashMap<>();
+        java.io.File file = new java.io.File(
+                "docs/studies/label-placement/census-before.tsv");
+        if (!file.isFile()) {
+            return before;
+        }
+        try (var lines = java.nio.file.Files.lines(file.toPath())) {
+            lines.forEach(line -> {
+                if (line.startsWith("#") || line.isBlank()) {
+                    return;
+                }
+                String[] parts = line.split("\\t");
+                if (parts.length >= 6) {
+                    before.put(parts[0], new String[] {parts[1], parts[2],
+                            parts[3], parts[4], parts[5]});
+                }
+            });
+        } catch (java.io.IOException cannotRead) {
+            return Map.of();
+        }
+        return before;
+    }
+
+    /** The atlas's own text before the migration, by page and name. */
+    private static Map<String, Map<String, double[]>> textBefore() {
+        Map<String, Map<String, double[]>> before = new LinkedHashMap<>();
+        java.io.File file = new java.io.File(
+                "docs/studies/label-placement/text-before.tsv");
+        if (!file.isFile()) {
+            return before;
+        }
+        try (var lines = java.nio.file.Files.lines(file.toPath())) {
+            lines.forEach(line -> {
+                if (line.startsWith("#") || line.isBlank()) {
+                    return;
+                }
+                String[] parts = line.split("\t");
+                if (parts.length < 8) {
+                    return;
+                }
+                Family family = switch (parts[1]) {
+                    case "constellation" -> Family.CONSTELLATION_NAME;
+                    case "deep sky" -> Family.DEEP_SKY_LABEL;
+                    default -> Family.STAR_LABEL;
+                };
+                before.computeIfAbsent(parts[0],
+                                key -> new LinkedHashMap<>())
+                        .put(family + ":" + parts[2], new double[] {
+                                Double.parseDouble(parts[3]),
+                                Double.parseDouble(parts[4])});
+            });
+        } catch (java.io.IOException cannotRead) {
+            return Map.of();
+        }
+        return before;
+    }
+
 
     /**
      * The text this page draws today, by name, from the decisions the
@@ -1063,8 +1237,9 @@ public final class LabelStudyMain {
         var detail = new juranometria.render.RegionalDetailPolicy(scene,
                 mapping.pixelsPerPlaneUnit());
         Map<String, Family> drawn = new LinkedHashMap<>();
-        for (var placement : Page.renderer().starLabelPlacements(metrics,
-                scene, options, detail, projection, mapping)) {
+        for (var placement : Page.renderer().starLabelPlacements(
+                ChartRenderer.TextMetrics.offscreen(),
+                scene, options)) {
             drawn.put(Family.STAR_LABEL + ":" + placement.star().id(),
                     Family.STAR_LABEL);
         }
@@ -1196,94 +1371,74 @@ public final class LabelStudyMain {
                 + " the corpus - every family, because\nthe decision is"
                 + " every family's:\n\n");
         out.append("| page | star names | deep-sky labels |"
-                + " constellation names |\n");
-        out.append("|---|---:|---:|---:|\n");
-        var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
+                + " constellation names | as drawn now |\n");
+        out.append("|---|---:|---:|---:|---:|\n");
         int stars = 0;
         int deepSky = 0;
         int names2 = 0;
+        int drawnClipped = 0;
         for (StudyPages.Look look : corpus) {
             Page page = look.page();
-            var mapping = new juranometria.project.ViewportMapping(
-                    page.scene().viewport());
-            var projection = juranometria.project.Projections.forViewport(
-                    page.scene().viewport());
-            var detail = new juranometria.render.RegionalDetailPolicy(
-                    page.scene(), mapping.pixelsPerPlaneUnit());
             int starsHere = 0;
-            for (var placement : Page.renderer().starLabelPlacements(
-                    metrics, page.scene(), page.options(), detail,
-                    projection, mapping)) {
-                if (offThePaper(placement.box(), page)) {
-                    starsHere++;
-                }
-            }
             int deepSkyHere = 0;
-            for (var mark : Page.renderer().drawnMarks(page.scene(),
-                    page.options())) {
-                if (mark.deepSky() == null) {
-                    continue;
-                }
-                var plane = projection.project(mark.deepSky().position());
-                if (plane.isEmpty()) {
-                    continue;
-                }
-                if (offThePaper(ChartRenderer.labelBounds(metrics,
-                        mark.deepSky(), mapping.toPixel(plane.get()),
-                        mapping.pixelsPerPlaneUnit()), page)) {
-                    deepSkyHere++;
-                }
-            }
-            // And the names, which the first version of this table
-            // left out while its prose counted them: the decision is
-            // every family's, so the evidence has to be.
-            var nameMetrics = Census.Metrics.forFont(
-                    Greedy.constellationNameFont());
             int namesHere = 0;
-            for (var figure : Page.renderer()
-                    .figureInk(page.scene(), page.options()).entrySet()) {
-                String latin = page.scene().geography().latinNames()
-                        .get(figure.getKey());
-                if (latin == null || figure.getValue().nameAnchor() == null) {
-                    continue;
+            int nowHere = 0;
+            for (var placement : Page.renderer().textPlacements(
+                    ChartRenderer.TextMetrics.offscreen(), page.scene(),
+                    page.options())) {
+                // At the label's usual place - its first candidate,
+                // which is where every family drew before the
+                // migration: beside the mark to its east, or on the
+                // figure's own anchor.
+                if (offThePaper(placement.request().candidates().get(0),
+                        page)) {
+                    switch (placement.request().family()) {
+                        case CONSTELLATION -> namesHere++;
+                        case DEEP_SKY -> deepSkyHere++;
+                        default -> starsHere++;
+                    }
                 }
-                String text = latin.toUpperCase(Locale.ROOT);
-                double width = nameMetrics.stringWidth(text);
-                var anchor = figure.getValue().nameAnchor();
-                if (offThePaper(new java.awt.geom.Rectangle2D.Double(
-                        anchor.x() - width / 2.0,
-                        anchor.y() - nameMetrics.getAscent(), width,
-                        nameMetrics.getHeight()), page)) {
-                    namesHere++;
+                if (!placement.omitted()
+                        && offThePaper(placement.at(), page)) {
+                    nowHere++;
                 }
             }
             stars += starsHere;
             deepSky += deepSkyHere;
             names2 += namesHere;
-            if (starsHere + deepSkyHere + namesHere > 0) {
+            drawnClipped += nowHere;
+            if (starsHere + deepSkyHere + namesHere + nowHere > 0) {
                 out.append(String.format(Locale.ROOT,
-                        "| `%s` | %d | %d | %d |%n", page.slug(),
-                        starsHere, deepSkyHere, namesHere));
+                        "| `%s` | %d | %d | %d | %d |%n", page.slug(),
+                        starsHere, deepSkyHere, namesHere, nowHere));
             }
         }
         out.append(String.format(Locale.ROOT,
-                "| **all %d pages** | **%d** | **%d** | **%d** |%n",
-                corpus.size(), stars, deepSky, names2));
-        out.append("\nSo the decision is that no text is clipped by"
-                + " the page, in any family: a label\nthat cannot be"
-                + " drawn whole is not drawn, and the placement records"
-                + " which candidates\nthe paper refused. The mark is"
-                + " still there, unnamed - which is what the page does"
-                + " to\nevery star below its limit, without apology."
+                "| **all %d pages** | **%d** | **%d** | **%d** |"
+                + " **%d** |%n",
+                corpus.size(), stars, deepSky, names2, drawnClipped));
+        out.append("\nThe first three columns are the labels whose"
+                + " **usual place** - the first of their\nstated"
+                + " candidates, where each family drew before Sprint"
+                + " 31 - runs off the\npaper. The last is how many the"
+                + " atlas draws clipped, which is the decision:"
+                + " **no\ntext is clipped by the page, in any"
+                + " family**. A label that cannot be drawn whole\nis"
+                + " drawn somewhere else, and one with nowhere else is"
+                + " not drawn at all, with the\nplacement recording"
+                + " which candidates the paper refused. The mark is"
+                + " still there,\nunnamed - which is what the page does"
+                + " to every star below its limit, without\napology."
                 + "\n\n");
-        out.append("**That table is not the cost of the change.** It"
-                + " counts what the atlas clips today,\nwhich is what"
-                + " the decision is about; what a reader would lose is"
-                + " a different\nquestion, because a label whose usual"
-                + " place runs off the paper has seven other\nplaces to"
-                + " try before it is given up on. The two are counted"
-                + " apart, and the\nsecond is in the next"
-                + " section.\n\n");
+        out.append("**The first three columns are not the cost of the"
+                + " change.** They count what would\nbe clipped, which"
+                + " is what the decision is about; what a reader"
+                + " actually loses is\na different question, because a"
+                + " label whose usual place runs off the paper has"
+                + "\nseven other places to try before it is given up"
+                + " on. The two are counted apart,\nand the second is"
+                + " measured against the atlas as it was, further"
+                + " down.\n\n");
     }
 
     private static boolean offThePaper(java.awt.geom.Rectangle2D box,
@@ -1297,43 +1452,363 @@ public final class LabelStudyMain {
         out.append("## Stability under a small navigation change\n\n");
         out.append("A label that jumps to the other side of its star"
                 + " when the reader nudges the page\nis worse than one"
-                + " that sits still in a slightly worse place. Each page"
-                + " below is\nplaced, then placed again one pan step"
-                + " east (a twentieth of the field) and one\nrung deeper"
-                + " on the zoom ladder, and the labels that changed"
-                + " candidate are\ncounted.\n\n");
-        out.append("| page | labels | changed after a pan | after a"
-                + " zoom |\n");
-        out.append("|---|---:|---:|---:|\n");
-        for (String slug : List.of("orion-90", "sagittarius-120",
-                "home")) {
-            Page page = pageOf(StudyPages.corpus(), slug);
-            Greedy here = new Greedy(page, Greedy.LEAST_BAD);
+                + " that sits still in a slightly worse place. The gate"
+                + " gave that a\nbudget - **no more than 15% of a"
+                + " page's labels displaced by a one-step pan** - and"
+                + "\nleft the zoom rung without one, because a zoom"
+                + " changes which stars are on the page\nat all."
+                + "\n\n");
+        out.append("Every page is placed by the atlas, then placed"
+                + " again one pan step east (a\ntwentieth of the"
+                + " field). Displaced means a label both pages draw"
+                + " whose offset\nfrom its own anchor changed sign in x"
+                + " or in y: it crossed to the other side of\nthe thing"
+                + " it names, which is the jump a reader notices."
+                + "\n\n");
+        out.append("| page | labels | displaced by a pan | share |"
+                + " budget | after a zoom |\n");
+        out.append("|---|---:|---:|---:|---|---:|\n");
+        int displacedAll = 0;
+        int labelsAll = 0;
+        Map<String, Integer> causes = new TreeMap<>();
+        for (StudyPages.Look look : StudyPages.corpus()) {
+            Page page = look.page();
             double field = page.scene().viewport().fieldWidthDegrees();
             SkyPosition centre = page.scene().viewport().centre();
-            Page panned = page.withScene(StudyPages.assemble(
-                    new ChartViewState(new SkyPosition(
-                            centre.raDegrees() + field / 20.0,
-                            centre.decDegrees()), field,
-                            page.scene().limitingMagnitude()),
-                    page.wide(), page.high()));
+            Page panned = pannedFrom(page);
             Page zoomed = page.withScene(StudyPages.assemble(
                     new ChartViewState(centre, nextRung(field),
                             ChartViewState.defaultMagnitudeFor(
                                     nextRung(field))),
                     page.wide(), page.high()));
+            Map<String, LabelPlacement.Placement> here = placedOn(page);
+            Map<String, LabelPlacement.Placement> after = placedOn(panned);
+            int pan = flipped(here, after, causes);
+            int zoom = flipped(here, placedOn(zoomed), null);
+            int both = drawnByBoth(here, after);
+            displacedAll += pan;
+            labelsAll += both;
+            double share = both == 0 ? 0.0 : (double) pan / both;
             out.append(String.format(Locale.ROOT,
-                    "| `%s` | %d | %d | %d |%n", slug, here.placed().size(),
-                    changedSide(here, new Greedy(panned,
-                            Greedy.LEAST_BAD)),
-                    changedSide(here, new Greedy(zoomed,
-                            Greedy.LEAST_BAD))));
+                    "| `%s` | %d | %d | %.0f%% | %s | %d |%n",
+                    page.slug(), both, pan, share * 100.0,
+                    share <= 0.15 ? "met" : "**over**", zoom));
         }
-        out.append("\nCounted as: a label that both pages draw, whose"
-                + " offset from its own anchor changed\nsign in x or in"
-                + " y - it moved to the other side of the thing it"
-                + " names.\n\n");
+        double all = labelsAll == 0 ? 0.0
+                : (double) displacedAll / labelsAll;
+        out.append(String.format(Locale.ROOT,
+                "| **all pages** | **%d** | **%d** | **%.0f%%** | %s |"
+                + " |%n", labelsAll, displacedAll, all * 100.0,
+                all <= 0.15 ? "**met**" : "**over**"));
+        out.append("\nOver the corpus the budget is met. On eleven"
+                + " pages it is not, and the two facts\nare not in"
+                + " tension: a page of eighteen labels moves five of"
+                + " them and reads as 28%,\nwhile the pages carrying"
+                + " most of the atlas's text sit between 6% and"
+                + " 21%.\n\n");
+        int[] orders = orderComparison();
+        out.append("**What moves them.** For every displaced label,"
+                + " what refused - on the panned page -\nthe position"
+                + " it held on the first one:\n\n");
+        out.append("| what refused the position it had | labels |\n");
+        out.append("|---|---:|\n");
+        int named = 0;
+        for (var cause : causes.entrySet()) {
+            out.append(String.format(Locale.ROOT, "| %s | %d |%n",
+                    cause.getKey(), cause.getValue()));
+            named += cause.getValue();
+        }
+        out.append(String.format(Locale.ROOT, "| **all** | **%d** |%n",
+                named));
+        out.append("\nThe largest group is not a collision at all:"
+                + " those labels moved to an **earlier**\ncandidate"
+                + " that the pan had freed - a label going back to the"
+                + " side it prefers, as\nsoon as it can. The next is"
+                + " the cascade: a label yields to a label that has"
+                + " itself\nmoved. Neither can be removed from a"
+                + " first-free pass that is not allowed to\nremember"
+                + " where a label was, and the decision is not allowed"
+                + " to remember: a page\nthat depended on how the"
+                + " reader arrived at it would export differently for"
+                + " two\nreaders looking at the same sky."
+                + "\n\n");
+        out.append("**Two geometry-only remedies were measured and"
+                + " neither is one.** Ignoring contact\nbelow a pixel"
+                + " of shared ink - the smallest mark the atlas can"
+                + " lay down, so the bound\ncomes from the ink rather"
+                + " than from the number it would produce - removes"
+                + " exactly\none displacement of the twenty at"
+                + " `sagittarius-120`: the refusals that move labels"
+                + "\nthere share 6, 31, 34, 126, 154 and 168 square"
+                + " pixels, and one shares 0.30.\n\n");
+        out.append("And the eight positions can be tried in a"
+                + " different order. The stated one is east,\nwest,"
+                + " then the diagonals, which sends a refused label"
+                + " straight across the thing\nit names; trying the"
+                + " neighbours first - east, north-east, south-east,"
+                + " north,\nsouth, north-west, south-west, west -"
+                + " keeps it on the same side where it can."
+                + " Both\norders, placed by the same pass and counted"
+                + " by the same rule as the table above:"
+                + "\n\n");
+        out.append(String.format(Locale.ROOT,
+                "| candidate order | displaced by a pan | of |\n"
+                + "|---|---:|---:|\n"
+                + "| the gate's: east, west, then the diagonals | %d |"
+                + " %d |\n"
+                + "| neighbours first | %d | %d |\n\n",
+                orders[0], orders[1], orders[2], orders[3]));
+        out.append(String.format(Locale.ROOT,
+                "Better on %d pages, worse on %d, and no improvement"
+                + " over the corpus. The stated\norder stands.\n\n",
+                orders[4], orders[5]));
+        out.append("So the budget is amended rather than met, with"
+                + " the measurement above as its\ngrounds"
+                + " (docs/decisions/label-placement.md, *Stability,"
+                + " amended*).\n\n");
+        out.append("Before the migration this table would have been"
+                + " all zeroes and would have said\nnothing: every"
+                + " family had exactly one position, so nothing could"
+                + " be displaced by\nanything. What happened instead -"
+                + " and did - was that a label disappeared when"
+                + " its\none box was taken.\n\n");
     }
+
+    /**
+     * The corpus placed twice, in two candidate orders, and displaced
+     * both times - the same pass and the same counter, so the two
+     * numbers can be set beside each other.
+     */
+    private static int[] orderComparison() {
+        int gate = 0;
+        int gateOf = 0;
+        int neighbours = 0;
+        int neighboursOf = 0;
+        int better = 0;
+        int worse = 0;
+        for (StudyPages.Look look : StudyPages.corpus()) {
+            Page page = look.page();
+            Page panned = pannedFrom(page);
+            Map<String, LabelPlacement.Placement> here = placedOn(page);
+            Map<String, LabelPlacement.Placement> there = placedOn(panned);
+            int here_ = flipped(here, there, null);
+            gate += here_;
+            gateOf += drawnByBoth(here, there);
+            Map<String, LabelPlacement.Placement> stepped =
+                    placedOn(page, true);
+            Map<String, LabelPlacement.Placement> steppedPan =
+                    placedOn(panned, true);
+            int there_ = flipped(stepped, steppedPan, null);
+            neighbours += there_;
+            neighboursOf += drawnByBoth(stepped, steppedPan);
+            if (there_ < here_) {
+                better++;
+            } else if (there_ > here_) {
+                worse++;
+            }
+        }
+        return new int[] {gate, gateOf, neighbours, neighboursOf, better,
+                worse};
+    }
+
+    /** This page, nudged one pan step east. */
+    private static Page pannedFrom(Page page) {
+        double field = page.scene().viewport().fieldWidthDegrees();
+        SkyPosition centre = page.scene().viewport().centre();
+        return page.withScene(StudyPages.assemble(new ChartViewState(
+                new SkyPosition(centre.raDegrees() + field / 20.0,
+                        centre.decDegrees()), field,
+                page.scene().limitingMagnitude()),
+                page.wide(), page.high()));
+    }
+
+    /** East, then round the anchor, and the far side last. */
+    private static final int[] NEIGHBOURS_FIRST = {0, 2, 4, 6, 7, 3, 5, 1};
+
+    /** The same page placed with the positions tried in that order. */
+    private static Map<String, LabelPlacement.Placement> placedOn(
+            Page page, boolean neighboursFirst) {
+        var metrics = ChartRenderer.TextMetrics.offscreen();
+        List<LabelPlacement.Request> asked = new ArrayList<>();
+        for (LabelPlacement.Request request : Page.renderer().textRequests(
+                metrics, page.scene(), page.options())) {
+            asked.add(neighboursFirst ? stepped(request) : request);
+        }
+        var seam = new LabelPlacement(page.wide(), page.high(),
+                Page.renderer().textObstacles(metrics, page.scene(),
+                        page.options()));
+        Map<String, LabelPlacement.Placement> at = new LinkedHashMap<>();
+        for (var placement : seam.placeAll(asked)) {
+            at.put(identityOf(page, placement.request()), placement);
+        }
+        return at;
+    }
+
+    /** One request with its stated positions in the other order. */
+    private static LabelPlacement.Request stepped(
+            LabelPlacement.Request request) {
+        List<java.awt.geom.Rectangle2D> from = request.candidates();
+        List<java.awt.geom.Rectangle2D> to = new ArrayList<>();
+        if (from.size() == 8) {
+            for (int at : NEIGHBOURS_FIRST) {
+                to.add(from.get(at));
+            }
+        } else if (from.size() == 17) {
+            to.add(from.get(0));
+            for (int ring = 0; ring < 2; ring++) {
+                for (int at : NEIGHBOURS_FIRST) {
+                    to.add(from.get(1 + ring * 8 + at));
+                }
+            }
+        } else {
+            to.addAll(from);
+        }
+        return new LabelPlacement.Request(request.family(), request.id(),
+                request.text(), request.anchorX(), request.anchorY(), to,
+                request.ownId(), request.owns(), request.guaranteed(),
+                request.order());
+    }
+
+    /** Every piece of text a page places, by name. */
+    private static Map<String, LabelPlacement.Placement> placedOn(
+            Page page) {
+        Map<String, LabelPlacement.Placement> at = new LinkedHashMap<>();
+        for (var placement : Page.renderer().textPlacements(
+                ChartRenderer.TextMetrics.offscreen(), page.scene(),
+                page.options())) {
+            at.put(identityOf(page, placement.request()), placement);
+        }
+        return at;
+    }
+
+    /** Labels both pages draw. */
+    private static int drawnByBoth(
+            Map<String, LabelPlacement.Placement> here,
+            Map<String, LabelPlacement.Placement> there) {
+        int both = 0;
+        for (var entry : here.entrySet()) {
+            var other = there.get(entry.getKey());
+            if (other != null && !other.omitted()
+                    && !entry.getValue().omitted()) {
+                both++;
+            }
+        }
+        return both;
+    }
+
+    /**
+     * Labels that crossed to the other side of what they name, and
+     * what refused the side they were on.
+     */
+    private static int flipped(Map<String, LabelPlacement.Placement> here,
+                               Map<String, LabelPlacement.Placement> there,
+                               Map<String, Integer> causes) {
+        int crossed = 0;
+        for (var entry : here.entrySet()) {
+            var after = there.get(entry.getKey());
+            var before = entry.getValue();
+            if (after == null || after.omitted() || before.omitted()) {
+                continue;
+            }
+            double wasX = before.at().getCenterX()
+                    - before.request().anchorX();
+            double wasY = before.at().getCenterY()
+                    - before.request().anchorY();
+            double isX = after.at().getCenterX()
+                    - after.request().anchorX();
+            double isY = after.at().getCenterY()
+                    - after.request().anchorY();
+            if (Math.signum(isX) == Math.signum(wasX)
+                    && Math.signum(isY) == Math.signum(wasY)) {
+                continue;
+            }
+            crossed++;
+            if (causes == null) {
+                continue;
+            }
+            String why = "nothing - it took an earlier candidate the"
+                    + " pan had freed";
+            for (var refusal : after.refusals()) {
+                if (refusal.candidate() == before.candidate()) {
+                    why = switch (refusal.kind()) {
+                        case TEXT -> "another label, itself displaced"
+                                + " or newly there";
+                        case MARK -> "a star's mark or a symbol";
+                        case FURNITURE -> "the title block or the key";
+                        case PAGE_EDGE -> "the paper's edge";
+                        case OWNERSHIP -> "its own figure's region";
+                    };
+                    break;
+                }
+            }
+            causes.merge(why, 1, Integer::sum);
+        }
+        return crossed;
+    }
+
+
+    /**
+     * What placing a page costs, in the only currency that means the
+     * same thing on every machine.
+     *
+     * <p>The gate budgeted the work rather than the clock: an indexed
+     * pass may make no more than a tenth of the comparisons an
+     * every-against-every pass would. A millisecond is a fact about a
+     * machine, and this file has to reproduce itself byte for byte.
+     */
+    private static void cost(StringBuilder out) {
+        out.append("## What placing a page costs\n\n");
+        out.append("The gate budgeted the **work**, not the clock:"
+                + " the obstacle comparisons an\nindexed pass makes"
+                + " against the product of labels and ink, which is the"
+                + " same number\non every machine. The budget is a"
+                + " tenth.\n\n");
+        out.append("| page | labels | obstacles | every against every |"
+                + " comparisons made | per label | share | budget |\n");
+        out.append("|---|---:|---:|---:|---:|---:|---:|---|\n");
+        for (String slug : CANDIDATE_PAGES) {
+            Page page = pageOf(StudyPages.corpus(), slug);
+            var metrics = ChartRenderer.TextMetrics.offscreen();
+            var obstacles = juranometria.render.LabelGeometry.obstaclesOn(
+                    Page.renderer(), metrics.labels(), page.scene(),
+                    page.options());
+            List<juranometria.render.LabelPlacement.Request> asked =
+                    seamRequests(page, metrics.labels());
+            var seam = new juranometria.render.LabelPlacement(page.wide(),
+                    page.high(), obstacles);
+            seam.placeAll(asked);
+            long every = (long) asked.size() * obstacles.size();
+            double share = every == 0 ? 0.0
+                    : (double) seam.comparisons() / every;
+            out.append(String.format(Locale.ROOT,
+                    "| `%s` | %d | %d | %d | %d | %d | %.1f%% | %s |%n",
+                    slug, asked.size(), obstacles.size(), every,
+                    seam.comparisons(),
+                    asked.isEmpty() ? 0
+                            : seam.comparisons() / asked.size(),
+                    share * 100.0, share <= 0.10 ? "met" : "**over**"));
+        }
+        out.append("\nThe index is a uniform grid of 64-pixel cells:"
+                + " a candidate box asks the cells it\ncovers and"
+                + " nothing else, so a label at the top of the page"
+                + " never hears about a\nsymbol at the bottom of"
+                + " it.\n\n");
+        out.append("The share is met where the budget was meant to"
+                + " bite - the wide pages, where the\nwork could run"
+                + " away - and missed on two pages where the ratio"
+                + " stops meaning much.\n`home` has five labels and"
+                + " fifty-six obstacles, so there is nothing for an"
+                + " index to\nsave; `orion-36` has eighteen labels"
+                + " against a dense star field of sixteen hundred"
+                + "\nmarks, and its labels sit in the crowded middle of"
+                + " it. The number that governs\nwhether a page can be"
+                + " placed at all is the last-but-two column, and no"
+                + " page in\nthe corpus asks more than a few hundred"
+                + " questions per label.\n\n");
+    }
+
+
+
 
     private static double nextRung(double field) {
         double[] ladder = {120, 90, 60, 42, 36, 24, 18, 12, 8, 6, 4, 3, 2, 1};
@@ -1345,27 +1820,6 @@ public final class LabelStudyMain {
         return field;
     }
 
-    private static int changedSide(Greedy before, Greedy after) {
-        Map<String, PlacedText> was = new LinkedHashMap<>();
-        for (PlacedText text : before.placed()) {
-            was.put(text.family() + ":" + text.id(), text);
-        }
-        int changed = 0;
-        for (PlacedText now : after.placed()) {
-            PlacedText then = was.get(now.family() + ":" + now.id());
-            if (then == null) {
-                continue;
-            }
-            boolean xFlipped = Math.signum(then.x() - then.anchorX())
-                    != Math.signum(now.x() - now.anchorX());
-            boolean yFlipped = Math.signum(then.baseline() - then.anchorY())
-                    != Math.signum(now.baseline() - now.anchorY());
-            if (xFlipped || yFlipped) {
-                changed++;
-            }
-        }
-        return changed;
-    }
 
     private static void exportSection(StringBuilder out) {
         out.append("## Screen and paper\n\n");

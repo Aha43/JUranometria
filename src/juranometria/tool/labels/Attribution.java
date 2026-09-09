@@ -90,8 +90,21 @@ public final class Attribution {
     private int renders;
 
     public Attribution(Page page) {
-        this.page = page;
-        this.base = page.paint();
+        this(page, true);
+    }
+
+    /**
+     * With the page's placement held still, or free to move.
+     *
+     * <p>Held is what every measurement here wants: since #314 one
+     * decision places the whole page, so an unheld page moves its text
+     * every time this takes a star away, and the difference is the
+     * placement rather than the ink. Free is kept for the one test
+     * that shows what holding buys.
+     */
+    public Attribution(Page page, boolean holdPlacement) {
+        this.page = holdPlacement ? page.withTextHeld() : page;
+        this.base = this.page.paint();
         this.renders = 1;
     }
 

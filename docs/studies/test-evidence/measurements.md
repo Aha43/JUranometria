@@ -127,16 +127,16 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **373** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **580**
+- explicit event-thread hand-offs (invokeAndWait): **586**
 
 ## Generated evidence, classified
 
 | class | the contract | files |
 |---|---|---|
 | deterministic-report | regenerates byte-for-byte on the same tree | 17 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 5 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 6 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 291 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 293 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
@@ -144,6 +144,7 @@ The byte-exact fixtures:
 - docs/studies/ecliptic/reference-vectors.txt
 - docs/studies/place-and-time/reference-vectors.txt
 - docs/studies/wider-field/released-pages.txt
+- docs/studies/wider-field/released-text.txt
 - scripts/ecliptic-vectors.c
 - scripts/reference-vectors.c
 

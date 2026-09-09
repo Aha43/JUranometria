@@ -361,15 +361,12 @@ class LabelGeometryTest {
 
                 String where = field + "° with deep-sky labels "
                         + (options.deepSkyLabels() ? "on" : "off") + ": ";
-                var mapping = new juranometria.project.ViewportMapping(
-                        scene.viewport());
                 var projection = juranometria.project.Projections
                         .forViewport(scene.viewport());
-                var detail = new RegionalDetailPolicy(scene,
-                        mapping.pixelsPerPlaneUnit());
                 for (ChartRenderer.StarLabelPlacement placement
-                        : RENDERER.starLabelPlacements(metrics, scene,
-                                options, detail, projection, mapping)) {
+                        : RENDERER.starLabelPlacements(
+                                ChartRenderer.TextMetrics.offscreen(),
+                                scene, options)) {
                     assertTrue(asked.contains("star:"
                                     + placement.star().id()),
                             where + "the page draws "

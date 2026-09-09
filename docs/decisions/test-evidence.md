@@ -98,7 +98,9 @@ the zoom-out control has to be pressed to prove the new step is
 reachable by pressing it; and #286's export dialog, laid out on
 both grounds at two text sizes and pressed through the shared route
 helper; and #287's closing journey, which shows the window a club
-member exports from.)
+member exports from — a journey #314 extended to walk the same route
+for a page whose text is placed, through the shared preference and
+window guards rather than a lifecycle of its own.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call

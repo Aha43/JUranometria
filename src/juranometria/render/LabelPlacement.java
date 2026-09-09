@@ -168,14 +168,39 @@ public final class LabelPlacement {
      * other took 45 ms on the machine this was written on and 154 on
      * the runner that builds it - inside the gate's budget on one and
      * not on the other, which is not a budget being met.
+     *
+     * <p>The cell is sized to the thing it indexes: a label's own box
+     * is about thirty pixels by fourteen, so a cell of this size means
+     * a candidate asks the cells it genuinely covers and little else.
+     * Measured over the corpus at #314, a dense detail page - eighteen
+     * labels among sixteen hundred marks - asks 3,859 questions with a
+     * 64-pixel cell and 1,626 with this one, for answers that are the
+     * same to the pixel; below this, nothing further is saved.
      */
-    private static final double CELL_PX = 64.0;
+    private static final double CELL_PX = 24.0;
 
     private final Rectangle2D paper;
     private final List<Obstacle> obstacles = new ArrayList<>();
-    private final Map<Long, List<Obstacle>> byCell = new LinkedHashMap<>();
+    /**
+     * Which obstacles are in a cell, by their position in the list
+     * they were given in. Positions rather than the obstacles
+     * themselves, so the order they were given in can be restored by
+     * sorting a handful of integers instead of walking every obstacle
+     * on the page - which on a dense star field is sixteen hundred of
+     * them for each candidate box (issue #314).
+     */
+    private final Map<Long, List<Integer>> byCell = new LinkedHashMap<>();
     private final double cellPx;
     private final Map<Obstacle, Area> asAreas = new java.util.HashMap<>();
+    /**
+     * Each obstacle's bounds, taken once. A shape's own intersection
+     * test walks its path, and a dense star field asks thousands of
+     * them; a rectangle that cannot overlap is not worth walking. The
+     * answer is unchanged - bounds contain the shape, so anything the
+     * bounds miss the shape misses too.
+     */
+    private final Map<Obstacle, Rectangle2D> bounds =
+            new java.util.HashMap<>();
     private int comparisons;
     private final List<Rectangle2D> taken = new ArrayList<>();
     private final Map<Rectangle2D, String> takenBy = new LinkedHashMap<>();
@@ -200,10 +225,13 @@ public final class LabelPlacement {
         this.cellPx = cellPx;
         this.paper = new Rectangle2D.Double(0.0, 0.0, widthPx, heightPx);
         this.obstacles.addAll(ink);
-        for (Obstacle obstacle : this.obstacles) {
-            for (long cell : cellsOf(obstacle.ink().getBounds2D())) {
+        for (int at = 0; at < this.obstacles.size(); at++) {
+            Obstacle obstacle = this.obstacles.get(at);
+            Rectangle2D box = obstacle.ink().getBounds2D();
+            bounds.put(obstacle, box);
+            for (long cell : cellsOf(box)) {
                 byCell.computeIfAbsent(cell, key -> new ArrayList<>())
-                        .add(obstacle);
+                        .add(at);
             }
         }
     }
@@ -242,16 +270,13 @@ public final class LabelPlacement {
      * page with no index gives.
      */
     private List<Obstacle> near(Rectangle2D box) {
-        java.util.LinkedHashSet<Obstacle> found =
-                new java.util.LinkedHashSet<>();
+        java.util.TreeSet<Integer> found = new java.util.TreeSet<>();
         for (long cell : cellsOf(box)) {
             found.addAll(byCell.getOrDefault(cell, List.of()));
         }
-        List<Obstacle> ordered = new ArrayList<>();
-        for (Obstacle obstacle : obstacles) {
-            if (found.contains(obstacle)) {
-                ordered.add(obstacle);
-            }
+        List<Obstacle> ordered = new ArrayList<>(found.size());
+        for (int at : found) {
+            ordered.add(obstacles.get(at));
         }
         return ordered;
     }
@@ -314,7 +339,10 @@ public final class LabelPlacement {
             }
             refusals.add(refused);
         }
-        int fallback = leastBad(request);
+        // The fallback is handed what the pass above already found.
+        // Asking again would be the same question twice, and it is
+        // asked of exactly the labels a crowded page has most of.
+        int fallback = leastBad(request, refusals);
         return fallback < 0
                 ? new Placement(request, null, -1, List.copyOf(refusals),
                         true)
@@ -358,6 +386,10 @@ public final class LabelPlacement {
                 // page.
                 continue;
             }
+            Rectangle2D around = bounds.get(obstacle);
+            if (around != null && !around.intersects(box)) {
+                continue;
+            }
             if (obstacle.ink().intersects(box)) {
                 return new Refused(at, obstacle.kind(), obstacle.id());
             }
@@ -374,9 +406,9 @@ public final class LabelPlacement {
      * constellation when their name is cut - SAGITTARIUS reads
      * SAGITTA, LEO MINOR reads LEO, TRIANGULUM AUSTRALE reads
      * TRIANGULUM - and 35,057 truncations of the deep-sky labels the
-     * gate's corpus carries are another object's label. A page that shows half a name is not untidy;
-     * it is a page that says something false
-     * (docs/decisions/label-placement.md).
+     * gate's corpus carries are another object's label. A page that
+     * shows half a name is not untidy; it is a page that says
+     * something false (docs/decisions/label-placement.md).
      */
     private boolean leavesThePaper(Rectangle2D box) {
         return box.getMinX() < EDGE_MARGIN_PX
@@ -397,12 +429,12 @@ public final class LabelPlacement {
      * constellation's region, or off the paper, is not in the running
      * at all: those are not costs to be spent.
      */
-    private int leastBad(Request request) {
+    private int leastBad(Request request, List<Refused> already) {
         int best = -1;
         double least = Double.MAX_VALUE;
         for (int at = 0; at < request.candidates().size(); at++) {
             Rectangle2D box = request.candidates().get(at);
-            Refused refused = refuse(request, at);
+            Refused refused = refusalOf(already, at);
             if (refused != null && (refused.kind() == Refusal.PAGE_EDGE
                     || refused.kind() == Refusal.OWNERSHIP)) {
                 continue;
@@ -414,6 +446,16 @@ public final class LabelPlacement {
             }
         }
         return best;
+    }
+
+    /** What the first pass found refused this candidate. */
+    private static Refused refusalOf(List<Refused> refusals, int candidate) {
+        for (Refused refused : refusals) {
+            if (refused.candidate() == candidate) {
+                return refused;
+            }
+        }
+        return null;
     }
 
     private double costOf(Request request, Rectangle2D box) {

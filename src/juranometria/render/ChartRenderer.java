@@ -429,6 +429,27 @@ public final class ChartRenderer {
 
     public void render(Graphics2D g, ChartScene scene, ChartOptions options,
                        ReferenceLayer reference) {
+        render(g, scene, options, reference, null);
+    }
+
+    /**
+     * The page, with its text placed by a decision taken elsewhere
+     * (Sprint 31, issue #314).
+     *
+     * <p>For measurement, and for one reason. Placement is now a
+     * decision about the whole page, so a study that takes one star
+     * away to see what it inked would find every label after it in a
+     * different place, and the difference would not be the star's ink.
+     * Handed the finished page's placements, the renderer draws the
+     * text where the page had it and the difference is the ink alone.
+     *
+     * <p>{@code null} means the ordinary thing: decide it here. What
+     * is passed is drawn as it is - a caller withholding a piece of
+     * text leaves it out of the list.
+     */
+    public void render(Graphics2D g, ChartScene scene, ChartOptions options,
+                       ReferenceLayer reference,
+                       java.util.List<LabelPlacement.Placement> given) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
         ChartPalette palette = options.palette();
@@ -447,6 +468,14 @@ public final class ChartRenderer {
         ViewportMapping mapping = new ViewportMapping(scene.viewport());
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
+        // Where every piece of this page's text goes, decided once
+        // and before any of it is drawn: names are painted under the
+        // marks and labels over them, and one decision that knows the
+        // whole page is what keeps the two out of each other's way
+        // (Sprint 31, issue #314).
+        java.util.List<LabelPlacement.Placement> placedText =
+                given != null ? given
+                        : textPlacements(TextMetrics.of(g), scene, options);
 
         g.setClip(1, 1, width - 2, height - 2);
         // The equatorial graticule draws first - the quietest ink on
@@ -462,7 +491,8 @@ public final class ChartRenderer {
             EquatorialGrid.draw(g, gridFor(g.getFontMetrics(LABEL_FONT),
                     scene, options), palette);
         }
-        drawGeography(g, scene, options, projection, mapping);
+        drawGeography(g, scene, options, projection, mapping,
+                constellationNamesIn(placedText));
         // Above the grid and the figures, below every mark: a
         // reference line is read across the chart and must not hide
         // an object (docs/decisions/place-and-time.md).
@@ -486,12 +516,12 @@ public final class ChartRenderer {
                 g.fill(mark.outline());
             }
         }
-        drawStarLabels(g, scene, options, policy, projection, mapping);
-        for (DeepSkyObject dso : labelledDeepSky(scene, options, policy)) {
-            projection.project(dso.position()).ifPresent(plane ->
-                    drawLabel(g, dso, mapping.toPixel(plane),
-                            mapping.pixelsPerPlaneUnit(), palette));
-        }
+        // Star labels, then deep-sky labels, which is the order the
+        // page has always drawn them in.
+        drawText(g, LABEL_FONT, palette.textInk(), placedText,
+                placement -> !isDeepSkyText(placement.request(), scene));
+        drawText(g, LABEL_FONT, palette.textInk(), placedText,
+                placement -> isDeepSkyText(placement.request(), scene));
         // Furniture last and opaque, in the decided order (Sprint 20,
         // docs/decisions/chart-furniture.md): neither block is ever
         // half-covered by chart ink, and each is the reader's to
@@ -521,7 +551,10 @@ public final class ChartRenderer {
     private static void drawGeography(Graphics2D g, ChartScene scene,
                                       ChartOptions options,
                                       Projection projection,
-                                      ViewportMapping mapping) {
+                                      ViewportMapping mapping,
+                                      java.util.List<
+                                              ConstellationNamePlacement>
+                                              names) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
         ChartPalette palette = options.palette();
@@ -542,10 +575,11 @@ public final class ChartRenderer {
                         visibleInk);
             }
             // Names depend on figures by decision, which is also why
-            // their visible-ink anchors exist exactly when they draw.
-            if (options.effectiveConstellationNames() && policy.namesDrawn()) {
-                drawConstellationNames(g, scene, visibleInk, palette);
-            }
+            // their visible-ink anchors exist exactly when they draw -
+            // and since #314 the placement decides which of those
+            // anchors a name actually sits on, or whether it sits on
+            // the page at all.
+            drawConstellationNames(g, names, palette);
         }
     }
 
@@ -685,22 +719,32 @@ public final class ChartRenderer {
      * constellation. Names may clip at page edges (honest position over
      * pretty placement); the title block draws later and always wins.
      */
-    private static void drawConstellationNames(Graphics2D g, ChartScene scene,
-                                               java.util.Map<String, double[]> visibleInk,
-                                               ChartPalette palette) {
+    private static void drawConstellationNames(
+            Graphics2D g,
+            java.util.List<ConstellationNamePlacement> names,
+            ChartPalette palette) {
         g.setFont(CONSTELLATION_NAME_FONT);
         g.setColor(palette.constellationNameInk());
-        for (java.util.Map.Entry<String, String> name
-                : scene.geography().latinNames().entrySet()) {
-            double[] sum = visibleInk.get(name.getKey());
-            if (sum == null) {
-                continue;
-            }
-            String text = name.getValue().toUpperCase(Locale.ROOT);
-            int textWidth = g.getFontMetrics().stringWidth(text);
-            g.drawString(text, (float) (sum[0] / sum[2] - textWidth / 2.0),
-                    (float) (sum[1] / sum[2]));
+        FontMetrics metrics = g.getFontMetrics();
+        for (ConstellationNamePlacement name : names) {
+            drawAt(g, name.text(), name.box(), metrics);
         }
+    }
+
+    private static java.util.List<ConstellationNamePlacement>
+            constellationNamesIn(
+                    java.util.List<LabelPlacement.Placement> placed) {
+        java.util.List<ConstellationNamePlacement> names =
+                new java.util.ArrayList<>();
+        for (LabelPlacement.Placement placement : placed) {
+            if (!placement.omitted() && placement.request().family()
+                    == LabelPlacement.Family.CONSTELLATION) {
+                names.add(new ConstellationNamePlacement(
+                        placement.request().id(),
+                        placement.request().text(), placement.at()));
+            }
+        }
+        return names;
     }
 
     private static SkyPosition slerp(SkyPosition from, SkyPosition to, double t) {
@@ -825,131 +869,274 @@ public final class ChartRenderer {
     }
 
     /**
+     * The two fonts a page's text is measured in, taken from one
+     * place so screen, sheet and study cannot each measure a string
+     * separately and disagree by a pixel (Sprint 31, issue #314).
+     */
+    public record TextMetrics(FontMetrics labels, FontMetrics names) {
+
+        /** The metrics of the surface actually being drawn on. */
+        public static TextMetrics of(Graphics2D g) {
+            return new TextMetrics(g.getFontMetrics(LABEL_FONT),
+                    g.getFontMetrics(CONSTELLATION_NAME_FONT));
+        }
+
+        /**
+         * The metrics of an offscreen surface, for asking where a
+         * page's text goes without drawing it.
+         */
+        public static TextMetrics offscreen() {
+            return OFFSCREEN;
+        }
+    }
+
+    private static final TextMetrics OFFSCREEN = offscreenMetrics();
+
+    private static TextMetrics offscreenMetrics() {
+        java.awt.image.BufferedImage scratch =
+                new java.awt.image.BufferedImage(1, 1,
+                        java.awt.image.BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scratch.createGraphics();
+        try {
+            return TextMetrics.of(g);
+        } finally {
+            g.dispose();
+        }
+    }
+
+    /**
+     * Where every piece of this page's placed text goes, and why
+     * (Sprint 31, issue #314, from the gate in
+     * docs/decisions/label-placement.md).
+     *
+     * <p>One decision for all three families rather than three passes
+     * that avoid different things. Each family keeps its own
+     * eligibility rule - which stars qualify at which field is {@link
+     * StarLabelPolicy}'s business and stays there - and hands {@link
+     * LabelPlacement} an anchor, a string, a priority and a candidate
+     * list. The order is the gate's: the searched target first and
+     * guaranteed, then star labels brightest first, then deep-sky
+     * labels by the catalogue's own priority, then constellation
+     * names, which have the most freedom and so choose last.
+     *
+     * <p>The obstacles are the page's ink and its text: every drawn
+     * mark at its own ink, the furniture that will actually draw, the
+     * grid's notation, and each label already accepted. Lines are not
+     * obstacles by decision - a policy that avoided them would stop
+     * drawing text on a wide page.
+     *
+     * <p>{@link #render} draws precisely this, and nothing else
+     * decides where a label goes.
+     */
+    public java.util.List<LabelPlacement.Placement> textPlacements(
+            TextMetrics metrics, ChartScene scene, ChartOptions options) {
+        return new LabelPlacement(scene.viewport().widthPx(),
+                scene.viewport().heightPx(),
+                textObstacles(metrics, scene, options))
+                .placeAll(textRequests(metrics, scene, options));
+    }
+
+    /**
+     * The ink and text this page's labels must avoid - published so
+     * that a study can ask the page the same question production asks
+     * it, rather than assembling a set beside it and differing by one
+     * grid label (Sprint 31, issue #314).
+     */
+    public java.util.List<LabelPlacement.Obstacle> textObstacles(
+            TextMetrics metrics, ChartScene scene, ChartOptions options) {
+        java.util.List<LabelPlacement.Obstacle> ink =
+                new java.util.ArrayList<>(LabelGeometry.obstaclesOn(this,
+                        metrics.labels(), scene, options));
+        // The grid's notation is text the page has already placed, so
+        // a star's name yields to it as it yields to any other
+        // accepted label. The reference layer's names are not here:
+        // docs/decisions/place-and-time.md settled that a module's
+        // ink may not displace the sky's own text, and a meridian
+        // that moved a star's name would be the observer editing the
+        // chart.
+        for (GridLabelPlacement grid
+                : gridLabelPlacements(metrics.labels(), scene, options)) {
+            ink.add(new LabelPlacement.Obstacle(
+                    LabelPlacement.Refusal.TEXT,
+                    "grid " + grid.text(), grid.box()));
+        }
+        return java.util.List.copyOf(ink);
+    }
+
+    /** Every piece of text this page asks to place, published too. */
+    public java.util.List<LabelPlacement.Request> textRequests(
+            TextMetrics metrics, ChartScene scene, ChartOptions options) {
+        java.util.List<LabelPlacement.Request> asked =
+                new java.util.ArrayList<>();
+        asked.addAll(LabelGeometry.starLabels(this, metrics.labels(),
+                scene, options));
+        asked.addAll(LabelGeometry.deepSkyLabels(this, metrics.labels(),
+                scene, options));
+        asked.addAll(LabelGeometry.constellationNames(this,
+                metrics.names(), scene, options));
+        return java.util.List.copyOf(asked);
+    }
+
+    /** The star labels this page draws, at the boxes it draws them in. */
+    public java.util.List<StarLabelPlacement> starLabelPlacements(
+            TextMetrics metrics, ChartScene scene, ChartOptions options) {
+        return starLabelsIn(textPlacements(metrics, scene, options), scene);
+    }
+
+    /**
      * The star-label pass's DECISION, shared so studies can report
      * exactly what the chart draws instead of re-implementing the
-     * selection and collision loop (issue #154). Returns the
-     * placements in drawing order; {@link #drawStarLabels} draws
-     * precisely this list.
+     * selection and collision loop (issue #154). Since #314 the
+     * decision is the page's shared one; this reads the star family
+     * out of it, in drawing order.
      */
-    public java.util.List<StarLabelPlacement> starLabelPlacements(
-            FontMetrics metrics, ChartScene scene, ChartOptions options,
-            RegionalDetailPolicy detailPolicy,
-            Projection projection, ViewportMapping mapping) {
-        StarLabelPolicy policy = new StarLabelPolicy(
-                scene.viewport().fieldWidthDegrees());
-        java.util.List<StarLabelPlacement> placed = new java.util.ArrayList<>();
-        java.util.List<Rectangle2D> occupied = new java.util.ArrayList<>();
-        // Labels yield to the furniture that will actually draw - to
-        // the title block as they always have, and now to the
-        // magnitude key on the same terms. Furniture the reader has
-        // switched off reserves nothing.
-        if (options.titleBlock()) {
-            java.awt.Rectangle titleBlock = titleBlockBounds(metrics, scene);
-            if (titleBlock != null) {
-                occupied.add(titleBlock);
-            }
-        }
-        if (options.magnitudeKey()) {
-            java.awt.Rectangle key =
-                    magnitudeKeyBounds(metrics, scene, starSizePolicy);
-            if (key != null) {
-                occupied.add(key);
-            }
-        }
-        // Star labels yield to the deep-sky labels that will actually
-        // draw. A family the reader has switched off reserves
-        // nothing, exactly as furniture does (issue #185).
-        for (DeepSkyObject dso
-                : labelledDeepSky(scene, options, detailPolicy)) {
-            var plane = projection.project(dso.position());
-            if (plane.isPresent()) {
-                occupied.add(labelBounds(metrics, dso,
-                        mapping.toPixel(plane.get()),
-                        mapping.pixelsPerPlaneUnit()));
-            }
-        }
-        // The searched star draws first, exempt from thresholds and
-        // collisions; its box seeds the set so ordinary labels yield.
+    private static java.util.List<StarLabelPlacement> starLabelsIn(
+            java.util.List<LabelPlacement.Placement> placed,
+            ChartScene scene) {
+        java.util.Map<String, Star> stars = new java.util.HashMap<>();
         for (Star star : scene.stars()) {
-            if (scene.targetIdentity() == null
-                    || !scene.targetIdentity().equals(star.id())
-                    || star.magnitude() > scene.limitingMagnitude()) {
+            stars.putIfAbsent(star.id(), star);
+        }
+        java.util.List<StarLabelPlacement> labels =
+                new java.util.ArrayList<>();
+        for (LabelPlacement.Placement placement : placed) {
+            if (placement.omitted()) {
                 continue;
             }
-            String text = StarLabelPolicy.guaranteedLabelFor(star);
-            if (text != null) {
-                consider(placed, occupied, metrics, scene, projection,
-                        mapping, star, text, true);
-            }
-        }
-        if (!options.anyStarLabels()) {
-            return java.util.List.copyOf(placed);
-        }
-        java.util.List<Star> stars = new java.util.ArrayList<>(scene.stars());
-        stars.sort(java.util.Comparator.comparingDouble(Star::magnitude)
-                .thenComparing(Star::id));
-        for (Star star : stars) {
-            if (star.magnitude() > scene.limitingMagnitude()
-                    || (scene.targetIdentity() != null
-                            && scene.targetIdentity().equals(star.id()))) {
+            Star star = stars.get(placement.request().id());
+            if (star == null || !isStarFamily(placement.request())) {
                 continue;
             }
-            // The pass composes what the reader permits from what
-            // the option-free policy says qualifies.
-            String text = policy.qualifying(star).text(options.starNames(),
-                    options.bayerLetters(), options.flamsteedNumbers());
-            if (text != null) {
-                consider(placed, occupied, metrics, scene, projection,
-                        mapping, star, text, false);
-            }
+            labels.add(new StarLabelPlacement(placement.request().text(),
+                    placement.at(), star, placement.request().guaranteed()));
         }
-        return java.util.List.copyOf(placed);
+        return java.util.List.copyOf(labels);
     }
 
-    /** Places one label unless the page or an accepted box refuses it. */
-    private void consider(java.util.List<StarLabelPlacement> placed,
-                          java.util.List<Rectangle2D> occupied,
-                          FontMetrics metrics,
-                          ChartScene scene, Projection projection,
-                          ViewportMapping mapping, Star star, String text,
-                          boolean guaranteed) {
-        var plane = projection.project(star.position());
-        if (plane.isEmpty()) {
-            return;
-        }
-        PixelPoint pixel = mapping.toPixel(plane.get());
-        if (pixel.x() < 0 || pixel.x() >= scene.viewport().widthPx()
-                || pixel.y() < 0
-                || pixel.y() >= scene.viewport().heightPx()) {
-            return;
-        }
-        Rectangle2D box = starLabelBounds(metrics, text, pixel,
-                starSizePolicy.radiusFor(star.magnitude()));
-        if (!guaranteed) {
-            for (Rectangle2D other : occupied) {
-                if (other.intersects(box)) {
-                    return;
-                }
-            }
-        }
-        occupied.add(box);
-        placed.add(new StarLabelPlacement(text, box, star, guaranteed));
+    private static boolean isStarFamily(LabelPlacement.Request request) {
+        return request.family() == LabelPlacement.Family.STAR
+                || request.family() == LabelPlacement.Family.TARGET;
     }
 
-    private void drawStarLabels(Graphics2D g, ChartScene scene,
-                                ChartOptions options,
-                                RegionalDetailPolicy detailPolicy,
-                                Projection projection,
-                                ViewportMapping mapping) {
-        g.setFont(LABEL_FONT);
-        g.setColor(options.palette().textInk());
+    /** One placed deep-sky label: the object, its text and its box. */
+    public record DeepSkyLabelPlacement(DeepSkyObject deepSky, String text,
+                                        Rectangle2D box) {
+    }
+
+    /** The deep-sky labels this page draws, at the boxes it draws them in. */
+    public java.util.List<DeepSkyLabelPlacement> deepSkyLabelPlacements(
+            TextMetrics metrics, ChartScene scene, ChartOptions options) {
+        java.util.Map<String, DeepSkyObject> objects =
+                new java.util.HashMap<>();
+        for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            objects.putIfAbsent(dso.id(), dso);
+        }
+        java.util.List<DeepSkyLabelPlacement> labels =
+                new java.util.ArrayList<>();
+        for (LabelPlacement.Placement placement
+                : textPlacements(metrics, scene, options)) {
+            if (placement.omitted() || isStarFamily(placement.request())
+                    && objects.get(placement.request().id()) == null) {
+                continue;
+            }
+            if (placement.request().family()
+                    == LabelPlacement.Family.CONSTELLATION) {
+                continue;
+            }
+            DeepSkyObject dso = objects.get(placement.request().id());
+            if (dso == null) {
+                continue;
+            }
+            labels.add(new DeepSkyLabelPlacement(dso,
+                    placement.request().text(), placement.at()));
+        }
+        return java.util.List.copyOf(labels);
+    }
+
+    /** One placed constellation name: the constellation and its box. */
+    public record ConstellationNamePlacement(String constellationId,
+                                             String text,
+                                             Rectangle2D box) {
+    }
+
+    /** The constellation names this page draws, at their placed boxes. */
+    public java.util.List<ConstellationNamePlacement>
+            constellationNamePlacements(TextMetrics metrics,
+                                        ChartScene scene,
+                                        ChartOptions options) {
+        java.util.List<ConstellationNamePlacement> names =
+                new java.util.ArrayList<>();
+        for (LabelPlacement.Placement placement
+                : textPlacements(metrics, scene, options)) {
+            if (placement.omitted() || placement.request().family()
+                    != LabelPlacement.Family.CONSTELLATION) {
+                continue;
+            }
+            names.add(new ConstellationNamePlacement(
+                    placement.request().id(), placement.request().text(),
+                    placement.at()));
+        }
+        return java.util.List.copyOf(names);
+    }
+
+    /**
+     * One family's worth of placed text, drawn where it was placed.
+     *
+     * <p>Nothing is looked up in the scene to draw it: what the page
+     * decided is all that is needed, so a study holding the decision
+     * still while it takes ink away gets the text back in the same
+     * place.
+     */
+    private static void drawText(Graphics2D g, Font font, Color ink,
+                                 java.util.List<LabelPlacement.Placement>
+                                         placed,
+                                 java.util.function.Predicate<
+                                         LabelPlacement.Placement> which) {
+        g.setFont(font);
+        g.setColor(ink);
         FontMetrics metrics = g.getFontMetrics();
-        for (StarLabelPlacement placement : starLabelPlacements(metrics,
-                scene, options, detailPolicy, projection, mapping)) {
-            g.drawString(placement.text(),
-                    (float) (placement.box().getX() + 2.0),
-                    (float) (placement.box().getY() + metrics.getAscent()));
+        for (LabelPlacement.Placement placement : placed) {
+            if (placement.omitted()
+                    || placement.request().family()
+                            == LabelPlacement.Family.CONSTELLATION
+                    || !which.test(placement)) {
+                continue;
+            }
+            drawAt(g, placement.request().text(), placement.at(), metrics);
         }
+    }
+
+    /**
+     * Whether a piece of text names a deep-sky object, which decides
+     * only which of the two label passes draws it. The searched
+     * target is a family of its own to the placement rule and a star
+     * or a nebula to the page.
+     */
+    private static boolean isDeepSkyText(LabelPlacement.Request request,
+                                         ChartScene scene) {
+        if (request.family() == LabelPlacement.Family.DEEP_SKY) {
+            return true;
+        }
+        if (request.family() != LabelPlacement.Family.TARGET) {
+            return false;
+        }
+        for (DeepSkyObject dso : scene.deepSkyObjects()) {
+            if (dso.id().equals(request.id())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Text at a placed box: the string starts two pixels in and sits
+     * on a baseline one ascent down, which is where every box in this
+     * renderer is measured from.
+     */
+    private static void drawAt(Graphics2D g, String text, Rectangle2D box,
+                               FontMetrics metrics) {
+        g.drawString(text, (float) (box.getX() + 2.0),
+                (float) (box.getY() + metrics.getAscent()));
     }
 
     /**
@@ -975,6 +1162,11 @@ public final class ChartRenderer {
     /** The size policy this renderer draws its stars at. */
     public juranometria.chart.StarSizePolicy starSize() {
         return starSizePolicy;
+    }
+
+    /** The font a constellation name is written in. */
+    public static java.awt.Font constellationNameFont() {
+        return CONSTELLATION_NAME_FONT;
     }
 
     /** The label font, shared with studies measuring this geometry. */

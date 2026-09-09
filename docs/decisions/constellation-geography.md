@@ -149,6 +149,16 @@ the geography and therefore always wins; names may clip at page edges
 avoidance is deferred with the existing label-collision work. Figure
 lines pass under star ink and DSO symbols by draw order.
 
+> **Superseded in part, Sprint 31 (issue #310's gate, applied by
+> #314).** Names no longer clip at page edges, and clipping is no
+> longer a matter of tidiness: a word cut short is very often another
+> word, and `SAGITTARIUS` cut by the paper reads `SAGITTA`. A name
+> that cannot be drawn whole moves to one of sixteen other stated
+> positions inside its own figure's region, and one with nowhere to
+> go is not drawn. Name-versus-name avoidance is no longer deferred
+> either: every family shares one placement decision
+> (`docs/decisions/label-placement.md`).
+
 ## Layer control
 
 **No toolbar layer control this sprint.** The scale policy alone
