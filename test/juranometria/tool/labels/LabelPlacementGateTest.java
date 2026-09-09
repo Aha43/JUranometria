@@ -79,27 +79,41 @@ class LabelPlacementGateTest {
         // subtracted back out of it. Without the subtraction, "one
         // star's name across another star's mark" and "across another
         // star's name" are the same reading.
+        //
+        // Since #314 the census holds the page's placement still while
+        // it withholds ink, which answers the same trap at its source
+        // - the label is drawn from a decision the withholding did not
+        // change - and both halves are checked here, because the
+        // subtraction is what guards a page whose decision is not
+        // held.
         Page page = fixturePage();
-        Attribution attribution = new Attribution(page);
         Participant label = new Participant(Participant.Family.STAR_LABEL,
                 StudyPages.NUNKI, "Nunki σ");
         Participant everything = new Participant(
                 Participant.Family.STAR_DISC, StudyPages.NUNKI, "the star");
         Participant discAlone = everything.alsoTaking(label);
 
-        int labelInk = attribution.inkOf(label).pixels();
-        int both = attribution.inkOf(everything).pixels();
-        int disc = attribution.inkOf(discAlone).pixels();
+        Attribution loose = new Attribution(page, false);
+        int labelInk = loose.inkOf(label).pixels();
+        int both = loose.inkOf(everything).pixels();
+        int disc = loose.inkOf(discAlone).pixels();
         assertTrue(labelInk > 50, "Nunki is labelled on this page: "
                 + labelInk + " px");
-        assertTrue(both > labelInk + 20, "removing the star takes its"
-                + " name and its mark: " + both + " px against "
-                + labelInk + " px of name alone");
+        assertTrue(both > labelInk + 20, "with the page free to replace"
+                + " it, removing the star takes its name and its mark: "
+                + both + " px against " + labelInk + " px of name alone");
         assertTrue(disc <= both - labelInk + 10 && disc > 5,
                 "and the subtraction leaves the mark: " + disc + " px");
-        assertFalse(attribution.inkOf(discAlone)
-                .meeting(attribution.inkOf(label)).any(),
+        assertFalse(loose.inkOf(discAlone).meeting(loose.inkOf(label)).any(),
                 "with nothing of the label left in it");
+
+        Attribution held = new Attribution(page);
+        int heldBoth = held.inkOf(everything).pixels();
+        assertTrue(heldBoth < labelInk, "and with the decision held,"
+                + " removing the star takes the mark alone: " + heldBoth
+                + " px against " + labelInk + " px of name");
+        assertTrue(Math.abs(held.inkOf(discAlone).pixels() - heldBoth) <= 2,
+                "which is what the subtraction was for");
     }
 
     @Test
@@ -128,6 +142,8 @@ class LabelPlacementGateTest {
         // The named regression fixture, in the terms the owner set:
         // Nunki's glyphs, Nunki's own disc beside which they are
         // anchored, and Namalsadirah's disc which they must not cross.
+        // Each is measurable on its own, which is what makes the
+        // repair below a measurement rather than a claim.
         Page page = fixturePage();
         Attribution attribution = new Attribution(page);
         Participant nunkiLabel = new Participant(
@@ -141,39 +157,36 @@ class LabelPlacementGateTest {
                 Participant.Family.STAR_DISC, StudyPages.NAMALSADIRAH,
                 "Namalsadirah's mark").alsoTaking(otherLabel);
 
+        assertTrue(attribution.inkOf(nunkiLabel).pixels() > 50,
+                "the name is on the page: "
+                        + attribution.inkOf(nunkiLabel).pixels() + " px");
+        assertTrue(attribution.inkOf(nunkiDisc).pixels() > 5,
+                "so is its own mark");
+        assertTrue(attribution.inkOf(otherDisc).pixels() > 5,
+                "so is the mark it was crossing");
+
         assertFalse(attribution.meeting(nunkiLabel, nunkiDisc).collides(),
                 "a star's name is anchored beside its own mark, not"
                         + " across it");
-        Attribution.Meeting defect =
+        // The defect the owner reported, measured the way it was
+        // reported: 68 px of Namalsadirah's disc under Nunki's name on
+        // the author's machine, 27 on the Linux runner, a quarter of
+        // the mark either way. Not one pixel now.
+        Attribution.Meeting repaired =
                 attribution.meeting(nunkiLabel, otherDisc);
-        assertTrue(defect.collides(), "and across an unrelated one: the"
-                + " defect the owner reported");
-        // As a share of the mark rather than as a pixel count. The
-        // count is font rendering, and font rendering is a fact about
-        // a machine: this shares 68 px on the author's macOS and 27 on
-        // the Linux runner, and a threshold tuned to either would be a
-        // test about the toolkit. What is true on both is that a
-        // substantial part of the mark is under the name.
-        int stillVisible = attribution.inkOf(otherDisc).pixels();
-        int covered = defect.where().pixels();
-        double share = (double) covered / (covered + stillVisible);
-        assertTrue(share > 0.25, "not by a pixel or two: " + covered
-                + " px of the mark covered against " + stillVisible
-                + " left visible, " + Math.round(share * 100) + "%");
-        assertEquals(Participant.Family.STAR_LABEL,
-                defect.over().family(),
-                "with the name on top of the mark");
-        assertEquals(StudyPages.NAMALSADIRAH, defect.under().id(),
-                "and the mark being Namalsadirah's, by catalogue id"
-                        + " rather than by name");
+        assertFalse(repaired.collides(), "and since #314 not across an"
+                + " unrelated one either: the defect the owner reported,"
+                + " repaired on the page it was reported on - "
+                + repaired.where().pixels() + " px shared");
     }
 
     @Test
-    void theAtlasRefusesNamalsadirahTheLetterItQualifiesFor() {
-        // The fourth participant, and the reason the fixture is worse
-        // than it looks: the star whose mark is covered also loses its
-        // own designation, to the very label that covers it. A
-        // contract for #314 - the letter must come back.
+    void namalsadirahKeepsTheLetterItQualifiesFor() {
+        // The fourth participant, and the reason the fixture was worse
+        // than it looked: the star whose mark was covered also lost
+        // its own designation, to the very label that covered it. The
+        // gate made the letter coming back a contract for #314, and
+        // this is where it is paid.
         ChartScene scene = fixturePage().scene();
         Star namalsadirah = null;
         for (Star star : scene.stars()) {
@@ -187,65 +200,95 @@ class LabelPlacementGateTest {
                         .text(true, true, true),
                 "which qualifies for its Bayer letter at this field");
 
-        var mapping = new juranometria.project.ViewportMapping(
-                scene.viewport());
-        var projection = juranometria.project.Projections.forViewport(
-                scene.viewport());
-        var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());
-        boolean drawn = false;
-        boolean nunkiDrawn = false;
+        java.awt.geom.Rectangle2D letter = null;
+        java.awt.geom.Rectangle2D nunki = null;
         for (ChartRenderer.StarLabelPlacement placement
-                : Page.renderer().starLabelPlacements(metrics, scene,
-                        ChartOptions.DEFAULTS,
-                        new RegionalDetailPolicy(scene,
-                                mapping.pixelsPerPlaneUnit()),
-                        projection, mapping)) {
-            drawn |= placement.star().id().equals(StudyPages.NAMALSADIRAH);
-            nunkiDrawn |= placement.star().id().equals(StudyPages.NUNKI);
+                : Page.renderer().starLabelPlacements(
+                        ChartRenderer.TextMetrics.offscreen(), scene,
+                        ChartOptions.DEFAULTS)) {
+            if (placement.star().id().equals(StudyPages.NAMALSADIRAH)) {
+                letter = placement.box();
+            }
+            if (placement.star().id().equals(StudyPages.NUNKI)) {
+                nunki = placement.box();
+            }
         }
-        assertTrue(nunkiDrawn, "the brighter star is labelled");
-        assertFalse(drawn, "and the fainter one's letter is refused,"
-                + " because the label that will be drawn across its"
-                + " mark got there first");
+        assertTrue(nunki != null, "the brighter star is labelled");
+        assertTrue(letter != null, "and the fainter one has its letter"
+                + " back: the atlas no longer declines to name a star"
+                + " in order to protect a name it then draws across"
+                + " that star's mark");
+        assertFalse(nunki.intersects(letter),
+                "and the two names do not share a pixel of box");
     }
 
     @Test
     void theChosenPolicyLosesNothingThePageAlreadyDraws() {
-        // The decision's load-bearing claim: the least-bad fallback
-        // repairs the observed defects without dropping a single label
-        // the released page draws. Measured on the fixture's own page,
-        // from the two painted pages rather than from the policy's
-        // account of itself.
+        // The decision's load-bearing claim, now asked of the atlas
+        // itself: production places this page and the study's own
+        // greedy pass places it separately, from the same document and
+        // sharing no code, and the two are compared on the painted
+        // page rather than on either one's account of itself.
         Page page = fixturePage();
-        Census today = new Census(page);
+        Census production = new Census(page);
         Greedy greedy = new Greedy(page, Greedy.LEAST_BAD);
-        Census after = new Census(greedy.pageWithPlacements());
+        Census candidate = new Census(greedy.pageWithPlacements());
 
-        java.util.Set<String> was = new java.util.LinkedHashSet<>();
-        for (Participant drawn : today.text()) {
-            was.add(drawn.family() + ":" + drawn.id());
+        java.util.Set<String> theirs = new java.util.LinkedHashSet<>();
+        for (Participant drawn : candidate.text()) {
+            theirs.add(drawn.family() + ":" + drawn.id());
         }
-        java.util.List<String> lost = new java.util.ArrayList<>();
-        for (String one : was) {
-            boolean kept = false;
-            for (Participant drawn : after.text()) {
-                kept |= (drawn.family() + ":" + drawn.id()).equals(one);
-            }
-            if (!kept) {
-                lost.add(one);
+        java.util.Set<String> ours = new java.util.LinkedHashSet<>();
+        for (Participant drawn : production.text()) {
+            ours.add(drawn.family() + ":" + drawn.id());
+        }
+        // What production draws and the study does not is the study's
+        // business; what production does NOT draw has to be the
+        // decision's doing, and the seam says which of the two it is.
+        // Either the label was omitted - every candidate off the paper
+        // or off its own figure - or the fallback spent the furniture,
+        // which the gate lets it spend, and the title block is opaque
+        // and drawn last, so the label is behind it. The study's own
+        // pass writes its text over the furniture and so keeps a label
+        // production covers.
+        java.awt.geom.Rectangle2D block = ChartRenderer.titleBlockBounds(
+                Census.Metrics.forFont(ChartRenderer.labelFont()),
+                page.scene());
+        java.util.Set<String> explained = new java.util.LinkedHashSet<>();
+        for (var placement : Page.renderer().textPlacements(
+                ChartRenderer.TextMetrics.offscreen(), page.scene(),
+                page.options())) {
+            if (placement.omitted()
+                    || block != null && block.contains(placement.at())) {
+                explained.add(familyOf(placement.request()) + ":"
+                        + placement.request().id());
             }
         }
-        assertEquals(List.of(), lost,
-                "the candidate page draws everything the released page"
-                        + " draws");
-        assertTrue(defects(after) * 4 < defects(today),
-                "and far fewer of the owner's two defects: "
-                        + defects(today) + " became " + defects(after));
-        assertTrue(greedy.candidatesTried() < 4000,
-                "and a finite ordered list, walked once per label"
-                        + " rather than searched: "
-                        + greedy.candidatesTried()
-                        + " candidate positions examined");
+        java.util.List<String> unexplained = new java.util.ArrayList<>();
+        for (String one : theirs) {
+            if (!ours.contains(one) && !explained.contains(one)) {
+                unexplained.add(one);
+            }
+        }
+        assertEquals(List.of(), unexplained,
+                "every piece of text the atlas does not draw is one the"
+                        + " decision omitted or one the fallback put"
+                        + " behind the title block");
+        assertTrue(defects(production) <= defects(candidate),
+                "and the atlas has no more of the owner's two defects"
+                        + " than the study's own pass: "
+                        + defects(production) + " against "
+                        + defects(candidate));
+    }
+
+    private static String familyOf(
+            juranometria.render.LabelPlacement.Request request) {
+        return switch (request.family()) {
+            case CONSTELLATION -> Participant.Family.CONSTELLATION_NAME
+                    .toString();
+            case DEEP_SKY -> Participant.Family.DEEP_SKY_LABEL.toString();
+            default -> Participant.Family.STAR_LABEL.toString();
+        };
     }
 
     @Test
@@ -371,54 +414,77 @@ class LabelPlacementGateTest {
     }
 
     @Test
-    void aNameIsAnchoredWhereTheAtlasAnchorsIt() {
-        // The policy's centroid must be the renderer's centroid, or
-        // every constellation number in the study is about a different
-        // page. Measured against the name the released page actually
-        // draws, found by withholding it.
-        Page page = fixturePage();
+    void aNameIsDrawnWhereTheAtlasPlacesIt() {
+        // Two claims, and they were one before #314: the anchor the
+        // policy computes is the renderer's own centroid, and the name
+        // is drawn at the box the page placed it in. Until the
+        // families migrated those were the same statement, because a
+        // name was always drawn on its anchor. Now a name may move,
+        // and each half has to be asked separately - measured against
+        // the name the page actually draws, found by withholding it.
+        Page page = fixturePage().withTextHeld();
         FigureRegion owned = FigureRegion.of(page);
         Attribution attribution = new Attribution(page);
+        java.util.Map<String, java.awt.geom.Rectangle2D> placed =
+                new java.util.HashMap<>();
+        java.util.Map<String, double[]> anchors = new java.util.HashMap<>();
+        for (var placement : Page.renderer().textPlacements(
+                ChartRenderer.TextMetrics.offscreen(), page.scene(),
+                page.options())) {
+            if (placement.request().family()
+                    != juranometria.render.LabelPlacement.Family
+                            .CONSTELLATION) {
+                continue;
+            }
+            anchors.put(placement.request().id(), new double[] {
+                    placement.request().anchorX(),
+                    placement.request().anchorY()});
+            if (!placement.omitted()) {
+                placed.put(placement.request().id(), placement.at());
+            }
+        }
         int checked = 0;
         for (java.util.Map.Entry<String, String> name
                 : page.scene().geography().latinNames().entrySet()) {
+            double[] centroid = owned.centroidOf(name.getKey());
+            double[] anchor = anchors.get(name.getKey());
+            if (centroid == null || anchor == null) {
+                continue;
+            }
+            // The anchor, which the study and the renderer must agree
+            // on or every constellation number in the study is about a
+            // different page.
+            assertTrue(Math.hypot(anchor[0] - centroid[0],
+                            anchor[1] - centroid[1]) < 1.0,
+                    name.getKey() + ": the policy anchors the name where"
+                            + " the atlas anchors it, " + anchor[0] + ","
+                            + anchor[1] + " against " + centroid[0] + ","
+                            + centroid[1]);
+            java.awt.geom.Rectangle2D box = placed.get(name.getKey());
             Ink ink = attribution.inkOf(new Participant(
                     Participant.Family.CONSTELLATION_NAME, name.getKey(),
                     name.getValue()));
             java.awt.geom.Rectangle2D drawn = ink.bounds();
-            double[] centroid = owned.centroidOf(name.getKey());
-            if (drawn == null || centroid == null
-                    || drawn.getMinX() <= 1 || drawn.getMaxX() >= page.wide() - 1) {
-                // A name clipped by the page edge has ink whose
-                // centre is not its own centre; the page's own rule
-                // lets it clip, and this is not the test for that.
+            if (box == null) {
+                assertTrue(drawn == null, name.getKey() + ": a name the"
+                        + " page omits is not drawn");
+                continue;
+            }
+            if (drawn == null) {
                 continue;
             }
             checked++;
-            // Eight pixels, not one, and the slack is the subject of
-            // this study rather than sloppiness: a name is drawn
-            // before every mark on the page, so its VISIBLE ink is
-            // what the discs drawn over it have left, and its centre
-            // shifts with them. Pavo's ink sits five pixels right of
-            // its anchor for that reason. What this catches is drift
-            // of a different order - an endpoint-based anchor misses
-            // by tens of pixels, or by the whole page.
-            assertTrue(Math.abs(drawn.getCenterX() - centroid[0]) < 8.0,
-                    name.getKey() + ": the policy anchors the name where"
-                            + " the atlas draws it, x " + centroid[0]
-                            + " against ink centred at "
-                            + drawn.getCenterX());
-            // And in y, which the first version of this test did not
-            // ask at all: an anchor can be right across the page and
-            // wrong down it, and half a check is worse than none
-            // because it reads as a whole one. The renderer draws the
-            // string with its baseline AT the centroid, and these
-            // names are capitals with no descender, so the bottom of
-            // the ink is the baseline.
-            assertTrue(Math.abs(drawn.getMaxY() - centroid[1]) < 4.0,
-                    name.getKey() + ": and down the page, baseline "
-                            + centroid[1] + " against ink ending at "
-                            + drawn.getMaxY());
+            // And the glyphs are inside the box the page placed, which
+            // is the claim every obstacle on the page depends on: a
+            // box that does not hold its own text reserves the wrong
+            // paper. One pixel of slack for the antialiased edge.
+            assertTrue(box.getX() - 1 <= drawn.getMinX()
+                            && drawn.getMaxX() <= box.getMaxX() + 1
+                            && box.getY() - 1 <= drawn.getMinY()
+                            && drawn.getMaxY() <= box.getMaxY() + 1,
+                    name.getKey() + ": the name is drawn inside the box"
+                            + " the page placed it in, " + drawn
+                            + " against " + box);
         }
         assertTrue(checked > 8, "on a useful number of names: " + checked);
     }

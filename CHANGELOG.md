@@ -7,6 +7,37 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Every label on a page is placed by one decision** (issue #314).
+  Star names, deep-sky labels and constellation names used to be
+  placed by three passes that avoided different things: a star's name
+  could be written across another star's mark, a constellation's name
+  could be written through by half a dozen star names, and a label
+  whose one box was taken was simply not drawn. They now share the
+  gate's decision (`docs/decisions/label-placement.md`) - eight
+  positions around what a label names, in a stated order, avoiding
+  every mark, every symbol, the furniture and each other, with a
+  constellation name kept inside its own figure's region.
+
+  Over the study's 23 pages: a star's name across an unrelated mark
+  fell from 252 to 32 and a constellation name crossed by a star
+  label from 56 to 9; the atlas draws 115 more pieces of text than it
+  did, because a name whose usual place is taken now moves instead of
+  vanishing. The named regression is repaired: Nunki's name no longer
+  shares a pixel with Namalsadirah's disc, and Namalsadirah has its
+  own Bayer letter back.
+
+- **No label is cut short by the page edge** (issue #314). A label
+  that cannot be drawn whole is drawn somewhere else, and one with
+  nowhere else is not drawn at all - because a word cut short is very
+  often another word: `SAGITTARIUS` cut reads `SAGITTA`, `NGC 2024`
+  cut reads `NGC 202`. On the released pages this costs 29 labels, 26
+  of which were being drawn entirely outside the paper, and 3 of
+  which were cut by the edge; no label that was wholly on the page is
+  lost. `docs/studies/wider-field/released-text.txt` lists every
+  label on every released page and what moved.
+
 ### Added
 
 - **A deterministic label-placement seam** (issue #313). One boundary

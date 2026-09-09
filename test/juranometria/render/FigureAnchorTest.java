@@ -446,15 +446,10 @@ class FigureAnchorTest {
         }
         ChartScene scene = page(120.0);
         double limit = ChartViewState.defaultMagnitudeFor(120.0);
-        var image = new java.awt.image.BufferedImage(WIDE, HIGH,
-                java.awt.image.BufferedImage.TYPE_INT_RGB);
-        var metrics = image.createGraphics().getFontMetrics();
         var mapping = new ViewportMapping(scene.viewport());
-        var labels = RENDERER.starLabelPlacements(metrics, scene,
-                ChartOptions.DEFAULTS,
-                new RegionalDetailPolicy(scene,
-                        mapping.pixelsPerPlaneUnit()),
-                Projections.forViewport(scene.viewport()), mapping);
+        var labels = RENDERER.starLabelPlacements(
+                ChartRenderer.TextMetrics.offscreen(),
+                scene, ChartOptions.DEFAULTS);
         assertFalse(labels.isEmpty(), "the page labels its bright stars");
         for (var placed : labels) {
             assertTrue(placed.star().magnitude() <= limit,

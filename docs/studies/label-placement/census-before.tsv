@@ -1,0 +1,33 @@
+# The census of the atlas before the families migrated
+#
+# Extracted from docs/studies/label-placement/measurements.md as it
+# stood at commit a0c8900 - the study's own report of the atlas as
+# 1.11.0 shipped it. Frozen evidence: the code that produced those
+# numbers is not checked out any more, and nothing regenerates this.
+#
+# page, text drawn, attributed collisions, collided pixels, name-vs-label
+# defects, star-name-over-another-mark defects.
+
+home	3	2	146	0	1
+orion-08	12	8	88	0	2
+orion-18	19	23	261	0	7
+orion-36	17	32	348	0	13
+orion-42	24	69	685	0	27
+orion-60	39	51	913	4	9
+orion-90	96	63	1371	4	7
+orion-120	174	169	3438	5	18
+sagittarius-90	88	84	1091	2	5
+sagittarius-120	106	147	2516	9	14
+cygnus-90	54	69	1315	5	2
+crux-90	74	74	1319	2	7
+pole-120	95	114	2545	3	11
+seam-120	101	91	1442	2	3
+orion-120-small	195	263	3414	5	23
+orion-42-a4	21	63	610	0	31
+orion-42-letter	24	84	821	0	37
+orion-90-black	96	63	1365	4	7
+sagittarius-90-key	87	84	1091	2	5
+sagittarius-90-ecliptic	88	102	1701	2	5
+orion-90-observer	96	68	1440	4	7
+nunki-searched	83	81	1100	3	4
+orion-18-selected	19	23	261	0	7

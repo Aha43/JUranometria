@@ -342,15 +342,11 @@ class LetteredStarJourneyTest {
     private List<String> labelsOf(ChartScene scene) {
         var probe = new java.awt.image.BufferedImage(1, 1,
                 java.awt.image.BufferedImage.TYPE_INT_RGB).createGraphics();
-        var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
         probe.dispose();
         var mapping = new ViewportMapping(scene.viewport());
-        return RENDERER.starLabelPlacements(metrics, scene,
-                        options.options(),
-                        new RegionalDetailPolicy(scene,
-                                mapping.pixelsPerPlaneUnit()),
-                        new GnomonicProjection(scene.viewport().centre()),
-                        mapping).stream()
+        return RENDERER.starLabelPlacements(
+                ChartRenderer.TextMetrics.offscreen(),
+                scene, options.options()).stream()
                 .map(ChartRenderer.StarLabelPlacement::text).toList();
     }
 

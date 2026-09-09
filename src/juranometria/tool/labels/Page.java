@@ -33,7 +33,14 @@ import juranometria.ui.ReferenceInk;
  */
 public record Page(String slug, ChartScene scene, ChartOptions options,
                    List<OverlayRegistry.Owned> overlays,
-                   List<PlacedText> placed, List<String> selected) {
+                   List<PlacedText> placed, List<String> selected,
+                   List<juranometria.render.LabelPlacement.Placement> text) {
+
+    public Page(String slug, ChartScene scene, ChartOptions options,
+                List<OverlayRegistry.Owned> overlays,
+                List<PlacedText> placed, List<String> selected) {
+        this(slug, scene, options, overlays, placed, selected, List.of());
+    }
 
     private static final ChartRenderer RENDERER =
             new ChartRenderer(StarSizePolicy.DEFAULT);
@@ -57,26 +64,62 @@ public record Page(String slug, ChartScene scene, ChartOptions options,
     }
 
     public Page withScene(ChartScene other) {
-        return new Page(slug, other, options, overlays, placed, selected);
+        return new Page(slug, other, options, overlays, placed, selected,
+                text);
     }
 
     public Page withOptions(ChartOptions other) {
-        return new Page(slug, scene, other, overlays, placed, selected);
+        return new Page(slug, scene, other, overlays, placed, selected,
+                text);
     }
 
     public Page withoutOverlays() {
-        return new Page(slug, scene, options, List.of(), placed, selected);
+        return new Page(slug, scene, options, List.of(), placed, selected,
+                text);
     }
 
-    public Page withPlaced(List<PlacedText> text) {
-        return new Page(slug, scene, options, overlays, List.copyOf(text),
-                selected);
+    public Page withPlaced(List<PlacedText> written) {
+        return new Page(slug, scene, options, overlays,
+                List.copyOf(written), selected, text);
+    }
+
+    /**
+     * This page with its text placed once and held there.
+     *
+     * <p>Since #314 placement is a decision about the whole page, so
+     * taking one star away moves every label after it. A study
+     * measuring what that star inked must hold the rest of the page
+     * still, or it measures the placement rather than the ink.
+     */
+    public Page withTextHeld() {
+        if (!text.isEmpty()) {
+            return this;
+        }
+        return new Page(slug, scene, options, overlays, placed, selected,
+                RENDERER.textPlacements(
+                        juranometria.render.ChartRenderer.TextMetrics
+                                .offscreen(), scene, options));
+    }
+
+    /** This page with one held piece of production text left out. */
+    public Page withoutText(
+            java.util.function.Predicate<
+                    juranometria.render.LabelPlacement.Request> which) {
+        List<juranometria.render.LabelPlacement.Placement> kept =
+                new ArrayList<>();
+        for (var placement : text) {
+            if (!which.test(placement.request())) {
+                kept.add(placement);
+            }
+        }
+        return new Page(slug, scene, options, overlays, placed, selected,
+                List.copyOf(kept));
     }
 
     /** The reader's working selection, as the chart component rings it. */
     public Page withSelection(List<String> members) {
         return new Page(slug, scene, options, overlays, placed,
-                List.copyOf(members));
+                List.copyOf(members), text);
     }
 
     /** This page with one selected member's ring left off. */
@@ -84,19 +127,19 @@ public record Page(String slug, ChartScene scene, ChartOptions options,
         List<String> kept = new ArrayList<>(selected);
         kept.remove(member);
         return new Page(slug, scene, options, overlays, placed,
-                List.copyOf(kept));
+                List.copyOf(kept), text);
     }
 
     /** This page with one candidate-placed piece of text left out. */
     public Page withoutPlaced(Participant.Family family, String id) {
         List<PlacedText> kept = new ArrayList<>();
-        for (PlacedText text : placed) {
-            if (text.family() != family || !text.id().equals(id)) {
-                kept.add(text);
+        for (PlacedText written : placed) {
+            if (written.family() != family || !written.id().equals(id)) {
+                kept.add(written);
             }
         }
         return new Page(slug, scene, options, overlays, List.copyOf(kept),
-                selected);
+                selected, text);
     }
 
     /** The page, painted. */
@@ -125,7 +168,8 @@ public record Page(String slug, ChartScene scene, ChartOptions options,
         try {
             RENDERER.render(g, scene, options, (layerG, layerScene) ->
                     ReferenceInk.paint(layerG, layerScene, overlays,
-                            options.palette()));
+                            options.palette()),
+                    text.isEmpty() ? null : text);
             // One ring per selected member, after the chart and before
             // the study's own text - which is where the chart
             // component draws it (issue #261).

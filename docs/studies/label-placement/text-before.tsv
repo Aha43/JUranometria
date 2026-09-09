@@ -1,0 +1,1168 @@
+# The text every study page drew before the families migrated
+#
+# Recorded from commit a0c8900 - the atlas as 1.11.0 shipped it, with
+# each family placing its own labels - by a dump of the three passes'
+# own decisions: the star pass's placements, the deep-sky labels at
+# their published bounds, and the constellation names on their
+# anchors. It is frozen evidence and no target regenerates it: the
+# code that produced it is not checked out any more.
+#
+# One line per drawn label: page, family, catalogue id, box x, y,
+# width, height, and the text. Boxes are measured text, so this is a
+# fact about the machine that recorded it (macOS 15.5, aarch64,
+# Homebrew OpenJDK 21) as well as about the atlas.
+#
+# juranometria.tool.labels.LabelStudyMain reads it to report what the
+# migration changed, page by page.
+home	star	TYC 2801-2090-1	304.56	363.30	10.00	14.00	ν
+home	deep sky	NGC 205	511.94	296.54	37.00	14.00	M 110
+home	deep sky	NGC 221	458.54	388.82	30.00	14.00	M 32
+home	deep sky	NGC 224	562.39	343.47	30.00	14.00	M 31
+orion-08	star	TYC 4766-2450-1	337.20	478.54	52.00	14.00	Alnilam ε
+orion-08	star	TYC 4771-1188-1	209.39	561.93	51.00	14.00	Alnitak ζ
+orion-08	star	TYC 4766-2445-1	455.06	377.09	54.00	14.00	Mintaka δ
+orion-08	star	TYC 4757-1588-1	666.07	613.04	82.00	14.00	Saif al Jabbar η
+orion-08	star	TYC 105-2801-1	599.29	-4.62	13.00	14.00	ψ
+orion-08	star	TYC 4752-1608-1	741.90	386.50	11.00	14.00	o
+orion-08	star	TYC 4753-1894-1	517.90	466.20	18.00	14.00	31
+orion-08	star	TYC 101-2568-1	657.89	135.94	18.00	14.00	25
+orion-08	star	TYC 115-2299-1	159.75	177.66	11.00	14.00	b
+orion-08	deep sky	NGC 1976	417.20	950.71	30.00	14.00	M 42
+orion-08	deep sky	NGC 1982	368.11	936.87	30.00	14.00	M 43
+orion-08	deep sky	NGC 2068	42.08	334.57	30.00	14.00	M 78
+orion-18	star	TYC 113-1856-1	540.73	27.19	56.00	14.00	Bellatrix γ
+orion-18	star	TYC 4766-2450-1	403.28	403.12	52.00	14.00	Alnilam ε
+orion-18	star	TYC 4771-1188-1	346.82	439.94	51.00	14.00	Alnitak ζ
+orion-18	star	TYC 4766-2445-1	455.16	358.33	54.00	14.00	Mintaka δ
+orion-18	star	TYC 4778-1401-1	412.54	637.64	47.00	14.00	Hatysa ι
+orion-18	star	TYC 4759-1671-1	755.59	597.79	46.00	14.00	Cursa β
+orion-18	star	TYC 4764-1639-1	633.43	685.20	10.00	14.00	τ
+orion-18	star	TYC 4757-1588-1	548.05	462.50	11.00	14.00	η
+orion-18	star	TYC 4771-1196-1	371.01	472.58	11.00	14.00	σ
+orion-18	star	TYC 85-2362-1	872.02	257.57	18.00	14.00	π⁶
+orion-18	star	TYC 103-2863-1	686.79	201.02	11.00	14.00	ρ
+orion-18	deep sky	NGC 1976	437.20	611.58	30.00	14.00	M 42
+orion-18	deep sky	NGC 1982	415.52	605.47	30.00	14.00	M 43
+orion-18	deep sky	NGC 2068	271.58	339.56	30.00	14.00	M 78
+orion-18	constellation	Eri	801.71	566.44	62.00	15.00	ERIDANUS
+orion-18	constellation	Ori	400.27	288.59	42.00	15.00	ORION
+orion-36	star	TYC 5331-1752-1	561.73	543.70	40.00	14.00	Rigel β
+orion-36	star	TYC 129-1873-1	315.45	162.53	72.00	14.00	Betelgeuse α
+orion-36	star	TYC 113-1856-1	497.07	189.31	56.00	14.00	Bellatrix γ
+orion-36	star	TYC 4766-2450-1	430.06	372.56	52.00	14.00	Alnilam ε
+orion-36	star	TYC 4771-1188-1	402.50	390.51	51.00	14.00	Alnitak ζ
+orion-36	star	TYC 5351-760-1	360.02	580.04	42.00	14.00	Saiph κ
+orion-36	star	TYC 4766-2445-1	455.20	350.73	54.00	14.00	Mintaka δ
+orion-36	star	TYC 4778-1401-1	434.36	486.88	8.00	14.00	ι
+orion-36	star	TYC 4759-1671-1	601.58	467.46	11.00	14.00	β
+orion-36	star	TYC 96-1462-1	712.61	171.50	18.00	14.00	π³
+orion-36	deep sky	NGC 1976	445.30	474.18	30.00	14.00	M 42
+orion-36	deep sky	NGC 1982	434.73	471.20	30.00	14.00	M 43
+orion-36	deep sky	NGC 2168	231.76	-291.25	30.00	14.00	M 35
+orion-36	constellation	Eri	725.09	442.48	62.00	15.00	ERIDANUS
+orion-36	constellation	Gem	-21.74	-13.00	45.00	15.00	GEMINI
+orion-36	constellation	Lep	529.88	677.38	38.00	15.00	LEPUS
+orion-36	constellation	Mon	39.46	316.34	79.00	15.00	MONOCEROS
+orion-36	constellation	Ori	442.37	231.39	42.00	15.00	ORION
+orion-42	star	TYC 5331-1752-1	545.49	512.96	40.00	14.00	Rigel β
+orion-42	star	TYC 129-1873-1	337.03	190.32	72.00	14.00	Betelgeuse α
+orion-42	star	TYC 113-1856-1	490.70	212.99	56.00	14.00	Bellatrix γ
+orion-42	star	TYC 4766-2450-1	433.97	368.10	52.00	14.00	Alnilam ε
+orion-42	star	TYC 4771-1188-1	410.63	383.29	51.00	14.00	Alnitak ζ
+orion-42	star	TYC 5351-760-1	374.66	543.72	42.00	14.00	Saiph κ
+orion-42	star	TYC 4766-2445-1	455.21	349.62	54.00	14.00	Mintaka δ
+orion-42	star	TYC 4759-1671-1	579.08	448.42	11.00	14.00	β
+orion-42	star	TYC 96-1462-1	673.04	197.91	18.00	14.00	π³
+orion-42	star	TYC 5902-1721-1	552.65	685.38	11.00	14.00	μ
+orion-42	star	TYC 754-2356-1	66.65	60.77	10.00	14.00	ξ
+orion-42	star	TYC 1265-1172-1	787.32	-2.94	16.00	14.00	θ²
+orion-42	deep sky	NGC 1976	446.48	454.11	30.00	14.00	M 42
+orion-42	deep sky	NGC 1982	437.54	451.59	30.00	14.00	M 43
+orion-42	deep sky	NGC 2168	265.73	-193.78	30.00	14.00	M 35
+orion-42	constellation	CMa	-34.41	640.88	81.00	15.00	CANIS MAJOR
+orion-42	constellation	Eri	718.79	443.57	62.00	15.00	ERIDANUS
+orion-42	constellation	Gem	57.87	21.68	45.00	15.00	GEMINI
+orion-42	constellation	Lep	431.21	653.43	38.00	15.00	LEPUS
+orion-42	constellation	Mon	70.87	328.21	79.00	15.00	MONOCEROS
+orion-42	constellation	Ori	434.99	227.11	42.00	15.00	ORION
+orion-42	constellation	Tau	810.14	2.46	50.00	15.00	TAURUS
+orion-60	star	TYC 5949-2777-1	191.65	596.45	45.00	14.00	Sirius α
+orion-60	star	TYC 5331-1752-1	519.68	464.08	40.00	14.00	Rigel β
+orion-60	star	TYC 129-1873-1	371.34	234.52	72.00	14.00	Betelgeuse α
+orion-60	star	TYC 1266-1416-1	657.89	96.24	70.00	14.00	Aldebaran α
+orion-60	star	TYC 113-1856-1	480.64	250.32	56.00	14.00	Bellatrix γ
+orion-60	star	TYC 4766-2450-1	440.09	361.12	52.00	14.00	Alnilam ε
+orion-60	star	TYC 5938-2918-1	273.62	612.02	53.00	14.00	Mirzam β
+orion-60	star	TYC 1329-1746-1	218.11	96.56	50.00	14.00	Alhena γ
+orion-60	star	TYC 5351-760-1	398.05	485.72	42.00	14.00	Saiph κ
+orion-60	star	TYC 5920-1685-1	452.57	606.83	12.00	14.00	α
+orion-60	star	TYC 4759-1671-1	543.49	418.30	11.00	14.00	β
+orion-60	star	TYC 5928-1657-1	468.37	651.13	11.00	14.00	β
+orion-60	star	TYC 764-2774-1	26.46	213.83	11.00	14.00	β
+orion-60	star	TYC 1878-1429-1	275.07	5.23	11.00	14.00	μ
+orion-60	star	TYC 1310-2697-1	435.06	30.03	11.00	14.00	ζ
+orion-60	star	TYC 5311-1285-1	799.12	550.87	10.00	14.00	γ
+orion-60	star	TYC 5913-1374-1	548.45	676.67	9.00	14.00	ε
+orion-60	star	TYC 96-1462-1	609.25	240.49	18.00	14.00	π³
+orion-60	star	TYC 5902-1721-1	523.38	583.00	11.00	14.00	μ
+orion-60	star	TYC 754-2356-1	187.57	148.83	10.00	14.00	ξ
+orion-60	star	TYC 1877-1716-1	303.58	6.51	11.00	14.00	η
+orion-60	star	TYC 662-1546-1	789.69	152.32	10.00	14.00	λ
+orion-60	deep sky	Mel022	842.39	-33.47	30.00	14.00	M 45
+orion-60	deep sky	NGC 1976	448.36	422.55	30.00	14.00	M 42
+orion-60	deep sky	NGC 2548	-160.19	439.25	30.00	14.00	M 48
+orion-60	constellation	CMa	123.67	593.23	81.00	15.00	CANIS MAJOR
+orion-60	constellation	CMi	-30.04	218.63	81.00	15.00	CANIS MINOR
+orion-60	constellation	Eri	714.75	477.19	62.00	15.00	ERIDANUS
+orion-60	constellation	Gem	127.30	44.68	45.00	15.00	GEMINI
+orion-60	constellation	Lep	447.01	604.75	38.00	15.00	LEPUS
+orion-60	constellation	Mon	129.01	337.25	79.00	15.00	MONOCEROS
+orion-60	constellation	Ori	422.49	239.98	42.00	15.00	ORION
+orion-60	constellation	Tau	681.26	118.42	50.00	15.00	TAURUS
+orion-90	star	TYC 5949-2777-1	285.00	507.13	45.00	14.00	Sirius α
+orion-90	star	TYC 5331-1752-1	497.19	421.50	40.00	14.00	Rigel β
+orion-90	star	TYC 187-2184-1	146.95	289.88	59.00	14.00	Procyon α
+orion-90	star	TYC 129-1873-1	401.22	273.00	72.00	14.00	Betelgeuse α
+orion-90	star	TYC 1266-1416-1	586.53	183.55	70.00	14.00	Aldebaran α
+orion-90	star	TYC 1920-2194-1	152.44	49.71	47.00	14.00	Pollux β
+orion-90	star	TYC 1859-1470-1	468.18	66.46	47.00	14.00	Elnath β
+orion-90	star	TYC 4766-2450-1	445.54	354.90	52.00	14.00	Alnilam ε
+orion-90	star	TYC 6532-5001-1	236.88	609.18	47.00	14.00	Wezen δ
+orion-90	star	TYC 2457-2407-1	183.69	11.85	51.00	14.00	Castor α
+orion-90	star	TYC 5938-2918-1	337.82	517.20	53.00	14.00	Mirzam β
+orion-90	star	TYC 1329-1746-1	301.90	183.76	50.00	14.00	Alhena γ
+orion-90	star	TYC 5351-760-1	418.29	435.50	42.00	14.00	Saiph κ
+orion-90	star	TYC 58-1618-1	822.71	300.26	12.00	14.00	α
+orion-90	star	TYC 5920-1685-1	453.49	513.84	12.00	14.00	α
+orion-90	star	TYC 7064-1357-1	438.73	676.50	12.00	14.00	α
+orion-90	star	TYC 2391-1446-1	530.86	18.26	8.00	14.00	ι
+orion-90	star	TYC 4759-1671-1	512.28	391.89	11.00	14.00	β
+orion-90	star	TYC 6555-3245-1	91.47	605.08	11.00	14.00	ρ
+orion-90	star	TYC 5928-1657-1	463.67	542.50	11.00	14.00	β
+orion-90	star	TYC 1800-2202-1	695.08	99.64	11.00	14.00	η
+orion-90	star	TYC 764-2774-1	177.81	259.62	11.00	14.00	β
+orion-90	star	TYC 2361-2820-1	670.57	19.83	11.00	14.00	ζ
+orion-90	star	TYC 1878-1429-1	338.62	124.68	11.00	14.00	μ
+orion-90	star	TYC 1310-2697-1	442.11	140.72	11.00	14.00	ζ
+orion-90	star	TYC 5311-1285-1	677.61	477.65	10.00	14.00	γ
+orion-90	star	TYC 1897-1639-1	291.84	95.59	9.00	14.00	ε
+orion-90	star	TYC 6523-3722-1	246.48	581.62	16.00	14.00	ο²
+orion-90	star	TYC 5913-1374-1	515.43	559.02	9.00	14.00	ε
+orion-90	star	TYC 96-1462-1	554.76	276.86	18.00	14.00	π³
+orion-90	star	TYC 5902-1721-1	499.19	498.43	11.00	14.00	μ
+orion-90	star	TYC 6557-4522-1	137.13	604.58	10.00	14.00	ξ
+orion-90	star	TYC 754-2356-1	281.95	217.57	10.00	14.00	ξ
+orion-90	star	TYC 1877-1716-1	356.99	125.51	11.00	14.00	η
+orion-90	star	TYC 662-1546-1	671.45	219.83	10.00	14.00	λ
+orion-90	deep sky	Mel022	704.89	99.64	30.00	14.00	M 45
+orion-90	deep sky	NGC 1976	450.00	394.64	30.00	14.00	M 42
+orion-90	deep sky	NGC 2632	5.00	120.65	30.00	14.00	M 44
+orion-90	constellation	Ari	845.38	47.71	36.00	15.00	ARIES
+orion-90	constellation	Aur	446.19	25.22	48.00	15.00	AURIGA
+orion-90	constellation	CMa	221.76	552.17	81.00	15.00	CANIS MAJOR
+orion-90	constellation	CMi	116.34	269.19	81.00	15.00	CANIS MINOR
+orion-90	constellation	Cae	485.55	687.74	51.00	15.00	CAELUM
+orion-90	constellation	Cet	839.27	278.62	41.00	15.00	CETUS
+orion-90	constellation	Cnc	-3.76	202.04	52.00	15.00	CANCER
+orion-90	constellation	Col	370.05	678.93	60.00	15.00	COLUMBA
+orion-90	constellation	Eri	666.74	505.34	62.00	15.00	ERIDANUS
+orion-90	constellation	For	784.66	670.92	52.00	15.00	FORNAX
+orion-90	constellation	Gem	211.59	98.09	45.00	15.00	GEMINI
+orion-90	constellation	Lep	441.36	510.56	38.00	15.00	LEPUS
+orion-90	constellation	Mon	179.89	351.07	79.00	15.00	MONOCEROS
+orion-90	constellation	Ori	424.79	274.60	42.00	15.00	ORION
+orion-90	constellation	Per	641.03	5.35	53.00	15.00	PERSEUS
+orion-90	constellation	Pup	115.63	628.79	42.00	15.00	PUPPIS
+orion-90	constellation	Pyx	-18.25	686.66	35.00	15.00	PYXIS
+orion-90	constellation	Tau	591.96	190.06	50.00	15.00	TAURUS
+orion-120	star	TYC 5949-2777-1	333.31	460.89	45.00	14.00	Sirius α
+orion-120	star	TYC 3358-3141-1	477.35	12.36	54.00	14.00	Capella α
+orion-120	star	TYC 5331-1752-1	485.55	399.46	40.00	14.00	Rigel β
+orion-120	star	TYC 187-2184-1	234.28	305.03	59.00	14.00	Procyon α
+orion-120	star	TYC 129-1873-1	416.69	292.92	72.00	14.00	Betelgeuse α
+orion-120	star	TYC 1266-1416-1	549.59	228.75	70.00	14.00	Aldebaran α
+orion-120	star	TYC 1920-2194-1	238.14	132.72	47.00	14.00	Pollux β
+orion-120	star	TYC 6535-3619-1	316.81	551.73	51.00	14.00	Adhara ε
+orion-120	star	TYC 1859-1470-1	464.61	144.74	47.00	14.00	Elnath β
+orion-120	star	TYC 4766-2450-1	448.36	351.68	52.00	14.00	Alnilam ε
+orion-120	star	TYC 6532-5001-1	298.65	534.11	47.00	14.00	Wezen δ
+orion-120	star	TYC 2457-2407-1	260.47	105.56	51.00	14.00	Castor α
+orion-120	star	TYC 5460-1592-1	18.68	421.17	58.00	14.00	Alphard α
+orion-120	star	TYC 1758-2416-1	809.29	146.43	48.00	14.00	Hamal α
+orion-120	star	TYC 1329-1746-1	345.27	228.90	50.00	14.00	Alhena γ
+orion-120	star	TYC 5351-760-1	428.78	409.50	42.00	14.00	Saiph κ
+orion-120	star	TYC 2286-1329-1	887.07	3.78	50.00	14.00	Mirach β
+orion-120	star	TYC 2851-2168-1	669.87	26.43	42.00	14.00	Algol β
+orion-120	star	TYC 58-1618-1	718.86	312.48	12.00	14.00	α
+orion-120	star	TYC 5920-1685-1	453.97	465.71	12.00	14.00	α
+orion-120	star	TYC 2418-1573-1	413.33	80.25	11.00	14.00	θ
+orion-120	star	TYC 7064-1357-1	443.37	582.40	12.00	14.00	α
+orion-120	star	TYC 1212-1935-1	838.31	164.28	11.00	14.00	β
+orion-120	star	TYC 2391-1446-1	509.46	110.16	8.00	14.00	ι
+orion-120	star	TYC 4759-1671-1	496.12	378.21	11.00	14.00	β
+orion-120	star	TYC 6555-3245-1	194.21	531.17	11.00	14.00	ρ
+orion-120	star	TYC 5928-1657-1	461.24	486.27	11.00	14.00	β
+orion-120	star	TYC 764-2774-1	256.15	283.32	11.00	14.00	β
+orion-120	star	TYC 2361-2820-1	609.67	111.28	11.00	14.00	ζ
+orion-120	star	TYC 2868-1623-1	595.10	49.11	9.00	14.00	ε
+orion-120	star	TYC 1878-1429-1	371.52	186.51	11.00	14.00	μ
+orion-120	star	TYC 1310-2697-1	445.75	198.02	11.00	14.00	ζ
+orion-120	star	TYC 5311-1285-1	614.71	439.74	10.00	14.00	γ
+orion-120	star	TYC 7073-2426-1	378.56	554.98	11.00	14.00	ζ
+orion-120	star	TYC 1897-1639-1	337.95	165.64	9.00	14.00	ε
+orion-120	star	TYC 2317-1647-1	779.72	49.45	11.00	14.00	β
+orion-120	star	TYC 6523-3722-1	305.40	514.34	16.00	14.00	ο²
+orion-120	star	TYC 2907-1275-1	497.83	28.86	9.00	14.00	ε
+orion-120	star	TYC 225-1116-1	85.68	293.91	11.00	14.00	ζ
+orion-120	star	TYC 7069-1482-1	426.06	595.39	11.00	14.00	β
+orion-120	star	TYC 2496-1728-1	80.86	39.08	12.00	14.00	α
+orion-120	star	TYC 2899-2237-1	492.16	49.49	11.00	14.00	η
+orion-120	star	TYC 5913-1374-1	498.33	498.12	9.00	14.00	ε
+orion-120	star	TYC 7563-1016-1	686.23	659.13	16.00	14.00	θ¹
+orion-120	star	TYC 96-1462-1	526.55	295.69	18.00	14.00	π³
+orion-120	star	TYC 5902-1721-1	486.67	454.65	11.00	14.00	μ
+orion-120	star	TYC 6557-4522-1	226.91	530.81	10.00	14.00	ξ
+orion-120	star	TYC 754-2356-1	330.81	253.15	10.00	14.00	ξ
+orion-120	star	TYC 1877-1716-1	384.64	187.10	11.00	14.00	η
+orion-120	star	TYC 2847-1572-1	678.22	42.59	11.00	14.00	ρ
+orion-120	star	TYC 662-1546-1	610.24	254.77	10.00	14.00	λ
+orion-120	star	TYC 1763-3028-1	823.23	87.38	12.00	14.00	α
+orion-120	star	TYC 224-1333-1	103.46	290.88	9.00	14.00	ε
+orion-120	star	TYC 5855-2292-1	867.12	483.95	10.00	14.00	τ
+orion-120	star	TYC 7092-2576-1	332.80	576.84	10.00	14.00	κ
+orion-120	deep sky	NGC 224	914.02	-75.04	30.00	14.00	M 31
+orion-120	deep sky	NGC 598	857.78	66.73	30.00	14.00	M 33
+orion-120	deep sky	Mel022	633.71	168.55	30.00	14.00	M 45
+orion-120	deep sky	NGC 1976	450.84	380.19	30.00	14.00	M 42
+orion-120	deep sky	NGC 2632	131.58	183.62	30.00	14.00	M 44
+orion-120	constellation	And	829.53	-5.64	81.00	15.00	ANDROMEDA
+orion-120	constellation	Ant	9.93	663.05	46.00	15.00	ANTLIA
+orion-120	constellation	Ari	765.87	140.60	36.00	15.00	ARIES
+orion-120	constellation	Aur	432.03	56.63	48.00	15.00	AURIGA
+orion-120	constellation	CMa	274.81	491.66	81.00	15.00	CANIS MAJOR
+orion-120	constellation	CMi	199.18	288.63	81.00	15.00	CANIS MINOR
+orion-120	constellation	Cae	495.39	620.78	51.00	15.00	CAELUM
+orion-120	constellation	Car	337.91	670.62	48.00	15.00	CARINA
+orion-120	constellation	Cet	774.61	356.62	41.00	15.00	CETUS
+orion-120	constellation	Cnc	93.77	194.46	52.00	15.00	CANCER
+orion-120	constellation	Col	384.88	595.49	60.00	15.00	COLUMBA
+orion-120	constellation	Eri	601.41	498.64	62.00	15.00	ERIDANUS
+orion-120	constellation	For	705.48	584.24	52.00	15.00	FORNAX
+orion-120	constellation	Gem	272.59	165.88	45.00	15.00	GEMINI
+orion-120	constellation	Hor	543.26	667.84	84.00	15.00	HOROLOGIUM
+orion-120	constellation	Hya	37.01	327.69	45.00	15.00	HYDRA
+orion-120	constellation	LMi	-6.64	-0.94	69.00	15.00	LEO MINOR
+orion-120	constellation	Lep	438.43	461.80	38.00	15.00	LEPUS
+orion-120	constellation	Lyn	110.86	1.70	34.00	15.00	LYNX
+orion-120	constellation	Mon	245.05	347.38	79.00	15.00	MONOCEROS
+orion-120	constellation	Ori	425.98	292.51	42.00	15.00	ORION
+orion-120	constellation	Per	599.61	40.29	53.00	15.00	PERSEUS
+orion-120	constellation	Psc	852.47	231.07	41.00	15.00	PISCES
+orion-120	constellation	Pup	222.29	583.16	42.00	15.00	PUPPIS
+orion-120	constellation	Pyx	142.85	619.54	35.00	15.00	PYXIS
+orion-120	constellation	Tau	544.79	231.86	50.00	15.00	TAURUS
+orion-120	constellation	Tri	750.17	64.19	81.00	15.00	TRIANGULUM
+sagittarius-90	star	TYC 1058-3399-1	118.11	-1.81	44.00	14.00	Altair α
+sagittarius-90	star	TYC 6803-2158-1	614.62	340.56	57.00	14.00	Antares α
+sagittarius-90	star	TYC 7388-1093-1	475.32	430.23	48.00	14.00	Shaula λ
+sagittarius-90	star	TYC 7401-3471-1	376.62	407.68	89.00	14.00	Kaus Australis ε
+sagittarius-90	star	TYC 7892-7679-1	467.25	486.61	50.00	14.00	Sargas θ
+sagittarius-90	star	TYC 7293-2215-1	875.15	538.04	59.00	14.00	Menkent θ
+sagittarius-90	star	TYC 6868-1829-1	303.47	338.22	45.00	14.00	Nunki σ
+sagittarius-90	star	TYC 7367-804-1	561.13	409.69	56.00	14.00	Larawag ε
+sagittarius-90	star	TYC 6779-2194-1	684.33	315.03	67.00	14.00	Dschubba δ
+sagittarius-90	star	TYC 8283-4134-1	752.72	606.48	37.00	14.00	Men α
+sagittarius-90	star	TYC 7814-3706-1	790.52	563.07	11.00	14.00	η
+sagittarius-90	star	TYC 7885-2065-1	458.07	448.40	38.00	14.00	Mula κ
+sagittarius-90	star	TYC 6232-1333-1	532.89	228.82	42.00	14.00	Sabik η
+sagittarius-90	star	TYC 8267-3545-1	825.72	653.04	11.00	14.00	ζ
+sagittarius-90	star	TYC 5632-1042-1	615.34	184.80	11.00	14.00	ζ
+sagittarius-90	star	TYC 5585-1014-1	816.56	204.41	11.00	14.00	β
+sagittarius-90	star	TYC 6885-2837-1	293.11	374.91	11.00	14.00	ζ
+sagittarius-90	star	TYC 6208-1623-1	677.80	285.43	16.00	14.00	β¹
+sagittarius-90	star	TYC 363-1135-1	770.59	23.46	12.00	14.00	α
+sagittarius-90	star	TYC 7832-2490-1	745.50	552.14	11.00	14.00	β
+sagittarius-90	star	TYC 6856-2170-1	379.00	363.81	10.00	14.00	δ
+sagittarius-90	star	TYC 5037-1068-1	679.19	121.95	10.00	14.00	δ
+sagittarius-90	star	TYC 6155-1210-1	864.72	290.98	17.00	14.00	α²
+sagittarius-90	star	TYC 423-1724-1	456.45	26.15	11.00	14.00	β
+sagittarius-90	star	TYC 6807-1012-1	597.70	355.61	10.00	14.00	τ
+sagittarius-90	star	TYC 8350-2600-1	474.35	553.78	12.00	14.00	α
+sagittarius-90	star	TYC 6861-3180-1	360.79	323.13	10.00	14.00	λ
+sagittarius-90	star	TYC 8732-2866-1	481.66	610.38	11.00	14.00	β
+sagittarius-90	star	TYC 6783-2697-1	680.37	349.55	13.00	14.00	π
+sagittarius-90	star	TYC 6295-282-1	263.54	292.35	13.00	14.00	π
+sagittarius-90	star	TYC 7391-2710-1	410.41	367.52	15.00	14.00	γ²
+sagittarius-90	star	TYC 7840-1432-1	687.99	507.32	10.00	14.00	γ
+sagittarius-90	star	TYC 7868-1821-1	553.10	445.13	16.00	14.00	μ¹
+sagittarius-90	star	TYC 5753-2281-1	81.75	266.49	11.00	14.00	β
+sagittarius-90	star	TYC 8411-1822-1	170.59	598.24	12.00	14.00	α
+sagittarius-90	star	TYC 8730-1439-1	518.76	618.64	11.00	14.00	ζ
+sagittarius-90	star	TYC 7404-7057-1	390.70	429.26	11.00	14.00	η
+sagittarius-90	star	TYC 7839-2803-1	714.63	511.28	10.00	14.00	δ
+sagittarius-90	star	TYC 5161-2682-1	74.91	113.28	11.00	14.00	θ
+sagittarius-90	star	TYC 5042-999-1	667.77	131.00	9.00	14.00	ε
+sagittarius-90	star	TYC 6829-577-1	502.18	316.06	11.00	14.00	θ
+sagittarius-90	star	TYC 5102-416-1	362.04	103.71	11.00	14.00	η
+sagittarius-90	star	TYC 6752-1455-1	803.18	374.56	11.00	14.00	σ
+sagittarius-90	star	TYC 6881-1777-1	280.12	355.30	10.00	14.00	τ
+sagittarius-90	star	TYC 5678-956-1	418.85	169.62	10.00	14.00	ν
+sagittarius-90	star	TYC 7847-2505-1	697.29	549.10	9.00	14.00	ε
+sagittarius-90	star	TYC 469-6227-1	192.37	54.26	10.00	14.00	δ
+sagittarius-90	star	TYC 7797-2744-1	873.23	609.06	10.00	14.00	ν
+sagittarius-90	star	TYC 7851-1814-1	649.66	467.04	11.00	14.00	η
+sagittarius-90	star	TYC 5136-2357-1	250.83	132.00	10.00	14.00	λ
+sagittarius-90	star	TYC 8306-3362-1	682.95	626.98	11.00	14.00	ζ
+sagittarius-90	star	TYC 8359-3650-1	382.27	519.42	12.00	14.00	α
+sagittarius-90	deep sky	NGC 6523	412.81	309.98	23.00	14.00	M 8
+sagittarius-90	deep sky	NGC 6611	373.53	210.48	30.00	14.00	M 16
+sagittarius-90	constellation	Aql	125.61	51.95	46.00	15.00	AQUILA
+sagittarius-90	constellation	Ara	476.68	606.96	28.00	15.00	ARA
+sagittarius-90	constellation	Cap	6.38	317.14	86.00	15.00	CAPRICORNUS
+sagittarius-90	constellation	Cen	797.17	585.31	74.00	15.00	CENTAURUS
+sagittarius-90	constellation	Cir	608.43	686.90	57.00	15.00	CIRCINUS
+sagittarius-90	constellation	CrA	254.96	471.10	117.00	15.00	CORONA AUSTRINA
+sagittarius-90	constellation	Hya	837.49	418.56	45.00	15.00	HYDRA
+sagittarius-90	constellation	Ind	147.39	641.04	39.00	15.00	INDUS
+sagittarius-90	constellation	Lib	773.12	282.20	36.00	15.00	LIBRA
+sagittarius-90	constellation	Lup	680.31	525.94	39.00	15.00	LUPUS
+sagittarius-90	constellation	Mic	24.94	525.98	93.00	15.00	MICROSCOPIUM
+sagittarius-90	constellation	Nor	574.20	546.15	48.00	15.00	NORMA
+sagittarius-90	constellation	Oph	514.63	143.13	71.00	15.00	OPHIUCHUS
+sagittarius-90	constellation	Pav	341.31	678.52	36.00	15.00	PAVO
+sagittarius-90	constellation	Sco	536.84	397.22	59.00	15.00	SCORPIUS
+sagittarius-90	constellation	Sct	294.49	166.22	52.00	15.00	SCUTUM
+sagittarius-90	constellation	Ser	455.87	112.36	97.00	15.00	SERPENS CAPUT
+sagittarius-90	constellation	Sgr	252.09	364.50	79.00	15.00	SAGITTARIUS
+sagittarius-90	constellation	Tel	342.24	521.54	83.00	15.00	TELESCOPIUM
+sagittarius-120	star	TYC 9007-5849-1	616.14	622.85	101.00	14.00	Rigil Kentaurus α¹
+sagittarius-120	star	TYC 1472-1436-1	883.58	20.60	63.00	14.00	Arcturus α
+sagittarius-120	star	TYC 9005-3919-1	646.40	641.76	46.00	14.00	Hadar β
+sagittarius-120	star	TYC 1058-3399-1	213.53	95.76	44.00	14.00	Altair α
+sagittarius-120	star	TYC 6803-2158-1	569.74	341.39	57.00	14.00	Antares α
+sagittarius-120	star	TYC 7388-1093-1	469.74	405.73	48.00	14.00	Shaula λ
+sagittarius-120	star	TYC 8438-1959-1	149.28	596.47	47.00	14.00	Alnair α
+sagittarius-120	star	TYC 7401-3471-1	398.90	389.55	89.00	14.00	Kaus Australis ε
+sagittarius-120	star	TYC 7892-7679-1	463.92	446.17	50.00	14.00	Sargas θ
+sagittarius-120	star	TYC 9275-3641-1	493.67	638.84	41.00	14.00	Atria α
+sagittarius-120	star	TYC 8785-1898-1	298.09	583.44	58.00	14.00	Peacock α
+sagittarius-120	star	TYC 7293-2215-1	756.54	483.07	59.00	14.00	Menkent θ
+sagittarius-120	star	TYC 6868-1829-1	346.39	339.71	45.00	14.00	Nunki σ
+sagittarius-120	star	TYC 1000-2508-1	472.48	55.54	76.00	14.00	Rasalhague α
+sagittarius-120	star	TYC 7367-804-1	531.23	390.99	56.00	14.00	Larawag ε
+sagittarius-120	star	TYC 6779-2194-1	619.61	323.07	67.00	14.00	Dschubba δ
+sagittarius-120	star	TYC 8283-4134-1	668.68	532.17	37.00	14.00	Men α
+sagittarius-120	star	TYC 7814-3706-1	695.79	501.03	11.00	14.00	η
+sagittarius-120	star	TYC 6232-1333-1	510.94	261.22	42.00	14.00	Sabik η
+sagittarius-120	star	TYC 8267-3545-1	721.03	565.58	11.00	14.00	ζ
+sagittarius-120	star	TYC 5632-1042-1	570.09	229.64	11.00	14.00	ζ
+sagittarius-120	star	TYC 5585-1014-1	714.45	243.71	11.00	14.00	β
+sagittarius-120	star	TYC 6885-2837-1	338.90	366.04	11.00	14.00	ζ
+sagittarius-120	star	TYC 6208-1623-1	614.89	301.84	16.00	14.00	β¹
+sagittarius-120	star	TYC 363-1135-1	681.46	113.89	12.00	14.00	α
+sagittarius-120	star	TYC 7832-2490-1	663.46	493.19	11.00	14.00	β
+sagittarius-120	star	TYC 6856-2170-1	400.51	358.07	10.00	14.00	δ
+sagittarius-120	star	TYC 1061-2577-1	220.56	80.71	10.00	14.00	γ
+sagittarius-120	star	TYC 5037-1068-1	615.87	184.55	10.00	14.00	δ
+sagittarius-120	star	TYC 7275-2074-1	818.21	529.07	8.00	14.00	ι
+sagittarius-120	star	TYC 6155-1210-1	748.98	305.82	17.00	14.00	α²
+sagittarius-120	star	TYC 423-1724-1	456.07	115.82	11.00	14.00	β
+sagittarius-120	star	TYC 6807-1012-1	557.40	352.19	10.00	14.00	τ
+sagittarius-120	star	TYC 8350-2600-1	468.90	494.37	12.00	14.00	α
+sagittarius-120	star	TYC 8240-2724-1	785.99	650.16	10.00	14.00	γ
+sagittarius-120	star	TYC 8732-2866-1	474.15	534.97	11.00	14.00	β
+sagittarius-120	star	TYC 9027-5712-1	545.09	608.84	11.00	14.00	β
+sagittarius-120	star	TYC 9259-4905-1	553.91	658.23	10.00	14.00	γ
+sagittarius-120	star	TYC 6363-1044-1	32.11	356.09	10.00	14.00	δ
+sagittarius-120	star	TYC 5216-1725-1	29.14	256.89	11.00	14.00	β
+sagittarius-120	star	TYC 6295-282-1	317.65	306.80	13.00	14.00	π
+sagittarius-120	star	TYC 1052-3027-1	299.40	49.05	11.00	14.00	ζ
+sagittarius-120	star	TYC 7391-2710-1	423.02	360.73	15.00	14.00	γ²
+sagittarius-120	star	TYC 7840-1432-1	622.16	461.03	10.00	14.00	γ
+sagittarius-120	star	TYC 6700-1436-1	889.02	433.10	10.00	14.00	γ
+sagittarius-120	star	TYC 7494-1748-1	113.59	519.55	10.00	14.00	γ
+sagittarius-120	star	TYC 7868-1821-1	525.38	416.41	16.00	14.00	μ¹
+sagittarius-120	star	TYC 7889-2669-1	450.28	426.31	13.00	14.00	ι¹
+sagittarius-120	star	TYC 5753-2281-1	187.20	288.25	11.00	14.00	β
+sagittarius-120	star	TYC 8411-1822-1	250.94	526.26	12.00	14.00	α
+sagittarius-120	star	TYC 8730-1439-1	500.73	540.90	11.00	14.00	ζ
+sagittarius-120	star	TYC 7404-7057-1	408.85	405.03	11.00	14.00	η
+sagittarius-120	star	TYC 9015-1445-1	593.96	648.55	12.00	14.00	α
+sagittarius-120	star	TYC 7839-2803-1	641.25	463.87	10.00	14.00	δ
+sagittarius-120	star	TYC 979-2198-1	541.81	81.37	10.00	14.00	κ
+sagittarius-120	star	TYC 5161-2682-1	182.28	178.33	11.00	14.00	θ
+sagittarius-120	star	TYC 6829-577-1	488.82	323.81	11.00	14.00	θ
+sagittarius-120	star	TYC 5102-416-1	388.28	171.47	11.00	14.00	η
+sagittarius-120	star	TYC 6738-1381-1	794.00	414.60	13.00	14.00	π
+sagittarius-120	star	TYC 6752-1455-1	704.76	365.78	11.00	14.00	σ
+sagittarius-120	star	TYC 6881-1777-1	329.50	351.97	10.00	14.00	τ
+sagittarius-120	star	TYC 5678-956-1	429.03	218.75	10.00	14.00	ν
+sagittarius-120	star	TYC 7847-2505-1	628.78	491.01	9.00	14.00	ε
+sagittarius-120	star	TYC 469-6227-1	266.53	135.99	10.00	14.00	δ
+sagittarius-120	star	TYC 7797-2744-1	755.01	534.02	10.00	14.00	ν
+sagittarius-120	star	TYC 7851-1814-1	594.61	432.13	11.00	14.00	η
+sagittarius-120	star	TYC 5136-2357-1	308.47	191.76	10.00	14.00	λ
+sagittarius-120	star	TYC 8306-3362-1	618.49	546.88	11.00	14.00	ζ
+sagittarius-120	star	TYC 8359-3650-1	402.76	469.71	12.00	14.00	α
+sagittarius-120	star	TYC 1624-3414-1	189.43	7.12	10.00	14.00	γ
+sagittarius-120	deep sky	NGC 6611	395.99	248.07	30.00	14.00	M 16
+sagittarius-120	constellation	Aql	217.82	114.95	46.00	15.00	AQUILA
+sagittarius-120	constellation	Aqr	15.52	260.00	62.00	15.00	AQUARIUS
+sagittarius-120	constellation	Ara	465.19	530.96	28.00	15.00	ARA
+sagittarius-120	constellation	Boo	836.03	21.61	50.00	15.00	BOÖTES
+sagittarius-120	constellation	Cap	80.85	336.91	86.00	15.00	CAPRICORNUS
+sagittarius-120	constellation	Cen	684.06	576.74	74.00	15.00	CENTAURUS
+sagittarius-120	constellation	Cir	557.42	613.95	57.00	15.00	CIRCINUS
+sagittarius-120	constellation	CrA	293.54	433.49	117.00	15.00	CORONA AUSTRINA
+sagittarius-120	constellation	Del	66.54	51.63	68.00	15.00	DELPHINUS
+sagittarius-120	constellation	Equ	-0.32	120.74	63.00	15.00	EQUULEUS
+sagittarius-120	constellation	Gru	98.25	599.68	35.00	15.00	GRUS
+sagittarius-120	constellation	Her	522.45	8.06	63.00	15.00	HERCULES
+sagittarius-120	constellation	Hya	792.28	416.23	45.00	15.00	HYDRA
+sagittarius-120	constellation	Ind	221.20	582.53	39.00	15.00	INDUS
+sagittarius-120	constellation	Lib	676.73	297.97	36.00	15.00	LIBRA
+sagittarius-120	constellation	Lup	609.73	472.83	39.00	15.00	LUPUS
+sagittarius-120	constellation	Mic	131.91	472.86	93.00	15.00	MICROSCOPIUM
+sagittarius-120	constellation	Nor	532.32	487.33	48.00	15.00	NORMA
+sagittarius-120	constellation	Oph	483.27	181.81	71.00	15.00	OPHIUCHUS
+sagittarius-120	constellation	Pav	349.11	627.89	36.00	15.00	PAVO
+sagittarius-120	constellation	PsA	-0.64	499.49	105.00	15.00	PISCIS AUSTRINUS
+sagittarius-120	constellation	Sco	503.96	380.49	59.00	15.00	SCORPIUS
+sagittarius-120	constellation	Sct	331.09	214.76	52.00	15.00	SCUTUM
+sagittarius-120	constellation	Ser	494.45	136.32	97.00	15.00	SERPENS CAPUT
+sagittarius-120	constellation	Sge	180.55	9.02	54.00	15.00	SAGITTA
+sagittarius-120	constellation	Sgr	296.85	357.01	79.00	15.00	SAGITTARIUS
+sagittarius-120	constellation	Tel	360.96	469.68	83.00	15.00	TELESCOPIUM
+sagittarius-120	constellation	TrA	452.30	630.29	144.00	15.00	TRIANGULUM AUSTRALE
+sagittarius-120	constellation	Tuc	193.50	683.12	53.00	15.00	TUCANA
+sagittarius-120	constellation	Vir	823.60	221.00	41.00	15.00	VIRGO
+cygnus-90	star	TYC 3105-2070-1	682.13	315.55	41.00	14.00	Vega α
+cygnus-90	star	TYC 1058-3399-1	580.25	640.38	44.00	14.00	Altair α
+cygnus-90	star	TYC 3574-3347-1	453.28	293.40	49.00	14.00	Deneb α
+cygnus-90	star	TYC 1735-3180-1	20.83	326.25	67.00	14.00	Alpheratz α
+cygnus-90	star	TYC 4017-2319-1	177.87	8.73	36.00	14.00	Navi γ
+cygnus-90	star	TYC 3156-2223-1	487.47	340.26	37.00	14.00	Sadr γ
+cygnus-90	star	TYC 3523-1684-1	692.71	170.58	49.00	14.00	Eltanin γ
+cygnus-90	star	TYC 3663-2668-1	157.93	55.81	52.00	14.00	Shedar α
+cygnus-90	star	TYC 4252-1870-1	411.55	123.63	70.00	14.00	Alderamin α
+cygnus-90	star	TYC 1711-2475-1	104.54	527.95	54.00	14.00	Markab α
+cygnus-90	star	TYC 2695-4139-1	442.98	400.62	52.00	14.00	Aljanah ε
+cygnus-90	star	TYC 2243-1831-1	151.05	401.36	49.00	14.00	Scheat β
+cygnus-90	star	TYC 1061-2577-1	589.18	621.40	10.00	14.00	γ
+cygnus-90	star	TYC 4190-2568-1	725.08	4.11	11.00	14.00	η
+cygnus-90	star	TYC 3521-1800-1	722.91	141.17	11.00	14.00	β
+cygnus-90	star	TYC 3557-2486-1	547.07	287.31	10.00	14.00	δ
+cygnus-90	star	TYC 2736-1823-1	201.39	396.17	11.00	14.00	η
+cygnus-90	star	TYC 1052-3027-1	685.54	573.24	11.00	14.00	ζ
+cygnus-90	star	TYC 4444-2239-1	537.42	62.80	10.00	14.00	δ
+cygnus-90	star	TYC 2133-2964-1	601.67	445.51	16.00	14.00	β¹
+cygnus-90	star	TYC 2604-1774-1	838.31	259.51	13.00	14.00	π
+cygnus-90	star	TYC 4210-1048-1	655.30	14.21	11.00	14.00	ζ
+cygnus-90	star	TYC 4465-2643-1	413.85	42.97	11.00	14.00	β
+cygnus-90	star	TYC 2702-2764-1	386.97	433.56	11.00	14.00	ζ
+cygnus-90	star	TYC 2643-3346-1	657.07	386.00	10.00	14.00	γ
+cygnus-90	star	TYC 3981-1590-1	339.65	151.76	11.00	14.00	ζ
+cygnus-90	star	TYC 469-6227-1	651.72	693.29	10.00	14.00	δ
+cygnus-90	star	TYC 1155-2187-1	150.08	589.49	11.00	14.00	ζ
+cygnus-90	star	TYC 2085-3062-1	823.50	378.18	11.00	14.00	μ
+cygnus-90	star	TYC 3663-2669-1	159.39	37.08	11.00	14.00	η
+cygnus-90	star	TYC 3070-1595-1	880.11	199.92	11.00	14.00	η
+cygnus-90	star	TYC 1624-3414-1	550.01	535.70	10.00	14.00	γ
+cygnus-90	star	TYC 4277-1102-1	327.67	60.34	8.00	14.00	ι
+cygnus-90	deep sky	NGC 224	44.86	172.36	30.00	14.00	M 31
+cygnus-90	deep sky	NGC 598	-134.90	176.28	30.00	14.00	M 33
+cygnus-90	constellation	And	42.91	192.64	81.00	15.00	ANDROMEDA
+cygnus-90	constellation	Aql	600.07	633.19	46.00	15.00	AQUILA
+cygnus-90	constellation	Cas	134.68	31.85	69.00	15.00	CASSIOPEIA
+cygnus-90	constellation	Cep	341.28	82.57	56.00	15.00	CEPHEUS
+cygnus-90	constellation	Cyg	476.63	338.41	51.00	15.00	CYGNUS
+cygnus-90	constellation	Del	416.88	582.82	68.00	15.00	DELPHINUS
+cygnus-90	constellation	Dra	608.34	61.65	46.00	15.00	DRACO
+cygnus-90	constellation	Equ	330.84	644.82	63.00	15.00	EQUULEUS
+cygnus-90	constellation	Her	819.64	256.65	63.00	15.00	HERCULES
+cygnus-90	constellation	Lac	246.31	254.91	57.00	15.00	LACERTA
+cygnus-90	constellation	Lyr	644.91	340.29	33.00	15.00	LYRA
+cygnus-90	constellation	Peg	125.86	469.09	55.00	15.00	PEGASUS
+cygnus-90	constellation	Per	3.71	-3.53	53.00	15.00	PERSEUS
+cygnus-90	constellation	Psc	5.37	629.12	41.00	15.00	PISCES
+cygnus-90	constellation	Ser	698.64	676.80	97.00	15.00	SERPENS CAPUT
+cygnus-90	constellation	Sge	544.57	537.13	54.00	15.00	SAGITTA
+cygnus-90	constellation	Vul	534.39	471.89	70.00	15.00	VULPECULA
+crux-90	star	TYC 8534-2277-1	847.03	606.13	63.00	14.00	Canopus α
+crux-90	star	TYC 9007-5849-1	309.26	389.12	101.00	14.00	Rigil Kentaurus α¹
+crux-90	star	TYC 9005-3919-1	345.75	367.32	46.00	14.00	Hadar β
+crux-90	star	TYC 8979-3464-1	457.20	372.89	53.00	14.00	Acrux α¹
+crux-90	star	TYC 8659-3107-1	432.11	341.43	55.00	14.00	Mimosa β
+crux-90	star	TYC 8654-3422-1	451.46	316.14	52.00	14.00	Gacrux γ
+crux-90	star	TYC 9200-2603-1	602.38	496.22	77.00	14.00	Miaplacidus β
+crux-90	star	TYC 8140-6533-1	828.73	414.27	50.00	14.00	Regor γ²
+crux-90	star	TYC 9275-3641-1	268.12	537.67	41.00	14.00	Atria α
+crux-90	star	TYC 8573-3571-1	733.22	417.35	66.00	14.00	Alsephina δ
+crux-90	star	TYC 7293-2215-1	261.11	148.59	59.00	14.00	Menkent θ
+crux-90	star	TYC 8579-2692-1	714.38	471.65	41.00	14.00	Avior ε
+crux-90	star	TYC 7689-2617-1	785.80	307.57	45.00	14.00	Suhail λ
+crux-90	star	TYC 7663-4093-1	899.79	376.94	41.00	14.00	Naos ζ
+crux-90	star	TYC 8595-3312-1	669.65	418.44	63.00	14.00	Aspidiske ι
+crux-90	star	TYC 8663-2929-1	354.47	294.84	9.00	14.00	ε
+crux-90	star	TYC 8283-4134-1	243.92	275.00	37.00	14.00	Men α
+crux-90	star	TYC 7814-3706-1	230.96	223.41	11.00	14.00	η
+crux-90	star	TYC 8588-4200-1	692.07	382.02	52.00	14.00	Markeb κ
+crux-90	star	TYC 8241-3235-1	484.84	256.40	10.00	14.00	δ
+crux-90	star	TYC 8267-3545-1	314.41	244.55	11.00	14.00	ζ
+crux-90	star	TYC 7832-2490-1	197.81	251.88	11.00	14.00	β
+crux-90	star	TYC 9228-3049-1	447.35	430.44	12.00	14.00	α
+crux-90	star	TYC 8965-1765-1	560.32	406.90	11.00	14.00	θ
+crux-90	star	TYC 7275-2074-1	351.28	128.76	8.00	14.00	ι
+crux-90	star	TYC 8206-3033-1	609.90	271.40	11.00	14.00	μ
+crux-90	star	TYC 8350-2600-1	64.82	497.64	12.00	14.00	α
+crux-90	star	TYC 8240-2724-1	433.85	239.02	10.00	14.00	γ
+crux-90	star	TYC 8732-2866-1	124.43	513.27	11.00	14.00	β
+crux-90	star	TYC 9027-5712-1	255.48	461.39	11.00	14.00	β
+crux-90	star	TYC 9259-4905-1	316.93	474.79	10.00	14.00	γ
+crux-90	star	TYC 8125-2314-1	858.76	556.94	10.00	14.00	τ
+crux-90	star	TYC 7840-1432-1	128.92	273.79	10.00	14.00	γ
+crux-90	star	TYC 8950-2272-1	606.93	441.03	11.00	14.00	υ
+crux-90	star	TYC 8730-1439-1	146.86	480.66	11.00	14.00	ζ
+crux-90	star	TYC 8976-5383-1	510.82	377.76	10.00	14.00	λ
+crux-90	star	TYC 9015-1445-1	325.14	425.51	12.00	14.00	α
+crux-90	star	TYC 7839-2803-1	147.45	253.66	10.00	14.00	δ
+crux-90	star	TYC 8899-2202-1	740.08	590.24	12.00	14.00	α
+crux-90	star	TYC 6738-1381-1	229.85	53.56	13.00	14.00	π
+crux-90	star	TYC 6752-1455-1	95.56	94.25	11.00	14.00	σ
+crux-90	star	TYC 9214-2842-1	559.71	467.68	14.00	14.00	ω
+crux-90	star	TYC 7882-569-1	17.56	430.79	11.00	14.00	η
+crux-90	star	TYC 7847-2505-1	169.07	288.95	9.00	14.00	ε
+crux-90	star	TYC 7797-2744-1	308.17	189.10	10.00	14.00	ν
+crux-90	star	TYC 7851-1814-1	71.27	283.70	11.00	14.00	η
+crux-90	star	TYC 8306-3362-1	225.86	339.80	11.00	14.00	ζ
+crux-90	star	TYC 8553-2883-1	790.30	465.23	10.00	14.00	χ
+crux-90	constellation	Ant	694.90	147.52	46.00	15.00	ANTLIA
+crux-90	constellation	Aps	344.23	560.36	33.00	15.00	APUS
+crux-90	constellation	Ara	112.48	494.56	28.00	15.00	ARA
+crux-90	constellation	Car	659.05	456.90	48.00	15.00	CARINA
+crux-90	constellation	Cen	325.45	252.26	74.00	15.00	CENTAURUS
+crux-90	constellation	Cha	456.59	534.52	85.00	15.00	CHAMAELEON
+crux-90	constellation	Cir	257.82	408.33	57.00	15.00	CIRCINUS
+crux-90	constellation	Crt	610.22	-9.91	51.00	15.00	CRATER
+crux-90	constellation	Cru	429.65	335.83	36.00	15.00	CRUX
+crux-90	constellation	Crv	470.35	-10.42	51.00	15.00	CORVUS
+crux-90	constellation	Dor	697.43	669.83	56.00	15.00	DORADO
+crux-90	constellation	Hya	382.75	41.88	45.00	15.00	HYDRA
+crux-90	constellation	Lib	31.04	65.59	36.00	15.00	LIBRA
+crux-90	constellation	Lup	133.17	266.72	39.00	15.00	LUPUS
+crux-90	constellation	Men	573.73	665.23	44.00	15.00	MENSA
+crux-90	constellation	Mus	423.97	429.06	44.00	15.00	MUSCA
+crux-90	constellation	Nor	93.64	366.64	48.00	15.00	NORMA
+crux-90	constellation	Oct	379.71	631.36	52.00	15.00	OCTANS
+crux-90	constellation	Pav	191.78	624.12	36.00	15.00	PAVO
+crux-90	constellation	Pic	770.91	636.40	47.00	15.00	PICTOR
+crux-90	constellation	Pup	842.41	387.76	42.00	15.00	PUPPIS
+crux-90	constellation	Pyx	871.85	301.86	35.00	15.00	PYXIS
+crux-90	constellation	Sco	-17.39	404.14	59.00	15.00	SCORPIUS
+crux-90	constellation	Tel	-31.82	584.55	83.00	15.00	TELESCOPIUM
+crux-90	constellation	TrA	202.84	487.56	144.00	15.00	TRIANGULUM AUSTRALE
+crux-90	constellation	Vel	690.33	305.43	33.00	15.00	VELA
+crux-90	constellation	Vol	619.02	530.42	50.00	15.00	VOLANS
+pole-120	star	TYC 3105-2070-1	824.74	403.45	41.00	14.00	Vega α
+pole-120	star	TYC 3358-3141-1	146.69	402.66	54.00	14.00	Capella α
+pole-120	star	TYC 1920-2194-1	36.20	135.88	47.00	14.00	Pollux β
+pole-120	star	TYC 3574-3347-1	699.98	551.12	49.00	14.00	Deneb α
+pole-120	star	TYC 3845-1190-1	511.23	111.51	44.00	14.00	Alioth ε
+pole-120	star	TYC 3320-2808-1	233.93	522.39	48.00	14.00	Mirfak α
+pole-120	star	TYC 3467-1257-1	586.15	85.75	47.00	14.00	Alkaid η
+pole-120	star	TYC 2924-2742-1	132.18	344.16	74.00	14.00	Menkalinan β
+pole-120	star	TYC 2457-2407-1	58.77	169.79	51.00	14.00	Castor α
+pole-120	star	TYC 4628-237-1	452.34	347.45	51.00	14.00	Polaris α
+pole-120	star	TYC 4146-1274-1	407.73	153.25	50.00	14.00	Dubhe α
+pole-120	star	TYC 4416-1799-1	528.91	263.76	54.00	14.00	Kochab β
+pole-120	star	TYC 2851-2168-1	195.14	585.81	42.00	14.00	Algol β
+pole-120	star	TYC 4017-2319-1	405.47	540.93	36.00	14.00	Navi γ
+pole-120	star	TYC 3156-2223-1	749.28	553.62	37.00	14.00	Sadr γ
+pole-120	star	TYC 2029-1690-1	842.27	58.96	64.00	14.00	Alphecca α
+pole-120	star	TYC 3523-1684-1	727.56	339.47	49.00	14.00	Eltanin γ
+pole-120	star	TYC 3663-2668-1	414.12	574.15	52.00	14.00	Shedar α
+pole-120	star	TYC 3664-1985-1	446.70	558.38	42.00	14.00	Caph β
+pole-120	star	TYC 3827-1079-1	396.15	115.59	46.00	14.00	Merak β
+pole-120	star	TYC 3833-1034-1	448.37	88.05	51.00	14.00	Phecda γ
+pole-120	star	TYC 4252-1870-1	578.33	488.37	70.00	14.00	Alderamin α
+pole-120	star	TYC 2695-4139-1	765.55	618.57	52.00	14.00	Aljanah ε
+pole-120	star	TYC 2418-1573-1	68.36	343.97	11.00	14.00	θ
+pole-120	star	TYC 4031-3289-1	379.39	536.28	10.00	14.00	δ
+pole-120	star	TYC 2391-1446-1	49.25	457.99	8.00	14.00	ι
+pole-120	star	TYC 4190-2568-1	635.86	263.02	11.00	14.00	η
+pole-120	star	TYC 3521-1800-1	718.97	309.27	11.00	14.00	β
+pole-120	star	TYC 2361-2820-1	85.67	569.57	11.00	14.00	ζ
+pole-120	star	TYC 2868-1623-1	142.08	528.12	9.00	14.00	ε
+pole-120	star	TYC 2582-3158-1	865.20	196.83	11.00	14.00	ζ
+pole-120	star	TYC 3557-2486-1	743.68	485.80	10.00	14.00	δ
+pole-120	star	TYC 3317-3034-1	206.39	512.90	10.00	14.00	δ
+pole-120	star	TYC 3012-2519-1	383.79	24.50	13.00	14.00	ψ
+pole-120	star	TYC 2907-1275-1	133.32	426.74	9.00	14.00	ε
+pole-120	star	TYC 3036-1151-1	687.54	46.06	10.00	14.00	γ
+pole-120	star	TYC 3004-1418-1	309.84	23.80	11.00	14.00	μ
+pole-120	star	TYC 4444-2239-1	601.22	391.41	10.00	14.00	δ
+pole-120	star	TYC 2133-2964-1	887.42	524.23	16.00	14.00	β¹
+pole-120	star	TYC 3420-2149-1	242.90	132.90	8.00	14.00	ι
+pole-120	star	TYC 2496-1728-1	192.21	27.44	12.00	14.00	α
+pole-120	star	TYC 2604-1774-1	837.68	267.45	13.00	14.00	π
+pole-120	star	TYC 2899-2237-1	111.24	425.20	11.00	14.00	η
+pole-120	star	TYC 4210-1048-1	618.47	306.34	11.00	14.00	ζ
+pole-120	star	TYC 3432-1451-1	292.76	126.59	11.00	14.00	θ
+pole-120	star	TYC 4465-2643-1	536.81	448.94	11.00	14.00	β
+pole-120	star	TYC 2702-2764-1	753.28	677.61	11.00	14.00	ζ
+pole-120	star	TYC 4606-3584-1	462.51	427.61	10.00	14.00	γ
+pole-120	star	TYC 2643-3346-1	866.83	451.84	10.00	14.00	γ
+pole-120	star	TYC 3837-1070-1	470.39	113.39	10.00	14.00	δ
+pole-120	star	TYC 3875-1620-1	623.60	208.00	8.00	14.00	ι
+pole-120	star	TYC 4036-2834-1	367.59	503.57	9.00	14.00	ε
+pole-120	star	TYC 3981-1590-1	556.63	540.81	11.00	14.00	ζ
+pole-120	star	TYC 4127-2431-1	293.45	219.36	11.00	14.00	ο
+pole-120	star	TYC 2847-1572-1	185.13	601.30	11.00	14.00	ρ
+pole-120	star	TYC 4246-1967-1	601.64	472.59	11.00	14.00	η
+pole-120	star	TYC 2566-1639-1	771.50	66.99	10.00	14.00	δ
+pole-120	star	TYC 3047-1258-1	711.66	90.96	11.00	14.00	β
+pole-120	star	TYC 3070-1595-1	806.33	220.56	11.00	14.00	η
+pole-120	star	TYC 4277-1102-1	504.39	500.08	8.00	14.00	ι
+pole-120	deep sky	NGC 224	394.18	690.38	30.00	14.00	M 31
+pole-120	deep sky	NGC 598	278.57	750.82	30.00	14.00	M 33
+pole-120	deep sky	Mel022	38.48	619.59	30.00	14.00	M 45
+pole-120	deep sky	NGC 2632	39.10	-10.13	30.00	14.00	M 44
+pole-120	constellation	And	360.51	658.54	81.00	15.00	ANDROMEDA
+pole-120	constellation	Aur	81.60	381.99	48.00	15.00	AURIGA
+pole-120	constellation	Boo	661.63	59.59	50.00	15.00	BOÖTES
+pole-120	constellation	CVn	453.45	-11.29	100.00	15.00	CANES VENATICI
+pole-120	constellation	Cam	244.63	384.67	107.00	15.00	CAMELOPARDALIS
+pole-120	constellation	Cas	362.28	540.45	69.00	15.00	CASSIOPEIA
+pole-120	constellation	Cep	498.21	477.01	56.00	15.00	CEPHEUS
+pole-120	constellation	Cnc	49.29	9.96	52.00	15.00	CANCER
+pole-120	constellation	CrB	781.55	74.64	113.00	15.00	CORONA BOREALIS
+pole-120	constellation	Cyg	731.53	537.22	51.00	15.00	CYGNUS
+pole-120	constellation	Dra	581.88	286.17	46.00	15.00	DRACO
+pole-120	constellation	Gem	6.44	168.70	45.00	15.00	GEMINI
+pole-120	constellation	Her	791.31	223.66	63.00	15.00	HERCULES
+pole-120	constellation	LMi	200.00	4.27	69.00	15.00	LEO MINOR
+pole-120	constellation	Lac	547.25	629.10	57.00	15.00	LACERTA
+pole-120	constellation	Lyn	181.26	177.67	34.00	15.00	LYNX
+pole-120	constellation	Lyr	818.77	421.75	33.00	15.00	LYRA
+pole-120	constellation	Per	183.40	538.51	53.00	15.00	PERSEUS
+pole-120	constellation	Tri	183.93	683.11	81.00	15.00	TRIANGULUM
+pole-120	constellation	UMa	342.30	105.03	77.00	15.00	URSA MAJOR
+pole-120	constellation	UMi	473.92	296.71	77.00	15.00	URSA MINOR
+pole-120	constellation	Vul	835.43	579.21	70.00	15.00	VULPECULA
+seam-120	star	TYC 6977-1267-1	554.81	553.18	71.00	14.00	Fomalhaut α
+seam-120	star	TYC 1758-2416-1	243.75	169.13	48.00	14.00	Hamal α
+seam-120	star	TYC 5847-2333-1	382.93	467.95	52.00	14.00	Diphda β
+seam-120	star	TYC 1735-3180-1	442.09	141.21	67.00	14.00	Alpheratz α
+seam-120	star	TYC 2286-1329-1	348.47	87.83	50.00	14.00	Mirach β
+seam-120	star	TYC 2851-2168-1	170.94	6.20	42.00	14.00	Algol β
+seam-120	star	TYC 8446-1644-1	562.57	689.39	39.00	14.00	Tiaki β
+seam-120	star	TYC 2837-2311-1	273.84	22.26	58.00	14.00	Almach γ¹
+seam-120	star	TYC 3156-2223-1	790.49	-5.36	37.00	14.00	Sadr γ
+seam-120	star	TYC 1125-2186-1	691.27	269.94	32.00	14.00	Enif ε
+seam-120	star	TYC 7527-1031-1	417.23	645.93	48.00	14.00	Ankaa α
+seam-120	star	TYC 1711-2475-1	547.91	237.97	54.00	14.00	Markab α
+seam-120	star	TYC 2695-4139-1	767.28	62.54	52.00	14.00	Aljanah ε
+seam-120	star	TYC 2243-1831-1	545.21	145.80	49.00	14.00	Scheat β
+seam-120	star	TYC 58-1618-1	128.28	310.77	12.00	14.00	α
+seam-120	star	TYC 1212-1935-1	263.18	191.39	11.00	14.00	β
+seam-120	star	TYC 1179-1775-1	432.97	239.53	10.00	14.00	γ
+seam-120	star	TYC 2361-2820-1	63.93	58.25	11.00	14.00	ζ
+seam-120	star	TYC 6363-1044-1	682.64	463.54	10.00	14.00	δ
+seam-120	star	TYC 5216-1725-1	715.99	385.69	11.00	14.00	β
+seam-120	star	TYC 2736-1823-1	577.31	127.44	11.00	14.00	η
+seam-120	star	TYC 5224-1806-1	653.37	345.82	12.00	14.00	α
+seam-120	star	TYC 5311-1285-1	17.73	465.41	10.00	14.00	γ
+seam-120	star	TYC 7494-1748-1	648.05	625.47	10.00	14.00	γ
+seam-120	star	TYC 2317-1647-1	252.84	79.34	11.00	14.00	β
+seam-120	star	TYC 5753-2281-1	849.96	471.13	11.00	14.00	β
+seam-120	star	TYC 2702-2764-1	727.69	104.89	11.00	14.00	ζ
+seam-120	star	TYC 5161-2682-1	879.61	350.75	11.00	14.00	θ
+seam-120	star	TYC 6387-1382-1	564.57	453.99	10.00	14.00	δ
+seam-120	star	TYC 2275-1753-1	392.99	126.90	10.00	14.00	δ
+seam-120	star	TYC 2847-1572-1	169.53	25.71	11.00	14.00	ρ
+seam-120	star	TYC 8032-1228-1	363.15	685.88	11.00	14.00	β
+seam-120	star	TYC 1155-2187-1	588.46	267.42	11.00	14.00	ζ
+seam-120	star	TYC 662-1546-1	10.48	230.03	10.00	14.00	λ
+seam-120	star	TYC 1763-3028-1	273.02	125.63	12.00	14.00	α
+seam-120	star	TYC 5273-2657-1	338.25	414.51	11.00	14.00	η
+seam-120	star	TYC 1624-3414-1	889.92	166.20	10.00	14.00	γ
+seam-120	star	TYC 5855-2292-1	278.40	458.33	10.00	14.00	τ
+seam-120	deep sky	NGC 224	397.15	47.80	30.00	14.00	M 31
+seam-120	deep sky	NGC 598	306.15	121.34	30.00	14.00	M 33
+seam-120	deep sky	Mel022	64.02	131.12	30.00	14.00	M 45
+seam-120	constellation	And	355.04	71.13	81.00	15.00	ANDROMEDA
+seam-120	constellation	Aql	865.03	327.35	46.00	15.00	AQUILA
+seam-120	constellation	Aqr	575.80	397.10	62.00	15.00	AQUARIUS
+seam-120	constellation	Ari	202.85	156.71	36.00	15.00	ARIES
+seam-120	constellation	Cap	721.24	490.10	86.00	15.00	CAPRICORNUS
+seam-120	constellation	Cet	245.93	379.25	41.00	15.00	CETUS
+seam-120	constellation	Cyg	774.23	32.23	51.00	15.00	CYGNUS
+seam-120	constellation	Del	772.87	216.84	68.00	15.00	DELPHINUS
+seam-120	constellation	Equ	710.99	274.25	63.00	15.00	EQUULEUS
+seam-120	constellation	Eri	69.00	539.01	62.00	15.00	ERIDANUS
+seam-120	constellation	For	164.85	579.56	52.00	15.00	FORNAX
+seam-120	constellation	Gru	574.73	660.47	35.00	15.00	GRUS
+seam-120	constellation	Lac	556.83	18.78	57.00	15.00	LACERTA
+seam-120	constellation	Mic	676.01	635.85	93.00	15.00	MICROSCOPIUM
+seam-120	constellation	Peg	516.61	190.66	55.00	15.00	PEGASUS
+seam-120	constellation	Per	87.91	17.87	53.00	15.00	PERSEUS
+seam-120	constellation	Phe	351.48	667.04	56.00	15.00	PHOENIX
+seam-120	constellation	PsA	551.18	566.47	105.00	15.00	PISCIS AUSTRINUS
+seam-120	constellation	Psc	351.47	266.04	41.00	15.00	PISCES
+seam-120	constellation	Scl	420.85	552.77	64.00	15.00	SCULPTOR
+seam-120	constellation	Sge	866.92	161.93	54.00	15.00	SAGITTA
+seam-120	constellation	Sgr	821.01	623.00	79.00	15.00	SAGITTARIUS
+seam-120	constellation	Tau	22.18	267.68	50.00	15.00	TAURUS
+seam-120	constellation	Tri	212.10	96.07	81.00	15.00	TRIANGULUM
+seam-120	constellation	Vul	834.06	100.02	70.00	15.00	VULPECULA
+orion-120-small	star	TYC 5949-2777-1	260.58	334.81	45.00	14.00	Sirius α
+orion-120-small	star	TYC 5331-1752-1	378.99	287.03	40.00	14.00	Rigel β
+orion-120-small	star	TYC 187-2184-1	183.55	213.58	59.00	14.00	Procyon α
+orion-120-small	star	TYC 129-1873-1	325.41	204.16	72.00	14.00	Betelgeuse α
+orion-120-small	star	TYC 1266-1416-1	428.75	154.25	70.00	14.00	Aldebaran α
+orion-120-small	star	TYC 1920-2194-1	186.49	79.56	47.00	14.00	Pollux β
+orion-120-small	star	TYC 6535-3619-1	247.65	405.46	51.00	14.00	Adhara ε
+orion-120-small	star	TYC 1859-1470-1	362.59	88.91	47.00	14.00	Elnath β
+orion-120-small	star	TYC 4766-2450-1	349.95	249.86	52.00	14.00	Alnilam ε
+orion-120-small	star	TYC 2457-2407-1	203.80	58.44	51.00	14.00	Castor α
+orion-120-small	star	TYC 5460-1592-1	15.74	303.91	58.00	14.00	Alphard α
+orion-120-small	star	TYC 1758-2416-1	630.65	90.22	48.00	14.00	Hamal α
+orion-120-small	star	TYC 1329-1746-1	269.75	154.36	50.00	14.00	Alhena γ
+orion-120-small	star	TYC 5351-760-1	334.69	294.84	42.00	14.00	Saiph κ
+orion-120-small	star	TYC 2851-2168-1	522.20	-3.11	42.00	14.00	Algol β
+orion-120-small	star	TYC 58-1618-1	560.27	219.37	12.00	14.00	α
+orion-120-small	star	TYC 5920-1685-1	354.24	338.55	12.00	14.00	α
+orion-120-small	star	TYC 2418-1573-1	322.63	38.75	11.00	14.00	θ
+orion-120-small	star	TYC 2391-1446-1	397.39	62.01	8.00	14.00	ι
+orion-120-small	star	TYC 4759-1671-1	387.00	270.50	11.00	14.00	β
+orion-120-small	star	TYC 6555-3245-1	152.18	389.46	11.00	14.00	ρ
+orion-120-small	star	TYC 5928-1657-1	359.87	354.55	11.00	14.00	β
+orion-120-small	star	TYC 764-2774-1	200.35	196.69	11.00	14.00	β
+orion-120-small	star	TYC 2361-2820-1	475.31	62.89	11.00	14.00	ζ
+orion-120-small	star	TYC 2868-1623-1	463.98	14.53	9.00	14.00	ε
+orion-120-small	star	TYC 1878-1429-1	290.08	121.40	11.00	14.00	μ
+orion-120-small	star	TYC 1310-2697-1	347.81	130.35	11.00	14.00	ζ
+orion-120-small	star	TYC 5311-1285-1	479.22	318.36	10.00	14.00	γ
+orion-120-small	star	TYC 1897-1639-1	263.96	105.17	9.00	14.00	ε
+orion-120-small	star	TYC 2317-1647-1	607.56	14.79	11.00	14.00	β
+orion-120-small	star	TYC 6523-3722-1	238.64	376.38	16.00	14.00	ο²
+orion-120-small	star	TYC 2907-1275-1	388.31	-1.22	9.00	14.00	ε
+orion-120-small	star	TYC 225-1116-1	67.74	204.93	11.00	14.00	ζ
+orion-120-small	star	TYC 2496-1728-1	63.99	6.73	12.00	14.00	α
+orion-120-small	star	TYC 2899-2237-1	383.89	14.82	11.00	14.00	η
+orion-120-small	star	TYC 5913-1374-1	388.69	363.76	9.00	14.00	ε
+orion-120-small	star	TYC 7563-1016-1	534.83	488.99	16.00	14.00	θ¹
+orion-120-small	star	TYC 96-1462-1	410.63	206.32	18.00	14.00	π³
+orion-120-small	star	TYC 5902-1721-1	379.61	329.95	11.00	14.00	μ
+orion-120-small	star	TYC 6557-4522-1	177.57	389.19	10.00	14.00	ξ
+orion-120-small	star	TYC 754-2356-1	258.37	173.23	10.00	14.00	ξ
+orion-120-small	star	TYC 662-1546-1	475.70	174.49	10.00	14.00	λ
+orion-120-small	star	TYC 1763-3028-1	641.36	44.30	12.00	14.00	α
+orion-120-small	star	TYC 224-1333-1	81.54	202.57	9.00	14.00	ε
+orion-120-small	star	TYC 5855-2292-1	675.49	352.74	10.00	14.00	τ
+orion-120-small	deep sky	Mel022	493.56	107.43	30.00	14.00	M 45
+orion-120-small	deep sky	NGC 1976	351.32	272.04	30.00	14.00	M 42
+orion-120-small	deep sky	NGC 2632	103.01	119.15	30.00	14.00	M 44
+orion-120-small	constellation	Ari	591.68	84.47	36.00	15.00	ARIES
+orion-120-small	constellation	Aur	333.97	34.95	48.00	15.00	AURIGA
+orion-120-small	constellation	CMa	204.74	357.51	81.00	15.00	CANIS MAJOR
+orion-120-small	constellation	CMi	145.92	199.60	81.00	15.00	CANIS MINOR
+orion-120-small	constellation	Cae	379.21	456.71	51.00	15.00	CAELUM
+orion-120-small	constellation	Car	253.89	486.53	48.00	15.00	CARINA
+orion-120-small	constellation	Cet	597.92	252.48	41.00	15.00	CETUS
+orion-120-small	constellation	Cnc	67.15	126.36	52.00	15.00	CANCER
+orion-120-small	constellation	Col	292.68	438.27	60.00	15.00	COLUMBA
+orion-120-small	constellation	Eri	458.47	353.98	62.00	15.00	ERIDANUS
+orion-120-small	constellation	For	542.93	429.52	52.00	15.00	FORNAX
+orion-120-small	constellation	Gem	207.02	104.13	45.00	15.00	GEMINI
+orion-120-small	constellation	Hor	401.77	483.72	84.00	15.00	HOROLOGIUM
+orion-120-small	constellation	Hya	23.78	229.98	45.00	15.00	HYDRA
+orion-120-small	constellation	Lep	336.78	334.29	38.00	15.00	LEPUS
+orion-120-small	constellation	Lyn	46.55	-6.54	34.00	15.00	LYNX
+orion-120-small	constellation	Mon	181.82	245.29	79.00	15.00	MONOCEROS
+orion-120-small	constellation	Ori	326.65	202.62	42.00	15.00	ORION
+orion-120-small	constellation	Per	459.88	16.09	53.00	15.00	PERSEUS
+orion-120-small	constellation	Psc	658.47	154.84	41.00	15.00	PISCES
+orion-120-small	constellation	Pup	169.00	424.83	42.00	15.00	PUPPIS
+orion-120-small	constellation	Pyx	107.22	456.97	35.00	15.00	PYXIS
+orion-120-small	constellation	Tau	418.17	155.45	50.00	15.00	TAURUS
+orion-120-small	constellation	Tri	574.46	25.04	81.00	15.00	TRIANGULUM
+orion-42-a4	star	TYC 5331-1752-1	467.57	399.98	40.00	14.00	Rigel β
+orion-42-a4	star	TYC 129-1873-1	289.21	123.94	72.00	14.00	Betelgeuse α
+orion-42-a4	star	TYC 113-1856-1	420.62	143.34	56.00	14.00	Bellatrix γ
+orion-42-a4	star	TYC 4766-2450-1	372.08	276.05	52.00	14.00	Alnilam ε
+orion-42-a4	star	TYC 5351-760-1	321.32	426.30	42.00	14.00	Saiph κ
+orion-42-a4	star	TYC 4766-2445-1	390.21	260.24	54.00	14.00	Mintaka δ
+orion-42-a4	star	TYC 4778-1401-1	375.08	358.83	8.00	14.00	ι
+orion-42-a4	star	TYC 4759-1671-1	496.17	344.77	11.00	14.00	β
+orion-42-a4	star	TYC 96-1462-1	576.53	130.44	18.00	14.00	π³
+orion-42-a4	star	TYC 754-2356-1	57.73	13.11	10.00	14.00	ξ
+orion-42-a4	deep sky	NGC 1976	382.42	349.63	30.00	14.00	M 42
+orion-42-a4	deep sky	NGC 2168	227.78	-204.67	30.00	14.00	M 35
+orion-42-a4	constellation	CMa	-34.35	492.72	81.00	15.00	CANIS MAJOR
+orion-42-a4	constellation	Eri	610.49	339.82	62.00	15.00	ERIDANUS
+orion-42-a4	constellation	Gem	37.17	-4.69	45.00	15.00	GEMINI
+orion-42-a4	constellation	Lep	356.60	503.81	38.00	15.00	LEPUS
+orion-42-a4	constellation	Mon	54.93	241.12	79.00	15.00	MONOCEROS
+orion-42-a4	constellation	Ori	374.09	169.22	42.00	15.00	ORION
+orion-42-letter	star	TYC 5331-1752-1	437.59	399.06	40.00	14.00	Rigel β
+orion-42-letter	star	TYC 129-1873-1	270.81	140.95	72.00	14.00	Betelgeuse α
+orion-42-letter	star	TYC 113-1856-1	393.67	159.09	56.00	14.00	Bellatrix γ
+orion-42-letter	star	TYC 4766-2450-1	348.28	283.18	52.00	14.00	Alnilam ε
+orion-42-letter	star	TYC 5351-760-1	300.81	423.67	42.00	14.00	Saiph κ
+orion-42-letter	star	TYC 4766-2445-1	365.21	268.40	54.00	14.00	Mintaka δ
+orion-42-letter	star	TYC 4778-1401-1	351.06	360.59	8.00	14.00	ι
+orion-42-letter	star	TYC 4759-1671-1	464.29	347.44	11.00	14.00	β
+orion-42-letter	star	TYC 96-1462-1	539.42	147.03	18.00	14.00	π³
+orion-42-letter	star	TYC 754-2356-1	54.29	37.32	10.00	14.00	ξ
+orion-42-letter	deep sky	NGC 1976	357.78	351.99	30.00	14.00	M 42
+orion-42-letter	deep sky	NGC 2168	213.18	-166.32	30.00	14.00	M 35
+orion-42-letter	constellation	CMa	-35.34	496.39	81.00	15.00	CANIS MAJOR
+orion-42-letter	constellation	Eri	568.83	342.46	62.00	15.00	ERIDANUS
+orion-42-letter	constellation	Gem	39.67	8.79	45.00	15.00	GEMINI
+orion-42-letter	constellation	Lep	332.52	506.02	38.00	15.00	LEPUS
+orion-42-letter	constellation	Mon	48.80	250.17	79.00	15.00	MONOCEROS
+orion-42-letter	constellation	Ori	346.04	172.28	42.00	15.00	ORION
+orion-42-letter	constellation	Tau	673.77	0.85	50.00	15.00	TAURUS
+orion-90-black	star	TYC 5949-2777-1	285.00	507.13	45.00	14.00	Sirius α
+orion-90-black	star	TYC 5331-1752-1	497.19	421.50	40.00	14.00	Rigel β
+orion-90-black	star	TYC 187-2184-1	146.95	289.88	59.00	14.00	Procyon α
+orion-90-black	star	TYC 129-1873-1	401.22	273.00	72.00	14.00	Betelgeuse α
+orion-90-black	star	TYC 1266-1416-1	586.53	183.55	70.00	14.00	Aldebaran α
+orion-90-black	star	TYC 1920-2194-1	152.44	49.71	47.00	14.00	Pollux β
+orion-90-black	star	TYC 1859-1470-1	468.18	66.46	47.00	14.00	Elnath β
+orion-90-black	star	TYC 4766-2450-1	445.54	354.90	52.00	14.00	Alnilam ε
+orion-90-black	star	TYC 6532-5001-1	236.88	609.18	47.00	14.00	Wezen δ
+orion-90-black	star	TYC 2457-2407-1	183.69	11.85	51.00	14.00	Castor α
+orion-90-black	star	TYC 5938-2918-1	337.82	517.20	53.00	14.00	Mirzam β
+orion-90-black	star	TYC 1329-1746-1	301.90	183.76	50.00	14.00	Alhena γ
+orion-90-black	star	TYC 5351-760-1	418.29	435.50	42.00	14.00	Saiph κ
+orion-90-black	star	TYC 58-1618-1	822.71	300.26	12.00	14.00	α
+orion-90-black	star	TYC 5920-1685-1	453.49	513.84	12.00	14.00	α
+orion-90-black	star	TYC 7064-1357-1	438.73	676.50	12.00	14.00	α
+orion-90-black	star	TYC 2391-1446-1	530.86	18.26	8.00	14.00	ι
+orion-90-black	star	TYC 4759-1671-1	512.28	391.89	11.00	14.00	β
+orion-90-black	star	TYC 6555-3245-1	91.47	605.08	11.00	14.00	ρ
+orion-90-black	star	TYC 5928-1657-1	463.67	542.50	11.00	14.00	β
+orion-90-black	star	TYC 1800-2202-1	695.08	99.64	11.00	14.00	η
+orion-90-black	star	TYC 764-2774-1	177.81	259.62	11.00	14.00	β
+orion-90-black	star	TYC 2361-2820-1	670.57	19.83	11.00	14.00	ζ
+orion-90-black	star	TYC 1878-1429-1	338.62	124.68	11.00	14.00	μ
+orion-90-black	star	TYC 1310-2697-1	442.11	140.72	11.00	14.00	ζ
+orion-90-black	star	TYC 5311-1285-1	677.61	477.65	10.00	14.00	γ
+orion-90-black	star	TYC 1897-1639-1	291.84	95.59	9.00	14.00	ε
+orion-90-black	star	TYC 6523-3722-1	246.48	581.62	16.00	14.00	ο²
+orion-90-black	star	TYC 5913-1374-1	515.43	559.02	9.00	14.00	ε
+orion-90-black	star	TYC 96-1462-1	554.76	276.86	18.00	14.00	π³
+orion-90-black	star	TYC 5902-1721-1	499.19	498.43	11.00	14.00	μ
+orion-90-black	star	TYC 6557-4522-1	137.13	604.58	10.00	14.00	ξ
+orion-90-black	star	TYC 754-2356-1	281.95	217.57	10.00	14.00	ξ
+orion-90-black	star	TYC 1877-1716-1	356.99	125.51	11.00	14.00	η
+orion-90-black	star	TYC 662-1546-1	671.45	219.83	10.00	14.00	λ
+orion-90-black	deep sky	Mel022	704.89	99.64	30.00	14.00	M 45
+orion-90-black	deep sky	NGC 1976	450.00	394.64	30.00	14.00	M 42
+orion-90-black	deep sky	NGC 2632	5.00	120.65	30.00	14.00	M 44
+orion-90-black	constellation	Ari	845.38	47.71	36.00	15.00	ARIES
+orion-90-black	constellation	Aur	446.19	25.22	48.00	15.00	AURIGA
+orion-90-black	constellation	CMa	221.76	552.17	81.00	15.00	CANIS MAJOR
+orion-90-black	constellation	CMi	116.34	269.19	81.00	15.00	CANIS MINOR
+orion-90-black	constellation	Cae	485.55	687.74	51.00	15.00	CAELUM
+orion-90-black	constellation	Cet	839.27	278.62	41.00	15.00	CETUS
+orion-90-black	constellation	Cnc	-3.76	202.04	52.00	15.00	CANCER
+orion-90-black	constellation	Col	370.05	678.93	60.00	15.00	COLUMBA
+orion-90-black	constellation	Eri	666.74	505.34	62.00	15.00	ERIDANUS
+orion-90-black	constellation	For	784.66	670.92	52.00	15.00	FORNAX
+orion-90-black	constellation	Gem	211.59	98.09	45.00	15.00	GEMINI
+orion-90-black	constellation	Lep	441.36	510.56	38.00	15.00	LEPUS
+orion-90-black	constellation	Mon	179.89	351.07	79.00	15.00	MONOCEROS
+orion-90-black	constellation	Ori	424.79	274.60	42.00	15.00	ORION
+orion-90-black	constellation	Per	641.03	5.35	53.00	15.00	PERSEUS
+orion-90-black	constellation	Pup	115.63	628.79	42.00	15.00	PUPPIS
+orion-90-black	constellation	Pyx	-18.25	686.66	35.00	15.00	PYXIS
+orion-90-black	constellation	Tau	591.96	190.06	50.00	15.00	TAURUS
+sagittarius-90-key	star	TYC 1058-3399-1	118.11	-1.81	44.00	14.00	Altair α
+sagittarius-90-key	star	TYC 6803-2158-1	614.62	340.56	57.00	14.00	Antares α
+sagittarius-90-key	star	TYC 7388-1093-1	475.32	430.23	48.00	14.00	Shaula λ
+sagittarius-90-key	star	TYC 7401-3471-1	376.62	407.68	89.00	14.00	Kaus Australis ε
+sagittarius-90-key	star	TYC 7892-7679-1	467.25	486.61	50.00	14.00	Sargas θ
+sagittarius-90-key	star	TYC 7293-2215-1	875.15	538.04	59.00	14.00	Menkent θ
+sagittarius-90-key	star	TYC 6868-1829-1	303.47	338.22	45.00	14.00	Nunki σ
+sagittarius-90-key	star	TYC 7367-804-1	561.13	409.69	56.00	14.00	Larawag ε
+sagittarius-90-key	star	TYC 6779-2194-1	684.33	315.03	67.00	14.00	Dschubba δ
+sagittarius-90-key	star	TYC 8283-4134-1	752.72	606.48	37.00	14.00	Men α
+sagittarius-90-key	star	TYC 7814-3706-1	790.52	563.07	11.00	14.00	η
+sagittarius-90-key	star	TYC 7885-2065-1	458.07	448.40	38.00	14.00	Mula κ
+sagittarius-90-key	star	TYC 6232-1333-1	532.89	228.82	42.00	14.00	Sabik η
+sagittarius-90-key	star	TYC 8267-3545-1	825.72	653.04	11.00	14.00	ζ
+sagittarius-90-key	star	TYC 5632-1042-1	615.34	184.80	11.00	14.00	ζ
+sagittarius-90-key	star	TYC 5585-1014-1	816.56	204.41	11.00	14.00	β
+sagittarius-90-key	star	TYC 6885-2837-1	293.11	374.91	11.00	14.00	ζ
+sagittarius-90-key	star	TYC 6208-1623-1	677.80	285.43	16.00	14.00	β¹
+sagittarius-90-key	star	TYC 7832-2490-1	745.50	552.14	11.00	14.00	β
+sagittarius-90-key	star	TYC 6856-2170-1	379.00	363.81	10.00	14.00	δ
+sagittarius-90-key	star	TYC 5037-1068-1	679.19	121.95	10.00	14.00	δ
+sagittarius-90-key	star	TYC 6155-1210-1	864.72	290.98	17.00	14.00	α²
+sagittarius-90-key	star	TYC 423-1724-1	456.45	26.15	11.00	14.00	β
+sagittarius-90-key	star	TYC 6807-1012-1	597.70	355.61	10.00	14.00	τ
+sagittarius-90-key	star	TYC 8350-2600-1	474.35	553.78	12.00	14.00	α
+sagittarius-90-key	star	TYC 6861-3180-1	360.79	323.13	10.00	14.00	λ
+sagittarius-90-key	star	TYC 8732-2866-1	481.66	610.38	11.00	14.00	β
+sagittarius-90-key	star	TYC 6783-2697-1	680.37	349.55	13.00	14.00	π
+sagittarius-90-key	star	TYC 6295-282-1	263.54	292.35	13.00	14.00	π
+sagittarius-90-key	star	TYC 7391-2710-1	410.41	367.52	15.00	14.00	γ²
+sagittarius-90-key	star	TYC 7840-1432-1	687.99	507.32	10.00	14.00	γ
+sagittarius-90-key	star	TYC 7868-1821-1	553.10	445.13	16.00	14.00	μ¹
+sagittarius-90-key	star	TYC 5753-2281-1	81.75	266.49	11.00	14.00	β
+sagittarius-90-key	star	TYC 8411-1822-1	170.59	598.24	12.00	14.00	α
+sagittarius-90-key	star	TYC 8730-1439-1	518.76	618.64	11.00	14.00	ζ
+sagittarius-90-key	star	TYC 7404-7057-1	390.70	429.26	11.00	14.00	η
+sagittarius-90-key	star	TYC 7839-2803-1	714.63	511.28	10.00	14.00	δ
+sagittarius-90-key	star	TYC 5161-2682-1	74.91	113.28	11.00	14.00	θ
+sagittarius-90-key	star	TYC 5042-999-1	667.77	131.00	9.00	14.00	ε
+sagittarius-90-key	star	TYC 6829-577-1	502.18	316.06	11.00	14.00	θ
+sagittarius-90-key	star	TYC 5102-416-1	362.04	103.71	11.00	14.00	η
+sagittarius-90-key	star	TYC 6752-1455-1	803.18	374.56	11.00	14.00	σ
+sagittarius-90-key	star	TYC 6881-1777-1	280.12	355.30	10.00	14.00	τ
+sagittarius-90-key	star	TYC 5678-956-1	418.85	169.62	10.00	14.00	ν
+sagittarius-90-key	star	TYC 7847-2505-1	697.29	549.10	9.00	14.00	ε
+sagittarius-90-key	star	TYC 469-6227-1	192.37	54.26	10.00	14.00	δ
+sagittarius-90-key	star	TYC 7797-2744-1	873.23	609.06	10.00	14.00	ν
+sagittarius-90-key	star	TYC 7851-1814-1	649.66	467.04	11.00	14.00	η
+sagittarius-90-key	star	TYC 5136-2357-1	250.83	132.00	10.00	14.00	λ
+sagittarius-90-key	star	TYC 8306-3362-1	682.95	626.98	11.00	14.00	ζ
+sagittarius-90-key	star	TYC 8359-3650-1	382.27	519.42	12.00	14.00	α
+sagittarius-90-key	deep sky	NGC 6523	412.81	309.98	23.00	14.00	M 8
+sagittarius-90-key	deep sky	NGC 6611	373.53	210.48	30.00	14.00	M 16
+sagittarius-90-key	constellation	Aql	125.61	51.95	46.00	15.00	AQUILA
+sagittarius-90-key	constellation	Ara	476.68	606.96	28.00	15.00	ARA
+sagittarius-90-key	constellation	Cap	6.38	317.14	86.00	15.00	CAPRICORNUS
+sagittarius-90-key	constellation	Cen	797.17	585.31	74.00	15.00	CENTAURUS
+sagittarius-90-key	constellation	Cir	608.43	686.90	57.00	15.00	CIRCINUS
+sagittarius-90-key	constellation	CrA	254.96	471.10	117.00	15.00	CORONA AUSTRINA
+sagittarius-90-key	constellation	Hya	837.49	418.56	45.00	15.00	HYDRA
+sagittarius-90-key	constellation	Ind	147.39	641.04	39.00	15.00	INDUS
+sagittarius-90-key	constellation	Lib	773.12	282.20	36.00	15.00	LIBRA
+sagittarius-90-key	constellation	Lup	680.31	525.94	39.00	15.00	LUPUS
+sagittarius-90-key	constellation	Mic	24.94	525.98	93.00	15.00	MICROSCOPIUM
+sagittarius-90-key	constellation	Nor	574.20	546.15	48.00	15.00	NORMA
+sagittarius-90-key	constellation	Oph	514.63	143.13	71.00	15.00	OPHIUCHUS
+sagittarius-90-key	constellation	Pav	341.31	678.52	36.00	15.00	PAVO
+sagittarius-90-key	constellation	Sco	536.84	397.22	59.00	15.00	SCORPIUS
+sagittarius-90-key	constellation	Sct	294.49	166.22	52.00	15.00	SCUTUM
+sagittarius-90-key	constellation	Ser	455.87	112.36	97.00	15.00	SERPENS CAPUT
+sagittarius-90-key	constellation	Sgr	252.09	364.50	79.00	15.00	SAGITTARIUS
+sagittarius-90-key	constellation	Tel	342.24	521.54	83.00	15.00	TELESCOPIUM
+sagittarius-90-ecliptic	star	TYC 1058-3399-1	118.11	-1.81	44.00	14.00	Altair α
+sagittarius-90-ecliptic	star	TYC 6803-2158-1	614.62	340.56	57.00	14.00	Antares α
+sagittarius-90-ecliptic	star	TYC 7388-1093-1	475.32	430.23	48.00	14.00	Shaula λ
+sagittarius-90-ecliptic	star	TYC 7401-3471-1	376.62	407.68	89.00	14.00	Kaus Australis ε
+sagittarius-90-ecliptic	star	TYC 7892-7679-1	467.25	486.61	50.00	14.00	Sargas θ
+sagittarius-90-ecliptic	star	TYC 7293-2215-1	875.15	538.04	59.00	14.00	Menkent θ
+sagittarius-90-ecliptic	star	TYC 6868-1829-1	303.47	338.22	45.00	14.00	Nunki σ
+sagittarius-90-ecliptic	star	TYC 7367-804-1	561.13	409.69	56.00	14.00	Larawag ε
+sagittarius-90-ecliptic	star	TYC 6779-2194-1	684.33	315.03	67.00	14.00	Dschubba δ
+sagittarius-90-ecliptic	star	TYC 8283-4134-1	752.72	606.48	37.00	14.00	Men α
+sagittarius-90-ecliptic	star	TYC 7814-3706-1	790.52	563.07	11.00	14.00	η
+sagittarius-90-ecliptic	star	TYC 7885-2065-1	458.07	448.40	38.00	14.00	Mula κ
+sagittarius-90-ecliptic	star	TYC 6232-1333-1	532.89	228.82	42.00	14.00	Sabik η
+sagittarius-90-ecliptic	star	TYC 8267-3545-1	825.72	653.04	11.00	14.00	ζ
+sagittarius-90-ecliptic	star	TYC 5632-1042-1	615.34	184.80	11.00	14.00	ζ
+sagittarius-90-ecliptic	star	TYC 5585-1014-1	816.56	204.41	11.00	14.00	β
+sagittarius-90-ecliptic	star	TYC 6885-2837-1	293.11	374.91	11.00	14.00	ζ
+sagittarius-90-ecliptic	star	TYC 6208-1623-1	677.80	285.43	16.00	14.00	β¹
+sagittarius-90-ecliptic	star	TYC 363-1135-1	770.59	23.46	12.00	14.00	α
+sagittarius-90-ecliptic	star	TYC 7832-2490-1	745.50	552.14	11.00	14.00	β
+sagittarius-90-ecliptic	star	TYC 6856-2170-1	379.00	363.81	10.00	14.00	δ
+sagittarius-90-ecliptic	star	TYC 5037-1068-1	679.19	121.95	10.00	14.00	δ
+sagittarius-90-ecliptic	star	TYC 6155-1210-1	864.72	290.98	17.00	14.00	α²
+sagittarius-90-ecliptic	star	TYC 423-1724-1	456.45	26.15	11.00	14.00	β
+sagittarius-90-ecliptic	star	TYC 6807-1012-1	597.70	355.61	10.00	14.00	τ
+sagittarius-90-ecliptic	star	TYC 8350-2600-1	474.35	553.78	12.00	14.00	α
+sagittarius-90-ecliptic	star	TYC 6861-3180-1	360.79	323.13	10.00	14.00	λ
+sagittarius-90-ecliptic	star	TYC 8732-2866-1	481.66	610.38	11.00	14.00	β
+sagittarius-90-ecliptic	star	TYC 6783-2697-1	680.37	349.55	13.00	14.00	π
+sagittarius-90-ecliptic	star	TYC 6295-282-1	263.54	292.35	13.00	14.00	π
+sagittarius-90-ecliptic	star	TYC 7391-2710-1	410.41	367.52	15.00	14.00	γ²
+sagittarius-90-ecliptic	star	TYC 7840-1432-1	687.99	507.32	10.00	14.00	γ
+sagittarius-90-ecliptic	star	TYC 7868-1821-1	553.10	445.13	16.00	14.00	μ¹
+sagittarius-90-ecliptic	star	TYC 5753-2281-1	81.75	266.49	11.00	14.00	β
+sagittarius-90-ecliptic	star	TYC 8411-1822-1	170.59	598.24	12.00	14.00	α
+sagittarius-90-ecliptic	star	TYC 8730-1439-1	518.76	618.64	11.00	14.00	ζ
+sagittarius-90-ecliptic	star	TYC 7404-7057-1	390.70	429.26	11.00	14.00	η
+sagittarius-90-ecliptic	star	TYC 7839-2803-1	714.63	511.28	10.00	14.00	δ
+sagittarius-90-ecliptic	star	TYC 5161-2682-1	74.91	113.28	11.00	14.00	θ
+sagittarius-90-ecliptic	star	TYC 5042-999-1	667.77	131.00	9.00	14.00	ε
+sagittarius-90-ecliptic	star	TYC 6829-577-1	502.18	316.06	11.00	14.00	θ
+sagittarius-90-ecliptic	star	TYC 5102-416-1	362.04	103.71	11.00	14.00	η
+sagittarius-90-ecliptic	star	TYC 6752-1455-1	803.18	374.56	11.00	14.00	σ
+sagittarius-90-ecliptic	star	TYC 6881-1777-1	280.12	355.30	10.00	14.00	τ
+sagittarius-90-ecliptic	star	TYC 5678-956-1	418.85	169.62	10.00	14.00	ν
+sagittarius-90-ecliptic	star	TYC 7847-2505-1	697.29	549.10	9.00	14.00	ε
+sagittarius-90-ecliptic	star	TYC 469-6227-1	192.37	54.26	10.00	14.00	δ
+sagittarius-90-ecliptic	star	TYC 7797-2744-1	873.23	609.06	10.00	14.00	ν
+sagittarius-90-ecliptic	star	TYC 7851-1814-1	649.66	467.04	11.00	14.00	η
+sagittarius-90-ecliptic	star	TYC 5136-2357-1	250.83	132.00	10.00	14.00	λ
+sagittarius-90-ecliptic	star	TYC 8306-3362-1	682.95	626.98	11.00	14.00	ζ
+sagittarius-90-ecliptic	star	TYC 8359-3650-1	382.27	519.42	12.00	14.00	α
+sagittarius-90-ecliptic	deep sky	NGC 6523	412.81	309.98	23.00	14.00	M 8
+sagittarius-90-ecliptic	deep sky	NGC 6611	373.53	210.48	30.00	14.00	M 16
+sagittarius-90-ecliptic	constellation	Aql	125.61	51.95	46.00	15.00	AQUILA
+sagittarius-90-ecliptic	constellation	Ara	476.68	606.96	28.00	15.00	ARA
+sagittarius-90-ecliptic	constellation	Cap	6.38	317.14	86.00	15.00	CAPRICORNUS
+sagittarius-90-ecliptic	constellation	Cen	797.17	585.31	74.00	15.00	CENTAURUS
+sagittarius-90-ecliptic	constellation	Cir	608.43	686.90	57.00	15.00	CIRCINUS
+sagittarius-90-ecliptic	constellation	CrA	254.96	471.10	117.00	15.00	CORONA AUSTRINA
+sagittarius-90-ecliptic	constellation	Hya	837.49	418.56	45.00	15.00	HYDRA
+sagittarius-90-ecliptic	constellation	Ind	147.39	641.04	39.00	15.00	INDUS
+sagittarius-90-ecliptic	constellation	Lib	773.12	282.20	36.00	15.00	LIBRA
+sagittarius-90-ecliptic	constellation	Lup	680.31	525.94	39.00	15.00	LUPUS
+sagittarius-90-ecliptic	constellation	Mic	24.94	525.98	93.00	15.00	MICROSCOPIUM
+sagittarius-90-ecliptic	constellation	Nor	574.20	546.15	48.00	15.00	NORMA
+sagittarius-90-ecliptic	constellation	Oph	514.63	143.13	71.00	15.00	OPHIUCHUS
+sagittarius-90-ecliptic	constellation	Pav	341.31	678.52	36.00	15.00	PAVO
+sagittarius-90-ecliptic	constellation	Sco	536.84	397.22	59.00	15.00	SCORPIUS
+sagittarius-90-ecliptic	constellation	Sct	294.49	166.22	52.00	15.00	SCUTUM
+sagittarius-90-ecliptic	constellation	Ser	455.87	112.36	97.00	15.00	SERPENS CAPUT
+sagittarius-90-ecliptic	constellation	Sgr	252.09	364.50	79.00	15.00	SAGITTARIUS
+sagittarius-90-ecliptic	constellation	Tel	342.24	521.54	83.00	15.00	TELESCOPIUM
+orion-90-observer	star	TYC 5949-2777-1	285.00	507.13	45.00	14.00	Sirius α
+orion-90-observer	star	TYC 5331-1752-1	497.19	421.50	40.00	14.00	Rigel β
+orion-90-observer	star	TYC 187-2184-1	146.95	289.88	59.00	14.00	Procyon α
+orion-90-observer	star	TYC 129-1873-1	401.22	273.00	72.00	14.00	Betelgeuse α
+orion-90-observer	star	TYC 1266-1416-1	586.53	183.55	70.00	14.00	Aldebaran α
+orion-90-observer	star	TYC 1920-2194-1	152.44	49.71	47.00	14.00	Pollux β
+orion-90-observer	star	TYC 1859-1470-1	468.18	66.46	47.00	14.00	Elnath β
+orion-90-observer	star	TYC 4766-2450-1	445.54	354.90	52.00	14.00	Alnilam ε
+orion-90-observer	star	TYC 6532-5001-1	236.88	609.18	47.00	14.00	Wezen δ
+orion-90-observer	star	TYC 2457-2407-1	183.69	11.85	51.00	14.00	Castor α
+orion-90-observer	star	TYC 5938-2918-1	337.82	517.20	53.00	14.00	Mirzam β
+orion-90-observer	star	TYC 1329-1746-1	301.90	183.76	50.00	14.00	Alhena γ
+orion-90-observer	star	TYC 5351-760-1	418.29	435.50	42.00	14.00	Saiph κ
+orion-90-observer	star	TYC 58-1618-1	822.71	300.26	12.00	14.00	α
+orion-90-observer	star	TYC 5920-1685-1	453.49	513.84	12.00	14.00	α
+orion-90-observer	star	TYC 7064-1357-1	438.73	676.50	12.00	14.00	α
+orion-90-observer	star	TYC 2391-1446-1	530.86	18.26	8.00	14.00	ι
+orion-90-observer	star	TYC 4759-1671-1	512.28	391.89	11.00	14.00	β
+orion-90-observer	star	TYC 6555-3245-1	91.47	605.08	11.00	14.00	ρ
+orion-90-observer	star	TYC 5928-1657-1	463.67	542.50	11.00	14.00	β
+orion-90-observer	star	TYC 1800-2202-1	695.08	99.64	11.00	14.00	η
+orion-90-observer	star	TYC 764-2774-1	177.81	259.62	11.00	14.00	β
+orion-90-observer	star	TYC 2361-2820-1	670.57	19.83	11.00	14.00	ζ
+orion-90-observer	star	TYC 1878-1429-1	338.62	124.68	11.00	14.00	μ
+orion-90-observer	star	TYC 1310-2697-1	442.11	140.72	11.00	14.00	ζ
+orion-90-observer	star	TYC 5311-1285-1	677.61	477.65	10.00	14.00	γ
+orion-90-observer	star	TYC 1897-1639-1	291.84	95.59	9.00	14.00	ε
+orion-90-observer	star	TYC 6523-3722-1	246.48	581.62	16.00	14.00	ο²
+orion-90-observer	star	TYC 5913-1374-1	515.43	559.02	9.00	14.00	ε
+orion-90-observer	star	TYC 96-1462-1	554.76	276.86	18.00	14.00	π³
+orion-90-observer	star	TYC 5902-1721-1	499.19	498.43	11.00	14.00	μ
+orion-90-observer	star	TYC 6557-4522-1	137.13	604.58	10.00	14.00	ξ
+orion-90-observer	star	TYC 754-2356-1	281.95	217.57	10.00	14.00	ξ
+orion-90-observer	star	TYC 1877-1716-1	356.99	125.51	11.00	14.00	η
+orion-90-observer	star	TYC 662-1546-1	671.45	219.83	10.00	14.00	λ
+orion-90-observer	deep sky	Mel022	704.89	99.64	30.00	14.00	M 45
+orion-90-observer	deep sky	NGC 1976	450.00	394.64	30.00	14.00	M 42
+orion-90-observer	deep sky	NGC 2632	5.00	120.65	30.00	14.00	M 44
+orion-90-observer	constellation	Ari	845.38	47.71	36.00	15.00	ARIES
+orion-90-observer	constellation	Aur	446.19	25.22	48.00	15.00	AURIGA
+orion-90-observer	constellation	CMa	221.76	552.17	81.00	15.00	CANIS MAJOR
+orion-90-observer	constellation	CMi	116.34	269.19	81.00	15.00	CANIS MINOR
+orion-90-observer	constellation	Cae	485.55	687.74	51.00	15.00	CAELUM
+orion-90-observer	constellation	Cet	839.27	278.62	41.00	15.00	CETUS
+orion-90-observer	constellation	Cnc	-3.76	202.04	52.00	15.00	CANCER
+orion-90-observer	constellation	Col	370.05	678.93	60.00	15.00	COLUMBA
+orion-90-observer	constellation	Eri	666.74	505.34	62.00	15.00	ERIDANUS
+orion-90-observer	constellation	For	784.66	670.92	52.00	15.00	FORNAX
+orion-90-observer	constellation	Gem	211.59	98.09	45.00	15.00	GEMINI
+orion-90-observer	constellation	Lep	441.36	510.56	38.00	15.00	LEPUS
+orion-90-observer	constellation	Mon	179.89	351.07	79.00	15.00	MONOCEROS
+orion-90-observer	constellation	Ori	424.79	274.60	42.00	15.00	ORION
+orion-90-observer	constellation	Per	641.03	5.35	53.00	15.00	PERSEUS
+orion-90-observer	constellation	Pup	115.63	628.79	42.00	15.00	PUPPIS
+orion-90-observer	constellation	Pyx	-18.25	686.66	35.00	15.00	PYXIS
+orion-90-observer	constellation	Tau	591.96	190.06	50.00	15.00	TAURUS
+nunki-searched	star	TYC 6868-1829-1	455.38	343.50	45.00	14.00	Nunki σ
+nunki-searched	star	TYC 1058-3399-1	312.12	2.03	44.00	14.00	Altair α
+nunki-searched	star	TYC 6803-2158-1	769.51	390.68	57.00	14.00	Antares α
+nunki-searched	star	TYC 7388-1093-1	611.55	461.09	48.00	14.00	Shaula λ
+nunki-searched	star	TYC 7401-3471-1	516.63	422.41	89.00	14.00	Kaus Australis ε
+nunki-searched	star	TYC 7892-7679-1	593.50	516.59	50.00	14.00	Sargas θ
+nunki-searched	star	TYC 7367-804-1	702.80	454.47	56.00	14.00	Larawag ε
+nunki-searched	star	TYC 6779-2194-1	847.32	373.82	67.00	14.00	Dschubba δ
+nunki-searched	star	TYC 7885-2065-1	591.05	476.53	38.00	14.00	Mula κ
+nunki-searched	star	TYC 6232-1333-1	699.15	263.45	42.00	14.00	Sabik η
+nunki-searched	star	TYC 5632-1042-1	790.11	226.65	11.00	14.00	ζ
+nunki-searched	star	TYC 6885-2837-1	440.06	377.60	11.00	14.00	ζ
+nunki-searched	star	TYC 6208-1623-1	844.45	341.20	16.00	14.00	β¹
+nunki-searched	star	TYC 7832-2490-1	870.81	640.18	11.00	14.00	β
+nunki-searched	star	TYC 6856-2170-1	525.71	379.48	10.00	14.00	δ
+nunki-searched	star	TYC 5037-1068-1	864.21	165.92	10.00	14.00	δ
+nunki-searched	star	TYC 423-1724-1	638.98	49.28	11.00	14.00	β
+nunki-searched	star	TYC 6807-1012-1	749.51	404.02	10.00	14.00	τ
+nunki-searched	star	TYC 8350-2600-1	587.76	585.64	12.00	14.00	α
+nunki-searched	star	TYC 6861-3180-1	513.54	336.73	10.00	14.00	λ
+nunki-searched	star	TYC 8732-2866-1	583.33	644.08	11.00	14.00	β
+nunki-searched	star	TYC 6783-2697-1	837.96	410.26	13.00	14.00	π
+nunki-searched	star	TYC 6363-1044-1	49.58	304.76	10.00	14.00	δ
+nunki-searched	star	TYC 5216-1725-1	62.40	183.72	11.00	14.00	β
+nunki-searched	star	TYC 6295-282-1	422.90	293.88	13.00	14.00	π
+nunki-searched	star	TYC 7391-2710-1	556.35	387.87	15.00	14.00	γ²
+nunki-searched	star	TYC 7840-1432-1	818.33	580.22	10.00	14.00	γ
+nunki-searched	star	TYC 7494-1748-1	113.17	523.17	10.00	14.00	γ
+nunki-searched	star	TYC 7868-1821-1	688.46	489.77	16.00	14.00	μ¹
+nunki-searched	star	TYC 5753-2281-1	255.01	247.31	11.00	14.00	β
+nunki-searched	star	TYC 8411-1822-1	285.21	568.27	12.00	14.00	α
+nunki-searched	star	TYC 8730-1439-1	618.99	660.53	11.00	14.00	ζ
+nunki-searched	star	TYC 7404-7057-1	527.04	446.11	11.00	14.00	η
+nunki-searched	star	TYC 7839-2803-1	846.06	589.80	10.00	14.00	δ
+nunki-searched	star	TYC 979-2198-1	764.72	6.51	10.00	14.00	κ
+nunki-searched	star	TYC 5161-2682-1	264.05	105.60	11.00	14.00	θ
+nunki-searched	star	TYC 5042-999-1	851.17	174.63	9.00	14.00	ε
+nunki-searched	star	TYC 6829-577-1	656.45	349.20	11.00	14.00	θ
+nunki-searched	star	TYC 5102-416-1	538.84	120.14	11.00	14.00	η
+nunki-searched	star	TYC 6881-1777-1	430.36	356.81	10.00	14.00	τ
+nunki-searched	star	TYC 5678-956-1	589.47	190.95	10.00	14.00	ν
+nunki-searched	star	TYC 7847-2505-1	819.71	626.73	9.00	14.00	ε
+nunki-searched	star	TYC 469-6227-1	378.27	59.42	10.00	14.00	δ
+nunki-searched	star	TYC 7851-1814-1	785.38	530.11	11.00	14.00	η
+nunki-searched	star	TYC 5136-2357-1	427.96	138.26	10.00	14.00	λ
+nunki-searched	star	TYC 8359-3650-1	502.81	533.63	12.00	14.00	α
+nunki-searched	deep sky	NGC 6523	566.96	330.73	23.00	14.00	M 8
+nunki-searched	deep sky	NGC 6611	540.02	226.96	30.00	14.00	M 16
+nunki-searched	constellation	Aql	314.30	51.20	46.00	15.00	AQUILA
+nunki-searched	constellation	Aqr	35.75	196.56	62.00	15.00	AQUARIUS
+nunki-searched	constellation	Ara	579.49	632.86	28.00	15.00	ARA
+nunki-searched	constellation	Cap	123.75	300.00	86.00	15.00	CAPRICORNUS
+nunki-searched	constellation	Cen	850.18	636.60	74.00	15.00	CENTAURUS
+nunki-searched	constellation	CrA	384.72	474.81	117.00	15.00	CORONA AUSTRINA
+nunki-searched	constellation	Equ	49.96	19.77	63.00	15.00	EQUULEUS
+nunki-searched	constellation	Gru	75.22	613.34	35.00	15.00	GRUS
+nunki-searched	constellation	Ind	238.41	638.84	39.00	15.00	INDUS
+nunki-searched	constellation	Lib	864.38	424.38	36.00	15.00	LIBRA
+nunki-searched	constellation	Lup	807.75	586.12	39.00	15.00	LUPUS
+nunki-searched	constellation	Mic	159.53	483.88	93.00	15.00	MICROSCOPIUM
+nunki-searched	constellation	Nor	691.03	604.21	48.00	15.00	NORMA
+nunki-searched	constellation	Oph	689.63	166.13	71.00	15.00	OPHIUCHUS
+nunki-searched	constellation	Pav	373.71	677.74	36.00	15.00	PAVO
+nunki-searched	constellation	PsA	4.61	479.86	105.00	15.00	PISCIS AUSTRINUS
+nunki-searched	constellation	Sco	680.39	442.24	59.00	15.00	SCORPIUS
+nunki-searched	constellation	Sct	465.64	178.37	52.00	15.00	SCUTUM
+nunki-searched	constellation	Ser	562.03	158.53	97.00	15.00	SERPENS CAPUT
+nunki-searched	constellation	Sgr	399.77	367.73	79.00	15.00	SAGITTARIUS
+nunki-searched	constellation	Tel	461.25	536.81	83.00	15.00	TELESCOPIUM
+orion-18-selected	star	TYC 113-1856-1	540.73	27.19	56.00	14.00	Bellatrix γ
+orion-18-selected	star	TYC 4766-2450-1	403.28	403.12	52.00	14.00	Alnilam ε
+orion-18-selected	star	TYC 4771-1188-1	346.82	439.94	51.00	14.00	Alnitak ζ
+orion-18-selected	star	TYC 4766-2445-1	455.16	358.33	54.00	14.00	Mintaka δ
+orion-18-selected	star	TYC 4778-1401-1	412.54	637.64	47.00	14.00	Hatysa ι
+orion-18-selected	star	TYC 4759-1671-1	755.59	597.79	46.00	14.00	Cursa β
+orion-18-selected	star	TYC 4764-1639-1	633.43	685.20	10.00	14.00	τ
+orion-18-selected	star	TYC 4757-1588-1	548.05	462.50	11.00	14.00	η
+orion-18-selected	star	TYC 4771-1196-1	371.01	472.58	11.00	14.00	σ
+orion-18-selected	star	TYC 85-2362-1	872.02	257.57	18.00	14.00	π⁶
+orion-18-selected	star	TYC 103-2863-1	686.79	201.02	11.00	14.00	ρ
+orion-18-selected	deep sky	NGC 1976	437.20	611.58	30.00	14.00	M 42
+orion-18-selected	deep sky	NGC 1982	415.52	605.47	30.00	14.00	M 43
+orion-18-selected	deep sky	NGC 2068	271.58	339.56	30.00	14.00	M 78
+orion-18-selected	constellation	Eri	801.71	566.44	62.00	15.00	ERIDANUS
+orion-18-selected	constellation	Ori	400.27	288.59	42.00	15.00	ORION

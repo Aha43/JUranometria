@@ -63,17 +63,36 @@ class StarLabelRenderingTest {
 
     @Test
     void collisionsResolveDeterministicallyBrightestFirst() {
-        // The dimmer neighbour's label box overlaps the brighter's and
-        // is omitted - so the page with the colliding identity renders
-        // exactly as if the dim star had no identity at all.
-        int[] withIdentity = pixels(
-                scene(List.of(BRIGHT, DIM), null), ChartOptions.DEFAULTS);
+        // The dimmer neighbour's label wants the box the brighter one
+        // has taken. It used to be dropped for that; since #314 it
+        // steps around to one of its seven other positions and is
+        // drawn - the atlas names both stars - and which position it
+        // takes is fixed, not searched.
+        ChartScene both = scene(List.of(BRIGHT, DIM), null);
+        var placed = RENDERER.starLabelPlacements(
+                ChartRenderer.TextMetrics.offscreen(), both,
+                ChartOptions.DEFAULTS);
+        assertEquals(2, placed.size(),
+                "both stars are named: " + placed.stream()
+                        .map(ChartRenderer.StarLabelPlacement::text)
+                        .toList());
+        java.awt.geom.Rectangle2D brighter = placed.get(0).box();
+        java.awt.geom.Rectangle2D dimmer = placed.get(1).box();
+        assertFalse(brighter.intersects(dimmer),
+                "and neither name is written over the other: "
+                        + brighter + " against " + dimmer);
+        assertArrayEquals(pixels(both, ChartOptions.DEFAULTS),
+                pixels(both, ChartOptions.DEFAULTS),
+                "deterministically");
+
+        // And the dimmer star's name is really on the page, which the
+        // page without an identity for it does not have.
+        int[] withIdentity = pixels(both, ChartOptions.DEFAULTS);
         int[] withoutIdentity = pixels(
                 scene(List.of(BRIGHT, DIM_ANONYMOUS), null),
                 ChartOptions.DEFAULTS);
-        assertArrayEquals(withIdentity, withoutIdentity,
-                "the losing label is omitted, deterministically");
-        // Sanity: the winning label does draw.
+        assertFalse(java.util.Arrays.equals(withIdentity, withoutIdentity),
+                "the label that used to be dropped is drawn");
         int[] bothAnonymous = pixels(scene(List.of(
                         new Star("TYC 1-1-1", CENTRE, 1.0), DIM_ANONYMOUS),
                 null), ChartOptions.DEFAULTS);
@@ -102,7 +121,6 @@ class StarLabelRenderingTest {
         probe.dispose();
         var mapping = new juranometria.project.ViewportMapping(
                 page.viewport());
-        var projection = new juranometria.project.GnomonicProjection(CENTRE);
 
         record Case(String label, ChartOptions options,
                     List<String> expected) {
@@ -122,11 +140,9 @@ class StarLabelRenderingTest {
                 new Case("all identifiers off", new ChartOptions(true, true,
                         true, true, true, false, false, false, true),
                         List.of()))) {
-            var texts = RENDERER.starLabelPlacements(metrics, page,
-                            sample.options(),
-                            new RegionalDetailPolicy(page,
-                                    mapping.pixelsPerPlaneUnit()),
-                            projection, mapping).stream()
+            var texts = RENDERER.starLabelPlacements(
+                    ChartRenderer.TextMetrics.offscreen(),
+                    page, sample.options()).stream()
                     .map(ChartRenderer.StarLabelPlacement::text).sorted()
                     .toList();
             assertEquals(sample.expected().stream().sorted().toList(), texts,
@@ -151,13 +167,10 @@ class StarLabelRenderingTest {
         probe.dispose();
         var mapping = new juranometria.project.ViewportMapping(
                 page.viewport());
-        var texts = RENDERER.starLabelPlacements(metrics, page,
+        var texts = RENDERER.starLabelPlacements(
+                        ChartRenderer.TextMetrics.offscreen(), page,
                         new ChartOptions(true, true, true, true, true,
-                                false, false, false, true),
-                        new RegionalDetailPolicy(page,
-                                mapping.pixelsPerPlaneUnit()),
-                        new juranometria.project.GnomonicProjection(CENTRE),
-                        mapping).stream()
+                                false, false, false, true)).stream()
                 .map(ChartRenderer.StarLabelPlacement::text).toList();
         assertEquals(List.of("Faintstar χ"), texts,
                 "the searched star keeps its full identity");
@@ -192,12 +205,9 @@ class StarLabelRenderingTest {
         probe.dispose();
         var mapping = new juranometria.project.ViewportMapping(
                 page.viewport());
-        var texts = RENDERER.starLabelPlacements(metrics, page,
-                        ChartOptions.DEFAULTS,
-                        new RegionalDetailPolicy(page,
-                                mapping.pixelsPerPlaneUnit()),
-                        new juranometria.project.GnomonicProjection(CENTRE),
-                        mapping).stream()
+        var texts = RENDERER.starLabelPlacements(
+                ChartRenderer.TextMetrics.offscreen(),
+                page, ChartOptions.DEFAULTS).stream()
                 .map(ChartRenderer.StarLabelPlacement::text).toList();
         assertTrue(texts.contains("Acrux α¹"),
                 "the pair with its raised component: " + texts);

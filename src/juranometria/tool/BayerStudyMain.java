@@ -340,13 +340,9 @@ public final class BayerStudyMain {
                 java.awt.image.BufferedImage.TYPE_INT_RGB).createGraphics();
         var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
         probe.dispose();
-        var placements = renderer.starLabelPlacements(metrics, scene,
-                ChartOptions.DEFAULTS,
-                new RegionalDetailPolicy(scene,
-                        new ViewportMapping(scene.viewport())
-                                .pixelsPerPlaneUnit()),
-                new GnomonicProjection(scene.viewport().centre()),
-                new ViewportMapping(scene.viewport()));
+        var placements = renderer.starLabelPlacements(
+                ChartRenderer.TextMetrics.offscreen(),
+                scene, ChartOptions.DEFAULTS);
         int names = 0;
         int letters = 0;
         int latin = 0;

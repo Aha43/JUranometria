@@ -342,8 +342,6 @@ public final class Greedy {
         ChartScene scene = page.scene();
         var mapping = new ViewportMapping(scene.viewport());
         Projection projection = Projections.forViewport(scene.viewport());
-        var detail = new RegionalDetailPolicy(scene,
-                mapping.pixelsPerPlaneUnit());
         // The labelled set is production's own: which objects earn a
         // label is not this gate's question, only where the label goes.
         for (DeepSkyObject dso : labelledDeepSky) {
@@ -454,14 +452,20 @@ public final class Greedy {
                 candidates.add(new double[] {dx, dy});
             }
         }
+        // A name's baseline is its anchor, and a label's is half an
+        // ascent below its star's centre. The two rules are the
+        // renderer's own and they are not the same rule; this pass
+        // used the second for both until #314 compared it with the
+        // seam and found every name drawn five pixels low.
+        boolean isName = family == Participant.Family.CONSTELLATION_NAME;
+        double sit = isName ? 0.0 : metrics.getAscent() / 2.0 - 1.0;
         double homeX = anchor.x() + homeReach + 3.0;
-        double homeBaseline = anchor.y() + metrics.getAscent() / 2.0 - 1.0;
+        double homeBaseline = anchor.y() + sit;
         for (int at = 0; at < candidates.size(); at++) {
             candidatesTried++;
             double[] offset = candidates.get(at);
             double x = anchor.x() + offset[0];
-            double baseline = anchor.y() + offset[1]
-                    + metrics.getAscent() / 2.0 - 1.0;
+            double baseline = anchor.y() + offset[1] + sit;
             Rectangle2D box = new Rectangle2D.Double(x - 2.0,
                     baseline - metrics.getAscent(), width + 4.0, height);
             if (!guaranteed && (refused(box) || disowned(family, id, box))) {
@@ -489,8 +493,7 @@ public final class Greedy {
                             width, height)
                     : candidates.get(0);
             double x = anchor.x() + home[0];
-            double baseline = anchor.y() + home[1]
-                    + metrics.getAscent() / 2.0 - 1.0;
+            double baseline = anchor.y() + home[1] + sit;
             Rectangle2D box = new Rectangle2D.Double(x - 2.0,
                     baseline - metrics.getAscent(), width + 4.0, height);
             taken.add(box);
@@ -523,10 +526,11 @@ public final class Greedy {
         double[] best = candidates.get(0);
         double least = Double.MAX_VALUE;
         boolean leastCrosses = true;
+        double sit = family == Participant.Family.CONSTELLATION_NAME
+                ? 0.0 : metrics.getAscent() / 2.0 - 1.0;
         for (double[] offset : candidates) {
             double x = anchor.x() + offset[0];
-            double baseline = anchor.y() + offset[1]
-                    + metrics.getAscent() / 2.0 - 1.0;
+            double baseline = anchor.y() + offset[1] + sit;
             Rectangle2D box = new Rectangle2D.Double(x - 2.0,
                     baseline - metrics.getAscent(), width + 4.0, height);
             if (disowned(family, id, box)) {

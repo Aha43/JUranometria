@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -74,6 +74,7 @@ help:
 	@echo "  overview-ink-study  Measure overview ink on pages the production renderer drew"
 	@echo "  figure-anchor-study Measure constellation figures against the magnitude limit"
 	@echo "  label-study  Measure how labels share a page"
+	@echo "  released-text     List the text every released page draws"
 	@echo "  dist              Build and verify the portable fallback ZIP"
 	@echo "  app-image         Build and verify this platform's native application image"
 	@echo "  clean        Delete build output"
@@ -268,6 +269,11 @@ figure-anchor-study: classes
 	@echo "  constellation figures against the magnitude limit"
 	@$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.FigureAnchorStudyMain > docs/studies/figure-anchors/measurements.md
 	@echo "written to docs/studies/figure-anchors/measurements.md"
+
+released-text: classes
+	@echo "  the text the released pages draw"
+	@$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ReleasedTextMain > docs/studies/wider-field/released-text.txt
+	@echo "written to docs/studies/wider-field/released-text.txt"
 
 wider-field-study: classes
 	@echo "  the released pages, hashed"

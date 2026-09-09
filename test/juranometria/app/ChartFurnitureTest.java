@@ -133,15 +133,9 @@ class ChartFurnitureTest {
             var metrics = g.getFontMetrics(ChartRenderer.labelFont());
             java.awt.Rectangle key =
                     RENDERER.magnitudeKeyBounds(metrics, scene);
-            var withKey = RENDERER.starLabelPlacements(metrics, scene,
-                    with(true, true),
-                    new juranometria.render.RegionalDetailPolicy(scene,
-                            new juranometria.project.ViewportMapping(
-                                    scene.viewport()).pixelsPerPlaneUnit()),
-                    new juranometria.project.GnomonicProjection(
-                            scene.viewport().centre()),
-                    new juranometria.project.ViewportMapping(
-                            scene.viewport()));
+            var withKey = RENDERER.starLabelPlacements(
+                    ChartRenderer.TextMetrics.offscreen(),
+                    scene, with(true, true));
             for (var placement : withKey) {
                 assertFalse(placement.box().intersects(key.x, key.y,
                                 key.width, key.height),
