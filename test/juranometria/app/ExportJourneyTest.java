@@ -1,6 +1,22 @@
 package juranometria.app;
 
 import java.awt.image.BufferedImage;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Window;
+import java.awt.geom.Rectangle2D;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import juranometria.chart.ChartScene;
+import juranometria.chart.WorkingSelection;
+import juranometria.render.LabelPlacement;
+import juranometria.sheet.SheetWriters;
+import juranometria.ui.ChartComponent;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -344,4 +360,262 @@ class ExportJourneyTest {
         }
         return found;
     }
+
+    /** A crowded sky for the placement journey below. */
+    private static final ChartViewState SAGITTARIUS = new ChartViewState(
+            new SkyPosition(281.0, -26.0), 120.0,
+            ChartViewState.defaultMagnitudeFor(120.0));
+
+    /** Where that page puts its text, decided for the paper's extent. */
+    private static List<LabelPlacement.Placement> decision() {
+        ChartScene scene = Atlas.assembler().assemble(SAGITTARIUS,
+                PaperSize.A4.chartWideUnits(), PaperSize.A4.chartHighUnits());
+        return new ChartRenderer(StarSizePolicy.DEFAULT).textPlacements(
+                ChartRenderer.TextMetrics.offscreen(), scene,
+                ChartOptions.DEFAULTS.withPalette(ChartPalette.WHITE_PAPER));
+    }
+
+    @Test
+    void theExportedSheetCarriesThePagesOwnPlacement(@TempDir Path folder)
+            throws Exception {
+        List<LabelPlacement.Placement> drawn = new ArrayList<>();
+        List<LabelPlacement.Placement> refused = new ArrayList<>();
+        for (LabelPlacement.Placement one : decision()) {
+            (one.omitted() ? refused : drawn).add(one);
+        }
+        assertTrue(drawn.size() > 80, "the page has text to carry: "
+                + drawn.size() + " labels");
+        assertFalse(refused.isEmpty(), "and text it refused to place,"
+                + " which is the half no format can show by drawing"
+                + " something");
+
+        Map<SheetFormat, Path> written = new LinkedHashMap<>();
+        JFrame window = null;
+        java.util.prefs.Preferences node =
+                java.util.prefs.Preferences.userRoot().node(
+                        "juranometria/test/export-journey");
+        try {
+            window = exportingAtlas(folder, written, node);
+            for (SheetFormat format : SheetFormat.values()) {
+                exportThrough(window, format);
+            }
+        } finally {
+            closeEverything(window);
+            node.removeNode();
+        }
+        assertEquals(List.of(SheetFormat.SVG, SheetFormat.PDF,
+                        SheetFormat.PNG),
+                List.copyOf(written.keySet()),
+                "the reader exported each format through the File menu");
+
+        // The bytes the route wrote, and the one recording they are of.
+        SheetRecording sheet = ChartSheet.record(Atlas.assembler()::assemble,
+                SAGITTARIUS, ChartOptions.DEFAULTS,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+        for (SheetFormat format : SheetFormat.values()) {
+            assertTrue(java.util.Arrays.equals(
+                            Files.readAllBytes(written.get(format)),
+                            SheetWriters.write(sheet, format, 300)),
+                    "and " + format + " is this page's own recording,"
+                            + " byte for byte");
+        }
+
+        // Read by the same three readers the oracle file puts to the
+        // question, so what passes here is what fails there when a
+        // writer stops carrying the decision.
+        PlacedTextTravelsToTheSheetTest reader =
+                new PlacedTextTravelsToTheSheetTest();
+        reader.readTheSvg(Files.readString(written.get(SheetFormat.SVG),
+                StandardCharsets.UTF_8), drawn, refused);
+        reader.readThePdf(Files.readString(written.get(SheetFormat.PDF),
+                StandardCharsets.ISO_8859_1), drawn, refused);
+        reader.readThePng(ImageIO.read(written.get(SheetFormat.PNG).toFile()),
+                sheet, drawn, refused);
+    }
+
+    // ---- the reader's own route --------------------------------------
+
+    /**
+     * The atlas, shown, with its real File menu wired to the real
+     * export route - and only the platform's save surface replaced,
+     * because a file chooser is the operating system's window.
+     */
+    private JFrame exportingAtlas(Path folder, Map<SheetFormat, Path> written,
+                                  java.util.prefs.Preferences node)
+            throws Exception {
+        JFrame[] made = new JFrame[1];
+        SwingUtilities.invokeAndWait(() -> {
+            ChartViewController navigation = new ChartViewController(
+                    Atlas.assembler()::fits);
+            ChartComponent chart = new ChartComponent(Atlas.assembler());
+            navigation.onChange(chart::setViewState);
+            navigation.recenter(SAGITTARIUS.centre(),
+                    SAGITTARIUS.fieldWidthDegrees());
+            ChartOptionsController options = new ChartOptionsController(
+                    ChartOptionsStore.forNode(node));
+            WorkingSelection working = new WorkingSelection();
+
+            JFrame frame = new JFrame("Export journey");
+            frame.add(chart);
+            frame.setSize(1100, 800);
+            ExportSheetSession.Surfaces real = ExportSheetSession.onScreen();
+            ExportSheetSession.Surfaces surfaces =
+                    new ExportSheetSession.Surfaces() {
+
+                        @Override
+                        public Optional<ExportSheet.Request> chooseWhat(
+                                java.awt.Frame owner,
+                                ExportSheet.Request initial) {
+                            return real.chooseWhat(owner, initial);
+                        }
+
+                        @Override
+                        public Optional<File> chooseWhere(
+                                java.awt.Frame owner, String suggested) {
+                            // The seam, and the only one: choosing a
+                            // file is the platform's own window.
+                            return Optional.of(
+                                    folder.resolve(suggested).toFile());
+                        }
+
+                        @Override
+                        public ExportSheet.ReplaceDecision replace(
+                                java.awt.Frame owner) {
+                            return real.replace(owner);
+                        }
+
+                        @Override
+                        public void report(java.awt.Frame owner,
+                                           ExportSheet.Outcome outcome) {
+                            if (outcome instanceof ExportSheet.Outcome.Written
+                                    done) {
+                                written.put(formatOf(done.file()),
+                                        done.file());
+                            }
+                            real.report(owner, outcome);
+                        }
+                    };
+            frame.setJMenuBar(AppMenuBar.create(navigation, () -> { },
+                    () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                    () -> ExportSheetSession.open(frame, navigation, chart,
+                            options, working, surfaces)));
+            frame.setVisible(true);
+            made[0] = frame;
+        });
+        flush();
+        return made[0];
+    }
+
+    /** One export, driven the way a reader drives it. */
+    private void exportThrough(JFrame window, SheetFormat format)
+            throws Exception {
+        JMenuItem export = AppMenuBar.exportItem(window.getJMenuBar());
+        assertTrue(export != null, "the File menu carries the export item");
+        assertEquals("Export Chart Sheet...", export.getText(),
+                "named for what it does");
+        SwingUtilities.invokeLater(export::doClick);
+
+        JDialog dialog = awaitDialog("Export chart sheet");
+        SwingUtilities.invokeAndWait(() -> {
+            JComboBox<?> box = find(dialog, JComboBox.class,
+                    ExportSheetDialog.FORMAT_BOX);
+            assertTrue(box != null, "the dialog offers the formats");
+            box.setSelectedItem(format);
+            JButton confirm = find(dialog, JButton.class,
+                    ExportSheetDialog.EXPORT_BUTTON);
+            assertTrue(confirm != null, "and an Export button");
+            confirm.doClick();
+        });
+        // The route then says what it did, in its own dialog.
+        JDialog told = awaitDialog("Chart sheet exported");
+        SwingUtilities.invokeAndWait(() -> {
+            JButton acknowledge = firstButton(told);
+            if (acknowledge != null) {
+                acknowledge.doClick();
+            } else {
+                told.setVisible(false);
+            }
+        });
+        flush();
+    }
+
+    private static SheetFormat formatOf(Path file) {
+        String name = file.getFileName().toString()
+                .toLowerCase(Locale.ROOT);
+        for (SheetFormat format : SheetFormat.values()) {
+            if (name.endsWith("." + format.name()
+                    .toLowerCase(Locale.ROOT))) {
+                return format;
+            }
+        }
+        throw new AssertionError("no format in " + name);
+    }
+
+    private JDialog awaitDialog(String title) throws Exception {
+        for (int tries = 0; tries < 400; tries++) {
+            JDialog[] found = new JDialog[1];
+            SwingUtilities.invokeAndWait(() -> {
+                for (Window open : Window.getWindows()) {
+                    if (open instanceof JDialog dialog && dialog.isVisible()
+                            && title.equals(dialog.getTitle())) {
+                        found[0] = dialog;
+                    }
+                }
+            });
+            if (found[0] != null) {
+                return found[0];
+            }
+            Thread.sleep(25);
+        }
+        throw new AssertionError("no dialog titled " + title + " appeared");
+    }
+
+    private static <T extends Component> T find(Container root,
+                                                Class<T> kind, String name) {
+        for (Component child : root.getComponents()) {
+            if (kind.isInstance(child) && name.equals(child.getName())) {
+                return kind.cast(child);
+            }
+            if (child instanceof Container inside) {
+                T found = find(inside, kind, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static JButton firstButton(Container root) {
+        for (Component child : root.getComponents()) {
+            if (child instanceof JButton button) {
+                return button;
+            }
+            if (child instanceof Container inside) {
+                JButton found = firstButton(inside);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void closeEverything(JFrame window) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            for (Window open : Window.getWindows()) {
+                if (open instanceof JDialog dialog) {
+                    dialog.dispose();
+                }
+            }
+            if (window != null) {
+                window.dispose();
+            }
+        });
+    }
+
+    private void flush() throws Exception {
+        SwingUtilities.invokeAndWait(() -> { });
+    }
+
 }

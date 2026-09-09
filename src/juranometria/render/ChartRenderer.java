@@ -1164,6 +1164,11 @@ public final class ChartRenderer {
         return starSizePolicy;
     }
 
+    /** The font a constellation name is written in. */
+    public static java.awt.Font constellationNameFont() {
+        return CONSTELLATION_NAME_FONT;
+    }
+
     /** The label font, shared with studies measuring this geometry. */
     public static java.awt.Font labelFont() {
         return LABEL_FONT;

@@ -76,8 +76,8 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **43 files** touch process-wide state —
-**21** use the shared guard, **21** restore locally,
+this document to them: **44 files** touch process-wide state —
+**21** use the shared guard, **22** restore locally,
 **0 flagged unprotected** — and **29 files** depend on a display,
 of which **16** state a focus premise and **20** a reachability
 premise through the shared route helper. (#246 added two
@@ -98,7 +98,9 @@ the zoom-out control has to be pressed to prove the new step is
 reachable by pressing it; and #286's export dialog, laid out on
 both grounds at two text sizes and pressed through the shared route
 helper; and #287's closing journey, which shows the window a club
-member exports from.)
+member exports from; and #314's placement journey, which opens a
+preferences node of its own so the export it drives is a reader's
+chart options rather than a default, and removes it afterwards.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
