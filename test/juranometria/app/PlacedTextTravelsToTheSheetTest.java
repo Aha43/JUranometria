@@ -213,6 +213,176 @@ class PlacedTextTravelsToTheSheetTest {
                         + " page placed it in");
     }
 
+    // ---- 3. the PNG holds the order it was replayed in --------------
+
+    @Test
+    void thePngHoldsTheOrderTheChartDrawsIn() throws Exception {
+        // A raster keeps no families and no sequence: all it has is
+        // which ink won each pixel. So the order is read where the
+        // order shows - where two things overlap - and the writer's
+        // own replay is what is put on trial, by handing it the same
+        // operations in a different order and requiring the pixels to
+        // say so.
+        SheetRecording sheet = ChartSheet.record(Atlas.assembler()::assemble,
+                SAGITTARIUS, ChartOptions.DEFAULTS,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+
+        // (i) A mark is drawn over a constellation name. Taking the
+        // name away changes nothing where the mark covers it - and
+        // under a text-last replay it would change everything there.
+        String name = coveredName(sheet);
+        BufferedImage asDrawn = pngOf(sheet);
+        BufferedImage asDrawnWithout = pngOf(sheetWithout(sheet, name));
+        SheetRecording textLast = sheetWith(sheet,
+                PlacedTextTravelsToTheSheetTest::textAfterEverything);
+        BufferedImage lastly = pngOf(textLast);
+        BufferedImage lastlyWithout = pngOf(sheetWithout(textLast, name));
+
+        int covered = coveredPixels(asDrawn, asDrawnWithout, lastly,
+                lastlyWithout);
+        assertTrue(covered > 20, name + " has glyphs under a mark that"
+                + " is drawn after it: " + covered + " px");
+        assertFalse(java.util.Arrays.equals(bytesOf(sheet), bytesOf(textLast)),
+                "and replaying the same operations with all the text"
+                        + " last is a different sheet, so the writer is"
+                        + " not already doing it");
+
+        // (ii) The furniture is opaque and drawn last. A label under
+        // it is invisible - and under a furniture-first replay it is
+        // not. The page places nothing under the block, so the label
+        // is put there: the operations are the same either way, and
+        // only their order differs.
+        Rectangle2D block = ChartRenderer.titleBlockBounds(
+                ChartRenderer.TextMetrics.offscreen().labels(),
+                sheet.scene());
+        SheetRecording hidden = sheetWith(sheet, operations ->
+                operations.add(firstFurniture(operations, block),
+                        textAt("UNDER THE BLOCK", new Rectangle2D.Double(
+                                block.getX() + 20.0, block.getY() + 20.0,
+                                90.0, 15.0))));
+        assertTrue(java.util.Arrays.equals(bytesOf(hidden),
+                        bytesOf(sheetWithout(hidden, "UNDER THE BLOCK"))),
+                "the PNG the writer replays hides text under the title"
+                        + " block completely - the same sheet with and"
+                        + " without it");
+
+        SheetRecording furnitureFirst = sheetWith(hidden, operations ->
+                furnitureBeforeText(operations, block));
+        assertTrue(differsInside(pngOf(hidden), pngOf(furnitureFirst),
+                        block, sheet) > 20,
+                "and replaying the furniture before the text it covers"
+                        + " puts that text back on the paper, which is"
+                        + " what the order is for");
+    }
+
+    /**
+     * Glyphs this page's writer covered: pixels that a text-last
+     * replay would show and the real one does not.
+     *
+     * <p>Measured rather than reasoned about. Where a name's glyphs
+     * fall under a mark drawn after them, taking the name away
+     * changes nothing in the sheet as replayed and changes those
+     * pixels in a sheet whose text is replayed last.
+     */
+    private static int coveredPixels(BufferedImage asDrawn,
+                                     BufferedImage asDrawnWithout,
+                                     BufferedImage lastly,
+                                     BufferedImage lastlyWithout) {
+        int covered = 0;
+        for (int y = 0; y < asDrawn.getHeight(); y++) {
+            for (int x = 0; x < asDrawn.getWidth(); x++) {
+                boolean showsWhenLast = lastly.getRGB(x, y)
+                        != lastlyWithout.getRGB(x, y);
+                boolean showsAsDrawn = asDrawn.getRGB(x, y)
+                        != asDrawnWithout.getRGB(x, y);
+                if (showsWhenLast && !showsAsDrawn) {
+                    covered++;
+                }
+            }
+        }
+        return covered;
+    }
+
+    /** A constellation name this page draws with a mark over it. */
+    private static String coveredName(SheetRecording sheet) {
+        for (LabelPlacement.Placement one : decision()) {
+            if (one.omitted() || one.request().family()
+                    != LabelPlacement.Family.CONSTELLATION) {
+                continue;
+            }
+            if (onTheSheet(one.at(), sheet)
+                    && drawnOnce(sheet, one.request().text())
+                    && coveredByAMark(one.at(), sheet)) {
+                return one.request().text();
+            }
+        }
+        throw new AssertionError("this page has a constellation name"
+                + " with a mark drawn over it");
+    }
+
+    /** The same operations, with every run of text replayed last. */
+    private static void textAfterEverything(
+            List<SheetRecorder.Operation> operations) {
+        List<SheetRecorder.Operation> text = new ArrayList<>();
+        operations.removeIf(each -> {
+            if (each instanceof SheetRecorder.Text) {
+                text.add(each);
+                return true;
+            }
+            return false;
+        });
+        operations.addAll(text);
+    }
+
+    /** The same operations, with the furniture replayed before text. */
+    private static void furnitureBeforeText(
+            List<SheetRecorder.Operation> operations, Rectangle2D block) {
+        List<SheetRecorder.Operation> furniture = new ArrayList<>();
+        operations.removeIf(each -> {
+            if (isFurniture(each, block)) {
+                furniture.add(each);
+                return true;
+            }
+            return false;
+        });
+        int first = operations.size();
+        for (int at = 0; at < operations.size(); at++) {
+            if (operations.get(at) instanceof SheetRecorder.Text) {
+                first = at;
+                break;
+            }
+        }
+        operations.addAll(first, furniture);
+    }
+
+    /** Where the title block's own operations begin. */
+    private static int firstFurniture(
+            List<SheetRecorder.Operation> operations, Rectangle2D block) {
+        for (int at = 0; at < operations.size(); at++) {
+            if (isFurniture(operations.get(at), block)) {
+                return at;
+            }
+        }
+        return operations.size();
+    }
+
+    /** Whether an operation is the title block drawing itself. */
+    private static boolean isFurniture(SheetRecorder.Operation operation,
+                                       Rectangle2D block) {
+        if (operation instanceof SheetRecorder.Text text) {
+            return block.contains(text.x(), text.y());
+        }
+        Rectangle2D bounds = ((SheetRecorder.Drawn) operation).shape()
+                .getBounds2D();
+        return block.contains(bounds.getCenterX(), bounds.getCenterY())
+                && bounds.getWidth() <= block.getWidth() + 1.0
+                && bounds.getHeight() <= block.getHeight() + 1.0;
+    }
+
+    private static byte[] bytesOf(SheetRecording sheet) throws Exception {
+        return SheetWriters.write(sheet, SheetFormat.PNG, 300);
+    }
+
     // ---- the three readers ------------------------------------------
 
     /** The SVG: every run of text, where it is, and in what order. */

@@ -397,19 +397,21 @@ class ExportJourneyTest {
                 + " something");
 
         Map<SheetFormat, Path> written = new LinkedHashMap<>();
-        JFrame window = null;
-        java.util.prefs.Preferences node =
-                java.util.prefs.Preferences.userRoot().node(
-                        "juranometria/test/export-journey");
-        try {
-            window = exportingAtlas(folder, written, node);
-            for (SheetFormat format : SheetFormat.values()) {
-                exportThrough(window, format);
-            }
-        } finally {
-            closeEverything(window);
-            node.removeNode();
-        }
+        // The window is held where the cleanup can see it even if
+        // showing it is what failed: a frame that was built and never
+        // returned is a frame the next display test inherits. The
+        // scratch node goes the same way - the guards exist because
+        // both of these have been left behind before.
+        JFrame[] window = new JFrame[1];
+        SwingSession.scratchPreferences("juranometria-export-journey",
+                node -> SwingSession.guarded(
+                        () -> {
+                            exportingAtlas(folder, written, node, window);
+                            for (SheetFormat format : SheetFormat.values()) {
+                                exportThrough(window[0], format);
+                            }
+                        },
+                        () -> closeEverything(window[0])));
         assertEquals(List.of(SheetFormat.SVG, SheetFormat.PDF,
                         SheetFormat.PNG),
                 List.copyOf(written.keySet()),
@@ -447,10 +449,10 @@ class ExportJourneyTest {
      * export route - and only the platform's save surface replaced,
      * because a file chooser is the operating system's window.
      */
-    private JFrame exportingAtlas(Path folder, Map<SheetFormat, Path> written,
-                                  java.util.prefs.Preferences node)
+    private void exportingAtlas(Path folder, Map<SheetFormat, Path> written,
+                                java.util.prefs.Preferences node,
+                                JFrame[] made)
             throws Exception {
-        JFrame[] made = new JFrame[1];
         SwingUtilities.invokeAndWait(() -> {
             ChartViewController navigation = new ChartViewController(
                     Atlas.assembler()::fits);
@@ -506,11 +508,12 @@ class ExportJourneyTest {
                     () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                     () -> ExportSheetSession.open(frame, navigation, chart,
                             options, working, surfaces)));
-            frame.setVisible(true);
+            // Held before it is shown, so nothing that happens next
+            // can lose it.
             made[0] = frame;
+            frame.setVisible(true);
         });
         flush();
-        return made[0];
     }
 
     /** One export, driven the way a reader drives it. */
@@ -608,17 +611,41 @@ class ExportJourneyTest {
         return null;
     }
 
+    /**
+     * Every window put away, each attempt independent of the last.
+     *
+     * <p>A dialog that refuses to close must not leave the frame
+     * showing, and neither must stop the other being tried: what is
+     * left behind is inherited by the next test that needs a display.
+     */
     private void closeEverything(JFrame window) throws Exception {
+        List<Throwable> trouble = new ArrayList<>();
         SwingUtilities.invokeAndWait(() -> {
             for (Window open : Window.getWindows()) {
                 if (open instanceof JDialog dialog) {
-                    dialog.dispose();
+                    try {
+                        dialog.dispose();
+                    } catch (RuntimeException stubborn) {
+                        trouble.add(stubborn);
+                    }
                 }
             }
             if (window != null) {
-                window.dispose();
+                try {
+                    window.dispose();
+                } catch (RuntimeException stubborn) {
+                    trouble.add(stubborn);
+                }
             }
         });
+        if (!trouble.isEmpty()) {
+            RuntimeException first = new IllegalStateException(
+                    "a window would not close", trouble.get(0));
+            for (Throwable other : trouble.subList(1, trouble.size())) {
+                first.addSuppressed(other);
+            }
+            throw first;
+        }
     }
 
     private void flush() throws Exception {
