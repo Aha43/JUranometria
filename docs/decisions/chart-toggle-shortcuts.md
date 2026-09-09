@@ -306,7 +306,9 @@ Measuring that needed care, and the care is the evidence:
 - **A repaint aimed at a window is recorded too.** `frame.repaint()`
   never reaches the recorder's component method, so a recorder
   watching only components would have called the two routes equal
-  while one of them painted the whole window.
+  while one of them painted the whole window. The chart's *own*
+  window, at that: a dialog painting itself is its own control
+  surface, and one desktop repaints it where another does not.
 - **Each route's own control surface is left out**: the palette
   redraws its own line and the menu redraws its own tick, and neither
   is a cost the other could have. Nothing *above the chart* belongs

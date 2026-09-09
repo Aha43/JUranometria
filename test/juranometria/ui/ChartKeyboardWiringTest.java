@@ -441,7 +441,12 @@ class ChartKeyboardWiringTest {
                     .filter(asked -> SwingUtilities.isDescendingFrom(
                             chart, asked))
                     .count();
-            int windowRepaints = repaints.windows.size();
+            // The chart's own window, and not every window: a
+            // dialog painting itself is its own control surface, as
+            // the palette's labels are the letter's, and one desktop
+            // repaints it where another does not.
+            int windowRepaints = (int) repaints.windows.stream()
+                    .filter(asked -> asked == frame).count();
             return new Cost(chartRepaints, aboveTheChart,
                     windowRepaints,
                     scene != onEdt(chart::currentScene),
