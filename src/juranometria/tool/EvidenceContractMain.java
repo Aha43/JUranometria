@@ -158,6 +158,83 @@ public final class EvidenceContractMain {
      * legacy baselines, judged as such below rather than being
      * counted "reproduced" by the accident of nobody touching them.
      */
+    /** The maps the provenance record reads to name a generator. */
+    static Map<String, String> buildWriters() {
+        return BUILD_WRITERS;
+    }
+
+    static Map<String, String> promotedDirectories() {
+        return PROMOTED_DIRECTORIES;
+    }
+
+    static List<String> imageMains() {
+        return IMAGE_MAINS;
+    }
+
+    /**
+     * The studies that write a platform record beside their report.
+     *
+     * <p>Both of them measure two things at once: what the atlas is,
+     * which is the same everywhere, and what this desktop calls a
+     * key, which is not. The report is the first; this is the second.
+     */
+    private static final Map<String, String> PLATFORM_REPORTS =
+            Map.of("juranometria.tool.ToggleShortcutStudyMain",
+                    "docs/studies/toggle-shortcuts/platform.md",
+                    "juranometria.tool.ControlExplanationStudyMain",
+                    "docs/studies/control-explanations/platform.md");
+
+    /**
+     * Every promoted rendering carries an account of itself, and the
+     * bytes in the repository are the bytes it accounts for.
+     *
+     * <p>This is what replaces "the study has fallen behind the
+     * atlas" on a machine that cannot know: a hash anybody can check,
+     * against a record saying when and on what the picture was
+     * agreed.
+     */
+    private static void provenanceBreaches(
+            Map<String, Snapshot> committed, List<String> failures,
+            Map<String, Integer> verdicts) throws Exception {
+        Map<String, EvidenceProvenanceMain.Entry> recorded =
+                new TreeMap<>();
+        for (EvidenceProvenanceMain.Entry entry
+                : EvidenceProvenanceMain.recorded()) {
+            recorded.put(entry.path(), entry);
+        }
+        if (recorded.isEmpty()) {
+            failures.add(EvidenceProvenanceMain.RECORD
+                    + ": no promoted image says where it came from;"
+                    + " run make evidence-provenance on the machine"
+                    + " that promotes them");
+            return;
+        }
+        int checked = 0;
+        for (Map.Entry<String, Snapshot> entry : committed.entrySet()) {
+            String path = entry.getKey();
+            if (!"renderer-drawn".equals(TestEvidenceScan.artifactClass(
+                    Path.of(path).getFileName().toString()))) {
+                continue;
+            }
+            EvidenceProvenanceMain.Entry account = recorded.get(path);
+            if (account == null) {
+                failures.add(path + ": promoted without an account of"
+                        + " itself - nothing records when or on what"
+                        + " it was agreed");
+            } else if (!account.sha256().equals(
+                    EvidenceProvenanceMain.sha256(
+                            entry.getValue().bytes()))) {
+                failures.add(path + ": the bytes in the repository are"
+                        + " not the bytes its provenance records, so"
+                        + " one of them is wrong");
+            } else {
+                checked++;
+            }
+        }
+        tally(verdicts, "provenance-verified (" + checked
+                + " promoted renderings)");
+    }
+
     private static final List<String> IMAGE_MAINS = List.of(
             "juranometria.tool.IdentifyMockupMain",
             "juranometria.tool.OnThisPageMockupMain",
@@ -436,12 +513,41 @@ public final class EvidenceContractMain {
                             java.nio.file.attribute.FileTime written) {
     }
 
+    /**
+     * Whether this run may compare a rendering with another
+     * machine's.
+     *
+     * <p><strong>portable</strong> is what CI runs: it holds the
+     * deterministic reports to their committed bytes, holds every
+     * rendering to reproducing <em>within this environment</em>, and
+     * checks a promoted image against the account it carries of
+     * itself. It never compares pixels drawn here with pixels
+     * recorded elsewhere, because the project's own 1.0 contract
+     * records pixel equality per environment and does not require it
+     * across environments - and asking anyway turns "a different
+     * machine" into "stale evidence" (#315).
+     *
+     * <p><strong>canonical</strong> is what the machine that promotes
+     * reference images runs. It may compare a fresh rendering with
+     * the committed one and say the study has fallen behind, because
+     * there the comparison means what it says.
+     */
+    public enum Mode { PORTABLE, CANONICAL }
+
     public static void main(String[] args) throws Exception {
+        Mode mode = args.length > 0 && "ci".equals(args[0])
+                ? Mode.PORTABLE : Mode.CANONICAL;
         Map<String, Snapshot> committed = snapshot();
         List<String> failures = new ArrayList<>();
         Map<String, Integer> verdicts = new TreeMap<>();
+        System.out.println(mode == Mode.PORTABLE
+                ? "portable contract: renderings are held to"
+                        + " reproducing here, never to another"
+                        + " machine's pixels"
+                : "canonical contract: renderings are compared with"
+                        + " the committed references");
         generateUnderRestoration(Path.of("docs/studies"), committed,
-                () -> run(committed, failures, verdicts));
+                () -> run(committed, failures, verdicts, mode));
     }
 
     /**
@@ -607,7 +713,8 @@ public final class EvidenceContractMain {
 
     private static void run(Map<String, Snapshot> committed,
                             List<String> failures,
-                            Map<String, Integer> verdicts)
+                            Map<String, Integer> verdicts,
+                            Mode mode)
             throws Exception {
 
         // ---- deterministic reports, from stdout: no churn --------
@@ -639,7 +746,77 @@ public final class EvidenceContractMain {
             }
         }
 
+        // ---- the platform half of the split reports --------------
+        // Held to what it can honestly be held to: it exists, it
+        // says which machine it is from, and running the study again
+        // writes the same bytes here. What it may not be held to is
+        // another machine's copy, which is the whole reason it was
+        // taken out of the report beside it (#315).
+        for (Map.Entry<String, String> record
+                : PLATFORM_REPORTS.entrySet()) {
+            Path file = Path.of(record.getValue());
+            if (!Files.exists(file)) {
+                failures.add(record.getValue() + ": the platform"
+                        + " record its study writes is missing");
+                continue;
+            }
+            byte[] first = Files.readAllBytes(file);
+            String said = new String(first,
+                    java.nio.charset.StandardCharsets.UTF_8);
+            if (!said.contains("| operating system |")) {
+                failures.add(record.getValue() + ": a platform record"
+                        + " has to name the machine it is from");
+                continue;
+            }
+            PrintStream was = System.out;
+            System.setOut(new PrintStream(
+                    new ByteArrayOutputStream(), true, "UTF-8"));
+            try {
+                Class.forName(record.getKey())
+                        .getMethod("main", String[].class)
+                        .invoke(null, (Object) new String[0]);
+            } finally {
+                System.setOut(was);
+            }
+            if (!java.util.Arrays.equals(first,
+                    Files.readAllBytes(file))) {
+                failures.add(record.getValue() + ": a platform record"
+                        + " has to reproduce within its own"
+                        + " environment"
+                        + differingLines(first,
+                                Files.readAllBytes(file)));
+            } else {
+                tally(verdicts, "platform-recorded (reproduces here;"
+                        + " not held across machines)");
+            }
+        }
+
+        // ---- what a promoted image says about itself --------------
+        provenanceBreaches(committed, failures, verdicts);
+
         // ---- image generators, then judge every touched file ------
+        // Twice, when the run may not look at another machine's
+        // pixels: what a portable contract can honestly ask of a
+        // rendering is that this machine draws it the same way
+        // twice - which catches a generator that has become
+        // nondeterministic, and says nothing about a font it has
+        // never seen (#315).
+        Map<String, byte[]> drawnHere = new TreeMap<>();
+        if (mode == Mode.PORTABLE) {
+            for (String main : IMAGE_MAINS) {
+                Class.forName(main).getMethod("main", String[].class)
+                        .invoke(null, (Object) new String[0]);
+            }
+            for (String path : committed.keySet()) {
+                if ("renderer-drawn".equals(
+                        TestEvidenceScan.artifactClass(Path.of(path)
+                                .getFileName().toString()))
+                        && Files.exists(Path.of(path))) {
+                    drawnHere.put(path,
+                            Files.readAllBytes(Path.of(path)));
+                }
+            }
+        }
         for (String main : IMAGE_MAINS) {
             Class.forName(main).getMethod("main", String[].class)
                     .invoke(null, (Object) new String[0]);
@@ -668,7 +845,17 @@ public final class EvidenceContractMain {
                             Files.isDirectory(gate.input()));
             if (incomplete != null) {
                 skippedBuildDirs.add(writer.getValue());
-                failures.add(incomplete);
+                // A download nobody has is a fact about the machine,
+                // not about the evidence. The canonical run says so
+                // as a breach because that machine is the one that
+                // promotes these families; a portable run reports it
+                // as what it is (#315).
+                if (mode == Mode.PORTABLE) {
+                    tally(verdicts, "unavailable here (raw sources are"
+                            + " gitignored downloads)");
+                } else {
+                    failures.add(incomplete);
+                }
                 continue;
             }
             Class.forName(writer.getKey())
@@ -700,7 +887,17 @@ public final class EvidenceContractMain {
                     continue;
                 }
                 judgedViaBuild.add(path);
-                if (java.util.Arrays.equals(
+                if (mode == Mode.PORTABLE) {
+                    // Whether the study has fallen behind the atlas
+                    // is a question about cartography, and a machine
+                    // whose fonts are not the fonts the page was
+                    // agreed on cannot ask it: every page would
+                    // answer yes, and mean nothing by it. What this
+                    // run holds instead is the account the page
+                    // carries of itself, checked above (#315).
+                    tally(verdicts, "promoted (provenance held; not"
+                            + " re-rendered against another machine)");
+                } else if (java.util.Arrays.equals(
                         committed.get(path).bytes(),
                         Files.readAllBytes(match))) {
                     tally(verdicts, "reproduced (via generator build"
@@ -732,8 +929,15 @@ public final class EvidenceContractMain {
             Path file = Path.of(path);
             byte[] now = Files.exists(file)
                     ? Files.readAllBytes(file) : null;
-            boolean same = java.util.Arrays.equals(
-                    entry.getValue().bytes(), now);
+            // What "the same" means depends on what this run is
+            // allowed to compare with. A portable run compares a
+            // rendering with the one it drew a moment ago on this
+            // machine; only the canonical run compares it with the
+            // pixels somebody agreed to elsewhere.
+            byte[] reference = mode == Mode.PORTABLE
+                    && drawnHere.containsKey(path)
+                    ? drawnHere.get(path) : entry.getValue().bytes();
+            boolean same = java.util.Arrays.equals(reference, now);
             boolean rewritten = Files.exists(file)
                     && !Files.getLastModifiedTime(file)
                             .equals(entry.getValue().written());
@@ -760,7 +964,12 @@ public final class EvidenceContractMain {
                     } else {
                         failures.add(path + ": renderer-drawn image"
                                 + " did not reproduce byte-for-byte"
-                                + " on this machine");
+                                + (mode == Mode.PORTABLE
+                                        ? " between two renderings on"
+                                                + " this machine - the"
+                                                + " generator is not"
+                                                + " deterministic"
+                                        : " on this machine"));
                     }
                 }
                 case "widget-rendered-inspection" -> {

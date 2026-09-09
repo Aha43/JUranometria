@@ -55,6 +55,21 @@ public final class ToggleShortcutStudyMain {
     private record Bound(String stroke, String what, String where) {
     }
 
+    /**
+     * Two documents, because there are two kinds of evidence here.
+     *
+     * <p>What the switches are, which letter reaches each, which
+     * master each waits for and what a scheme would cost is the same
+     * on every machine, and is printed to standard out where the
+     * evidence contract holds it to its committed bytes.
+     *
+     * <p>What this desktop <em>calls</em> a modifier, which strokes
+     * its look and feel binds into a text field, and how many of them
+     * there are is one machine's answer. Held to the same bytes
+     * across machines it is not evidence but a claim the project
+     * explicitly does not make, so it is written beside the report
+     * with the machine that produced it named (#315).
+     */
     public static void main(String[] args) throws Exception {
         juranometria.app.UiTheme.apply(false);
         StringBuilder out = new StringBuilder();
@@ -68,7 +83,43 @@ public final class ToggleShortcutStudyMain {
         letters(out, toggles, bound, editing);
         schemes(out, toggles, editing);
         built(out);
-        System.out.print(out);
+        System.out.print(PlatformEvidence.portable(out.toString()));
+
+        StringBuilder platform = new StringBuilder();
+        PlatformEvidence.preface(platform,
+                "The chart keyboard, as this desktop spells it",
+                "Sprint 31, issues #312 and #315.");
+        strokes(platform, bound, editing);
+        PlatformEvidence.write(platform,
+                "docs/studies/toggle-shortcuts/platform.md");
+    }
+
+    /** The strokes and their spelling: one machine's answer. */
+    private static void strokes(StringBuilder out, List<Bound> bound,
+                                Set<String> editing) {
+        out.append("## What this desktop already answers\n\n");
+        out.append("| keystroke | what it does | where it is bound"
+                + " |\n");
+        out.append("|---|---|---|\n");
+        for (Bound one : bound) {
+            out.append(String.format(Locale.ROOT, "| `%s` | %s | %s |%n",
+                    one.stroke(), one.what(), one.where()));
+        }
+        out.append(String.format(Locale.ROOT,
+                "| **%d strokes** | | |%n", bound.size()));
+        out.append(String.format(Locale.ROOT,
+                "%nAnd a text field, under this look and feel on this"
+                        + " platform, answers%n**%d keystrokes** of its"
+                        + " own. That number is not the same"
+                        + " everywhere - a%nMac's text field carries"
+                        + " emacs-style bindings a Linux one does"
+                        + " not - which is%nwhy the report beside this"
+                        + " one counts what a scheme would collide"
+                        + " with%nrather than quoting this"
+                        + " figure.%n%n", editing.size()));
+        out.append("The prefix, in this desktop's own words: **")
+                .append(juranometria.app.ChartKeys.prefixText())
+                .append("**.\n");
     }
 
     private static void preface(StringBuilder out) {
@@ -111,24 +162,35 @@ public final class ToggleShortcutStudyMain {
     }
 
     /** Every keystroke the application already answers, and where. */
+    /**
+     * What the keyboard already means, in terms no desktop decides.
+     *
+     * <p>How many strokes are bound and what each does is the atlas's
+     * own fact. What those strokes are <em>called</em> is the
+     * desktop's, and lives in `platform.md` beside this - as does the
+     * number of editing strokes a text field answers, which is not
+     * the same on two platforms.
+     */
     private static void audit(StringBuilder out, List<Bound> bound,
                               Set<String> editing) {
         out.append("## What the keyboard already means\n\n");
-        out.append("| keystroke | what it does | where it is bound"
-                + " |\n");
-        out.append("|---|---|---|\n");
+        out.append("| what it does | where it is bound |\n");
+        out.append("|---|---|\n");
         for (Bound one : bound) {
-            out.append(String.format(Locale.ROOT, "| `%s` | %s | %s |%n",
-                    one.stroke(), one.what(), one.where()));
+            out.append(String.format(Locale.ROOT, "| %s | %s |%n",
+                    one.what(), one.where()));
         }
         out.append(String.format(Locale.ROOT,
-                "| **%d strokes** | | |%n", bound.size()));
-        out.append("\nAnd a text field, under this look and feel,"
-                + " answers **" + editing.size() + " keystrokes** of"
-                + "\nits own - every one of them a thing a reader"
-                + " typing a star's name expects to keep.\nA scheme"
-                + " that binds bare letters takes them away, which is"
-                + " why none of the\ncandidates below does.\n\n");
+                "| **%d strokes** | |%n", bound.size()));
+        out.append("\nEvery one of them carries the platform's own"
+                + " menu modifier, and a text field\nunder this look"
+                + " and feel answers dozens of editing strokes of its"
+                + " own - every\none of them a thing a reader typing a"
+                + " star's name expects to keep. A scheme\nthat binds"
+                + " bare letters takes them away, which is why none of"
+                + " the candidates\nbelow does. The spellings and the"
+                + " count are one machine's answer, recorded"
+                + " in\n`platform.md`.\n\n");
     }
 
     /** How much room a direct-accelerator scheme would actually have. */
