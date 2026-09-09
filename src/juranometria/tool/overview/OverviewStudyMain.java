@@ -101,10 +101,18 @@ public final class OverviewStudyMain {
                     PaperSize.A4.chartHighUnits(), "-sheet");
         }
 
-        Files.writeString(out.resolve("measurements.md"),
-                document(pages.toString(), scenes),
+        // The report goes to standard output, the way every other
+        // study main sends its report, so that capturing it is what
+        // regenerates the file - and so the evidence contract, which
+        // reproduces a report by running its main and reading what it
+        // printed, can verify this one at all. It wrote the file
+        // itself and printed a notice until #315, which is why the
+        // contract had been reporting it unreproducible since the
+        // sprint that promoted it.
+        String report = document(pages.toString(), scenes);
+        Files.writeString(out.resolve("measurements.md"), report,
                 StandardCharsets.UTF_8);
-        System.out.println("wrote " + out.resolve("measurements.md"));
+        System.out.print(report);
     }
 
     private static void write(Path out, StudyScenes scenes,

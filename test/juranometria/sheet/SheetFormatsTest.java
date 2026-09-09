@@ -208,19 +208,25 @@ class SheetFormatsTest {
             // Labels are ink too, and on the editable sheets they are
             // text operations rather than paths - which the oracle
             // did not look at, while two committed constellation
-            // labels are anchored outside the chart (PR #288 round
-            // 4). Their clips are the only thing keeping them off the
-            // margin.
+            // labels were anchored outside the chart (PR #288 round
+            // 4). Their clips were the only thing keeping them off
+            // the margin.
+            //
+            // Since #314 no label is anchored outside the paper at
+            // all: a label that cannot be drawn whole is drawn
+            // somewhere else, and one with nowhere else is not drawn.
+            // So the premise this check was written on is gone with
+            // the defect it was written for, and what is held here is
+            // the stronger statement - none escapes, clipped or not -
+            // with the clip still proven to be doing work by the
+            // paths above, which do cross the boundary.
             if (editableText) {
-                assertTrue(evidence.textEscapingClipped()
-                                + evidence.textEscapingUnclipped() > 0,
-                        name + " has labels anchored outside the chart"
-                                + " rectangle, so the check below"
-                                + " could have failed");
-                assertEquals(0, evidence.textEscapingUnclipped(),
-                        name + " clips every one of them - an"
-                                + " unclipped label is a name printed"
-                                + " out in the half-inch margin");
+                assertEquals(0, evidence.textEscapingClipped()
+                                + evidence.textEscapingUnclipped(),
+                        name + " anchors no label outside the chart"
+                                + " rectangle at all, which is the"
+                                + " placement decision of #314 rather"
+                                + " than a clip doing the work");
             } else {
                 assertEquals(0, evidence.textEscapingClipped()
                                 + evidence.textEscapingUnclipped(),
