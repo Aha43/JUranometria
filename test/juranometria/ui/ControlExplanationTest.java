@@ -58,7 +58,7 @@ class ControlExplanationTest {
     @Test
     void everyOperableControlCarriesADecision() throws Exception {
         SwingSession.restoring(() -> {
-            List<Control> controls = ControlExplanationStudyMain.audit();
+            List<Control> controls = ControlExplanationStudyMain.audit().controls();
             List<Control> undecided = controls.stream()
                     .filter(control -> "UNDECIDED".equals(control.how()))
                     .toList();
@@ -69,7 +69,7 @@ class ControlExplanationTest {
                             + " deliberately left to its own visible"
                             + " words. A new control with none is this"
                             + " test's whole reason for existing.");
-            assertTrue(controls.size() > 80,
+            assertTrue(controls.size() > 60,
                     "and the walk reached the surfaces rather than"
                             + " quietly finding nothing: "
                             + controls.size());
@@ -77,9 +77,45 @@ class ControlExplanationTest {
     }
 
     @Test
+    void eachControlIsWalkedExactlyOnce() throws Exception {
+        // The walk used to reach a tabbed pane's children twice -
+        // once through the pane's own tab list and once through its
+        // children - so every control in Chart Options was counted
+        // twice and every total taken from the walk was wrong
+        // (review, #311). Rows cannot show that: two rows about one
+        // control read exactly like two controls. The components can.
+        SwingSession.restoring(() -> {
+            ControlExplanationStudyMain.Audit audit =
+                    ControlExplanationStudyMain.audit();
+            assertEquals(audit.controls().size(),
+                    audit.components().size(),
+                    "one row per component visited");
+            java.util.Map<javax.swing.JComponent, Integer> seen =
+                    new java.util.IdentityHashMap<>();
+            List<String> twice = new java.util.ArrayList<>();
+            for (int i = 0; i < audit.components().size(); i++) {
+                javax.swing.JComponent component =
+                        audit.components().get(i);
+                Integer before = seen.put(component, i);
+                if (before != null) {
+                    twice.add(audit.controls().get(i).surface() + " "
+                            + audit.controls().get(i).seen());
+                }
+            }
+            assertEquals(List.of(), twice,
+                    "no control is walked twice: an overlapping"
+                            + " traversal inflates the inventory and"
+                            + " every count taken from it, and reads"
+                            + " exactly like a larger surface");
+            assertEquals(audit.components().size(), seen.size(),
+                    "so the count of controls is a count of things");
+        });
+    }
+
+    @Test
     void theDocumentSaysWhatTheWalkFound() throws Exception {
         SwingSession.restoring(() -> {
-            List<Control> controls = ControlExplanationStudyMain.audit();
+            List<Control> controls = ControlExplanationStudyMain.audit().controls();
             String report = Files.readString(REPORT);
             long hovered = count(controls, "hovered");
             long dynamic = count(controls, "dynamic");
@@ -100,7 +136,7 @@ class ControlExplanationTest {
     @Test
     void nobodySaysTheSameWordsToBothAudiences() throws Exception {
         SwingSession.restoring(() -> {
-            for (Control control : ControlExplanationStudyMain.audit()) {
+            for (Control control : ControlExplanationStudyMain.audit().controls()) {
                 if (control.hovered() == null) {
                     continue;
                 }
@@ -124,7 +160,7 @@ class ControlExplanationTest {
         // ones, so those are exactly the tooltips that would run off
         // the side of the window - and further at enlarged text.
         SwingSession.restoring(() -> {
-            for (Control control : ControlExplanationStudyMain.audit()) {
+            for (Control control : ControlExplanationStudyMain.audit().controls()) {
                 String hovered = control.hovered();
                 if (hovered == null
                         || hovered.length() <= Explain.WRAP_OVER) {
@@ -161,7 +197,7 @@ class ControlExplanationTest {
                                     Shortcuts.menuModifierText())
                             + "[^()]*)\\)");
             int found = 0;
-            for (Control control : ControlExplanationStudyMain.audit()) {
+            for (Control control : ControlExplanationStudyMain.audit().controls()) {
                 for (String text : new String[] {control.hovered(),
                         control.heard()}) {
                     if (text == null) {

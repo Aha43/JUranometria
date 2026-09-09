@@ -79,19 +79,33 @@ public final class ControlExplanationStudyMain {
     }
 
     /**
-     * Every operable control the application builds, walked.
+     * What one walk of the application's surfaces found.
+     *
+     * <p>The rows and the components they were read from, in the
+     * same order. The second list is the one that makes "each
+     * control once" checkable: a row can only say what a control
+     * says, and two rows saying the same thing are exactly what an
+     * overlapping traversal produces.
+     */
+    public record Audit(List<Control> controls,
+                        List<JComponent> components) {
+    }
+
+    /**
+     * Every operable control the application builds, walked once.
      *
      * <p>Applies the shipped look and feel first, because a surface
      * is built out of the look and feel's own parts and an audit
      * under Metal would be an audit of a program nobody ships.
      */
-    public static List<Control> audit() {
+    public static Audit audit() {
         juranometria.app.UiTheme.apply(false);
         List<Control> controls = new ArrayList<>();
+        List<JComponent> visited = new ArrayList<>();
         for (Map.Entry<String, Component> surface : surfaces().entrySet()) {
-            walk(surface.getKey(), surface.getValue(), controls);
+            walk(surface.getKey(), surface.getValue(), controls, visited);
         }
-        return controls;
+        return new Audit(controls, visited);
     }
 
     /** How many surfaces the audit walks. */
@@ -100,7 +114,7 @@ public final class ControlExplanationStudyMain {
     }
 
     public static void main(String[] args) throws Exception {
-        List<Control> controls = audit();
+        List<Control> controls = audit().controls();
 
         StringBuilder out = new StringBuilder();
         preface(out);
@@ -375,32 +389,34 @@ public final class ControlExplanationStudyMain {
     // ---- walking one surface ----------------------------------------
 
     private static void walk(String surface, Component root,
-                             List<Control> found) {
+                             List<Control> found,
+                             List<JComponent> visited) {
         if (root instanceof JComponent component && operable(component)) {
             found.add(read(surface, component));
+            visited.add(component);
         }
         if (root instanceof JMenuBar bar) {
             for (int i = 0; i < bar.getMenuCount(); i++) {
-                walk(surface, bar.getMenu(i), found);
+                walk(surface, bar.getMenu(i), found, visited);
             }
             return;
         }
         if (root instanceof JMenu menu) {
             for (int i = 0; i < menu.getItemCount(); i++) {
                 if (menu.getItem(i) != null) {
-                    walk(surface, menu.getItem(i), found);
+                    walk(surface, menu.getItem(i), found, visited);
                 }
             }
             return;
         }
-        if (root instanceof JTabbedPane tabs) {
-            for (int i = 0; i < tabs.getTabCount(); i++) {
-                walk(surface, tabs.getComponentAt(i), found);
-            }
-        }
+        // No branch for a tabbed pane. Its tab components are its
+        // own children, so the general walk below reaches them - and
+        // walking them here as well reached every control on every
+        // tab twice, which inflated the inventory and every count
+        // taken from it (review, #311).
         if (root instanceof Container container) {
             for (Component child : container.getComponents()) {
-                walk(surface, child, found);
+                walk(surface, child, found, visited);
             }
         }
     }

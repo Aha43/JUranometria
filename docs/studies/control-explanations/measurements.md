@@ -36,23 +36,6 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenu | Help | &mdash; | What this application is, and what it is built on | self-explanatory |
 | Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window naming the application, its version and what it is built on | self-explanatory |
 | Chart Options | JTabbedPane | Deep sky, Stars, Constellations, Chart | &mdash; | Four groups of switches: deep sky, stars, constellations, and the chart's own furniture | self-explanatory |
-| Chart Options | JCheckBox | Deep-sky objects | Draw deep-sky objects on the chart at all (⌃K then D) | Draw deep-sky objects on the chart at all. Switched here, or from the chart by pressing... | hovered |
-| Chart Options | JCheckBox | Galaxies | <html><body style='width: 260px'>Galaxies, drawn at their catalogued size and orientati... | Galaxies, drawn at their catalogued size and orientation, including close pairs, triple... | hovered |
-| Chart Options | JCheckBox | Open clusters | <html><body style='width: 260px'>Loose clusters of young stars in the plane of the Milk... | Loose clusters of young stars in the plane of the Milky Way. For example: M 45, M 44, N... | hovered |
-| Chart Options | JCheckBox | Globular clusters | <html><body style='width: 260px'>Dense, ancient balls of stars in the galactic halo. Fo... | Dense, ancient balls of stars in the galactic halo. For example: M 13, M 22, NGC 5139..... | hovered |
-| Chart Options | JCheckBox | Nebulae | <html><body style='width: 260px'>Clouds of gas and dust: emission, reflection and dark ... | Clouds of gas and dust: emission, reflection and dark nebulae, H II regions, supernova ... | hovered |
-| Chart Options | JCheckBox | Planetary nebulae | <html><body style='width: 260px'>Shells thrown off by dying stars, drawn small and cros... | Shells thrown off by dying stars, drawn small and crossed so they read apart from the o... | hovered |
-| Chart Options | JCheckBox | Deep-sky labels | Name the deep-sky objects the chart draws (⌃K then L) | Name the deep-sky objects the chart draws. Switched here, or from the chart by pressing... | hovered |
-| Chart Options | JCheckBox | Star names | Traditional proper names such as Betelgeuse (⌃K then S) | Traditional proper names such as Betelgeuse. Switched here, or from the chart by pressi... | hovered |
-| Chart Options | JCheckBox | Bayer letters | <html><body style='width: 260px'>Greek and Latin Bayer designations such as alpha Orion... | Greek and Latin Bayer designations such as alpha Orionis. Switched here, or from the ch... | hovered |
-| Chart Options | JCheckBox | Flamsteed numbers | <html><body style='width: 260px'>Flamsteed catalogue numbers on the regional charts (⌃K... | Flamsteed catalogue numbers on the regional charts. Switched here, or from the chart by... | hovered |
-| Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations (⌃K then F) | The joined stick figures of the constellations. Switched here, or from the chart by pre... | hovered |
-| Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875 (⌃K then B) | The IAU boundaries, precessed from B1875. Switched here, or from the chart by pressing ... | hovered |
-| Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is (⌃K then N) | The figure's name, drawn where the figure is. Switched here, or from the chart by press... | hovered |
-| Chart Options | JCheckBox | Equatorial coordinate grid | <html><body style='width: 260px'>ICRS/J2000 right-ascension and declination grid lines ... | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Switched ... | hovered |
-| Chart Options | JCheckBox | Title block | <html><body style='width: 260px'>The panel in the lower left stating the target, centre... | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | hovered |
-| Chart Options | JCheckBox | Stellar-magnitude key | <html><body style='width: 260px'>A key in the upper right showing the circle size the c... | A key in the upper right showing the circle size the chart draws for three visual magni... | hovered |
-| Chart Options | JCheckBox | Black sky | <html><body style='width: 260px'>White stars and restrained light ink on a black ground... | White stars and restrained light ink on a black ground, instead of the white-paper char... | hovered |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show earlier tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
 | Chart Options | FlatMoreTabsButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
@@ -113,7 +96,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**96 operable controls** across 11 surfaces: **65** hovered, **5** dynamic, **26** left to their own visible words, **0 undecided**.
+**79 operable controls** across 11 surfaces: **48** hovered, **5** dynamic, **26** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

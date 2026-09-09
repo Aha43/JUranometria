@@ -43,7 +43,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Every control explains itself** (issue #311). The atlas had ten
   tooltips, and five whole surfaces - Place and Time, Export Chart
   Sheet, Settings, About, and the entire menu bar - had none at all.
-  Now every one of the **96** controls a reader can operate carries a
+  Now every one of the **79** controls a reader can operate carries a
   decision: a tooltip, a tooltip that follows the state, or a
   recorded reason for needing none because the words on it are the
   whole meaning. A control that nobody has decided about fails the
