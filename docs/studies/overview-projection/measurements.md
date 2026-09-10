@@ -22,11 +22,11 @@ this issue existed - and the round trip is measured
 too, because a projection that could not be inverted
 is one a reader could not point at.
 
-| candidate | checked against | worst difference | round trip | reaches |
-|---|---|---:|---:|---:|
-| gnomonic | production's `GnomonicProjection` | 0.000e+00 | 7.7e-14° | 420 of 840 |
-| stereographic | Sprint 29's `StereographicCandidate` | 2.111e-13 | 7.8e-14° | 840 of 840 |
-| orthographic | its own definition, `sin(theta)` | 0.000e+00 | 3.3e-13° | 420 of 840 |
+| candidate | checked against | agrees within 1.0E-9 | round trip returns within 1.0E-9° | reaches |
+|---|---|---|---|---:|
+| gnomonic | production's `GnomonicProjection` | yes | yes | 420 of 840 |
+| stereographic | Sprint 29's `StereographicCandidate` | yes | yes | 840 of 840 |
+| orthographic | its own definition, `sin(theta)` | yes | yes | 420 of 840 |
 
 The gnomonic candidate is not merely close to
 production's: it is the same plane point. It delegates

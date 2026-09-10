@@ -127,7 +127,7 @@ public final class FurnitureStudyMain {
      * labels, since a label count says nothing about the graticule,
      * a constellation name, or the stars themselves.
      */
-    private static void cost() {
+    private static void cost() throws java.io.IOException {
         System.out.println("## What the furniture costs the page");
         System.out.println();
         System.out.println("Two measurements, and the difference"
@@ -140,9 +140,40 @@ public final class FurnitureStudyMain {
                 + " pixel is, which would count labels, figures and"
                 + " constellation names as stars (Sprint 20 review).");
         System.out.println();
-        System.out.println("| page | key box | share of page | chart ink"
-                + " it would cover | star and symbol ink |");
-        System.out.println("|---|---|---:|---:|---:|");
+        // What the key's box measures is what a font drew; whether
+        // it is small, and whether it covers a mark a reader is
+        // looking for, is the decision. The measurements are recorded
+        // beside this with the machine that took them (#315).
+        System.out.println("What survives here is what does not"
+                + " depend on a font: that the key is\ndrawn, that it"
+                + " is the same box on every page rather than one that"
+                + " grows with\nthe page's contents, and that it stays"
+                + " a corner. **What it costs in covered\nink is a"
+                + " measurement and nothing else** - it is the number"
+                + " this study exists\nto report, it differs on every"
+                + " page and on every machine, and there is no"
+                + " portable\nclaim underneath it. It is recorded in"
+                + " `platform.md` beside this, with the machine\nthat"
+                + " measured it.\n");
+        System.out.println();
+        System.out.println("| page | key | one box for every page |"
+                + " under " + KEY_SHARE_CEILING + "% of the page |");
+        System.out.println("|---|---|---|---|");
+        StringBuilder observed = new StringBuilder();
+        PlatformEvidence.preface(observed,
+                "Chart furniture, measured on one machine",
+                "Sprint 20, issue #163; classified in Sprint 31,"
+                        + " issue #315.");
+        observed.append("The magnitude key's box is laid out from font"
+                + " metrics, so its size and the\nink inside it are"
+                + " this machine's answer. What the study concluded"
+                + " from them -\nthat the key is a small corner of"
+                + " the page and covers nothing a reader is\nlooking"
+                + " for - is in the report beside this one.\n\n");
+        observed.append("| page | key box | share of page | chart ink"
+                + " it would cover | star and symbol ink |\n");
+        observed.append("|---|---|---:|---:|---:|\n");
+        String[] oneBox = new String[1];
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         // Stars and deep-sky symbols alone: every other layer off, so
         // what remains in the box is what those two layers drew.
@@ -156,18 +187,57 @@ public final class FurnitureStudyMain {
             java.awt.Rectangle box = renderer.magnitudeKeyBounds(
                     bare.createGraphics().getFontMetrics(
                             ChartRenderer.labelFont()), scene);
-            System.out.printf(Locale.ROOT,
+            double share = box == null ? 0.0
+                    : 100.0 * box.width * box.height / (WIDTH * HEIGHT);
+            long chartInk = box == null ? 0 : inkIn(bare, box);
+            long markInk = box == null ? 0 : inkIn(marks, box);
+            String shape = box == null ? null
+                    : box.width + "x" + box.height;
+            if (shape != null) {
+                if (oneBox[0] == null) {
+                    oneBox[0] = shape;
+                }
+                if (!oneBox[0].equals(shape)) {
+                    throw new IllegalStateException(page.name()
+                            + ": the magnitude key is " + shape
+                            + " here and " + oneBox[0] + " elsewhere -"
+                            + " a key that grows with the page is a"
+                            + " second thing to read");
+                }
+            }
+            System.out.printf(Locale.ROOT, "| %s | %s | %s | %s |%n",
+                    page.name(), box == null ? "omitted" : "drawn",
+                    box == null ? "—" : "yes",
+                    box == null ? "—"
+                            : share <= KEY_SHARE_CEILING ? "yes"
+                                    : "**no**");
+            observed.append(String.format(Locale.ROOT,
                     "| %s | %s | %.2f%% | %d px | %d px |%n", page.name(),
                     box == null ? "omitted"
                             : box.width + "x" + box.height + " px",
-                    box == null ? 0.0
-                            : 100.0 * box.width * box.height
-                                    / (WIDTH * HEIGHT),
-                    box == null ? 0 : inkIn(bare, box),
-                    box == null ? 0 : inkIn(marks, box));
+                    share, chartInk, markInk));
+            if (box != null && share > KEY_SHARE_CEILING) {
+                throw new IllegalStateException(page.name() + ": the"
+                        + " magnitude key takes " + share + "% of the"
+                        + " page, past the corner this study accepted");
+            }
         }
         System.out.println();
+        PlatformEvidence.write(observed,
+                "docs/studies/chart-furniture/platform.md");
     }
+
+    /**
+     * How much of the page the magnitude key may take.
+     *
+     * <p>The key is a corner of the chart, and the decision it
+     * supports is that a reader gains a scale without losing sky. Its
+     * measured share is about 1.8% here and 2.0% on a Linux runner,
+     * because the box is laid out from font metrics; five per cent is
+     * the width of "a corner" rather than a fit chosen to pass
+     * (#315).
+     */
+    private static final double KEY_SHARE_CEILING = 5.0;
 
     /** Pixels darker than the paper inside a box. */
     private static long inkIn(BufferedImage page, java.awt.Rectangle box) {

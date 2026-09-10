@@ -113,6 +113,26 @@ public final class OverviewStudyMain {
         Files.writeString(out.resolve("measurements.md"), report,
                 StandardCharsets.UTF_8);
         System.out.print(report);
+
+        StringBuilder observed = new StringBuilder();
+        juranometria.tool.PlatformEvidence.preface(observed,
+                "Overview projections, to the last decimal on one"
+                        + " machine",
+                "Sprint 30, issue #296; classified in Sprint 31,"
+                        + " issue #315.");
+        observed.append("The residues below are rounding in double"
+                + " arithmetic: 7.8e-14 degrees on\none machine and"
+                + " 7.7e-14 on another, because a JDK and a chip are"
+                + " free to\nassociate a sum differently. The report"
+                + " beside this one says what the study\nconcluded"
+                + " from them - that each candidate agrees with what"
+                + " it was checked\nagainst, and that a round trip"
+                + " returns where it started - which is the same"
+                + " on\nany machine that can add.\n\n");
+        observed.append(AgreementReport.observed(
+                new SkyPosition(83.0, 0.0)));
+        juranometria.tool.PlatformEvidence.write(observed,
+                "docs/studies/overview-projection/platform.md");
     }
 
     private static void write(Path out, StudyScenes scenes,

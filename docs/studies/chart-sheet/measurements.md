@@ -17,15 +17,15 @@ Regenerate with `make chart-sheet-study`.
 
 ## The sheets
 
-| file | paper | shapes | labels | bytes |
-|---|---|---:|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 27 | 461485 |
-| `sheet-letter.svg` | US Letter | 2472 | 27 | 504498 |
-| `sheet-a4-outlines.svg` | A4 | 2267 | 0 | 532854 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 17 | 392398 |
-| `sheet-a4.pdf` | A4 | 2267 | 27 as outlines | 510431 |
-| `sheet-a4-modules.pdf` | A4 | 1966 | 17 as outlines | 413797 |
-| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 27 | 430302 |
+| file | paper | shapes | labels |
+|---|---|---:|---:|
+| `sheet-a4.svg` | A4 | 2267 | 27 |
+| `sheet-letter.svg` | US Letter | 2472 | 27 |
+| `sheet-a4-outlines.svg` | A4 | 2267 | 0 |
+| `sheet-a4-modules.svg` | A4 | 1966 | 17 |
+| `sheet-a4.pdf` | A4 | 2267 | 27 as outlines |
+| `sheet-a4-modules.pdf` | A4 | 1966 | 17 as outlines |
+| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 27 |
 
 `sheet-a4-outlines.svg` is the same chart with every label converted to
 its outline, for a machine whose fonts are unknown. It is larger and it

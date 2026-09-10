@@ -186,7 +186,13 @@ public final class EvidenceContractMain {
                     "juranometria.tool.BlackSkyStudyMain",
                     "docs/studies/black-sky/platform.md",
                     "juranometria.tool.OverviewInkStudyMain",
-                    "docs/studies/overview-ink/platform.md");
+                    "docs/studies/overview-ink/platform.md",
+                    "juranometria.tool.FurnitureStudyMain",
+                    "docs/studies/chart-furniture/platform.md",
+                    "juranometria.tool.ChartSheetStudyMain",
+                    "docs/studies/chart-sheet/platform.md",
+                    "juranometria.tool.overview.OverviewStudyMain",
+                    "docs/studies/overview-projection/platform.md");
 
     /**
      * Every promoted rendering carries an account of itself, and the

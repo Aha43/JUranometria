@@ -29,15 +29,24 @@ For contrast, a key stepping by ONE magnitude would place circles this close tog
 
 Two measurements, and the difference matters. **Chart ink** is any pixel darker than the paper inside the key's box, on the page as it draws WITHOUT the key. **Star and symbol ink** is that same box measured on a page rendered with only those two layers switched on - derived from the layers themselves, not guessed from how dark a pixel is, which would count labels, figures and constellation names as stars (Sprint 20 review).
 
-| page | key box | share of page | chart ink it would cover | star and symbol ink |
-|---|---|---:|---:|---:|
-| m31-08 | 160x72 px | 1.83% | 288 px | 0 px |
-| sagittarius-08 | 160x72 px | 1.83% | 400 px | 0 px |
-| orion-36 | 160x72 px | 1.83% | 635 px | 436 px |
-| polaris-18 | 160x72 px | 1.83% | 445 px | 33 px |
-| crux-18 | 160x72 px | 1.83% | 487 px | 118 px |
-| quiet-08 | 160x72 px | 1.83% | 405 px | 0 px |
-| m31-08-mag4 | 160x72 px | 1.83% | 288 px | 0 px |
-| m31-08-mag6 | 160x72 px | 1.83% | 288 px | 0 px |
+What survives here is what does not depend on a font: that the key is
+drawn, that it is the same box on every page rather than one that grows with
+the page's contents, and that it stays a corner. **What it costs in covered
+ink is a measurement and nothing else** - it is the number this study exists
+to report, it differs on every page and on every machine, and there is no portable
+claim underneath it. It is recorded in `platform.md` beside this, with the machine
+that measured it.
+
+
+| page | key | one box for every page | under 5.0% of the page |
+|---|---|---|---|
+| m31-08 | drawn | yes | yes |
+| sagittarius-08 | drawn | yes | yes |
+| orion-36 | drawn | yes | yes |
+| polaris-18 | drawn | yes | yes |
+| crux-18 | drawn | yes | yes |
+| quiet-08 | drawn | yes | yes |
+| m31-08-mag4 | drawn | yes | yes |
+| m31-08-mag6 | drawn | yes | yes |
 
 Study pages written to docs/studies/chart-furniture
