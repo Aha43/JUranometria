@@ -422,7 +422,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(34, display.size(),
+        assertEquals(35, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -514,7 +514,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 35,
+        assertTrue(doClick <= 36,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -553,7 +553,10 @@ class TestEvidenceGateTest {
                         + " palette's letter, and #312's wiring test"
                         + " reaches it by the same convention to"
                         + " compare what the two routes cost the"
-                        + " running atlas: " + doClick);
+                        + " running atlas; and #315's closing journey"
+                        + " reaches Chart Options and the export item"
+                        + " by the same convention on its way through"
+                        + " the sprint: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

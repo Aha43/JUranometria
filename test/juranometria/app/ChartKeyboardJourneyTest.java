@@ -165,11 +165,15 @@ class ChartKeyboardJourneyTest {
             try {
                 session.open();
                 javax.swing.JTextField field = session.search();
-                SwingUtilities.invokeAndWait(field::requestFocusInWindow);
-                flush();
                 String before = onEdt(field::getText);
 
-                ReaderInput.shortcut(field, KeyEvent.VK_K,
+                // The premise is the caret, not the window. Asking
+                // only that the window is focused let this pass or
+                // fail on whether the desktop had given the field the
+                // focus - and a suite with more windows in it than
+                // before is exactly where that stops being true
+                // (#315). shortcutOn insists on the focus owner.
+                ReaderInput.shortcutOn(field, KeyEvent.VK_K,
                         AppMenuBar.menuShortcutMask());
                 flush();
                 assertTrue(session.opened().isEmpty(),

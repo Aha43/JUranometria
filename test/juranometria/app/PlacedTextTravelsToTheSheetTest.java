@@ -776,9 +776,18 @@ class PlacedTextTravelsToTheSheetTest {
         double baseline = at.getY() + ascent;
         for (Run fill : fills) {
             double below = fill.box().getMaxY() - baseline;
-            if (Math.abs(fill.box().getMinX() - left) < 2.0 && below > -1.5
-                    && below < 4.0
-                    && fill.box().getMaxX() <= at.getMaxX() + 1.0) {
+            if (Math.abs(fill.box().getMinX() - left) >= 2.0
+                    || below <= -1.5 || below >= 4.0
+                    || fill.box().getMaxX() > at.getMaxX() + 1.0) {
+                continue;
+            }
+            // And as wide as the run this box was measured for. The
+            // corner alone is not enough on a crowded sheet: a
+            // constellation name has seventeen positions, and a short
+            // label elsewhere can start at one of their corners by
+            // coincidence. A run of glyphs fills its own box within
+            // the side bearings; a different label does not.
+            if (fill.box().getWidth() >= at.getWidth() - 12.0) {
                 return fill.at();
             }
         }
