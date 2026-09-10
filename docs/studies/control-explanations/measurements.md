@@ -14,12 +14,12 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 | surface | control | seen | hovered | heard | decided |
 |---|---|---|---|---|---|
-| Toolbar | JButton | (icon only) | Zoom in (<menu>=) | Shows a narrower field, with fainter stars on it | dynamic |
-| Toolbar | JButton | (icon only) | Zoom out (<menu>-) | Shows a wider field, with fewer stars on it | dynamic |
+| Toolbar | JButton | (icon only) | Zoom in (<key:zoomIn>) | Shows a narrower field, with fainter stars on it | dynamic |
+| Toolbar | JButton | (icon only) | Zoom out (<key:zoomOut>) | Shows a wider field, with fewer stars on it | dynamic |
 | Toolbar | JButton | (icon only) | Fewer stars (brighter magnitude limit) | Draws only the brighter stars, one step at a time | hovered |
 | Toolbar | JButton | (icon only) | More stars (fainter magnitude limit) | Draws fainter stars as well, one step at a time | hovered |
 | Toolbar | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
-| Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<menu>I) | Hidden; press to open the panel that names what you have chosen and what is on this page | dynamic |
+| Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that names what you have chosen and what is on this page | dynamic |
 | Toolbar | JToggleButton | Accumulate | <html><body style='width: 260px'>When on, choosing objects adds them to the working sel... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Toolbar | SearchField | (a field) | <html><body style='width: 260px'>Find an object or coordinates, e.g. M 31, NGC 224, TYC... | Type a Messier or NGC number, a star's catalogue identity, or a right ascension and dec... | hovered |
 | Toolbar | JButton | (icon only) | Exit JUranometria | Closes the atlas; what you chose is remembered | hovered |
@@ -39,19 +39,19 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show earlier tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
 | Chart Options | FlatMoreTabsButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
-| Chart Options | JCheckBox | Deep-sky objects | Draw deep-sky objects on the chart at all (<menu>K then D) | Draw deep-sky objects on the chart at all. Switched here, or from the chart by pressing... | hovered |
+| Chart Options | JCheckBox | Deep-sky objects | Draw deep-sky objects on the chart at all (<prefix> then D) | Draw deep-sky objects on the chart at all. Switched here, or from the chart by pressing... | hovered |
 | Chart Options | JCheckBox | Galaxies | <html><body style='width: 260px'>Galaxies, drawn at their catalogued size and orientati... | Galaxies, drawn at their catalogued size and orientation, including close pairs, triple... | hovered |
 | Chart Options | JCheckBox | Open clusters | <html><body style='width: 260px'>Loose clusters of young stars in the plane of the Milk... | Loose clusters of young stars in the plane of the Milky Way. For example: M 45, M 44, N... | hovered |
 | Chart Options | JCheckBox | Globular clusters | <html><body style='width: 260px'>Dense, ancient balls of stars in the galactic halo. Fo... | Dense, ancient balls of stars in the galactic halo. For example: M 13, M 22, NGC 5139..... | hovered |
 | Chart Options | JCheckBox | Nebulae | <html><body style='width: 260px'>Clouds of gas and dust: emission, reflection and dark ... | Clouds of gas and dust: emission, reflection and dark nebulae, H II regions, supernova ... | hovered |
 | Chart Options | JCheckBox | Planetary nebulae | <html><body style='width: 260px'>Shells thrown off by dying stars, drawn small and cros... | Shells thrown off by dying stars, drawn small and crossed so they read apart from the o... | hovered |
-| Chart Options | JCheckBox | Deep-sky labels | Name the deep-sky objects the chart draws (<menu>K then L) | Name the deep-sky objects the chart draws. Switched here, or from the chart by pressing... | hovered |
-| Chart Options | JCheckBox | Star names | Traditional proper names such as Betelgeuse (<menu>K then S) | Traditional proper names such as Betelgeuse. Switched here, or from the chart by pressi... | hovered |
+| Chart Options | JCheckBox | Deep-sky labels | Name the deep-sky objects the chart draws (<prefix> then L) | Name the deep-sky objects the chart draws. Switched here, or from the chart by pressing... | hovered |
+| Chart Options | JCheckBox | Star names | Traditional proper names such as Betelgeuse (<prefix> then S) | Traditional proper names such as Betelgeuse. Switched here, or from the chart by pressi... | hovered |
 | Chart Options | JCheckBox | Bayer letters | <html><body style='width: 260px'>Greek and Latin Bayer designations such as alpha Orion... | Greek and Latin Bayer designations such as alpha Orionis. Switched here, or from the ch... | hovered |
-| Chart Options | JCheckBox | Flamsteed numbers | <html><body style='width: 260px'>Flamsteed catalogue numbers on the regional charts (<menu>K... | Flamsteed catalogue numbers on the regional charts. Switched here, or from the chart by... | hovered |
-| Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations (<menu>K then F) | The joined stick figures of the constellations. Switched here, or from the chart by pre... | hovered |
-| Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875 (<menu>K then B) | The IAU boundaries, precessed from B1875. Switched here, or from the chart by pressing ... | hovered |
-| Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is (<menu>K then N) | The figure's name, drawn where the figure is. Switched here, or from the chart by press... | hovered |
+| Chart Options | JCheckBox | Flamsteed numbers | <html><body style='width: 260px'>Flamsteed catalogue numbers on the regional charts (<prefix>... | Flamsteed catalogue numbers on the regional charts. Switched here, or from the chart by... | hovered |
+| Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations (<prefix> then F) | The joined stick figures of the constellations. Switched here, or from the chart by pre... | hovered |
+| Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875 (<prefix> then B) | The IAU boundaries, precessed from B1875. Switched here, or from the chart by pressing ... | hovered |
+| Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is (<prefix> then N) | The figure's name, drawn where the figure is. Switched here, or from the chart by press... | hovered |
 | Chart Options | JCheckBox | Equatorial coordinate grid | <html><body style='width: 260px'>ICRS/J2000 right-ascension and declination grid lines ... | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Switched ... | hovered |
 | Chart Options | JCheckBox | Title block | <html><body style='width: 260px'>The panel in the lower left stating the target, centre... | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | hovered |
 | Chart Options | JCheckBox | Stellar-magnitude key | <html><body style='width: 260px'>A key in the upper right showing the circle size the c... | A key in the upper right showing the circle size the chart draws for three visual magni... | hovered |
@@ -82,7 +82,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | About | JButton | Close | &mdash; | Closes this window and returns to the chart | self-explanatory |
 | About, notices | JTextArea | (read-only text) | &mdash; | The notices and licence texts of everything the atlas bundles, in full | self-explanatory |
 | About, notices | JButton | Close | &mdash; | Closes this window and returns to the chart | self-explanatory |
-| Inspector | JButton | (icon only) | Close Inspector (<menu>I) | Hides this pane. The chart keeps its place, its target and your selection, and widens t... | hovered |
+| Inspector | JButton | (icon only) | Close Inspector (<key:inspector>) | Hides this pane. The chart keeps its place, its target and your selection, and widens t... | hovered |
 | Inspector | JToggleButton | Selected | The facts of the object you last chose | Shows what the atlas holds on the one object you chose, rather than everything on the page | hovered |
 | Inspector | JToggleButton | On this page | Everything on the page you are looking at, drawn or not | Lists every object the atlas holds within this page, including the ones the chart is no... | hovered |
 | Inspector | JList | (Objects at this point) | <html><body style='width: 260px'>Several objects lie within reach of that point; choose... | A list of everything within reach of the point you clicked. Choosing one shows its fact... | hovered |

@@ -19,15 +19,15 @@ never across two - the portable half of this study is the document beside it.
 
 | keystroke | what it does | where it is bound |
 |---|---|---|
-| `⌃++` | chart.zoomIn | the window's own keys |
-| `⌃+-` | Zoom Out | the View menu |
-| `⌃+-` | chart.zoomOut | the window's own keys |
-| `⌃+=` | Zoom In | the View menu |
-| `⌃+=` | chart.zoomIn | the window's own keys |
 | `⌃+E` | Export Chart Sheet... | the File menu |
 | `⌃+I` | Inspector | the View menu |
+| `⌃+=` | Zoom In | the View menu |
+| `⌃+-` | Zoom Out | the View menu |
+| `⌃++` | chart.zoomIn | the window's own keys |
+| `⌃+=` | chart.zoomIn | the window's own keys |
 | `⌃+⇧+=` | chart.zoomIn | the window's own keys |
 | `⌃+⌨ +` | chart.zoomIn | the window's own keys |
+| `⌃+-` | chart.zoomOut | the window's own keys |
 | `⌃+⌨ -` | chart.zoomOut | the window's own keys |
 | **10 strokes** | | |
 

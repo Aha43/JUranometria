@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -53,10 +54,30 @@ public final class PlatformEvidence {
      * anywhere.
      */
     public static String portable(String text) {
+        // Longest first, and the whole keystroke rather than only its
+        // modifier: a desktop spells the key as well as the modifier,
+        // and `⌘=` against `Ctrl+Equals` differs in both halves. What
+        // is left behind is which action was quoted, which is the
+        // atlas's own answer (#315).
+        String portable = text.replace(
+                juranometria.app.ChartKeys.prefixText(), PREFIX);
+        List<juranometria.ui.Shortcuts.Shortcut> byLength =
+                new java.util.ArrayList<>(
+                        juranometria.ui.Shortcuts.all());
+        byLength.sort(java.util.Comparator.comparingInt(
+                (juranometria.ui.Shortcuts.Shortcut one)
+                        -> one.text().length()).reversed());
+        for (juranometria.ui.Shortcuts.Shortcut shortcut : byLength) {
+            portable = portable.replace(shortcut.text(),
+                    "<key:" + shortcut.id() + ">");
+        }
         String modifier = juranometria.ui.Shortcuts.menuModifierText();
-        return modifier.isEmpty() ? text
-                : text.replace(modifier, MENU_MODIFIER);
+        return modifier.isEmpty() ? portable
+                : portable.replace(modifier, MENU_MODIFIER);
     }
+
+    /** The token standing in for the chart keyboard's own prefix. */
+    public static final String PREFIX = "<prefix>";
 
     /** The heading every platform record carries. */
     public static void preface(StringBuilder out, String title,

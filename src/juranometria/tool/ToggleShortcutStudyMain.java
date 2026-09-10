@@ -465,7 +465,15 @@ public final class ToggleShortcutStudyMain {
                         "the window's own keys"));
             }
         }
-        found.sort((one, other) -> one.stroke().compareTo(other.stroke()));
+        // Ordered by what the stroke does, not by what this desktop
+        // spells it: `=` on one platform and `Equals` on another sort
+        // differently, and the portable half of this study may not
+        // have its rows rearranged by a font's idea of a key's name
+        // (#315).
+        found.sort(java.util.Comparator
+                .comparing((Bound one) -> one.what())
+                .thenComparing(Bound::where)
+                .thenComparing(Bound::stroke));
         return found;
     }
 

@@ -14,19 +14,19 @@ in their head.
 
 | control | its own key in the dialog | depends on | what it says |
 |---|---|---|---|
-| Deep-sky objects | `D` | — | Draw deep-sky objects on the chart at all (<menu>K then D) |
+| Deep-sky objects | `D` | — | Draw deep-sky objects on the chart at all (<prefix> then D) |
 | Galaxies | `G` | Deep-sky objects | Galaxies, drawn at their catalogued size and orientation,... |
 | Open clusters | `O` | Deep-sky objects | Loose clusters of young stars in the plane of the Milky W... |
 | Globular clusters | `C` | Deep-sky objects | Dense, ancient balls of stars in the galactic halo. For e... |
 | Nebulae | `U` | Deep-sky objects | Clouds of gas and dust: emission, reflection and dark neb... |
 | Planetary nebulae | `P` | Deep-sky objects | Shells thrown off by dying stars, drawn small and crossed... |
-| Deep-sky labels | `L` | Deep-sky objects | Name the deep-sky objects the chart draws (<menu>K then L) |
-| Star names | `S` | — | Traditional proper names such as Betelgeuse (<menu>K then S) |
+| Deep-sky labels | `L` | Deep-sky objects | Name the deep-sky objects the chart draws (<prefix> then L) |
+| Star names | `S` | — | Traditional proper names such as Betelgeuse (<prefix> then S) |
 | Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis ... |
-| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts (<menu>K th... |
-| Constellation figures | `F` | — | The joined stick figures of the constellations (<menu>K then F) |
-| Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875 (<menu>K then B) |
-| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is (<menu>K then N) |
+| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts (<prefix> th... |
+| Constellation figures | `F` | — | The joined stick figures of the constellations (<prefix> then F) |
+| Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875 (<prefix> then B) |
+| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is (<prefix> then N) |
 | Equatorial coordinate grid | `E` | — | ICRS/J2000 right-ascension and declination grid lines wit... |
 | Title block | `T` | — | The panel in the lower left stating the target, centre, f... |
 | Stellar-magnitude key | `K` | — | A key in the upper right showing the circle size the char... |
@@ -42,15 +42,15 @@ View menu, the observer's lines in Place and Time.
 
 | what it does | where it is bound |
 |---|---|
-| chart.zoomIn | the window's own keys |
-| Zoom Out | the View menu |
-| chart.zoomOut | the window's own keys |
-| Zoom In | the View menu |
-| chart.zoomIn | the window's own keys |
 | Export Chart Sheet... | the File menu |
 | Inspector | the View menu |
+| Zoom In | the View menu |
+| Zoom Out | the View menu |
 | chart.zoomIn | the window's own keys |
 | chart.zoomIn | the window's own keys |
+| chart.zoomIn | the window's own keys |
+| chart.zoomIn | the window's own keys |
+| chart.zoomOut | the window's own keys |
 | chart.zoomOut | the window's own keys |
 | **10 strokes** | |
 
@@ -115,7 +115,7 @@ application without the study changing with it.
 The chart's keyboard opens with the platform's own menu key and `K`: **⌘K** on
 macOS and **Ctrl+K** elsewhere, spelled by the registry rather than typed anywhere.
 This document is generated headlessly, where the toolkit reports no menu mask at
-all, so what it prints for itself is the fallback: **<menu>K**.
+all, so what it prints for itself is the fallback: **<prefix>**.
 
 | switch | key | remembered | needs | why this letter |
 |---|---|---|---|---|
