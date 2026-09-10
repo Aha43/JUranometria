@@ -146,9 +146,19 @@ class WiderFieldStepTest {
                 reinked.add(row.trim() + " now inks " + ink);
             }
             if (samePlatform) {
+                // The pixel digest lives in the platform record
+                // beside the oracle now, because it is the one column
+                // that is this machine's answer (#315). Same rows,
+                // same order, one digest each.
                 String pixels = juranometria.tool.WiderFieldStudyMain
                         .fingerprint(renderer, centre, field, black);
-                if (!pixels.equals(cell[6])) {
+                String recorded = rasterisedOfRecord().get(
+                        cell[0] + " " + cell[1] + " " + cell[2] + " "
+                                + cell[3]);
+                if (recorded == null) {
+                    rasterised.add(row.trim() + " has no recorded"
+                            + " rasterisation beside the oracle");
+                } else if (!pixels.equals(recorded)) {
                     rasterised.add(row.trim() + " now renders " + pixels);
                 }
             }
@@ -166,15 +176,52 @@ class WiderFieldStepTest {
     }
 
     /** The platform the committed pixel column is an oracle for. */
+    /** The pixel digests, keyed by the row they belong to. */
+    private static java.util.Map<String, String> rasterisedOfRecord()
+            throws Exception {
+        java.util.Map<String, String> found =
+                new java.util.LinkedHashMap<>();
+        for (String line : Files.readAllLines(Path.of(
+                "docs/studies/wider-field/platform.md"))) {
+            String[] cell = line.trim().split("\\s+");
+            if (cell.length != 5) {
+                continue;
+            }
+            try {
+                Double.parseDouble(cell[0]);
+            } catch (NumberFormatException notARow) {
+                continue;
+            }
+            found.put(cell[0] + " " + cell[1] + " " + cell[2] + " "
+                    + cell[3], cell[4]);
+        }
+        return found;
+    }
+
+    /**
+     * The machine the pixel digests were taken on.
+     *
+     * <p>Read from the platform record beside the oracle, which is
+     * where the digests moved when the evidence was classified: the
+     * oracle itself is arithmetic and holds anywhere, so it no longer
+     * names a machine (#315).
+     */
     private static String platformOfRecord() throws Exception {
-        for (String line : Files.readAllLines(RELEASED_PAGES)) {
+        for (String line : Files.readAllLines(Path.of(
+                "docs/studies/wider-field/platform.md"))) {
+            if (line.startsWith("| operating system |")
+                    || line.startsWith("| architecture |")
+                    || line.startsWith("| Java |")) {
+                continue;
+            }
             if (line.startsWith("Recorded on: `")) {
                 return line.substring(line.indexOf('`') + 1,
                         line.lastIndexOf('`'));
             }
         }
-        throw new AssertionError("the oracle does not say which"
-                + " platform its pixel column came from");
+        throw new AssertionError("the record beside the oracle does"
+                + " not say which platform its pixel digests came"
+                + " from");
     }
 
     @Test

@@ -63,16 +63,22 @@ final class PageCurveReport {
     static int agreed;
     static int disagreed;
 
+    /** The residuals themselves, for the record beside the report. */
+    static final StringBuilder observed = new StringBuilder();
+
     static String of(double[] widths, double wide, double high) {
         rows = 0;
         worstMiss = 0.0;
         agreed = 0;
         disagreed = 0;
         Rectangle2D page = new Rectangle2D.Double(0, 0, wide, high);
+        observed.setLength(0);
+        observed.append("| projection | centre | field | circle |"
+                + " worst miss |\n|---|---|---:|---|---:|\n");
         StringBuilder out = new StringBuilder();
         out.append("| projection | centre | field | circle | form |"
-                + " worst miss | runs | ends |\n");
-        out.append("|---|---|---:|---|---|---:|---:|---|\n");
+                + " passes through every point | runs | ends |\n");
+        out.append("|---|---|---:|---|---|---|---:|---|\n");
         for (String name : List.of("gnomonic", "stereographic",
                 "orthographic")) {
             for (Field field : FIELDS) {
@@ -112,18 +118,34 @@ final class PageCurveReport {
                             worstMiss = Math.max(worstMiss,
                                     built.get().residual());
                         }
+                        // The residual is rounding: 2.7e-13 on one
+                        // machine and 2.8e-13 on another, because a
+                        // JDK and a chip associate a sum differently.
+                        // What the row is claiming is that the drawn
+                        // curve passes through the projected points,
+                        // and that is which side of the tolerance it
+                        // falls on (#315). The magnitudes are in the
+                        // record beside the report.
+                        double residual = built.get().residual();
                         out.append(String.format(Locale.ROOT,
                                 "| %s | %s | %.0f° | %s | %s | %s | %d |"
                                         + " %s |%n",
                                 name, field.name(), width, circle.name(),
                                 built.get().curve().form(),
-                                Double.isNaN(built.get().residual())
-                                        ? "—"
-                                        : String.format(Locale.ROOT, "%.1e",
-                                                built.get().residual()),
+                                Double.isNaN(residual) ? "—"
+                                        : residual <= CurveFormReport
+                                                .FITS_WITHIN
+                                                ? "yes" : "**no**",
                                 runs.size(),
                                 closed ? "**none - it closes**"
                                         : "two per run"));
+                        observed.append(String.format(Locale.ROOT,
+                                "| %s | %s | %.0f° | %s | %s |%n",
+                                name, field.name(), width,
+                                circle.name(),
+                                Double.isNaN(residual) ? "—"
+                                        : String.format(Locale.ROOT,
+                                                "%.1e", residual)));
                     }
                 }
             }

@@ -158,6 +158,99 @@ public final class EvidenceContractMain {
      * legacy baselines, judged as such below rather than being
      * counted "reproduced" by the accident of nobody touching them.
      */
+    /** The maps the provenance record reads to name a generator. */
+    static Map<String, String> buildWriters() {
+        return BUILD_WRITERS;
+    }
+
+    static Map<String, String> promotedDirectories() {
+        return PROMOTED_DIRECTORIES;
+    }
+
+    static List<String> imageMains() {
+        return IMAGE_MAINS;
+    }
+
+    /**
+     * The studies that write a platform record beside their report.
+     *
+     * <p>Both of them measure two things at once: what the atlas is,
+     * which is the same everywhere, and what this desktop calls a
+     * key, which is not. The report is the first; this is the second.
+     */
+    private static final Map<String, String> PLATFORM_REPORTS =
+            Map.of("juranometria.tool.ToggleShortcutStudyMain",
+                    "docs/studies/toggle-shortcuts/platform.md",
+                    "juranometria.tool.ControlExplanationStudyMain",
+                    "docs/studies/control-explanations/platform.md",
+                    "juranometria.tool.BlackSkyStudyMain",
+                    "docs/studies/black-sky/platform.md",
+                    "juranometria.tool.OverviewInkStudyMain",
+                    "docs/studies/overview-ink/platform.md",
+                    "juranometria.tool.FurnitureStudyMain",
+                    "docs/studies/chart-furniture/platform.md",
+                    "juranometria.tool.ChartSheetStudyMain",
+                    "docs/studies/chart-sheet/platform.md",
+                    "juranometria.tool.overview.OverviewStudyMain",
+                    "docs/studies/overview-projection/platform.md",
+                    "juranometria.tool.FigureAnchorStudyMain",
+                    "docs/studies/figure-anchors/platform.md",
+                    "juranometria.tool.WiderFieldStudyMain",
+                    "docs/studies/wider-field/platform.md",
+                    "juranometria.tool.labels.LabelStudyMain",
+                    "docs/studies/label-placement/platform.md");
+
+    /**
+     * Every promoted rendering carries an account of itself, and the
+     * bytes in the repository are the bytes it accounts for.
+     *
+     * <p>This is what replaces "the study has fallen behind the
+     * atlas" on a machine that cannot know: a hash anybody can check,
+     * against a record saying when and on what the picture was
+     * agreed.
+     */
+    private static void provenanceBreaches(
+            Map<String, Snapshot> committed, List<String> failures,
+            Map<String, Integer> verdicts) throws Exception {
+        Map<String, EvidenceProvenanceMain.Entry> recorded =
+                new TreeMap<>();
+        for (EvidenceProvenanceMain.Entry entry
+                : EvidenceProvenanceMain.recorded()) {
+            recorded.put(entry.path(), entry);
+        }
+        if (recorded.isEmpty()) {
+            failures.add(EvidenceProvenanceMain.RECORD
+                    + ": no promoted image says where it came from;"
+                    + " run make evidence-provenance on the machine"
+                    + " that promotes them");
+            return;
+        }
+        int checked = 0;
+        for (Map.Entry<String, Snapshot> entry : committed.entrySet()) {
+            String path = entry.getKey();
+            if (!"renderer-drawn".equals(TestEvidenceScan.artifactClass(
+                    Path.of(path).getFileName().toString()))) {
+                continue;
+            }
+            EvidenceProvenanceMain.Entry account = recorded.get(path);
+            if (account == null) {
+                failures.add(path + ": promoted without an account of"
+                        + " itself - nothing records when or on what"
+                        + " it was agreed");
+            } else if (!account.sha256().equals(
+                    EvidenceProvenanceMain.sha256(
+                            entry.getValue().bytes()))) {
+                failures.add(path + ": the bytes in the repository are"
+                        + " not the bytes its provenance records, so"
+                        + " one of them is wrong");
+            } else {
+                checked++;
+            }
+        }
+        tally(verdicts, "provenance-verified (" + checked
+                + " promoted renderings)");
+    }
+
     private static final List<String> IMAGE_MAINS = List.of(
             "juranometria.tool.IdentifyMockupMain",
             "juranometria.tool.OnThisPageMockupMain",
@@ -436,12 +529,335 @@ public final class EvidenceContractMain {
                             java.nio.file.attribute.FileTime written) {
     }
 
+    /**
+     * Whether this run may compare a rendering with another
+     * machine's.
+     *
+     * <p><strong>portable</strong> is what CI runs: it holds the
+     * deterministic reports to their committed bytes, holds every
+     * rendering to reproducing <em>within this environment</em>, and
+     * checks a promoted image against the account it carries of
+     * itself. It never compares pixels drawn here with pixels
+     * recorded elsewhere, because the project's own 1.0 contract
+     * records pixel equality per environment and does not require it
+     * across environments - and asking anyway turns "a different
+     * machine" into "stale evidence" (#315).
+     *
+     * <p><strong>canonical</strong> is what the machine that promotes
+     * reference images runs. It may compare a fresh rendering with
+     * the committed one and say the study has fallen behind, because
+     * there the comparison means what it says.
+     */
+    public enum Mode { PORTABLE, CANONICAL }
+
     public static void main(String[] args) throws Exception {
+        Mode mode = args.length > 0 && "ci".equals(args[0])
+                ? Mode.PORTABLE : Mode.CANONICAL;
         Map<String, Snapshot> committed = snapshot();
         List<String> failures = new ArrayList<>();
         Map<String, Integer> verdicts = new TreeMap<>();
+        System.out.println(mode == Mode.PORTABLE
+                ? "portable contract: renderings are held to"
+                        + " reproducing here, never to another"
+                        + " machine's pixels"
+                : "canonical contract: renderings are compared with"
+                        + " the committed references");
         generateUnderRestoration(Path.of("docs/studies"), committed,
-                () -> run(committed, failures, verdicts));
+                () -> run(committed, failures, verdicts, mode));
+    }
+
+    /**
+     * The first few lines that differ, for a breach to be acted on.
+     *
+     * <p>"Did not reproduce" names the file and nothing else, which
+     * is enough to know something is wrong and not enough to know
+     * what kind of wrong. A number that moved with a font is a
+     * different finding from a number that moved with the atlas, and
+     * telling them apart is the whole of the work (#315).
+     */
+    private static String differingLines(byte[] expected,
+                                         byte[] found) {
+        List<String> was = new java.io.BufferedReader(
+                new java.io.StringReader(new String(expected,
+                        java.nio.charset.StandardCharsets.UTF_8)))
+                .lines().toList();
+        List<String> now = new java.io.BufferedReader(
+                new java.io.StringReader(new String(found,
+                        java.nio.charset.StandardCharsets.UTF_8)))
+                .lines().toList();
+        StringBuilder out = new StringBuilder();
+        int shown = 0;
+        int differing = 0;
+        for (int line = 0; line < Math.max(was.size(), now.size());
+                line++) {
+            String before = line < was.size() ? was.get(line) : null;
+            String after = line < now.size() ? now.get(line) : null;
+            if (java.util.Objects.equals(before, after)) {
+                continue;
+            }
+            differing++;
+            if (shown++ < DIFFERENCES_SHOWN) {
+                out.append(System.lineSeparator())
+                        .append("    line ").append(line + 1)
+                        .append(System.lineSeparator())
+                        .append("      committed: ").append(before)
+                        .append(System.lineSeparator())
+                        .append("      here     : ").append(after);
+            }
+        }
+        if (differing > DIFFERENCES_SHOWN) {
+            out.append(System.lineSeparator())
+                    .append("    and ")
+                    .append(differing - DIFFERENCES_SHOWN)
+                    .append(" more differing lines of ")
+                    .append(Math.max(was.size(), now.size()));
+        }
+        return out.toString();
+    }
+
+    /**
+     * How many differing lines a breach prints before summarising.
+     *
+     * <p>Generous on purpose. Six of forty differing lines is nearly
+     * as unhelpful as none: what a reader of this output has to do
+     * is decide whether the differences are one kind or two, and a
+     * sample cannot answer that.
+     */
+    private static final int DIFFERENCES_SHOWN = 40;
+
+    /**
+     * A platform observation, held to reproducing on this machine.
+     *
+     * <p>Run again, into a second buffer, and required to say the
+     * same thing. That catches the failure a byte contract catches -
+     * a generator that has stopped being deterministic - without
+     * claiming anything about a font it has never seen.
+     */
+    private static List<String> observedBreaches(
+            Map.Entry<String, String> report,
+            ByteArrayOutputStream first) throws Exception {
+        ByteArrayOutputStream again = new ByteArrayOutputStream();
+        PrintStream was = System.out;
+        System.setOut(new PrintStream(again, true, "UTF-8"));
+        try {
+            Class.forName(report.getKey())
+                    .getMethod("main", String[].class)
+                    .invoke(null, (Object) new String[0]);
+        } finally {
+            System.setOut(was);
+        }
+        if (java.util.Arrays.equals(first.toByteArray(),
+                again.toByteArray())) {
+            return List.of();
+        }
+        return List.of(report.getValue() + ": a platform observation"
+                + " has to reproduce within its own environment"
+                + differingLines(first.toByteArray(),
+                        again.toByteArray()));
+    }
+
+    /**
+     * What two runs of every rendering generator produced.
+     *
+     * @param first what each path held after the first run
+     * @param claimed the paths a generator actually wrote in both
+     *     runs - a file nothing touched has not been drawn twice and
+     *     may not be reported as though it had
+     * @param differing the paths whose two drawings disagree
+     */
+    record DrawnTwice(Map<String, byte[]> first,
+                      java.util.Set<String> claimed,
+                      List<String> differing) {
+    }
+
+    /**
+     * Runs every generator twice and says which renderings moved.
+     *
+     * <p>Package-visible and taking its generators as an argument so
+     * that a test can hand it one that draws something different each
+     * time, and require this to say so (review, #322).
+     */
+    static DrawnTwice drawTwice(List<String> generators,
+                                List<String> paths) throws Exception {
+        return drawTwice(generators, paths, List.of());
+    }
+
+    /**
+     * The same, also watching whatever appears in these directories.
+     *
+     * <p>The promoted study pages are not written where they are
+     * committed: their generators draw into {@code build/}, and the
+     * canonical run compares the two. A portable run may not make
+     * that comparison - the committed page was agreed on another
+     * machine - but the generator's own determinism is still a fair
+     * question, and asking it of the build output is how it gets
+     * asked. Without this, a build writer could draw a different page
+     * every time and a portable run would notice nothing, because it
+     * only ever looks at what is committed (review, #322).
+     */
+    static DrawnTwice drawTwice(List<String> generators,
+                                List<String> paths,
+                                List<String> directories)
+            throws Exception {
+        // Whether a generator wrote a file is asked by dating every
+        // candidate to the epoch first and seeing which dates moved.
+        // Comparing timestamps before and after does not answer it:
+        // two runs of a quick generator land in the same millisecond,
+        // and the file then looks untouched when it was written twice
+        // - which this test caught before CI did.
+        Map<String, Long> original = stamps(paths);
+        java.util.Set<String> writtenOnce = wroteWhileDatedOld(
+                generators, paths);
+        Map<String, byte[]> first = new TreeMap<>();
+        for (String path : paths) {
+            if (Files.exists(Path.of(path))) {
+                first.put(path, Files.readAllBytes(Path.of(path)));
+            }
+        }
+        Map<String, byte[]> firstBuilt = drawnIn(directories);
+        java.util.Set<String> writtenAgain = wroteWhileDatedOld(
+                generators, paths);
+        Map<String, byte[]> builtAgain = drawnIn(directories);
+
+        java.util.Set<String> claimed = new java.util.TreeSet<>();
+        List<String> differing = new ArrayList<>();
+        for (String path : paths) {
+            if (!writtenOnce.contains(path)
+                    || !writtenAgain.contains(path)) {
+                // Nothing drew it, so nothing here may say it was
+                // drawn twice. Its own class decides what happens to
+                // it further down.
+                restore(path, original.get(path));
+                continue;
+            }
+            claimed.add(path);
+            if (!java.util.Arrays.equals(first.get(path),
+                    Files.readAllBytes(Path.of(path)))) {
+                differing.add(path);
+            }
+        }
+        // And whatever the generators drew where they draw it.
+        for (Map.Entry<String, byte[]> built : firstBuilt.entrySet()) {
+            byte[] now = builtAgain.get(built.getKey());
+            if (now == null) {
+                continue;
+            }
+            claimed.add(built.getKey());
+            if (!java.util.Arrays.equals(built.getValue(), now)) {
+                differing.add(built.getKey());
+            }
+        }
+        return new DrawnTwice(first, claimed, differing);
+    }
+
+    /** Every image a generator has left in these directories. */
+    private static Map<String, byte[]> drawnIn(List<String> directories)
+            throws IOException {
+        Map<String, byte[]> found = new TreeMap<>();
+        for (String directory : directories) {
+            Path root = Path.of(directory);
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (Stream<Path> tree = Files.walk(root)) {
+                for (Path file : tree.filter(Files::isRegularFile)
+                        .filter(f -> f.toString().endsWith(".png"))
+                        .toList()) {
+                    found.put(file.toString(),
+                            Files.readAllBytes(file));
+                }
+            }
+        }
+        return found;
+    }
+
+    /** Dates every candidate old, runs the generators, says what moved. */
+    private static java.util.Set<String> wroteWhileDatedOld(
+            List<String> generators, List<String> paths)
+            throws Exception {
+        for (String path : paths) {
+            restore(path, 0L);
+        }
+        runAll(generators);
+        java.util.Set<String> written = new java.util.TreeSet<>();
+        for (String path : paths) {
+            Path file = Path.of(path);
+            if (Files.exists(file)
+                    && Files.getLastModifiedTime(file).toMillis() != 0L) {
+                written.add(path);
+            }
+        }
+        return written;
+    }
+
+    /** Puts a file's date back, where there is one to put back. */
+    private static void restore(String path, Long when)
+            throws IOException {
+        Path file = Path.of(path);
+        if (when != null && Files.exists(file)) {
+            Files.setLastModifiedTime(file,
+                    java.nio.file.attribute.FileTime.fromMillis(when));
+        }
+    }
+
+    /** Every generator that owns a renderer-drawn artifact. */
+    private static List<String> renderingGenerators() {
+        List<String> generators = new ArrayList<>(REPORT_MAINS.keySet());
+        for (String main : PLATFORM_REPORTS.keySet()) {
+            if (!generators.contains(main)) {
+                generators.add(main);
+            }
+        }
+        generators.addAll(IMAGE_MAINS);
+        for (Map.Entry<String, String> writer : BUILD_WRITERS.entrySet()) {
+            Gate gate = GATED_GENERATORS.get(writer.getKey());
+            if (gate == null || Files.isDirectory(gate.input())) {
+                generators.add(writer.getKey());
+            }
+        }
+        return generators;
+    }
+
+    /** Every committed artifact a renderer drew. */
+    private static List<String> rendererDrawn(
+            Map<String, Snapshot> committed) {
+        List<String> paths = new ArrayList<>();
+        for (String path : committed.keySet()) {
+            if ("renderer-drawn".equals(TestEvidenceScan.artifactClass(
+                    Path.of(path).getFileName().toString()))) {
+                paths.add(path);
+            }
+        }
+        return paths;
+    }
+
+    private static void runAll(List<String> generators)
+            throws Exception {
+        PrintStream was = System.out;
+        System.setOut(new PrintStream(new ByteArrayOutputStream(),
+                true, "UTF-8"));
+        try {
+            for (String main : generators) {
+                Class.forName(main).getMethod("main", String[].class)
+                        .invoke(null, (Object) new String[0]);
+            }
+        } finally {
+            System.setOut(was);
+        }
+    }
+
+    /** When each of these files was last written, or null. */
+    private static Map<String, Long> stamps(List<String> paths)
+            throws IOException {
+        Map<String, Long> when = new TreeMap<>();
+        for (String path : paths) {
+            Path file = Path.of(path);
+            if (Files.exists(file)) {
+                when.put(path, Files.getLastModifiedTime(file)
+                        .toMillis());
+            }
+        }
+        return when;
     }
 
     /** A generation step that may fail. */
@@ -548,8 +964,68 @@ public final class EvidenceContractMain {
 
     private static void run(Map<String, Snapshot> committed,
                             List<String> failures,
-                            Map<String, Integer> verdicts)
+                            Map<String, Integer> verdicts,
+                            Mode mode)
             throws Exception {
+
+        // ---- every rendering, drawn twice, before anything else --
+        // What a portable contract can honestly ask of a rendering is
+        // that this machine draws it the same way twice. That has to
+        // mean *every* generator that owns renderer output, not only
+        // the ones in IMAGE_MAINS: the report generators draw pages
+        // too, and a first version of this captured them before the
+        // second pass and then compared each with itself, so a
+        // nondeterministic report image would have passed while the
+        // run claimed every rendering reproduced (review, #322).
+        DrawnTwice twice = null;
+        if (mode == Mode.PORTABLE) {
+            twice = drawTwice(renderingGenerators(),
+                    rendererDrawn(committed),
+                    new ArrayList<>(BUILD_WRITERS.values()));
+            for (String path : twice.differing()) {
+                failures.add(path + ": renderer-drawn image did not"
+                        + " reproduce byte-for-byte between two"
+                        + " renderings on this machine - the generator"
+                        + " is not deterministic");
+            }
+            tally(verdicts, "drawn twice here and identical ("
+                    + (twice.claimed().size() - twice.differing().size())
+                    + " renderings)");
+            // And the residue, named rather than implied: a committed
+            // rendering that no generator wrote in either pass has
+            // not been checked by this run, and saying how many there
+            // are and which they are is the difference between a
+            // contract and a comfortable number (review, #322).
+            List<String> unclaimed = new ArrayList<>();
+            for (String path : rendererDrawn(committed)) {
+                if (!twice.claimed().contains(path)) {
+                    unclaimed.add(path);
+                }
+            }
+            // The promoted pages are the bulk of that residue, and
+            // they are not unchecked: their generators drew into
+            // build/ twice above, and the committed page is held to
+            // the account it carries of itself.
+            tally(verdicts, "drawn twice where the generator draws"
+                    + " ("
+                    + twice.claimed().stream()
+                            .filter(path -> path.startsWith("build/"))
+                            .count()
+                    + " build outputs)");
+            tally(verdicts, "not drawn here (" + unclaimed.size()
+                    + " renderings; held by their own class)");
+            if (!unclaimed.isEmpty()) {
+                System.out.println("Renderings nothing drew on this"
+                        + " run, held as committed by their own"
+                        + " class:");
+                for (String path : unclaimed) {
+                    System.out.println("  " + path
+                            + (PROMOTED_WITHOUT_GENERATOR.contains(path)
+                                    ? " (pinned: no generator)" : ""));
+                }
+                System.out.println();
+            }
+        }
 
         // ---- deterministic reports, from stdout: no churn --------
         PrintStream realOut = System.out;
@@ -563,6 +1039,25 @@ public final class EvidenceContractMain {
             } finally {
                 System.setOut(realOut);
             }
+            String said = captured.toString("UTF-8");
+            if (said.contains(PlatformEvidence.OBSERVED_MARK)) {
+                // The report says of itself that its numbers are this
+                // machine's. Held to what that allows: it names the
+                // machine, and running the study again here writes
+                // the same thing. Comparing it with a recording made
+                // on another desktop would be asking a question the
+                // project's own contract refuses to ask (#315).
+                failures.addAll(observedBreaches(report, captured));
+                if (!said.contains("Recorded on: `")) {
+                    failures.add(report.getValue() + ": a platform"
+                            + " observation has to name the machine"
+                            + " it was taken on");
+                } else {
+                    tally(verdicts, "platform-observed (reproduces"
+                            + " here; not held across machines)");
+                }
+                continue;
+            }
             Snapshot expectedSnapshot = committed.get(report.getValue());
             byte[] expected = expectedSnapshot == null ? null
                     : expectedSnapshot.bytes();
@@ -572,11 +1067,62 @@ public final class EvidenceContractMain {
             } else if (!java.util.Arrays.equals(expected,
                     captured.toByteArray())) {
                 failures.add(report.getValue() + ": deterministic"
-                        + " report did not reproduce byte-for-byte");
+                        + " report did not reproduce byte-for-byte"
+                        + differingLines(expected,
+                                captured.toByteArray()));
             } else {
                 tally(verdicts, "reproduced");
             }
         }
+
+        // ---- the platform half of the split reports --------------
+        // Held to what it can honestly be held to: it exists, it
+        // says which machine it is from, and running the study again
+        // writes the same bytes here. What it may not be held to is
+        // another machine's copy, which is the whole reason it was
+        // taken out of the report beside it (#315).
+        for (Map.Entry<String, String> record
+                : PLATFORM_REPORTS.entrySet()) {
+            Path file = Path.of(record.getValue());
+            if (!Files.exists(file)) {
+                failures.add(record.getValue() + ": the platform"
+                        + " record its study writes is missing");
+                continue;
+            }
+            byte[] first = Files.readAllBytes(file);
+            String said = new String(first,
+                    java.nio.charset.StandardCharsets.UTF_8);
+            if (!said.contains("| operating system |")
+                    && !said.contains("Recorded on: `")) {
+                failures.add(record.getValue() + ": a platform record"
+                        + " has to name the machine it is from");
+                continue;
+            }
+            PrintStream was = System.out;
+            System.setOut(new PrintStream(
+                    new ByteArrayOutputStream(), true, "UTF-8"));
+            try {
+                Class.forName(record.getKey())
+                        .getMethod("main", String[].class)
+                        .invoke(null, (Object) new String[0]);
+            } finally {
+                System.setOut(was);
+            }
+            if (!java.util.Arrays.equals(first,
+                    Files.readAllBytes(file))) {
+                failures.add(record.getValue() + ": a platform record"
+                        + " has to reproduce within its own"
+                        + " environment"
+                        + differingLines(first,
+                                Files.readAllBytes(file)));
+            } else {
+                tally(verdicts, "platform-recorded (reproduces here;"
+                        + " not held across machines)");
+            }
+        }
+
+        // ---- what a promoted image says about itself --------------
+        provenanceBreaches(committed, failures, verdicts);
 
         // ---- image generators, then judge every touched file ------
         for (String main : IMAGE_MAINS) {
@@ -607,7 +1153,17 @@ public final class EvidenceContractMain {
                             Files.isDirectory(gate.input()));
             if (incomplete != null) {
                 skippedBuildDirs.add(writer.getValue());
-                failures.add(incomplete);
+                // A download nobody has is a fact about the machine,
+                // not about the evidence. The canonical run says so
+                // as a breach because that machine is the one that
+                // promotes these families; a portable run reports it
+                // as what it is (#315).
+                if (mode == Mode.PORTABLE) {
+                    tally(verdicts, "unavailable here (raw sources are"
+                            + " gitignored downloads)");
+                } else {
+                    failures.add(incomplete);
+                }
                 continue;
             }
             Class.forName(writer.getKey())
@@ -639,7 +1195,17 @@ public final class EvidenceContractMain {
                     continue;
                 }
                 judgedViaBuild.add(path);
-                if (java.util.Arrays.equals(
+                if (mode == Mode.PORTABLE) {
+                    // Whether the study has fallen behind the atlas
+                    // is a question about cartography, and a machine
+                    // whose fonts are not the fonts the page was
+                    // agreed on cannot ask it: every page would
+                    // answer yes, and mean nothing by it. What this
+                    // run holds instead is the account the page
+                    // carries of itself, checked above (#315).
+                    tally(verdicts, "promoted (provenance held; not"
+                            + " re-rendered against another machine)");
+                } else if (java.util.Arrays.equals(
                         committed.get(path).bytes(),
                         Files.readAllBytes(match))) {
                     tally(verdicts, "reproduced (via generator build"
@@ -671,8 +1237,15 @@ public final class EvidenceContractMain {
             Path file = Path.of(path);
             byte[] now = Files.exists(file)
                     ? Files.readAllBytes(file) : null;
-            boolean same = java.util.Arrays.equals(
-                    entry.getValue().bytes(), now);
+            // What "the same" means depends on what this run is
+            // allowed to compare with. A portable run compares a
+            // rendering with the one it drew a moment ago on this
+            // machine; only the canonical run compares it with the
+            // pixels somebody agreed to elsewhere.
+            byte[] reference = mode == Mode.PORTABLE
+                    && twice != null && twice.first().containsKey(path)
+                    ? twice.first().get(path) : entry.getValue().bytes();
+            boolean same = java.util.Arrays.equals(reference, now);
             boolean rewritten = Files.exists(file)
                     && !Files.getLastModifiedTime(file)
                             .equals(entry.getValue().written());
@@ -699,7 +1272,12 @@ public final class EvidenceContractMain {
                     } else {
                         failures.add(path + ": renderer-drawn image"
                                 + " did not reproduce byte-for-byte"
-                                + " on this machine");
+                                + (mode == Mode.PORTABLE
+                                        ? " between two renderings on"
+                                                + " this machine - the"
+                                                + " generator is not"
+                                                + " deterministic"
+                                        : " on this machine"));
                     }
                 }
                 case "widget-rendered-inspection" -> {

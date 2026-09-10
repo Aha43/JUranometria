@@ -69,6 +69,43 @@ public final class BlackSkyStudyMain {
                         double field, boolean key) {
     }
 
+    /**
+     * How much of the page's classification may disagree between the
+     * two grounds before this study calls it a defect.
+     *
+     * <p>A floor rather than a figure, because the disagreement is
+     * antialiasing at edges where coverage is marginal against one
+     * ground and not the other - which is a fact about the fonts and
+     * the rasteriser in front of the renderer. The committed
+     * recording measures 99.55% here and 99.56% on a Linux runner;
+     * neither is wrong, and neither is the number the study is
+     * making a claim about (#315).
+     */
+    private static final double CLASS_AGREEMENT_FLOOR = 99.0;
+
+    /**
+     * How much of the page may be ink on one ground and not the
+     * other before this study calls it a defect.
+     *
+     * <p>Not zero, and the study's own prose said why before this
+     * was a threshold: the residue is rounding at edges where
+     * coverage is marginal against one ground and not against the
+     * other. The reference page happens to have none of it and a
+     * dense wide page has a few hundred pixels of it, which is a
+     * fact about antialiasing rather than about the palettes. What
+     * matters, and what is pinned, is that it stays a residue: a
+     * palette painting ink where the other paints ground would be
+     * whole shapes, not a thousandth of a page (#315).
+     */
+    private static final double MASK_RESIDUE_CEILING = 0.001;
+
+    /**
+     * The counts, for the record beside this one.
+     *
+     * <p>Everything a font decides goes here and nothing else does.
+     */
+    private static final StringBuilder observation = new StringBuilder();
+
     private static final List<Page> PAGES = List.of(
             new Page("m31-08", "the released reference page: the"
                     + " largest pale fill, labels, grid",
@@ -93,6 +130,11 @@ public final class BlackSkyStudyMain {
                     true));
 
     public static void main(String[] args) throws Exception {
+        // Emptied first: the contract runs a study twice in one JVM
+        // to see whether it reproduces here, and a buffer that
+        // survives the first run makes the second one disagree with
+        // it for a reason that has nothing to do with the atlas.
+        observation.setLength(0);
         File outDir = new File("docs/studies/black-sky");
         outDir.mkdirs();
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
@@ -296,10 +338,18 @@ public final class BlackSkyStudyMain {
                 + " edges where coverage is marginal against one"
                 + " ground but not the other.");
         System.out.println();
-        System.out.println("| page | why | palette px | AA px |"
-                + " AA greys | class agreement | mask agreement |"
-                + " mask differs |");
-        System.out.println("|---|---|---|---|---|---|---|---|");
+        // What this table says is what the comparison concluded, not
+        // how many pixels it counted. A count of antialiased pixels
+        // is a measurement of the fonts in front of the renderer, and
+        // holding one machine's count against another's is the
+        // question the project's own contract refuses (#315). The
+        // counts are recorded beside this, on the machine that took
+        // them; what is pinned here is the outcome, which is the same
+        // wherever the study runs.
+        System.out.println("| page | why | every inked pixel inked on"
+                + " both grounds | classification agreement |"
+                + " the galaxy's whisper |");
+        System.out.println("|---|---|---|---|---|");
 
         for (Page page : PAGES) {
             ChartViewState state = new ChartViewState(
@@ -415,28 +465,54 @@ public final class BlackSkyStudyMain {
                 }
             }
         }
-        System.out.printf(Locale.ROOT,
-                "| %s | %s | %.2f%% | %d (%.3f%%) | %d | %.3f%% |"
-                        + " %.3f%% | %d |%n",
+        // The two claims that do not move between machines. Mask
+        // agreement compares the same page drawn twice here, so a
+        // pixel inked on paper is inked on black or the palette has
+        // put ink where the other ground has none - which is the
+        // halo defect this study exists to catch, and is exact.
+        // Classification agreement counts antialiased greys into
+        // buckets, so it is held to a floor rather than a figure.
+        int fillPixels = ChartPalette.BLACK_SKY.galaxyFill() == null ? 0
+                : census.getOrDefault(
+                        ChartPalette.BLACK_SKY.galaxyFill().getRGB(), 0);
+        double classAgreement = 100.0 * classAgree / total;
+        System.out.printf(Locale.ROOT, "| %s | %s | %s | %s | %s |%n",
                 page.name(), page.why(),
-                100.0 * palettePixels / total, aaPixels,
-                100.0 * aaPixels / total, aaGreys,
-                100.0 * classAgree / total, 100.0 * maskAgree / total,
-                maskDiffer);
+                maskDiffer <= total * MASK_RESIDUE_CEILING
+                        ? "yes, within the " + MASK_RESIDUE_CEILING
+                                + " residue"
+                        : "**beyond the residue this study accepts**",
+                classAgreement >= CLASS_AGREEMENT_FLOOR
+                        ? "at or above the " + CLASS_AGREEMENT_FLOOR
+                                + "% floor"
+                        : "**below the " + CLASS_AGREEMENT_FLOOR
+                                + "% floor**",
+                page.name().equals("m31-08")
+                        ? (fillPixels > 0 ? "audible" : "**silent**")
+                        : "—");
+        observation.append(String.format(Locale.ROOT,
+                "| %s | %.2f%% | %d (%.3f%%) | %d | %.3f%% | %.3f%% |"
+                        + " %d | %d |%n",
+                page.name(), 100.0 * palettePixels / total, aaPixels,
+                100.0 * aaPixels / total, aaGreys, classAgreement,
+                100.0 * maskAgree / total, maskDiffer, fillPixels));
 
-        if (page.name().equals("m31-08")) {
-            int fill = ChartPalette.BLACK_SKY.galaxyFill().getRGB();
-            int fillPixels = census.getOrDefault(fill, 0);
-            if (fillPixels == 0) {
-                throw new IllegalStateException("the galaxy fill is"
-                        + " invisible on the black reference page -"
-                        + " the whisper has gone silent");
-            }
-            System.out.printf(Locale.ROOT,
-                    "%n`m31-08-black`: the galaxy fill is present"
-                            + " and itself - %d pixels of exact grey"
-                            + " %d inside M31's ellipse.%n%n",
-                    fillPixels, fill & 0xff);
+        if (maskDiffer > total * MASK_RESIDUE_CEILING) {
+            throw new IllegalStateException(page.name() + ": "
+                    + maskDiffer + " pixels are ink on one ground and"
+                    + " not on the other, past the edge-rounding"
+                    + " residue this study accepts - the palettes"
+                    + " disagree about where the chart is drawn");
+        }
+        if (classAgreement < CLASS_AGREEMENT_FLOOR) {
+            throw new IllegalStateException(page.name()
+                    + ": classification agreement " + classAgreement
+                    + "% is below the floor this study accepts");
+        }
+        if (page.name().equals("m31-08") && fillPixels == 0) {
+            throw new IllegalStateException("the galaxy fill is"
+                    + " invisible on the black reference page -"
+                    + " the whisper has gone silent");
         }
         if (page.key()) {
             furniture(page, black, ground);
@@ -469,7 +545,7 @@ public final class BlackSkyStudyMain {
 
     // ---- what stays constant -------------------------------------
 
-    private static void constancies() {
+    private static void constancies() throws java.io.IOException {
         System.out.println("## What stays constant, and where it is"
                 + " proven");
         System.out.println();
@@ -512,5 +588,33 @@ public final class BlackSkyStudyMain {
                 + " its data. The compatibility question is recorded"
                 + " in docs/decisions/black-sky.md, not answered"
                 + " here.");
+
+        writeObservation();
+    }
+
+    /** The counts, beside the report, with the machine that took them. */
+    private static void writeObservation() throws java.io.IOException {
+        StringBuilder out = new StringBuilder();
+        PlatformEvidence.preface(out,
+                "Black sky, counted on one machine",
+                "Sprint 26, issue #246; classified in Sprint 31,"
+                        + " issue #315.");
+        out.append("The report beside this one says what the"
+                + " comparison concluded - that every\ninked pixel is"
+                + " inked on both grounds, that classification"
+                + " agreement clears\nits floor, that the galaxy's"
+                + " whisper is audible. Those outcomes are the"
+                + " same\nwherever the study runs. The counts below"
+                + " are not: an antialiased pixel is a\npixel some"
+                + " font drew at some coverage, and a different"
+                + " rasteriser draws a\ndifferent number of"
+                + " them.\n\n");
+        out.append("| page | palette px | AA px | AA greys |"
+                + " class agreement | mask agreement | mask differs |"
+                + " galaxy-fill px |\n");
+        out.append("|---|---|---|---|---|---|---|---|\n");
+        out.append(observation);
+        PlatformEvidence.write(out,
+                "docs/studies/black-sky/platform.md");
     }
 }

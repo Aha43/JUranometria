@@ -94,35 +94,59 @@ public final class OverviewInkStudyMain {
                 + " paper, which is the ground the gate\nmeasured on."
                 + " Rasterised, so labels place themselves by font"
                 + " metrics and\nthe numbers move between machines.\n\n");
-        out.append("Recorded on: `" + WiderFieldStudyMain.platform()
-                + "`\n\n");
-        out.append("## Ink by field and magnitude\n\n");
+        StringBuilder observed = new StringBuilder();
+        PlatformEvidence.preface(observed,
+                "Overview ink, measured on one machine",
+                "Sprint 30, issue #299; classified in Sprint 31,"
+                        + " issue #315.");
+        observed.append("Every figure here is a fraction of pixels a"
+                + " renderer inked, so it is a\nmeasurement of the"
+                + " fonts and the rasteriser as much as of the"
+                + " chart. The report\nbeside this one carries what"
+                + " the study concluded from them - the rungs, the"
+                + " limit\neach arrives at, and whether that keeps"
+                + " the page at or under the density of the\npage a"
+                + " reader is leaving - which is the same wherever it"
+                + " is measured.\n\n");
+        observed.append("## Ink by field and magnitude\n\n");
 
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         for (int at = 0; at < CENTRES.length; at++) {
-            out.append("### ").append(CENTRE_NAMES[at])
+            observed.append("### ").append(CENTRE_NAMES[at])
                     .append(String.format(Locale.ROOT,
                             " (RA %.3f, dec %.3f)%n%n",
                             CENTRES[at][0], CENTRES[at][1]));
-            out.append("| field |");
+            observed.append("| field |");
             for (double magnitude : MAGNITUDES) {
-                out.append(String.format(Locale.ROOT, " V %.1f |",
+                observed.append(String.format(Locale.ROOT, " V %.1f |",
                         magnitude));
             }
-            out.append("\n|---:|");
-            out.append("---:|".repeat(MAGNITUDES.length));
-            out.append("\n");
+            observed.append("\n|---:|");
+            observed.append("---:|".repeat(MAGNITUDES.length));
+            observed.append("\n");
             for (double field : FIELDS) {
-                out.append(String.format(Locale.ROOT, "| %.0f° |", field));
+                observed.append(String.format(Locale.ROOT, "| %.0f° |",
+                        field));
                 for (double magnitude : MAGNITUDES) {
-                    out.append(String.format(Locale.ROOT, " %.1f%% |",
+                    observed.append(String.format(Locale.ROOT, " %.1f%% |",
                             100.0 * inkAt(renderer, CENTRES[at], field,
                                     magnitude)));
                 }
-                out.append("\n");
+                observed.append("\n");
             }
-            out.append("\n");
+            observed.append("\n");
         }
+
+        out.append("## The rungs, and what each arrives at\n\n");
+        out.append("The ladder in order, with the limit the atlas"
+                + " gives a page of that width.\nThese are the"
+                + " decision, and they do not depend on a font.\n\n");
+        out.append("| field | default limit |\n|---:|---:|\n");
+        for (double field : FIELDS) {
+            out.append(String.format(Locale.ROOT, "| %.0f° | V %.1f |%n",
+                    field, ChartViewState.defaultMagnitudeFor(field)));
+        }
+        out.append("\n");
 
         out.append("## What a reader is given\n\n");
         out.append("The default limiting magnitude follows the field,"
@@ -131,25 +155,82 @@ public final class OverviewInkStudyMain {
                 + " rescue. The reader's magnitude control is"
                 + " unchanged and still\nwins: this decides where a"
                 + " page starts, not where it stays.\n\n");
-        out.append("| field | default limit | ink at Orion |"
-                + " against the control |\n");
-        out.append("|---:|---:|---:|---:|\n");
+        // The relationship the decision rests on, said as an
+        // outcome. Whether a 120-degree page is 11.3% ink or 9.8% ink
+        // is the rasteriser's answer; whether it is *no denser than
+        // the page the reader is leaving* is the atlas's, and it is
+        // the same answer anywhere (#315).
+        out.append("| field | default limit | quieter than the"
+                + " atlas's own V 8.0 here | within " + DENSITY_BAND
+                + " points of the sheet page |\n");
+        out.append("|---:|---:|---|---|\n");
         double control = inkAt(renderer, CENTRES[0], 42.0,
                 juranometria.chart.ChartViewState.DEFAULT
                         .limitingMagnitude());
+        observed.append("## What a reader is given\n\n");
+        observed.append("| field | default limit | ink at Orion |"
+                + " against the control | ink if V 8.0 were left in"
+                + " place |\n");
+        observed.append("|---:|---:|---:|---:|---:|\n");
+        double atlasDefault = juranometria.chart.ChartViewState.DEFAULT
+                .limitingMagnitude();
         for (double field : FIELDS) {
             double limit = ChartViewState.defaultMagnitudeFor(field);
             double ink = inkAt(renderer, CENTRES[0], field, limit);
+            double unrescued = limit == atlasDefault ? ink
+                    : inkAt(renderer, CENTRES[0], field, atlasDefault);
+            boolean quieter = limit == atlasDefault || ink < unrescued;
+            boolean nearControl =
+                    Math.abs(ink - control) <= DENSITY_BAND / 100.0;
             out.append(String.format(Locale.ROOT,
-                    "| %.0f° | V %.1f | %.1f%% | %+.1f points |%n",
+                    "| %.0f° | V %.1f | %s | %s |%n", field, limit,
+                    limit == atlasDefault ? "— (it is V 8.0)"
+                            : quieter ? "yes" : "**no**",
+                    nearControl ? "yes" : "**no**"));
+            observed.append(String.format(Locale.ROOT,
+                    "| %.0f° | V %.1f | %.1f%% | %+.1f points | %.1f%% |%n",
                     field, limit, 100.0 * ink,
-                    100.0 * (ink - control)));
+                    100.0 * (ink - control), 100.0 * unrescued));
+            if (!quieter) {
+                throw new IllegalStateException(String.format(
+                        Locale.ROOT, "a %.0f-degree page at V %.1f"
+                                + " draws no less ink than leaving the"
+                                + " atlas's own V %.1f would, so the"
+                                + " default limit is buying the reader"
+                                + " nothing", field, limit,
+                        atlasDefault));
+            }
+            if (!nearControl) {
+                throw new IllegalStateException(String.format(
+                        Locale.ROOT, "a %.0f-degree page at V %.1f is"
+                                + " more than %s points from the sheet"
+                                + " page a reader leaves, which is the"
+                                + " band this study accepted", field,
+                        limit, DENSITY_BAND));
+            }
         }
-        out.append("\nThe control row is the released sheet page at"
-                + " the atlas's own default\nof V 8.0, which is what a"
-                + " reader zooming out actually leaves.\n");
+        out.append("\nThe page a reader leaves is the released 42°"
+                + " sheet at the atlas's own\ndefault of V 8.0. How"
+                + " much ink each of these actually laid down, on the"
+                + " machine\nthat measured it, is in `platform.md`"
+                + " beside this.\n");
         System.out.print(out);
+        PlatformEvidence.write(observed,
+                "docs/studies/overview-ink/platform.md");
     }
+
+    /**
+     * How far from the sheet page's density an overview rung may
+     * arrive, in points of ink.
+     *
+     * <p>The measured spread on the recording machine runs from
+     * -3.2 to +2.1 points, so this is not a tight fit chosen to make
+     * the numbers pass: it is the width of "about as busy as the page
+     * you were reading", which is what the default limit is for. The
+     * exact points belong to whichever rasteriser measured them
+     * (#315).
+     */
+    private static final double DENSITY_BAND = 5.0;
 
     /** One page, drawn and measured. */
     private static double inkAt(ChartRenderer renderer, double[] centre,

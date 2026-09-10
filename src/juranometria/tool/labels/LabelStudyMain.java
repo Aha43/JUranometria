@@ -93,7 +93,71 @@ public final class LabelStudyMain {
                         + " `docs/decisions/label-placement.md`, which"
                         + " says which machine\nit was taken on.\n",
                 corpus.size(), renders));
-        System.out.print(out);
+        // Two documents. The census is a count of pixels on a page
+        // some font drew, and it says so in its own preface; what the
+        // study concluded from it - which pages, whether the atlas
+        // clips a word, whether a nudge moves labels within the
+        // amended budget - is the same wherever it is measured, and
+        // is what the contract pins (#315).
+        juranometria.tool.PlatformEvidence.write(out,
+                "docs/studies/label-placement/platform.md");
+        StringBuilder portable = new StringBuilder();
+        conclusions(portable, corpus);
+        System.out.print(portable);
+    }
+
+    /** What the census concluded, in terms no font decides. */
+    private static void conclusions(StringBuilder out,
+                                    List<StudyPages.Look> corpus) {
+        out.append("# What the label census concluded\n\n");
+        out.append("Sprint 31, issues #310, #313 and #314; classified"
+                + " in Sprint 31, issue #315.\n\n");
+        out.append("The census itself is in `platform.md` beside this."
+                + " Every number in it is a\ncount of pixels on a page"
+                + " a font drew, so it reproduces on a machine rather"
+                + " than\nacross machines. What survives the journey"
+                + " between machines is what the study\nwas for: which"
+                + " pages it looked at, and what it decided.\n\n");
+        out.append("## The corpus\n\n");
+        out.append("| page | field | extent | why it is here |\n"
+                + "|---|---:|---|---|\n");
+        for (StudyPages.Look page : corpus) {
+            out.append(String.format(Locale.ROOT,
+                    "| `%s` | %.0f° | %s | %s |%n",
+                    page.page().slug(),
+                    page.page().scene().viewport()
+                            .fieldWidthDegrees(),
+                    page.extent(), page.why()));
+        }
+        out.append(String.format(Locale.ROOT,
+                "%n**%d pages.**%n%n", corpus.size()));
+        out.append("## Stability under a one-step pan\n\n");
+        out.append("The gate's amended budget: no more than 15% of the"
+                + " corpus's labels displaced by\na one-step pan, and"
+                + " no single page above 30%"
+                + " (`docs/decisions/label-placement.md`).\n\n");
+        out.append(String.format(Locale.ROOT,
+                "| the corpus | within 15%% | %s |%n"
+                        + "| the worst page | within 30%% | %s |%n%n",
+                stabilityVerdict[0] <= 0.15 ? "yes" : "**no**",
+                stabilityVerdict[1] <= 0.30 ? "yes" : "**no**"));
+        if (stabilityVerdict[0] > 0.15 || stabilityVerdict[1] > 0.30) {
+            throw new IllegalStateException("the corpus is outside the"
+                    + " stability budget the gate was amended to: "
+                    + stabilityVerdict[0] + " over the corpus, "
+                    + stabilityVerdict[1] + " on the worst page");
+        }
+        out.append("## What has no portable form\n\n");
+        out.append("The collision census, the migration's before and"
+                + " after, the clipping counts and\nthe cost of"
+                + " placing a page are measurements of ink, and there"
+                + " is no inequality\nunderneath them that would"
+                + " survive a change of font: the numbers *are* the"
+                + " evidence.\nThey are in `platform.md`, with the"
+                + " machine that took them. What is not a"
+                + " measurement -\nthat a cut word reads as another"
+                + " word, and which words - is in"
+                + " `docs/decisions/label-placement.md`.\n");
     }
 
     private static void preface(StringBuilder out) {
@@ -115,15 +179,11 @@ public final class LabelStudyMain {
                 + " `text-before.tsv`.\nWhat the migration did to the"
                 + " atlas, page by page and label by label, is its"
                 + " own\nsection below.\n\n");
-        out.append("Recorded on: `" + WiderFieldStudyMain.platform()
-                + "`, and that matters here. Every\nnumber below is a"
-                + " count of pixels, so it is reproducible on a machine"
-                + " rather than\nacross machines, exactly like the"
-                + " atlas's other renderer-drawn evidence: font\nrasterisation"
-                + " differs, and the same collision that shares 68"
-                + " pixels here shares\n27 on a Linux runner. What does"
-                + " not differ is which pairs collide and which do"
-                + "\nnot, which is what this document is for.\n\n");
+        out.append(juranometria.tool.PlatformEvidence.observed(
+                "What each label is, where the policy allows it to go,"
+                + " which candidate it took and why a refusal was"
+                + " refused does not depend on a font, and is"
+                + " asserted by this study's gate."));
         out.append("## What counts as a collision here\n\n");
         out.append("Two rules, and both of them cost this study a"
                 + " rewrite.\n\n");
@@ -1448,6 +1508,9 @@ public final class LabelStudyMain {
                 || box.getMaxY() > page.high();
     }
 
+    /** The corpus share and the worst page's share, for the report. */
+    private static double[] stabilityVerdict = {0.0, 0.0};
+
     private static void stability(StringBuilder out) {
         out.append("## Stability under a small navigation change\n\n");
         out.append("A label that jumps to the other side of its star"
@@ -1469,6 +1532,7 @@ public final class LabelStudyMain {
                 + " budget | after a zoom |\n");
         out.append("|---|---:|---:|---:|---|---:|\n");
         int displacedAll = 0;
+        double[] worstShare = {0.0};
         int labelsAll = 0;
         Map<String, Integer> causes = new TreeMap<>();
         for (StudyPages.Look look : StudyPages.corpus()) {
@@ -1489,6 +1553,7 @@ public final class LabelStudyMain {
             displacedAll += pan;
             labelsAll += both;
             double share = both == 0 ? 0.0 : (double) pan / both;
+            worstShare[0] = Math.max(worstShare[0], share);
             out.append(String.format(Locale.ROOT,
                     "| `%s` | %d | %d | %.0f%% | %s | %d |%n",
                     page.slug(), both, pan, share * 100.0,
@@ -1496,6 +1561,7 @@ public final class LabelStudyMain {
         }
         double all = labelsAll == 0 ? 0.0
                 : (double) displacedAll / labelsAll;
+        stabilityVerdict = new double[] {all, worstShare[0]};
         out.append(String.format(Locale.ROOT,
                 "| **all pages** | **%d** | **%d** | **%.0f%%** | %s |"
                 + " |%n", labelsAll, displacedAll, all * 100.0,

@@ -14,19 +14,19 @@ in their head.
 
 | control | its own key in the dialog | depends on | what it says |
 |---|---|---|---|
-| Deep-sky objects | `D` | — | Draw deep-sky objects on the chart at all |
+| Deep-sky objects | `D` | — | Draw deep-sky objects on the chart at all (<prefix> then D) |
 | Galaxies | `G` | Deep-sky objects | Galaxies, drawn at their catalogued size and orientation,... |
 | Open clusters | `O` | Deep-sky objects | Loose clusters of young stars in the plane of the Milky W... |
 | Globular clusters | `C` | Deep-sky objects | Dense, ancient balls of stars in the galactic halo. For e... |
 | Nebulae | `U` | Deep-sky objects | Clouds of gas and dust: emission, reflection and dark neb... |
 | Planetary nebulae | `P` | Deep-sky objects | Shells thrown off by dying stars, drawn small and crossed... |
-| Deep-sky labels | `L` | Deep-sky objects | Name the deep-sky objects the chart draws |
-| Star names | `S` | — | Traditional proper names such as Betelgeuse |
-| Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis |
-| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts |
-| Constellation figures | `F` | — | The joined stick figures of the constellations |
-| Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875 |
-| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is |
+| Deep-sky labels | `L` | Deep-sky objects | Name the deep-sky objects the chart draws (<prefix> then L) |
+| Star names | `S` | — | Traditional proper names such as Betelgeuse (<prefix> the... |
+| Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis ... |
+| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts (<pref... |
+| Constellation figures | `F` | — | The joined stick figures of the constellations (<prefix> ... |
+| Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875 (<prefix> then B) |
+| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is (<prefix> th... |
 | Equatorial coordinate grid | `E` | — | ICRS/J2000 right-ascension and declination grid lines wit... |
 | Title block | `T` | — | The panel in the lower left stating the target, centre, f... |
 | Stellar-magnitude key | `K` | — | A key in the upper right showing the circle size the char... |
@@ -40,24 +40,26 @@ View menu, the observer's lines in Place and Time.
 
 ## What the keyboard already means
 
-| keystroke | what it does | where it is bound |
-|---|---|---|
-| `⌃++` | chart.zoomIn | the window's own keys |
-| `⌃+-` | Zoom Out | the View menu |
-| `⌃+-` | chart.zoomOut | the window's own keys |
-| `⌃+=` | Zoom In | the View menu |
-| `⌃+=` | chart.zoomIn | the window's own keys |
-| `⌃+E` | Export Chart Sheet... | the File menu |
-| `⌃+I` | Inspector | the View menu |
-| `⌃+⇧+=` | chart.zoomIn | the window's own keys |
-| `⌃+⌨ +` | chart.zoomIn | the window's own keys |
-| `⌃+⌨ -` | chart.zoomOut | the window's own keys |
-| **10 strokes** | | |
+| what it does | where it is bound |
+|---|---|
+| Export Chart Sheet... | the File menu |
+| Inspector | the View menu |
+| Zoom In | the View menu |
+| Zoom Out | the View menu |
+| chart.zoomIn | the window's own keys |
+| chart.zoomIn | the window's own keys |
+| chart.zoomIn | the window's own keys |
+| chart.zoomIn | the window's own keys |
+| chart.zoomOut | the window's own keys |
+| chart.zoomOut | the window's own keys |
+| **10 strokes** | |
 
-And a text field, under this look and feel, answers **49 keystrokes** of
-its own - every one of them a thing a reader typing a star's name expects to keep.
-A scheme that binds bare letters takes them away, which is why none of the
-candidates below does.
+Every one of them carries the platform's own menu modifier, and a text field
+under this look and feel answers dozens of editing strokes of its own - every
+one of them a thing a reader typing a star's name expects to keep. A scheme
+that binds bare letters takes them away, which is why none of the candidates
+below does. The spellings and the count are one machine's answer, recorded in
+`platform.md`.
 
 ## The letters are not a map
 
@@ -95,7 +97,7 @@ and what follows is what such a scheme has to settle before a key is wired.
 |---|---|
 | cancelling | a reader who opens the prefix and changes their mind must be able to leave without switching anything |
 | waiting | a prefix that waits for ever is a keyboard that has stopped answering; one that times out surprises a slow reader |
-| a field with the caret in it | the prefix may not fire while a reader is typing a star's name, and the 49 editing strokes above say what else it may not take |
+| a field with the caret in it | the prefix may not fire while a reader is typing a star's name, and the editing strokes a text field answers say what else it may not take |
 | the platform's own modifier | the same scheme has to read as Command here and Ctrl elsewhere, spelled from one place |
 | what is remembered | the GUI control persists the reader's choice, so the keyboard has to persist exactly the same thing |
 | a master and its dependants | switching deep-sky objects off hides the labels; the keyboard must mean what the checkbox means, including what it stores |
@@ -113,7 +115,7 @@ application without the study changing with it.
 The chart's keyboard opens with the platform's own menu key and `K`: **⌘K** on
 macOS and **Ctrl+K** elsewhere, spelled by the registry rather than typed anywhere.
 This document is generated headlessly, where the toolkit reports no menu mask at
-all, so what it prints for itself is the fallback: **⌃K**.
+all, so what it prints for itself is the fallback: **<prefix>**.
 
 | switch | key | remembered | needs | why this letter |
 |---|---|---|---|---|

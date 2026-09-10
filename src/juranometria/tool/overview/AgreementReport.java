@@ -122,29 +122,74 @@ final class AgreementReport {
         return reached;
     }
 
+    /**
+     * How far from exact agreement still counts as agreement.
+     *
+     * <p>The residues are rounding in double arithmetic - 7.8e-14
+     * degrees on one machine and 7.7e-14 on another, because a JDK
+     * and a chip are free to associate a sum differently. The claim
+     * the study makes is that the candidate agrees with production
+     * and that a round trip returns where it started; a tolerance
+     * nine orders of magnitude above the residue says exactly that
+     * and nothing about a machine's last decimal (#315).
+     */
+    static final double AGREES_WITHIN = 1e-9;
+
     static String of(SkyPosition centre) {
         StringBuilder out = new StringBuilder();
-        out.append("| candidate | checked against | worst difference |"
-                + " round trip | reaches |\n|---|---|---:|---:|---:|\n");
+        out.append("| candidate | checked against | agrees within "
+                + AGREES_WITHIN + " | round trip returns within "
+                + AGREES_WITHIN + "° | reaches |\n"
+                + "|---|---|---|---|---:|\n");
         int all = sample().size();
-        out.append(String.format(Locale.ROOT,
-                "| gnomonic | production's `GnomonicProjection` | %.3e |"
-                        + " %.1e° | %d of %d |%n",
+        out.append(row("gnomonic", "production's `GnomonicProjection`",
                 gnomonicAgreement(centre),
                 roundTrip(Candidates.gnomonic(centre)),
                 reaches(Candidates.gnomonic(centre)), all));
-        out.append(String.format(Locale.ROOT,
-                "| stereographic | Sprint 29's `StereographicCandidate`"
-                        + " | %.3e | %.1e° | %d of %d |%n",
+        out.append(row("stereographic",
+                "Sprint 29's `StereographicCandidate`",
                 stereographicAgreement(centre),
                 roundTrip(Candidates.stereographic(centre)),
                 reaches(Candidates.stereographic(centre)), all));
-        out.append(String.format(Locale.ROOT,
-                "| orthographic | its own definition, `sin(theta)` | %.3e |"
-                        + " %.1e° | %d of %d |%n",
+        out.append(row("orthographic",
+                "its own definition, `sin(theta)`",
                 orthographicAgreement(centre),
                 roundTrip(Candidates.orthographic(centre)),
                 reaches(Candidates.orthographic(centre)), all));
+        return out.toString();
+    }
+
+    private static String row(String candidate, String against,
+                              double difference, double trip,
+                              int reaches, int all) {
+        if (difference > AGREES_WITHIN || trip > AGREES_WITHIN) {
+            throw new IllegalStateException(candidate + " no longer"
+                    + " agrees with " + against + " to within "
+                    + AGREES_WITHIN + ": " + difference + ", round"
+                    + " trip " + trip);
+        }
+        return String.format(Locale.ROOT,
+                "| %s | %s | yes | yes | %d of %d |%n",
+                candidate, against, reaches, all);
+    }
+
+    /** The residues themselves, for the record beside the report. */
+    static String observed(SkyPosition centre) {
+        StringBuilder out = new StringBuilder();
+        out.append("| candidate | worst difference | round trip |\n"
+                + "|---|---:|---:|\n");
+        out.append(String.format(Locale.ROOT,
+                "| gnomonic | %.3e | %.1e° |%n",
+                gnomonicAgreement(centre),
+                roundTrip(Candidates.gnomonic(centre))));
+        out.append(String.format(Locale.ROOT,
+                "| stereographic | %.3e | %.1e° |%n",
+                stereographicAgreement(centre),
+                roundTrip(Candidates.stereographic(centre))));
+        out.append(String.format(Locale.ROOT,
+                "| orthographic | %.3e | %.1e° |%n",
+                orthographicAgreement(centre),
+                roundTrip(Candidates.orthographic(centre))));
         return out.toString();
     }
 

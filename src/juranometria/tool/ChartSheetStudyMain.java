@@ -51,6 +51,9 @@ public final class ChartSheetStudyMain {
             new SkyPosition(0.0, 0.0), 42.0, 6.0);
 
     public static void main(String[] args) throws Exception {
+        // Emptied first: the contract runs a study twice in one
+        // JVM to see whether it reproduces here.
+        sizes.setLength(0);
         DIR.mkdirs();
         StringBuilder report = new StringBuilder();
 
@@ -79,8 +82,14 @@ public final class ChartSheetStudyMain {
                 PaperSize.A4.marginMm(), PaperSize.LETTER.marginMm()));
 
         report.append("\n## The sheets\n\n");
-        report.append("| file | paper | shapes | labels | bytes |\n");
-        report.append("|---|---|---:|---:|---:|\n");
+        // No byte column. A file's size is what a font's outlines
+        // encode to, and holding one machine's number against
+        // another's says nothing about the sheet: what a reader needs
+        // to know is that the file is a valid one, that the vector
+        // structure is there, and how many shapes and labels it
+        // carries (#315). The sizes are recorded beside this.
+        report.append("| file | paper | shapes | labels |\n");
+        report.append("|---|---|---:|---:|\n");
 
         svg(report, "sheet-a4.svg", ORION, PaperSize.A4, false,
                 SvgSheetWriter.Text.EDITABLE);
@@ -153,6 +162,24 @@ public final class ChartSheetStudyMain {
         Files.writeString(new File(DIR, "measurements.md").toPath(),
                 report.toString(), StandardCharsets.UTF_8);
         System.out.print(report);
+
+        StringBuilder observed = new StringBuilder();
+        PlatformEvidence.preface(observed,
+                "Chart sheets, weighed on one machine",
+                "Sprint 18, issue #141; classified in Sprint 31,"
+                        + " issue #315.");
+        observed.append("What a sheet weighs is what its fonts encode"
+                + " to: an SVG with its text as\noutlines carries the"
+                + " glyph paths of whatever font drew it, and a PNG"
+                + " carries\nwhatever those glyphs rasterised to. The"
+                + " report beside this one carries the\nfile's"
+                + " structure - how many shapes, how many labels,"
+                + " which paper - which is\nthe sheet's own answer"
+                + " and the same everywhere.\n\n");
+        observed.append("| file | bytes |\n|---|---:|\n");
+        observed.append(sizes);
+        PlatformEvidence.write(observed,
+                "docs/studies/chart-sheet/platform.md");
     }
 
     /** The ruler check, in millimetres, from the sheet's own ink. */
@@ -209,9 +236,10 @@ public final class ChartSheetStudyMain {
         byte[] pdf = PdfSheetWriter.write(sheet);
         Files.write(new File(DIR, name).toPath(), pdf);
         report.append(String.format(Locale.ROOT,
-                "| `%s` | %s | %d | %d as outlines | %d |%n", name,
+                "| `%s` | %s | %d | %d as outlines |%n", name,
                 paper.readableName(), sheet.shapeCount(),
-                sheet.textCount(), pdf.length));
+                sheet.textCount()));
+        sized(name, pdf.length);
     }
 
     private static void png(StringBuilder report, String name,
@@ -221,11 +249,12 @@ public final class ChartSheetStudyMain {
         byte[] png = PngSheetWriter.write(sheet, dpi);
         Files.write(new File(DIR, name).toPath(), png);
         report.append(String.format(Locale.ROOT,
-                "| `%s` | %s at %d dpi, %d x %d px | %d | %d | %d |%n",
+                "| `%s` | %s at %d dpi, %d x %d px | %d | %d |%n",
                 name, paper.readableName(), dpi,
                 PngSheetWriter.widePixels(paper, dpi),
                 PngSheetWriter.highPixels(paper, dpi),
-                sheet.shapeCount(), sheet.textCount(), png.length));
+                sheet.shapeCount(), sheet.textCount()));
+        sized(name, png.length);
     }
 
     private static SheetRecording record(ChartViewState state,
@@ -245,12 +274,21 @@ public final class ChartSheetStudyMain {
         File file = new File(DIR, name);
         Files.writeString(file.toPath(), svg, StandardCharsets.UTF_8);
         report.append(String.format(Locale.ROOT,
-                "| `%s` | %s | %d | %d | %d |%n", name,
+                "| `%s` | %s | %d | %d |%n", name,
                 paper.readableName(), sheet.shapeCount(),
                 text == SvgSheetWriter.Text.OUTLINES ? 0
-                        : sheet.textCount(),
-                file.length()));
+                        : sheet.textCount()));
+        sized(name, file.length());
     }
+
+    /** One file's encoded size, for the record beside the report. */
+    private static void sized(String name, long bytes) {
+        sizes.append(String.format(Locale.ROOT, "| `%s` | %d |%n",
+                name, bytes));
+    }
+
+    /** The sizes, which are the fonts' answer and not the sheet's. */
+    private static final StringBuilder sizes = new StringBuilder();
 
     /** The observer's lines and the ecliptic, as the screen has them. */
     private static ChartRenderer.ReferenceLayer modules() {

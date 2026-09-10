@@ -12,26 +12,24 @@ the second.
 Every page below is drawn by the production renderer through the production
 assembler, at the field's own default limit, 900 x 700 on white paper.
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
-
 ## The defect, and the repair
 
 Figure endpoints that land on the paper, and how many of them had no star.
 
-| centre | field | limit | endpoints on page | without a node | under the title block |
-|---|---:|---:|---:|---:|---:|
-| Orion | 42° | V 8.0 | 41 | 0 | 2 |
-| Orion | 60° | V 5.0 | 72 | 0 | 0 |
-| Orion | 90° | V 4.0 | 120 | 0 | 6 |
-| Orion | 120° | V 4.0 | 189 | 0 | 4 |
-| Sagittarius | 42° | V 8.0 | 45 | 0 | 4 |
-| Sagittarius | 60° | V 5.0 | 81 | 0 | 1 |
-| Sagittarius | 90° | V 4.0 | 133 | 0 | 2 |
-| Sagittarius | 120° | V 4.0 | 206 | 0 | 6 |
-| M31 | 42° | V 8.0 | 27 | 0 | 1 |
-| M31 | 60° | V 5.0 | 64 | 0 | 3 |
-| M31 | 90° | V 4.0 | 118 | 0 | 4 |
-| M31 | 120° | V 4.0 | 179 | 0 | 3 |
+| centre | field | limit | endpoints on page | every one has a node |
+|---|---:|---:|---:|---|
+| Orion | 42° | V 8.0 | 41 | yes |
+| Orion | 60° | V 5.0 | 72 | yes |
+| Orion | 90° | V 4.0 | 120 | yes |
+| Orion | 120° | V 4.0 | 189 | yes |
+| Sagittarius | 42° | V 8.0 | 45 | yes |
+| Sagittarius | 60° | V 5.0 | 81 | yes |
+| Sagittarius | 90° | V 4.0 | 133 | yes |
+| Sagittarius | 120° | V 4.0 | 206 | yes |
+| M31 | 42° | V 8.0 | 27 | yes |
+| M31 | 60° | V 5.0 | 64 | yes |
+| M31 | 90° | V 4.0 | 118 | yes |
+| M31 | 120° | V 4.0 | 179 | yes |
 
 With the exception removed and the page otherwise unchanged, the same column
 reads:

@@ -66,7 +66,8 @@ public final class FigureAnchorStudyMain {
 
     private static final String[] NAMES = {"Orion", "Sagittarius", "M31"};
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+            throws java.io.IOException {
         StringBuilder out = new StringBuilder();
         out.append("# Constellation figures and the overview's"
                 + " magnitude limit\n\n");
@@ -85,15 +86,32 @@ public final class FigureAnchorStudyMain {
                 + " renderer through the production\nassembler, at the"
                 + " field's own default limit, " + WIDE + " x " + HIGH
                 + " on white paper.\n\n");
-        out.append("Recorded on: `" + WiderFieldStudyMain.platform()
-                + "`\n\n");
+
 
         out.append("## The defect, and the repair\n\n");
         out.append("Figure endpoints that land on the paper, and how"
                 + " many of them had no star.\n\n");
+        // The defect is an endpoint the reader can see nothing at,
+        // and that is a count of zero or a failure. An endpoint the
+        // title block happens to cover is a different thing: the
+        // block is laid out from font metrics, so how many endpoints
+        // fall under it is this machine's answer and is recorded
+        // beside the report (#315).
         out.append("| centre | field | limit | endpoints on page |"
-                + " without a node | under the title block |\n");
-        out.append("|---|---:|---:|---:|---:|---:|\n");
+                + " every one has a node |\n");
+        out.append("|---|---:|---:|---:|---|\n");
+        StringBuilder observed = new StringBuilder();
+        PlatformEvidence.preface(observed,
+                "Figure anchors, counted on one machine",
+                "Sprint 30, issue #307; classified in Sprint 31,"
+                        + " issue #315.");
+        observed.append("How many figure endpoints the title block"
+                + " covers depends on how wide a font\ndraws the"
+                + " block. The report beside this one carries what the"
+                + " study concluded:\nthat no endpoint is left"
+                + " without a node for a reader to see.\n\n");
+        observed.append("| centre | field | endpoints on page |"
+                + " under the title block |\n|---|---:|---:|---:|\n");
         for (int at = 0; at < CENTRES.length; at++) {
             for (double field : FIELDS) {
                 ChartScene scene = pageOf(CENTRES[at], field);
@@ -120,10 +138,23 @@ public final class FigureAnchorStudyMain {
                     }
                 }
                 out.append(String.format(Locale.ROOT,
-                        "| %s | %.0f° | V %.1f | %d | %d | %d |%n",
+                        "| %s | %.0f° | V %.1f | %d | %s |%n",
                         NAMES[at], field,
                         ChartViewState.defaultMagnitudeFor(field),
-                        endpoints.size(), missing, covered));
+                        endpoints.size(),
+                        missing == 0 ? "yes"
+                                : "**no, " + missing + " without**"));
+                observed.append(String.format(Locale.ROOT,
+                        "| %s | %.0f° | %d | %d |%n", NAMES[at], field,
+                        endpoints.size(), covered));
+                if (missing != 0) {
+                    throw new IllegalStateException(NAMES[at] + " at "
+                            + field + "°: " + missing + " figure"
+                            + " endpoints have no node - the lines"
+                            + " reach stars the chart is not drawing,"
+                            + " which is the defect this study"
+                            + " measured and #307 repaired");
+                }
             }
         }
         out.append("\nWith the exception removed and the page otherwise"
@@ -283,6 +314,8 @@ public final class FigureAnchorStudyMain {
                 + " endpoints\nwhose star is outside the queried sky;"
                 + " they match nothing, and are meant to.\n");
         System.out.print(out);
+        PlatformEvidence.write(observed,
+                "docs/studies/figure-anchors/platform.md");
     }
 
     private static ChartScene pageOf(double[] centre, double field) {

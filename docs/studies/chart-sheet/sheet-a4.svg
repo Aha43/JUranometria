@@ -2035,11 +2035,11 @@
       <path d="M378.83 272.00 L384.97 266.74" clip-path="url(#clip0)" stroke="#787878" stroke-width="1.00" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10.00"/>
     </g>
     <g class="labels">
-      <text x="-32.35" y="504.72" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">CANIS MAJOR</text>
+      <text x="7.65" y="504.72" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">CANIS MAJOR</text>
       <text x="612.49" y="351.82" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">ERIDANUS</text>
-      <text x="39.17" y="7.31" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">GEMINI</text>
+      <text x="19.17" y="27.31" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">GEMINI</text>
       <text x="358.60" y="515.81" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">LEPUS</text>
-      <text x="56.93" y="253.12" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">MONOCEROS</text>
+      <text x="76.93" y="233.12" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">MONOCEROS</text>
       <text x="376.09" y="181.22" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">ORION</text>
     </g>
     <g class="ink" fill="none">
@@ -2294,18 +2294,18 @@
       <path d="M162.47 32.29 C162.47 33.73 161.30 34.90 159.86 34.90 C158.42 34.90 157.26 33.73 157.26 32.29 C157.26 30.86 158.42 29.69 159.86 29.69 C161.30 29.69 162.47 30.86 162.47 32.29 Z" clip-path="url(#clip0)" fill="#000000"/>
     </g>
     <g class="labels">
-      <text x="469.57" y="410.98" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Rigel β</text>
-      <text x="291.21" y="134.94" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Betelgeuse α</text>
+      <text x="417.57" y="425.98" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Rigel β</text>
+      <text x="207.29" y="134.94" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Betelgeuse α</text>
       <text x="422.62" y="154.34" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Bellatrix γ</text>
-      <text x="374.08" y="287.05" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Alnilam ε</text>
+      <text x="311.03" y="272.52" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Alnilam ε</text>
+      <text x="292.20" y="314.49" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Alnitak ζ</text>
       <text x="323.32" y="437.30" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Saiph κ</text>
-      <text x="392.21" y="271.24" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Mintaka δ</text>
-      <text x="377.08" y="369.83" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">ι</text>
-      <text x="498.17" y="355.77" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">β</text>
+      <text x="392.21" y="256.99" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Mintaka δ</text>
+      <text x="377.08" y="383.94" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">ι</text>
+      <text x="476.98" y="355.77" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">β</text>
       <text x="578.53" y="141.44" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">π³</text>
-      <text x="59.73" y="24.11" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">ξ</text>
+      <text x="40.01" y="24.11" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">ξ</text>
       <text x="384.42" y="360.63" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">M 42</text>
-      <text x="229.78" y="-193.67" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">M 35</text>
     </g>
     <g class="ink" fill="none">
       <path d="M12.00 453.00 L333.00 453.00 L333.00 511.00 L12.00 511.00 L12.00 453.00 Z" clip-path="url(#clip0)" fill="#ffffff"/>

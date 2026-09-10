@@ -126,6 +126,108 @@ could reach.)
 - **0 test files** open the application's real `juranometria`
   node. That is the standing state and the gate pins it (guard G2).
 
+## Three kinds of evidence, and what each may be held to
+
+Sprint 31, issue #315, from the first run of the evidence gate on a
+machine that was not the one that wrote it. It reported **189
+breaches** where the same command reports none locally, and they were
+not one problem:
+
+| count | what it said |
+|---|---|
+| 125 | renderer-drawn image did not reproduce byte-for-byte |
+| 52 | promoted study page has fallen behind the atlas |
+| 10 | deterministic report did not reproduce byte-for-byte |
+| 2 | family not verified — raw sources are gitignored downloads |
+
+Classified by taking one small report and reading every differing
+line: they were `⌃K` here against `CtrlK` there — the same modifier
+mask, spelled by the toolkit in the desktop's own words — and **49
+keystrokes** against **31**, which is what a text field's look and
+feel binds on each platform. Font rasterisation accounts for the
+images the same way.
+
+**None of that is stale evidence, and the project had already said
+so.** The 1.0 contract records pixel equality *per environment* and
+does not require it across environments; `ReleasedPage` compares a
+journey's page with what *this machine* draws for exactly that
+reason. A gate that compares Linux pixels with macOS pixels asserts
+across machines the one thing the contract refuses to assert, and
+turns "a different machine" into "the study has fallen behind the
+atlas".
+
+So evidence is classified rather than normalised:
+
+- **Deterministic reports** — the atlas's own answers, in words no
+  desktop chooses. Held to their committed bytes everywhere.
+- **Platform records** — what this desktop calls a modifier, what its
+  look and feel binds into a text field, what a font measures. Held
+  to existing, to naming the machine they came from, and to
+  reproducing *within* that machine. Never to another's copy.
+- **Renderer-drawn images** — held to reproducing within one
+  environment: the same runner draws the page twice and the bytes
+  must match, which catches a generator that has stopped being
+  deterministic and claims nothing about a font it has never seen.
+- **Promoted inspection images** — held to the account they carry of
+  themselves: when, on what machine, from which generator, and the
+  hash of the bytes somebody agreed to
+  (`docs/studies/PROVENANCE.md`). **That proves identity and recorded
+  origin, and not that the picture is still visually current**; the
+  contract reads the record and never writes it, because a timestamp
+  refreshed by a passing check would date the check rather than the
+  decision. Whether the atlas has moved under
+  them is a cartographic question, carried by the ink and semantic
+  evidence and by reviewed regeneration, not inferred from
+  cross-platform pixels.
+- **Raw sources nobody downloaded** — reported as unavailable here.
+  A gitignored download that a machine does not have is a fact about
+  the machine.
+
+A study that measured both kinds at once was **split**, not
+normalised. Ten studies now print the portable half where the
+contract pins its bytes and write the platform half beside it, with
+the machine named in it. Only one substitution is made in the
+portable half - this desktop's word for a keystroke, reduced to the
+action it reaches - because normalising everything would hide the
+difference rather than classify it.
+
+What survived the split, study by study, is the decision each was
+taken for:
+
+| study | portable | recorded on one machine |
+|---|---|---|
+| toggle shortcuts | the switches, letters, masters, collisions | the modifier's spelling, the strokes a text field answers |
+| control explanations | which control is decided about, and how | the keystroke each explanation shows |
+| black sky | every inked pixel inked on both grounds within the residue; agreement clears its floor; the galaxy's whisper audible | the pixel and antialiasing counts |
+| overview ink | the rungs, the limit each arrives at, quieter than V 8.0, within five points of the sheet page | the ink percentages |
+| chart furniture | the key is drawn, one box for every page, under a twentieth of the paper | the box's size and the ink it covers |
+| chart sheets | the paper, the shape and label counts | the encoded file sizes |
+| overview projections | each candidate agrees, and a round trip returns, within 1e-9 | the residues themselves |
+| figure anchors | every figure endpoint has a node | how many the title block covers |
+| wider field | the mark and ink digests, which are arithmetic | the pixel digest |
+| label placement | the corpus, and the stability budget met | the whole collision census |
+
+**Two of them keep numbers that have no portable form, and say so.**
+The magnitude key's covered ink and the label census are what those
+studies exist to report: they differ on every page and every machine,
+and there is no inequality underneath them that a change of font
+would survive. Inventing a threshold for such a number would be
+worse than recording it as a measurement, which is what the reports
+now do in as many words.
+
+**Two commands, deliberately named apart**, so that neither silently
+behaves like the other:
+
+| command | what it may compare |
+|---|---|
+| `make evidence-contracts-ci` | nothing against another machine's pixels; this is what CI runs |
+| `make evidence-contracts` | everything, including promoted images against their generators; run where reference images are promoted |
+
+`make evidence-provenance` writes the record, on the machine that
+promotes them, after a reviewed regeneration — never automatically,
+because a record that rewrites itself whenever the pixels move
+records nothing.
+
 ## Evidence executables under src
 
 The review's first finding: the initial scan looked only under

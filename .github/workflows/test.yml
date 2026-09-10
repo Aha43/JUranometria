@@ -97,3 +97,37 @@ jobs:
           [ "$aborted" = 0 ] \
             || fail "$aborted aborted on a display run; this job" \
                     'exists so that cannot happen quietly'
+
+  # Generated evidence, checked against its own generators (issue
+  # #315). `make test` never runs this, and at the end of #314 the
+  # contract had 107 breaches nobody had seen: moving where labels
+  # are drawn moved every renderer-drawn study page in the
+  # repository, and one report had not been reproducible since the
+  # sprint that promoted it. A gate nobody runs reports its findings
+  # to nobody, so it runs here.
+  #
+  # On a display, because the study pages are rendered - and with the
+  # portable contract, which never compares a rendering made here with
+  # pixels recorded on somebody else's machine. See
+  # docs/decisions/test-evidence.md, "Three kinds of evidence".
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/cache@v6
+        with:
+          path: lib
+          key: libs-${{ hashFiles('scripts/lib-versions.env') }}
+      - run: scripts/download-libs.sh
+      - name: Reproduce every generated artifact from its generator
+        # The pixel-exact families are a fact about a machine's fonts
+        # and 2D pipeline, so what this job holds is what holds
+        # anywhere: the deterministic reports, the geometry digests
+        # and the promoted pages' own arithmetic. The contract says
+        # which is which and skips out loud where a family cannot be
+        # verified from a clean checkout.
+        run: xvfb-run -a make evidence-contracts-ci

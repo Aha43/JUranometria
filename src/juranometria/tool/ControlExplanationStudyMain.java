@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
@@ -120,9 +121,49 @@ public final class ControlExplanationStudyMain {
         preface(out);
         table(out, controls);
         counted(out, controls);
-        shortcuts(out);
         excluded(out);
-        System.out.print(out);
+        // The portable half: which control was decided about and how,
+        // with this desktop's own word for the menu modifier reduced
+        // to a token. What that word actually is, and what a tooltip
+        // therefore shows a reader, is the machine's answer and is
+        // written beside this (#315).
+        System.out.print(PlatformEvidence.portable(out.toString()));
+
+        StringBuilder platform = new StringBuilder();
+        PlatformEvidence.preface(platform,
+                "What a control shows, as this desktop spells it",
+                "Sprint 31, issues #311 and #315.");
+        shortcuts(platform);
+        quoted(platform, controls);
+        PlatformEvidence.write(platform,
+                "docs/studies/control-explanations/platform.md");
+    }
+
+    /** Every explanation that quotes a key, as a reader sees it here. */
+    private static void quoted(StringBuilder out, List<Control> controls) {
+        String modifier = Shortcuts.menuModifierText();
+        out.append("## Every explanation that names a key\n\n");
+        out.append("| surface | control | as a reader is shown it"
+                + " |\n|---|---|---|\n");
+        int named = 0;
+        for (Control control : controls) {
+            String hovered = control.hovered();
+            if (hovered == null || !hovered.contains(modifier)) {
+                continue;
+            }
+            named++;
+            out.append("| ").append(control.surface()).append(" | ")
+                    .append(cell(control.seen())).append(" | ")
+                    .append(cell(hovered)).append(" |\n");
+        }
+        out.append(String.format(Locale.ROOT,
+                "%n**%d explanations** name a key on this platform."
+                        + " The report beside this one%nholds the same"
+                        + " sentences with the modifier reduced to a"
+                        + " token, so that what%nis pinned is which"
+                        + " control quotes which switch rather than"
+                        + " what this%ndesktop calls a key.%n",
+                named));
     }
 
     private static void preface(StringBuilder out) {
@@ -249,8 +290,20 @@ public final class ControlExplanationStudyMain {
         if (text == null) {
             return "&mdash;";
         }
-        String flat = text.replace("|", "\\|").replaceAll("\\s+", " ")
-                .trim();
+        // Made portable before it is cut, not after: a keystroke
+        // spelled `⌘=` here and `Ctrl+Equals` elsewhere is a
+        // different number of characters, so cutting first moves
+        // where the cut falls and two machines disagree about a line
+        // neither of them measured differently (#315).
+        // The markup goes first. A tooltip past the wrap length is
+        // handed to the HTML renderer with a stated width, and
+        // whether it passes that length depends on how this desktop
+        // spells the keystroke inside it - so one machine showed the
+        // wrapper and another showed the sentence (#315). What the
+        // audit is reporting is the sentence.
+        String flat = PlatformEvidence.portable(text)
+                .replaceAll("<html>|</html>|<body[^>]*>|</body>", " ")
+                .replace("|", "\\|").replaceAll("\\s+", " ").trim();
         return flat.length() <= 90 ? flat
                 : flat.substring(0, 87) + "...";
     }

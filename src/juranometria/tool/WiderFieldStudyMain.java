@@ -114,7 +114,7 @@ public final class WiderFieldStudyMain {
                 + " OS and version, architecture, and JDK\nbuild - and"
                 + " the test skips it out loud anywhere else rather"
                 + " than\npretending.\n\n");
-        out.append("Recorded on: `" + platform() + "`\n\n");
+
         out.append("Every released field step, at four centres that"
                 + " exercise the cases\nthe atlas treats differently -"
                 + " the M31 default, Orion on the\nequator, a"
@@ -141,25 +141,51 @@ public final class WiderFieldStudyMain {
                 + " `released-text.txt` beside this file lists\nwhich"
                 + " label moved where, one line each.\n\n");
         out.append("## The rows\n\n");
+        // The two digests the study itself calls arithmetic stay
+        // here, where the contract pins their bytes on any machine.
+        // The pixel digest is the rasterised page, which the study
+        // itself calls an oracle only on the platform named in it -
+        // so it is recorded beside this rather than pinned here
+        // (#315).
         out.append("field  ra           dec          ground "
-                + " marks             ink               pixels\n");
+                + " marks             ink\n");
+        StringBuilder observed = new StringBuilder();
+        PlatformEvidence.preface(observed,
+                "Released pages, rasterised on one machine",
+                "Sprint 29, issue #288; classified in Sprint 31,"
+                        + " issue #315.");
+        observed.append("The pixel digest of every released page. It"
+                + " is an oracle on this exact\nplatform and nowhere"
+                + " else: every label the mark and ink digests leave"
+                + " out,\nand every pixel of everything they cover,"
+                + " comes out of a font stack and a\n2D pipeline. The"
+                + " report beside this one carries the two digests"
+                + " that are\narithmetic and hold anywhere.\n\n");
+        observed.append("field  ra           dec          ground "
+                + " pixels\n");
 
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         for (double field : RELEASED_FIELDS) {
             for (double[] centre : CENTRES) {
                 for (boolean black : new boolean[] {false, true}) {
                     out.append(String.format(Locale.ROOT,
-                            "%-6.0f %-12.6f %-12.6f %-7s %-17s %-17s"
-                                    + " %s%n",
+                            "%-6.0f %-12.6f %-12.6f %-7s %-17s %s%n",
                             field, centre[0], centre[1],
                             black ? "black" : "paper",
                             markFingerprint(renderer, centre, field),
-                            inkFingerprint(centre, field, black),
-                            fingerprint(renderer, centre, field, black)));
+                            inkFingerprint(centre, field, black)));
+                    observed.append(String.format(Locale.ROOT,
+                            "%-6.0f %-12.6f %-12.6f %-7s %s%n",
+                            field, centre[0], centre[1],
+                            black ? "black" : "paper",
+                            fingerprint(renderer, centre, field,
+                                    black)));
                 }
             }
         }
         System.out.print(out);
+        PlatformEvidence.write(observed,
+                "docs/studies/wider-field/platform.md");
     }
 
     /**

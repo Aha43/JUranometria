@@ -23,36 +23,17 @@ Pages are 900 x 700 on white paper, which is the ground the gate
 measured on. Rasterised, so labels place themselves by font metrics and
 the numbers move between machines.
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+## The rungs, and what each arrives at
 
-## Ink by field and magnitude
+The ladder in order, with the limit the atlas gives a page of that width.
+These are the decision, and they do not depend on a font.
 
-### Orion (RA 83.000, dec 0.000)
-
-| field | V 4.0 | V 5.0 | V 6.0 | V 7.0 | V 8.0 |
-|---:|---:|---:|---:|---:|---:|
-| 42° | 6.4% | 6.9% | 7.9% | 10.0% | 13.1% |
-| 60° | 8.7% | 9.5% | 11.4% | 14.9% | 20.2% |
-| 90° | 10.6% | 12.3% | 16.4% | 23.2% | 33.7% |
-| 120° | 13.7% | 16.2% | 22.6% | 32.9% | 47.9% |
-
-### M31 (RA 10.685, dec 41.269)
-
-| field | V 4.0 | V 5.0 | V 6.0 | V 7.0 | V 8.0 |
-|---:|---:|---:|---:|---:|---:|
-| 42° | 5.9% | 6.2% | 6.7% | 8.5% | 11.1% |
-| 60° | 7.6% | 8.2% | 9.3% | 12.4% | 17.2% |
-| 90° | 10.6% | 11.9% | 14.5% | 21.0% | 31.0% |
-| 120° | 13.9% | 16.0% | 20.8% | 31.2% | 45.8% |
-
-### polar (RA 0.000, dec 75.000)
-
-| field | V 4.0 | V 5.0 | V 6.0 | V 7.0 | V 8.0 |
-|---:|---:|---:|---:|---:|---:|
-| 42° | 4.0% | 4.2% | 5.1% | 6.7% | 9.4% |
-| 60° | 5.6% | 6.0% | 7.7% | 11.0% | 16.2% |
-| 90° | 9.4% | 10.7% | 14.0% | 21.0% | 31.3% |
-| 120° | 11.5% | 13.7% | 19.1% | 30.5% | 46.4% |
+| field | default limit |
+|---:|---:|
+| 42° | V 8.0 |
+| 60° | V 5.0 |
+| 90° | V 4.0 |
+| 120° | V 4.0 |
 
 ## What a reader is given
 
@@ -61,12 +42,13 @@ arrives readable rather than arriving at the atlas's own default and
 needing rescue. The reader's magnitude control is unchanged and still
 wins: this decides where a page starts, not where it stays.
 
-| field | default limit | ink at Orion | against the control |
-|---:|---:|---:|---:|
-| 42° | V 8.0 | 13.1% | +0.0 points |
-| 60° | V 5.0 | 9.5% | -3.6 points |
-| 90° | V 4.0 | 10.6% | -2.4 points |
-| 120° | V 4.0 | 13.7% | +0.6 points |
+| field | default limit | quieter than the atlas's own V 8.0 here | within 5.0 points of the sheet page |
+|---:|---:|---|---|
+| 42° | V 8.0 | — (it is V 8.0) | yes |
+| 60° | V 5.0 | yes | yes |
+| 90° | V 4.0 | yes | yes |
+| 120° | V 4.0 | yes | yes |
 
-The control row is the released sheet page at the atlas's own default
-of V 8.0, which is what a reader zooming out actually leaves.
+The page a reader leaves is the released 42° sheet at the atlas's own
+default of V 8.0. How much ink each of these actually laid down, on the machine
+that measured it, is in `platform.md` beside this.

@@ -61,7 +61,19 @@ public final class OverviewStudyMain {
             new Look("equinox", "the vernal equinox",
                     new SkyPosition(0.0, 0.0), new double[] {60, 120}));
 
+    /** The worst miss, for the record beside the report. */
+    private static double observedMiss;
+
+    /** Every ink fraction this study measures, for the same record. */
+    private static final StringBuilder inkObserved = new StringBuilder();
+
     public static void main(String[] args) throws IOException {
+        // Emptied first. The contract runs a study twice in one JVM
+        // to see whether it reproduces here, and a buffer that
+        // survives the first run makes the second disagree with it
+        // for a reason that has nothing to do with the atlas - the
+        // third time this study family has taught me that (#315).
+        inkObserved.setLength(0);
         Path out = Path.of(args.length > 0 ? args[0]
                 : "docs/studies/overview-projection");
         Files.createDirectories(out);
@@ -69,8 +81,8 @@ public final class OverviewStudyMain {
 
         StringBuilder pages = new StringBuilder();
         pages.append("| page | projection | field | stars drawn |"
-                + " off the projection | ink | reference ink |\n");
-        pages.append("|---|---|---:|---:|---:|---:|---|\n");
+                + " off the projection | reference ink |\n");
+        pages.append("|---|---|---:|---:|---:|---|\n");
 
         for (Look look : LOOKS) {
             for (double field : look.fields()) {
@@ -101,10 +113,54 @@ public final class OverviewStudyMain {
                     PaperSize.A4.chartHighUnits(), "-sheet");
         }
 
-        Files.writeString(out.resolve("measurements.md"),
-                document(pages.toString(), scenes),
+        // The report goes to standard output, the way every other
+        // study main sends its report, so that capturing it is what
+        // regenerates the file - and so the evidence contract, which
+        // reproduces a report by running its main and reading what it
+        // printed, can verify this one at all. It wrote the file
+        // itself and printed a notice until #315, which is why the
+        // contract had been reporting it unreproducible since the
+        // sprint that promoted it.
+        String report = document(pages.toString(), scenes);
+        Files.writeString(out.resolve("measurements.md"), report,
                 StandardCharsets.UTF_8);
-        System.out.println("wrote " + out.resolve("measurements.md"));
+        System.out.print(report);
+
+        StringBuilder observed = new StringBuilder();
+        juranometria.tool.PlatformEvidence.preface(observed,
+                "Overview projections, to the last decimal on one"
+                        + " machine",
+                "Sprint 30, issue #296; classified in Sprint 31,"
+                        + " issue #315.");
+        observed.append("The residues below are rounding in double"
+                + " arithmetic: 7.8e-14 degrees on\none machine and"
+                + " 7.7e-14 on another, because a JDK and a chip are"
+                + " free to\nassociate a sum differently. The report"
+                + " beside this one says what the study\nconcluded"
+                + " from them - that each candidate agrees with what"
+                + " it was checked\nagainst, and that a round trip"
+                + " returns where it started - which is the same"
+                + " on\nany machine that can add.\n\n");
+        observed.append("## The candidates against what they were"
+                + " checked with\n\n");
+        observed.append(AgreementReport.observed(
+                new SkyPosition(83.0, 0.0)));
+        observed.append(String.format(java.util.Locale.ROOT,
+                "%n## How far a drawn curve misses a projected"
+                        + " point%n%n%.1e page units, worst over %d"
+                        + " combinations.%n",
+                observedMiss, PageCurveReport.rows));
+        observed.append("\n## How much of a page each candidate"
+                + " inks\n\n");
+        observed.append("| page | ink |\n|---|---:|\n");
+        observed.append(inkObserved);
+        observed.append("\n## How far each drawn curve misses\n\n");
+        observed.append(PageCurveReport.observed);
+        observed.append("\n## What each great circle fits\n\n");
+        observed.append(CurveFormReport.observed(
+                new SkyPosition(83.0, 0.0)));
+        juranometria.tool.PlatformEvidence.write(observed,
+                "docs/studies/overview-projection/platform.md");
     }
 
     private static void write(Path out, StudyScenes scenes,
@@ -128,11 +184,18 @@ public final class OverviewStudyMain {
                 look.slug(), field, projection.name(), suffix);
         ImageIO.write(image, "png", new File(out.toFile(), file));
 
+        // No ink column. What fraction of a page a renderer inked
+        // is a measurement of the fonts in front of it - 4.3% here
+        // and 4.2% on a Linux runner - and it is recorded beside the
+        // report. How many stars the page draws and how many it holds
+        // off the projection are the atlas's own answers (#315).
         pages.append(String.format(Locale.ROOT,
-                "| %s | %s | %.0f° | %d | %d | %.1f%% | %s |%n",
+                "| %s | %s | %.0f° | %d | %d | %s |%n",
                 file, projection.name(), field, page.starsDrawn(),
-                page.starsHeld(), 100.0 * inkFraction(image, palette),
-                String.join("; ", page.notes())));
+                page.starsHeld(), String.join("; ", page.notes())));
+        inkObserved.append(String.format(Locale.ROOT,
+                "| %s | %.1f%% |%n", file,
+                100.0 * inkFraction(image, palette)));
     }
 
     /**
@@ -183,8 +246,20 @@ public final class OverviewStudyMain {
         for (double field : new double[] {60, 90, 120, 180}) {
             out.append(String.format(Locale.ROOT, "| %.0f° |", field));
             for (double magnitude : magnitudes) {
-                out.append(String.format(Locale.ROOT, " %.1f%% |",
-                        100.0 * inkAt(scenes, projection, field, magnitude)));
+                // Recorded, not concluded. There is no ordering to
+                // pin here: a fainter limit draws more stars and the
+                // size policy draws them smaller, so ink does not
+                // rise monotonically with the limit - a 60-degree
+                // page inks less at V 5.5 than at the brighter step
+                // before it. The first draft of this asserted the
+                // ordering and the study refused to run, which is the
+                // study being right (#315).
+                out.append(" recorded |");
+                inkObserved.append(String.format(Locale.ROOT,
+                        "| %s | %.0f° | V %.1f | %.1f%% |%n",
+                        projection.name(), field, magnitude,
+                        100.0 * inkAt(scenes, projection, field,
+                                magnitude)));
             }
             out.append("\n");
         }
@@ -220,9 +295,13 @@ public final class OverviewStudyMain {
                 180}, SCREEN_WIDE, SCREEN_HIGH);
         int combinations = PageCurveReport.rows;
         double worstMiss = PageCurveReport.worstMiss;
-        String control = String.format(Locale.ROOT, "%.1f%%",
-                100.0 * inkAt(scenes, Candidates.stereographic(orion), 42.0,
-                        StudyScenes.DEFAULT_LIMIT));
+        inkObserved.append(String.format(Locale.ROOT,
+                "%n## The released control%n%n"
+                        + "The 42-degree page's middle half at V %.1f:"
+                        + " **%.1f%% ink**.%n%n",
+                StudyScenes.DEFAULT_LIMIT,
+                100.0 * inkAt(scenes, Candidates.stereographic(orion),
+                        42.0, StudyScenes.DEFAULT_LIMIT)));
 
         out.append("""
                 # Seeing more sky at once
@@ -496,13 +575,24 @@ public final class OverviewStudyMain {
 
                 """);
         out.append(String.format(java.util.Locale.ROOT, """
-                | measured over | stated form agrees with fitted form | worst the drawn curve misses a projected point |
+                | measured over | stated form agrees with fitted form | the drawn curve passes through every projected point |
                 |---:|---:|---:|
-                | %d combinations | %d, and %d disagree | %.1e page units |
+                | %d combinations | %d, and %d disagree | %s |
 
                 """, PageCurveReport.rows,
                 PageCurveReport.agreed, PageCurveReport.disagreed,
-                PageCurveReport.worstMiss));
+                PageCurveReport.worstMiss <= CurveFormReport.FITS_WITHIN
+                        ? "yes, within " + CurveFormReport.FITS_WITHIN
+                                + " page units"
+                        : "**no**"));
+        if (PageCurveReport.worstMiss > CurveFormReport.FITS_WITHIN) {
+            throw new IllegalStateException("a drawn curve misses a"
+                    + " projected point by "
+                    + PageCurveReport.worstMiss + " page units, which"
+                    + " is past rounding: the curve the page draws is"
+                    + " not the curve the projection made");
+        }
+        observedMiss = PageCurveReport.worstMiss;
         out.append("""
                 The disagreement that this check did find is worth
                 recording, because it was not an error. Centred on
@@ -732,16 +822,17 @@ public final class OverviewStudyMain {
                 ## How faint an overview can afford to be
 
                 The released 42-degree page is the control: it is
-                readable, people have used it, and its middle half is
-                **%s ink** at the chart's default magnitude of 6. A
-                90-degree page at the same magnitude is more than
-                twice that, and a 180-degree page is a third of the
-                paper. Density is not a projection's fault - it is
-                the sky's - but an overview that arrives at the
+                readable, people have used it, and its middle half
+                carries the ink recorded beside this report at the
+                chart's default magnitude of 6. A 90-degree page at
+                the same magnitude is more than twice that, and a
+                180-degree page is a third of the paper. Density
+                is not a projection's fault - it is the sky's - but
+                an overview that arrives at the
                 default magnitude arrives unreadable, so what the
                 default should be is a measurement and not a taste:
 
-                """.formatted(control));
+                """);
         out.append(magnitudeTable(scenes));
         out.append("""
 
