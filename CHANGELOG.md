@@ -7,6 +7,36 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-09-10
+
+Sprint 31 — Give every label a place. The atlas drew its text in
+three passes that avoided different things, and it showed: a star's
+name could be written across another star's mark, a constellation's
+name could be crossed by half a dozen star labels, and a label whose
+one position was taken was simply not drawn. A reader who reported
+`Nunki` sitting on top of `Namalsadirah` had found all three at once.
+
+Every piece of text on a page is now placed by one decision, in a
+stated order, avoiding every mark, every symbol, the furniture and
+each other. Nothing is cut short by the paper's edge, because a word
+cut short is very often another word — `SAGITTARIUS` cut reads
+`SAGITTA`.
+
+The sprint also gave the chart a keyboard and the controls a voice:
+twenty layers answer to one prefix and a letter, and every control a
+reader can operate either explains itself or is recorded as needing
+no explanation.
+
+Minor, because nothing a reader could do before has been taken away.
+What moved is where text sits: a star's name across an unrelated mark
+fell from 252 to 32 over the study's 23 pages, and the atlas draws
+115 more pieces of text than it did, because a name whose usual place
+is taken now moves instead of vanishing.
+
+**Still not printed.** No page has been read on paper.
+[#293](https://github.com/Aha43/JUranometria/issues/293) is open for
+anyone who prints one and can say what they find.
+
 ### Changed
 
 - **Every label on a page is placed by one decision** (issue #314).
@@ -106,6 +136,21 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   drawn ink and the point its name is anchored on, the graticule's
   notation with its boxes, the reference layer's names, and what the
   title block covers as distinct from what it is laid out in.
+
+- **Nothing a reader can see: the atlas's evidence is classified**
+  (issue #315). `make evidence-contracts` ran for the first time on a
+  machine that was not the one that wrote it and reported 189
+  breaches — every one of them a font, a desktop's own spelling of a
+  modifier, or floating-point rounding, and none of them stale
+  evidence. Evidence is now classified rather than normalised:
+  deterministic reports are held to their bytes everywhere, platform
+  records to reproducing within their own machine, renderings to
+  being drawn twice on the runner, and promoted images to the account
+  they carry of themselves. Two commands are named apart —
+  `make evidence-contracts-ci`, which CI runs and which may not
+  compare a rendering with another machine's pixels, and
+  `make evidence-contracts`, which may. Decided in
+  `docs/decisions/test-evidence.md`.
 
 - **A study of how labels share a page** (issue #310, the Sprint 31
   gate): what the atlas does with text today, inventoried by
