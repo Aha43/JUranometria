@@ -35,6 +35,85 @@ any machine that can add.
 
 2.7e-12 page units, worst over 108 combinations.
 
+## How much of a page each candidate inks
+
+| page | ink |
+|---|---:|
+| orion-036-gnomonic.png | 4.3% |
+| orion-036-stereographic.png | 4.2% |
+| orion-036-orthographic.png | 4.1% |
+| orion-042-gnomonic.png | 5.2% |
+| orion-042-stereographic.png | 5.0% |
+| orion-042-orthographic.png | 4.9% |
+| orion-048-gnomonic.png | 5.9% |
+| orion-048-stereographic.png | 5.6% |
+| orion-048-orthographic.png | 5.4% |
+| orion-060-gnomonic.png | 7.5% |
+| orion-060-stereographic.png | 7.2% |
+| orion-060-orthographic.png | 6.8% |
+| orion-090-gnomonic.png | 13.7% |
+| orion-090-stereographic.png | 12.2% |
+| orion-090-orthographic.png | 9.6% |
+| orion-120-gnomonic.png | 23.7% |
+| orion-120-stereographic.png | 18.5% |
+| orion-120-orthographic.png | 13.7% |
+| orion-180-stereographic.png | 32.3% |
+| ursa-major-060-gnomonic.png | 6.7% |
+| ursa-major-060-stereographic.png | 6.4% |
+| ursa-major-060-orthographic.png | 6.7% |
+| ursa-major-090-gnomonic.png | 10.9% |
+| ursa-major-090-stereographic.png | 9.7% |
+| ursa-major-090-orthographic.png | 8.9% |
+| sagittarius-060-gnomonic.png | 7.7% |
+| sagittarius-060-stereographic.png | 7.2% |
+| sagittarius-060-orthographic.png | 7.2% |
+| sagittarius-090-gnomonic.png | 13.2% |
+| sagittarius-090-stereographic.png | 10.9% |
+| sagittarius-090-orthographic.png | 9.8% |
+| pole-090-gnomonic.png | 12.4% |
+| pole-090-stereographic.png | 10.4% |
+| pole-090-orthographic.png | 8.9% |
+| pole-120-gnomonic.png | 23.3% |
+| pole-120-stereographic.png | 16.6% |
+| pole-120-orthographic.png | 12.2% |
+| equinox-060-gnomonic.png | 5.3% |
+| equinox-060-stereographic.png | 5.1% |
+| equinox-060-orthographic.png | 4.4% |
+| equinox-120-gnomonic.png | 17.9% |
+| equinox-120-stereographic.png | 12.0% |
+| equinox-120-orthographic.png | 8.5% |
+| orion-090-gnomonic-black.png | 13.6% |
+| orion-090-gnomonic-sheet.png | 18.3% |
+| orion-090-stereographic-black.png | 12.2% |
+| orion-090-stereographic-sheet.png | 15.2% |
+| orion-090-orthographic-black.png | 9.6% |
+| orion-090-orthographic-sheet.png | 12.0% |
+
+## The released control
+
+The 42-degree page's middle half at V 6.0: **5.0% ink**.
+
+| stereographic | 60° | V 6.0 | 7.2% |
+| stereographic | 60° | V 5.5 | 6.0% |
+| stereographic | 60° | V 5.0 | 5.2% |
+| stereographic | 60° | V 4.5 | 4.7% |
+| stereographic | 60° | V 4.0 | 4.3% |
+| stereographic | 90° | V 6.0 | 12.2% |
+| stereographic | 90° | V 5.5 | 9.6% |
+| stereographic | 90° | V 5.0 | 7.8% |
+| stereographic | 90° | V 4.5 | 6.8% |
+| stereographic | 90° | V 4.0 | 6.1% |
+| stereographic | 120° | V 6.0 | 18.5% |
+| stereographic | 120° | V 5.5 | 14.4% |
+| stereographic | 120° | V 5.0 | 11.8% |
+| stereographic | 120° | V 4.5 | 10.3% |
+| stereographic | 120° | V 4.0 | 9.1% |
+| stereographic | 180° | V 6.0 | 32.3% |
+| stereographic | 180° | V 5.5 | 25.0% |
+| stereographic | 180° | V 5.0 | 20.3% |
+| stereographic | 180° | V 4.5 | 17.2% |
+| stereographic | 180° | V 4.0 | 15.3% |
+
 ## How far each drawn curve misses
 
 | projection | centre | field | circle | worst miss |

@@ -650,76 +650,77 @@ this, and a name is placed beside a mark whatever put
 the mark there. What does change is how many marks
 compete, which is counted.
 
-| page | projection | field | stars drawn | off the projection | ink | reference ink |
-|---|---|---:|---:|---:|---:|---|
-| orion-036-gnomonic.png | gnomonic | 36° | 204 | 242 | 4.3% | the celestial equator: straight, 1 run, named at the upper end |
-| orion-036-stereographic.png | stereographic | 36° | 203 | 251 | 4.2% | the celestial equator: straight, 1 run, named at the upper end |
-| orion-036-orthographic.png | orthographic | 36° | 203 | 260 | 4.1% | the celestial equator: straight, 1 run, named at the upper end |
-| orion-042-gnomonic.png | gnomonic | 42° | 283 | 242 | 5.2% | the celestial equator: straight, 1 run, named at the upper end |
-| orion-042-stereographic.png | stereographic | 42° | 282 | 246 | 5.0% | the celestial equator: straight, 1 run, named at the upper end |
-| orion-042-orthographic.png | orthographic | 42° | 279 | 265 | 4.9% | the celestial equator: straight, 1 run, named at the upper end |
-| orion-048-gnomonic.png | gnomonic | 48° | 351 | 262 | 5.9% | the celestial equator: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
-| orion-048-stereographic.png | stereographic | 48° | 352 | 294 | 5.6% | the celestial equator: straight, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
-| orion-048-orthographic.png | orthographic | 48° | 350 | 326 | 5.4% | the celestial equator: straight, 1 run, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
-| orion-060-gnomonic.png | gnomonic | 60° | 497 | 331 | 7.5% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
-| orion-060-stereographic.png | stereographic | 60° | 502 | 363 | 7.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 2 runs, named at the upper end; a meridian: circular, 1 run, named at the upper end |
-| orion-060-orthographic.png | orthographic | 60° | 512 | 418 | 6.8% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 4 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
-| orion-090-gnomonic.png | gnomonic | 90° | 928 | 424 | 13.7% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
-| orion-090-stereographic.png | stereographic | 90° | 922 | 546 | 12.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
-| orion-090-orthographic.png | orthographic | 90° | 934 | 847 | 9.6% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| orion-120-gnomonic.png | gnomonic | 120° | 1406 | 448 | 23.7% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
-| orion-120-stereographic.png | stereographic | 120° | 1382 | 722 | 18.5% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| orion-120-orthographic.png | orthographic | 120° | 1485 | 1331 | 13.7% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 4 runs, named at the upper end |
-| orion-180-stereographic.png | stereographic | 180° | 2507 | 855 | 32.3% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| ursa-major-060-gnomonic.png | gnomonic | 60° | 259 | 241 | 6.7% | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
-| ursa-major-060-stereographic.png | stereographic | 60° | 263 | 262 | 6.4% | a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| ursa-major-060-orthographic.png | orthographic | 60° | 264 | 305 | 6.7% | a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| ursa-major-090-gnomonic.png | gnomonic | 90° | 565 | 374 | 10.9% | the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
-| ursa-major-090-stereographic.png | stereographic | 90° | 567 | 487 | 9.7% | the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| ursa-major-090-orthographic.png | orthographic | 90° | 592 | 798 | 8.9% | the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| sagittarius-060-gnomonic.png | gnomonic | 60° | 369 | 298 | 7.7% | the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
-| sagittarius-060-stereographic.png | stereographic | 60° | 370 | 348 | 7.2% | the celestial equator: circular, 2 runs, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
-| sagittarius-060-orthographic.png | orthographic | 60° | 374 | 396 | 7.2% | the celestial equator: elliptical, 4 runs, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
-| sagittarius-090-gnomonic.png | gnomonic | 90° | 763 | 428 | 13.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
-| sagittarius-090-stereographic.png | stereographic | 90° | 772 | 551 | 10.9% | the celestial equator: circular, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
-| sagittarius-090-orthographic.png | orthographic | 90° | 809 | 847 | 9.8% | the celestial equator: elliptical, 2 runs, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| pole-090-gnomonic.png | gnomonic | 90° | 739 | 400 | 12.4% | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
-| pole-090-stereographic.png | stereographic | 90° | 760 | 504 | 10.4% | a meridian: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| pole-090-orthographic.png | orthographic | 90° | 795 | 796 | 8.9% | a meridian: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| pole-120-gnomonic.png | gnomonic | 120° | 1245 | 431 | 23.3% | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
-| pole-120-stereographic.png | stereographic | 120° | 1272 | 672 | 16.6% | the ecliptic: circular, 2 runs, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| pole-120-orthographic.png | orthographic | 120° | 1408 | 1208 | 12.2% | the celestial equator: circular, 4 runs, named at the upper end; the ecliptic: elliptical, 4 runs, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| equinox-060-gnomonic.png | gnomonic | 60° | 258 | 214 | 5.3% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
-| equinox-060-stereographic.png | stereographic | 60° | 254 | 246 | 5.1% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| equinox-060-orthographic.png | orthographic | 60° | 258 | 295 | 4.4% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| equinox-120-gnomonic.png | gnomonic | 120° | 1034 | 517 | 17.9% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
-| equinox-120-stereographic.png | stereographic | 120° | 1050 | 821 | 12.0% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
-| equinox-120-orthographic.png | orthographic | 120° | 1237 | 1489 | 8.5% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| orion-090-gnomonic-black.png | gnomonic | 90° | 928 | 424 | 13.6% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
-| orion-090-gnomonic-sheet.png | gnomonic | 90° | 854 | 498 | 18.3% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
-| orion-090-stereographic-black.png | stereographic | 90° | 922 | 546 | 12.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
-| orion-090-stereographic-sheet.png | stereographic | 90° | 831 | 637 | 15.2% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
-| orion-090-orthographic-black.png | orthographic | 90° | 934 | 847 | 9.6% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
-| orion-090-orthographic-sheet.png | orthographic | 90° | 834 | 947 | 12.0% | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| page | projection | field | stars drawn | off the projection | reference ink |
+|---|---|---:|---:|---:|---|
+| orion-036-gnomonic.png | gnomonic | 36° | 204 | 242 | the celestial equator: straight, 1 run, named at the upper end |
+| orion-036-stereographic.png | stereographic | 36° | 203 | 251 | the celestial equator: straight, 1 run, named at the upper end |
+| orion-036-orthographic.png | orthographic | 36° | 203 | 260 | the celestial equator: straight, 1 run, named at the upper end |
+| orion-042-gnomonic.png | gnomonic | 42° | 283 | 242 | the celestial equator: straight, 1 run, named at the upper end |
+| orion-042-stereographic.png | stereographic | 42° | 282 | 246 | the celestial equator: straight, 1 run, named at the upper end |
+| orion-042-orthographic.png | orthographic | 42° | 279 | 265 | the celestial equator: straight, 1 run, named at the upper end |
+| orion-048-gnomonic.png | gnomonic | 48° | 351 | 262 | the celestial equator: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-048-stereographic.png | stereographic | 48° | 352 | 294 | the celestial equator: straight, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-048-orthographic.png | orthographic | 48° | 350 | 326 | the celestial equator: straight, 1 run, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
+| orion-060-gnomonic.png | gnomonic | 60° | 497 | 331 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-060-stereographic.png | stereographic | 60° | 502 | 363 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 2 runs, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-060-orthographic.png | orthographic | 60° | 512 | 418 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 4 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
+| orion-090-gnomonic.png | gnomonic | 90° | 928 | 424 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-090-stereographic.png | stereographic | 90° | 922 | 546 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-090-orthographic.png | orthographic | 90° | 934 | 847 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| orion-120-gnomonic.png | gnomonic | 120° | 1406 | 448 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| orion-120-stereographic.png | stereographic | 120° | 1382 | 722 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| orion-120-orthographic.png | orthographic | 120° | 1485 | 1331 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 4 runs, named at the upper end |
+| orion-180-stereographic.png | stereographic | 180° | 2507 | 855 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| ursa-major-060-gnomonic.png | gnomonic | 60° | 259 | 241 | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| ursa-major-060-stereographic.png | stereographic | 60° | 263 | 262 | a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| ursa-major-060-orthographic.png | orthographic | 60° | 264 | 305 | a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| ursa-major-090-gnomonic.png | gnomonic | 90° | 565 | 374 | the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| ursa-major-090-stereographic.png | stereographic | 90° | 567 | 487 | the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| ursa-major-090-orthographic.png | orthographic | 90° | 592 | 798 | the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| sagittarius-060-gnomonic.png | gnomonic | 60° | 369 | 298 | the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| sagittarius-060-stereographic.png | stereographic | 60° | 370 | 348 | the celestial equator: circular, 2 runs, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| sagittarius-060-orthographic.png | orthographic | 60° | 374 | 396 | the celestial equator: elliptical, 4 runs, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end |
+| sagittarius-090-gnomonic.png | gnomonic | 90° | 763 | 428 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| sagittarius-090-stereographic.png | stereographic | 90° | 772 | 551 | the celestial equator: circular, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| sagittarius-090-orthographic.png | orthographic | 90° | 809 | 847 | the celestial equator: elliptical, 2 runs, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| pole-090-gnomonic.png | gnomonic | 90° | 739 | 400 | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| pole-090-stereographic.png | stereographic | 90° | 760 | 504 | a meridian: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| pole-090-orthographic.png | orthographic | 90° | 795 | 796 | a meridian: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| pole-120-gnomonic.png | gnomonic | 120° | 1245 | 431 | a meridian: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| pole-120-stereographic.png | stereographic | 120° | 1272 | 672 | the ecliptic: circular, 2 runs, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| pole-120-orthographic.png | orthographic | 120° | 1408 | 1208 | the celestial equator: circular, 4 runs, named at the upper end; the ecliptic: elliptical, 4 runs, named at the upper end; a meridian: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| equinox-060-gnomonic.png | gnomonic | 60° | 258 | 214 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| equinox-060-stereographic.png | stereographic | 60° | 254 | 246 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| equinox-060-orthographic.png | orthographic | 60° | 258 | 295 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| equinox-120-gnomonic.png | gnomonic | 120° | 1034 | 517 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a horizon: straight, 1 run, named at the upper end |
+| equinox-120-stereographic.png | stereographic | 120° | 1050 | 821 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end; a horizon: circular, 1 run, named at the upper end |
+| equinox-120-orthographic.png | orthographic | 120° | 1237 | 1489 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| orion-090-gnomonic-black.png | gnomonic | 90° | 928 | 424 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-090-gnomonic-sheet.png | gnomonic | 90° | 854 | 498 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: straight, 1 run, named at the upper end; a meridian: straight, 1 run, named at the upper end |
+| orion-090-stereographic-black.png | stereographic | 90° | 922 | 546 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-090-stereographic-sheet.png | stereographic | 90° | 831 | 637 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: circular, 1 run, named at the upper end; a meridian: circular, 1 run, named at the upper end |
+| orion-090-orthographic-black.png | orthographic | 90° | 934 | 847 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
+| orion-090-orthographic-sheet.png | orthographic | 90° | 834 | 947 | the celestial equator: straight, 1 run, named at the upper end; the ecliptic: elliptical, 2 runs, named at the upper end; a meridian: elliptical, 2 runs, named at the upper end; a horizon: elliptical, 2 runs, named at the upper end |
 
 ## How faint an overview can afford to be
 
 The released 42-degree page is the control: it is
-readable, people have used it, and its middle half is
-**5.0% ink** at the chart's default magnitude of 6. A
-90-degree page at the same magnitude is more than
-twice that, and a 180-degree page is a third of the
-paper. Density is not a projection's fault - it is
-the sky's - but an overview that arrives at the
+readable, people have used it, and its middle half
+carries the ink recorded beside this report at the
+chart's default magnitude of 6. A 90-degree page at
+the same magnitude is more than twice that, and a
+180-degree page is a third of the paper. Density
+is not a projection's fault - it is the sky's - but
+an overview that arrives at the
 default magnitude arrives unreadable, so what the
 default should be is a measurement and not a taste:
 
 | field | mag 6.0 | mag 5.5 | mag 5.0 | mag 4.5 | mag 4.0 |
 |---:|---:|---:|---:|---:|---:|
-| 60° | 7.2% | 6.0% | 5.2% | 4.7% | 4.3% |
-| 90° | 12.2% | 9.6% | 7.8% | 6.8% | 6.1% |
-| 120° | 18.5% | 14.4% | 11.8% | 10.3% | 9.1% |
-| 180° | 32.3% | 25.0% | 20.3% | 17.2% | 15.3% |
+| 60° | recorded | recorded | recorded | recorded | recorded |
+| 90° | recorded | recorded | recorded | recorded | recorded |
+| 120° | recorded | recorded | recorded | recorded | recorded |
+| 180° | recorded | recorded | recorded | recorded | recorded |
 
 Read across each row to the column nearest the
 control. This is a contract for the issue that builds
