@@ -249,15 +249,15 @@ is further down, and it is not this.
 
 | projection | great circle | points | as a line | as a circle | as a conic |
 |---|---|---:|---:|---:|---:|
-| gnomonic | the celestial equator | 200 | 1.1e-30 | degenerate | 6.8e-15 |
-| gnomonic | the ecliptic | 200 | 1.5e-14 | degenerate | 8.5e-14 |
-| gnomonic | a circle through the page centre | 199 | 0.0e+00 | degenerate | 0.0e+00 |
-| stereographic | the celestial equator | 400 | 2.6e-12 | degenerate | 9.8e-14 |
-| stereographic | the ecliptic | 400 | 1.0e+01 | 7.1e-15 | 2.1e-14 |
-| stereographic | a circle through the page centre | 399 | 0.0e+00 | degenerate | 0.0e+00 |
-| orthographic | the celestial equator | 200 | 7.4e-18 | degenerate | 1.4e-17 |
-| orthographic | the ecliptic | 200 | 3.9e-01 | 5.6e-02 | 8.9e-16 |
-| orthographic | a circle through the page centre | 201 | 0.0e+00 | degenerate | 0.0e+00 |
+| gnomonic | the celestial equator | 200 | yes | degenerate | yes |
+| gnomonic | the ecliptic | 200 | yes | degenerate | yes |
+| gnomonic | a circle through the page centre | 199 | yes | degenerate | yes |
+| stereographic | the celestial equator | 400 | yes | degenerate | yes |
+| stereographic | the ecliptic | 400 | no | yes | yes |
+| stereographic | a circle through the page centre | 399 | yes | degenerate | yes |
+| orthographic | the celestial equator | 200 | yes | degenerate | yes |
+| orthographic | the ecliptic | 200 | no | no | yes |
+| orthographic | a circle through the page centre | 201 | yes | degenerate | yes |
 
 So the vocabulary is three words, and all three are
 exact:
@@ -309,9 +309,9 @@ projection's algebra, one from several hundred points
 it actually projected - must arrive at the same form,
 and the drawn curve must pass through those points:
 
-| measured over | stated form agrees with fitted form | worst the drawn curve misses a projected point |
+| measured over | stated form agrees with fitted form | the drawn curve passes through every projected point |
 |---:|---:|---:|
-| 108 combinations | 108, and 0 disagree | 2.7e-12 page units |
+| 108 combinations | 108, and 0 disagree | yes, within 1.0E-6 page units |
 
 The disagreement that this check did find is worth
 recording, because it was not an error. Centred on

@@ -97,7 +97,7 @@ and what follows is what such a scheme has to settle before a key is wired.
 |---|---|
 | cancelling | a reader who opens the prefix and changes their mind must be able to leave without switching anything |
 | waiting | a prefix that waits for ever is a keyboard that has stopped answering; one that times out surprises a slow reader |
-| a field with the caret in it | the prefix may not fire while a reader is typing a star's name, and the 49 editing strokes above say what else it may not take |
+| a field with the caret in it | the prefix may not fire while a reader is typing a star's name, and the editing strokes a text field answers say what else it may not take |
 | the platform's own modifier | the same scheme has to read as Command here and Ctrl elsewhere, spelled from one place |
 | what is remembered | the GUI control persists the reader's choice, so the keyboard has to persist exactly the same thing |
 | a master and its dependants | switching deep-sky objects off hides the labels; the keyboard must mean what the checkbox means, including what it stores |

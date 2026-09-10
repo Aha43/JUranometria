@@ -71,9 +71,15 @@ public final class PlatformEvidence {
             portable = portable.replace(shortcut.text(),
                     "<key:" + shortcut.id() + ">");
         }
-        String modifier = juranometria.ui.Shortcuts.menuModifierText();
-        return modifier.isEmpty() ? portable
-                : portable.replace(modifier, MENU_MODIFIER);
+        // And no substitution of the bare modifier. It was the
+        // crude first version of this, and it damaged prose: a
+        // sentence explaining that a scheme "has to read as Command
+        // here and Ctrl elsewhere" had the word Ctrl replaced on the
+        // platform that calls it that, so the two machines disagreed
+        // about a sentence neither of them measured (#315). What is
+        // substituted is a keystroke the atlas binds, named by the
+        // action it reaches.
+        return portable;
     }
 
     /** The token standing in for the chart keyboard's own prefix. */

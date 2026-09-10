@@ -296,9 +296,8 @@ public final class ToggleShortcutStudyMain {
                 + " times out surprises a slow reader |\n");
         out.append("| a field with the caret in it | the prefix may"
                 + " not fire while a reader is typing a star's name,"
-                + " and the "
-                + editing.size() + " editing strokes above say what"
-                + " else it may not take |\n");
+                + " and the editing strokes a text field answers say"
+                + " what else it may not take |\n");
         out.append("| the platform's own modifier | the same scheme"
                 + " has to read as Command here and Ctrl elsewhere,"
                 + " spelled from one place |\n");

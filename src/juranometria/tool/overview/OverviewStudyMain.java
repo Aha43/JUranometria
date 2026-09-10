@@ -61,6 +61,9 @@ public final class OverviewStudyMain {
             new Look("equinox", "the vernal equinox",
                     new SkyPosition(0.0, 0.0), new double[] {60, 120}));
 
+    /** The worst miss, for the record beside the report. */
+    private static double observedMiss;
+
     public static void main(String[] args) throws IOException {
         Path out = Path.of(args.length > 0 ? args[0]
                 : "docs/studies/overview-projection");
@@ -129,7 +132,17 @@ public final class OverviewStudyMain {
                 + " it was checked\nagainst, and that a round trip"
                 + " returns where it started - which is the same"
                 + " on\nany machine that can add.\n\n");
+        observed.append("## The candidates against what they were"
+                + " checked with\n\n");
         observed.append(AgreementReport.observed(
+                new SkyPosition(83.0, 0.0)));
+        observed.append(String.format(java.util.Locale.ROOT,
+                "%n## How far a drawn curve misses a projected"
+                        + " point%n%n%.1e page units, worst over %d"
+                        + " combinations.%n",
+                observedMiss, PageCurveReport.rows));
+        observed.append("\n## What each great circle fits\n\n");
+        observed.append(CurveFormReport.observed(
                 new SkyPosition(83.0, 0.0)));
         juranometria.tool.PlatformEvidence.write(observed,
                 "docs/studies/overview-projection/platform.md");
@@ -524,13 +537,24 @@ public final class OverviewStudyMain {
 
                 """);
         out.append(String.format(java.util.Locale.ROOT, """
-                | measured over | stated form agrees with fitted form | worst the drawn curve misses a projected point |
+                | measured over | stated form agrees with fitted form | the drawn curve passes through every projected point |
                 |---:|---:|---:|
-                | %d combinations | %d, and %d disagree | %.1e page units |
+                | %d combinations | %d, and %d disagree | %s |
 
                 """, PageCurveReport.rows,
                 PageCurveReport.agreed, PageCurveReport.disagreed,
-                PageCurveReport.worstMiss));
+                PageCurveReport.worstMiss <= CurveFormReport.FITS_WITHIN
+                        ? "yes, within " + CurveFormReport.FITS_WITHIN
+                                + " page units"
+                        : "**no**"));
+        if (PageCurveReport.worstMiss > CurveFormReport.FITS_WITHIN) {
+            throw new IllegalStateException("a drawn curve misses a"
+                    + " projected point by "
+                    + PageCurveReport.worstMiss + " page units, which"
+                    + " is past rounding: the curve the page draws is"
+                    + " not the curve the projection made");
+        }
+        observedMiss = PageCurveReport.worstMiss;
         out.append("""
                 The disagreement that this check did find is worth
                 recording, because it was not an error. Centred on

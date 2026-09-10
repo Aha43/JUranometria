@@ -295,7 +295,14 @@ public final class ControlExplanationStudyMain {
         // different number of characters, so cutting first moves
         // where the cut falls and two machines disagree about a line
         // neither of them measured differently (#315).
+        // The markup goes first. A tooltip past the wrap length is
+        // handed to the HTML renderer with a stated width, and
+        // whether it passes that length depends on how this desktop
+        // spells the keystroke inside it - so one machine showed the
+        // wrapper and another showed the sentence (#315). What the
+        // audit is reporting is the sentence.
         String flat = PlatformEvidence.portable(text)
+                .replaceAll("<html>|</html>|<body[^>]*>|</body>", " ")
                 .replace("|", "\\|").replaceAll("\\s+", " ").trim();
         return flat.length() <= 90 ? flat
                 : flat.substring(0, 87) + "...";
