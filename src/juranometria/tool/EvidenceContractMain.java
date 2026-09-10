@@ -182,7 +182,11 @@ public final class EvidenceContractMain {
             Map.of("juranometria.tool.ToggleShortcutStudyMain",
                     "docs/studies/toggle-shortcuts/platform.md",
                     "juranometria.tool.ControlExplanationStudyMain",
-                    "docs/studies/control-explanations/platform.md");
+                    "docs/studies/control-explanations/platform.md",
+                    "juranometria.tool.BlackSkyStudyMain",
+                    "docs/studies/black-sky/platform.md",
+                    "juranometria.tool.OverviewInkStudyMain",
+                    "docs/studies/overview-ink/platform.md");
 
     /**
      * Every promoted rendering carries an account of itself, and the
@@ -609,6 +613,37 @@ public final class EvidenceContractMain {
      */
     private static final int DIFFERENCES_SHOWN = 40;
 
+    /**
+     * A platform observation, held to reproducing on this machine.
+     *
+     * <p>Run again, into a second buffer, and required to say the
+     * same thing. That catches the failure a byte contract catches -
+     * a generator that has stopped being deterministic - without
+     * claiming anything about a font it has never seen.
+     */
+    private static List<String> observedBreaches(
+            Map.Entry<String, String> report,
+            ByteArrayOutputStream first) throws Exception {
+        ByteArrayOutputStream again = new ByteArrayOutputStream();
+        PrintStream was = System.out;
+        System.setOut(new PrintStream(again, true, "UTF-8"));
+        try {
+            Class.forName(report.getKey())
+                    .getMethod("main", String[].class)
+                    .invoke(null, (Object) new String[0]);
+        } finally {
+            System.setOut(was);
+        }
+        if (java.util.Arrays.equals(first.toByteArray(),
+                again.toByteArray())) {
+            return List.of();
+        }
+        return List.of(report.getValue() + ": a platform observation"
+                + " has to reproduce within its own environment"
+                + differingLines(first.toByteArray(),
+                        again.toByteArray()));
+    }
+
     /** A generation step that may fail. */
     interface Generation {
         void run() throws Exception;
@@ -728,6 +763,25 @@ public final class EvidenceContractMain {
                         .invoke(null, (Object) new String[0]);
             } finally {
                 System.setOut(realOut);
+            }
+            String said = captured.toString("UTF-8");
+            if (said.contains(PlatformEvidence.OBSERVED_MARK)) {
+                // The report says of itself that its numbers are this
+                // machine's. Held to what that allows: it names the
+                // machine, and running the study again here writes
+                // the same thing. Comparing it with a recording made
+                // on another desktop would be asking a question the
+                // project's own contract refuses to ask (#315).
+                failures.addAll(observedBreaches(report, captured));
+                if (!said.contains("Recorded on: `")) {
+                    failures.add(report.getValue() + ": a platform"
+                            + " observation has to name the machine"
+                            + " it was taken on");
+                } else {
+                    tally(verdicts, "platform-observed (reproduces"
+                            + " here; not held across machines)");
+                }
+                continue;
             }
             Snapshot expectedSnapshot = committed.get(report.getValue());
             byte[] expected = expectedSnapshot == null ? null

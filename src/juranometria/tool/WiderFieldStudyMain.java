@@ -114,7 +114,9 @@ public final class WiderFieldStudyMain {
                 + " OS and version, architecture, and JDK\nbuild - and"
                 + " the test skips it out loud anywhere else rather"
                 + " than\npretending.\n\n");
-        out.append("Recorded on: `" + platform() + "`\n\n");
+        out.append(PlatformEvidence.observed("Which pages the atlas"
+                + " releases, and at which steps, is portable and is"
+                + " asserted by this study's gate."));
         out.append("Every released field step, at four centres that"
                 + " exercise the cases\nthe atlas treats differently -"
                 + " the M31 default, Orion on the\nequator, a"

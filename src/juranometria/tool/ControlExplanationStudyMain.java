@@ -290,8 +290,13 @@ public final class ControlExplanationStudyMain {
         if (text == null) {
             return "&mdash;";
         }
-        String flat = text.replace("|", "\\|").replaceAll("\\s+", " ")
-                .trim();
+        // Made portable before it is cut, not after: a keystroke
+        // spelled `⌘=` here and `Ctrl+Equals` elsewhere is a
+        // different number of characters, so cutting first moves
+        // where the cut falls and two machines disagree about a line
+        // neither of them measured differently (#315).
+        String flat = PlatformEvidence.portable(text)
+                .replace("|", "\\|").replaceAll("\\s+", " ").trim();
         return flat.length() <= 90 ? flat
                 : flat.substring(0, 87) + "...";
     }

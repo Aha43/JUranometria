@@ -115,15 +115,11 @@ public final class LabelStudyMain {
                 + " `text-before.tsv`.\nWhat the migration did to the"
                 + " atlas, page by page and label by label, is its"
                 + " own\nsection below.\n\n");
-        out.append("Recorded on: `" + WiderFieldStudyMain.platform()
-                + "`, and that matters here. Every\nnumber below is a"
-                + " count of pixels, so it is reproducible on a machine"
-                + " rather than\nacross machines, exactly like the"
-                + " atlas's other renderer-drawn evidence: font\nrasterisation"
-                + " differs, and the same collision that shares 68"
-                + " pixels here shares\n27 on a Linux runner. What does"
-                + " not differ is which pairs collide and which do"
-                + "\nnot, which is what this document is for.\n\n");
+        out.append(juranometria.tool.PlatformEvidence.observed(
+                "What each label is, where the policy allows it to go,"
+                + " which candidate it took and why a refusal was"
+                + " refused does not depend on a font, and is"
+                + " asserted by this study's gate."));
         out.append("## What counts as a collision here\n\n");
         out.append("Two rules, and both of them cost this study a"
                 + " rewrite.\n\n");

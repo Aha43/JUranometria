@@ -85,8 +85,9 @@ public final class FigureAnchorStudyMain {
                 + " renderer through the production\nassembler, at the"
                 + " field's own default limit, " + WIDE + " x " + HIGH
                 + " on white paper.\n\n");
-        out.append("Recorded on: `" + WiderFieldStudyMain.platform()
-                + "`\n\n");
+        out.append(PlatformEvidence.observed("Which anchor each"
+                + " figure takes, and why, does not depend on a font"
+                + " and is asserted by this study's gate."));
 
         out.append("## The defect, and the repair\n\n");
         out.append("Figure endpoints that land on the paper, and how"

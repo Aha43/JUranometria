@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Where a promoted image came from (Sprint 31, issue #315).
@@ -30,6 +31,12 @@ import java.util.Locale;
  * promotes them, after a reviewed regeneration - never automatically,
  * because a record that rewrites itself whenever the pixels move
  * records nothing.
+ *
+ * <p><strong>What it proves is identity and recorded origin, not that
+ * the picture is still visually current.</strong> The contract's
+ * check reads this record and never writes it: a timestamp refreshed
+ * by a gate that merely passed would date the check rather than the
+ * decision.
  */
 public final class EvidenceProvenanceMain {
 
@@ -47,18 +54,35 @@ public final class EvidenceProvenanceMain {
 
     public static void main(String[] args) throws Exception {
         List<Entry> entries = new ArrayList<>();
-        String recorded = args.length > 0 ? args[0]
+        String today = args.length > 0 ? args[0]
                 : java.time.LocalDate.now().toString();
+        Map<String, Entry> already = new java.util.TreeMap<>();
+        for (Entry entry : recorded()) {
+            already.put(entry.path(), entry);
+        }
+        int promoted = 0;
         for (Path file : rendered()) {
-            entries.add(new Entry(file.toString().replace('\\', '/'),
-                    sha256(Files.readAllBytes(file)), recorded,
-                    PlatformEvidence.environment(),
-                    generatorOf(file)));
+            String path = file.toString().replace('\\', '/');
+            String hash = sha256(Files.readAllBytes(file));
+            Entry before = already.get(path);
+            if (before != null && before.sha256().equals(hash)) {
+                // Unchanged bytes keep the day somebody agreed to
+                // them. Restamping every artifact on every run would
+                // record when this command was last typed, which is
+                // not what anybody wants to know (#315).
+                entries.add(before);
+                continue;
+            }
+            promoted++;
+            entries.add(new Entry(path, hash, today,
+                    PlatformEvidence.environment(), generatorOf(file)));
         }
         Files.writeString(RECORD, document(entries),
                 StandardCharsets.UTF_8);
         System.out.println("provenance recorded for " + entries.size()
-                + " promoted artifacts in " + RECORD);
+                + " promoted artifacts in " + RECORD + "; " + promoted
+                + " newly dated, the rest keeping the day they were"
+                + " agreed");
     }
 
     /** Every committed artifact whose bytes a renderer drew. */
@@ -113,12 +137,23 @@ public final class EvidenceProvenanceMain {
                 + " the hash of\nthe bytes that were agreed - so any"
                 + " machine can check that the file in the\n"
                 + "repository is the file that was recorded.\n\n");
-        out.append("**It cannot say whether the atlas has moved since,"
-                + " and neither can a rerender\non another machine:"
-                + " text rasterises differently there and nothing has"
-                + " gone\nstale. Cartographic freshness is carried by"
-                + " the ink and semantic evidence, and\nby reviewed"
+        out.append("**What this proves is identity and recorded"
+                + " origin: that the file in the\nrepository is the"
+                + " file somebody agreed to, and when and on what they"
+                + " agreed\nto it. It does not prove the picture is"
+                + " still visually current, and no rerender\non"
+                + " another machine can prove that either - text"
+                + " rasterises differently there\nand nothing has gone"
+                + " stale. Cartographic freshness is carried by the ink"
+                + " and\nsemantic evidence and by reviewed"
                 + " regeneration.**\n\n");
+        out.append("A date below is written when somebody promotes"
+                + " that image on purpose. A run\nthat finds the bytes"
+                + " unchanged keeps the date they already carried, and"
+                + " the\ncontract's check only ever reads this file: a"
+                + " timestamp refreshed by a gate\nthat merely passed"
+                + " would date the check rather than the"
+                + " decision.\n\n");
         out.append(String.format(Locale.ROOT,
                 "**%d promoted artifacts.**%n%n", entries.size()));
         out.append("| artifact | sha256 | recorded | environment |"

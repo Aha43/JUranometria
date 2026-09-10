@@ -51,18 +51,15 @@ Ink purposes ordered by contrast against their ground - identical on both ground
 
 Each page is rendered in both palettes (900x700; committed beside this document as `<page>-paper.png` and `<page>-black.png`). For the black render, three contracts, asserted: every pixel is grey; every colour covering at least 0.5% of the page is a reviewed palette value (an accidental white island or a furniture block on the wrong ground is thousands of pixels; the antialiased rim of a long feature is a legitimate concentration of a single intermediate grey - the first run caught 531 pixels of grey 1 along M31's ellipse rim, honest compositing a naive floor misread); and every remaining colour is counted as antialiasing, not waved through. Then the two renders are compared structurally, pixel for pixel, each classified ground / exact ink / antialiased: compositing against the wrong ground would put antialiasing where the paper render has none, so the classification agreement is the halo check made executable. "Mask" is the set of non-ground pixels; its residual disagreement is rounding at edges where coverage is marginal against one ground but not the other.
 
-| page | why | palette px | AA px | AA greys | class agreement | mask agreement | mask differs |
-|---|---|---|---|---|---|---|---|
-| m31-08 | the released reference page: the largest pale fill, labels, grid | 96.79% | 20224 (3.210%) | 241 | 99.551% | 100.000% | 0 |
-
-`m31-08-black`: the galaxy fill is present and itself - 33593 pixels of exact grey 27 inside M31's ellipse.
-
-| orion-36 | wide and dense: figures, names, boundaries, every symbol family | 91.82% | 51538 (8.181%) | 244 | 99.180% | 99.977% | 145 |
-| polar-36 | polar: converging meridians, name and label crowding | 94.11% | 37089 (5.887%) | 244 | 99.271% | 99.975% | 157 |
-| seam-24 | the 0h right-ascension seam | 95.03% | 31334 (4.974%) | 244 | 99.410% | 99.986% | 91 |
-| m42-01 | narrow: one nebula box near its contrast floor | 97.75% | 14151 (2.246%) | 224 | 99.675% | 100.000% | 0 |
-| sparse-08 | sparse: mostly ground, the frame and grid alone must carry the page | 95.84% | 26237 (4.165%) | 239 | 99.509% | 100.000% | 0 |
-| m31-08-key | the reference page with the stellar-magnitude key: furniture interiors on the dark ground | 96.70% | 20797 (3.301%) | 243 | 99.403% | 100.000% | 0 |
+| page | why | every inked pixel inked on both grounds | classification agreement | the galaxy's whisper |
+|---|---|---|---|---|
+| m31-08 | the released reference page: the largest pale fill, labels, grid | yes, within the 0.001 residue | at or above the 99.0% floor | audible |
+| orion-36 | wide and dense: figures, names, boundaries, every symbol family | yes, within the 0.001 residue | at or above the 99.0% floor | — |
+| polar-36 | polar: converging meridians, name and label crowding | yes, within the 0.001 residue | at or above the 99.0% floor | — |
+| seam-24 | the 0h right-ascension seam | yes, within the 0.001 residue | at or above the 99.0% floor | — |
+| m42-01 | narrow: one nebula box near its contrast floor | yes, within the 0.001 residue | at or above the 99.0% floor | — |
+| sparse-08 | sparse: mostly ground, the frame and grid alone must carry the page | yes, within the 0.001 residue | at or above the 99.0% floor | — |
+| m31-08-key | the reference page with the stellar-magnitude key: furniture interiors on the dark ground | yes, within the 0.001 residue | at or above the 99.0% floor | — |
 `m31-08-key-black`: furniture interiors are the ground (title-block padding probe grey 0, page corner grey 0) - opaque blocks, no white islands.
 
 

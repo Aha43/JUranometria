@@ -8,10 +8,17 @@ it and agreed. This says when, on what, and by which generator, and the hash of
 the bytes that were agreed - so any machine can check that the file in the
 repository is the file that was recorded.
 
-**It cannot say whether the atlas has moved since, and neither can a rerender
-on another machine: text rasterises differently there and nothing has gone
-stale. Cartographic freshness is carried by the ink and semantic evidence, and
-by reviewed regeneration.**
+**What this proves is identity and recorded origin: that the file in the
+repository is the file somebody agreed to, and when and on what they agreed
+to it. It does not prove the picture is still visually current, and no rerender
+on another machine can prove that either - text rasterises differently there
+and nothing has gone stale. Cartographic freshness is carried by the ink and
+semantic evidence and by reviewed regeneration.**
+
+A date below is written when somebody promotes that image on purpose. A run
+that finds the bytes unchanged keeps the date they already carried, and the
+contract's check only ever reads this file: a timestamp refreshed by a gate
+that merely passed would date the check rather than the decision.
 
 **293 promoted artifacts.**
 

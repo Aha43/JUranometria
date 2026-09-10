@@ -21,12 +21,12 @@ in their head.
 | Nebulae | `U` | Deep-sky objects | Clouds of gas and dust: emission, reflection and dark neb... |
 | Planetary nebulae | `P` | Deep-sky objects | Shells thrown off by dying stars, drawn small and crossed... |
 | Deep-sky labels | `L` | Deep-sky objects | Name the deep-sky objects the chart draws (<prefix> then L) |
-| Star names | `S` | — | Traditional proper names such as Betelgeuse (<prefix> then S) |
+| Star names | `S` | — | Traditional proper names such as Betelgeuse (<prefix> the... |
 | Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis ... |
-| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts (<prefix> th... |
-| Constellation figures | `F` | — | The joined stick figures of the constellations (<prefix> then F) |
+| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts (<pref... |
+| Constellation figures | `F` | — | The joined stick figures of the constellations (<prefix> ... |
 | Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875 (<prefix> then B) |
-| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is (<prefix> then N) |
+| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is (<prefix> th... |
 | Equatorial coordinate grid | `E` | — | ICRS/J2000 right-ascension and declination grid lines wit... |
 | Title block | `T` | — | The panel in the lower left stating the target, centre, f... |
 | Stellar-magnitude key | `K` | — | A key in the upper right showing the circle size the char... |

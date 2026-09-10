@@ -509,8 +509,14 @@ public final class ToggleShortcutStudyMain {
         if (text == null) {
             return "—";
         }
-        String plain = text.replaceAll("<[^>]*>", " ")
-                .replaceAll("\\s+", " ").trim();
+        // Portable before it is cut: a keystroke spelled one way here
+        // and another elsewhere is a different number of characters,
+        // and cutting first moves where the cut falls (#315). The
+        // stand-in token contains angle brackets, so the markup strip
+        // runs first and the substitution after it.
+        String plain = PlatformEvidence.portable(
+                text.replaceAll("<[^>]*>", " ")
+                        .replaceAll("\\s+", " ").trim());
         return plain.length() > 60 ? plain.substring(0, 57) + "..." : plain;
     }
 

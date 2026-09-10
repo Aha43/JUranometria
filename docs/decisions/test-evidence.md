@@ -171,7 +171,11 @@ So evidence is classified rather than normalised:
 - **Promoted inspection images** — held to the account they carry of
   themselves: when, on what machine, from which generator, and the
   hash of the bytes somebody agreed to
-  (`docs/studies/PROVENANCE.md`). Whether the atlas has moved under
+  (`docs/studies/PROVENANCE.md`). **That proves identity and recorded
+  origin, and not that the picture is still visually current**; the
+  contract reads the record and never writes it, because a timestamp
+  refreshed by a passing check would date the check rather than the
+  decision. Whether the atlas has moved under
   them is a cartographic question, carried by the ink and semantic
   evidence and by reviewed regeneration, not inferred from
   cross-platform pixels.

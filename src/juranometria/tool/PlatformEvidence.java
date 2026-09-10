@@ -79,6 +79,40 @@ public final class PlatformEvidence {
     /** The token standing in for the chart keyboard's own prefix. */
     public static final String PREFIX = "<prefix>";
 
+    /**
+     * The marker a report prints when its numbers are this machine's.
+     *
+     * <p>A study that measures ink, font extents or encoded sizes is
+     * measuring the desktop as much as the atlas. Saying so in the
+     * document is what lets the contract hold it to the right thing -
+     * reproducing here, not matching a recording made elsewhere - and
+     * lets a reader of the document know which kind of number they
+     * are reading.
+     */
+    public static final String OBSERVED_MARK = "Platform observation";
+
+    /** The banner, with the machine that took the measurements. */
+    public static String observed(String whatIsPortable) {
+        return "> **" + OBSERVED_MARK + ".** The measurements below"
+                + " are this machine's:\n> ink counts, font extents"
+                + " and encoded sizes depend on the fonts and the\n>"
+                + " rasteriser in front of them, and another machine"
+                + " measures differently\n> without anything being"
+                + " wrong. Held to reproducing here, never to"
+                + " matching\n> another machine's recording. "
+                + whatIsPortable + "\n>\n> Recorded on: `"
+                + machine() + "`\n\n";
+    }
+
+    /** The machine, in one line. */
+    public static String machine() {
+        return System.getProperty("os.name") + " "
+                + System.getProperty("os.version") + "/"
+                + System.getProperty("os.arch") + "/"
+                + System.getProperty("java.vendor") + " "
+                + System.getProperty("java.version");
+    }
+
     /** The heading every platform record carries. */
     public static void preface(StringBuilder out, String title,
                                String sprint) {
