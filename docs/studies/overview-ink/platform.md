@@ -12,8 +12,9 @@ never across two - the portable half of this study is the document beside it.
 | operating system | Mac OS X |
 | architecture | aarch64 |
 | Java | 21.0.11 |
-| look and feel | Metal |
 | headless | true |
+
+Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
 
 Every figure here is a fraction of pixels a renderer inked, so it is a
 measurement of the fonts and the rasteriser as much as of the chart. The report

@@ -192,7 +192,13 @@ public final class EvidenceContractMain {
                     "juranometria.tool.ChartSheetStudyMain",
                     "docs/studies/chart-sheet/platform.md",
                     "juranometria.tool.overview.OverviewStudyMain",
-                    "docs/studies/overview-projection/platform.md");
+                    "docs/studies/overview-projection/platform.md",
+                    "juranometria.tool.FigureAnchorStudyMain",
+                    "docs/studies/figure-anchors/platform.md",
+                    "juranometria.tool.WiderFieldStudyMain",
+                    "docs/studies/wider-field/platform.md",
+                    "juranometria.tool.labels.LabelStudyMain",
+                    "docs/studies/label-placement/platform.md");
 
     /**
      * Every promoted rendering carries an account of itself, and the
@@ -823,7 +829,8 @@ public final class EvidenceContractMain {
             byte[] first = Files.readAllBytes(file);
             String said = new String(first,
                     java.nio.charset.StandardCharsets.UTF_8);
-            if (!said.contains("| operating system |")) {
+            if (!said.contains("| operating system |")
+                    && !said.contains("Recorded on: `")) {
                 failures.add(record.getValue() + ": a platform record"
                         + " has to name the machine it is from");
                 continue;

@@ -12,8 +12,9 @@ never across two - the portable half of this study is the document beside it.
 | operating system | Mac OS X |
 | architecture | aarch64 |
 | Java | 21.0.11 |
-| look and feel | Metal |
 | headless | true |
+
+Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
 
 The residues below are rounding in double arithmetic: 7.8e-14 degrees on
 one machine and 7.7e-14 on another, because a JDK and a chip are free to

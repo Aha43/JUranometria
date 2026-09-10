@@ -132,14 +132,22 @@ public final class PlatformEvidence {
                 .append(System.getProperty("os.arch")).append(" |\n");
         out.append("| Java | ")
                 .append(System.getProperty("java.version")).append(" |\n");
-        out.append("| look and feel | ")
-                .append(javax.swing.UIManager.getLookAndFeel() == null
-                        ? "none"
-                        : javax.swing.UIManager.getLookAndFeel().getName())
-                .append(" |\n");
+        // Not the look and feel. It is a property of the JVM at the
+        // moment the study ran rather than of the machine, and a
+        // contract that runs several studies in one process found
+        // exactly that: a study measuring ink reported Metal the
+        // first time and FlatLaf the second, because another study
+        // had applied it in between (#315). A study whose numbers
+        // depend on a look and feel says so itself.
         out.append("| headless | ")
                 .append(java.awt.GraphicsEnvironment.isHeadless())
                 .append(" |\n\n");
+        // The same one line every other platform record carries, in
+        // the same words, so that a reader and a test can both find
+        // the machine without parsing a table.
+        out.append("Recorded on: `")
+                .append(juranometria.tool.WiderFieldStudyMain.platform())
+                .append("`\n\n");
     }
 
     /** Writes a platform record where the contract looks for it. */

@@ -184,12 +184,36 @@ So evidence is classified rather than normalised:
   the machine.
 
 A study that measured both kinds at once was **split**, not
-normalised: the toggle-shortcut and control-explanation studies now
-print the portable half where the contract pins its bytes and write
-the platform half beside it, with the machine named in it. Only one
-substitution is made in the portable half - this desktop's word for
-the menu modifier, reduced to a token - because normalising
-everything would hide the difference rather than classify it.
+normalised. Ten studies now print the portable half where the
+contract pins its bytes and write the platform half beside it, with
+the machine named in it. Only one substitution is made in the
+portable half - this desktop's word for a keystroke, reduced to the
+action it reaches - because normalising everything would hide the
+difference rather than classify it.
+
+What survived the split, study by study, is the decision each was
+taken for:
+
+| study | portable | recorded on one machine |
+|---|---|---|
+| toggle shortcuts | the switches, letters, masters, collisions | the modifier's spelling, the strokes a text field answers |
+| control explanations | which control is decided about, and how | the keystroke each explanation shows |
+| black sky | every inked pixel inked on both grounds within the residue; agreement clears its floor; the galaxy's whisper audible | the pixel and antialiasing counts |
+| overview ink | the rungs, the limit each arrives at, quieter than V 8.0, within five points of the sheet page | the ink percentages |
+| chart furniture | the key is drawn, one box for every page, under a twentieth of the paper | the box's size and the ink it covers |
+| chart sheets | the paper, the shape and label counts | the encoded file sizes |
+| overview projections | each candidate agrees, and a round trip returns, within 1e-9 | the residues themselves |
+| figure anchors | every figure endpoint has a node | how many the title block covers |
+| wider field | the mark and ink digests, which are arithmetic | the pixel digest |
+| label placement | the corpus, and the stability budget met | the whole collision census |
+
+**Two of them keep numbers that have no portable form, and say so.**
+The magnitude key's covered ink and the label census are what those
+studies exist to report: they differ on every page and every machine,
+and there is no inequality underneath them that a change of font
+would survive. Inventing a threshold for such a number would be
+worse than recording it as a measurement, which is what the reports
+now do in as many words.
 
 **Two commands, deliberately named apart**, so that neither silently
 behaves like the other:
