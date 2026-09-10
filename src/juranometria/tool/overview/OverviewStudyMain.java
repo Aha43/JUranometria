@@ -141,6 +141,8 @@ public final class OverviewStudyMain {
                         + " point%n%n%.1e page units, worst over %d"
                         + " combinations.%n",
                 observedMiss, PageCurveReport.rows));
+        observed.append("\n## How far each drawn curve misses\n\n");
+        observed.append(PageCurveReport.observed);
         observed.append("\n## What each great circle fits\n\n");
         observed.append(CurveFormReport.observed(
                 new SkyPosition(83.0, 0.0)));

@@ -35,6 +35,119 @@ any machine that can add.
 
 2.7e-12 page units, worst over 108 combinations.
 
+## How far each drawn curve misses
+
+| projection | centre | field | circle | worst miss |
+|---|---|---:|---|---:|
+| gnomonic | Orion | 42° | the celestial equator | 5.7e-14 |
+| gnomonic | Orion | 60° | the celestial equator | 5.7e-14 |
+| gnomonic | Orion | 60° | the ecliptic | 2.7e-13 |
+| gnomonic | Orion | 60° | a meridian | 3.4e-13 |
+| gnomonic | Orion | 90° | the celestial equator | 5.7e-14 |
+| gnomonic | Orion | 90° | the ecliptic | 2.6e-13 |
+| gnomonic | Orion | 90° | a meridian | 1.1e-13 |
+| gnomonic | Orion | 120° | the celestial equator | 5.7e-14 |
+| gnomonic | Orion | 120° | the ecliptic | 4.5e-13 |
+| gnomonic | Orion | 120° | a meridian | 1.1e-13 |
+| gnomonic | Orion | 120° | a horizon | 2.3e-12 |
+| gnomonic | the north pole | 42° | a meridian | 8.0e-13 |
+| gnomonic | the north pole | 42° | a horizon | 9.1e-13 |
+| gnomonic | the north pole | 60° | a meridian | 6.8e-13 |
+| gnomonic | the north pole | 60° | a horizon | 6.8e-13 |
+| gnomonic | the north pole | 90° | a meridian | 6.8e-13 |
+| gnomonic | the north pole | 90° | a horizon | 1.0e-12 |
+| gnomonic | the north pole | 120° | a meridian | 6.8e-13 |
+| gnomonic | the north pole | 120° | a horizon | 7.4e-13 |
+| gnomonic | the vernal equinox | 42° | the celestial equator | 5.7e-14 |
+| gnomonic | the vernal equinox | 42° | the ecliptic | 5.1e-13 |
+| gnomonic | the vernal equinox | 60° | the celestial equator | 5.7e-14 |
+| gnomonic | the vernal equinox | 60° | the ecliptic | 4.0e-13 |
+| gnomonic | the vernal equinox | 60° | a horizon | 9.1e-13 |
+| gnomonic | the vernal equinox | 90° | the celestial equator | 0.0e+00 |
+| gnomonic | the vernal equinox | 90° | the ecliptic | 3.1e-13 |
+| gnomonic | the vernal equinox | 90° | a horizon | 5.7e-13 |
+| gnomonic | the vernal equinox | 120° | the celestial equator | 0.0e+00 |
+| gnomonic | the vernal equinox | 120° | the ecliptic | 2.3e-13 |
+| gnomonic | the vernal equinox | 120° | a horizon | 3.4e-13 |
+| stereographic | Orion | 42° | the celestial equator | 5.7e-14 |
+| stereographic | Orion | 60° | the celestial equator | 5.7e-14 |
+| stereographic | Orion | 60° | the ecliptic | 2.7e-12 |
+| stereographic | Orion | 60° | a meridian | 9.1e-13 |
+| stereographic | Orion | 90° | the celestial equator | 5.7e-14 |
+| stereographic | Orion | 90° | the ecliptic | 4.5e-13 |
+| stereographic | Orion | 90° | a meridian | 4.5e-13 |
+| stereographic | Orion | 120° | the celestial equator | 5.7e-14 |
+| stereographic | Orion | 120° | the ecliptic | 4.5e-13 |
+| stereographic | Orion | 120° | a meridian | 4.5e-13 |
+| stereographic | Orion | 120° | a horizon | 9.1e-13 |
+| stereographic | Orion | 180° | the celestial equator | 5.7e-14 |
+| stereographic | Orion | 180° | the ecliptic | 4.5e-13 |
+| stereographic | Orion | 180° | a meridian | 2.3e-13 |
+| stereographic | Orion | 180° | a horizon | 1.1e-12 |
+| stereographic | the north pole | 42° | a meridian | 8.0e-13 |
+| stereographic | the north pole | 42° | a horizon | 9.1e-13 |
+| stereographic | the north pole | 60° | a meridian | 6.8e-13 |
+| stereographic | the north pole | 60° | a horizon | 9.1e-13 |
+| stereographic | the north pole | 90° | a meridian | 8.0e-13 |
+| stereographic | the north pole | 90° | a horizon | 9.1e-13 |
+| stereographic | the north pole | 120° | the ecliptic | 4.5e-13 |
+| stereographic | the north pole | 120° | a meridian | 8.0e-13 |
+| stereographic | the north pole | 120° | a horizon | 1.1e-12 |
+| stereographic | the north pole | 180° | the celestial equator | 2.3e-13 |
+| stereographic | the north pole | 180° | the ecliptic | 4.0e-13 |
+| stereographic | the north pole | 180° | a meridian | 6.8e-13 |
+| stereographic | the north pole | 180° | a horizon | 6.8e-13 |
+| stereographic | the vernal equinox | 42° | the celestial equator | 5.7e-14 |
+| stereographic | the vernal equinox | 42° | the ecliptic | 4.8e-13 |
+| stereographic | the vernal equinox | 60° | the celestial equator | 5.7e-14 |
+| stereographic | the vernal equinox | 60° | the ecliptic | 3.1e-13 |
+| stereographic | the vernal equinox | 60° | a horizon | 9.1e-13 |
+| stereographic | the vernal equinox | 90° | the celestial equator | 5.7e-14 |
+| stereographic | the vernal equinox | 90° | the ecliptic | 2.6e-13 |
+| stereographic | the vernal equinox | 90° | a horizon | 9.1e-13 |
+| stereographic | the vernal equinox | 120° | the celestial equator | 0.0e+00 |
+| stereographic | the vernal equinox | 120° | the ecliptic | 3.4e-13 |
+| stereographic | the vernal equinox | 120° | a meridian | 3.4e-13 |
+| stereographic | the vernal equinox | 120° | a horizon | 6.8e-13 |
+| stereographic | the vernal equinox | 180° | the celestial equator | 5.7e-14 |
+| stereographic | the vernal equinox | 180° | the ecliptic | 3.4e-13 |
+| stereographic | the vernal equinox | 180° | a meridian | 8.0e-13 |
+| stereographic | the vernal equinox | 180° | a horizon | 1.0e-12 |
+| orthographic | Orion | 42° | the celestial equator | 5.7e-14 |
+| orthographic | Orion | 60° | the celestial equator | 5.7e-14 |
+| orthographic | Orion | 60° | the ecliptic | 4.8e-13 |
+| orthographic | Orion | 60° | a meridian | 3.4e-13 |
+| orthographic | Orion | 90° | the celestial equator | 5.7e-14 |
+| orthographic | Orion | 90° | the ecliptic | 4.7e-13 |
+| orthographic | Orion | 90° | a meridian | 2.3e-13 |
+| orthographic | Orion | 90° | a horizon | 4.7e-13 |
+| orthographic | Orion | 120° | the celestial equator | 5.7e-14 |
+| orthographic | Orion | 120° | the ecliptic | 3.4e-13 |
+| orthographic | Orion | 120° | a meridian | 3.4e-13 |
+| orthographic | Orion | 120° | a horizon | 3.4e-13 |
+| orthographic | the north pole | 42° | a meridian | 6.8e-13 |
+| orthographic | the north pole | 42° | a horizon | 8.2e-13 |
+| orthographic | the north pole | 60° | a meridian | 6.8e-13 |
+| orthographic | the north pole | 60° | a horizon | 8.9e-13 |
+| orthographic | the north pole | 90° | a meridian | 3.4e-13 |
+| orthographic | the north pole | 90° | a horizon | 7.6e-13 |
+| orthographic | the north pole | 120° | the celestial equator | 1.1e-13 |
+| orthographic | the north pole | 120° | the ecliptic | 2.5e-13 |
+| orthographic | the north pole | 120° | a meridian | 4.5e-13 |
+| orthographic | the north pole | 120° | a horizon | 7.3e-13 |
+| orthographic | the vernal equinox | 42° | the celestial equator | 5.7e-14 |
+| orthographic | the vernal equinox | 42° | the ecliptic | 6.0e-13 |
+| orthographic | the vernal equinox | 60° | the celestial equator | 5.7e-14 |
+| orthographic | the vernal equinox | 60° | the ecliptic | 3.7e-13 |
+| orthographic | the vernal equinox | 60° | a horizon | 1.0e-12 |
+| orthographic | the vernal equinox | 90° | the celestial equator | 5.7e-14 |
+| orthographic | the vernal equinox | 90° | the ecliptic | 3.1e-13 |
+| orthographic | the vernal equinox | 90° | a horizon | 8.0e-13 |
+| orthographic | the vernal equinox | 120° | the celestial equator | 5.7e-14 |
+| orthographic | the vernal equinox | 120° | the ecliptic | 2.6e-13 |
+| orthographic | the vernal equinox | 120° | a meridian | 2.0e-13 |
+| orthographic | the vernal equinox | 120° | a horizon | 6.8e-13 |
+
 ## What each great circle fits
 
 | projection | great circle | points | as a line | as a circle | as a conic |
