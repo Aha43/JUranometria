@@ -656,6 +656,210 @@ public final class EvidenceContractMain {
                         again.toByteArray()));
     }
 
+    /**
+     * What two runs of every rendering generator produced.
+     *
+     * @param first what each path held after the first run
+     * @param claimed the paths a generator actually wrote in both
+     *     runs - a file nothing touched has not been drawn twice and
+     *     may not be reported as though it had
+     * @param differing the paths whose two drawings disagree
+     */
+    record DrawnTwice(Map<String, byte[]> first,
+                      java.util.Set<String> claimed,
+                      List<String> differing) {
+    }
+
+    /**
+     * Runs every generator twice and says which renderings moved.
+     *
+     * <p>Package-visible and taking its generators as an argument so
+     * that a test can hand it one that draws something different each
+     * time, and require this to say so (review, #322).
+     */
+    static DrawnTwice drawTwice(List<String> generators,
+                                List<String> paths) throws Exception {
+        return drawTwice(generators, paths, List.of());
+    }
+
+    /**
+     * The same, also watching whatever appears in these directories.
+     *
+     * <p>The promoted study pages are not written where they are
+     * committed: their generators draw into {@code build/}, and the
+     * canonical run compares the two. A portable run may not make
+     * that comparison - the committed page was agreed on another
+     * machine - but the generator's own determinism is still a fair
+     * question, and asking it of the build output is how it gets
+     * asked. Without this, a build writer could draw a different page
+     * every time and a portable run would notice nothing, because it
+     * only ever looks at what is committed (review, #322).
+     */
+    static DrawnTwice drawTwice(List<String> generators,
+                                List<String> paths,
+                                List<String> directories)
+            throws Exception {
+        // Whether a generator wrote a file is asked by dating every
+        // candidate to the epoch first and seeing which dates moved.
+        // Comparing timestamps before and after does not answer it:
+        // two runs of a quick generator land in the same millisecond,
+        // and the file then looks untouched when it was written twice
+        // - which this test caught before CI did.
+        Map<String, Long> original = stamps(paths);
+        java.util.Set<String> writtenOnce = wroteWhileDatedOld(
+                generators, paths);
+        Map<String, byte[]> first = new TreeMap<>();
+        for (String path : paths) {
+            if (Files.exists(Path.of(path))) {
+                first.put(path, Files.readAllBytes(Path.of(path)));
+            }
+        }
+        Map<String, byte[]> firstBuilt = drawnIn(directories);
+        java.util.Set<String> writtenAgain = wroteWhileDatedOld(
+                generators, paths);
+        Map<String, byte[]> builtAgain = drawnIn(directories);
+
+        java.util.Set<String> claimed = new java.util.TreeSet<>();
+        List<String> differing = new ArrayList<>();
+        for (String path : paths) {
+            if (!writtenOnce.contains(path)
+                    || !writtenAgain.contains(path)) {
+                // Nothing drew it, so nothing here may say it was
+                // drawn twice. Its own class decides what happens to
+                // it further down.
+                restore(path, original.get(path));
+                continue;
+            }
+            claimed.add(path);
+            if (!java.util.Arrays.equals(first.get(path),
+                    Files.readAllBytes(Path.of(path)))) {
+                differing.add(path);
+            }
+        }
+        // And whatever the generators drew where they draw it.
+        for (Map.Entry<String, byte[]> built : firstBuilt.entrySet()) {
+            byte[] now = builtAgain.get(built.getKey());
+            if (now == null) {
+                continue;
+            }
+            claimed.add(built.getKey());
+            if (!java.util.Arrays.equals(built.getValue(), now)) {
+                differing.add(built.getKey());
+            }
+        }
+        return new DrawnTwice(first, claimed, differing);
+    }
+
+    /** Every image a generator has left in these directories. */
+    private static Map<String, byte[]> drawnIn(List<String> directories)
+            throws IOException {
+        Map<String, byte[]> found = new TreeMap<>();
+        for (String directory : directories) {
+            Path root = Path.of(directory);
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (Stream<Path> tree = Files.walk(root)) {
+                for (Path file : tree.filter(Files::isRegularFile)
+                        .filter(f -> f.toString().endsWith(".png"))
+                        .toList()) {
+                    found.put(file.toString(),
+                            Files.readAllBytes(file));
+                }
+            }
+        }
+        return found;
+    }
+
+    /** Dates every candidate old, runs the generators, says what moved. */
+    private static java.util.Set<String> wroteWhileDatedOld(
+            List<String> generators, List<String> paths)
+            throws Exception {
+        for (String path : paths) {
+            restore(path, 0L);
+        }
+        runAll(generators);
+        java.util.Set<String> written = new java.util.TreeSet<>();
+        for (String path : paths) {
+            Path file = Path.of(path);
+            if (Files.exists(file)
+                    && Files.getLastModifiedTime(file).toMillis() != 0L) {
+                written.add(path);
+            }
+        }
+        return written;
+    }
+
+    /** Puts a file's date back, where there is one to put back. */
+    private static void restore(String path, Long when)
+            throws IOException {
+        Path file = Path.of(path);
+        if (when != null && Files.exists(file)) {
+            Files.setLastModifiedTime(file,
+                    java.nio.file.attribute.FileTime.fromMillis(when));
+        }
+    }
+
+    /** Every generator that owns a renderer-drawn artifact. */
+    private static List<String> renderingGenerators() {
+        List<String> generators = new ArrayList<>(REPORT_MAINS.keySet());
+        for (String main : PLATFORM_REPORTS.keySet()) {
+            if (!generators.contains(main)) {
+                generators.add(main);
+            }
+        }
+        generators.addAll(IMAGE_MAINS);
+        for (Map.Entry<String, String> writer : BUILD_WRITERS.entrySet()) {
+            Gate gate = GATED_GENERATORS.get(writer.getKey());
+            if (gate == null || Files.isDirectory(gate.input())) {
+                generators.add(writer.getKey());
+            }
+        }
+        return generators;
+    }
+
+    /** Every committed artifact a renderer drew. */
+    private static List<String> rendererDrawn(
+            Map<String, Snapshot> committed) {
+        List<String> paths = new ArrayList<>();
+        for (String path : committed.keySet()) {
+            if ("renderer-drawn".equals(TestEvidenceScan.artifactClass(
+                    Path.of(path).getFileName().toString()))) {
+                paths.add(path);
+            }
+        }
+        return paths;
+    }
+
+    private static void runAll(List<String> generators)
+            throws Exception {
+        PrintStream was = System.out;
+        System.setOut(new PrintStream(new ByteArrayOutputStream(),
+                true, "UTF-8"));
+        try {
+            for (String main : generators) {
+                Class.forName(main).getMethod("main", String[].class)
+                        .invoke(null, (Object) new String[0]);
+            }
+        } finally {
+            System.setOut(was);
+        }
+    }
+
+    /** When each of these files was last written, or null. */
+    private static Map<String, Long> stamps(List<String> paths)
+            throws IOException {
+        Map<String, Long> when = new TreeMap<>();
+        for (String path : paths) {
+            Path file = Path.of(path);
+            if (Files.exists(file)) {
+                when.put(path, Files.getLastModifiedTime(file)
+                        .toMillis());
+            }
+        }
+        return when;
+    }
+
     /** A generation step that may fail. */
     interface Generation {
         void run() throws Exception;
@@ -764,6 +968,65 @@ public final class EvidenceContractMain {
                             Mode mode)
             throws Exception {
 
+        // ---- every rendering, drawn twice, before anything else --
+        // What a portable contract can honestly ask of a rendering is
+        // that this machine draws it the same way twice. That has to
+        // mean *every* generator that owns renderer output, not only
+        // the ones in IMAGE_MAINS: the report generators draw pages
+        // too, and a first version of this captured them before the
+        // second pass and then compared each with itself, so a
+        // nondeterministic report image would have passed while the
+        // run claimed every rendering reproduced (review, #322).
+        DrawnTwice twice = null;
+        if (mode == Mode.PORTABLE) {
+            twice = drawTwice(renderingGenerators(),
+                    rendererDrawn(committed),
+                    new ArrayList<>(BUILD_WRITERS.values()));
+            for (String path : twice.differing()) {
+                failures.add(path + ": renderer-drawn image did not"
+                        + " reproduce byte-for-byte between two"
+                        + " renderings on this machine - the generator"
+                        + " is not deterministic");
+            }
+            tally(verdicts, "drawn twice here and identical ("
+                    + (twice.claimed().size() - twice.differing().size())
+                    + " renderings)");
+            // And the residue, named rather than implied: a committed
+            // rendering that no generator wrote in either pass has
+            // not been checked by this run, and saying how many there
+            // are and which they are is the difference between a
+            // contract and a comfortable number (review, #322).
+            List<String> unclaimed = new ArrayList<>();
+            for (String path : rendererDrawn(committed)) {
+                if (!twice.claimed().contains(path)) {
+                    unclaimed.add(path);
+                }
+            }
+            // The promoted pages are the bulk of that residue, and
+            // they are not unchecked: their generators drew into
+            // build/ twice above, and the committed page is held to
+            // the account it carries of itself.
+            tally(verdicts, "drawn twice where the generator draws"
+                    + " ("
+                    + twice.claimed().stream()
+                            .filter(path -> path.startsWith("build/"))
+                            .count()
+                    + " build outputs)");
+            tally(verdicts, "not drawn here (" + unclaimed.size()
+                    + " renderings; held by their own class)");
+            if (!unclaimed.isEmpty()) {
+                System.out.println("Renderings nothing drew on this"
+                        + " run, held as committed by their own"
+                        + " class:");
+                for (String path : unclaimed) {
+                    System.out.println("  " + path
+                            + (PROMOTED_WITHOUT_GENERATOR.contains(path)
+                                    ? " (pinned: no generator)" : ""));
+                }
+                System.out.println();
+            }
+        }
+
         // ---- deterministic reports, from stdout: no churn --------
         PrintStream realOut = System.out;
         for (Map.Entry<String, String> report : REPORT_MAINS.entrySet()) {
@@ -862,28 +1125,6 @@ public final class EvidenceContractMain {
         provenanceBreaches(committed, failures, verdicts);
 
         // ---- image generators, then judge every touched file ------
-        // Twice, when the run may not look at another machine's
-        // pixels: what a portable contract can honestly ask of a
-        // rendering is that this machine draws it the same way
-        // twice - which catches a generator that has become
-        // nondeterministic, and says nothing about a font it has
-        // never seen (#315).
-        Map<String, byte[]> drawnHere = new TreeMap<>();
-        if (mode == Mode.PORTABLE) {
-            for (String main : IMAGE_MAINS) {
-                Class.forName(main).getMethod("main", String[].class)
-                        .invoke(null, (Object) new String[0]);
-            }
-            for (String path : committed.keySet()) {
-                if ("renderer-drawn".equals(
-                        TestEvidenceScan.artifactClass(Path.of(path)
-                                .getFileName().toString()))
-                        && Files.exists(Path.of(path))) {
-                    drawnHere.put(path,
-                            Files.readAllBytes(Path.of(path)));
-                }
-            }
-        }
         for (String main : IMAGE_MAINS) {
             Class.forName(main).getMethod("main", String[].class)
                     .invoke(null, (Object) new String[0]);
@@ -1002,8 +1243,8 @@ public final class EvidenceContractMain {
             // machine; only the canonical run compares it with the
             // pixels somebody agreed to elsewhere.
             byte[] reference = mode == Mode.PORTABLE
-                    && drawnHere.containsKey(path)
-                    ? drawnHere.get(path) : entry.getValue().bytes();
+                    && twice != null && twice.first().containsKey(path)
+                    ? twice.first().get(path) : entry.getValue().bytes();
             boolean same = java.util.Arrays.equals(reference, now);
             boolean rewritten = Files.exists(file)
                     && !Files.getLastModifiedTime(file)
