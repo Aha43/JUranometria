@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -550,6 +551,19 @@ public final class EvidenceContractMain {
      */
     public enum Mode { PORTABLE, CANONICAL }
 
+    /**
+     * A breach, on its way out through the restoration (#323).
+     *
+     * <p>Carries no message: the breaches were printed where they
+     * were found, in the words the reader needs. What this exists for
+     * is to reach the outer finally before the process ends, so that
+     * the run which drifted the working tree is not also the run that
+     * skipped putting it back.
+     */
+    static final class Breached extends Exception {
+        private static final long serialVersionUID = 1L;
+    }
+
     public static void main(String[] args) throws Exception {
         Mode mode = args.length > 0 && "ci".equals(args[0])
                 ? Mode.PORTABLE : Mode.CANONICAL;
@@ -562,8 +576,15 @@ public final class EvidenceContractMain {
                         + " machine's pixels"
                 : "canonical contract: renderings are compared with"
                         + " the committed references");
-        generateUnderRestoration(Path.of("docs/studies"), committed,
-                () -> run(committed, failures, verdicts, mode));
+        try {
+            generateUnderRestoration(Path.of("docs/studies"), committed,
+                    () -> run(committed, failures, verdicts, mode));
+        } catch (Breached breached) {
+            // The restoration has already run, which is the whole
+            // point of coming out this way; the breaches are already
+            // printed. All that is left is the exit status CI reads.
+            System.exit(1);
+        }
     }
 
     /**
@@ -640,9 +661,7 @@ public final class EvidenceContractMain {
         PrintStream was = System.out;
         System.setOut(new PrintStream(again, true, "UTF-8"));
         try {
-            Class.forName(report.getKey())
-                    .getMethod("main", String[].class)
-                    .invoke(null, (Object) new String[0]);
+            invoke(report.getKey());
         } finally {
             System.setOut(was);
         }
@@ -667,7 +686,20 @@ public final class EvidenceContractMain {
      */
     record DrawnTwice(Map<String, byte[]> first,
                       java.util.Set<String> claimed,
-                      List<String> differing) {
+                      List<String> differing,
+                      List<String> intermittent,
+                      Map<String, byte[]> said,
+                      List<String> saidDiffering,
+                      Map<String, byte[]> recordFirst,
+                      List<String> recordDiffering,
+                      List<String> recordIntermittent,
+                      List<String> recordUnwritten) {
+    }
+
+    /** What one pass wrote and what each generator said while doing it. */
+    private record Pass(java.util.Set<String> written,
+                        java.util.Set<String> wroteRecords,
+                        Map<String, byte[]> said) {
     }
 
     /**
@@ -679,7 +711,7 @@ public final class EvidenceContractMain {
      */
     static DrawnTwice drawTwice(List<String> generators,
                                 List<String> paths) throws Exception {
-        return drawTwice(generators, paths, List.of());
+        return drawTwice(generators, paths, List.of(), List.of());
     }
 
     /**
@@ -699,6 +731,24 @@ public final class EvidenceContractMain {
                                 List<String> paths,
                                 List<String> directories)
             throws Exception {
+        return drawTwice(generators, paths, directories, List.of());
+    }
+
+    /**
+     * The same, also keeping the bytes of files that are not
+     * renderings but are written by these same generators (#323).
+     *
+     * <p>The platform records are the case: they are held to
+     * reproducing within one environment, which is a question about
+     * two runs, and two runs is exactly what is already happening
+     * here. They stay out of {@code claimed} and {@code differing},
+     * which speak for renderings and whose counts the tally reports.
+     */
+    static DrawnTwice drawTwice(List<String> generators,
+                                List<String> paths,
+                                List<String> directories,
+                                List<String> alsoCapture)
+            throws Exception {
         // Whether a generator wrote a file is asked by dating every
         // candidate to the epoch first and seeing which dates moved.
         // Comparing timestamps before and after does not answer it:
@@ -706,8 +756,11 @@ public final class EvidenceContractMain {
         // and the file then looks untouched when it was written twice
         // - which this test caught before CI did.
         Map<String, Long> original = stamps(paths);
-        java.util.Set<String> writtenOnce = wroteWhileDatedOld(
-                generators, paths);
+        Map<String, Long> builtBefore = stampsIn(directories);
+        Map<String, Long> recordsBefore = stamps(alsoCapture);
+        Pass once = wroteWhileDatedOld(generators, paths, directories,
+                alsoCapture);
+        java.util.Set<String> writtenOnce = once.written();
         Map<String, byte[]> first = new TreeMap<>();
         for (String path : paths) {
             if (Files.exists(Path.of(path))) {
@@ -715,15 +768,71 @@ public final class EvidenceContractMain {
             }
         }
         Map<String, byte[]> firstBuilt = drawnIn(directories);
-        java.util.Set<String> writtenAgain = wroteWhileDatedOld(
-                generators, paths);
+        Map<String, byte[]> recordFirst = bytesOf(alsoCapture);
+        Pass again = wroteWhileDatedOld(generators, paths, directories,
+                alsoCapture);
+        java.util.Set<String> writtenAgain = again.written();
         Map<String, byte[]> builtAgain = drawnIn(directories);
+        Map<String, byte[]> recordAgain = bytesOf(alsoCapture);
+
+        // What each generator said, and whether it said the same
+        // thing twice (#323). The reports used to be captured by a
+        // third run, which could not see a generator whose stdout
+        // moved between the first two - so this is one invocation
+        // fewer and one question more.
+        List<String> saidDiffering = new ArrayList<>();
+        for (Map.Entry<String, byte[]> spoke : once.said().entrySet()) {
+            byte[] now = again.said().get(spoke.getKey());
+            if (now != null && !java.util.Arrays.equals(
+                    spoke.getValue(), now)) {
+                saidDiffering.add(spoke.getKey());
+            }
+        }
+        // The platform records, held to the same three answers as
+        // every other artifact here (review of #328).
+        List<String> recordDiffering = new ArrayList<>();
+        List<String> recordIntermittent = new ArrayList<>();
+        List<String> recordUnwritten = new ArrayList<>();
+        for (String path : alsoCapture) {
+            boolean wroteFirst = once.wroteRecords().contains(path);
+            boolean wroteAgain = again.wroteRecords().contains(path);
+            if (wroteFirst != wroteAgain) {
+                recordIntermittent.add(path);
+                restore(path, recordsBefore.get(path));
+                continue;
+            }
+            if (!wroteFirst) {
+                recordUnwritten.add(path);
+                restore(path, recordsBefore.get(path));
+                continue;
+            }
+            byte[] then = recordFirst.get(path);
+            byte[] now = recordAgain.get(path);
+            if (then == null || now == null
+                    || !java.util.Arrays.equals(then, now)) {
+                recordDiffering.add(path);
+            }
+        }
 
         java.util.Set<String> claimed = new java.util.TreeSet<>();
         List<String> differing = new ArrayList<>();
+        // Three answers, not two (review of #328). A page written in
+        // one pass and not the other is neither residue nor a
+        // rendering this run may speak for: it is a generator that
+        // drew something once and then did not, which is exactly the
+        // nondeterminism the two passes exist to catch. Folding it in
+        // with "nothing drew it" let an intermittent generator omit a
+        // rendering and pass.
+        List<String> intermittent = new ArrayList<>();
         for (String path : paths) {
-            if (!writtenOnce.contains(path)
-                    || !writtenAgain.contains(path)) {
+            boolean drewFirst = writtenOnce.contains(path);
+            boolean drewAgain = writtenAgain.contains(path);
+            if (drewFirst != drewAgain) {
+                intermittent.add(path);
+                restore(path, original.get(path));
+                continue;
+            }
+            if (!drewFirst) {
                 // Nothing drew it, so nothing here may say it was
                 // drawn twice. Its own class decides what happens to
                 // it further down.
@@ -736,21 +845,90 @@ public final class EvidenceContractMain {
                 differing.add(path);
             }
         }
-        // And whatever the generators drew where they draw it.
-        for (Map.Entry<String, byte[]> built : firstBuilt.entrySet()) {
-            byte[] now = builtAgain.get(built.getKey());
-            if (now == null) {
+        // And whatever the generators drew where they draw it, held
+        // to the same three answers. A build output written in one
+        // pass only used to vanish from the reckoning entirely - the
+        // pass-one case fell out of the loop, and the pass-two case
+        // was never in it.
+        java.util.Set<String> everBuilt = new java.util.TreeSet<>();
+        everBuilt.addAll(firstBuilt.keySet());
+        everBuilt.addAll(builtAgain.keySet());
+        for (String path : everBuilt) {
+            byte[] then = firstBuilt.get(path);
+            byte[] now = builtAgain.get(path);
+            if (then == null || now == null) {
+                intermittent.add(path);
                 continue;
             }
-            claimed.add(built.getKey());
-            if (!java.util.Arrays.equals(built.getValue(), now)) {
-                differing.add(built.getKey());
+            claimed.add(path);
+            if (!java.util.Arrays.equals(then, now)) {
+                differing.add(path);
             }
         }
-        return new DrawnTwice(first, claimed, differing);
+        // A page nothing wrote keeps the date it arrived with, so a
+        // later run asks the same question of it rather than finding
+        // an epoch stamp this one left behind.
+        for (Map.Entry<String, Long> was : builtBefore.entrySet()) {
+            if (!claimed.contains(was.getKey())) {
+                restore(was.getKey(), was.getValue());
+            }
+        }
+        return new DrawnTwice(first, claimed, differing, intermittent,
+                once.said(), saidDiffering, recordFirst,
+                recordDiffering, recordIntermittent, recordUnwritten);
     }
 
-    /** Every image a generator has left in these directories. */
+    /** When each image in these directories was last written. */
+    private static Map<String, Long> stampsIn(List<String> directories)
+            throws IOException {
+        Map<String, Long> when = new TreeMap<>();
+        for (String directory : directories) {
+            Path root = Path.of(directory);
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (Stream<Path> tree = Files.walk(root)) {
+                for (Path file : tree.filter(Files::isRegularFile)
+                        .filter(f -> f.toString().endsWith(".png"))
+                        .toList()) {
+                    when.put(file.toString(),
+                            Files.getLastModifiedTime(file).toMillis());
+                }
+            }
+        }
+        return when;
+    }
+
+    /** The bytes these files hold now, where they exist. */
+    private static Map<String, byte[]> bytesOf(List<String> paths)
+            throws IOException {
+        Map<String, byte[]> held = new TreeMap<>();
+        for (String path : paths) {
+            Path file = Path.of(path);
+            if (Files.exists(file)) {
+                held.put(path, Files.readAllBytes(file));
+            }
+        }
+        return held;
+    }
+
+    /**
+     * Every image a generator wrote in these directories <em>during
+     * the pass that just ran</em> (#323, found in review of #328).
+     *
+     * <p>It used to be every image present, which asked no question
+     * at all of the ones that were already there. A page left in
+     * {@code build/} by an earlier run - by a generator since gated
+     * off, renamed, or simply not run today - was read in both
+     * passes, compared with itself, found equal, and counted as a
+     * rendering this run had drawn twice. The same false credit the
+     * committed half was fixed for in #322, still being given here.
+     *
+     * <p>So the same mechanism answers it: every file in these
+     * directories is dated to the epoch before the pass, and only a
+     * file whose date moved was written by it. A file nobody wrote
+     * keeps the date it had, and no verdict here speaks for it.
+     */
     private static Map<String, byte[]> drawnIn(List<String> directories)
             throws IOException {
         Map<String, byte[]> found = new TreeMap<>();
@@ -762,6 +940,7 @@ public final class EvidenceContractMain {
             try (Stream<Path> tree = Files.walk(root)) {
                 for (Path file : tree.filter(Files::isRegularFile)
                         .filter(f -> f.toString().endsWith(".png"))
+                        .filter(f -> written(f))
                         .toList()) {
                     found.put(file.toString(),
                             Files.readAllBytes(file));
@@ -771,23 +950,77 @@ public final class EvidenceContractMain {
         return found;
     }
 
+    /** Whether this file's date moved off the epoch, i.e. was written. */
+    private static boolean written(Path file) {
+        try {
+            return Files.exists(file)
+                    && Files.getLastModifiedTime(file).toMillis() != 0L;
+        } catch (IOException unreadable) {
+            return false;
+        }
+    }
+
+    /**
+     * Dates every image in these directories to the epoch, and says
+     * what date each one had (#323).
+     *
+     * <p>The build directories are not committed, so there is no
+     * snapshot to compare them against; what makes a page there
+     * evidence is that a generator wrote it while this run was
+     * watching. Dating them old first is how that gets asked.
+     */
+    private static Map<String, Long> dateDirectoriesOld(
+            List<String> directories) throws IOException {
+        Map<String, Long> original = new TreeMap<>();
+        for (String directory : directories) {
+            Path root = Path.of(directory);
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (Stream<Path> tree = Files.walk(root)) {
+                for (Path file : tree.filter(Files::isRegularFile)
+                        .filter(f -> f.toString().endsWith(".png"))
+                        .toList()) {
+                    original.put(file.toString(),
+                            Files.getLastModifiedTime(file).toMillis());
+                    restore(file.toString(), 0L);
+                }
+            }
+        }
+        return original;
+    }
+
     /** Dates every candidate old, runs the generators, says what moved. */
-    private static java.util.Set<String> wroteWhileDatedOld(
-            List<String> generators, List<String> paths)
+    private static Pass wroteWhileDatedOld(
+            List<String> generators, List<String> paths,
+            List<String> directories, List<String> records)
             throws Exception {
         for (String path : paths) {
             restore(path, 0L);
         }
-        runAll(generators);
+        dateDirectoriesOld(directories);
+        // The platform records are dated old for the same reason
+        // everything else here is (review of #328): they were read
+        // after each pass and never asked whether anybody had written
+        // them, so a record no generator touched was read twice,
+        // compared with itself, and credited as reproducing.
+        for (String path : records) {
+            restore(path, 0L);
+        }
+        Map<String, byte[]> said = runAll(generators);
         java.util.Set<String> written = new java.util.TreeSet<>();
         for (String path : paths) {
-            Path file = Path.of(path);
-            if (Files.exists(file)
-                    && Files.getLastModifiedTime(file).toMillis() != 0L) {
+            if (written(Path.of(path))) {
                 written.add(path);
             }
         }
-        return written;
+        java.util.Set<String> wroteRecords = new java.util.TreeSet<>();
+        for (String path : records) {
+            if (written(Path.of(path))) {
+                wroteRecords.add(path);
+            }
+        }
+        return new Pass(written, wroteRecords, said);
     }
 
     /** Puts a file's date back, where there is one to put back. */
@@ -831,18 +1064,90 @@ public final class EvidenceContractMain {
         return paths;
     }
 
-    private static void runAll(List<String> generators)
+    /**
+     * Runs each generator once, keeping what it printed (#323).
+     *
+     * <p>The stdout used to be thrown away here and the generator run
+     * again later to capture it. It is the same generator saying the
+     * same thing, so it is captured once and judged where the
+     * judgement belongs.
+     */
+    private static Map<String, byte[]> runAll(List<String> generators)
             throws Exception {
+        Map<String, byte[]> said = new LinkedHashMap<>();
         PrintStream was = System.out;
-        System.setOut(new PrintStream(new ByteArrayOutputStream(),
-                true, "UTF-8"));
         try {
             for (String main : generators) {
-                Class.forName(main).getMethod("main", String[].class)
-                        .invoke(null, (Object) new String[0]);
+                ByteArrayOutputStream captured =
+                        new ByteArrayOutputStream();
+                System.setOut(new PrintStream(captured, true, "UTF-8"));
+                try {
+                    invoke(main);
+                } finally {
+                    System.setOut(was);
+                }
+                said.put(main, captured.toByteArray());
             }
         } finally {
             System.setOut(was);
+        }
+        return said;
+    }
+
+    /**
+     * What each generator has cost this run, and how often it ran
+     * (#323).
+     *
+     * <p>Nothing measured which of the thirty-two generators the
+     * hour went on, so which of them to run differently was a guess.
+     * The count matters as much as the time: a generator that appears
+     * here having run four times is one the contract asked the same
+     * question of four times.
+     */
+    private static final Map<String, long[]> SPENT = new TreeMap<>();
+
+    /**
+     * Runs one generator's {@code main}, timed.
+     *
+     * <p>Every invocation in the contract goes through here, so the
+     * table at the end is the whole cost and not a sample of it. It
+     * times the failing case too - a generator that throws has still
+     * spent what it spent, and hiding that would flatter the run.
+     */
+    static void invoke(String main) throws Exception {
+        long start = System.nanoTime();
+        try {
+            Class.forName(main).getMethod("main", String[].class)
+                    .invoke(null, (Object) new String[0]);
+        } finally {
+            long[] spent = SPENT.computeIfAbsent(main,
+                    unused -> new long[2]);
+            spent[0] += System.nanoTime() - start;
+            spent[1]++;
+        }
+    }
+
+    /** The cost table, most expensive first. */
+    private static void reportSpending(PrintStream out) {
+        long total = 0;
+        long runs = 0;
+        for (long[] spent : SPENT.values()) {
+            total += spent[0];
+            runs += spent[1];
+        }
+        out.println();
+        out.printf(Locale.ROOT,
+                "generators: %d, invoked %d times, %.1f s in all%n",
+                SPENT.size(), runs, total / 1e9);
+        List<Map.Entry<String, long[]>> byCost =
+                new ArrayList<>(SPENT.entrySet());
+        byCost.sort((one, other) -> Long.compare(
+                other.getValue()[0], one.getValue()[0]));
+        for (Map.Entry<String, long[]> spent : byCost) {
+            out.printf(Locale.ROOT, "%8.1f s  %d x  %s%n",
+                    spent.getValue()[0] / 1e9, spent.getValue()[1],
+                    spent.getKey().substring(
+                            spent.getKey().lastIndexOf('.') + 1));
         }
     }
 
@@ -981,12 +1286,20 @@ public final class EvidenceContractMain {
         if (mode == Mode.PORTABLE) {
             twice = drawTwice(renderingGenerators(),
                     rendererDrawn(committed),
-                    new ArrayList<>(BUILD_WRITERS.values()));
+                    new ArrayList<>(BUILD_WRITERS.values()),
+                    new ArrayList<>(PLATFORM_REPORTS.values()));
             for (String path : twice.differing()) {
                 failures.add(path + ": renderer-drawn image did not"
                         + " reproduce byte-for-byte between two"
                         + " renderings on this machine - the generator"
                         + " is not deterministic");
+            }
+            for (String path : twice.intermittent()) {
+                failures.add(path + ": drawn in one of the two passes"
+                        + " and not the other, so the generator that"
+                        + " owns it does not draw it every time - a"
+                        + " rendering that comes and goes is not"
+                        + " evidence, and this is not residue either");
             }
             tally(verdicts, "drawn twice here and identical ("
                     + (twice.claimed().size() - twice.differing().size())
@@ -1030,14 +1343,28 @@ public final class EvidenceContractMain {
         // ---- deterministic reports, from stdout: no churn --------
         PrintStream realOut = System.out;
         for (Map.Entry<String, String> report : REPORT_MAINS.entrySet()) {
+            // Portable runs have already run this generator twice and
+            // kept both of the things it said, so judging it here
+            // costs nothing (#323). Canonical runs it once, here,
+            // because there is no drawing pass to take it from.
             ByteArrayOutputStream captured = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(captured, true, "UTF-8"));
-            try {
-                Class.forName(report.getKey())
-                        .getMethod("main", String[].class)
-                        .invoke(null, (Object) new String[0]);
-            } finally {
-                System.setOut(realOut);
+            if (twice != null
+                    && twice.said().containsKey(report.getKey())) {
+                captured.write(twice.said().get(report.getKey()));
+                if (twice.saidDiffering().contains(report.getKey())) {
+                    failures.add(report.getValue() + ": the generator"
+                            + " said two different things in two runs"
+                            + " on this machine, so nothing it says"
+                            + " can be held to any bytes");
+                    continue;
+                }
+            } else {
+                System.setOut(new PrintStream(captured, true, "UTF-8"));
+                try {
+                    invoke(report.getKey());
+                } finally {
+                    System.setOut(realOut);
+                }
             }
             String said = captured.toString("UTF-8");
             if (said.contains(PlatformEvidence.OBSERVED_MARK)) {
@@ -1047,7 +1374,9 @@ public final class EvidenceContractMain {
                 // the same thing. Comparing it with a recording made
                 // on another desktop would be asking a question the
                 // project's own contract refuses to ask (#315).
-                failures.addAll(observedBreaches(report, captured));
+                if (twice == null) {
+                    failures.addAll(observedBreaches(report, captured));
+                }
                 if (!said.contains("Recorded on: `")) {
                     failures.add(report.getValue() + ": a platform"
                             + " observation has to name the machine"
@@ -1098,22 +1427,57 @@ public final class EvidenceContractMain {
                         + " has to name the machine it is from");
                 continue;
             }
-            PrintStream was = System.out;
-            System.setOut(new PrintStream(
-                    new ByteArrayOutputStream(), true, "UTF-8"));
-            try {
-                Class.forName(record.getKey())
-                        .getMethod("main", String[].class)
-                        .invoke(null, (Object) new String[0]);
-            } finally {
-                System.setOut(was);
+            byte[] afterFirstPass = first;
+            boolean moved;
+            if (twice != null && (twice.recordUnwritten()
+                    .contains(record.getValue())
+                    || twice.recordIntermittent()
+                            .contains(record.getValue()))) {
+                // Present is not the same as written (review of
+                // #328). A record no generator wrote in either pass
+                // has not been shown to reproduce here; one written
+                // in a single pass has been shown not to.
+                failures.add(record.getValue()
+                        + (twice.recordUnwritten()
+                                .contains(record.getValue())
+                                ? ": nothing wrote this platform record"
+                                        + " in either pass, so the run"
+                                        + " has not seen it reproduce"
+                                        + " - a file read twice is not"
+                                        + " a file written twice"
+                                : ": this platform record was written"
+                                        + " in one of the two passes"
+                                        + " and not the other, so the"
+                                        + " study that owns it does"
+                                        + " not write it every time"));
+                continue;
             }
-            if (!java.util.Arrays.equals(first,
-                    Files.readAllBytes(file))) {
+            if (twice != null) {
+                // Written twice already, by the two drawing passes
+                // (#323): the comparison is between those, not
+                // between the committed file and a third run.
+                byte[] wasThen = twice.recordFirst()
+                        .get(record.getValue());
+                afterFirstPass = wasThen != null ? wasThen : first;
+                moved = twice.recordDiffering()
+                        .contains(record.getValue());
+            } else {
+                PrintStream was = System.out;
+                System.setOut(new PrintStream(
+                        new ByteArrayOutputStream(), true, "UTF-8"));
+                try {
+                    invoke(record.getKey());
+                } finally {
+                    System.setOut(was);
+                }
+                moved = !java.util.Arrays.equals(first,
+                        Files.readAllBytes(file));
+            }
+            if (moved) {
                 failures.add(record.getValue() + ": a platform record"
                         + " has to reproduce within its own"
                         + " environment"
-                        + differingLines(first,
+                        + differingLines(afterFirstPass,
                                 Files.readAllBytes(file)));
             } else {
                 tally(verdicts, "platform-recorded (reproduces here;"
@@ -1125,9 +1489,13 @@ public final class EvidenceContractMain {
         provenanceBreaches(committed, failures, verdicts);
 
         // ---- image generators, then judge every touched file ------
-        for (String main : IMAGE_MAINS) {
-            Class.forName(main).getMethod("main", String[].class)
-                    .invoke(null, (Object) new String[0]);
+        // Portable runs drew these in both passes; running them a
+        // third time draws the same pages again and asks nothing new
+        // (#323).
+        if (twice == null) {
+            for (String main : IMAGE_MAINS) {
+                invoke(main);
+            }
         }
         Snapshot widgetMeasuredSnap = committed.get(WIDGET_MEASURED_REPORT);
         byte[] widgetMeasured = widgetMeasuredSnap == null ? null
@@ -1166,9 +1534,9 @@ public final class EvidenceContractMain {
                 }
                 continue;
             }
-            Class.forName(writer.getKey())
-                    .getMethod("main", String[].class)
-                    .invoke(null, (Object) new String[0]);
+            if (twice == null) {
+                invoke(writer.getKey());
+            }
         }
         for (Map.Entry<String, String> pair
                 : PROMOTED_DIRECTORIES.entrySet()) {
@@ -1351,10 +1719,18 @@ public final class EvidenceContractMain {
             realOut.printf("%5d  %s%n", verdict.getValue(),
                     verdict.getKey());
         }
+        reportSpending(realOut);
         if (!failures.isEmpty()) {
             realOut.println();
             failures.forEach(f -> realOut.println("CONTRACT BREACH: " + f));
-            System.exit(1);
+            // Thrown rather than exited (#323). System.exit does not
+            // unwind, so exiting here walked straight past the outer
+            // finally that puts inspection imagery back - the one
+            // path where the restoration guarantee mattered most,
+            // because a breached run is exactly the run that leaves
+            // drift behind. The breaches are already printed, so what
+            // travels is a signal and not a message.
+            throw new Breached();
         }
         realOut.println();
         realOut.println("EVIDENCE CONTRACTS OK");
