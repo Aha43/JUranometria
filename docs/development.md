@@ -142,7 +142,11 @@ are executable, not aspirational:
   screenshots, digest-pinned; re-capture is a reviewed provenance event).
 - **Studies are reproducibility paths** (`make <name>-study`); their chosen
   pages are production output, and the contracts compare them against their
-  generators' build output rather than trusting the commit.
+  generators' build output rather than trusting the commit. **A study's make
+  target runs it the way the contract runs it** — headless, so that typing
+  the documented command reproduces the committed bytes. Four of them did
+  not, and each rewrote its own `platform.md` with `headless | false` for
+  anyone who followed their own instructions (issue #323).
 
 ## Releases
 
@@ -176,9 +180,7 @@ once in the release branch and once on the published site:
   `AppInfo.version()` into every exported sheet — the SVG `<metadata>`
   element, the PDF `/Producer` entry, the PNG text chunk — so the seven
   artifacts under `docs/studies/chart-sheet/` carry the version that
-  drew them. Regenerate them the way the contract invokes their study
-  (`-Djava.awt.headless=true`; `make chart-sheet-study` does not set it
-  and rewrites `platform.md` instead), then `make evidence-provenance`,
+  drew them. `make chart-sheet-study`, then `make evidence-provenance`,
   which re-dates only the rows whose bytes moved.
 - **The gallery.** `docs/gallery/manifest.json` carries `release` and
   `downloads` by hand; `GalleryMain` only reads them. Update both, run

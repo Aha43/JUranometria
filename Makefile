@@ -194,7 +194,8 @@ bayer-study: classes
 # pictures beside them.
 # Chart furniture (docs/decisions/chart-furniture.md, issue #179).
 furniture-study: classes
-	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.FurnitureStudyMain \
+	$(JAVA) -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.FurnitureStudyMain \
 		> docs/studies/chart-furniture/measurements.md
 
 identify-study: classes
@@ -238,7 +239,8 @@ icons: classes
 # and what asking costs.
 chart-sheet-study: classes
 	@echo "  chart sheets"
-	@$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartSheetStudyMain > /dev/null
+	@$(JAVA) -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartSheetStudyMain > /dev/null
 	@echo "written to docs/studies/chart-sheet"
 
 # The Sprint 30 gate (issue #296): the overview candidates drawn over
@@ -288,7 +290,8 @@ released-text: classes
 
 wider-field-study: classes
 	@echo "  the released pages, hashed"
-	@$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WiderFieldStudyMain > docs/studies/wider-field/released-pages.txt
+	@$(JAVA) -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WiderFieldStudyMain > docs/studies/wider-field/released-pages.txt
 	@echo "written to docs/studies/wider-field/released-pages.txt"
 
 on-this-page-study: classes
@@ -340,7 +343,8 @@ working-selection-study: classes
 # accounted.
 black-sky-study: classes
 	mkdir -p docs/studies/black-sky
-	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
+	$(JAVA) -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
 .PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study printable-chart-study
