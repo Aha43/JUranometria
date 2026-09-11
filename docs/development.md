@@ -142,7 +142,11 @@ are executable, not aspirational:
   screenshots, digest-pinned; re-capture is a reviewed provenance event).
 - **Studies are reproducibility paths** (`make <name>-study`); their chosen
   pages are production output, and the contracts compare them against their
-  generators' build output rather than trusting the commit.
+  generators' build output rather than trusting the commit. **A study's make
+  target runs it the way the contract runs it** — headless, so that typing
+  the documented command reproduces the committed bytes. Four of them did
+  not, and each rewrote its own `platform.md` with `headless | false` for
+  anyone who followed their own instructions (issue #323).
 
 ## Releases
 
@@ -161,11 +165,38 @@ Use semantic versions:
 1. Review the complete change since the previous release.
 2. Run all tests and exercise the packaged application.
 3. Move the accumulated changelog entries into a dated version section.
-4. Update `VERSION` in a release pull request, and merge it.
+4. Update `VERSION` in a release pull request, **and regenerate what
+   `VERSION` feeds** — see below — and merge it.
 5. Create and push an annotated tag on the merged commit:
    `git tag -a v1.2.3 -m "JUranometria 1.2.3" && git push origin v1.2.3`
 6. Watch the `release` workflow, then check the published downloads.
 7. Close the sprint milestone if it is not already closed.
+
+**`VERSION` is an input to committed artifacts, not only a number.**
+Both of these were missed at 1.12.0 and had to be corrected afterwards,
+once in the release branch and once on the published site:
+
+- **The chart sheets.** `juranometria.sheet.SheetMetadata` writes
+  `AppInfo.version()` into every exported sheet — the SVG `<metadata>`
+  element, the PDF `/Producer` entry, the PNG text chunk — so the seven
+  artifacts under `docs/studies/chart-sheet/` carry the version that
+  drew them. `make chart-sheet-study`, then `make evidence-provenance`,
+  which re-dates only the rows whose bytes moved.
+- **The gallery.** `docs/gallery/manifest.json` carries `release` and
+  `downloads` by hand; `GalleryMain` only reads them. Update both, run
+  `make gallery`, and commit the regenerated pages — the `pages`
+  workflow is path-filtered, so a release that touches no gallery file
+  never rebuilds the site and it goes on advertising the previous
+  version.
+
+**Neither is caught by the evidence contract**, and not by oversight:
+the portable route holds a rendering to reproducing on the runner that
+drew it, so a sheet drawn twice at the new version agrees with itself,
+and provenance compares the committed bytes with the record of those
+same committed bytes. Both pass while the artifacts are stale. Issue
+#324 carries the general problem — that neither same-runner
+reproduction nor provenance can say whether committed bytes are current
+for today's generator inputs.
 
 ### What the tag sets off
 
