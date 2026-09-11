@@ -19,6 +19,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
 import juranometria.chart.StarIdentity;
 import juranometria.chart.StarSizePolicy;
+import juranometria.project.DrawnPage;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -416,7 +417,7 @@ public final class BayerStudyMain {
         var metrics = g.getFontMetrics();
         var centre = scene.viewport().centre();
         var projection = new GnomonicProjection(centre);
-        var mapping = new ViewportMapping(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
         StarSizePolicy sizes = StarSizePolicy.DEFAULT;
 
         List<Rectangle2D> occupied = new ArrayList<>();

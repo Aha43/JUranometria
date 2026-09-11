@@ -8,6 +8,7 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
@@ -58,8 +59,8 @@ public final class PageInventory {
                     "an inventory is of a scene under options");
         }
         Projection projection =
-                Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+                DrawnPage.of(scene).projection();
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
         SkyPosition centre = scene.viewport().centre();

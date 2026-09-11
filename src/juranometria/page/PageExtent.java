@@ -9,6 +9,7 @@ import java.util.Locale;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.ChartScene;
 import juranometria.chart.SkyPosition;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
@@ -76,8 +77,8 @@ public final class PageExtent {
      */
     public static boolean onPage(ChartScene scene, DeepSkyObject dso) {
         Projection projection =
-                Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+                DrawnPage.of(scene).projection();
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         Rectangle2D paper = ChartRenderer.paperOf(scene);
 
         PixelPoint centre = projection.project(dso.position())
@@ -133,8 +134,8 @@ public final class PageExtent {
             return false;
         }
         Path2D.Double outline = outlineOf(
-                Projections.forViewport(scene.viewport()),
-                new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
+                DrawnPage.of(scene).projection(),
+                new ViewportMapping(DrawnPage.of(scene)), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, MAX_DEPTH);
         if (outline.getCurrentPoint() == null) {
             return false;          // nothing of it is on this sky
@@ -277,8 +278,8 @@ public final class PageExtent {
     static Path2D.Double outlineOn(ChartScene scene, SkyPosition centre,
                                    double semiMajorDeg, double semiMinorDeg,
                                    double positionAngleDeg, int maxDepth) {
-        return outlineOf(Projections.forViewport(scene.viewport()),
-                new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
+        return outlineOf(DrawnPage.of(scene).projection(),
+                new ViewportMapping(DrawnPage.of(scene)), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, maxDepth);
     }
 
@@ -288,8 +289,8 @@ public final class PageExtent {
                                           double semiMajorDeg,
                                           double semiMinorDeg,
                                           double positionAngleDeg, double t) {
-        return boundaryPixel(Projections.forViewport(scene.viewport()),
-                new ViewportMapping(scene.viewport()), centre, semiMajorDeg,
+        return boundaryPixel(DrawnPage.of(scene).projection(),
+                new ViewportMapping(DrawnPage.of(scene)), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, t);
     }
 

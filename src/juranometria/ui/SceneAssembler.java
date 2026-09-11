@@ -159,6 +159,72 @@ public final class SceneAssembler {
         return assembleScene(state, widthPx, heightPx, radius);
     }
 
+    /**
+     * A scene at a field and projection the atlas does not offer a
+     * reader, for the celestial-globe gate (Sprint 32, issue #301).
+     *
+     * <p><strong>Study only, and temporary: issue #329 owns its
+     * removal</strong>, when the orthographic projection becomes a
+     * production projection and a 180-degree page becomes a rung a
+     * reader can reach. Until then there is no such rung: 180 is not
+     * a field step, the projection enum has no orthographic value,
+     * and {@link ChartViewState} goes on refusing both - which
+     * {@code CelestialGlobeDoorTest} holds it to.
+     *
+     * <p>What this does <em>not</em> do is build a second atlas. The
+     * catalogue query, the coverage check, the geography policy, the
+     * page geometry and the scene are the production ones; the only
+     * thing supplied from outside is which projection draws it. A
+     * study that assembled its own scene would be measuring itself.
+     *
+     * <p>The viewport still carries a projection <em>kind</em>,
+     * because a viewport is a production record and the enum has no
+     * value for this one. Nothing reads it here: the renderer is
+     * given the real projection through its own study door, and
+     * takes the page's identity from that. Which is the gate's
+     * question about identity arriving early, and it is recorded in
+     * the decision rather than answered by a placeholder.
+     */
+    public juranometria.project.DrawnPage assembleForStudy(SkyPosition centre,
+                                       double fieldWidthDegrees,
+                                       double limitingMagnitude,
+                                       String title,
+                                       Projection projection,
+                                       int widthPx, int heightPx) {
+        // A page rectangle cannot describe a disc. The ordinary rule
+        // asks what angle the page's corner is at, and a hemisphere's
+        // corner is past the limb, where there is no angle to give -
+        // Sprint 30's "it is sized by a different rule", arriving as
+        // a NaN. A bounded projection answers the question exactly
+        // instead: everything it can show is within its limb of the
+        // centre, and nothing beyond it exists to be queried.
+        double radius = Double.isFinite(projection.visiblePlaneRadius())
+                ? projection.limitDegrees() + objectExtentMarginDegrees
+                : queryRadiusDegrees(projection, fieldWidthDegrees,
+                        widthPx, heightPx);
+        if (!allSky) {
+            double offset = centre.separationDegrees(dataCentre);
+            if (offset + radius > coverageRadiusDegrees) {
+                throw new IllegalArgumentException(String.format(
+                        java.util.Locale.ROOT,
+                        "a study page %dx%d at %.1f degrees offset %.2f"
+                                + " needs data to %.2f degrees but"
+                                + " coverage ends at %.1f",
+                        widthPx, heightPx, fieldWidthDegrees, offset,
+                        offset + radius, coverageRadiusDegrees));
+            }
+        }
+        ChartViewport viewport = new ChartViewport(centre,
+                fieldWidthDegrees, widthPx, heightPx,
+                ChartProjection.forField(fieldWidthDegrees));
+        SkyRegion query = new SkyRegion(centre, Math.min(radius, 180.0));
+        return new juranometria.project.DrawnPage(new ChartScene(viewport,
+                catalogue.starsIn(query),
+                catalogue.deepSkyObjectsIn(query),
+                title, limitingMagnitude, null,
+                geographyFor(fieldWidthDegrees, query)), projection);
+    }
+
     private ChartScene assembleScene(ChartViewState state, int widthPx, int heightPx,
                                      double radius) {
         // The scene carries the projection the state chose, so the
@@ -179,11 +245,16 @@ public final class SceneAssembler {
      * - and only those, so narrow pages perform no geography work at all.
      */
     private SceneGeography geographyFor(ChartViewState state, SkyRegion query) {
+        return geographyFor(state.fieldWidthDegrees(), query);
+    }
+
+    private SceneGeography geographyFor(double fieldWidthDegrees,
+                                        SkyRegion query) {
         if (geography == null) {
             return SceneGeography.EMPTY;
         }
         var policy = new juranometria.render.GeographyDetailPolicy(
-                state.fieldWidthDegrees());
+                fieldWidthDegrees);
         java.util.List<juranometria.geo.GeoSegment> figures =
                 policy.figuresDrawn() ? geography.figureSegmentsIn(query)
                         : java.util.List.of();

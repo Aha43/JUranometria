@@ -99,7 +99,7 @@ class ReferenceInkTest {
 
     private static double[] pixelOf(SkyPosition at) {
         return new GnomonicProjection(SCENE.viewport().centre()).project(at)
-                .map(new ViewportMapping(SCENE.viewport())::toPixel)
+                .map(new ViewportMapping(juranometria.project.DrawnPage.of(SCENE))::toPixel)
                 .map(pixel -> new double[] {pixel.x(), pixel.y()})
                 .orElseThrow();
     }
@@ -342,7 +342,7 @@ class ReferenceInkTest {
                     var paper = ChartRenderer.paperOf(scene);
                     var arc = juranometria.project.GreatCirclePage.clip(
                             new GnomonicProjection(scene.viewport().centre()),
-                            new ViewportMapping(scene.viewport()),
+                            new ViewportMapping(juranometria.project.DrawnPage.of(scene)),
                             juranometria.project.PageRegion.paper(
                                     paper.getMinX(), paper.getMinY(),
                                     paper.getMaxX(), paper.getMaxY()),

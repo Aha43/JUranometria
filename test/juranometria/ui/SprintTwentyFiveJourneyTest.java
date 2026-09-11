@@ -350,7 +350,8 @@ class SprintTwentyFiveJourneyTest {
         return juranometria.project.GreatCirclePage.clip(
                 new juranometria.project.GnomonicProjection(
                         scene.viewport().centre()),
-                new juranometria.project.ViewportMapping(scene.viewport()),
+                new juranometria.project.ViewportMapping(scene.viewport(),
+                juranometria.project.Projections.of(scene.viewport().projection(), scene.viewport().centre())),
                 juranometria.project.PageRegion.paper(
                         paper.getMinX(), paper.getMinY(),
                         paper.getMaxX(), paper.getMaxY()),
@@ -503,8 +504,8 @@ class SprintTwentyFiveJourneyTest {
         return new juranometria.project.GnomonicProjection(
                 scene.viewport().centre()).project(sky.zenith())
                 .map(plane -> {
-                    var pixel = new juranometria.project.ViewportMapping(
-                            scene.viewport()).toPixel(plane);
+                    var pixel = new juranometria.project.ViewportMapping(scene.viewport(),
+                juranometria.project.Projections.of(scene.viewport().projection(), scene.viewport().centre())).toPixel(plane);
                     return new double[] {pixel.x(),
                             pixel.y() + pageOffset()};
                 }).orElse(null);
@@ -576,8 +577,8 @@ class SprintTwentyFiveJourneyTest {
         ChartScene scene = chart.currentScene();
         var plane = new juranometria.project.GnomonicProjection(
                 scene.viewport().centre()).project(position).orElseThrow();
-        var pixel = new juranometria.project.ViewportMapping(
-                scene.viewport()).toPixel(plane);
+        var pixel = new juranometria.project.ViewportMapping(scene.viewport(),
+                juranometria.project.Projections.of(scene.viewport().projection(), scene.viewport().centre())).toPixel(plane);
         return new double[] {pixel.x(), pixel.y() + pageOffset()};
     }
 

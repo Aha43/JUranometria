@@ -19,6 +19,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.geo.GeoSegment;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
@@ -69,11 +70,79 @@ public final class ChartRenderer {
 
     private final StarSizePolicy starSizePolicy;
 
+    /**
+     * The projection this renderer draws by, when it has been told
+     * one instead of asking the viewport (Sprint 32, issue #301).
+     *
+     * <p><strong>Study only, and temporary: issue #329 owns its
+     * removal.</strong> The celestial-globe gate has to see what the
+     * production renderer draws for a hemisphere before production
+     * has an orthographic projection to name - and a study that drew
+     * hemispheres with its own renderer would be measuring itself
+     * rather than the atlas.
+     *
+     * <p>Null in every production path, where the viewport's own kind
+     * answers exactly as it did before.
+     */
+    private final DrawnPage told;
+
     public ChartRenderer(StarSizePolicy starSizePolicy) {
+        this(starSizePolicy, null);
+    }
+
+    private ChartRenderer(StarSizePolicy starSizePolicy, DrawnPage told) {
         if (starSizePolicy == null) {
             throw new IllegalArgumentException("star size policy must not be null");
         }
         this.starSizePolicy = starSizePolicy;
+        this.told = told;
+    }
+
+    /**
+     * A renderer for one page drawn by a projection its viewport does
+     * not name (Sprint 32, issue #301; #329 owns the removal).
+     *
+     * <p>Takes the page and the projection as the single value they
+     * arrive in, and will draw <em>that page and no other</em>: a
+     * renderer holding one page's projection is wrong for every other
+     * page, and the way to be sure it is never used for one is to
+     * refuse.
+     */
+    public static ChartRenderer drawing(DrawnPage page,
+                                        StarSizePolicy starSizePolicy) {
+        if (page == null) {
+            throw new IllegalArgumentException("page must not be null");
+        }
+        return new ChartRenderer(starSizePolicy, page);
+    }
+
+    /**
+     * The projection this page is drawn by: the one this renderer was
+     * told, or the one its viewport names.
+     *
+     * <p>One method rather than a condition at each of the four
+     * places that asked - three that draw and one that writes the
+     * page's identity into the title block - because a globe drawn by
+     * one projection and titled by another would be the study lying
+     * in exactly the way the gate exists to prevent.
+     */
+    private Projection drawnBy(ChartScene scene) {
+        return page(scene).projection();
+    }
+
+    /** This scene as a page, with the projection that draws it. */
+    private DrawnPage page(ChartScene scene) {
+        if (told == null) {
+            return DrawnPage.of(scene);
+        }
+        if (told.scene() != scene) {
+            throw new IllegalArgumentException(
+                    "this renderer was built for one page and told"
+                            + " which projection draws it; it cannot"
+                            + " draw another, because it would draw"
+                            + " that one by the wrong projection");
+        }
+        return told;
     }
 
     /** Renders the scene with the released default options. */
@@ -282,9 +351,8 @@ public final class ChartRenderer {
 
     public java.util.List<DrawnMark> drawnMarks(ChartScene scene,
                                                 ChartOptions options) {
-        Projection projection =
-                Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        Projection projection = drawnBy(scene);
+        ViewportMapping mapping = new ViewportMapping(page(scene));
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
         return drawnMarks(scene, options, policy, projection, mapping);
@@ -464,8 +532,8 @@ public final class ChartRenderer {
         g.setColor(palette.ground());
         g.fillRect(0, 0, width, height);
 
-        Projection projection = Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        Projection projection = drawnBy(scene);
+        ViewportMapping mapping = new ViewportMapping(page(scene));
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
         // Where every piece of this page's text goes, decided once
@@ -602,13 +670,13 @@ public final class ChartRenderer {
      */
     public java.util.Map<String, FigureInk> figureInk(ChartScene scene,
                                                       ChartOptions options) {
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(page(scene));
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
         if (!options.constellationFigures() || !policy.figuresDrawn()) {
             return java.util.Map.of();
         }
-        Projection projection = Projections.forViewport(scene.viewport());
+        Projection projection = drawnBy(scene);
         java.util.Map<String, java.util.List<java.awt.geom.Line2D>> pieces =
                 new java.util.LinkedHashMap<>();
         java.util.Map<String, double[]> anchors =
@@ -825,7 +893,7 @@ public final class ChartRenderer {
     public EquatorialGrid.Grid gridFor(FontMetrics metrics,
                                        ChartScene scene,
                                        ChartOptions options) {
-        return EquatorialGrid.gridFor(scene.viewport(),
+        return EquatorialGrid.gridFor(page(scene),
                 options.titleBlock() ? titleBlockBounds(metrics, scene)
                         : null,
                 options.magnitudeKey()
@@ -1673,7 +1741,7 @@ public final class ChartRenderer {
      */
     public java.util.List<DeepSkyObject> labelledDeepSky(
             ChartScene scene, ChartOptions options) {
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(page(scene));
         return labelledDeepSky(scene, options,
                 new RegionalDetailPolicy(scene,
                         mapping.pixelsPerPlaneUnit()));
@@ -1712,7 +1780,7 @@ public final class ChartRenderer {
      */
     public java.util.List<DeepSkyObject> drawnDeepSky(ChartScene scene,
                                                       ChartOptions options) {
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(page(scene));
         RegionalDetailPolicy policy = new RegionalDetailPolicy(scene,
                 mapping.pixelsPerPlaneUnit());
         java.util.List<DeepSkyObject> drawn = new java.util.ArrayList<>();
@@ -1804,9 +1872,9 @@ public final class ChartRenderer {
      * change actually costs is one phrase in the title block of every
      * printed page, which is the thing the gate asked for.
      */
-    private static String[] titleLines(ChartScene scene) {
-        String shape = " · "
-                + scene.viewport().projection().displayName();
+    private static String[] titleLines(ChartScene scene,
+                                       String projectionName) {
+        String shape = " · " + projectionName;
         return new String[] {
                 scene.title(),
                 "Centre " + formatRa(scene.viewport().centre().raDegrees())
@@ -2028,7 +2096,22 @@ public final class ChartRenderer {
      */
     public static java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
                                                       ChartScene scene) {
-        String[] lines = titleLines(scene);
+        return titleBlockLayout(metrics, scene,
+                DrawnPage.of(scene).projection().name());
+    }
+
+    /**
+     * The same, for a page whose projection is not the one its
+     * viewport names (Sprint 32, issue #301; #329 removes it).
+     *
+     * <p>The block is sized from the words it will actually carry. A
+     * globe measured with the name of a projection that did not draw
+     * it would report a title block the page never had.
+     */
+    public static java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
+                                                      ChartScene scene,
+                                                      String projectionName) {
+        String[] lines = titleLines(scene, projectionName);
         int lineHeight = metrics.getHeight();
         int textWidth = 0;
         for (String line : lines) {
@@ -2051,12 +2134,13 @@ public final class ChartRenderer {
                                 ChartPalette palette) {
         // A viewport too small to hold the block with its margins omits it
         // rather than clipping formal notation (Codex review, PR #12).
+        String projectionName = drawnBy(scene).name();
         java.awt.Rectangle box = titleBlockLayout(
-                g.getFontMetrics(LABEL_FONT), scene);
+                g.getFontMetrics(LABEL_FONT), scene, projectionName);
         if (box == null) {
             return;
         }
-        String[] lines = titleLines(scene);
+        String[] lines = titleLines(scene, projectionName);
         g.setFont(LABEL_FONT);
         FontMetrics metrics = g.getFontMetrics();
         int lineHeight = metrics.getHeight();

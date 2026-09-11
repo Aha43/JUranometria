@@ -19,7 +19,7 @@ class ViewportMappingTest {
 
     @Test
     void chartCentreMapsToPixelCentre() {
-        PixelPoint pixel = new ViewportMapping(VIEWPORT).toPixel(new PlanePoint(0.0, 0.0));
+        PixelPoint pixel = new ViewportMapping(VIEWPORT, juranometria.project.Projections.of(VIEWPORT.projection(), VIEWPORT.centre())).toPixel(new PlanePoint(0.0, 0.0));
         assertEquals(400.0, pixel.x(), PIXEL_TOLERANCE);
         assertEquals(300.0, pixel.y(), PIXEL_TOLERANCE);
     }
@@ -27,7 +27,7 @@ class ViewportMappingTest {
     @Test
     void halfFieldEastMapsToLeftEdge() {
         double halfFieldPlane = Math.tan(Math.toRadians(4.0));
-        PixelPoint pixel = new ViewportMapping(VIEWPORT).toPixel(new PlanePoint(halfFieldPlane, 0.0));
+        PixelPoint pixel = new ViewportMapping(VIEWPORT, juranometria.project.Projections.of(VIEWPORT.projection(), VIEWPORT.centre())).toPixel(new PlanePoint(halfFieldPlane, 0.0));
         assertEquals(0.0, pixel.x(), PIXEL_TOLERANCE);
         assertEquals(300.0, pixel.y(), PIXEL_TOLERANCE);
     }
@@ -36,7 +36,7 @@ class ViewportMappingTest {
     void eastIsLeftAndNorthIsUp() {
         // Regression guard for the atlas orientation: a sky position east and
         // north of centre must land left of and above the pixel centre.
-        ViewportMapping mapping = new ViewportMapping(VIEWPORT);
+        ViewportMapping mapping = new ViewportMapping(VIEWPORT, juranometria.project.Projections.of(VIEWPORT.projection(), VIEWPORT.centre()));
         GnomonicProjection projection = new GnomonicProjection(M31);
         PixelPoint pixel = mapping.toPixel(projection.project(
                 new SkyPosition(M31.raDegrees() + 1.0, M31.decDegrees() + 1.0)).orElseThrow());
@@ -46,7 +46,7 @@ class ViewportMappingTest {
 
     @Test
     void verticalScaleMatchesHorizontalScale() {
-        ViewportMapping mapping = new ViewportMapping(VIEWPORT);
+        ViewportMapping mapping = new ViewportMapping(VIEWPORT, juranometria.project.Projections.of(VIEWPORT.projection(), VIEWPORT.centre()));
         PixelPoint east = mapping.toPixel(new PlanePoint(0.01, 0.0));
         PixelPoint north = mapping.toPixel(new PlanePoint(0.0, 0.01));
         assertEquals(400.0 - east.x(), 300.0 - north.y(), PIXEL_TOLERANCE);
@@ -59,6 +59,9 @@ class ViewportMappingTest {
         // which draws it, and is refused for a different reason.
         assertThrows(IllegalArgumentException.class,
                 () -> new ViewportMapping(new ChartViewport(M31, 180.0,
-                        800, 600, juranometria.chart.ChartProjection.GNOMONIC)));
+                        800, 600, juranometria.chart.ChartProjection.GNOMONIC),
+                        Projections.of(
+                                juranometria.chart.ChartProjection.GNOMONIC,
+                                M31)));
     }
 }

@@ -26,6 +26,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
 import juranometria.chart.DeepSkyObject;
+import juranometria.project.DrawnPage;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -132,7 +133,7 @@ public final class StarIdentityStudyMain {
         var image = renderer.renderToImage(scene, new ChartOptions(
                 true, false, true, true, true, false));
         GnomonicProjection projection = new GnomonicProjection(centre);
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         StarSizePolicy sizes = StarSizePolicy.DEFAULT;
 
         // Deterministic label pass: brightest first with a stable TYC

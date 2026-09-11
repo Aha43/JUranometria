@@ -558,7 +558,7 @@ class LabelPlacementGateTest {
             java.awt.geom.Rectangle2D furniture =
                     Census.Metrics.titleBlockOf(page);
             var mapping = new juranometria.project.ViewportMapping(
-                    page.scene().viewport());
+                juranometria.project.DrawnPage.of(page.scene()));
             var projection = juranometria.project.Projections.forViewport(
                     page.scene().viewport());
             var metrics = Census.Metrics.forFont(ChartRenderer.labelFont());

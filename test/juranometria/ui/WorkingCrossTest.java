@@ -54,7 +54,7 @@ class WorkingCrossTest {
                                               SkyPosition position) {
         return new GnomonicProjection(scene.viewport().centre())
                 .project(position)
-                .map(new ViewportMapping(scene.viewport())::toPixel)
+                .map(new ViewportMapping(juranometria.project.DrawnPage.of(scene))::toPixel)
                 .orElseThrow();
     }
 

@@ -145,7 +145,7 @@ class GeographyRenderingTest {
         // segment crossing the block's interior changes nothing inside it.
         GnomonicProjection projection = new GnomonicProjection(CENTRE);
         ViewportMapping mapping = new ViewportMapping(
-                new ChartViewport(CENTRE, 12.0, 900, 700));
+                new ChartViewport(CENTRE, 12.0, 900, 700), projection);
         GeoSegment throughBlock = segmentThroughPixel(projection, mapping,
                 new PixelPoint(40, 650));
         BufferedImage blocked = RENDERER.renderToImage(scene(12.0,

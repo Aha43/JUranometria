@@ -418,7 +418,7 @@ class OverviewPageTest {
         for (double x : new double[] {60, 250, 450, 700, 860}) {
             for (double y : new double[] {40, 200, 350, 520, 660}) {
                 SkyPosition read = ChartHitTest.skyAt(overview, x, y);
-                PixelPoint back = new ViewportMapping(overview.viewport())
+                PixelPoint back = new ViewportMapping(juranometria.project.DrawnPage.of(overview))
                         .toPixel(Projections.forViewport(overview.viewport())
                                 .project(read).orElseThrow());
                 worst = Math.max(worst,
@@ -485,9 +485,9 @@ class OverviewPageTest {
         assertTrue(solved.centre().isPresent(), "the drag has a centre");
         assertFalse(solved.constrained(), "and is not against a bound");
 
-        PixelPoint landed = new ViewportMapping(
-                new juranometria.chart.ChartViewport(solved.centre().get(),
-                        120.0, WIDE, HIGH))
+        PixelPoint landed = new ViewportMapping(new juranometria.chart.ChartViewport(solved.centre().get(),
+                        120.0, WIDE, HIGH),
+                juranometria.project.Projections.of(juranometria.chart.ChartProjection.STEREOGRAPHIC, solved.centre().get()))
                 .toPixel(Projections.of(ChartProjection.STEREOGRAPHIC,
                                 solved.centre().get())
                         .project(grabbed).orElseThrow());
@@ -720,7 +720,7 @@ class OverviewPageTest {
         var figures = page.geography().figureSegments();
         assertFalse(figures.isEmpty(), "the page carries figures");
 
-        var mapping = new ViewportMapping(page.viewport());
+        var mapping = new ViewportMapping(juranometria.project.DrawnPage.of(page));
         var projection = Projections.forViewport(page.viewport());
         String orion = "Ori";
         int drawn = 0;

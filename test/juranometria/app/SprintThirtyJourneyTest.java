@@ -299,7 +299,7 @@ class SprintThirtyJourneyTest {
                     onEdt(navigation::state), ChartOptions.DEFAULTS,
                     juranometria.ui.SheetInk.reference(chart),
                     PaperSize.A4);
-            var drawnOn = new ViewportMapping(wideInk.scene().viewport());
+            var drawnOn = new ViewportMapping(juranometria.project.DrawnPage.of(wideInk.scene()));
             var drawnBy = Projections.forViewport(
                     wideInk.scene().viewport());
 
@@ -579,7 +579,7 @@ class SprintThirtyJourneyTest {
             // projection puts that object, which is a different place
             // on a different page and the same star in the sky.
             ChartScene detailed = onEdt(chart::currentScene);
-            var detailMapping = new ViewportMapping(detailed.viewport());
+            var detailMapping = new ViewportMapping(juranometria.project.DrawnPage.of(detailed));
             var detailProjection =
                     Projections.forViewport(detailed.viewport());
             int placed = 0;
@@ -1276,7 +1276,7 @@ class SprintThirtyJourneyTest {
                         PaperSize.A4.chartWideUnits(),
                         PaperSize.A4.chartHighUnits(),
                         page.projection());
-        var mapping = new ViewportMapping(viewport);
+        var mapping = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
         var projection = Projections.forViewport(viewport);
         int seen = 0;
         int dark = 0;

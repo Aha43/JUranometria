@@ -742,10 +742,9 @@ public final class LabelStudyMain {
 
     private static String meets(ChartScene scene,
                                 java.awt.FontMetrics metrics) {
-        var mapping = new juranometria.project.ViewportMapping(
-                scene.viewport());
-        var projection = juranometria.project.Projections.forViewport(
-                scene.viewport());
+        var studied = juranometria.project.DrawnPage.of(scene);
+        var mapping = new juranometria.project.ViewportMapping(studied);
+        var projection = studied.projection();
         var detail = new juranometria.render.RegionalDetailPolicy(scene,
                 mapping.pixelsPerPlaneUnit());
         java.awt.geom.Rectangle2D box = null;
@@ -1290,10 +1289,9 @@ public final class LabelStudyMain {
             Page page, java.awt.FontMetrics metrics) {
         ChartScene scene = page.scene();
         var options = page.options();
-        var mapping = new juranometria.project.ViewportMapping(
-                scene.viewport());
-        var projection = juranometria.project.Projections.forViewport(
-                scene.viewport());
+        var studied = juranometria.project.DrawnPage.of(scene);
+        var mapping = new juranometria.project.ViewportMapping(studied);
+        var projection = studied.projection();
         var detail = new juranometria.render.RegionalDetailPolicy(scene,
                 mapping.pixelsPerPlaneUnit());
         Map<String, Family> drawn = new LinkedHashMap<>();

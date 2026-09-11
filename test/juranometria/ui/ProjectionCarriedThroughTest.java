@@ -283,8 +283,7 @@ class ProjectionCarriedThroughTest {
         // fail here rather than merely look odd.
         ChartScene scene = sceneDrawnBy(ChartProjection.STEREOGRAPHIC, OVERVIEW);
         Projection projection = Projections.forViewport(scene.viewport());
-        var mapping = new juranometria.project.ViewportMapping(
-                scene.viewport());
+        var mapping = new juranometria.project.ViewportMapping(juranometria.project.DrawnPage.of(scene));
         List<ChartRenderer.DrawnMark> marks =
                 new ChartRenderer(StarSizePolicy.DEFAULT)
                         .drawnMarks(scene, ChartOptions.DEFAULTS);
@@ -323,8 +322,7 @@ class ProjectionCarriedThroughTest {
                     kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW);
             Projection projection =
                     Projections.forViewport(scene.viewport());
-            var mapping = new juranometria.project.ViewportMapping(
-                    scene.viewport());
+            var mapping = new juranometria.project.ViewportMapping(juranometria.project.DrawnPage.of(scene));
             int checked = 0;
             for (int x = 150; x <= 750; x += 150) {
                 for (int y = 100; y <= 600; y += 125) {
@@ -370,9 +368,11 @@ class ProjectionCarriedThroughTest {
             var wide = new ChartViewport(ORION, from, 900, 700, kind);
             var narrow = new ChartViewport(ORION, to, 900, 700, kind);
             var wideMapping =
-                    new juranometria.project.ViewportMapping(wide);
+                    new juranometria.project.ViewportMapping(wide,
+                    Projections.of(wide.projection(), wide.centre()));
             var narrowMapping =
-                    new juranometria.project.ViewportMapping(narrow);
+                    new juranometria.project.ViewportMapping(narrow,
+                    Projections.of(narrow.projection(), narrow.centre()));
             assertEquals(wideMapping.pixelsPerPlaneUnit()
                             / narrowMapping.pixelsPerPlaneUnit(),
                     scale, 1.0e-12,
@@ -440,9 +440,11 @@ class ProjectionCarriedThroughTest {
         // being entered, and those are different plane points.
         var sheet = new ChartViewport(ORION, SHEET, 900, 700);
         var overview = new ChartViewport(ORION, OVERVIEW, 900, 700);
-        var sheetMapping = new juranometria.project.ViewportMapping(sheet);
+        var sheetMapping = new juranometria.project.ViewportMapping(sheet,
+                    Projections.of(sheet.projection(), sheet.centre()));
         var overviewMapping =
-                new juranometria.project.ViewportMapping(overview);
+                new juranometria.project.ViewportMapping(overview,
+                    Projections.of(overview.projection(), overview.centre()));
         juranometria.project.PixelPoint corner = new juranometria.project.PixelPoint(780.0, 620.0);
         PlanePoint onSheet = juranometria.project.PanSolver
                 .planeFromPixel(sheet, corner);
@@ -456,7 +458,8 @@ class ProjectionCarriedThroughTest {
                         "zooming out of the sheet page onto the"
                                 + " overview is a reversible step"));
         juranometria.project.PixelPoint landed = new juranometria.project.ViewportMapping(
-                new ChartViewport(after, OVERVIEW, 900, 700))
+                new ChartViewport(after, OVERVIEW, 900, 700),
+                Projections.of(ChartProjection.STEREOGRAPHIC, after))
                 .toPixel(Projections.of(ChartProjection.STEREOGRAPHIC,
                         after).project(star).orElseThrow());
         assertTrue(Math.hypot(landed.x() - corner.x(),
@@ -485,8 +488,7 @@ class ProjectionCarriedThroughTest {
                     kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW);
             Projection projection =
                     Projections.forViewport(scene.viewport());
-            var mapping = new juranometria.project.ViewportMapping(
-                    scene.viewport());
+            var mapping = new juranometria.project.ViewportMapping(juranometria.project.DrawnPage.of(scene));
             var middle = mapping.toPixel(projection
                     .project(scene.viewport().centre()).orElseThrow());
             assertEquals(450.0, middle.x(), 1.0e-9,

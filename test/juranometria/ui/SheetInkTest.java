@@ -136,8 +136,8 @@ class SheetInkTest {
 
         var at = new juranometria.project.GnomonicProjection(
                         scene.viewport().centre()).project(undrawn)
-                .map(new juranometria.project.ViewportMapping(
-                        scene.viewport())::toPixel).orElseThrow();
+                .map(new juranometria.project.ViewportMapping(scene.viewport(),
+                juranometria.project.Projections.of(scene.viewport().projection(), scene.viewport().centre()))::toPixel).orElseThrow();
         // The cross is four ticks with a gap in the middle, so the
         // object itself stays visible through its own mark. None of
         // them is centred on it; the four together are.

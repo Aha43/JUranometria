@@ -30,7 +30,7 @@ class EquatorialGridTest {
     @Test
     void raRunsEastLeftAndZeroHoursWraps() {
         ChartViewport viewport = page(0.3, 45.0, 24.0);
-        var grid = EquatorialGrid.gridFor(viewport, null);
+        var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
         // Bottom-edge RA labels: for any two, the greater RA (mod the
         // wrap around this page's centre) sits further LEFT.
         var raLabels = grid.labels().stream()
@@ -67,7 +67,7 @@ class EquatorialGridTest {
         // On the RA-0h page every visible parallel is one continuous
         // polyline: the sampling walks the sky, so RA 0 is nothing
         // special and no seam splits the curve there.
-        var grid = EquatorialGrid.gridFor(page(0.3, 45.0, 24.0), null);
+        var grid = EquatorialGrid.gridFor(pageOf(page(0.3, 45.0, 24.0)), null);
         for (List<PixelPoint> piece : grid.parallels()) {
             for (int i = 1; i < piece.size(); i++) {
                 double jump = Math.hypot(
@@ -94,7 +94,7 @@ class EquatorialGridTest {
 
     @Test
     void thePoleConvergesWithoutSeamsOrRunawayDensity() {
-        var grid = EquatorialGrid.gridFor(page(37.946619, 89.9, 36.0), null);
+        var grid = EquatorialGrid.gridFor(pageOf(page(37.946619, 89.9, 36.0)), null);
         assertEquals(90.0, grid.spec().raStepDegrees(),
                 "the RA step reaches its 6h cap at the pole");
         assertTrue(grid.meridians().size() <= 8,
@@ -109,7 +109,7 @@ class EquatorialGridTest {
     @Test
     void clippingIsHonestAndOutputDeterministic() {
         ChartViewport viewport = page(83.818667, -5.389667, 12.0);
-        var grid = EquatorialGrid.gridFor(viewport, null);
+        var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
         for (var family : List.of(grid.meridians(), grid.parallels())) {
             for (List<PixelPoint> piece : family) {
                 assertTrue(piece.size() >= 2);
@@ -126,7 +126,7 @@ class EquatorialGridTest {
                 assertTrue(touches, "every kept piece touches the page");
             }
         }
-        var again = EquatorialGrid.gridFor(viewport, null);
+        var again = EquatorialGrid.gridFor(pageOf(viewport), null);
         assertEquals(grid.meridians().size(), again.meridians().size());
         assertEquals(grid.parallels().size(), again.parallels().size());
         assertEquals(grid.labels(), again.labels(),
@@ -137,7 +137,7 @@ class EquatorialGridTest {
     void everyReleasedFieldStaysWithinToleranceAndPleasantDensity() {
         for (double field : new double[] {1, 2, 3, 4, 6, 8, 12, 18, 24, 36}) {
             ChartViewport viewport = page(83.818667, -5.389667, field);
-            var grid = EquatorialGrid.gridFor(viewport, null);
+            var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
             assertTrue(grid.maxChordErrorPx() < TOLERANCE_PX,
                     "tolerance holds at " + field + " degrees: "
                             + grid.maxChordErrorPx());
@@ -169,7 +169,7 @@ class EquatorialGridTest {
             ChartViewport viewport = new ChartViewport(
                     new SkyPosition(83.0 + shift * 0.11, -5.389667),
                     12.0, 900, 700);
-            var grid = EquatorialGrid.gridFor(viewport, null);
+            var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
             for (var label : grid.labels()) {
                 assertTrue(EquatorialGrid.fitsPaper(label, metrics, viewport),
                         "every emitted label's exact box lies on the paper:"
@@ -200,13 +200,25 @@ class EquatorialGridTest {
     @Test
     void gridLabelsYieldToTheTitleBlockOnly() {
         ChartViewport viewport = page(10.684708, 41.268750, 8.0);
-        var open = EquatorialGrid.gridFor(viewport, null);
-        var titled = EquatorialGrid.gridFor(viewport,
+        var open = EquatorialGrid.gridFor(pageOf(viewport), null);
+        var titled = EquatorialGrid.gridFor(pageOf(viewport),
                 new java.awt.Rectangle(12, 560, 320, 128));
         assertTrue(titled.suppressedLabels() > 0,
                 "labels under the title block are suppressed");
         assertEquals(open.labels().size(),
                 titled.labels().size() + titled.suppressedLabels(),
                 "suppression is exactly the title collisions, nothing else");
+    }
+
+    /**
+     * A viewport as the page it would draw: these tests are about the
+     * grid's geometry, and a grid is drawn on a page (#301).
+     */
+    private static juranometria.project.DrawnPage pageOf(
+            ChartViewport viewport) {
+        return juranometria.project.DrawnPage.of(
+                new juranometria.chart.ChartScene(viewport,
+                        java.util.List.of(), java.util.List.of(),
+                        "grid", 6.0, null));
     }
 }

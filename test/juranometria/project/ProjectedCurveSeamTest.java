@@ -52,7 +52,8 @@ class ProjectedCurveSeamTest {
         }
 
         ViewportMapping mapping() {
-            return new ViewportMapping(viewport());
+            return new juranometria.project.ViewportMapping(viewport(),
+                juranometria.project.Projections.of(viewport().projection(), viewport().centre()));
         }
 
         PageRegion region() {
@@ -348,7 +349,8 @@ class ProjectedCurveSeamTest {
         static Hemisphere over(SkyPosition centre) {
             return new Hemisphere(centre, new ViewportMapping(
                     new ChartViewport(centre, 90.0, 900, 700,
-                            ChartProjection.STEREOGRAPHIC)));
+                            ChartProjection.STEREOGRAPHIC),
+                    Projections.of(ChartProjection.STEREOGRAPHIC, centre)));
         }
 
         /** One plane unit in page units: the limb's own radius. */

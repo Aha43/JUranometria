@@ -40,6 +40,26 @@ public record SheetMetadata(String title, String description,
 
     static SheetMetadata of(ChartScene scene, ChartViewState state,
                             ChartOptions options, PaperSize paper) {
+        return of(juranometria.project.DrawnPage.of(scene),
+                state.fieldWidthDegrees(), state.limitingMagnitude(),
+                options, paper);
+    }
+
+    /**
+     * The same, for a page that carries the projection that drew it
+     * (Sprint 32, issue #301; #329 owns the removal).
+     *
+     * <p>A sheet says what it is, and the projection is part of what
+     * it is - which is why this takes the page rather than the scene:
+     * the scene's viewport names a <em>kind</em>, and for the length
+     * of the celestial-globe gate a study page's kind is not what
+     * drew it.
+     */
+    static SheetMetadata of(juranometria.project.DrawnPage page,
+                            double fieldWidthDegrees,
+                            double limitingMagnitude,
+                            ChartOptions options, PaperSize paper) {
+        ChartScene scene = page.scene();
         String subject = scene.title();
         return new SheetMetadata(
                 AppInfo.NAME + " chart sheet: " + subject,
@@ -50,7 +70,7 @@ public record SheetMetadata(String title, String description,
                         subject,
                         scene.viewport().centre().raDegrees(),
                         scene.viewport().centre().decDegrees(),
-                        state.fieldWidthDegrees(),
+                        fieldWidthDegrees,
                         // Asked, not asserted. This said "gnomonic"
                         // in every sheet the atlas had ever written,
                         // which was true of every page it could draw
@@ -59,8 +79,8 @@ public record SheetMetadata(String title, String description,
                         // was a sheet claiming to be something it was
                         // not, which is worse than a sheet that says
                         // nothing (Sprint 30, issue #300).
-                        scene.viewport().projection().displayName(),
-                        state.limitingMagnitude(),
+                        page.projectionName(),
+                        limitingMagnitude,
                         paper.describe(),
                         options.palette().storedAs()),
                 AppInfo.NAME + " " + AppInfo.version() + ", "

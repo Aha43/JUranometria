@@ -198,16 +198,9 @@ public final class ChartComponent extends JComponent {
      * another page's word.
      */
     private static String describe(ChartScene scene) {
-        return String.format(java.util.Locale.ROOT,
-                "%s. Centre RA %.4f, Dec %+.4f (ICRS J2000)."
-                        + " Field %.1f degrees wide, %s projection."
-                        + " Stars to V %.1f. North up, east left.",
-                scene.title(),
-                scene.viewport().centre().raDegrees(),
-                scene.viewport().centre().decDegrees(),
-                scene.viewport().fieldWidthDegrees(),
-                scene.viewport().projection().displayName(),
-                scene.limitingMagnitude());
+        // One source for what a page says it is, shared with the
+        // title block and the exported sheet (#301).
+        return juranometria.project.DrawnPage.of(scene).describe();
     }
 
     /** Top of the paper page inside the (possibly letterboxed) canvas. */

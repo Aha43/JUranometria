@@ -89,7 +89,7 @@ class ZoomInteractionTest {
                                   int x, int y, int width, int height) {
         ChartViewport viewport = new ChartViewport(state.centre(),
                 state.fieldWidthDegrees(), width, height);
-        PixelPoint landed = new ViewportMapping(viewport).toPixel(
+        PixelPoint landed = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).toPixel(
                 new GnomonicProjection(state.centre())
                         .project(anchor).orElseThrow());
         return Math.hypot(landed.x() - x, landed.y() - y);

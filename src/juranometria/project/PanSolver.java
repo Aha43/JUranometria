@@ -71,8 +71,13 @@ public final class PanSolver {
         // The viewport's own scale, not a second copy of the rule
         // that computes it - this held the same inlined tangent
         // ViewportMapping did.
-        double pixelsPerPlaneUnit =
-                new ViewportMapping(viewport).pixelsPerPlaneUnit();
+        // Navigation arithmetic on a viewport with nothing drawn
+        // yet, so the projection is named rather than carried: the
+        // viewport says which kind draws its field, and that is the
+        // one derivation the atlas makes (#301).
+        double pixelsPerPlaneUnit = new ViewportMapping(viewport,
+                Projections.of(viewport.projection(),
+                        viewport.centre())).pixelsPerPlaneUnit();
         return new PlanePoint(
                 (viewport.widthPx() / 2.0 - pixel.x()) / pixelsPerPlaneUnit,
                 (viewport.heightPx() / 2.0 - pixel.y()) / pixelsPerPlaneUnit);

@@ -75,7 +75,7 @@ class ExplorationJourneyTest {
         mouse(chart, MouseEvent.MOUSE_DRAGGED, 610, 210);
         mouse(chart, MouseEvent.MOUSE_RELEASED, 610, 210);
 
-        PixelPoint now = new ViewportMapping(chart.scene().viewport())
+        PixelPoint now = new ViewportMapping(juranometria.project.DrawnPage.of(chart.scene()))
                 .toPixel(new GnomonicProjection(chart.scene().viewport()
                         .centre()).project(grabbed).orElseThrow());
         assertTrue(Math.hypot(now.x() - 610, now.y() - 210) < 1e-3,

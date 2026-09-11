@@ -20,6 +20,7 @@ import juranometria.chart.ChartScene;
 import juranometria.module.InkRole;
 import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.CurveRun;
@@ -131,8 +132,8 @@ public final class ReferenceInk {
         reference.sort(Comparator.comparing(OverlayRegistry.Owned::key));
 
         Projection projection =
-                Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+                DrawnPage.of(scene).projection();
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         Rectangle2D paper = ChartRenderer.paperOf(scene);
         // The paper, and the limb if this projection has one: a
         // curve is clipped to where there is sky, not only to where
@@ -236,8 +237,8 @@ public final class ReferenceInk {
         if (reference.isEmpty()) {
             return List.of();
         }
-        Projection projection = Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        Projection projection = DrawnPage.of(scene).projection();
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         Rectangle2D paper = ChartRenderer.paperOf(scene);
         PageRegion region = mapping.regionFor(scene.viewport(), projection);
         List<Named> names = new ArrayList<>();

@@ -28,7 +28,7 @@ package juranometria.tool.overview;
  * hemisphere and plainly straight across a telescope field, and only
  * the page knows which is being drawn.
  */
-record PlaneConic(double a, double b, double c, double d, double e,
+public record PlaneConic(double a, double b, double c, double d, double e,
                   double f) {
 
     /** A line, which is a conic with no quadratic part. */

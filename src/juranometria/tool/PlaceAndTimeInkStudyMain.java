@@ -28,6 +28,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.sky.LocalSky;
 import juranometria.sky.Observer;
 import juranometria.chart.StarSizePolicy;
+import juranometria.project.DrawnPage;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -267,7 +268,7 @@ public final class PlaceAndTimeInkStudyMain {
     private static PixelPoint pixel(ChartScene scene, SkyPosition position) {
         return new GnomonicProjection(scene.viewport().centre())
                 .project(position)
-                .map(new ViewportMapping(scene.viewport())::toPixel)
+                .map(new ViewportMapping(DrawnPage.of(scene))::toPixel)
                 .orElse(null);
     }
 

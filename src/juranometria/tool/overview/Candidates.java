@@ -21,7 +21,7 @@ import juranometria.project.PlanePoint;
  * the released projection and not a copy of it that might have
  * drifted.
  */
-final class Candidates {
+public final class Candidates {
 
     private Candidates() {
     }
@@ -103,7 +103,7 @@ final class Candidates {
     }
 
     /** r = sin(theta): the globe's own outline, one hemisphere. */
-    static StudyProjection orthographic(SkyPosition centre) {
+    public static StudyProjection orthographic(SkyPosition centre) {
         return azimuthal(centre, "orthographic",
                 Math::sin,
                 // A radius of exactly one is the limb, and the limb

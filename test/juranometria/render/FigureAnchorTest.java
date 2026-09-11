@@ -93,7 +93,7 @@ class FigureAnchorTest {
 
     /** Every figure endpoint this page actually draws on its paper. */
     private static List<SkyPosition> endpointsOn(ChartScene scene) {
-        var mapping = new ViewportMapping(scene.viewport());
+        var mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
         var projection = Projections.forViewport(scene.viewport());
         List<SkyPosition> found = new ArrayList<>();
         Set<String> seen = new HashSet<>();
@@ -182,7 +182,7 @@ class FigureAnchorTest {
                            java.awt.image.BufferedImage withheld) {
 
         boolean nodeAt(SkyPosition endpoint) {
-            var mapping = new ViewportMapping(scene.viewport());
+            var mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
             var plane = Projections.forViewport(scene.viewport())
                     .project(endpoint);
             if (plane.isEmpty()) {
@@ -248,7 +248,7 @@ class FigureAnchorTest {
      */
     private static Set<String> inkingNear(ChartScene scene,
                                           List<SkyPosition> endpoints) {
-        var mapping = new ViewportMapping(scene.viewport());
+        var mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
         var projection = Projections.forViewport(scene.viewport());
         List<PixelPoint> at = new ArrayList<>();
         for (SkyPosition endpoint : endpoints) {
@@ -446,7 +446,7 @@ class FigureAnchorTest {
         }
         ChartScene scene = page(120.0);
         double limit = ChartViewState.defaultMagnitudeFor(120.0);
-        var mapping = new ViewportMapping(scene.viewport());
+        var mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
         var labels = RENDERER.starLabelPlacements(
                 ChartRenderer.TextMetrics.offscreen(),
                 scene, ChartOptions.DEFAULTS);

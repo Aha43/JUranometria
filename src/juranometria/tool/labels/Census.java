@@ -9,6 +9,7 @@ import java.util.Map;
 
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.Star;
+import juranometria.project.DrawnPage;
 import juranometria.project.PixelPoint;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
@@ -134,9 +135,9 @@ public final class Census {
     /** The participants this page's text families actually drew. */
     private void gatherText() {
         FontMetrics metrics = Metrics.forFont(ChartRenderer.labelFont());
-        var mapping = new ViewportMapping(page.scene().viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(page.scene()));
         Projection projection =
-                Projections.forViewport(page.scene().viewport());
+                DrawnPage.of(page.scene()).projection();
 
         if (page.isCandidate()) {
             for (PlacedText placed : page.placed()) {
@@ -375,8 +376,8 @@ public final class Census {
         }
 
         static PixelPoint pixelOf(Page page, juranometria.chart.SkyPosition at) {
-            var mapping = new ViewportMapping(page.scene().viewport());
-            var plane = Projections.forViewport(page.scene().viewport())
+            var mapping = new ViewportMapping(DrawnPage.of(page.scene()));
+            var plane = DrawnPage.of(page.scene()).projection()
                     .project(at);
             return plane.map(mapping::toPixel).orElse(null);
         }
@@ -384,7 +385,7 @@ public final class Census {
         static EquatorialGrid.Grid gridOf(Page page) {
             java.awt.Graphics2D g = SCRATCH.createGraphics();
             try {
-                return EquatorialGrid.gridFor(page.scene().viewport(),
+                return EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(page.scene()),
                         page.options().titleBlock()
                                 ? ChartRenderer.titleBlockBounds(g,
                                         page.scene()) : null,

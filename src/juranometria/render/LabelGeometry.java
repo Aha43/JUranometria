@@ -12,6 +12,7 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.Star;
 import juranometria.project.PixelPoint;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.ViewportMapping;
@@ -101,8 +102,9 @@ public final class LabelGeometry {
     public static List<LabelPlacement.Request> starLabels(
             ChartRenderer renderer, FontMetrics metrics, ChartScene scene,
             ChartOptions options) {
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
-        Projection projection = Projections.forViewport(scene.viewport());
+        DrawnPage page = DrawnPage.of(scene);
+        ViewportMapping mapping = new ViewportMapping(page);
+        Projection projection = page.projection();
         StarLabelPolicy policy =
                 new StarLabelPolicy(scene.viewport().fieldWidthDegrees());
         List<Star> stars = new ArrayList<>(scene.stars());
@@ -159,8 +161,9 @@ public final class LabelGeometry {
     public static List<LabelPlacement.Request> deepSkyLabels(
             ChartRenderer renderer, FontMetrics metrics, ChartScene scene,
             ChartOptions options) {
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
-        Projection projection = Projections.forViewport(scene.viewport());
+        DrawnPage page = DrawnPage.of(scene);
+        ViewportMapping mapping = new ViewportMapping(page);
+        Projection projection = page.projection();
         List<LabelPlacement.Request> asked = new ArrayList<>();
         // The objects the page labels, from the renderer's own rule
         // and from nothing beside it. An earlier version asked for a

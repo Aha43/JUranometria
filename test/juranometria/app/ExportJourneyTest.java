@@ -217,8 +217,8 @@ class ExportJourneyTest {
 
         GnomonicProjection projection = new GnomonicProjection(
                 sheet.scene().viewport().centre());
-        ViewportMapping mapping = new ViewportMapping(
-                sheet.scene().viewport());
+        ViewportMapping mapping = new juranometria.project.ViewportMapping(
+                juranometria.project.DrawnPage.of(sheet.scene()));
         double scale = 300 / 72.0;
         double margin = PaperSize.A4.marginPoints();
 

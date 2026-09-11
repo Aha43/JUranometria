@@ -76,7 +76,7 @@ public final class TestChartServices implements ChartServices {
                         scene.viewport().centre()).project(at)
                         .map(plane -> {
                             var pixel = new juranometria.project
-                                    .ViewportMapping(scene.viewport())
+                                    .ViewportMapping(juranometria.project.DrawnPage.of(scene))
                                     .toPixel(plane);
                             return new double[] {pixel.x(), pixel.y()};
                         });

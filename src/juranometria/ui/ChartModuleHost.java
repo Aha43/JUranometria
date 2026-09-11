@@ -150,8 +150,8 @@ public final class ChartModuleHost implements ChartServices {
                 return juranometria.project.Projections
                         .forViewport(scene.viewport()).project(position)
                         .map(plane -> {
-                            var pixel = new juranometria.project
-                                    .ViewportMapping(scene.viewport())
+                            var pixel = new juranometria.project.ViewportMapping(
+                                    juranometria.project.DrawnPage.of(scene))
                                     .toPixel(plane);
                             return new double[] {pixel.x(), pixel.y()};
                         });

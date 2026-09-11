@@ -18,6 +18,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
 import juranometria.geo.GeoSegment;
+import juranometria.project.DrawnPage;
 import juranometria.project.PixelPoint;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
@@ -298,8 +299,8 @@ public final class Greedy {
 
     private void placeStarLabels() {
         ChartScene scene = page.scene();
-        var mapping = new ViewportMapping(scene.viewport());
-        Projection projection = Projections.forViewport(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
+        Projection projection = DrawnPage.of(scene).projection();
         StarLabelPolicy policy =
                 new StarLabelPolicy(scene.viewport().fieldWidthDegrees());
         List<Star> stars = new ArrayList<>(scene.stars());
@@ -340,8 +341,8 @@ public final class Greedy {
             return;
         }
         ChartScene scene = page.scene();
-        var mapping = new ViewportMapping(scene.viewport());
-        Projection projection = Projections.forViewport(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
+        Projection projection = DrawnPage.of(scene).projection();
         // The labelled set is production's own: which objects earn a
         // label is not this gate's question, only where the label goes.
         for (DeepSkyObject dso : labelledDeepSky) {
@@ -376,9 +377,9 @@ public final class Greedy {
         Page lit = page.withOptions(Participant.Options.deepSkyLabels(
                 page.options(), true));
         Attribution attribution = new Attribution(lit);
-        var mapping = new ViewportMapping(page.scene().viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(page.scene()));
         Projection projection =
-                Projections.forViewport(page.scene().viewport());
+                DrawnPage.of(page.scene()).projection();
         for (DeepSkyObject dso : page.scene().deepSkyObjects()) {
             var plane = projection.project(dso.position());
             if (plane.isEmpty()) {
@@ -696,8 +697,8 @@ public final class Greedy {
      */
     private boolean crossesALine(Rectangle2D box) {
         ChartScene scene = page.scene();
-        var mapping = new ViewportMapping(scene.viewport());
-        Projection projection = Projections.forViewport(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
+        Projection projection = DrawnPage.of(scene).projection();
         List<GeoSegment> lines = new ArrayList<>();
         lines.addAll(scene.geography().figureSegments());
         lines.addAll(scene.geography().boundarySegments());
