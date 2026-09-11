@@ -134,6 +134,16 @@ public final class Attribution {
         painted.clear();
         window.clear();
         windowOf = null;
+        // And the per-participant masks, for the same reason and
+        // with the same proof. The study never reads ink back through
+        // a census - its one inkOf call is on the fixture page's own
+        // attribution - so this map holds a mask per participant that
+        // nothing will ask for again. What the report does read stays
+        // reachable on its own: the text participants' ink through
+        // the census's own map, and every collision's shared pixels
+        // through the meetings it kept. Only the masks nothing else
+        // refers to are released.
+        inkCache.clear();
     }
 
     public Page page() {

@@ -349,18 +349,31 @@ black-sky-study: classes
 
 .PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
-# ergonomics chose for it: the label study holds one ink set per label
-# per page, and the CI runner's default quarter-of-RAM is not the same
-# number as a developer's. Measured need after #315's fix is under
-# 2 GB; this is twice that.
+# ergonomics chose for it: the CI runner's default quarter-of-RAM is
+# not the same number as a developer's.
+#
+# 1 GiB, and the number is measured rather than guessed (#323). The
+# label study dominates this run, and after its page caches stopped
+# being held for the whole corpus it completes at every limit down to
+# 256m - which is exactly why "the smallest that passes" is the wrong
+# rule. What the limits cost it, on one machine:
+#
+#     4g  345.7 s   1g  348.8 s   768m 347.9 s   512m 353.5 s
+#                 384m  358.3 s   320m 365.1 s   256m 588.0 s
+#
+# 320m is the last affordable value and 256m is a cliff - four extra
+# minutes to save 60 MB. 1 GiB sits three times above that practical
+# floor, costs under 1%, and leaves room for a runner whose garbage
+# collector has a different number of threads than this laptop's.
+# Three consecutive runs at this limit: 1.03, 1.03, 1.04 GiB peak.
 evidence-contracts: classes
-	$(JAVA) -Xmx4g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
+	$(JAVA) -Xmx1g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 
 # What CI runs: the same instrument, forbidden to compare a rendering
 # here with pixels recorded on another machine. See
 # docs/decisions/test-evidence.md.
 evidence-contracts-ci: classes
-	$(JAVA) -Xmx4g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain ci
+	$(JAVA) -Xmx1g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain ci
 
 # Run on the machine that promotes reference images, after a reviewed
 # regeneration: records when, on what, and from which generator each
