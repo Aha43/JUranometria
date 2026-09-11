@@ -10,6 +10,25 @@ on:
   push:
     branches: [main]
 
+# One run per branch at a time (issue #323). This workflow carries the
+# two slow jobs - the display journeys and the evidence contract, which
+# together outlast several pushes to an active pull request - and
+# without a group each push started another full set beside the ones
+# already running. A superseded run cannot say anything about the head
+# commit, so it is cancelled rather than raced.
+#
+# Never on `main`: a push there is the commit the branch protection
+# answered for, and cancelling one would leave a merged commit whose
+# required checks were killed halfway. The condition names the ref so
+# the queue is per branch, and the fallback is the run id, which is
+# unique - so a push to main groups only with itself and never
+# cancels.
+concurrency:
+  group: >-
+    test-${{ github.event_name == 'pull_request'
+      && github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest

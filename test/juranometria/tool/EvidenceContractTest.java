@@ -229,6 +229,48 @@ class EvidenceContractTest {
     }
 
     @Test
+    void aBreachedRunStillPutsTheInspectionImageryBack()
+            throws Exception {
+        // The leak this closes (#323): breaches used to end the
+        // process with System.exit, which does not unwind, so the one
+        // run guaranteed to have drifted the working tree - a
+        // breached one - was the one run that walked past the outer
+        // finally. The signal now travels as an exception, and this
+        // holds it to arriving through the restoration.
+        Path root = Files.createTempDirectory("evidence-breach");
+        try {
+            Path inspection = root.resolve("controls-thing.png");
+            Files.write(inspection, new byte[] {1, 2, 3});
+            var committed = EvidenceContractMain.snapshot(root);
+
+            org.junit.jupiter.api.Assertions.assertThrows(
+                    EvidenceContractMain.Breached.class, () ->
+                    EvidenceContractMain.generateUnderRestoration(
+                            root, committed, () -> {
+                                Files.write(inspection,
+                                        new byte[] {9, 9, 9});
+                                throw new EvidenceContractMain
+                                        .Breached();
+                            }));
+
+            assertArrayEquals(new byte[] {1, 2, 3},
+                    Files.readAllBytes(inspection),
+                    "a breached run restores the inspection imagery"
+                            + " like any other - the exit status is"
+                            + " set by the caller afterwards, not by"
+                            + " leaving the process from inside the"
+                            + " run");
+        } finally {
+            try (var tree = Files.walk(root)) {
+                for (Path file : tree.sorted(
+                        java.util.Comparator.reverseOrder()).toList()) {
+                    Files.deleteIfExists(file);
+                }
+            }
+        }
+    }
+
+    @Test
     void aFailingRestorationRidesSuppressedBehindTheEvidenceFailure()
             throws Exception {
         // The standing suppression rule, held on the verifier's own
