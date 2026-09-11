@@ -1037,9 +1037,9 @@ public final class ChartRenderer {
         java.util.List<LabelPlacement.Request> asked =
                 new java.util.ArrayList<>();
         asked.addAll(LabelGeometry.starLabels(this, metrics.labels(),
-                scene, options));
+                page(scene), options));
         asked.addAll(LabelGeometry.deepSkyLabels(this, metrics.labels(),
-                scene, options));
+                page(scene), options));
         asked.addAll(LabelGeometry.constellationNames(this,
                 metrics.names(), scene, options));
         return java.util.List.copyOf(asked);

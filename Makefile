@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test globe-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test globe-study globe-frame-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -244,6 +244,13 @@ globe-study: classes
 	@echo "  hemispheres"
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeStudyMain
+
+# The globe frame candidates (#301): the same crowded hemisphere at
+# four disc sizes, three furniture states and three containers.
+globe-frame-study: classes
+	@echo "  globe frames"
+	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFrameStudyMain
 
 chart-sheet-study: classes
 	@echo "  chart sheets"

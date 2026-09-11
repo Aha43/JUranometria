@@ -105,6 +105,45 @@ class OneProjectionPerPageTest {
                         + " hemisphere by the wrong projection");
     }
 
+    /**
+     * The files that draw or measure a page and must be <em>handed</em>
+     * one.
+     *
+     * <p>The rule above is not enough on its own, and Sprint 32 proved
+     * it by being caught out: a sweep replaced the derivations in the
+     * label passes with {@code DrawnPage.of(scene)}, which satisfied
+     * "derived in one place" perfectly and put the split straight
+     * back. The passes were building a page from the viewport rather
+     * than labelling the page being drawn, so on a globe they placed
+     * their text stereographically - and a star ninety-five degrees
+     * away, on the hidden hemisphere, got a label hovering in the
+     * empty corner outside the limb. The owner found it by looking at
+     * the picture.
+     */
+    private static final List<String> MUST_RECEIVE = List.of(
+            "src/juranometria/render/LabelGeometry.java",
+            "src/juranometria/render/EquatorialGrid.java");
+
+    @Test
+    void thePassesThatDrawAPageAreHandedOneRatherThanBuildingIt() {
+        List<String> built = new ArrayList<>();
+        for (String where : MUST_RECEIVE) {
+            String said = assertReadable(Path.of(where));
+            if (said.contains("DrawnPage.of(")) {
+                built.add(where);
+            }
+        }
+        assertEquals(List.of(), built,
+                "these draw or measure a page the caller has already"
+                        + " decided the projection of, so they take it"
+                        + " as an argument. Building one from the"
+                        + " viewport is the same split under a"
+                        + " different name: it reads correctly, it"
+                        + " passes every test of what the atlas draws"
+                        + " today, and it labels a globe"
+                        + " stereographically: " + built);
+    }
+
     private static String assertReadable(Path file) {
         try {
             return Files.readString(file, StandardCharsets.UTF_8);

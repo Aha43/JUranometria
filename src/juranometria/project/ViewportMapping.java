@@ -99,8 +99,47 @@ public final class ViewportMapping {
         }
         this.centreX = viewport.widthPx() / 2.0;
         this.centreY = viewport.heightPx() / 2.0;
-        this.pixelsPerPlaneUnit =
-                viewport.widthPx() / (2.0 * halfRadius);
+        this.pixelsPerPlaneUnit = bounded
+                ? globeFrame() * Math.min(viewport.widthPx(),
+                        viewport.heightPx()) / 2.0
+                        / projection.visiblePlaneRadius()
+                : viewport.widthPx() / (2.0 * halfRadius);
+    }
+
+    /**
+     * How much of a page's short side the globe's disc fills (Sprint
+     * 32, issue #301).
+     *
+     * <p>A rectangular chart is sized by the rule every page in the
+     * atlas shares: half the field across half the width. A globe
+     * cannot be. It is a disc, so a disc sized by the width runs off
+     * the top and bottom of a landscape page at every field, and a
+     * disc sized to fill the short side exactly touches the paper on
+     * two sides with nowhere for the title block to go but on top of
+     * the sky.
+     *
+     * <p>So the globe is <strong>a bounded object placed on paper</strong>
+     * rather than a field filling a frame: a centred disc at a stated
+     * fraction of the short side, leaving a quiet border that is the
+     * same on every page and belongs to the cartography rather than
+     * to the reader. The furniture lives in that border - in the
+     * generous side gutters of a landscape page, above and below on a
+     * portrait one - instead of over the celestial sphere.
+     *
+     * <p>The scale does not depend on whether any furniture is
+     * enabled: a globe that changed size when the reader turned the
+     * magnitude key on would be a globe whose scale meant nothing.
+     *
+     * <p>The fraction is overridable only while the gate is choosing
+     * it, so the candidates can be compared by eye at one sitting.
+     * <strong>Issue #329 removes the override</strong> and leaves the
+     * constant.
+     */
+    private static final double GLOBE_FRAME = 0.90;
+
+    private static double globeFrame() {
+        String chosen = System.getProperty("juranometria.globeFrame");
+        return chosen == null ? GLOBE_FRAME : Double.parseDouble(chosen);
     }
 
     /** Pixels per tangent-plane unit; multiply an angle in radians to get

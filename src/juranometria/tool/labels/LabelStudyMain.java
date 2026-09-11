@@ -1325,10 +1325,11 @@ public final class LabelStudyMain {
             seamRequests(Page page, java.awt.FontMetrics metrics) {
         List<juranometria.render.LabelPlacement.Request> asked =
                 new ArrayList<>();
+        var drawn = juranometria.project.DrawnPage.of(page.scene());
         asked.addAll(juranometria.render.LabelGeometry.starLabels(
-                Page.renderer(), metrics, page.scene(), page.options()));
+                Page.renderer(), metrics, drawn, page.options()));
         asked.addAll(juranometria.render.LabelGeometry.deepSkyLabels(
-                Page.renderer(), metrics, page.scene(), page.options()));
+                Page.renderer(), metrics, drawn, page.options()));
         asked.addAll(juranometria.render.LabelGeometry.constellationNames(
                 Page.renderer(), metrics, page.scene(), page.options()));
         return asked;
