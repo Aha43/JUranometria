@@ -342,6 +342,44 @@ in this sprint may blur these classes into each other — a
 photograph must never be diffed as if it were a report, and a
 report must never be excused as if it were a photograph.
 
+### Write-ownership: every family answers it, in three states
+
+Sprint 32, issue #323, from four review findings that were one
+omission wearing four hats.
+
+> **Before a run may say anything about an artifact, it must know
+> that a generator wrote it during this run.** Reading a file twice
+> is not drawing it twice.
+
+The portable contract's whole claim is same-environment reproduction:
+the runner produces each artifact twice and the bytes must match. A
+file that is merely *present* satisfies that comparison for free — it
+equals itself — so any family the contract watches without asking who
+wrote it is credited for a check nobody performed. This was found
+four times in one file, each time by review and never by the contract:
+the committed renderings (#322), the build outputs, the
+once-versus-never distinction, and the platform records.
+
+So every watched family answers the same question, and it has **three**
+answers, not two:
+
+| what happened | the verdict |
+|---|---|
+| **written in neither pass** | unclaimed residue — named and counted, never credited, and left to its own class |
+| **written in exactly one pass** | a **breach**: the generator that owns it does not produce it every time, and a thing that comes and goes is not evidence |
+| **written in both passes** | the bytes are compared, and only here may the run speak for it |
+
+The middle row is the one a two-state check loses, and losing it is
+what lets an intermittent generator omit an artifact and pass. The
+mechanism is the same everywhere: date every candidate to the epoch
+before each pass, and only a file whose date moved was written by it.
+A file nobody wrote keeps the date it arrived with — asking about a
+file is not permission to change it.
+
+**A new artifact family added to the contract inherits this rule**,
+and `EvidenceDrawnTwiceTest` is where it is held: one test per state,
+each shown to fail without its check.
+
 **As #242 settled it, the contracts are executable.**
 `make evidence-contracts` runs every generator that writes into
 docs/studies — the eight legacy study mains that write only under
