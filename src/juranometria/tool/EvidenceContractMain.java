@@ -691,11 +691,14 @@ public final class EvidenceContractMain {
                       Map<String, byte[]> said,
                       List<String> saidDiffering,
                       Map<String, byte[]> recordFirst,
-                      List<String> recordDiffering) {
+                      List<String> recordDiffering,
+                      List<String> recordIntermittent,
+                      List<String> recordUnwritten) {
     }
 
     /** What one pass wrote and what each generator said while doing it. */
     private record Pass(java.util.Set<String> written,
+                        java.util.Set<String> wroteRecords,
                         Map<String, byte[]> said) {
     }
 
@@ -754,7 +757,9 @@ public final class EvidenceContractMain {
         // - which this test caught before CI did.
         Map<String, Long> original = stamps(paths);
         Map<String, Long> builtBefore = stampsIn(directories);
-        Pass once = wroteWhileDatedOld(generators, paths, directories);
+        Map<String, Long> recordsBefore = stamps(alsoCapture);
+        Pass once = wroteWhileDatedOld(generators, paths, directories,
+                alsoCapture);
         java.util.Set<String> writtenOnce = once.written();
         Map<String, byte[]> first = new TreeMap<>();
         for (String path : paths) {
@@ -764,7 +769,8 @@ public final class EvidenceContractMain {
         }
         Map<String, byte[]> firstBuilt = drawnIn(directories);
         Map<String, byte[]> recordFirst = bytesOf(alsoCapture);
-        Pass again = wroteWhileDatedOld(generators, paths, directories);
+        Pass again = wroteWhileDatedOld(generators, paths, directories,
+                alsoCapture);
         java.util.Set<String> writtenAgain = again.written();
         Map<String, byte[]> builtAgain = drawnIn(directories);
         Map<String, byte[]> recordAgain = bytesOf(alsoCapture);
@@ -782,12 +788,29 @@ public final class EvidenceContractMain {
                 saidDiffering.add(spoke.getKey());
             }
         }
+        // The platform records, held to the same three answers as
+        // every other artifact here (review of #328).
         List<String> recordDiffering = new ArrayList<>();
-        for (Map.Entry<String, byte[]> wrote : recordFirst.entrySet()) {
-            byte[] now = recordAgain.get(wrote.getKey());
-            if (now == null || !java.util.Arrays.equals(
-                    wrote.getValue(), now)) {
-                recordDiffering.add(wrote.getKey());
+        List<String> recordIntermittent = new ArrayList<>();
+        List<String> recordUnwritten = new ArrayList<>();
+        for (String path : alsoCapture) {
+            boolean wroteFirst = once.wroteRecords().contains(path);
+            boolean wroteAgain = again.wroteRecords().contains(path);
+            if (wroteFirst != wroteAgain) {
+                recordIntermittent.add(path);
+                restore(path, recordsBefore.get(path));
+                continue;
+            }
+            if (!wroteFirst) {
+                recordUnwritten.add(path);
+                restore(path, recordsBefore.get(path));
+                continue;
+            }
+            byte[] then = recordFirst.get(path);
+            byte[] now = recordAgain.get(path);
+            if (then == null || now == null
+                    || !java.util.Arrays.equals(then, now)) {
+                recordDiffering.add(path);
             }
         }
 
@@ -852,7 +875,7 @@ public final class EvidenceContractMain {
         }
         return new DrawnTwice(first, claimed, differing, intermittent,
                 once.said(), saidDiffering, recordFirst,
-                recordDiffering);
+                recordDiffering, recordIntermittent, recordUnwritten);
     }
 
     /** When each image in these directories was last written. */
@@ -930,7 +953,8 @@ public final class EvidenceContractMain {
     /** Whether this file's date moved off the epoch, i.e. was written. */
     private static boolean written(Path file) {
         try {
-            return Files.getLastModifiedTime(file).toMillis() != 0L;
+            return Files.exists(file)
+                    && Files.getLastModifiedTime(file).toMillis() != 0L;
         } catch (IOException unreadable) {
             return false;
         }
@@ -969,22 +993,34 @@ public final class EvidenceContractMain {
     /** Dates every candidate old, runs the generators, says what moved. */
     private static Pass wroteWhileDatedOld(
             List<String> generators, List<String> paths,
-            List<String> directories)
+            List<String> directories, List<String> records)
             throws Exception {
         for (String path : paths) {
             restore(path, 0L);
         }
         dateDirectoriesOld(directories);
+        // The platform records are dated old for the same reason
+        // everything else here is (review of #328): they were read
+        // after each pass and never asked whether anybody had written
+        // them, so a record no generator touched was read twice,
+        // compared with itself, and credited as reproducing.
+        for (String path : records) {
+            restore(path, 0L);
+        }
         Map<String, byte[]> said = runAll(generators);
         java.util.Set<String> written = new java.util.TreeSet<>();
         for (String path : paths) {
-            Path file = Path.of(path);
-            if (Files.exists(file)
-                    && Files.getLastModifiedTime(file).toMillis() != 0L) {
+            if (written(Path.of(path))) {
                 written.add(path);
             }
         }
-        return new Pass(written, said);
+        java.util.Set<String> wroteRecords = new java.util.TreeSet<>();
+        for (String path : records) {
+            if (written(Path.of(path))) {
+                wroteRecords.add(path);
+            }
+        }
+        return new Pass(written, wroteRecords, said);
     }
 
     /** Puts a file's date back, where there is one to put back. */
@@ -1393,6 +1429,29 @@ public final class EvidenceContractMain {
             }
             byte[] afterFirstPass = first;
             boolean moved;
+            if (twice != null && (twice.recordUnwritten()
+                    .contains(record.getValue())
+                    || twice.recordIntermittent()
+                            .contains(record.getValue()))) {
+                // Present is not the same as written (review of
+                // #328). A record no generator wrote in either pass
+                // has not been shown to reproduce here; one written
+                // in a single pass has been shown not to.
+                failures.add(record.getValue()
+                        + (twice.recordUnwritten()
+                                .contains(record.getValue())
+                                ? ": nothing wrote this platform record"
+                                        + " in either pass, so the run"
+                                        + " has not seen it reproduce"
+                                        + " - a file read twice is not"
+                                        + " a file written twice"
+                                : ": this platform record was written"
+                                        + " in one of the two passes"
+                                        + " and not the other, so the"
+                                        + " study that owns it does"
+                                        + " not write it every time"));
+                continue;
+            }
             if (twice != null) {
                 // Written twice already, by the two drawing passes
                 // (#323): the comparison is between those, not

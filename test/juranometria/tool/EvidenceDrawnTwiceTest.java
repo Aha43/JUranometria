@@ -218,6 +218,104 @@ class EvidenceDrawnTwiceTest {
                         + " one page and not the pass");
     }
 
+    /** Where the record-writing stand-ins write. */
+    static final Path RECORD =
+            Path.of("build/evidence-twice/platform.md");
+    static final Path SOMETIMES =
+            Path.of("build/evidence-twice/sometimes.md");
+
+    /** A study that writes its platform record every time. */
+    public static final class Recorder {
+
+        private Recorder() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            Files.createDirectories(RECORD.getParent());
+            Files.writeString(RECORD, "Recorded on: `here`\n");
+        }
+    }
+
+    /** A study that writes its record once and then stops. */
+    public static final class SometimesRecorder {
+
+        private static boolean written;
+
+        private SometimesRecorder() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            if (written) {
+                return;
+            }
+            written = true;
+            Files.createDirectories(SOMETIMES.getParent());
+            Files.writeString(SOMETIMES, "Recorded on: `here`\n");
+        }
+    }
+
+    @Test
+    void aPlatformRecordNobodyWroteIsNotCreditedAsReproducing()
+            throws Exception {
+        // The third ownership gap, found in review of PR #328 and
+        // introduced by it: the platform records were read after each
+        // pass and never asked whether anybody had written them. A
+        // record left over from an earlier run - or one whose study
+        // has stopped writing it - was read twice, compared with
+        // itself, found equal, and credited as reproducing here.
+        Files.createDirectories(RECORD.getParent());
+        Path orphan = RECORD.getParent().resolve("orphan.md");
+        Files.writeString(orphan, "Recorded on: `somewhere else`\n");
+        Files.setLastModifiedTime(orphan,
+                java.nio.file.attribute.FileTime.fromMillis(
+                        1_600_000_000_000L));
+
+        EvidenceContractMain.DrawnTwice twice =
+                EvidenceContractMain.drawTwice(
+                        List.of(Recorder.class.getName()),
+                        List.of(), List.of(),
+                        List.of(RECORD.toString(),
+                                orphan.toString()));
+
+        assertEquals(List.of(orphan.toString()),
+                twice.recordUnwritten(),
+                "the record nothing wrote is named as unwritten, and"
+                        + " it is the only one");
+        assertEquals(List.of(), twice.recordDiffering(),
+                "it is not a byte difference: nothing was compared,"
+                        + " because nothing was written");
+        assertTrue(twice.recordFirst().containsKey(RECORD.toString()),
+                "the record its study really did write is kept, to be"
+                        + " compared against the second writing");
+        assertEquals(1_600_000_000_000L,
+                Files.getLastModifiedTime(orphan).toMillis(),
+                "and the orphan keeps the date it arrived with");
+    }
+
+    @Test
+    void aPlatformRecordWrittenInOnlyOnePassIsABreach()
+            throws Exception {
+        Files.deleteIfExists(SOMETIMES);
+
+        EvidenceContractMain.DrawnTwice twice =
+                EvidenceContractMain.drawTwice(
+                        List.of(SometimesRecorder.class.getName(),
+                                Recorder.class.getName()),
+                        List.of(), List.of(),
+                        List.of(SOMETIMES.toString(),
+                                RECORD.toString()));
+
+        assertEquals(List.of(SOMETIMES.toString()),
+                twice.recordIntermittent(),
+                "a record written in one pass and not the other is"
+                        + " named as exactly that");
+        assertEquals(List.of(), twice.recordUnwritten(),
+                "it is not unwritten - something did write it, once,"
+                        + " which is the whole problem");
+        assertEquals(List.of(), twice.recordDiffering(),
+                "and it is not a byte difference either");
+    }
+
     @Test
     void aRenderingNobodyDrewIsNotReportedAsDrawnTwice()
             throws Exception {
