@@ -55,6 +55,11 @@ public final class Census {
         gatherText();
         gatherObstacles();
         attribute();
+        // The census is complete, and the painting caches were only
+        // ever scratch for taking it (#323). The study keeps every
+        // page's census for the whole report, so anything left here
+        // is multiplied by the corpus.
+        attribution.forgetPaintings();
     }
 
     public Page page() {

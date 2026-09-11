@@ -108,6 +108,34 @@ public final class Attribution {
         this.renders = 1;
     }
 
+    /**
+     * Drops the painting caches, keeping what the study reads later
+     * (Sprint 32, issue #323).
+     *
+     * <p>Both of them are scratch for the attribution work: a whole
+     * page with one participant withheld, and one window of one page,
+     * each kept so the pair loop paints its outer participant once
+     * rather than once per pair. Once the collisions are gathered
+     * nothing reads them again, and they are the study's largest
+     * retention by a distance - {@code PAGES_KEPT} whole pages per
+     * page of the corpus, all alive at once because the study holds
+     * every page's census for the whole report. Twenty-three pages
+     * kept ninety-two repaints alive to answer questions nobody asks
+     * any more.
+     *
+     * <p>Dropping a cache can only cost time, never correctness:
+     * both repaint on a miss. But a repaint is counted in
+     * {@link #renders()} and that number is printed in the report, so
+     * a repaint caused by this would change the document - which
+     * makes byte-identical output the exact test of whether anything
+     * still wanted them.
+     */
+    public void forgetPaintings() {
+        painted.clear();
+        window.clear();
+        windowOf = null;
+    }
+
     public Page page() {
         return page;
     }
