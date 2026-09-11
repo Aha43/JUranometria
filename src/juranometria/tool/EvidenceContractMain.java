@@ -687,6 +687,7 @@ public final class EvidenceContractMain {
     record DrawnTwice(Map<String, byte[]> first,
                       java.util.Set<String> claimed,
                       List<String> differing,
+                      List<String> intermittent,
                       Map<String, byte[]> said,
                       List<String> saidDiffering,
                       Map<String, byte[]> recordFirst,
@@ -792,9 +793,23 @@ public final class EvidenceContractMain {
 
         java.util.Set<String> claimed = new java.util.TreeSet<>();
         List<String> differing = new ArrayList<>();
+        // Three answers, not two (review of #328). A page written in
+        // one pass and not the other is neither residue nor a
+        // rendering this run may speak for: it is a generator that
+        // drew something once and then did not, which is exactly the
+        // nondeterminism the two passes exist to catch. Folding it in
+        // with "nothing drew it" let an intermittent generator omit a
+        // rendering and pass.
+        List<String> intermittent = new ArrayList<>();
         for (String path : paths) {
-            if (!writtenOnce.contains(path)
-                    || !writtenAgain.contains(path)) {
+            boolean drewFirst = writtenOnce.contains(path);
+            boolean drewAgain = writtenAgain.contains(path);
+            if (drewFirst != drewAgain) {
+                intermittent.add(path);
+                restore(path, original.get(path));
+                continue;
+            }
+            if (!drewFirst) {
                 // Nothing drew it, so nothing here may say it was
                 // drawn twice. Its own class decides what happens to
                 // it further down.
@@ -807,15 +822,24 @@ public final class EvidenceContractMain {
                 differing.add(path);
             }
         }
-        // And whatever the generators drew where they draw it.
-        for (Map.Entry<String, byte[]> built : firstBuilt.entrySet()) {
-            byte[] now = builtAgain.get(built.getKey());
-            if (now == null) {
+        // And whatever the generators drew where they draw it, held
+        // to the same three answers. A build output written in one
+        // pass only used to vanish from the reckoning entirely - the
+        // pass-one case fell out of the loop, and the pass-two case
+        // was never in it.
+        java.util.Set<String> everBuilt = new java.util.TreeSet<>();
+        everBuilt.addAll(firstBuilt.keySet());
+        everBuilt.addAll(builtAgain.keySet());
+        for (String path : everBuilt) {
+            byte[] then = firstBuilt.get(path);
+            byte[] now = builtAgain.get(path);
+            if (then == null || now == null) {
+                intermittent.add(path);
                 continue;
             }
-            claimed.add(built.getKey());
-            if (!java.util.Arrays.equals(built.getValue(), now)) {
-                differing.add(built.getKey());
+            claimed.add(path);
+            if (!java.util.Arrays.equals(then, now)) {
+                differing.add(path);
             }
         }
         // A page nothing wrote keeps the date it arrived with, so a
@@ -826,7 +850,7 @@ public final class EvidenceContractMain {
                 restore(was.getKey(), was.getValue());
             }
         }
-        return new DrawnTwice(first, claimed, differing,
+        return new DrawnTwice(first, claimed, differing, intermittent,
                 once.said(), saidDiffering, recordFirst,
                 recordDiffering);
     }
@@ -1233,6 +1257,13 @@ public final class EvidenceContractMain {
                         + " reproduce byte-for-byte between two"
                         + " renderings on this machine - the generator"
                         + " is not deterministic");
+            }
+            for (String path : twice.intermittent()) {
+                failures.add(path + ": drawn in one of the two passes"
+                        + " and not the other, so the generator that"
+                        + " owns it does not draw it every time - a"
+                        + " rendering that comes and goes is not"
+                        + " evidence, and this is not residue either");
             }
             tally(verdicts, "drawn twice here and identical ("
                     + (twice.claimed().size() - twice.differing().size())

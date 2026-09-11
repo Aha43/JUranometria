@@ -161,6 +161,63 @@ class EvidenceDrawnTwiceTest {
                         + " an epoch stamp this one left behind");
     }
 
+    /** Where the generator that gives up after one page draws. */
+    static final Path INTERMITTENT =
+            Path.of("build/evidence-twice/intermittent.png");
+
+    /** A generator that draws on its first run and then stops. */
+    public static final class Intermittent {
+
+        private static boolean drawn;
+
+        private Intermittent() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            if (drawn) {
+                return;
+            }
+            drawn = true;
+            write(INTERMITTENT, 6);
+        }
+    }
+
+    @Test
+    void aRenderingDrawnInOnlyOneOfTheTwoPassesIsABreach()
+            throws Exception {
+        // The second review finding on PR #328. "Written in one pass
+        // and not the other" was folded in with "written in neither",
+        // so a generator that drew a page once and then stopped was
+        // reported as residue - one line in a count of renderings
+        // held by their own class - and the run passed. A rendering
+        // that comes and goes is not evidence, and calling it residue
+        // says the opposite of what happened.
+        Files.deleteIfExists(INTERMITTENT);
+
+        EvidenceContractMain.DrawnTwice twice =
+                EvidenceContractMain.drawTwice(
+                        List.of(Intermittent.class.getName(),
+                                Steady.class.getName()),
+                        List.of(INTERMITTENT.toString(),
+                                STEADY.toString()));
+
+        assertEquals(List.of(INTERMITTENT.toString()),
+                twice.intermittent(),
+                "a page drawn in one pass and not the other is named"
+                        + " as exactly that, and it is the only one");
+        assertFalse(twice.claimed().contains(INTERMITTENT.toString()),
+                "it is not claimed: this run cannot say it was drawn"
+                        + " twice, because it was not");
+        assertEquals(List.of(), twice.differing(),
+                "and it is not a byte difference either - nothing was"
+                        + " compared, because there was nothing to"
+                        + " compare it with");
+        assertTrue(twice.claimed().contains(STEADY.toString()),
+                "the generator beside it that drew both times is"
+                        + " still claimed, so the breach is about the"
+                        + " one page and not the pass");
+    }
+
     @Test
     void aRenderingNobodyDrewIsNotReportedAsDrawnTwice()
             throws Exception {
