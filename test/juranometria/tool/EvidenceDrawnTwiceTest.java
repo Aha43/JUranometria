@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -96,6 +97,68 @@ class EvidenceDrawnTwiceTest {
                 "the first drawing is kept, because the comparison is"
                         + " against it and not against a committed"
                         + " file from another machine");
+    }
+
+    /** Where the directory-watching stand-in draws. */
+    static final Path BUILT =
+            Path.of("build/evidence-twice-built/drawn.png");
+
+    /** A generator that draws into a watched build directory. */
+    public static final class Builder {
+
+        private Builder() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            write(BUILT, 5);
+        }
+    }
+
+    @Test
+    void aStalePageLeftInABuildDirectoryIsNotCreditedAsDrawnTwice()
+            throws Exception {
+        // The review's finding on PR #328. The committed half asks
+        // whether a generator wrote a file; the build half did not,
+        // and simply read whatever was lying in the directory. So a
+        // page left by an earlier run - by a generator since gated
+        // off, renamed, or not run today - was compared with itself,
+        // found equal, and counted as a rendering this run had drawn
+        // twice. Two passes over one stale file is not two drawings.
+        Files.createDirectories(BUILT.getParent());
+        Path stale = BUILT.getParent().resolve("stale.png");
+        write(stale, 2);
+        // Dated a week ago, as a leftover would be: the check must
+        // rest on nobody having written it, not on it being new.
+        Files.setLastModifiedTime(stale,
+                java.nio.file.attribute.FileTime.fromMillis(
+                        1_600_000_000_000L));
+        byte[] before = Files.readAllBytes(stale);
+
+        EvidenceContractMain.DrawnTwice twice =
+                EvidenceContractMain.drawTwice(
+                        List.of(Builder.class.getName()),
+                        List.of(),
+                        List.of(BUILT.getParent().toString()));
+
+        assertTrue(twice.claimed().contains(BUILT.toString()),
+                "the page the generator actually drew in both passes"
+                        + " is claimed");
+        assertFalse(twice.claimed().contains(stale.toString()),
+                "the page nothing drew is not claimed - a file that"
+                        + " equals itself across two passes has been"
+                        + " read twice, not drawn twice");
+        assertEquals(List.of(), twice.differing(),
+                "and nothing differs: one was drawn twice, the other"
+                        + " was not drawn at all");
+        assertArrayEquals(before, Files.readAllBytes(stale),
+                "the stale page is left exactly as it was found;"
+                        + " asking about it is not permission to"
+                        + " change it");
+        assertEquals(1_600_000_000_000L,
+                Files.getLastModifiedTime(stale).toMillis(),
+                "including the date it arrived with, so the next run"
+                        + " asks the same question rather than finding"
+                        + " an epoch stamp this one left behind");
     }
 
     @Test

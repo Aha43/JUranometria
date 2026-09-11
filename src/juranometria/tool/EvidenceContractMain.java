@@ -752,7 +752,8 @@ public final class EvidenceContractMain {
         // and the file then looks untouched when it was written twice
         // - which this test caught before CI did.
         Map<String, Long> original = stamps(paths);
-        Pass once = wroteWhileDatedOld(generators, paths);
+        Map<String, Long> builtBefore = stampsIn(directories);
+        Pass once = wroteWhileDatedOld(generators, paths, directories);
         java.util.Set<String> writtenOnce = once.written();
         Map<String, byte[]> first = new TreeMap<>();
         for (String path : paths) {
@@ -762,7 +763,7 @@ public final class EvidenceContractMain {
         }
         Map<String, byte[]> firstBuilt = drawnIn(directories);
         Map<String, byte[]> recordFirst = bytesOf(alsoCapture);
-        Pass again = wroteWhileDatedOld(generators, paths);
+        Pass again = wroteWhileDatedOld(generators, paths, directories);
         java.util.Set<String> writtenAgain = again.written();
         Map<String, byte[]> builtAgain = drawnIn(directories);
         Map<String, byte[]> recordAgain = bytesOf(alsoCapture);
@@ -817,9 +818,38 @@ public final class EvidenceContractMain {
                 differing.add(built.getKey());
             }
         }
+        // A page nothing wrote keeps the date it arrived with, so a
+        // later run asks the same question of it rather than finding
+        // an epoch stamp this one left behind.
+        for (Map.Entry<String, Long> was : builtBefore.entrySet()) {
+            if (!claimed.contains(was.getKey())) {
+                restore(was.getKey(), was.getValue());
+            }
+        }
         return new DrawnTwice(first, claimed, differing,
                 once.said(), saidDiffering, recordFirst,
                 recordDiffering);
+    }
+
+    /** When each image in these directories was last written. */
+    private static Map<String, Long> stampsIn(List<String> directories)
+            throws IOException {
+        Map<String, Long> when = new TreeMap<>();
+        for (String directory : directories) {
+            Path root = Path.of(directory);
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (Stream<Path> tree = Files.walk(root)) {
+                for (Path file : tree.filter(Files::isRegularFile)
+                        .filter(f -> f.toString().endsWith(".png"))
+                        .toList()) {
+                    when.put(file.toString(),
+                            Files.getLastModifiedTime(file).toMillis());
+                }
+            }
+        }
+        return when;
     }
 
     /** The bytes these files hold now, where they exist. */
@@ -835,7 +865,23 @@ public final class EvidenceContractMain {
         return held;
     }
 
-    /** Every image a generator has left in these directories. */
+    /**
+     * Every image a generator wrote in these directories <em>during
+     * the pass that just ran</em> (#323, found in review of #328).
+     *
+     * <p>It used to be every image present, which asked no question
+     * at all of the ones that were already there. A page left in
+     * {@code build/} by an earlier run - by a generator since gated
+     * off, renamed, or simply not run today - was read in both
+     * passes, compared with itself, found equal, and counted as a
+     * rendering this run had drawn twice. The same false credit the
+     * committed half was fixed for in #322, still being given here.
+     *
+     * <p>So the same mechanism answers it: every file in these
+     * directories is dated to the epoch before the pass, and only a
+     * file whose date moved was written by it. A file nobody wrote
+     * keeps the date it had, and no verdict here speaks for it.
+     */
     private static Map<String, byte[]> drawnIn(List<String> directories)
             throws IOException {
         Map<String, byte[]> found = new TreeMap<>();
@@ -847,6 +893,7 @@ public final class EvidenceContractMain {
             try (Stream<Path> tree = Files.walk(root)) {
                 for (Path file : tree.filter(Files::isRegularFile)
                         .filter(f -> f.toString().endsWith(".png"))
+                        .filter(f -> written(f))
                         .toList()) {
                     found.put(file.toString(),
                             Files.readAllBytes(file));
@@ -856,13 +903,54 @@ public final class EvidenceContractMain {
         return found;
     }
 
+    /** Whether this file's date moved off the epoch, i.e. was written. */
+    private static boolean written(Path file) {
+        try {
+            return Files.getLastModifiedTime(file).toMillis() != 0L;
+        } catch (IOException unreadable) {
+            return false;
+        }
+    }
+
+    /**
+     * Dates every image in these directories to the epoch, and says
+     * what date each one had (#323).
+     *
+     * <p>The build directories are not committed, so there is no
+     * snapshot to compare them against; what makes a page there
+     * evidence is that a generator wrote it while this run was
+     * watching. Dating them old first is how that gets asked.
+     */
+    private static Map<String, Long> dateDirectoriesOld(
+            List<String> directories) throws IOException {
+        Map<String, Long> original = new TreeMap<>();
+        for (String directory : directories) {
+            Path root = Path.of(directory);
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (Stream<Path> tree = Files.walk(root)) {
+                for (Path file : tree.filter(Files::isRegularFile)
+                        .filter(f -> f.toString().endsWith(".png"))
+                        .toList()) {
+                    original.put(file.toString(),
+                            Files.getLastModifiedTime(file).toMillis());
+                    restore(file.toString(), 0L);
+                }
+            }
+        }
+        return original;
+    }
+
     /** Dates every candidate old, runs the generators, says what moved. */
     private static Pass wroteWhileDatedOld(
-            List<String> generators, List<String> paths)
+            List<String> generators, List<String> paths,
+            List<String> directories)
             throws Exception {
         for (String path : paths) {
             restore(path, 0L);
         }
+        dateDirectoriesOld(directories);
         Map<String, byte[]> said = runAll(generators);
         java.util.Set<String> written = new java.util.TreeSet<>();
         for (String path : paths) {
