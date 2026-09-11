@@ -74,6 +74,8 @@ help:
 	@echo "  overview-ink-study  Measure overview ink on pages the production renderer drew"
 	@echo "  figure-anchor-study Measure constellation figures against the magnitude limit"
 	@echo "  label-study  Measure how labels share a page"
+	@echo "  globe-study       Draw the Sprint 32 celestial-globe candidate hemispheres"
+	@echo "  globe-frame-study Compare how much of the page the globe disc fills"
 	@echo "  released-text     List the text every released page draws"
 	@echo "  dist              Build and verify the portable fallback ZIP"
 	@echo "  app-image         Build and verify this platform's native application image"
