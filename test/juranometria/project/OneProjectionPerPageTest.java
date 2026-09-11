@@ -122,15 +122,47 @@ class OneProjectionPerPageTest {
      */
     private static final List<String> MUST_RECEIVE = List.of(
             "src/juranometria/render/LabelGeometry.java",
-            "src/juranometria/render/EquatorialGrid.java");
+            "src/juranometria/render/EquatorialGrid.java",
+            "src/juranometria/page/PageInventory.java",
+            "src/juranometria/page/PageExtent.java",
+            "src/juranometria/ui/ReferenceInk.java",
+            "src/juranometria/ui/WorkingCrossInk.java");
+
+    /**
+     * How many one-line adapters each file is allowed.
+     *
+     * <p>These are the production entry points: a caller with a scene
+     * and no opinion about its projection asks for the ordinary one,
+     * and that is the derivation {@code DrawnPage.of} exists for. What
+     * is forbidden is a <em>consumer</em> rebuilding a page it was
+     * already handed, which is how the label passes came to place a
+     * globe's names stereographically.
+     *
+     * <p>A number rather than a cleverer rule, because a number moves
+     * when somebody adds a rebuild and does not move when somebody
+     * adds an argument. Raising one of these is a decision, not
+     * maintenance: the question to answer first is why a consumer
+     * needs a page nobody gave it.
+     */
+    private static final java.util.Map<String, Integer> ADAPTERS =
+            java.util.Map.of(
+                    "src/juranometria/render/LabelGeometry.java", 0,
+                    "src/juranometria/render/EquatorialGrid.java", 0,
+                    "src/juranometria/page/PageInventory.java", 1,
+                    "src/juranometria/page/PageExtent.java", 1,
+                    "src/juranometria/ui/ReferenceInk.java", 2,
+                    "src/juranometria/ui/WorkingCrossInk.java", 0);
 
     @Test
     void thePassesThatDrawAPageAreHandedOneRatherThanBuildingIt() {
         List<String> built = new ArrayList<>();
         for (String where : MUST_RECEIVE) {
             String said = assertReadable(Path.of(where));
-            if (said.contains("DrawnPage.of(")) {
-                built.add(where);
+            int rebuilds = said.split("DrawnPage\\.of\\(", -1).length - 1;
+            int allowed = ADAPTERS.get(where);
+            if (rebuilds > allowed) {
+                built.add(where + " (" + rebuilds + " of an allowed "
+                        + allowed + ")");
             }
         }
         assertEquals(List.of(), built,

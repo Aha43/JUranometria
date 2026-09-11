@@ -289,7 +289,7 @@ public final class ChartComponent extends JComponent {
             // ordinary and reference rendering are untouched by them
             // - and identical when nothing is marked, because a
             // module with nothing to say contributes nothing.
-            WorkingCrossInk.paint(g2, scene, overlays.collect(), highlighted,
+            WorkingCrossInk.paint(g2, juranometria.project.DrawnPage.of(scene), overlays.collect(), highlighted,
                     chartOptions.palette());
         } finally {
             g2.dispose();

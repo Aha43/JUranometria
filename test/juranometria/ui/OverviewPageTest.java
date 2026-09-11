@@ -537,7 +537,7 @@ class OverviewPageTest {
         assertEquals(2, marked.size(), "two objects to mark");
 
         ChartRenderer.ReferenceLayer modules = (g, scene) ->
-                ReferenceInk.paint(g, scene, registry.collect(),
+                ReferenceInk.paint(g, juranometria.project.DrawnPage.of(scene), registry.collect(),
                         ChartPalette.WHITE_PAPER);
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
         ChartRenderer.ReferenceLayer working = (g, scene) -> {

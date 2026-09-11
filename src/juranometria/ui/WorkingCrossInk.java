@@ -58,16 +58,16 @@ final class WorkingCrossInk {
      * @param leadIdentity the object whose facts a reader is
      *     reading, which wears the selection treatment; may be null
      */
-    static void paint(Graphics2D g, ChartScene scene,
+    static void paint(Graphics2D g, DrawnPage page,
                       List<OverlayRegistry.Owned> contributions,
                       String leadIdentity,
                       juranometria.render.ChartPalette palette) {
         if (contributions.isEmpty()) {
             return;
         }
-        Projection projection =
-                DrawnPage.of(scene).projection();
-        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
+        ChartScene scene = page.scene();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         java.awt.geom.Rectangle2D paper =
                 juranometria.render.ChartRenderer.paperOf(scene);
 

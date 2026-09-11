@@ -75,10 +75,15 @@ public final class PageExtent {
      * @throws IllegalStateException if the object runs off the
      *     projection, which nothing the atlas bundles can do
      */
+    /** The ordinary entry point (review of #335). */
     public static boolean onPage(ChartScene scene, DeepSkyObject dso) {
-        Projection projection =
-                DrawnPage.of(scene).projection();
-        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
+        return onPage(DrawnPage.of(scene), dso);
+    }
+
+    public static boolean onPage(DrawnPage page, DeepSkyObject dso) {
+        ChartScene scene = page.scene();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         Rectangle2D paper = ChartRenderer.paperOf(scene);
 
         PixelPoint centre = projection.project(dso.position())
@@ -101,10 +106,10 @@ public final class PageExtent {
             // Width or orientation unrecorded: the catalogue permits
             // a family of ellipses and every one lies inside the
             // circle of the semi-major, so the circle is asked.
-            return reaches(scene, dso.position(), semiMajorDeg,
+            return reaches(page, dso.position(), semiMajorDeg,
                     semiMajorDeg, 0.0);
         }
-        return reaches(scene, dso.position(), semiMajorDeg,
+        return reaches(page, dso.position(), semiMajorDeg,
                 recorded.minorAxisArcmin() / 120.0,
                 recorded.positionAngleDegrees());
     }
@@ -123,25 +128,26 @@ public final class PageExtent {
      *     object margin, and 60.0 + 5.39 + 5.39 is short of the
      *     90-degree horizon.
      */
-    public static boolean reaches(ChartScene scene, SkyPosition centre,
+    public static boolean reaches(DrawnPage page, SkyPosition centre,
                                   double semiMajorDeg, double semiMinorDeg,
                                   double positionAngleDeg) {
         // Nowhere near this page, and no walk needed to say so.
         // This is what keeps the refusal rare: an object out by the
         // projection's horizon is answered here rather than walked.
-        if (centre.separationDegrees(scene.viewport().centre())
-                > pageReachDegrees(scene) + semiMajorDeg) {
+        if (centre.separationDegrees(page.scene().viewport().centre())
+                > pageReachDegrees(page.scene()) + semiMajorDeg) {
             return false;
         }
         Path2D.Double outline = outlineOf(
-                DrawnPage.of(scene).projection(),
-                new ViewportMapping(DrawnPage.of(scene)), centre, semiMajorDeg,
+                page.projection(),
+                new ViewportMapping(page), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, MAX_DEPTH);
         if (outline.getCurrentPoint() == null) {
             return false;          // nothing of it is on this sky
         }
         outline.closePath();
-        return outline.intersects(ChartRenderer.paperOf(scene));
+        return outline.intersects(
+                ChartRenderer.paperOf(page.scene()));
     }
 
     /**
@@ -268,29 +274,29 @@ public final class PageExtent {
     }
 
     /** The same boundary, for a page rather than for a projection. */
-    static Path2D.Double outlineOn(ChartScene scene, SkyPosition centre,
+    static Path2D.Double outlineOn(DrawnPage page, SkyPosition centre,
                                    double semiMajorDeg, double semiMinorDeg,
                                    double positionAngleDeg) {
-        return outlineOn(scene, centre, semiMajorDeg, semiMinorDeg,
+        return outlineOn(page, centre, semiMajorDeg, semiMinorDeg,
                 positionAngleDeg, MAX_DEPTH);
     }
 
-    static Path2D.Double outlineOn(ChartScene scene, SkyPosition centre,
+    static Path2D.Double outlineOn(DrawnPage page, SkyPosition centre,
                                    double semiMajorDeg, double semiMinorDeg,
                                    double positionAngleDeg, int maxDepth) {
-        return outlineOf(DrawnPage.of(scene).projection(),
-                new ViewportMapping(DrawnPage.of(scene)), centre, semiMajorDeg,
+        return outlineOf(page.projection(),
+                new ViewportMapping(page), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, maxDepth);
     }
 
     /** The same boundary point, for a page rather than a projection. */
-    static Point2D.Double boundaryPixelOn(ChartScene scene,
+    static Point2D.Double boundaryPixelOn(DrawnPage page,
                                           SkyPosition centre,
                                           double semiMajorDeg,
                                           double semiMinorDeg,
                                           double positionAngleDeg, double t) {
-        return boundaryPixel(DrawnPage.of(scene).projection(),
-                new ViewportMapping(DrawnPage.of(scene)), centre, semiMajorDeg,
+        return boundaryPixel(page.projection(),
+                new ViewportMapping(page), centre, semiMajorDeg,
                 semiMinorDeg, positionAngleDeg, t);
     }
 

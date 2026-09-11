@@ -51,7 +51,7 @@ class DrawnPageIdentityTest {
      * the one the viewport names, it answers to its own name, and its
      * geometry is its own.
      */
-    private static final class NotWhatTheViewportSays
+    private static class NotWhatTheViewportSays
             implements Projection {
 
         @Override
@@ -135,6 +135,47 @@ class DrawnPageIdentityTest {
         assertEquals("orthographic", page.projectionName(),
                 "and the page is drawn by something else - which is"
                         + " the situation the door exists for");
+    }
+
+    @Test
+    void aPageCannotBeDrawnAboutSomewhereElse() {
+        // Review of #335. Refusing nulls was not enough: a scene
+        // centred on Orion carrying a projection centred on M31 was
+        // accepted, and every mark would have been placed around M31
+        // while the title, the description, the query and the sheet
+        // all said Orion. One page, two geometric identities - the
+        // thing this value exists to make impossible.
+        ChartScene orion = sceneSayingStereographic();
+        SkyPosition m31 = new SkyPosition(10.68, 41.27);
+        Projection elsewhere = new NotWhatTheViewportSays() {
+            @Override
+            public SkyPosition centre() {
+                return m31;
+            }
+        };
+
+        IllegalArgumentException refused = assertThrows(
+                IllegalArgumentException.class,
+                () -> new DrawnPage(orion, elsewhere),
+                "a page drawn about M31 is not a page centred on"
+                        + " Orion, whatever its viewport says");
+        assertTrue(refused.getMessage().contains("degrees apart"),
+                "and it says how far apart they are, because the"
+                        + " number is the evidence: "
+                        + refused.getMessage());
+
+        // The same place written another way is the same place: a
+        // centre travels through solvers and round trips, and the
+        // projections agree to 3.3e-13 degrees.
+        SkyPosition sameAgain = new SkyPosition(
+                CENTRE.raDegrees() + 1e-12,
+                CENTRE.decDegrees() - 1e-12);
+        new DrawnPage(orion, new NotWhatTheViewportSays() {
+            @Override
+            public SkyPosition centre() {
+                return sameAgain;
+            }
+        });
     }
 
     @Test

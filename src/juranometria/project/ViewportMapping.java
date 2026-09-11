@@ -99,7 +99,20 @@ public final class ViewportMapping {
         }
         this.centreX = viewport.widthPx() / 2.0;
         this.centreY = viewport.heightPx() / 2.0;
-        this.pixelsPerPlaneUnit = bounded
+        // The frame rule is about a page that shows the whole
+        // bounded object, and only such a page (review of #335).
+        //
+        // "Bounded" alone was too loose: it made the field stop
+        // affecting the scale at all, so an orthographic page that
+        // said 120 degrees was drawn at the scale of the full limb
+        // and put its own 60-degree edge nowhere near the frame it
+        // claimed. A globe is a disc placed on paper when the page IS
+        // the hemisphere; a narrower bounded page is an ordinary page
+        // that happens to be drawn by a projection with an edge, and
+        // is sized by the rule every other page in the atlas uses.
+        boolean wholeObject = bounded
+                && half >= projection.limitDegrees();
+        this.pixelsPerPlaneUnit = wholeObject
                 ? globeFrame() * Math.min(viewport.widthPx(),
                         viewport.heightPx()) / 2.0
                         / projection.visiblePlaneRadius()

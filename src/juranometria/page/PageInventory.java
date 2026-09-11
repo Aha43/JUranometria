@@ -53,14 +53,22 @@ public final class PageInventory {
      * magnitude limit, catalogue content, or a chart option that
      * changes visibility - and at no other time.
      */
+    /**
+     * The ordinary entry point: a scene drawn by the projection its
+     * viewport names (review of #335).
+     */
     public static PageContents of(ChartScene scene, ChartOptions options) {
-        if (scene == null || options == null) {
+        return of(DrawnPage.of(scene), options);
+    }
+
+    public static PageContents of(DrawnPage page, ChartOptions options) {
+        if (page == null || options == null) {
             throw new IllegalArgumentException(
-                    "an inventory is of a scene under options");
+                    "an inventory is of a page under options");
         }
-        Projection projection =
-                DrawnPage.of(scene).projection();
-        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
+        ChartScene scene = page.scene();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
         SkyPosition centre = scene.viewport().centre();

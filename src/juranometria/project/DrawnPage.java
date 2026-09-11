@@ -55,7 +55,45 @@ public record DrawnPage(ChartScene scene, Projection projection) {
                     "a page is drawn by a projection; none is not an"
                             + " answer");
         }
+        // And drawn about the place it says it is drawn about
+        // (review of #335). Refusing nulls was not enough: a scene
+        // centred on Orion carrying a projection centred on M31 was
+        // accepted, and every mark would then have been placed around
+        // M31 while the title block, the accessible description, the
+        // catalogue query and the exported sheet all said Orion. That
+        // is the same page carrying two geometric identities, which
+        // is the one thing this value exists to make impossible.
+        //
+        // Compared as the sky compares positions rather than field by
+        // field: a centre is a place, and two ways of writing the
+        // same place are the same centre.
+        double apart = scene.viewport().centre()
+                .separationDegrees(projection.centre());
+        if (!(apart <= CENTRE_TOLERANCE_DEGREES)) {
+            throw new IllegalArgumentException(String.format(
+                    java.util.Locale.ROOT,
+                    "a page drawn about %s cannot be a page centred"
+                            + " on %s: they are %.6f degrees apart,"
+                            + " and every mark on it would be placed"
+                            + " around one while the page said the"
+                            + " other",
+                    projection.centre(), scene.viewport().centre(),
+                    apart));
+        }
     }
+
+    /**
+     * How far apart two spellings of the same centre may be.
+     *
+     * <p>Not zero, because a centre travels through solvers and
+     * round trips: the projections round-trip to 3.3e-13 degrees, and
+     * a page rebuilt about its own unprojected centre can differ in
+     * the last bits without being a different place. Far below
+     * anything a reader could see - a thousandth of an arcsecond is
+     * a hundred-thousandth of a pixel on the widest page the atlas
+     * draws.
+     */
+    private static final double CENTRE_TOLERANCE_DEGREES = 1e-9;
 
     /** The ordinary case: the page is drawn by what its viewport says. */
     public static DrawnPage of(ChartScene scene) {

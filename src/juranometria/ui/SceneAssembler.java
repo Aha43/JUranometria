@@ -198,7 +198,13 @@ public final class SceneAssembler {
         // a NaN. A bounded projection answers the question exactly
         // instead: everything it can show is within its limb of the
         // centre, and nothing beyond it exists to be queried.
+        // The whole hemisphere is queried only by a page that shows
+        // the whole hemisphere (review of #335). A narrower page
+        // drawn by a bounded projection asks the ordinary question
+        // about its own corner, or it would query the entire sky to
+        // draw a fraction of it.
         double radius = Double.isFinite(projection.visiblePlaneRadius())
+                && fieldWidthDegrees / 2.0 >= projection.limitDegrees()
                 ? projection.limitDegrees() + objectExtentMarginDegrees
                 : queryRadiusDegrees(projection, fieldWidthDegrees,
                         widthPx, heightPx);

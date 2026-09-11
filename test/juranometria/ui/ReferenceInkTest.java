@@ -56,7 +56,7 @@ class ReferenceInkTest {
         try {
             RENDERER.render(g, SCENE, ChartOptions.DEFAULTS,
                     (layerG, scene) ->
-                            ReferenceInk.paint(layerG, scene, ink,
+                            ReferenceInk.paint(layerG, juranometria.project.DrawnPage.of(scene), ink,
                                     ChartOptions.DEFAULTS.palette()));
         } finally {
             g.dispose();
@@ -705,7 +705,7 @@ class ReferenceInkTest {
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
             g.setRenderingHints(layerHints(scene));
             g.setClip(layerClip(scene));
-            ReferenceInk.paint(g, scene, ink,
+            ReferenceInk.paint(g, juranometria.project.DrawnPage.of(scene), ink,
                     ChartOptions.DEFAULTS.palette());
         } finally {
             g.dispose();
