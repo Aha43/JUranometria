@@ -45,12 +45,12 @@ class GridRenderingTest {
         // dot pixel must be star ink, not grid grey - the grid is the
         // quietest, bottom-most ink.
         var grid = EquatorialGrid.gridFor(
-                scene(List.of()).viewport(), null);
+                juranometria.project.DrawnPage.of(scene(List.of())), null);
         var meridianPiece = grid.meridians().get(0);
         var on = meridianPiece.get(meridianPiece.size() / 2);
         var projection = new juranometria.project.GnomonicProjection(CENTRE);
         var mapping = new juranometria.project.ViewportMapping(
-                scene(List.of()).viewport());
+                juranometria.project.DrawnPage.of(scene(List.of())));
         // Recover the sky under that grid pixel and put a star there.
         SkyPosition under = juranometria.project.PanSolver.skyFromPlane(
                 juranometria.chart.ChartProjection.GNOMONIC, CENTRE,

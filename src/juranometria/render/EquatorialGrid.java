@@ -10,6 +10,7 @@ import java.util.List;
 
 import juranometria.chart.ChartViewport;
 import juranometria.chart.SkyPosition;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
@@ -142,14 +143,14 @@ public final class EquatorialGrid {
      * pieces; edge labels; and the measured worst chord error against
      * the true projected curve midpoint.
      */
-    public static Grid gridFor(ChartViewport viewport,
+    public static Grid gridFor(DrawnPage page,
                                java.awt.Rectangle... furniture) {
+        ChartViewport viewport = page.scene().viewport();
         GridSpec spec = spec(viewport);
-        Projection projection =
-                Projections.forViewport(viewport);
-        ViewportMapping mapping = new ViewportMapping(viewport);
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         double sampleStep = viewport.fieldWidthDegrees() / 180.0;
-        SkyBounds bounds = boundsFor(viewport);
+        SkyBounds bounds = boundsFor(page);
         java.awt.FontMetrics metrics = labelMetrics();
 
         List<List<PixelPoint>> meridians = new ArrayList<>();
@@ -267,9 +268,10 @@ public final class EquatorialGrid {
         }
     }
 
-    public static SkyBounds boundsFor(ChartViewport viewport) {
-        var projection = Projections.forViewport(viewport);
-        var mapping = new ViewportMapping(viewport);
+    public static SkyBounds boundsFor(DrawnPage page) {
+        ChartViewport viewport = page.scene().viewport();
+        var projection = page.projection();
+        var mapping = new ViewportMapping(page);
         double centreRa = viewport.centre().raDegrees();
         double decMin = 90.0;
         double decMax = -90.0;

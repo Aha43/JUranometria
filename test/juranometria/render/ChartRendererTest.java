@@ -53,7 +53,7 @@ class ChartRendererTest {
     @Test
     void aKnownStarLandsAsInkAtItsProjectedPixel() {
         BufferedImage image = RENDERER.renderToImage(SCENE);
-        PixelPoint pixel = new ViewportMapping(VIEWPORT)
+        PixelPoint pixel = new ViewportMapping(VIEWPORT, juranometria.project.Projections.of(VIEWPORT.projection(), VIEWPORT.centre()))
                 .toPixel(new GnomonicProjection(M31_CENTRE)
                         .project(NU_AND.position()).orElseThrow());
         int rgb = image.getRGB((int) Math.round(pixel.x()), (int) Math.round(pixel.y()));

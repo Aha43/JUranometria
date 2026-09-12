@@ -37,7 +37,7 @@ class RegionalDetailPolicyTest {
         ChartScene scene = new ChartScene(viewport, List.of(), List.of(),
                 "Policy test", 8.0, identity);
         return new RegionalDetailPolicy(
-                scene, new ViewportMapping(viewport).pixelsPerPlaneUnit());
+                scene, new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).pixelsPerPlaneUnit());
     }
 
     @Test

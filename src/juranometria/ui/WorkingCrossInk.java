@@ -12,6 +12,7 @@ import juranometria.chart.ChartScene;
 import juranometria.module.InkRole;
 import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
@@ -57,16 +58,16 @@ final class WorkingCrossInk {
      * @param leadIdentity the object whose facts a reader is
      *     reading, which wears the selection treatment; may be null
      */
-    static void paint(Graphics2D g, ChartScene scene,
+    static void paint(Graphics2D g, DrawnPage page,
                       List<OverlayRegistry.Owned> contributions,
                       String leadIdentity,
                       juranometria.render.ChartPalette palette) {
         if (contributions.isEmpty()) {
             return;
         }
-        Projection projection =
-                Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ChartScene scene = page.scene();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         java.awt.geom.Rectangle2D paper =
                 juranometria.render.ChartRenderer.paperOf(scene);
 

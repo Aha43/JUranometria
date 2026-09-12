@@ -70,7 +70,7 @@ class PageExtentTest {
     private static boolean rule(ChartScene scene, SkyPosition centre,
                                 double semiMajorDeg, double semiMinorDeg,
                                 double positionAngleDeg) {
-        return PageExtent.reaches(scene, centre,
+        return PageExtent.reaches(juranometria.project.DrawnPage.of(scene), centre,
                 semiMajorDeg, semiMinorDeg, positionAngleDeg);
     }
 
@@ -103,7 +103,7 @@ class PageExtentTest {
                         SkyPosition centre = PageExtent.offsetOf(
                                 scene.viewport().centre(), semiMajor * 0.6, 25.0);
                         java.awt.geom.Path2D.Double outline =
-                                PageExtent.outlineOn(scene, centre,
+                                PageExtent.outlineOn(juranometria.project.DrawnPage.of(scene), centre,
                                         semiMajor, semiMajor * ratio, pa);
                         shapes++;
                         double strayed = furthestFromPath(outline, scene,
@@ -159,7 +159,7 @@ class PageExtentTest {
         int samples = 20_000;
         for (int i = 0; i < samples; i++) {
             java.awt.geom.Point2D.Double truth =
-                    PageExtent.boundaryPixelOn(scene, centre,
+                    PageExtent.boundaryPixelOn(juranometria.project.DrawnPage.of(scene), centre,
                             semiMajorDeg, semiMinorDeg, positionAngleDeg,
                             2 * Math.PI * i / samples);
             if (truth == null) {
@@ -211,7 +211,7 @@ class PageExtentTest {
 
         IllegalStateException refused = assertThrows(
                 IllegalStateException.class,
-                () -> PageExtent.outlineOn(scene, centre,
+                () -> PageExtent.outlineOn(juranometria.project.DrawnPage.of(scene), centre,
                         12.0, 1.0, 40.0, 1),
                 "a depth of one cannot follow this curve");
         assertTrue(refused.getMessage().contains("could not be followed"),
@@ -219,7 +219,7 @@ class PageExtentTest {
 
         // And with the real depth the same curve is followed all the
         // way, so the refusal is about the depth and not the curve.
-        PageExtent.outlineOn(scene, centre, 12.0, 1.0, 40.0);
+        PageExtent.outlineOn(juranometria.project.DrawnPage.of(scene), centre, 12.0, 1.0, 40.0);
     }
 
 
@@ -250,7 +250,7 @@ class PageExtentTest {
             SkyPosition candidate =
                     PageExtent.offsetOf(target, radius, bearing);
             java.awt.geom.Point2D.Double where =
-                    PageExtent.boundaryPixelOn(scene, candidate,
+                    PageExtent.boundaryPixelOn(juranometria.project.DrawnPage.of(scene), candidate,
                             1e-6, 1e-6, 0.0, 0.0);
             if (where == null) {
                 continue;
@@ -264,7 +264,7 @@ class PageExtentTest {
         assertTrue(centre != null, "a centre off the page was found");
         double scale = pixelsPerDegreeAt(scene, target);
         double grown = radius + beyondPx / scale;
-        return PageExtent.reaches(scene, centre, grown,
+        return PageExtent.reaches(juranometria.project.DrawnPage.of(scene), centre, grown,
                 grown, 0.0);
     }
 
@@ -272,10 +272,10 @@ class PageExtentTest {
     private static double pixelsPerDegreeAt(ChartScene scene,
                                             SkyPosition where) {
         java.awt.geom.Point2D.Double here =
-                PageExtent.boundaryPixelOn(scene, where,
+                PageExtent.boundaryPixelOn(juranometria.project.DrawnPage.of(scene), where,
                         1e-6, 1e-6, 0.0, 0.0);
         java.awt.geom.Point2D.Double there =
-                PageExtent.boundaryPixelOn(scene,
+                PageExtent.boundaryPixelOn(juranometria.project.DrawnPage.of(scene),
                         PageExtent.offsetOf(where, 0.001, 0.0),
                         1e-6, 1e-6, 0.0, 0.0);
         assertTrue(here != null && there != null, "both points project");

@@ -200,7 +200,8 @@ class ZoomStudyMainTest {
         PixelPoint pixel = new PixelPoint(123.0, 456.0);
         SkyPosition anchor = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre,
                 PanSolver.planeFromPixel(viewport, pixel));
-        var landed = new juranometria.project.ViewportMapping(viewport)
+        var landed = new juranometria.project.ViewportMapping(viewport,
+                juranometria.project.Projections.of(viewport.projection(), viewport.centre()))
                 .toPixel(new juranometria.project.GnomonicProjection(centre)
                         .project(anchor).orElseThrow());
         assertTrue(Math.hypot(landed.x() - pixel.x(),

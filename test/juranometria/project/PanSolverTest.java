@@ -82,7 +82,7 @@ class PanSolverTest {
                     PlanePoint achieved = new GnomonicProjection(newCentre)
                             .project(grabbed).orElseThrow();
                     PixelPoint reprojected =
-                            new ViewportMapping(moved).toPixel(achieved);
+                            new ViewportMapping(moved, juranometria.project.Projections.of(moved.projection(), moved.centre())).toPixel(achieved);
                     double error = Math.hypot(reprojected.x() - release.x(),
                             reprojected.y() - release.y());
                     if (error >= 1e-3) {

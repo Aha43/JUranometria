@@ -260,8 +260,8 @@ class EclipticModuleTest {
                                                        SkyPosition at) {
         return new juranometria.project.GnomonicProjection(
                         scene.viewport().centre()).project(at)
-                .map(new juranometria.project.ViewportMapping(
-                        scene.viewport())::toPixel)
+                .map(new juranometria.project.ViewportMapping(scene.viewport(),
+                juranometria.project.Projections.of(scene.viewport().projection(), scene.viewport().centre()))::toPixel)
                 .map(p -> new double[] {p.x(), p.y()});
     }
 

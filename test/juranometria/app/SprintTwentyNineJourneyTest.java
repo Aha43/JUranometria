@@ -621,7 +621,7 @@ class SprintTwentyNineJourneyTest {
     private static double sagitta(ChartScene scene) {
         GnomonicProjection projection =
                 new GnomonicProjection(scene.viewport().centre());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
         List<double[]> points = new ArrayList<>();
         for (double ra = -18.0; ra <= 18.0; ra += 1.0) {
             projection.project(new SkyPosition(
@@ -648,7 +648,7 @@ class SprintTwentyNineJourneyTest {
     private static List<String> missingFromCorners(ChartScene scene) {
         GnomonicProjection projection =
                 new GnomonicProjection(scene.viewport().centre());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
         TiledCatalogue catalogue = TiledCatalogue.load();
         List<String> missing = new ArrayList<>();
         for (int[] pixel : new int[][] {{1, 1},
@@ -829,7 +829,7 @@ class SprintTwentyNineJourneyTest {
                         PaperSize.A4);
         var at = new GnomonicProjection(page.scene().viewport().centre())
                 .project(position)
-                .map(new ViewportMapping(page.scene().viewport())::toPixel)
+                .map(new ViewportMapping(juranometria.project.DrawnPage.of(page.scene()))::toPixel)
                 .orElseThrow();
 
         // Four short arms with a gap in the middle, together centred
@@ -870,8 +870,8 @@ class SprintTwentyNineJourneyTest {
         List<double[]> ink = pathBoxes(svg);
         GnomonicProjection projection = new GnomonicProjection(
                 page.scene().viewport().centre());
-        ViewportMapping mapping = new ViewportMapping(
-                page.scene().viewport());
+        ViewportMapping mapping = new juranometria.project.ViewportMapping(
+                juranometria.project.DrawnPage.of(page.scene()));
 
         List<String> missing = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark
@@ -958,8 +958,8 @@ class SprintTwentyNineJourneyTest {
 
         GnomonicProjection projection = new GnomonicProjection(
                 sheet.scene().viewport().centre());
-        ViewportMapping onPaper = new ViewportMapping(
-                sheet.scene().viewport());
+        ViewportMapping onPaper = new juranometria.project.ViewportMapping(
+                juranometria.project.DrawnPage.of(sheet.scene()));
         double scale = 300 / 72.0;
         double margin = PaperSize.A4.marginPoints();
 

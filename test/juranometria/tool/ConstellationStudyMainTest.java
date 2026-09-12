@@ -27,7 +27,7 @@ class ConstellationStudyMainTest {
         SkyPosition centre = new SkyPosition(0.0, 0.0);
         ChartViewport viewport = new ChartViewport(centre, 24.0, 900, 700);
         GnomonicProjection projection = new GnomonicProjection(centre);
-        ViewportMapping mapping = new ViewportMapping(viewport);
+        ViewportMapping mapping = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
 
         SkyPosition from = new SkyPosition(12.078, 8.976);
         SkyPosition to = new SkyPosition(11.792, 9.270);

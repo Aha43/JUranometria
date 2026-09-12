@@ -19,6 +19,7 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.StarSizePolicy;
+import juranometria.project.DrawnPage;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.PlanePoint;
@@ -152,7 +153,7 @@ public final class ConstellationStudyMain {
         ChartScene scene = assembler.assemble(state, WIDTH, HEIGHT);
         var image = renderer.renderToImage(scene);
         GnomonicProjection projection = new GnomonicProjection(target.centre());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
 
         long r0 = System.nanoTime();
         Graphics2D g = image.createGraphics();

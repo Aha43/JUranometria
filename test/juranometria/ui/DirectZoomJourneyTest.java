@@ -332,7 +332,7 @@ class DirectZoomJourneyTest {
                 navigation.state().centre(),
                 navigation.state().fieldWidthDegrees(),
                 viewport.widthPx(), viewport.heightPx());
-        PixelPoint landed = new ViewportMapping(current).toPixel(
+        PixelPoint landed = new ViewportMapping(current, juranometria.project.Projections.of(current.projection(), current.centre())).toPixel(
                 new GnomonicProjection(navigation.state().centre())
                         .project(anchor).orElseThrow());
         return Math.hypot(landed.x() - x,

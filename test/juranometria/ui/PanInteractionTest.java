@@ -87,7 +87,7 @@ class PanInteractionTest {
     /** The page pixel now showing the given sky position. */
     private static PixelPoint pixelOf(ChartComponent chart, SkyPosition sky) {
         var viewport = chart.scene().viewport();
-        return new ViewportMapping(viewport).toPixel(
+        return new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).toPixel(
                 new GnomonicProjection(viewport.centre())
                         .project(sky).orElseThrow());
     }

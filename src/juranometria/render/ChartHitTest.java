@@ -149,13 +149,25 @@ public final class ChartHitTest {
      * inverse - the same geometry the pan gesture uses, so empty sky
      * answers with the coordinates the chart would centre on.
      */
+    /** The ordinary entry point (review of #335). */
     public static SkyPosition skyAt(ChartScene scene, double x, double y) {
-        // The same two calls the grab-to-pan gesture makes, so an
-        // empty-sky answer names the coordinates the chart would
-        // centre on if the reader asked it to.
-        PlanePoint plane = PanSolver.planeFromPixel(scene.viewport(),
+        return skyAt(juranometria.project.DrawnPage.of(scene), x, y);
+    }
+
+    /**
+     * Which sky is under this pixel of this page.
+     *
+     * <p>Takes the page rather than the scene because pointing is
+     * geometry: a globe answers a different question from the
+     * projection its viewport happens to name, and a caller that
+     * asked the viewport would hit-test a sky the reader is not
+     * looking at.
+     */
+    public static SkyPosition skyAt(juranometria.project.DrawnPage page,
+                                    double x, double y) {
+        PlanePoint plane = PanSolver.planeFromPixel(page,
                 new PixelPoint(x, y));
-        return PanSolver.skyFromPlane(scene.viewport(), plane);
+        return PanSolver.skyFromPlane(page, plane);
     }
 
     private static boolean onPaper(ChartScene scene, double x, double y) {

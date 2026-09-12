@@ -20,6 +20,7 @@ import juranometria.page.PageExtent;
 import juranometria.page.PageInventory;
 import juranometria.page.PageVisibility;
 import juranometria.chart.Star;
+import juranometria.project.DrawnPage;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -221,7 +222,7 @@ public final class OnThisPageStudyMain {
     private static Inventory inventoryOf(ChartScene scene) {
         GnomonicProjection projection =
                 new GnomonicProjection(scene.viewport().centre());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         List<DeepSkyObject> deepSky = new ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
             if (PageExtent.onPage(scene, dso)) {
@@ -308,7 +309,7 @@ public final class OnThisPageStudyMain {
                 GnomonicProjection projection =
                         new GnomonicProjection(scene.viewport().centre());
                 ViewportMapping mapping =
-                        new ViewportMapping(scene.viewport());
+                        new ViewportMapping(DrawnPage.of(scene));
                 int centres = 0;
                 int extents = 0;
                 for (DeepSkyObject dso : scene.deepSkyObjects()) {

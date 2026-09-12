@@ -19,8 +19,26 @@ public final class ViewportMapping {
     private final double centreY;
     private final double pixelsPerPlaneUnit;
 
-    public ViewportMapping(ChartViewport viewport) {
-        this(viewport, Projections.forViewport(viewport));
+    /**
+     * The mapping a page is drawn at (Sprint 32, issue #301).
+     *
+     * <p>A page's scale is its projection's answer at half its field,
+     * so a mapping built from a different projection draws the page
+     * at the wrong size. That used to be impossible to get wrong,
+     * because a viewport named its projection and there was no other
+     * answer to have. The celestial-globe gate made it possible, and
+     * then made it happen: a hemisphere's stars were placed at
+     * orthographic radii on a plane scaled stereographically, and the
+     * disc landed at half the page it should have filled.
+     *
+     * <p>So a mapping is built from the page, which carries the scene
+     * and the projection that draws it as one value. The pair cannot
+     * disagree, which is what the private two-argument form below was
+     * protecting and what a caller passing two loose arguments could
+     * not promise.
+     */
+    public ViewportMapping(DrawnPage page) {
+        this(page.scene().viewport(), page.projection());
     }
 
     /**
@@ -33,10 +51,47 @@ public final class ViewportMapping {
      * projection disagreeing with the viewport in either. There is
      * one viewport, it names one projection, and this asks it.
      */
-    private ViewportMapping(ChartViewport viewport,
+    /**
+     * A mapping from a viewport and the projection drawing it, named
+     * separately.
+     *
+     * <p>Public again, narrowly: navigation arithmetic works on a
+     * viewport with no page assembled - there is nothing drawn yet to
+     * carry a projection - and it already knows which projection it
+     * is solving in, because it was handed the kind. What a review
+     * objected to was a caller <em>guessing</em> the pair. A caller
+     * that has a page must use {@link #ViewportMapping(DrawnPage)},
+     * where the two cannot disagree.
+     */
+    public ViewportMapping(ChartViewport viewport,
                             Projection projection) {
         double half = viewport.fieldWidthDegrees() / 2.0;
-        if (half >= projection.limitDegrees()) {
+        // Whether the limit is an edge that exists, or one the
+        // projection only approaches (#301).
+        //
+        // A bounded projection has a limb: ninety degrees out is a
+        // real circle at plane radius one, it is the circle the
+        // projection draws best, and a page whose half-field lands
+        // exactly on it is a whole hemisphere rather than an
+        // impossible page. An unbounded one never reaches its limit -
+        // a tangent plane's ninety degrees is the horizon, where the
+        // scale runs away - so a half-field that arrives there has
+        // nothing finite to be drawn at.
+        //
+        // Comparing angles alone made those the same refusal, which
+        // is the same ">= against >" the reviewed orthographic
+        // candidate records getting wrong once already. Testing the
+        // radius alone makes them the same acceptance: tan of ninety
+        // degrees in doubles is 1.6e16, which is not infinity and
+        // would have let an impossible page through.
+        boolean bounded =
+                Double.isFinite(projection.visiblePlaneRadius());
+        double halfRadius = projection.planeRadius(half);
+        boolean pastTheEdge = bounded
+                ? half > projection.limitDegrees()
+                : half >= projection.limitDegrees();
+        if (pastTheEdge || !Double.isFinite(halfRadius)
+                || halfRadius <= 0.0) {
             throw new IllegalArgumentException(
                     "field width reaches past what the "
                             + projection.name() + " projection shows: "
@@ -44,8 +99,60 @@ public final class ViewportMapping {
         }
         this.centreX = viewport.widthPx() / 2.0;
         this.centreY = viewport.heightPx() / 2.0;
-        this.pixelsPerPlaneUnit =
-                viewport.widthPx() / (2.0 * projection.planeRadius(half));
+        // The frame rule is about a page that shows the whole
+        // bounded object, and only such a page (review of #335).
+        //
+        // "Bounded" alone was too loose: it made the field stop
+        // affecting the scale at all, so an orthographic page that
+        // said 120 degrees was drawn at the scale of the full limb
+        // and put its own 60-degree edge nowhere near the frame it
+        // claimed. A globe is a disc placed on paper when the page IS
+        // the hemisphere; a narrower bounded page is an ordinary page
+        // that happens to be drawn by a projection with an edge, and
+        // is sized by the rule every other page in the atlas uses.
+        boolean wholeObject = bounded
+                && half >= projection.limitDegrees();
+        this.pixelsPerPlaneUnit = wholeObject
+                ? globeFrame() * Math.min(viewport.widthPx(),
+                        viewport.heightPx()) / 2.0
+                        / projection.visiblePlaneRadius()
+                : viewport.widthPx() / (2.0 * halfRadius);
+    }
+
+    /**
+     * How much of a page's short side the globe's disc fills (Sprint
+     * 32, issue #301).
+     *
+     * <p>A rectangular chart is sized by the rule every page in the
+     * atlas shares: half the field across half the width. A globe
+     * cannot be. It is a disc, so a disc sized by the width runs off
+     * the top and bottom of a landscape page at every field, and a
+     * disc sized to fill the short side exactly touches the paper on
+     * two sides with nowhere for the title block to go but on top of
+     * the sky.
+     *
+     * <p>So the globe is <strong>a bounded object placed on paper</strong>
+     * rather than a field filling a frame: a centred disc at a stated
+     * fraction of the short side, leaving a quiet border that is the
+     * same on every page and belongs to the cartography rather than
+     * to the reader. The furniture lives in that border - in the
+     * generous side gutters of a landscape page, above and below on a
+     * portrait one - instead of over the celestial sphere.
+     *
+     * <p>The scale does not depend on whether any furniture is
+     * enabled: a globe that changed size when the reader turned the
+     * magnitude key on would be a globe whose scale meant nothing.
+     *
+     * <p>The fraction is overridable only while the gate is choosing
+     * it, so the candidates can be compared by eye at one sitting.
+     * <strong>Issue #329 removes the override</strong> and leaves the
+     * constant.
+     */
+    private static final double GLOBE_FRAME = 0.90;
+
+    private static double globeFrame() {
+        String chosen = System.getProperty("juranometria.globeFrame");
+        return chosen == null ? GLOBE_FRAME : Double.parseDouble(chosen);
     }
 
     /** Pixels per tangent-plane unit; multiply an angle in radians to get

@@ -91,7 +91,7 @@ public final class GridStudyMain {
             probe.dispose();
             long t0 = System.nanoTime();
             EquatorialGrid.Grid grid = EquatorialGrid.gridFor(
-                    scene.viewport(), titleBlock);
+                    juranometria.project.DrawnPage.of(scene), titleBlock);
             long t1 = System.nanoTime();
             warmNanos += t1 - t0;
             warmed++;

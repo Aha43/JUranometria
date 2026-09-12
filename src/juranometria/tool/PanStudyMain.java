@@ -168,7 +168,7 @@ public final class PanStudyMain {
         if (plane.isEmpty()) {
             return Double.POSITIVE_INFINITY;
         }
-        PixelPoint pixel = new ViewportMapping(viewport).toPixel(plane.get());
+        PixelPoint pixel = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).toPixel(plane.get());
         return Math.hypot(pixel.x() - WIDTH / 2.0, pixel.y() - HEIGHT / 2.0);
     }
 
@@ -196,7 +196,7 @@ public final class PanStudyMain {
             SkyPosition newCentre = solved.centre().get();
             ChartViewport moved = new ChartViewport(
                     newCentre, field, WIDTH, HEIGHT);
-            PixelPoint reprojected = new ViewportMapping(moved).toPixel(
+            PixelPoint reprojected = new ViewportMapping(moved, juranometria.project.Projections.of(moved.projection(), moved.centre())).toPixel(
                     new GnomonicProjection(newCentre)
                             .project(grabbed).orElseThrow());
             double error = Math.hypot(reprojected.x() - release.x(),
@@ -227,7 +227,7 @@ public final class PanStudyMain {
         if (plane.isEmpty()) {
             return Double.POSITIVE_INFINITY;
         }
-        PixelPoint drifted = new ViewportMapping(viewport).toPixel(plane.get());
+        PixelPoint drifted = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).toPixel(plane.get());
         return Math.hypot(drifted.x() - WIDTH / 2.0, drifted.y() - HEIGHT / 2.0);
     }
 

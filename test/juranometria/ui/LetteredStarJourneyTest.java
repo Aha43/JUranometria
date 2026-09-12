@@ -312,7 +312,7 @@ class LetteredStarJourneyTest {
                                                         SkyPosition to) {
         ChartScene scene = chart.scene();
         var projection = new GnomonicProjection(scene.viewport().centre());
-        var mapping = new ViewportMapping(scene.viewport());
+        var mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
         var start = mapping.toPixel(projection.project(from).orElseThrow());
         var end = mapping.toPixel(projection.project(to).orElseThrow());
         var path = new java.awt.geom.Line2D.Double(start.x(), start.y(),
@@ -343,7 +343,7 @@ class LetteredStarJourneyTest {
         var probe = new java.awt.image.BufferedImage(1, 1,
                 java.awt.image.BufferedImage.TYPE_INT_RGB).createGraphics();
         probe.dispose();
-        var mapping = new ViewportMapping(scene.viewport());
+        var mapping = new ViewportMapping(juranometria.project.DrawnPage.of(scene));
         return RENDERER.starLabelPlacements(
                 ChartRenderer.TextMetrics.offscreen(),
                 scene, options.options()).stream()

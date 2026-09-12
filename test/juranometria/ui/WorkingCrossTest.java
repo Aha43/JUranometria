@@ -54,7 +54,7 @@ class WorkingCrossTest {
                                               SkyPosition position) {
         return new GnomonicProjection(scene.viewport().centre())
                 .project(position)
-                .map(new ViewportMapping(scene.viewport())::toPixel)
+                .map(new ViewportMapping(juranometria.project.DrawnPage.of(scene))::toPixel)
                 .orElseThrow();
     }
 
@@ -69,7 +69,7 @@ class WorkingCrossTest {
         try {
             g.setColor(java.awt.Color.WHITE);
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
-            WorkingCrossInk.paint(g, scene, contributions, lead,
+            WorkingCrossInk.paint(g, juranometria.project.DrawnPage.of(scene), contributions, lead,
                     juranometria.render.ChartPalette.WHITE_PAPER);
         } finally {
             g.dispose();
@@ -558,7 +558,7 @@ class WorkingCrossTest {
             g.setColor(juranometria.render.ChartPalette.BLACK_SKY
                     .ground());
             g.fillRect(0, 0, image.getWidth(), image.getHeight());
-            WorkingCrossInk.paint(g, scene,
+            WorkingCrossInk.paint(g, juranometria.project.DrawnPage.of(scene),
                     List.of(crossAt("TEST", object)), null,
                     juranometria.render.ChartPalette.BLACK_SKY);
         } finally {

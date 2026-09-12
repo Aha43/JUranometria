@@ -13,6 +13,7 @@ import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
 import juranometria.chart.StarSizePolicy;
 import juranometria.geo.GeoSegment;
+import juranometria.project.DrawnPage;
 import juranometria.project.PixelPoint;
 import juranometria.project.Projections;
 import juranometria.project.ViewportMapping;
@@ -327,8 +328,8 @@ public final class FigureAnchorStudyMain {
     }
 
     private static List<SkyPosition> endpointsOn(ChartScene scene) {
-        var mapping = new ViewportMapping(scene.viewport());
-        var projection = Projections.forViewport(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
+        var projection = DrawnPage.of(scene).projection();
         List<SkyPosition> found = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         for (GeoSegment segment : scene.geography().figureSegments()) {
@@ -371,8 +372,8 @@ public final class FigureAnchorStudyMain {
         if (titleBlock == null) {
             return false;
         }
-        var mapping = new ViewportMapping(scene.viewport());
-        var projection = Projections.forViewport(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
+        var projection = DrawnPage.of(scene).projection();
         var plane = projection.project(endpoint);
         return plane.isPresent() && titleBlock.contains(
                 (int) Math.round(mapping.toPixel(plane.get()).x()),
@@ -446,8 +447,8 @@ public final class FigureAnchorStudyMain {
      */
     private static Set<String> figureStarsOf(ChartScene scene,
                                              List<SkyPosition> endpoints) {
-        var mapping = new ViewportMapping(scene.viewport());
-        var projection = Projections.forViewport(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
+        var projection = DrawnPage.of(scene).projection();
         List<PixelPoint> at = new ArrayList<>();
         for (SkyPosition endpoint : endpoints) {
             projection.project(endpoint)
@@ -496,8 +497,8 @@ public final class FigureAnchorStudyMain {
     private static boolean nodeAt(BufferedImage page,
                                   BufferedImage withheld,
                                   ChartScene scene, SkyPosition endpoint) {
-        var mapping = new ViewportMapping(scene.viewport());
-        var projection = Projections.forViewport(scene.viewport());
+        var mapping = new ViewportMapping(DrawnPage.of(scene));
+        var projection = DrawnPage.of(scene).projection();
         var plane = projection.project(endpoint);
         if (plane.isEmpty()) {
             return false;

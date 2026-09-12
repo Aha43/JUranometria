@@ -117,7 +117,7 @@ public final class ZoomStudyMain {
         SkyPosition newCentre = step.solution().centre().orElseThrow();
         ChartViewport viewport = new ChartViewport(
                 newCentre, newFieldDegrees, WIDTH, heightPx);
-        PixelPoint landed = new ViewportMapping(viewport).toPixel(
+        PixelPoint landed = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).toPixel(
                 new GnomonicProjection(newCentre)
                         .project(step.anchor()).orElseThrow());
         return Math.hypot(landed.x() - pointer.x(),
@@ -139,7 +139,7 @@ public final class ZoomStudyMain {
         SkyPosition newCentre = step.solution().centre().orElseThrow();
         ChartViewport viewport = new ChartViewport(
                 newCentre, newFieldDegrees, WIDTH, HEIGHT);
-        PixelPoint landed = new ViewportMapping(viewport).toPixel(
+        PixelPoint landed = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).toPixel(
                 new GnomonicProjection(newCentre)
                         .project(step.anchor()).orElseThrow());
         return Math.hypot(landed.x() - pointer.x(),

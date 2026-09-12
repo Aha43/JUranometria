@@ -211,7 +211,7 @@ class ChartSheetTest {
         var projection = new juranometria.project.GnomonicProjection(
                 with.scene().viewport().centre());
         var mapping = new juranometria.project.ViewportMapping(
-                with.scene().viewport());
+                juranometria.project.DrawnPage.of(with.scene()));
 
         EclipticModule ecliptic = new EclipticModule();
         ecliptic.showing(true);

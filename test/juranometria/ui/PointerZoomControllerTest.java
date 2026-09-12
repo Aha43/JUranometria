@@ -58,7 +58,7 @@ class PointerZoomControllerTest {
     private static PixelPoint pixelOf(ChartViewState state, SkyPosition sky) {
         ChartViewport viewport = new ChartViewport(
                 state.centre(), state.fieldWidthDegrees(), WIDTH, HEIGHT);
-        return new ViewportMapping(viewport).toPixel(
+        return new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())).toPixel(
                 Projections.forViewport(viewport).project(sky).orElseThrow());
     }
 
@@ -323,7 +323,7 @@ class PointerZoomControllerTest {
         ChartViewport zoomed = new ChartViewport(
                 controller.state().centre(),
                 controller.state().fieldWidthDegrees(), WIDTH, paperHeight);
-        PixelPoint landed = new ViewportMapping(zoomed).toPixel(
+        PixelPoint landed = new ViewportMapping(zoomed, juranometria.project.Projections.of(zoomed.projection(), zoomed.centre())).toPixel(
                 new GnomonicProjection(controller.state().centre())
                         .project(anchor).orElseThrow());
         assertTrue(Math.hypot(landed.x() - pixel.x(),

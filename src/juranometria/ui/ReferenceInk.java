@@ -20,6 +20,7 @@ import juranometria.chart.ChartScene;
 import juranometria.module.InkRole;
 import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.CurveRun;
@@ -113,9 +114,17 @@ public final class ReferenceInk {
      * happened to attach. Two modules attached the other way round
      * produce the same page.
      */
+    /** The ordinary entry point (review of #335). */
     public static void paint(Graphics2D g, ChartScene scene,
                       List<OverlayRegistry.Owned> contributions,
                       juranometria.render.ChartPalette palette) {
+        paint(g, DrawnPage.of(scene), contributions, palette);
+    }
+
+    public static void paint(Graphics2D g, DrawnPage page,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette) {
+        ChartScene scene = page.scene();
         if (contributions.isEmpty()) {
             return;
         }
@@ -130,9 +139,8 @@ public final class ReferenceInk {
         }
         reference.sort(Comparator.comparing(OverlayRegistry.Owned::key));
 
-        Projection projection =
-                Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         Rectangle2D paper = ChartRenderer.paperOf(scene);
         // The paper, and the limb if this projection has one: a
         // curve is clipped to where there is sky, not only to where
@@ -230,14 +238,21 @@ public final class ReferenceInk {
      * way the star-label pass has published its since #154, and
      * {@link #paint} writes precisely this list.
      */
+    /** The ordinary entry point (review of #335). */
     public static List<NamePlacement> namePlacements(ChartScene scene,
             List<OverlayRegistry.Owned> contributions) {
+        return namePlacements(DrawnPage.of(scene), contributions);
+    }
+
+    public static List<NamePlacement> namePlacements(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions) {
+        ChartScene scene = page.scene();
         List<OverlayRegistry.Owned> reference = referenceOf(contributions);
         if (reference.isEmpty()) {
             return List.of();
         }
-        Projection projection = Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         Rectangle2D paper = ChartRenderer.paperOf(scene);
         PageRegion region = mapping.regionFor(scene.viewport(), projection);
         List<Named> names = new ArrayList<>();

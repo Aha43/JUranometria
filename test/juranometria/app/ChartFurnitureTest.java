@@ -166,10 +166,8 @@ class ChartFurnitureTest {
         }
         assertTrue(title != null, "the page has a title block to hide");
 
-        var withBlock = juranometria.render.EquatorialGrid.gridFor(
-                scene.viewport(), title);
-        var withoutBlock = juranometria.render.EquatorialGrid.gridFor(
-                scene.viewport(), (java.awt.Rectangle) null);
+        var withBlock = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), title);
+        var withoutBlock = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), (java.awt.Rectangle) null);
 
         assertTrue(withoutBlock.labels().size() > withBlock.labels().size(),
                 "the block really was suppressing labels: "
@@ -216,10 +214,8 @@ class ChartFurnitureTest {
             } finally {
                 g.dispose();
             }
-            var unreserved = juranometria.render.EquatorialGrid.gridFor(
-                    scene.viewport(), (java.awt.Rectangle) null);
-            var reserved = juranometria.render.EquatorialGrid.gridFor(
-                    scene.viewport(), null, key);
+            var unreserved = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), (java.awt.Rectangle) null);
+            var reserved = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), null, key);
             assertEquals(unreserved.labels().size(),
                     reserved.labels().size(),
                     "the key suppresses no grid label, because it stands"
@@ -237,22 +233,19 @@ class ChartFurnitureTest {
         // not a claim that the key happens to overlap something,
         // which on a real page it never does (sprint review).
         ChartScene scene = page();
-        var unreserved = juranometria.render.EquatorialGrid.gridFor(
-                scene.viewport(), (java.awt.Rectangle) null);
+        var unreserved = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), (java.awt.Rectangle) null);
         java.awt.Rectangle overTheBottomEdge = new java.awt.Rectangle(
                 0, scene.viewport().heightPx() - 40,
                 scene.viewport().widthPx(), 40);
 
-        var reserved = juranometria.render.EquatorialGrid.gridFor(
-                scene.viewport(), null, overTheBottomEdge);
+        var reserved = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), null, overTheBottomEdge);
 
         assertTrue(reserved.labels().size() < unreserved.labels().size(),
                 "furniture over the labels suppresses them: "
                         + unreserved.labels().size() + " unreserved, "
                         + reserved.labels().size() + " reserved");
         assertEquals(unreserved.labels().size(),
-                juranometria.render.EquatorialGrid.gridFor(
-                        scene.viewport(), null, null).labels().size(),
+                juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), null, null).labels().size(),
                 "and reserving nothing suppresses nothing");
     }
 

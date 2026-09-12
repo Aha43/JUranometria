@@ -346,7 +346,7 @@ public final class EclipticStudyMain {
         ChartViewport viewport = new ChartViewport(centre, field,
                 PAGE_WIDTH, PAGE_HEIGHT);
         GnomonicProjection projection = new GnomonicProjection(centre);
-        ViewportMapping mapping = new ViewportMapping(viewport);
+        ViewportMapping mapping = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
         PixelPoint first = projection.project(a).map(mapping::toPixel)
                 .orElseThrow();
         PixelPoint second = projection.project(b).map(mapping::toPixel)

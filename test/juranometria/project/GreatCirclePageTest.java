@@ -48,7 +48,7 @@ class GreatCirclePageTest {
         java.awt.geom.Rectangle2D paper = ChartRenderer.paperOf(scene);
         return GreatCirclePage.clip(
                 new GnomonicProjection(scene.viewport().centre()),
-                new ViewportMapping(scene.viewport()),
+                new ViewportMapping(juranometria.project.DrawnPage.of(scene)),
                 PageRegion.paper(paper.getMinX(), paper.getMinY(),
                         paper.getMaxX(), paper.getMaxY()),
                 pole);
@@ -394,7 +394,7 @@ class GreatCirclePageTest {
 
     private static PixelPoint pixel(ChartScene scene, SkyPosition at) {
         return new GnomonicProjection(scene.viewport().centre()).project(at)
-                .map(new ViewportMapping(scene.viewport())::toPixel)
+                .map(new ViewportMapping(juranometria.project.DrawnPage.of(scene))::toPixel)
                 .orElse(null);
     }
 

@@ -233,9 +233,9 @@ class LabelGeometryTest {
                 List<LabelPlacement.Request> asked =
                         new java.util.ArrayList<>();
                 asked.addAll(LabelGeometry.starLabels(RENDERER, metrics,
-                        scene, ChartOptions.DEFAULTS));
+                        juranometria.project.DrawnPage.of(scene), ChartOptions.DEFAULTS));
                 asked.addAll(LabelGeometry.deepSkyLabels(RENDERER, metrics,
-                        scene, ChartOptions.DEFAULTS));
+                        juranometria.project.DrawnPage.of(scene), ChartOptions.DEFAULTS));
                 asked.addAll(LabelGeometry.constellationNames(RENDERER,
                         metrics, scene, ChartOptions.DEFAULTS));
                 assertFalse(asked.isEmpty(), field + "° at " + extent[0]
@@ -345,12 +345,12 @@ class LabelGeometryTest {
                 java.util.Set<String> asked = new java.util.HashSet<>();
                 for (LabelPlacement.Request request
                         : LabelGeometry.starLabels(RENDERER, metrics,
-                                scene, options)) {
+                                juranometria.project.DrawnPage.of(scene), options)) {
                     asked.add("star:" + request.id());
                 }
                 for (LabelPlacement.Request request
                         : LabelGeometry.deepSkyLabels(RENDERER, metrics,
-                                scene, options)) {
+                                juranometria.project.DrawnPage.of(scene), options)) {
                     asked.add("deep sky:" + request.id());
                 }
                 for (LabelPlacement.Request request
@@ -478,9 +478,9 @@ class LabelGeometryTest {
         ChartScene scene = page(266.0, -28.0, 120.0, 900, 700);
         FontMetrics metrics = metrics();
         List<LabelPlacement.Request> asked = new java.util.ArrayList<>();
-        asked.addAll(LabelGeometry.starLabels(RENDERER, metrics, scene,
+        asked.addAll(LabelGeometry.starLabels(RENDERER, metrics, juranometria.project.DrawnPage.of(scene),
                 ChartOptions.DEFAULTS));
-        asked.addAll(LabelGeometry.deepSkyLabels(RENDERER, metrics, scene,
+        asked.addAll(LabelGeometry.deepSkyLabels(RENDERER, metrics, juranometria.project.DrawnPage.of(scene),
                 ChartOptions.DEFAULTS));
         asked.addAll(LabelGeometry.constellationNames(RENDERER, metrics,
                 scene, ChartOptions.DEFAULTS));
@@ -507,9 +507,9 @@ class LabelGeometryTest {
         ChartScene scene = page(83.0, 0.0, 90.0, 900, 700);
         FontMetrics metrics = metrics();
         List<LabelPlacement.Request> asked = new java.util.ArrayList<>();
-        asked.addAll(LabelGeometry.starLabels(RENDERER, metrics, scene,
+        asked.addAll(LabelGeometry.starLabels(RENDERER, metrics, juranometria.project.DrawnPage.of(scene),
                 ChartOptions.DEFAULTS));
-        asked.addAll(LabelGeometry.deepSkyLabels(RENDERER, metrics, scene,
+        asked.addAll(LabelGeometry.deepSkyLabels(RENDERER, metrics, juranometria.project.DrawnPage.of(scene),
                 ChartOptions.DEFAULTS));
         asked.addAll(LabelGeometry.constellationNames(RENDERER, metrics,
                 scene, ChartOptions.DEFAULTS));

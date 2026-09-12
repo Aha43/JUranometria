@@ -124,7 +124,8 @@ public final class RegionalStudyMain {
 
         // Visibly drawn = projected inside the frame (and V-limited for stars).
         var projection = new juranometria.project.GnomonicProjection(target.centre());
-        var mapping = new juranometria.project.ViewportMapping(viewport);
+        var mapping = new juranometria.project.ViewportMapping(viewport,
+                juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
         int drawnStars = 0;
         for (Star star : stars) {
             if (star.magnitude() <= LIMIT_V && inFrame(projection, mapping, star.position())) {

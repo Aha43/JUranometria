@@ -68,7 +68,7 @@ public final class SheetInk {
             for (String member : members) {
                 renderer.drawSelectionHighlight(g, scene, onPaper, member);
             }
-            WorkingCrossInk.paint(g, scene, chart.overlays().collect(),
+            WorkingCrossInk.paint(g, juranometria.project.DrawnPage.of(scene), chart.overlays().collect(),
                     leadIdentity, ChartPalette.WHITE_PAPER);
         };
     }

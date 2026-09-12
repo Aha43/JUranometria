@@ -110,8 +110,8 @@ class SheetGeometryTest {
         // Every screen mark, put where the sky says it goes on paper.
         GnomonicProjection projection = new GnomonicProjection(
                 sheet.scene().viewport().centre());
-        ViewportMapping onPaper = new ViewportMapping(
-                sheet.scene().viewport());
+        ViewportMapping onPaper = new juranometria.project.ViewportMapping(
+                juranometria.project.DrawnPage.of(sheet.scene()));
 
         // Every mark the paper render decided on has to be in the
         // file, at the place the sky puts it.

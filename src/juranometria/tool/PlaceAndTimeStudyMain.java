@@ -15,6 +15,7 @@ import juranometria.sky.GreatCircle;
 import juranometria.sky.LocalSky;
 import juranometria.sky.Observer;
 import juranometria.sky.SkyFrame;
+import juranometria.project.DrawnPage;
 import juranometria.project.GnomonicProjection;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -610,7 +611,7 @@ public final class PlaceAndTimeStudyMain {
 
     private static double pixelsPerDegree(double field) {
         ChartScene scene = page(ChartViewState.DEFAULT.centre(), field);
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         return mapping.pixelsPerPlaneUnit() * Math.PI / 180.0;
     }
 
@@ -618,7 +619,7 @@ public final class PlaceAndTimeStudyMain {
     private static double onPaper(ChartScene scene, List<SkyPosition> curve) {
         GnomonicProjection projection =
                 new GnomonicProjection(scene.viewport().centre());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         java.awt.geom.Rectangle2D paper = ChartRenderer.paperOf(scene);
         int on = 0;
         for (SkyPosition point : curve) {
@@ -639,7 +640,7 @@ public final class PlaceAndTimeStudyMain {
                                        List<SkyPosition> curve) {
         GnomonicProjection projection =
                 new GnomonicProjection(scene.viewport().centre());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ViewportMapping mapping = new ViewportMapping(DrawnPage.of(scene));
         java.awt.geom.Rectangle2D paper = ChartRenderer.paperOf(scene);
         List<PixelPoint> shown = new ArrayList<>();
         for (SkyPosition point : curve) {

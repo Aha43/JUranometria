@@ -8,6 +8,7 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.DeepSkyObject;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.Star;
+import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
@@ -52,21 +53,29 @@ public final class PageInventory {
      * magnitude limit, catalogue content, or a chart option that
      * changes visibility - and at no other time.
      */
+    /**
+     * The ordinary entry point: a scene drawn by the projection its
+     * viewport names (review of #335).
+     */
     public static PageContents of(ChartScene scene, ChartOptions options) {
-        if (scene == null || options == null) {
+        return of(DrawnPage.of(scene), options);
+    }
+
+    public static PageContents of(DrawnPage page, ChartOptions options) {
+        if (page == null || options == null) {
             throw new IllegalArgumentException(
-                    "an inventory is of a scene under options");
+                    "an inventory is of a page under options");
         }
-        Projection projection =
-                Projections.forViewport(scene.viewport());
-        ViewportMapping mapping = new ViewportMapping(scene.viewport());
+        ChartScene scene = page.scene();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
         RegionalDetailPolicy policy =
                 new RegionalDetailPolicy(scene, mapping.pixelsPerPlaneUnit());
         SkyPosition centre = scene.viewport().centre();
 
         List<DeepSkyObject> deepSky = new ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (PageExtent.onPage(scene, dso)) {
+            if (PageExtent.onPage(page, dso)) {
                 deepSky.add(dso);
             }
         }

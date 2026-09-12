@@ -119,8 +119,8 @@ class StarLabelRenderingTest {
                 .createGraphics();
         var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
         probe.dispose();
-        var mapping = new juranometria.project.ViewportMapping(
-                page.viewport());
+        var mapping = new juranometria.project.ViewportMapping(page.viewport(),
+                juranometria.project.Projections.of(page.viewport().projection(), page.viewport().centre()));
 
         record Case(String label, ChartOptions options,
                     List<String> expected) {
@@ -165,8 +165,8 @@ class StarLabelRenderingTest {
                 .createGraphics();
         var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
         probe.dispose();
-        var mapping = new juranometria.project.ViewportMapping(
-                page.viewport());
+        var mapping = new juranometria.project.ViewportMapping(page.viewport(),
+                juranometria.project.Projections.of(page.viewport().projection(), page.viewport().centre()));
         var texts = RENDERER.starLabelPlacements(
                         ChartRenderer.TextMetrics.offscreen(), page,
                         new ChartOptions(true, true, true, true, true,
@@ -203,8 +203,8 @@ class StarLabelRenderingTest {
                 .createGraphics();
         var metrics = probe.getFontMetrics(ChartRenderer.labelFont());
         probe.dispose();
-        var mapping = new juranometria.project.ViewportMapping(
-                page.viewport());
+        var mapping = new juranometria.project.ViewportMapping(page.viewport(),
+                juranometria.project.Projections.of(page.viewport().projection(), page.viewport().centre()));
         var texts = RENDERER.starLabelPlacements(
                 ChartRenderer.TextMetrics.offscreen(),
                 page, ChartOptions.DEFAULTS).stream()

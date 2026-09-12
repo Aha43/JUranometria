@@ -213,7 +213,7 @@ class ProjectionStrategyTest {
                 ChartProjection.STEREOGRAPHIC);
         SkyPosition eclipticPole = new SkyPosition(270.0, 66.5607);
         PageRegion paper = PageRegion.paper(0, 0, 900, 700);
-        ViewportMapping mapping = new ViewportMapping(viewport);
+        ViewportMapping mapping = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
         Projection projection = Projections.forViewport(viewport);
 
         PlaneCurve curve = mapping.onPage(
@@ -231,7 +231,7 @@ class ProjectionStrategyTest {
                     900, 700, kind);
             List<CurveRun> runs = GreatCirclePage.clip(
                     Projections.forViewport(carrying),
-                    new ViewportMapping(carrying), paper, equatorPole);
+                    new ViewportMapping(carrying, juranometria.project.Projections.of(carrying.projection(), carrying.centre())), paper, equatorPole);
             assertFalse(runs.isEmpty(),
                     kind + " draws the celestial equator across a"
                             + " chart centred on it");
@@ -248,7 +248,7 @@ class ProjectionStrategyTest {
         // line the sky has not made.
         ChartViewport viewport = new ChartViewport(ORION, 1.0, 900, 700);
         assertTrue(GreatCirclePage.clip(Projections.forViewport(viewport),
-                        new ViewportMapping(viewport),
+                        new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre())),
                         PageRegion.paper(0, 0, 900, 700),
                         new SkyPosition(83.0, 89.0))
                         .isEmpty(),
@@ -267,7 +267,7 @@ class ProjectionStrategyTest {
             ChartViewport viewport = new ChartViewport(ORION, 60.0,
                     900, 700, kind);
             Projection projection = Projections.forViewport(viewport);
-            ViewportMapping mapping = new ViewportMapping(viewport);
+            ViewportMapping mapping = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
             // Half the field east of the centre, which is half the
             // page across - and east is left, so it lands on the
             // left edge whichever projection scaled it.
@@ -287,7 +287,7 @@ class ProjectionStrategyTest {
         // tangent plane cannot scale one at all past 180.
         ChartViewport wide = new ChartViewport(ORION, 170.0, 900, 700,
                 ChartProjection.STEREOGRAPHIC);
-        ViewportMapping mapping = new ViewportMapping(wide);
+        ViewportMapping mapping = new ViewportMapping(wide, juranometria.project.Projections.of(wide.projection(), wide.centre()));
         assertTrue(mapping.pixelsPerPlaneUnit() > 0.0,
                 "the overview scales a 170-degree page");
 

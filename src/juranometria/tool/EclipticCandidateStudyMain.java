@@ -301,7 +301,8 @@ public final class EclipticCandidateStudyMain {
         ChartViewport viewport = scene.viewport();
         GnomonicProjection projection =
                 new GnomonicProjection(viewport.centre());
-        ViewportMapping mapping = new ViewportMapping(viewport);
+        ViewportMapping mapping = new ViewportMapping(viewport,
+                juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
         Rectangle2D paper = new Rectangle2D.Double(1, 1,
                 viewport.widthPx() - 2, viewport.heightPx() - 2);
 
