@@ -351,6 +351,39 @@ a study, and equal ink area does not establish that a two-dimensional
 form is resolved. An evidence repair is no place to make a new
 cartographic rule.
 
+**The classification is confirmed in pixels, on objects drawn by
+themselves.** A rule computed from footprints is a prediction until
+somebody looks at the ink, so one object of each family in each band
+is rendered alone on the page and the ink it leaves is measured:
+
+| family | band | footprint | drawn today | inked box |
+|---|---|---|---|---|
+| galaxies | limb | 0.7 × 0.3 px | 6.0 px | 8 × 6 |
+| open clusters | centre | 2.6 × 2.6 px | 6.0 px | 8 × 8 |
+| open clusters | limb | 0.4 × 0.1 px | 6.0 px | 8 × 7 |
+| globular clusters | centre | 3.3 × 3.2 px | 6.0 px | 8 × 8 |
+| globular clusters | limb | 1.9 × 0.8 px | 6.0 px | 8 × 8 |
+| nebulae | centre | 4.6 × 4.3 px | 6.0 px | 6 × 8 |
+| nebulae | limb | 4.9 × 1.3 px | 7.1 px | 3 × 9 |
+
+Each is an object the geometry calls a **minimum symbol**, and each
+inks about the minimum glyph — which is what the classification says
+it should. **Three of the ten rows have no object to look at**, and
+the report says so rather than omitting them: on a regional page the
+clamp reaches only Messier priority and the searched target, so the
+28 centre galaxies and the 59 planetary nebulae below the practical
+minimum are not drawn at all and have no pixels to confirm anything
+with.
+
+*Two repairs stand behind that table (review of PR #336).* It could
+choose an object production leaves undrawn and then report whatever
+ink was in the window as its, and it cropped from a whole-family
+rendering, so a neighbour's ink could be counted. It now requires that
+the atlas draws the object, and draws that object by itself. The
+"stands alone" filter it used to lean on is gone: rendering one object
+cannot admit a neighbour anyway, and the filter was refusing eight
+rows of ten.
+
 The categories are named **resolved extent** and **minimum symbol**
 rather than anything that assumes the conclusion, because a minimum
 glyph is not nothing. Compared pixel by pixel at 6 px, the five family
@@ -391,27 +424,45 @@ and that claim is withdrawn.** It came from a study that modelled
 every mark as a filled disc of its major diameter, which ignores the
 minor span and is wrong about every family: an open cluster is a
 dotted ring around nothing, a nebula an empty box, a planetary a small
-circle with spokes. Measured instead from `ChartRenderer.symbolInk` —
-the production geometry, both axes, the right shape per family, which
-is published for exactly this kind of question (#313):
+circle with spokes.
+
+The replacement was wrong too, and differently, which the review of
+PR #336 caught: it compared **ink against a silhouette**. The
+corrected side used the area the projected footprint *encloses*, so a
+ring, a box, a cross or a pair of spokes became a filled ellipse again
+the moment it resolved; and the today side took its minor axis from
+the foreshortened globe span, where production scales **both**
+catalogue axes at the page centre's rate. Two different geometries in
+one ratio.
+
+Both sides are now the ink a production symbol leaves, asked of
+`ChartRenderer.symbolInk` over the axes each rule gives it — today's
+from `ChartRenderer.symbolAxesPx`, which is published rather than
+restated, because restating it is how the wrong minor axis got in:
 
 | band | symbol ink today | corrected |
 |---|---|---|
-| centre | 742 px | 765 px (103%) |
-| limb | 1 833 px | 1 735 px (95%) |
-| whole disc | 2 841 px | 2 780 px (98%) |
+| centre | 717 px | 725 px (**101%**) |
+| limb | 5 493 px | 1 799 px (**33%**) |
+| whole disc | 6 489 px | 2 803 px (**43%**) |
 
-**The correction barely changes the ink**, and the reason is a better
-finding than the one it replaces: at the limb almost every object's
-centre-scale size is *already* below the practical minimum, so both
-rules draw the same minimum glyph. What the correction changes is the
-drawn extent of the few large objects, and those are a small share of
-the ink.
+**The correction removes two thirds of the deep-sky ink at the limb**,
+and the centre confirms the measurement rather than the story: there
+the two rules agree to within 1%, because at the page centre the
+centre-scale conversion is the right one. The limb is where a symbol
+is drawn tens of pixels across for a footprint a tenth of one, and
+that is exactly where the ink falls away.
+
+That is a stronger result than the 73% it replaces, and it was hidden
+by the earlier mismatch in both directions at once — a silhouette
+over-counts the corrected side, and a foreshortened minor axis
+under-counts today's.
 
 **None of this alters the family decision.** The population is
 retained overwhelmingly through Messier priority — 18 of 20 galaxies,
 28 of 28 globulars — which both rules keep, so the objects a reader
-sees are the same either way.
+sees are the same either way. What changes is how much ink those same
+objects cost, and the corrected rule costs less.
 
 ### Two model errors this study made first
 

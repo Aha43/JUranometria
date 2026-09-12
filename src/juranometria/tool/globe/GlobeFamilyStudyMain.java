@@ -79,11 +79,28 @@ public final class GlobeFamilyStudyMain {
             new Band("whole disc", 0.0, 1.0));
 
     /** What one object's footprint measured. */
+    /**
+     * @param areaPx the area the projected footprint encloses - a
+     *     silhouette, not ink, and never the ink a symbol leaves
+     * @param todayMajorPx production's own drawn major axis, read
+     *     from {@code ChartRenderer.symbolAxesPx} rather than
+     *     restated here
+     * @param todayMinorPx production's own drawn minor axis: the
+     *     catalogue minor at the page centre's rate, enlarged by the
+     *     same factor as the major when the clamp applies - not the
+     *     foreshortened globe span, which is what this study wrongly
+     *     used until the review of PR #336
+     * @param symbol the mark the atlas draws for this object, so the
+     *     ink question is asked of the right shape
+     */
     record Measured(SymbolFamily family, String id,
                     double pixelX, double pixelY,
                     double radiusOnDisc,
                     double radialPx, double tangentialPx,
-                    double areaPx, double centreScalePx,
+                    double areaPx, double todayMajorPx,
+                    double todayMinorPx,
+                    juranometria.render.ChartRenderer.Symbol symbol,
+                    DeepSkyObject dso,
                     boolean messier, boolean drawnToday) {
 
         /**
@@ -94,6 +111,11 @@ public final class GlobeFamilyStudyMain {
          */
         boolean drawnCorrected() {
             return resolved() || messier();
+        }
+
+        /** What the crop table calls centre-scale: today's major. */
+        double centreScalePx() {
+            return todayMajorPx;
         }
 
         double majorPx() {
@@ -275,7 +297,7 @@ public final class GlobeFamilyStudyMain {
                                 DrawnPage page, List<Measured> measured)
             throws IOException {
         System.out.println("  the pixels, on an object the geometry"
-                + " calls a minimum symbol and that stands alone:");
+                + " calls a minimum symbol, drawn by itself:");
         System.out.printf(Locale.ROOT,
                 "    %-20s %8s %8s %12s %12s%n",
                 "family", "band", "radius", "footprint",
@@ -285,37 +307,13 @@ public final class GlobeFamilyStudyMain {
                 "family", "band", "inked box");
 
         for (SymbolFamily family : SymbolFamily.values()) {
-            // That family alone on the page, so the ink in the crop
-            // is the object's and not its neighbours'.
-            java.awt.image.BufferedImage only = render(page, families(
-                    family == SymbolFamily.GALAXIES,
-                    family == SymbolFamily.OPEN_CLUSTERS,
-                    family == SymbolFamily.GLOBULAR_CLUSTERS,
-                    family == SymbolFamily.NEBULAE,
-                    family == SymbolFamily.PLANETARY_NEBULAE));
-            crop(look, only, measured, family, "centre", 0.0, 0.5);
-            crop(look, only, measured, family, "limb", 0.9, 1.0);
+            crop(look, page, measured, family, "centre", 0.0, 0.5);
+            crop(look, page, measured, family, "limb", 0.9, 1.0);
         }
-    }
-
-    /** Whether nothing else drawn stands within the crop window. */
-    private static boolean alone(Measured one,
-                                 List<Measured> everything) {
-        for (Measured other : everything) {
-            if (other == one || other.family() == null) {
-                continue;
-            }
-            if (Math.hypot(one.pixelX() - other.pixelX(),
-                    one.pixelY() - other.pixelY()) < 20.0) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private static void crop(GlobeDensityStudyMain.Look look,
-                             java.awt.image.BufferedImage marks,
-                             List<Measured> measured,
+                             DrawnPage page, List<Measured> measured,
                              SymbolFamily family, String band,
                              double from, double to)
             throws IOException {
@@ -329,19 +327,50 @@ public final class GlobeFamilyStudyMain {
         // belonged to whatever else happened to be nearby: a crop of
         // a crowded limb is 24 by 24 pixels of ink whatever is at its
         // centre.
+        // And one the atlas actually draws. Without that test the
+        // crop could choose an object production leaves undrawn -
+        // outside a regional page's clamp and below a pixel across -
+        // and then report whatever ink happened to be in the window
+        // as its. The review of PR #336 made that visible by
+        // correcting the axes: rows saying 0.0 px drawn sat beside a
+        // 17x12 inked box.
+        int inBand = 0;
+        int unresolved = 0;
         Measured chosen = null;
         for (Measured one : measured) {
-            if (one.family() != family || one.resolved()
-                    || one.radiusOnDisc() < from
-                    || one.radiusOnDisc() > to || !alone(one, measured)) {
+            if (one.family() != family || one.radiusOnDisc() < from
+                    || one.radiusOnDisc() > to) {
                 continue;
             }
-            if (chosen == null
-                    || one.areaPx() > chosen.areaPx()) {
+            inBand++;
+            if (one.resolved()) {
+                continue;
+            }
+            unresolved++;
+            if (!one.drawnToday()) {
+                continue;
+            }
+            if (chosen == null || one.areaPx() > chosen.areaPx()) {
                 chosen = one;
             }
         }
         if (chosen == null) {
+            // Said, not skipped. A row that simply vanishes reads as
+            // a check that covered everything, and this one covers
+            // two families of five: on a regional page the clamp
+            // reaches only Messier priority and the searched target,
+            // so most unresolved objects are not drawn at all and
+            // have no pixels to confirm anything with.
+            System.out.printf(Locale.ROOT,
+                    "    %-20s %8s %8s   no object to look at: %s%n",
+                    family.label(), band, "-",
+                    inBand == 0 ? "none of this family in this band"
+                            : unresolved == 0
+                                    ? "every one of the " + inBand
+                                            + " resolves"
+                                    : unresolved + " below the"
+                                            + " practical minimum,"
+                                            + " none of them drawn");
             return;
         }
         int window = 24;
@@ -349,8 +378,35 @@ public final class GlobeFamilyStudyMain {
         int top = (int) Math.round(chosen.pixelY()) - window / 2;
         if (left < 0 || top < 0 || left + window > SIDE_PX
                 || top + window > SIDE_PX) {
+            System.out.printf(Locale.ROOT,
+                    "    %-20s %8s %8s   no object to look at: the"
+                            + " crop window falls off the page%n",
+                    family.label(), band, "-");
             return;
         }
+        // Drawn by itself, so the ink in the window is this object's
+        // and nothing else's - the same rule the export study had to
+        // learn about comparing layers.
+        //
+        // This is also what retired the old "stands alone" filter,
+        // which required no other object within twenty pixels. It
+        // existed to keep a neighbour's ink out of the window, which
+        // rendering one object cannot let in anyway, and it was
+        // refusing eight rows of ten on a crowded hemisphere - a
+        // check that covers one family because its guard is too
+        // strict is not safer than one that covers five.
+        java.awt.image.BufferedImage marks = render(
+                new DrawnPage(new juranometria.chart.ChartScene(
+                        page.scene().viewport(), List.of(),
+                        List.of(chosen.dso()), page.scene().title(),
+                        page.scene().limitingMagnitude(),
+                        page.scene().targetIdentity()),
+                        page.projection()),
+                families(family == SymbolFamily.GALAXIES,
+                        family == SymbolFamily.OPEN_CLUSTERS,
+                        family == SymbolFamily.GLOBULAR_CLUSTERS,
+                        family == SymbolFamily.NEBULAE,
+                        family == SymbolFamily.PLANETARY_NEBULAE));
         java.awt.image.BufferedImage tile =
                 marks.getSubimage(left, top, window, window);
         javax.imageio.ImageIO.write(tile, "png", new File(DIR,
@@ -477,19 +533,25 @@ public final class GlobeFamilyStudyMain {
             if (one.family() == null || !one.drawnToday()) {
                 continue;
             }
-            // Today: the axes scaled at the page centre's rate, with
-            // the practical minimum applied as the renderer applies
-            // it, and the true axis ratio kept.
-            double ratio = one.majorPx() <= 0.0 ? 1.0
-                    : one.minorPx() / one.majorPx();
-            double nowMajor = Math.max(
-                    RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                    one.centreScalePx());
-            today += inkArea(one.family(), nowMajor, nowMajor * ratio);
-            // Corrected: the projected footprint where it resolves,
-            // and the family's own minimum glyph where it does not.
-            corrected += one.resolved() ? one.areaPx()
-                    : minimumGlyphArea(one.family());
+            // Both sums are the ink a production symbol leaves, which
+            // is the only way the two are comparable. The first
+            // version of this compared ink against a silhouette: the
+            // corrected side used the area the projected footprint
+            // encloses, so a dotted ring, an open box, a cross or a
+            // pair of spokes became a filled ellipse again the moment
+            // it resolved. And the today side took its minor axis
+            // from the foreshortened globe span, which is not what
+            // production does - it scales both catalogue axes at the
+            // page centre's rate (review of PR #336).
+            today += inkArea(one.symbol(), one.todayMajorPx(),
+                    one.todayMinorPx());
+            // Corrected: the same symbol over the truthfully
+            // projected spans where the footprint resolves, and the
+            // family's own minimum glyph where it does not.
+            corrected += one.resolved()
+                    ? inkArea(one.symbol(), one.majorPx(),
+                            one.minorPx())
+                    : minimumGlyphArea(one.symbol());
         }
         if (today > 0.0) {
             System.out.printf(Locale.ROOT,
@@ -598,21 +660,29 @@ public final class GlobeFamilyStudyMain {
      * the same width ink quite different amounts, and a study that
      * modelled them all as discs would be measuring its own model.
      */
-    private static double inkArea(SymbolFamily family, double majorPx,
-                                  double minorPx) {
+    private static double inkArea(
+            juranometria.render.ChartRenderer.Symbol symbol,
+            double majorPx, double minorPx) {
         java.awt.geom.Area ink =
                 juranometria.render.ChartRenderer.symbolInk(
-                        symbolOf(family), 0.0, 0.0, majorPx,
+                        symbol, 0.0, 0.0, majorPx,
                         Math.max(0.01, minorPx), 0.0);
         return areaOfShape(ink);
     }
 
-    /** Each family's minimum glyph, inked once and remembered. */
-    private static final Map<SymbolFamily, Double> MINIMUM_GLYPH =
-            new java.util.EnumMap<>(SymbolFamily.class);
+    /** Each symbol's minimum glyph, inked once and remembered. */
+    private static final Map<
+            juranometria.render.ChartRenderer.Symbol, Double>
+            MINIMUM_GLYPH = new java.util.HashMap<>();
 
-    private static double minimumGlyphArea(SymbolFamily family) {
-        return MINIMUM_GLYPH.computeIfAbsent(family, one -> inkArea(one,
+    /**
+     * What an unresolved object is actually drawn as: the mark at the
+     * atlas's practical minimum, both axes, which is the shape the
+     * clamp produces when a footprint has collapsed.
+     */
+    private static double minimumGlyphArea(
+            juranometria.render.ChartRenderer.Symbol symbol) {
+        return MINIMUM_GLYPH.computeIfAbsent(symbol, one -> inkArea(one,
                 RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
                 RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX));
     }
@@ -646,12 +716,6 @@ public final class GlobeFamilyStudyMain {
             walk.next();
         }
         return Math.abs(twice) / 2.0;
-    }
-
-    private static juranometria.render.ChartRenderer.Symbol symbolOf(
-            SymbolFamily family) {
-        return juranometria.render.ChartRenderer.symbolForType(
-                typeOf(family));
     }
 
     private static double median(List<Measured> of,
@@ -726,19 +790,21 @@ public final class GlobeFamilyStudyMain {
                 crossHigh = Math.max(crossHigh, across);
             }
 
+            // What the atlas draws today, read from the renderer's
+            // own rule rather than restated here: both catalogue axes
+            // at the page centre's rate, enlarged together when the
+            // clamp applies. Restating it is how this study came to
+            // use a foreshortened minor axis production never uses.
+            double[] axes =
+                    juranometria.render.ChartRenderer.symbolAxesPx(dso,
+                            policy, mapping.pixelsPerPlaneUnit());
             measured.add(new Measured(SymbolFamily.of(dso),
                     dso.id(), midX, midY,
                     away / discRadius,
                     radialHigh - radialLow, crossHigh - crossLow,
-                    areaOf(pixels),
-                    // What the atlas draws today: the axes scaled at
-                    // the page centre's rate, which is the conversion
-                    // this gate forbade and #331 replaces.
-                    Math.max(
-                            RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                            Math.toRadians(dso.majorAxisArcmin() / 60.0)
-                                    * mapping.pixelsPerPlaneUnit()),
-                    dso.labelPriority() <= 1,
+                    areaOf(pixels), axes[0], axes[1],
+                    juranometria.render.ChartRenderer.symbolFor(dso),
+                    dso, dso.labelPriority() <= 1,
                     policy.drawn(dso)));
         }
         return measured;

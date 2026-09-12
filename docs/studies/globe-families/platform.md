@@ -32,10 +32,13 @@ sagittarius:
     Planetary nebulae         0.00%      0.01%
   what that object actually inked:
     family                   band   inked box
-    Galaxies               centre      7x7   
-    Open clusters          centre      9x16  
-    Globular clusters      centre      1x2   
-    Planetary nebulae      centre     17x12  
+    Galaxies                 limb      8x6   
+    Open clusters          centre      8x8   
+    Open clusters            limb      8x7   
+    Globular clusters      centre      8x8   
+    Globular clusters        limb      8x8   
+    Nebulae                centre      6x8   
+    Nebulae                  limb      3x9   
 
 orion:
   what each family costs:
@@ -47,12 +50,12 @@ orion:
     Planetary nebulae         0.00%      0.06%
   what that object actually inked:
     family                   band   inked box
-    Galaxies               centre      0x0   
-    Galaxies                 limb      0x0   
-    Open clusters          centre      0x0   
-    Nebulae                centre     22x23  
-    Planetary nebulae      centre      7x13  
-    Planetary nebulae        limb     13x14  
+    Galaxies                 limb      6x7   
+    Open clusters          centre      8x8   
+    Open clusters            limb      8x8   
+    Globular clusters      centre      8x8   
+    Nebulae                centre      6x8   
+    Planetary nebulae        limb     13x12  
 
 The family glyphs at 6 px, compared with each other pixel by pixel:
     Galaxies           vs Open clusters        44 pixels differ
