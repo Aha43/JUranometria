@@ -124,7 +124,9 @@ public final class PanInteraction extends MouseAdapter {
         }
         // Nothing to grab where there is no sky. A press on the
         // paper around a globe's limb is not a drag that goes wrong
-        // later; it is a press on nothing (#301).
+        // later; it is a press on nothing (#301) - and the hover
+        // cursor asks this same question, so what the pointer offers
+        // and what the press does cannot disagree.
         var under = PanSolver.skyAt(scene.viewport(),
                 PanSolver.planeFromPixel(scene.viewport(),
                         pagePixel(event.getPoint())));
@@ -192,9 +194,38 @@ public final class PanInteraction extends MouseAdapter {
         return dragging;
     }
 
+    /**
+     * The open hand where a grab can begin, and nowhere else.
+     *
+     * <p>On paper was the whole question until the globe, because
+     * every page was sky to its corners. A globe page has a margin
+     * around its disc that is paper and not sky, and
+     * {@link #mousePressed} already refuses to grab there - so a
+     * cursor that asked only about the paper offered a gesture the
+     * next click would decline, which reads as broken rather than as
+     * inert (review of PR #337).
+     *
+     * <p>So it asks the same question the press asks, of the same
+     * page. The two cannot disagree about where a drag can start,
+     * because they are now one question asked twice.
+     */
     private void updateHoverCursor(Point point) {
-        chart.setCursor(chart.isOnPaper(point)
+        chart.setCursor(canGrabAt(point)
                 ? openHand : Cursor.getDefaultCursor());
+    }
+
+    /** Whether a press here would find sky to take hold of. */
+    private boolean canGrabAt(Point point) {
+        if (!chart.isOnPaper(point)) {
+            return false;
+        }
+        var scene = chart.scene();
+        if (scene == null) {
+            return false;
+        }
+        return PanSolver.skyAt(scene.viewport(),
+                PanSolver.planeFromPixel(scene.viewport(),
+                        pagePixel(point))).isPresent();
     }
 
     /** Component coordinates to page-pixel coordinates. */

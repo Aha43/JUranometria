@@ -462,4 +462,77 @@ class PanInteractionTest {
         assertEquals(ChartViewState.DEFAULT, fixture.controller.state(),
                 "Home after a drag restores the exact released default");
     }
+
+    @org.junit.jupiter.api.Test
+    void theGlobesMarginOffersNothingAndTheDiscOffersTheHand()
+            throws Exception {
+        // The visible half of the refusal contract. A press on the
+        // paper around a globe's limb finds no sky and is declined,
+        // and the cursor has to say so before the click rather than
+        // after it: an open hand over the margin advertises a gesture
+        // that cannot begin, which reads as broken rather than as
+        // inert (review of PR #337).
+        Fixture fixture = new Fixture(900, 700);
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                fixture.controller.recenter(
+                        new juranometria.chart.SkyPosition(266.0, -28.0),
+                        180.0));
+        Fixture.flush();
+
+        // The disc is 90% of the short side, centred: radius 315 px
+        // about (450, 350) on this page.
+        int middleX = 450;
+        int middleY = 350;
+        for (int[] onTheSky : new int[][] {{middleX, middleY},
+                {middleX + 300, middleY}, {middleX, middleY + 300},
+                {middleX - 200, middleY - 200}}) {
+            fixture.move(onTheSky[0], onTheSky[1]);
+            org.junit.jupiter.api.Assertions.assertEquals(
+                    java.awt.Cursor.CUSTOM_CURSOR,
+                    cursorTypeOf(fixture),
+                    "sky at " + onTheSky[0] + "," + onTheSky[1]
+                            + " offers the open hand");
+        }
+
+        for (int[] onThePaper : new int[][] {{5, 5}, {895, 5}, {5, 695},
+                {895, 695}, {middleX + 330, middleY},
+                {middleX, middleY + 330}}) {
+            fixture.move(onThePaper[0], onThePaper[1]);
+            org.junit.jupiter.api.Assertions.assertEquals(
+                    java.awt.Cursor.DEFAULT_CURSOR,
+                    cursorTypeOf(fixture),
+                    "paper at " + onThePaper[0] + "," + onThePaper[1]
+                            + " offers nothing, because a press there"
+                            + " would find nothing");
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    void anOrdinaryPageOffersTheHandToItsCorners() throws Exception {
+        // And the rule did not narrow for every other page: a chart
+        // page is sky to its corners, so the hand belongs there.
+        Fixture fixture = new Fixture(900, 700);
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                fixture.controller.recenter(
+                        new juranometria.chart.SkyPosition(83.0, 0.0),
+                        42.0));
+        Fixture.flush();
+        for (int[] corner : new int[][] {{5, 5}, {895, 5}, {5, 695},
+                {895, 695}, {450, 350}}) {
+            fixture.move(corner[0], corner[1]);
+            org.junit.jupiter.api.Assertions.assertEquals(
+                    java.awt.Cursor.CUSTOM_CURSOR,
+                    cursorTypeOf(fixture),
+                    "a 42-degree page is sky at " + corner[0] + ","
+                            + corner[1]);
+        }
+    }
+
+    /** What the chart's cursor is, read on the event thread. */
+    private static int cursorTypeOf(Fixture fixture) throws Exception {
+        int[] type = new int[1];
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                type[0] = fixture.chart.getCursor().getType());
+        return type[0];
+    }
 }
