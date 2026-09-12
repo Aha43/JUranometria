@@ -117,8 +117,21 @@ public final class GlobeDensityStudyMain {
             new Band("limb band", 0.9, 1.0),
             new Band("whole disc", 0.0, 1.0));
 
+    private static Split split;
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-density",
+                "How much sky a hemisphere can carry, inked on one"
+                        + " machine",
+                "Sprint 32, issue #301.");
+        split.beside("Ink is counted from a rendered page, and a"
+                + " machine that draws a name a\nfraction wider inks"
+                + " more of the paper without anything being wrong."
+                + " The\nreport beside this one carries what does not"
+                + " move: what each band of the\ndisc holds, and how"
+                + " many stars a limiting magnitude puts on the"
+                + " page.");
         System.out.println("# How much sky a hemisphere can carry");
         System.out.println();
         System.out.println("Ink is the atlas's own measure - a pixel"
@@ -144,16 +157,26 @@ public final class GlobeDensityStudyMain {
         System.out.println("marks - so the furniture's floor can be"
                 + " told from what the stars add.");
         System.out.println();
-        System.out.printf(Locale.ROOT,
-                "%-13s %5s %8s %9s %9s %9s %9s%n",
+        System.out.printf(Locale.ROOT, "%-13s %5s %8s%n",
+                "page", "V", "stars");
+        split.machine("Ink twice over: the page as the atlas draws"
+                + " it, and the same page with nothing\nbut marks - so"
+                + " the furniture's floor can be told from what the"
+                + " stars add.\n");
+        split.machinef("%-13s %5s %8s %9s %9s %9s %9s%n",
                 "page", "V", "stars", "mid", "limb", "mid*", "limb*");
-        System.out.println("                                     "
+        split.machine("                                     "
                 + "  (as drawn)      (marks only)");
         for (Look look : corpus()) {
             for (double limit : LIMITS) {
                 measure(look, limit);
             }
         }
+        split.write();
+        System.out.println();
+        System.out.println("The ink these pages carry is this"
+                + " machine's answer and is recorded in");
+        System.out.println("docs/studies/globe-density/platform.md.");
         System.out.println();
         System.out.println("Written to " + DIR);
     }
@@ -201,7 +224,9 @@ public final class GlobeDensityStudyMain {
                 drawn++;
             }
         }
-        System.out.printf(Locale.ROOT,
+        System.out.printf(Locale.ROOT, "%-13s %5.1f %8d%n",
+                look.slug(), limit, drawn);
+        split.machinef(
                 "%-13s %5.1f %8d %8.1f%% %8.1f%% %8.1f%% %8.1f%%%n",
                 look.slug(), limit, drawn,
                 inkIn(canvas, BANDS.get(0)) * 100.0,

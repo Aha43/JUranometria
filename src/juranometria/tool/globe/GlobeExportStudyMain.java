@@ -68,8 +68,22 @@ public final class GlobeExportStudyMain {
     private static final SkyPosition CENTRE =
             new SkyPosition(266.0, -28.0);
 
+    private static Split split;
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-export",
+                "What a written globe measures, on one machine",
+                "Sprint 32, issue #301.");
+        split.beside("Every count here is pixels or bytes: how much"
+                + " ink a layer leaves beyond the\nlimb, how far two"
+                + " rasterisations of one page differ, how large a"
+                + " file is and\nhow many text elements a layout"
+                + " produced. The report beside this one carries"
+                + " what\nis true of the file anywhere - the"
+                + " projection it names, whether anything is"
+                + " drawn\nbeyond the limb at all, and whether the"
+                + " writer changed the page.");
         System.out.println("# What a globe looks like after it is"
                 + " written to a file");
         System.out.println();
@@ -88,10 +102,23 @@ public final class GlobeExportStudyMain {
                             + " known overrun)"
                     : "## The core globe, no modules");
             System.out.println();
+            split.machine("");
+            split.machine(withModules
+                    ? "## The same globe with modules"
+                    : "## The core globe, no modules");
+            split.machine("");
             for (SheetFormat format : SheetFormat.values()) {
                 write(format, withModules);
             }
         }
+        split.write();
+        System.out.println();
+        System.out.println("The counts behind all of this - ink beyond"
+                + " the limb by layer, the two");
+        System.out.println("rasterisations compared, file sizes and"
+                + " text-element counts - are this");
+        System.out.println("machine's and are in"
+                + " docs/studies/globe-export/platform.md.");
     }
 
     /**
@@ -120,12 +147,16 @@ public final class GlobeExportStudyMain {
         System.out.println("recovers less than the two rows"
                 + " together.");
         System.out.println();
-        System.out.printf(Locale.ROOT, "  %-26s %12s %12s %12s%n",
+        split.machine("## Where the ink outside the limb comes from");
+        split.machine("");
+        split.machine("Marginal costs, which do not sum: ink"
+                + " overlaps, so removing two layers\nrecovers less"
+                + " than the two rows together.\n");
+        split.machinef("  %-26s %12s %12s %12s%n",
                 "page", "beyond limb", "within 1%", "further out");
 
         Outside all = outside(render(page, settled(), paper), paper);
-        System.out.printf(Locale.ROOT,
-                "  %-26s %12d %12d %12d%n", "everything",
+        split.machinef("  %-26s %12d %12d %12d%n", "everything",
                 all.total(), all.residue(), all.further());
 
         record Layer(String name, ChartOptions without) {
@@ -146,10 +177,17 @@ public final class GlobeExportStudyMain {
         for (Layer layer : layers) {
             Outside less = outside(render(page, layer.without(), paper),
                     paper);
-            System.out.printf(Locale.ROOT,
-                    "  %-26s %12d %12d %12d   (%+d)%n", layer.name(),
-                    less.total(), less.residue(), less.further(),
-                    less.total() - all.total());
+            split.machinef("  %-26s %12d %12d %12d   (%+d)%n",
+                    layer.name(), less.total(), less.residue(),
+                    less.further(), less.total() - all.total());
+        }
+        System.out.printf(Locale.ROOT,
+                "Each of these layers was taken away in turn and the"
+                        + " ink beyond the limb%n");
+        System.out.println("recounted, so what a removal recovers is"
+                + " what that layer put there:");
+        for (Layer layer : layers) {
+            System.out.println("  " + layer.name());
         }
     }
 
@@ -167,111 +205,242 @@ public final class GlobeExportStudyMain {
         PaperSize paper = PaperSize.A4;
         DrawnPage page = globe(paper);
 
-        SheetRecording sheet = ChartSheet.recordForStudy(page, 180.0,
-                settled(), ChartRenderer.ReferenceLayer.NONE,
-                ChartRenderer.ReferenceLayer.NONE, paper);
-        byte[] written = SheetWriters.write(sheet, SheetFormat.PNG, 300);
-        BufferedImage after = ImageIO.read(
-                new ByteArrayInputStream(written));
-
-        // The file is the whole sheet; the chart is inset by the
-        // margin. Comparing a chart-area render against the whole
-        // sheet was the second way this measurement went wrong - the
-        // first divided by a scale and measured resolution instead of
-        // fidelity - so the chart's own rectangle is cut out of the
-        // file and compared with a render of exactly that size.
-        double pxPerPoint = after.getWidth() / paper.widePoints();
-        int left = (int) Math.round(paper.marginPoints() * pxPerPoint);
-        int top = left;
-        int wide = (int) Math.round(paper.chartWidePoints()
-                * pxPerPoint);
-        int high = (int) Math.round(paper.chartHighPoints()
-                * pxPerPoint);
-        if (left + wide > after.getWidth()
-                || top + high > after.getHeight()) {
-            System.out.println();
-            System.out.println("## The writer could not be measured");
-            System.out.println();
-            System.out.println("  the chart's rectangle does not fit"
-                    + " the file as this study computes it, so");
-            System.out.println("  fidelity is unverified rather than"
-                    + " assumed.");
-            return;
-        }
-        BufferedImage chart = after.getSubimage(left, top, wide, high);
-        after = chart;
-        BufferedImage before = renderAt(page, settled(), paper,
-                wide, high);
-
-        int onlyBefore = 0;
-        int onlyAfter = 0;
-        int both = 0;
-        int ground = ChartPalette.WHITE_PAPER.ground().getRGB()
-                & 0xffffff;
-        double centreX = after.getWidth() / 2.0;
-        double centreY = after.getHeight() / 2.0;
-        double discRadius = 0.90
-                * Math.min(after.getWidth(), after.getHeight()) / 2.0;
-        for (int y = 0; y < after.getHeight(); y++) {
-            for (int x = 0; x < after.getWidth(); x++) {
-                if (Math.hypot(x + 0.5 - centreX, y + 0.5 - centreY)
-                        <= discRadius) {
-                    continue;
-                }
-                boolean was = (before.getRGB(x, y) & 0xffffff)
-                        != ground;
-                boolean is = (after.getRGB(x, y) & 0xffffff) != ground;
-                if (was && is) {
-                    both++;
-                } else if (was) {
-                    onlyBefore++;
-                } else if (is) {
-                    onlyAfter++;
-                }
-            }
-        }
-
         System.out.println();
         System.out.println("## The writer, measured rather than"
                 + " assumed");
         System.out.println();
-        System.out.printf(Locale.ROOT,
-                "  rasterised at the writer's own %dx%d%n",
-                after.getWidth(), after.getHeight());
-        System.out.printf(Locale.ROOT,
-                "  outside the limb in both:            %d px%n", both);
-        System.out.printf(Locale.ROOT,
-                "  in the page but not the file:        %d px%n",
-                onlyBefore);
-        System.out.printf(Locale.ROOT,
-                "  in the file but not the page:        %d px%n",
-                onlyAfter);
+        System.out.println("Layer by layer, because asking whether a"
+                + " differing pixel has any ink near it in the");
+        System.out.println("other rendering credits whatever happens"
+                + " to be nearby: outside a globe's limb the");
+        System.out.println("figures, names and grid lie across one"
+                + " another, so a displaced shape could be");
+        System.out.println("excused by an unrelated glyph. One layer"
+                + " at a time, the ink in the comparison");
+        System.out.println("belongs to the shape being compared.");
+        System.out.println();
+        split.machine("## The writer, layer by layer\n");
+        split.machinef("  %-22s %9s %10s %10s %9s %7s%n",
+                "layer", "both", "page only", "file only", "furthest",
+                "beyond");
 
-        // Counts alone cannot tell edge rasterisation from a small
-        // shape that moved or went missing: both show as a few per
-        // cent. So every one-sided pixel is asked how far it is from
-        // ink in the other rendering. Antialiasing disagreements sit
-        // against ink that is there; a displaced or missing shape
-        // leaves pixels with nothing near them at all.
-        Apart apart = apart(before, after, ground, centreX, centreY,
-                discRadius);
-        System.out.printf(Locale.ROOT,
-                "  furthest one-sided pixel from ink in the other:"
-                        + " %.1f px%n", apart.furthest());
-        System.out.printf(Locale.ROOT,
-                "  one-sided pixels further than sqrt(5) ="
-                        + " %.2f px: %d%n",
-                ALLOWANCE, apart.beyondAllowance());
-        System.out.println(apart.beyondAllowance() == 0
-                ? "  every difference lies against ink in the other"
-                        + " rendering: edge rasterisation, not a"
-                : "  ** some differences stand alone: a shape may be"
-                        + " missing or displaced **");
-        if (apart.beyondAllowance() == 0) {
-            System.out.println("  missing or displaced shape. The"
-                    + " writer is faithful.");
+        record Layer(String name, ChartOptions only) {
         }
+        List<Layer> alone = List.of(
+                new Layer("constellation figures",
+                        only(true, false, false, false, false, false)),
+                new Layer("the grid",
+                        only(false, true, false, false, false, false)),
+                new Layer("deep-sky symbols",
+                        only(false, false, true, false, false, false)),
+                new Layer("star marks",
+                        only(false, false, false, true, false, false)),
+                new Layer("star names",
+                        only(false, false, false, true, true, false)),
+                new Layer("constellation names",
+                        only(true, false, false, false, false, true)));
+
+        boolean everyLayerHeld = true;
+        for (Layer layer : alone) {
+            Compared how = compare(page, layer.only(), paper);
+            everyLayerHeld &= how.beyond() == 0;
+            System.out.printf(Locale.ROOT, "  %-22s %s%n",
+                    layer.name(), how.beyond() == 0
+                            ? "every difference is an edge within the"
+                                    + " bound"
+                            : "** " + how.beyond() + " DIFFERENCES"
+                                    + " BEYOND THE BOUND **");
+            split.machinef("  %-22s %9d %10d %10d %8.1fpx %7d%n",
+                    layer.name(), how.both(), how.pageOnly(),
+                    how.fileOnly(), how.furthest(), how.beyond());
+        }
+
+        // And the oracle shown to fail, because one that cannot fail
+        // proves nothing. A patch of ink beyond the limb is struck
+        // out of the page side only: if the comparison still passes,
+        // it was never testing what it claimed to.
+        Mutated mutated = mutate(page,
+                only(true, false, false, false, false, false), paper);
+        boolean oracleCanFail = mutated.removedPx() > 0
+                && mutated.how().beyond() > 0;
+        System.out.println();
+        System.out.println(oracleCanFail
+                ? "  with one outside-limb patch struck from the page,"
+                        + " the comparison fails, as it must"
+                : "  ** THE ORACLE CANNOT FAIL **");
+        split.machinef(
+                "\n  one outside-limb patch struck from the page:"
+                        + " %d px of ink removed, %d px then beyond"
+                        + " the bound, furthest %.1fpx%n",
+                mutated.removedPx(), mutated.how().beyond(),
+                mutated.how().furthest());
+        System.out.println(everyLayerHeld && oracleCanFail
+                ? "  every layer holds and the oracle can fail: the"
+                        + " writer is faithful."
+                : "  ** the writer is not established as faithful **");
     }
+
+    /** What comparing one layer found. */
+    private record Compared(int both, int pageOnly, int fileOnly,
+                            double furthest, int beyond) {
+    }
+
+    /** A comparison, with what the mutation removed before it. */
+    private record Mutated(int removedPx, Compared how) {
+    }
+
+    private static Compared compare(DrawnPage page, ChartOptions only,
+                                    PaperSize paper) throws IOException {
+        return compare(page, only, paper, false).how();
+    }
+
+    private static Mutated mutate(DrawnPage page, ChartOptions only,
+                                  PaperSize paper) throws IOException {
+        return compare(page, only, paper, true);
+    }
+
+    /**
+     * One layer, written and read back, compared with the same layer
+     * rendered directly.
+     */
+    private static Mutated compare(DrawnPage page, ChartOptions only,
+                                   PaperSize paper, boolean strike)
+            throws IOException {
+        SheetRecording sheet = ChartSheet.recordForStudy(page, 180.0,
+                only, ChartRenderer.ReferenceLayer.NONE,
+                ChartRenderer.ReferenceLayer.NONE, paper);
+        BufferedImage whole = ImageIO.read(new ByteArrayInputStream(
+                SheetWriters.write(sheet, SheetFormat.PNG, 300)));
+
+        double pxPerPoint = whole.getWidth() / paper.widePoints();
+        int left = (int) Math.round(paper.marginPoints() * pxPerPoint);
+        int wide = (int) Math.round(paper.chartWidePoints() * pxPerPoint);
+        int high = (int) Math.round(paper.chartHighPoints() * pxPerPoint);
+        BufferedImage after = whole.getSubimage(left, left, wide, high);
+        BufferedImage before = renderAt(page, only, paper, wide, high);
+
+        int removed = strike ? deleteAShape(before, wide, high) : 0;
+
+        int ground = ChartPalette.WHITE_PAPER.ground().getRGB()
+                & 0xffffff;
+        double centreX = wide / 2.0;
+        double centreY = high / 2.0;
+        double discRadius = 0.90 * Math.min(wide, high) / 2.0;
+        int both = 0;
+        int pageOnly = 0;
+        int fileOnly = 0;
+        for (int y = 0; y < high; y++) {
+            for (int x = 0; x < wide; x++) {
+                if (Math.hypot(x + 0.5 - centreX, y + 0.5 - centreY)
+                        <= discRadius) {
+                    continue;
+                }
+                boolean was = (before.getRGB(x, y) & 0xffffff) != ground;
+                boolean is = (after.getRGB(x, y) & 0xffffff) != ground;
+                if (was && is) {
+                    both++;
+                } else if (was) {
+                    pageOnly++;
+                } else if (is) {
+                    fileOnly++;
+                }
+            }
+        }
+        Apart apart = apart(before, after, ground, centreX, centreY,
+                discRadius, !strike);
+        return new Mutated(removed, new Compared(both, pageOnly,
+                fileOnly, apart.furthest(), apart.beyondAllowance()));
+    }
+
+    /**
+     * Strikes out the outermost patch of module-free sky ink beyond
+     * the limb, so the comparison has something it must notice.
+     *
+     * <p>Returns how many inked pixels it actually removed: a
+     * mutation that removes nothing would let the oracle pass for the
+     * wrong reason, which is the failure this whole check exists to
+     * rule out.
+     */
+    private static int deleteAShape(BufferedImage page, int wide,
+                                    int high) {
+        int ground = ChartPalette.WHITE_PAPER.ground().getRGB()
+                & 0xffffff;
+        double centreX = wide / 2.0;
+        double centreY = high / 2.0;
+        double discRadius = 0.90 * Math.min(wide, high) / 2.0;
+
+        int atX = -1;
+        int atY = -1;
+        double furthest = 0.0;
+        for (int y = 0; y < high; y++) {
+            for (int x = 0; x < wide; x++) {
+                if ((page.getRGB(x, y) & 0xffffff) == ground) {
+                    continue;
+                }
+                double radius = Math.hypot(x + 0.5 - centreX,
+                        y + 0.5 - centreY) / discRadius;
+                if (radius > JUST_BEYOND && radius <= NEAR_THE_LIMB
+                        && radius > furthest) {
+                    furthest = radius;
+                    atX = x;
+                    atY = y;
+                }
+            }
+        }
+        if (atX < 0) {
+            return 0;
+        }
+        split.machinef(
+                "  striking a %dx%d patch at %d,%d - radius %.3f of"
+                        + " the disc, beyond the limb%n",
+                2 * HALF_PATCH_PX + 1, 2 * HALF_PATCH_PX + 1, atX, atY,
+                furthest);
+
+        int removed = 0;
+        for (int y = Math.max(0, atY - HALF_PATCH_PX);
+                y <= Math.min(high - 1, atY + HALF_PATCH_PX); y++) {
+            for (int x = Math.max(0, atX - HALF_PATCH_PX);
+                    x <= Math.min(wide - 1, atX + HALF_PATCH_PX); x++) {
+                if ((page.getRGB(x, y) & 0xffffff) != ground) {
+                    page.setRGB(x, y, ground);
+                    removed++;
+                }
+            }
+        }
+        return removed;
+    }
+
+    /**
+     * Half the side of the struck-out patch, in device pixels. Wide
+     * enough that its centre lies further than {@link #ALLOWANCE}
+     * from whatever ink survives at its edge, so the excision cannot
+     * be excused as a rounded edge.
+     */
+    private static final int HALF_PATCH_PX = 12;
+
+    /**
+     * The band the struck patch is chosen from: clear of the limb, so
+     * the comparison's disc exclusion cannot swallow it, and clear of
+     * the page corners, so what is removed is ink of the kind this
+     * check is about rather than a sheet border.
+     */
+    private static final double JUST_BEYOND = 1.02;
+
+    private static final double NEAR_THE_LIMB = 1.40;
+
+    /** One layer alone on the page. */
+    private static ChartOptions only(boolean figures, boolean grid,
+                                     boolean deepSky, boolean stars,
+                                     boolean starText, boolean names) {
+        return new ChartOptions(
+                deepSky, false,
+                figures, false, names,
+                starText, starText, starText,
+                grid, false, false,
+                deepSky, deepSky, deepSky, deepSky, deepSky,
+                ChartPalette.WHITE_PAPER);
+    }
+
 
     /**
      * What each rendering has around one pixel, so a lone difference
@@ -329,7 +498,7 @@ public final class GlobeExportStudyMain {
     private static Apart apart(BufferedImage before,
                                BufferedImage after, int ground,
                                double centreX, double centreY,
-                               double discRadius) {
+                               double discRadius, boolean name) {
         int wide = before.getWidth();
         int high = before.getHeight();
         boolean[][] inBefore = new boolean[high][wide];
@@ -376,6 +545,9 @@ public final class GlobeExportStudyMain {
                 furthest = Math.max(furthest, nearest);
                 if (nearest > ALLOWANCE) {
                     beyond++;
+                    if (!name) {
+                        continue;
+                    }
                     // Named, not counted. A lone distant pixel is
                     // either an edge the rasterisers rounded
                     // differently or a shape that moved, and the two
@@ -525,14 +697,26 @@ public final class GlobeExportStudyMain {
 
         Read read = readBack(format, written, paper);
         System.out.printf(Locale.ROOT,
-                "  %-4s %8d bytes  identity: %-12s  %s%n",
-                format.name(), written.length,
+                "  %-4s identity: %-12s  %s%n", format.name(),
                 read.saysOrthographic() ? "orthographic" : "** LOST **",
-                read.geometry());
+                read.verdict());
+        split.machinef("  %-4s %8d bytes  %s%n", format.name(),
+                written.length, read.geometry());
     }
 
-    /** What reading the file back could establish. */
-    private record Read(boolean saysOrthographic, String geometry) {
+    /**
+     * What reading the file back could establish.
+     *
+     * @param saysOrthographic whether the file still names the
+     *     projection it was drawn with
+     * @param verdict what is true of the file anywhere - that ink or
+     *     text lies beyond the limb, or that the format cannot say
+     * @param geometry the counts behind that verdict, which are this
+     *     machine's: how many text elements a layout produced and how
+     *     many pixels a rasteriser inked
+     */
+    private record Read(boolean saysOrthographic, String verdict,
+                        String geometry) {
     }
 
     /**
@@ -555,20 +739,20 @@ public final class GlobeExportStudyMain {
                 paper.chartHighUnits()) / 2.0;
 
         return switch (format) {
-            case SVG -> new Read(identity,
-                    svgTextOutside(said, centreX, centreY, discRadius));
-            case PNG -> new Read(identity,
-                    pngInkOutside(written, centreX, centreY,
-                            discRadius));
+            case SVG -> svgTextOutside(said, identity, centreX,
+                    centreY, discRadius);
+            case PNG -> pngInkOutside(written, identity, centreX,
+                    centreY, discRadius);
             default -> new Read(identity,
+                    "geometry not read back from this format",
                     "geometry not read back from this format");
         };
     }
 
     /** Text elements in the file, and how many sit outside the disc. */
-    private static String svgTextOutside(String svg, double centreX,
-                                         double centreY,
-                                         double discRadius) {
+    private static Read svgTextOutside(String svg, boolean identity,
+                                       double centreX, double centreY,
+                                       double discRadius) {
         Pattern text = Pattern.compile(
                 "<text[^>]*\\bx=\"([-0-9.]+)\"[^>]*\\by=\"([-0-9.]+)\"");
         Matcher found = text.matcher(svg);
@@ -583,22 +767,25 @@ public final class GlobeExportStudyMain {
                         x, y));
             }
         }
-        return String.format(Locale.ROOT,
-                "%d text elements, %d anchored outside the limb%s",
-                all, outside.size(),
-                outside.isEmpty() ? "" : "  ** " + outside.size()
-                        + " OUTSIDE **");
+        return new Read(identity,
+                outside.isEmpty()
+                        ? "no text anchored outside the limb"
+                        : "** text anchored outside the limb **",
+                String.format(Locale.ROOT,
+                        "%d text elements, %d anchored outside the"
+                                + " limb", all, outside.size()));
     }
 
     /** Ink beyond the limb, counted in the written picture. */
-    private static String pngInkOutside(byte[] written, double centreX,
-                                        double centreY,
-                                        double discRadius)
+    private static Read pngInkOutside(byte[] written, boolean identity,
+                                      double centreX, double centreY,
+                                      double discRadius)
             throws IOException {
         BufferedImage page = ImageIO.read(
                 new ByteArrayInputStream(written));
         if (page == null) {
-            return "could not be read back";
+            return new Read(identity, "could not be read back",
+                    "could not be read back");
         }
         double scale = page.getWidth() / (centreX * 2.0);
         int ground = ChartPalette.WHITE_PAPER.ground().getRGB()
@@ -619,9 +806,12 @@ public final class GlobeExportStudyMain {
                 }
             }
         }
-        return String.format(Locale.ROOT,
-                "%d px inside the limb, %d beyond it%s", inside,
-                outside, outside == 0 ? "" : "  ** BEYOND **");
+        return new Read(identity,
+                outside == 0 ? "no ink beyond the limb"
+                        : "** ink beyond the limb **",
+                String.format(Locale.ROOT,
+                        "%d px inside the limb, %d beyond it", inside,
+                        outside));
     }
 
     private static OverlayRegistry modules() {

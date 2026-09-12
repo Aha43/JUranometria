@@ -56,8 +56,17 @@ public final class GlobeGridFadeStudyMain {
     /** The strengths at the limb under comparison. */
     private static final double[] AT_LIMB = {1.00, 0.35, 0.25, 0.15};
 
+    private static Split split;
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-grid-fade",
+                "How faint the globe grid goes, weighed on one machine",
+                "Sprint 32, issue #301.");
+        split.beside("Ink and weight are read off a rendered page, so"
+                + " both are this desktop's\nanswer. The report beside"
+                + " this one carries the candidates themselves and"
+                + " the\nrule they are candidates for.");
         System.out.println("# How faint the grid should go at the limb");
         System.out.println();
         System.out.printf(Locale.ROOT,
@@ -76,10 +85,11 @@ public final class GlobeGridFadeStudyMain {
         // cannot see a fade at all. What a fade changes is weight -
         // how far the ink stands from the paper - so that is what is
         // reported beside it.
-        System.out.printf(Locale.ROOT,
-                "%-13s %9s %11s %12s %12s%n",
+        split.machinef("%-13s %9s %11s %12s %12s%n",
                 "page", "at limb", "grid ink", "grid weight",
                 "page weight");
+        System.out.printf(Locale.ROOT, "%-13s %9s%n",
+                "page", "at limb");
 
         for (var look : GlobeDensityStudyMain.corpus().subList(0, 2)) {
             DrawnPage page = Atlas.assembler().assembleForStudy(
@@ -95,7 +105,9 @@ public final class GlobeGridFadeStudyMain {
                 ImageIO.write(whole, "png", new File(DIR, String.format(
                         Locale.ROOT, "%s-limb%02.0f.png", look.slug(),
                         atLimb * 100)));
-                System.out.printf(Locale.ROOT,
+                System.out.printf(Locale.ROOT, "%-13s %8.0f%%%n",
+                        look.slug(), atLimb * 100.0);
+                split.machinef(
                         "%-13s %8.0f%% %10.1f%% %11.2f%% %11.2f%%%n",
                         look.slug(), atLimb * 100.0,
                         GlobeFurnitureStudyMain.inkIn(faded, 0.9, 1.0)
@@ -104,6 +116,12 @@ public final class GlobeGridFadeStudyMain {
                         weightIn(whole, 0.9, 1.0) * 100.0);
             }
         }
+        split.write();
+        System.out.println();
+        System.out.println("What each candidate does to the ink and"
+                + " to its weight against the paper is");
+        System.out.println("counted from these renderings, and is in");
+        System.out.println("docs/studies/globe-grid-fade/platform.md.");
         System.out.println();
         System.out.println("Written to " + DIR);
     }

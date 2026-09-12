@@ -251,70 +251,103 @@ icons: classes
 # no tests and no evidence generators.
 globe-study: classes
 	@echo "  hemispheres"
+	@mkdir -p docs/studies/globe-hemispheres
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeStudyMain \
+		> docs/studies/globe-hemispheres/measurements.md
+	@echo "written to docs/studies/globe-hemispheres/measurements.md"
 
 # The globe frame candidates (#301): the same crowded hemisphere at
 # four disc sizes, three furniture states and three containers.
 globe-frame-study: classes
 	@echo "  globe frames"
+	@mkdir -p docs/studies/globe-frame
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFrameStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFrameStudyMain \
+		> docs/studies/globe-frame/measurements.md
+	@echo "written to docs/studies/globe-frame/measurements.md"
 
 # How much sky a hemisphere can carry (#301): ink by band of the
 # disc, at every limiting magnitude a reader can choose.
 globe-density-study: classes
 	@echo "  globe density"
+	@mkdir -p docs/studies/globe-density
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeDensityStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeDensityStudyMain \
+		> docs/studies/globe-density/measurements.md
+	@echo "written to docs/studies/globe-density/measurements.md"
 
 # What each layer costs a hemisphere, and whether the grid needs
 # less of itself near the limb (#301).
 globe-furniture-study: classes
 	@echo "  globe furniture"
+	@mkdir -p docs/studies/globe-furniture
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFurnitureStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFurnitureStudyMain \
+		> docs/studies/globe-furniture/measurements.md
+	@echo "written to docs/studies/globe-furniture/measurements.md"
 
 globe-grid-study: classes
 	@echo "  globe grid"
+	@mkdir -p docs/studies/globe-grid
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeGridStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeGridStudyMain \
+		> docs/studies/globe-grid/measurements.md
+	@echo "written to docs/studies/globe-grid/measurements.md"
 
 # How faint the globe's grid should go at its limb (#301).
 globe-grid-fade-study: classes
 	@echo "  globe grid fade"
+	@mkdir -p docs/studies/globe-grid-fade
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeGridFadeStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeGridFadeStudyMain \
+		> docs/studies/globe-grid-fade/measurements.md
+	@echo "written to docs/studies/globe-grid-fade/measurements.md"
 
 # Which object families a hemisphere can carry (#301).
 globe-family-study: classes
 	@echo "  globe families"
+	@mkdir -p docs/studies/globe-families
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFamilyStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFamilyStudyMain \
+		> docs/studies/globe-families/measurements.md
+	@echo "written to docs/studies/globe-families/measurements.md"
 
 # Whether a hemisphere's names name anything (#301).
 globe-name-study: classes
 	@echo "  globe names"
+	@mkdir -p docs/studies/globe-names
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeNameStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeNameStudyMain \
+		> docs/studies/globe-names/measurements.md
+	@echo "written to docs/studies/globe-names/measurements.md"
 
 # What a pixel is worth on a globe (#301).
 globe-pointing-study: classes
 	@echo "  globe pointing"
+	@mkdir -p docs/studies/globe-pointing
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobePointingStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobePointingStudyMain \
+		> docs/studies/globe-pointing/measurements.md
+	@echo "written to docs/studies/globe-pointing/measurements.md"
 
 # Whether the modules' lines stop where the sky does, and what a
 # globe exports (#301).
 globe-module-study: classes
 	@echo "  globe modules"
+	@mkdir -p docs/studies/globe-modules
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeModuleStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeModuleStudyMain \
+		> docs/studies/globe-modules/measurements.md
+	@echo "written to docs/studies/globe-modules/measurements.md"
 
 globe-export-study: classes
 	@echo "  globe export"
+	@mkdir -p docs/studies/globe-export
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
-		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeExportStudyMain
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeExportStudyMain \
+		> docs/studies/globe-export/measurements.md
+	@echo "written to docs/studies/globe-export/measurements.md"
 
 chart-sheet-study: classes
 	@echo "  chart sheets"

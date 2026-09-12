@@ -61,8 +61,22 @@ public final class GlobeFurnitureStudyMain {
         return GlobeDensityStudyMain.corpus();
     }
 
+    private static Split split;
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-furniture",
+                "What each layer costs a hemisphere, inked on one"
+                        + " machine",
+                "Sprint 32, issue #301.");
+        split.beside("Every number here is a share of a rendered"
+                + " page's pixels, so every number\nhere is this"
+                + " desktop's. What the report beside this one carries"
+                + " is what was\nmeasured and on which pages: the"
+                + " ordering these figures produce is the\nevidence"
+                + " for the globe's furniture default, and the"
+                + " decision document\ncites it as one machine's"
+                + " measurement.");
         System.out.println("# What each layer costs a hemisphere");
         System.out.println();
         System.out.println("At V 5.0, the globe's default. Each layer"
@@ -72,11 +86,19 @@ public final class GlobeFurnitureStudyMain {
         System.out.println("recovers, and a layer drawn alone cannot"
                 + " say that.");
         System.out.println();
-        System.out.printf(Locale.ROOT, "%-13s %-22s %9s %9s%n",
+        System.out.printf(Locale.ROOT, "%-13s %-22s%n",
+                "page", "layer taken away");
+        split.machinef("%-13s %-22s %9s %9s%n",
                 "page", "without", "disc", "limb band");
         for (var look : corpus()) {
             measure(look);
         }
+        split.write();
+        System.out.println();
+        System.out.println("What each removal recovers is counted in"
+                + " pixels, which is this machine's");
+        System.out.println("answer: the figures are in"
+                + " docs/studies/globe-furniture/platform.md.");
         System.out.println();
         System.out.println("Written to " + DIR);
     }
@@ -88,7 +110,9 @@ public final class GlobeFurnitureStudyMain {
                 new GlobeProjection(look.centre()), SIDE_PX, SIDE_PX);
 
         BufferedImage drawn = render(page, all());
-        System.out.printf(Locale.ROOT, "%-13s %-22s %9s %9s%n",
+        System.out.printf(Locale.ROOT, "%-13s %-22s%n",
+                look.slug(), "nothing (as drawn)");
+        split.machinef("%-13s %-22s %9s %9s%n",
                 look.slug(), "nothing (as drawn)",
                 percent(inkIn(drawn, 0.0, 1.0)),
                 percent(inkIn(drawn, 0.9, 1.0)));
@@ -98,7 +122,9 @@ public final class GlobeFurnitureStudyMain {
             ImageIO.write(without, "png", new File(DIR, String.format(
                     Locale.ROOT, "%s-without-%s.png", look.slug(),
                     layer.name().replace(' ', '-'))));
-            System.out.printf(Locale.ROOT, "%-13s %-22s %9s %9s%n",
+            System.out.printf(Locale.ROOT, "%-13s %-22s%n",
+                    "", layer.name());
+            split.machinef("%-13s %-22s %9s %9s%n",
                     "", layer.name(),
                     percent(inkIn(without, 0.0, 1.0)),
                     percent(inkIn(without, 0.9, 1.0)));

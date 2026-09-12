@@ -65,8 +65,19 @@ public final class GlobeModuleStudyMain {
     private static final Observer OSLO = new Observer(59.9, 10.7,
             Instant.parse("2026-03-20T21:33:00Z"));
 
+    private static Split split;
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-modules",
+                "What the modules ink on a hemisphere, on one machine",
+                "Sprint 32, issue #301.");
+        split.beside("Module ink is counted from a rendering and a"
+                + " module's name is placed in a box\nthis desktop's"
+                + " font measures, so both are here. The report beside"
+                + " this one\ncarries the centres the modules were"
+                + " asked at and why the sky's own labels\ncannot be"
+                + " moved by any of it.");
         System.out.println("# Whether the modules' lines stop where"
                 + " the sky does");
         System.out.println();
@@ -75,9 +86,11 @@ public final class GlobeModuleStudyMain {
         System.out.println("is sky drawn where there is none,"
                 + " whatever computed it.");
         System.out.println();
-        System.out.printf(Locale.ROOT, "%-16s %10s %10s %9s %9s%n",
+        split.machinef("%-16s %10s %10s %9s %9s%n",
                 "centred on", "ink inside", "ink beyond", "furthest",
                 "names");
+        System.out.printf(Locale.ROOT, "%-16s %-34s%n",
+                "centred on", "centre");
 
         for (Look look : centres()) {
             DrawnPage page = Atlas.assembler().assembleForStudy(
@@ -93,19 +106,28 @@ public final class GlobeModuleStudyMain {
             List<ReferenceInk.NamePlacement> names =
                     ReferenceInk.namePlacements(page,
                             registry.collect());
-            System.out.printf(Locale.ROOT,
-                    "%-16s %10d %10d %9.4f %9d%n",
+            System.out.printf(Locale.ROOT, "%-16s %-34s%n",
+                    look.slug(),
+                    String.format(Locale.ROOT, "RA %.1f, Dec %+.1f",
+                            look.centre().raDegrees(),
+                            look.centre().decDegrees()));
+            split.machinef("%-16s %10d %10d %9.4f %9d%n",
                     look.slug(), beyond.inside(), beyond.outside(),
                     beyond.furthest(), names.size());
             for (ReferenceInk.NamePlacement name : names) {
-                System.out.printf(Locale.ROOT,
-                        "    %-14s %-24s %s%n", name.moduleId(),
+                split.machinef("    %-14s %-24s %s%n", name.moduleId(),
                         name.name(),
                         insideTheDisc(name.box()) ? "inside the disc"
                                 : "** OUTSIDE THE DISC **");
             }
         }
 
+        split.write();
+        System.out.println();
+        System.out.println("How much each of those pages inks inside"
+                + " the limb and beyond it, and where");
+        System.out.println("each module's name landed, is in"
+                + " docs/studies/globe-modules/platform.md.");
         System.out.println();
         System.out.println("The sky's own labels cannot be moved by"
                 + " module ink: the renderer builds its obstacles");

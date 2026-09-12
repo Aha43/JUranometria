@@ -135,6 +135,38 @@ public final class EvidenceContractMain {
         // found by looking at a page rather than by any test (#307).
         REPORT_MAINS.put("juranometria.tool.FigureAnchorStudyMain",
                 "docs/studies/figure-anchors/measurements.md");
+        // The celestial-globe gate (#301). Its decision document
+        // cites these eleven studies, and until the review of PR #336
+        // none of them was run here: a green contract said nothing
+        // about the numbers the gate was decided on. Each splits what
+        // the atlas answers - objects counted, footprints projected,
+        // a projection named after a writer has had it - from what
+        // this desktop answers, which is every count of ink.
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeStudyMain",
+                "docs/studies/globe-hemispheres/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeFrameStudyMain",
+                "docs/studies/globe-frame/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeDensityStudyMain",
+                "docs/studies/globe-density/measurements.md");
+        REPORT_MAINS.put(
+                "juranometria.tool.globe.GlobeFurnitureStudyMain",
+                "docs/studies/globe-furniture/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeGridStudyMain",
+                "docs/studies/globe-grid/measurements.md");
+        REPORT_MAINS.put(
+                "juranometria.tool.globe.GlobeGridFadeStudyMain",
+                "docs/studies/globe-grid-fade/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeFamilyStudyMain",
+                "docs/studies/globe-families/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeNameStudyMain",
+                "docs/studies/globe-names/measurements.md");
+        REPORT_MAINS.put(
+                "juranometria.tool.globe.GlobePointingStudyMain",
+                "docs/studies/globe-pointing/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeModuleStudyMain",
+                "docs/studies/globe-modules/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeExportStudyMain",
+                "docs/studies/globe-export/measurements.md");
     }
 
     /**
@@ -180,26 +212,50 @@ public final class EvidenceContractMain {
      * key, which is not. The report is the first; this is the second.
      */
     private static final Map<String, String> PLATFORM_REPORTS =
-            Map.of("juranometria.tool.ToggleShortcutStudyMain",
-                    "docs/studies/toggle-shortcuts/platform.md",
-                    "juranometria.tool.ControlExplanationStudyMain",
-                    "docs/studies/control-explanations/platform.md",
-                    "juranometria.tool.BlackSkyStudyMain",
-                    "docs/studies/black-sky/platform.md",
-                    "juranometria.tool.OverviewInkStudyMain",
-                    "docs/studies/overview-ink/platform.md",
-                    "juranometria.tool.FurnitureStudyMain",
-                    "docs/studies/chart-furniture/platform.md",
-                    "juranometria.tool.ChartSheetStudyMain",
-                    "docs/studies/chart-sheet/platform.md",
-                    "juranometria.tool.overview.OverviewStudyMain",
-                    "docs/studies/overview-projection/platform.md",
-                    "juranometria.tool.FigureAnchorStudyMain",
-                    "docs/studies/figure-anchors/platform.md",
-                    "juranometria.tool.WiderFieldStudyMain",
-                    "docs/studies/wider-field/platform.md",
-                    "juranometria.tool.labels.LabelStudyMain",
-                    "docs/studies/label-placement/platform.md");
+            new LinkedHashMap<>();
+    static {
+        PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
+                "docs/studies/toggle-shortcuts/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
+                "docs/studies/control-explanations/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.BlackSkyStudyMain",
+                "docs/studies/black-sky/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.OverviewInkStudyMain",
+                "docs/studies/overview-ink/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.FurnitureStudyMain",
+                "docs/studies/chart-furniture/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.ChartSheetStudyMain",
+                "docs/studies/chart-sheet/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.overview.OverviewStudyMain",
+                "docs/studies/overview-projection/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.FigureAnchorStudyMain",
+                "docs/studies/figure-anchors/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.WiderFieldStudyMain",
+                "docs/studies/wider-field/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.labels.LabelStudyMain",
+                "docs/studies/label-placement/platform.md");
+        // Eight of the globe gate's eleven studies measure
+        // ink, and ink is the desktop's answer as much as the
+        // atlas's (#315). The three that do not - the
+        // hemispheres, the frame and the pointing arithmetic -
+        // are portable throughout and have no record here.
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeDensityStudyMain",
+                "docs/studies/globe-density/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeFurnitureStudyMain",
+                "docs/studies/globe-furniture/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeGridStudyMain",
+                "docs/studies/globe-grid/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeGridFadeStudyMain",
+                "docs/studies/globe-grid-fade/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeFamilyStudyMain",
+                "docs/studies/globe-families/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeNameStudyMain",
+                "docs/studies/globe-names/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeModuleStudyMain",
+                "docs/studies/globe-modules/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeExportStudyMain",
+                "docs/studies/globe-export/platform.md");
+    }
 
     /**
      * Every promoted rendering carries an account of itself, and the

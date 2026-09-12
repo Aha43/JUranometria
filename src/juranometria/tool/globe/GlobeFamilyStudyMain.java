@@ -104,14 +104,45 @@ public final class GlobeFamilyStudyMain {
             return Math.min(radialPx, tangentialPx);
         }
 
+        /**
+         * Whether the reader sees the object's own shape: the
+         * atlas's own practical minimum on the major span, and
+         * nothing added to it.
+         *
+         * <p>A review of this study proposed also requiring the
+         * footprint to cover the production glyph's inked area, on
+         * the grounds that a six-pixel line with no width is not a
+         * resolved ellipse. That is true, and the extra condition was
+         * withdrawn anyway: the ink area is production-derived but
+         * the <em>comparison</em> was invented here, and equal ink
+         * area does not establish that a two-dimensional form is
+         * resolved. An evidence repair is no place to make a new
+         * cartographic rule.
+         *
+         * <p><strong>Whether the minor span should bear on resolution
+         * is an open question for #331</strong>, recorded in the
+         * decision rather than settled by this study.
+         */
         boolean resolved() {
             return majorPx()
                     >= RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX;
         }
     }
 
+    private static Split split;
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-families",
+                "What the families ink on a hemisphere, on one machine",
+                "Sprint 32, issue #301.");
+        split.beside("Counting objects, projecting a footprint and"
+                + " measuring a production symbol's\nown inked area"
+                + " are the atlas's answers and are in the report"
+                + " beside this\none. What a family costs a rendered"
+                + " page, what a crop of it inks and how\nfar two"
+                + " glyphs differ pixel by pixel are this desktop's,"
+                + " and are here.");
         System.out.println("# Which families a hemisphere can carry");
         System.out.println();
         System.out.printf(Locale.ROOT,
@@ -139,10 +170,19 @@ public final class GlobeFamilyStudyMain {
             for (Band band : BANDS) {
                 report(band, measured);
             }
+            split.machine("");
+            split.machine(look.slug() + ":");
             cost(look, page, measured);
             confirm(look, page, measured);
         }
         glyphs();
+        split.write();
+        System.out.println();
+        System.out.println("What each family costs a rendered page,"
+                + " and how far its glyph differs from");
+        System.out.println("the others pixel by pixel, is this"
+                + " machine's answer and is in");
+        System.out.println("docs/studies/globe-families/platform.md.");
     }
 
     /**
@@ -162,10 +202,12 @@ public final class GlobeFamilyStudyMain {
             throws IOException {
         java.awt.image.BufferedImage all = render(page, families(
                 true, true, true, true, true));
-        System.out.println("  what each family costs:");
-        System.out.printf(Locale.ROOT,
-                "    %-20s %10s %10s %11s %11s%n",
-                "family", "ink centre", "ink limb", "glyphs", "colliding");
+        System.out.println("  what each family puts on the page:");
+        System.out.printf(Locale.ROOT, "    %-20s %11s %11s%n",
+                "family", "glyphs", "colliding");
+        split.machine("  what each family costs:");
+        split.machinef("    %-20s %10s %10s%n",
+                "family", "ink centre", "ink limb");
 
         for (SymbolFamily family : SymbolFamily.values()) {
             java.awt.image.BufferedImage without = render(page,
@@ -183,16 +225,17 @@ public final class GlobeFamilyStudyMain {
             if (mine.isEmpty()) {
                 continue;
             }
-            System.out.printf(Locale.ROOT,
-                    "    %-20s %9.2f%% %9.2f%% %11d %11d%n",
+            System.out.printf(Locale.ROOT, "    %-20s %11d %11d%n",
+                    family.label(), mine.size(),
+                    colliding(mine, measured));
+            split.machinef("    %-20s %9.2f%% %9.2f%%%n",
                     family.label(),
                     (GlobeFurnitureStudyMain.inkIn(all, 0.0, 0.5)
                             - GlobeFurnitureStudyMain.inkIn(without,
                                     0.0, 0.5)) * 100.0,
                     (GlobeFurnitureStudyMain.inkIn(all, 0.9, 1.0)
                             - GlobeFurnitureStudyMain.inkIn(without,
-                                    0.9, 1.0)) * 100.0,
-                    mine.size(), colliding(mine, measured));
+                                    0.9, 1.0)) * 100.0);
         }
     }
 
@@ -234,9 +277,12 @@ public final class GlobeFamilyStudyMain {
         System.out.println("  the pixels, on an object the geometry"
                 + " calls a minimum symbol and that stands alone:");
         System.out.printf(Locale.ROOT,
-                "    %-20s %8s %8s %12s %12s %11s%n",
+                "    %-20s %8s %8s %12s %12s%n",
                 "family", "band", "radius", "footprint",
-                "centre-scale", "inked box");
+                "centre-scale");
+        split.machine("  what that object actually inked:");
+        split.machinef("    %-20s %8s %11s%n",
+                "family", "band", "inked box");
 
         for (SymbolFamily family : SymbolFamily.values()) {
             // That family alone on the page, so the ink in the crop
@@ -327,10 +373,12 @@ public final class GlobeFamilyStudyMain {
             }
         }
         System.out.printf(Locale.ROOT,
-                "    %-20s %8s %8.2f %6.1fx%-5.1f %10.1fpx %6dx%-4d%n",
+                "    %-20s %8s %8.2f %6.1fx%-5.1f %10.1fpx%n",
                 family.label(), band, chosen.radiusOnDisc(),
                 chosen.majorPx(), chosen.minorPx(),
-                chosen.centreScalePx(),
+                chosen.centreScalePx());
+        split.machinef("    %-20s %8s %6dx%-4d%n",
+                family.label(), band,
                 maxX < 0 ? 0 : maxX - minX + 1,
                 maxY < 0 ? 0 : maxY - minY + 1);
     }
@@ -412,23 +460,36 @@ public final class GlobeFamilyStudyMain {
                     today - corrected, messier,
                     median(family, Measured::majorPx));
         }
-        // Where the ink actually goes. The population barely moves
-        // under the corrected rule, so if the limb is expensive the
-        // cost must be size rather than number: an object drawn at
-        // the centre-scale rate is drawn at the size it would have
-        // near the middle of the page, however far out it really is.
+        // Where the ink actually goes, measured from the production
+        // symbol's own inked area rather than modelled.
+        //
+        // The first version of this treated every mark as a filled
+        // circle of its major diameter, which ignores the minor span,
+        // ignores the footprint area already measured, and is wrong
+        // about every family: an open cluster is a dotted ring around
+        // nothing, a nebula an empty box, a planetary a small circle
+        // with spokes. ChartRenderer.symbolInk publishes what a
+        // symbol actually inks, for exactly this kind of question
+        // (#313), so it is asked (review of PR #336).
         double today = 0.0;
         double corrected = 0.0;
         for (Measured one : inBand) {
             if (one.family() == null || !one.drawnToday()) {
                 continue;
             }
-            double drawnNow = one.centreScalePx();
-            double drawnAfter = Math.max(
+            // Today: the axes scaled at the page centre's rate, with
+            // the practical minimum applied as the renderer applies
+            // it, and the true axis ratio kept.
+            double ratio = one.majorPx() <= 0.0 ? 1.0
+                    : one.minorPx() / one.majorPx();
+            double nowMajor = Math.max(
                     RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                    one.majorPx());
-            today += Math.PI * drawnNow * drawnNow / 4.0;
-            corrected += Math.PI * drawnAfter * drawnAfter / 4.0;
+                    one.centreScalePx());
+            today += inkArea(one.family(), nowMajor, nowMajor * ratio);
+            // Corrected: the projected footprint where it resolves,
+            // and the family's own minimum glyph where it does not.
+            corrected += one.resolved() ? one.areaPx()
+                    : minimumGlyphArea(one.family());
         }
         if (today > 0.0) {
             System.out.printf(Locale.ROOT,
@@ -484,14 +545,13 @@ public final class GlobeFamilyStudyMain {
                             + ".png"));
         }
 
-        System.out.println();
-        System.out.printf(Locale.ROOT,
-                "The family glyphs at %.0f px, compared with each"
-                        + " other pixel by pixel:%n", size);
+        split.machine("");
+        split.machinef("The family glyphs at %.0f px, compared with"
+                + " each other pixel by pixel:%n", size);
         List<String> names = new ArrayList<>(drawn.keySet());
         for (int i = 0; i < names.size(); i++) {
             for (int j = i + 1; j < names.size(); j++) {
-                System.out.printf(Locale.ROOT,
+                split.machinef(
                         "    %-18s vs %-18s %4d pixels differ%n",
                         names.get(i), names.get(j),
                         differing(drawn.get(names.get(i)),
@@ -527,6 +587,71 @@ public final class GlobeFamilyStudyMain {
             }
         }
         return differ;
+    }
+
+    /**
+     * The area a production symbol actually inks at these axes.
+     *
+     * <p>Asked of {@code ChartRenderer.symbolInk}, which is published
+     * so that a policy can ask what a symbol inks rather than guess
+     * from its silhouette. A ring, a box, a cross and an ellipse of
+     * the same width ink quite different amounts, and a study that
+     * modelled them all as discs would be measuring its own model.
+     */
+    private static double inkArea(SymbolFamily family, double majorPx,
+                                  double minorPx) {
+        java.awt.geom.Area ink =
+                juranometria.render.ChartRenderer.symbolInk(
+                        symbolOf(family), 0.0, 0.0, majorPx,
+                        Math.max(0.01, minorPx), 0.0);
+        return areaOfShape(ink);
+    }
+
+    /** Each family's minimum glyph, inked once and remembered. */
+    private static final Map<SymbolFamily, Double> MINIMUM_GLYPH =
+            new java.util.EnumMap<>(SymbolFamily.class);
+
+    private static double minimumGlyphArea(SymbolFamily family) {
+        return MINIMUM_GLYPH.computeIfAbsent(family, one -> inkArea(one,
+                RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
+                RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX));
+    }
+
+    /** The area a shape encloses, by walking its outline. */
+    private static double areaOfShape(java.awt.Shape shape) {
+        java.awt.geom.PathIterator walk =
+                shape.getPathIterator(null, 0.25);
+        double twice = 0.0;
+        double[] point = new double[6];
+        double startX = 0.0;
+        double startY = 0.0;
+        double lastX = 0.0;
+        double lastY = 0.0;
+        while (!walk.isDone()) {
+            int kind = walk.currentSegment(point);
+            if (kind == java.awt.geom.PathIterator.SEG_MOVETO) {
+                startX = point[0];
+                startY = point[1];
+                lastX = startX;
+                lastY = startY;
+            } else if (kind == java.awt.geom.PathIterator.SEG_LINETO) {
+                twice += lastX * point[1] - point[0] * lastY;
+                lastX = point[0];
+                lastY = point[1];
+            } else if (kind == java.awt.geom.PathIterator.SEG_CLOSE) {
+                twice += lastX * startY - startX * lastY;
+                lastX = startX;
+                lastY = startY;
+            }
+            walk.next();
+        }
+        return Math.abs(twice) / 2.0;
+    }
+
+    private static juranometria.render.ChartRenderer.Symbol symbolOf(
+            SymbolFamily family) {
+        return juranometria.render.ChartRenderer.symbolForType(
+                typeOf(family));
     }
 
     private static double median(List<Measured> of,

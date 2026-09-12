@@ -118,15 +118,31 @@ public final class GlobeNameStudyMain {
 
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-names",
+                "What became of a hemisphere's names, on one machine",
+                "Sprint 32, issue #301.");
+        split.beside("A label's fate is decided by the box its text"
+                + " needs, and that box is measured\nin a font this"
+                + " desktop supplies. So what was asked for is in the"
+                + " report\nbeside this one - it comes from the sky"
+                + " and the policy - and what became of\neach request"
+                + " is here.\n\nAttributed means the label's own object"
+                + " is strictly nearer its box than every\nsame-family"
+                + " rival; omitted means no truthful placement exists."
+                + " Rank is the\nmedian candidate the policy settled"
+                + " on, and the last three columns say where\nthe box"
+                + " ended up against the limb.");
         System.out.println("# Whether a hemisphere's names name"
                 + " anything");
         System.out.println();
         System.out.println("The production placement policy, asked"
-                + " what became of its own placements. Identified");
-        System.out.println("means the label's own object is strictly"
-                + " nearer its box than every same-family rival;");
-        System.out.println("doubtful means one is as near or nearer;"
-                + " omitted means no truthful placement exists.");
+                + " what became of its own placements - twice, once");
+        System.out.println("with the paper's edge as the boundary and"
+                + " once with the limb. What it was asked for");
+        System.out.println("comes from the sky and is here; what"
+                + " became of each request depends on the box a");
+        System.out.println("font gives the text, and is in the"
+                + " platform record beside this.");
 
         for (var look : GlobeDensityStudyMain.corpus().subList(0, 2)) {
             DrawnPage page = Atlas.assembler().assembleForStudy(
@@ -136,23 +152,41 @@ public final class GlobeNameStudyMain {
             List<Named> onPaper = examine(page, false);
             System.out.println();
             System.out.println(look.slug()
+                    + ", what the policy was asked for:");
+            split.machine("");
+            split.machine(look.slug()
                     + ", with the paper's edge as the boundary:");
-            report("centre", onPaper, 0.0, 0.5);
-            report("limb", onPaper, 0.9, 1.0);
-            report("whole disc", onPaper, 0.0, 1.0);
+            report("centre", onPaper, true, 0.0, 0.5);
+            report("limb", onPaper, true, 0.9, 1.0);
+            report("whole disc", onPaper, true, 0.0, 1.0);
 
+            // The same requests, asked again with the limb as the
+            // boundary. What is asked for does not depend on the
+            // boundary - only what becomes of it does - so the
+            // portable half says it once rather than printing an
+            // identical table twice.
             List<Named> onSky = examine(page, true);
-            System.out.println();
-            System.out.println(look.slug()
+            split.machine("");
+            split.machine(look.slug()
                     + ", with the limb as the boundary:");
-            report("centre", onSky, 0.0, 0.5);
-            report("limb", onSky, 0.9, 1.0);
-            report("whole disc", onSky, 0.0, 1.0);
+            report("centre", onSky, false, 0.0, 0.5);
+            report("limb", onSky, false, 0.9, 1.0);
+            report("whole disc", onSky, false, 0.0, 1.0);
             moved(onPaper, onSky);
         }
+        split.write();
+        System.out.println();
+        System.out.println("What became of each request - placed,"
+                + " moved, refused, and whether its box");
+        System.out.println("stayed inside the limb - depends on this"
+                + " machine's fonts and is in");
+        System.out.println("docs/studies/globe-names/platform.md.");
     }
 
+    private static Split split;
+
     private static void report(String band, List<Named> all,
+                               boolean alsoPortable,
                                double from, double to) {
         List<Named> inBand = new ArrayList<>();
         for (Named one : all) {
@@ -160,9 +194,13 @@ public final class GlobeNameStudyMain {
                 inBand.add(one);
             }
         }
-        System.out.printf(Locale.ROOT, "  %s:%n", band);
-        System.out.printf(Locale.ROOT,
-                "    %-16s %6s %11s %7s %6s %8s %7s %7s%n",
+        if (alsoPortable) {
+            System.out.printf(Locale.ROOT, "  %s:%n", band);
+            System.out.printf(Locale.ROOT, "    %-16s %6s%n",
+                    "family", "asked");
+        }
+        split.machinef("  %s:%n", band);
+        split.machinef("    %-16s %6s %11s %7s %6s %8s %7s %7s%n",
                 "family", "asked", "attributed", "omitted",
                 "rank", "in disc", "crosses", "outside");
 
@@ -187,7 +225,11 @@ public final class GlobeNameStudyMain {
                     ? family.stream().filter(Named::onItsOwnFigure)
                             .count()
                     : identified;
-            System.out.printf(Locale.ROOT,
+            if (alsoPortable) {
+                System.out.printf(Locale.ROOT, "    %-16s %6d%n",
+                        entry.getKey(), family.size());
+            }
+            split.machinef(
                     "    %-16s %6d %11d %7d %6s %8d %7d %7d%n",
                     entry.getKey(), family.size(), attributed,
                     omitted,
@@ -218,7 +260,7 @@ public final class GlobeNameStudyMain {
                         .append(cause.getKey()).append(" ")
                         .append(cause.getValue());
             }
-            System.out.printf(Locale.ROOT,
+            split.machinef(
                     "    omitted labels were refused by: %s%n", said);
         }
     }
@@ -252,7 +294,7 @@ public final class GlobeNameStudyMain {
                 stayed++;
             }
         }
-        System.out.printf(Locale.ROOT,
+        split.machinef(
                 "  of the labels the paper placed: %d stayed where"
                         + " they were, %d moved, %d became omissions%n",
                 stayed, shifted, lost);

@@ -72,20 +72,41 @@ public final class GlobeFrameStudyMain {
         System.out.println();
         System.out.printf(Locale.ROOT, "%-14s %-14s %6s %10s %10s%n",
                 "container", "furniture", "frame", "disc px", "border px");
-        for (Container container : containers) {
-            for (Furniture shown : furniture) {
-                for (double frame : FRAMES) {
-                    draw(container, shown, frame);
+        // Restored, always. The frame is a JVM-wide property, and a
+        // study that leaves it set draws every globe after it at
+        // whatever fraction it happened to stop on - which is exactly
+        // what happened the first time these studies were run
+        // together in one process: the pointing study, running after
+        // this one, reported a pixel at r = 0.95 as 83.8 degrees out
+        // instead of 71.8, because its disc had quietly become 86% of
+        // the page. Nothing found it until the evidence contract ran
+        // them in one JVM (review of PR #336).
+        String was = System.getProperty(FRAME_PROPERTY);
+        try {
+            for (Container container : containers) {
+                for (Furniture shown : furniture) {
+                    for (double frame : FRAMES) {
+                        draw(container, shown, frame);
+                    }
                 }
+            }
+        } finally {
+            if (was == null) {
+                System.clearProperty(FRAME_PROPERTY);
+            } else {
+                System.setProperty(FRAME_PROPERTY, was);
             }
         }
         System.out.println();
         System.out.println("Written to " + DIR);
     }
 
+    /** The JVM-wide override this study has to put back. */
+    static final String FRAME_PROPERTY = "juranometria.globeFrame";
+
     private static void draw(Container container, Furniture shown,
                              double frame) throws IOException {
-        System.setProperty("juranometria.globeFrame",
+        System.setProperty(FRAME_PROPERTY,
                 String.format(Locale.ROOT, "%.2f", frame));
         DrawnPage page = Atlas.assembler().assembleForStudy(
                 CROWDED, 180.0, 8.0,

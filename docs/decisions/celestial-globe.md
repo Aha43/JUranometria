@@ -336,10 +336,20 @@ hemisphere is drawn as its own shape. Median footprints run **0.1 to
 limb. So the reader is not being shown what objects look like; they
 are being shown **where objects are**, by family glyph.
 
-Both spans are recorded, not the major alone — a 6 px line with no
-width is not a resolved ellipse, and near the limb it is the radial
-direction that collapses: two globulars measure 3.7 px major against
-1.5 px minor, which the major alone would have called nearly resolved.
+Both spans are **recorded**, not the major alone: near the limb it is
+the radial direction that collapses, and two globulars measure 3.7 px
+major against 1.5 px minor, which the major alone calls nearly
+resolved.
+
+**Whether the minor span should bear on resolution is an open question
+for #331, not something this gate settles.** The classification here
+uses the atlas's existing major-axis rule and adds nothing to it. A
+review proposed also requiring the footprint to cover the production
+glyph's inked area — true to the concern, but the ink is
+production-derived while the *comparison* would have been invented in
+a study, and equal ink area does not establish that a two-dimensional
+form is resolved. An evidence repair is no place to make a new
+cartographic rule.
 
 The categories are named **resolved extent** and **minimum symbol**
 rather than anything that assumes the conclusion, because a minimum
@@ -371,19 +381,37 @@ seventy deep-sky symbols, and they are overwhelmingly Messier — 18 of
 | nebulae | 14 | 13 | **1** |
 | planetary nebulae | 2 | 2 | 0 |
 
-What changes is how large they are drawn. A large galaxy near the limb
-is currently sized at the rate it would have near the middle of the
-page — tens of pixels — when its true footprint is a tenth of one:
+What changes is how large a few of them are drawn. A large galaxy near
+the limb is currently sized at the rate it would have near the middle
+of the page — tens of pixels — when its true footprint is a tenth of
+one.
 
-| band | symbol area today | corrected |
+**How much ink that costs was claimed at 73% of today's at the limb,
+and that claim is withdrawn.** It came from a study that modelled
+every mark as a filled disc of its major diameter, which ignores the
+minor span and is wrong about every family: an open cluster is a
+dotted ring around nothing, a nebula an empty box, a planetary a small
+circle with spokes. Measured instead from `ChartRenderer.symbolInk` —
+the production geometry, both axes, the right shape per family, which
+is published for exactly this kind of question (#313):
+
+| band | symbol ink today | corrected |
 |---|---|---|
-| centre | 1 166 px | 1 081 px (93%) |
-| **limb** | **7 081 px** | **5 135 px (73%)** |
-| whole disc | 8 530 px | 6 498 px (76%) |
+| centre | 742 px | 765 px (103%) |
+| limb | 1 833 px | 1 735 px (95%) |
+| whole disc | 2 841 px | 2 780 px (98%) |
 
-**About a quarter of the deep-sky ink at the limb is false
-prominence**, and it goes without any object going. The globe keeps
-its landmarks and draws them at an honest scale.
+**The correction barely changes the ink**, and the reason is a better
+finding than the one it replaces: at the limb almost every object's
+centre-scale size is *already* below the practical minimum, so both
+rules draw the same minimum glyph. What the correction changes is the
+drawn extent of the few large objects, and those are a small share of
+the ink.
+
+**None of this alters the family decision.** The population is
+retained overwhelmingly through Messier priority — 18 of 20 galaxies,
+28 of 28 globulars — which both rules keep, so the objects a reader
+sees are the same either way.
 
 ### Two model errors this study made first
 
@@ -622,15 +650,24 @@ modules: SVG, PDF and PNG each carry "orthographic".
 recording was rasterised at the writer's own 3208×2180 — the chart's
 own rectangle cut from the sheet, since the file is the whole page and
 the chart is inset by the margin — and the outside-limb masks compared
-pixel for pixel:
+pixel for pixel, **one layer at a time**:
 
-| | |
-|---|---|
-| outside the limb in both | 177 186 px |
-| in the page but not the file | 7 879 px |
-| in the file but not the page | 4 986 px |
-| furthest one-sided pixel from ink in the other | **2.2 px** |
-| one-sided pixels beyond the bound | **0** |
+| layer alone on the page | in both | page only | file only | furthest | beyond √5 |
+|---|---|---|---|---|---|
+| constellation figures | 74 013 | 3 042 | 286 | 1.0 px | **0** |
+| the grid | 73 416 | 3 049 | 314 | 1.4 px | **0** |
+| deep-sky symbols | 83 516 | 2 943 | 319 | 1.0 px | **0** |
+| star marks | 72 354 | 2 881 | 268 | 1.0 px | **0** |
+| star names | 112 846 | 5 047 | 2 428 | 1.4 px | **0** |
+| constellation names | 134 787 | 6 100 | 3 337 | **2.2 px** | **0** |
+
+A first version of this check compared the whole page at once, asking
+of each differing pixel only whether the other rendering had *any* ink
+within the bound. **That oracle was withdrawn**: beyond a globe's limb
+the figures, the grid and the names lie across one another, so a shape
+the writer had moved could be excused by an unrelated glyph that
+happened to be near. Drawing one layer alone keeps the ink in the
+comparison owned by the shape being compared.
 
 The bound is **√5 ≈ 2.24 px**, and it comes from the mechanism rather
 than from this page: two rasterisers may place a filled edge up to one
@@ -642,8 +679,15 @@ The single pixel that reached that bound was chased down rather than
 called an edge effect: it sits on a **glyph stem in a constellation
 name beyond the limb**, which both renderings draw, the file's block
 beginning a row higher and ending a column wider. That it fell in
-constellation-name text — one of the two largest sources above — is
-the reason chasing it mattered.
+constellation-name text — the largest source above — is the reason
+chasing it mattered.
+
+**And the oracle is shown to fail.** A check that cannot fail proves
+nothing, so a 25×25 patch is struck out of the page rendering at
+radius 1.40 of the disc — beyond the limb, clear of the sheet border —
+removing **125 px** of constellation-figure ink. The comparison then
+reports **105 px beyond the bound**, the furthest 8 px from any ink in
+the file. A deleted outside-limb shape is not survivable.
 
 So a globe's exported geometry is wrong **before** anything is
 written. The writers preserve a page that is already drawing sky
@@ -671,6 +715,64 @@ its remover in the code as well as here:
 not a door — the investigation found thirteen implicit copies of that
 boundary already in the atlas, and `OneProjectionPerPageTest` keeps it
 at one.
+
+### Where this gate's evidence lives, and what checks it
+
+The eleven studies above write documents under `docs/studies/`, and
+`EvidenceContractMain` runs every one of them. Until the review of
+PR #336 it ran none: the gate cited numbers that no green contract had
+ever looked at, so a study could have fallen behind the atlas without
+anything saying so.
+
+Each study writes **two** documents, because it measures two kinds of
+thing and a report mixing them can be held to neither (#315):
+
+| | pinned to bytes | held to reproducing here |
+|---|---|---|
+| what | objects counted, footprints projected, spans in degrees, a projection named after a writer has had it, every pass-or-fail verdict | every count of ink, every font-measured box, every file size |
+| where | `measurements.md` | `platform.md` |
+
+So "no ink beyond the limb" is in the portable half and fails anywhere
+it stops being true, while the 99 625 pixels that *are* beyond it are
+this machine's number and are held to reproducing on it.
+
+| study | `docs/studies/` | platform record |
+|---|---|---|
+| `make globe-study` | `globe-hemispheres/` | — |
+| `make globe-frame-study` | `globe-frame/` | — |
+| `make globe-density-study` | `globe-density/` | yes |
+| `make globe-furniture-study` | `globe-furniture/` | yes |
+| `make globe-grid-study` | `globe-grid/` | yes |
+| `make globe-grid-fade-study` | `globe-grid-fade/` | yes |
+| `make globe-family-study` | `globe-families/` | yes |
+| `make globe-name-study` | `globe-names/` | yes |
+| `make globe-pointing-study` | `globe-pointing/` | — |
+| `make globe-module-study` | `globe-modules/` | yes |
+| `make globe-export-study` | `globe-export/` | yes |
+
+**Publishing them found a defect the gate had been living with.** The
+frame study asks what fraction of the page a disc should fill, and the
+only way to ask is a JVM-wide property. Run on its own it put the
+property back by exiting; run in one process with the other ten —
+which is how the contract runs them — it left the last fraction it
+tried, **86%**, set for everything after it. The pointing study then
+reported a pixel at r = 0.95 as **83.8°** out from the centre instead
+of 71.8°, and every study between them measured a disc four percent
+too small. Nothing in the gate could have noticed: each study was run
+in its own JVM, by hand, and agreed with itself — which is also why
+**no figure recorded above is wrong**: every one of them was measured
+by a study running alone, at the atlas's own 90%. The property is now
+restored in a `finally`, and `GlobeStudyIsolationTest` holds both that
+it is restored *and* that a globe assembled afterwards has the disc it
+would have had — the second because a property put back by luck would
+satisfy the first.
+
+The three without a platform record measure no ink at all: the
+hemispheres count what the sky puts on a page, the frame is the disc's
+geometry against the paper's, and the pointing study is projection
+arithmetic. The hemisphere study also lost its wall-clock column when
+it was published — a timing cannot be pinned to bytes, and the label
+study settled that (#310).
 
 ## What this gate does not claim
 

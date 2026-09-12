@@ -61,8 +61,19 @@ public final class GlobeGridStudyMain {
     private static final double[] RADII =
             {0.2, 0.5, 0.8, 0.9, 0.95, 0.99};
 
+    private static Split split;
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
+        split = new Split("globe-grid",
+                "The globe grid's gaps, walked on one machine",
+                "Sprint 32, issue #301.");
+        split.beside("Lines, ink and gaps are counted along a circle"
+                + " of a rendered page, so all\nthree are this"
+                + " desktop's answer. What the report beside this one"
+                + " carries is\nthe geometry that does not move: how"
+                + " much sky each circle of the disc stands\nout"
+                + " from the centre.");
         System.out.println("# Whether the globe's grid needs less of"
                 + " itself near the limb");
         System.out.println();
@@ -84,16 +95,32 @@ public final class GlobeGridStudyMain {
             ImageIO.write(grid, "png",
                     new File(DIR, look.slug() + "-grid-only.png"));
 
-            System.out.println(look.slug() + ":");
-            System.out.printf(Locale.ROOT,
-                    "  %8s %10s %8s %10s %10s %10s%n",
+            split.machine(look.slug() + ":");
+            split.machinef("  %8s %10s %8s %10s %10s %10s%n",
                     "radius", "sky out", "lines", "inked", "median gap",
                     "worst gap");
             for (double radius : RADII) {
                 report(grid, radius);
             }
-            System.out.println();
+            split.machine("");
         }
+
+        System.out.printf(Locale.ROOT, "  %8s %10s%n",
+                "radius", "sky out");
+        for (double radius : RADII) {
+            System.out.printf(Locale.ROOT, "  %7.2f %9.1f\u00b0%n",
+                    radius,
+                    Math.toDegrees(Math.asin(Math.min(1.0, radius))));
+        }
+        System.out.println();
+        System.out.println("What the grid does along those circles -"
+                + " how many lines cross them, how much");
+        System.out.println("ink they carry and what ground is left"
+                + " between one line and the next - is");
+        System.out.println("counted from a rendering, and is in"
+                + " docs/studies/globe-grid/platform.md.");
+        System.out.println();
+        split.write();
         System.out.println("Written to " + DIR);
     }
 
@@ -101,7 +128,7 @@ public final class GlobeGridStudyMain {
         Walk walk = walk(grid, radius);
         double discRadiusPx = FRAME * SIDE_PX / 2.0;
         double circumference = 2.0 * Math.PI * radius * discRadiusPx;
-        System.out.printf(Locale.ROOT,
+        split.machinef(
                 "  %7.2f %9.1f° %8d %9.1f%% %9.1fpx %9.1fpx%n",
                 radius, Math.toDegrees(Math.asin(Math.min(1.0, radius))),
                 walk.lines(), walk.inked() * 100.0,
