@@ -13,7 +13,7 @@ sagittarius:
     Globular clusters         15        15          0        15       0.6px
     Nebulae                    9         9          0         4       1.6px
     Planetary nebulae          0         0          0         0       0.0px
-    symbol area              717 px drawn today, 725 px corrected (101% of it)
+    symbol area              717 px drawn today, 723 px corrected (101% of it)
   limb:
     family                 today corrected  withdrawn   Messier   med major
     Galaxies                  19        19          0        17       0.1px
@@ -21,7 +21,7 @@ sagittarius:
     Globular clusters          6         6          0         6       0.3px
     Nebulae                    5         4          1         0       0.2px
     Planetary nebulae          0         0          0         0       0.0px
-    symbol area             5493 px drawn today, 1799 px corrected (33% of it)
+    symbol area             5493 px drawn today, 1287 px corrected (23% of it)
   whole disc:
     family                 today corrected  withdrawn   Messier   med major
     Galaxies                  20        20          0        18       0.1px
@@ -29,7 +29,7 @@ sagittarius:
     Globular clusters         28        28          0        28       0.4px
     Nebulae                   14        13          1         4       0.4px
     Planetary nebulae          2         2          0         2       0.0px
-    symbol area             6489 px drawn today, 2803 px corrected (43% of it)
+    symbol area             6489 px drawn today, 2276 px corrected (35% of it)
   what each family puts on the page:
     family                    glyphs   colliding
     Galaxies                    5018        4516
@@ -58,7 +58,7 @@ orion:
     Globular clusters          1         1          0         1       0.8px
     Nebulae                    8         8          0         4       0.7px
     Planetary nebulae          0         0          0         0       0.0px
-    symbol area              364 px drawn today, 380 px corrected (104% of it)
+    symbol area              364 px drawn today, 371 px corrected (102% of it)
   limb:
     family                 today corrected  withdrawn   Messier   med major
     Galaxies                  13        13          0        11       0.1px
@@ -66,7 +66,7 @@ orion:
     Globular clusters          0         0          0         0       0.3px
     Nebulae                    3         3          0         0       0.2px
     Planetary nebulae          2         2          0         2       0.1px
-    symbol area             5185 px drawn today, 2080 px corrected (40% of it)
+    symbol area             5185 px drawn today, 1801 px corrected (35% of it)
   whole disc:
     family                 today corrected  withdrawn   Messier   med major
     Galaxies                  16        16          0        14       0.1px
@@ -74,7 +74,7 @@ orion:
     Globular clusters          1         1          0         1       0.3px
     Nebulae                   17        17          0         4       0.4px
     Planetary nebulae          2         2          0         2       0.1px
-    symbol area             6099 px drawn today, 2984 px corrected (49% of it)
+    symbol area             6099 px drawn today, 2663 px corrected (44% of it)
   what each family puts on the page:
     family                    glyphs   colliding
     Galaxies                    4709        4171

@@ -435,18 +435,35 @@ the foreshortened globe span, where production scales **both**
 catalogue axes at the page centre's rate. Two different geometries in
 one ratio.
 
+And it was measuring **one population for two rules**. A single loop
+entered through "drawn today" charged the corrected side for the
+nebula the corrected rule withdraws, and could never have charged it
+for an object the corrected rule newly admits. The unresolved
+landmarks were also given a *square* 6 × 6 glyph, where the atlas's
+own clamp raises the major to the practical minimum and enlarges the
+minor by the same factor, so the object keeps its shape.
+
 Both sides are now the ink a production symbol leaves, asked of
 `ChartRenderer.symbolInk` over the axes each rule gives it — today's
 from `ChartRenderer.symbolAxesPx`, which is published rather than
-restated, because restating it is how the wrong minor axis got in:
+restated, because restating it is how the wrong minor axis got in —
+each summed over **its own** population, and each population checked
+against the counts in the table above:
 
 | band | symbol ink today | corrected |
 |---|---|---|
-| centre | 717 px | 725 px (**101%**) |
-| limb | 5 493 px | 1 799 px (**33%**) |
-| whole disc | 6 489 px | 2 803 px (**43%**) |
+| centre | 717 px | 723 px (**101%**) |
+| limb | 5 493 px | 1 287 px (**23%**) |
+| whole disc | 6 489 px | 2 276 px (**35%**) |
 
-**The correction removes two thirds of the deep-sky ink at the limb**,
+The study now **fails** rather than prints if the two sums cover a
+different population from the one it has just tabulated. Charging the
+corrected side through "drawn today" — the defect itself — trips it:
+*the ink sums cover 31 today and 31 corrected, but the table above
+counts 31 and 30*.
+
+**The correction removes over three quarters of the deep-sky ink at
+the limb**,
 and the centre confirms the measurement rather than the story: there
 the two rules agree to within 1%, because at the page centre the
 centre-scale conversion is the right one. The limb is where a symbol
@@ -454,9 +471,10 @@ is drawn tens of pixels across for a footprint a tenth of one, and
 that is exactly where the ink falls away.
 
 That is a stronger result than the 73% it replaces, and it was hidden
-by the earlier mismatch in both directions at once — a silhouette
-over-counts the corrected side, and a foreshortened minor axis
-under-counts today's.
+by mismatches running in both directions at once — a silhouette and a
+withdrawn object over-count the corrected side, a foreshortened minor
+axis under-counts today's, and a square minimum glyph over-counts
+every landmark the corrected rule draws small.
 
 **None of this alters the family decision.** The population is
 retained overwhelmingly through Messier priority — 18 of 20 galaxies,

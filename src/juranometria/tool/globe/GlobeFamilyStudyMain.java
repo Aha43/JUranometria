@@ -498,6 +498,8 @@ public final class GlobeFamilyStudyMain {
             }
             byFamily.get(one.family()).add(one);
         }
+        long tabledToday = 0;
+        long tabledCorrected = 0;
         for (var entry : byFamily.entrySet()) {
             List<Measured> family = entry.getValue();
             if (family.isEmpty()) {
@@ -507,6 +509,8 @@ public final class GlobeFamilyStudyMain {
                     .filter(Measured::drawnToday).count();
             long corrected = family.stream()
                     .filter(Measured::drawnCorrected).count();
+            tabledToday += today;
+            tabledCorrected += corrected;
             long messier = family.stream()
                     .filter(one -> one.messier() && one.drawnCorrected())
                     .count();
@@ -527,31 +531,60 @@ public final class GlobeFamilyStudyMain {
         // with spokes. ChartRenderer.symbolInk publishes what a
         // symbol actually inks, for exactly this kind of question
         // (#313), so it is asked (review of PR #336).
+        //
+        // The two sums are over two populations, not one. A single
+        // loop entered through drawnToday charged the corrected side
+        // for the nebula the corrected rule withdraws, and could
+        // never charge it for an object the corrected rule newly
+        // admits - so the ink total was answering for a population
+        // the table above does not describe (review of PR #336).
         double today = 0.0;
+        long todayDrawn = 0;
         double corrected = 0.0;
+        long correctedDrawn = 0;
+        int noSize = 0;
         for (Measured one : inBand) {
-            if (one.family() == null || !one.drawnToday()) {
+            if (one.family() == null) {
                 continue;
             }
-            // Both sums are the ink a production symbol leaves, which
-            // is the only way the two are comparable. The first
-            // version of this compared ink against a silhouette: the
-            // corrected side used the area the projected footprint
-            // encloses, so a dotted ring, an open box, a cross or a
-            // pair of spokes became a filled ellipse again the moment
-            // it resolved. And the today side took its minor axis
-            // from the foreshortened globe span, which is not what
-            // production does - it scales both catalogue axes at the
-            // page centre's rate (review of PR #336).
-            today += inkArea(one.symbol(), one.todayMajorPx(),
-                    one.todayMinorPx());
-            // Corrected: the same symbol over the truthfully
-            // projected spans where the footprint resolves, and the
-            // family's own minimum glyph where it does not.
-            corrected += one.resolved()
-                    ? inkArea(one.symbol(), one.majorPx(),
-                            one.minorPx())
-                    : minimumGlyphArea(one.symbol());
+            if (one.drawnToday()) {
+                todayDrawn++;
+                double ink = inkArea(one.symbol(), one.todayMajorPx(),
+                        one.todayMinorPx());
+                if (Double.isFinite(ink)) {
+                    today += ink;
+                } else {
+                    noSize++;
+                }
+            }
+            if (one.drawnCorrected()) {
+                correctedDrawn++;
+                double[] axes = correctedAxes(one);
+                double ink = inkArea(one.symbol(), axes[0], axes[1]);
+                if (Double.isFinite(ink)) {
+                    corrected += ink;
+                } else {
+                    noSize++;
+                }
+            }
+        }
+        // The ink may not answer for a population other than the one
+        // counted above it. This is the check that says so, and it
+        // fails the study rather than printing a number that quietly
+        // describes something else.
+        if (todayDrawn != tabledToday
+                || correctedDrawn != tabledCorrected) {
+            throw new IllegalStateException(String.format(Locale.ROOT,
+                    "the ink sums cover %d today and %d corrected,"
+                            + " but the table above counts %d and %d",
+                    todayDrawn, correctedDrawn, tabledToday,
+                    tabledCorrected));
+        }
+        if (noSize > 0) {
+            System.out.printf(Locale.ROOT,
+                    "    %-20s %7d   (drawn at no finite size, so"
+                            + " their ink is not in the totals)%n",
+                    "no size", noSize);
         }
         if (today > 0.0) {
             System.out.printf(Locale.ROOT,
@@ -670,21 +703,31 @@ public final class GlobeFamilyStudyMain {
         return areaOfShape(ink);
     }
 
-    /** Each symbol's minimum glyph, inked once and remembered. */
-    private static final Map<
-            juranometria.render.ChartRenderer.Symbol, Double>
-            MINIMUM_GLYPH = new java.util.HashMap<>();
-
     /**
-     * What an unresolved object is actually drawn as: the mark at the
-     * atlas's practical minimum, both axes, which is the shape the
-     * clamp produces when a footprint has collapsed.
+     * The axes the corrected rule draws an object at.
+     *
+     * <p>Its truthfully projected spans where the footprint resolves.
+     * Where it does not, the object is a priority landmark drawn at
+     * the minimum glyph - and the minimum glyph is not a square. The
+     * atlas's existing clamp raises the major axis to the practical
+     * minimum and enlarges the minor <em>by the same factor</em>, so
+     * the object keeps its shape; measuring it as 6 by 6 gave every
+     * unresolved object a round mark the renderer would never draw
+     * (review of PR #336).
+     *
+     * <p>A projected major of zero has no ratio to preserve, which is
+     * also what production's clamp produces for it - a non-finite
+     * size, drawn as nothing. Such an object is counted and named
+     * rather than quietly given a shape.
      */
-    private static double minimumGlyphArea(
-            juranometria.render.ChartRenderer.Symbol symbol) {
-        return MINIMUM_GLYPH.computeIfAbsent(symbol, one -> inkArea(one,
-                RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX));
+    private static double[] correctedAxes(Measured one) {
+        if (one.resolved()) {
+            return new double[] {one.majorPx(), one.minorPx()};
+        }
+        double enlarge = RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX
+                / one.majorPx();
+        return new double[] {one.majorPx() * enlarge,
+                one.minorPx() * enlarge};
     }
 
     /** The area a shape encloses, by walking its outline. */
