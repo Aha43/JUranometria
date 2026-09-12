@@ -321,6 +321,89 @@ the paper. **Weight**, the mean distance of a band's pixels from the
 ground, is the measure this question needed, and the one the table
 above reports.
 
+## Which families a hemisphere shows
+
+All five stay enabled. The decision took two corrections to reach, and
+both are recorded because each was a model error caught before it
+became policy.
+
+### The globe is a symbol map of where things are
+
+Measured from projected footprints against the atlas's own practical
+minimum of 6 px (`make globe-family-study`), almost nothing on a
+hemisphere is drawn as its own shape. Median footprints run **0.1 to
+1.7 px** against that 6 px threshold, at the centre as well as the
+limb. So the reader is not being shown what objects look like; they
+are being shown **where objects are**, by family glyph.
+
+Both spans are recorded, not the major alone — a 6 px line with no
+width is not a resolved ellipse, and near the limb it is the radial
+direction that collapses: two globulars measure 3.7 px major against
+1.5 px minor, which the major alone would have called nearly resolved.
+
+The categories are named **resolved extent** and **minimum symbol**
+rather than anything that assumes the conclusion, because a minimum
+glyph is not nothing. Compared pixel by pixel at 6 px, the five family
+glyphs differ from one another by **33 to 50 pixels** — the closest
+pair being open clusters against nebulae, a dotted circle against a
+box. Family identity survives at the size everything is actually
+drawn.
+
+### Eligibility
+
+> An object appears when its **truthfully projected footprint
+> resolves**, or it is a **Messier landmark**, or it is the
+> **searched target**. A priority object whose real footprint is
+> unresolved is drawn at the existing minimum family glyph. There is
+> no globe-specific promotion for any family.
+
+### What the footprint correction actually does
+
+It removes **false size, not objects**. A hemisphere draws about
+seventy deep-sky symbols, and they are overwhelmingly Messier — 18 of
+20 galaxies, 28 of 28 globulars — so both rules keep them:
+
+| family | drawn today | under the corrected rule | withdrawn |
+|---|---|---|---|
+| galaxies | 20 | 20 | 0 |
+| open clusters | 9 | 9 | 0 |
+| globular clusters | 28 | 28 | 0 |
+| nebulae | 14 | 13 | **1** |
+| planetary nebulae | 2 | 2 | 0 |
+
+What changes is how large they are drawn. A large galaxy near the limb
+is currently sized at the rate it would have near the middle of the
+page — tens of pixels — when its true footprint is a tenth of one:
+
+| band | symbol area today | corrected |
+|---|---|---|
+| centre | 1 166 px | 1 081 px (93%) |
+| **limb** | **7 081 px** | **5 135 px (73%)** |
+| whole disc | 8 530 px | 6 498 px (76%) |
+
+**About a quarter of the deep-sky ink at the limb is false
+prominence**, and it goes without any object going. The globe keeps
+its landmarks and draws them at an honest scale.
+
+### Two model errors this study made first
+
+Recorded because policy was nearly written on them.
+
+**A magnitude filter the atlas does not have.** The first counts
+filtered objects at V 5.0 and reported 134 galaxies and 106 open
+clusters on a hemisphere. `RegionalDetailPolicy.drawn` has no
+magnitude test: above 18 degrees a page is regional, and an object
+appears if it draws at true size, or is Messier priority, or is the
+target. The real figure is about seventy symbols, and the counts, the
+collisions and the ink had all been computed over the wrong
+population.
+
+**A prediction that the correction would empty the limb.** It followed
+from the first error: the nineteen limb galaxies looked like objects
+admitted by the centre-scale mistake, and they are Messier landmarks
+that both rules keep. Measuring the corrected population rather than
+reasoning about it is what caught it.
+
 ## A page is drawn by one projection
 
 Not a cartographic decision, but the gate found it and it had to be
@@ -349,8 +432,14 @@ was satisfied by a fix that put the split straight back.
 
 ## Still open
 
-Which families are visible at 180 degrees; how many names are useful; whether boundaries stay on
-by default, assessed with #326 in mind; navigation and pointing near
-the limb; module geometry; projection identity in export; and paper
-policy, with #293 remaining the authority for any claim that needs
-printing.
+How many names are useful, decided on the settled page and judged by
+whether a label stays close enough to identify its object rather than
+by whether placement found an empty rectangle; navigation and pointing
+near the limb; which module geometry remains useful there; projection
+identity in export; and paper policy, with #293 remaining the
+authority for any claim that needs printing.
+
+The shared placement policy stands: names on a globe are placed by the
+same rule as everywhere else. If it cannot cope near the limb, that is
+a measured finding to bring back, not grounds for a private globe
+rule.

@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-family-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -80,6 +80,7 @@ help:
 	@echo "  globe-furniture-study Measure what each layer costs a hemisphere"
 	@echo "  globe-grid-study  Measure the globe grid's gaps by radius"
 	@echo "  globe-grid-fade-study How faint the globe grid goes at its limb"
+	@echo "  globe-family-study Which object families a hemisphere can carry"
 	@echo "  released-text     List the text every released page draws"
 	@echo "  dist              Build and verify the portable fallback ZIP"
 	@echo "  app-image         Build and verify this platform's native application image"
@@ -282,6 +283,12 @@ globe-grid-fade-study: classes
 	@echo "  globe grid fade"
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeGridFadeStudyMain
+
+# Which object families a hemisphere can carry (#301).
+globe-family-study: classes
+	@echo "  globe families"
+	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeFamilyStudyMain
 
 chart-sheet-study: classes
 	@echo "  chart sheets"
