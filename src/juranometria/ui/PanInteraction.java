@@ -114,18 +114,18 @@ public final class PanInteraction extends MouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent event) {
-        if (!SwingUtilities.isLeftMouseButton(event)
-                || !chart.isOnPaper(event.getPoint())) {
+        if (!SwingUtilities.isLeftMouseButton(event)) {
             return;
         }
-        var scene = chart.scene();
-        if (scene == null) {
+        // Nothing to grab where there is no sky. A press on the paper
+        // around a globe's limb is not a drag that goes wrong later;
+        // it is a press on nothing (#301).
+        var under = skyUnder(event.getPoint());
+        if (under.isEmpty()) {
             return;
         }
         pressPoint = event.getPoint();
-        grabbed = PanSolver.skyFromPlane(scene.viewport(),
-                PanSolver.planeFromPixel(scene.viewport(),
-                        pagePixel(event.getPoint())));
+        grabbed = under.get();
         dragging = false;
     }
 
@@ -185,9 +185,49 @@ public final class PanInteraction extends MouseAdapter {
         return dragging;
     }
 
+    /**
+     * The open hand where a grab can begin, and nowhere else.
+     *
+     * <p>On paper was the whole question until the globe, because
+     * every page was sky to its corners. A globe page has a margin
+     * around its disc that is paper and not sky, and the press
+     * refuses to grab there - so a cursor that asked only about the
+     * paper offered a gesture the next click would decline, which
+     * reads as broken rather than as inert (review of PR #337).
+     */
     private void updateHoverCursor(Point point) {
-        chart.setCursor(chart.isOnPaper(point)
+        chart.setCursor(skyUnder(point).isPresent()
                 ? openHand : Cursor.getDefaultCursor());
+    }
+
+    /**
+     * The sky a grab at this component point would take hold of, or
+     * empty where there is none.
+     *
+     * <p>The one place the question is answered, because the first
+     * repair answered it twice and said in a comment that the two
+     * could not disagree. They could, exactly as the hover rule had
+     * already drifted from the press: two routes computing the same
+     * thing agree until one of them is edited (review of PR #337).
+     *
+     * <p>So the hover asks whether there is an answer and the press
+     * takes the answer itself. A change to what a page shows - a
+     * different frame, a projection with another kind of edge, paper
+     * that stops meaning what it means today - reaches both, or
+     * neither.
+     */
+    private java.util.Optional<juranometria.chart.SkyPosition> skyUnder(
+            Point point) {
+        if (!chart.isOnPaper(point)) {
+            return java.util.Optional.empty();
+        }
+        var scene = chart.scene();
+        if (scene == null) {
+            return java.util.Optional.empty();
+        }
+        return PanSolver.skyAt(scene.viewport(),
+                PanSolver.planeFromPixel(scene.viewport(),
+                        pagePixel(point)));
     }
 
     /** Component coordinates to page-pixel coordinates. */

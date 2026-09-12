@@ -183,7 +183,11 @@ public final class ChartSheet {
                 paper.chartWideUnits(), paper.chartHighUnits());
         Graphics2D g = (Graphics2D) recorder.create();
         try {
-            ChartRenderer.drawing(page, StarSizePolicy.DEFAULT)
+            // The plain renderer: a page and its viewport now name
+            // the same projection at every rung, including the
+            // globe's, so there is nothing left for a renderer built
+            // around one page to be told (#329 removed that door).
+            new ChartRenderer(StarSizePolicy.DEFAULT)
                     .render(g, scene, onPaper, reference);
             overChart.paint(g, scene);
         } finally {

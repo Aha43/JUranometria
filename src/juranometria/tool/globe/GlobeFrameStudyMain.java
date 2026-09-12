@@ -17,14 +17,23 @@ import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
 
 /**
- * How big the disc should be on the paper (Sprint 32, issue #301).
+ * How big the disc is on the paper (Sprint 32, issues #301 and #329).
  *
  * <p>The globe is the one page in the atlas that is a bounded object
  * placed on paper rather than a field filling a frame, so how much of
- * the page it fills is a decision rather than a consequence. This
- * draws the candidates side by side, because the question - does the
- * limb read as an edge, and does the furniture sit beside the sphere
- * rather than on it - is one only an eye can answer.
+ * the page it fills is a decision rather than a consequence. The gate
+ * compared 100, 94, 90 and 86 per cent of the short side by eye and
+ * chose 90 (docs/decisions/celestial-globe.md).
+ *
+ * <p><strong>It compared them through a JVM-wide property, and that
+ * is gone with #329</strong> - along with the defect it caused, a
+ * study that did not put the property back leaving every globe drawn
+ * after it in one process four per cent too small. So this no longer
+ * chooses; it <em>checks</em>. The production frame is drawn in every
+ * container and furniture state the reader meets, and what is
+ * reported is the disc and the border each one leaves. A frame that
+ * changed, or a container that let the furniture onto the sphere,
+ * moves these numbers.
  *
  * <p>The crowded hemisphere deliberately: a border that survives the
  * worst page is a border that works.
@@ -36,8 +45,7 @@ public final class GlobeFrameStudyMain {
 
     static final File DIR = new File("build/globe-study/frame");
 
-    /** The fractions of the short side under comparison. */
-    private static final double[] FRAMES = {1.00, 0.94, 0.90, 0.86};
+
 
     /** What is turned on, and what that is meant to show. */
     record Furniture(String slug, ChartOptions options) {
@@ -70,8 +78,9 @@ public final class GlobeFrameStudyMain {
         System.out.println("page is a border that works. Disc as a"
                 + " fraction of the page's short side.");
         System.out.println();
-        System.out.printf(Locale.ROOT, "%-14s %-14s %6s %10s %10s%n",
-                "container", "furniture", "frame", "disc px", "border px");
+        System.out.printf(Locale.ROOT, "%-14s %-14s %10s %10s %10s%n",
+                "container", "furniture", "page px", "disc px",
+                "border px");
         // Restored, always. The frame is a JVM-wide property, and a
         // study that leaves it set draws every globe after it at
         // whatever fraction it happened to stop on - which is exactly
@@ -81,58 +90,53 @@ public final class GlobeFrameStudyMain {
         // instead of 71.8, because its disc had quietly become 86% of
         // the page. Nothing found it until the evidence contract ran
         // them in one JVM (review of PR #336).
-        String was = System.getProperty(FRAME_PROPERTY);
-        try {
-            for (Container container : containers) {
-                for (Furniture shown : furniture) {
-                    for (double frame : FRAMES) {
-                        draw(container, shown, frame);
-                    }
-                }
-            }
-        } finally {
-            if (was == null) {
-                System.clearProperty(FRAME_PROPERTY);
-            } else {
-                System.setProperty(FRAME_PROPERTY, was);
+        for (Container container : containers) {
+            for (Furniture shown : furniture) {
+                draw(container, shown);
             }
         }
         System.out.println();
         System.out.println("Written to " + DIR);
     }
 
-    /** The JVM-wide override this study has to put back. */
-    static final String FRAME_PROPERTY = "juranometria.globeFrame";
-
-    private static void draw(Container container, Furniture shown,
-                             double frame) throws IOException {
-        System.setProperty(FRAME_PROPERTY,
-                String.format(Locale.ROOT, "%.2f", frame));
-        DrawnPage page = Atlas.assembler().assembleForStudy(
-                CROWDED, 180.0, 8.0,
-                "Sagittarius and Scorpius",
-                new GlobeProjection(CROWDED),
-                container.widthPx(), container.heightPx());
+    private static void draw(Container container, Furniture shown)
+            throws IOException {
+        // The production page, assembled the way the reader's is:
+        // there is no study door left here to supply a projection,
+        // because 180 degrees is a rung and the orthographic
+        // projection is the one that draws it (#329).
+        DrawnPage page = juranometria.project.DrawnPage.of(
+                Atlas.assembler().assemble(
+                        new juranometria.chart.ChartViewState(CROWDED,
+                                180.0, 8.0),
+                        container.widthPx(), container.heightPx()));
 
         BufferedImage canvas = new BufferedImage(container.widthPx(),
                 container.heightPx(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            ChartRenderer.drawing(page, StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT)
                     .render(g, page.scene(), shown.options());
         } finally {
             g.dispose();
         }
-        String name = String.format(Locale.ROOT, "%s-%s-%03d.png",
-                container.slug(), shown.slug(),
-                Math.round(frame * 100));
-        ImageIO.write(canvas, "png", new File(DIR, name));
+        ImageIO.write(canvas, "png", new File(DIR, String.format(
+                Locale.ROOT, "%s-%s.png", container.slug(),
+                shown.slug())));
 
+        // The disc as the mapping actually draws it, not as a
+        // fraction restated here: a copy of the frame in a study is a
+        // copy that can disagree with the page.
+        double discRadius = new juranometria.project.ViewportMapping(page)
+                .pixelsPerPlaneUnit()
+                * page.projection().visiblePlaneRadius();
         int shortSide = Math.min(container.widthPx(),
                 container.heightPx());
-        long disc = Math.round(frame * shortSide);
-        System.out.printf(Locale.ROOT, "%-14s %-14s %5.0f%% %10d %10d%n",
-                container.slug(), shown.slug(), frame * 100, disc,
+        long disc = Math.round(2.0 * discRadius);
+        System.out.printf(Locale.ROOT,
+                "%-14s %-14s %10s %10d %10d%n",
+                container.slug(), shown.slug(),
+                container.widthPx() + "x" + container.heightPx(), disc,
                 Math.round((shortSide - disc) / 2.0));
     }
 

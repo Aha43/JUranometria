@@ -103,7 +103,37 @@ public final class PanSolver {
     public static SkyPosition skyFromPlane(ChartProjection kind,
                                            SkyPosition centre,
                                            PlanePoint plane) {
-        return Projections.of(kind, centre).unproject(plane).orElseThrow();
+        return skyAt(kind, centre, plane).orElseThrow(
+                () -> new IllegalArgumentException(
+                        "no sky under " + plane + " on a " + kind
+                                + " page centred at " + centre));
+    }
+
+    /**
+     * The sky under a plane point, or empty where there is none.
+     *
+     * <p>Every page had sky everywhere until the globe: a chart
+     * projection's plane is sky all the way out, so a caller could
+     * take the answer and a missing one could only be a bug. A
+     * bounded page has paper outside its limb, and a reader pointing
+     * there is pointing past the edge of the world - which #301
+     * settled is a refusal rather than an error
+     * (docs/decisions/celestial-globe.md).
+     *
+     * <p>So the question has two forms and callers choose. A caller
+     * that has already established the point is on the sky may take
+     * the answer; one holding a pointer the reader aimed has to ask
+     * this one, because the reader can aim at paper.
+     */
+    public static java.util.Optional<SkyPosition> skyAt(
+            ChartProjection kind, SkyPosition centre, PlanePoint plane) {
+        return Projections.of(kind, centre).unproject(plane);
+    }
+
+    /** The same, for a caller that has the page it is pointing at. */
+    public static java.util.Optional<SkyPosition> skyAt(
+            ChartViewport viewport, PlanePoint plane) {
+        return skyAt(viewport.projection(), viewport.centre(), plane);
     }
 
     /** The same, for a caller that has the page it is pointing at. */
@@ -193,6 +223,22 @@ public final class PanSolver {
         double along = asked.along();
         double east = asked.east();
         double north = asked.north();
+
+        // A target the projection cannot read is no centre, not a
+        // NaN one. Every page had sky at every plane point until the
+        // globe, so this could not arise and the arithmetic below was
+        // free to trust its inputs; a bounded page has paper past its
+        // limb, and asking what angle a plane radius beyond it stands
+        // for answers NaN. Carried on, that NaN reaches a
+        // SkyPosition, which refuses it - so a reader dragging on a
+        // globe sprayed "right ascension must be in [0, 360) degrees:
+        // NaN" from the event thread while the drag silently did
+        // nothing. Refusing here answers every caller at once, rather
+        // than each of them learning the same lesson (#329).
+        if (!Double.isFinite(along) || !Double.isFinite(east)
+                || !Double.isFinite(north)) {
+            return new PanSolution(Optional.empty(), false, false, false);
+        }
 
         // Feasibility: |s . e| <= cos(decS), because e depends on the
         // centre's right ascension alone and cannot reach further

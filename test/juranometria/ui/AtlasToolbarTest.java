@@ -66,10 +66,16 @@ class AtlasToolbarTest {
         while (controller.state().canZoomOut()) {
             controller.zoomOut();
         }
-        assertEquals("Field 120° · Stars to V 4.0", readout(toolbar).getText(),
-                "the widest rung arrives at its own limit (#299)");
+        // The globe, reached by zooming out from the released 8
+        // degrees: the ladder's rule carries the brighter limit up
+        // with the reader, so the V 4.0 the overview's rungs impose
+        // is what arrives here rather than the globe's own V 5.0
+        // (#329).
+        assertEquals("Field 180° · Stars to V 4.0", readout(toolbar).getText(),
+                "the widest rung is the globe's, at the limit the"
+                        + " reader carried to it");
         assertFalse(button(toolbar, "Zoom out").isEnabled(),
-                "zoom out is disabled at the 42-degree bound");
+                "zoom out is disabled at the widest bound");
         controller.reset();
 
         while (controller.state().canZoomIn()) {

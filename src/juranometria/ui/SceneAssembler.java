@@ -159,78 +159,6 @@ public final class SceneAssembler {
         return assembleScene(state, widthPx, heightPx, radius);
     }
 
-    /**
-     * A scene at a field and projection the atlas does not offer a
-     * reader, for the celestial-globe gate (Sprint 32, issue #301).
-     *
-     * <p><strong>Study only, and temporary: issue #329 owns its
-     * removal</strong>, when the orthographic projection becomes a
-     * production projection and a 180-degree page becomes a rung a
-     * reader can reach. Until then there is no such rung: 180 is not
-     * a field step, the projection enum has no orthographic value,
-     * and {@link ChartViewState} goes on refusing both - which
-     * {@code CelestialGlobeDoorTest} holds it to.
-     *
-     * <p>What this does <em>not</em> do is build a second atlas. The
-     * catalogue query, the coverage check, the geography policy, the
-     * page geometry and the scene are the production ones; the only
-     * thing supplied from outside is which projection draws it. A
-     * study that assembled its own scene would be measuring itself.
-     *
-     * <p>The viewport still carries a projection <em>kind</em>,
-     * because a viewport is a production record and the enum has no
-     * value for this one. Nothing reads it here: the renderer is
-     * given the real projection through its own study door, and
-     * takes the page's identity from that. Which is the gate's
-     * question about identity arriving early, and it is recorded in
-     * the decision rather than answered by a placeholder.
-     */
-    public juranometria.project.DrawnPage assembleForStudy(SkyPosition centre,
-                                       double fieldWidthDegrees,
-                                       double limitingMagnitude,
-                                       String title,
-                                       Projection projection,
-                                       int widthPx, int heightPx) {
-        // A page rectangle cannot describe a disc. The ordinary rule
-        // asks what angle the page's corner is at, and a hemisphere's
-        // corner is past the limb, where there is no angle to give -
-        // Sprint 30's "it is sized by a different rule", arriving as
-        // a NaN. A bounded projection answers the question exactly
-        // instead: everything it can show is within its limb of the
-        // centre, and nothing beyond it exists to be queried.
-        // The whole hemisphere is queried only by a page that shows
-        // the whole hemisphere (review of #335). A narrower page
-        // drawn by a bounded projection asks the ordinary question
-        // about its own corner, or it would query the entire sky to
-        // draw a fraction of it.
-        double radius = Double.isFinite(projection.visiblePlaneRadius())
-                && fieldWidthDegrees / 2.0 >= projection.limitDegrees()
-                ? projection.limitDegrees() + objectExtentMarginDegrees
-                : queryRadiusDegrees(projection, fieldWidthDegrees,
-                        widthPx, heightPx);
-        if (!allSky) {
-            double offset = centre.separationDegrees(dataCentre);
-            if (offset + radius > coverageRadiusDegrees) {
-                throw new IllegalArgumentException(String.format(
-                        java.util.Locale.ROOT,
-                        "a study page %dx%d at %.1f degrees offset %.2f"
-                                + " needs data to %.2f degrees but"
-                                + " coverage ends at %.1f",
-                        widthPx, heightPx, fieldWidthDegrees, offset,
-                        offset + radius, coverageRadiusDegrees));
-            }
-        }
-        ChartViewport viewport = new ChartViewport(centre,
-                fieldWidthDegrees, widthPx, heightPx,
-                ChartProjection.forField(fieldWidthDegrees));
-        SkyRegion query = new SkyRegion(centre, Math.min(radius, 180.0));
-        return new juranometria.project.DrawnPage(new ChartScene(viewport,
-                catalogue.starsIn(query),
-                catalogue.deepSkyObjectsIn(query),
-                title, limitingMagnitude, null,
-                geographyFor(fieldWidthDegrees, query)), projection);
-    }
-
     private ChartScene assembleScene(ChartViewState state, int widthPx, int heightPx,
                                      double radius) {
         // The scene carries the projection the state chose, so the
@@ -363,6 +291,22 @@ public final class SceneAssembler {
     public int maxPageHeightPx(ChartProjection kind, SkyPosition centre,
                                double fieldWidthDegrees, int widthPx) {
         Projection projection = Projections.of(kind, centre);
+        // A bounded page is not corner-limited, because its corners
+        // are not sky. Every other page is a window onto a plane that
+        // goes on, so the height is whatever the corner budget has
+        // left after the width; a globe's sky stops at the limb
+        // inside the paper, and the rest of the page is margin the
+        // furniture lives in (docs/decisions/celestial-globe.md).
+        //
+        // Without this the arithmetic below is exactly right and
+        // exactly useless: half the width already reaches the whole
+        // domain, so sqrt(limit^2 - halfWidth^2) is zero and the page
+        // is 900 by 0 pixels.
+        if (Double.isFinite(projection.visiblePlaneRadius())
+                && fieldWidthDegrees / 2.0
+                        >= projection.limitDegrees()) {
+            return Integer.MAX_VALUE;
+        }
         double halfWidthPlane =
                 projection.planeRadius(fieldWidthDegrees / 2.0);
         if (allSky) {
@@ -410,6 +354,20 @@ public final class SceneAssembler {
     double queryRadiusDegrees(Projection projection,
                               double fieldWidthDegrees,
                               int widthPx, int heightPx) {
+        // A bounded page reaches its own limb and no further, and the
+        // corner arithmetic below cannot say so: the page corner lies
+        // outside the limb, where the projection has no angle to
+        // give, and what comes back is NaN rather than a radius.
+        //
+        // What a globe needs fetching is the hemisphere, plus the
+        // same object margin every other page adds - an object whose
+        // centre is just over the limb can still have a footprint on
+        // this side of it.
+        if (Double.isFinite(projection.visiblePlaneRadius())
+                && fieldWidthDegrees / 2.0
+                        >= projection.limitDegrees()) {
+            return projection.limitDegrees() + objectExtentMarginDegrees;
+        }
         double halfWidthPlane =
                 projection.planeRadius(fieldWidthDegrees / 2.0);
         double halfHeightPlane = halfWidthPlane * heightPx / (double) widthPx;

@@ -93,7 +93,10 @@ class ZoomShortcutsTest {
     @Test
     void shortcutsRespectBoundsAndCoverageLikeTheToolbar() {
         ChartViewController navigation = new ChartViewController();
-        navigation.recenter(new SkyPosition(10.684708, 41.268750), 120.0);
+        // The widest page is the globe's hemisphere now (#329), and
+        // the shortcut is guarded there exactly as it was at the
+        // overview's widest rung.
+        navigation.recenter(new SkyPosition(10.684708, 41.268750), 180.0);
         JRootPane root = new JRootPane();
         AppMenuBar.installZoomShortcuts(root, navigation);
         int[] notified = {0};
@@ -101,7 +104,7 @@ class ZoomShortcutsTest {
         notified[0] = 0;
         fire(boundAction(root,
                 KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, MASK)));
-        assertEquals(120.0, navigation.state().fieldWidthDegrees(),
+        assertEquals(180.0, navigation.state().fieldWidthDegrees(),
                 "zoom out at the widest page is a guarded no-op");
         assertEquals(0, notified[0], "and notifies nobody");
 
@@ -130,7 +133,7 @@ class ZoomShortcutsTest {
     @Test
     void theViewMenuGainsCentrePreservingZoomItemsWithAccelerators() {
         ChartViewController navigation = new ChartViewController();
-        navigation.recenter(new SkyPosition(10.684708, 41.268750), 120.0);
+        navigation.recenter(new SkyPosition(10.684708, 41.268750), 180.0);
         JMenuBar bar = AppMenuBar.create(navigation, null, () -> { },
                 () -> { });
         JMenu view = bar.getMenu(0);
@@ -148,7 +151,7 @@ class ZoomShortcutsTest {
                         + " cannot zoom out");
         assertTrue(zoomIn.isEnabled());
         zoomIn.doClick();
-        assertEquals(90.0, navigation.state().fieldWidthDegrees(),
+        assertEquals(120.0, navigation.state().fieldWidthDegrees(),
                 "the menu item is the toolbar's centre-preserving step");
         assertTrue(zoomOut.isEnabled(),
                 "enablement updates with the state");

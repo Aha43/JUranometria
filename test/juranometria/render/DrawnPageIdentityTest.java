@@ -207,17 +207,31 @@ class DrawnPageIdentityTest {
                 BufferedImage.TYPE_INT_RGB);
         java.awt.Graphics2D g = canvas.createGraphics();
         try {
-            ChartRenderer renderer = ChartRenderer.drawing(page,
+            ChartRenderer renderer = new ChartRenderer(
                     StarSizePolicy.DEFAULT);
             java.awt.Rectangle box = ChartRenderer.titleBlockLayout(
                     g.getFontMetrics(), page.scene(),
                     page.projectionName());
             assertTrue(box != null && box.width > 0,
                     "the block is sized from the words it will carry");
-            assertThrows(IllegalArgumentException.class,
-                    () -> renderer.render(g, sceneSayingStereographic()),
-                    "and a renderer told one page's projection refuses"
-                            + " to draw a different page with it");
+            // The refusal that used to be here belonged to the study
+            // door: a renderer built around one page had to reject
+            // every other. #329 removed the door, because a page and
+            // its viewport name the same projection at every rung
+            // now. What replaces it is the positive rule - a renderer
+            // draws whatever page it is handed, by that page's own
+            // projection, and says so in the block.
+            java.awt.Rectangle other = ChartRenderer.titleBlockLayout(
+                    g.getFontMetrics(), sceneSayingStereographic(),
+                    DrawnPage.of(sceneSayingStereographic())
+                            .projectionName());
+            assertTrue(other != null && other.width > 0,
+                    "the same renderer sizes a block for another page");
+            assertEquals("stereographic",
+                    DrawnPage.of(sceneSayingStereographic())
+                            .projectionName(),
+                    "and that page is named by what draws it, not by"
+                            + " what drew the last one");
         } finally {
             g.dispose();
         }

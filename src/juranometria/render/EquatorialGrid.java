@@ -268,6 +268,46 @@ public final class EquatorialGrid {
         }
     }
 
+    /** The paper's own four edges, for a page that is sky to them. */
+    private static java.util.List<PixelPoint> aroundTheEdges(
+            ChartViewport viewport, int perEdge) {
+        java.util.List<PixelPoint> walk = new java.util.ArrayList<>();
+        for (int i = 0; i <= perEdge; i++) {
+            double fx = (double) i / perEdge * (viewport.widthPx() - 1);
+            double fy = (double) i / perEdge * (viewport.heightPx() - 1);
+            walk.add(new PixelPoint(fx, 0));
+            walk.add(new PixelPoint(fx, viewport.heightPx() - 1));
+            walk.add(new PixelPoint(0, fy));
+            walk.add(new PixelPoint(viewport.widthPx() - 1, fy));
+        }
+        return walk;
+    }
+
+    /**
+     * The limb, for a page whose sky ends inside the paper.
+     *
+     * <p>Sampled a hair inside it, because the limb is where the
+     * inverse is at its worst conditioned: the whole far hemisphere
+     * is squeezed into the last sliver of plane radius, and a point
+     * one part in a million outside answers nothing at all.
+     */
+    private static java.util.List<PixelPoint> aroundTheLimb(
+            ViewportMapping mapping,
+            juranometria.project.Projection projection, int around) {
+        java.util.List<PixelPoint> walk = new java.util.ArrayList<>();
+        double radius = projection.visiblePlaneRadius() * (1.0 - 1.0e-9);
+        for (int i = 0; i < around; i++) {
+            double angle = 2.0 * Math.PI * i / around;
+            walk.add(mapping.toPixel(
+                    new juranometria.project.PlanePoint(
+                            radius * Math.cos(angle),
+                            radius * Math.sin(angle))));
+        }
+        walk.add(mapping.toPixel(
+                new juranometria.project.PlanePoint(0.0, 0.0)));
+        return walk;
+    }
+
     public static SkyBounds boundsFor(DrawnPage page) {
         ChartViewport viewport = page.scene().viewport();
         var projection = page.projection();
@@ -276,25 +316,30 @@ public final class EquatorialGrid {
         double decMin = 90.0;
         double decMax = -90.0;
         double maxDelta = 0.0;
+        // Where a page's sky ends, which is not the same question on
+        // every page. A chart page is sky to its corners, so its own
+        // edges are the boundary to walk. A globe's edges are paper:
+        // walking them finds nothing, and a first attempt at this
+        // simply skipped the samples that had no sky - which left a
+        // hemisphere with a declination span of nothing and ONE
+        // parallel drawn across it (#329). The boundary of a bounded
+        // page is its limb, so that is what gets walked.
         int perEdge = 32;
-        for (int i = 0; i <= perEdge; i++) {
-            double fx = (double) i / perEdge * (viewport.widthPx() - 1);
-            double fy = (double) i / perEdge * (viewport.heightPx() - 1);
-            for (PixelPoint pixel : new PixelPoint[] {
-                    new PixelPoint(fx, 0),
-                    new PixelPoint(fx, viewport.heightPx() - 1),
-                    new PixelPoint(0, fy),
-                    new PixelPoint(viewport.widthPx() - 1, fy)}) {
-                SkyPosition sky = juranometria.project.PanSolver
-                        .skyFromPlane(viewport,
-                                juranometria.project.PanSolver
-                                        .planeFromPixel(viewport, pixel));
-                decMin = Math.min(decMin, sky.decDegrees());
-                decMax = Math.max(decMax, sky.decDegrees());
-                double raw = (((sky.raDegrees() - centreRa) % 360.0)
-                        + 540.0) % 360.0 - 180.0;
-                maxDelta = Math.max(maxDelta, Math.abs(raw));
+        for (PixelPoint pixel : page.bounded()
+                ? aroundTheLimb(mapping, projection, 4 * perEdge)
+                : aroundTheEdges(viewport, perEdge)) {
+            var under = juranometria.project.PanSolver
+                    .skyAt(viewport, juranometria.project.PanSolver
+                            .planeFromPixel(viewport, pixel));
+            if (under.isEmpty()) {
+                continue;
             }
+            SkyPosition sky = under.get();
+            decMin = Math.min(decMin, sky.decDegrees());
+            decMax = Math.max(decMax, sky.decDegrees());
+            double raw = (((sky.raDegrees() - centreRa) % 360.0)
+                    + 540.0) % 360.0 - 180.0;
+            maxDelta = Math.max(maxDelta, Math.abs(raw));
         }
         boolean fullRa = false;
         for (double pole : new double[] {89.9999, -89.9999}) {

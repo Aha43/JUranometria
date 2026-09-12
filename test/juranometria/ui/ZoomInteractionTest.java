@@ -154,9 +154,11 @@ class ZoomInteractionTest {
         Fixture fixture = new Fixture();
         // Out to the widest page, then one more: consumed, unchanged.
         // Three more notches than before #299 put the overview's
-        // rungs above the sheet page.
-        fixture.wheel(450, 350, 8.0);
-        assertEquals(120.0, fixture.controller.state().fieldWidthDegrees());
+        // rungs above the sheet page, and one more again since #329
+        // put the globe above those. The pointer is the page centre,
+        // which is sky on every rung including the globe's.
+        fixture.wheel(450, 350, 9.0);
+        assertEquals(180.0, fixture.controller.state().fieldWidthDegrees());
         ChartViewState atBound = fixture.controller.state();
         MouseWheelEvent beyond = fixture.wheel(450, 350, 1.0);
         assertTrue(beyond.isConsumed(),

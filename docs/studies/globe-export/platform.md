@@ -28,18 +28,18 @@ Marginal costs, which do not sum: ink overlaps, so removing two layers
 recovers less than the two rows together.
 
   page                        beyond limb    within 1%  further out
-  everything                        13632         2040        11592
-  without star names                10709         1953         8756   (-2923)
-  without the grid                  13542         1950        11592   (-90)
-  without figures                    9069         1653         7416   (-4563)
-  without star marks                13632         2040        11592   (+0)
-  without deep-sky symbols          12948         1909        11039   (-684)
-  without constellation names         9215         1792         7423   (-4417)
+  everything                        13677         2085        11592
+  without star names                10762         2006         8756   (-2915)
+  without the grid                  13542         1950        11592   (-135)
+  without figures                    9132         1716         7416   (-4545)
+  without star marks                13677         2085        11592   (+0)
+  without deep-sky symbols          12993         1954        11039   (-684)
+  without constellation names         9268         1845         7423   (-4409)
 ## The writer, layer by layer
 
   layer                       both  page only  file only  furthest  beyond
   constellation figures      74013       3042        286      1.0px       0
-  the grid                   73416       3049        314      1.4px       0
+  the grid                   73946       3050        322      1.4px       0
   deep-sky symbols           83516       2943        319      1.0px       0
   star marks                 72354       2881        268      1.0px       0
   star names             every difference is an edge within the bound
@@ -52,12 +52,12 @@ recovers less than the two rows together.
 
 ## The core globe, no modules
 
-  SVG   1643869 bytes  209 text elements, 38 anchored outside the limb
-  PDF   1967905 bytes  geometry not read back from this format
-  PNG   1028128 bytes  1041163 px inside the limb, 99625 beyond it
+  SVG   1653094 bytes  209 text elements, 38 anchored outside the limb
+  PDF   1976100 bytes  geometry not read back from this format
+  PNG   1028817 bytes  1042014 px inside the limb, 99625 beyond it
 
 ## The same globe with modules
 
-  SVG   1646421 bytes  214 text elements, 42 anchored outside the limb
-  PDF   1998956 bytes  geometry not read back from this format
-  PNG   1092899 bytes  1084259 px inside the limb, 113610 beyond it
+  SVG   1654385 bytes  211 text elements, 39 anchored outside the limb
+  PDF   1992918 bytes  geometry not read back from this format
+  PNG   1060743 bytes  1064419 px inside the limb, 103494 beyond it

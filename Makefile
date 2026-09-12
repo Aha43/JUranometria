@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run run-log test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -56,7 +56,8 @@ help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "  all    Build the app (default)"
-	@echo "  run    Build and launch the app"
+	@echo "  run    Build and launch the app (also logs to build/run.log)"
+	@echo "  run-log  What the last run said, and whether it threw"
 	@echo "  test         Compile and run unit tests"
 	@echo "  chart-image  Write the deterministic reference chart image"
 	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
@@ -156,11 +157,81 @@ app: jar
 	mkdir -p $(APP_DIR)/lib
 	cp $(LIB_DIR)/*.jar $(APP_DIR)/lib/
 
+# Where a run's own words go, kept as well as shown.
+#
+# Swing prints an uncaught exception from the event thread to stderr
+# and carries on: the window looks fine, the reader notices nothing,
+# and the only record scrolls past in a terminal nobody was watching.
+# So the run is teed - the terminal still shows everything live, and
+# build/run.log keeps it to read afterwards - and the tail of the
+# recipe says whether anything was thrown, because a log you have to
+# remember to open is a log you find out about too late.
+#
+# Appended, never truncated, with a dated banner per run: the
+# interesting case is usually "it happened that time and not this
+# time", which a file overwritten on every launch cannot answer.
+RUN_LOG := $(BUILD_DIR)/run.log
+
+# Everything since the last banner. Named once because three recipes
+# want it, and awk rather than sed because the sed idiom for it is
+# GNU's and this is the target most likely to be run on a Mac.
+LAST_RUN = awk '/^==== /{buf=""} {buf = buf $$0 "\n"} \
+	END{printf "%s", buf}' $(RUN_LOG)
+
+# The thrown lines of the last run, and nothing else.
+THROWN = $(LAST_RUN) | grep -E '(Exception|Error|Throwable)'
+
+run: SHELL := /bin/bash
 run: app
-	$(JAVA) \
+	@mkdir -p $(BUILD_DIR)
+	@printf '\n==== %s  make run\n' "$$(date '+%Y-%m-%d %H:%M:%S')" \
+		>> $(RUN_LOG)
+	@echo "  this run is also being written to $(RUN_LOG)"
+	@set -o pipefail; $(JAVA) \
 		--enable-native-access=ALL-UNNAMED \
 		-cp "$(APP_DIR)/$(MAIN_JAR):$(APP_DIR)/lib/*" \
-		$(MAIN_CLASS)
+		$(MAIN_CLASS) 2>&1 | tee -a $(RUN_LOG); \
+		status=$$?; \
+		thrown=$$($(THROWN) -c || true); \
+		if [ "$$thrown" -gt 0 ]; then \
+			echo ""; \
+			echo "  $$thrown line(s) in this run named an exception."; \
+			echo "  The application may have carried on regardless -"; \
+			echo "  Swing catches what the event thread throws - so"; \
+			echo "  read them even if nothing looked wrong:"; \
+			echo ""; \
+			$(THROWN) | head -5 | sed 's/^/      /'; \
+			echo ""; \
+			echo "  All of it: $(RUN_LOG)"; \
+		fi; \
+		exit $$status
+
+# What the last run said, for when the terminal is gone.
+#
+# The summary make run prints scrolls away with the window it was in,
+# and the question afterwards is always the same one: did that launch
+# throw anything, and what. This answers it without launching
+# anything, which matters when what is being asked about is a run that
+# looked fine.
+run-log: SHELL := /bin/bash
+run-log:
+	@if [ ! -f $(RUN_LOG) ]; then \
+		echo "  no run has been logged yet: $(RUN_LOG)"; \
+		echo "  make run writes it"; \
+		exit 0; \
+	fi; \
+	printf '  the last run, from %s\n' \
+		"$$(grep '^==== ' $(RUN_LOG) | tail -1 | sed 's/^==== //')"; \
+	thrown=$$($(THROWN) -c || true); \
+	if [ "$$thrown" -eq 0 ]; then \
+		echo "  threw nothing."; \
+	else \
+		echo "  threw $$thrown line(s):"; \
+		echo ""; \
+		$(THROWN) | sed 's/^/      /'; \
+	fi; \
+	echo ""; \
+	echo "  the whole log: $(RUN_LOG)"
 
 chart-image: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.app.ChartImageMain

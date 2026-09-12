@@ -167,7 +167,12 @@ public final class ChartHitTest {
                                     double x, double y) {
         PlanePoint plane = PanSolver.planeFromPixel(page,
                 new PixelPoint(x, y));
-        return PanSolver.skyFromPlane(page, plane);
+        // Null where the page has no sky, which a bounded page has
+        // outside its limb. Every page was sky to its corners until
+        // the globe, so this could only ever answer; now the paper
+        // around the disc is a place a reader can point at and the
+        // honest answer is nothing (#301, #329).
+        return page.projection().unproject(plane).orElse(null);
     }
 
     private static boolean onPaper(ChartScene scene, double x, double y) {

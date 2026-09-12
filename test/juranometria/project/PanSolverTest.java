@@ -189,4 +189,81 @@ class PanSolverTest {
         assertTrue(pastPole.pastPole(),
                 "the hold carries the solver's own past-pole evidence");
     }
+
+    @org.junit.jupiter.api.Test
+    void aTargetTheProjectionCannotReadIsNoCentreRatherThanANaNOne() {
+        // The fault a reader found by dragging on the first real
+        // globe: 245 exceptions from the event thread in one session,
+        // every one of them "right ascension must be in [0, 360)
+        // degrees: NaN", while the drag silently did nothing.
+        //
+        // Every page had sky at every plane point until the globe, so
+        // this could not arise and the arithmetic trusted its inputs.
+        // A bounded page has paper past its limb: asking what angle a
+        // plane radius beyond it stands for answers NaN, and the NaN
+        // travelled all the way to a SkyPosition, which refused it.
+        juranometria.chart.SkyPosition centre =
+                new juranometria.chart.SkyPosition(266.0, -28.0);
+        for (double beyond : new double[] {1.0001, 1.5, 2.0, 40.0}) {
+            PanSolver.PanSolution solution = PanSolver.solveCentre(
+                    juranometria.chart.ChartProjection.ORTHOGRAPHIC,
+                    M42, new PlanePoint(beyond, 0.0), centre);
+            org.junit.jupiter.api.Assertions.assertTrue(
+                    solution.centre().isEmpty(),
+                    "a target " + beyond + " plane units out is past"
+                            + " the limb and has no centre");
+        }
+        // And the limb itself still solves: the refusal is about sky
+        // that is not there, not about the edge of the sky that is.
+        org.junit.jupiter.api.Assertions.assertTrue(
+                PanSolver.solveCentre(
+                        juranometria.chart.ChartProjection.ORTHOGRAPHIC,
+                        M42, new PlanePoint(1.0, 0.0), centre)
+                        .centre().isPresent(),
+                "the limb is a place a grab can be taken to");
+    }
+
+    @org.junit.jupiter.api.Test
+    void draggingOffAGlobeIsRefusedAndTheReaderIsNotMoved() {
+        // The same thing where the reader meets it. Grabbing a star
+        // on the disc and dragging it onto the paper is a gesture
+        // with no answer, and what a gesture with no answer does is
+        // nothing (docs/decisions/celestial-globe.md).
+        juranometria.chart.SkyPosition centre =
+                new juranometria.chart.SkyPosition(266.0, -28.0);
+        juranometria.chart.ChartViewport page =
+                new juranometria.chart.ChartViewport(centre, 180.0,
+                        900, 700);
+        juranometria.ui.ChartViewController controller =
+                new juranometria.ui.ChartViewController();
+        controller.recenter(centre, 180.0);
+        juranometria.chart.SkyPosition grabbed = PanSolver.skyAt(page,
+                PanSolver.planeFromPixel(page,
+                        new PixelPoint(500, 380))).orElseThrow();
+
+        juranometria.chart.ChartViewState before = controller.state();
+        int[] notified = {0};
+        controller.onChange(state -> notified[0]++);
+        notified[0] = 0;
+        for (int[] onThePaper : new int[][] {{5, 5}, {895, 5},
+                {5, 695}, {895, 695}}) {
+            org.junit.jupiter.api.Assertions.assertFalse(
+                    controller.pan(grabbed, PanSolver.planeFromPixel(page,
+                            new PixelPoint(onThePaper[0],
+                                    onThePaper[1]))),
+                    "dragging onto the paper at " + onThePaper[0] + ","
+                            + onThePaper[1] + " is refused");
+        }
+        org.junit.jupiter.api.Assertions.assertEquals(before,
+                controller.state(), "and the page did not move");
+        org.junit.jupiter.api.Assertions.assertEquals(0, notified[0],
+                "and nobody was told it did");
+
+        // While a drag that stays on the disc still moves the page:
+        // the refusal is narrow, not a globe that cannot be dragged.
+        org.junit.jupiter.api.Assertions.assertTrue(
+                controller.pan(grabbed, PanSolver.planeFromPixel(page,
+                        new PixelPoint(520, 360))),
+                "a drag within the sky still pans");
+    }
 }

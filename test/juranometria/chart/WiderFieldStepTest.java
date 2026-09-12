@@ -39,18 +39,23 @@ class WiderFieldStepTest {
 
     @Test
     void theSequenceGainedTheStepTheGateChoseAndNothingElse() {
-        assertEquals(List.of(120.0, 90.0, 60.0, 42.0, 36.0, 24.0, 18.0,
-                        12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
+        assertEquals(List.of(180.0, 120.0, 90.0, 60.0, 42.0, 36.0,
+                        24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
                 ChartViewState.fieldWidthSteps(),
-                "this step at the top of the released order, and the"
-                        + " three the overview added above it (#299)");
+                "this step at the top of the released order, the three"
+                        + " the overview added above it (#299), and"
+                        + " the globe's hemisphere above those (#329)");
 
         // The fields the gate measured and rejected stay unreachable.
         // 45 and 48 exceed the 12% anisotropy budget; 40 is inside it
         // but was not chosen, and an unchosen field is not a step.
         // 60 became a step when a projection arrived that draws it,
         // and it is the overview's rather than this gate's.
-        for (double rejected : new double[] {40.0, 45.0, 48.0, 180.0}) {
+        // 180 left this list when a projection arrived that draws a
+        // hemisphere: it is the globe's rung now, and the fields
+        // between the rungs are as unreachable as they ever were.
+        for (double rejected : new double[] {40.0, 45.0, 48.0, 150.0,
+                181.0}) {
             assertThrows(IllegalArgumentException.class,
                     () -> new ChartViewState(new SkyPosition(83.0, 0.0),
                             rejected, 6.0),
@@ -64,9 +69,9 @@ class WiderFieldStepTest {
         while (state.canZoomOut()) {
             state = state.zoomOut();
         }
-        assertEquals(120.0, state.fieldWidthDegrees(),
-                "the widest page a reader can reach is the overview's"
-                        + " widest rung (#299)");
+        assertEquals(180.0, state.fieldWidthDegrees(),
+                "the widest page a reader can reach is the globe's"
+                        + " hemisphere (#329)");
         assertFalse(state.canZoomOut(), "and it is the end of the road");
         assertSame(state, state.zoomOut(),
                 "zooming out there is a clean no-op, as at every other"
@@ -75,9 +80,9 @@ class WiderFieldStepTest {
         // And the sheet page is still one step above the released
         // widest, not a jump past it: the reader still passes
         // through 36 on the way down from it.
-        ChartViewState sheet = state.zoomIn().zoomIn().zoomIn();
+        ChartViewState sheet = state.zoomIn().zoomIn().zoomIn().zoomIn();
         assertEquals(42.0, sheet.fieldWidthDegrees(),
-                "the sheet page is three rungs below the widest");
+                "the sheet page is four rungs below the widest");
         assertEquals(36.0, sheet.zoomIn().fieldWidthDegrees(),
                 "36 is now a stop on the way rather than the end");
         assertEquals(42.0, sheet.zoomIn().zoomOut().fieldWidthDegrees(),

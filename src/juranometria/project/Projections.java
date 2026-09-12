@@ -22,6 +22,7 @@ public final class Projections {
         return switch (kind) {
             case GNOMONIC -> new GnomonicProjection(centre);
             case STEREOGRAPHIC -> new StereographicProjection(centre);
+            case ORTHOGRAPHIC -> new OrthographicProjection(centre);
         };
     }
 

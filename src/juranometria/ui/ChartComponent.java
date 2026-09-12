@@ -114,6 +114,29 @@ public final class ChartComponent extends JComponent {
         return chartOptions;
     }
 
+    /**
+     * The options this page is actually drawn with (Sprint 32, issue
+     * #329).
+     *
+     * <p>The reader's own, as the page has them: a globe turns
+     * constellation boundaries off, because the gate measured them
+     * costing more ink than any other layer at a limb carrying half
+     * the sky (docs/decisions/celestial-globe.md). Nothing is stored,
+     * so the reader's switches are exactly as they left them.
+     *
+     * <p>Kept apart from {@link #chartOptions()} on purpose. That one
+     * is what the reader chose and what the dialog edits; this one is
+     * what the page shows, and the inventory has to agree with the
+     * ink rather than with the switches - an inventory listing a
+     * boundary the page does not draw is the fault #217 was about,
+     * the other way round.
+     */
+    public juranometria.render.ChartOptions drawnOptions() {
+        return scene == null ? chartOptions
+                : chartOptions.onPage(
+                        juranometria.project.DrawnPage.of(scene));
+    }
+
     ChartScene scene() {
         return scene;
     }
@@ -271,18 +294,18 @@ public final class ChartComponent extends JComponent {
             // only moment it can be laid down (#227). With no module
             // contributing, the layer is empty and the page is the
             // released page.
-            renderer.render(g2, scene, chartOptions,
+            juranometria.render.ChartOptions drawn = drawnOptions();
+            renderer.render(g2, scene, drawn,
                     (layerG, layerScene) -> ReferenceInk.paint(layerG,
                             layerScene, overlays.collect(),
-                            chartOptions.palette()));
+                            drawn.palette()));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its
             // cross and an off-page member leaves no ink at all -
             // never both treatments for one object.
             for (String member : selected) {
-                renderer.drawSelectionHighlight(g2, scene, chartOptions,
-                        member);
+                renderer.drawSelectionHighlight(g2, scene, drawn, member);
             }
             // After the chart, never inside it: working crosses are
             // an interaction overlay and not catalogue symbols, so

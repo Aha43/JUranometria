@@ -105,9 +105,8 @@ public final class GlobeFurnitureStudyMain {
 
     private static void measure(GlobeDensityStudyMain.Look look)
             throws IOException {
-        DrawnPage page = Atlas.assembler().assembleForStudy(
-                look.centre(), 180.0, LIMIT, look.title(),
-                new GlobeProjection(look.centre()), SIDE_PX, SIDE_PX);
+        DrawnPage page = GlobePage.of(look.centre(), LIMIT, SIDE_PX,
+                SIDE_PX);
 
         BufferedImage drawn = render(page, all());
         System.out.printf(Locale.ROOT, "%-13s %-22s%n",
@@ -141,7 +140,7 @@ public final class GlobeFurnitureStudyMain {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            ChartRenderer.drawing(page, StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();

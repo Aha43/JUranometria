@@ -981,7 +981,8 @@ public final class PackagedAcceptanceMain {
         var pointer = PanSolver.planeFromPixel(viewport,
                 new PixelPoint(700, 250));
         var under = PanSolver.skyFromPlane(viewport, pointer);
-        var outcome = navigation.zoomAt(pointer, true);
+        var outcome = navigation.zoomAt(pointer, true, viewport.widthPx(),
+                viewport.heightPx());
         require(outcome == ChartViewController.PointerZoomOutcome.ACCEPTED,
                 "a pointer zoom in open sky is accepted: " + outcome);
         require(navigation.state().fieldWidthDegrees() == 12.0,

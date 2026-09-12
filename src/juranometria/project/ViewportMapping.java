@@ -143,16 +143,27 @@ public final class ViewportMapping {
      * enabled: a globe that changed size when the reader turned the
      * magnitude key on would be a globe whose scale meant nothing.
      *
-     * <p>The fraction is overridable only while the gate is choosing
-     * it, so the candidates can be compared by eye at one sitting.
-     * <strong>Issue #329 removes the override</strong> and leaves the
-     * constant.
+     * <p>Ninety per cent, measured. The candidates were 100, 94, 90
+     * and 86 per cent of the short side, compared across three
+     * containers and three furniture states on the crowded
+     * hemisphere, because a border that survives the worst page is a
+     * border that works: 100 is not a margin but a clipped globe, 94
+     * is the first size that closes the circle, and 90 leaves about
+     * 10.5 mm on each side of A4's short dimension without making the
+     * sphere feel small (docs/decisions/celestial-globe.md).
+     *
+     * <p>It was a JVM-wide property while the gate was choosing, so
+     * the candidates could be seen side by side at one sitting. That
+     * override is gone with #329, and it left a lesson behind: the
+     * study that set it did not put it back, so every globe drawn
+     * after it in one process was four per cent too small, and the
+     * pointing study reported a pixel at r = 0.95 as 83.8 degrees out
+     * instead of 71.8. A constant cannot do that.
      */
     private static final double GLOBE_FRAME = 0.90;
 
     private static double globeFrame() {
-        String chosen = System.getProperty("juranometria.globeFrame");
-        return chosen == null ? GLOBE_FRAME : Double.parseDouble(chosen);
+        return GLOBE_FRAME;
     }
 
     /** Pixels per tangent-plane unit; multiply an angle in radians to get
@@ -211,8 +222,22 @@ public final class ViewportMapping {
         }
 
         double determinant = 4.0 * here.a() * here.c() - here.b() * here.b();
-        if (determinant == 0.0) {
-            return tangentAtTheCentre(here, slope);
+        // Degenerate by size, not by equality. A projection that
+        // clears a square root by squaring hands back a perfect
+        // square whose determinant is zero exactly and 1.5e-32 in a
+        // double - and PlaneConic's own note says it: a form that has
+        // to be rescued by a tolerance near its degenerate case, and
+        // cannot be rescued by an equality either, is being asked the
+        // wrong question. The scale to judge against is the conic's
+        // own quadratic part, so the test means the same thing at
+        // every size of page.
+        double quadratic = Math.abs(here.a()) + Math.abs(here.b())
+                + Math.abs(here.c());
+        if (Math.abs(determinant)
+                <= DEGENERATE_CONIC * quadratic * quadratic) {
+            PlaneCurve doubled = doubleLine(here);
+            return doubled != null ? doubled
+                    : tangentAtTheCentre(here, slope);
         }
         double middleX = (here.b() * here.e() - 2.0 * here.c() * here.d())
                 / determinant;
@@ -259,6 +284,64 @@ public final class ViewportMapping {
         // seam. Leaving it out would have put the redesign back.
         return new PlaneCurve.Elliptical(middleX, middleY, radiusAlong,
                 radiusAcross, tilt);
+    }
+
+    /**
+     * How far from zero a determinant may be and still be zero, as a
+     * fraction of the conic's own quadratic scale: a few dozen ulps,
+     * which is what squaring and mapping cost it.
+     */
+    private static final double DEGENERATE_CONIC = 64.0 * Math.ulp(1.0);
+
+    /**
+     * The line a conic that is a perfect square really is, or null
+     * when it is not one.
+     *
+     * <p>A projection showing a hemisphere clears a square root by
+     * squaring, so the great circle through its page centre comes
+     * back as {@code -(p x + q y + r)^2 = 0} - one line, counted
+     * twice. Its determinant is zero like a line's, and its gradient
+     * is zero everywhere <em>on</em> it, so asking for the tangent at
+     * the page centre asks for the direction of a point and gets
+     * {@code NaN, NaN, NaN}.
+     *
+     * <p>The coefficients say it exactly:
+     * {@code a = -p^2, b = -2pq, c = -q^2, d = -2pr, e = -2qr,
+     * f = -r^2}. Recovered from the larger of {@code p} and
+     * {@code q}, so the division is by the better-conditioned of the
+     * two.
+     */
+    private static PlaneCurve doubleLine(PlaneConic here) {
+        // Either sign. A conic and its negation are the same curve,
+        // and which one a projection writes is its own business: the
+        // globe's own form carries a negative quadratic part, the
+        // seam's independent fixture for the same geometry carries a
+        // positive one, and a recovery that knew only one convention
+        // answered NaN for the other. That fixture found it.
+        double sign = here.a() > 0.0 || here.c() > 0.0 ? -1.0 : 1.0;
+        double a = sign * here.a();
+        double b = sign * here.b();
+        double c = sign * here.c();
+        double d = sign * here.d();
+        double e = sign * here.e();
+        if (a > 0.0 || c > 0.0 || (a == 0.0 && c == 0.0)) {
+            return null;
+        }
+        double p = Math.sqrt(-a);
+        double q = Math.sqrt(-c);
+        double r;
+        if (p >= q) {
+            q = Math.copySign(q, -b * p == 0.0 ? 1.0 : -b);
+            r = -d / (2.0 * p);
+        } else {
+            p = Math.copySign(p, -b * q == 0.0 ? 1.0 : -b);
+            r = -e / (2.0 * q);
+        }
+        if (!Double.isFinite(p) || !Double.isFinite(q)
+                || !Double.isFinite(r) || Math.hypot(p, q) == 0.0) {
+            return null;
+        }
+        return PlaneCurve.Straight.of(r, p, q);
     }
 
     /** The conic's own tangent where the page is. */

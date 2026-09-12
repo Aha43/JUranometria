@@ -109,16 +109,14 @@ public final class GlobeStudyMain {
     }
 
     private static void draw(Look look) throws IOException {
-        DrawnPage page = Atlas.assembler().assembleForStudy(
-                look.centre(), 180.0, look.limitingMagnitude(),
-                look.title(), new GlobeProjection(look.centre()),
-                SIDE_PX, SIDE_PX);
+        DrawnPage page = GlobePage.of(look.centre(),
+                look.limitingMagnitude(), SIDE_PX, SIDE_PX);
 
         BufferedImage canvas = new BufferedImage(SIDE_PX, SIDE_PX,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            ChartRenderer.drawing(page, StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT)
                     .render(g, page.scene(), ChartOptions.DEFAULTS);
         } finally {
             g.dispose();

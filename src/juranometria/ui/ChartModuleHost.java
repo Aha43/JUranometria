@@ -95,8 +95,12 @@ public final class ChartModuleHost implements ChartServices {
     /** Rebuilds the inventory and tells whoever is listening. */
     private void rebuild() {
         ChartScene scene = chart.currentScene();
+        // The options the page draws with, not the ones the reader
+        // chose: on a globe those differ, and an inventory that
+        // listed a layer the page does not draw would be describing
+        // another page (#329).
         inventory = scene == null ? PageContents.EMPTY
-                : PageInventory.of(scene, chart.chartOptions());
+                : PageInventory.of(scene, chart.drawnOptions());
         for (Consumer<PageContents> listener : List.copyOf(pageListeners)) {
             listener.accept(inventory);
         }

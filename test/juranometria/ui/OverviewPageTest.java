@@ -82,11 +82,22 @@ class OverviewPageTest {
         controller.zoomOut();
         controller.zoomOut();
         assertEquals(120.0, controller.state().fieldWidthDegrees(),
-                "three rungs, and the widest the sky is offered at");
-        assertFalse(controller.state().canZoomOut(),
-                "180 degrees is drawable and not readable, so it is"
-                        + " not offered");
+                "three rungs, and the widest the overview draws");
+        assertTrue(controller.state().canZoomOut(),
+                "with the globe above it: 180 degrees is a rung now,"
+                        + " drawn by a projection that has a limb"
+                        + " (#329)");
 
+        controller.zoomOut();
+        assertEquals(180.0, controller.state().fieldWidthDegrees(),
+                "and that is the end of the ladder");
+        assertEquals(ChartProjection.ORTHOGRAPHIC,
+                controller.state().projection(),
+                "drawn by the globe's own projection");
+        assertFalse(controller.state().canZoomOut(),
+                "a hemisphere is all the sky one page can hold");
+
+        controller.zoomIn();
         controller.zoomIn();
         controller.zoomIn();
         controller.zoomIn();
@@ -204,7 +215,14 @@ class OverviewPageTest {
             ReaderInput.click(out);
             assertEquals(120.0,
                     onEdt(() -> navigation[0].state().fieldWidthDegrees()),
-                    "three presses reach the widest rung");
+                    "three presses reach the overview's widest rung");
+            assertTrue(onEdt(out::isEnabled),
+                    "and the control offers the globe above it");
+
+            ReaderInput.click(out);
+            assertEquals(180.0,
+                    onEdt(() -> navigation[0].state().fieldWidthDegrees()),
+                    "a fourth press reaches the globe");
             assertFalse(onEdt(out::isEnabled),
                     "and the control says the ladder ends there");
 
@@ -254,9 +272,11 @@ class OverviewPageTest {
 
             ReaderInput.click(in);
             ReaderInput.click(in);
+            ReaderInput.click(in);
             assertEquals(60.0,
                     onEdt(() -> navigation[0].state().fieldWidthDegrees()),
-                    "two presses back down the overview's own rungs");
+                    "three presses back down: the globe's rung, then"
+                            + " the overview's own two");
             assertTrue(onEdt(() -> navigation[0].state().overview()),
                     "still a wide page");
 
@@ -449,7 +469,7 @@ class OverviewPageTest {
         // detailed atlas's, drawn by the projection that field
         // belongs to.
         ChartViewController controller = new ChartViewController();
-        controller.recenter(ORION, 120.0);
+        controller.recenter(ORION, 180.0);
         ChartScene overview = Atlas.assembler().assemble(
                 controller.state(), WIDE, HIGH);
         SkyPosition clicked = ChartHitTest.skyAt(overview, 700.0, 210.0);
@@ -782,10 +802,10 @@ class OverviewPageTest {
         // the sequence's own ends, and a pointer whose anchor the
         // geometry cannot pin.
         ChartViewController controller = new ChartViewController();
-        controller.recenter(ORION, 120.0);
+        controller.recenter(ORION, 180.0);
         ChartViewState before = controller.state();
         assertEquals(ChartViewController.PointerZoomOutcome.AT_BOUND,
-                controller.zoomAt(new PlanePoint(0.2, 0.1), false),
+                controller.zoomAt(new PlanePoint(0.2, 0.1), false, 900, 700),
                 "the widest rung is the end of the sequence");
         assertEquals(before, controller.state(), "and nothing moved");
 
@@ -800,7 +820,7 @@ class OverviewPageTest {
                 new PixelPoint(899.0, 1.0));
         assertEquals(ChartViewController.PointerZoomOutcome
                         .INFEASIBLE_POINTER,
-                polar.zoomAt(corner, true),
+                polar.zoomAt(corner, true, 900, 700),
                 "a pointer the geometry cannot pin is refused");
         assertEquals(polarBefore, polar.state(),
                 "and the chart is exactly as it was");
@@ -845,7 +865,7 @@ class OverviewPageTest {
         ChartViewController controller = new ChartViewController();
         assertEquals(ChartViewState.DEFAULT, controller.state(),
                 "a new controller is Home, whatever the last one saw");
-        controller.recenter(ORION, 120.0);
+        controller.recenter(ORION, 180.0);
         controller.reset();
         assertEquals(ChartViewState.DEFAULT, controller.state(),
                 "and Home from the overview is the complete default -"

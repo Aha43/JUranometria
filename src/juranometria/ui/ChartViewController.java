@@ -205,7 +205,8 @@ public final class ChartViewController {
      * one notification.
      */
     public PointerZoomOutcome zoomAt(juranometria.project.PlanePoint pointer,
-                                     boolean zoomIn) {
+                                     boolean zoomIn, int widthPx,
+                                     int heightPx) {
         if (zoomIn ? !state.canZoomIn() : !state.canZoomOut()) {
             return PointerZoomOutcome.AT_BOUND;
         }
@@ -225,7 +226,8 @@ public final class ChartViewController {
                 solveExactReversible(state.projection(),
                         centred.projection(), state.centre(),
                         state.fieldWidthDegrees(),
-                        centred.fieldWidthDegrees(), pointer);
+                        centred.fieldWidthDegrees(), pointer,
+                        widthPx, heightPx);
         if (solved.isEmpty()) {
             return PointerZoomOutcome.INFEASIBLE_POINTER;
         }
@@ -261,9 +263,10 @@ public final class ChartViewController {
      * agree with a wrong one.
      */
     static double zoomScale(juranometria.project.Projection projection,
-                            double fieldDegrees, double newFieldDegrees) {
+                            double fieldDegrees, double newFieldDegrees,
+                            int widthPx, int heightPx) {
         return zoomScale(projection, projection, fieldDegrees,
-                newFieldDegrees);
+                newFieldDegrees, widthPx, heightPx);
     }
 
     /**
@@ -280,9 +283,36 @@ public final class ChartViewController {
      */
     static double zoomScale(juranometria.project.Projection from,
                             juranometria.project.Projection to,
-                            double fieldDegrees, double newFieldDegrees) {
-        return to.planeRadius(newFieldDegrees / 2.0)
-                / from.planeRadius(fieldDegrees / 2.0);
+                            double fieldDegrees, double newFieldDegrees,
+                            int widthPx, int heightPx) {
+        // Asked of the two pages rather than of the two fields. What
+        // this ratio has to be is "the plane point of the same
+        // pixel", and a pixel becomes a plane point through the
+        // page's own scale - which was half the field across half the
+        // width for every page the atlas drew, so the two were the
+        // same number and the shorter one was written.
+        //
+        // A globe is scaled by its disc instead: ninety per cent of
+        // the page's short side, whatever field it names
+        // (docs/decisions/celestial-globe.md). Written as a ratio of
+        // fields, a step onto the globe moved the sky out from under
+        // the pointer that asked for it - not because the solve was
+        // wrong but because the target was the wrong plane point
+        // (#329).
+        return scaleOf(from, fieldDegrees, widthPx, heightPx)
+                / scaleOf(to, newFieldDegrees, widthPx, heightPx);
+    }
+
+    /** How many pixels one plane unit is on a page of this shape. */
+    private static double scaleOf(juranometria.project.Projection projection,
+                                  double fieldDegrees, int widthPx,
+                                  int heightPx) {
+        return new juranometria.project.ViewportMapping(
+                new juranometria.chart.ChartViewport(projection.centre(),
+                        fieldDegrees, widthPx, heightPx,
+                        juranometria.chart.ChartProjection.forField(
+                                fieldDegrees)),
+                projection).pixelsPerPlaneUnit();
     }
 
     /**
@@ -301,7 +331,8 @@ public final class ChartViewController {
                                  juranometria.chart.ChartProjection toKind,
                                  juranometria.chart.SkyPosition centre,
                                  double fieldDegrees, double newFieldDegrees,
-                                 juranometria.project.PlanePoint pointer) {
+                                 juranometria.project.PlanePoint pointer,
+                                 int widthPx, int heightPx) {
         // Two pages, each read by its own projection. The pointer is
         // a plane point on the page being left; the target is the
         // same pixel on the page being entered, which is a different
@@ -313,13 +344,32 @@ public final class ChartViewController {
                 juranometria.project.Projections.of(fromKind, centre);
         juranometria.project.Projection to =
                 juranometria.project.Projections.of(toKind, centre);
-        juranometria.chart.SkyPosition anchor =
-                juranometria.project.PanSolver.skyFromPlane(fromKind, centre,
+        // A pointer on paper anchors nothing, which is the same
+        // refusal as a pointer whose solve is ambiguous - the wheel
+        // visibly does nothing rather than inventing a star to zoom
+        // towards (#301).
+        java.util.Optional<juranometria.chart.SkyPosition> under =
+                juranometria.project.PanSolver.skyAt(fromKind, centre,
                         pointer);
-        double scale = zoomScale(from, to, fieldDegrees, newFieldDegrees);
+        if (under.isEmpty()) {
+            return java.util.Optional.empty();
+        }
+        juranometria.chart.SkyPosition anchor = under.get();
+        double scale = zoomScale(from, to, fieldDegrees, newFieldDegrees,
+                widthPx, heightPx);
         juranometria.project.PlanePoint target =
                 new juranometria.project.PlanePoint(
                         pointer.xiEast() * scale, pointer.etaNorth() * scale);
+        // The same question of the page being entered, and before
+        // the solve rather than after it: a pointer that is sky on
+        // this page can scale to a plane point that is paper on the
+        // next, and the solver asked about paper answers with a NaN
+        // centre rather than with a refusal. Refusing here is what
+        // stops a step onto a globe becoming a page centred nowhere.
+        if (juranometria.project.PanSolver.skyAt(toKind, centre, target)
+                .isEmpty()) {
+            return java.util.Optional.empty();
+        }
         var out = juranometria.project.PanSolver.solveCentre(
                 toKind, anchor, target, centre);
         if (out.centre().isEmpty() || out.constrained()
@@ -327,9 +377,12 @@ public final class ChartViewController {
             return java.util.Optional.empty();
         }
         juranometria.chart.SkyPosition mid = out.centre().get();
-        juranometria.chart.SkyPosition anchorAgain =
-                juranometria.project.PanSolver.skyFromPlane(toKind, mid,
-                        target);
+        java.util.Optional<juranometria.chart.SkyPosition> againAt =
+                juranometria.project.PanSolver.skyAt(toKind, mid, target);
+        if (againAt.isEmpty()) {
+            return java.util.Optional.empty();
+        }
+        juranometria.chart.SkyPosition anchorAgain = againAt.get();
         var back = juranometria.project.PanSolver.solveCentre(
                 fromKind, anchorAgain, pointer, mid);
         if (back.centre().isEmpty() || back.constrained()

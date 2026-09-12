@@ -129,26 +129,27 @@ class DirectZoomJourneyTest {
             // the sequence, and the very same scene object remains -
             // no assembly, no query, no stale frame. The sheet page
             // stopped being the end of the sequence when #299 put
-            // the overview's rungs above it.
-            wheel(px, py, 3.0);
-            assertEquals(120.0, navigation.state().fieldWidthDegrees(),
-                    "three notches past the sheet page is the"
-                            + " overview's widest rung");
+            // the overview's rungs above it, and the overview's
+            // widest stopped being the end when #329 put the globe
+            // above that.
+            wheel(px, py, 4.0);
+            assertEquals(180.0, navigation.state().fieldWidthDegrees(),
+                    "four notches past the sheet page is the globe");
             var sceneAtBound = chart.scene();
             MouseWheelEvent beyond = wheel(px, py, 1.0);
             assertTrue(beyond.isConsumed());
-            assertEquals(120.0, navigation.state().fieldWidthDegrees());
+            assertEquals(180.0, navigation.state().fieldWidthDegrees());
             assertSame(sceneAtBound, chart.scene(),
                     "a refused notch assembles nothing");
 
-            // Reverse all eight steps at the same pointer: the sky
-            // stays put and the pre-burst view returns within the
-            // reviewed tolerance - compared against the centre
-            // captured BEFORE zooming out, never the final view. The
-            // reverse crosses the rung where the projection changes,
-            // which is the step no single-projection arithmetic can
-            // make (#299).
-            wheel(px, py, -8.0);
+            // Reverse every step at the same pointer: the sky stays
+            // put and the pre-burst view returns within the reviewed
+            // tolerance - compared against the centre captured BEFORE
+            // zooming out, never the final view. The reverse crosses
+            // both rungs where the projection changes, which is the
+            // step no single-projection arithmetic can make (#299,
+            // and the globe's own since #329).
+            wheel(px, py, -9.0);
             assertEquals(8.0, navigation.state().fieldWidthDegrees());
             assertTrue(pointerDrift(anchor, px, py) < DRIFT_TOLERANCE_PX,
                     "the anchor survives the reverse burst");

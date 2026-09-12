@@ -11,7 +11,6 @@ import juranometria.chart.DeepSkyObject;
 import juranometria.chart.DsoType;
 import juranometria.chart.SkyPosition;
 import juranometria.project.DrawnPage;
-import juranometria.tool.globe.GlobeProjection;
 import juranometria.render.ChartOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,7 +82,8 @@ class MismatchedPageInventoryTest {
                 900, 900, ChartProjection.STEREOGRAPHIC);
         ChartScene scene = new ChartScene(viewport, List.of(), objects,
                 "Sagittarius", 8.0, null);
-        return new DrawnPage(scene, new GlobeProjection(CENTRE));
+        return new DrawnPage(scene, juranometria.project.Projections.of(
+                juranometria.chart.ChartProjection.ORTHOGRAPHIC, CENTRE));
     }
 
     @Test
@@ -117,7 +117,8 @@ class MismatchedPageInventoryTest {
         ChartScene scene = new ChartScene(viewport, List.of(),
                 List.of(), "Sagittarius", 8.0, null);
         DrawnPage globe = new DrawnPage(scene,
-                new GlobeProjection(centre));
+                juranometria.project.Projections.of(
+                juranometria.chart.ChartProjection.ORTHOGRAPHIC, centre));
 
         assertEquals(90.0, PageExtent.pageReachDegrees(globe), 1e-9,
                 "a page showing a whole hemisphere reaches to its"

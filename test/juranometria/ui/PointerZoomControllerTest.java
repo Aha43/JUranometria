@@ -70,6 +70,76 @@ class PointerZoomControllerTest {
     }
 
     @Test
+    void aPointerOnTheGlobesPaperIsRefusedAndNothingMoves() {
+        // The other half of the rule above. Outside the limb there is
+        // no sky, so a pointer-anchored step has nothing to anchor:
+        // the wheel visibly does nothing rather than inventing a star
+        // to zoom towards, and the state is exactly what it was.
+        SkyPosition centre = new SkyPosition(266.0, -28.0);
+        ChartViewController controller = controllerAt(centre, 180.0);
+        ChartViewState before = controller.state();
+        int[] notified = {0};
+        controller.onChange(state -> notified[0]++);
+        notified[0] = 0;
+
+        int refusals = 0;
+        for (PixelPoint corner : new PixelPoint[] {
+                new PixelPoint(1.0, 1.0),
+                new PixelPoint(WIDTH - 1.0, 1.0),
+                new PixelPoint(1.0, HEIGHT - 1.0),
+                new PixelPoint(WIDTH - 1.0, HEIGHT - 1.0)}) {
+            PlanePoint at = plane(before, corner);
+            assertTrue(PanSolver.skyAt(before.projection(),
+                            before.centre(), at).isEmpty(),
+                    corner + " is paper on a globe page, which is what"
+                            + " makes it the case worth testing");
+            assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
+                    controller.zoomAt(at, true, WIDTH, HEIGHT),
+                    "a pointer with no sky under it is refused");
+            refusals++;
+        }
+        assertEquals(4, refusals, "all four corners are paper here");
+        assertEquals(before, controller.state(),
+                "and the state does not move");
+        assertEquals(0, notified[0], "nor is anybody told it did");
+    }
+
+    @Test
+    void aStepWhoseTargetPixelIsPaperIsRefusedRatherThanSolved() {
+        // Both ends of a transition have to be sky before the solver
+        // is asked. This pointer is sky on the page being left - the
+        // overview's plane has no edge - and paper on the page being
+        // entered, because a globe's disc does. Handed that target
+        // the solver answers with a NaN centre, and the refusal used
+        // to arrive as "right ascension must be in [0, 360) degrees:
+        // NaN" from deep inside a SkyPosition (#329).
+        SkyPosition centre = new SkyPosition(10.684708, 41.268750);
+        ChartViewController controller = controllerAt(centre, 120.0);
+        ChartViewState before = controller.state();
+        PixelPoint pointer = new PixelPoint(1.0, 350.0);
+
+        PlanePoint at = plane(before, pointer);
+        assertTrue(PanSolver.skyAt(before.projection(), before.centre(),
+                        at).isPresent(),
+                "the pointer is on sky where it is");
+        ChartViewState globe = before.withFieldWidth(180.0);
+        assertTrue(PanSolver.skyAt(globe.projection(), globe.centre(),
+                        plane(globe, pointer)).isEmpty(),
+                "and the same pixel is paper on the page it would"
+                        + " enter, which is what makes this the case");
+
+        int[] notified = {0};
+        controller.onChange(state -> notified[0]++);
+        notified[0] = 0;
+        assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
+                controller.zoomAt(at, false, WIDTH, HEIGHT),
+                "refused, rather than solved into a page centred"
+                        + " nowhere");
+        assertEquals(before, controller.state(), "and nothing moved");
+        assertEquals(0, notified[0], "and nobody was told it did");
+    }
+
+    @Test
     void everyAdjacentStepPreservesTheSkyBeneathThePointer() {
         List<Double> fields = ChartViewState.fieldWidthSteps();
         SkyPosition[] centres = {
@@ -86,16 +156,43 @@ class PointerZoomControllerTest {
                     for (PixelPoint pointer : pointers) {
                         ChartViewController controller =
                                 controllerAt(centre, from);
-                        SkyPosition anchor = PanSolver.skyFromPlane(
+                        // A pointer on the paper outside a globe's
+                        // limb anchors nothing, and the step is
+                        // refused rather than accepted with the sky
+                        // sliding out from under it. Held below as
+                        // its own contract; skipped here, because
+                        // there is no sky whose staying put could be
+                        // measured (#301, #329).
+                        var under = PanSolver.skyAt(
                                 controller.state().projection(),
                                 controller.state().centre(),
                                 plane(controller.state(), pointer));
+                        if (under.isEmpty()) {
+                            continue;
+                        }
+                        // And the pixel has to be sky on the page
+                        // being entered too. A globe's disc is fixed
+                        // in its page, so a pixel outside it is paper
+                        // whatever the centre becomes - there is no
+                        // step that could put the anchor there, and
+                        // the refusal is the contract rather than a
+                        // failure of this one.
+                        double to = zoomIn ? fields.get(i + 1)
+                                : fields.get(i);
+                        ChartViewState next = controller.state()
+                                .withFieldWidth(to);
+                        if (PanSolver.skyAt(next.projection(),
+                                next.centre(),
+                                plane(next, pointer)).isEmpty()) {
+                            continue;
+                        }
+                        SkyPosition anchor = under.get();
                         int[] notified = {0};
                         controller.onChange(state -> notified[0]++);
                         notified[0] = 0;
                         assertEquals(PointerZoomOutcome.ACCEPTED,
                                 controller.zoomAt(plane(controller.state(),
-                                        pointer), zoomIn));
+                                        pointer), zoomIn, WIDTH, HEIGHT));
                         assertEquals(1, notified[0],
                                 "one atomic transition, one notification");
                         PixelPoint landed = pixelOf(controller.state(), anchor);
@@ -117,9 +214,9 @@ class PointerZoomControllerTest {
         SkyPosition origin = controller.state().centre();
         PixelPoint pointer = new PixelPoint(250.0, 500.0);
         assertEquals(PointerZoomOutcome.ACCEPTED,
-                controller.zoomAt(plane(controller.state(), pointer), true));
+                controller.zoomAt(plane(controller.state(), pointer), true, WIDTH, HEIGHT));
         assertEquals(PointerZoomOutcome.ACCEPTED,
-                controller.zoomAt(plane(controller.state(), pointer), false));
+                controller.zoomAt(plane(controller.state(), pointer), false, WIDTH, HEIGHT));
         assertEquals(18.0, controller.state().fieldWidthDegrees());
         assertTrue(controller.state().centre().separationDegrees(origin)
                         < REVERSAL_TOLERANCE_DEGREES,
@@ -130,18 +227,18 @@ class PointerZoomControllerTest {
     @Test
     void refusalsChangeNothingAndNotifyNobody() {
         // At-bound: the widest page cannot zoom out. That is the
-        // widest overview rung now, not the sheet page - the ladder
-        // did not stop at 42 degrees once a projection arrived that
-        // could carry further (#299).
+        // globe's hemisphere now, not the sheet page and not the
+        // overview's widest rung - the ladder grew twice, each time a
+        // projection arrived that could carry further (#299, #329).
         ChartViewController atBound = controllerAt(
-                new SkyPosition(83.818667, -5.389667), 120.0);
+                new SkyPosition(83.818667, -5.389667), 180.0);
         ChartViewState before = atBound.state();
         int[] notified = {0};
         atBound.onChange(state -> notified[0]++);
         notified[0] = 0;
         assertEquals(PointerZoomOutcome.AT_BOUND,
                 atBound.zoomAt(plane(before, new PixelPoint(300, 200)),
-                        false));
+                        false, WIDTH, HEIGHT));
         assertEquals(before, atBound.state());
         assertEquals(0, notified[0]);
 
@@ -154,7 +251,7 @@ class PointerZoomControllerTest {
         polarNotified[0] = 0;
         assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
                 polar.zoomAt(plane(polarBefore, new PixelPoint(1, 350)),
-                        false));
+                        false, WIDTH, HEIGHT));
         assertEquals(polarBefore, polar.state());
         assertEquals(0, polarNotified[0],
                 "a constrained refusal notifies nobody");
@@ -169,7 +266,7 @@ class PointerZoomControllerTest {
         nearPoleNotified[0] = 0;
         assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
                 nearPole.zoomAt(plane(nearPoleBefore,
-                        new PixelPoint(450, 1)), true));
+                        new PixelPoint(450, 1)), true, WIDTH, HEIGHT));
         assertEquals(nearPoleBefore, nearPole.state());
         assertEquals(0, nearPoleNotified[0],
                 "a preflight refusal notifies nobody");
@@ -186,7 +283,7 @@ class PointerZoomControllerTest {
         fencedNotified[0] = 0;
         assertEquals(PointerZoomOutcome.REFUSED_COVERAGE,
                 fenced.zoomAt(plane(fencedBefore, new PixelPoint(300, 200)),
-                        true));
+                        true, WIDTH, HEIGHT));
         assertEquals(fencedBefore, fenced.state());
         assertEquals("NGC 1976", fenced.state().targetIdentity(),
                 "a refused transition keeps the target untouched");
@@ -203,7 +300,7 @@ class PointerZoomControllerTest {
                 "Betelgeuse · α Ori region", "TYC 129-1873-1");
         assertEquals(PointerZoomOutcome.ACCEPTED,
                 moved.zoomAt(plane(moved.state(), new PixelPoint(200, 150)),
-                        false));
+                        false, WIDTH, HEIGHT));
         assertNull(moved.state().targetIdentity(),
                 "a step that moves the centre is anonymous");
         assertNull(moved.state().targetLabel());
@@ -214,7 +311,7 @@ class PointerZoomControllerTest {
         centred.recenter(new SkyPosition(88.792939, 7.407064), 8.0,
                 "Betelgeuse · α Ori region", "TYC 129-1873-1");
         assertEquals(PointerZoomOutcome.ACCEPTED,
-                centred.zoomAt(new PlanePoint(0.0, 0.0), false));
+                centred.zoomAt(new PlanePoint(0.0, 0.0), false, WIDTH, HEIGHT));
         assertEquals("TYC 129-1873-1", centred.state().targetIdentity(),
                 "the target survives exactly when the centre survives");
         assertEquals(12.0, centred.state().fieldWidthDegrees());
@@ -246,7 +343,7 @@ class PointerZoomControllerTest {
         ChartViewState before = jump.state();
         assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
                 jump.zoomAt(plane(before, new PixelPoint(597.0, 581.0)),
-                        false),
+                        false, WIDTH, HEIGHT),
                 "a root the step could not have reached is refused");
         assertEquals(before, jump.state(), "and nothing moved");
 
@@ -264,7 +361,7 @@ class PointerZoomControllerTest {
                         + anchor.separationDegrees(wide.state().centre()));
         assertEquals(PointerZoomOutcome.ACCEPTED,
                 wide.zoomAt(plane(wide.state(),
-                        new PixelPoint(899.0, 699.0)), true));
+                        new PixelPoint(899.0, 699.0)), true, WIDTH, HEIGHT));
         assertTrue(wide.state().centre().separationDegrees(
                         new SkyPosition(83.818667, -5.389667))
                         <= anchor.separationDegrees(
@@ -295,14 +392,14 @@ class PointerZoomControllerTest {
         ChartViewState before = wide.state();
         assertEquals(PointerZoomOutcome.INFEASIBLE_POINTER,
                 wide.zoomAt(plane(before, new PixelPoint(899.0, 1.0)),
-                        true));
+                        true, WIDTH, HEIGHT));
         assertEquals(before, wide.state());
 
         SkyPosition crux = new SkyPosition(186.649563, -63.099093);
         ChartViewController regional = controllerAt(crux, 18.0);
         assertEquals(PointerZoomOutcome.ACCEPTED,
                 regional.zoomAt(plane(regional.state(),
-                        new PixelPoint(899.0, 699.0)), true));
+                        new PixelPoint(899.0, 699.0)), true, WIDTH, HEIGHT));
     }
 
     @Test
@@ -319,7 +416,7 @@ class PointerZoomControllerTest {
                 centre, 36.0, WIDTH, paperHeight), pixel);
         SkyPosition anchor = PanSolver.skyFromPlane(ChartProjection.GNOMONIC, centre, pointer);
         assertEquals(PointerZoomOutcome.ACCEPTED,
-                controller.zoomAt(pointer, true));
+                controller.zoomAt(pointer, true, WIDTH, HEIGHT));
         ChartViewport zoomed = new ChartViewport(
                 controller.state().centre(),
                 controller.state().fieldWidthDegrees(), WIDTH, paperHeight);

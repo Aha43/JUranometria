@@ -98,7 +98,8 @@ public final class ZoomInteraction implements MouseWheelListener {
                     controller.state().fieldWidthDegrees(),
                     viewport.widthPx(), viewport.heightPx(),
                     controller.state().projection()), pixel);
-            controller.zoomAt(pointer, zoomIn);
+            controller.zoomAt(pointer, zoomIn, viewport.widthPx(),
+                    viewport.heightPx());
             // A refusal (bound, infeasible pointer, coverage) consumes
             // the notch like any other: the wheel visibly does nothing
             // rather than banking movement for a surprise later.

@@ -145,10 +145,8 @@ public final class GlobeNameStudyMain {
                 + " platform record beside this.");
 
         for (var look : GlobeDensityStudyMain.corpus().subList(0, 2)) {
-            DrawnPage page = Atlas.assembler().assembleForStudy(
-                    look.centre(), 180.0, LIMIT, look.title(),
-                    new GlobeProjection(look.centre()), SIDE_PX,
-                    SIDE_PX);
+            DrawnPage page = GlobePage.of(look.centre(), LIMIT,
+                    SIDE_PX, SIDE_PX);
             List<Named> onPaper = examine(page, false);
             System.out.println();
             System.out.println(look.slug()
@@ -318,8 +316,7 @@ public final class GlobeNameStudyMain {
         Graphics2D g = canvas.createGraphics();
         List<LabelPlacement.Placement> placements;
         try {
-            ChartRenderer renderer = ChartRenderer.drawing(page,
-                    StarSizePolicy.DEFAULT);
+            ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
             ChartRenderer.TextMetrics metrics =
                     ChartRenderer.TextMetrics.of(g);
             List<LabelPlacement.Request> asked =
