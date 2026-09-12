@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-family-study globe-name-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -82,6 +82,7 @@ help:
 	@echo "  globe-grid-fade-study How faint the globe grid goes at its limb"
 	@echo "  globe-family-study Which object families a hemisphere can carry"
 	@echo "  globe-name-study  Whether a hemisphere's names name anything"
+	@echo "  globe-pointing-study What a pixel is worth on a globe"
 	@echo "  released-text     List the text every released page draws"
 	@echo "  dist              Build and verify the portable fallback ZIP"
 	@echo "  app-image         Build and verify this platform's native application image"
@@ -296,6 +297,24 @@ globe-name-study: classes
 	@echo "  globe names"
 	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeNameStudyMain
+
+# What a pixel is worth on a globe (#301).
+globe-pointing-study: classes
+	@echo "  globe pointing"
+	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobePointingStudyMain
+
+# Whether the modules' lines stop where the sky does, and what a
+# globe exports (#301).
+globe-module-study: classes
+	@echo "  globe modules"
+	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeModuleStudyMain
+
+globe-export-study: classes
+	@echo "  globe export"
+	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeExportStudyMain
 
 chart-sheet-study: classes
 	@echo "  chart sheets"

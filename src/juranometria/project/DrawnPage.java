@@ -39,10 +39,13 @@ import juranometria.chart.ChartScene;
  * on a plane scaled stereographically, the disc landing at half the
  * page it should have filled.
  *
- * <p><strong>Issue #329 owns the end of this.</strong> When
- * orthographic becomes a production projection paired with a real
- * field, {@link #of(ChartScene)} becomes the only way to build one
- * and the pair can never disagree again.
+ * <p><strong>This value is not temporary.</strong> The mismatch it
+ * carries is: when #329 makes orthographic a production projection
+ * paired with a real field, {@link #of(ChartScene)} becomes the only
+ * way to build one and the pair can never disagree again. The value
+ * itself stays, because production had thirteen implicit copies of
+ * this boundary before a globe existed to make them disagree, and
+ * {@code OneProjectionPerPageTest} exists to keep it at one.
  */
 public record DrawnPage(ChartScene scene, Projection projection) {
 

@@ -70,45 +70,188 @@ public final class GlobePointingStudyMain {
         System.out.println("asked here.");
         System.out.println();
         System.out.printf(Locale.ROOT,
-                "%8s %8s %12s %12s %14s %12s%n",
-                "radius", "sky out", "1px radial", "1px tangent",
-                "pixel spread", "round trip");
+                "%8s %7s %9s %9s %9s %9s %9s %9s %8s%n",
+                "radius", "sky out", "radial", "worst",
+                "tangent", "worst", "spread", "worst", "no sky");
 
         for (double radius : RADII) {
-            PixelPoint at = new PixelPoint(
-                    middle + radius * discRadius, middle);
-            SkyPosition here = skyAt(page, mapping, at);
-            if (here == null) {
-                System.out.printf(Locale.ROOT,
-                        "%8.3f %8s %12s %12s %14s %12s%n",
-                        radius, "-", "no sky", "no sky", "no sky",
-                        "-");
-                continue;
-            }
-            double out = centre.separationDegrees(here);
-
-            Double radial = stepDegrees(page, mapping, here,
-                    new PixelPoint(at.x() + 1.0, at.y()));
-            Double tangent = stepDegrees(page, mapping, here,
-                    new PixelPoint(at.x(), at.y() + 1.0));
-            String spread = spreadDegrees(page, mapping, at);
-            String trip = roundTrip(page, mapping, here);
-
-            System.out.printf(Locale.ROOT,
-                    "%8.3f %7.2f° %12s %12s %14s %12s%n",
-                    radius, out, arcmin(radial), arcmin(tangent),
-                    spread, trip);
+            sample(page, mapping, centre, discRadius, middle, radius);
         }
         System.out.println();
         System.out.println("A dash where the inverse has no answer:"
                 + " that pixel is not sky, and a reader");
         System.out.println("pointing at it is pointing past the edge"
                 + " of the world.");
+
+        System.out.println();
+        System.out.println("## Recentring");
+        System.out.println();
+        System.out.println("The centre a click asks for is the sky"
+                + " under it, so how far the centre moves per");
+        System.out.println("pixel of input is the table above."
+                + " Reversal is asked separately: recentre on a");
+        System.out.println("point, then click where the old centre"
+                + " now lies and see what returns.");
+        System.out.println();
+        System.out.printf(Locale.ROOT, "%8s %14s %16s%n",
+                "radius", "reversal", "returned");
+        for (double radius : RADII) {
+            reversal(page, mapping, centre, discRadius, middle, radius);
+        }
+
+        System.out.println();
+        System.out.println("## Dragging to pan");
+        System.out.println();
+        System.out.println("Not measurable here, and that is the"
+                + " finding: PanSolver.solveCentre takes a");
+        System.out.println("ChartProjection kind, so there is no way"
+                + " to ask it about a globe at all. The");
+        System.out.println("solver is keyed on the enum rather than"
+                + " on a projection. Giving it the page, as");
+        System.out.println("the rest of the render path now takes"
+                + " one, belongs to #330.");
     }
+
+    /**
+     * One radius, sampled around the disc and across the pixel grid.
+     *
+     * <p>A single sample is a fortunate or unfortunate pixel: where
+     * the exact point falls between pixel centres changes the round
+     * trip entirely, which is why the first run of this study
+     * reported round-trip errors that rose and fell with no pattern.
+     * So each radius is asked at several azimuths and several
+     * sub-pixel phases, and what is reported is the median and the
+     * worst rather than whichever pixel came first.
+     */
+    private static void sample(DrawnPage page, ViewportMapping mapping,
+                               SkyPosition centre, double discRadius,
+                               double middle, double radius) {
+        List<Double> radial = new java.util.ArrayList<>();
+        List<Double> tangent = new java.util.ArrayList<>();
+        List<Double> spread = new java.util.ArrayList<>();
+        List<Double> trip = new java.util.ArrayList<>();
+        int noSky = 0;
+        int asked = 0;
+
+        for (int turn = 0; turn < AZIMUTHS; turn++) {
+            double angle = 2.0 * Math.PI * turn / AZIMUTHS;
+            for (double phase : PHASES) {
+                asked++;
+                double away = radius * discRadius + phase;
+                PixelPoint at = new PixelPoint(
+                        middle + away * Math.cos(angle),
+                        middle + away * Math.sin(angle));
+                SkyPosition here = skyAt(page, at);
+                if (here == null) {
+                    noSky++;
+                    continue;
+                }
+                double outX = Math.cos(angle);
+                double outY = Math.sin(angle);
+                Double out = stepDegrees(page, here, new PixelPoint(
+                        at.x() + outX, at.y() + outY));
+                Double along = stepDegrees(page, here, new PixelPoint(
+                        at.x() - outY, at.y() + outX));
+                if (out != null) {
+                    radial.add(out);
+                }
+                if (along != null) {
+                    tangent.add(along);
+                }
+                Double covered = spreadDegrees(page, at);
+                if (covered != null) {
+                    spread.add(covered);
+                } else {
+                    noSky++;
+                }
+                Double returned = roundTrip(page, mapping, here);
+                if (returned != null) {
+                    trip.add(returned);
+                }
+            }
+        }
+
+        SkyPosition at = skyAt(page, new PixelPoint(
+                middle + radius * discRadius, middle));
+        System.out.printf(Locale.ROOT,
+                "%8.3f %7s %9s %9s %9s %9s %9s %9s %6d/%d%n",
+                radius,
+                at == null ? "-" : String.format(Locale.ROOT, "%.2f",
+                        centre.separationDegrees(at)),
+                arcmin(median(radial)), arcmin(worst(radial)),
+                arcmin(median(tangent)), arcmin(worst(tangent)),
+                arcmin(median(spread)), arcmin(worst(spread)),
+                noSky, asked);
+    }
+
+    /**
+     * Recentre on a point, then ask for the old centre back.
+     *
+     * <p>A gesture a reader cannot undo is a gesture they will not
+     * trust. The old centre is projected onto the page the recentring
+     * made, snapped to the pixel a click would carry, and unprojected:
+     * what comes back is where the reader would land trying to return.
+     */
+    private static void reversal(DrawnPage page, ViewportMapping mapping,
+                                 SkyPosition centre, double discRadius,
+                                 double middle, double radius) {
+        PixelPoint at = new PixelPoint(
+                middle + radius * discRadius, middle);
+        SkyPosition asked = skyAt(page, at);
+        if (asked == null) {
+            System.out.printf(Locale.ROOT, "%8.3f %14s %16s%n",
+                    radius, "no sky", "refused");
+            return;
+        }
+        // The page the recentring makes, and the old centre on it.
+        GlobeProjection after = new GlobeProjection(asked);
+        Optional<PlanePoint> was = after.project(centre);
+        if (was.isEmpty()) {
+            System.out.printf(Locale.ROOT, "%8.3f %14s %16s%n",
+                    radius, "off the globe",
+                    "cannot be asked for");
+            return;
+        }
+        double perUnit = mapping.pixelsPerPlaneUnit();
+        PixelPoint onNew = new PixelPoint(
+                Math.round(middle - was.get().xiEast() * perUnit),
+                Math.round(middle - was.get().etaNorth() * perUnit));
+        PlanePoint back = new PlanePoint(
+                (middle - onNew.x()) / perUnit,
+                (middle - onNew.y()) / perUnit);
+        Optional<SkyPosition> returned = after.unproject(back);
+        System.out.printf(Locale.ROOT, "%8.3f %14s %16s%n",
+                radius,
+                returned.isEmpty() ? "lost"
+                        : String.format(Locale.ROOT, "%.2f'",
+                                centre.separationDegrees(
+                                        returned.get()) * 60.0),
+                returned.isEmpty() ? "-" : "yes");
+    }
+
+    private static Double median(List<Double> of) {
+        if (of.isEmpty()) {
+            return null;
+        }
+        List<Double> sorted = new java.util.ArrayList<>(of);
+        sorted.sort(Double::compareTo);
+        return sorted.get(sorted.size() / 2);
+    }
+
+    private static Double worst(List<Double> of) {
+        return of.isEmpty() ? null
+                : of.stream().mapToDouble(Double::doubleValue).max()
+                        .getAsDouble();
+    }
+
+    /** How many directions round the disc each radius is asked in. */
+    private static final int AZIMUTHS = 16;
+
+    /** Where between pixel centres the point is placed. */
+    private static final double[] PHASES = {0.0, 0.25, 0.5, 0.75};
 
     /** The sky under a pixel, or null where there is none. */
     private static SkyPosition skyAt(DrawnPage page,
-                                     ViewportMapping mapping,
                                      PixelPoint at) {
         PlanePoint plane = PanSolver.planeFromPixel(page, at);
         Optional<SkyPosition> sky = page.projection().unproject(plane);
@@ -117,9 +260,8 @@ public final class GlobePointingStudyMain {
 
     /** How far the sky moves for this one-pixel step. */
     private static Double stepDegrees(DrawnPage page,
-                                      ViewportMapping mapping,
                                       SkyPosition from, PixelPoint to) {
-        SkyPosition there = skyAt(page, mapping, to);
+        SkyPosition there = skyAt(page, to);
         return there == null ? null : from.separationDegrees(there);
     }
 
@@ -131,8 +273,7 @@ public final class GlobePointingStudyMain {
      * is what happens to a pointer straddling the limb - part of it is
      * on the globe and part of it is nowhere.
      */
-    private static String spreadDegrees(DrawnPage page,
-                                        ViewportMapping mapping,
+    private static Double spreadDegrees(DrawnPage page,
                                         PixelPoint at) {
         List<PixelPoint> corners = List.of(
                 new PixelPoint(at.x() - 0.5, at.y() - 0.5),
@@ -141,9 +282,9 @@ public final class GlobePointingStudyMain {
                 new PixelPoint(at.x() + 0.5, at.y() + 0.5));
         List<SkyPosition> sky = new java.util.ArrayList<>();
         for (PixelPoint corner : corners) {
-            SkyPosition one = skyAt(page, mapping, corner);
+            SkyPosition one = skyAt(page, corner);
             if (one == null) {
-                return "past the limb";
+                return null;          // part of it is not sky
             }
             sky.add(one);
         }
@@ -154,7 +295,7 @@ public final class GlobePointingStudyMain {
                         sky.get(i).separationDegrees(sky.get(j)));
             }
         }
-        return arcmin(widest);
+        return widest;
     }
 
     /**
@@ -170,22 +311,18 @@ public final class GlobePointingStudyMain {
      * returns is how well a reader can name the place they pointed
      * at.
      */
-    private static String roundTrip(DrawnPage page,
+    private static Double roundTrip(DrawnPage page,
                                     ViewportMapping mapping,
                                     SkyPosition from) {
         Optional<PlanePoint> plane = page.projection().project(from);
         if (plane.isEmpty()) {
-            return "-";
+            return null;
         }
         PixelPoint exact = mapping.toPixel(plane.get());
         PixelPoint pixel = new PixelPoint(Math.round(exact.x()),
                 Math.round(exact.y()));
-        SkyPosition back = skyAt(page, mapping, pixel);
-        if (back == null) {
-            return "lost";
-        }
-        double error = from.separationDegrees(back) * 3600.0;
-        return String.format(Locale.ROOT, "%.2e\"", error);
+        SkyPosition back = skyAt(page, pixel);
+        return back == null ? null : from.separationDegrees(back);
     }
 
     private static String arcmin(Double degrees) {

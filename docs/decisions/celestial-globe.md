@@ -474,6 +474,220 @@ hulls, not any confusion a reader could have. Constellation names are
 now judged by whether they sit on the figure they name, which is what
 the policy's `OWNERSHIP` refusal already guarantees.
 
+## Pointing: the footprint decides, and nothing else
+
+Sprint 30 refused the orthographic projection for the chart ladder
+partly because **it cannot be pointed at**. Measured through the
+production projection and mapping, radially and tangentially apart,
+at sixteen azimuths and four sub-pixel phases per radius
+(`make globe-pointing-study`) — because a single sample is a
+fortunate pixel, and the first run of this study reported round-trip
+errors that rose and fell with no pattern for exactly that reason:
+
+| radius | sky out | 1 px radial | 1 px tangential | pixel spread | samples with no sky |
+|---|---|---|---|---|---|
+| 0.00 | 0° | 8.49′ | 8.49′ | 12.00′ | 0/64 |
+| 0.50 | 30° | 9.82′ | 8.49′ | 13.62′ | 0/64 |
+| 0.80 | 53° | 14.23′ | 8.49′ | 19.10′ | 0/64 |
+| 0.90 | 64° | 19.71′ | 8.49′ | 26.00′ | 0/64 |
+| 0.95 | 72° | 27.87′ | 8.49′ | 36.25′ | 0/64 |
+| 0.99 | 82° | **69.53′** | 8.49′ | 84.43′ | 0/64 |
+| 0.999 | 87° | **no sky** | 8.49′ | no sky | **64/64** |
+| 1.00 | 90° | no sky | no sky | no sky | 64/64 |
+
+**Tangential pointing is 8.49′ per pixel everywhere** — median and
+worst identical, at every azimuth and phase. A reader points *along*
+the limb exactly as well as at the centre. Only the radial direction
+degrades, and it degrades smoothly: there is no measured point at
+which it stops working and before which it works.
+
+**Failure, when it comes, is abrupt and geometric.** At r = 0.99 every
+sample has sky; at r = 0.999 not one does. The footprint either
+contains dependable sky or it does not.
+
+### The rule
+
+> - **Object clicks** use visible ink and catalogue identity, and are
+>   unaffected by any of this: clicking a drawn mark names the object
+>   outright, however coarse the inversion is there.
+> - **Empty-sky pointing and recentring** are allowed only when the
+>   pointer's **entire logical pixel footprint lies inside the globe**.
+> - If any part of that footprint has no inverse, the gesture is
+>   **refused**.
+> - **No additional radial cutoff.**
+
+The growing radial uncertainty is real, but it is smooth, reversible
+and visibly explained by the projection — the reader can see the sky
+compressing. Recentring reverses everywhere it is defined: the old
+centre is recoverable to 2–4′ inside r = 0.9 and 16–32′ near the limb,
+with no branch switching and no jumps, and is lost only at the limb
+itself. A separate threshold would forbid pointing that works.
+
+### The round trip had to go through a real pixel
+
+Recorded because the first version measured nothing a reader could
+experience. Sky to plane to pixel and back in double precision only
+proves that the same arithmetic reverses itself, which Sprint 30 had
+already shown to 3.3e-13 degrees. Snapped to the whole pixel a mouse
+event actually delivers, the same loop reaches **9 223 arcseconds —
+2.6 degrees** — near the limb. The rounding is the measurement.
+
+### Dragging to pan is not settled
+
+**It could not be measured, and that is the finding.**
+`PanSolver.solveCentre` takes a `ChartProjection` *kind*, so there is
+no way to ask it about a globe at all: the solver is coupled to the
+enum rather than to the projection being navigated — the same shape of
+fault `DrawnPage` corrected elsewhere in this gate.
+
+**#330 must accept the page or projection being navigated before drag
+behaviour can be measured at all.** Nothing here settles it, and it
+must not be inferred from the other two gestures: solver continuity,
+whether the grabbed sky stays under the pointer, and whether a drag
+can switch branches are questions about the solver's tie-break, which
+was written for pages whose scale does not collapse.
+
+## Modules, clipping, and what a globe exports
+
+### The clipping rule
+
+> **Every piece of sky-derived ink is clipped to the bounded page
+> region before painting. Furniture is outside that clip.**
+
+One sentence rather than a list, so that no family is forgotten:
+constellation figures and boundaries, the grid, the modules, working
+marks, star marks and deep-sky symbols are all sky-derived. **Text is
+not clipped** — it is governed by placement inside the disc, because
+clipping a word would make a false name.
+
+For modules specifically, **#331 must make this true of every
+contribution, not only curves**:
+
+- curve geometry may reach the limb, but no painted stroke may extend
+  beyond it except the unavoidable stroke-edge tolerance;
+- point marks such as the zenith draw only when their sky position is
+  visible;
+- a module name is drawn only with a truthful anchor and its whole
+  label inside the disc, and is otherwise omitted;
+- module ink stays below sky text and does not influence label
+  placement, preserving the existing module contract.
+
+### What the modules do today: known debt
+
+Observed, not inferred (`make globe-module-study`):
+
+| centred on | module ink inside | beyond the limb | furthest | names |
+|---|---|---|---|---|
+| zenith overhead | 7 682 px | 2 506 px | **1.55×** | Meridian — inside the disc |
+| southern horizon | 7 152 px | 948 px | 1.19× | Mathematical horizon — **outside the disc** |
+| ecliptic high | 10 514 px | 1 389 px | 1.55× | none |
+| Sagittarius | 10 868 px | 1 450 px | 1.30× | none |
+
+Module curves reach **half again the disc's radius**, and a module
+name is drawn wholly on the paper. The first run of this study used
+one centre, found no names at all, and would have let the name rule
+pass vacuously — the other centres were chosen so each module had
+somewhere to put a name.
+
+What does hold is the module contract: `textObstacles` is built from
+the scene and options and is never offered a module's contribution, so
+module ink cannot move a sky label.
+
+### Where a globe's outside-limb ink comes from
+
+Attributed by removing one layer at a time from the page
+(`make globe-export-study`). **These are marginal costs and do not
+sum**: the ink overlaps, so removing two layers recovers less than the
+two rows together.
+
+| removed | recovers |
+|---|---|
+| constellation figures | **4 563 px** |
+| constellation names | **4 417 px** |
+| star names | 2 923 px |
+| deep-sky symbols | 684 px |
+| the grid | 90 px |
+| **star marks** | **0 px** |
+
+Star marks never leave the limb — they cannot project past ninety
+degrees. The overrun is lines and text, which is why the clipping rule
+had to be broadened past "curves".
+
+### Export: identity and fidelity settled, geometry not
+
+**Projection identity survives all three writers**, with and without
+modules: SVG, PDF and PNG each carry "orthographic".
+
+**The PNG writer is faithful**, measured rather than assumed. The
+recording was rasterised at the writer's own 3208×2180 — the chart's
+own rectangle cut from the sheet, since the file is the whole page and
+the chart is inset by the margin — and the outside-limb masks compared
+pixel for pixel:
+
+| | |
+|---|---|
+| outside the limb in both | 177 186 px |
+| in the page but not the file | 7 879 px |
+| in the file but not the page | 4 986 px |
+| furthest one-sided pixel from ink in the other | **2.2 px** |
+| one-sided pixels beyond the bound | **0** |
+
+The bound is **√5 ≈ 2.24 px**, and it comes from the mechanism rather
+than from this page: two rasterisers may place a filled edge up to one
+device pixel apart *in each axis*, and a span may gain or lose a pixel
+at each end, so a solid block's corner can lie √(2²+1²) from the
+other's nearest ink and no further.
+
+The single pixel that reached that bound was chased down rather than
+called an edge effect: it sits on a **glyph stem in a constellation
+name beyond the limb**, which both renderings draw, the file's block
+beginning a row higher and ending a column wider. That it fell in
+constellation-name text — one of the two largest sources above — is
+the reason chasing it mattered.
+
+So a globe's exported geometry is wrong **before** anything is
+written. The writers preserve a page that is already drawing sky
+outside the sphere.
+
+**PDF geometry is unverified**, deliberately. `PdfSheetWriter.path`
+can confirm a known shape is present but cannot enumerate marks, so
+circular containment cannot be answered without a parser this gate has
+no business building. Its projection identity *is* verified.
+
+### The three study doors, and who removes each
+
+The gate could not see a production globe without them, and each names
+its remover in the code as well as here:
+
+| door | why it exists | removed by |
+|---|---|---|
+| `SceneAssembler.assembleForStudy` | a `ChartViewState` refuses a 180-degree field | **#329** |
+| `GlobeProjection` (and `ViewportMapping`'s frame override) | production has no orthographic projection | **#329** |
+| `ChartSheet.recordForStudy` | the sheet path takes a `ChartViewState` too | **#331** |
+
+`ChartRenderer.drawing(page, …)` goes with the first two: **#329**.
+
+**`DrawnPage` is not on this list.** It is production architecture,
+not a door — the investigation found thirteen implicit copies of that
+boundary already in the atlas, and `OneProjectionPerPageTest` keeps it
+at one.
+
+## What this gate does not claim
+
+Stated here rather than only in passing, because a limit mentioned
+once inside a paragraph reads as a pass to anyone scanning:
+
+- **PDF geometry is unverified.** Its projection identity is verified;
+  whether its marks lie inside the limb is not, and this gate
+  deliberately did not build a PDF parser to find out.
+- **Paper readability is not claimed.** Nothing here has been printed.
+  How a globe reads on paper — at what size the limb crowding becomes
+  unreadable in ink, whether the faded grid survives a press — belongs
+  to **#293**, which remains the authority for any claim that needs
+  physical printing. This gate settles geometry and exported truth
+  only.
+- **Drag-to-pan is not settled**, and was not measurable: see above.
+
 ## A page is drawn by one projection
 
 Not a cartographic decision, but the gate found it and it had to be
@@ -502,9 +716,9 @@ was satisfied by a fix that put the split straight back.
 
 ## Still open
 
-Navigation and pointing near the limb; which module geometry remains useful there; projection
-identity in export; and paper policy, with #293 remaining the
-authority for any claim that needs printing.
+Dragging to pan, which #330 must make measurable first; paper
+readability, which remains #293's; and how a globe's page and limb reach the
+placement seam and the clip in production, which is #331's.
 
 The shared placement policy stood: it needed no change, only the
 page's true shape.
