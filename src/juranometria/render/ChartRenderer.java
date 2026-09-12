@@ -503,6 +503,10 @@ public final class ChartRenderer {
                         : textPlacements(TextMetrics.of(g), scene, options);
 
         g.setClip(1, 1, width - 2, height - 2);
+        // Where this page's sky ends, and the shape every piece of
+        // sky-derived ink is painted inside (Sprint 32, issue #331).
+        java.awt.Shape paper = g.getClip();
+        java.awt.Shape sky = skyClip(scene, mapping, paper);
         // The equatorial graticule draws first - the quietest ink on
         // the chart, beneath geography, stars, and every label, per
         // docs/decisions/coordinate-grid.md. Its labels yield to the
@@ -513,11 +517,14 @@ public final class ChartRenderer {
             // notation: a reader who switches the title block off
             // gets back the labels it was hiding, and the key
             // suppresses on the same terms (Sprint 20 review).
+            // Unclipped on purpose: the grid's curves come through
+            // PageRegion, which already ends at the limb, so a clip
+            // here would hide a regression rather than prevent one.
             EquatorialGrid.draw(g, gridFor(g.getFontMetrics(LABEL_FONT),
                     scene, options), palette);
         }
         drawGeography(g, scene, options, projection, mapping,
-                constellationNamesIn(placedText));
+                constellationNamesIn(placedText), sky, paper);
         // Above the grid and the figures, below every mark: a
         // reference line is read across the chart and must not hide
         // an object (docs/decisions/place-and-time.md).
@@ -527,6 +534,7 @@ public final class ChartRenderer {
         // what the reader can see - there is no second geometry.
         java.util.List<DrawnMark> marks =
                 drawnMarks(scene, options, policy, projection, mapping);
+        g.setClip(sky);
         for (DrawnMark mark : marks) {
             if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
                 drawSymbol(g, mark.deepSky(), policy, mark.centre(),
@@ -541,6 +549,7 @@ public final class ChartRenderer {
                 g.fill(mark.outline());
             }
         }
+        g.setClip(paper);
         // Star labels, then deep-sky labels, which is the order the
         // page has always drawn them in.
         drawText(g, LABEL_FONT, palette.textInk(), placedText,
@@ -573,32 +582,81 @@ public final class ChartRenderer {
      * RA-wrap and pole geometry come out curved and complete, with no
      * straight jumps across the page.
      */
+    /**
+     * The shape every piece of sky-derived ink is painted inside
+     * (Sprint 32, issue #331).
+     *
+     * <p>One rule rather than a list, so that no family is forgotten:
+     * <strong>every piece of sky-derived ink is clipped to the
+     * bounded page region before painting, and furniture is outside
+     * that clip</strong> (docs/decisions/celestial-globe.md). On a
+     * page whose sky has no edge this is the paper itself and nothing
+     * changes; on a globe it is the disc, past which there is no sky
+     * at all rather than empty sky.
+     *
+     * <p><strong>Text is not clipped.</strong> A name cut in half is
+     * a false name, so where a word may go is a question for the
+     * placement policy - the whole label inside the disc or no label
+     * - and not for a clip. That is why the constellation names, the
+     * star and deep-sky labels, the title block and the key are all
+     * painted with the paper's own clip restored.
+     *
+     * <p>The module layer is not inside this yet. Its contributions
+     * are curves, point marks and names in one call, and separating
+     * them is #331's fourth step; until then a module's ink is
+     * governed by its own geometry as #301 left it.
+     */
+    private static java.awt.Shape skyClip(ChartScene scene,
+                                          ViewportMapping mapping,
+                                          java.awt.Shape paper) {
+        juranometria.project.Projection projection =
+                page(scene).projection();
+        if (!Double.isFinite(projection.visiblePlaneRadius())) {
+            return paper;
+        }
+        double radius = mapping.pixelsPerPlaneUnit()
+                * projection.visiblePlaneRadius();
+        PixelPoint middle = mapping.toPixel(
+                new juranometria.project.PlanePoint(0.0, 0.0));
+        return new java.awt.geom.Ellipse2D.Double(middle.x() - radius,
+                middle.y() - radius, 2.0 * radius, 2.0 * radius);
+    }
+
     private static void drawGeography(Graphics2D g, ChartScene scene,
                                       ChartOptions options,
                                       Projection projection,
                                       ViewportMapping mapping,
                                       java.util.List<
                                               ConstellationNamePlacement>
-                                              names) {
+                                              names,
+                                      java.awt.Shape sky,
+                                      java.awt.Shape paper) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
         ChartPalette palette = options.palette();
         if (options.constellationBoundaries() && policy.boundariesDrawn()) {
             g.setColor(palette.boundaryInk());
             g.setStroke(BOUNDARY_STROKE);
+            g.setClip(sky);
             for (GeoSegment segment : scene.geography().boundarySegments()) {
                 drawGeographySegment(g, segment, scene, projection, mapping, null);
             }
+            g.setClip(paper);
         }
         if (options.constellationFigures() && policy.figuresDrawn()) {
             g.setColor(palette.figureInk());
             g.setStroke(OUTLINE_STROKE);
             java.util.Map<String, double[]> visibleInk =
                     new java.util.LinkedHashMap<>();
+            g.setClip(sky);
             for (GeoSegment segment : scene.geography().figureSegments()) {
                 drawGeographySegment(g, segment, scene, projection, mapping,
                         visibleInk);
             }
+            // And the names outside it: a clipped word is a false
+            // name, so text is governed by where it is placed rather
+            // than by where it is cut (#301).
+            g.setClip(paper);
             // Names depend on figures by decision, which is also why
             // their visible-ink anchors exist exactly when they draw -
             // and since #314 the placement decides which of those

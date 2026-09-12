@@ -28,36 +28,36 @@ Marginal costs, which do not sum: ink overlaps, so removing two layers
 recovers less than the two rows together.
 
   page                        beyond limb    within 1%  further out
-  everything                        13677         2085        11592
-  without star names                10762         2006         8756   (-2915)
-  without the grid                  13542         1950        11592   (-135)
-  without figures                    9132         1716         7416   (-4545)
-  without star marks                13677         2085        11592   (+0)
-  without deep-sky symbols          12993         1954        11039   (-684)
-  without constellation names         9268         1845         7423   (-4409)
+  everything                        11802         1055        10747
+  without star names                 8830          939         7891   (-2972)
+  without the grid                  11506          759        10747   (-296)
+  without figures                    7178          644         6534   (-4624)
+  without star marks                11802         1055        10747   (+0)
+  without deep-sky symbols          11774         1035        10739   (-28)
+  without constellation names         7189          655         6534   (-4613)
 ## The writer, layer by layer
 
   layer                       both  page only  file only  furthest  beyond
-  constellation figures      74013       3042        286      1.0px       0
-  the grid                   73946       3050        322      1.4px       0
-  deep-sky symbols           83516       2943        319      1.0px       0
-  star marks                 72354       2881        268      1.0px       0
+  constellation figures      51617       2189         19      1.0px       0
+  the grid                   54444       2552        128      1.4px       0
+  deep-sky symbols           51617       2182         20      1.0px       0
+  star marks                 51617       2182         15      1.0px       0
   star names             every difference is an edge within the bound
-  star names                112846       5047       2428      1.4px       0
+  star names                 92217       4368       2188      1.4px       0
   constellation names    every difference is an edge within the bound
-  constellation names       134787       6100       3337      2.2px       0
+  constellation names       114023       5469       3166      2.2px       0
   striking a 25x25 patch at 765,2 - radius 1.400 of the disc, beyond the limb
 
   one outside-limb patch struck from the page: 125 px of ink removed, 105 px then beyond the bound, furthest 8.0px
 
 ## The core globe, no modules
 
-  SVG   1653094 bytes  209 text elements, 38 anchored outside the limb
-  PDF   1976100 bytes  geometry not read back from this format
-  PNG   1028817 bytes  1042014 px inside the limb, 99625 beyond it
+  SVG   1653328 bytes  209 text elements, 38 anchored outside the limb
+  PDF   2641237 bytes  geometry not read back from this format
+  PNG   1015951 bytes  1014996 px inside the limb, 95600 beyond it
 
 ## The same globe with modules
 
-  SVG   1654385 bytes  211 text elements, 39 anchored outside the limb
-  PDF   1992918 bytes  geometry not read back from this format
-  PNG   1060743 bytes  1064419 px inside the limb, 103494 beyond it
+  SVG   1654619 bytes  211 text elements, 39 anchored outside the limb
+  PDF   2658055 bytes  geometry not read back from this format
+  PNG   1048797 bytes  1037684 px inside the limb, 99469 beyond it

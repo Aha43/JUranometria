@@ -506,12 +506,35 @@ public final class EquatorialGrid {
         draw(g, grid, ChartPalette.WHITE_PAPER);
     }
 
-    /** Draws a computed grid onto a graphics context, quietest ink. */
+    /**
+     * Draws a computed grid onto a graphics context, quietest ink.
+     *
+     * <p><strong>Not clipped to the limb, and deliberately.</strong>
+     * The grid is the one sky family that needs no clip: its curves
+     * are built through {@code PageRegion}, which on a bounded page
+     * already ends at the limb, so not a point of them lies outside
+     * it. Clipping them again would not make the page more truthful -
+     * it would hide the day one of them stopped being bounded, where
+     * {@code GlobeClipTest} fails on it instead (Sprint 32, issue
+     * #331).
+     *
+     * <p>The first attempt at that rule clipped this call as a whole,
+     * which would also have cut the grid's notation - and a
+     * coordinate cut in half reads as a different coordinate. On a
+     * globe there is no notation to cut, which is its own recorded
+     * limitation.
+     */
     public static void draw(Graphics2D g, Grid grid, ChartPalette palette) {
         g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        drawCurves(g, grid, palette);
+        drawNotation(g, grid, palette);
+    }
+
+    private static void drawCurves(Graphics2D g, Grid grid,
+                                   ChartPalette palette) {
         g.setColor(palette.gridInk());
         g.setStroke(new BasicStroke(1.0f));
         for (List<List<PixelPoint>> family
@@ -524,6 +547,10 @@ public final class EquatorialGrid {
                 }
             }
         }
+    }
+
+    private static void drawNotation(Graphics2D g, Grid grid,
+                                     ChartPalette palette) {
         g.setColor(palette.gridLabelInk());
         g.setFont(GRID_LABEL_FONT);
         for (Label label : grid.labels()) {

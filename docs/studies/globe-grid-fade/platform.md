@@ -21,11 +21,11 @@ answer. The report beside this one carries the candidates themselves and the
 rule they are candidates for.
 
 page            at limb    grid ink  grid weight  page weight
-sagittarius        100%       22.1%       11.24%       15.50%
-sagittarius         35%       22.0%        8.36%       15.33%
-sagittarius         25%       22.0%        7.92%       15.31%
-sagittarius         15%       22.0%        7.48%       15.28%
-orion              100%       20.9%       10.36%       14.70%
-orion               35%       20.8%        7.57%       14.45%
-orion               25%       20.8%        7.15%       14.41%
-orion               15%       20.7%        6.72%       14.37%
+sagittarius        100%       22.0%       11.12%       15.34%
+sagittarius         35%       21.9%        8.32%       15.17%
+sagittarius         25%       21.9%        7.89%       15.14%
+sagittarius         15%       21.9%        7.46%       15.11%
+orion              100%       20.8%       10.25%       14.56%
+orion               35%       20.7%        7.54%       14.31%
+orion               25%       20.7%        7.12%       14.27%
+orion               15%       20.6%        6.70%       14.23%

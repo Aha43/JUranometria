@@ -928,6 +928,47 @@ band, and no drag policy of any kind** — the globe keeps the one rule
 it already had, that a pointer with no sky under it is refused. #330
 changed no production behaviour and closed on its evidence.
 
+### Where sky ink stops (#331)
+
+> **Every piece of sky-derived ink is clipped to the bounded page
+> region before painting. Furniture is outside that clip.**
+
+Held as a general rule rather than a list, and measured as **depth
+rather than area**, because the two answer different questions: a line
+running along the limb leaves hundreds of pixels outside it and every
+one of them a fraction of a pixel deep, while a shape that was never
+cut runs out across the margin however few pixels it covers.
+
+| | ink beyond the limb | deepest |
+|---|---|---|
+| the paper's own border, empty page | 3 996 px | — (furniture) |
+| **all sky ink, no words** | 542 px | **1.01 px** |
+| the same page with no clip at all | 3 733 px | **30.89 px** |
+
+The allowance is **1.5 px**, derived from the raster rather than from
+the result: the clip is exact geometry, so a stroke lying on the limb
+has its outer half cut away rather than painted, leaving antialiasing
+(1.0 px, which tints the pixel a clipped edge passes through) and
+sampling (0.5 px, since ink is measured at pixel centres while the
+limb is a real radius).
+
+**Two masks, never one.** A globe page is a circular sky on
+rectangular paper, and the paper has a border. Counting ink beyond the
+limb without separating them measures that border forever and reads as
+a leak no clipping can fix.
+
+**The grid needed no clip and got one anyway — and that was worth
+finding.** Its curves come through `PageRegion`, which on a bounded
+page already ends at the limb, so not one of its published points lies
+outside. Unclipped it still paints **4.62 px** past the limb, because
+`BasicStroke` joins with a miter by default and a sharp corner spikes
+up to ten stroke widths beyond its own path. Geometrically inside is
+not the same as painted inside.
+
+**Text is outside this rule.** A name cut in half is a false name, so
+where a word may go is a question of placement — the whole label
+inside the disc, or no label.
+
 ### What a globe page fetches, and why it is more than it draws
 
 Recorded because it looks like waste and is not (#329). A globe page
@@ -966,6 +1007,20 @@ once inside a paragraph reads as a pass to anyone scanning:
   to **#293**, which remains the authority for any claim that needs
   physical printing. This gate settles geometry and exported truth
   only.
+- **A globe's grid carries no coordinates.** Grid notation is
+  anchored at the page margins, and a globe's margin is paper rather
+  than sky, so a hemisphere draws a graticule with no figures against
+  it: **zero labels**, where a 120-degree page draws 15 and a
+  42-degree page 15. #331 did not cause this and does not fix it —
+  making existing ink truthful is not the same work as deciding what
+  a globe's grid should say. Recorded as an observed limitation
+  rather than a settled design, with **labels outside the limb ruled
+  out**: they describe sky geometry, and sky's own text belongs
+  inside the sky. The alternatives — an unlabelled graticule,
+  selected coordinates just inside the limb, or sparse coordinates
+  placed through the shared policy — are a backlog issue of their
+  own. The grid still shows orientation, curvature and the pole
+  without them.
 - **Drag-to-pan is settled** (#330). It was not measurable when this
   gate was written, because `PanSolver.solveCentre` took a projection
   kind and there was no globe to give it; measured on the production
