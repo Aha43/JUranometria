@@ -56,7 +56,7 @@ help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "  all    Build the app (default)"
-	@echo "  run    Build and launch the app"
+	@echo "  run    Build and launch the app (also logs to build/run.log)"
 	@echo "  test         Compile and run unit tests"
 	@echo "  chart-image  Write the deterministic reference chart image"
 	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
@@ -156,11 +156,50 @@ app: jar
 	mkdir -p $(APP_DIR)/lib
 	cp $(LIB_DIR)/*.jar $(APP_DIR)/lib/
 
+# Where a run's own words go, kept as well as shown.
+#
+# Swing prints an uncaught exception from the event thread to stderr
+# and carries on: the window looks fine, the reader notices nothing,
+# and the only record scrolls past in a terminal nobody was watching.
+# So the run is teed - the terminal still shows everything live, and
+# build/run.log keeps it to read afterwards - and the tail of the
+# recipe says whether anything was thrown, because a log you have to
+# remember to open is a log you find out about too late.
+#
+# Appended, never truncated, with a dated banner per run: the
+# interesting case is usually "it happened that time and not this
+# time", which a file overwritten on every launch cannot answer.
+RUN_LOG := $(BUILD_DIR)/run.log
+
+run: SHELL := /bin/bash
 run: app
-	$(JAVA) \
+	@mkdir -p $(BUILD_DIR)
+	@printf '\n==== %s  make run\n' "$$(date '+%Y-%m-%d %H:%M:%S')" \
+		>> $(RUN_LOG)
+	@echo "  this run is also being written to $(RUN_LOG)"
+	@set -o pipefail; $(JAVA) \
 		--enable-native-access=ALL-UNNAMED \
 		-cp "$(APP_DIR)/$(MAIN_JAR):$(APP_DIR)/lib/*" \
-		$(MAIN_CLASS)
+		$(MAIN_CLASS) 2>&1 | tee -a $(RUN_LOG); \
+		status=$$?; \
+		thrown=$$(awk '/^==== /{buf=""} {buf = buf $$0 "\n"} \
+			END{printf "%s", buf}' $(RUN_LOG) \
+			| grep -cE '(Exception|Error|Throwable)' || true); \
+		if [ "$$thrown" -gt 0 ]; then \
+			echo ""; \
+			echo "  $$thrown line(s) in this run named an exception."; \
+			echo "  The application may have carried on regardless -"; \
+			echo "  Swing catches what the event thread throws - so"; \
+			echo "  read them even if nothing looked wrong:"; \
+			echo ""; \
+			awk '/^==== /{buf=""} {buf = buf $$0 "\n"} \
+				END{printf "%s", buf}' $(RUN_LOG) \
+				| grep -E '(Exception|Error|Throwable)' \
+				| head -5 | sed 's/^/      /'; \
+			echo ""; \
+			echo "  All of it: $(RUN_LOG)"; \
+		fi; \
+		exit $$status
 
 chart-image: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.app.ChartImageMain
