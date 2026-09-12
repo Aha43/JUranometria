@@ -136,45 +136,118 @@ class GlobeDragQualityTest {
     }
 
     @Test
-    void aFinelySampledDragNeverJumpsToTheOtherSideOfTheSky() {
-        // No tolerance and no threshold. A branch switch does not move
-        // the centre a little too far; it moves it to the far root,
-        // where the sky the reader is holding is behind the globe. So
-        // the test is that the grabbed sky is on the visible
-        // hemisphere at every step of the gesture, and that the page
-        // advances rather than doubling back.
+    void aFinelySampledDragTakesTheNearRootAtEveryStep() {
+        // The first version of this test could not fail. It asserted
+        // that the grabbed sky still projects onto the page and that
+        // the centre's distance from the start does not decrease -
+        // and a branch switch satisfies both. Every candidate the
+        // solver verifies has already reprojected the grabbed sky
+        // onto the target, so the first is true of either root; and a
+        // jump further around the globe increases the distance from
+        // the start, so the second is true of the far one too
+        // (review of PR #338).
+        //
+        // What tells the roots apart is which centre the reader was
+        // already at. The solver takes the verified candidate nearest
+        // its previousCentre, so asking it again from the antipode of
+        // that centre returns the other root - both answers, without
+        // the solver needing a new way to be asked. The step is then
+        // held to the near one directly.
         ChartViewState start = new ChartViewState(SAGITTARIUS, 180.0, 5.0);
         ChartViewport page = viewportFor(start);
         ChartViewController controller = new ChartViewController();
         controller.recenter(start.centre(), 180.0);
 
+        // Grabbed where the second root is actually there to be
+        // taken. Due east of the centre at r = 0.95 the solve has one
+        // verified candidate throughout, so a gesture along it could
+        // assert the near root was chosen while never facing a choice
+        // - the first draft of this test did exactly that and passed
+        // for that reason. Off the horizontal, at r = 0.75, every
+        // step of this drag is two-rooted.
         PixelPoint press = new PixelPoint(
-                WIDE_PX / 2.0 + 0.95 * DISC_PX, HIGH_PX / 2.0);
+                WIDE_PX / 2.0 + 0.75 * DISC_PX * Math.cos(Math.PI / 4.0),
+                HIGH_PX / 2.0 + 0.75 * DISC_PX * Math.sin(Math.PI / 4.0));
         SkyPosition grabbed = PanSolver.skyAt(page,
                 PanSolver.planeFromPixel(page, press)).orElseThrow();
 
-        double travelled = 0.0;
         int steps = 0;
+        int twoRooted = 0;
+        double worstJumpPastTheNearRoot = 0.0;
         for (double back = 0.5; back <= 120.0; back += 0.5) {
-            PixelPoint at = new PixelPoint(press.x() - back, press.y());
-            if (!controller.pan(grabbed, PanSolver.planeFromPixel(page, at))) {
+            SkyPosition previous = controller.state().centre();
+            PlanePoint target = PanSolver.planeFromPixel(page,
+                    new PixelPoint(press.x() - back, press.y()));
+
+            // Both roots, and then *this test* decides which of them
+            // is the near one. Taking the solver's answer as the
+            // definition of near would be a measurement agreeing with
+            // itself: a solver that took the far root would report
+            // the far root as near, and the comparison would pass
+            // while the page jumped.
+            SkyPosition one = PanSolver.solveCentre(
+                    ChartProjection.ORTHOGRAPHIC, grabbed, target,
+                    previous).centre().orElse(null);
+            SkyPosition other = PanSolver.solveCentre(
+                    ChartProjection.ORTHOGRAPHIC, grabbed, target,
+                    antipodeOf(previous)).centre().orElse(null);
+            SkyPosition near = one;
+            SkyPosition far = other;
+            if (one != null && other != null
+                    && other.separationDegrees(previous)
+                            < one.separationDegrees(previous)) {
+                near = other;
+                far = one;
+            }
+
+            if (!controller.pan(grabbed, target)) {
                 continue;
             }
             steps++;
-            Projection projection = drawnBy(controller.state());
-            assertTrue(projection.project(grabbed).isPresent(),
-                    "the sky in the reader's hand is still on the page"
-                            + " after " + back + " px - a branch switch"
-                            + " would have put it behind the globe");
-            double from = start.centre()
-                    .separationDegrees(controller.state().centre());
-            assertTrue(from >= travelled - 1.0e-9,
-                    "the page advances rather than doubling back: "
-                            + from + " after " + travelled);
-            travelled = from;
+            SkyPosition took = controller.state().centre();
+
+            assertEquals(0.0, took.separationDegrees(near), 1.0e-9,
+                    "the step took the root nearest where the reader"
+                            + " already was, after " + back + " px");
+
+            // The solver's own threshold for "two answers rather
+            // than the double root's numerical twins", so this test
+            // and the solver cannot disagree about what ambiguity is.
+            if (far == null || far.separationDegrees(near)
+                    <= PanSolver.AMBIGUITY_SEPARATION_DEGREES) {
+                continue;
+            }
+            twoRooted++;
+            // Both roots put the grabbed sky under the pointer; only
+            // one of them is a drag. The other is a jump, and its
+            // distance from the near root is how big a jump it would
+            // have been - so the step must stay far closer to the
+            // near root than the two roots are to each other.
+            double toNear = took.separationDegrees(near);
+            double toFar = took.separationDegrees(far);
+            assertTrue(toNear < toFar,
+                    "after " + back + " px the step landed on the far"
+                            + " root: " + toNear + " degrees from the"
+                            + " near one against " + toFar
+                            + " from the far one");
+            worstJumpPastTheNearRoot =
+                    Math.max(worstJumpPastTheNearRoot, toNear);
         }
+
         assertTrue(steps > 200,
                 "a finely sampled gesture, not three points: " + steps);
+        assertTrue(twoRooted >= 50,
+                "and one that meets the two-rooted case it is about: "
+                        + twoRooted + " of " + steps + " steps had a"
+                        + " second root to be wrong about");
+        assertEquals(0.0, worstJumpPastTheNearRoot, 1.0e-9,
+                "no step drifted off the near root at all");
+    }
+
+    /** The point opposite a centre, for asking after the other root. */
+    private static SkyPosition antipodeOf(SkyPosition centre) {
+        return new SkyPosition((centre.raDegrees() + 180.0) % 360.0,
+                -centre.decDegrees());
     }
 
     @Test
