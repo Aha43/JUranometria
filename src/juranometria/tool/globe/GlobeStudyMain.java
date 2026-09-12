@@ -94,8 +94,13 @@ public final class GlobeStudyMain {
         System.out.println("through the study door that #329 owns."
                 + " Square pages so the disc is whole.");
         System.out.println();
-        System.out.printf(Locale.ROOT, "%-14s  %-34s %8s %8s %8s%n",
-                "page", "centre", "stars", "objects", "ms");
+        // No wall-clock column. What a page took to draw is this
+        // machine's answer and moves between two runs of it, so a
+        // report pinned to bytes cannot carry it; the label study
+        // settled that (#310) and the runtimes live in the decision
+        // document.
+        System.out.printf(Locale.ROOT, "%-14s  %-34s %8s %8s%n",
+                "page", "centre", "stars", "objects");
         for (Look look : corpus()) {
             draw(look);
         }
@@ -104,7 +109,6 @@ public final class GlobeStudyMain {
     }
 
     private static void draw(Look look) throws IOException {
-        long started = System.nanoTime();
         DrawnPage page = Atlas.assembler().assembleForStudy(
                 look.centre(), 180.0, look.limitingMagnitude(),
                 look.title(), new GlobeProjection(look.centre()),
@@ -122,13 +126,12 @@ public final class GlobeStudyMain {
         ImageIO.write(canvas, "png",
                 new File(DIR, look.slug() + ".png"));
 
-        long ms = (System.nanoTime() - started) / 1_000_000L;
-        System.out.printf(Locale.ROOT, "%-14s  %-34s %8d %8d %8d%n",
+        System.out.printf(Locale.ROOT, "%-14s  %-34s %8d %8d%n",
                 look.slug(),
                 String.format(Locale.ROOT, "RA %.1f, Dec %+.1f",
                         look.centre().raDegrees(),
                         look.centre().decDegrees()),
                 page.scene().stars().size(),
-                page.scene().deepSkyObjects().size(), ms);
+                page.scene().deepSkyObjects().size());
     }
 }

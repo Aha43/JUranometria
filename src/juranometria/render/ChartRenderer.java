@@ -1345,10 +1345,18 @@ public final class ChartRenderer {
      * A symbol's drawn axes in page pixels, including the clamp that
      * keeps a tiny object visible. One rule, so the drawing and the
      * published outline can never disagree about how big a symbol is.
+     *
+     * <p>Published for the reason {@link #symbolInk} was (#313): a
+     * study asking what the atlas draws today has to read the rule
+     * rather than restate it. The globe gate's family study restated
+     * it and got it wrong - it took the minor axis from the
+     * foreshortened globe footprint, where production scales both
+     * catalogue axes uniformly at the page centre's rate (review of
+     * PR #336). Behaviour is unchanged; only the door is open.
      */
-    private static double[] symbolAxesPx(DeepSkyObject dso,
-                                         RegionalDetailPolicy policy,
-                                         double pixelsPerPlaneUnit) {
+    public static double[] symbolAxesPx(DeepSkyObject dso,
+                                        RegionalDetailPolicy policy,
+                                        double pixelsPerPlaneUnit) {
         double majorPx = arcminToPx(dso.majorAxisArcmin(), pixelsPerPlaneUnit);
         double minorPx = arcminToPx(dso.minorAxisArcmin(), pixelsPerPlaneUnit);
         if (majorPx < RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX

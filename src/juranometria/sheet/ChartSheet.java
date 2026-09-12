@@ -142,4 +142,55 @@ public final class ChartSheet {
         return new SheetRecording(recorder, paper, scene, onPaper,
                 SheetMetadata.of(scene, state, onPaper, paper));
     }
+
+    /**
+     * A sheet of a page whose projection its viewport does not name
+     * (Sprint 32, issue #301).
+     *
+     * <p><strong>Study only, and temporary: #331 owns its
+     * removal</strong>, when a globe is a page a reader can reach and
+     * a {@link ChartViewState} can describe one. Until then the sheet
+     * path cannot be asked about a hemisphere at all, because a state
+     * refuses a 180-degree field - so the gate cannot see what a globe
+     * exports without this.
+     *
+     * <p>Everything else is the production path: the same recorder,
+     * the same renderer, the same white-paper palette, the same
+     * module layers in the same order, and metadata read from the page
+     * that drew it.
+     */
+    public static SheetRecording recordForStudy(
+            juranometria.project.DrawnPage page,
+            double fieldWidthDegrees,
+            ChartOptions options,
+            ChartRenderer.ReferenceLayer reference,
+            ChartRenderer.ReferenceLayer overChart,
+            PaperSize paper) {
+        if (page == null || options == null || paper == null) {
+            throw new IllegalArgumentException(
+                    "page, options and paper are required");
+        }
+        if (reference == null || overChart == null) {
+            throw new IllegalArgumentException(
+                    "both layers are required; pass"
+                            + " ChartRenderer.ReferenceLayer.NONE");
+        }
+        ChartScene scene = page.scene();
+        ChartOptions onPaper =
+                options.withPalette(ChartPalette.WHITE_PAPER);
+
+        SheetRecorder recorder = new SheetRecorder(
+                paper.chartWideUnits(), paper.chartHighUnits());
+        Graphics2D g = (Graphics2D) recorder.create();
+        try {
+            ChartRenderer.drawing(page, StarSizePolicy.DEFAULT)
+                    .render(g, scene, onPaper, reference);
+            overChart.paint(g, scene);
+        } finally {
+            g.dispose();
+        }
+        return new SheetRecording(recorder, paper, scene, onPaper,
+                SheetMetadata.of(page, fieldWidthDegrees,
+                        scene.limitingMagnitude(), onPaper, paper));
+    }
 }
