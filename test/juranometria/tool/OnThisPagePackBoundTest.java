@@ -63,12 +63,33 @@ class OnThisPagePackBoundTest {
                         + " own manifest declares: "
                         + OnThisPageStudyMain.largestRecordedSemiMajorDegrees()
                         + " vs " + margin);
-        double horizon = juranometria.project.Projections.of(
+        juranometria.project.Projection widestProjection =
+                juranometria.project.Projections.of(
                         juranometria.chart.ChartProjection.forField(
                                 juranometria.chart.ChartViewState
                                         .fieldWidthSteps().get(0)),
-                        new juranometria.chart.SkyPosition(0.0, 0.0))
-                .limitDegrees();
+                        new juranometria.chart.SkyPosition(0.0, 0.0));
+        double horizon = widestProjection.limitDegrees();
+        if (Double.isFinite(widestProjection.visiblePlaneRadius())) {
+            // A bounded page is a different promise, and the sum
+            // above is not it. The globe's page reaches its own limb
+            // exactly - that is what a hemisphere is - and the query
+            // margin deliberately fetches past it, because an object
+            // centred just beyond the limb can still have a footprint
+            // on this side. Those objects project to nothing and draw
+            // nothing; what must hold is that the page claims no sky
+            // past its edge and the query stays inside the sky.
+            assertEquals(horizon, reach, 1.0e-9,
+                    "a bounded page reaches its own limb and no"
+                            + " further: " + reach + "° against a "
+                            + horizon + "° limb");
+            assertTrue(reach + margin + margin <= 180.0, String.format(
+                    "%.2f° of page reach plus %.2f° of query margin and"
+                            + " %.2f° of object radius come to %.2f°,"
+                            + " which must stay inside the sky",
+                    reach, margin, margin, reach + margin + margin));
+            return;
+        }
         assertTrue(reach + margin + margin < horizon, String.format(
                 "%.2f° of page reach, %.2f° of query margin and %.2f°"
                         + " of object radius come to %.2f°, which must"

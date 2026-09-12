@@ -129,10 +129,10 @@ class AtlasTest {
         assertTrue(assembler.fits(new SkyPosition(0.1, -89.5), 8.0),
                 "near the south pole");
         assertTrue(assembler.fits(new SkyPosition(359.9, 0.0), 1.0), "at the RA wrap");
-        assertEquals(120.0, assembler.widestFittingFieldDegrees(
+        assertEquals(180.0, assembler.widestFittingFieldDegrees(
                 new SkyPosition(180.0, -45.0)).orElseThrow(),
-                "the widest step - the overview's widest rung - fits"
-                        + " anywhere under all-sky coverage");
+                "the widest step - the globe's hemisphere - fits"
+                        + " anywhere under all-sky coverage (#329)");
         assertTrue(assembler.maxPageHeightPx(new SkyPosition(83.8, -5.4), 8.0, 900) > 10000,
                 "the projection-sanity cap sits far beyond real windows");
     }

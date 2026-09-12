@@ -53,7 +53,8 @@ class GlobeFootprintTest {
 
     @Test
     void theCloudsFootprintStaysOnTheSkyWhereTheCloudIs() {
-        GlobeProjection globe = new GlobeProjection(PAGE);
+        juranometria.project.Projection globe = juranometria.project.Projections.of(
+                juranometria.chart.ChartProjection.ORTHOGRAPHIC, PAGE);
         double centreSeparation = PAGE.separationDegrees(LMC);
         assertTrue(centreSeparation > 80.0 && centreSeparation < 85.0,
                 "the fixture is the cloud near the limb, and it has"
@@ -79,7 +80,8 @@ class GlobeFootprintTest {
         // If a change ever makes centre-scale sizing agree with the
         // projected footprint here, the reason will be worth knowing
         // and this will say so by failing.
-        GlobeProjection globe = new GlobeProjection(PAGE);
+        juranometria.project.Projection globe = juranometria.project.Projections.of(
+                juranometria.chart.ChartProjection.ORTHOGRAPHIC, PAGE);
         List<PlanePoint> scaled = Footprint.atCentreScale(globe, LMC,
                 LMC_MAJOR_ARCMIN, LMC_MINOR_ARCMIN,
                 LMC_POSITION_ANGLE);
@@ -101,7 +103,8 @@ class GlobeFootprintTest {
         // Four degrees across, centred eighty-nine degrees out: this
         // one really does straddle, and the rule is that the limb
         // clips rather than erases.
-        GlobeProjection globe = new GlobeProjection(PAGE);
+        juranometria.project.Projection globe = juranometria.project.Projections.of(
+                juranometria.chart.ChartProjection.ORTHOGRAPHIC, PAGE);
         SkyPosition straddling = Footprint.outlineIn(PAGE,
                 2.0 * 89.0 * 60.0, 2.0 * 89.0 * 60.0, 0.0).get(0);
         assertTrue(PAGE.separationDegrees(straddling) > 88.0,

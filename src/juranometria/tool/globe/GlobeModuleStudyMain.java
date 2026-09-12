@@ -93,9 +93,7 @@ public final class GlobeModuleStudyMain {
                 "centred on", "centre");
 
         for (Look look : centres()) {
-            DrawnPage page = Atlas.assembler().assembleForStudy(
-                    look.centre(), 180.0, 5.0, look.what(),
-                    new GlobeProjection(look.centre()), SIDE_PX,
+            DrawnPage page = GlobePage.of(look.centre(), 5.0, SIDE_PX,
                     SIDE_PX);
             OverlayRegistry registry = modules();
             BufferedImage onlyModules = paintModules(page, registry);

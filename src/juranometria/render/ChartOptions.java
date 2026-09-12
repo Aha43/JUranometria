@@ -36,6 +36,58 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            ChartPalette palette) {
 
     /**
+     * The same options as a globe page draws them (Sprint 32, issue
+     * #301).
+     *
+     * <p>One difference from whatever the reader has chosen, and it
+     * is cartographic rather than a preference: <strong>constellation
+     * boundaries are off</strong>. On a hemisphere they are the layer
+     * that stops earning its ink - the gate measured them recovering
+     * more than any other layer at the limb, and a boundary drawn
+     * across a band carrying half the sky is a fence nobody can
+     * follow (docs/decisions/celestial-globe.md). Everything else the
+     * gate settled - figures, grid, constellation names, star names
+     * and letters, all five deep-sky families - is on by default
+     * already and is left as the reader has it.
+     *
+     * <p>Applied to the page, never written back: a reader who
+     * switches boundaries on for their charts still has them on when
+     * they come back from the globe, which is what
+     * {@code GlobeDefaultsDoNotLeakTest} holds.
+     */
+    /**
+     * The options a page is drawn with, given what the reader chose
+     * (Sprint 32, issue #329).
+     *
+     * <p>One seam, so the chart, the exported sheet and the
+     * accessible description cannot disagree about what a globe
+     * shows - and the page is <em>asked</em> rather than named: a
+     * bounded page is one whose sky ends inside the paper, which
+     * every projection can answer without anything here knowing the
+     * word "orthographic".
+     *
+     * <p>The direction of the dependency is why this lives here
+     * rather than on the page: {@code juranometria.project} knows
+     * nothing of rendering, and a page that reached for
+     * {@code ChartOptions} would put a cycle in the one boundary the
+     * atlas keeps straight.
+     */
+    public ChartOptions onPage(juranometria.project.DrawnPage page) {
+        return page.bounded() ? onAGlobe() : this;
+    }
+
+    public ChartOptions onAGlobe() {
+        return constellationBoundaries
+                ? new ChartOptions(deepSkyObjects, deepSkyLabels,
+                        constellationFigures, false, constellationNames,
+                        starNames, bayerLetters, flamsteedNumbers,
+                        equatorialGrid, titleBlock, magnitudeKey,
+                        galaxies, openClusters, globularClusters,
+                        nebulae, planetaryNebulae, palette)
+                : this;
+    }
+
+    /**
      * The released chart: every layer on, the title block on, the
      * stellar-magnitude key OFF - the Sprint 20 decision, which
      * measured the key covering up to 436 px of star and symbol ink

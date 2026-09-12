@@ -410,34 +410,80 @@ public final class OnThisPageStudyMain {
                         + " projection, or a boundary that cannot be"
                         + " followed to that distance, stops the study"
                         + " where it stands.%n%n");
-        System.out.printf(Locale.ROOT,
-                "Neither can happen with the bundled pack, and the"
-                        + " reason is structural rather than a survey"
-                        + " of pages. At the widest field the atlas"
-                        + " offers, the tallest page the assembler"
-                        + " will build reaches **%.1f°** from its"
-                        + " centre - it letterboxes a taller window"
-                        + " rather than promising sky the projection"
-                        + " cannot draw honestly; the assembler"
-                        + " queries"
-                        + " that reach plus the pack's declared"
-                        + " **%.2f°** object margin; and nothing it"
-                        + " returns extends more than that same"
-                        + " **%.2f°** from its own centre. So the"
-                        + " furthest any boundary can lie from a page"
-                        + " centre is %.1f + %.2f + %.2f ="
-                        + " **%.2f°**, short of the %.0f° horizon."
-                        + " The largest object the pack actually"
-                        + " records is %.2f°, and it holds %,d in"
-                        + " all. Every number here is asked of"
-                        + " production rather than restated: the"
-                        + " margin from the pack's manifest, the reach"
-                        + " from a page the assembler built.%n%n",
-                widestPageReachDegrees(), declaredObjectMarginDegrees(),
-                declaredObjectMarginDegrees(), widestPageReachDegrees(),
-                declaredObjectMarginDegrees(), declaredObjectMarginDegrees(),
-                widestPageReachDegrees() + 2 * declaredObjectMarginDegrees(),
-                90.0, largestRecordedSemiMajorDegrees(), packSize());
+        // The widest page is bounded now, and the old sentence
+        // cannot be told about it: it ended "short of the 90 degree
+        // horizon", and a hemisphere's page reaches that horizon
+        // exactly. Reading it back after #329 it said 100.78 degrees
+        // was short of 90, which is the shape of an argument written
+        // for one kind of page and applied to another.
+        juranometria.project.Projection widest =
+                juranometria.project.Projections.of(
+                        juranometria.chart.ChartProjection.forField(
+                                ChartViewState.fieldWidthSteps().get(0)),
+                        Atlas.DEFAULT_CENTRE);
+        if (Double.isFinite(widest.visiblePlaneRadius())) {
+            System.out.printf(Locale.ROOT,
+                    "Neither can happen with the bundled pack, and the"
+                            + " reason is structural rather than a"
+                            + " survey of pages. The widest field the"
+                            + " atlas offers is a **bounded** page -"
+                            + " the celestial globe - so the argument"
+                            + " is a different one from the chart"
+                            + " pages' below it. Its page reaches"
+                            + " **%.1f°** from its centre, which is"
+                            + " its own limb and its projection's"
+                            + " whole domain: there is no sky beyond"
+                            + " it to run off, because past the limb"
+                            + " there is no sky at all rather than sky"
+                            + " the projection cannot place. The"
+                            + " assembler queries that reach plus the"
+                            + " pack's declared **%.2f°** object"
+                            + " margin - deliberately past the limb,"
+                            + " since an object centred just beyond it"
+                            + " can still have a footprint on this"
+                            + " side - and what it fetches from over"
+                            + " there projects to nothing and draws"
+                            + " nothing. The query reaches %.1f +"
+                            + " %.2f = **%.2f°**, inside the sky's own"
+                            + " 180°. The largest object the pack"
+                            + " actually records is %.2f°, and it"
+                            + " holds %,d in all.%n%n",
+                    widestPageReachDegrees(), declaredObjectMarginDegrees(),
+                    widestPageReachDegrees(), declaredObjectMarginDegrees(),
+                    widestPageReachDegrees() + declaredObjectMarginDegrees(),
+                    largestRecordedSemiMajorDegrees(), packSize());
+        } else {
+            System.out.printf(Locale.ROOT,
+                    "Neither can happen with the bundled pack, and the"
+                            + " reason is structural rather than a"
+                            + " survey of pages. At the widest field"
+                            + " the atlas offers, the tallest page the"
+                            + " assembler will build reaches **%.1f°**"
+                            + " from its centre - it letterboxes a"
+                            + " taller window rather than promising"
+                            + " sky the projection cannot draw"
+                            + " honestly; the assembler queries that"
+                            + " reach plus the pack's declared"
+                            + " **%.2f°** object margin; and nothing"
+                            + " it returns extends more than that same"
+                            + " **%.2f°** from its own centre. So the"
+                            + " furthest any boundary can lie from a"
+                            + " page centre is %.1f + %.2f + %.2f ="
+                            + " **%.2f°**, short of the %.0f° horizon."
+                            + " The largest object the pack actually"
+                            + " records is %.2f°, and it holds %,d in"
+                            + " all. Every number here is asked of"
+                            + " production rather than restated: the"
+                            + " margin from the pack's manifest, the"
+                            + " reach from a page the assembler"
+                            + " built.%n%n",
+                    widestPageReachDegrees(), declaredObjectMarginDegrees(),
+                    declaredObjectMarginDegrees(), widestPageReachDegrees(),
+                    declaredObjectMarginDegrees(), declaredObjectMarginDegrees(),
+                    widestPageReachDegrees() + 2 * declaredObjectMarginDegrees(),
+                    widest.limitDegrees(), largestRecordedSemiMajorDegrees(),
+                    packSize());
+        }
         System.out.println("`OnThisPageSphericalTest` checks the"
                 + " rule from the opposite direction: it samples the"
                 + " **paper**, turns each pixel back into a sky"
@@ -500,7 +546,11 @@ public final class OnThisPageStudyMain {
         SceneAssembler assembler = Atlas.assembler();
         double widestField = ChartViewState.fieldWidthSteps().get(0);
         SkyPosition centre = Atlas.DEFAULT_CENTRE;
-        int tallest = assembler.maxPageHeightPx(centre, widestField, WIDTH);
+        // Square where the cap is unbounded: a globe page has no
+        // projection limit on its height, and a page as tall as an
+        // int is not a page (#329).
+        int tallest = Math.min(WIDTH,
+                assembler.maxPageHeightPx(centre, widestField, WIDTH));
         return PageExtent.pageReachDegrees(assembler.assemble(
                 new ChartViewState(centre, widestField, 8.0),
                 WIDTH, tallest));
