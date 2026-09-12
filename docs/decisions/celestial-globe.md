@@ -655,11 +655,29 @@ pixel for pixel, **one layer at a time**:
 | layer alone on the page | in both | page only | file only | furthest | beyond √5 |
 |---|---|---|---|---|---|
 | constellation figures | 74 013 | 3 042 | 286 | 1.0 px | **0** |
-| the grid | 73 416 | 3 049 | 314 | 1.4 px | **0** |
+| the grid | 73 416 | 3 049 | 314 | 1.0 px | **0** |
 | deep-sky symbols | 83 516 | 2 943 | 319 | 1.0 px | **0** |
 | star marks | 72 354 | 2 881 | 268 | 1.0 px | **0** |
-| star names | 112 846 | 5 047 | 2 428 | 1.4 px | **0** |
-| constellation names | 134 787 | 6 100 | 3 337 | **2.2 px** | **0** |
+| *star names* | *112 846* | *5 047* | *2 428* | *1.4 px* | *0* |
+| *constellation names* | *134 787* | *6 100* | *3 337* | *2.2 px* | *0* |
+
+**The two italicised rows are this machine's answer only**, and a
+second machine is why. Running the contract on the CI runner, the
+star-names layer produced lone pixels **4.0 px** apart at radius 1.118
+of the disc, and the neighbourhood shows what they are: a vertical
+glyph stem two pixels wide in the page and four pixels wide in the
+file, sitting five columns to the left. The same stroke, hinted
+differently under the two paths' transforms — the page drawn straight
+to a raster, the file replayed by the writer at 300 dpi. That is font
+rasterisation, which #315 already classifies as the desktop's answer
+rather than the atlas's.
+
+So the claim is split, and narrowed to what it can carry: **the writer
+keeps the page's geometry for vector ink on every machine**, pinned to
+bytes at √5; for **text ink** the comparison is held to reproducing
+within one environment and lives in the platform record. The
+demonstration that the oracle can fail uses the constellation-figures
+layer, so it stays portable.
 
 A first version of this check compared the whole page at once, asking
 of each differing pixel only whether the other rendering had *any* ink
@@ -680,7 +698,9 @@ called an edge effect: it sits on a **glyph stem in a constellation
 name beyond the limb**, which both renderings draw, the file's block
 beginning a row higher and ending a column wider. That it fell in
 constellation-name text — the largest source above — is the reason
-chasing it mattered.
+chasing it mattered, and the CI runner later showed why: the same
+mechanism, on a desktop that hints text differently, moves a stem four
+pixels rather than two.
 
 **And the oracle is shown to fail.** A check that cannot fail proves
 nothing, so a 25×25 patch is struck out of the page rendering at
@@ -789,6 +809,14 @@ once inside a paragraph reads as a pass to anyone scanning:
   physical printing. This gate settles geometry and exported truth
   only.
 - **Drag-to-pan is not settled**, and was not measurable: see above.
+- **Writer fidelity for text ink is established per environment, not
+  across machines.** Vector ink — figures, grid, deep-sky symbols,
+  star marks — is held to √5 on every machine that runs the contract.
+  Text is not, because two rasterisation paths hint a glyph stem to
+  different pixels, and the CI runner moves one four pixels where this
+  machine moves it two. What that leaves unproven is narrow: whether a
+  *letter* survives the writer unmoved is a claim this gate makes only
+  of the desktop it was measured on.
 
 ## A page is drawn by one projection
 

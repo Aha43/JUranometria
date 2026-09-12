@@ -29,11 +29,16 @@ belongs to the shape being compared.
   the grid               every difference is an edge within the bound
   deep-sky symbols       every difference is an edge within the bound
   star marks             every difference is an edge within the bound
-  star names             every difference is an edge within the bound
-  constellation names    every difference is an edge within the bound
+
+The two text layers are not in that list, and the reason is a measurement:
+the CI runner draws a glyph stem four pixels left of where this machine draws
+it, and two pixels wider, in the written file against the page - the same
+stroke, hinted differently under the two paths' transforms. That is the
+desktop's answer, not the atlas's, so the text layers are compared in the
+platform record beside this and held to reproducing within one environment.
 
   with one outside-limb patch struck from the page, the comparison fails, as it must
-  every layer holds and the oracle can fail: the writer is faithful.
+  every vector layer holds and the oracle can fail: the writer keeps the page's geometry.
 
 ## The core globe, no modules
 

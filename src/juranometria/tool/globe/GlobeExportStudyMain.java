@@ -224,36 +224,53 @@ public final class GlobeExportStudyMain {
                 "layer", "both", "page only", "file only", "furthest",
                 "beyond");
 
-        record Layer(String name, ChartOptions only) {
+        record Layer(String name, boolean vector, ChartOptions only) {
         }
         List<Layer> alone = List.of(
-                new Layer("constellation figures",
+                new Layer("constellation figures", true,
                         only(true, false, false, false, false, false)),
-                new Layer("the grid",
+                new Layer("the grid", true,
                         only(false, true, false, false, false, false)),
-                new Layer("deep-sky symbols",
+                new Layer("deep-sky symbols", true,
                         only(false, false, true, false, false, false)),
-                new Layer("star marks",
+                new Layer("star marks", true,
                         only(false, false, false, true, false, false)),
-                new Layer("star names",
+                new Layer("star names", false,
                         only(false, false, false, true, true, false)),
-                new Layer("constellation names",
+                new Layer("constellation names", false,
                         only(true, false, false, false, false, true)));
 
         boolean everyLayerHeld = true;
         for (Layer layer : alone) {
             Compared how = compare(page, layer.only(), paper);
-            everyLayerHeld &= how.beyond() == 0;
-            System.out.printf(Locale.ROOT, "  %-22s %s%n",
-                    layer.name(), how.beyond() == 0
-                            ? "every difference is an edge within the"
-                                    + " bound"
-                            : "** " + how.beyond() + " DIFFERENCES"
-                                    + " BEYOND THE BOUND **");
+            String verdict = how.beyond() == 0
+                    ? "every difference is an edge within the bound"
+                    : "** " + how.beyond() + " DIFFERENCES BEYOND THE"
+                            + " BOUND **";
+            if (layer.vector()) {
+                everyLayerHeld &= how.beyond() == 0;
+                System.out.printf(Locale.ROOT, "  %-22s %s%n",
+                        layer.name(), verdict);
+            } else {
+                split.machinef("  %-22s %s%n", layer.name(), verdict);
+            }
             split.machinef("  %-22s %9d %10d %10d %8.1fpx %7d%n",
                     layer.name(), how.both(), how.pageOnly(),
                     how.fileOnly(), how.furthest(), how.beyond());
         }
+        System.out.println();
+        System.out.println("The two text layers are not in that list,"
+                + " and the reason is a measurement:");
+        System.out.println("the CI runner draws a glyph stem four"
+                + " pixels left of where this machine draws");
+        System.out.println("it, and two pixels wider, in the written"
+                + " file against the page - the same");
+        System.out.println("stroke, hinted differently under the two"
+                + " paths' transforms. That is the");
+        System.out.println("desktop's answer, not the atlas's, so the"
+                + " text layers are compared in the");
+        System.out.println("platform record beside this and held to"
+                + " reproducing within one environment.");
 
         // And the oracle shown to fail, because one that cannot fail
         // proves nothing. A patch of ink beyond the limb is struck
@@ -275,9 +292,11 @@ public final class GlobeExportStudyMain {
                 mutated.removedPx(), mutated.how().beyond(),
                 mutated.how().furthest());
         System.out.println(everyLayerHeld && oracleCanFail
-                ? "  every layer holds and the oracle can fail: the"
-                        + " writer is faithful."
-                : "  ** the writer is not established as faithful **");
+                ? "  every vector layer holds and the oracle can"
+                        + " fail: the writer keeps the page's"
+                        + " geometry."
+                : "  ** the writer is not established as keeping the"
+                        + " page's geometry **");
     }
 
     /** What comparing one layer found. */
@@ -450,7 +469,7 @@ public final class GlobeExportStudyMain {
                                       BufferedImage after, int ground,
                                       int atX, int atY) {
         int reach = 5;
-        System.out.println("      page            file");
+        split.machine("      page            file");
         for (int dy = -reach; dy <= reach; dy++) {
             StringBuilder left = new StringBuilder("      ");
             StringBuilder right = new StringBuilder();
@@ -467,7 +486,7 @@ public final class GlobeExportStudyMain {
                         : (after.getRGB(x, y) & 0xffffff) != ground
                                 ? '#' : '.');
             }
-            System.out.println(left + "    " + right);
+            split.machine(left + "    " + right);
         }
     }
 
@@ -552,7 +571,15 @@ public final class GlobeExportStudyMain {
                     // either an edge the rasterisers rounded
                     // differently or a shape that moved, and the two
                     // are told apart by looking at where it is.
-                    System.out.printf(Locale.ROOT,
+                    //
+                    // Into the machine's record, never onto stdout:
+                    // this is a picture of pixels, and a report
+                    // pinned to bytes cannot carry one. The CI runner
+                    // found that immediately - a stem hinted four
+                    // pixels left of where this machine puts it
+                    // dumped its neighbourhood into the middle of the
+                    // committed document (review of PR #336).
+                    split.machinef(
                             "    lone pixel at %d,%d - %.1f px from"
                                     + " ink in the other, %s, radius"
                                     + " %.4f of the disc%n",

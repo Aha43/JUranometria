@@ -42,7 +42,9 @@ recovers less than the two rows together.
   the grid                   73416       3049        314      1.4px       0
   deep-sky symbols           83516       2943        319      1.0px       0
   star marks                 72354       2881        268      1.0px       0
+  star names             every difference is an edge within the bound
   star names                112846       5047       2428      1.4px       0
+  constellation names    every difference is an edge within the bound
   constellation names       134787       6100       3337      2.2px       0
   striking a 25x25 patch at 765,2 - radius 1.400 of the disc, beyond the limb
 
