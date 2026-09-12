@@ -224,6 +224,22 @@ public final class PanSolver {
         double east = asked.east();
         double north = asked.north();
 
+        // A target the projection cannot read is no centre, not a
+        // NaN one. Every page had sky at every plane point until the
+        // globe, so this could not arise and the arithmetic below was
+        // free to trust its inputs; a bounded page has paper past its
+        // limb, and asking what angle a plane radius beyond it stands
+        // for answers NaN. Carried on, that NaN reaches a
+        // SkyPosition, which refuses it - so a reader dragging on a
+        // globe sprayed "right ascension must be in [0, 360) degrees:
+        // NaN" from the event thread while the drag silently did
+        // nothing. Refusing here answers every caller at once, rather
+        // than each of them learning the same lesson (#329).
+        if (!Double.isFinite(along) || !Double.isFinite(east)
+                || !Double.isFinite(north)) {
+            return new PanSolution(Optional.empty(), false, false, false);
+        }
+
         // Feasibility: |s . e| <= cos(decS), because e depends on the
         // centre's right ascension alone and cannot reach further
         // east of a near-polar grab than that. An infeasible request
