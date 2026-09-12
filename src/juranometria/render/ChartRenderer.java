@@ -70,61 +70,36 @@ public final class ChartRenderer {
 
     private final StarSizePolicy starSizePolicy;
 
-    /**
-     * The projection this renderer draws by, when it has been told
-     * one instead of asking the viewport (Sprint 32, issue #301).
-     *
-     * <p><strong>Study only, and temporary: issue #329 owns its
-     * removal.</strong> The celestial-globe gate has to see what the
-     * production renderer draws for a hemisphere before production
-     * has an orthographic projection to name - and a study that drew
-     * hemispheres with its own renderer would be measuring itself
-     * rather than the atlas.
-     *
-     * <p>Null in every production path, where the viewport's own kind
-     * answers exactly as it did before.
-     */
-    private final DrawnPage told;
-
     public ChartRenderer(StarSizePolicy starSizePolicy) {
-        this(starSizePolicy, null);
-    }
-
-    private ChartRenderer(StarSizePolicy starSizePolicy, DrawnPage told) {
         if (starSizePolicy == null) {
             throw new IllegalArgumentException("star size policy must not be null");
         }
         this.starSizePolicy = starSizePolicy;
-        this.told = told;
     }
 
     /**
-     * The projection this page is drawn by: the one this renderer was
-     * told, or the one its viewport names.
+     * The projection this page is drawn by.
      *
      * <p>One method rather than a condition at each of the four
-     * places that asked - three that draw and one that writes the
-     * page's identity into the title block - because a globe drawn by
-     * one projection and titled by another would be the study lying
-     * in exactly the way the gate exists to prevent.
+     * places that ask - three that draw and one that writes the
+     * page's identity into the title block - because a page drawn by
+     * one projection and titled by another is the fault the whole
+     * boundary exists to prevent.
+     *
+     * <p>It carried a second answer until #329: a renderer could be
+     * <em>told</em> a projection its viewport did not name, because
+     * the celestial-globe gate had to see production ink for a
+     * hemisphere before production had an orthographic projection.
+     * The rung made that unnecessary and the door went with it; the
+     * field it read was left behind and is removed here.</p>
      */
-    private Projection drawnBy(ChartScene scene) {
+    private static Projection drawnBy(ChartScene scene) {
         return page(scene).projection();
     }
 
     /** This scene as a page, with the projection that draws it. */
-    private DrawnPage page(ChartScene scene) {
-        if (told == null) {
-            return DrawnPage.of(scene);
-        }
-        if (told.scene() != scene) {
-            throw new IllegalArgumentException(
-                    "this renderer was built for one page and told"
-                            + " which projection draws it; it cannot"
-                            + " draw another, because it would draw"
-                            + " that one by the wrong projection");
-        }
-        return told;
+    private static DrawnPage page(ChartScene scene) {
+        return DrawnPage.of(scene);
     }
 
     /** Renders the scene with the released default options. */
