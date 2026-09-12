@@ -404,6 +404,76 @@ admitted by the centre-scale mistake, and they are Messier landmarks
 that both rules keep. Measuring the corrected population rather than
 reasoning about it is what caught it.
 
+## Names: no globe budget, a truthful page instead
+
+There is **no separate name budget for the globe**. Family eligibility
+and the shared placement priority are unchanged. What changes is that
+the placement seam receives the globe's **circular page region as its
+hard boundary**: text may neither cross nor leave the limb, and a
+constellation name with no position inside both its visible figure
+region and the globe is truthfully omitted.
+
+This is not a private globe placement rule. The policy is untouched —
+same candidate order, same obstacles, same collisions. It is the
+existing policy told where the page ends, instead of assuming every
+page is a rectangle.
+
+### Why a budget looked unnecessary, and why that was not evidence
+
+Measured first with the paper's edge as the boundary
+(`make globe-name-study`), a hemisphere looked flawless: every label
+placed, none omitted, 150 of 150 star names attributable at first
+choice. It was flawless because the policy had the whole white margin
+to work in.
+
+| | on the disc | crossing the limb | outside it |
+|---|---|---|---|
+| star names | 129 | 15 | **6** |
+| constellation names | 42 | 16 | 0 |
+
+Six star names sat **entirely off the celestial sphere**, and each
+passed every attribution test while breaking the rule that nothing
+floats outside the disc. **The zero in the omitted column and the
+labels in the margin were the same fact.**
+
+### What the truthful page costs
+
+Given the limb as its boundary, the same policy on the same page:
+
+| | outcome |
+|---|---|
+| star names | **150 of 150** attributable, all inside the disc, none crossing |
+| deep-sky names | unchanged |
+| constellation names | 52 placed inside the disc, **6 omitted** |
+| labels that moved | **54** |
+| labels unchanged | 149 |
+
+**No star name is lost**, and at the limb their median candidate rank
+*improves* from 1 to 0 — excluding the margin did not push them into
+worse positions, it stopped them wandering off the sky.
+
+The six losses are constellation names, and the refusal cause says
+which boundary refused them: **`OWNERSHIP`, not `PAGE_EDGE`**. They
+cannot find a position inside their own figure's region that is also
+on the sphere, because those figures are cut by the limb and most of
+their region is not on this page. A name for a figure the page barely
+shows is a name worth omitting.
+
+So the budget question answers itself: attribution was already good
+and stays good, and the only cost of telling the truth is six names
+for constellations that are mostly elsewhere.
+
+### A measure that was mine rather than the atlas's
+
+The first run also reported 34 "doubtful" constellation names by the
+nearest-rival test. That result was withdrawn rather than recorded: a
+constellation's owned shape is the convex hull of a sprawling figure,
+neighbouring hulls interpenetrate, so a name is routinely zero from
+its own hull and zero from a neighbour's. It measured overlapping
+hulls, not any confusion a reader could have. Constellation names are
+now judged by whether they sit on the figure they name, which is what
+the policy's `OWNERSHIP` refusal already guarantees.
+
 ## A page is drawn by one projection
 
 Not a cartographic decision, but the gate found it and it had to be
@@ -432,14 +502,9 @@ was satisfied by a fix that put the split straight back.
 
 ## Still open
 
-How many names are useful, decided on the settled page and judged by
-whether a label stays close enough to identify its object rather than
-by whether placement found an empty rectangle; navigation and pointing
-near the limb; which module geometry remains useful there; projection
+Navigation and pointing near the limb; which module geometry remains useful there; projection
 identity in export; and paper policy, with #293 remaining the
 authority for any claim that needs printing.
 
-The shared placement policy stands: names on a globe are placed by the
-same rule as everywhere else. If it cannot cope near the limb, that is
-a measured finding to bring back, not grounds for a private globe
-rule.
+The shared placement policy stood: it needed no change, only the
+page's true shape.

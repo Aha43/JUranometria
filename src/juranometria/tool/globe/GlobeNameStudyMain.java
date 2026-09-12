@@ -85,12 +85,34 @@ public final class GlobeNameStudyMain {
                          boolean omitted, Against against,
                          List<LabelPlacement.Refusal> refusedBy) {
 
+        /**
+         * For a star or a deep-sky object: its own mark is strictly
+         * nearer than every same-family rival.
+         *
+         * <p>Not asked of a constellation name. Its {@code owns} is
+         * the convex hull of a sprawling figure, and neighbouring
+         * hulls interpenetrate, so a name can be zero from its own and
+         * zero from a neighbour's - which measures overlapping hulls
+         * rather than any confusion a reader could have. What matters
+         * for a constellation is that the name is inside the figure it
+         * names, and the shared policy already refuses otherwise
+         * through OWNERSHIP.
+         */
         boolean identified() {
             return !omitted && toOwn < toRival;
         }
 
         boolean doubtful() {
             return !omitted && !identified();
+        }
+
+        boolean constellation() {
+            return family == LabelPlacement.Family.CONSTELLATION;
+        }
+
+        /** A constellation name sitting on the figure it names. */
+        boolean onItsOwnFigure() {
+            return !omitted && toOwn == 0.0;
         }
     }
 
@@ -111,12 +133,22 @@ public final class GlobeNameStudyMain {
                     look.centre(), 180.0, LIMIT, look.title(),
                     new GlobeProjection(look.centre()), SIDE_PX,
                     SIDE_PX);
-            List<Named> names = examine(page);
+            List<Named> onPaper = examine(page, false);
             System.out.println();
-            System.out.println(look.slug() + ":");
-            report("centre", names, 0.0, 0.5);
-            report("limb", names, 0.9, 1.0);
-            report("whole disc", names, 0.0, 1.0);
+            System.out.println(look.slug()
+                    + ", with the paper's edge as the boundary:");
+            report("centre", onPaper, 0.0, 0.5);
+            report("limb", onPaper, 0.9, 1.0);
+            report("whole disc", onPaper, 0.0, 1.0);
+
+            List<Named> onSky = examine(page, true);
+            System.out.println();
+            System.out.println(look.slug()
+                    + ", with the limb as the boundary:");
+            report("centre", onSky, 0.0, 0.5);
+            report("limb", onSky, 0.9, 1.0);
+            report("whole disc", onSky, 0.0, 1.0);
+            moved(onPaper, onSky);
         }
     }
 
@@ -130,8 +162,8 @@ public final class GlobeNameStudyMain {
         }
         System.out.printf(Locale.ROOT, "  %s:%n", band);
         System.out.printf(Locale.ROOT,
-                "    %-16s %6s %9s %8s %7s %6s %8s %7s %7s%n",
-                "family", "asked", "identified", "doubtful", "omitted",
+                "    %-16s %6s %11s %7s %6s %8s %7s %7s%n",
+                "family", "asked", "attributed", "omitted",
                 "rank", "in disc", "crosses", "outside");
 
         Map<LabelPlacement.Family, List<Named>> byFamily =
@@ -144,16 +176,21 @@ public final class GlobeNameStudyMain {
             List<Named> family = entry.getValue();
             long identified = family.stream()
                     .filter(Named::identified).count();
-            long doubtful = family.stream()
-                    .filter(Named::doubtful).count();
             long omitted = family.stream()
                     .filter(Named::omitted).count();
             int[] ranks = family.stream().filter(one -> !one.omitted())
                     .mapToInt(Named::candidate).sorted().toArray();
+            // Stars and deep-sky objects are attributed by the
+            // nearest-rival test; a constellation name by whether it
+            // sits on the figure it names.
+            long attributed = family.get(0).constellation()
+                    ? family.stream().filter(Named::onItsOwnFigure)
+                            .count()
+                    : identified;
             System.out.printf(Locale.ROOT,
-                    "    %-16s %6d %9d %8d %7d %6s %8d %7d %7d%n",
-                    entry.getKey(), family.size(), identified,
-                    doubtful, omitted,
+                    "    %-16s %6d %11d %7d %6s %8d %7d %7d%n",
+                    entry.getKey(), family.size(), attributed,
+                    omitted,
                     ranks.length == 0 ? "-"
                             : String.valueOf(ranks[ranks.length / 2]),
                     count(family, Against.INSIDE),
@@ -191,8 +228,49 @@ public final class GlobeNameStudyMain {
                 .count();
     }
 
-    /** Every placement the production policy made, examined. */
-    private static List<Named> examine(DrawnPage page) {
+    /**
+     * What changed when the page told the truth about its shape.
+     */
+    private static void moved(List<Named> onPaper, List<Named> onSky) {
+        Map<String, Named> before = new LinkedHashMap<>();
+        for (Named one : onPaper) {
+            before.put(one.family() + "/" + one.id(), one);
+        }
+        int stayed = 0;
+        int shifted = 0;
+        int lost = 0;
+        for (Named after : onSky) {
+            Named was = before.get(after.family() + "/" + after.id());
+            if (was == null) {
+                continue;
+            }
+            if (after.omitted() && !was.omitted()) {
+                lost++;
+            } else if (after.candidate() != was.candidate()) {
+                shifted++;
+            } else {
+                stayed++;
+            }
+        }
+        System.out.printf(Locale.ROOT,
+                "  of the labels the paper placed: %d stayed where"
+                        + " they were, %d moved, %d became omissions%n",
+                stayed, shifted, lost);
+    }
+
+    /**
+     * Every placement the production policy made, examined.
+     *
+     * <p>With {@code toTheLimb}, the same policy is given the page's
+     * truthful shape: a candidate that is not wholly on the sphere is
+     * not a candidate, because a globe's page ends at its limb and not
+     * at the paper's corner. <strong>The policy itself is
+     * unchanged</strong> - same candidate order, same obstacles, same
+     * collision rules - and this is not a globe-specific placement
+     * rule but the existing one told where the page is.
+     */
+    private static List<Named> examine(DrawnPage page,
+                                       boolean toTheLimb) {
         BufferedImage canvas = new BufferedImage(SIDE_PX, SIDE_PX,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
@@ -200,9 +278,17 @@ public final class GlobeNameStudyMain {
         try {
             ChartRenderer renderer = ChartRenderer.drawing(page,
                     StarSizePolicy.DEFAULT);
-            placements = renderer.textPlacements(
-                    ChartRenderer.TextMetrics.of(g), page.scene(),
-                    settled());
+            ChartRenderer.TextMetrics metrics =
+                    ChartRenderer.TextMetrics.of(g);
+            List<LabelPlacement.Request> asked =
+                    renderer.textRequests(metrics, page.scene(),
+                            settled());
+            if (toTheLimb) {
+                asked = onTheSphere(asked);
+            }
+            placements = new LabelPlacement(SIDE_PX, SIDE_PX,
+                    renderer.textObstacles(metrics, page.scene(),
+                            settled())).placeAll(asked);
         } finally {
             g.dispose();
         }
@@ -253,6 +339,37 @@ public final class GlobeNameStudyMain {
                     kinds));
         }
         return examined;
+    }
+
+    /**
+     * The same requests, offered only the candidates that are wholly
+     * on the sphere.
+     *
+     * <p>The order is untouched: a candidate keeps its rank among
+     * those that remain, so a label still prefers what it preferred
+     * before. What it may no longer do is ask for somewhere that is
+     * not sky.
+     */
+    private static List<LabelPlacement.Request> onTheSphere(
+            List<LabelPlacement.Request> asked) {
+        double centre = SIDE_PX / 2.0;
+        double discRadius = FRAME * SIDE_PX / 2.0;
+        List<LabelPlacement.Request> truthful = new ArrayList<>();
+        for (LabelPlacement.Request request : asked) {
+            List<Rectangle2D> kept = new ArrayList<>();
+            for (Rectangle2D candidate : request.candidates()) {
+                if (against(candidate, centre, discRadius)
+                        == Against.INSIDE) {
+                    kept.add(candidate);
+                }
+            }
+            truthful.add(new LabelPlacement.Request(request.family(),
+                    request.id(), request.text(), request.anchorX(),
+                    request.anchorY(), kept, request.ownId(),
+                    request.owns(), request.guaranteed(),
+                    request.order()));
+        }
+        return truthful;
     }
 
     /**
