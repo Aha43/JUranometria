@@ -264,6 +264,63 @@ on globally gets them on the globe too.
 than pitch dark.** That remains worth doing for narrower charts and
 for the reader who asks for them here.
 
+## The grid fades toward the limb
+
+The grid stays on, and it is the second most expensive layer on the
+page. Whether its *detail* is still doing anything out there was asked
+as **gaps rather than ink**, because ink cannot tell a few fat lines
+from a hundred hairlines (`make globe-grid-study`):
+
+| radius | sky from centre | lines crossed | median clear gap |
+|---|---|---|---|
+| 0.50 | 30° | 18–23 | 37–41 px |
+| 0.80 | 53° | 44–46 | 24–31 px |
+| **0.95** | **72°** | **69–76** | **15–20 px** |
+| 0.99 | 82° | 125–160 | **3–8 px** |
+
+Out to **r = 0.95** the grid is a grid. By r = 0.99 it crosses a
+hundred and sixty times around one circuit with three pixels between
+lines, which is a texture, and it is much of why the limb reads as a
+dark rim.
+
+**Stopping it there was refused**: the band beyond 0.95 holds 31 per
+cent of the hemisphere, so stopping would abandon a third of the sky
+to no orientation at all — the one thing the grid was kept on for.
+**Thinning it was refused**: a line that begins or ends according to
+where it happens to fall has stopped meaning anything geometric.
+
+> **Full contrast through r = 0.95, then a linear fade to 25% of
+> contrast at the limb. The orthographic globe only.**
+
+Strength is a share of the ink's *contrast against the ground* rather
+than of its value, because that is what "fainter" means to an eye and
+to a press.
+
+Chosen by eye from candidates at 35, 25 and 15 per cent
+(`make globe-grid-fade-study`): 35 still forms a mesh at the crowded
+limb, 15 all but disappears exactly where orientation is hardest, and
+25 quiets the rim while the lines stay traceable into it. The
+hierarchy is what improves — objects lead, the grid supports, and the
+limb stops looking reinforced by a second outline.
+
+**What the fade does not do**, measured so that nobody expects
+otherwise: the grid's own weight in the limb band falls from 11.2% to
+7.9%, while the whole page's weight moves only from 15.50% to 15.31%.
+The stars and figures are the rest of what is heavy there, and they do
+not fade. Fading the grid makes the grid legible; it does not make the
+limb light.
+
+### A measure that could not see the question
+
+Recorded because it nearly went into the decision. The first fade
+numbers showed ink of 22.1% against 22.0% across every candidate, as
+though fading changed nothing. The gate's ink measure asks whether a
+pixel is the ground — the right question for *is anything drawn here*
+and the wrong one for *how heavily*, since a faded line is still not
+the paper. **Weight**, the mean distance of a band's pixels from the
+ground, is the measure this question needed, and the one the table
+above reports.
+
 ## A page is drawn by one projection
 
 Not a cartographic decision, but the gate found it and it had to be
@@ -292,8 +349,7 @@ was satisfied by a fix that put the split straight back.
 
 ## Still open
 
-Whether the grid needs reduced detail near the limb, measured before
-its appearance is altered; which families are visible at 180 degrees; how many names are useful; whether boundaries stay on
+Which families are visible at 180 degrees; how many names are useful; whether boundaries stay on
 by default, assessed with #326 in mind; navigation and pointing near
 the limb; module geometry; projection identity in export; and paper
 policy, with #293 remaining the authority for any claim that needs
