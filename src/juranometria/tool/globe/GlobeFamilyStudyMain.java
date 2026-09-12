@@ -786,7 +786,7 @@ public final class GlobeFamilyStudyMain {
             if (SymbolFamily.of(dso) == null) {
                 continue;          // the atlas draws nothing for it
             }
-            List<PlanePoint> footprint = Footprint.projected(
+            List<PlanePoint> footprint = juranometria.project.SkyFootprint.projected(
                     page.projection(), dso.position(),
                     dso.majorAxisArcmin(), dso.minorAxisArcmin(),
                     dso.positionAngleDegrees());
