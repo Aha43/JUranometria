@@ -135,7 +135,7 @@ public final class PageExtent {
         // This is what keeps the refusal rare: an object out by the
         // projection's horizon is answered here rather than walked.
         if (centre.separationDegrees(page.scene().viewport().centre())
-                > pageReachDegrees(page.scene()) + semiMajorDeg) {
+                > pageReachDegrees(page) + semiMajorDeg) {
             return false;
         }
         Path2D.Double outline = outlineOf(
@@ -154,7 +154,65 @@ public final class PageExtent {
      * How far this page's own corners reach from its centre, in
      * degrees - asked of the page, at whatever size it was built.
      */
+    /**
+     * How far a page with a limb reaches (review of #335).
+     *
+     * <p>Walking the paper's corners back into the sky assumes a
+     * corner <em>is</em> sky. On a globe none of them is: the disc
+     * fills ninety per cent of the short side, so every corner is
+     * outside the limb, all four inverse projections come back empty
+     * and the page reports a reach of zero degrees - which excludes
+     * every object on it from the inventory, including the ones it
+     * plainly draws.
+     *
+     * <p>So a bounded page is measured in the plane instead of
+     * through the corners. The furthest the paper goes is capped at
+     * the furthest the projection shows, and the angle at that radius
+     * is the reach: for a whole hemisphere on paper that is the limb
+     * itself, ninety degrees. The cap is what makes it right for a
+     * page smaller than its own disc as well, where the paper runs
+     * out before the sky does.
+     */
+    private static double boundedReachDegrees(DrawnPage page) {
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        double furthestPlane = 0.0;
+        for (double[] corner : new double[][] {
+                {paper.getMinX(), paper.getMinY()},
+                {paper.getMaxX(), paper.getMinY()},
+                {paper.getMinX(), paper.getMaxY()},
+                {paper.getMaxX(), paper.getMaxY()}}) {
+            juranometria.project.PlanePoint plane =
+                    juranometria.project.PanSolver.planeFromPixel(page,
+                            new juranometria.project.PixelPoint(
+                                    corner[0], corner[1]));
+            furthestPlane = Math.max(furthestPlane,
+                    Math.hypot(plane.xiEast(), plane.etaNorth()));
+        }
+        double reach = Math.min(furthestPlane,
+                page.projection().visiblePlaneRadius());
+        return page.projection().angleAtPlaneRadius(reach);
+    }
+
+    /** The ordinary entry point (review of #335). */
     public static double pageReachDegrees(ChartScene scene) {
+        return pageReachDegrees(DrawnPage.of(scene));
+    }
+
+    /**
+     * How far this page reaches, asked of the page rather than of its
+     * viewport (review of #335).
+     *
+     * <p>This walks the paper's corners back into the sky, and which
+     * sky a corner is depends on what drew the page. Asking the
+     * viewport here was an indirect rebuild that no count of the
+     * source could see: the method took a page, handed a scene to a
+     * helper, and the helper derived a projection of its own.
+     */
+    public static double pageReachDegrees(DrawnPage page) {
+        ChartScene scene = page.scene();
+        if (Double.isFinite(page.projection().visiblePlaneRadius())) {
+            return boundedReachDegrees(page);
+        }
         SkyPosition centre = scene.viewport().centre();
         Rectangle2D paper = ChartRenderer.paperOf(scene);
         double furthest = 0;
@@ -164,7 +222,7 @@ public final class PageExtent {
                 {paper.getMinX(), paper.getMaxY()},
                 {paper.getMaxX(), paper.getMaxY()}}) {
             SkyPosition sky = juranometria.render.ChartHitTest.skyAt(
-                    scene, corner[0], corner[1]);
+                    page, corner[0], corner[1]);
             if (sky != null) {
                 furthest = Math.max(furthest, centre.separationDegrees(sky));
             }

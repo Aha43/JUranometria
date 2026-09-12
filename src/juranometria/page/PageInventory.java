@@ -75,7 +75,7 @@ public final class PageInventory {
 
         List<DeepSkyObject> deepSky = new ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
-            if (PageExtent.onPage(scene, dso)) {
+            if (PageExtent.onPage(page, dso)) {
                 deepSky.add(dso);
             }
         }

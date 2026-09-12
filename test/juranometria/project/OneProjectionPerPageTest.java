@@ -149,7 +149,11 @@ class OneProjectionPerPageTest {
                     "src/juranometria/render/LabelGeometry.java", 0,
                     "src/juranometria/render/EquatorialGrid.java", 0,
                     "src/juranometria/page/PageInventory.java", 1,
-                    "src/juranometria/page/PageExtent.java", 1,
+                    // Two, and the second was added deliberately in
+                    // review: onPage and pageReachDegrees are both
+                    // production entry points that callers reach with
+                    // a scene and no opinion about its projection.
+                    "src/juranometria/page/PageExtent.java", 2,
                     "src/juranometria/ui/ReferenceInk.java", 2,
                     "src/juranometria/ui/WorkingCrossInk.java", 0);
 

@@ -112,6 +112,32 @@ public final class PanSolver {
         return skyFromPlane(viewport.projection(), viewport.centre(), plane);
     }
 
+    /**
+     * The same, for a caller pointing at a page that carries the
+     * projection drawing it (review of #335).
+     *
+     * <p>The viewport form asks the viewport which kind drew the
+     * page, which is right whenever the page is the one its field
+     * implies and wrong for a globe. A caller holding a page must ask
+     * the page - otherwise it points at a different sky from the one
+     * the reader is looking at.
+     */
+    public static SkyPosition skyFromPlane(DrawnPage page,
+                                           PlanePoint plane) {
+        return page.projection().unproject(plane).orElse(null);
+    }
+
+    /** The plane point under a pixel of this page. */
+    public static PlanePoint planeFromPixel(DrawnPage page,
+                                            PixelPoint pixel) {
+        ChartViewport viewport = page.scene().viewport();
+        double pixelsPerPlaneUnit =
+                new ViewportMapping(page).pixelsPerPlaneUnit();
+        return new PlanePoint(
+                (viewport.widthPx() / 2.0 - pixel.x()) / pixelsPerPlaneUnit,
+                (viewport.heightPx() / 2.0 - pixel.y()) / pixelsPerPlaneUnit);
+    }
+
 
     /**
      * The grab invariant, solved exactly: find the chart centre for
