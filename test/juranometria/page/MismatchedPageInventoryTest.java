@@ -1,7 +1,6 @@
 package juranometria.page;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,9 +11,7 @@ import juranometria.chart.DeepSkyObject;
 import juranometria.chart.DsoType;
 import juranometria.chart.SkyPosition;
 import juranometria.project.DrawnPage;
-import juranometria.project.PlaneConic;
-import juranometria.project.PlanePoint;
-import juranometria.project.Projection;
+import juranometria.tool.globe.GlobeProjection;
 import juranometria.render.ChartOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,83 +45,6 @@ class MismatchedPageInventoryTest {
             new SkyPosition(266.0, -28.0);
 
     /**
-     * A hemisphere: nothing further than ninety degrees exists, and
-     * the limb is at plane radius one.
-     *
-     * <p>The viewport will go on saying stereographic, which shows
-     * everything out to a hundred and eighty and would happily place
-     * the object below.
-     */
-    private static final class Hemisphere implements Projection {
-
-        @Override
-        public String name() {
-            return "orthographic";
-        }
-
-        @Override
-        public SkyPosition centre() {
-            return CENTRE;
-        }
-
-        @Override
-        public Optional<PlanePoint> project(SkyPosition position) {
-            double away = CENTRE.separationDegrees(position);
-            if (away > 90.0) {
-                return Optional.empty();
-            }
-            double radius = Math.sin(Math.toRadians(away));
-            return Optional.of(new PlanePoint(radius, 0.0));
-        }
-
-        @Override
-        public Optional<SkyPosition> unproject(PlanePoint point) {
-            // Honest, and it matters that it is: an earlier version
-            // answered the centre for every point inside the limb,
-            // which made this page report a reach of zero degrees for
-            // the same reason the real one did - and so hid the bug
-            // this test was written to find (review of #335).
-            double radius = Math.hypot(point.xiEast(), point.etaNorth());
-            if (radius > 1.0) {
-                return Optional.empty();
-            }
-            return Optional.of(CENTRE);
-        }
-
-        @Override
-        public double planeRadius(double angleDegrees) {
-            return angleDegrees > 90.0 ? Double.NaN
-                    : Math.sin(Math.toRadians(angleDegrees));
-        }
-
-        @Override
-        public double angleAtPlaneRadius(double planeRadius) {
-            return planeRadius > 1.0 ? Double.NaN
-                    : Math.toDegrees(Math.asin(planeRadius));
-        }
-
-        @Override
-        public double limitDegrees() {
-            return 90.0;
-        }
-
-        @Override
-        public double usefulCornerDegrees() {
-            return 90.0;
-        }
-
-        @Override
-        public double visiblePlaneRadius() {
-            return 1.0;
-        }
-
-        @Override
-        public Optional<PlaneConic> greatCircle(SkyPosition pole) {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * An extended object on the far side of the globe - a hundred and
      * twenty degrees out, which the hemisphere cannot show and the
      * viewport's stereographic projection places without complaint.
@@ -140,12 +60,30 @@ class MismatchedPageInventoryTest {
                         DeepSkyObject.Recorded.Band.VISUAL));
     }
 
+    /**
+     * A page whose viewport says stereographic and which is drawn by
+     * the real orthographic hemisphere.
+     *
+     * <p>The projection is {@link GlobeProjection} and not a stand-in.
+     * An earlier version of this test carried a hand-written
+     * hemisphere whose inverse answered the page centre for every
+     * point inside the limb, and that invented arithmetic reproduced
+     * the very fault the test existed to catch: the page reported a
+     * reach of zero degrees, everything was excluded, and the
+     * assertions passed for a reason nobody intended (review of
+     * #335).
+     *
+     * <p>So the mismatch is real and the geometry is real. The
+     * viewport goes on naming stereographic, which shows everything
+     * out to a hundred and eighty degrees and would place the far
+     * side of this page without complaint.
+     */
     private static DrawnPage hemispherePage(List<DeepSkyObject> objects) {
         ChartViewport viewport = new ChartViewport(CENTRE, 180.0,
                 900, 900, ChartProjection.STEREOGRAPHIC);
         ChartScene scene = new ChartScene(viewport, List.of(), objects,
                 "Sagittarius", 8.0, null);
-        return new DrawnPage(scene, new Hemisphere());
+        return new DrawnPage(scene, new GlobeProjection(CENTRE));
     }
 
     @Test
@@ -179,7 +117,7 @@ class MismatchedPageInventoryTest {
         ChartScene scene = new ChartScene(viewport, List.of(),
                 List.of(), "Sagittarius", 8.0, null);
         DrawnPage globe = new DrawnPage(scene,
-                new juranometria.tool.globe.GlobeProjection(centre));
+                new GlobeProjection(centre));
 
         assertEquals(90.0, PageExtent.pageReachDegrees(globe), 1e-9,
                 "a page showing a whole hemisphere reaches to its"
