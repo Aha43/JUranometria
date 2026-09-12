@@ -27,7 +27,15 @@ public enum ChartProjection {
      * it and nothing else does
      * (docs/decisions/overview-projection.md).
      */
-    STEREOGRAPHIC("stereographic");
+    STEREOGRAPHIC("stereographic"),
+
+    /**
+     * The celestial globe, and the only one of the three with a
+     * horizon: one hemisphere, ending at a real limb
+     * (docs/decisions/celestial-globe.md). It draws the widest rung
+     * and nothing else.
+     */
+    ORTHOGRAPHIC("orthographic");
 
     private final String displayName;
 
@@ -69,7 +77,23 @@ public enum ChartProjection {
      * need the second one did not exist yet.
      */
     public static ChartProjection forField(double fieldWidthDegrees) {
+        if (fieldWidthDegrees >= WHOLE_HEMISPHERE_DEGREES) {
+            return ORTHOGRAPHIC;
+        }
         return fieldWidthDegrees > WIDEST_TANGENT_FIELD_DEGREES
                 ? STEREOGRAPHIC : GNOMONIC;
     }
+
+    /**
+     * The field that is a whole hemisphere, and the only one the
+     * globe draws.
+     *
+     * <p>Not "wide enough for the globe" but exactly a hemisphere: a
+     * hundred and seventy-nine degrees is a stereographic page that
+     * happens to be very wide, and a hundred and eighty is a sphere
+     * seen from outside. The projection changes because the page
+     * becomes a different kind of thing, not because a threshold was
+     * crossed.
+     */
+    public static final double WHOLE_HEMISPHERE_DEGREES = 180.0;
 }

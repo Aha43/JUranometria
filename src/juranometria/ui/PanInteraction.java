@@ -122,10 +122,17 @@ public final class PanInteraction extends MouseAdapter {
         if (scene == null) {
             return;
         }
-        pressPoint = event.getPoint();
-        grabbed = PanSolver.skyFromPlane(scene.viewport(),
+        // Nothing to grab where there is no sky. A press on the
+        // paper around a globe's limb is not a drag that goes wrong
+        // later; it is a press on nothing (#301).
+        var under = PanSolver.skyAt(scene.viewport(),
                 PanSolver.planeFromPixel(scene.viewport(),
                         pagePixel(event.getPoint())));
+        if (under.isEmpty()) {
+            return;
+        }
+        pressPoint = event.getPoint();
+        grabbed = under.get();
         dragging = false;
     }
 

@@ -92,9 +92,7 @@ public final class GlobeGridFadeStudyMain {
                 "page", "at limb");
 
         for (var look : GlobeDensityStudyMain.corpus().subList(0, 2)) {
-            DrawnPage page = Atlas.assembler().assembleForStudy(
-                    look.centre(), 180.0, 5.0, look.title(),
-                    new GlobeProjection(look.centre()), SIDE_PX,
+            DrawnPage page = GlobePage.of(look.centre(), 5.0, SIDE_PX,
                     SIDE_PX);
             BufferedImage grid = render(page, gridOnly());
             BufferedImage rest = render(page, withoutGrid());
@@ -243,7 +241,7 @@ public final class GlobeGridFadeStudyMain {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            ChartRenderer.drawing(page, StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();

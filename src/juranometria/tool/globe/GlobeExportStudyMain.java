@@ -599,9 +599,8 @@ public final class GlobeExportStudyMain {
     }
 
     private static DrawnPage globe(PaperSize paper) {
-        return Atlas.assembler().assembleForStudy(CENTRE, 180.0, 5.0,
-                "Sagittarius and Scorpius", new GlobeProjection(CENTRE),
-                paper.chartWideUnits(), paper.chartHighUnits());
+        return GlobePage.of(CENTRE, 5.0, paper.chartWideUnits(),
+                paper.chartHighUnits());
     }
 
     private static BufferedImage renderAt(DrawnPage page,
@@ -618,8 +617,7 @@ public final class GlobeExportStudyMain {
                     high / (double) paper.chartHighUnits());
             g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                     java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-            ChartRenderer.drawing(page,
-                    juranometria.chart.StarSizePolicy.DEFAULT)
+            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();
@@ -638,8 +636,7 @@ public final class GlobeExportStudyMain {
             g.setColor(ChartPalette.WHITE_PAPER.ground());
             g.fillRect(0, 0, paper.chartWideUnits(),
                     paper.chartHighUnits());
-            ChartRenderer.drawing(page,
-                    juranometria.chart.StarSizePolicy.DEFAULT)
+            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();
@@ -702,10 +699,8 @@ public final class GlobeExportStudyMain {
     private static void write(SheetFormat format, boolean withModules)
             throws IOException {
         PaperSize paper = PaperSize.A4;
-        DrawnPage page = Atlas.assembler().assembleForStudy(
-                CENTRE, 180.0, 5.0, "Sagittarius and Scorpius",
-                new GlobeProjection(CENTRE), paper.chartWideUnits(),
-                paper.chartHighUnits());
+        DrawnPage page = GlobePage.of(CENTRE, 5.0,
+                paper.chartWideUnits(), paper.chartHighUnits());
 
         OverlayRegistry registry = withModules ? modules() : null;
         ChartRenderer.ReferenceLayer reference = registry == null

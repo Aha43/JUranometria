@@ -191,16 +191,44 @@ class ProjectionCarriedThroughTest {
                         .usefulCornerDegrees(),
                 "and the overview's, at the same scale budget");
 
+        // The globe's cap is not a distortion budget and cannot be
+        // one. Its radial scale goes to zero at the limb rather than
+        // growing, so there is no angle out at which a corner degree
+        // is four times a centre degree - the ratio at its cap is a
+        // quarter of nothing. What #301 settled instead is that the
+        // whole hemisphere is the useful reach, because a globe page
+        // is a bounded disc and its corners are paper rather than
+        // sky (docs/decisions/celestial-globe.md).
+        assertEquals(90.0, Projections.of(ChartProjection.ORTHOGRAPHIC, ORION)
+                        .usefulCornerDegrees(),
+                "the globe's useful reach is its own limb");
+
         for (ChartProjection kind : ChartProjection.values()) {
             Projection projection = Projections.of(kind, ORION);
             double corner = projection.usefulCornerDegrees();
+            assertTrue(corner <= projection.limitDegrees(),
+                    kind + ": and the cap is inside what it can show");
+            if (Double.isFinite(projection.visiblePlaneRadius())) {
+                assertEquals(projection.limitDegrees(), corner,
+                        kind + ": a bounded page is useful to its own"
+                                + " edge, where the sky stops");
+                // Measured just inside the limb, because at the limb
+                // itself the outward difference has no sky to land
+                // on: the scale does not grow toward a bound here, it
+                // collapses to nothing at it, which is what the edge
+                // of a sphere looks like.
+                assertTrue(radialScaleAt(projection, corner - 0.01)
+                                / radialScaleAt(projection, 1.0e-4)
+                                < 0.02,
+                        kind + ": its scale collapses at the limb"
+                                + " rather than growing");
+                continue;
+            }
             double centreScale = radialScaleAt(projection, 1.0e-4);
             double cornerScale = radialScaleAt(projection, corner);
             assertEquals(4.0, cornerScale / centreScale, 0.01,
                     kind + ": a corner degree is four times a centre"
                             + " degree at the cap");
-            assertTrue(corner <= projection.limitDegrees(),
-                    kind + ": and the cap is inside what it can show");
         }
     }
 
@@ -220,13 +248,27 @@ class ProjectionCarriedThroughTest {
         // released field is still the atlas's own, and the three
         // rungs above the sheet page are the overview's.
         for (double field : ChartViewState.fieldWidthSteps()) {
-            ChartProjection expected = field > SHEET
-                    ? ChartProjection.STEREOGRAPHIC
-                    : ChartProjection.GNOMONIC;
+            ChartProjection expected;
+            if (field >= ChartProjection.WHOLE_HEMISPHERE_DEGREES) {
+                expected = ChartProjection.ORTHOGRAPHIC;
+            } else if (field > SHEET) {
+                expected = ChartProjection.STEREOGRAPHIC;
+            } else {
+                expected = ChartProjection.GNOMONIC;
+            }
             assertEquals(expected,
-                    new ChartViewState(ORION, field, 6.0).projection(),
+                    new ChartViewState(ORION, field, 5.0).projection(),
                     field + " degrees");
         }
+        // Named at the three boundaries rather than left to the loop:
+        // 42 is the atlas's own widest, 120 is still the overview's,
+        // and 180 is the globe's (#329).
+        assertEquals(ChartProjection.GNOMONIC,
+                ChartProjection.forField(42.0));
+        assertEquals(ChartProjection.STEREOGRAPHIC,
+                ChartProjection.forField(120.0));
+        assertEquals(ChartProjection.ORTHOGRAPHIC,
+                ChartProjection.forField(180.0));
         // And it is not a preference a caller can override.
         assertThrows(IllegalArgumentException.class,
                 () -> new ChartViewState(ORION, 8.0, 6.0, null, null,
@@ -306,6 +348,21 @@ class ProjectionCarriedThroughTest {
                 "a page's worth of marks: " + checked);
     }
 
+    /**
+     * A field each projection actually draws.
+     *
+     * <p>Not one field for all three: a projection is paired with the
+     * rungs it draws, and asking the globe about a 60-degree page
+     * asks it about a page no reader can be on.
+     */
+    private static double fieldFor(ChartProjection kind) {
+        return switch (kind) {
+            case GNOMONIC -> SHEET;
+            case STEREOGRAPHIC -> OVERVIEW;
+            case ORTHOGRAPHIC -> 180.0;
+        };
+    }
+
     @Test
     void pointingAtThePageReadsItBackThroughTheSameProjection() {
         // A review found the pointer scaled by one projection and
@@ -318,8 +375,7 @@ class ProjectionCarriedThroughTest {
         // Held as a round trip through the chart: what the projection
         // puts at a pixel is what pointing at that pixel returns.
         for (ChartProjection kind : ChartProjection.values()) {
-            ChartScene scene = sceneDrawnBy(kind,
-                    kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW);
+            ChartScene scene = sceneDrawnBy(kind, fieldFor(kind));
             Projection projection =
                     Projections.forViewport(scene.viewport());
             var mapping = new juranometria.project.ViewportMapping(juranometria.project.DrawnPage.of(scene));
@@ -329,6 +385,19 @@ class ProjectionCarriedThroughTest {
                     SkyPosition pointed =
                             juranometria.render.ChartHitTest.skyAt(scene,
                                     x, y);
+                    if (pointed == null) {
+                        // A bounded page has paper outside its limb,
+                        // and pointing there is pointing past the
+                        // edge of the world. The positive half of
+                        // that rule is checked below: it happens on
+                        // a globe and on no other page.
+                        assertTrue(juranometria.project.DrawnPage
+                                        .of(scene).bounded(),
+                                kind + " lost the sky at " + x + ","
+                                        + y + " and its sky has no"
+                                        + " edge to lose it at");
+                        continue;
+                    }
                     var back = mapping.toPixel(projection
                             .project(pointed).orElseThrow());
                     assertEquals(x, back.x(), 1.0e-6,
@@ -339,7 +408,15 @@ class ProjectionCarriedThroughTest {
                     checked++;
                 }
             }
-            assertTrue(checked >= 25, "a grid of pointings: " + checked);
+            assertTrue(checked >= (kind == ChartProjection.ORTHOGRAPHIC
+                            ? 12 : 25),
+                    kind + ": a grid of pointings: " + checked);
+            if (kind == ChartProjection.ORTHOGRAPHIC) {
+                assertTrue(checked < 25,
+                        "and some of that grid is paper rather than"
+                                + " sky, which is what a bounded page"
+                                + " means: " + checked);
+            }
         }
     }
 
@@ -360,7 +437,7 @@ class ProjectionCarriedThroughTest {
             // draw at. A wrong formula agrees with itself; it does
             // not agree with the pages.
             double scale = ChartViewController.zoomScale(projection,
-                    from, to);
+                    from, to, 900, 700);
 
             // A star a third of the way out on the wider page, and
             // where it must sit on the narrower one for the pointer
@@ -407,7 +484,7 @@ class ProjectionCarriedThroughTest {
             // can be asked for.
             SkyPosition moved = ChartViewController
                     .solveExactReversible(kind, kind, ORION, from, to,
-                            pointer)
+                            pointer, 900, 700)
                     .orElseThrow(() -> new AssertionError(
                             kind + ": a reversible pointer zoom"));
             // Measured in pixels, which is the unit the atlas
@@ -453,7 +530,7 @@ class ProjectionCarriedThroughTest {
         SkyPosition after = ChartViewController.solveExactReversible(
                         ChartProjection.GNOMONIC,
                         ChartProjection.STEREOGRAPHIC, ORION, SHEET,
-                        OVERVIEW, onSheet)
+                        OVERVIEW, onSheet, 900, 700)
                 .orElseThrow(() -> new AssertionError(
                         "zooming out of the sheet page onto the"
                                 + " overview is a reversible step"));
@@ -484,8 +561,7 @@ class ProjectionCarriedThroughTest {
         // position at the middle of the chart is at the middle of
         // the page, exactly, whichever projection drew it.
         for (ChartProjection kind : ChartProjection.values()) {
-            ChartScene scene = sceneDrawnBy(kind,
-                    kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW);
+            ChartScene scene = sceneDrawnBy(kind, fieldFor(kind));
             Projection projection =
                     Projections.forViewport(scene.viewport());
             var mapping = new juranometria.project.ViewportMapping(juranometria.project.DrawnPage.of(scene));

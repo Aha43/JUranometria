@@ -39,9 +39,13 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
      *  tangent plane*; the three overview rungs above it come from
      *  docs/decisions/overview-projection.md, which measured that a
      *  different projection carries them and that 180 degrees is
-     *  drawable but not readable. */
+     *  drawable but not readable *for that projection*. The 180
+     *  rung above them is the celestial globe, which a third
+     *  projection draws and docs/decisions/celestial-globe.md
+     *  settles: a bounded hemisphere on paper rather than a chart
+     *  continued. */
     private static final double[] FIELD_WIDTH_STEPS =
-            {120.0, 90.0, 60.0,
+            {180.0, 120.0, 90.0, 60.0,
              42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
 
     /** Magnitude-limit sequence, brightest first; fainter walks toward 8. */
@@ -138,6 +142,22 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
      * magnitude control is unchanged and still wins.
      */
     public static double defaultMagnitudeFor(double fieldWidthDegrees) {
+        // The globe's own, measured rather than inherited: at V 8.0 a
+        // hemisphere's limb band is 80 per cent inked and at V 4.0 it
+        // carries about three hundred stars, too few for the figures
+        // to hold together. V 5.0 was the gate's choice
+        // (docs/decisions/celestial-globe.md).
+        //
+        // The ladder's rule still applies on arrival: zooming out
+        // never adds stars, so a reader coming from the 120-degree
+        // rung at V 4.0 keeps V 4.0 and steps to V 5.0 if they want
+        // it. This is the limit the rung arrives with, not one
+        // imposed over the reader's.
+        if (fieldWidthDegrees
+                >= juranometria.chart.ChartProjection
+                        .WHOLE_HEMISPHERE_DEGREES) {
+            return 5.0;
+        }
         if (fieldWidthDegrees >= 90.0) {
             return 4.0;
         }

@@ -37,13 +37,17 @@ class ChartViewStateTest {
         // measured, and it is no longer the end: the three rungs
         // above it are the overview's, and the projection changes
         // with the rung rather than with a setting
-        // (docs/decisions/overview-projection.md).
-        double[] expected = {12.0, 18.0, 24.0, 36.0, 42.0, 60.0, 90.0, 120.0};
+        // (docs/decisions/overview-projection.md). The last is the
+        // globe's, and the walk ends there because a hemisphere is
+        // all the sky one page can hold (#329).
+        double[] expected = {12.0, 18.0, 24.0, 36.0, 42.0, 60.0, 90.0,
+                120.0, 180.0};
         ChartProjection[] drawnBy = {
                 ChartProjection.GNOMONIC, ChartProjection.GNOMONIC,
                 ChartProjection.GNOMONIC, ChartProjection.GNOMONIC,
                 ChartProjection.GNOMONIC, ChartProjection.STEREOGRAPHIC,
-                ChartProjection.STEREOGRAPHIC, ChartProjection.STEREOGRAPHIC};
+                ChartProjection.STEREOGRAPHIC, ChartProjection.STEREOGRAPHIC,
+                ChartProjection.ORTHOGRAPHIC};
         for (int step = 0; step < expected.length; step++) {
             assertTrue(state.canZoomOut());
             state = state.zoomOut();
@@ -59,9 +63,9 @@ class ChartViewStateTest {
         // to read something closely. Nothing they chose is lost and
         // nothing tells them the projection changed.
         assertEquals(ChartProjection.GNOMONIC,
-                state.zoomIn().zoomIn().zoomIn().projection(),
+                state.zoomIn().zoomIn().zoomIn().zoomIn().projection(),
                 "the way back is the same ladder");
-        assertEquals(42.0, state.zoomIn().zoomIn().zoomIn()
+        assertEquals(42.0, state.zoomIn().zoomIn().zoomIn().zoomIn()
                 .fieldWidthDegrees());
     }
 
@@ -201,8 +205,36 @@ class ChartViewStateTest {
 
     @Test
     void fieldWidthStepsAreExposedWidestFirst() {
-        assertEquals(java.util.List.of(120.0, 90.0, 60.0, 42.0, 36.0, 24.0,
-                        18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0),
+        // 180 is the final rung: a hemisphere is all the sky one page
+        // can hold, so there is nothing above it to offer
+        // (docs/decisions/celestial-globe.md, #329).
+        assertEquals(java.util.List.of(180.0, 120.0, 90.0, 60.0, 42.0,
+                        36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0,
+                        2.0, 1.0),
                 ChartViewState.fieldWidthSteps());
+        assertEquals(180.0, ChartViewState.fieldWidthSteps().get(0),
+                "and it is the widest");
+    }
+
+    @Test
+    void aWidthAboveTheLadderIsStillRefused() {
+        // The globe did not open the ladder; it added one rung to it.
+        // A field is a step or it is nothing, and the steps are the
+        // ones above.
+        for (double wider : new double[] {181.0, 200.0, 270.0, 360.0,
+                Double.MAX_VALUE}) {
+            IllegalArgumentException refused = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> new ChartViewState(
+                            new SkyPosition(266.0, -28.0), wider, 5.0),
+                    wider + " degrees is not a step");
+            assertTrue(refused.getMessage().contains("supported step"),
+                    refused.getMessage());
+        }
+        // And the sky does not wrap around to a narrower page either.
+        assertThrows(IllegalArgumentException.class,
+                () -> new ChartViewState(new SkyPosition(0.0, 0.0),
+                        150.0, 5.0),
+                "150 degrees is between two rungs, which is not a rung");
     }
 }

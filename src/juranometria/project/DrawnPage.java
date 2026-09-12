@@ -105,6 +105,19 @@ public record DrawnPage(ChartScene scene, Projection projection) {
     }
 
     /** What this page calls its projection, wherever it says so. */
+    /**
+     * Whether the sky on this page ends inside the paper.
+     *
+     * <p>Asked of the projection rather than of its name: a page is
+     * bounded when there is a plane radius past which there is no sky
+     * at all, which is a property every projection can answer and
+     * nothing outside {@code juranometria.project} has to know the
+     * word for.
+     */
+    public boolean bounded() {
+        return Double.isFinite(projection.visiblePlaneRadius());
+    }
+
     public String projectionName() {
         return projection.name();
     }

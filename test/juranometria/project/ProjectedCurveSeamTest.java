@@ -312,7 +312,7 @@ class ProjectedCurveSeamTest {
     }
 
     @Test
-    void theTwoShippedProjectionsUseTheFirstTwoWordsAndInventNoOther() {
+    void theThreeShippedProjectionsUseTheThreeWordsAndInventNoOther() {
         java.util.Set<String> forms = new java.util.TreeSet<>();
         for (Page page : pages()) {
             for (SkyPosition pole : POLES) {
@@ -321,8 +321,46 @@ class ProjectedCurveSeamTest {
                                 .onPage(conic, page.region()).form()));
             }
         }
-        assertEquals(java.util.Set.of("circular", "straight"), forms,
-                "both words are used, and neither page invents another");
+        assertEquals(
+                java.util.Set.of("circular", "elliptical", "straight"),
+                forms,
+                "all three words are used, and no page invents a"
+                        + " fourth");
+
+        // And each projection uses the words its own geometry has.
+        // The third was carried by #298 and unreachable until the
+        // globe arrived; it is drawn by a shipped projection now
+        // rather than by a fixture (#329).
+        assertEquals(java.util.Set.of("straight"),
+                wordsOf(ChartProjection.GNOMONIC),
+                "a tangent plane draws every great circle straight,"
+                        + " which is the whole of its argument");
+        assertEquals(java.util.Set.of("circular", "straight"),
+                wordsOf(ChartProjection.STEREOGRAPHIC),
+                "a conformal projection draws circles, degenerating"
+                        + " to the line through its centre");
+        assertEquals(
+                java.util.Set.of("circular", "elliptical", "straight"),
+                wordsOf(ChartProjection.ORTHOGRAPHIC),
+                "and a hemisphere draws ellipses - the limb itself"
+                        + " being the circular one, and the circle"
+                        + " through the page centre the straight one");
+    }
+
+    /** The words one projection's pages use. */
+    private static java.util.Set<String> wordsOf(ChartProjection kind) {
+        java.util.Set<String> forms = new java.util.TreeSet<>();
+        for (Page page : pages()) {
+            if (page.kind() != kind) {
+                continue;
+            }
+            for (SkyPosition pole : POLES) {
+                page.projection().greatCircle(pole).ifPresent(conic ->
+                        forms.add(page.mapping()
+                                .onPage(conic, page.region()).form()));
+            }
+        }
+        return forms;
     }
 
     /**

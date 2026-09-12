@@ -54,9 +54,7 @@ public final class GlobePointingStudyMain {
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
         SkyPosition centre = new SkyPosition(266.0, -28.0);
-        DrawnPage page = Atlas.assembler().assembleForStudy(
-                centre, 180.0, 5.0, "Sagittarius",
-                new GlobeProjection(centre), SIDE_PX, SIDE_PX);
+        DrawnPage page = GlobePage.of(centre, 5.0, SIDE_PX, SIDE_PX);
         ViewportMapping mapping = new ViewportMapping(page);
         double discRadius = FRAME * SIDE_PX / 2.0;
         double middle = SIDE_PX / 2.0;
@@ -203,8 +201,13 @@ public final class GlobePointingStudyMain {
                     radius, "no sky", "refused");
             return;
         }
-        // The page the recentring makes, and the old centre on it.
-        GlobeProjection after = new GlobeProjection(asked);
+        // The page the recentring makes, and the old centre on it -
+        // through the production registry, since the globe is a
+        // production projection now (#329).
+        juranometria.project.Projection after =
+                juranometria.project.Projections.of(
+                        juranometria.chart.ChartProjection.ORTHOGRAPHIC,
+                        asked);
         Optional<PlanePoint> was = after.project(centre);
         if (was.isEmpty()) {
             System.out.printf(Locale.ROOT, "%8.3f %14s %16s%n",

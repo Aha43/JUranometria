@@ -99,24 +99,6 @@ public final class ChartRenderer {
     }
 
     /**
-     * A renderer for one page drawn by a projection its viewport does
-     * not name (Sprint 32, issue #301; #329 owns the removal).
-     *
-     * <p>Takes the page and the projection as the single value they
-     * arrive in, and will draw <em>that page and no other</em>: a
-     * renderer holding one page's projection is wrong for every other
-     * page, and the way to be sure it is never used for one is to
-     * refuse.
-     */
-    public static ChartRenderer drawing(DrawnPage page,
-                                        StarSizePolicy starSizePolicy) {
-        if (page == null) {
-            throw new IllegalArgumentException("page must not be null");
-        }
-        return new ChartRenderer(starSizePolicy, page);
-    }
-
-    /**
      * The projection this page is drawn by: the one this renderer was
      * told, or the one its viewport names.
      *

@@ -181,9 +181,7 @@ public final class GlobeFamilyStudyMain {
                 + " collapses.");
 
         for (var look : GlobeDensityStudyMain.corpus().subList(0, 2)) {
-            DrawnPage page = Atlas.assembler().assembleForStudy(
-                    look.centre(), 180.0, LIMIT, look.title(),
-                    new GlobeProjection(look.centre()), SIDE_PX,
+            DrawnPage page = GlobePage.of(look.centre(), LIMIT, SIDE_PX,
                     SIDE_PX);
             List<Measured> measured = measure(page);
 
@@ -446,7 +444,7 @@ public final class GlobeFamilyStudyMain {
                         java.awt.image.BufferedImage.TYPE_INT_RGB);
         java.awt.Graphics2D g = canvas.createGraphics();
         try {
-            juranometria.render.ChartRenderer.drawing(page,
+            new juranometria.render.ChartRenderer(
                     juranometria.chart.StarSizePolicy.DEFAULT)
                     .render(g, page.scene(), options);
         } finally {

@@ -863,6 +863,30 @@ arithmetic. The hemisphere study also lost its wall-clock column when
 it was published — a timing cannot be pinned to bytes, and the label
 study settled that (#310).
 
+### What a globe page fetches, and why it is more than it draws
+
+Recorded because it looks like waste and is not (#329). A globe page
+reaches its own limb — ninety degrees — and the assembler queries
+**95.39°**: the limb plus the pack's declared object margin.
+
+The margin is deliberate and must not be optimised away. An object
+whose *centre* lies beyond the limb can still have a **footprint that
+intersects the visible hemisphere**, and #301 settled what happens to
+it: the visible part is real sky and is drawn, clipped at the limb,
+and the object is in the page inventory. Fetching only to ninety
+degrees would drop those objects before anything could ask.
+
+The other half of the rule keeps the first honest. An object whose
+projected footprint contributes nothing — wholly on the hidden
+hemisphere — **is absent from the rendering and from the inventory
+alike**: it does not project, so it leaves no ink, takes no hit and
+occupies no row. Nothing is drawn on the strength of having been
+queried.
+
+So the two numbers mean different things and neither is the other's
+mistake: **90° is what the page shows, 95.39° is what it has to look
+at to know.**
+
 ## What this gate does not claim
 
 Stated here rather than only in passing, because a limit mentioned
