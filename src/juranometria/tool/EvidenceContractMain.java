@@ -167,6 +167,13 @@ public final class EvidenceContractMain {
                 "docs/studies/globe-modules/measurements.md");
         REPORT_MAINS.put("juranometria.tool.globe.GlobeExportStudyMain",
                 "docs/studies/globe-export/measurements.md");
+        // What a drag does near the limb (#330). Portable throughout
+        // and with no platform record beside it: every other globe
+        // study measures ink, which is the desktop's answer as much
+        // as the atlas's, and this measures where a page goes when a
+        // hand moves.
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeDragStudyMain",
+                "docs/studies/globe-drag/measurements.md");
     }
 
     /**

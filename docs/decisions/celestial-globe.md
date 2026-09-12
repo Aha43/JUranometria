@@ -863,6 +863,71 @@ arithmetic. The hemisphere study also lost its wall-clock column when
 it was published — a timing cannot be pinned to bytes, and the label
 study settled that (#310).
 
+### Dragging near the limb: the cost of the projection, not a defect
+
+Measured on the production globe through the path a hand actually
+takes — the sky taken at the press, the pointer's plane point, and
+`ChartViewController.pan` between them (`make globe-drag-study`, #330).
+
+**The grabbed sky stays under the pointer everywhere it is offered.**
+Out to r = 0.995 and for steps from 1 px to 64 px, the worst drift is
+**2.3e-5 px**, against the 1e-2 px the pointer-zoom gate reviewed.
+
+**And the page moves faster and faster as the grab nears the limb:**
+
+| grab at | sky out | degrees per pixel | × centre |
+|---|---|---|---|
+| 0.00 | 0.0° | 0.159 | 1.0× |
+| 0.75 | 48.6° | 0.280 | 1.8× |
+| 0.90 | 64.2° | 0.534 | 3.4× |
+| 0.95 | 71.8° | 0.935 | 5.9× |
+| 0.98 | 78.5° | 2.035 | 12.8× |
+| **0.995** | **84.3°** | **6.040** | **38.0×** |
+
+That is `1/cos` of the angle from the centre — **the physical cost of
+looking at a sphere from outside, and not a defect**. The same
+foreshortening that squashes a circle near the limb makes a pixel
+there worth more sky.
+
+> **Nothing is damped, clamped or refused beyond the rule the globe
+> already has: a pointer with no sky under it.**
+
+Each cure was considered and costs more than it buys:
+
+- **Damping** would break the strongest result — the sky staying
+  exactly under the hand. A damped globe slips under the pointer.
+- **Refusing ambiguous solves** would make a large and useful part of
+  the globe intermittently immovable: ambiguity begins at **r = 0.75**
+  and reaches 22 of 32 sampled solves past r = 0.95. The existing
+  nearest-previous-centre rule gives continuity, and the out-and-back
+  gesture confirms it.
+- **A refusal band near the limb** would be the invented radial cutoff
+  this gate already ruled against, over a region that is one or two
+  screen pixels wide on an ordinary window.
+
+**A gesture that leaves the disc and returns brings the page back.**
+132 steps out past the limb and back: 93 moved the page, 39 were
+refused for having no sky under them, and the centre returned to
+within 1e-9 of where it started.
+
+**The rungs below are untouched** — no drift, no refusals, and no
+ambiguous solves at all: that band belongs to the globe alone.
+
+**And a hand settled it.** The measurements can say the sky never
+leaves the pointer and the page never jumps; they cannot say whether
+six degrees of sky per pixel is something a hand can steer. So the
+owner dragged the production globe slowly at r ≈ 0.95 and again a
+pixel or two inside the limb, looking for a jump, a reversal, slipping
+away from the pointer, or a region impossible to steer, and found
+none. The verdict was **"feels absolutely magical"**: near-limb
+dragging is controllable, the globe follows the hand, and the
+increasing rate reads as *rotating a sphere* rather than as a fault.
+
+That is the whole of the ruling. **No damping, no clamp, no refusal
+band, and no drag policy of any kind** — the globe keeps the one rule
+it already had, that a pointer with no sky under it is refused. #330
+changed no production behaviour and closed on its evidence.
+
 ### What a globe page fetches, and why it is more than it draws
 
 Recorded because it looks like waste and is not (#329). A globe page
@@ -901,7 +966,10 @@ once inside a paragraph reads as a pass to anyone scanning:
   to **#293**, which remains the authority for any claim that needs
   physical printing. This gate settles geometry and exported truth
   only.
-- **Drag-to-pan is not settled**, and was not measurable: see above.
+- **Drag-to-pan is settled** (#330). It was not measurable when this
+  gate was written, because `PanSolver.solveCentre` took a projection
+  kind and there was no globe to give it; measured on the production
+  globe it needed no new policy. See below.
 - **Writer fidelity for text ink is established per environment, not
   across machines.** Vector ink — figures, grid, deep-sky symbols,
   star marks — is held to √5 on every machine that runs the contract.
