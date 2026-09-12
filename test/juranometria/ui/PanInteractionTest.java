@@ -487,9 +487,9 @@ class PanInteractionTest {
                 {middleX + 300, middleY}, {middleX, middleY + 300},
                 {middleX - 200, middleY - 200}}) {
             fixture.move(onTheSky[0], onTheSky[1]);
-            org.junit.jupiter.api.Assertions.assertEquals(
-                    java.awt.Cursor.CUSTOM_CURSOR,
-                    cursorTypeOf(fixture),
+            org.junit.jupiter.api.Assertions.assertNotEquals(
+                    java.awt.Cursor.getDefaultCursor(),
+                    cursorOf(fixture),
                     "sky at " + onTheSky[0] + "," + onTheSky[1]
                             + " offers the open hand");
         }
@@ -499,8 +499,8 @@ class PanInteractionTest {
                 {middleX, middleY + 330}}) {
             fixture.move(onThePaper[0], onThePaper[1]);
             org.junit.jupiter.api.Assertions.assertEquals(
-                    java.awt.Cursor.DEFAULT_CURSOR,
-                    cursorTypeOf(fixture),
+                    java.awt.Cursor.getDefaultCursor(),
+                    cursorOf(fixture),
                     "paper at " + onThePaper[0] + "," + onThePaper[1]
                             + " offers nothing, because a press there"
                             + " would find nothing");
@@ -520,19 +520,29 @@ class PanInteractionTest {
         for (int[] corner : new int[][] {{5, 5}, {895, 5}, {5, 695},
                 {895, 695}, {450, 350}}) {
             fixture.move(corner[0], corner[1]);
-            org.junit.jupiter.api.Assertions.assertEquals(
-                    java.awt.Cursor.CUSTOM_CURSOR,
-                    cursorTypeOf(fixture),
+            org.junit.jupiter.api.Assertions.assertNotEquals(
+                    java.awt.Cursor.getDefaultCursor(),
+                    cursorOf(fixture),
                     "a 42-degree page is sky at " + corner[0] + ","
                             + corner[1]);
         }
     }
 
-    /** What the chart's cursor is, read on the event thread. */
-    private static int cursorTypeOf(Fixture fixture) throws Exception {
-        int[] type = new int[1];
+    /**
+     * The chart's cursor, read on the event thread.
+     *
+     * <p>Compared against the default rather than required to be a
+     * CUSTOM_CURSOR: the hand is drawn programmatically where that is
+     * possible and falls back to the platform's own hand where it is
+     * not, so a test naming the custom kind would be asserting which
+     * machine it ran on. What the contract says is that the pointer
+     * offers something here and nothing there (review of PR #337).
+     */
+    private static java.awt.Cursor cursorOf(Fixture fixture)
+            throws Exception {
+        java.awt.Cursor[] shown = new java.awt.Cursor[1];
         javax.swing.SwingUtilities.invokeAndWait(() ->
-                type[0] = fixture.chart.getCursor().getType());
-        return type[0];
+                shown[0] = fixture.chart.getCursor());
+        return shown[0];
     }
 }
