@@ -139,6 +139,131 @@ geometry the seam needs, to **#329**. The fixtures are pinned in
 returns, and the straddler, which fails if clipping quietly becomes
 dropping.
 
+## How much sky a hemisphere can carry
+
+The gate's first cartographic decision, and the one the others depend
+on: how many names are useful, and whether boundaries help, are
+different questions at V 4.0 than at V 6.0.
+
+**The difficulty is not density but its distribution.** A rectangular
+chart is much the same everywhere, so one ink figure describes it. A
+globe's scale collapses toward the limb, and the arithmetic of that is
+severe:
+
+| band of the disc | of the paper | of the sky |
+|---|---|---|
+| middle, inside half the radius | 25.0% | 13.4% |
+| **limb band, the outer tenth** | **19.0%** | **43.6%** |
+
+The outer tenth of the radius carries nearly half the hemisphere in a
+fifth of the page. Nothing is drawn differently there; there is simply
+more sky in it.
+
+Measured with the atlas's own definition of ink — a pixel that is not
+the ground — over those bands, on four hemispheres, twice each: the
+page as the atlas draws it, and the same page carrying marks alone
+(`make globe-density-study`).
+
+| V | stars | middle, as drawn | limb, as drawn | middle, marks | limb, marks |
+|---|---|---|---|---|---|
+| 4.0 | ~300 | 10–21% | 32–40% | 1–6% | 7–10% |
+| 5.0 | ~900 | 11–23% | 36–44% | 3–9% | 15–18% |
+| 6.0 | ~2 800 | 15–28% | 46–54% | 7–15% | 30–36% |
+| 7.0 | ~8 700 | 22–38% | 62–71% | 15–26% | 52–61% |
+| 8.0 | ~25 000 | 33–51% | 78–86% | 27–44% | 73–82% |
+
+Three things the measurement says that looking could not:
+
+**The limb carries about three times the mark-ink of the middle, at
+every magnitude.** That ratio is the projection, not the sky, and it
+does not improve with a brighter limit — it is the shape of the
+problem rather than a quantity to tune away.
+
+**Below V 6.0 most of the ink is furniture, not stars.** At V 4.0 a
+hemisphere carries three hundred stars and is already a fifth inked;
+the marks account for one to six points of that, and the grid,
+boundaries, figures and names for the rest. **Choosing a brighter
+limiting magnitude barely quietens a globe** — which is why the
+boundary question (#326) is not a separate tidy-up but part of this
+decision.
+
+**A sparse centre does not give a sparse page.** The emptiest
+hemisphere in the corpus has the *lowest* middle ink and the *highest*
+limb ink at every limit — 0.9% against 8.5% of marks at V 4.0 —
+because centring on empty sky puts the Milky Way near the limb, where
+the page can least afford it.
+
+### The default is V 5.0
+
+At V 6.0 the limb band is half the paper in ink as drawn, and about a
+third in marks alone: the outer ring reads as a dark rim rather than
+as sky. At V 7.0 and V 8.0 it is solid.
+
+V 5.0 keeps the limb band under half as drawn and under a fifth in
+marks, and the disc stays a sky rather than a texture: figures remain
+followable across it, and names still have somewhere to sit.
+
+V 4.0 is quieter by only a few points, because at that limit the page
+is nearly all furniture, and it costs the reader most of the naked-eye
+sky — which is the thing a globe is for.
+
+**This is the globe's own default and not a change to the ladder.**
+The magnitude steps stay `{4.0, 5.0, 6.0, 7.0, 8.0}`, the reader can
+choose any of them at 180 degrees as at any other field, and no other
+rung's default moves.
+
+## What each layer costs, and which stay on
+
+The density measurement found that a globe cannot be quietened by
+drawing fewer stars, because below V 6.0 most of its ink is furniture.
+So each layer was measured by **taking it away from the finished
+page** — what a reader gains by switching it off is what removing it
+recovers. A layer drawn alone cannot answer that: the grid over empty
+paper inks every pixel it touches, while the grid over a crowded limb
+inks only the pixels that were not already dark
+(`make globe-furniture-study`).
+
+At V 5.0, across four hemispheres:
+
+| layer | costs, over the disc | costs, in the limb band |
+|---|---|---|
+| constellation figures | 4.7–6.1 points | **6.3–8.3 points** |
+| the coordinate grid | 3.3–3.7 | 5.0–5.9 |
+| constellation boundaries | 3.1–3.6 | 4.4–5.5 |
+| constellation names | 2.0–2.7 | 1.8–4.0 |
+| star names and letters | 1.8–2.4 | 1.8–3.3 |
+| **all five together** | | **20.1–26.5** |
+| *the marks themselves, for comparison* | | *15.0–18.3* |
+
+**The furniture costs half again what the sky it decorates costs.**
+And the ranking does not follow value: the most expensive layer is the
+one a globe can least do without, and the cheapest layers are the ones
+that were suspected first.
+
+The policy at 180 degrees:
+
+- **Figures stay on.** The most expensive layer on the page, and the
+  one that earns it: without them a hemisphere is a field of dots, and
+  recognising the sky is what a globe is for.
+- **The grid stays on.** Also expensive, and it does two things
+  nothing else does — it orients the reader, and it is what makes the
+  disc read as a sphere rather than as a circular crop.
+- **Boundaries are off by default.** The clearest case: real ink for
+  little a reader at this scale is reading. Dotted administrative
+  lines are a detail chart's tool.
+- **Constellation names, star names and letters stay on.** Under four
+  points each, and they are how a reader learns the sky. This reverses
+  the expectation the study began with — the text was never the
+  problem.
+
+**This is the 180-degree policy alone.** No existing page changes:
+boundaries stay on where they already are, and a reader who turns them
+on globally gets them on the globe too.
+
+**When boundaries are drawn, #326 should make them subdued rather
+than pitch dark.** That remains worth doing for narrower charts and
+for the reader who asks for them here.
+
 ## A page is drawn by one projection
 
 Not a cartographic decision, but the gate found it and it had to be
@@ -167,8 +292,8 @@ was satisfied by a fix that put the split straight back.
 
 ## Still open
 
-Density and the default limiting magnitude; which families are visible
-at 180 degrees; how many names are useful; whether boundaries stay on
+Whether the grid needs reduced detail near the limb, measured before
+its appearance is altered; which families are visible at 180 degrees; how many names are useful; whether boundaries stay on
 by default, assessed with #326 in mind; navigation and pointing near
 the limb; module geometry; projection identity in export; and paper
 policy, with #293 remaining the authority for any claim that needs
