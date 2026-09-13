@@ -271,8 +271,12 @@ class SprintThirtyTwoJourneyTest {
                             + " is not in the page's own contents");
             assertFalse(named(drawn(chart, options), hidden),
                     "5. nor among the names the page writes");
-            assertFalse(hitAnywhere(chart, hidden),
-                    "5. nor anywhere a reader could point at");
+            assertFalse(pointedAtAnyOf(chart, sampledPlaces(chart),
+                            hidden),
+                    "5. nor at any of the places a reader is likely to"
+                            + " point: the middle of the disc, two"
+                            + " radial bands, the limb itself and the"
+                            + " paper beyond it");
             assertFalse(listedOnThisPage(onThisPage[0], hidden),
                     "5. nor in what On this page shows the reader");
 
@@ -284,8 +288,11 @@ class SprintThirtyTwoJourneyTest {
                             + " page");
             assertTrue(listedOnThisPage(onThisPage[0], hidden),
                     "5. and to what On this page shows the reader");
-            assertTrue(hitAnywhere(chart, hidden),
-                    "5. and to what a reader can point at");
+            assertTrue(pointedAtAnyOf(chart, aroundTheMarkOf(chart, hidden),
+                            hidden),
+                    "5. and to what a reader can point at, asked of"
+                            + " the hit test at and around where the"
+                            + " page draws it");
 
             // ---- 6. point at a star, then go down to it -----------
             SwingUtilities.invokeAndWait(() ->
@@ -783,38 +790,112 @@ class SprintThirtyTwoJourneyTest {
     }
 
     /**
-     * Whether a reader could point anywhere on this page and be given
-     * this object - asked of the hit test itself, which is the seam
-     * the pointer goes through, rather than of the marks behind it.
+     * Whether the hit test - the seam a pointer goes through - gives
+     * this object at any of these places.
      *
-     * <p>Swept over the page on a grid a little finer than the hit
-     * test's own tolerance, so nothing it would answer to is stepped
-     * over.
+     * <p><strong>These places, and not "anywhere".</strong> The first
+     * version of this swept the whole page at the hit test's own
+     * tolerance: some thirty-nine thousand calls, twice, which cost
+     * the closing journey seventeen minutes on CI and would have cost
+     * it on every display run thereafter. Exhaustiveness was not what
+     * the question needed. That the object is off the page is
+     * established by the page's own contents and by what On this page
+     * lists; what the pointer adds is that the reader's seam does not
+     * contradict them, and a bounded sample of the places a reader
+     * actually points answers that.
      */
-    private static boolean hitAnywhere(ChartComponent chart, String id)
-            throws Exception {
+    private static boolean pointedAtAnyOf(ChartComponent chart,
+                                          List<double[]> places,
+                                          String id) throws Exception {
+        assertTrue(places.size() <= MOST_POINTS,
+                "the pointer is asked at a bounded number of places,"
+                        + " so this cannot quietly become a full-page"
+                        + " scan again: " + places.size() + " against"
+                        + " a ceiling of " + MOST_POINTS);
         return onEdt(() -> {
             ChartScene scene = chart.currentScene();
-            ChartHitTest pointing =
-                    new ChartHitTest(new ChartRenderer(
-                            StarSizePolicy.DEFAULT));
-            int step = (int) Math.max(1.0, ChartHitTest.TOLERANCE_PX);
-            for (int y = 0; y < scene.viewport().heightPx(); y += step) {
-                for (int x = 0; x < scene.viewport().widthPx(); x += step) {
-                    ChartHitTest.Hit hit = pointing.at(scene,
-                            chart.drawnOptions(), x, y);
-                    if (hit == null) {
-                        continue;
-                    }
-                    for (var candidate : hit.candidates()) {
-                        if (names(candidate, id)) {
-                            return true;
-                        }
+            ChartHitTest pointing = new ChartHitTest(
+                    new ChartRenderer(StarSizePolicy.DEFAULT));
+            for (double[] at : places) {
+                ChartHitTest.Hit hit = pointing.at(scene,
+                        chart.drawnOptions(), at[0], at[1]);
+                if (hit == null) {
+                    continue;
+                }
+                for (var candidate : hit.candidates()) {
+                    if (names(candidate, id)) {
+                        return true;
                     }
                 }
             }
             return false;
         });
+    }
+
+    /**
+     * How many places the pointer may be asked about. A ceiling
+     * rather than a description: if someone later restores the sweep,
+     * this fails rather than the journey quietly taking a quarter of
+     * an hour again.
+     */
+    private static final int MOST_POINTS = 64;
+
+    /**
+     * Where a reader points: the middle of the disc, two radial
+     * bands, the limb itself, and the paper beyond it - the places
+     * the globe's own behaviour differs, stated as a list so the
+     * sampling is visible rather than implied.
+     */
+    private static List<double[]> sampledPlaces(ChartComponent chart)
+            throws Exception {
+        PageRegion region = regionOf(chart);
+        List<double[]> places = new ArrayList<>();
+        places.add(new double[] {region.limbX(), region.limbY()});
+        for (double band : new double[] {0.5, 0.9, 1.0, 1.08}) {
+            for (int step = 0; step < 8; step++) {
+                double angle = step * Math.PI / 4.0;
+                places.add(new double[] {
+                        region.limbX()
+                                + band * region.limbRadius()
+                                        * Math.cos(angle),
+                        region.limbY()
+                                + band * region.limbRadius()
+                                        * Math.sin(angle)});
+            }
+        }
+        return places;
+    }
+
+    /**
+     * Where the page draws this object, and a few pixels around it -
+     * the positive path, asked of the hit test at the place a reader
+     * would aim. The mark's own centre supplies the place; the answer
+     * comes from the seam.
+     */
+    private static List<double[]> aroundTheMarkOf(ChartComponent chart,
+                                                  String id)
+            throws Exception {
+        double[] at = onEdt(() -> {
+            for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT)
+                    .drawnMarks(chart.currentScene(),
+                            chart.drawnOptions())) {
+                if (mark.kind() == ChartRenderer.DrawnMark.Kind.DEEP_SKY
+                        && mark.deepSky().id().equals(id)) {
+                    return new double[] {mark.centre().x(),
+                            mark.centre().y()};
+                }
+            }
+            return null;
+        });
+        assertNotNull(at, "5. the page draws " + id + " somewhere to"
+                + " point at");
+        List<double[]> places = new ArrayList<>();
+        places.add(at);
+        for (double off : new double[] {-2.0, 2.0}) {
+            places.add(new double[] {at[0] + off, at[1]});
+            places.add(new double[] {at[0], at[1] + off});
+        }
+        return places;
     }
 
     private static boolean names(juranometria.chart.Selection.Object what,
