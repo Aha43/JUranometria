@@ -38,7 +38,7 @@ sagittarius:
     Globular clusters      centre      8x8   
     Globular clusters        limb      8x8   
     Nebulae                centre      8x8   
-    Nebulae                  limb      0x0   
+    Nebulae                  limb   withdrawn: its projected footprint does not resolve and it is neither Messier nor the target
 
 orion:
   what each family costs:
