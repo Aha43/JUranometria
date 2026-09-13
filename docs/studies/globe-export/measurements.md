@@ -44,13 +44,13 @@ platform record beside this and held to reproducing within one environment.
 
   SVG  identity: orthographic  no text anchored outside the limb
   PDF  identity: orthographic  geometry not read back from this format
-  PNG  identity: orthographic  ink beyond the limb includes the page's furniture
+  PNG  identity: orthographic  no sky ink beyond the limb
 
 ## The same globe with modules
 
   SVG  identity: orthographic  no text anchored outside the limb
   PDF  identity: orthographic  geometry not read back from this format
-  PNG  identity: orthographic  ink beyond the limb includes the page's furniture
+  PNG  identity: orthographic  no sky ink beyond the limb
 
 The counts behind all of this - ink beyond the limb by layer, the two
 rasterisations compared, file sizes and text-element counts - are this
