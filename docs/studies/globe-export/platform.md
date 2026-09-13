@@ -58,6 +58,6 @@ recovers less than the two rows together.
 
 ## The same globe with modules
 
-  SVG   1652625 bytes  199 text elements, 1 anchored outside the limb
-  PDF   2623759 bytes  geometry not read back from this format
-  PNG   1004034 bytes  1019079 px inside the limb, 55086 beyond it
+  SVG   1653418 bytes  199 text elements, 1 anchored outside the limb
+  PDF   2624414 bytes  geometry not read back from this format
+  PNG   1029680 bytes  1039644 px inside the limb, 55086 beyond it
