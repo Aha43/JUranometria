@@ -36,7 +36,7 @@ sagittarius, with the paper's edge as the boundary:
   limb:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                 50          50       0      1       29      15       6
-    CONSTELLATION        23          23       0      2        8      15       0
+    CONSTELLATION        23          23       0      3        9      14       0
   whole disc:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                150         150       0      1      129      15       6
@@ -60,7 +60,7 @@ sagittarius, with the limb as the boundary:
     DEEP_SKY              1           1       0      0        1       0       0
     CONSTELLATION        58          52       6      3       52       0       0
     omitted labels were refused by: OWNERSHIP 6
-  of the labels the paper placed: 149 stayed where they were, 54 moved, 6 became omissions
+  of the labels the paper placed: 148 stayed where they were, 55 moved, 6 became omissions
 
 orion, with the paper's edge as the boundary:
   centre:

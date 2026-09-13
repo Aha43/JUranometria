@@ -23,6 +23,7 @@ import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
+import juranometria.project.SkyFootprint;
 import juranometria.project.ViewportMapping;
 
 /**
@@ -137,12 +138,39 @@ public final class ChartRenderer {
      * star's dot radius, or half a symbol's larger axis.
      */
     public record DrawnMark(Kind kind, Object subject, PixelPoint centre,
-                            Shape outline, double reach, Shape ink) {
+                            Shape outline, double reach, Shape ink,
+                            Painted painted) {
 
         /** A mark whose ink is its outline, which is every star's. */
         public DrawnMark(Kind kind, Object subject, PixelPoint centre,
                          Shape outline, double reach) {
-            this(kind, subject, centre, outline, reach, outline);
+            this(kind, subject, centre, outline, reach, outline, null);
+        }
+
+        /**
+         * How a deep-sky mark is painted: the axes its glyph is built
+         * at, and the map that carries the built glyph onto the page
+         * (Sprint 32, issue #331). Null for a star.
+         *
+         * <p>This exists so that the decision is made <em>once</em>.
+         * A bounded page corrects an extended object's shape, and the
+         * first attempt corrected it in the painter - after {@link
+         * ChartRenderer#drawnMarks} had already published the
+         * uncorrected outline, reach and ink to hit testing, label
+         * placement, the inventory, selection and stacking. The page
+         * could then draw a thin sliver while accepting clicks over
+         * the large ellipse it used to be. What exists, what is
+         * painted, what can be clicked, what blocks a label and what
+         * enters the inventory are now one answer.
+         *
+         * <p>{@code carried} is null when the glyph is painted as
+         * built, which is every ordinary page and a bounded page's
+         * minimum glyph. The ordinary page therefore reaches {@link
+         * #paintSymbol} by the same call it always did, with no
+         * transform concatenated that would be the identity anyway.
+         */
+        public record Painted(double majorPx, double minorPx,
+                              SkyFootprint.Foreshortening carried) {
         }
 
         public enum Kind { STAR, DEEP_SKY }
@@ -326,6 +354,10 @@ public final class ChartRenderer {
         // have let a click near an edge select an object off the
         // page, and would have inflated every count measured here.
         java.awt.geom.Rectangle2D paper = paperOf(scene);
+        // A bounded page decides an extended object's shape from its
+        // projected footprint, and that decision governs the mark
+        // itself - existence included (#331).
+        boolean bounded = Double.isFinite(projection.visiblePlaneRadius());
         java.util.List<DrawnMark> marks = new java.util.ArrayList<>();
         java.util.List<DrawnMark> deepSky = new java.util.ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
@@ -337,22 +369,17 @@ public final class ChartRenderer {
             }
             projection.project(dso.position()).ifPresent(plane -> {
                 PixelPoint centre = mapping.toPixel(plane);
-                Shape outline = symbolOutline(dso, policy, centre,
-                        mapping.pixelsPerPlaneUnit());
-                if (outline != null && outline.intersects(paper)) {
-                    double[] axes = symbolAxesPx(dso, policy,
-                            mapping.pixelsPerPlaneUnit());
-                    deepSky.add(new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso,
-                            centre, outline,
-                            symbolReach(dso, policy,
-                                    mapping.pixelsPerPlaneUnit()),
-                            symbolInk(symbolFor(dso), centre.x(),
-                                    centre.y(), axes[0], axes[1],
-                                    dso.positionAngleDegrees())));
+                DrawnMark mark = bounded
+                        ? correctedMark(dso, policy, centre, mapping,
+                                projection)
+                        : ordinaryMark(dso, policy, centre,
+                                mapping.pixelsPerPlaneUnit());
+                if (mark != null && mark.outline().intersects(paper)) {
+                    deepSky.add(mark);
                 }
             });
         }
-        deepSky.sort(stackingOrder(policy, mapping.pixelsPerPlaneUnit()));
+        deepSky.sort(stackingOrder());
         marks.addAll(deepSky);
         // The page's own limit, excepting the stars its figures are
         // drawn to (issue #307). A limit says how crowded the page
@@ -535,20 +562,14 @@ public final class ChartRenderer {
         java.util.List<DrawnMark> marks =
                 drawnMarks(scene, options, policy, projection, mapping);
         g.setClip(sky);
-        // A bounded page foreshortens its marks; every other page
-        // takes the branch it always took, so the released atlas is
-        // not redrawn through a transform that would be the identity
-        // anyway (#331).
-        boolean bounded = Double.isFinite(projection.visiblePlaneRadius());
+        // Painted from the published mark's own decision (#331), so
+        // there is no second geometry to drift from the first. A
+        // mark that carries no map - every ordinary page's, and a
+        // bounded page's minimum glyph - reaches paintSymbol by the
+        // call it always did.
         for (DrawnMark mark : marks) {
             if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
-                if (bounded) {
-                    drawForeshortenedSymbol(g, mark.deepSky(), policy,
-                            mark.centre(), mapping, projection, palette);
-                } else {
-                    drawSymbol(g, mark.deepSky(), policy, mark.centre(),
-                            mapping.pixelsPerPlaneUnit(), palette);
-                }
+                drawSymbol(g, mark, palette);
             }
         }
         g.setColor(palette.starInk());
@@ -1284,17 +1305,152 @@ public final class ChartRenderer {
      * rather than its size. Half the major axis is the same distance
      * whichever way the object lies.
      */
-    private static double symbolReach(DeepSkyObject dso,
-                                      RegionalDetailPolicy policy,
-                                      double pixelsPerPlaneUnit) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+    private static double symbolReach(DeepSkyObject dso, double majorPx) {
         if (symbolFor(dso) == Symbol.PLANETARY) {
             // The planetary's spokes are its outermost ink.
             double r = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                    axes[0]) / 2.0;
+                    majorPx) / 2.0;
             return r * 1.7;
         }
-        return axes[0] / 2.0;
+        return majorPx / 2.0;
+    }
+
+    /**
+     * The mark an ordinary page draws: the object's axes at the page
+     * centre's rate, clamp included, painted as built.
+     */
+    private static DrawnMark ordinaryMark(DeepSkyObject dso,
+                                          RegionalDetailPolicy policy,
+                                          PixelPoint centre,
+                                          double pixelsPerPlaneUnit) {
+        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+        return markFrom(dso, centre, axes[0], axes[1], axes[0], null);
+    }
+
+    /**
+     * The mark a bounded page draws, decided once (Sprint 32, issue
+     * #331): whether the object appears at all, at what axes its
+     * glyph is built, and the map that carries it.
+     *
+     * <p>Returns null when the object is <strong>withdrawn</strong>.
+     * A regional page admits an object either because its footprint
+     * resolves or because it is a Messier landmark or the reader's
+     * searched target; {@link RegionalDetailPolicy#drawn} asks that
+     * question at the page centre's rate, which on a hemisphere is
+     * the very number this step exists to stop trusting. An ordinary
+     * object admitted <em>solely</em> because centre-scale said it
+     * resolved, whose real projected footprint then fails the major
+     * or minor test, has no remaining reason to be on the page, and
+     * promoting it to a minimum glyph would be inventing a landmark.
+     * The two objects the settled policy does promote - the ones
+     * {@link RegionalDetailPolicy#clampAllowed} names - keep their
+     * minimum glyph, because their reason for being drawn was never
+     * their size.
+     *
+     * <p>Two conditions send a mark back to its minimum glyph, and
+     * they ask different questions. The <strong>major</strong> span
+     * against the atlas's practical minimum asks whether the reader
+     * sees the object's own shape. The <strong>minor</strong> span
+     * against twice the stroke width asks whether what they see can
+     * still say which family it is: every sky glyph is stroked at
+     * 1 px, so below one stroke width of separation the two sides of
+     * any shape merge into a single bar and every family looks alike.
+     * One stroke to hold them apart and one device pixel of clear
+     * separation is 2 px, and the five glyphs measurably stop
+     * differing from one another between 1.5 and 1 px of minor span.
+     *
+     * <p>Nothing here decides what reaches the paper. The page's own
+     * clip does that, after this has decided what the mark is.
+     */
+    private static DrawnMark correctedMark(DeepSkyObject dso,
+                                           RegionalDetailPolicy policy,
+                                           PixelPoint centre,
+                                           ViewportMapping mapping,
+                                           Projection projection) {
+        SkyFootprint.Extent extent = SkyFootprint.extentOn(projection,
+                mapping, dso.position(), dso.majorAxisArcmin(),
+                dso.minorAxisArcmin(), dso.positionAngleDegrees());
+        SkyFootprint.Foreshortening carried = extent == null ? null
+                : SkyFootprint.foreshortening(projection, mapping,
+                        dso.position(), dso.majorAxisArcmin(),
+                        dso.minorAxisArcmin(), dso.positionAngleDegrees());
+        if (carried == null
+                || extent.majorPx()
+                        < RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX
+                || extent.minorPx() < LEGIBLE_MINOR_PX) {
+            if (!policy.clampAllowed(dso)) {
+                return null;
+            }
+            // The family's minimum glyph, at the practical minimum in
+            // both axes - not the mark's ordinary centre-scale size,
+            // which for a strongly foreshortened object is the very
+            // number this whole step exists to stop trusting. A 4
+            // degree cluster at 89 degrees out would have fallen back
+            // to a 25 px ring, which is neither its footprint nor a
+            // minimum glyph.
+            double minimum = RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX;
+            return markFrom(dso, centre, minimum, minimum, minimum, null);
+        }
+        double[] axes = symbolAxesPx(dso, policy,
+                mapping.pixelsPerPlaneUnit());
+        return markFrom(dso, centre, axes[0], axes[1],
+                extent.majorPx(), carried);
+    }
+
+    /**
+     * One mark from one decision: the outline a reader aims at, the
+     * ink a label must not cover, and the reach a highlight rings -
+     * all three from the glyph as it is actually painted.
+     *
+     * <p>The glyph is built exactly as every other page builds it -
+     * the family's own vocabulary, at the given axes and position
+     * angle - and then the whole composed shape is carried by the
+     * map. Crosses, dashes and spokes travel with it because the map
+     * is applied to the mark rather than to each piece's definition,
+     * so a family added later is foreshortened without being told
+     * that globes exist.
+     *
+     * <p>{@code drawnMajorPx} is the mark's larger span <em>as
+     * drawn</em>, which is what a reach is half of. It is a separate
+     * argument rather than something recovered from the carried map,
+     * because the map's largest stretch is not it: a projection that
+     * only squashes leaves one direction alone, so scaling the reach
+     * by that factor would leave a strongly foreshortened cloud
+     * ringed at the size it stopped being. The projected footprint
+     * has already measured the span, so the reach is taken from the
+     * measurement.
+     */
+    private static DrawnMark markFrom(DeepSkyObject dso, PixelPoint centre,
+                                      double majorPx, double minorPx,
+                                      double drawnMajorPx,
+                                      SkyFootprint.Foreshortening carried) {
+        Shape outline = symbolOutline(dso, centre, majorPx, minorPx);
+        if (outline == null) {
+            return null;
+        }
+        Shape ink = symbolInk(symbolFor(dso), centre.x(), centre.y(),
+                majorPx, minorPx, dso.positionAngleDegrees());
+        double reach = symbolReach(dso, drawnMajorPx);
+        if (carried != null) {
+            java.awt.geom.AffineTransform about = carriedAbout(centre, carried);
+            outline = about.createTransformedShape(outline);
+            ink = about.createTransformedShape(ink);
+        }
+        return new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso, centre, outline,
+                reach, ink,
+                new DrawnMark.Painted(majorPx, minorPx, carried));
+    }
+
+    /** The carried map, about the mark's own anchor on the page. */
+    private static java.awt.geom.AffineTransform carriedAbout(
+            PixelPoint centre, SkyFootprint.Foreshortening carried) {
+        java.awt.geom.AffineTransform about =
+                java.awt.geom.AffineTransform.getTranslateInstance(
+                        centre.x(), centre.y());
+        about.concatenate(new java.awt.geom.AffineTransform(carried.m00(),
+                carried.m10(), carried.m01(), carried.m11(), 0.0, 0.0));
+        about.translate(-centre.x(), -centre.y());
+        return about;
     }
 
     /**
@@ -1326,11 +1482,10 @@ public final class ChartRenderer {
      * CSV, map or collection iteration: reverse the input and the
      * page is unchanged.
      */
-    private static java.util.Comparator<DrawnMark> stackingOrder(
-            RegionalDetailPolicy policy, double pixelsPerPlaneUnit) {
+    private static java.util.Comparator<DrawnMark> stackingOrder() {
         return java.util.Comparator
-                .comparingDouble((DrawnMark mark) -> -symbolFootprintPx(
-                        mark.deepSky(), policy, pixelsPerPlaneUnit))
+                .comparingDouble((DrawnMark mark)
+                        -> -symbolFootprintPx(mark))
                 .thenComparing(mark -> mark.deepSky().id());
     }
 
@@ -1345,25 +1500,32 @@ public final class ChartRenderer {
      * reason about - and to test - than a rule with a family
      * exception in it.
      */
-    private static double symbolFootprintPx(DeepSkyObject dso,
-                                            RegionalDetailPolicy policy,
-                                            double pixelsPerPlaneUnit) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
-        return switch (symbolFor(dso)) {
-            case ELLIPSE, DOTTED_CIRCLE ->
-                    Math.PI * axes[0] * axes[1] / 4.0;
-            case CROSSED_CIRCLE -> Math.PI * axes[0] * axes[0] / 4.0;
-            case BOX -> axes[0] * axes[1];
+    private static double symbolFootprintPx(DrawnMark mark) {
+        DeepSkyObject dso = mark.deepSky();
+        DrawnMark.Painted painted = mark.painted();
+        double majorPx = painted.majorPx();
+        double minorPx = painted.minorPx();
+        double built = switch (symbolFor(dso)) {
+            case ELLIPSE, DOTTED_CIRCLE -> Math.PI * majorPx * minorPx / 4.0;
+            case CROSSED_CIRCLE -> Math.PI * majorPx * majorPx / 4.0;
+            case BOX -> majorPx * minorPx;
             case PLANETARY -> {
                 // Its spokes reach further than its disc, but the
                 // disc is what it encloses.
                 double r = Math.max(
                         RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                        axes[0]) / 2.0 / 1.7;
+                        majorPx) / 2.0 / 1.7;
                 yield Math.PI * r * r;
             }
             case NONE -> 0.0;
         };
+        // What the page paints, not what the object would cover at
+        // the centre's rate (#331). A linear map multiplies every
+        // area it carries by the same factor, so a strongly
+        // foreshortened cloud no longer stacks as though it were
+        // still the disc it is not.
+        return painted.carried() == null ? built
+                : built * painted.carried().areaFactor();
     }
 
     /**
@@ -1400,12 +1562,9 @@ public final class ChartRenderer {
      * shape a reader points at.
      */
     private static Shape symbolOutline(DeepSkyObject dso,
-                                       RegionalDetailPolicy policy,
                                        PixelPoint centre,
-                                       double pixelsPerPlaneUnit) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
-        double majorPx = axes[0];
-        double minorPx = axes[1];
+                                       double majorPx,
+                                       double minorPx) {
         Shape local = switch (symbolFor(dso)) {
             case ELLIPSE, DOTTED_CIRCLE -> new Ellipse2D.Double(
                     -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
@@ -1437,88 +1596,22 @@ public final class ChartRenderer {
         return place.createTransformedShape(local);
     }
 
-    private static void drawSymbol(Graphics2D g, DeepSkyObject dso,
-                                   RegionalDetailPolicy policy,
-                                   PixelPoint centre, double pixelsPerPlaneUnit,
+    private static void drawSymbol(Graphics2D g, DrawnMark mark,
                                    ChartPalette palette) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
-        paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
-                axes[0], axes[1], dso.positionAngleDegrees(), palette);
-    }
-
-    /**
-     * The same mark, carried into what a bounded page makes of it
-     * (Sprint 32, issue #331).
-     *
-     * <p>The glyph is built exactly as every other page builds it -
-     * the family's own vocabulary, at the object's own axes and
-     * position angle - and then the whole composed shape is carried
-     * by the map from its ordinary footprint to its projected one.
-     * Crosses, dashes and spokes travel with it because the map is
-     * applied to the mark rather than to each piece's definition, so
-     * a family added later is foreshortened without being told that
-     * globes exist.
-     *
-     * <p>Two conditions send a mark back to its minimum glyph
-     * instead, and they ask different questions. The
-     * <strong>major</strong> span against the atlas's practical
-     * minimum asks whether the reader sees the object's own shape.
-     * The <strong>minor</strong> span against twice the stroke width
-     * asks whether what they see can still say which family it is:
-     * every sky glyph is stroked at 1 px, so below one stroke width
-     * of separation the two sides of any shape merge into a single
-     * bar and every family looks alike. One stroke to hold them
-     * apart and one device pixel of clear separation is 2 px, and the
-     * five glyphs measurably stop differing from one another between
-     * 1.5 and 1 px of minor span.
-     *
-     * <p>Nothing here decides what reaches the paper. The page's own
-     * clip does that, after this has decided what the mark is.
-     */
-    private static void drawForeshortenedSymbol(
-            Graphics2D g, DeepSkyObject dso, RegionalDetailPolicy policy,
-            PixelPoint centre, ViewportMapping mapping,
-            juranometria.project.Projection projection,
-            ChartPalette palette) {
-        double[] axes = symbolAxesPx(dso, policy,
-                mapping.pixelsPerPlaneUnit());
-        juranometria.project.SkyFootprint.Extent extent =
-                juranometria.project.SkyFootprint.extentOn(projection,
-                        mapping, dso.position(), dso.majorAxisArcmin(),
-                        dso.minorAxisArcmin(),
-                        dso.positionAngleDegrees());
-        juranometria.project.SkyFootprint.Foreshortening carried =
-                extent == null ? null
-                        : juranometria.project.SkyFootprint.foreshortening(
-                                projection, mapping, dso.position(),
-                                dso.majorAxisArcmin(),
-                                dso.minorAxisArcmin(),
-                                dso.positionAngleDegrees());
-        if (carried == null
-                || extent.majorPx()
-                        < RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX
-                || extent.minorPx() < LEGIBLE_MINOR_PX) {
-            // The family's minimum glyph, at the practical minimum in
-            // both axes - not the mark's ordinary centre-scale size,
-            // which for a strongly foreshortened object is the very
-            // number this whole step exists to stop trusting. A 4
-            // degree cluster at 89 degrees out would have fallen back
-            // to a 25 px ring, which is neither its footprint nor a
-            // minimum glyph.
-            double minimum =
-                    RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX;
+        DeepSkyObject dso = mark.deepSky();
+        DrawnMark.Painted painted = mark.painted();
+        PixelPoint centre = mark.centre();
+        if (painted.carried() == null) {
             paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
-                    minimum, minimum, dso.positionAngleDegrees(),
-                    palette);
+                    painted.majorPx(), painted.minorPx(),
+                    dso.positionAngleDegrees(), palette);
             return;
         }
         Graphics2D g2 = (Graphics2D) g.create();
         try {
-            g2.translate(centre.x(), centre.y());
-            g2.transform(new java.awt.geom.AffineTransform(
-                    carried.m00(), carried.m10(), carried.m01(),
-                    carried.m11(), 0.0, 0.0));
-            paintSymbol(g2, symbolFor(dso), 0.0, 0.0, axes[0], axes[1],
+            g2.transform(carriedAbout(centre, painted.carried()));
+            paintSymbol(g2, symbolFor(dso), centre.x(), centre.y(),
+                    painted.majorPx(), painted.minorPx(),
                     dso.positionAngleDegrees(), palette);
         } finally {
             g2.dispose();

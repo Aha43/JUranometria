@@ -28,7 +28,7 @@ sagittarius:
     Galaxies                  0.00%      0.98%
     Open clusters             0.17%      0.02%
     Globular clusters         0.58%      0.31%
-    Nebulae                   0.31%      0.16%
+    Nebulae                   0.31%      0.09%
     Planetary nebulae         0.00%      0.01%
   what that object actually inked:
     family                   band   inked box
@@ -38,7 +38,7 @@ sagittarius:
     Globular clusters      centre      8x8   
     Globular clusters        limb      8x8   
     Nebulae                centre      8x8   
-    Nebulae                  limb      8x8   
+    Nebulae                  limb      0x0   
 
 orion:
   what each family costs:
@@ -46,7 +46,7 @@ orion:
     Galaxies                  0.00%      1.82%
     Open clusters             0.19%      0.02%
     Globular clusters         0.04%      0.00%
-    Nebulae                   0.22%      0.10%
+    Nebulae                   0.22%      0.09%
     Planetary nebulae         0.00%      0.06%
   what that object actually inked:
     family                   band   inked box

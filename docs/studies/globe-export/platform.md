@@ -52,12 +52,12 @@ recovers less than the two rows together.
 
 ## The core globe, no modules
 
-  SVG   1653328 bytes  209 text elements, 38 anchored outside the limb
-  PDF   2641237 bytes  geometry not read back from this format
-  PNG   1017419 bytes  1008758 px inside the limb, 95600 beyond it
+  SVG   1652873 bytes  209 text elements, 38 anchored outside the limb
+  PDF   2640574 bytes  geometry not read back from this format
+  PNG   1017315 bytes  1008264 px inside the limb, 95585 beyond it
 
 ## The same globe with modules
 
-  SVG   1654619 bytes  211 text elements, 39 anchored outside the limb
-  PDF   2658055 bytes  geometry not read back from this format
-  PNG   1050225 bytes  1031442 px inside the limb, 99469 beyond it
+  SVG   1654164 bytes  211 text elements, 39 anchored outside the limb
+  PDF   2657392 bytes  geometry not read back from this format
+  PNG   1050142 bytes  1030992 px inside the limb, 99454 beyond it
