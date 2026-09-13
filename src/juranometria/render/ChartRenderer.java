@@ -581,6 +581,29 @@ public final class ChartRenderer {
             }
         }
         g.setClip(paper);
+        // The page's own edge, once, after every piece of sky ink
+        // (Sprint 32, issue #331).
+        //
+        // Owner testing found the disc's outline breaking up as the
+        // globe turned, and the cause was that there was no outline:
+        // what read as one was assembled from whatever sky ink
+        // happened to end at the clip - 27 per cent of the
+        // circumference with stars alone, 76 with the settled page -
+        // so rotating the sphere moved the gaps rather than closing
+        // them. An outline three-quarters there is not an outline,
+        // and one made of line ends says nothing about where the
+        // visible hemisphere stops, which is the one thing it is for.
+        //
+        // Drawn from the clip's own shape, so the boundary a reader
+        // sees and the boundary the ink obeys cannot differ. After
+        // the sky, so no figure can break it or be mistaken for it;
+        // and unclipped, because furniture is not cut by the edge it
+        // draws.
+        if (sky != paper) {
+            g.setColor(quiet(palette.gridInk(), palette.ground()));
+            g.setStroke(new BasicStroke(1.0f));
+            g.draw(sky);
+        }
         // Star labels, then deep-sky labels, which is the order the
         // page has always drawn them in.
         drawText(g, LABEL_FONT, palette.textInk(), placedText,
@@ -637,6 +660,34 @@ public final class ChartRenderer {
      * them is #331's fourth step; until then a module's ink is
      * governed by its own geometry as #301 left it.
      */
+    /**
+     * How heavy the limb is: a quarter of the grid's own ink against
+     * the ground (Sprint 32, issue #331, settled by eye).
+     *
+     * <p>A quarter because that is where the grid itself ends up at
+     * the edge, so the boundary and the last parallel beside it carry
+     * the same weight, and the disc reads as the edge of the page's
+     * sky rather than as one more celestial circle. Both this and a
+     * third were measured to close the outline completely - the
+     * choice between them was hierarchy, not coverage - and the
+     * heavier one begins to rebuild the reinforced rim that fading
+     * the grid was done to remove.
+     */
+    private static final double LIMB_STRENGTH = 0.25;
+
+    /** An ink let down towards the ground, for furniture that must not shout. */
+    private static java.awt.Color quiet(java.awt.Color ink,
+                                        java.awt.Color ground) {
+        return new java.awt.Color(
+                towards(ground.getRed(), ink.getRed()),
+                towards(ground.getGreen(), ink.getGreen()),
+                towards(ground.getBlue(), ink.getBlue()));
+    }
+
+    private static int towards(int ground, int ink) {
+        return (int) Math.round(ground + (ink - ground) * LIMB_STRENGTH);
+    }
+
     private static java.awt.Shape skyClip(ChartScene scene,
                                           ViewportMapping mapping,
                                           java.awt.Shape paper) {

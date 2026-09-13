@@ -30,12 +30,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * clipping test while proving nothing, so that case fails here.
  *
  * <p><strong>Two masks, never one.</strong> A globe page is a
- * circular sky on rectangular paper, and the paper has a border: an
- * empty page with every option off inks 3 996 px, all of it outside
- * the limb. Counting "ink beyond the limb" without separating the
- * two measures that border forever and reads as a leak that no
- * clipping can fix. The furniture control below pins that floor so
- * the other tests can subtract it honestly.
+ * circular sky on rectangular paper, and the page draws furniture of
+ * its own on both: a border at the paper's edge, 3 996 px of it and
+ * every pixel outside the limb, and since #331 gave the globe an
+ * edge, the limb circle itself. Counting "ink beyond the limb"
+ * without separating furniture from sky measures the border forever
+ * and reads as a leak no clipping can fix; counting a mark's own ink
+ * without separating them measures the limb as part of the mark. The
+ * furniture control below pins both floors so the other tests can
+ * subtract them honestly.
  *
  * <p><strong>Text is deliberately outside this rule.</strong> A name
  * cut in half is a false name, so where a word may go is a question
@@ -103,25 +106,36 @@ class GlobeClipTest {
     private static final int PAGE_BORDER_PX = 3;
 
     @Test
-    void theEmptyPageInksNothingButItsOwnBorder() {
+    void theEmptyPageInksNothingButItsOwnFurniture() {
+        // Its border and its limb, and nothing else. The limb joined
+        // this list when #331 gave the globe an edge of its own: it
+        // is furniture in exactly the way the border is - drawn
+        // whatever the sky holds, saying where the page's sky stops
+        // rather than what is in it.
         ChartScene empty = new ChartScene(globeViewport(),
                 List.of(), List.of(), "nothing at all", 5.0);
         Inked inked = inkOf(empty, off());
-        assertEquals(0, inked.total(),
-                "an empty globe page inks nothing but its own border,"
-                        + " and the border is excluded by where it is"
-                        + " drawn rather than by subtracting a count");
+        assertTrue(inked.total() > 0,
+                "an empty globe page draws its own limb");
+        assertTrue(inked.deepest() <= STROKE_EDGE_PX,
+                "and nothing of it reaches past the limb by more than"
+                        + " the stroke drawn on the limb accounts for: "
+                        + inked.deepest() + " px");
 
-        // And the border really is there, so that exclusion is not
-        // quietly hiding an empty measurement: counted without it,
-        // the same page inks thousands of pixels, every one outside
-        // the limb.
+        // And the border really is there, so that excluding it is
+        // not quietly hiding an empty measurement. Counted on its
+        // own - everything, less what the limb contributes - it is
+        // thousands of pixels and every one of them outside the limb,
+        // which is what makes it a different mask from the limb's
+        // rather than more of the same furniture.
         Inked withBorder = everyPixelOf(empty, off());
-        assertTrue(withBorder.beyond() > 3000,
-                "the paper's frame is real: " + withBorder.beyond()
-                        + " px, all of it outside the limb");
-        assertEquals(withBorder.total(), withBorder.beyond(),
-                "and none of it inside");
+        int frame = withBorder.total() - inked.total();
+        int frameBeyond = withBorder.beyond() - inked.beyond();
+        assertTrue(frame > 3000,
+                "the paper's frame is real: " + frame + " px");
+        assertEquals(frame, frameBeyond,
+                "and every pixel of it is outside the limb, where the"
+                        + " limb's own ink sits on the boundary");
     }
 
     @Test

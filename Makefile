@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run run-log test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run run-log test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -375,6 +375,15 @@ globe-grid-fade-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeGridFadeStudyMain \
 		> docs/studies/globe-grid-fade/measurements.md
 	@echo "written to docs/studies/globe-grid-fade/measurements.md"
+
+# Whether the globe draws its own limb, and how quietly (#331).
+globe-limb-study: classes
+	@echo "  globe limb"
+	@mkdir -p docs/studies/globe-limb
+	@$(JAVA) -Xmx1g -Djava.awt.headless=true \
+		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.globe.GlobeLimbStudyMain \
+		> docs/studies/globe-limb/measurements.md
+	@echo "written to docs/studies/globe-limb/measurements.md"
 
 # Which object families a hemisphere can carry (#301).
 globe-family-study: classes

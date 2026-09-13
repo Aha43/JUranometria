@@ -265,7 +265,7 @@ class GlobeSymbolTest {
      */
     private static void assertItIsTheMinimumGlyph(DeepSkyObject dso,
                                                   String why) {
-        int[][] drawn = maskOf(draw(sceneWith(dso)));
+        int[][] drawn = maskOf(draw(sceneWith(dso)), draw(emptyScene()));
         assertTrue(drawn.length > 0, why + ": something is drawn");
 
         int[][] minimum = maskOf(minimumGlyphAt(dso, dso.type()));
@@ -357,13 +357,31 @@ class GlobeSymbolTest {
 
     /** One mark's ink, cut from its own bounding box. */
     private static int[][] maskOf(BufferedImage page) {
+        return maskOf(page, null);
+    }
+
+    /** Ink that belongs to the object rather than to the page. */
+    private static boolean marked(BufferedImage page,
+                                  BufferedImage without, int x, int y) {
+        return without == null ? isInk(page, x, y)
+                : (page.getRGB(x, y) & 0xffffff)
+                        != (without.getRGB(x, y) & 0xffffff);
+    }
+
+    /**
+     * The same, against the page as it would be without the object -
+     * so that the page's own furniture, its border and its limb, is
+     * not read as part of the mark.
+     */
+    private static int[][] maskOf(BufferedImage page,
+                                  BufferedImage without) {
         int minX = WIDE_PX;
         int minY = HIGH_PX;
         int maxX = -1;
         int maxY = -1;
         for (int y = 3; y < HIGH_PX - 3; y++) {
             for (int x = 3; x < WIDE_PX - 3; x++) {
-                if (!isInk(page, x, y)) {
+                if (!marked(page, without, x, y)) {
                     continue;
                 }
                 minX = Math.min(minX, x);
@@ -378,7 +396,8 @@ class GlobeSymbolTest {
         int[][] mask = new int[maxY - minY + 1][maxX - minX + 1];
         for (int y = minY; y <= maxY; y++) {
             for (int x = minX; x <= maxX; x++) {
-                mask[y - minY][x - minX] = isInk(page, x, y) ? 1 : 0;
+                mask[y - minY][x - minX] =
+                        marked(page, without, x, y) ? 1 : 0;
             }
         }
         return mask;
@@ -447,20 +466,34 @@ class GlobeSymbolTest {
         DeepSkyObject dso = object(type, awayFromCentre(degreesOut),
                 FIXTURE_ARCMIN, FIXTURE_ARCMIN, 0.0);
         BufferedImage page = draw(sceneWith(dso));
-        int ground = PAPER.ground().getRGB() & 0xffffff;
+        BufferedImage without = draw(emptyScene());
         int inked = 0;
         for (int y = 0; y < HIGH_PX; y++) {
             for (int x = 0; x < WIDE_PX; x++) {
-                if (x < 3 || y < 3 || x >= WIDE_PX - 3
-                        || y >= HIGH_PX - 3) {
-                    continue;
-                }
-                if ((page.getRGB(x, y) & 0xffffff) != ground) {
+                if ((page.getRGB(x, y) & 0xffffff)
+                        != (without.getRGB(x, y) & 0xffffff)) {
                     inked++;
                 }
             }
         }
         return inked;
+    }
+
+    /**
+     * The same page without the object on it: its border and its own
+     * limb, and nothing else.
+     *
+     * <p>The mark is measured as the difference between the two,
+     * which is the only way to ask what one object inks on a page
+     * that draws furniture of its own. Excluding the furniture by
+     * where it sits would not do here - the limb runs through the
+     * band these fixtures are placed in, and a mark near it would be
+     * measured short.
+     */
+    private static ChartScene emptyScene() {
+        return new ChartScene(new ChartViewport(PAGE, 180.0, WIDE_PX,
+                HIGH_PX, ChartProjection.ORTHOGRAPHIC), List.of(),
+                List.of(), "no object", 8.0);
     }
 
     /** The released vocabulary's own glyph, as a bounding box. */
@@ -518,10 +551,15 @@ class GlobeSymbolTest {
 
     /** The bounding box of one object's ink, in page pixels. */
     private static int[] inkBoxOf(DeepSkyObject dso) {
-        return boxOf(draw(sceneWith(dso)));
+        return boxOf(draw(sceneWith(dso)), draw(emptyScene()));
     }
 
     private static int[] boxOf(BufferedImage page) {
+        return boxOf(page, null);
+    }
+
+    private static int[] boxOf(BufferedImage page,
+                               BufferedImage without) {
         int ground = PAPER.ground().getRGB() & 0xffffff;
         int minX = WIDE_PX;
         int minY = HIGH_PX;
@@ -529,7 +567,9 @@ class GlobeSymbolTest {
         int maxY = -1;
         for (int y = 3; y < HIGH_PX - 3; y++) {
             for (int x = 3; x < WIDE_PX - 3; x++) {
-                if ((page.getRGB(x, y) & 0xffffff) == ground) {
+                int here = page.getRGB(x, y) & 0xffffff;
+                if (without == null ? here == ground
+                        : here == (without.getRGB(x, y) & 0xffffff)) {
                     continue;
                 }
                 minX = Math.min(minX, x);
