@@ -422,7 +422,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(35, display.size(),
+        assertEquals(36, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -460,8 +460,13 @@ class TestEvidenceGateTest {
                         + " shown by resting the pointer on a control"
                         + " in a shown window, since a tooltip read"
                         + " off a field answers for a control no"
-                        + " pointer could reach; each with its"
-                        + " premises stated");
+                        + " pointer could reach; and #332's closing"
+                        + " journey, which walks the field-width"
+                        + " ladder by pressing the toolbar's own"
+                        + " controls and exports through the real"
+                        + " dialog, neither of which can be asked of"
+                        + " a page nobody is looking at; each with"
+                        + " its premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

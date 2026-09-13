@@ -76,10 +76,10 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **50 files** touch process-wide state —
-**27** use the shared guard, **22** restore locally,
-**0 flagged unprotected** — and **35 files** depend on a display,
-of which **18** state a focus premise and **26** a reachability
+this document to them: **51 files** touch process-wide state —
+**28** use the shared guard, **22** restore locally,
+**0 flagged unprotected** — and **36 files** depend on a display,
+of which **19** state a focus premise and **27** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -123,7 +123,13 @@ asks is what the reader's own Restore Defaults button does to a globe
 page — layers reset, magnitude and centre untouched, and the reader's
 stored chart never replaced by the globe's view of it — and that
 question cannot be asked of anything but a real store and a real
-button press.)
+button press; and #332 added the sprint's closing journey, which
+walks a reader from Home up the field-width ladder to the globe and
+back by pressing the toolbar's own controls, points at a star to
+identify it through the projection's inverse, and exports both papers
+in all three formats through the real export dialog — none of which
+can be asked of a page nobody is looking at, and it aborts rather
+than passes where there is no display.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -307,8 +313,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **391
-reads of live chart state** against **671 explicit hand-offs**
+own premise capture). The measurements count the traffic: **414
+reads of live chart state** against **690 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
