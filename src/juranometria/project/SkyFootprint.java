@@ -235,8 +235,23 @@ public final class SkyFootprint {
         // nothing and knows nothing that draws. The render seam turns
         // these four numbers into whatever its toolkit calls a
         // transform.
-        double tilt = Math.toRadians(projected.tiltDegrees());
         double back = -Math.toRadians(90.0 - positionAngleDegrees);
+        // A round footprint has no orientation, and the fit says so
+        // by answering arbitrarily: with xx ~ yy and xy ~ 0 the tilt
+        // is half the angle of a vector that is numerically nothing.
+        // Composed with the mark's own frame the two rotations then
+        // failed to cancel and the mark came out turned - a nebula at
+        // a globe's centre drawn 24 px across where every other page
+        // draws it 20.
+        //
+        // So where the axes differ by less than the fit can resolve,
+        // the only defensible orientation is the one the mark already
+        // has, and the transform becomes the pure scale a circle
+        // deserves.
+        double tilt = projected.majorPx() - projected.minorPx()
+                < ROUND_ENOUGH * projected.majorPx()
+                        ? -back
+                        : Math.toRadians(projected.tiltDegrees());
         double cosTilt = Math.cos(tilt);
         double sinTilt = Math.sin(tilt);
         double cosBack = Math.cos(back);
@@ -283,6 +298,13 @@ public final class SkyFootprint {
                     Math.max(Math.abs(m01), Math.abs(m10)));
         }
     }
+
+    /**
+     * How nearly equal two axes must be before the shape counts as
+     * round: a thousandth, which is far above the fit's own error and
+     * far below any difference a page could show.
+     */
+    private static final double ROUND_ENOUGH = 1.0e-3;
 
     /**
      * Where an object's footprint lands and what shape it has there.

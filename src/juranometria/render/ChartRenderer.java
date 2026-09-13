@@ -535,10 +535,20 @@ public final class ChartRenderer {
         java.util.List<DrawnMark> marks =
                 drawnMarks(scene, options, policy, projection, mapping);
         g.setClip(sky);
+        // A bounded page foreshortens its marks; every other page
+        // takes the branch it always took, so the released atlas is
+        // not redrawn through a transform that would be the identity
+        // anyway (#331).
+        boolean bounded = Double.isFinite(projection.visiblePlaneRadius());
         for (DrawnMark mark : marks) {
             if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
-                drawSymbol(g, mark.deepSky(), policy, mark.centre(),
-                        mapping.pixelsPerPlaneUnit(), palette);
+                if (bounded) {
+                    drawForeshortenedSymbol(g, mark.deepSky(), policy,
+                            mark.centre(), mapping, projection, palette);
+                } else {
+                    drawSymbol(g, mark.deepSky(), policy, mark.centre(),
+                            mapping.pixelsPerPlaneUnit(), palette);
+                }
             }
         }
         g.setColor(palette.starInk());
@@ -1435,6 +1445,92 @@ public final class ChartRenderer {
         paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
                 axes[0], axes[1], dso.positionAngleDegrees(), palette);
     }
+
+    /**
+     * The same mark, carried into what a bounded page makes of it
+     * (Sprint 32, issue #331).
+     *
+     * <p>The glyph is built exactly as every other page builds it -
+     * the family's own vocabulary, at the object's own axes and
+     * position angle - and then the whole composed shape is carried
+     * by the map from its ordinary footprint to its projected one.
+     * Crosses, dashes and spokes travel with it because the map is
+     * applied to the mark rather than to each piece's definition, so
+     * a family added later is foreshortened without being told that
+     * globes exist.
+     *
+     * <p>Two conditions send a mark back to its minimum glyph
+     * instead, and they ask different questions. The
+     * <strong>major</strong> span against the atlas's practical
+     * minimum asks whether the reader sees the object's own shape.
+     * The <strong>minor</strong> span against twice the stroke width
+     * asks whether what they see can still say which family it is:
+     * every sky glyph is stroked at 1 px, so below one stroke width
+     * of separation the two sides of any shape merge into a single
+     * bar and every family looks alike. One stroke to hold them
+     * apart and one device pixel of clear separation is 2 px, and the
+     * five glyphs measurably stop differing from one another between
+     * 1.5 and 1 px of minor span.
+     *
+     * <p>Nothing here decides what reaches the paper. The page's own
+     * clip does that, after this has decided what the mark is.
+     */
+    private static void drawForeshortenedSymbol(
+            Graphics2D g, DeepSkyObject dso, RegionalDetailPolicy policy,
+            PixelPoint centre, ViewportMapping mapping,
+            juranometria.project.Projection projection,
+            ChartPalette palette) {
+        double[] axes = symbolAxesPx(dso, policy,
+                mapping.pixelsPerPlaneUnit());
+        juranometria.project.SkyFootprint.Extent extent =
+                juranometria.project.SkyFootprint.extentOn(projection,
+                        mapping, dso.position(), dso.majorAxisArcmin(),
+                        dso.minorAxisArcmin(),
+                        dso.positionAngleDegrees());
+        juranometria.project.SkyFootprint.Foreshortening carried =
+                extent == null ? null
+                        : juranometria.project.SkyFootprint.foreshortening(
+                                projection, mapping, dso.position(),
+                                dso.majorAxisArcmin(),
+                                dso.minorAxisArcmin(),
+                                dso.positionAngleDegrees());
+        if (carried == null
+                || extent.majorPx()
+                        < RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX
+                || extent.minorPx() < LEGIBLE_MINOR_PX) {
+            // The family's minimum glyph, at the practical minimum in
+            // both axes - not the mark's ordinary centre-scale size,
+            // which for a strongly foreshortened object is the very
+            // number this whole step exists to stop trusting. A 4
+            // degree cluster at 89 degrees out would have fallen back
+            // to a 25 px ring, which is neither its footprint nor a
+            // minimum glyph.
+            double minimum =
+                    RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX;
+            paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
+                    minimum, minimum, dso.positionAngleDegrees(),
+                    palette);
+            return;
+        }
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            g2.translate(centre.x(), centre.y());
+            g2.transform(new java.awt.geom.AffineTransform(
+                    carried.m00(), carried.m10(), carried.m01(),
+                    carried.m11(), 0.0, 0.0));
+            paintSymbol(g2, symbolFor(dso), 0.0, 0.0, axes[0], axes[1],
+                    dso.positionAngleDegrees(), palette);
+        } finally {
+            g2.dispose();
+        }
+    }
+
+    /**
+     * The narrowest a mark may be drawn and still say what family it
+     * is: one stroke width to hold its two sides apart, and one
+     * device pixel of clear separation between them.
+     */
+    private static final double LEGIBLE_MINOR_PX = 2.0;
 
     /**
      * Draws one symbol at a given size and orientation - the atlas's

@@ -40,7 +40,7 @@ recovers less than the two rows together.
   layer                       both  page only  file only  furthest  beyond
   constellation figures      51617       2189         19      1.0px       0
   the grid                   54444       2552        128      1.4px       0
-  deep-sky symbols           51617       2182         20      1.0px       0
+  deep-sky symbols           51617       2182         21      1.0px       0
   star marks                 51617       2182         15      1.0px       0
   star names             every difference is an edge within the bound
   star names                 92217       4368       2188      1.4px       0
@@ -54,10 +54,10 @@ recovers less than the two rows together.
 
   SVG   1653328 bytes  209 text elements, 38 anchored outside the limb
   PDF   2641237 bytes  geometry not read back from this format
-  PNG   1015951 bytes  1014996 px inside the limb, 95600 beyond it
+  PNG   1017419 bytes  1008758 px inside the limb, 95600 beyond it
 
 ## The same globe with modules
 
   SVG   1654619 bytes  211 text elements, 39 anchored outside the limb
   PDF   2658055 bytes  geometry not read back from this format
-  PNG   1048797 bytes  1037684 px inside the limb, 99469 beyond it
+  PNG   1050225 bytes  1031442 px inside the limb, 99469 beyond it
