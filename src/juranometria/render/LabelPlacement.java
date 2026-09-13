@@ -179,7 +179,33 @@ public final class LabelPlacement {
      */
     private static final double CELL_PX = 24.0;
 
-    private final Rectangle2D paper;
+    /**
+     * Where the page's sky is, and what to call its edge (Sprint 32,
+     * issue #331).
+     *
+     * <p>Most pages are rectangles and their sky reaches the paper.
+     * A globe's does not: it ends at the limb, and the paper outside
+     * that circle is not somewhere a name can go, because a name
+     * written there names nothing. Rather than teach the placement
+     * about globes, the placement is told <em>where the page is</em>
+     * and applies the one rule it already had.
+     *
+     * @param region the sky, as a shape; text must fit wholly inside
+     *     it with the edge margin to spare
+     * @param edge what to call it when a candidate is refused, so a
+     *     refusal says the limb when it was the limb
+     */
+    public record Page(Shape region, String edge) {
+
+        /** The ordinary page, whose sky reaches its paper. */
+        public static Page paper(double widthPx, double heightPx) {
+            return new Page(
+                    new Rectangle2D.Double(0.0, 0.0, widthPx, heightPx),
+                    "the paper");
+        }
+    }
+
+    private final Page page;
     private final List<Obstacle> obstacles = new ArrayList<>();
     /**
      * Which obstacles are in a cell, by their position in the list
@@ -213,7 +239,16 @@ public final class LabelPlacement {
      */
     public LabelPlacement(double widthPx, double heightPx,
                           List<Obstacle> ink) {
-        this(widthPx, heightPx, ink, CELL_PX);
+        this(widthPx, heightPx, ink, Page.paper(widthPx, heightPx));
+    }
+
+    /**
+     * The same over a page whose sky is not its paper - a globe's,
+     * which ends at the limb.
+     */
+    public LabelPlacement(double widthPx, double heightPx,
+                          List<Obstacle> ink, Page page) {
+        this(ink, page, CELL_PX);
     }
 
     /**
@@ -222,8 +257,12 @@ public final class LabelPlacement {
      */
     LabelPlacement(double widthPx, double heightPx, List<Obstacle> ink,
                    double cellPx) {
+        this(ink, Page.paper(widthPx, heightPx), cellPx);
+    }
+
+    private LabelPlacement(List<Obstacle> ink, Page page, double cellPx) {
         this.cellPx = cellPx;
-        this.paper = new Rectangle2D.Double(0.0, 0.0, widthPx, heightPx);
+        this.page = page;
         this.obstacles.addAll(ink);
         for (int at = 0; at < this.obstacles.size(); at++) {
             Obstacle obstacle = this.obstacles.get(at);
@@ -319,15 +358,15 @@ public final class LabelPlacement {
         List<Refused> refusals = new ArrayList<>();
         if (request.guaranteed()) {
             // The guarantee is against collisions, not against the
-            // paper. A searched target's name may be written over
+            // edge of the page. A searched target's name may be written over
             // anything on the page; it may not be written half off it,
             // because half a designation is another object's.
             for (int at = 0; at < request.candidates().size(); at++) {
-                if (!leavesThePaper(request.candidates().get(at))) {
+                if (!leavesThePage(request.candidates().get(at))) {
                     return accept(request, at, refusals, false);
                 }
                 refusals.add(new Refused(at, Refusal.PAGE_EDGE,
-                        "the paper"));
+                        page.edge()));
             }
             return new Placement(request, null, -1,
                     List.copyOf(refusals), true);
@@ -366,8 +405,8 @@ public final class LabelPlacement {
     /** What refuses this candidate, or null when nothing does. */
     private Refused refuse(Request request, int at) {
         Rectangle2D box = request.candidates().get(at);
-        if (leavesThePaper(box)) {
-            return new Refused(at, Refusal.PAGE_EDGE, "the paper");
+        if (leavesThePage(box)) {
+            return new Refused(at, Refusal.PAGE_EDGE, page.edge());
         }
         if (request.owns() != null && !request.owns().intersects(box)) {
             return new Refused(at, Refusal.OWNERSHIP, request.id());
@@ -409,12 +448,24 @@ public final class LabelPlacement {
      * gate's corpus carries are another object's label. A page that
      * shows half a name is not untidy; it is a page that says
      * something false (docs/decisions/label-placement.md).
+     *
+     * <p>Asked of the page's own region rather than of its paper
+     * (#331). A globe's sky ends at its limb, and a name written on
+     * the paper outside that circle names nothing - it is the same
+     * fault as a name cut in half, arrived at from the other side.
+     *
+     * <p>The margin is applied by growing the box rather than by
+     * shrinking the region, so that one line serves any shape. For a
+     * rectangle it is exactly the arithmetic this always used: a
+     * grown box fits inside the paper precisely when the box cleared
+     * every edge by the margin.
      */
-    private boolean leavesThePaper(Rectangle2D box) {
-        return box.getMinX() < EDGE_MARGIN_PX
-                || box.getMinY() < EDGE_MARGIN_PX
-                || box.getMaxX() > paper.getMaxX() - EDGE_MARGIN_PX
-                || box.getMaxY() > paper.getMaxY() - EDGE_MARGIN_PX;
+    private boolean leavesThePage(Rectangle2D box) {
+        return !page.region().contains(new Rectangle2D.Double(
+                box.getMinX() - EDGE_MARGIN_PX,
+                box.getMinY() - EDGE_MARGIN_PX,
+                box.getWidth() + 2.0 * EDGE_MARGIN_PX,
+                box.getHeight() + 2.0 * EDGE_MARGIN_PX));
     }
 
     /**

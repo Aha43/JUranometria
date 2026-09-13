@@ -40,8 +40,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p><strong>Text is deliberately outside this rule.</strong> A name
  * cut in half is a false name, so where a word may go is a question
  * for the placement policy - the whole label inside the disc, or no
- * label - and is #331's third step. Nothing here may grow into a
- * demand that words be clipped.
+ * label - which #331's third step settled by telling that policy
+ * where the page is. {@link GlobeLabelTest} holds it. Nothing here
+ * may grow into a demand that words be clipped: the one test below
+ * that mentions them checks that none of them lies outside the limb
+ * <em>and</em> that they are all still written.
  */
 class GlobeClipTest {
 
@@ -227,23 +230,31 @@ class GlobeClipTest {
     }
 
     @Test
-    void textIsNotClippedAndThisTestDoesNotAskItToBe() {
-        // Stated as a test so that nothing later mistakes the rule
-        // for "no ink outside the disc, ever". Words are placed, not
-        // cut: a page with its names on inks well beyond the limb
-        // today, and #331's third step moves them inside by choosing
-        // where they go rather than by trimming them.
+    void namesAreMovedInsideTheLimbRatherThanCutByIt() {
+        // Text reaches the limb through the placement policy, not
+        // through the clip (#331, step three). Stated here as a test
+        // so that nothing later mistakes the rule for "clip the
+        // words": a name cut in half is a false name, so the whole
+        // label goes inside the disc or no label does.
+        //
+        // Two halves, and both are needed. Nothing of the names lies
+        // beyond the limb - and the names are still on the page,
+        // which is what says they were moved rather than dropped.
         Inked words = inkOf(globe(), new ChartOptions(
                 true, true, true, true, true, true, true, true, true,
                 false, false, true, true, true, true, true, PAPER));
         Inked silent = inkOf(globe(), new ChartOptions(
                 true, false, true, true, false, false, false, false,
                 true, false, false, true, true, true, true, true, PAPER));
-        assertTrue(words.beyond() > silent.beyond() + 1000,
-                "the names are what is left outside the limb, and they"
-                        + " are outside it by placement rather than by"
-                        + " a failure to clip: " + words.beyond()
-                        + " px against " + silent.beyond());
+        assertEquals(silent.beyond(), words.beyond(),
+                "turning every name on adds nothing at all outside"
+                        + " the limb: " + words.beyond() + " px"
+                        + " against " + silent.beyond());
+        assertTrue(words.inside() > silent.inside() + 1000,
+                "and the names really are written - " + words.inside()
+                        + " px inside the limb against "
+                        + silent.inside() + " - so this passed by"
+                        + " placing them, not by losing them");
     }
 
     @Test

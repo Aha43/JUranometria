@@ -1046,8 +1046,33 @@ public final class ChartRenderer {
             TextMetrics metrics, ChartScene scene, ChartOptions options) {
         return new LabelPlacement(scene.viewport().widthPx(),
                 scene.viewport().heightPx(),
-                textObstacles(metrics, scene, options))
+                textObstacles(metrics, scene, options),
+                textPage(scene))
                 .placeAll(textRequests(metrics, scene, options));
+    }
+
+    /**
+     * Where this page's sky is, for the purpose of placing text
+     * (Sprint 32, issue #331).
+     *
+     * <p>The same boundary the ink is clipped to, asked for by the
+     * same method, because a page cannot have two edges. Text is not
+     * clipped to it - a name cut by the limb would be the very fault
+     * the clip exists to prevent, and half a name is often another
+     * name - so the boundary reaches text as a placement rule
+     * instead: the whole of a label, or none of it.
+     *
+     * <p>An ordinary page gets its paper, which is what it always
+     * had.
+     */
+    private static LabelPlacement.Page textPage(ChartScene scene) {
+        java.awt.geom.Rectangle2D paper = paperOf(scene);
+        java.awt.Shape sky = skyClip(scene,
+                new ViewportMapping(page(scene)), paper);
+        return sky == paper
+                ? LabelPlacement.Page.paper(scene.viewport().widthPx(),
+                        scene.viewport().heightPx())
+                : new LabelPlacement.Page(sky, "the limb");
     }
 
     /**
