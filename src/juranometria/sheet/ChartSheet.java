@@ -126,7 +126,25 @@ public final class ChartSheet {
 
         ChartScene scene = pages.assemble(state,
                 paper.chartWideUnits(), paper.chartHighUnits());
-        ChartOptions onPaper = options.withPalette(ChartPalette.WHITE_PAPER);
+        // The page's own options, then the paper's ground - the same
+        // two steps, in the same order, that the screen takes
+        // (Sprint 32, issue #331, step five).
+        //
+        // Only the palette was applied here, so a sheet was written
+        // from the reader's raw switches while the screen drew the
+        // page's. On a globe those differ: a hemisphere turns
+        // constellation boundaries off, because the gate measured
+        // them costing more ink than any other layer at a limb
+        // carrying half the sky. An exported globe therefore carried
+        // 89,570 px of boundary the reader had never been shown, and
+        // the file disagreed with the page it was a copy of.
+        //
+        // On every page whose sky has no edge onPage is the identity,
+        // so every released sheet is unchanged - which the evidence
+        // contract holds to the byte.
+        ChartOptions onPaper = options
+                .onPage(juranometria.project.DrawnPage.of(scene))
+                .withPalette(ChartPalette.WHITE_PAPER);
 
         SheetRecorder recorder = new SheetRecorder(paper.chartWideUnits(),
                 paper.chartHighUnits());
@@ -141,60 +159,5 @@ public final class ChartSheet {
         }
         return new SheetRecording(recorder, paper, scene, onPaper,
                 SheetMetadata.of(scene, state, onPaper, paper));
-    }
-
-    /**
-     * A sheet of a page whose projection its viewport does not name
-     * (Sprint 32, issue #301).
-     *
-     * <p><strong>Study only, and temporary: #331 owns its
-     * removal</strong>, when a globe is a page a reader can reach and
-     * a {@link ChartViewState} can describe one. Until then the sheet
-     * path cannot be asked about a hemisphere at all, because a state
-     * refuses a 180-degree field - so the gate cannot see what a globe
-     * exports without this.
-     *
-     * <p>Everything else is the production path: the same recorder,
-     * the same renderer, the same white-paper palette, the same
-     * module layers in the same order, and metadata read from the page
-     * that drew it.
-     */
-    public static SheetRecording recordForStudy(
-            juranometria.project.DrawnPage page,
-            double fieldWidthDegrees,
-            ChartOptions options,
-            ChartRenderer.ReferenceLayer reference,
-            ChartRenderer.ReferenceLayer overChart,
-            PaperSize paper) {
-        if (page == null || options == null || paper == null) {
-            throw new IllegalArgumentException(
-                    "page, options and paper are required");
-        }
-        if (reference == null || overChart == null) {
-            throw new IllegalArgumentException(
-                    "both layers are required; pass"
-                            + " ChartRenderer.ReferenceLayer.NONE");
-        }
-        ChartScene scene = page.scene();
-        ChartOptions onPaper =
-                options.withPalette(ChartPalette.WHITE_PAPER);
-
-        SheetRecorder recorder = new SheetRecorder(
-                paper.chartWideUnits(), paper.chartHighUnits());
-        Graphics2D g = (Graphics2D) recorder.create();
-        try {
-            // The plain renderer: a page and its viewport now name
-            // the same projection at every rung, including the
-            // globe's, so there is nothing left for a renderer built
-            // around one page to be told (#329 removed that door).
-            new ChartRenderer(StarSizePolicy.DEFAULT)
-                    .render(g, scene, onPaper, reference);
-            overChart.paint(g, scene);
-        } finally {
-            g.dispose();
-        }
-        return new SheetRecording(recorder, paper, scene, onPaper,
-                SheetMetadata.of(page, fieldWidthDegrees,
-                        scene.limitingMagnitude(), onPaper, paper));
     }
 }
