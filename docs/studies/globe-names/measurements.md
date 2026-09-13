@@ -1,7 +1,8 @@
 # Whether a hemisphere's names name anything
 
 The production placement policy, asked what became of its own placements - twice, once
-with the paper's edge as the boundary and once with the limb. What it was asked for
+with the paper's edge as the boundary, which is what it used to be told, and once as
+production now places them. What it was asked for
 comes from the sky and is here; what became of each request depends on the box a
 font gives the text, and is in the platform record beside this.
 

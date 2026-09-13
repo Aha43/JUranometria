@@ -42,7 +42,7 @@ platform record beside this and held to reproducing within one environment.
 
 ## The core globe, no modules
 
-  SVG  identity: orthographic  ** text anchored outside the limb **
+  SVG  identity: orthographic  no text anchored outside the limb
   PDF  identity: orthographic  geometry not read back from this format
   PNG  identity: orthographic  ** ink beyond the limb **
 

@@ -28,13 +28,13 @@ Marginal costs, which do not sum: ink overlaps, so removing two layers
 recovers less than the two rows together.
 
   page                        beyond limb    within 1%  further out
-  everything                        11802         1055        10747
-  without star names                 8830          939         7891   (-2972)
-  without the grid                  11506          759        10747   (-296)
-  without figures                    7178          644         6534   (-4624)
-  without star marks                11802         1055        10747   (+0)
-  without deep-sky symbols          11774         1035        10739   (-28)
-  without constellation names         7189          655         6534   (-4613)
+  everything                         3118          536         2582
+  without star names                 3118          536         2582   (+0)
+  without the grid                   2722          140         2582   (-396)
+  without figures                    3107          525         2582   (-11)
+  without star marks                 3118          536         2582   (+0)
+  without deep-sky symbols           3118          536         2582   (+0)
+  without constellation names         3118          536         2582   (+0)
 ## The writer, layer by layer
 
   layer                       both  page only  file only  furthest  beyond
@@ -43,21 +43,21 @@ recovers less than the two rows together.
   deep-sky symbols           51617       2182         21      1.0px       0
   star marks                 51617       2182         15      1.0px       0
   star names             every difference is an edge within the bound
-  star names                 92217       4368       2188      1.4px       0
+  star names                 51617       2182         15      1.0px       0
   constellation names    every difference is an edge within the bound
-  constellation names       114023       5469       3166      2.2px       0
+  constellation names        51617       2189         19      1.0px       0
   striking a 25x25 patch at 765,2 - radius 1.400 of the disc, beyond the limb
 
   one outside-limb patch struck from the page: 125 px of ink removed, 105 px then beyond the bound, furthest 8.0px
 
 ## The core globe, no modules
 
-  SVG   1652873 bytes  209 text elements, 38 anchored outside the limb
-  PDF   2640574 bytes  geometry not read back from this format
-  PNG   1017351 bytes  1008357 px inside the limb, 95585 beyond it
+  SVG   1651334 bytes  197 text elements, 0 anchored outside the limb
+  PDF   2606941 bytes  geometry not read back from this format
+  PNG    971745 bytes  996215 px inside the limb, 51155 beyond it
 
 ## The same globe with modules
 
-  SVG   1654164 bytes  211 text elements, 39 anchored outside the limb
-  PDF   2657392 bytes  geometry not read back from this format
-  PNG   1050149 bytes  1031085 px inside the limb, 99454 beyond it
+  SVG   1652625 bytes  199 text elements, 1 anchored outside the limb
+  PDF   2623759 bytes  geometry not read back from this format
+  PNG   1004034 bytes  1019079 px inside the limb, 55086 beyond it
