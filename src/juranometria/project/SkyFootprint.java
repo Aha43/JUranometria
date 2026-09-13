@@ -267,7 +267,24 @@ public final class SkyFootprint {
                 + cosTilt * acrossScale * sinBack;
         double m11 = -sinTilt * alongScale * sinBack
                 + cosTilt * acrossScale * cosBack;
-        return new Foreshortening(m00, m10, m01, m11);
+
+        // And where the fit says the footprint actually sits. The
+        // ordinary mark is centred on the object's projected
+        // position, so the map's translation is what separates that
+        // point from the middle of the projected footprint - measured
+        // by the same fit that gave the four numbers above, rather
+        // than assumed to be zero.
+        PlanePoint anchor = projection.project(centre).orElse(null);
+        if (anchor == null) {
+            // The object's own centre is behind the globe. Part of
+            // its outline may still show, but there is no ordinary
+            // mark at a place on this page to carry anywhere.
+            return null;
+        }
+        PixelPoint at = mapping.toPixel(anchor);
+        return new Foreshortening(m00, m10, m01, m11,
+                projected.centreX() - at.x(),
+                projected.centreY() - at.y());
     }
 
     /**
@@ -284,18 +301,50 @@ public final class SkyFootprint {
      * @param m11 y from y
      */
     public record Foreshortening(double m00, double m10, double m01,
-                                 double m11) {
+                                 double m11, double dx, double dy) {
 
         /** How much of its ordinary area the mark keeps. */
         public double areaFactor() {
             return Math.abs(m00 * m11 - m01 * m10);
         }
 
-        /** How far this is from leaving a mark alone. */
+        /**
+         * How far this is from leaving a mark's <em>shape</em> alone.
+         *
+         * <p>The linear part only. {@link #shiftPx} answers the rest,
+         * and the two are kept apart because they are not measured in
+         * the same thing: these four are ratios and those two are
+         * pixels, so one {@code max} over all six would compare a
+         * scale factor with a distance.
+         */
         public double offTheIdentity() {
             return Math.max(Math.max(Math.abs(m00 - 1.0),
                             Math.abs(m11 - 1.0)),
                     Math.max(Math.abs(m01), Math.abs(m10)));
+        }
+
+        /**
+         * How far the map moves the mark, in page pixels (#331,
+         * review P1).
+         *
+         * <p>A projection does not keep an extended outline's centre
+         * where the centre of the object projects to. Seen from
+         * outside a sphere, the near half of a large object covers
+         * more of the page than the far half, so the footprint's
+         * middle sits inward of the point its centre projects to.
+         *
+         * <p>Measured, on a 1200x800 hemisphere: exactly nothing at
+         * the page centre, 1.2 px at 60 degrees out, and 2.3 px at
+         * its largest for a cloud of the Magellanic sort near the
+         * limb. That is less than {@code ChartHitTest.TOLERANCE_PX},
+         * so it is not on its own the difference between hitting a
+         * mark and missing it - but it is a systematic displacement
+         * rather than noise, it is in the same direction every time,
+         * and a mark carried by the linear part alone has the right
+         * size, shape and area in the wrong pixels.
+         */
+        public double shiftPx() {
+            return Math.hypot(dx, dy);
         }
     }
 

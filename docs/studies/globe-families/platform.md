@@ -25,7 +25,7 @@ far two glyphs differ pixel by pixel are this desktop's, and are here.
 sagittarius:
   what each family costs:
     family               ink centre   ink limb
-    Galaxies                  0.00%      0.98%
+    Galaxies                  0.00%      1.07%
     Open clusters             0.17%      0.02%
     Globular clusters         0.58%      0.31%
     Nebulae                   0.31%      0.09%
@@ -43,7 +43,7 @@ sagittarius:
 orion:
   what each family costs:
     family               ink centre   ink limb
-    Galaxies                  0.00%      1.82%
+    Galaxies                  0.00%      1.81%
     Open clusters             0.19%      0.02%
     Globular clusters         0.04%      0.00%
     Nebulae                   0.22%      0.09%

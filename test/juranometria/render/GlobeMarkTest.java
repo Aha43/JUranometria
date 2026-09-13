@@ -15,6 +15,9 @@ import juranometria.chart.DeepSkyObject;
 import juranometria.chart.DsoType;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.StarSizePolicy;
+import juranometria.project.PixelPoint;
+import juranometria.project.PlanePoint;
+import juranometria.project.SkyFootprint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -221,6 +224,60 @@ class GlobeMarkTest {
     }
 
     @Test
+    void aCarriedMarkIsPaintedWhereItsFootprintActuallySits() {
+        // The third fault in this transform (#331, review P1): the
+        // map carried shape without carrying position, so a mark
+        // could have the right size, the right shape and the right
+        // area while occupying the wrong pixels.
+        //
+        // The oracle is where the ink lands, measured from the page,
+        // against where the projected footprint says the object is.
+        DeepSkyObject cloud = new DeepSkyObject("cloud",
+                new ArrayList<>(), DsoType.GALAXY, awayFromCentre(80.0),
+                645.0, 550.0, 170.0, 5.0, LANDMARK_PRIORITY,
+                new DeepSkyObject.Recorded(645.0, 550.0, 170.0,
+                        DeepSkyObject.Recorded.Band.VISUAL));
+        ChartScene scene = sceneWith(cloud);
+        List<ChartRenderer.DrawnMark> marks = marksOf(scene);
+        assertEquals(1, marks.size());
+        ChartRenderer.DrawnMark mark = marks.get(0);
+        assertNotNull(mark.painted().carried(), "the fixture is carried");
+
+        SkyFootprint.Extent extent = SkyFootprint.extentOn(
+                juranometria.project.Projections.of(
+                        ChartProjection.ORTHOGRAPHIC, PAGE),
+                mapping(), cloud.position(), 645.0, 550.0, 170.0);
+        assertNotNull(extent);
+
+        // The premise: the two answers are far enough apart that the
+        // page can tell them apart. Without this the check would pass
+        // on an object whose footprint happens not to move.
+        PlanePoint plane = juranometria.project.Projections.of(
+                        ChartProjection.ORTHOGRAPHIC, PAGE)
+                .project(cloud.position()).orElseThrow();
+        PixelPoint anchor = mapping().toPixel(plane);
+        double apart = Math.hypot(extent.centreX() - anchor.x(),
+                extent.centreY() - anchor.y());
+        assertTrue(apart > 1.0,
+                "the fixture separates the footprint's middle from"
+                        + " the point its centre projects to by more"
+                        + " than a pixel: " + apart);
+
+        double[] inked = inkCentroid(scene);
+        assertTrue(inked[2] > 0, "the fixture is painted");
+        assertEquals(extent.centreX(), inked[0], 1.0,
+                "the ink's middle is where the projected footprint"
+                        + " is, across the page");
+        assertEquals(extent.centreY(), inked[1], 1.0,
+                "and down it");
+        assertEquals(extent.centreX(), mark.centre().x(), 1.0e-9,
+                "and the published centre says the same, so a"
+                        + " selection ring is drawn around the mark"
+                        + " rather than beside it");
+        assertEquals(extent.centreY(), mark.centre().y(), 1.0e-9);
+    }
+
+    @Test
     void stackingFollowsThePaintedFootprintRatherThanTheCatalogueSize() {
         // Two objects the reader sees at once: a large one strongly
         // foreshortened near the limb, and a smaller one that keeps
@@ -279,6 +336,30 @@ class GlobeMarkTest {
             }
         }
         return inked;
+    }
+
+    /**
+     * Where the sky ink sits: the middle of it, and how much there
+     * is. Position rather than extent, because a mark can be the
+     * right size in the wrong place.
+     */
+    private static double[] inkCentroid(ChartScene scene) {
+        BufferedImage canvas = draw(scene);
+        double sumX = 0.0;
+        double sumY = 0.0;
+        int inked = 0;
+        for (int y = 0; y < HIGH_PX; y++) {
+            for (int x = 0; x < WIDE_PX; x++) {
+                if (insideTheLimb(x, y)
+                        && (canvas.getRGB(x, y) & 0xFFFFFF) != 0xFFFFFF) {
+                    sumX += x + 0.5;
+                    sumY += y + 0.5;
+                    inked++;
+                }
+            }
+        }
+        return inked == 0 ? new double[] {0.0, 0.0, 0.0}
+                : new double[] {sumX / inked, sumY / inked, inked};
     }
 
     /** The width and height of what the page inks on the sky. */

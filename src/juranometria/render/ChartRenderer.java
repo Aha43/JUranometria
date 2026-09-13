@@ -1431,25 +1431,51 @@ public final class ChartRenderer {
         Shape ink = symbolInk(symbolFor(dso), centre.x(), centre.y(),
                 majorPx, minorPx, dso.positionAngleDegrees());
         double reach = symbolReach(dso, drawnMajorPx);
+        // Where the mark ends up, which for a carried mark is not
+        // where its object projects to. The published centre moves
+        // with the ink, because a selection ring is drawn around it
+        // and a ring that does not move with the mark it names is the
+        // same disagreement one layer up. A mark with no map to carry
+        // stays where it always was: the fallback glyph has no fit to
+        // trust, its premise being that the footprint did not resolve.
+        PixelPoint at = carried == null ? centre
+                : new PixelPoint(centre.x() + carried.dx(),
+                        centre.y() + carried.dy());
         if (carried != null) {
-            java.awt.geom.AffineTransform about = carriedAbout(centre, carried);
+            java.awt.geom.AffineTransform about = carriedAbout(at, carried);
             outline = about.createTransformedShape(outline);
             ink = about.createTransformedShape(ink);
         }
-        return new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso, centre, outline,
+        return new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso, at, outline,
                 reach, ink,
                 new DrawnMark.Painted(majorPx, minorPx, carried));
     }
 
-    /** The carried map, about the mark's own anchor on the page. */
+    /**
+     * The carried map: about the anchor the glyph was built on, and
+     * onto where the projected footprint actually sits.
+     *
+     * <p>The translation is not decoration. A projection does not
+     * keep an extended outline's middle at the point its centre
+     * projects to - seen from outside a sphere the near half of a
+     * large object covers more of the page than the far half - so the
+     * linear part alone gives a mark the right size, the right shape
+     * and the right area in the wrong pixels: nothing at all at the
+     * page centre, rising to about two pixels near the limb.
+     *
+     * <p>Takes the mark's <em>published</em> centre and recovers the
+     * build anchor from it, so that the mark and its painting cannot
+     * be placed by two different arithmetics.
+     */
     private static java.awt.geom.AffineTransform carriedAbout(
-            PixelPoint centre, SkyFootprint.Foreshortening carried) {
+            PixelPoint at, SkyFootprint.Foreshortening carried) {
         java.awt.geom.AffineTransform about =
                 java.awt.geom.AffineTransform.getTranslateInstance(
-                        centre.x(), centre.y());
+                        at.x(), at.y());
         about.concatenate(new java.awt.geom.AffineTransform(carried.m00(),
                 carried.m10(), carried.m01(), carried.m11(), 0.0, 0.0));
-        about.translate(-centre.x(), -centre.y());
+        about.translate(-(at.x() - carried.dx()),
+                -(at.y() - carried.dy()));
         return about;
     }
 
@@ -1609,8 +1635,13 @@ public final class ChartRenderer {
         }
         Graphics2D g2 = (Graphics2D) g.create();
         try {
+            // Built on the anchor the map expects and carried onto
+            // the published centre, by the one transform that decided
+            // where the mark is.
             g2.transform(carriedAbout(centre, painted.carried()));
-            paintSymbol(g2, symbolFor(dso), centre.x(), centre.y(),
+            paintSymbol(g2, symbolFor(dso),
+                    centre.x() - painted.carried().dx(),
+                    centre.y() - painted.carried().dy(),
                     painted.majorPx(), painted.minorPx(),
                     dso.positionAngleDegrees(), palette);
         } finally {

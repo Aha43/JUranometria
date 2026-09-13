@@ -54,10 +54,10 @@ recovers less than the two rows together.
 
   SVG   1652873 bytes  209 text elements, 38 anchored outside the limb
   PDF   2640574 bytes  geometry not read back from this format
-  PNG   1017315 bytes  1008264 px inside the limb, 95585 beyond it
+  PNG   1017351 bytes  1008357 px inside the limb, 95585 beyond it
 
 ## The same globe with modules
 
   SVG   1654164 bytes  211 text elements, 39 anchored outside the limb
   PDF   2657392 bytes  geometry not read back from this format
-  PNG   1050142 bytes  1030992 px inside the limb, 99454 beyond it
+  PNG   1050149 bytes  1031085 px inside the limb, 99454 beyond it

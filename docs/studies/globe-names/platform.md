@@ -58,7 +58,7 @@ sagittarius, with the limb as the boundary:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                150         150       0      0      150       0       0
     DEEP_SKY              1           1       0      0        1       0       0
-    CONSTELLATION        58          52       6      3       52       0       0
+    CONSTELLATION        58          52       6      2       52       0       0
     omitted labels were refused by: OWNERSHIP 6
   of the labels the paper placed: 148 stayed where they were, 55 moved, 6 became omissions
 

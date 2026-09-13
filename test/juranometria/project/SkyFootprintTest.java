@@ -68,6 +68,100 @@ class SkyFootprintTest {
                         + " other page draws");
         assertEquals(1.0, transform.areaFactor(),
                 NUMERICALLY_THE_IDENTITY, "and covers the same area");
+        assertEquals(0.0, transform.shiftPx(), NUMERICALLY_THE_IDENTITY,
+                "and is not moved: at the page centre the footprint's"
+                        + " middle is where the object projects to");
+    }
+
+    @Test
+    void aFootprintSitsInwardOfWhereItsCentreProjects() {
+        // The translation half of the map (#331, review P1). A sphere
+        // seen from outside shows more of a large object's near half
+        // than its far half, so the middle of what is drawn is not
+        // the point the object's centre projects to - it is pulled
+        // towards the page centre.
+        //
+        // Checked as a direction and a trend rather than against the
+        // fit's own number, so that the fit is not asked to confirm
+        // itself.
+        double previous = -1.0;
+        int checked = 0;
+        for (double out : new double[] {0.0, 30.0, 60.0, 80.0}) {
+            var transform = SkyFootprint.foreshortening(globe(),
+                    mapping(), awayFromCentre(out), LMC_MAJOR_ARCMIN,
+                    LMC_MINOR_ARCMIN, LMC_POSITION_ANGLE);
+            assertNotNull(transform, out + " degrees out is on the page");
+            assertTrue(transform.shiftPx() > previous,
+                    "the further out, the further the footprint's"
+                            + " middle is from where its centre"
+                            + " projects: " + transform.shiftPx()
+                            + " px at " + out + " degrees against "
+                            + previous + " px nearer in");
+            previous = transform.shiftPx();
+            if (out == 0.0) {
+                continue;
+            }
+            checked++;
+
+            // Inward: the object lies due south of the page centre,
+            // so a footprint pulled towards the centre is pulled
+            // north, which is negative y in page pixels.
+            assertTrue(transform.dy() < 0.0,
+                    "and the pull is towards the page centre, not away"
+                            + " from it: dy = " + transform.dy()
+                            + " at " + out + " degrees");
+            assertTrue(Math.abs(transform.dx())
+                            < 0.1 * Math.abs(transform.dy()),
+                    "and along the radius rather than across it,"
+                            + " because that is the direction the"
+                            + " sphere has turned in: dx = "
+                            + transform.dx());
+        }
+        assertTrue(checked == 3, "three positions carried the claim");
+    }
+
+    @Test
+    void aStraddlerIsPlacedWhereItsVisiblePartIs() {
+        // An object the limb actually cuts. What the page draws is
+        // the visible part, so the mark belongs over the visible
+        // part - not centred on a point that is half behind the
+        // globe. The oracle is the visible outline's own middle,
+        // computed here from the points rather than taken from the
+        // fit.
+        SkyPosition straddling = awayFromCentre(87.0);
+        SkyFootprint.Extent extent = SkyFootprint.extentOn(globe(),
+                mapping(), straddling, LMC_MAJOR_ARCMIN,
+                LMC_MAJOR_ARCMIN, 0.0);
+        assertNotNull(extent);
+        assertTrue(!extent.whole(), "the fixture really is cut");
+
+        List<PixelPoint> outline = SkyFootprint.visibleOn(globe(),
+                mapping(), straddling, LMC_MAJOR_ARCMIN,
+                LMC_MAJOR_ARCMIN, 0.0);
+        double sumX = 0.0;
+        double sumY = 0.0;
+        for (PixelPoint point : outline) {
+            sumX += point.x();
+            sumY += point.y();
+        }
+        double middleY = sumY / outline.size();
+
+        var transform = SkyFootprint.foreshortening(globe(), mapping(),
+                straddling, LMC_MAJOR_ARCMIN, LMC_MAJOR_ARCMIN, 0.0);
+        assertNotNull(transform);
+        PlanePoint plane = globe().project(straddling).orElseThrow();
+        double anchorY = mapping().toPixel(plane).y();
+        double placedY = anchorY + transform.dy();
+
+        assertTrue(Math.abs(placedY - middleY) < Math.abs(anchorY - middleY),
+                "the mark is placed nearer the visible outline's"
+                        + " middle (" + middleY + ") than the point"
+                        + " its centre projects to (" + anchorY
+                        + ") is: placed at " + placedY);
+        assertTrue(Math.abs(anchorY - middleY) > 1.0,
+                "and the fixture separates the two answers by more"
+                        + " than a pixel, so the comparison is not"
+                        + " about rounding: " + Math.abs(anchorY - middleY));
     }
 
     @Test
