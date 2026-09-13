@@ -134,12 +134,34 @@ public record DrawnPage(ChartScene scene, Projection projection) {
         return String.format(Locale.ROOT,
                 "%s. Centre RA %.4f, Dec %+.4f (ICRS J2000)."
                         + " Field %.1f degrees wide, %s projection."
-                        + " Stars to V %.1f. North up, east left.",
+                        + " Stars to V %.1f. North up, east left.%s",
                 scene.title(),
                 scene.viewport().centre().raDegrees(),
                 scene.viewport().centre().decDegrees(),
                 scene.viewport().fieldWidthDegrees(),
                 projectionName(),
-                scene.limitingMagnitude());
+                scene.limitingMagnitude(),
+                bounded() ? " " + HEMISPHERE : "");
     }
+
+    /**
+     * What a page with an edge to its sky adds (Sprint 32, issue
+     * #331, step five).
+     *
+     * <p>"Orthographic" and "180 degrees" are both true and neither
+     * says the thing a reader who cannot see the page most needs to
+     * know: that this page shows half the sky and stops, and that the
+     * paper around it is not empty sky but not sky at all. A reader
+     * told only the field width would reasonably expect the corners
+     * to hold something.
+     *
+     * <p>Plain language on purpose, and only the spatial fact. What
+     * the boundary does to ink, and why a drag will not cross it, are
+     * interaction details a description should not carry; the
+     * sentence gives the shape those behaviours follow from.
+     */
+    static final String HEMISPHERE =
+            "Shows one hemisphere of the sky, out to 90 degrees from"
+                    + " the centre in every direction. Outside the"
+                    + " circular limb is paper, not sky.";
 }
