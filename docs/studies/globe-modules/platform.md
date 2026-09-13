@@ -24,7 +24,7 @@ cannot be moved by any of it.
 centred on       ink inside ink beyond  furthest     names
 zenith-overhead        7363         43    1.0009         1
     meridian       Meridian                 inside the disc
-horizon-south          7570          1    1.0004         1
+horizon-south          7580          1    1.0004         1
     meridian       Mathematical horizon     inside the disc
 ecliptic-high          9674          2    1.0002         0
-sagittarius           10931         13    1.0005         0
+sagittarius           10493         13    1.0005         0

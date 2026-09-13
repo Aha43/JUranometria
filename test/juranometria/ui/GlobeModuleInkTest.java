@@ -176,6 +176,109 @@ class GlobeModuleInkTest {
     }
 
     @Test
+    void everyModuleNameIsNearestTheCurveItNames() {
+        // Inside the limb is not the same as attached to the right
+        // thing. A name walked towards the middle of the disc leaves
+        // the ellipse it names at once, and on a page carrying a
+        // meridian, a horizon and an ecliptic it can end up nearer a
+        // line it says nothing about - a label that passes every
+        // containment check and is still a lie (review of #331).
+        //
+        // So the reader's own question: of the reference lines on
+        // this page, which is this name beside? It has to be its own,
+        // and strictly.
+        int judged = 0;
+        double crowded = Double.MAX_VALUE;
+        for (SkyPosition centre : List.of(ZENITH, HORIZON_SOUTH,
+                ECLIPTIC_HIGH, SAGITTARIUS)) {
+            DrawnPage page = globe(centre);
+            var contributions = modules().collect();
+            for (ReferenceInk.NamePlacement placed
+                    : ReferenceInk.namePlacements(page, contributions)) {
+                Double own = null;
+                double nearestOther = Double.MAX_VALUE;
+                String rival = "-";
+                for (var owned : contributions) {
+                    if (!(owned.geometry() instanceof
+                            juranometria.module.OverlayContribution
+                                    .GreatCircle circle)) {
+                        continue;
+                    }
+                    double away = farFrom(page, circle, placed.box());
+                    if (Double.isNaN(away)) {
+                        continue;
+                    }
+                    if (circle.accessibleName().equals(placed.name())) {
+                        own = away;
+                    } else if (away < nearestOther) {
+                        nearestOther = away;
+                        rival = circle.accessibleName();
+                    }
+                }
+                if (own == null || nearestOther == Double.MAX_VALUE) {
+                    continue;
+                }
+                judged++;
+                crowded = Math.min(crowded, nearestOther);
+                assertTrue(own < nearestOther,
+                        "\"" + placed.name() + "\" is written "
+                                + Math.round(own) + " px from its own"
+                                + " line and " + Math.round(nearestOther)
+                                + " px from \"" + rival + "\", on the"
+                                + " page centred at "
+                                + centre.raDegrees() + "/"
+                                + centre.decDegrees());
+            }
+        }
+        assertTrue(judged >= 2,
+                "the pages really do carry names with a rival line to"
+                        + " be confused with: " + judged);
+        // And the rivals are near enough that this discriminates. A
+        // page whose other lines were half a disc away would satisfy
+        // the check above while proving nothing; here the nearest
+        // rival to a judged name is within a few tens of pixels, and
+        // before the repair one of them was nearer than the name's
+        // own line.
+        assertTrue(crowded < 40.0,
+                "a rival line is close enough for the question to be"
+                        + " a real one: nearest is " + crowded + " px");
+    }
+
+    /** How far this box sits from a great circle's drawn run. */
+    private static double farFrom(DrawnPage page,
+            juranometria.module.OverlayContribution.GreatCircle circle,
+            Rectangle2D box) {
+        ViewportMapping mapping = new ViewportMapping(page);
+        var runs = juranometria.project.GreatCirclePage.clip(
+                page.projection(), mapping,
+                mapping.regionFor(page.scene().viewport(),
+                        page.projection()),
+                circle.pole());
+        double nearest = Double.NaN;
+        for (var run : runs) {
+            for (int at = 0; at <= 200; at++) {
+                var point = run.at(at / 200.0);
+                // From the box itself rather than from its middle: a
+                // long name would otherwise be judged further from
+                // its own line than a short one written in the same
+                // place, which measures the wording and not the
+                // placement.
+                double dx = Math.max(0.0, Math.max(
+                        box.getMinX() - point.x(),
+                        point.x() - box.getMaxX()));
+                double dy = Math.max(0.0, Math.max(
+                        box.getMinY() - point.y(),
+                        point.y() - box.getMaxY()));
+                double away = Math.hypot(dx, dy);
+                if (Double.isNaN(nearest) || away < nearest) {
+                    nearest = away;
+                }
+            }
+        }
+        return nearest;
+    }
+
+    @Test
     void anOrdinaryPageIsUnchangedByAnyOfIt() {
         // The rule reaches the globe and nothing else: on a page
         // whose sky has no edge the sky IS the paper, so a module

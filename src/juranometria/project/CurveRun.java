@@ -21,6 +21,18 @@ import java.util.Optional;
  */
 public sealed interface CurveRun {
 
+    /**
+     * A point along this run, from its start at 0 to its end at 1
+     * (Sprint 32, issue #331).
+     *
+     * <p>So that a caller wanting somewhere <em>on</em> a curve can
+     * ask the curve, rather than set off from one of its ends in a
+     * direction of its own choosing. A projected great circle is an
+     * ellipse, and neither a straight line towards the middle of the
+     * page nor a slide down the paper stays on it.
+     */
+    PixelPoint at(double fraction);
+
     /** Where the run begins, or empty when it closes on itself. */
     Optional<PixelPoint> from();
 
@@ -56,6 +68,13 @@ public sealed interface CurveRun {
         @Override
         public Optional<PixelPoint> to() {
             return Optional.of(end);
+        }
+
+        @Override
+        public PixelPoint at(double fraction) {
+            return new PixelPoint(
+                    start.x() + (end.x() - start.x()) * fraction,
+                    start.y() + (end.y() - start.y()) * fraction);
         }
     }
 
@@ -138,6 +157,17 @@ public sealed interface CurveRun {
         @Override
         public Optional<PixelPoint> to() {
             return Optional.ofNullable(end);
+        }
+
+        @Override
+        public PixelPoint at(double fraction) {
+            double angle = startRadians + spanRadians * fraction;
+            double cos = Math.cos(tiltRadians);
+            double sin = Math.sin(tiltRadians);
+            double along = radiusAlong * Math.cos(angle);
+            double across = radiusAcross * Math.sin(angle);
+            return new PixelPoint(centreX + along * cos - across * sin,
+                    centreY + along * sin + across * cos);
         }
 
         /** Whether the two radii are the same: a circular arc. */
