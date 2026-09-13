@@ -23,6 +23,7 @@ import juranometria.project.DrawnPage;
 import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.PixelPoint;
+import juranometria.project.SkyFootprint;
 import juranometria.project.ViewportMapping;
 
 /**
@@ -70,61 +71,36 @@ public final class ChartRenderer {
 
     private final StarSizePolicy starSizePolicy;
 
-    /**
-     * The projection this renderer draws by, when it has been told
-     * one instead of asking the viewport (Sprint 32, issue #301).
-     *
-     * <p><strong>Study only, and temporary: issue #329 owns its
-     * removal.</strong> The celestial-globe gate has to see what the
-     * production renderer draws for a hemisphere before production
-     * has an orthographic projection to name - and a study that drew
-     * hemispheres with its own renderer would be measuring itself
-     * rather than the atlas.
-     *
-     * <p>Null in every production path, where the viewport's own kind
-     * answers exactly as it did before.
-     */
-    private final DrawnPage told;
-
     public ChartRenderer(StarSizePolicy starSizePolicy) {
-        this(starSizePolicy, null);
-    }
-
-    private ChartRenderer(StarSizePolicy starSizePolicy, DrawnPage told) {
         if (starSizePolicy == null) {
             throw new IllegalArgumentException("star size policy must not be null");
         }
         this.starSizePolicy = starSizePolicy;
-        this.told = told;
     }
 
     /**
-     * The projection this page is drawn by: the one this renderer was
-     * told, or the one its viewport names.
+     * The projection this page is drawn by.
      *
      * <p>One method rather than a condition at each of the four
-     * places that asked - three that draw and one that writes the
-     * page's identity into the title block - because a globe drawn by
-     * one projection and titled by another would be the study lying
-     * in exactly the way the gate exists to prevent.
+     * places that ask - three that draw and one that writes the
+     * page's identity into the title block - because a page drawn by
+     * one projection and titled by another is the fault the whole
+     * boundary exists to prevent.
+     *
+     * <p>It carried a second answer until #329: a renderer could be
+     * <em>told</em> a projection its viewport did not name, because
+     * the celestial-globe gate had to see production ink for a
+     * hemisphere before production had an orthographic projection.
+     * The rung made that unnecessary and the door went with it; the
+     * field it read was left behind and is removed here.</p>
      */
-    private Projection drawnBy(ChartScene scene) {
+    private static Projection drawnBy(ChartScene scene) {
         return page(scene).projection();
     }
 
     /** This scene as a page, with the projection that draws it. */
-    private DrawnPage page(ChartScene scene) {
-        if (told == null) {
-            return DrawnPage.of(scene);
-        }
-        if (told.scene() != scene) {
-            throw new IllegalArgumentException(
-                    "this renderer was built for one page and told"
-                            + " which projection draws it; it cannot"
-                            + " draw another, because it would draw"
-                            + " that one by the wrong projection");
-        }
-        return told;
+    private static DrawnPage page(ChartScene scene) {
+        return DrawnPage.of(scene);
     }
 
     /** Renders the scene with the released default options. */
@@ -162,12 +138,39 @@ public final class ChartRenderer {
      * star's dot radius, or half a symbol's larger axis.
      */
     public record DrawnMark(Kind kind, Object subject, PixelPoint centre,
-                            Shape outline, double reach, Shape ink) {
+                            Shape outline, double reach, Shape ink,
+                            Painted painted) {
 
         /** A mark whose ink is its outline, which is every star's. */
         public DrawnMark(Kind kind, Object subject, PixelPoint centre,
                          Shape outline, double reach) {
-            this(kind, subject, centre, outline, reach, outline);
+            this(kind, subject, centre, outline, reach, outline, null);
+        }
+
+        /**
+         * How a deep-sky mark is painted: the axes its glyph is built
+         * at, and the map that carries the built glyph onto the page
+         * (Sprint 32, issue #331). Null for a star.
+         *
+         * <p>This exists so that the decision is made <em>once</em>.
+         * A bounded page corrects an extended object's shape, and the
+         * first attempt corrected it in the painter - after {@link
+         * ChartRenderer#drawnMarks} had already published the
+         * uncorrected outline, reach and ink to hit testing, label
+         * placement, the inventory, selection and stacking. The page
+         * could then draw a thin sliver while accepting clicks over
+         * the large ellipse it used to be. What exists, what is
+         * painted, what can be clicked, what blocks a label and what
+         * enters the inventory are now one answer.
+         *
+         * <p>{@code carried} is null when the glyph is painted as
+         * built, which is every ordinary page and a bounded page's
+         * minimum glyph. The ordinary page therefore reaches {@link
+         * #paintSymbol} by the same call it always did, with no
+         * transform concatenated that would be the identity anyway.
+         */
+        public record Painted(double majorPx, double minorPx,
+                              SkyFootprint.Foreshortening carried) {
         }
 
         public enum Kind { STAR, DEEP_SKY }
@@ -351,6 +354,10 @@ public final class ChartRenderer {
         // have let a click near an edge select an object off the
         // page, and would have inflated every count measured here.
         java.awt.geom.Rectangle2D paper = paperOf(scene);
+        // A bounded page decides an extended object's shape from its
+        // projected footprint, and that decision governs the mark
+        // itself - existence included (#331).
+        boolean bounded = Double.isFinite(projection.visiblePlaneRadius());
         java.util.List<DrawnMark> marks = new java.util.ArrayList<>();
         java.util.List<DrawnMark> deepSky = new java.util.ArrayList<>();
         for (DeepSkyObject dso : scene.deepSkyObjects()) {
@@ -362,22 +369,17 @@ public final class ChartRenderer {
             }
             projection.project(dso.position()).ifPresent(plane -> {
                 PixelPoint centre = mapping.toPixel(plane);
-                Shape outline = symbolOutline(dso, policy, centre,
-                        mapping.pixelsPerPlaneUnit());
-                if (outline != null && outline.intersects(paper)) {
-                    double[] axes = symbolAxesPx(dso, policy,
-                            mapping.pixelsPerPlaneUnit());
-                    deepSky.add(new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso,
-                            centre, outline,
-                            symbolReach(dso, policy,
-                                    mapping.pixelsPerPlaneUnit()),
-                            symbolInk(symbolFor(dso), centre.x(),
-                                    centre.y(), axes[0], axes[1],
-                                    dso.positionAngleDegrees())));
+                DrawnMark mark = bounded
+                        ? correctedMark(dso, policy, centre, mapping,
+                                projection)
+                        : ordinaryMark(dso, policy, centre,
+                                mapping.pixelsPerPlaneUnit());
+                if (mark != null && mark.outline().intersects(paper)) {
+                    deepSky.add(mark);
                 }
             });
         }
-        deepSky.sort(stackingOrder(policy, mapping.pixelsPerPlaneUnit()));
+        deepSky.sort(stackingOrder());
         marks.addAll(deepSky);
         // The page's own limit, excepting the stars its figures are
         // drawn to (issue #307). A limit says how crowded the page
@@ -528,6 +530,10 @@ public final class ChartRenderer {
                         : textPlacements(TextMetrics.of(g), scene, options);
 
         g.setClip(1, 1, width - 2, height - 2);
+        // Where this page's sky ends, and the shape every piece of
+        // sky-derived ink is painted inside (Sprint 32, issue #331).
+        java.awt.Shape paper = g.getClip();
+        java.awt.Shape sky = skyClip(scene, mapping, paper);
         // The equatorial graticule draws first - the quietest ink on
         // the chart, beneath geography, stars, and every label, per
         // docs/decisions/coordinate-grid.md. Its labels yield to the
@@ -538,11 +544,14 @@ public final class ChartRenderer {
             // notation: a reader who switches the title block off
             // gets back the labels it was hiding, and the key
             // suppresses on the same terms (Sprint 20 review).
+            // Unclipped on purpose: the grid's curves come through
+            // PageRegion, which already ends at the limb, so a clip
+            // here would hide a regression rather than prevent one.
             EquatorialGrid.draw(g, gridFor(g.getFontMetrics(LABEL_FONT),
                     scene, options), palette);
         }
         drawGeography(g, scene, options, projection, mapping,
-                constellationNamesIn(placedText));
+                constellationNamesIn(placedText), sky, paper);
         // Above the grid and the figures, below every mark: a
         // reference line is read across the chart and must not hide
         // an object (docs/decisions/place-and-time.md).
@@ -552,10 +561,15 @@ public final class ChartRenderer {
         // what the reader can see - there is no second geometry.
         java.util.List<DrawnMark> marks =
                 drawnMarks(scene, options, policy, projection, mapping);
+        g.setClip(sky);
+        // Painted from the published mark's own decision (#331), so
+        // there is no second geometry to drift from the first. A
+        // mark that carries no map - every ordinary page's, and a
+        // bounded page's minimum glyph - reaches paintSymbol by the
+        // call it always did.
         for (DrawnMark mark : marks) {
             if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
-                drawSymbol(g, mark.deepSky(), policy, mark.centre(),
-                        mapping.pixelsPerPlaneUnit(), palette);
+                drawSymbol(g, mark, palette);
             }
         }
         g.setColor(palette.starInk());
@@ -565,6 +579,30 @@ public final class ChartRenderer {
             if (mark.kind() == DrawnMark.Kind.STAR) {
                 g.fill(mark.outline());
             }
+        }
+        g.setClip(paper);
+        // The page's own edge, once, after every piece of sky ink
+        // (Sprint 32, issue #331).
+        //
+        // Owner testing found the disc's outline breaking up as the
+        // globe turned, and the cause was that there was no outline:
+        // what read as one was assembled from whatever sky ink
+        // happened to end at the clip - 27 per cent of the
+        // circumference with stars alone, 76 with the settled page -
+        // so rotating the sphere moved the gaps rather than closing
+        // them. An outline three-quarters there is not an outline,
+        // and one made of line ends says nothing about where the
+        // visible hemisphere stops, which is the one thing it is for.
+        //
+        // Drawn from the clip's own shape, so the boundary a reader
+        // sees and the boundary the ink obeys cannot differ. After
+        // the sky, so no figure can break it or be mistaken for it;
+        // and unclipped, because furniture is not cut by the edge it
+        // draws.
+        if (sky != paper) {
+            g.setColor(quiet(palette.gridInk(), palette.ground()));
+            g.setStroke(new BasicStroke(1.0f));
+            g.draw(sky);
         }
         // Star labels, then deep-sky labels, which is the order the
         // page has always drawn them in.
@@ -598,32 +636,109 @@ public final class ChartRenderer {
      * RA-wrap and pole geometry come out curved and complete, with no
      * straight jumps across the page.
      */
+    /**
+     * The shape every piece of sky-derived ink is painted inside
+     * (Sprint 32, issue #331).
+     *
+     * <p>One rule rather than a list, so that no family is forgotten:
+     * <strong>every piece of sky-derived ink is clipped to the
+     * bounded page region before painting, and furniture is outside
+     * that clip</strong> (docs/decisions/celestial-globe.md). On a
+     * page whose sky has no edge this is the paper itself and nothing
+     * changes; on a globe it is the disc, past which there is no sky
+     * at all rather than empty sky.
+     *
+     * <p><strong>Text is not clipped.</strong> A name cut in half is
+     * a false name, so where a word may go is a question for the
+     * placement policy - the whole label inside the disc or no label
+     * - and not for a clip. That is why the constellation names, the
+     * star and deep-sky labels, the title block and the key are all
+     * painted with the paper's own clip restored.
+     *
+     * <p>The module layer is not inside this yet. Its contributions
+     * are curves, point marks and names in one call, and separating
+     * them is #331's fourth step; until then a module's ink is
+     * governed by its own geometry as #301 left it.
+     */
+    /**
+     * How heavy the limb is: a quarter of the grid's own ink against
+     * the ground (Sprint 32, issue #331, settled by eye).
+     *
+     * <p>A quarter because that is where the grid itself ends up at
+     * the edge, so the boundary and the last parallel beside it carry
+     * the same weight, and the disc reads as the edge of the page's
+     * sky rather than as one more celestial circle. Both this and a
+     * third were measured to close the outline completely - the
+     * choice between them was hierarchy, not coverage - and the
+     * heavier one begins to rebuild the reinforced rim that fading
+     * the grid was done to remove.
+     */
+    private static final double LIMB_STRENGTH = 0.25;
+
+    /** An ink let down towards the ground, for furniture that must not shout. */
+    private static java.awt.Color quiet(java.awt.Color ink,
+                                        java.awt.Color ground) {
+        return new java.awt.Color(
+                towards(ground.getRed(), ink.getRed()),
+                towards(ground.getGreen(), ink.getGreen()),
+                towards(ground.getBlue(), ink.getBlue()));
+    }
+
+    private static int towards(int ground, int ink) {
+        return (int) Math.round(ground + (ink - ground) * LIMB_STRENGTH);
+    }
+
+    private static java.awt.Shape skyClip(ChartScene scene,
+                                          ViewportMapping mapping,
+                                          java.awt.Shape paper) {
+        juranometria.project.Projection projection =
+                page(scene).projection();
+        if (!Double.isFinite(projection.visiblePlaneRadius())) {
+            return paper;
+        }
+        double radius = mapping.pixelsPerPlaneUnit()
+                * projection.visiblePlaneRadius();
+        PixelPoint middle = mapping.toPixel(
+                new juranometria.project.PlanePoint(0.0, 0.0));
+        return new java.awt.geom.Ellipse2D.Double(middle.x() - radius,
+                middle.y() - radius, 2.0 * radius, 2.0 * radius);
+    }
+
     private static void drawGeography(Graphics2D g, ChartScene scene,
                                       ChartOptions options,
                                       Projection projection,
                                       ViewportMapping mapping,
                                       java.util.List<
                                               ConstellationNamePlacement>
-                                              names) {
+                                              names,
+                                      java.awt.Shape sky,
+                                      java.awt.Shape paper) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
         ChartPalette palette = options.palette();
         if (options.constellationBoundaries() && policy.boundariesDrawn()) {
             g.setColor(palette.boundaryInk());
             g.setStroke(BOUNDARY_STROKE);
+            g.setClip(sky);
             for (GeoSegment segment : scene.geography().boundarySegments()) {
                 drawGeographySegment(g, segment, scene, projection, mapping, null);
             }
+            g.setClip(paper);
         }
         if (options.constellationFigures() && policy.figuresDrawn()) {
             g.setColor(palette.figureInk());
             g.setStroke(OUTLINE_STROKE);
             java.util.Map<String, double[]> visibleInk =
                     new java.util.LinkedHashMap<>();
+            g.setClip(sky);
             for (GeoSegment segment : scene.geography().figureSegments()) {
                 drawGeographySegment(g, segment, scene, projection, mapping,
                         visibleInk);
             }
+            // And the names outside it: a clipped word is a false
+            // name, so text is governed by where it is placed rather
+            // than by where it is cut (#301).
+            g.setClip(paper);
             // Names depend on figures by decision, which is also why
             // their visible-ink anchors exist exactly when they draw -
             // and since #314 the placement decides which of those
@@ -982,8 +1097,33 @@ public final class ChartRenderer {
             TextMetrics metrics, ChartScene scene, ChartOptions options) {
         return new LabelPlacement(scene.viewport().widthPx(),
                 scene.viewport().heightPx(),
-                textObstacles(metrics, scene, options))
+                textObstacles(metrics, scene, options),
+                textPage(scene))
                 .placeAll(textRequests(metrics, scene, options));
+    }
+
+    /**
+     * Where this page's sky is, for the purpose of placing text
+     * (Sprint 32, issue #331).
+     *
+     * <p>The same boundary the ink is clipped to, asked for by the
+     * same method, because a page cannot have two edges. Text is not
+     * clipped to it - a name cut by the limb would be the very fault
+     * the clip exists to prevent, and half a name is often another
+     * name - so the boundary reaches text as a placement rule
+     * instead: the whole of a label, or none of it.
+     *
+     * <p>An ordinary page gets its paper, which is what it always
+     * had.
+     */
+    private static LabelPlacement.Page textPage(ChartScene scene) {
+        java.awt.geom.Rectangle2D paper = paperOf(scene);
+        java.awt.Shape sky = skyClip(scene,
+                new ViewportMapping(page(scene)), paper);
+        return sky == paper
+                ? LabelPlacement.Page.paper(scene.viewport().widthPx(),
+                        scene.viewport().heightPx())
+                : new LabelPlacement.Page(sky, "the limb");
     }
 
     /**
@@ -1241,17 +1381,178 @@ public final class ChartRenderer {
      * rather than its size. Half the major axis is the same distance
      * whichever way the object lies.
      */
-    private static double symbolReach(DeepSkyObject dso,
-                                      RegionalDetailPolicy policy,
-                                      double pixelsPerPlaneUnit) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+    private static double symbolReach(DeepSkyObject dso, double majorPx) {
         if (symbolFor(dso) == Symbol.PLANETARY) {
             // The planetary's spokes are its outermost ink.
             double r = Math.max(RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                    axes[0]) / 2.0;
+                    majorPx) / 2.0;
             return r * 1.7;
         }
-        return axes[0] / 2.0;
+        return majorPx / 2.0;
+    }
+
+    /**
+     * The mark an ordinary page draws: the object's axes at the page
+     * centre's rate, clamp included, painted as built.
+     */
+    private static DrawnMark ordinaryMark(DeepSkyObject dso,
+                                          RegionalDetailPolicy policy,
+                                          PixelPoint centre,
+                                          double pixelsPerPlaneUnit) {
+        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
+        return markFrom(dso, centre, axes[0], axes[1], axes[0], null);
+    }
+
+    /**
+     * The mark a bounded page draws, decided once (Sprint 32, issue
+     * #331): whether the object appears at all, at what axes its
+     * glyph is built, and the map that carries it.
+     *
+     * <p>Returns null when the object is <strong>withdrawn</strong>.
+     * A regional page admits an object either because its footprint
+     * resolves or because it is a Messier landmark or the reader's
+     * searched target; {@link RegionalDetailPolicy#drawn} asks that
+     * question at the page centre's rate, which on a hemisphere is
+     * the very number this step exists to stop trusting. An ordinary
+     * object admitted <em>solely</em> because centre-scale said it
+     * resolved, whose real projected footprint then fails the major
+     * or minor test, has no remaining reason to be on the page, and
+     * promoting it to a minimum glyph would be inventing a landmark.
+     * The two objects the settled policy does promote - the ones
+     * {@link RegionalDetailPolicy#clampAllowed} names - keep their
+     * minimum glyph, because their reason for being drawn was never
+     * their size.
+     *
+     * <p>Two conditions send a mark back to its minimum glyph, and
+     * they ask different questions. The <strong>major</strong> span
+     * against the atlas's practical minimum asks whether the reader
+     * sees the object's own shape. The <strong>minor</strong> span
+     * against twice the stroke width asks whether what they see can
+     * still say which family it is: every sky glyph is stroked at
+     * 1 px, so below one stroke width of separation the two sides of
+     * any shape merge into a single bar and every family looks alike.
+     * One stroke to hold them apart and one device pixel of clear
+     * separation is 2 px, and the five glyphs measurably stop
+     * differing from one another between 1.5 and 1 px of minor span.
+     *
+     * <p>Nothing here decides what reaches the paper. The page's own
+     * clip does that, after this has decided what the mark is.
+     */
+    private static DrawnMark correctedMark(DeepSkyObject dso,
+                                           RegionalDetailPolicy policy,
+                                           PixelPoint centre,
+                                           ViewportMapping mapping,
+                                           Projection projection) {
+        SkyFootprint.Extent extent = SkyFootprint.extentOn(projection,
+                mapping, dso.position(), dso.majorAxisArcmin(),
+                dso.minorAxisArcmin(), dso.positionAngleDegrees());
+        SkyFootprint.Foreshortening carried = extent == null ? null
+                : SkyFootprint.foreshortening(projection, mapping,
+                        dso.position(), dso.majorAxisArcmin(),
+                        dso.minorAxisArcmin(), dso.positionAngleDegrees());
+        if (carried == null
+                || extent.majorPx()
+                        < RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX
+                || extent.minorPx() < LEGIBLE_MINOR_PX) {
+            if (!policy.clampAllowed(dso)) {
+                return null;
+            }
+            // The family's minimum glyph, at the practical minimum in
+            // both axes - not the mark's ordinary centre-scale size,
+            // which for a strongly foreshortened object is the very
+            // number this whole step exists to stop trusting. A 4
+            // degree cluster at 89 degrees out would have fallen back
+            // to a 25 px ring, which is neither its footprint nor a
+            // minimum glyph.
+            double minimum = RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX;
+            return markFrom(dso, centre, minimum, minimum, minimum, null);
+        }
+        double[] axes = symbolAxesPx(dso, policy,
+                mapping.pixelsPerPlaneUnit());
+        return markFrom(dso, centre, axes[0], axes[1],
+                extent.majorPx(), carried);
+    }
+
+    /**
+     * One mark from one decision: the outline a reader aims at, the
+     * ink a label must not cover, and the reach a highlight rings -
+     * all three from the glyph as it is actually painted.
+     *
+     * <p>The glyph is built exactly as every other page builds it -
+     * the family's own vocabulary, at the given axes and position
+     * angle - and then the whole composed shape is carried by the
+     * map. Crosses, dashes and spokes travel with it because the map
+     * is applied to the mark rather than to each piece's definition,
+     * so a family added later is foreshortened without being told
+     * that globes exist.
+     *
+     * <p>{@code drawnMajorPx} is the mark's larger span <em>as
+     * drawn</em>, which is what a reach is half of. It is a separate
+     * argument rather than something recovered from the carried map,
+     * because the map's largest stretch is not it: a projection that
+     * only squashes leaves one direction alone, so scaling the reach
+     * by that factor would leave a strongly foreshortened cloud
+     * ringed at the size it stopped being. The projected footprint
+     * has already measured the span, so the reach is taken from the
+     * measurement.
+     */
+    private static DrawnMark markFrom(DeepSkyObject dso, PixelPoint centre,
+                                      double majorPx, double minorPx,
+                                      double drawnMajorPx,
+                                      SkyFootprint.Foreshortening carried) {
+        Shape outline = symbolOutline(dso, centre, majorPx, minorPx);
+        if (outline == null) {
+            return null;
+        }
+        Shape ink = symbolInk(symbolFor(dso), centre.x(), centre.y(),
+                majorPx, minorPx, dso.positionAngleDegrees());
+        double reach = symbolReach(dso, drawnMajorPx);
+        // Where the mark ends up, which for a carried mark is not
+        // where its object projects to. The published centre moves
+        // with the ink, because a selection ring is drawn around it
+        // and a ring that does not move with the mark it names is the
+        // same disagreement one layer up. A mark with no map to carry
+        // stays where it always was: the fallback glyph has no fit to
+        // trust, its premise being that the footprint did not resolve.
+        PixelPoint at = carried == null ? centre
+                : new PixelPoint(centre.x() + carried.dx(),
+                        centre.y() + carried.dy());
+        if (carried != null) {
+            java.awt.geom.AffineTransform about = carriedAbout(at, carried);
+            outline = about.createTransformedShape(outline);
+            ink = about.createTransformedShape(ink);
+        }
+        return new DrawnMark(DrawnMark.Kind.DEEP_SKY, dso, at, outline,
+                reach, ink,
+                new DrawnMark.Painted(majorPx, minorPx, carried));
+    }
+
+    /**
+     * The carried map: about the anchor the glyph was built on, and
+     * onto where the projected footprint actually sits.
+     *
+     * <p>The translation is not decoration. A projection does not
+     * keep an extended outline's middle at the point its centre
+     * projects to - seen from outside a sphere the near half of a
+     * large object covers more of the page than the far half - so the
+     * linear part alone gives a mark the right size, the right shape
+     * and the right area in the wrong pixels: nothing at all at the
+     * page centre, rising to about two pixels near the limb.
+     *
+     * <p>Takes the mark's <em>published</em> centre and recovers the
+     * build anchor from it, so that the mark and its painting cannot
+     * be placed by two different arithmetics.
+     */
+    private static java.awt.geom.AffineTransform carriedAbout(
+            PixelPoint at, SkyFootprint.Foreshortening carried) {
+        java.awt.geom.AffineTransform about =
+                java.awt.geom.AffineTransform.getTranslateInstance(
+                        at.x(), at.y());
+        about.concatenate(new java.awt.geom.AffineTransform(carried.m00(),
+                carried.m10(), carried.m01(), carried.m11(), 0.0, 0.0));
+        about.translate(-(at.x() - carried.dx()),
+                -(at.y() - carried.dy()));
+        return about;
     }
 
     /**
@@ -1283,11 +1584,10 @@ public final class ChartRenderer {
      * CSV, map or collection iteration: reverse the input and the
      * page is unchanged.
      */
-    private static java.util.Comparator<DrawnMark> stackingOrder(
-            RegionalDetailPolicy policy, double pixelsPerPlaneUnit) {
+    private static java.util.Comparator<DrawnMark> stackingOrder() {
         return java.util.Comparator
-                .comparingDouble((DrawnMark mark) -> -symbolFootprintPx(
-                        mark.deepSky(), policy, pixelsPerPlaneUnit))
+                .comparingDouble((DrawnMark mark)
+                        -> -symbolFootprintPx(mark))
                 .thenComparing(mark -> mark.deepSky().id());
     }
 
@@ -1302,25 +1602,32 @@ public final class ChartRenderer {
      * reason about - and to test - than a rule with a family
      * exception in it.
      */
-    private static double symbolFootprintPx(DeepSkyObject dso,
-                                            RegionalDetailPolicy policy,
-                                            double pixelsPerPlaneUnit) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
-        return switch (symbolFor(dso)) {
-            case ELLIPSE, DOTTED_CIRCLE ->
-                    Math.PI * axes[0] * axes[1] / 4.0;
-            case CROSSED_CIRCLE -> Math.PI * axes[0] * axes[0] / 4.0;
-            case BOX -> axes[0] * axes[1];
+    private static double symbolFootprintPx(DrawnMark mark) {
+        DeepSkyObject dso = mark.deepSky();
+        DrawnMark.Painted painted = mark.painted();
+        double majorPx = painted.majorPx();
+        double minorPx = painted.minorPx();
+        double built = switch (symbolFor(dso)) {
+            case ELLIPSE, DOTTED_CIRCLE -> Math.PI * majorPx * minorPx / 4.0;
+            case CROSSED_CIRCLE -> Math.PI * majorPx * majorPx / 4.0;
+            case BOX -> majorPx * minorPx;
             case PLANETARY -> {
                 // Its spokes reach further than its disc, but the
                 // disc is what it encloses.
                 double r = Math.max(
                         RegionalDetailPolicy.PRACTICAL_MINIMUM_MAJOR_PX,
-                        axes[0]) / 2.0 / 1.7;
+                        majorPx) / 2.0 / 1.7;
                 yield Math.PI * r * r;
             }
             case NONE -> 0.0;
         };
+        // What the page paints, not what the object would cover at
+        // the centre's rate (#331). A linear map multiplies every
+        // area it carries by the same factor, so a strongly
+        // foreshortened cloud no longer stacks as though it were
+        // still the disc it is not.
+        return painted.carried() == null ? built
+                : built * painted.carried().areaFactor();
     }
 
     /**
@@ -1357,12 +1664,9 @@ public final class ChartRenderer {
      * shape a reader points at.
      */
     private static Shape symbolOutline(DeepSkyObject dso,
-                                       RegionalDetailPolicy policy,
                                        PixelPoint centre,
-                                       double pixelsPerPlaneUnit) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
-        double majorPx = axes[0];
-        double minorPx = axes[1];
+                                       double majorPx,
+                                       double minorPx) {
         Shape local = switch (symbolFor(dso)) {
             case ELLIPSE, DOTTED_CIRCLE -> new Ellipse2D.Double(
                     -minorPx / 2.0, -majorPx / 2.0, minorPx, majorPx);
@@ -1394,14 +1698,39 @@ public final class ChartRenderer {
         return place.createTransformedShape(local);
     }
 
-    private static void drawSymbol(Graphics2D g, DeepSkyObject dso,
-                                   RegionalDetailPolicy policy,
-                                   PixelPoint centre, double pixelsPerPlaneUnit,
+    private static void drawSymbol(Graphics2D g, DrawnMark mark,
                                    ChartPalette palette) {
-        double[] axes = symbolAxesPx(dso, policy, pixelsPerPlaneUnit);
-        paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
-                axes[0], axes[1], dso.positionAngleDegrees(), palette);
+        DeepSkyObject dso = mark.deepSky();
+        DrawnMark.Painted painted = mark.painted();
+        PixelPoint centre = mark.centre();
+        if (painted.carried() == null) {
+            paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
+                    painted.majorPx(), painted.minorPx(),
+                    dso.positionAngleDegrees(), palette);
+            return;
+        }
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            // Built on the anchor the map expects and carried onto
+            // the published centre, by the one transform that decided
+            // where the mark is.
+            g2.transform(carriedAbout(centre, painted.carried()));
+            paintSymbol(g2, symbolFor(dso),
+                    centre.x() - painted.carried().dx(),
+                    centre.y() - painted.carried().dy(),
+                    painted.majorPx(), painted.minorPx(),
+                    dso.positionAngleDegrees(), palette);
+        } finally {
+            g2.dispose();
+        }
     }
+
+    /**
+     * The narrowest a mark may be drawn and still say what family it
+     * is: one stroke width to hold its two sides apart, and one
+     * device pixel of clear separation between them.
+     */
+    private static final double LEGIBLE_MINOR_PX = 2.0;
 
     /**
      * Draws one symbol at a given size and orientation - the atlas's

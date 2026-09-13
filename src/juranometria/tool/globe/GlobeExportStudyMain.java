@@ -98,8 +98,7 @@ public final class GlobeExportStudyMain {
         for (boolean withModules : new boolean[] {false, true}) {
             System.out.println();
             System.out.println(withModules
-                    ? "## The same globe with modules (carries #331's"
-                            + " known overrun)"
+                    ? "## The same globe with modules"
                     : "## The core globe, no modules");
             System.out.println();
             split.machine("");
@@ -325,8 +324,9 @@ public final class GlobeExportStudyMain {
     private static Mutated compare(DrawnPage page, ChartOptions only,
                                    PaperSize paper, boolean strike)
             throws IOException {
-        SheetRecording sheet = ChartSheet.recordForStudy(page, 180.0,
-                only, ChartRenderer.ReferenceLayer.NONE,
+        SheetRecording sheet = ChartSheet.record(
+                Atlas.assembler()::assemble, globeState(), only,
+                ChartRenderer.ReferenceLayer.NONE,
                 ChartRenderer.ReferenceLayer.NONE, paper);
         BufferedImage whole = ImageIO.read(new ByteArrayInputStream(
                 SheetWriters.write(sheet, SheetFormat.PNG, 300)));
@@ -705,19 +705,25 @@ public final class GlobeExportStudyMain {
         OverlayRegistry registry = withModules ? modules() : null;
         ChartRenderer.ReferenceLayer reference = registry == null
                 ? ChartRenderer.ReferenceLayer.NONE
-                : (g, drawn) -> ReferenceInk.paint(g, page,
+                : (g, drawn) -> ReferenceInk.paint(g, drawn,
                         registry.collect(), ChartPalette.WHITE_PAPER);
 
-        SheetRecording sheet = ChartSheet.recordForStudy(page, 180.0,
-                settled(), reference,
-                ChartRenderer.ReferenceLayer.NONE, paper);
+        // The production route (#331, step five). A reader can reach
+        // a hemisphere and a view state can describe one since #329
+        // added the rung, so the sheet path no longer needs a door of
+        // its own to be asked what a globe exports.
+        SheetRecording sheet = ChartSheet.record(
+                Atlas.assembler()::assemble, globeState(), settled(),
+                reference, ChartRenderer.ReferenceLayer.NONE, paper);
         byte[] written = SheetWriters.write(sheet, format, 300);
         File file = new File(DIR, String.format(Locale.ROOT,
                 "globe-%s.%s", withModules ? "modules" : "core",
                 format.extension()));
         Files.write(file.toPath(), written);
 
-        Read read = readBack(format, written, paper);
+        Read read = readBack(format, written, paper,
+                format == SheetFormat.PNG
+                        ? furnitureBeyondTheLimb(paper) : 0);
         System.out.printf(Locale.ROOT,
                 "  %-4s identity: %-12s  %s%n", format.name(),
                 read.saysOrthographic() ? "orthographic" : "** LOST **",
@@ -750,8 +756,49 @@ public final class GlobeExportStudyMain {
      * carries neither in a form this study can read without a parser
      * it has no business writing.
      */
+    /** How much of the written sheet's furniture lies beyond the limb. */
+    private static int furnitureBeyondTheLimb(PaperSize paper)
+            throws IOException {
+        SheetRecording bare = ChartSheet.record(
+                Atlas.assembler()::assemble, globeState(),
+                furnitureOnly(), ChartRenderer.ReferenceLayer.NONE,
+                ChartRenderer.ReferenceLayer.NONE, paper);
+        return beyondTheLimbIn(
+                SheetWriters.write(bare, SheetFormat.PNG, 300), paper);
+    }
+
+    /** Pixels beyond the limb in a written PNG, furniture included. */
+    private static int beyondTheLimbIn(byte[] written, PaperSize paper)
+            throws IOException {
+        BufferedImage page = ImageIO.read(
+                new ByteArrayInputStream(written));
+        if (page == null) {
+            return 0;
+        }
+        double centreX = paper.chartWideUnits() / 2.0;
+        double centreY = paper.chartHighUnits() / 2.0;
+        double discRadius = 0.90 * Math.min(paper.chartWideUnits(),
+                paper.chartHighUnits()) / 2.0;
+        double scale = page.getWidth() / (centreX * 2.0);
+        int ground = ChartPalette.WHITE_PAPER.ground().getRGB() & 0xffffff;
+        int outside = 0;
+        for (int y = 0; y < page.getHeight(); y++) {
+            for (int x = 0; x < page.getWidth(); x++) {
+                if ((page.getRGB(x, y) & 0xffffff) == ground) {
+                    continue;
+                }
+                if (Math.hypot(x / scale - centreX, y / scale - centreY)
+                        > discRadius) {
+                    outside++;
+                }
+            }
+        }
+        return outside;
+    }
+
     private static Read readBack(SheetFormat format, byte[] written,
-                                 PaperSize paper) throws IOException {
+                                 PaperSize paper, int furniture)
+            throws IOException {
         String said = new String(written, StandardCharsets.ISO_8859_1);
         boolean identity = said.contains("orthographic");
 
@@ -764,7 +811,7 @@ public final class GlobeExportStudyMain {
             case SVG -> svgTextOutside(said, identity, centreX,
                     centreY, discRadius);
             case PNG -> pngInkOutside(written, identity, centreX,
-                    centreY, discRadius);
+                    centreY, discRadius, furniture);
             default -> new Read(identity,
                     "geometry not read back from this format",
                     "geometry not read back from this format");
@@ -801,7 +848,7 @@ public final class GlobeExportStudyMain {
     /** Ink beyond the limb, counted in the written picture. */
     private static Read pngInkOutside(byte[] written, boolean identity,
                                       double centreX, double centreY,
-                                      double discRadius)
+                                      double discRadius, int furniture)
             throws IOException {
         BufferedImage page = ImageIO.read(
                 new ByteArrayInputStream(written));
@@ -828,12 +875,26 @@ public final class GlobeExportStudyMain {
                 }
             }
         }
+        // Two masks, never one. The page draws furniture beyond the
+        // limb by design - the frame at the paper's edge, the title
+        // block, the key - so counting every pixel out there measures
+        // the frame forever and reads as a leak no clipping can fix.
+        // The same page with every piece of sky switched off is
+        // rendered separately and subtracted, which leaves what the
+        // sky itself put on the paper (#331, step five).
+        int sky = outside - furniture;
         return new Read(identity,
-                outside == 0 ? "no ink beyond the limb"
-                        : "** ink beyond the limb **",
+                sky <= 0 ? "no sky ink beyond the limb"
+                        : "** sky ink beyond the limb **",
                 String.format(Locale.ROOT,
-                        "%d px inside the limb, %d beyond it", inside,
-                        outside));
+                        "%d px inside the limb, %d beyond it of which"
+                                + " %d is the page's own furniture",
+                        inside, outside, furniture));
+    }
+
+    /** The globe as a reader reaches it: the settled rung and limit. */
+    private static juranometria.chart.ChartViewState globeState() {
+        return new juranometria.chart.ChartViewState(CENTRE, 180.0, 5.0);
     }
 
     private static OverlayRegistry modules() {
@@ -859,6 +920,25 @@ public final class GlobeExportStudyMain {
      * furniture off, every mark beyond the limb is sky drawn where
      * there is no sky - which is the thing being asked about.
      */
+    /**
+     * The same page with every piece of sky switched off: its border,
+     * its title block, its key and its limb, and nothing else.
+     *
+     * <p>What a globe sheet inks beyond its limb cannot be read from
+     * one rendering, because the page draws furniture out there by
+     * design - the frame at the paper's edge, and the two blocks. So
+     * the furniture is rendered on its own and subtracted, which is
+     * the two-masks rule this issue applied to the screen, applied
+     * here to the written sheet (#331, step five).
+     */
+    private static ChartOptions furnitureOnly() {
+        ChartOptions on = settled();
+        return new ChartOptions(false, false, false, false, false,
+                false, false, false, false, on.titleBlock(),
+                on.magnitudeKey(), false, false, false, false, false,
+                on.palette());
+    }
+
     private static ChartOptions settled() {
         return new ChartOptions(
                 true, true, true, false, true,

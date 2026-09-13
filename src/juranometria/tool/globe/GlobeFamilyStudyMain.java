@@ -431,10 +431,22 @@ public final class GlobeFamilyStudyMain {
                 family.label(), band, chosen.radiusOnDisc(),
                 chosen.majorPx(), chosen.minorPx(),
                 chosen.centreScalePx());
+        if (maxX < 0) {
+            // Said, not left as zeroes. An empty window here is a
+            // decision and not a failed measurement: production
+            // withdraws an ordinary object whose projected footprint
+            // does not resolve, rather than promoting it to a
+            // minimum glyph, and the two the policy does promote -
+            // a Messier landmark and the searched target - would
+            // have inked something (#331).
+            split.machinef("    %-20s %8s   withdrawn: its projected"
+                            + " footprint does not resolve and it is"
+                            + " neither Messier nor the target%n",
+                    family.label(), band);
+            return;
+        }
         split.machinef("    %-20s %8s %6dx%-4d%n",
-                family.label(), band,
-                maxX < 0 ? 0 : maxX - minX + 1,
-                maxY < 0 ? 0 : maxY - minY + 1);
+                family.label(), band, maxX - minX + 1, maxY - minY + 1);
     }
 
     private static java.awt.image.BufferedImage render(DrawnPage page,
@@ -786,7 +798,7 @@ public final class GlobeFamilyStudyMain {
             if (SymbolFamily.of(dso) == null) {
                 continue;          // the atlas draws nothing for it
             }
-            List<PlanePoint> footprint = Footprint.projected(
+            List<PlanePoint> footprint = juranometria.project.SkyFootprint.projected(
                     page.projection(), dso.position(),
                     dso.majorAxisArcmin(), dso.minorAxisArcmin(),
                     dso.positionAngleDegrees());

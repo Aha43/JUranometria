@@ -60,17 +60,17 @@ class GlobeFootprintTest {
                 "the fixture is the cloud near the limb, and it has"
                         + " moved: " + centreSeparation);
 
-        List<PlanePoint> footprint = Footprint.projected(globe, LMC,
+        List<PlanePoint> footprint = juranometria.project.SkyFootprint.projected(globe, LMC,
                 LMC_MAJOR_ARCMIN, LMC_MINOR_ARCMIN,
                 LMC_POSITION_ANGLE);
-        assertEquals(Footprint.SAMPLES, footprint.size(),
+        assertEquals(juranometria.project.SkyFootprint.SAMPLES, footprint.size(),
                 "every point of this cloud's outline is on the visible"
                         + " hemisphere - it reaches 87.5 degrees and"
                         + " the limb is at 90");
-        assertTrue(Footprint.furthestPlaneRadius(footprint) < LIMB,
+        assertTrue(juranometria.project.SkyFootprint.furthestPlaneRadius(footprint) < LIMB,
                 "so its footprint is inside the limb, where the cloud"
                         + " is: "
-                        + Footprint.furthestPlaneRadius(footprint));
+                        + juranometria.project.SkyFootprint.furthestPlaneRadius(footprint));
     }
 
     @Test
@@ -82,10 +82,10 @@ class GlobeFootprintTest {
         // and this will say so by failing.
         juranometria.project.Projection globe = juranometria.project.Projections.of(
                 juranometria.chart.ChartProjection.ORTHOGRAPHIC, PAGE);
-        List<PlanePoint> scaled = Footprint.atCentreScale(globe, LMC,
+        List<PlanePoint> scaled = juranometria.project.SkyFootprint.atCentreScale(globe, LMC,
                 LMC_MAJOR_ARCMIN, LMC_MINOR_ARCMIN,
                 LMC_POSITION_ANGLE);
-        double furthest = Footprint.furthestPlaneRadius(scaled);
+        double furthest = juranometria.project.SkyFootprint.furthestPlaneRadius(scaled);
 
         assertTrue(furthest > LIMB,
                 "scaled about its projected centre the cloud reaches"
@@ -105,23 +105,23 @@ class GlobeFootprintTest {
         // clips rather than erases.
         juranometria.project.Projection globe = juranometria.project.Projections.of(
                 juranometria.chart.ChartProjection.ORTHOGRAPHIC, PAGE);
-        SkyPosition straddling = Footprint.outlineIn(PAGE,
+        SkyPosition straddling = juranometria.project.SkyFootprint.outlineIn(PAGE,
                 2.0 * 89.0 * 60.0, 2.0 * 89.0 * 60.0, 0.0).get(0);
         assertTrue(PAGE.separationDegrees(straddling) > 88.0,
                 "the fixture sits just inside the limb");
 
-        List<PlanePoint> footprint = Footprint.projected(globe,
+        List<PlanePoint> footprint = juranometria.project.SkyFootprint.projected(globe,
                 straddling, 240.0, 240.0, 0.0);
 
         assertTrue(!footprint.isEmpty(),
                 "the visible part is real sky and is drawn: an object"
                         + " crossing the limb is clipped, never"
                         + " dropped");
-        assertTrue(footprint.size() < Footprint.SAMPLES,
+        assertTrue(footprint.size() < juranometria.project.SkyFootprint.SAMPLES,
                 "and the hidden part is not: some of this outline is"
                         + " on the far side of the globe, where there"
                         + " is nothing to draw");
-        assertTrue(Footprint.furthestPlaneRadius(footprint)
+        assertTrue(juranometria.project.SkyFootprint.furthestPlaneRadius(footprint)
                         <= LIMB + 1e-9,
                 "nothing it draws reaches past the limb");
     }

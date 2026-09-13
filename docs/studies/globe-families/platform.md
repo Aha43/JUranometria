@@ -25,37 +25,37 @@ far two glyphs differ pixel by pixel are this desktop's, and are here.
 sagittarius:
   what each family costs:
     family               ink centre   ink limb
-    Galaxies                  0.00%      3.14%
+    Galaxies                  0.00%      1.02%
     Open clusters             0.17%      0.02%
     Globular clusters         0.58%      0.31%
-    Nebulae                   0.31%      0.26%
+    Nebulae                   0.31%      0.09%
     Planetary nebulae         0.00%      0.01%
   what that object actually inked:
     family                   band   inked box
-    Galaxies                 limb      8x6   
+    Galaxies                 limb      8x8   
     Open clusters          centre      8x8   
-    Open clusters            limb      8x7   
+    Open clusters            limb     16x16  
     Globular clusters      centre      8x8   
     Globular clusters        limb      8x8   
-    Nebulae                centre      6x8   
-    Nebulae                  limb      3x9   
+    Nebulae                centre      8x8   
+    Nebulae                  limb      6x5   
 
 orion:
   what each family costs:
     family               ink centre   ink limb
-    Galaxies                  0.00%      3.19%
-    Open clusters             0.20%      0.02%
+    Galaxies                  0.00%      1.79%
+    Open clusters             0.19%      0.02%
     Globular clusters         0.04%      0.00%
-    Nebulae                   0.22%      0.18%
-    Planetary nebulae         0.00%      0.06%
+    Nebulae                   0.22%      0.09%
+    Planetary nebulae         0.00%      0.05%
   what that object actually inked:
     family                   band   inked box
-    Galaxies                 limb      6x7   
+    Galaxies                 limb     24x14  
     Open clusters          centre      8x8   
-    Open clusters            limb      8x8   
+    Open clusters            limb     16x16  
     Globular clusters      centre      8x8   
-    Nebulae                centre      6x8   
-    Planetary nebulae        limb     13x12  
+    Nebulae                centre      8x8   
+    Planetary nebulae        limb     24x19  
 
 The family glyphs at 6 px, compared with each other pixel by pixel:
     Galaxies           vs Open clusters        44 pixels differ

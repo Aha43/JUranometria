@@ -156,6 +156,8 @@ public final class EvidenceContractMain {
         REPORT_MAINS.put(
                 "juranometria.tool.globe.GlobeGridFadeStudyMain",
                 "docs/studies/globe-grid-fade/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.globe.GlobeLimbStudyMain",
+                "docs/studies/globe-limb/measurements.md");
         REPORT_MAINS.put("juranometria.tool.globe.GlobeFamilyStudyMain",
                 "docs/studies/globe-families/measurements.md");
         REPORT_MAINS.put("juranometria.tool.globe.GlobeNameStudyMain",
@@ -254,6 +256,8 @@ public final class EvidenceContractMain {
                 "docs/studies/globe-grid/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeGridFadeStudyMain",
                 "docs/studies/globe-grid-fade/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeLimbStudyMain",
+                "docs/studies/globe-limb/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeFamilyStudyMain",
                 "docs/studies/globe-families/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.globe.GlobeNameStudyMain",

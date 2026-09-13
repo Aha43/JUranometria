@@ -152,6 +152,24 @@ public final class ReferenceInk {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             g2.clip(paper);
+            // A module's curves and points are sky, and are clipped
+            // where the sky ends (#331, step four). Its names are
+            // not: a name cut by the limb is a false name, so they
+            // are kept inside by where they are put, exactly as the
+            // chart's own labels are.
+            // Only a bounded page's clip is touched at all. These
+            // are geometric no-ops on ordinary paper - the sky IS
+            // the paper there - but a vector writer records every
+            // clip it is given, so doing them unconditionally
+            // rewrote the released sheets' SVG and PDF without
+            // moving a single pixel. The contract caught it on
+            // sheet-a4-modules.
+            boolean bounded = region.bounded();
+            java.awt.Shape sky = skyOf(region, paper);
+            java.awt.Shape wholePaper = g2.getClip();
+            if (bounded) {
+                g2.clip(sky);
+            }
             // Circles first, then their names, then the points.
             //
             // The names are placed together rather than each with its
@@ -173,6 +191,9 @@ public final class ReferenceInk {
             // The names are the published decision, written rather
             // than decided again here: one placement, drawn by this
             // and readable by anyone (issue #313).
+            if (bounded) {
+                g2.setClip(wholePaper);
+            }
             List<Rectangle2D> taken = new ArrayList<>();
             g2.setColor(palette.gridLabelInk());
             g2.setFont(EquatorialGrid.GRID_LABEL_FONT);
@@ -185,11 +206,14 @@ public final class ReferenceInk {
                                 - metrics.getDescent()));
                 taken.add(placed.box());
             }
+            if (bounded) {
+                g2.clip(sky);
+            }
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.Point point) {
-                    drawPoint(g2, projection, mapping, paper, point,
-                            taken, palette);
+                    drawPoint(g2, projection, mapping, paper, sky,
+                            bounded, point, taken, palette);
                 }
             }
         } finally {
@@ -197,9 +221,28 @@ public final class ReferenceInk {
         }
     }
 
-    /** A line's name, and the end of it the name belongs to. */
+    /**
+     * A line's name, the end of it the name belongs to, and the run
+     * that end is on.
+     *
+     * <p>The run is carried so the name can be walked <em>along its
+     * own curve</em> when it does not fit where it first asked. A
+     * projected great circle is an ellipse; a straight line towards
+     * the middle of the page is not on it, and a slide down the paper
+     * is not either - so either would let a name drift off the thing
+     * it names and, on a page carrying four reference lines, onto a
+     * neighbour's (review of #331).
+     */
     private record Named(PixelPoint anchor, String name,
-                         String moduleId) {
+                         String moduleId, CurveRun run,
+                         boolean fromTheStart, List<CurveRun> own,
+                         List<CurveRun> others) {
+
+        /** A name with no curve to walk: a point's own. */
+        Named(PixelPoint anchor, String name, String moduleId) {
+            this(anchor, name, moduleId, null, false, List.of(),
+                    List.of());
+        }
     }
 
     private static void drawCircle(Graphics2D g,
@@ -259,20 +302,26 @@ public final class ReferenceInk {
         for (OverlayRegistry.Owned owned : reference) {
             if (owned.geometry()
                     instanceof OverlayContribution.GreatCircle circle) {
-                PixelPoint anchor = labelAnchor(GreatCirclePage.clip(
-                        projection, mapping, region, circle.pole()));
+                List<CurveRun> runs = GreatCirclePage.clip(projection,
+                        mapping, region, circle.pole());
+                PixelPoint anchor = labelAnchor(runs);
                 if (anchor != null) {
-                    names.add(new Named(anchor, circle.accessibleName(),
-                            owned.moduleId()));
+                    CurveRun on = runCarrying(runs, anchor);
+                    names.add(new Named(anchor,
+                            circle.accessibleName(), owned.moduleId(),
+                            on, startsAt(on, anchor), runs,
+                            everyOtherCurve(reference, owned,
+                                    projection, mapping, region)));
                 }
             }
         }
         FontMetrics metrics = EquatorialGrid.labelMetrics();
+        java.awt.Shape sky = skyOf(region, paper);
         List<NamePlacement> placed = new ArrayList<>();
         List<Rectangle2D> taken = new ArrayList<>();
         for (Named named : names) {
-            Rectangle2D box = boxFor(paper, named.anchor(), named.name(),
-                    metrics, taken);
+            Rectangle2D box = boxAlong(paper, sky, named, metrics,
+                    taken);
             if (box != null) {
                 taken.add(box);
                 placed.add(new NamePlacement(named.moduleId(),
@@ -302,14 +351,37 @@ public final class ReferenceInk {
     private static Rectangle2D boxFor(Rectangle2D paper, PixelPoint anchor,
                                       String name, FontMetrics metrics,
                                       List<Rectangle2D> taken) {
+        return boxFor(paper, paper, anchor, name, metrics, taken);
+    }
+
+    /**
+     * Where one name goes, on a page whose sky may not be its paper.
+     *
+     * <p>Candidates in a stated order, the first free one winning, as
+     * everything else that places text on this atlas does: the end of
+     * the line, then the same point walked in towards the middle of
+     * the sky, and at each of those the existing slide downwards past
+     * whatever is already written. A candidate counts only if the
+     * <em>whole</em> box is on the sky - half a name is a false name
+     * wherever the half is lost, at the paper's edge or at the limb.
+     *
+     * <p>Returns null when nothing fits, which is an omission and not
+     * a silence: the page simply does not carry that name, the same
+     * answer this has always given when the paper ran out.
+     */
+    private static Rectangle2D boxFor(Rectangle2D paper,
+                                      java.awt.Shape sky,
+                                      PixelPoint anchor,
+                                      String name, FontMetrics metrics,
+                                      List<Rectangle2D> taken) {
         double line = metrics.getHeight();
         Rectangle2D box = labelBox(paper, anchor, name, metrics);
-        while (overlaps(box, taken)
+        while ((overlaps(box, taken) || !sky.contains(box))
                 && box.getMaxY() + line <= paper.getMaxY()) {
             box = new Rectangle2D.Double(box.getX(), box.getY() + line,
                     box.getWidth(), box.getHeight());
         }
-        return overlaps(box, taken) ? null : box;
+        return !overlaps(box, taken) && sky.contains(box) ? box : null;
     }
 
     /**
@@ -318,13 +390,14 @@ public final class ReferenceInk {
      * used here for a point's name so there is one rule and not two.
      */
     private static void write(Graphics2D g, Rectangle2D paper,
+                              java.awt.Shape sky,
                               PixelPoint anchor, String name,
                               List<Rectangle2D> taken,
                               juranometria.render.ChartPalette palette) {
         g.setColor(palette.gridLabelInk());
         g.setFont(EquatorialGrid.GRID_LABEL_FONT);
         FontMetrics metrics = g.getFontMetrics();
-        Rectangle2D box = boxFor(paper, anchor, name, metrics, taken);
+        Rectangle2D box = boxFor(paper, sky, anchor, name, metrics, taken);
         if (box == null) {
             return;
         }
@@ -454,16 +527,173 @@ public final class ReferenceInk {
                 metrics.getAscent() + metrics.getDescent());
     }
 
+    /** Every reference curve on this page except this one's. */
+    private static List<CurveRun> everyOtherCurve(
+            List<OverlayRegistry.Owned> reference,
+            OverlayRegistry.Owned mine, Projection projection,
+            ViewportMapping mapping, PageRegion region) {
+        List<CurveRun> others = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : reference) {
+            if (owned == mine || !(owned.geometry()
+                    instanceof OverlayContribution.GreatCircle circle)) {
+                continue;
+            }
+            others.addAll(GreatCirclePage.clip(projection, mapping,
+                    region, circle.pole()));
+        }
+        return others;
+    }
+
+    /**
+     * How far this box lies from the nearest of these curves, or NaN
+     * when there are none.
+     *
+     * <p>From the box rather than from its middle, so a long name is
+     * not judged further from its own line than a short one written
+     * in the same place.
+     */
+    private static double awayFrom(List<CurveRun> runs, Rectangle2D box) {
+        double nearest = Double.NaN;
+        for (CurveRun run : runs) {
+            for (int at = 0; at <= ATTRIBUTION_SAMPLES; at++) {
+                PixelPoint point = run.at(at / (double) ATTRIBUTION_SAMPLES);
+                double dx = Math.max(0.0, Math.max(
+                        box.getMinX() - point.x(),
+                        point.x() - box.getMaxX()));
+                double dy = Math.max(0.0, Math.max(
+                        box.getMinY() - point.y(),
+                        point.y() - box.getMaxY()));
+                double away = Math.hypot(dx, dy);
+                if (Double.isNaN(nearest) || away < nearest) {
+                    nearest = away;
+                }
+            }
+        }
+        return nearest;
+    }
+
+    /** How finely a curve is sampled when asking what a name is beside. */
+    private static final int ATTRIBUTION_SAMPLES = 120;
+
+    /**
+     * Whether a reader could tell which line this name belongs to:
+     * its own curve is strictly nearer the box than any other
+     * reference curve on the page.
+     *
+     * <p>Being inside the limb was never the whole requirement. Two
+     * great circles on a hemisphere always cross, and near a crossing
+     * a name can sit beside the wrong one while breaking no rule that
+     * was being checked - which is a label that is placed correctly
+     * and says something false (review of #331).
+     */
+    private static boolean attributable(Named named, Rectangle2D box) {
+        double own = awayFrom(named.own(), box);
+        double other = awayFrom(named.others(), box);
+        return Double.isNaN(own) || Double.isNaN(other) || own < other;
+    }
+
+    /** Which of these runs carries this endpoint. */
+    private static CurveRun runCarrying(List<CurveRun> runs,
+                                        PixelPoint end) {
+        for (CurveRun run : runs) {
+            for (Optional<PixelPoint> at
+                    : List.of(run.from(), run.to())) {
+                if (at.isPresent() && at.get().equals(end)) {
+                    return run;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Whether this endpoint is the run's start rather than its end. */
+    private static boolean startsAt(CurveRun run, PixelPoint end) {
+        return run != null && run.from().isPresent()
+                && run.from().get().equals(end);
+    }
+
+    /**
+     * Where one reference name goes, walked along its own curve.
+     *
+     * <p>Candidates in a stated order, the first free one winning, as
+     * everything else that places text on this atlas does: the end of
+     * the line where the name belongs, then points further along the
+     * <strong>same run</strong>, and at each of those the existing
+     * slide downwards past whatever is already written. A candidate
+     * counts only if the whole box is on the sky.
+     *
+     * <p>Walking the curve rather than the page is the whole point. A
+     * name that set off towards the middle of the disc would leave
+     * the ellipse it names immediately, and on a page carrying a
+     * meridian, a horizon and an ecliptic it could end up nearer a
+     * line it says nothing about - a label inside the limb and still
+     * a lie (review of #331).
+     *
+     * <p>A name with no run - a point's - does not walk at all. Its
+     * anchor is the place it names, and a place has no curve to move
+     * along; it takes the slide or it is not written.
+     */
+    private static Rectangle2D boxAlong(Rectangle2D paper,
+                                        java.awt.Shape sky,
+                                        Named named,
+                                        FontMetrics metrics,
+                                        List<Rectangle2D> taken) {
+        if (named.run() == null) {
+            return boxFor(paper, sky, named.anchor(), named.name(),
+                    metrics, taken);
+        }
+        for (int step = 0; step <= ALONG_STEPS; step++) {
+            double walked = step / (double) ALONG_STEPS * ALONG_MOST;
+            double fraction = named.fromTheStart() ? walked
+                    : 1.0 - walked;
+            Rectangle2D box = boxFor(paper, sky,
+                    named.run().at(fraction), named.name(), metrics,
+                    taken);
+            if (box != null && attributable(named, box)) {
+                return box;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * How far along its own run a name may be walked, and in how many
+     * steps: at most to the middle of the run, so a name stays in the
+     * half of the curve whose end it belongs to and cannot wander
+     * into the other end's territory.
+     */
+    private static final int ALONG_STEPS = 20;
+
+    private static final double ALONG_MOST = 0.5;
+
+    /**
+     * The sky this page has, as a shape: the disc for a globe, and
+     * the paper for every other page (Sprint 32, issue #331, step
+     * four).
+     */
+    static java.awt.Shape skyOf(PageRegion region, Rectangle2D paper) {
+        return region.bounded()
+                ? new Ellipse2D.Double(
+                        region.limbX() - region.limbRadius(),
+                        region.limbY() - region.limbRadius(),
+                        2.0 * region.limbRadius(),
+                        2.0 * region.limbRadius())
+                : paper;
+    }
+
+
     private static void drawPoint(Graphics2D g,
                                   Projection projection,
                                   ViewportMapping mapping,
                                   Rectangle2D paper,
+                                  java.awt.Shape sky,
+                                  boolean bounded,
                                   OverlayContribution.Point point,
                                   List<Rectangle2D> taken,
                                   juranometria.render.ChartPalette palette) {
         PixelPoint at = projection.project(point.at())
                 .map(mapping::toPixel).orElse(null);
-        if (at == null || !paper.contains(at.x(), at.y())) {
+        if (at == null || !sky.contains(at.x(), at.y())) {
             return;
         }
         g.setColor(palette.figureInk());
@@ -489,7 +719,24 @@ public final class ReferenceInk {
         // as of the other landmarks': the marks are drawn in their
         // own order and only the words are placed against what is
         // already written.
-        write(g, paper, at, point.accessibleName(), taken, palette);
+        //
+        // Written outside the sky clip the mark was drawn under, and
+        // kept on the sky by where it is put instead (#331, step
+        // four). A name the limb cut in half would be the fault this
+        // whole step exists to prevent.
+        if (!bounded) {
+            write(g, paper, sky, at, point.accessibleName(), taken,
+                    palette);
+            return;
+        }
+        Shape marksClip = g.getClip();
+        g.setClip(paper);
+        try {
+            write(g, paper, sky, at, point.accessibleName(), taken,
+                    palette);
+        } finally {
+            g.setClip(marksClip);
+        }
     }
 
     /** A landmark's open diamond, about its position. */

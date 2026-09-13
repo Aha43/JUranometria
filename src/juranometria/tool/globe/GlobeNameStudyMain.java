@@ -137,8 +137,10 @@ public final class GlobeNameStudyMain {
         System.out.println();
         System.out.println("The production placement policy, asked"
                 + " what became of its own placements - twice, once");
-        System.out.println("with the paper's edge as the boundary and"
-                + " once with the limb. What it was asked for");
+        System.out.println("with the paper's edge as the boundary,"
+                + " which is what it used to be told, and once as");
+        System.out.println("production now places them. What it was"
+                + " asked for");
         System.out.println("comes from the sky and is here; what"
                 + " became of each request depends on the box a");
         System.out.println("font gives the text, and is in the"
@@ -166,7 +168,8 @@ public final class GlobeNameStudyMain {
             List<Named> onSky = examine(page, true);
             split.machine("");
             split.machine(look.slug()
-                    + ", with the limb as the boundary:");
+                    + ", as production places them, with the limb as"
+                    + " the boundary:");
             report("centre", onSky, false, 0.0, 0.5);
             report("limb", onSky, false, 0.9, 1.0);
             report("whole disc", onSky, false, 0.0, 1.0);
@@ -319,15 +322,27 @@ public final class GlobeNameStudyMain {
             ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
             ChartRenderer.TextMetrics metrics =
                     ChartRenderer.TextMetrics.of(g);
-            List<LabelPlacement.Request> asked =
-                    renderer.textRequests(metrics, page.scene(),
-                            settled());
-            if (toTheLimb) {
-                asked = onTheSphere(asked);
-            }
-            placements = new LabelPlacement(SIDE_PX, SIDE_PX,
-                    renderer.textObstacles(metrics, page.scene(),
-                            settled())).placeAll(asked);
+            placements = toTheLimb
+                    // Production's own answer, through production's
+                    // own route (#331, step three). This used to be
+                    // this study's reconstruction of what a limb
+                    // boundary would do, and a reconstruction is
+                    // exactly what the family study got wrong: the
+                    // page and the study agreed only as long as
+                    // nobody changed either. Now the study measures
+                    // rather than predicts, and cannot drift.
+                    ? renderer.textPlacements(metrics, page.scene(),
+                            settled())
+                    // The before-picture, which no longer exists in
+                    // production and so is still built here: the same
+                    // policy, the same requests, the same obstacles,
+                    // told its page is its paper.
+                    : new LabelPlacement(SIDE_PX, SIDE_PX,
+                            renderer.textObstacles(metrics, page.scene(),
+                                    settled()),
+                            LabelPlacement.Page.paper(SIDE_PX, SIDE_PX))
+                            .placeAll(renderer.textRequests(metrics,
+                                    page.scene(), settled()));
         } finally {
             g.dispose();
         }
@@ -389,28 +404,6 @@ public final class GlobeNameStudyMain {
      * before. What it may no longer do is ask for somewhere that is
      * not sky.
      */
-    private static List<LabelPlacement.Request> onTheSphere(
-            List<LabelPlacement.Request> asked) {
-        double centre = SIDE_PX / 2.0;
-        double discRadius = FRAME * SIDE_PX / 2.0;
-        List<LabelPlacement.Request> truthful = new ArrayList<>();
-        for (LabelPlacement.Request request : asked) {
-            List<Rectangle2D> kept = new ArrayList<>();
-            for (Rectangle2D candidate : request.candidates()) {
-                if (against(candidate, centre, discRadius)
-                        == Against.INSIDE) {
-                    kept.add(candidate);
-                }
-            }
-            truthful.add(new LabelPlacement.Request(request.family(),
-                    request.id(), request.text(), request.anchorX(),
-                    request.anchorY(), kept, request.ownId(),
-                    request.owns(), request.guaranteed(),
-                    request.order()));
-        }
-        return truthful;
-    }
-
     /**
      * Where this box sits in relation to the limb.
      *
