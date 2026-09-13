@@ -95,6 +95,8 @@ class SprintThirtyTwoJourneyTest {
         SearchField[] searchHolder = new SearchField[1];
         ExportSheetSession.Surfaces[] exporting =
                 new ExportSheetSession.Surfaces[1];
+        juranometria.ui.onthispage.OnThisPageModule[] onThisPage =
+                new juranometria.ui.onthispage.OnThisPageModule[1];
         MeridianModule meridian = new MeridianModule(new Observer(59.9,
                 10.7, java.time.Instant.parse("2026-03-20T21:33:00Z")));
         EclipticModule ecliptic = new EclipticModule();
@@ -122,6 +124,12 @@ class SprintThirtyTwoJourneyTest {
                         request -> navigation.recenter(request.centre()));
                 hostHolder[0].attach(meridian);
                 hostHolder[0].attach(ecliptic);
+                // The reader's own page listing, attached the way a
+                // reader gets it, so the journey can read what On
+                // this page shows rather than what its model would
+                // have said.
+                onThisPage[0] = hostHolder[0].attach(
+                        new juranometria.ui.onthispage.OnThisPageModule());
                 chart.setViewState(ChartViewState.DEFAULT);
                 chart.setPreferredSize(new java.awt.Dimension(900, 700));
                 searchHolder[0] = new SearchField(Atlas.search(),
@@ -241,16 +249,43 @@ class SprintThirtyTwoJourneyTest {
             SkyPosition behind = new SkyPosition(
                     (SAGITTARIUS.raDegrees() + 180.0) % 360.0,
                     -SAGITTARIUS.decDegrees());
-            ChartScene globe = onEdt(chart::currentScene);
-            assertTrue(nothingWithin(globe, behind),
-                    "5. the far side of the sphere is on no page: the"
-                            + " scene carries nothing within 10 degrees"
-                            + " of the antipode");
+
+            // A named object on the far side, chosen from the sky
+            // rather than from a list written here: whatever the
+            // catalogue puts nearest the antipode and gives a name
+            // to. Asked of every surface the issue names, because
+            // "absent from the ink" is the weakest of the four and
+            // the only one a clip alone would give.
+            SwingUtilities.invokeAndWait(() -> navigation.recenter(behind));
+            flush();
+            String hidden = aNamedObjectOn(chart);
+            assertNotNull(hidden,
+                    "5. the far side carries a named object to look"
+                            + " for");
+            SwingUtilities.invokeAndWait(() ->
+                    navigation.recenter(SAGITTARIUS));
+            flush();
+
+            assertFalse(inTheScene(chart, hidden),
+                    "5. with the globe turned away, " + hidden
+                            + " is not in the page's own contents");
+            assertFalse(named(drawn(chart, options), hidden),
+                    "5. nor among the names the page writes");
+            assertFalse(hitAnywhere(chart, hidden),
+                    "5. nor anywhere a reader could point at");
+            assertFalse(listedOnThisPage(onThisPage[0], hidden),
+                    "5. nor in what On this page shows the reader");
+
             // And it comes back by turning the globe, not by a switch.
             SwingUtilities.invokeAndWait(() -> navigation.recenter(behind));
             flush();
-            assertFalse(nothingWithin(onEdt(chart::currentScene), behind),
-                    "5. and rotating brings it into view");
+            assertTrue(inTheScene(chart, hidden),
+                    "5. and rotating brings " + hidden + " back to the"
+                            + " page");
+            assertTrue(listedOnThisPage(onThisPage[0], hidden),
+                    "5. and to what On this page shows the reader");
+            assertTrue(hitAnywhere(chart, hidden),
+                    "5. and to what a reader can point at");
 
             // ---- 6. point at a star, then go down to it -----------
             SwingUtilities.invokeAndWait(() ->
@@ -306,22 +341,44 @@ class SprintThirtyTwoJourneyTest {
                             + " it");
 
             // ---- 8. the observer's own geometry, at the limb ------
+            //
+            // Measured as a difference, not as a quantity. The page
+            // is full of ink that owes nothing to a module - stars,
+            // figures, the grid, the names, the limb itself - so
+            // "there is ink inside the disc" is true of a chart with
+            // no module attached at all. What is asked instead is
+            // what the module adds: the same page rendered twice,
+            // once with the reader's switch off and once on.
+            int withoutIt = pageInk(chart);
             eclipticOn(eclipticToggle[0]);
             flush();
-            assertTrue(moduleInkInside(chart, options) > 0,
-                    "8. the ecliptic is drawn on the globe");
+            int withIt = pageInk(chart);
+            assertTrue(withIt > withoutIt,
+                    "8. turning the ecliptic on puts ink on the page:"
+                            + " " + withoutIt + " px became " + withIt);
+            int module = withIt - withoutIt;
             assertTrue(deepestSkyBeyond(chart) <= STROKE_EDGE_PX,
-                    "8. and stops where the sky does: "
+                    "8. and it stops where the sky does: "
                             + deepestSkyBeyond(chart) + " px past it");
-            // Turned right round, it never blinks out.
+
+            // Turned right round, it never blinks out - which is the
+            // defect owner testing found, asked here of the module's
+            // own ink rather than of the page's.
             for (double ra = 0.0; ra < 360.0; ra += 45.0) {
                 double at = ra;
                 SwingUtilities.invokeAndWait(() -> navigation.recenter(
                         new SkyPosition(at, -28.0)));
                 flush();
-                assertTrue(moduleInkInside(chart, options) > 0,
-                        "8. the observer's lines are still there at RA "
-                                + at);
+                int on = pageInk(chart);
+                SwingUtilities.invokeAndWait(eclipticToggle[0]);
+                flush();
+                int off = pageInk(chart);
+                SwingUtilities.invokeAndWait(eclipticToggle[0]);
+                flush();
+                assertTrue(on > off,
+                        "8. the observer's lines are still drawn at RA "
+                                + at + ": the switch is worth " + (on - off)
+                                + " px there");
             }
 
             // ---- 9. exported, and the same page ------------------
@@ -335,12 +392,102 @@ class SprintThirtyTwoJourneyTest {
                     String said = new String(
                             java.nio.file.Files.readAllBytes(written),
                             java.nio.charset.StandardCharsets.ISO_8859_1);
+                    String what = "9. the " + paper + " " + format;
+
+                    // Metadata, of every format.
                     assertTrue(said.contains("orthographic"),
-                            "9. the " + paper + " " + format
-                                    + " says what drew the page");
+                            what + " says what drew the page");
                     assertFalse(said.contains("gnomonic"),
-                            "9. and claims no projection it was not"
+                            what + " claims no projection it was not"
                                     + " drawn by");
+
+                    switch (format) {
+                        case SVG -> {
+                            // Geometry: the page is drawn, not merely
+                            // labelled. And order: the sky's own text
+                            // is written after the ink it must not be
+                            // buried under.
+                            assertTrue(said.contains("<path"),
+                                    what + " carries the page's ink");
+                            // Layer order is NOT judged here, and the
+                            // reason is worth stating rather than
+                            // leaving as an absence. The first
+                            // version of this asked whether the first
+                            // text came after the first path, which a
+                            // file ordered path, text, path satisfies
+                            // while the later path buries the label.
+                            // Strengthening it from the file alone
+                            // founders on a real property of the
+                            // page: the grid's notation is text and
+                            // is drawn first, under everything, so
+                            // hundreds of sky paths legitimately
+                            // follow the first piece of sky text.
+                            //
+                            // The order the renderer drew in, kept
+                            // through every writer, is held by
+                            // PaintOrderTest - which catches the case
+                            // this was reaching for, a constellation
+                            // name read straight through the title
+                            // panel, and catches it in SVG, PDF and
+                            // PNG alike.
+                            // Every text element outside the disc
+                            // must be the page's own furniture. The
+                            // title block and the magnitude key are
+                            // text and live out there by design, and
+                            // their bounds are published - so this
+                            // asks which text is outside AND not in
+                            // one of them, rather than comparing two
+                            // differently populated pages.
+                            assertEquals(0,
+                                    skyTextOutsideTheLimb(said, paper),
+                                    what + " anchors no text of the"
+                                            + " sky outside the limb");
+                        }
+                        case PNG -> {
+                            // Geometry, read back from the picture:
+                            // the disc is inked and the paper around
+                            // it carries nothing but furniture.
+                            int[] both = inkOfSheet(
+                                    javax.imageio.ImageIO.read(
+                                            written.toFile()), paper);
+                            assertTrue(both[0] > 100000,
+                                    what + " draws a page: " + both[0]
+                                            + " px inside the limb");
+                            // Geometry, and its stated limit. The
+                            // disc is inked and the sky's ink is
+                            // overwhelmingly within it; what the
+                            // paper outside the limb costs is NOT
+                            // judged here, because the page draws
+                            // furniture out there whose extent
+                            // differs between a full page and an
+                            // empty one, and a difference this
+                            // journey cannot attribute is a number it
+                            // should not assert. GlobeSheetTest holds
+                            // that claim, on sheets recorded through
+                            // the same route.
+                            // and no ratio is asserted between the
+                            // two, because any such number would be
+                            // invented here rather than derived from
+                            // the page.
+                            assertTrue(both[1] > 0,
+                                    what + " has its furniture on the"
+                                            + " paper, which is where"
+                                            + " that belongs");
+                        }
+                        case PDF -> assertTrue(said.contains("%PDF"),
+                                // The stated limit, kept stated: a PDF
+                                // carries neither text elements nor
+                                // pixels in a form this suite can read
+                                // without a parser it has no business
+                                // writing, so its geometry is NOT read
+                                // back here. Its metadata is, and that
+                                // is all this format is held to.
+                                what + " is a PDF, and is held to its"
+                                        + " metadata alone - its"
+                                        + " geometry is deliberately"
+                                        + " not read back");
+                        default -> throw new AssertionError(format);
+                    }
                 }
             }
 
@@ -586,15 +733,111 @@ class SprintThirtyTwoJourneyTest {
         return outside;
     }
 
-    /** Whether the scene carries nothing near this place on the sky. */
-    private static boolean nothingWithin(ChartScene scene,
-                                         SkyPosition where) {
-        for (var star : scene.stars()) {
-            if (apart(star.position(), where) < 10.0) {
-                return false;
+    /**
+     * A deep-sky object this page holds that the atlas gives a name
+     * to, nearest the middle of it.
+     */
+    private static String aNamedObjectOn(ChartComponent chart)
+            throws Exception {
+        return onEdt(() -> {
+            ChartScene scene = chart.currentScene();
+            String best = null;
+            double nearest = Double.MAX_VALUE;
+            for (var dso : scene.deepSkyObjects()) {
+                if (dso.labelPriority() > 1) {
+                    continue;
+                }
+                double away = apart(dso.position(),
+                        scene.viewport().centre());
+                if (away < nearest) {
+                    nearest = away;
+                    best = dso.id();
+                }
+            }
+            return best;
+        });
+    }
+
+    /** Whether the assembled page carries this object at all. */
+    private static boolean inTheScene(ChartComponent chart, String id)
+            throws Exception {
+        return onEdt(() -> {
+            for (var dso : chart.currentScene().deepSkyObjects()) {
+                if (dso.id().equals(id)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    /** Whether any of the page's own names is this object's. */
+    private static boolean named(Set<String> written, String id) {
+        for (String name : written) {
+            if (name.replace(" ", "").equalsIgnoreCase(
+                    id.replace(" ", ""))) {
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * Whether a reader could point anywhere on this page and be given
+     * this object - asked of the hit test itself, which is the seam
+     * the pointer goes through, rather than of the marks behind it.
+     *
+     * <p>Swept over the page on a grid a little finer than the hit
+     * test's own tolerance, so nothing it would answer to is stepped
+     * over.
+     */
+    private static boolean hitAnywhere(ChartComponent chart, String id)
+            throws Exception {
+        return onEdt(() -> {
+            ChartScene scene = chart.currentScene();
+            ChartHitTest pointing =
+                    new ChartHitTest(new ChartRenderer(
+                            StarSizePolicy.DEFAULT));
+            int step = (int) Math.max(1.0, ChartHitTest.TOLERANCE_PX);
+            for (int y = 0; y < scene.viewport().heightPx(); y += step) {
+                for (int x = 0; x < scene.viewport().widthPx(); x += step) {
+                    ChartHitTest.Hit hit = pointing.at(scene,
+                            chart.drawnOptions(), x, y);
+                    if (hit == null) {
+                        continue;
+                    }
+                    for (var candidate : hit.candidates()) {
+                        if (names(candidate, id)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        });
+    }
+
+    private static boolean names(juranometria.chart.Selection.Object what,
+                                 String id) {
+        return what.toString().contains(id);
+    }
+
+    /**
+     * Whether On this page shows the reader this object - read off
+     * the panel's own rows, which is what a reader sees, rather than
+     * off the inventory the panel is built from.
+     */
+    private static boolean listedOnThisPage(
+            juranometria.ui.onthispage.OnThisPageModule module, String id)
+            throws Exception {
+        return onEdt(() -> {
+            for (var row : module.panel().rows()) {
+                if (id.equals(row.identity())) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
     private static double apart(SkyPosition one, SkyPosition two) {
@@ -625,26 +868,48 @@ class SprintThirtyTwoJourneyTest {
         });
     }
 
-    /** Module ink inside the limb, as the page draws it. */
-    private static int moduleInkInside(ChartComponent chart,
-                                       ChartOptionsController options)
-            throws Exception {
-        BufferedImage page = paint(chart);
-        PageRegion region = regionOf(chart);
+    /**
+     * Every inked pixel of the page as the reader has it, modules
+     * included - the quantity a module's own contribution is the
+     * difference between.
+     */
+    private static int pageInk(ChartComponent chart) throws Exception {
+        BufferedImage page = paintAsShown(chart);
         int ground = ChartPalette.WHITE_PAPER.ground().getRGB() & 0xffffff;
-        int inside = 0;
+        int inked = 0;
         for (int y = 0; y < page.getHeight(); y++) {
             for (int x = 0; x < page.getWidth(); x++) {
-                if ((page.getRGB(x, y) & 0xffffff) == ground) {
-                    continue;
-                }
-                if (Math.hypot(x + 0.5 - region.limbX(),
-                        y + 0.5 - region.limbY()) <= region.limbRadius()) {
-                    inside++;
+                if ((page.getRGB(x, y) & 0xffffff) != ground) {
+                    inked++;
                 }
             }
         }
-        return inside;
+        return inked;
+    }
+
+    /**
+     * The component's own painting, modules and all: what the reader
+     * is looking at, rather than a chart re-rendered beside it. A
+     * module's ink arrives through the host's overlay, which a bare
+     * renderer call would never draw.
+     */
+    private static BufferedImage paintAsShown(ChartComponent chart)
+            throws Exception {
+        return onEdt(() -> {
+            BufferedImage canvas = new BufferedImage(
+                    Math.max(1, chart.getWidth()),
+                    Math.max(1, chart.getHeight()),
+                    BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics2D g = canvas.createGraphics();
+            try {
+                g.setColor(java.awt.Color.WHITE);
+                g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                chart.paint(g);
+            } finally {
+                g.dispose();
+            }
+            return canvas;
+        });
     }
 
     private static PageRegion regionOf(ChartComponent chart)
@@ -664,6 +929,164 @@ class SprintThirtyTwoJourneyTest {
         SwingUtilities.invokeAndWait(toggle);
     }
 
+    /** Text elements in an SVG anchored outside the disc. */
+    private static int textOutsideTheLimb(String svg, PaperSize paper) {
+        double centreX = paper.chartWideUnits() / 2.0;
+        double centreY = paper.chartHighUnits() / 2.0;
+        double limb = 0.90 * Math.min(paper.chartWideUnits(),
+                paper.chartHighUnits()) / 2.0;
+        int outside = 0;
+        int at = 0;
+        while ((at = svg.indexOf("<text", at)) >= 0) {
+            int end = svg.indexOf('>', at);
+            if (end < 0) {
+                break;
+            }
+            String tag = svg.substring(at, end);
+            Double x = attribute(tag, "x=\"");
+            Double y = attribute(tag, "y=\"");
+            if (x != null && y != null
+                    && Math.hypot(x - centreX, y - centreY) > limb) {
+                outside++;
+            }
+            at = end;
+        }
+        return outside;
+    }
+
+    private static Double attribute(String tag, String name) {
+        int at = tag.indexOf(name);
+        if (at < 0) {
+            return null;
+        }
+        int from = at + name.length();
+        int to = tag.indexOf('"', from);
+        try {
+            return Double.parseDouble(tag.substring(from, to));
+        } catch (RuntimeException notANumber) {
+            return null;
+        }
+    }
+
+    /**
+     * Text anchored outside the disc that is not the page's own
+     * furniture - which must be none.
+     *
+     * <p>The two blocks are text, and they sit on the paper beyond
+     * the limb because that is where they were decided to go. Their
+     * bounds are published by the renderer, so what is outside them
+     * and outside the limb is the sky's text on the paper, which is
+     * the thing that must not exist.
+     */
+    private static int skyTextOutsideTheLimb(String svg, PaperSize paper)
+            throws Exception {
+        java.awt.Rectangle[] furniture = furnitureBoxes(paper);
+        double centreX = paper.chartWideUnits() / 2.0;
+        double centreY = paper.chartHighUnits() / 2.0;
+        double limb = 0.90 * Math.min(paper.chartWideUnits(),
+                paper.chartHighUnits()) / 2.0;
+        int stray = 0;
+        int at = 0;
+        while ((at = svg.indexOf("<text", at)) >= 0) {
+            int end = svg.indexOf('>', at);
+            if (end < 0) {
+                break;
+            }
+            String tag = svg.substring(at, end);
+            Double x = attribute(tag, "x=\"");
+            Double y = attribute(tag, "y=\"");
+            at = end;
+            if (x == null || y == null
+                    || Math.hypot(x - centreX, y - centreY) <= limb) {
+                continue;
+            }
+            boolean isFurniture = false;
+            for (java.awt.Rectangle box : furniture) {
+                if (box != null && box.contains(x, y)) {
+                    isFurniture = true;
+                }
+            }
+            if (!isFurniture) {
+                stray++;
+            }
+        }
+        return stray;
+    }
+
+    /** Where the title block and the magnitude key are, as published. */
+    private static java.awt.Rectangle[] furnitureBoxes(PaperSize paper)
+            throws Exception {
+        ChartScene scene = Atlas.assembler().assemble(
+                new ChartViewState(SAGITTARIUS, 180.0, 5.0),
+                paper.chartWideUnits(), paper.chartHighUnits());
+        BufferedImage canvas = new BufferedImage(10, 10,
+                BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = canvas.createGraphics();
+        try {
+            java.awt.FontMetrics metrics = g.getFontMetrics();
+            return new java.awt.Rectangle[] {
+                    ChartRenderer.titleBlockBounds(metrics, scene),
+                    new ChartRenderer(StarSizePolicy.DEFAULT)
+                            .magnitudeKeyBounds(metrics, scene)};
+        } finally {
+            g.dispose();
+        }
+    }
+
+    /**
+     * Ink inside the limb, and ink outside it that is not the page's
+     * own furniture, in a written PNG sheet.
+     *
+     * <p>The chart area is cropped out of the sheet first, the way
+     * the export study does it: the written page includes the
+     * paper's margins, and measuring chart coordinates against the
+     * whole sheet's width puts the disc in the wrong place. That
+     * mistake is why the first version of this check compared two
+     * numbers that were both wrong in the same direction.
+     *
+     * <p>What is beyond the limb is returned as a count rather than
+     * judged here, because the page draws furniture out there by
+     * design; the caller subtracts the same sheet with its sky off.
+     */
+    private static int[] inkOfSheet(BufferedImage whole, PaperSize paper)
+            throws Exception {
+        double pxPerPoint = whole.getWidth() / paper.widePoints();
+        int left = (int) Math.round(paper.marginPoints() * pxPerPoint);
+        int wide = (int) Math.round(paper.chartWidePoints() * pxPerPoint);
+        int high = (int) Math.round(paper.chartHighPoints() * pxPerPoint);
+        BufferedImage chart = whole.getSubimage(left, left, wide, high);
+
+        double scale = wide / (double) paper.chartWideUnits();
+        double centreX = paper.chartWideUnits() / 2.0;
+        double centreY = paper.chartHighUnits() / 2.0;
+        double limb = 0.90 * Math.min(paper.chartWideUnits(),
+                paper.chartHighUnits()) / 2.0;
+        int ground = ChartPalette.WHITE_PAPER.ground().getRGB() & 0xffffff;
+        int inside = 0;
+        int stray = 0;
+        for (int y = 0; y < chart.getHeight(); y++) {
+            for (int x = 0; x < chart.getWidth(); x++) {
+                if ((chart.getRGB(x, y) & 0xffffff) == ground) {
+                    continue;
+                }
+                double atX = x / scale;
+                double atY = y / scale;
+                if (Math.hypot(atX - centreX, atY - centreY) <= limb) {
+                    inside++;
+                } else {
+                    stray++;
+                }
+            }
+        }
+        return new int[] {inside, stray};
+    }
+
+    /**
+     * The same sheet with every piece of sky switched off: its frame,
+     * its blocks and its limb. Two masks, never one - the paper
+     * outside the disc is furniture by design, and counting it as sky
+     * would make the check above unsatisfiable.
+     */
     // ---- the export route --------------------------------------------
 
     private Path exportThrough(JFrame window,
