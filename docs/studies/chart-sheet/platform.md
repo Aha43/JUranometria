@@ -24,10 +24,10 @@ the sheet's own answer and the same everywhere.
 
 | file | bytes |
 |---|---:|
-| `sheet-a4.svg` | 461485 |
-| `sheet-letter.svg` | 504498 |
-| `sheet-a4-outlines.svg` | 532854 |
-| `sheet-a4-modules.svg` | 392398 |
-| `sheet-a4.pdf` | 510431 |
-| `sheet-a4-modules.pdf` | 413797 |
-| `sheet-a4-300dpi.png` | 430302 |
+| `sheet-a4.svg` | 461484 |
+| `sheet-letter.svg` | 504497 |
+| `sheet-a4-outlines.svg` | 532853 |
+| `sheet-a4-modules.svg` | 392397 |
+| `sheet-a4.pdf` | 510430 |
+| `sheet-a4-modules.pdf` | 413796 |
+| `sheet-a4-300dpi.png` | 430301 |

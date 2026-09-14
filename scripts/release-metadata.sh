@@ -130,11 +130,30 @@ atlas. The first four include their own Java runtime — install nothing.
 Verify your download against \`SHA256SUMS.txt\`. Paths containing
 spaces are fine.
 
-**These builds are unsigned.** On macOS, Gatekeeper may block the
-first launch: right-click the app and choose Open, or approve it
-under System Settings > Privacy & Security. On Windows, SmartScreen
-may show "Windows protected your PC": choose More info, then Run
-anyway.
+**These builds are unsigned and not notarised**, and on macOS that
+has a consequence worth reading before you download.
+
+A file fetched with a browser is quarantined, and macOS may refuse a
+quarantined unsigned application with **“JUranometria is damaged and
+can't be opened.”** The application is not damaged and the archive is
+not corrupt: verify it against \`SHA256SUMS.txt\` and the checksum will
+match. Gatekeeper's own **Open Anyway** approval is not offered for
+this dialog, so ordinary Finder installation is **not supported** for
+this release. That is
+[#282](https://github.com/Aha43/JUranometria/issues/282), and it stays
+open until the application is signed, notarised and stapled.
+
+Until then, a reader who has verified the checksum can clear the
+quarantine flag themselves:
+
+    xattr -dr com.apple.quarantine /Applications/JUranometria.app
+
+That is a temporary workaround, not the accepted installation route.
+The portable download, run with your own Java 21+, avoids the question
+entirely.
+
+On Windows, SmartScreen may show “Windows protected your PC”: choose
+More info, then Run anyway.
 
 **Everything works offline, permanently.** The application makes no
 network requests of any kind — no telemetry, no update check, no

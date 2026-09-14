@@ -140,6 +140,23 @@ are executable, not aspirational:
   never silently churned), session photographs (display-bound; structure
   asserted in the suite), and captured evidence (operating-system
   screenshots, digest-pinned; re-capture is a reviewed provenance event).
+- **Read the contract's own verdict, never a wrapper's exit status.** The
+  run takes minutes, so it is usually backgrounded into a log — and a
+  compound command ending in anything else (`make evidence-contracts > log
+  2>&1; echo done`) reports the *last* command's status, not `make`'s. A
+  2.0.0 preparation run breached seven artifacts and was reported as exit 0
+  by exactly that shape. Write the real status into the log
+  (`…; echo "MAKE_EXIT=$?" >> log`) and confirm `EVIDENCE CONTRACTS OK`
+  appears, because a truncated or wrapped run reads exactly like a passing
+  one. The same applies to `tail -n`: piping the run through it discards
+  the header carrying the generator and invocation counts.
+- **`VERSION` is a contract input.** The exported chart sheets embed the
+  version string — six vector documents in their provenance line, the
+  300 dpi raster in its PNG `iTXt` *Software* chunk — so bumping `VERSION`
+  rewrites seven artifacts and their provenance hashes with no pixel and
+  no measured geometry changed. That is the contract working. Regenerate
+  with `make evidence-provenance`, and check the count of moved hashes
+  equals the count of breaches.
 - **Studies are reproducibility paths** (`make <name>-study`); their chosen
   pages are production output, and the contracts compare them against their
   generators' build output rather than trusting the commit. **A study's make

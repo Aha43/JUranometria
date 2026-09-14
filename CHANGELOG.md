@@ -7,6 +7,111 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-14
+
+**The sky as a sphere.** Sprint 32 — Hold the celestial sphere.
+
+The atlas could draw the sky on flat paper at any field a reader
+asked for, and at the widest fields that flatness showed: a
+constellation near the edge was stretched into a shape the sky does
+not have. This release gives the atlas a second way of showing the
+sky, and it is the one a reader already owns a model of — a globe,
+seen from outside, with a limb you can see the sky curve away
+behind.
+
+Every part of the page follows the sphere. Deep-sky objects are
+foreshortened by the same transform that places them, so a galaxy
+near the limb is squashed the way the projection squashes everything
+else; labels are placed against the circular page rather than a
+rectangle, so no name is written off the disc; the grid, the
+ecliptic, the meridian and the mathematical horizon stay continuous
+as the globe turns, and an edge-on great circle becomes a diameter
+rather than vanishing. A subdued limb circle at a quarter of the
+grid's strength closes the disc, because a page whose edge is only
+implied by where ink stops is a page a reader has to infer.
+
+Major, for the sky it shows rather than for anything it takes away:
+the atlas gains a projection, a page kind, and a rung of field width
+it did not have. Nothing a reader stored is invalidated, no option
+changes meaning, and no file format moves.
+
+Four existing pages do draw one label in a different place, and that
+is deliberate. The globe work left ordinary pages untouched — every
+rule it added is reached only by a page whose sky has an edge — but
+the label-stability fix below moves eight renders across four pages:
+M32 at six, three and one degrees on the Andromeda page, and
+TYC 4771-1188-1 at six degrees on another, with cost splits of
+2.9e-11 and 7.3e-12 square pixels. Each was a tie the old code
+resolved by rounding, so those positions were chosen by arithmetic
+noise rather than by the placement rule, and they are not worth
+preserving for byte identity.
+
+Two defects found by owner testing are fixed here, both reproduced
+before they were touched. A label could oscillate between candidate
+positions while the chart was dragged — M32's designation hopped 163
+times in 201 steps, up to 64 px, because eight equally buried
+candidates differed by five hundredths of a billionth of a square
+pixel and a strict comparison let whichever rounded down take the
+label. And the page a reader opened exempted its own galaxy from the
+deep-sky switches they had saved, so M31 was drawn to a reader who
+had switched galaxies off and disappeared on the first drag, which
+read as settings being applied late.
+
+**macOS downloads are unsigned and not notarised.** A browser
+download is quarantined, and macOS may refuse it as "damaged" — the
+archive is not corrupt, and `SHA256SUMS.txt` answers that. Ordinary
+Finder installation is **not supported** for this release;
+[#282](https://github.com/Aha43/JUranometria/issues/282) stays open
+until the application is signed, notarised and stapled, and the
+documented quarantine-removal step is a temporary workaround rather
+than the accepted route.
+
+**Still not printed.** No page has been read on paper, and no globe
+has been read at arm's length.
+[#293](https://github.com/Aha43/JUranometria/issues/293) is open for
+anyone who prints one and can say what they find.
+
+### Added
+
+- The celestial globe: an orthographic projection showing the sky as
+  a sphere seen from outside, with a subdued limb circle at a quarter
+  of the grid's edge strength drawn after all sky-derived ink, and a
+  field-width rung that reaches it.
+- Extended objects are foreshortened by the projection that places
+  them, so what is drawn, what can be clicked, what blocks a label
+  and what enters the page inventory are all the same answer.
+- Label placement takes the page's own region, so a circular page
+  refuses a name that would leave the disc instead of writing it off
+  the edge.
+- The Place and Time, ecliptic and meridian modules draw on a globe
+  under the same rules as on flat paper, with great circles continuous
+  through every orientation and an edge-on circle drawn as a diameter.
+
+### Fixed
+
+- A label no longer oscillates between candidate positions as the
+  chart is dragged. Costs that differ only by floating-point noise no
+  longer displace an incumbent candidate, and a genuinely cheaper
+  candidate still wins however small the improvement. The same settled
+  page places its text identically however the reader reached it, so a
+  printed or exported sheet never depends on navigation history
+  ([#340](https://github.com/Aha43/JUranometria/issues/340)).
+- The page a reader opens no longer exempts its own galaxy from the
+  deep-sky switches they saved. A page's subject and the target a
+  reader searched for are now separate: the opening page keeps its
+  title and claims no target, while an explicitly searched object is
+  still drawn whatever was hidden earlier
+  ([#341](https://github.com/Aha43/JUranometria/issues/341)).
+
+### Changed
+
+- The macOS notes in the release, the application-image README and the
+  portable README now describe the dialog readers actually meet and
+  say the ordinary Finder route is unsupported, instead of offering a
+  Privacy & Security approval that macOS does not present for a
+  quarantined unsigned application
+  ([#282](https://github.com/Aha43/JUranometria/issues/282)).
+
 ## [1.12.0] - 2026-09-10
 
 Sprint 31 — Give every label a place. The atlas drew its text in

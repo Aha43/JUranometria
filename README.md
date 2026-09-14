@@ -79,11 +79,20 @@ covers troubleshooting for a missing or too-old Java, and
 `SHA256SUMS.txt` beside the downloads lets you verify what you
 got.
 
-**These builds are unsigned.** On macOS, Gatekeeper may block the
-first launch: right-click the app and choose Open, or approve it
-under System Settings > Privacy & Security. On Windows, SmartScreen
-may show "Windows protected your PC": choose More info, then Run
-anyway. Installers, signing, and notarization are post-1.0 work.
+**These builds are unsigned and not notarized, and on macOS that has
+a consequence.** A file fetched with a browser is quarantined, and
+macOS may refuse a quarantined unsigned application with
+*"JUranometria is damaged and can't be opened."* The application is
+not damaged and the archive is not corrupt — verify it against
+`SHA256SUMS.txt`. Gatekeeper offers no **Open Anyway** approval for
+that dialog, so **ordinary Finder installation is not supported**:
+see [#282](https://github.com/Aha43/JUranometria/issues/282), open
+until the application is signed, notarized and stapled. Until then,
+after verifying the checksum, `xattr -dr com.apple.quarantine
+/Applications/JUranometria.app` clears the flag — a temporary
+workaround, not the accepted route. The portable download with your
+own Java avoids the question. On Windows, SmartScreen may show
+"Windows protected your PC": choose More info, then Run anyway.
 
 ## Build and run (contributors)
 
@@ -340,8 +349,11 @@ independent review whose trail lives in `docs/reviews/`, and is
 published from an annotated tag by
 [the release workflow](.github/workflows/release.yml).
 
-Beyond 1.0: installers, code signing and notarization, and update
-checking remain deliberately out of scope, recorded as candidates
-rather than silent omissions. The deliberately simple
+Beyond 1.0: installers and update checking remain deliberately out
+of scope, recorded as candidates rather than silent omissions. Code
+signing and notarization are no longer among them — a reader met the
+consequence, so they are
+[#282](https://github.com/Aha43/JUranometria/issues/282) and belong
+to an early 2.x distribution sprint. The deliberately simple
 plain-Java/Make organization proven in NamDesktop, and the
 issue-driven sprint rhythm proven in NamWeb, both still hold.
