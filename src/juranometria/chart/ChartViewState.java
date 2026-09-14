@@ -51,10 +51,17 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     /** Magnitude-limit sequence, brightest first; fainter walks toward 8. */
     private static final double[] MAGNITUDE_LIMIT_STEPS = {4.0, 5.0, 6.0, 7.0, 8.0};
 
-    /** The Sprint 1 chart: M31, 8-degree field, stars to V 8.0. */
+    /**
+     * The Sprint 1 chart: M31, 8-degree field, stars to V 8.0.
+     *
+     * <p>Titled, and <strong>not targeted</strong> (issue #341). The
+     * page says what it shows, which is true however the reader's
+     * switches stand; it does not claim the reader searched for M31,
+     * because they did not - the application opened here.
+     */
     public static final ChartViewState DEFAULT = new ChartViewState(
             new SkyPosition(10.684708, 41.268750), 8.0, 8.0,
-            "M31 \u00b7 Andromeda Galaxy region", "NGC 224");
+            "M31 \u00b7 Andromeda Galaxy region", null);
 
     /** A view without a named target; its title is its coordinates. */
     public ChartViewState(SkyPosition centre, double fieldWidthDegrees,
@@ -119,12 +126,30 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
             throw new IllegalArgumentException(
                     "target identity must be null (no target) or non-blank");
         }
-        // A catalogue target is atomic: label and identity together, or
-        // neither (PR #59 review) - a chart may never name a target whose
-        // identity the rendering policy cannot preserve.
-        if ((targetLabel == null) != (targetIdentity == null)) {
+        // A target identity always names something, so it may not
+        // appear without a label. The reverse is allowed, and the
+        // distinction is the point (issue #341).
+        //
+        // These were atomic - both or neither - since PR #59, on the
+        // ground that a chart may never name a target whose identity
+        // the rendering policy cannot preserve. That is still true of
+        // a target. What it wrongly made true as well is that a page
+        // cannot have a subject unless some object on it holds the
+        // searched-target privilege, and the opening page has been
+        // paying for that: it is titled "M31 - Andromeda Galaxy
+        // region" because the application chose to open there, and
+        // the identity riding along with the title exempted M31 from
+        // the reader's own switches. A reader who had hidden deep-sky
+        // objects was shown one anyway, and only the first drag -
+        // which drops the target - made the page agree with the
+        // settings.
+        //
+        // So the label is what the page is ABOUT, and may stand
+        // alone; the identity is what the reader ASKED FOR in this
+        // session, and carries the privilege.
+        if (targetIdentity != null && targetLabel == null) {
             throw new IllegalArgumentException(
-                    "target label and identity must both be present or both absent");
+                    "a target identity names something: give it a label");
         }
     }
 

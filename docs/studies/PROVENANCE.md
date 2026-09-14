@@ -193,7 +193,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/place-and-time-horizon.png` | `2cb652b98dbe3ae63ba7488382fc74aa3ad39bbfef13c5229700c6ed3c5c3068` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-zenith.png` | `79f181512f064dee1f5e6d7c965661420d066aec1efe2cab26acd26fe84597f0` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/census-before.tsv` | `a257d9597af4b00b9889f6b07b22d09f9b6c3dcf37bdd2cf89b4b47d2ee28a96` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/label-placement/home-candidate.png` | `f49ecdfa43bb933263ca27024f248e1eae137cda9978af3bf2d6af9e0f751681` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/label-placement/home-candidate.png` | `fe2815677cff74b5e5f5b9301ae2ad067f600f792f58a21fcc1dfd78e12eb47e` | 2026-09-14 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-today.png` | `4bcce3c0971294087a56a21dc0666c2c5213290b3750a740f1921ce482fff6f3` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/orion-90-candidate.png` | `0093b03d794841e3981dc378802634dd608c45d9cc6a63209c90f6bb5f2af87d` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/orion-90-today.png` | `15e352674709b7629ea34304c0a0f15be04f3bfb8dc74820e93fa369d054527c` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |

@@ -325,11 +325,20 @@ class SprintTwentyThreeJourneyTest {
             assertEquals(ChartViewState.DEFAULT, restarted.navigation.state(),
                     "a new session opens on the released page,"
                             + " carrying no navigation across");
-            assertEquals(M31, restarted.navigation.state().targetIdentity(),
+            assertEquals("M31 · Andromeda Galaxy region",
+                    restarted.navigation.state().targetLabel(),
                     "named for M 31, as the released page is - not"
                             + " for the M 33 this journey retired,"
                             + " because navigation is not persisted"
                             + " and a retirement is navigation");
+            // And named without being targeted (#341). What the page
+            // is about survives a restart because it is the page the
+            // application opens at; what the reader asked for does
+            // not, because they have not asked for anything yet.
+            assertNull(restarted.navigation.state().targetIdentity(),
+                    "and carrying no searched target into a session"
+                            + " in which nothing has been searched"
+                            + " for");
             assertFalse(restarted.options.options().globularClusters(),
                     "it reads back what OK persisted");
             assertFalse(restarted.options.options().flamsteedNumbers(),

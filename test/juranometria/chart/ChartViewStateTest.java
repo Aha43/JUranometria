@@ -162,14 +162,35 @@ class ChartViewStateTest {
     }
 
     @Test
-    void aTargetIsAtomicLabelAndIdentityTogetherOrNeither() {
-        // PR #59 review: a chart may never name a target whose identity
-        // the rendering policy cannot preserve, and vice versa.
+    void aSubjectMayStandAloneButAnIdentityMayNot() {
+        // These were atomic - both or neither - since PR #59, on the
+        // ground that a chart may never name a target whose identity
+        // the rendering policy cannot preserve. That is still true of
+        // a target, and is still held below. What it wrongly made
+        // true as well is that a page cannot say what it is about
+        // unless some object on it holds the searched-target
+        // privilege, and the opening page paid for that: titled after
+        // M31, it exempted M31 from the reader's own switches (issue
+        // #341).
+        //
+        // So a subject may stand alone - what the page is about is
+        // true however the switches stand - while an identity may
+        // not, because it names something.
         SkyPosition somewhere = new SkyPosition(12.0, 43.0);
+
+        ChartViewState titled = new ChartViewState(somewhere, 8.0, 8.0,
+                "M 42 · Great Orion Nebula region", null);
+        assertEquals("M 42 · Great Orion Nebula region",
+                titled.targetLabel(),
+                "a page may say what it is about");
+        assertEquals(null, titled.targetIdentity(),
+                "without claiming the reader asked for it");
+
         assertThrows(IllegalArgumentException.class, () -> new ChartViewState(
-                somewhere, 8.0, 8.0, "M 42 · Great Orion Nebula region", null));
-        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(
-                somewhere, 8.0, 8.0, null, "NGC 1976"));
+                somewhere, 8.0, 8.0, null, "NGC 1976"),
+                "but an identity names something, and may not appear"
+                        + " without a label");
+
         assertEquals("NGC 1976", ChartViewState.DEFAULT
                 .recenteredAt(somewhere, "M 42 region", "NGC 1976").targetIdentity());
         assertEquals(null, ChartViewState.DEFAULT.recenteredAt(somewhere).targetLabel());
