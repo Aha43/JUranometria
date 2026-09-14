@@ -103,11 +103,23 @@ class StartupTargetTest {
                         ChartViewState.DEFAULT.centre().raDegrees() + 0.01,
                         ChartViewState.DEFAULT.centre().decDegrees())));
 
-        assertEquals(deepSkyMarks(home, off), deepSkyMarks(afterADrag, off),
-                "the first drag draws no more and no fewer marks");
-        assertEquals(namesOn(home, off).size(),
-                namesOn(afterADrag, off).size(),
-                "and no more and no fewer names");
+        // Which objects and which words, not how many of each. A
+        // count is satisfied by a swap - M31 leaving as something
+        // else arrives - and a swap is the same visible
+        // discontinuity this issue exists to remove. Where they are
+        // drawn may move, because the page moved; what is drawn may
+        // not.
+        //
+        // Mutation-proved by exactly that swap: an exemption granted
+        // to the object nearest the centre before the drag and to the
+        // second nearest after it draws one mark on each page, so the
+        // counts stay 1 and 1, and this fails on membership -
+        // expected [NGC 224] but was [NGC 221].
+        assertEquals(deepSkyOn(home, off), deepSkyOn(afterADrag, off),
+                "the first drag draws the same objects, not merely as"
+                        + " many of them");
+        assertEquals(namesOn(home, off), namesOn(afterADrag, off),
+                "and writes the same words");
     }
 
     @Test
@@ -190,15 +202,21 @@ class StartupTargetTest {
 
     private static int deepSkyMarks(ChartScene scene,
                                     ChartOptions options) {
-        int marks = 0;
+        return deepSkyOn(scene, options).size();
+    }
+
+    /** Which deep-sky objects this page draws, by identity. */
+    private static Set<String> deepSkyOn(ChartScene scene,
+                                         ChartOptions options) {
+        Set<String> drawn = new LinkedHashSet<>();
         for (ChartRenderer.DrawnMark mark
                 : new ChartRenderer(StarSizePolicy.DEFAULT)
                         .drawnMarks(scene, options)) {
             if (mark.kind() == ChartRenderer.DrawnMark.Kind.DEEP_SKY) {
-                marks++;
+                drawn.add(mark.deepSky().id());
             }
         }
-        return marks;
+        return drawn;
     }
 
     private static Set<String> namesOn(ChartScene scene,
