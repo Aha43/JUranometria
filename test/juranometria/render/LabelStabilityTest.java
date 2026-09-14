@@ -58,6 +58,18 @@ class LabelStabilityTest {
     /** The field the oscillation was found at. */
     private static final double CROWDED_FIELD = 6.0;
 
+    /**
+     * How far the reader wanders before coming back.
+     *
+     * <p>Measured, not chosen: a quarter of a degree away every
+     * label takes the same candidate it takes here, so a route
+     * ending there could not tell a remembered answer from a
+     * recomputed one. A degree away M32 takes candidate 1 where the
+     * target page gives it 0, which is what makes the comparison
+     * able to fail.
+     */
+    private static final double AWAY_DEGREES = 1.0;
+
     @Test
     void aLabelDoesNotFlickerAsThePageIsDragged() {
         // The reproduction from the issue, at its own field: a slow
@@ -125,49 +137,57 @@ class LabelStabilityTest {
         // Andromeda, where the defect was, and Sagittarius, which
         // carries enough names for the comparison to be about a page
         // rather than about four labels.
+        //
+        // The order is the whole test. The baseline is taken FIRST,
+        // before any other page has been placed, so it is the answer
+        // a reader gets who opens this page and nothing else. Only
+        // then is the drag walked, and only then is the same page
+        // assembled again - freshly, not the object the baseline
+        // used - and placed. If anything survived between
+        // placements, the second answer would have had a chance to
+        // differ from the first, and this compares exactly those two.
         int compared = 0;
         boolean coveredTheOneThatMoved = false;
         for (SkyPosition centre : List.of(centreAt(200),
                 new SkyPosition(266.0, -28.0))) {
-            ChartScene openedDirectly = Atlas.assembler().assemble(
-                    new ChartViewState(centre, CROWDED_FIELD, 8.0),
-                    WIDE_PX, HIGH_PX);
-            // The same page, arrived at rather than opened: the
-            // assembler is asked for every step of a drag up to it,
-            // so anything that remembered a previous frame would have
-            // something to remember.
-            ChartScene arrivedAt = null;
-            for (int step = 190; step <= 200; step++) {
-                arrivedAt = Atlas.assembler().assemble(
-                        new ChartViewState(walkedTo(centre, step),
-                                CROWDED_FIELD, 8.0),
-                        WIDE_PX, HIGH_PX);
-                placementsOn(arrivedAt);
+            List<LabelPlacement.Placement> beforeAnyHistory =
+                    placementsOn(pageAt(centre));
+
+            // The route: a drag up to that page, and then away from
+            // it and back - each page placed, so a cache or a
+            // remembered candidate has something to have remembered.
+            //
+            // The detour is the part that makes this able to fail. A
+            // neighbouring page gives the same answer, so history
+            // ending there would be indistinguishable from no history
+            // at all; a degree away, M32 takes a different candidate,
+            // so anything carried forward from there would show.
+            for (int step = 190; step < 200; step++) {
+                placementsOn(pageAt(walkedTo(centre, step)));
             }
-            arrivedAt = openedDirectly;
+            placementsOn(pageAt(new SkyPosition(
+                    centre.raDegrees() + AWAY_DEGREES,
+                    centre.decDegrees())));
 
-            List<LabelPlacement.Placement> walked = placementsOn(arrivedAt);
-            List<LabelPlacement.Placement> direct =
-                    placementsOn(openedDirectly);
+            List<LabelPlacement.Placement> afterTheWalk =
+                    placementsOn(pageAt(centre));
 
-            assertEquals(direct.size(), walked.size(),
+            assertEquals(beforeAnyHistory.size(), afterTheWalk.size(),
                     "the same page carries the same text either way");
-            for (int at = 0; at < direct.size(); at++) {
-                assertEquals(direct.get(at).request().id(),
-                        walked.get(at).request().id(),
+            for (int at = 0; at < beforeAnyHistory.size(); at++) {
+                LabelPlacement.Placement first = beforeAnyHistory.get(at);
+                LabelPlacement.Placement later = afterTheWalk.get(at);
+                assertEquals(first.request().id(), later.request().id(),
                         "in the same order");
-                assertEquals(direct.get(at).candidate(),
-                        walked.get(at).candidate(),
-                        direct.get(at).request().id()
-                                + " takes the same position whether the"
-                                + " reader opened this page or dragged"
-                                + " onto it");
-                assertEquals(direct.get(at).at(), walked.get(at).at(),
-                        direct.get(at).request().id()
-                                + " is written in exactly the same"
-                                + " place");
+                assertEquals(first.candidate(), later.candidate(),
+                        first.request().id() + " takes the same"
+                                + " position whether the reader opened"
+                                + " this page or dragged onto it");
+                assertEquals(first.at(), later.at(),
+                        first.request().id() + " is written in exactly"
+                                + " the same place");
                 compared++;
-                if (M32.equals(direct.get(at).request().id())) {
+                if (M32.equals(first.request().id())) {
                     coveredTheOneThatMoved = true;
                 }
             }
@@ -235,6 +255,13 @@ class LabelStabilityTest {
         Rectangle2D shared = obstacle.createIntersection(box);
         return shared.isEmpty() ? 0.0
                 : shared.getWidth() * shared.getHeight();
+    }
+
+    /** A freshly assembled page centred here. */
+    private static ChartScene pageAt(SkyPosition centre) {
+        return Atlas.assembler().assemble(
+                new ChartViewState(centre, CROWDED_FIELD, 8.0),
+                WIDE_PX, HIGH_PX);
     }
 
     /** The page the reader has after this many steps of the drag. */
