@@ -164,7 +164,7 @@ the migration section, and the two are different questions.
 
 | page | text drawn | before | collisions | before | pixels | before | worst single | order check |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `home` | 2 | 3 | 0 | 2 | 0 | 146 | 0 | 0.00 |
+| `home` | 3 | 3 | 0 | 2 | 0 | 146 | 0 | 0.00 |
 | `orion-08` | 12 | 12 | 6 | 8 | 55 | 88 | 13 | 1.00 |
 | `orion-18` | 15 | 19 | 10 | 23 | 117 | 261 | 20 | 1.00 |
 | `orion-36` | 17 | 17 | 23 | 32 | 235 | 348 | 25 | 0.98 |
@@ -350,11 +350,11 @@ marking its own work.
 | page | policy | collisions | of the two defects | lost | gained | moved | worst move | candidates tried |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | `home` | the atlas itself | 0 | 0 | — | — | — | — | — |
-| | greedy, star labels first | 0 | 0 | 0 | 0 | 1 | 22 px | 11 |
-| | greedy, constellation names first | 0 | 0 | 0 | 0 | 1 | 22 px | 11 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 0 | 0 | 1 | 22 px | 11 |
-| | greedy, star labels first, keeping what it cannot place | 1 | 0 | 0 | 1 | 1 | 22 px | 11 |
-| | greedy, star labels first, least bad when nothing is free | 1 | 0 | 0 | 1 | 1 | 22 px | 11 |
+| | greedy, star labels first | 0 | 0 | 0 | 0 | 1 | 22 px | 12 |
+| | greedy, constellation names first | 0 | 0 | 0 | 0 | 1 | 22 px | 12 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 0 | 0 | 1 | 22 px | 12 |
+| | greedy, star labels first, keeping what it cannot place | 1 | 0 | 0 | 1 | 1 | 22 px | 12 |
+| | greedy, star labels first, least bad when nothing is free | 1 | 0 | 0 | 1 | 1 | 22 px | 12 |
 | `orion-36` | the atlas itself | 23 | 9 | — | — | — | — | — |
 | | greedy, star labels first | 9 | 0 | 7 | 0 | 7 | 47 px | 126 |
 | | greedy, constellation names first | 9 | 0 | 7 | 0 | 7 | 47 px | 126 |
@@ -603,7 +603,7 @@ the same question, which is worth more than asking either of them twice.
 
 | page | labels both place | same candidate | same box | placed under duress | omitted by the seam |
 |---|---:|---:|---:|---:|---:|
-| `home` | 3 | 3 | 2 | 2 | 0 |
+| `home` | 4 | 4 | 2 | 2 | 0 |
 | `orion-36` | 16 | 16 | 10 | 6 | 2 |
 | `orion-90` | 64 | 61 | 45 | 8 | 2 |
 | `orion-120` | 97 | 89 | 67 | 12 | 3 |
@@ -726,7 +726,7 @@ on every machine. The budget is a tenth.
 
 | page | labels | obstacles | every against every | comparisons made | per label | share | budget |
 |---|---:|---:|---:|---:|---:|---:|---|
-| `home` | 5 | 56 | 280 | 65 | 13 | 23.2% | **over** |
+| `home` | 5 | 56 | 280 | 66 | 13 | 23.6% | **over** |
 | `orion-36` | 18 | 1566 | 28188 | 1561 | 86 | 5.5% | met |
 | `orion-90` | 66 | 174 | 11484 | 503 | 7 | 4.4% | met |
 | `orion-120` | 101 | 249 | 25149 | 828 | 8 | 3.3% | met |

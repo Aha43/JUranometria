@@ -127,10 +127,25 @@ class SceneAssemblerTest {
         SceneAssembler assembler = new SceneAssembler(
                 new CountingCatalogue(), M31, 10.0, TEST_MARGIN);
 
-        ChartScene searched = assembler.assemble(ChartViewState.DEFAULT, 900, 700);
+        // A searched state, not the application's own: since #341 the
+        // opening page is titled and untargeted, so asking it for an
+        // identity would be asking the wrong page. What is on trial
+        // is that assembly carries an identity when there is one.
+        ChartScene searched = assembler.assemble(new ChartViewState(
+                ChartViewState.DEFAULT.centre(), 8.0, 8.0,
+                "M31 · Andromeda Galaxy region", "NGC 224"), 900, 700);
         assertEquals("NGC 224", searched.targetIdentity(),
                 "the state's stable catalogue identity lands in the scene");
         assertEquals("M31 · Andromeda Galaxy region", searched.title());
+
+        // And the page the application opens at carries the title
+        // without the identity, which is the distinction #341 drew.
+        ChartScene home = assembler.assemble(ChartViewState.DEFAULT,
+                900, 700);
+        assertEquals("M31 · Andromeda Galaxy region", home.title(),
+                "Home still says what it shows");
+        assertEquals(null, home.targetIdentity(),
+                "and grants nothing the searched-target exemption");
 
         ChartScene anonymous = assembler.assemble(
                 ChartViewState.DEFAULT.recenteredAt(M31), 900, 700);

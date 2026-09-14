@@ -32,6 +32,9 @@ import juranometria.ui.ChartViewController;
  */
 public final class PackagedAcceptanceMain {
 
+    /** M31's catalogue identity: the opening page's own galaxy. */
+    private static final String ANDROMEDA_ID = "NGC 224";
+
     private PackagedAcceptanceMain() {
     }
 
@@ -1313,9 +1316,11 @@ public final class PackagedAcceptanceMain {
             java.util.Map<String, Integer> without = marksByFamily(renderer,
                     crowded, released.withFamily(family, false));
             // The searched target is exempt and stays drawn, so what
-            // must go is every OTHER mark of that family. The home
-            // page names M 31, which is exactly the exemption at work
-            // rather than a leak.
+            // must go is every OTHER mark of that family. These two
+            // pages were reached by moving to a place and carry no
+            // target, so nothing here is exempt and the expected
+            // count is zero; the exemption itself is proved below, on
+            // a page a search put a target on.
             int survivors = without.getOrDefault(family.name(), 0);
             int exempt = targetOf(renderer, crowded,
                     released.withFamily(family, false), family);
@@ -1429,20 +1434,64 @@ public final class PackagedAcceptanceMain {
                                         .equals(symbolless.id())),
                 "and the packaged renderer invents no mark for it");
 
-        // And the exemption, on the page that names a target: the
-        // home page's own galaxy stays drawn with galaxies hidden.
-        int exemptAtHome = targetOf(renderer, furnished,
-                released.withFamily(
-                        juranometria.render.SymbolFamily.GALAXIES, false),
-                juranometria.render.SymbolFamily.GALAXIES);
-        require(exemptAtHome == 1,
+        // And the exemption, on a page that carries a target because
+        // the reader asked for one. This used to be proved on the
+        // home page, whose own galaxy stayed drawn with galaxies
+        // hidden - but opening at Andromeda is not a reader asking
+        // for M31, and a page's subject is true however the switches
+        // stand (#341). The privilege belongs to the search, so the
+        // search is what is driven here, through the same production
+        // policy the search field uses.
+        ChartOptions noGalaxies = released.withFamily(
+                juranometria.render.SymbolFamily.GALAXIES, false);
+        var foundGalaxy = Atlas.search().search(ANDROMEDA_ID);
+        require(!foundGalaxy.isEmpty(),
+                "the packaged search finds " + ANDROMEDA_ID);
+        juranometria.ui.ChartViewController asked =
+                new juranometria.ui.ChartViewController(
+                        Atlas.assembler()::fits);
+        require(juranometria.ui.SearchNavigation.apply(foundGalaxy.get(0),
+                        Atlas.assembler(), asked, null)
+                        != juranometria.ui.SearchNavigation.Outcome.NO_FIT,
+                "and the packaged coverage reaches it");
+        ChartScene searchedFor = Atlas.assembler()
+                .assemble(asked.state(), 900, 700);
+        require(ANDROMEDA_ID.equals(searchedFor.targetIdentity()),
+                "the search carried its identity onto the page: "
+                        + searchedFor.targetIdentity());
+        require(targetOf(renderer, searchedFor, released,
+                        juranometria.render.SymbolFamily.GALAXIES) == 1,
+                "the page draws it before hiding galaxies can prove"
+                        + " anything");
+        require(targetOf(renderer, searchedFor, noGalaxies,
+                        juranometria.render.SymbolFamily.GALAXIES) == 1,
                 "the searched target survives its family being hidden");
+
+        // The other direction, which is the defect #341 removes: the
+        // page a reader opens at claims nothing, so the same galaxy
+        // in the same place obeys the switches they saved.
+        require(furnished.targetIdentity() == null,
+                "the opening page claims no target: "
+                        + furnished.targetIdentity());
+        require(renderer.drawnMarks(furnished, released).stream()
+                        .anyMatch(mark -> mark.deepSky() != null
+                                && ANDROMEDA_ID.equals(
+                                        mark.deepSky().id())),
+                "it draws Andromeda with galaxies on, so hiding them"
+                        + " can prove something");
+        require(renderer.drawnMarks(furnished, noGalaxies).stream()
+                        .noneMatch(mark -> mark.deepSky() != null
+                                && ANDROMEDA_ID.equals(
+                                        mark.deepSky().id())),
+                "and a reader who hid galaxies is shown none of them"
+                        + " on the page they open at");
         System.out.println("deep-sky families OK (" + String.join(", ",
                 hidden) + ", each leaving the others untouched; a"
-                + " hidden family changes the drawn page; the named"
-                + " target still drawn with its own family hidden;"
-                + " symbol-less " + symbolless.id() + " found,"
-                + " centred and titled with no invented mark)");
+                + " hidden family changes the drawn page; a searched"
+                + " target still drawn with its own family hidden,"
+                + " where the same galaxy on the unasked-for opening"
+                + " page is not; symbol-less " + symbolless.id()
+                + " found, centred and titled with no invented mark)");
 
         // Home: the journey ends on the page it started from,
         // rendered identically.
