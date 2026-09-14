@@ -43,6 +43,35 @@ public final class LabelPlacement {
     /** How far from the paper's edge a label must stay. */
     private static final double EDGE_MARGIN_PX = 2.0;
 
+    /**
+     * How much less ink a later candidate must cover to displace an
+     * earlier one, as a share of the cost (issue #340).
+     *
+     * <p>A billionth, and the size is derived rather than chosen for
+     * comfort. It has to sit in a band with two walls:
+     *
+     * <ul>
+     *   <li><strong>Above the arithmetic's own error.</strong> The
+     *       costs that oscillated were equal in principle - a box
+     *       wholly inside a disc covers exactly its own area - and
+     *       came back from {@link Area} differing by 5.8e-11 on a
+     *       cost of 420, which is some thousand units in the last
+     *       place. A billionth of 420 is four hundred times that.</li>
+     *   <li><strong>Below the smallest difference a page can show.</strong>
+     *       Ink is laid on a pixel grid, and the least a pixel can
+     *       carry is a fraction of one square pixel. A millionth of
+     *       one is already far beneath anything a rasteriser can
+     *       represent, let alone a reader see.</li>
+     * </ul>
+     *
+     * <p>An absolute allowance of one whole pixel was tried first and
+     * was wrong: it moved text on ten released page renders and four
+     * study pages, because it was large enough to swallow differences
+     * that are real. This is not a perception threshold. It is the
+     * width of the noise, and nothing else.
+     */
+    private static final double MEANINGFULLY_LESS = 1.0e-9;
+
     /** The families this places, in the order it places them. */
     public enum Family {
         /** The searched target's label: guaranteed, never moved. */
@@ -479,6 +508,43 @@ public final class LabelPlacement {
      * order a set happened to iterate in. A candidate outside its own
      * constellation's region, or off the paper, is not in the running
      * at all: those are not costs to be spent.
+     *
+     * <p><strong>And a later candidate must be meaningfully cheaper
+     * to displace an earlier one</strong> (issue #340). Breaking ties
+     * towards the earlier candidate is not enough when the costs are
+     * equal in principle and differ in the last bits: M32's label on
+     * the Andromeda page has all eight of its candidates buried in
+     * M31's disc, so every one of them covers exactly the box's own
+     * area - 420 square pixels - and the eight values came back
+     * differing by five hundredths of a billionth of a square pixel.
+     * A strict {@code <} let whichever of them happened to round down
+     * take the label, and as the reader dragged, that changed almost
+     * every frame: 163 hops in 201 steps, the name flicking up to 64
+     * pixels back and forth.
+     *
+     * <p>So a later candidate must be cheaper by more than the
+     * arithmetic's own error to displace an earlier one. What that
+     * buys, stated as the four things it has to be true:
+     *
+     * <ul>
+     *   <li><strong>Candidate order resolves differences within
+     *       arithmetic noise.</strong> Where the costs are equal in
+     *       principle, the preference order decides - which is
+     *       nearness to the thing being named, and is what that order
+     *       is for.</li>
+     *   <li><strong>A meaningfully cheaper candidate still wins.</strong>
+     *       The allowance is the width of the noise and nothing
+     *       wider. An absolute pixel was tried first and moved text
+     *       on released pages that had no tie at all.</li>
+     *   <li><strong>Identical page state always produces identical
+     *       placement.</strong> Nothing here reads a clock, a
+     *       counter, or a previous answer.</li>
+     *   <li><strong>Navigation history cannot affect the screen, the
+     *       print or the export, because none is stored.</strong>
+     *       There is no memory to consult and so no way for the route
+     *       a reader took to reach a page to change what the page
+     *       says.</li>
+     * </ul>
      */
     private int leastBad(Request request, List<Refused> already) {
         int best = -1;
@@ -491,7 +557,10 @@ public final class LabelPlacement {
                 continue;
             }
             double cost = costOf(request, box);
-            if (cost < least) {
+            if (cost < least - MEANINGFULLY_LESS * Math.max(1.0, least)) {
+                least = cost;
+                best = at;
+            } else if (best < 0) {
                 least = cost;
                 best = at;
             }
