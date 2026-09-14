@@ -182,6 +182,49 @@ class ReleaseAutomationTest {
             assertTrue(text.contains("Gatekeeper")
                             && text.contains("SmartScreen"),
                     "and the unsigned reality");
+            // The unsigned reality in the words a reader meets it in.
+            // These notes used to answer the macOS case with "right-
+            // click and choose Open, or approve it under Privacy &
+            // Security" - advice that cannot succeed for the dialog
+            // readers actually get, because macOS offers no approval
+            // for a quarantined unsigned application and simply calls
+            // it damaged (#282). Notes that send a reader to a button
+            // which is not there are worse than notes that say the
+            // route is unsupported.
+            assertTrue(text.contains("damaged"),
+                    "the notes name the dialog a reader actually"
+                            + " meets: " + text);
+            assertTrue(text.contains("not supported"),
+                    "and say the ordinary route is unsupported rather"
+                            + " than offering a step that fails");
+            assertTrue(text.contains("com.apple.quarantine"),
+                    "the workaround is stated for a reader who wants"
+                            + " it");
+            assertTrue(text.contains("temporary workaround"),
+                    "and named as temporary, not as the route");
+            // Integrity is answered inside the passage that raises
+            // the word "damaged", and before the flag is mentioned -
+            // not merely somewhere earlier on the page. The checksum
+            // table names SHA256SUMS.txt near the top whatever this
+            // passage says, so comparing first occurrences would pass
+            // for a reader who is told to clear the quarantine flag
+            // with the damage claim left standing.
+            int damaged = text.indexOf("damaged");
+            int flag = text.indexOf("com.apple.quarantine");
+            assertTrue(damaged >= 0 && flag > damaged,
+                    "the workaround follows the dialog it answers: "
+                            + text);
+            assertTrue(text.substring(damaged, flag)
+                            .contains("SHA256SUMS.txt"),
+                    "and integrity is settled between them, rather"
+                            + " than left to a checksum line further"
+                            + " up the page: "
+                            + text.substring(damaged, flag));
+            assertTrue(text.contains("282"),
+                    "and the open issue is named, so documenting the"
+                            + " workaround cannot read as closing it");
+            assertFalse(text.contains("right-click the app and choose"),
+                    "and the advice that cannot work is gone: " + text);
             assertTrue(text.contains("network requests of any kind"),
                     "and the offline promise");
         } finally {

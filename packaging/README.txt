@@ -38,9 +38,18 @@ application.
 Unsigned application note
 -------------------------
 The native application images are not code-signed or notarized.
-On macOS, Gatekeeper may block the first launch: right-click the
-app and choose Open, or approve it under System Settings > Privacy
-& Security. On Windows, SmartScreen may show "Windows protected
-your PC": choose More info, then Run anyway. This is expected for
-an unsigned open-source application; the portable ZIP with your own
-Java avoids the prompt entirely.
+
+On macOS, a browser-downloaded image is quarantined, and macOS may
+refuse it with "JUranometria is damaged and can't be opened." It is
+not damaged: check the archive against SHA256SUMS.txt. Gatekeeper
+offers no Open Anyway approval for that dialog, so ordinary Finder
+installation is not supported for this release (issue #282). After
+verifying the checksum, clearing the quarantine flag with
+"xattr -dr com.apple.quarantine" is a temporary workaround, not the
+accepted route.
+
+On Windows, SmartScreen may show "Windows protected your PC":
+choose More info, then Run anyway. This is expected for an unsigned
+open-source application.
+
+This portable ZIP, run with your own Java, avoids both entirely.

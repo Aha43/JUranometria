@@ -149,15 +149,34 @@ three candidates.
 
 ## What changed on the released pages
 
-**Nothing.** Every byte-pinned sheet and page render reproduces
-exactly, held by the evidence contract across 45 generators and 64
-invocations. Every rule added this sprint is reached only by a page
-whose sky has an edge: the clip resolves to the paper, `onPage` is
-the identity, the placement region is the paper rectangle by the same
-arithmetic it always used, and no limb is drawn.
+**Nothing, from the globe work.** Every byte-pinned sheet and page
+render reproduces exactly, held by the evidence contract across 45
+generators and 64 invocations. Every rule added this sprint is
+reached only by a page whose sky has an edge: the clip resolves to
+the paper, `onPage` is the identity, the placement region is the
+paper rectangle by the same arithmetic it always used, and no limb is
+drawn.
 
 That was tested by trying to break it, and the contract caught one
 attempt that no other check did — see below.
+
+**Four pages changed afterwards, and not from this sprint.** This
+section was written when Sprint 32 closed and was true of it. The
+document has since been amended for #340, #341 and the 2.0 decision,
+so the distinction has to be kept rather than quietly absorbed: the
+#340 repair — made after the sprint, on its own branch from the
+merged `main` — deliberately moved eight released renders across four
+ordinary pages. M32's designation at six, three and one degrees on
+the Andromeda page, and TYC 4771-1188-1 at six degrees on another,
+with cost splits of 2.9e-11 and 7.3e-12 square pixels. Every one was
+a tie the old code resolved by rounding, so each position had been
+chosen by arithmetic noise rather than by the placement rule. Two
+study reports changed with them.
+
+Those are corrections, not regressions, and they are the reason the
+release cannot claim every previously released page is byte-for-byte
+what it was. It claims the compatible thing instead: stored settings,
+options and file formats are unaffected.
 
 ## Every review correction worth carrying forward
 
@@ -218,10 +237,11 @@ misread.
 
 ## Remaining risks
 
-**Two pre-existing defects are release blockers.** Both were found by
-owner testing during this sprint, both were reproduced, and both were
-**measured identical at the branch point**, so neither is this
-sprint's doing:
+**Two pre-existing defects were release blockers, and both are now
+fixed.** Both were found by owner testing during this sprint, both
+were reproduced, and both were **measured identical at the branch
+point**, so neither was this sprint's doing. They are recorded here as
+they were found, each with the pull request that closed it:
 
 - **#340** — a label can oscillate between candidate positions during
   a drag. At 6° on the Andromeda page, M32's designation hopped 163
@@ -232,6 +252,18 @@ sprint's doing:
 - **#341** — the startup target exempts its family from the reader's
   saved switches, so the opening page draws a galaxy a reader had
   switched off, and the first drag is what makes the two agree.
+  **Closed by PR #345**, which separated a page's subject from the
+  target a reader asked for, and repaired the packaged acceptance that
+  had encoded the same conflation.
+
+**A macOS download cannot be installed the ordinary way.** #282: a
+browser-fetched archive is quarantined, and macOS refuses a
+quarantined unsigned application as "damaged" — with no Open Anyway
+approval offered, so the advice previously shipped could not succeed.
+This is a publication limitation rather than a product defect, it does
+not block 2.0.0 by the owner's decision of 2026-09-14, and it stays
+open until the application is signed, notarised and stapled in a
+dedicated early 2.x distribution sprint.
 
 **Physical paper remains #293's.** No globe has been read at arm's
 length on a printed sheet. Whether the limb at a quarter strength
@@ -251,30 +283,51 @@ is a decision rather than a defect.
 study as a possible refinement: one successful request to adjust a
 weight is not evidence that readers want a control over it.
 
-## Recommended version — a recommendation only
+## Recommended version
 
-**1.13.0**, and not the 2.0.0 the issue anticipated.
+**2.0.0 — The sky as a sphere**, the title #332 anticipated and the
+sprint earned.
 
-#332 was written expecting this sprint might recommend **2.0.0 — The
-sky as a sphere**, and the sprint has earned that title. It is
-recommended at 1.13.0 anyway, for one reason: two defects found by
-owner testing during the sprint are release blockers for 2.0 and are
-not yet fixed (#340, #341). A 2.0 called while a label oscillates
-under the reader's hand would be a version number making a promise
-the atlas has not kept.
+**What this section said when it was written, and why it has moved.**
+It recommended 1.13.0, for one reason only: two defects found by owner
+testing during the sprint were release blockers for 2.0 and were not
+then fixed (#340, #341). A 2.0 called while a label oscillated under
+the reader's hand would have been a version number making a promise
+the atlas had not kept. The stated sequence was 1.13.0 for what
+shipped here, and 2.0.0 once those two were closed.
 
-The honest sequence is 1.13.0 for what shipped here, and 2.0.0 — The
-sky as a sphere — once those two are closed. Both are recommendations
-only, and neither is this document's to act on.
+**Both are now closed** — #340 by PR #344 and #341 by PR #345, each
+reproduced before it was touched and each held by a mutation-proved
+contract. The condition this section set is met, so the sequence
+collapses: no 1.13.0 was ever published, and the release is 2.0.0.
+The owner decided that on 2026-09-14; this paragraph records the
+decision rather than making it.
 
-Minor, not patch: the atlas gains a rung a reader can
-reach, a projection, and a page kind it did not have. Not major:
-nothing a reader stored is invalidated, no option changes meaning, no
-file format moves, and every released page is byte-for-byte what it
-was.
+**What the major number does and does not claim**, stated plainly
+because the compatibility argument points the other way. By
+compatibility alone this is a minor release: the atlas gains a rung a
+reader can reach, a projection, and a page kind it did not have, while
+nothing a reader stored is invalidated, no option changes meaning, and
+no file format moves. The major number is a judgement about the sky
+the atlas now shows — a sphere a reader can hold — and not a warning
+about breakage. A reader upgrading from 1.12.0 loses nothing.
 
-The two blockers above should be fixed before 2.0 is called complete,
-and this recommendation says nothing about that release.
+What it does not claim is byte identity of every page. The globe work
+left ordinary pages untouched, but #340 intentionally moved one label
+on each of four of them, as recorded above. Those placements had been
+decided by arithmetic noise, so preserving them would have been
+preserving an accident.
 
-`VERSION` is unchanged at 1.12.0, nothing is tagged, and nothing is
-published.
+**macOS downloads remain unsigned, and 2.0.0 ships that way.** #282 is
+a publication limitation, not a product defect: a browser download is
+quarantined and macOS may refuse it as "damaged", so ordinary Finder
+installation is not supported for this release. The archives are not
+corrupt and `SHA256SUMS.txt` answers that; the documented
+quarantine-removal step is a temporary workaround and not the accepted
+route. Signing, notarisation and stapling belong to a dedicated early
+2.x distribution sprint, and #282 stays open until they land. The
+release notes and both shipped READMEs say this in the words a reader
+meets it in.
+
+`VERSION` is 2.0.0 and `CHANGELOG.md` carries its dated section.
+Nothing is tagged and nothing is published; both remain the owner's.
