@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import juranometria.catalog.Sha256;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -71,6 +72,8 @@ public final class SkyLanguageScan {
         FILENAME,
         /** Diagnostics: exceptions, logs, developer-facing failure. */
         DIAGNOSTIC,
+        /** Markup, page-description operators, serialisation. */
+        STRUCTURAL,
         /** The rules could not place it; reported, never absorbed. */
         UNCLASSIFIED
     }
@@ -143,14 +146,35 @@ public final class SkyLanguageScan {
      * follow, and those two are inspected in different ways.
      */
     public record Literal(String path, int line, String text, Kind kind,
-                          String route, String reason) {
+                          String route, String reason, String context) {
 
         /** A literal the rules placed; no limitation to name. */
         Literal(String path, int line, String text, Kind kind, String route) {
-            this(path, line, text, kind, route, "");
+            this(path, line, text, kind, route, "", "");
         }
 
-        /** Which surface publishes this string. */
+        Literal(String path, int line, String text, Kind kind, String route,
+                String reason) {
+            this(path, line, text, kind, route, reason, "");
+        }
+
+        /**
+         * How firmly this classification is known.
+         *
+         * <p>A traced literal is published by a named call. A
+         * recognised one is a sentence in a reader-facing class that
+         * no rule could follow to a call - included because leaving
+         * real words out of the queue is the worse error, but it is
+         * a <em>candidate</em>, not a proven reader string, and the
+         * label has to survive into #350 so a heuristic never
+         * hardens into a product claim.
+         */
+        public Confidence confidence() {
+            return route().startsWith("recognised")
+                    ? Confidence.RECOGNISED : Confidence.TRACED;
+        }
+
+        /** Where the wording is defined. */
         public Surface surface() {
             return surfaceOf(path, kind);
         }
@@ -162,6 +186,99 @@ public final class SkyLanguageScan {
                     && surface() != Surface.DEVELOPER_TOOLS
                     || surface() == Surface.READER_REACHABLE_DIAGNOSTIC;
         }
+
+        /**
+         * Every surface this string can reach, sorted.
+         *
+         * <p>Derived from what the string is and who owns it. Chart
+         * and page text is replayed into the sheet writers by one
+         * recording, so a word drawn on the chart is emitted by all
+         * three formats as well as the screen; a sheet's own
+         * metadata reaches the three files but never the screen; an
+         * accessible description is spoken and not drawn.
+         */
+        public java.util.SortedSet<Emitter> emitters() {
+            java.util.SortedSet<Emitter> reaches =
+                    new java.util.TreeSet<>();
+            switch (kind) {
+                case ACCESSIBILITY -> reaches.add(Emitter.ACCESSIBILITY);
+                case FILENAME -> reaches.add(Emitter.FILENAME);
+                case DIAGNOSTIC -> {
+                    reaches.add(Emitter.LOG);
+                    if (surface() == Surface.READER_REACHABLE_DIAGNOSTIC) {
+                        reaches.add(Emitter.SCREEN);
+                    }
+                }
+                default -> {
+                    if (surface() == Surface.EXPORT) {
+                        reaches.add(Emitter.SVG);
+                        reaches.add(Emitter.PDF);
+                        reaches.add(Emitter.PNG);
+                    } else if (surface() == Surface.APPLICATION) {
+                        reaches.add(Emitter.SCREEN);
+                        // Text the chart draws is replayed into every
+                        // writer from one recording (Sprint 29), so a
+                        // name on the page is also a name on paper.
+                        if (path.contains("/render/")
+                                || path.contains("/chart/")
+                                || path.contains("/page/")
+                                || path.contains("/project/")) {
+                            reaches.add(Emitter.SVG);
+                            reaches.add(Emitter.PDF);
+                            reaches.add(Emitter.PNG);
+                        }
+                    }
+                }
+            }
+            return reaches;
+        }
+
+        /** The declaration site: where the wording is defined. */
+        public String owner() {
+            return path;
+        }
+
+        /**
+         * A stable name for this occurrence.
+         *
+         * <p>Built from the file, the literal and the statement
+         * around it - never the line number, which moves whenever
+         * anything above it is edited and would invalidate a whole
+         * ledger for an unrelated change. Because the statement is
+         * part of it, editing the code around an unresolved literal
+         * DOES change its identity, which is the point: a reviewed
+         * disposition should not survive the code it was made about.
+         */
+        public String identity() {
+            return Sha256.hex((path + "\u0000" + text + "\u0000"
+                    + context).getBytes(java.nio.charset.StandardCharsets.UTF_8))
+                    .substring(0, 16);
+        }
+    }
+
+    /**
+     * Where a string can reach a reader.
+     *
+     * <p>Distinct from the <em>owner</em>, which is the declaration
+     * site. One chart title is owned once and emitted many times:
+     * onto the screen, into the accessible description, and into
+     * all three exported formats. Recording only one of those would
+     * make a translation look cheaper than it is - and would hide
+     * that changing it changes files a reader has already saved.
+     *
+     * <p>Export writers are emitters and never owners. They author
+     * no language; they carry what another surface wrote.
+     */
+    public enum Emitter {
+        SCREEN, ACCESSIBILITY, SVG, PDF, PNG, FILENAME, LOG
+    }
+
+    /** How firmly a classification is known. */
+    public enum Confidence {
+        /** A named call publishes it. */
+        TRACED,
+        /** Recognised as prose; a candidate, not a proven string. */
+        RECOGNISED
     }
 
     /** Which surface a path's strings belong to. */
@@ -308,6 +425,17 @@ public final class SkyLanguageScan {
         SINKS.put("toggle(", Kind.VISIBLE_PROSE);
         SINKS.put("explain(", Kind.VISIBLE_PROSE);
         SINKS.put("Explain.", Kind.VISIBLE_PROSE);
+        // An Action carries its own menu text; a dialog takes its
+        // title through super(); and this codebase writes its own
+        // small control factories. All three were publishing words
+        // the audit could not see.
+        SINKS.put("new AbstractAction", Kind.VISIBLE_PROSE);
+        SINKS.put("putValue(Action.NAME", Kind.VISIBLE_PROSE);
+        SINKS.put("super(owner", Kind.VISIBLE_PROSE);
+        SINKS.put("checkBox(", Kind.VISIBLE_PROSE);
+        SINKS.put("addTab(", Kind.VISIBLE_PROSE);
+        SINKS.put("iconButton(", Kind.VISIBLE_PROSE);
+        SINKS.put("Shortcuts.saying(", Kind.VISIBLE_PROSE);
     }
 
     /** Astronomical notation, which no language changes. */
@@ -348,10 +476,35 @@ public final class SkyLanguageScan {
     private static final Pattern LITERAL =
             Pattern.compile("\"((?:[^\"\\\\]|\\\\.)*)\"");
 
+    /**
+     * A type or member declaration, for identity.
+     *
+     * <p>Two methods in one file can hold the identical statement -
+     * the same {@code new JLabel("Close")} in two dialogs - and an
+     * identity built from file, literal and statement alone would
+     * merge them into one entry, so one review would silently stand
+     * for two occurrences. The enclosing member separates them.
+     */
+    private static final Pattern MEMBER = Pattern.compile(
+            "^\\s*(?:(?:public|private|protected|static|final|abstract"
+                    + "|sealed|default)\\s+)*(?:class|interface|enum|record"
+                    + "|[\\w.<>\\[\\],? ]+\\s+\\w+\\s*\\()[^;]*");
+
+    /** The enclosing type, so a member signature is qualified. */
+    private static final Pattern TYPE = Pattern.compile(
+            "(?:class|interface|enum|record)\\s+(\\w+)");
+
     private static final Pattern LOCALE_CALL =
             Pattern.compile("Locale\\.(ROOT|getDefault|US|ENGLISH|of)");
 
-    /** Scans the production sources under this tree. */
+    /**
+     * Scans the production sources under this tree.
+     *
+     * <p>Refuses a colliding identity rather than merging the two
+     * occurrences behind it. A merged identity would let one
+     * reviewed disposition stand silently for a string nobody
+     * looked at, which is the failure the ledger exists to prevent.
+     */
     public static List<File> scan(Path tree) throws IOException {
         List<File> files = new ArrayList<>();
         Path src = tree.resolve("src/juranometria");
@@ -368,6 +521,22 @@ public final class SkyLanguageScan {
                     .toList();
             for (Path source : sources) {
                 files.add(classify(tree, source));
+            }
+        }
+        Map<String, Literal> seen = new LinkedHashMap<>();
+        for (File file : files) {
+            for (Literal literal : file.literals()) {
+                Literal already = seen.put(literal.identity(), literal);
+                if (already != null) {
+                    throw new IllegalStateException(
+                            "two occurrences share one identity, so a"
+                                    + " review of either would stand for"
+                                    + " both: " + already.path() + ":"
+                                    + already.line() + " and "
+                                    + literal.path() + ":"
+                                    + literal.line() + " \""
+                                    + literal.text() + "\"");
+                }
             }
         }
         return files;
@@ -399,6 +568,8 @@ public final class SkyLanguageScan {
         List<LocaleUse> locales = new ArrayList<>();
         boolean inBlockComment = false;
         StringBuilder statement = new StringBuilder();
+        String type = "";
+        String member = "";
         List<int[]> held = new ArrayList<>();
         List<String> heldText = new ArrayList<>();
         int open = 0;
@@ -417,6 +588,15 @@ public final class SkyLanguageScan {
             }
             if (trimmed.startsWith("//") || trimmed.startsWith("*")) {
                 continue;
+            }
+            Matcher names = TYPE.matcher(line);
+            if (names.find()) {
+                type = names.group(1);
+                member = "";
+            }
+            Matcher declares = MEMBER.matcher(line);
+            if (declares.find()) {
+                member = declares.group().strip();
             }
             Matcher locale = LOCALE_CALL.matcher(line);
             while (locale.find()) {
@@ -461,12 +641,19 @@ public final class SkyLanguageScan {
                 if (text.isEmpty()) {
                     continue;
                 }
+                // The ordinal within the statement. One statement can
+                // hold the same literal twice - a separator written
+                // between three parts - and those are two occurrences
+                // a reviewer may decide differently about, so they
+                // must not share an identity.
                 literals.add(new Literal(path, places.get(which)[0], text,
-                        kindOf(text, whole, route), route));
+                        kindOf(text, whole, route), route, "",
+                        type + "#" + member + " |" + which + "| "
+                                + whole.strip().replaceAll("\\s+", " ")));
             }
         }
-        return new File(path, List.copyOf(followConstants(lines, literals)),
-                List.copyOf(locales));
+        return new File(path, List.copyOf(followConstants(lines,
+                numbered(literals))), List.copyOf(locales));
     }
 
     /**
@@ -567,14 +754,48 @@ public final class SkyLanguageScan {
                 followed.add(literal);
             } else if (reaches != null && hasLetters(literal.text())) {
                 followed.add(new Literal(literal.path(), literal.line(),
-                        literal.text(), reaches, name + " → reader"));
+                        literal.text(), reaches, name + " → reader", "",
+                        literal.context()));
             } else {
                 String reason = name == null
                         ? narrow(literal)
                         : why.getOrDefault(name, narrow(literal));
+                // A named population is CLASSIFIED, not unresolved.
+                // Leaving markup and notation in the unclassified
+                // bucket with an explanatory string understated what
+                // the rules actually knew, and made the residue look
+                // four times larger than the part needing a person.
+                Kind placed = switch (reason) {
+                    case Unresolved.STRUCTURAL -> Kind.STRUCTURAL;
+                    case Unresolved.NOTATION_FRAGMENT -> Kind.NOTATION;
+                    case Unresolved.RESOURCE_KEY -> Kind.FILENAME;
+                    case Unresolved.INTERNAL_IDENTITY -> Kind.IDENTIFIER;
+                    default -> Kind.UNCLASSIFIED;
+                };
+                String route = literal.route();
+                if (placed == Kind.UNCLASSIFIED
+                        && Unresolved.NO_ROUTE.equals(reason)) {
+                    // Recognised, though not traced. A sentence in a
+                    // reader-facing class is the reader's even when
+                    // it is concatenated into a message or carried by
+                    // an enum constant, and marking it UNKNOWN would
+                    // leave real words out of the translation queue -
+                    // the dangerous direction of the two. The ROUTE
+                    // says how weakly it is known, so a reviewer can
+                    // tell a traced call from a recognised sentence.
+                    if (readerFacing(literal.path())
+                            && looksLikeProse(literal.text())) {
+                        placed = Kind.VISIBLE_PROSE;
+                        route = "recognised as prose; no sink traced";
+                    } else if (oneToken(literal.text())) {
+                        placed = Kind.IDENTIFIER;
+                        route = "single token in a reader-facing class";
+                    }
+                }
                 followed.add(new Literal(literal.path(), literal.line(),
-                        literal.text(), Kind.UNCLASSIFIED, literal.route(),
-                        reason));
+                        literal.text(), placed, route,
+                        placed == Kind.UNCLASSIFIED ? reason : "",
+                        literal.context()));
             }
         }
         return followed;
@@ -592,12 +813,22 @@ public final class SkyLanguageScan {
      */
     private static String narrow(Literal literal) {
         String text = literal.text();
+        // Judged on the text without its escapes or indentation. An
+        // SVG element written as "  <defs>\n" is scaffolding
+        // whatever whitespace surrounds it, and a PDF operator is a
+        // page-description instruction, not a word.
+        String plain = bare(text).strip();
         Surface surface = surfaceOf(literal.path(), Kind.VISIBLE_PROSE);
         if (surface == Surface.DEVELOPER_TOOLS) {
             return Unresolved.TOOL_OUTPUT;
         }
-        if (STRUCTURAL.matcher(text).find()) {
+        if (STRUCTURAL.matcher(plain).find()
+                || plain.indexOf('<') >= 0 || plain.indexOf('>') >= 0
+                || PDF_OPERATOR.matcher(plain).matches()) {
             return Unresolved.STRUCTURAL;
+        }
+        if (GREEK_NAME.matcher(plain).matches()) {
+            return Unresolved.NOTATION_FRAGMENT;
         }
         if (RESOURCE.matcher(text).matches()) {
             return Unresolved.RESOURCE_KEY;
@@ -605,8 +836,12 @@ public final class SkyLanguageScan {
         if (NOTATION_ISH.matcher(text).matches()) {
             return Unresolved.NOTATION_FRAGMENT;
         }
-        if (INTERNAL.matcher(text).matches()) {
+        if (INTERNAL.matcher(text).matches()
+                || STYLE_TOKEN.matcher(plain).matches()) {
             return Unresolved.INTERNAL_IDENTITY;
+        }
+        if (!hasLetters(text)) {
+            return Unresolved.STRUCTURAL;
         }
         return Unresolved.NO_ROUTE;
     }
@@ -616,6 +851,46 @@ public final class SkyLanguageScan {
             "^</?[a-zA-Z][\\w:-]*|/>|^\\d+ \\d+ (?:obj|R)$|^stream$"
                     + "|^endobj$|^%PDF|xmlns|^<<|>>$|viewBox|^[a-z-]+=\"$"
                     + "|^(?:M|L|C|Z|A) ?$|font-|stroke-|text-anchor");
+
+    /**
+     * PDF page-description operators, named rather than guessed.
+     *
+     * <p>A one- or two-letter token in a PDF writer is an
+     * instruction to the page, not a word: {@code rg} sets a colour,
+     * {@code f} fills, {@code S} strokes. Listing them by name keeps
+     * this from swallowing a genuine two-letter label.
+     */
+    private static final Pattern PDF_OPERATOR = Pattern.compile(
+            "^(?:endstream|endobj|stream|xref|trailer|startxref"
+                    + "|BT|ET|Tf|Td|TJ|Tj|Tw|re|rg|RG|cm|gs|Do|scn"
+                    + "|W|n|f|S|s|Q|q|h|m|l|c|v|y|B|b)$");
+
+    /**
+     * The Greek letters, spelled out.
+     *
+     * <p>Search accepts "alpha Orionis" as well as the symbol, so
+     * these are the grammar's vocabulary rather than words on a
+     * page. Translating them would break the search a reader types.
+     */
+    private static final Pattern GREEK_NAME = Pattern.compile(
+            "^(?:alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota"
+                    + "|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma"
+                    + "|tau|upsilon|phi|chi|psi|omega)$",
+            Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Look-and-feel client properties and style tokens.
+     *
+     * <p>{@code FlatLaf.styleClass}, {@code JButton.buttonType} and
+     * the {@code h2} / {@code close} values they take are addressed
+     * to the toolkit, not to a reader. They look like words and are
+     * not.
+     */
+    private static final Pattern STYLE_TOKEN = Pattern.compile(
+            "^(?:(?:FlatLaf|JButton|JComponent|Component|TitlePane"
+                    + "|Table|List|Tree|ScrollPane|TextField)\\.[\\w.]+"
+                    + "|h[1-6]|close|small|large|mini|monospaced"
+                    + "|roundRect|square|borderless|toolBarButton)$");
 
     /** Resource paths, preference keys, MIME types. */
     private static final Pattern RESOURCE = Pattern.compile(
@@ -631,6 +906,70 @@ public final class SkyLanguageScan {
     private static final Pattern INTERNAL = Pattern.compile(
             "^(?:[A-Z][A-Z0-9_]+|[a-z]+(?:[A-Z][a-z0-9]*)+|--?[\\w-]+"
                     + "|[a-z]+(?:-[a-z]+)+)$");
+
+    /** Whether this file publishes to a reader at all. */
+    private static boolean readerFacing(String path) {
+        Surface where = surfaceOf(path, Kind.VISIBLE_PROSE);
+        return where == Surface.APPLICATION || where == Surface.EXPORT;
+    }
+
+    /**
+     * Whether a literal reads as a sentence or phrase.
+     *
+     * <p>Two or more words, at least one of them long enough not to
+     * be an abbreviation, and no shape that identifies it as a key,
+     * a path or a token. Fragments count: reader messages in this
+     * codebase are routinely built from pieces like
+     * {@code " already exists in "}.
+     */
+    private static boolean looksLikeProse(String text) {
+        String plain = bare(text).strip();
+        if (plain.length() < 4 || IDENTIFIER.matcher(plain).matches()
+                || STYLE_TOKEN.matcher(plain).matches()
+                || RESOURCE.matcher(plain).matches()) {
+            return false;
+        }
+        long words = Pattern.compile("\\p{L}{2,}").matcher(plain)
+                .results().count();
+        return words >= 2 || (words == 1 && plain.contains(" ")
+                && Pattern.compile("\\p{L}{4,}").matcher(plain).find());
+    }
+
+    /** A single bare word or dotted key, with no sentence around it. */
+    private static boolean oneToken(String text) {
+        String plain = bare(text).strip();
+        return !plain.isEmpty() && !plain.contains(" ")
+                && plain.matches("[\\w.$-]+");
+    }
+
+    /**
+     * Distinguishes occurrences nothing else can tell apart.
+     *
+     * <p>A file can hold the same literal, in the same member, in
+     * two textually identical statements - the same
+     * {@code "ICRS J2000"} written twice in one panel. Those are two
+     * occurrences a reviewer may decide differently about, so they
+     * cannot share an identity; but numbering them by LINE would
+     * churn every identity below any edit, which is what the
+     * statement-based identity was chosen to avoid. They are
+     * numbered instead by how many identical occurrences precede
+     * them in the same file, which only changes when one of those
+     * occurrences is itself added or removed.
+     */
+    private static List<Literal> numbered(List<Literal> literals) {
+        Map<String, Integer> seen = new LinkedHashMap<>();
+        List<Literal> numbered = new ArrayList<>();
+        for (Literal literal : literals) {
+            String key = literal.context() + "\u0000" + literal.text();
+            int nth = seen.merge(key, 1, Integer::sum) - 1;
+            numbered.add(nth == 0 ? literal
+                    : new Literal(literal.path(), literal.line(),
+                            literal.text(), literal.kind(), literal.route(),
+                            literal.reason(),
+                            literal.context() + " ~" + nth));
+        }
+        return numbered;
+    }
 
     /** Brace depth a line adds, ignoring quoted text. */
     private static int braceDepth(String line) {
@@ -772,7 +1111,21 @@ public final class SkyLanguageScan {
         return words >= 2;
     }
 
+    /**
+     * Whether any letter survives once escapes are removed.
+     *
+     * <p>A Java literal's backslash-n reaches this scan as the two
+     * characters {@code \\} and {@code n}, and {@code n} is a
+     * letter - so a row of equals signs ending in a newline looked
+     * like prose, and a separator was offered for translation.
+     */
     private static boolean hasLetters(String text) {
-        return text.codePoints().anyMatch(Character::isLetter);
+        return bare(text).codePoints().anyMatch(Character::isLetter);
+    }
+
+    /** The literal with its escape sequences removed. */
+    private static String bare(String text) {
+        return text.replaceAll("\\\\[nrtbf0\"'\\\\]", " ")
+                .replaceAll("\\\\u[0-9a-fA-F]{4}", " ");
     }
 }
