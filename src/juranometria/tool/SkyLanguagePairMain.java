@@ -190,8 +190,8 @@ public final class SkyLanguagePairMain {
         //
         // It may NOT assert a fixed count. This demanded ten, which
         // was one machine's number - omissions depend on how wide a
-        // word is drawn, and CI measured nine with neither machine
-        // wrong. A constant taken from an observation and asserted as
+        // word is drawn, and a run on the Linux CI runner measured
+        // nine with neither machine wrong. A constant taken from an observation and asserted as
         // universal is the mistake this sprint keeps finding, and
         // here it broke a build on a platform behaving correctly.
         //

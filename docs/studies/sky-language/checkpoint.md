@@ -9,9 +9,9 @@ committed name list. Nothing here changes what the application does;
 these are study images.
 
 **These sheets are this machine's rendering.** Placement depends on
-how wide a word is drawn, and fonts differ between platforms — CI
-measures nine asymmetric omissions where this machine measures ten,
-with neither wrong. What you judge here holds for these sheets; it
+how wide a word is drawn, and fonts differ between platforms — a run
+on the Linux CI runner measured nine asymmetric omissions where this
+machine measures ten, with neither wrong. What you judge here holds for these sheets; it
 is not a cross-platform assertion, and the counts quoted below are
 platform observations rather than facts about the atlas.
 

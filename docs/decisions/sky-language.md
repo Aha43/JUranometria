@@ -510,8 +510,11 @@ the service; this gate owns the contract it must satisfy.
 ## What is portable, and what is this machine's
 
 Stated before any figure is quoted, because the distinction was
-learned the hard way: CI measured **9 omissions and 98 moves** where
-this machine measures 10 and 102, with neither machine wrong.
+learned the hard way: a run on the Linux CI runner (`ubuntu-24.04`)
+measured **9 omissions and 98 moves** where this machine measures 10
+and 102, with neither machine wrong. Naming the runner matters: CI is
+an execution route, not a typography, and a different runner image or
+a font update would be another observation again.
 Placement depends on how wide a word is drawn, and fonts and
 rasterisers differ.
 
@@ -579,8 +582,9 @@ behaviour.
 ### Every omission is at a globe's limb
 
 On this machine there are ten, seven in Norwegian and three in
-Latin; CI measured nine. The count is typography's; **the pattern is
-the finding** — every one falls at a limb, in both languages. The limb refuses
+Latin; one run on the Linux CI runner measured nine. The count is
+typography's; **the pattern is the finding** — every one falls at a
+limb, in both languages. The limb refuses
 whichever *whole word* cannot fit rather than favouring either
 language — the placement policy applying evenly under a language it
 was never designed for, not a translation tax.
