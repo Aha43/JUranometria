@@ -271,6 +271,20 @@ public final class SkyLanguageStudyMain {
                 `juranometria.tool.SkyLanguageStudyMain`.
 
                 """);
+        // Every figure below is a placement figure, and placement
+        // depends on how wide a word is drawn. Fonts and rasterisers
+        // differ between machines, so this study measures differently
+        // on Linux than on macOS WITHOUT ANYTHING BEING WRONG: CI
+        // found 9 omissions where this machine finds 10, and 98 moves
+        // where it finds 102. Registering it as a deterministic
+        // report claimed a portability it never had.
+        report.append(PlatformEvidence.observed(
+                "What is portable is the METHOD and the contracts -"
+                        + " one canonical scene placed twice, neither"
+                        + " answer derived from the other, every page"
+                        + " at its rung's own density - and the names,"
+                        + " which come from a pinned source. The counts"
+                        + " are this machine's."));
         // The standing of these numbers comes from the data, exactly
         // as the title and the footer do. It used to be a paragraph
         // written into Java, so a verified study opened by calling
@@ -515,13 +529,17 @@ public final class SkyLanguageStudyMain {
                         + provenance.licence() + "`, retrieved "
                         + provenance.retrieved())
                 .append("\n");
-        // Printed, not written. Every report generator in this
-        // contract is judged on what it SAYS - the contract captures
-        // stdout and holds it to the committed bytes - and the make
-        // target is what puts it on disk. Writing the file here and
-        // printing a summary instead made the contract compare a
-        // one-line summary against a five-hundred-line report.
-        System.out.print(report);
+        // WRITTEN, not printed. This is a platform record, and the
+        // portable contract proves such a record reproduces by
+        // watching its generator write it in each of two passes - "a
+        // file read twice is not a file written twice". Printing to
+        // stdout and letting the make target redirect is the
+        // DETERMINISTIC REPORT convention, and leaving it in place
+        // after the reclassification meant nothing wrote the file in
+        // either pass, so the run could not see it reproduce at all.
+        Files.createDirectories(REPORT.getParent());
+        Files.writeString(REPORT, report.toString(),
+                java.nio.charset.StandardCharsets.UTF_8);
         System.err.println("sky-language placement study ("
                 + provenance.status() + "): "
                 + renamed + " renamed in place, " + moved + " moved, "

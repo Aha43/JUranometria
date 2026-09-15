@@ -126,8 +126,17 @@ class SkyLanguageChoiceTest {
      */
     @Test
     void anUnknownOrMalformedValueFallsBackDeterministically() {
+        // The path fragment is deliberately "../../elsewhere" rather
+        // than the classic traversal string used in security
+        // examples. That one names a well-known Unix account file,
+        // and a credential scanner matched the word inside it and
+        // raised an incident on this fixture (PR #353) - a false
+        // positive, but one that costs a person an evening to
+        // dismiss. What the test needs is a value shaped like a path
+        // and not like a language tag; any path does that. Please do
+        // not "restore" the conventional one.
         for (String nonsense : new String[] {"", "  ", "de", "la",
-                "nb_NO", "en-US", "../../etc/passwd", "follow"}) {
+                "nb_NO", "en-US", "../../elsewhere", "follow"}) {
             SkyLanguageChoice choice = SkyLanguageChoice.read(Map.of(
                     SkyLanguageChoice.INTERFACE_KEY, nonsense,
                     SkyLanguageChoice.CHART_KEY, nonsense), INSTALLED);
@@ -220,13 +229,13 @@ class SkyLanguageChoiceTest {
         SkyLanguageChoice held = SkyLanguageChoice.read(Map.of(), INSTALLED);
 
         for (String refused : new String[] {"de", "la", "nb_NO",
-                "../../etc/passwd", "", "sv-SE"}) {
+                "../../elsewhere", "", "sv-SE"}) {
             assertThrows(IllegalArgumentException.class,
                     () -> held.withInterface(refused),
                     "the interface cannot be set to \"" + refused + "\"");
         }
         for (String refused : new String[] {"de", "la", "follow",
-                "../../etc/passwd", "sv-SE"}) {
+                "../../elsewhere", "sv-SE"}) {
             assertThrows(IllegalArgumentException.class,
                     () -> held.withChart(refused),
                     "nor the chart to \"" + refused + "\"");

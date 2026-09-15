@@ -183,15 +183,67 @@ public final class SkyLanguagePairMain {
                 "sky-language paired pages: %d sheets, %d omissions "
                         + "indexed from %d pages%n", PAGES.size(),
                 omissions.size(), ALL_PAGES.size());
-        if (omissions.size() != 10) {
-            // The study measured ten. An index that showed fewer
-            // would be a curated view of the thing curation cannot
-            // show, and nobody would notice the difference.
-            throw new IllegalStateException("the study measures ten"
-                    + " asymmetric omissions and this index holds "
-                    + omissions.size() + "; they must be the same"
-                    + " ten, or one of the two is wrong");
+        // The index must hold every omission THIS RUN found, across
+        // all fourteen pages rather than only the curated sheets: an
+        // absence is invisible on a full page, so a short index hides
+        // exactly what the index is for.
+        //
+        // It may NOT assert a fixed count. This demanded ten, which
+        // was one machine's number - omissions depend on how wide a
+        // word is drawn, and CI measured nine with neither machine
+        // wrong. A constant taken from an observation and asserted as
+        // universal is the mistake this sprint keeps finding, and
+        // here it broke a build on a platform behaving correctly.
+        //
+        // Nor may it check the list against itself: "the index holds
+        // what the generator supplied" is true however few were
+        // supplied. The WRITTEN SHEET is measured instead, so the
+        // number that must agree comes from the file a reader opens.
+        if (omissions.isEmpty()) {
+            throw new IllegalStateException("no asymmetric omission"
+                    + " was found on any of the " + ALL_PAGES.size()
+                    + " pages, so the index proves nothing");
         }
+        java.util.Set<String> distinct = new java.util.LinkedHashSet<>();
+        for (Omission omission : omissions) {
+            if (!distinct.add(omission.page() + "/" + omission.id())) {
+                throw new IllegalStateException("the same omission is"
+                        + " indexed twice: " + omission.page() + "/"
+                        + omission.id());
+            }
+        }
+        int drawn = rowsOn(new File(DIR, "omissions.png"));
+        if (drawn != omissions.size()) {
+            throw new IllegalStateException("the written index shows "
+                    + drawn + " of the " + omissions.size()
+                    + " omissions measured on this run; a row that"
+                    + " never reached the sheet is an absence nobody"
+                    + " can see");
+        }
+    }
+
+    /**
+     * How many omission rows the written sheet carries.
+     *
+     * <p>Read back from the image on disk, not counted from the list
+     * that drew it. One row per omission at a fixed pitch, so the
+     * sheet's own height says how many rows exist - a number that
+     * disagrees with the generator if a row was dropped between
+     * being decided and being drawn.
+     */
+    private static int rowsOn(File sheet) throws IOException {
+        BufferedImage written = ImageIO.read(sheet);
+        if (written == null) {
+            throw new IllegalStateException(
+                    "the omission index was not written at all");
+        }
+        int rowHigh = 130 + 46;
+        if (written.getHeight() % rowHigh != 0) {
+            throw new IllegalStateException("the index's height "
+                    + written.getHeight() + " is not whole rows of "
+                    + rowHigh + "; its layout and this check disagree");
+        }
+        return written.getHeight() / rowHigh;
     }
 
     /** One page, rendered exactly as it would be on its own. */

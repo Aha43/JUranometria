@@ -599,8 +599,7 @@ test-evidence-study: classes
 sky-language-study: classes
 	mkdir -p docs/studies/sky-language
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true \
-		juranometria.tool.SkyLanguageStudyMain \
-		> docs/studies/sky-language/placement.md
+		juranometria.tool.SkyLanguageStudyMain
 
 place-and-time-study: classes
 	mkdir -p docs/studies/place-and-time

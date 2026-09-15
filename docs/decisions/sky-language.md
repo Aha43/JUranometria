@@ -50,12 +50,12 @@ issue, its own geometry and its own provenance.
 
 A mechanical classifier (`juranometria.tool.SkyLanguageScan`) over
 the whole tree, calibrated by `SkyLanguageScanTest` against synthetic
-input. **9,269 string literals**, partitioned by surface:
+input. **9,282 string literals**, partitioned by surface:
 
 | surface | literals |
 |---|---|
-| developer tools and generators | 4,998 |
-| confined diagnostics | 2,789 |
+| developer tools and generators | 5,001 |
+| confined diagnostics | 2,799 |
 | application | 1,197 |
 | export | 199 |
 | reader-reachable diagnostics | 86 |
@@ -352,9 +352,10 @@ This is required reading beside the attribution numbers, because it
 shows why nearest-line attribution is **informative but not
 absolute**. A Serpens label cannot avoid being nearer Ophiuchus' lines
 than to half of its own figure, and no placement policy could change
-that. The 23 negative margins are therefore published as
-**inspection candidates** with their distances and competing
-identity - never as acceptance failures.
+that. The 23 negative margins this machine measures are therefore
+published as **inspection candidates** with their distances and
+competing identity — never as acceptance failures, and never as a
+count another machine must reproduce.
 
 ## Scope finding: search does not accept constellation names at all
 
@@ -506,11 +507,45 @@ code or a supported-language enum. Removing one row, or adding an
 invented 89th identity, must fail at the data boundary. #348 owns
 the service; this gate owns the contract it must satisfy.
 
-## Owner checkpoint — passed 2026-09-15
+## What is portable, and what is this machine's
+
+Stated before any figure is quoted, because the distinction was
+learned the hard way: CI measured **9 omissions and 98 moves** where
+this machine measures 10 and 102, with neither machine wrong.
+Placement depends on how wide a word is drawn, and fonts and
+rasterisers differ.
+
+**Portable — held across machines:**
+
+- the method: one canonical scene placed twice, neither answer
+  derived from the other;
+- the fixtures: fourteen pages, each at its rung's own density;
+- canonical identities and the IAU comparison;
+- the names and their provenance;
+- that every attachment observation must be measurable;
+- the contribution and language-choice contracts.
+
+**This machine's — a platform observation, not a fact about the
+atlas:** every count and distance below. Totals of moved, omitted,
+renamed and identical; identities affected; attachment margins; the
+closest approach to a page edge; and the seven-versus-three split of
+omissions between the languages. `placement.md` carries the standard
+`Platform observation` banner and is registered as a platform record
+rather than a deterministic report.
+
+All figures quoted here were recorded on
+`Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`.
+
+## Owner checkpoint — passed 2026-09-15 (macOS rendering)
 
 Eight matched Latin/Norwegian pages and an index of every asymmetric
 omission (`checkpoint.md`). All six questions pass, with **no
 production policy change requested**.
+
+The sheets the owner inspected were rendered on macOS. The visual
+conclusions hold **for those sheets**; they are not cross-platform
+assertions, and another machine's typography would place some names
+differently without any of these judgements becoming wrong.
 
 - **The Norwegian sky reads naturally** — not as decoration laid over
   a Latin atlas. *Skytten*, *Slangebæreren*, *Vannmannen*,
@@ -520,7 +555,7 @@ production policy change requested**.
   belong to a neighbouring figure, including `SLANGEN` above
   `SLANGEBÆREREN` on Sagittarius 120° — despite that being the case
   the nearest-line metric scores worst.
-- **The ten omissions leave honest space**, and none makes an
+- **The omissions leave honest space**, and none makes an
   unexplained hole.
 - **The hierarchy stays quiet.** Longer words do not become louder;
   constellation names keep their subdued place beneath stars, object
@@ -541,9 +576,11 @@ inside the limb, it is **omitted rather than compressed, clipped or
 pushed into another constellation**. That is the right cartographic
 behaviour.
 
-### All ten omissions are at a globe's limb
+### Every omission is at a globe's limb
 
-Seven fall in Norwegian and three in Latin. The limb refuses
+On this machine there are ten, seven in Norwegian and three in
+Latin; CI measured nine. The count is typography's; **the pattern is
+the finding** — every one falls at a limb, in both languages. The limb refuses
 whichever *whole word* cannot fit rather than favouring either
 language — the placement policy applying evenly under a language it
 was never designed for, not a translation tax.

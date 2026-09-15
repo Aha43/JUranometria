@@ -99,18 +99,36 @@ class SkyLanguageRecordTest {
                 "the traced remainder");
     }
 
-    /** Figures the record quotes from the study it cites. */
+    /**
+     * Figures the record quotes from the study it cites.
+     *
+     * <p>Both are read from committed files, and deliberately so.
+     * The study's counts are a <em>platform observation</em> - CI
+     * measures nine omissions where the recording machine measured
+     * ten - so comparing the record's quoted figure against a LIVE
+     * measurement would fail on every machine but the one that wrote
+     * them, and would be asserting portability the study explicitly
+     * disclaims. What must agree is the record and the study it
+     * quotes: two committed documents, recorded together.
+     */
     @Test
     void theRecordAgreesWithTheStudyItQuotes() throws Exception {
         String record = Files.readString(RECORD);
         String study = Files.readString(STUDY);
 
+        assertTrue(study.contains(PlatformEvidence.OBSERVED_MARK),
+                "the study declares its counts a platform"
+                        + " observation, which is what makes quoting"
+                        + " them from a document rather than"
+                        + " re-measuring them correct");
         Matcher measured = Pattern.compile(
                 "\\*\\*Negative margins: (\\d+)\\*\\*").matcher(study);
         assertTrue(measured.find(), "the study reports its margins");
         assertStated(record, "The (\\d+) negative margins",
                 Integer.parseInt(measured.group(1)),
                 "the attachment margins it cites from the study");
+        assertTrue(record.contains("this machine's"),
+                "and the record says whose measurements they are");
     }
 
     private static void assertStated(String record, String pattern,

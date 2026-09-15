@@ -77,14 +77,6 @@ public final class EvidenceContractMain {
                 "docs/studies/test-evidence/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PlaceAndTimeStudyMain",
                 "docs/studies/place-and-time/measurements.md");
-        // Sprint 33 (#347). Held to its bytes like any report, which
-        // is what makes "regenerate when the names change" a
-        // checkable promise rather than an intention: if the names
-        // move and the report does not, the contract says so. Its
-        // inputs - norwegian-names.tsv and names.manifest - are
-        // pinned fixtures, and no production code reads either.
-        REPORT_MAINS.put("juranometria.tool.SkyLanguageStudyMain",
-                "docs/studies/sky-language/placement.md");
         // Writes its renderer-drawn pages beside the report as it
         // runs (issue #246), so capturing the report regenerates
         // them too - byte-reproducible per machine, like every
@@ -231,6 +223,19 @@ public final class EvidenceContractMain {
     private static final Map<String, String> PLATFORM_REPORTS =
             new LinkedHashMap<>();
     static {
+        // Sprint 33 (#347). Registered here rather than as a
+        // deterministic report, which is what it was until CI proved
+        // otherwise. Every figure it carries is a PLACEMENT figure,
+        // and placement depends on how wide a word is drawn: Linux
+        // measured 9 omissions and 98 moves where this machine
+        // measures 10 and 102, with neither machine wrong. Holding it
+        // to committed bytes claimed a portability it never had. What
+        // IS portable - the method, the fixtures, the canonical
+        // identities, the provenance, same-scene independence, each
+        // rung's own density, and that every observation must be
+        // measurable - is held by its own tests.
+        PLATFORM_REPORTS.put("juranometria.tool.SkyLanguageStudyMain",
+                "docs/studies/sky-language/placement.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
