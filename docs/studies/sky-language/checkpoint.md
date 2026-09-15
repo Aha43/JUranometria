@@ -11,9 +11,10 @@ these are study images.
 **These sheets are this machine's rendering.** Placement depends on
 how wide a word is drawn, and fonts differ between platforms — a run
 on the Linux CI runner measured nine asymmetric omissions where this
-machine measures ten, with neither wrong. What you judge here holds for these sheets; it
-is not a cross-platform assertion, and the counts quoted below are
-platform observations rather than facts about the atlas.
+machine measures ten, with neither wrong. What you judge here holds
+for these sheets; it is not a cross-platform assertion, and the
+counts quoted below are platform observations rather than facts about
+the atlas.
 
 ## What you are looking at
 
@@ -57,9 +58,9 @@ Only things an eye can decide. The numbers are in `placement.md`.
    they are correct — that is settled by provenance — but whether
    they read as a sky rather than as a translation of one.
 2. **Are moved names still unmistakably attached?** On this machine
-   102 placement observations moved to a different candidate; CI
-   measures 98. On the sheets, does each still read as belonging to
-   its own figure?
+   102 placement observations moved to a different candidate; the
+   Linux CI run on `ubuntu-24.04` measured 98. On the sheets, does
+   each still read as belonging to its own figure?
 3. **Do the omissions leave honest space, or obvious holes?** Every
    one is at a globe's limb — ten of them on this machine, seven lost
    in Norwegian and three in Latin, so this is not simply a cost of
