@@ -23,7 +23,7 @@ their lower-case forms.
 
 ## crowded Sagittarius, 18 degrees
 
-2 constellation names asked in Latin, 2 in Norwegian.
+Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 2 constellation names asked in Latin, 2 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
@@ -32,7 +32,7 @@ their lower-case forms.
 
 ## sparse Orion, 18 degrees
 
-2 constellation names asked in Latin, 2 in Norwegian.
+Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 2 constellation names asked in Latin, 2 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
@@ -40,7 +40,7 @@ their lower-case forms.
 
 ## Sagittarius, 42 degrees
 
-6 constellation names asked in Latin, 6 in Norwegian.
+Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 6 constellation names asked in Latin, 6 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
@@ -53,7 +53,7 @@ their lower-case forms.
 
 ## Orion, 42 degrees
 
-7 constellation names asked in Latin, 7 in Norwegian.
+Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 7 constellation names asked in Latin, 7 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
@@ -65,171 +65,172 @@ their lower-case forms.
 
 ## Sagittarius, 120 degrees
 
-31 constellation names asked in Latin, 31 in Norwegian.
+Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 31 constellation names asked in Latin, 31 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
-| `Aql` | Aquila | Ørnen | renamed in place | candidate 2 |
-| `Aqr` | Aquarius | Vannmannen | moved | candidate 1 to 9, 20 px |
-| `Ara` | Ara | Alteret | moved | candidate 3 to 9, 28 px |
-| `Boo` | Boötes | Oksedriveren | moved | candidate 4 to 12, 28 px |
-| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 6 |
-| `Cen` | Centaurus | Kentauren | renamed in place | candidate 14 |
-| `Cir` | Circinus | Passeren | renamed in place | candidate 7 |
-| `CrA` | Corona Austrina | Sørlige krone | moved | candidate 6 to 10, 28 px |
-| `Del` | Delphinus | Delfinen | renamed in place | candidate 10 |
-| `Equ` | Equuleus | Føllet | moved | candidate 0 to 1, 20 px |
-| `Gru` | Grus | Tranen | renamed in place | candidate 11 |
-| `Her` | Hercules | Herkules | renamed in place | candidate 6 |
-| `Hya` | Hydra | Vannslangen | moved | candidate 9 to 4, 63 px |
-| `Ind` | Indus | Inderen | moved | candidate 11 to 0, 57 px |
-| `Lib` | Libra | Vekten | renamed in place | candidate 16 |
-| `Lup` | Lupus | Ulven | renamed in place | candidate 11 |
-| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 4 |
-| `Nor` | Norma | Vinkelhaken | renamed in place | candidate 1 |
-| `Oph` | Ophiuchus | Slangebæreren | moved | candidate 16 to 14, 40 px |
-| `Pav` | Pavo | Påfuglen | renamed in place | candidate 4 |
-| `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 4 to 7, 20 px |
-| `Sco` | Scorpius | Skorpionen | renamed in place | candidate 13 |
+| `Aql` | Aquila | Ørnen | renamed in place | candidate 0 |
+| `Aqr` | Aquarius | Vannmannen | renamed in place | candidate 5 |
+| `Ara` | Ara | Alteret | renamed in place | candidate 4 |
+| `Boo` | Boötes | Oksedriveren | moved | candidate 2 to 10, 20 px |
+| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 4 |
+| `Cen` | Centaurus | Kentauren | renamed in place | candidate 10 |
+| `Cir` | Circinus | Passeren | renamed in place | candidate 3 |
+| `CrA` | Corona Austrina | Sørlige krone | renamed in place | candidate 9 |
+| `Del` | Delphinus | Delfinen | renamed in place | candidate 5 |
+| `Equ` | Equuleus | Føllet | renamed in place | candidate 0 |
+| `Gru` | Grus | Tranen | renamed in place | candidate 3 |
+| `Her` | Hercules | Herkules | renamed in place | candidate 0 |
+| `Hya` | Hydra | Vannslangen | moved | candidate 10 to 4, 28 px |
+| `Ind` | Indus | Inderen | renamed in place | candidate 0 |
+| `Lib` | Libra | Vekten | renamed in place | candidate 0 |
+| `Lup` | Lupus | Ulven | renamed in place | candidate 2 |
+| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 0 |
+| `Nor` | Norma | Vinkelhaken | moved | candidate 1 to 9, 20 px |
+| `Oph` | Ophiuchus | Slangebæreren | moved | candidate 4 to 5, 57 px |
+| `Pav` | Pavo | Påfuglen | renamed in place | candidate 0 |
+| `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 3 to 2, 45 px |
+| `Sco` | Scorpius | Skorpionen | moved | candidate 13 to 4, 85 px |
 | `Sct` | Scutum | Skjoldet | renamed in place | candidate 3 |
-| `Ser` | Serpens Caput | Slangen | moved | candidate 4 to 2, 20 px |
-| `Sge` | Sagitta | Pilen | moved | candidate 10 to 8, 45 px |
-| `Sgr` | Sagittarius | Skytten | moved | candidate 14 to 10, 40 px |
-| `Tel` | Telescopium | Teleskopet | renamed in place | candidate 10 |
-| `TrA` | Triangulum Australe | Sørlige triangel | moved | candidate 10 to 2, 20 px |
-| `Vir` | Virgo | Jomfruen | renamed in place | candidate 4 |
+| `Ser` | Serpens Caput | Slangen | moved | candidate 2 to 0, 20 px |
+| `Sge` | Sagitta | Pilen | moved | candidate 9 to 1, 20 px |
+| `Sgr` | Sagittarius | Skytten | moved | candidate 6 to 9, 63 px |
+| `Tel` | Telescopium | Teleskopet | renamed in place | candidate 5 |
+| `TrA` | Triangulum Australe | Sørlige triangel | renamed in place | candidate 10 |
+| `Vir` | Virgo | Jomfruen | renamed in place | candidate 0 |
 
 ## Orion, 120 degrees
 
-26 constellation names asked in Latin, 26 in Norwegian.
+Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 26 constellation names asked in Latin, 26 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
 | `Ant` | Antlia | Luftpumpen | moved | candidate 0 to 1, 20 px |
-| `Ari` | Aries | Væren | moved | candidate 2 to 10, 20 px |
-| `Aur` | Auriga | Kusken | renamed in place | candidate 6 |
-| `CMa` | Canis Major | Store hund | renamed in place | candidate 13 |
-| `CMi` | Canis Minor | Lille hund | renamed in place | candidate 5 |
-| `Cae` | Caelum | Gravstikken | renamed in place | candidate 7 |
+| `Ari` | Aries | Væren | moved | candidate 0 to 2, 20 px |
+| `Aur` | Auriga | Kusken | renamed in place | candidate 0 |
+| `CMa` | Canis Major | Store hund | renamed in place | candidate 4 |
+| `CMi` | Canis Minor | Lille hund | moved | candidate 10 to 2, 20 px |
+| `Cae` | Caelum | Gravstikken | renamed in place | candidate 0 |
 | `Car` | Carina | Kjølen | renamed in place | candidate 1 |
-| `Cet` | Cetus | Hvalen | renamed in place | candidate 13 |
-| `Cnc` | Cancer | Krepsen | renamed in place | candidate 12 |
-| `Col` | Columba | Duen | moved | candidate 16 to 6, 28 px |
-| `Eri` | Eridanus | Floden | moved | candidate 15 to 5, 63 px |
-| `For` | Fornax | Smelteovnen | moved | candidate 9 to 8, 45 px |
-| `Gem` | Gemini | Tvillingene | moved | candidate 13 to 11, 80 px |
+| `Cet` | Cetus | Hvalen | renamed in place | candidate 0 |
+| `Cnc` | Cancer | Krepsen | renamed in place | candidate 5 |
+| `Col` | Columba | Duen | moved | candidate 5 to 2, 45 px |
+| `Eri` | Eridanus | Floden | renamed in place | candidate 2 |
+| `For` | Fornax | Smelteovnen | renamed in place | candidate 0 |
+| `Gem` | Gemini | Tvillingene | renamed in place | candidate 0 |
 | `Hor` | Horologium | Uret | moved | candidate 10 to 2, 20 px |
-| `Hya` | Hydra | Vannslangen | moved | candidate 6 to 8, 20 px |
-| `Lep` | Lepus | Haren | moved | candidate 5 to 10, 63 px |
-| `Lyn` | Lynx | Gaupen | moved | candidate 8 to 5, 20 px |
-| `Mon` | Monoceros | Enhjørningen | renamed in place | candidate 7 |
-| `Psc` | Pisces | Fiskene | renamed in place | candidate 15 |
-| `Pup` | Puppis | Akterstavnen | moved | candidate 12 to 5, 85 px |
-| `Pyx` | Pyxis | Kompasset | renamed in place | candidate 12 |
+| `Hya` | Hydra | Vannslangen | renamed in place | candidate 0 |
+| `Lep` | Lepus | Haren | renamed in place | candidate 7 |
+| `Lyn` | Lynx | Gaupen | moved | candidate 6 to 5, 40 px |
+| `Mon` | Monoceros | Enhjørningen | renamed in place | candidate 4 |
+| `Psc` | Pisces | Fiskene | renamed in place | candidate 4 |
+| `Pup` | Puppis | Akterstavnen | moved | candidate 0 to 2, 20 px |
+| `Pyx` | Pyxis | Kompasset | renamed in place | candidate 3 |
 | `Tau` | Taurus | Tyren | renamed in place | candidate 9 |
-| `Tri` | Triangulum | Triangelet | renamed in place | candidate 6 |
+| `Tri` | Triangulum | Triangelet | renamed in place | candidate 1 |
 
 ## the globe at Sagittarius, 180 degrees
 
-58 constellation names asked in Latin, 58 in Norwegian.
+Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 58 constellation names asked in Latin, 58 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
-| `Aps` | Apus | Paradisfuglen | moved | candidate 2 to 10, 20 px |
+| `Aps` | Apus | Paradisfuglen | moved | candidate 1 to 0, 20 px |
 | `Aql` | Aquila | Ørnen | renamed in place | candidate 6 |
-| `Aqr` | Aquarius | Vannmannen | renamed in place | candidate 11 |
-| `Ara` | Ara | Alteret | moved | candidate 3 to 10, 63 px |
-| `Boo` | Boötes | Oksedriveren | moved | candidate 2 to 14, 45 px |
+| `Aqr` | Aquarius | Vannmannen | moved | candidate 9 to 1, 20 px |
+| `Ara` | Ara | Alteret | moved | candidate 3 to 6, 57 px |
+| `Boo` | Boötes | Oksedriveren | moved | candidate 2 to 10, 20 px |
 | `Cap` | Capricornus | Steinbukken | renamed in place | candidate 5 |
-| `Car` | Carina | Kjølen | renamed in place | candidate 10 |
+| `Car` | Carina | Kjølen | renamed in place | candidate 3 |
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 10 |
 | `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 10 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 4 |
-| `CrA` | Corona Austrina | Sørlige krone | moved | candidate 4 to 6, 40 px |
+| `CrA` | Corona Austrina | Sørlige krone | moved | candidate 0 to 1, 20 px |
 | `CrB` | Corona Borealis | Nordlige krone | renamed in place | candidate 10 |
-| `Cru` | Crux | Sydkorset | moved | candidate 1 to 10, 60 px |
+| `Cru` | Crux | Sydkorset | moved | candidate 1 to 0, 20 px |
 | `Crv` | Corvus | Ravnen | renamed in place | candidate 4 |
 | `Cyg` | Cygnus | Svanen | renamed in place | candidate 13 |
-| `Del` | Delphinus | Delfinen | renamed in place | candidate 8 |
-| `Dra` | Draco | Dragen | renamed in place | candidate 5 |
-| `Equ` | Equuleus | Føllet | renamed in place | candidate 5 |
+| `Del` | Delphinus | Delfinen | moved | candidate 8 to 5, 20 px |
+| `Dra` | Draco | Dragen | moved | candidate 5 to 8, 20 px |
+| `Equ` | Equuleus | Føllet | moved | candidate 1 to 5, 20 px |
 | `Eri` | Eridanus | Floden | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
 | `Gru` | Grus | Tranen | renamed in place | candidate 3 |
 | `Her` | Hercules | Herkules | renamed in place | candidate 14 |
 | `Hya` | Hydra | Vannslangen | renamed in place | candidate 4 |
 | `Hyi` | Hydrus | Sørlige vannslange | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
-| `Ind` | Indus | Inderen | renamed in place | candidate 5 |
-| `Lib` | Libra | Vekten | renamed in place | candidate 15 |
-| `Lup` | Lupus | Ulven | renamed in place | candidate 15 |
-| `Lyr` | Lyra | Lyren | renamed in place | candidate 1 |
-| `Mic` | Microscopium | Mikroskopet | moved | candidate 9 to 1, 20 px |
+| `Ind` | Indus | Inderen | moved | candidate 8 to 3, 45 px |
+| `Lib` | Libra | Vekten | renamed in place | candidate 3 |
+| `Lup` | Lupus | Ulven | renamed in place | candidate 14 |
+| `Lyr` | Lyra | Lyren | moved | candidate 8 to 2, 28 px |
+| `Mic` | Microscopium | Mikroskopet | moved | candidate 1 to 0, 20 px |
 | `Mus` | Musca | Fluen | renamed in place | candidate 2 |
 | `Nor` | Norma | Vinkelhaken | moved | candidate 0 to 2, 20 px |
-| `Oct` | Octans | Oktanten | moved | candidate 9 to 1, 20 px |
-| `Oph` | Ophiuchus | Slangebæreren | renamed in place | candidate 6 |
-| `Pav` | Pavo | Påfuglen | moved | candidate 7 to 4, 20 px |
+| `Oct` | Octans | Oktanten | renamed in place | candidate 0 |
+| `Oph` | Ophiuchus | Slangebæreren | moved | candidate 8 to 15, 60 px |
+| `Pav` | Pavo | Påfuglen | renamed in place | candidate 8 |
+| `Peg` | Pegasus | Pegasus | moved | candidate 9 to 5, 28 px |
 | `Phe` | Phoenix | Føniks | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
 | `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 3 to 7, 20 px |
 | `Psc` | Pisces | Fiskene | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
 | `Scl` | Sculptor | Billedhuggeren | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
-| `Sco` | Scorpius | Skorpionen | moved | candidate 15 to 5, 63 px |
-| `Sct` | Scutum | Skjoldet | moved | candidate 8 to 6, 20 px |
-| `Ser` | Serpens Caput | Slangen | moved | candidate 8 to 6, 20 px |
+| `Sco` | Scorpius | Skorpionen | moved | candidate 4 to 8, 45 px |
+| `Sct` | Scutum | Skjoldet | renamed in place | candidate 3 |
+| `Ser` | Serpens Caput | Slangen | moved | candidate 3 to 11, 28 px |
 | `Sge` | Sagitta | Pilen | renamed in place | candidate 1 |
-| `Sgr` | Sagittarius | Skytten | moved | candidate 6 to 11, 85 px |
-| `Tel` | Telescopium | Teleskopet | renamed in place | candidate 8 |
+| `Sgr` | Sagittarius | Skytten | renamed in place | candidate 11 |
+| `Tel` | Telescopium | Teleskopet | renamed in place | candidate 6 |
 | `TrA` | Triangulum Australe | Sørlige triangel | renamed in place | candidate 10 |
-| `Tuc` | Tucana | Tukanen | renamed in place | candidate 9 |
-| `Vir` | Virgo | Jomfruen | moved | candidate 4 to 12, 28 px |
-| `Vul` | Vulpecula | Reven | moved | candidate 5 to 8, 20 px |
+| `Tuc` | Tucana | Tukanen | moved | candidate 9 to 2, 60 px |
+| `Vir` | Virgo | Jomfruen | moved | candidate 16 to 6, 28 px |
+| `Vul` | Vulpecula | Reven | moved | candidate 10 to 2, 20 px |
 
 ## the globe at Orion, 180 degrees
 
-49 constellation names asked in Latin, 49 in Norwegian.
+Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 49 constellation names asked in Latin, 49 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
 | `Ant` | Antlia | Luftpumpen | moved | candidate 1 to 9, 20 px |
-| `Ari` | Aries | Væren | renamed in place | candidate 8 |
-| `Aur` | Auriga | Kusken | renamed in place | candidate 13 |
+| `Ari` | Aries | Væren | moved | candidate 10 to 6, 28 px |
+| `Aur` | Auriga | Kusken | renamed in place | candidate 14 |
 | `CMa` | Canis Major | Store hund | renamed in place | candidate 9 |
-| `CMi` | Canis Minor | Lille hund | moved | candidate 6 to 1, 45 px |
-| `Cae` | Caelum | Gravstikken | moved | candidate 1 to 0, 20 px |
-| `Cam` | Camelopardalis | Sjiraffen | moved | candidate 14 to 16, 40 px |
+| `CMi` | Canis Minor | Lille hund | moved | candidate 10 to 9, 80 px |
+| `Cae` | Caelum | Gravstikken | moved | candidate 10 to 0, 40 px |
+| `Cam` | Camelopardalis | Sjiraffen | moved | candidate 8 to 16, 20 px |
 | `Car` | Carina | Kjølen | renamed in place | candidate 11 |
 | `Cet` | Cetus | Hvalen | renamed in place | candidate 2 |
 | `Cnc` | Cancer | Krepsen | renamed in place | candidate 5 |
-| `Col` | Columba | Duen | moved | candidate 16 to 5, 28 px |
-| `Dor` | Dorado | Gullfisken | moved | candidate 2 to 0, 20 px |
-| `Eri` | Eridanus | Floden | renamed in place | candidate 11 |
-| `For` | Fornax | Smelteovnen | moved | candidate 10 to 6, 28 px |
-| `Gem` | Gemini | Tvillingene | moved | candidate 2 to 10, 20 px |
-| `Hor` | Horologium | Uret | moved | candidate 4 to 7, 20 px |
-| `Hya` | Hydra | Vannslangen | renamed in place | candidate 11 |
-| `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 3 to 7, 20 px |
+| `Col` | Columba | Duen | renamed in place | candidate 6 |
+| `Dor` | Dorado | Gullfisken | moved | candidate 3 to 7, 20 px |
+| `Eri` | Eridanus | Floden | moved | candidate 6 to 4, 40 px |
+| `For` | Fornax | Smelteovnen | moved | candidate 0 to 5, 28 px |
+| `Gem` | Gemini | Tvillingene | moved | candidate 0 to 3, 28 px |
+| `Hor` | Horologium | Uret | moved | candidate 7 to 0, 20 px |
+| `Hya` | Hydra | Vannslangen | moved | candidate 11 to 13, 80 px |
+| `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 3 to 4, 40 px |
 | `LMi` | Leo Minor | Lille løve | renamed in place | candidate 9 |
-| `Leo` | Leo | Løven | renamed in place | candidate 5 |
-| `Lep` | Lepus | Haren | renamed in place | candidate 4 |
-| `Lyn` | Lynx | Gaupen | moved | candidate 8 to 5, 20 px |
+| `Leo` | Leo | Løven | renamed in place | candidate 11 |
+| `Lep` | Lepus | Haren | renamed in place | candidate 7 |
+| `Lyn` | Lynx | Gaupen | renamed in place | candidate 0 |
 | `Men` | Mensa | Taffelberget | moved | candidate 10 to 0, 40 px |
-| `Mon` | Monoceros | Enhjørningen | renamed in place | candidate 14 |
-| `Phe` | Phoenix | Føniks | moved | candidate 10 to 2, 20 px |
-| `Pic` | Pictor | Maleren | renamed in place | candidate 2 |
-| `Psc` | Pisces | Fiskene | renamed in place | candidate 14 |
-| `Pup` | Puppis | Akterstavnen | moved | candidate 4 to 12, 28 px |
-| `Pyx` | Pyxis | Kompasset | renamed in place | candidate 4 |
+| `Mon` | Monoceros | Enhjørningen | moved | candidate 4 to 16, 63 px |
+| `Phe` | Phoenix | Føniks | moved | candidate 4 to 7, 20 px |
+| `Pic` | Pictor | Maleren | moved | candidate 1 to 4, 45 px |
+| `Psc` | Pisces | Fiskene | renamed in place | candidate 0 |
+| `Pup` | Puppis | Akterstavnen | moved | candidate 9 to 4, 63 px |
+| `Pyx` | Pyxis | Kompasset | moved | candidate 4 to 12, 28 px |
 | `Ret` | Reticulum | Nettet | moved | candidate 10 to 1, 60 px |
 | `Scl` | Sculptor | Billedhuggeren | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
-| `Sex` | Sextans | Sekstanten | renamed in place | candidate 3 |
+| `Sex` | Sextans | Sekstanten | moved | candidate 1 to 9, 20 px |
 | `Tau` | Taurus | Tyren | renamed in place | candidate 9 |
 | `Tri` | Triangulum | Triangelet | renamed in place | candidate 10 |
 | `UMa` | Ursa Major | Store bjørn | renamed in place | candidate 16 |
-| `Vel` | Vela | Seilet | moved | candidate 4 to 3, 40 px |
-| `Vol` | Volans | Flygefisken | renamed in place | candidate 1 |
+| `Vel` | Vela | Seilet | renamed in place | candidate 0 |
+| `Vol` | Volans | Flygefisken | moved | candidate 0 to 1, 20 px |
 
 ## the RA seam, 42 degrees
 
-3 constellation names asked in Latin, 3 in Norwegian.
+Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 3 constellation names asked in Latin, 3 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
@@ -237,45 +238,45 @@ their lower-case forms.
 
 ## the RA seam, 180 degrees
 
-47 constellation names asked in Latin, 47 in Norwegian.
+Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 47 constellation names asked in Latin, 47 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
 | `Aql` | Aquila | Ørnen | renamed in place | candidate 14 |
-| `Aqr` | Aquarius | Vannmannen | moved | candidate 7 to 4, 20 px |
-| `Ari` | Aries | Væren | renamed in place | candidate 2 |
+| `Aqr` | Aquarius | Vannmannen | renamed in place | candidate 3 |
+| `Ari` | Aries | Væren | renamed in place | candidate 7 |
 | `Aur` | Auriga | Kusken | renamed in place | candidate 16 |
-| `Cam` | Camelopardalis | Sjiraffen | moved | candidate 16 to 5, 28 px |
+| `Cam` | Camelopardalis | Sjiraffen | moved | candidate 14 to 0, 57 px |
 | `Cap` | Capricornus | Steinbukken | renamed in place | candidate 4 |
-| `Cas` | Cassiopeia | Kassiopeia | renamed in place | candidate 8 |
-| `Cep` | Cepheus | Kefeus | renamed in place | candidate 3 |
-| `Cet` | Cetus | Hvalen | renamed in place | candidate 7 |
-| `Cyg` | Cygnus | Svanen | renamed in place | candidate 14 |
-| `Del` | Delphinus | Delfinen | moved | candidate 10 to 6, 28 px |
-| `Dra` | Draco | Dragen | renamed in place | candidate 6 |
-| `Equ` | Equuleus | Føllet | moved | candidate 0 to 6, 28 px |
-| `Eri` | Eridanus | Floden | moved | candidate 3 to 7, 20 px |
-| `For` | Fornax | Smelteovnen | renamed in place | candidate 9 |
+| `Cas` | Cassiopeia | Kassiopeia | renamed in place | candidate 4 |
+| `Cep` | Cepheus | Kefeus | renamed in place | candidate 12 |
+| `Cet` | Cetus | Hvalen | renamed in place | candidate 3 |
+| `Cyg` | Cygnus | Svanen | renamed in place | candidate 6 |
+| `Del` | Delphinus | Delfinen | renamed in place | candidate 6 |
+| `Dra` | Draco | Dragen | renamed in place | candidate 8 |
+| `Equ` | Equuleus | Føllet | renamed in place | candidate 6 |
+| `Eri` | Eridanus | Floden | renamed in place | candidate 4 |
+| `For` | Fornax | Smelteovnen | moved | candidate 9 to 4, 63 px |
 | `Gru` | Grus | Tranen | moved | candidate 3 to 7, 20 px |
 | `Her` | Hercules | Herkules | renamed in place | candidate 10 |
 | `Hor` | Horologium | Uret | omitted in Latin | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
 | `Ind` | Indus | Inderen | omitted in Latin | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
 | `Lac` | Lacerta | Øglen | moved | candidate 10 to 2, 20 px |
-| `Lyr` | Lyra | Lyren | renamed in place | candidate 2 |
-| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 10 |
-| `Phe` | Phoenix | Føniks | renamed in place | candidate 10 |
-| `PsA` | Piscis Austrinus | Sørlige fisk | renamed in place | candidate 10 |
-| `Psc` | Pisces | Fiskene | moved | candidate 2 to 0, 20 px |
-| `Scl` | Sculptor | Billedhuggeren | renamed in place | candidate 10 |
-| `Sge` | Sagitta | Pilen | renamed in place | candidate 2 |
+| `Lyr` | Lyra | Lyren | renamed in place | candidate 8 |
+| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 4 |
+| `Phe` | Phoenix | Føniks | moved | candidate 9 to 5, 28 px |
+| `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 1 to 0, 20 px |
+| `Psc` | Pisces | Fiskene | renamed in place | candidate 0 |
+| `Scl` | Sculptor | Billedhuggeren | moved | candidate 10 to 0, 40 px |
+| `Sge` | Sagitta | Pilen | renamed in place | candidate 1 |
 | `Sgr` | Sagittarius | Skytten | renamed in place | candidate 10 |
 | `Tau` | Taurus | Tyren | renamed in place | candidate 13 |
-| `Tri` | Triangulum | Triangelet | moved | candidate 1 to 0, 20 px |
-| `Vul` | Vulpecula | Reven | renamed in place | candidate 10 |
+| `Tri` | Triangulum | Triangelet | renamed in place | candidate 10 |
+| `Vul` | Vulpecula | Reven | moved | candidate 8 to 5, 20 px |
 
 ## the north pole, 42 degrees
 
-4 constellation names asked in Latin, 4 in Norwegian.
+Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 4 constellation names asked in Latin, 4 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
@@ -286,7 +287,7 @@ their lower-case forms.
 
 ## the south pole, 42 degrees
 
-9 constellation names asked in Latin, 9 in Norwegian.
+Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 9 constellation names asked in Latin, 9 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
@@ -302,101 +303,101 @@ their lower-case forms.
 
 ## the north pole, 180 degrees
 
-41 constellation names asked in Latin, 41 in Norwegian.
+Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 41 constellation names asked in Latin, 41 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
 | `Aql` | Aquila | Ørnen | renamed in place | candidate 4 |
-| `Ari` | Aries | Væren | moved | candidate 2 to 4, 20 px |
-| `Aur` | Auriga | Kusken | renamed in place | candidate 3 |
-| `Boo` | Boötes | Oksedriveren | moved | candidate 2 to 10, 20 px |
+| `Ari` | Aries | Væren | renamed in place | candidate 4 |
+| `Aur` | Auriga | Kusken | renamed in place | candidate 0 |
+| `Boo` | Boötes | Oksedriveren | renamed in place | candidate 14 |
 | `CVn` | Canes Venatici | Jakthundene | renamed in place | candidate 10 |
-| `Cam` | Camelopardalis | Sjiraffen | renamed in place | candidate 11 |
+| `Cam` | Camelopardalis | Sjiraffen | renamed in place | candidate 3 |
 | `Cas` | Cassiopeia | Kassiopeia | renamed in place | candidate 3 |
 | `Cep` | Cepheus | Kefeus | renamed in place | candidate 15 |
 | `Cnc` | Cancer | Krepsen | renamed in place | candidate 9 |
-| `Com` | Coma Berenices | Berenikes hår | moved | candidate 6 to 8, 20 px |
+| `Com` | Coma Berenices | Berenikes hår | renamed in place | candidate 8 |
 | `CrB` | Corona Borealis | Nordlige krone | renamed in place | candidate 6 |
-| `Cyg` | Cygnus | Svanen | renamed in place | candidate 12 |
+| `Cyg` | Cygnus | Svanen | renamed in place | candidate 4 |
 | `Del` | Delphinus | Delfinen | omitted in Latin | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
-| `Dra` | Draco | Dragen | renamed in place | candidate 12 |
-| `Gem` | Gemini | Tvillingene | moved | candidate 9 to 13, 40 px |
-| `Her` | Hercules | Herkules | renamed in place | candidate 10 |
-| `LMi` | Leo Minor | Lille løve | renamed in place | candidate 9 |
-| `Lac` | Lacerta | Øglen | renamed in place | candidate 5 |
+| `Dra` | Draco | Dragen | renamed in place | candidate 6 |
+| `Gem` | Gemini | Tvillingene | renamed in place | candidate 1 |
+| `Her` | Hercules | Herkules | renamed in place | candidate 12 |
+| `LMi` | Leo Minor | Lille løve | renamed in place | candidate 6 |
+| `Lac` | Lacerta | Øglen | moved | candidate 9 to 3, 28 px |
 | `Leo` | Leo | Løven | moved | candidate 0 to 1, 20 px |
-| `Lyn` | Lynx | Gaupen | renamed in place | candidate 0 |
-| `Lyr` | Lyra | Lyren | moved | candidate 1 to 6, 45 px |
+| `Lyn` | Lynx | Gaupen | renamed in place | candidate 2 |
+| `Lyr` | Lyra | Lyren | moved | candidate 2 to 6, 20 px |
 | `Oph` | Ophiuchus | Slangebæreren | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
-| `Psc` | Pisces | Fiskene | renamed in place | candidate 3 |
+| `Psc` | Pisces | Fiskene | moved | candidate 2 to 0, 20 px |
 | `Ser` | Serpens Caput | Slangen | renamed in place | candidate 10 |
 | `Sge` | Sagitta | Pilen | renamed in place | candidate 2 |
-| `Tau` | Taurus | Tyren | moved | candidate 9 to 5, 28 px |
-| `Tri` | Triangulum | Triangelet | renamed in place | candidate 9 |
-| `UMa` | Ursa Major | Store bjørn | renamed in place | candidate 4 |
+| `Tau` | Taurus | Tyren | renamed in place | candidate 5 |
+| `Tri` | Triangulum | Triangelet | moved | candidate 0 to 8, 20 px |
+| `UMa` | Ursa Major | Store bjørn | moved | candidate 14 to 8, 45 px |
 | `UMi` | Ursa Minor | Lille bjørn | renamed in place | candidate 10 |
 | `Vir` | Virgo | Jomfruen | moved | candidate 5 to 8, 20 px |
-| `Vul` | Vulpecula | Reven | moved | candidate 10 to 14, 40 px |
+| `Vul` | Vulpecula | Reven | renamed in place | candidate 14 |
 
 ## the south pole, 180 degrees
 
-56 constellation names asked in Latin, 56 in Norwegian.
+Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 56 constellation names asked in Latin, 56 in Norwegian.
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
-| `Ant` | Antlia | Luftpumpen | renamed in place | candidate 1 |
+| `Ant` | Antlia | Luftpumpen | moved | candidate 0 to 1, 20 px |
 | `Aps` | Apus | Paradisfuglen | moved | candidate 2 to 6, 20 px |
 | `Aql` | Aquila | Ørnen | renamed in place | candidate 6 |
-| `Aqr` | Aquarius | Vannmannen | moved | candidate 6 to 16, 28 px |
-| `Ara` | Ara | Alteret | moved | candidate 2 to 10, 20 px |
+| `Aqr` | Aquarius | Vannmannen | moved | candidate 16 to 6, 28 px |
+| `Ara` | Ara | Alteret | renamed in place | candidate 5 |
 | `CMa` | Canis Major | Store hund | renamed in place | candidate 11 |
-| `Cae` | Caelum | Gravstikken | renamed in place | candidate 9 |
-| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 10 |
-| `Car` | Carina | Kjølen | renamed in place | candidate 15 |
+| `Cae` | Caelum | Gravstikken | renamed in place | candidate 5 |
+| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 16 |
+| `Car` | Carina | Kjølen | renamed in place | candidate 12 |
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 14 |
 | `Cet` | Cetus | Hvalen | renamed in place | candidate 5 |
-| `Cha` | Chamaeleon | Kameleonen | moved | candidate 0 to 10, 40 px |
+| `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 10 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 9 |
-| `Col` | Columba | Duen | moved | candidate 9 to 3, 28 px |
+| `Col` | Columba | Duen | renamed in place | candidate 9 |
 | `CrA` | Corona Austrina | Sørlige krone | renamed in place | candidate 10 |
 | `Crt` | Crater | Begeret | renamed in place | candidate 9 |
-| `Cru` | Crux | Sydkorset | renamed in place | candidate 5 |
-| `Crv` | Corvus | Ravnen | renamed in place | candidate 1 |
-| `Dor` | Dorado | Gullfisken | moved | candidate 0 to 4, 28 px |
-| `Eri` | Eridanus | Floden | renamed in place | candidate 13 |
-| `For` | Fornax | Smelteovnen | renamed in place | candidate 9 |
-| `Gru` | Grus | Tranen | renamed in place | candidate 5 |
-| `Hor` | Horologium | Uret | renamed in place | candidate 9 |
-| `Hya` | Hydra | Vannslangen | moved | candidate 4 to 7, 20 px |
-| `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 12 to 15, 40 px |
-| `Ind` | Indus | Inderen | renamed in place | candidate 10 |
+| `Cru` | Crux | Sydkorset | renamed in place | candidate 6 |
+| `Crv` | Corvus | Ravnen | renamed in place | candidate 9 |
+| `Dor` | Dorado | Gullfisken | renamed in place | candidate 6 |
+| `Eri` | Eridanus | Floden | moved | candidate 14 to 0, 57 px |
+| `For` | Fornax | Smelteovnen | moved | candidate 9 to 1, 20 px |
+| `Gru` | Grus | Tranen | renamed in place | candidate 9 |
+| `Hor` | Horologium | Uret | moved | candidate 2 to 0, 20 px |
+| `Hya` | Hydra | Vannslangen | moved | candidate 4 to 8, 45 px |
+| `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 15 to 11, 40 px |
+| `Ind` | Indus | Inderen | renamed in place | candidate 7 |
 | `Lep` | Lepus | Haren | renamed in place | candidate 3 |
-| `Lib` | Libra | Vekten | renamed in place | candidate 4 |
-| `Lup` | Lupus | Ulven | renamed in place | candidate 9 |
+| `Lib` | Libra | Vekten | moved | candidate 6 to 4, 40 px |
+| `Lup` | Lupus | Ulven | moved | candidate 5 to 9, 28 px |
 | `Men` | Mensa | Taffelberget | moved | candidate 5 to 9, 28 px |
-| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 16 |
+| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 5 |
 | `Mon` | Monoceros | Enhjørningen | moved | candidate 9 to 11, 40 px |
 | `Mus` | Musca | Fluen | renamed in place | candidate 2 |
-| `Nor` | Norma | Vinkelhaken | moved | candidate 2 to 10, 20 px |
-| `Oct` | Octans | Oktanten | moved | candidate 1 to 9, 20 px |
-| `Oph` | Ophiuchus | Slangebæreren | renamed in place | candidate 12 |
-| `Pav` | Pavo | Påfuglen | moved | candidate 10 to 9, 80 px |
-| `Phe` | Phoenix | Føniks | renamed in place | candidate 16 |
-| `Pic` | Pictor | Maleren | moved | candidate 13 to 7, 72 px |
-| `PsA` | Piscis Austrinus | Sørlige fisk | renamed in place | candidate 8 |
-| `Pup` | Puppis | Akterstavnen | renamed in place | candidate 11 |
-| `Pyx` | Pyxis | Kompasset | renamed in place | candidate 16 |
+| `Nor` | Norma | Vinkelhaken | renamed in place | candidate 0 |
+| `Oct` | Octans | Oktanten | renamed in place | candidate 0 |
+| `Oph` | Ophiuchus | Slangebæreren | moved | candidate 10 to 12, 40 px |
+| `Pav` | Pavo | Påfuglen | renamed in place | candidate 0 |
+| `Phe` | Phoenix | Føniks | renamed in place | candidate 4 |
+| `Pic` | Pictor | Maleren | renamed in place | candidate 0 |
+| `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 4 to 0, 28 px |
+| `Pup` | Puppis | Akterstavnen | moved | candidate 11 to 13, 80 px |
+| `Pyx` | Pyxis | Kompasset | renamed in place | candidate 6 |
 | `Ret` | Reticulum | Nettet | renamed in place | candidate 9 |
-| `Scl` | Sculptor | Billedhuggeren | renamed in place | candidate 6 |
+| `Scl` | Sculptor | Billedhuggeren | moved | candidate 1 to 0, 20 px |
 | `Sco` | Scorpius | Skorpionen | renamed in place | candidate 10 |
 | `Ser` | Serpens Caput | Slangen | moved | candidate 10 to 14, 40 px |
 | `Sgr` | Sagittarius | Skytten | renamed in place | candidate 12 |
 | `Tel` | Telescopium | Teleskopet | renamed in place | candidate 10 |
-| `TrA` | Triangulum Australe | Sørlige triangel | moved | candidate 2 to 1, 40 px |
-| `Tuc` | Tucana | Tukanen | moved | candidate 8 to 5, 20 px |
-| `Vel` | Vela | Seilet | renamed in place | candidate 16 |
+| `TrA` | Triangulum Australe | Sørlige triangel | moved | candidate 2 to 0, 20 px |
+| `Tuc` | Tucana | Tukanen | renamed in place | candidate 0 |
+| `Vel` | Vela | Seilet | moved | candidate 2 to 16, 45 px |
 | `Vir` | Virgo | Jomfruen | moved | candidate 3 to 7, 20 px |
-| `Vol` | Volans | Flygefisken | moved | candidate 3 to 7, 20 px |
+| `Vol` | Volans | Flygefisken | renamed in place | candidate 16 |
 
 
 ## What the lead costs, in total
@@ -405,12 +406,12 @@ These are **placement observations across 14 pages**, not distinct constellation
 
 | outcome | observations |
 |---|---|
-| renamed in place (no cost) | 167 |
+| renamed in place (no cost) | 168 |
 | moved | 102 |
 | omitted in one language | 10 |
-| identical in both languages | 18 |
+| identical in both languages | 17 |
 
-**Unique constellation identities affected** (moved, omitted or renamed at least once): 84 of 88.
+**Unique constellation identities affected** (moved, omitted or renamed at least once): 85 of 88.
 
 Closest any written name comes to the page edge, measured from its whole box: 2.6 px (Ant on Orion, 120 degrees).
 
@@ -422,52 +423,50 @@ Measured: 287 labels. Not measurable: 0 (premise: the constellation, or every ri
 
 | id | page | to own | to rival | rival | margin |
 |---|---|---|---|---|---|
-| `Ser` | Sagittarius, 120 degrees | 89.6 px | 0.0 px | `Oph` | -89.6 px |
-| `Ser` | the globe at Sagittarius, 180 degrees | 49.5 px | 0.0 px | `Oph` | -49.5 px |
-| `Psc` | the north pole, 180 degrees | 24.6 px | 0.0 px | `And` | -24.6 px |
+| `Ser` | Sagittarius, 120 degrees | 74.1 px | 0.0 px | `Oph` | -74.1 px |
 | `Psc` | the RA seam, 42 degrees | 157.7 px | 134.3 px | `Peg` | -23.4 px |
+| `Ser` | the globe at Sagittarius, 180 degrees | 23.3 px | 0.0 px | `Oph` | -23.3 px |
 | `Vir` | the north pole, 180 degrees | 22.4 px | 0.0 px | `Com` | -22.4 px |
 | `Ser` | the north pole, 180 degrees | 21.6 px | 0.0 px | `CrB` | -21.6 px |
 | `And` | the globe at Orion, 180 degrees | 15.8 px | 0.0 px | `Tri` | -15.8 px |
-| `Dra` | the north pole, 180 degrees | 24.9 px | 9.5 px | `UMi` | -15.4 px |
-| `Sco` | Sagittarius, 120 degrees | 15.0 px | 0.6 px | `Lup` | -14.3 px |
-| `Hya` | the south pole, 180 degrees | 16.1 px | 2.2 px | `Ant` | -14.0 px |
-| `Peg` | the globe at Sagittarius, 180 degrees | 13.1 px | 0.1 px | `Equ` | -13.0 px |
-| `Boo` | the globe at Sagittarius, 180 degrees | 11.7 px | 0.0 px | `Ser` | -11.7 px |
+| `Aql` | the south pole, 180 degrees | 10.8 px | 0.0 px | `Sgr` | -10.8 px |
+| `Pyx` | Orion, 120 degrees | 10.5 px | 0.0 px | `Pup` | -10.5 px |
+| `Cet` | the RA seam, 180 degrees | 33.2 px | 22.7 px | `Psc` | -10.4 px |
+| `Mon` | the south pole, 180 degrees | 7.9 px | 0.0 px | `CMa` | -7.9 px |
+| `Aqr` | the south pole, 180 degrees | 7.3 px | 0.0 px | `PsA` | -7.3 px |
+| `UMa` | the globe at Orion, 180 degrees | 5.5 px | 0.0 px | `Lyn` | -5.5 px |
 
 *The twelve tightest margins, ascending.*
 
-**Negative margins: 25** — for owner inspection, not automatically a defect. Placement uses the constellation's visible geography, and where figures interlock or one contributes only a stub of line, the nearest line is an imperfect oracle for what a reader reads as belonging.
+**Negative margins: 23** — for owner inspection, not automatically a defect. Placement uses the constellation's visible geography, and where figures interlock or one contributes only a stub of line, the nearest line is an imperfect oracle for what a reader reads as belonging.
 
-- `Sco` on Sagittarius, 120 degrees: 15.0 px from its own figure, 0.6 px from `Lup` (margin -14.3 px)
-- `Ser` on Sagittarius, 120 degrees: 89.6 px from its own figure, 0.0 px from `Oph` (margin -89.6 px)
-- `Boo` on the globe at Sagittarius, 180 degrees: 11.7 px from its own figure, 0.0 px from `Ser` (margin -11.7 px)
-- `Car` on the globe at Sagittarius, 180 degrees: 0.2 px from its own figure, 0.0 px from `Cha` (margin -0.2 px)
+- `Ser` on Sagittarius, 120 degrees: 74.1 px from its own figure, 0.0 px from `Oph` (margin -74.1 px)
+- `Pyx` on Orion, 120 degrees: 10.5 px from its own figure, 0.0 px from `Pup` (margin -10.5 px)
 - `Cyg` on the globe at Sagittarius, 180 degrees: 0.0 px from its own figure, 0.0 px from `Vul` (margin -0.0 px)
-- `Peg` on the globe at Sagittarius, 180 degrees: 13.1 px from its own figure, 0.1 px from `Equ` (margin -13.0 px)
-- `Ser` on the globe at Sagittarius, 180 degrees: 49.5 px from its own figure, 0.0 px from `Oph` (margin -49.5 px)
+- `Lup` on the globe at Sagittarius, 180 degrees: 3.1 px from its own figure, 1.1 px from `Nor` (margin -2.0 px)
+- `Ser` on the globe at Sagittarius, 180 degrees: 23.3 px from its own figure, 0.0 px from `Oph` (margin -23.3 px)
 - `And` on the globe at Orion, 180 degrees: 15.8 px from its own figure, 0.0 px from `Tri` (margin -15.8 px)
+- `Dor` on the globe at Orion, 180 degrees: 0.4 px from its own figure, 0.0 px from `Pic` (margin -0.4 px)
+- `Pic` on the globe at Orion, 180 degrees: 3.8 px from its own figure, 0.0 px from `Car` (margin -3.8 px)
 - `UMa` on the globe at Orion, 180 degrees: 5.5 px from its own figure, 0.0 px from `Lyn` (margin -5.5 px)
 - `Psc` on the RA seam, 42 degrees: 157.7 px from its own figure, 134.3 px from `Peg` (margin -23.4 px)
+- `Cet` on the RA seam, 180 degrees: 33.2 px from its own figure, 22.7 px from `Psc` (margin -10.4 px)
 - `Sgr` on the RA seam, 180 degrees: 1.9 px from its own figure, 0.0 px from `Cap` (margin -1.9 px)
 - `Aql` on the north pole, 180 degrees: 0.4 px from its own figure, 0.0 px from `Cyg` (margin -0.4 px)
-- `Dra` on the north pole, 180 degrees: 24.9 px from its own figure, 9.5 px from `UMi` (margin -15.4 px)
 - `Ori` on the north pole, 180 degrees: 1.7 px from its own figure, 0.0 px from `Aur` (margin -1.7 px)
-- `Psc` on the north pole, 180 degrees: 24.6 px from its own figure, 0.0 px from `And` (margin -24.6 px)
+- `Psc` on the north pole, 180 degrees: 7.2 px from its own figure, 2.5 px from `And` (margin -4.7 px)
 - `Ser` on the north pole, 180 degrees: 21.6 px from its own figure, 0.0 px from `CrB` (margin -21.6 px)
 - `Vir` on the north pole, 180 degrees: 22.4 px from its own figure, 0.0 px from `Com` (margin -22.4 px)
 - `Aql` on the south pole, 180 degrees: 10.8 px from its own figure, 0.0 px from `Sgr` (margin -10.8 px)
-- `Aqr` on the south pole, 180 degrees: 10.2 px from its own figure, 0.0 px from `PsA` (margin -10.2 px)
+- `Aqr` on the south pole, 180 degrees: 7.3 px from its own figure, 0.0 px from `PsA` (margin -7.3 px)
 - `Cet` on the south pole, 180 degrees: 2.6 px from its own figure, 0.0 px from `Scl` (margin -2.6 px)
-- `Eri` on the south pole, 180 degrees: 2.3 px from its own figure, 0.0 px from `Hor` (margin -2.3 px)
-- `Hya` on the south pole, 180 degrees: 16.1 px from its own figure, 2.2 px from `Ant` (margin -14.0 px)
 - `Mon` on the south pole, 180 degrees: 7.9 px from its own figure, 0.0 px from `CMa` (margin -7.9 px)
 - `Ser` on the south pole, 180 degrees: 3.1 px from its own figure, 0.0 px from `Oph` (margin -3.1 px)
 - `Vir` on the south pole, 180 degrees: 4.2 px from its own figure, 0.0 px from `Hya` (margin -4.2 px)
 
 ### Why the metric changed
 
-The first attempt compared bounding-box **centres**. It reported 30 detached labels on this corpus, and their distribution gave it away: they clustered on 180-degree globes, which is exactly where a bounding box least resembles the figure inside it. The corrected metric measures to the real projected path and finds 25 negative margins, for a geometric reason rather than a change of threshold.
+The first attempt compared bounding-box **centres**. It reported 33 detached labels on this corpus — a REJECTED METRIC, recorded only so its bias can be shown. Its count is not a measure of placement and a rise in it means nothing about the page. Their distribution gave it away: they clustered on 180-degree globes, which is exactly where a bounding box least resembles the figure inside it. The corrected metric measures to the real projected path and finds 23 negative margins, for a geometric reason rather than a change of threshold.
 
 ## Why this report can be trusted to go stale
 

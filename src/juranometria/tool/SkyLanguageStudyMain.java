@@ -172,37 +172,51 @@ public final class SkyLanguageStudyMain {
 
     static {
         PAGES.put("crowded Sagittarius, 18 degrees", new ChartViewState(
-                new SkyPosition(271.0, -24.0), 18.0, 8.0));
+                new SkyPosition(271.0, -24.0), 18.0,
+                ChartViewState.defaultMagnitudeFor(18.0)));
         PAGES.put("sparse Orion, 18 degrees", new ChartViewState(
-                new SkyPosition(83.8, 0.0), 18.0, 8.0));
+                new SkyPosition(83.8, 0.0), 18.0,
+                ChartViewState.defaultMagnitudeFor(18.0)));
         PAGES.put("Sagittarius, 42 degrees", new ChartViewState(
-                new SkyPosition(271.0, -24.0), 42.0, 8.0));
+                new SkyPosition(271.0, -24.0), 42.0,
+                ChartViewState.defaultMagnitudeFor(42.0)));
         PAGES.put("Orion, 42 degrees", new ChartViewState(
-                new SkyPosition(83.8, 0.0), 42.0, 8.0));
+                new SkyPosition(83.8, 0.0), 42.0,
+                ChartViewState.defaultMagnitudeFor(42.0)));
         PAGES.put("Sagittarius, 120 degrees", new ChartViewState(
-                new SkyPosition(271.0, -24.0), 120.0, 8.0));
+                new SkyPosition(271.0, -24.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
         PAGES.put("Orion, 120 degrees", new ChartViewState(
-                new SkyPosition(83.8, 0.0), 120.0, 8.0));
+                new SkyPosition(83.8, 0.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
         PAGES.put("the globe at Sagittarius, 180 degrees",
                 new ChartViewState(new SkyPosition(271.0, -24.0),
-                        180.0, 8.0));
+                        180.0,
+                        ChartViewState.defaultMagnitudeFor(180.0)));
         PAGES.put("the globe at Orion, 180 degrees", new ChartViewState(
-                new SkyPosition(83.8, 0.0), 180.0, 8.0));
+                new SkyPosition(83.8, 0.0), 180.0,
+                ChartViewState.defaultMagnitudeFor(180.0)));
         // The RA seam. Named by the gate's corpus, and not
         // satisfied by another test that happens to cross it: a
         // study promises the pages it lists.
         PAGES.put("the RA seam, 42 degrees", new ChartViewState(
-                new SkyPosition(0.0, 20.0), 42.0, 8.0));
+                new SkyPosition(0.0, 20.0), 42.0,
+                ChartViewState.defaultMagnitudeFor(42.0)));
         PAGES.put("the RA seam, 180 degrees", new ChartViewState(
-                new SkyPosition(0.0, 20.0), 180.0, 8.0));
+                new SkyPosition(0.0, 20.0), 180.0,
+                ChartViewState.defaultMagnitudeFor(180.0)));
         PAGES.put("the north pole, 42 degrees", new ChartViewState(
-                new SkyPosition(0.0, 89.0), 42.0, 8.0));
+                new SkyPosition(0.0, 89.0), 42.0,
+                ChartViewState.defaultMagnitudeFor(42.0)));
         PAGES.put("the south pole, 42 degrees", new ChartViewState(
-                new SkyPosition(0.0, -89.0), 42.0, 8.0));
+                new SkyPosition(0.0, -89.0), 42.0,
+                ChartViewState.defaultMagnitudeFor(42.0)));
         PAGES.put("the north pole, 180 degrees", new ChartViewState(
-                new SkyPosition(0.0, 89.0), 180.0, 8.0));
+                new SkyPosition(0.0, 89.0), 180.0,
+                ChartViewState.defaultMagnitudeFor(180.0)));
         PAGES.put("the south pole, 180 degrees", new ChartViewState(
-                new SkyPosition(0.0, -89.0), 180.0, 8.0));
+                new SkyPosition(0.0, -89.0), 180.0,
+                ChartViewState.defaultMagnitudeFor(180.0)));
     }
 
     /** One measured attachment, for the distribution. */
@@ -216,6 +230,25 @@ public final class SkyLanguageStudyMain {
     }
 
     public static void main(String[] args) throws IOException {
+        // What the study measured, before what it found. A page's
+        // density is a production decision and the study must draw
+        // the page a reader gets: the globe fixtures were measured at
+        // V 8.0 until 2026-09-15, which the globe decision calls
+        // "solid" and which a reader reaches only by stepping the
+        // magnitude back up after arriving.
+        for (Map.Entry<String, ChartViewState> page : PAGES.entrySet()) {
+            double asked = page.getValue().limitingMagnitude();
+            double arrives = ChartViewState.defaultMagnitudeFor(
+                    page.getValue().fieldWidthDegrees());
+            if (asked != arrives) {
+                throw new IllegalStateException(page.getKey()
+                        + " is measured at V " + asked
+                        + " where the rung arrives at V " + arrives
+                        + "; a study that asks production to draw a"
+                        + " page a reader does not get measures"
+                        + " something else");
+            }
+        }
         if (PAGES.size() != PROMISED_PAGES) {
             throw new IllegalStateException(
                     "this study promises " + PROMISED_PAGES
@@ -416,7 +449,10 @@ public final class SkyLanguageStudyMain {
                 .append("The first attempt compared bounding-box ")
                 .append("**centres**. It reported ")
                 .append(boxCentreSaid.size())
-                .append(" detached labels on this corpus, and their ")
+                .append(" detached labels on this corpus — a REJECTED ")
+                .append("METRIC, recorded only so its bias can be shown. ")
+                .append("Its count is not a measure of placement and a ")
+                .append("rise in it means nothing about the page. Their ")
                 .append("distribution gave it away: they clustered on ")
                 .append("180-degree globes, which is exactly where a ")
                 .append("bounding box least resembles the figure inside ")
@@ -480,6 +516,11 @@ public final class SkyLanguageStudyMain {
                                    List<Fate> fates, int latinCount,
                                    int norskCount) {
         report.append("## ").append(where).append("\n\n")
+                .append("Limiting magnitude **V ")
+                .append(String.format(java.util.Locale.ROOT, "%.1f",
+                        PAGES.get(where).limitingMagnitude()))
+                .append("**, which is the limit this rung arrives with ")
+                .append("(`ChartViewState.defaultMagnitudeFor`). ")
                 .append(latinCount).append(" constellation names asked in ")
                 .append("Latin, ").append(norskCount)
                 .append(" in Norwegian.\n\n");
