@@ -126,7 +126,7 @@ never near. The distinction is in the footnote under the table.
 
 | text family | grid | boundary | figure | const. name | reference | dso symbol | star disc | star label | dso label | ring | title | key |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| const. name | 159 | 73 | 200 | — | 2 | 6 | 62 | 8 | · | · | 6 | · |
+| const. name | 155 | 72 | 200 | — | 2 | 6 | 62 | 8 | · | · | 6 | · |
 | star label | 221 | 162 | 239 | 8 | 6 | 15 | 32 | — | · | · | 22 | · |
 | dso label | 94 | 17 | 6 | · | 15 | 5 | 7 | · | — | · | · | · |
 
@@ -172,9 +172,9 @@ the migration section, and the two are different questions.
 | `orion-60` | 41 | 39 | 32 | 51 | 467 | 913 | 55 | 0.96 |
 | `orion-90` | 100 | 96 | 54 | 63 | 830 | 1371 | 62 | 1.00 |
 | `orion-120` | 175 | 174 | 128 | 169 | 2216 | 3438 | 70 | 1.00 |
-| `sagittarius-90` | 97 | 88 | 84 | 84 | 998 | 1091 | 95 | 0.94 |
-| `sagittarius-120` | 122 | 106 | 126 | 147 | 2070 | 2516 | 97 | 1.06 |
-| `cygnus-90` | 57 | 54 | 55 | 69 | 685 | 1315 | 73 | 1.00 |
+| `sagittarius-90` | 97 | 88 | 83 | 84 | 1016 | 1091 | 95 | 0.94 |
+| `sagittarius-120` | 122 | 106 | 126 | 147 | 2075 | 2516 | 97 | 1.04 |
+| `cygnus-90` | 57 | 54 | 54 | 69 | 677 | 1315 | 73 | 1.00 |
 | `crux-90` | 78 | 74 | 79 | 74 | 1082 | 1319 | 61 | 1.00 |
 | `pole-120` | 119 | 95 | 88 | 114 | 1232 | 2545 | 93 | 1.00 |
 | `seam-120` | 145 | 101 | 77 | 91 | 1320 | 1442 | 94 | 0.95 |
@@ -182,12 +182,12 @@ the migration section, and the two are different questions.
 | `orion-42-a4` | 21 | 21 | 26 | 63 | 251 | 610 | 29 | 1.00 |
 | `orion-42-letter` | 21 | 24 | 37 | 84 | 293 | 821 | 19 | 1.00 |
 | `orion-90-black` | 100 | 96 | 54 | 63 | 830 | 1365 | 62 | 1.00 |
-| `sagittarius-90-key` | 96 | 87 | 84 | 84 | 998 | 1091 | 95 | 0.94 |
-| `sagittarius-90-ecliptic` | 97 | 88 | 102 | 102 | 1608 | 1701 | 95 | 1.06 |
+| `sagittarius-90-key` | 96 | 87 | 83 | 84 | 1016 | 1091 | 95 | 0.94 |
+| `sagittarius-90-ecliptic` | 97 | 88 | 101 | 102 | 1626 | 1701 | 95 | 1.06 |
 | `orion-90-observer` | 100 | 96 | 59 | 68 | 892 | 1440 | 62 | 1.06 |
-| `nunki-searched` | 94 | 83 | 87 | 81 | 1154 | 1100 | 54 | 0.94 |
+| `nunki-searched` | 94 | 83 | 86 | 81 | 1189 | 1100 | 54 | 0.94 |
 | `orion-18-selected` | 15 | 19 | 10 | 23 | 117 | 261 | 20 | 1.00 |
-| **all 23 pages** | | | **1357** | **1827** | **19534** | **29281** | | **1.20** |
+| **all 23 pages** | | | **1352** | **1827** | **19620** | **29281** | | **1.20** |
 
 The collision measure does not depend on who is on top: each participant's ink is
 measured with the other absent, and the collision is the intersection. Which of the
@@ -212,12 +212,12 @@ grid and reference notation lighter still.
 |---|---:|---:|
 | star label over figure | 239 | 2721 |
 | star label over grid | 221 | 3184 |
-| const. name over figure | 200 | 3626 |
+| const. name over figure | 200 | 3700 |
 | star label over boundary | 162 | 1650 |
-| const. name over grid | 159 | 3227 |
+| const. name over grid | 155 | 3220 |
 | dso label over grid | 94 | 1133 |
-| const. name over boundary | 73 | 1054 |
-| star disc over const. name | 62 | 641 |
+| const. name over boundary | 72 | 1037 |
+| star disc over const. name | 62 | 677 |
 | star label over star disc | 32 | 264 |
 | title over star label | 22 | 741 |
 | dso label over boundary | 17 | 121 |
@@ -374,11 +374,11 @@ marking its own work.
 | | greedy, star labels first, keeping what it cannot place | 117 | 10 | 0 | 5 | 56 | 88 px | 982 |
 | | greedy, star labels first, least bad when nothing is free | 429 | 2 | 0 | 5 | 48 | 88 px | 1011 |
 | `sagittarius-120` | the atlas itself | 126 | 12 | — | — | — | — | — |
-| | greedy, star labels first | 83 | 0 | 14 | 0 | 41 | 116 px | 424 |
-| | greedy, constellation names first | 86 | 0 | 11 | 0 | 46 | 90 px | 421 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 53 | 0 | 57 | 71 px | 893 |
-| | greedy, star labels first, keeping what it cannot place | 149 | 21 | 0 | 2 | 42 | 116 px | 435 |
-| | greedy, star labels first, least bad when nothing is free | 133 | 13 | 0 | 2 | 42 | 116 px | 434 |
+| | greedy, star labels first | 83 | 0 | 14 | 0 | 40 | 116 px | 422 |
+| | greedy, constellation names first | 86 | 0 | 11 | 0 | 45 | 90 px | 419 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 52 | 0 | 58 | 71 px | 887 |
+| | greedy, star labels first, keeping what it cannot place | 149 | 21 | 0 | 2 | 41 | 116 px | 433 |
+| | greedy, star labels first, least bad when nothing is free | 133 | 13 | 0 | 2 | 41 | 116 px | 432 |
 | `crux-90` | the atlas itself | 79 | 1 | — | — | — | — | — |
 | | greedy, star labels first | 71 | 0 | 4 | 0 | 24 | 92 px | 251 |
 | | greedy, constellation names first | 70 | 0 | 3 | 0 | 26 | 92 px | 230 |
@@ -433,8 +433,8 @@ it and without it:
 |  | free | 18 | 12 | 82 px | 5 | 9 | 57 |
 | `orion-120` | owned | 27 | 14 | 82 px | 0 | 12 | 429 |
 |  | free | 27 | 16 | 82 px | 6 | 13 | 426 |
-| `sagittarius-120` | owned | 30 | 15 | 73 px | 0 | 15 | 133 |
-|  | free | 30 | 18 | 92 px | 10 | 17 | 116 |
+| `sagittarius-120` | owned | 30 | 14 | 73 px | 0 | 15 | 133 |
+|  | free | 30 | 17 | 92 px | 10 | 17 | 116 |
 | `crux-90` | owned | 27 | 11 | 57 px | 0 | 16 | 83 |
 |  | free | 27 | 15 | 62 px | 6 | 17 | 81 |
 
@@ -545,9 +545,9 @@ a loss and a gain.
 | `sagittarius-90-key` | 72 | 81 | 49 | 22 | 100 px | 1 | 10 |
 | `sagittarius-90-ecliptic` | 73 | 81 | 50 | 22 | 100 px | 1 | 9 |
 | `orion-90-observer` | 56 | 64 | 31 | 23 | 84 px | 2 | 10 |
-| `nunki-searched` | 69 | 79 | 43 | 26 | 100 px | 0 | 10 |
+| `nunki-searched` | 69 | 79 | 42 | 27 | 100 px | 0 | 10 |
 | `orion-18-selected` | 16 | 16 | 8 | 8 | 86 px | 0 | 0 |
-| **all pages** | **1152** | **1267** | **647** | **472** | **113 px** | **33** | **148** |
+| **all pages** | **1152** | **1267** | **646** | **473** | **113 px** | **33** | **148** |
 
 The atlas draws **115 more** pieces of text than it did, and the two directions
 are different things. What it stopped drawing is the clipping decision being
@@ -649,8 +649,8 @@ the thing it names, which is the jump a reader notices.
 | `orion-60` | 35 | 3 | 9% | met | 15 |
 | `orion-90` | 63 | 7 | 11% | met | 16 |
 | `orion-120` | 96 | 13 | 14% | met | 29 |
-| `sagittarius-90` | 79 | 5 | 6% | met | 15 |
-| `sagittarius-120` | 116 | 18 | 16% | **over** | 22 |
+| `sagittarius-90` | 79 | 5 | 6% | met | 14 |
+| `sagittarius-120` | 116 | 18 | 16% | **over** | 21 |
 | `cygnus-90` | 52 | 5 | 10% | met | 8 |
 | `crux-90` | 76 | 12 | 16% | **over** | 19 |
 | `pole-120` | 90 | 19 | 21% | **over** | 12 |
@@ -659,12 +659,12 @@ the thing it names, which is the jump a reader notices.
 | `orion-42-a4` | 18 | 3 | 17% | **over** | 7 |
 | `orion-42-letter` | 18 | 5 | 28% | **over** | 4 |
 | `orion-90-black` | 63 | 7 | 11% | met | 16 |
-| `sagittarius-90-key` | 79 | 6 | 8% | met | 15 |
-| `sagittarius-90-ecliptic` | 79 | 5 | 6% | met | 15 |
+| `sagittarius-90-key` | 79 | 6 | 8% | met | 14 |
+| `sagittarius-90-ecliptic` | 79 | 5 | 6% | met | 14 |
 | `orion-90-observer` | 63 | 7 | 11% | met | 16 |
-| `nunki-searched` | 75 | 12 | 16% | **over** | 13 |
+| `nunki-searched` | 75 | 11 | 15% | met | 14 |
 | `orion-18-selected` | 15 | 1 | 7% | met | 2 |
-| **all pages** | **1233** | **161** | **13%** | **met** | |
+| **all pages** | **1233** | **160** | **13%** | **met** | |
 
 Over the corpus the budget is met. On eleven pages it is not, and the two facts
 are not in tension: a page of eighteen labels moves five of them and reads as 28%,
@@ -676,11 +676,11 @@ the position it held on the first one:
 | what refused the position it had | labels |
 |---|---:|
 | a star's mark or a symbol | 44 |
-| another label, itself displaced or newly there | 22 |
+| another label, itself displaced or newly there | 21 |
 | nothing - it took an earlier candidate the pan had freed | 65 |
 | the paper's edge | 20 |
 | the title block or the key | 10 |
-| **all** | **161** |
+| **all** | **160** |
 
 The largest group is not a collision at all: those labels moved to an **earlier**
 candidate that the pan had freed - a label going back to the side it prefers, as
@@ -704,8 +704,8 @@ orders, placed by the same pass and counted by the same rule as the table above:
 
 | candidate order | displaced by a pan | of |
 |---|---:|---:|
-| the gate's: east, west, then the diagonals | 161 | 1233 |
-| neighbours first | 167 | 1233 |
+| the gate's: east, west, then the diagonals | 160 | 1233 |
+| neighbours first | 166 | 1233 |
 
 Better on 3 pages, worse on 8, and no improvement over the corpus. The stated
 order stands.
@@ -730,7 +730,7 @@ on every machine. The budget is a tenth.
 | `orion-36` | 18 | 1566 | 28188 | 1561 | 86 | 5.5% | met |
 | `orion-90` | 66 | 174 | 11484 | 503 | 7 | 4.4% | met |
 | `orion-120` | 101 | 249 | 25149 | 828 | 8 | 3.3% | met |
-| `sagittarius-120` | 119 | 271 | 32249 | 977 | 8 | 3.0% | met |
+| `sagittarius-120` | 119 | 271 | 32249 | 976 | 8 | 3.0% | met |
 | `crux-90` | 80 | 166 | 13280 | 228 | 2 | 1.7% | met |
 
 The index is a uniform grid of 64-pixel cells: a candidate box asks the cells it
@@ -771,7 +771,7 @@ must not get worse.
 
 ## What this cost to measure
 
-23 pages and 16831 painted renders for the census alone. Every collision in this
+23 pages and 16829 painted renders for the census alone. Every collision in this
 document is one of those renders differenced against another, which is what a
 collision nobody can dispute costs.
 

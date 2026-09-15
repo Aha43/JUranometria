@@ -24,20 +24,20 @@ cites it as one machine's measurement.
 
 page          without                     disc limb band
 sagittarius   nothing (as drawn)         24.8%     41.2%
-              constellation boundaries     21.5%     35.7%
-              the coordinate grid        21.2%     35.4%
+              constellation boundaries     21.4%     35.7%
+              the coordinate grid        21.1%     35.4%
               constellation figures      19.0%     34.2%
               constellation names        22.1%     38.5%
-              star names and letters     22.5%     38.0%
+              star names and letters     22.4%     38.0%
 orion         nothing (as drawn)         22.8%     38.1%
               constellation boundaries     19.7%     33.7%
               the coordinate grid        19.5%     32.4%
               constellation figures      18.1%     32.4%
               constellation names        20.8%     36.4%
               star names and letters     20.3%     34.8%
-south-pole    nothing (as drawn)         25.8%     36.8%
-              constellation boundaries     22.2%     32.3%
-              the coordinate grid        22.8%     32.7%
+south-pole    nothing (as drawn)         25.7%     36.8%
+              constellation boundaries     22.2%     32.4%
+              the coordinate grid        22.7%     32.8%
               constellation figures      19.6%     30.2%
               constellation names        22.9%     34.9%
               star names and letters     23.1%     33.8%

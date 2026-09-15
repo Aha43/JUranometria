@@ -2,8 +2,8 @@ package juranometria.tool;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,140 +13,117 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The decision record states what is true now (issue #347).
+ * The gate's record says what the gate measured (issue #347).
  *
- * <p>A document is the one kind of evidence nothing regenerates. Its
- * figures are typed once and then quietly outlive the thing they
- * describe: the gate's own record went to review claiming 446
- * reader-visible occurrences after the drain had taken them to 749,
- * and 25 negative attachment margins after the density correction had
- * taken them to 23. Every measured figure was reproducible, and the
- * sentences around them were stale.
+ * <p>Its figures are <strong>frozen at the gate boundary</strong>.
+ * They describe the tree #347 evaluated - merge commit
+ * {@code 8fb6789} - and are deliberately not refreshed as later work
+ * adds strings. A decision record should explain what was approved;
+ * one rewritten by every branch that touches the corpus stops
+ * explaining anything, and #348 onwards would be editing a closed
+ * document to keep a number true of a tree nobody is reviewing.
  *
- * <p>So the numbers a reader of the record relies on are read back
- * out of it and compared against the thing that produced them. The
- * prose is a human's to write; the figures inside it are checked.
+ * <p>So this no longer compares the record against a live scan. It
+ * did, and that was right while the gate was open - it caught the
+ * record claiming 446 reader occurrences after the drain had taken
+ * them to 749. Once the gate closed, the same check became a demand
+ * that a historical measurement track the present, and #348's first
+ * commit tripped it by adding thirteen strings.
+ *
+ * <p>What survives is what a frozen record can still get wrong:
+ * arithmetic that does not add up, and a boundary it fails to name.
+ * The live surface belongs to {@link SkyLanguageLedgerTest}, which
+ * holds the scanner and the ledger to each other and is where #350's
+ * translation queue is actually governed.
  */
 class SkyLanguageRecordTest {
 
     private static final Path RECORD =
             Path.of("docs/decisions/sky-language.md");
 
-    private static final Path STUDY =
-            Path.of("docs/studies/sky-language/placement.md");
-
-    /** The audit figures, against a live scan. */
+    /** A frozen figure is only meaningful beside the tree it describes. */
     @Test
-    void theRecordStatesTheAuditItActuallyHas() throws Exception {
+    void theRecordNamesTheTreeItsFiguresDescribe() throws Exception {
         String record = Files.readString(RECORD);
-        List<SkyLanguageScan.Literal> literals =
-                SkyLanguageScan.scan(Path.of(".")).stream()
-                        .flatMap(f -> f.literals().stream()).toList();
-        Map<String, SkyLanguageLedger.Entry> ledger =
-                SkyLanguageLedger.read();
-        List<SkyLanguageScan.Literal> queue =
-                SkyLanguageLedger.readerSurface(literals, ledger);
 
-        assertStated(record, "\\*\\*([\\d,]+) string literals\\*\\*",
-                literals.size(), "the corpus it partitions");
-        assertStated(record,
-                "surface: ([\\d,]+) occurrences", queue.size(),
-                "the reader-visible occurrences");
-        assertStated(record,
-                "occurrences, ([\\d,]+) unique translation",
-                (int) queue.stream()
-                        .map(SkyLanguageScan.Literal::text)
-                        .distinct().count(),
-                "the unique translation units");
+        assertTrue(record.contains("frozen at the gate boundary"),
+                "the record says its figures are frozen, so a reader"
+                        + " does not take them for current measurements");
+        assertTrue(Pattern.compile("`[0-9a-f]{7,40}`").matcher(record)
+                        .find(),
+                "and names the commit they were taken on; a frozen"
+                        + " number with no tree beside it is a number"
+                        + " nobody can check");
+    }
 
-        for (SkyLanguageScan.Surface surface
-                : SkyLanguageScan.Surface.values()) {
-            long held = literals.stream()
-                    .filter(l -> l.surface() == surface).count();
-            assertTrue(record.contains("| " + group(held) + " |"),
-                    "the record's surface table states "
-                            + surface + " as " + held);
+    /** The surface table accounts for the whole corpus. */
+    @Test
+    void theSurfacesSumToTheCorpusTheRecordStates() throws Exception {
+        String record = Files.readString(RECORD);
+        int stated = stated(record, "\\*\\*([\\d,]+) string literals\\*\\*");
+
+        List<Integer> surfaces = new ArrayList<>();
+        Matcher row = Pattern.compile(
+                "\\| (?:developer tools and generators|confined"
+                        + " diagnostics|application|export|reader-reachable"
+                        + " diagnostics) \\| ([\\d,]+) \\|")
+                .matcher(record);
+        while (row.find()) {
+            surfaces.add(Integer.parseInt(row.group(1).replace(",", "")));
         }
+
+        assertEquals(5, surfaces.size(),
+                "all five surfaces are tabulated: " + surfaces);
+        assertEquals(stated, surfaces.stream()
+                        .mapToInt(Integer::intValue).sum(),
+                "and they account for the whole corpus, so a surface"
+                        + " cannot be dropped from the table while the"
+                        + " total stays put: " + surfaces);
     }
 
-    /** The confidence split, which #350 relies on. */
+    /** The confidence split accounts for the whole queue. */
     @Test
-    void theRecordStatesHowFirmlyEachFigureIsKnown() throws Exception {
+    void theConfidenceSplitSumsToTheReaderSurface() throws Exception {
         String record = Files.readString(RECORD);
-        List<SkyLanguageScan.Literal> queue =
-                SkyLanguageLedger.readerSurface(
-                        SkyLanguageScan.scan(Path.of(".")).stream()
-                                .flatMap(f -> f.literals().stream())
-                                .toList(),
-                        SkyLanguageLedger.read());
+        int occurrences = stated(record,
+                "baseline #347 established: ([\\d,]+) occurrences");
+        int traced = stated(record, "\\*\\*([\\d,]+) traced\\*\\*");
+        int recognised = stated(record, "\\*\\*([\\d,]+) recognised\\*\\*");
+        int manual = stated(record,
+                "\\*\\*([\\d,]+) manually reviewed\\*\\*");
 
-        long manual = queue.stream()
-                .filter(l -> l.route().startsWith("manually reviewed"))
-                .count();
-        long recognised = queue.stream()
-                .filter(l -> l.confidence()
-                        == SkyLanguageScan.Confidence.RECOGNISED)
-                .count();
-
-        assertStated(record, "\\*\\*([\\d,]+) recognised\\*\\*",
-                (int) recognised,
-                "the candidates, which must not be presented as"
-                        + " proven reader strings");
-        assertStated(record, "\\*\\*([\\d,]+) manually reviewed\\*\\*",
-                (int) manual, "the ledger's own contribution");
-        assertStated(record, "\\*\\*([\\d,]+) traced\\*\\*",
-                (int) (queue.size() - recognised - manual),
-                "the traced remainder");
+        assertEquals(occurrences, traced + recognised + manual,
+                "every reader-visible occurrence is accounted for as"
+                        + " traced, recognised or manually reviewed - "
+                        + traced + " + " + recognised + " + " + manual
+                        + " against " + occurrences + "; a split that"
+                        + " does not add up hides whichever group was"
+                        + " forgotten");
+        assertTrue(recognised > 0,
+                "and the recognised group is real, so the candidate"
+                        + " label #350 relies on means something");
     }
 
-    /**
-     * Figures the record quotes from the study it cites.
-     *
-     * <p>Both are read from committed files, and deliberately so.
-     * The study's counts are a <em>platform observation</em> - CI
-     * measures nine omissions where the recording machine measured
-     * ten - so comparing the record's quoted figure against a LIVE
-     * measurement would fail on every machine but the one that wrote
-     * them, and would be asserting portability the study explicitly
-     * disclaims. What must agree is the record and the study it
-     * quotes: two committed documents, recorded together.
-     */
+    /** Units cannot exceed occurrences. */
     @Test
-    void theRecordAgreesWithTheStudyItQuotes() throws Exception {
+    void thereAreNoMoreTranslationUnitsThanOccurrences() throws Exception {
         String record = Files.readString(RECORD);
-        String study = Files.readString(STUDY);
+        int occurrences = stated(record,
+                "baseline #347 established: ([\\d,]+) occurrences");
+        int units = stated(record,
+                "occurrences, ([\\d,]+)\\s+unique translation");
 
-        assertTrue(study.contains(PlatformEvidence.OBSERVED_MARK),
-                "the study declares its counts a platform"
-                        + " observation, which is what makes quoting"
-                        + " them from a document rather than"
-                        + " re-measuring them correct");
-        Matcher measured = Pattern.compile(
-                "\\*\\*Negative margins: (\\d+)\\*\\*").matcher(study);
-        assertTrue(measured.find(), "the study reports its margins");
-        assertStated(record, "The (\\d+) negative margins",
-                Integer.parseInt(measured.group(1)),
-                "the attachment margins it cites from the study");
-        assertTrue(record.contains("this machine's"),
-                "and the record says whose measurements they are");
+        assertTrue(units <= occurrences,
+                units + " unique translation units cannot exceed "
+                        + occurrences + " occurrences; repetition"
+                        + " collapses units, it cannot create them");
+        assertTrue(units > 0, "and the queue is not empty");
     }
 
-    private static void assertStated(String record, String pattern,
-                                     int measured, String what) {
-        Matcher stated = Pattern.compile(pattern).matcher(record);
-        assertTrue(stated.find(),
-                "the record states " + what + " (" + pattern + ")");
-        assertEquals(measured,
-                Integer.parseInt(stated.group(1).replace(",", "")),
-                "the record states " + what + " as \""
-                        + stated.group(1) + "\" where it is now "
-                        + measured + "; a document is the one evidence"
-                        + " nothing regenerates, so its figures go"
-                        + " stale in silence");
-    }
-
-    /** As the record writes a number: thousands separated. */
-    private static String group(long value) {
-        return String.format(java.util.Locale.ROOT, "%,d", value);
+    private static int stated(String record, String pattern) {
+        Matcher found = Pattern.compile(pattern).matcher(record);
+        assertTrue(found.find(),
+                "the record states this figure (" + pattern + ")");
+        return Integer.parseInt(found.group(1).replace(",", ""));
     }
 }

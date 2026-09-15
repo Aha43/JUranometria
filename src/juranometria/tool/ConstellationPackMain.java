@@ -47,7 +47,37 @@ public final class ConstellationPackMain {
      * "gen" field repeats the nominative.
      */
     static final Map<String, String[]> GENITIVE_ERRATA = Map.of(
-            "Cru", new String[] {"Crux", "Crucis"});
+            "Cru", new String[] {"Crux", "Crucis"},
+            // Sprint 33 (#348). The IAU's own list gives Corona
+            // Australis the genitive Coronae Australis. The source's
+            // "Coronae Austrini" is malformed either way: Austrini is
+            // a masculine genitive against the feminine corona.
+            "CrA", new String[] {"Coronae Austrini", "Coronae Australis"});
+
+    /**
+     * Recorded source errata in the NOMINATIVE name (#348).
+     *
+     * <p>Same contract as the genitive errata above: the pack states
+     * the wrong value it expects to find, corrects it, declares the
+     * correction, and refuses to run if the source stops carrying
+     * what was recorded - so an erratum is never a silent patch and
+     * never outlives the defect it was written for.
+     *
+     * <p><strong>Ser.</strong> The source carries Serpens TWICE, as
+     * its two sky parts, and this pack keeps the first under one
+     * identity - so the whole constellation inherited the name of
+     * half of it. The IAU constellation is Serpens; Caput and Cauda
+     * name regions of it. The pack's own genitive, Serpentis, is the
+     * genitive of Serpens and always disagreed with the nominative
+     * beside it.
+     *
+     * <p><strong>CrA.</strong> The IAU list gives Corona Australis.
+     * A reader searching the standard "alpha Coronae Australis" found
+     * nothing at all before this.
+     */
+    static final Map<String, String[]> NAME_ERRATA = Map.of(
+            "Ser", new String[] {"Serpens Caput", "Serpens"},
+            "CrA", new String[] {"Corona Austrina", "Corona Australis"});
 
     /** The pinned raw inputs this pack is generated from. */
     static final Map<String, String> PINNED = Map.of(
@@ -110,8 +140,18 @@ public final class ConstellationPackMain {
                 }
                 genitive = erratum[1];
             }
-            String[] row = {id, (String) p.get("name"), genitive,
-                    (String) p.get("rank")};
+            String name = (String) p.get("name");
+            String[] named = NAME_ERRATA.get(id);
+            if (named != null) {
+                if (!named[0].equals(name)) {
+                    throw new IllegalStateException("recorded name"
+                            + " erratum for " + id + " expects the source"
+                            + " to carry '" + named[0] + "' but it carries"
+                            + " '" + name + "'; re-examine the erratum");
+                }
+                name = named[1];
+            }
+            String[] row = {id, name, genitive, (String) p.get("rank")};
             requireNoCommas(row);
             identities.add(row);
         }
@@ -293,6 +333,12 @@ public final class ConstellationPackMain {
         for (Map.Entry<String, String[]> erratum
                 : new TreeMap<>(GENITIVE_ERRATA).entrySet()) {
             entries.put("erratum.genitive." + erratum.getKey(),
+                    erratum.getValue()[1] + " (source carries "
+                            + erratum.getValue()[0] + ")");
+        }
+        for (Map.Entry<String, String[]> erratum
+                : new TreeMap<>(NAME_ERRATA).entrySet()) {
+            entries.put("erratum.name." + erratum.getKey(),
                     erratum.getValue()[1] + " (source carries "
                             + erratum.getValue()[0] + ")");
         }

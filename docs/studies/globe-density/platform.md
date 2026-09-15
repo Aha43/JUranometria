@@ -26,8 +26,8 @@ but marks - so the furniture's floor can be told from what the stars add.
 
 page              V    stars       mid      limb      mid*     limb*
                                        (as drawn)      (marks only)
-sagittarius     4.0      303     18.0%     37.4%      3.7%      9.6%
-sagittarius     5.0      910     19.8%     41.2%      6.9%     17.1%
+sagittarius     4.0      303     17.8%     37.4%      3.7%      9.6%
+sagittarius     5.0      910     19.9%     41.2%      6.9%     17.1%
 sagittarius     6.0     2737     24.8%     51.3%     12.8%     31.5%
 sagittarius     7.0     8401     34.8%     66.4%     24.4%     53.6%
 sagittarius     8.0    24786     49.2%     80.7%     41.0%     74.1%
@@ -39,7 +39,7 @@ orion           8.0    25131     51.2%     79.2%     44.2%     73.3%
 south-pole      4.0      308     21.1%     32.1%      5.7%      8.8%
 south-pole      5.0      932     22.4%     36.8%      8.3%     16.6%
 south-pole      6.0     2846     27.6%     47.2%     14.5%     30.9%
-south-pole      7.0     8637     37.4%     63.4%     26.2%     52.4%
+south-pole      7.0     8637     37.4%     63.3%     26.2%     52.4%
 south-pole      8.0    25250     50.8%     79.5%     41.9%     73.5%
 sparse          4.0      297     10.1%     39.9%      0.9%      9.6%
 sparse          5.0      944     11.0%     44.9%      2.7%     19.0%
