@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.ui.language;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

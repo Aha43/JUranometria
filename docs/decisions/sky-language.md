@@ -411,6 +411,18 @@ than something a later implementer invents.
 Owner ruling, 2026-09-15. Stated as meanings; the Java types may
 differ, the meanings may not.
 
+**Where the type lives.** `SkyLanguageChoice` was written here as a
+gate contract and first placed in `juranometria.tool`. It stopped
+being tooling the moment #348 persisted it: it now defines the
+application's language state and is read and written by
+`SkyLanguageStore`, so it lives in `juranometria.ui.language` with
+its test beside it. There is one implementation, not a gate model
+and a production copy — two would be free to drift, and the
+migration contract below is only worth anything if exactly one type
+decides what a stored value means. `SkyLanguagePack` and
+`SkyLanguageScan` stay in `juranometria.tool`: they validate and
+measure resource data and no application code depends on them.
+
 ```
 language.interface = en | nb-NO | …whatever is installed
 language.chart     = follow-interface | latin | …whatever pack is found
