@@ -223,6 +223,19 @@ public final class EvidenceContractMain {
     private static final Map<String, String> PLATFORM_REPORTS =
             new LinkedHashMap<>();
     static {
+        // Sprint 33 (#347). Registered here rather than as a
+        // deterministic report, which is what it was until CI proved
+        // otherwise. Every figure it carries is a PLACEMENT figure,
+        // and placement depends on how wide a word is drawn: Linux
+        // measured 9 omissions and 98 moves where this machine
+        // measures 10 and 102, with neither machine wrong. Holding it
+        // to committed bytes claimed a portability it never had. What
+        // IS portable - the method, the fixtures, the canonical
+        // identities, the provenance, same-scene independence, each
+        // rung's own density, and that every observation must be
+        // measurable - is held by its own tests.
+        PLATFORM_REPORTS.put("juranometria.tool.SkyLanguageStudyMain",
+                "docs/studies/sky-language/placement.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -320,6 +333,13 @@ public final class EvidenceContractMain {
     }
 
     private static final List<String> IMAGE_MAINS = List.of(
+            // Sprint 33 (#347): the owner checkpoint's paired
+            // Latin/Norwegian pages and the omission index. Drawn by
+            // the production renderer into committed images, so they
+            // are held like any other renderer-drawn evidence - and
+            // they HAVE a generator, which is what keeps them from
+            // being promoted without an account of themselves.
+            "juranometria.tool.SkyLanguagePairMain",
             "juranometria.tool.IdentifyMockupMain",
             "juranometria.tool.OnThisPageMockupMain",
             "juranometria.tool.DeepSkyVocabularyMockupMain",
@@ -590,7 +610,22 @@ public final class EvidenceContractMain {
                     + "238cf3147fec335489336b4b",
             "scripts/reference-vectors.c",
             "baf6f526f4f22997a0e2fc73d5574b9566f491df"
-                    + "b8a675c55ba56ca1300f1b3e");
+                    + "b8a675c55ba56ca1300f1b3e",
+            // Sprint 33 (#347). Owner-supplied working material, not
+            // a generated artifact and not a cited source: pinned by
+            // digest so that changing the names, or the manifest that
+            // says what they are, is a provenance event needing a
+            // regenerated study - never a quiet edit. The manifest is
+            // where "provisional" versus "verified" actually lives.
+            "docs/studies/sky-language/norwegian-names.tsv",
+            "c181a95654c41055ed77e3623eb5b8cd004ae440"
+                    + "7864f18769312b63c1af7341",
+            "docs/studies/sky-language/iau-constellations.tsv",
+            "ff06d67961a1ca12302f6385c61d86cc0b141fd8"
+                    + "dd2f7bbf12095f390f2a8f5f",
+            "docs/studies/sky-language/names.manifest",
+            "3db24d7fa5676b70f9bf7da5ec6af99a9d49a0ad"
+                    + "4f4fe187699dd3ee9f2b9cfb");
 
     /** One committed file: its bytes and when it was last written. */
     record Snapshot(byte[] bytes,

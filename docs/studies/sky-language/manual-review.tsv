@@ -1,0 +1,119 @@
+# The manual ledger: application-surface occurrences the scanner
+# could not route, each reviewed and given a concrete disposition.
+#
+# WHY THIS EXISTS. The classifier reads statements; it does not do
+# data flow. It therefore cannot follow a word out of a collection,
+# through a return value, or across a multi-step alias. Those cases
+# do not vanish - they arrive here, are looked at by a person, and
+# are recorded with what they actually are. The automation boundary
+# is closed by this file rather than pretended away.
+#
+# IDENTITY is derived from the file, the literal and the STATEMENT
+# around it - never the line number, which moves when anything above
+# it is edited. Because the statement is part of the identity,
+# editing the code around a reviewed literal changes its identity and
+# the entry stops matching: the disposition does not survive the code
+# it was made about. SkyLanguageLedgerTest requires this file's
+# identities to equal the scanner's unresolved set exactly, so a
+# missing entry and a stale one are both failures.
+#
+# DISPOSITIONS. One of six, and no generic "reviewed" or "ignore":
+#   reader-prose     a reader reads it; it becomes a translation unit
+#   reader-technical a reader sees it and it must be preserved exactly
+#   notation         astronomical notation, which no language changes
+#   identifier       a stable key, path, or stored value
+#   developer-only   never reaches a reader
+#   false-positive   not text at all, with the reason said plainly
+#
+identity	file	literal	scanner-reason	disposition	why
+21e53c185a6a0a2b	app/AboutDialog.java	Tycho-2 star data	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+257d81a34ecac668	app/AboutDialog.java	OpenNGC deep-sky data	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+58dd5732936a4212	app/AboutDialog.java	CC BY-SA 4.0 licence text	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+ab200a04642822d4	app/AboutDialog.java	Constellation geography	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+34bff71dfc94fd92	app/AboutDialog.java	Star identities	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+dbb75cd5992c5beb	app/AboutDialog.java	BSD-3-Clause licence text	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+e78e16cb8ccb96fc	app/AboutDialog.java	Tabler icons licence	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+78ceac80eb6f1698	app/AboutDialog.java	/resources/icons/LICENSE	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+87d8572b24dee5c1	app/AppInfo.java	JUranometria	declared name has no use in this file	identifier	a stable key, path or stored value; no language changes it
+49e44a3b892b252d	app/AppInfo.java	https://github.com/Aha43/JUranometria	declared name has no use in this file	identifier	a stable key, path or stored value; no language changes it
+75ec4f72cfbdfd1e	app/AppMenuBar.java	inspectorItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+1158ad40a6f3f40f	app/AppMenuBar.java	exportSheetItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+1d5074cea7ca679d	app/AppMenuBar.java	eclipticItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+15ed09bb3dac2f90	app/AppearanceStore.java	light	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+fee9e234b9f9bc8a	app/AppearanceStore.java	dark	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+715d0623c46acc1a	app/ChartKeyboard.java	chartKeyboard	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+d68d9e9c23565c20	app/ChartOptionsDialog.java	&amp;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+6e901911f9cf63fd	app/ChartOptionsDialog.java	&lt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+ea474c04731970e2	app/ChartOptionsDialog.java	&gt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+0f6356ab132877bb	app/InspectorPanel.java	page	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+20cc9c2fe2c284bf	app/InspectorPanel.java	 (Flamsteed)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
+9dbfa63483f447a0	app/InspectorPanel.java	  (Bayer)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
+40681018e0b3d790	app/InspectorPanel.java	  (Flamsteed)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
+93d25862bcbb26d6	app/StartupFailure.java	:/:juranometria/	unresolved: no route found, needs manual inspection	identifier	a stable key, path or stored value; no language changes it
+aea4d55f973e2351	catalog/PackManifest.java	radec-grid-30	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+6978b855fecb347d	catalog/StarIdentities.java	/resources/catalog/star-identities/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+7467c34d54a9e00e	catalog/StarIdentities.java	star-identities	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+82d4261fd488b0fc	catalog/StarIdentities.java	rows	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+8cec4570a78b11f9	catalog/StarIdentities.java	source	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+fae62607fce1d8b1	catalog/StarIdentities.java	license	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+73ecca0720a94de1	catalog/StarIdentities.java	checksum.	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+f5a2dfd5724e4c5f	catalog/TiledCatalogue.java	/resources/catalog/bright-sky/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+318c96a74b161372	catalog/TiledCatalogue.java	checksum.tiles/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+73ee7b10cbb13fe9	catalog/TiledCatalogue.java	tiles/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+f3eb6c167b8e81e2	chart/DsoType.java	Cl+N	unresolved: no route found, needs manual inspection	notation	an OpenNGC object-type code
+d540471f0c131314	chart/DsoType.java	*Ass	unresolved: no route found, needs manual inspection	notation	an OpenNGC object-type code
+9626e857781f580a	ecliptic/EclipticModule.java	ecliptic	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+72b981a86f004eb3	geo/ConstellationGeography.java	/resources/geo/constellations/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+8542e24bde280d7f	geo/ConstellationGeography.java	constellation-geography	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+6130e58d0e232687	geo/ConstellationGeography.java	ICRS-J2000	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+6cd4ff7e430ecec0	geo/ConstellationGeography.java	checksum.	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+815a76a718d7ba3f	meridian/MeridianModule.java	meridian	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+45cca1fc920ac14d	project/DrawnPage.java	Shows one hemisphere of the sky, out to 90 degrees from	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
+77d02d4e0bd2fe21	project/DrawnPage.java	 the centre in every direction. Outside the	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
+bb575c95d9534a7b	project/DrawnPage.java	 circular limb is paper, not sky.	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
+cf4f667e6ae2e06b	render/ChartRenderer.java	Stars, visual magnitude	declared name used, but never at a known sink	reader-prose	shown in the application; belongs in the translation queue
+2b42a0817c34dead	render/SymbolFamily.java	M 31, M 51, NGC 3628	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+6dbd9f1eee6abcb2	render/SymbolFamily.java	M 45, M 44, NGC 869	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+7da8e70f4ab2c1cf	render/SymbolFamily.java	M 13, M 22, NGC 5139	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+2ad4f5cd3da6ba2f	render/SymbolFamily.java	M 42, M 1, NGC 7000	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+ff85096f134bcd53	render/SymbolFamily.java	M 57, M 27, NGC 7009	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+1a1fee49b6ca4285	search/LocalSearch.java	\\d+$	declared name used, but never at a known sink	false-positive	regular-expression: a regular expression, not words
+dc5dc035114e38ac	search/LocalSearch.java	\\s+	declared name used, but never at a known sink	false-positive	regular-expression: a regular expression, not words
+5758dde4362a06f8	search/LocalSearch.java	\\s*,\\s*|\\s+	collection/alias flow not traced	false-positive	regular-expression: a regular expression, not words
+cd6d3e9b1b7bdd56	sheet/PdfSheetWriter.java	 /Title 	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+d503f8d5d14c4566	sheet/PdfSheetWriter.java	 /Subject 	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+c014b289e3cc9fc9	sheet/PdfSheetWriter.java	 0 obj\n	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+3cec86091e370ff4	sheet/PdfSheetWriter.java	0000000000 65535 f \n	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+43f3f9ba67742ee0	sheet/PdfSheetWriter.java	W n\n	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+17b717672b2d65a2	sheet/PdfSheetWriter.java	[] 0 d\n	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+92de76ee523a4b98	sheet/PngSheetWriter.java	javax_imageio_png_1.0	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+c473fde040e2a4a8	sheet/SheetFileName.java	\\p{M}+	declared name used, but never at a known sink	false-positive	regular-expression: a regular expression, not words
+450182233d0b91f3	sheet/SvgSheetWriter.java	ink	declared name used, but never at a known sink	identifier	an SVG class name the writer emits
+569ed11ff7fdf2c8	sheet/SvgSheetWriter.java	labels	declared name used, but never at a known sink	identifier	an SVG class name the writer emits
+bdb26c3e764c5589	sheet/SvgSheetWriter.java	 fill=\"	unresolved: no route found, needs manual inspection	false-positive	svg-attribute: an SVG attribute name
+3af4ca17a7ef1db1	sheet/SvgSheetWriter.java	 stroke=\"	unresolved: no route found, needs manual inspection	false-positive	svg-attribute: an SVG attribute name
+05f99e54c26a485e	sheet/SvgSheetWriter.java	 fill=\"	unresolved: no route found, needs manual inspection	false-positive	svg-attribute: an SVG attribute name
+68203efc0484b124	sheet/SvgSheetWriter.java	&amp;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+a6cd21469bb493ab	sheet/SvgSheetWriter.java	&lt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+8e143e69997c6b50	sheet/SvgSheetWriter.java	&gt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+d2a8ec1c8bd1f1c7	sheet/SvgSheetWriter.java	&quot;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+f0b888d68d4cee96	sheet/SvgSheetWriter.java	&apos;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+a606bdeeb5031932	ui/Explain.java	&amp;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+022e61b72054908c	ui/Explain.java	&lt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+149c81bbec32ceea	ui/SearchField.java	No match in the bundled catalogue	declared name used, but never at a known sink	reader-prose	shown in the application; belongs in the translation queue
+9042f3da9957a235	ui/SearchField.java	Found, but beyond this pack's coverage	declared name used, but never at a known sink	reader-prose	shown in the application; belongs in the translation queue
+40dfc1042ecad961	ui/Shortcuts.java	export	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+503e7e33e6fa2b02	ui/Shortcuts.java	inspector	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+5156e247f7979f83	ui/Shortcuts.java	zoomIn	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+8755f94128fc9d1a	ui/Shortcuts.java	zoomOut	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+13f371d0092d6e83	ui/ecliptic/EclipticStore.java	eclipticShown	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+06c6ca6ab7ee1ee0	ui/onthispage/OnThisPageModule.java	on-this-page	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+b774ab09bd649bc9	ui/onthispage/OnThisPageTable.java	Whether and why this object is drawn on the chart	declared name used, but never at a known sink	reader-prose	a column tooltip a reader reads
+d4df79100a7853a4	ui/onthispage/OnThisPageTable.java	\u25cf NGC 317A	unresolved: no route found, needs manual inspection	notation	a catalogue designation in a worked example
+cf5e0da7934850e6	ui/onthispage/OnThisPageTable.java	\\s+	unresolved: no route found, needs manual inspection	false-positive	regular-expression: a regular expression, not words
+5d0b3f566d1faca3	ui/onthispage/OnThisPageTable.java	 V	declared name used, but never at a known sink	notation	a photometric band letter
+b4e65c9964bd2b15	ui/onthispage/OnThisPageTable.java	 B	declared name used, but never at a known sink	notation	a photometric band letter
+eebd7a16aabc2101	ui/onthispage/OnThisPageTable.java	Object	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+6a4e49858398c81d	ui/onthispage/OnThisPageTable.java	From	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+1ad6eaf1fea34b10	ui/onthispage/OnThisPageTable.java	Chart	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
+b12bded29a8ea584	ui/placeandtime/PlaceAndTimeDialog.java	 -90 to 90	unresolved: no route found, needs manual inspection	reader-prose	an input hint beside the latitude field

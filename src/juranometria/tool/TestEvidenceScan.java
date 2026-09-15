@@ -370,7 +370,17 @@ public final class TestEvidenceScan {
         if (fileName.endsWith(".md")) {
             return "deterministic-report";
         }
-        if (fileName.endsWith(".txt") || fileName.endsWith(".c")) {
+        // Committed data, pinned by digest: a change is a reviewed
+        // provenance event, not a regeneration. The tabular and
+        // manifest forms were added for Sprint 33's owner-supplied
+        // name lead (#347), which the fallthrough below had been
+        // calling renderer-drawn - so a text file was being asked
+        // for the provenance record a promoted IMAGE carries. The
+        // default is only safe while every unlisted file happens to
+        // be a picture, and it had quietly stopped being.
+        if (fileName.endsWith(".txt") || fileName.endsWith(".c")
+                || fileName.endsWith(".tsv")
+                || fileName.endsWith(".manifest")) {
             return "byte-exact-fixture";
         }
         for (String prefix : new String[] {"screenshot-"}) {

@@ -1,0 +1,102 @@
+# JUranometria's Norwegian Bokmal constellation names (Sprint 33, #347).
+#
+# TWO COLUMNS ONLY: the IAU abbreviation, which is the canonical
+# identity, and the Norwegian name. The Latin name is deliberately
+# absent - it belongs to the identity layer, which a Norwegian source
+# does not establish, and repeating it here would invite the two
+# layers to drift apart.
+#
+# This is an EDITORIAL LIST, not a copy of any single publication.
+# See names.manifest beside it for the full account: the pinned
+# redistributable starting dataset, the canonical identity source,
+# and every one of the fifteen individually reviewed choices.
+#
+IAU	Norwegian
+And	Andromeda
+Ant	Luftpumpen
+Aps	Paradisfuglen
+Aql	Ørnen
+Aqr	Vannmannen
+Ara	Alteret
+Ari	Væren
+Aur	Kusken
+Boo	Oksedriveren
+CMa	Store hund
+CMi	Lille hund
+CVn	Jakthundene
+Cae	Gravstikken
+Cam	Sjiraffen
+Cap	Steinbukken
+Car	Kjølen
+Cas	Kassiopeia
+Cen	Kentauren
+Cep	Kefeus
+Cet	Hvalen
+Cha	Kameleonen
+Cir	Passeren
+Cnc	Krepsen
+Col	Duen
+Com	Berenikes hår
+CrA	Sørlige krone
+CrB	Nordlige krone
+Crt	Begeret
+Cru	Sydkorset
+Crv	Ravnen
+Cyg	Svanen
+Del	Delfinen
+Dor	Gullfisken
+Dra	Dragen
+Equ	Føllet
+Eri	Floden
+For	Smelteovnen
+Gem	Tvillingene
+Gru	Tranen
+Her	Herkules
+Hor	Uret
+Hya	Vannslangen
+Hyi	Sørlige vannslange
+Ind	Inderen
+LMi	Lille løve
+Lac	Øglen
+Leo	Løven
+Lep	Haren
+Lib	Vekten
+Lup	Ulven
+Lyn	Gaupen
+Lyr	Lyren
+Men	Taffelberget
+Mic	Mikroskopet
+Mon	Enhjørningen
+Mus	Fluen
+Nor	Vinkelhaken
+Oct	Oktanten
+Oph	Slangebæreren
+Ori	Orion
+Pav	Påfuglen
+Peg	Pegasus
+Per	Perseus
+Phe	Føniks
+Pic	Maleren
+PsA	Sørlige fisk
+Psc	Fiskene
+Pup	Akterstavnen
+Pyx	Kompasset
+Ret	Nettet
+Scl	Billedhuggeren
+Sco	Skorpionen
+Sct	Skjoldet
+Ser	Slangen
+Sex	Sekstanten
+Sge	Pilen
+Sgr	Skytten
+Tau	Tyren
+Tel	Teleskopet
+TrA	Sørlige triangel
+Tri	Triangelet
+Tuc	Tukanen
+UMa	Store bjørn
+UMi	Lille bjørn
+Vel	Seilet
+Vir	Jomfruen
+Vol	Flygefisken
+Vul	Reven

@@ -1,0 +1,110 @@
+# The IAU's official constellation list: canonical identities, Latin
+# nominatives, three-letter abbreviations and genitives.
+#
+# Source: "The Constellations", International Astronomical Union,
+#   https://iauarchive.eso.org/public/themes/constellations/
+#   (the IAU archive hosted by ESO; www.iau.org answers 403 to
+#   automated agents, the archive does not)
+# Retrieved: 2026-09-15
+# Corroboration: IAU Style Manual 1989, Table 11,
+#   https://iauarchive.eso.org/static/publications/stylemanual1989.pdf
+#   - where its historical presentation differs, the current
+#   88-constellation page governs.
+#
+# This is nomenclature: the factual names and abbreviations adopted
+# by the IAU in 1922 and since. It carries no Norwegian column - a
+# Norwegian source does not establish this layer, and this layer does
+# not establish Norwegian names.
+#
+# Held by IauIdentityTest, which compares every row against the
+# atlas's own constellation data.
+#
+Latin	IAU	Genitive
+Andromeda	And	Andromedae
+Antlia	Ant	Antliae
+Apus	Aps	Apodis
+Aquarius	Aqr	Aquarii
+Aquila	Aql	Aquilae
+Ara	Ara	Arae
+Aries	Ari	Arietis
+Auriga	Aur	Aurigae
+Boötes	Boo	Boötis
+Caelum	Cae	Caeli
+Camelopardalis	Cam	Camelopardalis
+Cancer	Cnc	Cancri
+Canes Venatici	CVn	Canum Venaticorum
+Canis Major	CMa	Canis Majoris
+Canis Minor	CMi	Canis Minoris
+Capricornus	Cap	Capricorni
+Carina	Car	Carinae
+Cassiopeia	Cas	Cassiopeiae
+Centaurus	Cen	Centauri
+Cepheus	Cep	Cephei
+Cetus	Cet	Ceti
+Chamaeleon	Cha	Chamaeleontis
+Circinus	Cir	Circini
+Columba	Col	Columbae
+Coma Berenices	Com	Comae Berenices
+Corona Australis	CrA	Coronae Australis
+Corona Borealis	CrB	Coronae Borealis
+Corvus	Crv	Corvi
+Crater	Crt	Crateris
+Crux	Cru	Crucis
+Cygnus	Cyg	Cygni
+Delphinus	Del	Delphini
+Dorado	Dor	Doradus
+Draco	Dra	Draconis
+Equuleus	Equ	Equulei
+Eridanus	Eri	Eridani
+Fornax	For	Fornacis
+Gemini	Gem	Geminorum
+Grus	Gru	Gruis
+Hercules	Her	Herculis
+Horologium	Hor	Horologii
+Hydra	Hya	Hydrae
+Hydrus	Hyi	Hydri
+Indus	Ind	Indi
+Lacerta	Lac	Lacertae
+Leo	Leo	Leonis
+Leo Minor	LMi	Leonis Minoris
+Lepus	Lep	Leporis
+Libra	Lib	Librae
+Lupus	Lup	Lupi
+Lynx	Lyn	Lyncis
+Lyra	Lyr	Lyrae
+Mensa	Men	Mensae
+Microscopium	Mic	Microscopii
+Monoceros	Mon	Monocerotis
+Musca	Mus	Muscae
+Norma	Nor	Normae
+Octans	Oct	Octantis
+Ophiuchus	Oph	Ophiuchi
+Orion	Ori	Orionis
+Pavo	Pav	Pavonis
+Pegasus	Peg	Pegasi
+Perseus	Per	Persei
+Phoenix	Phe	Phoenicis
+Pictor	Pic	Pictoris
+Pisces	Psc	Piscium
+Piscis Austrinus	PsA	Piscis Austrini
+Puppis	Pup	Puppis
+Pyxis	Pyx	Pyxidis
+Reticulum	Ret	Reticuli
+Sagitta	Sge	Sagittae
+Sagittarius	Sgr	Sagittarii
+Scorpius	Sco	Scorpii
+Sculptor	Scl	Sculptoris
+Scutum	Sct	Scuti
+Serpens	Ser	Serpentis
+Sextans	Sex	Sextantis
+Taurus	Tau	Tauri
+Telescopium	Tel	Telescopii
+Triangulum	Tri	Trianguli
+Triangulum Australe	TrA	Trianguli Australis
+Tucana	Tuc	Tucanae
+Ursa Major	UMa	Ursae Majoris
+Ursa Minor	UMi	Ursae Minoris
+Vela	Vel	Velorum
+Virgo	Vir	Virginis
+Volans	Vol	Volantis
+Vulpecula	Vul	Vulpeculae

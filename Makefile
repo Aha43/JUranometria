@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run run-log test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run run-log test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -590,6 +590,16 @@ test-evidence-study: classes
 	mkdir -p docs/studies/test-evidence
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.TestEvidenceStudyMain \
 		> docs/studies/test-evidence/measurements.md
+
+# Sprint 33 (#347). Measured against
+# docs/studies/sky-language/norwegian-names.tsv, whose provenance is
+# recorded beside it in names.manifest; the report takes its standing
+# from that manifest rather than from this comment. Headless, so
+# typing this command reproduces the committed bytes.
+sky-language-study: classes
+	mkdir -p docs/studies/sky-language
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true \
+		juranometria.tool.SkyLanguageStudyMain
 
 place-and-time-study: classes
 	mkdir -p docs/studies/place-and-time
