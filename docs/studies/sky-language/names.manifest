@@ -1,0 +1,99 @@
+# Where JUranometria's Norwegian constellation names come from
+# (Sprint 33, issue #347).
+#
+# The study READS ITS STATUS FROM HERE. It is not a banner in Java:
+# status=verified requires source, licence, retrieved and
+# transformations to be filled in, or the generator refuses to run.
+#
+# ---------------------------------------------------------------
+# Two layers, kept apart
+# ---------------------------------------------------------------
+#
+# CANONICAL IDENTITIES, LATIN NAMES AND ABBREVIATIONS come from the
+# IAU's official constellation list. A Norwegian source does not
+# establish which 88 constellations exist or what they are called in
+# Latin, so this file carries no Latin column at all. Two known
+# defects in the atlas's current Latin data - Ser named "Serpens
+# Caput" and CrA named "Corona Austrina" with a malformed genitive -
+# are recorded in docs/decisions/sky-language.md and belong to #348.
+#
+# NORWEGIAN NAMES are this file. The IAU does not establish them.
+#
+# ---------------------------------------------------------------
+# What this list is, and what it is not
+# ---------------------------------------------------------------
+#
+# It is an EDITORIAL LIST assembled by JUranometria: a redistributable
+# starting dataset, restructured onto the canonical IAU identities,
+# with fifteen disputed forms reviewed individually and each choice
+# recorded below.
+#
+# It is NOT a republication of any single work. No prose, no table
+# presentation, no historical or brightest-star material and no
+# explanatory wording has been taken from Store norske leksikon.
+# SNL is cited as EVIDENCE for individual editorial choices about
+# which Norwegian astronomical term is better, which is what citing a
+# source is for. The names themselves are nomenclature: nobody owns
+# the fact that Cru is called Sydkorset.
+#
+# ---------------------------------------------------------------
+
+status=verified
+rows=88
+
+source=Liste over stjernebilder (Norwegian Wikipedia), permanent revision 25182596 of 2025-06-10 18:33, https://no.wikipedia.org/w/index.php?title=Liste_over_stjernebilder&oldid=25182596 - used as the redistributable starting dataset for the Norwegian column
+
+identity-source=The Constellations, International Astronomical Union, retrieved 2026-09-15 from the IAU archive hosted by ESO, https://iauarchive.eso.org/public/themes/constellations/ - canonical 88 identities, Latin nominatives, three-letter abbreviations and genitives. Committed beside this file as iau-constellations.tsv. Corroborated by IAU Style Manual 1989 Table 11, https://iauarchive.eso.org/static/publications/stylemanual1989.pdf, with the current 88-constellation page governing where its historical presentation differs.
+
+identity-comparison=All 88 rows compared against the atlas's own constellation data by IauIdentityTest on 2026-09-15. Abbreviations: 88 of 88 identical, none missing, none extra. Latin nominatives and genitives: 86 of 88 agree exactly. Two disagree, both pre-existing and both assigned to #348 - Ser is held as "Serpens Caput" where the official name is "Serpens", and CrA is held as "Corona Austrina" with genitive "Coronae Austrini" where the official forms are "Corona Australis" and "Coronae Australis". No other mismatch exists; this was established by comparing every row, not by assuming the two already known were all of them.
+
+licence=CC BY-SA 4.0 for the starting dataset. Attribution required: "Liste over stjernebilder", Norwegian Wikipedia contributors, revision 25182596, CC BY-SA 4.0. Share-alike applies to this derived name list.
+
+retrieved=2026-09-15
+
+corroborating-source=stjernebilder, Store norske leksikon, Rolf Stabell and Maria Hammerstrom (Universitetet i Oslo), updated 2024-11-25, https://snl.no/stjernebilder - cited as evidence for the fifteen choices below, never copied. Also Sydkorset, SNL, Maria Hammerstrom and Are Vidar Boie Hansen, updated 2025-09-17, https://snl.no/Sydkorset
+
+transformations=Fifteen names changed from the starting dataset, each adopting the astronomy-authored form; all other 73 names are the starting dataset's unchanged. Enumerated below, in the form IAU: starting-dataset -> adopted.
+
+# The fifteen editorial choices.
+#
+# Five are different words, not spellings:
+change-Boo=Bjornevokteren -> Oksedriveren
+change-Cae=Meiselen -> Gravstikken
+change-Lac=Firfislen -> Oglen
+change-Men=Bordet -> Taffelberget
+change-Ind=Indianeren -> Inderen
+#
+# Two are variant forms:
+change-Cet=Hvalfisken -> Hvalen
+change-Per=Persevs -> Perseus
+#
+# One is a named term with its own article in the corroborating
+# source, where Sydkorset is the headword and Sorkorset is recorded
+# as an alternative - established contemporary astronomical usage,
+# not an obsolete spelling:
+change-Cru=Sorkorset -> Sydkorset
+#
+# Seven are a consistent house style on the definite article. This
+# matters beyond taste: the shorter forms are narrower, and label
+# width decides what fits on a crowded page and at the globe rim.
+change-CMi=Den lille hund -> Lille hund
+change-CrA=Den sorlige krone -> Sorlige krone
+change-CrB=Den nordlige krone -> Nordlige krone
+change-Hyi=Den sorlige vannslangen -> Sorlige vannslange
+change-LMi=Den lille lowe -> Lille lowe
+change-PsA=Den sorlige fisken -> Sorlige fisk
+change-TrA=Det sorlige triangelet -> Sorlige triangel
+
+# Unresolved conflicts: none. The Sydkorset/Sorkorset question is
+# settled above on stated evidence rather than by preference.
+#
+# Independent corroboration: the resulting 88 names are identical to
+# the owner's original working lead, which was assembled separately.
+# That is corroboration rather than circularity - the list above is
+# reachable by any contributor from a pinned public revision plus the
+# fifteen documented choices, with no private material involved.
+#
+# NOTE ON ASCII: this file spells Norwegian letters plainly in its
+# comments so that the account survives any encoding. The DATA file,
+# norwegian-names.tsv, carries the correct forms with ae/o/aa.

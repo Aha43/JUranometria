@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SkyLanguageProvenanceTest {
 
     private static final Path MANIFEST =
-            Path.of("docs/studies/sky-language/lead.manifest");
+            Path.of("docs/studies/sky-language/names.manifest");
 
     private static final Path REPORT =
             Path.of("docs/studies/sky-language/placement.md");
@@ -46,12 +47,13 @@ class SkyLanguageProvenanceTest {
         assertTrue(report.contains(stated.toUpperCase(java.util.Locale.ROOT)),
                 "the committed report states the status its manifest"
                         + " declares (" + stated + ")");
-        if ("provisional".equals(stated)) {
-            assertTrue(report.lines().findFirst().orElse("")
-                            .contains("PROVISIONAL"),
-                    "and a provisional study says so in its title,"
-                            + " where a reader meets it first");
-        }
+        boolean titleWarns = report.lines().findFirst().orElse("")
+                .contains("PROVISIONAL");
+        assertEquals("provisional".equals(stated), titleWarns,
+                "a provisional study warns in its title where a reader"
+                        + " meets it first, and a verified one does"
+                        + " not - the title follows the data in both"
+                        + " directions, not just one");
     }
 
     /** Provisional data cannot produce a verified report. */

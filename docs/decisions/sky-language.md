@@ -183,48 +183,99 @@ construction:
 localised display name — which must change stacking or output, and
 fail.
 
-## Data provenance — OUTSTANDING
+## Data provenance — SETTLED
 
-An 88-row lead was supplied by the owner on #347. It is a **lead, not
-provenance**, and is recorded as such.
+The names are an **editorial JUranometria list**, not a copy of any
+single publication. Owner ruling, 2026-09-15: nobody owns the
+Norwegian names of the constellations. A publisher may restrict reuse
+of its article — its prose, its presentation, its table as a compiled
+work — without acquiring exclusive rights to the nomenclature itself.
 
-Validated mechanically against the atlas's own geography: 88 rows, 88
-canonical constellations, IAU abbreviations matching exactly — none
-missing, none extra, no duplicates, no malformed rows, no duplicate
-Norwegian names.
+**Two layers, established separately.**
 
-Still required before #348: verification of every name against a
-citable source, with licence, version or retrieval date,
-transformation notes and every editorial deviation recorded. The
-lead's brightest-star and historical-attribution columns are
-deliberately excluded.
+| layer | source |
+|---|---|
+| canonical identities, Latin names, abbreviations, genitives | the IAU's official constellation list, retrieved from the ESO-hosted IAU archive and committed as `iau-constellations.tsv` |
+| Norwegian names | pinned Norwegian Wikipedia revision, CC BY-SA |
 
-### Two separate fixture events, not one
+A Norwegian source does not establish the identity table and the IAU
+does not establish Norwegian names, so `norwegian-names.tsv` carries
+**no Latin column at all** — two columns, IAU abbreviation and
+Norwegian name. Repeating the Latin name there would invite the
+layers to drift.
 
-Both the lead and its manifest are pinned in the evidence contract's
-`FIXTURES` as byte-exact working material. Pinning them does not
-manufacture provenance - it records exactly which owner-supplied
-bytes the study measured, and forces review when they change.
+### The identity layer, compared rather than cited
 
-When verification happens, these are **two reviewed changes and must
-not be collapsed into one**:
+Naming a source is not checking against it. All 88 rows were compared
+against the atlas's own data by `IauIdentityTest` on 2026-09-15:
 
-1. **Replacing the lead with sourced data** is a fixture provenance
-   event in its own right. Re-pin it only after comparing all 88 rows
-   against the source and recording every deviation - including
-   whichever of `Sydkorset` / `Sørkorset` the source supports.
-2. **Moving the manifest from `provisional` to `verified`** is a
-   separate reviewed fixture change, and the generator refuses it
-   without source, licence, retrieval date and transformation notes.
+- **abbreviations: 88 of 88 identical**, none missing, none extra;
+- **Latin nominatives and genitives: 86 of 88 agree exactly**;
+- **two disagree**, and comparing every row is what establishes that
+  there are only two.
 
-One refreshed digest must never implicitly approve the other. A
-single commit re-pinning both would let new names arrive under a
-status nobody checked, or a status change bless names nobody
-compared.
+| id | atlas holds | official |
+|---|---|---|
+| `Ser` | Serpens Caput | **Serpens** |
+| `CrA` | Corona Austrina / Coronae Austrini | **Corona Australis** / **Coronae Australis** |
 
-**Known open discrepancy:** the lead gives Crux → `Sydkorset`, the
-older Dano-Norwegian form; modern Bokmål usage also has `Sørkorset`.
-Not to be normalised silently. The verified source settles it.
+`CrA` is wrong twice — the name and a genitive that is malformed
+Latin either way. Both corrections belong to **#348**; #347's job was
+to establish their authoritative expected values, which
+`IauIdentityTest` now records so #348 need not re-derive them. That
+test also asserts the two defects are *still defects*, so a stale
+exception cannot outlive the problem it was written for.
+
+**How the list was built**, recorded in full in `names.manifest`:
+
+1. Starting dataset: *Liste over stjernebilder*, Norwegian Wikipedia,
+   **permanent revision 25182596** of 2025-06-10, CC BY-SA 4.0,
+   retrieved 2026-09-15. Attribution and share-alike apply.
+2. Restructured onto the canonical IAU identities.
+3. **Fifteen disputed forms reviewed individually**, each adopting
+   the astronomy-authored form, with *Store norske leksikon* cited as
+   evidence for that choice. The other 73 are the starting dataset's,
+   unchanged.
+
+No SNL prose, table presentation, historical column or brightest-star
+material is reproduced. SNL is cited as evidence for individual
+editorial judgements, which is what citing a source is for.
+
+### The fifteen choices
+
+Five are different words, not spellings: `Boo` Bjørnevokteren →
+**Oksedriveren**, `Cae` Meiselen → **Gravstikken**, `Lac` Firfislen →
+**Øglen**, `Men` Bordet → **Taffelberget**, `Ind` Indianeren →
+**Inderen** (a different referent entirely: Indian of India, not
+Native American).
+
+Two are variants: `Cet` Hvalfisken → **Hvalen**, `Per` Persevs →
+**Perseus**.
+
+Seven are a consistent house style on the definite article — `CMi`,
+`CrA`, `CrB`, `Hyi`, `LMi`, `PsA`, `TrA` all drop *Den/Det*. This is
+not merely taste: the shorter forms are narrower, and label width
+decides what fits on a crowded page and at the globe rim.
+
+### Sydkorset, settled on evidence
+
+`Cru` Sørkorset → **Sydkorset**. Store norske leksikon's dedicated
+astronomy article (updated 2025-09-17) carries **Sydkorset as its
+headword** and records *Sørkorset* as an alternative. A current,
+astronomy-authored encyclopaedia keeping the older form as its
+primary headword for this constellation is evidence of an established
+contemporary astronomical term — not an obsolete spelling in need of
+modernising. Norwegian Wikipedia titles its article *Sørkorset*;
+Nynorsk uses *Sørkrossen*. Chosen on that evidence, not by preference.
+
+### Corroboration, not circularity
+
+The finished 88 names are **identical to the owner's original working
+lead**, which was assembled separately and has now been retired. That
+is corroboration: the list is reachable by any contributor from a
+pinned public revision plus fifteen documented choices, with no
+private material involved — which is exactly what the gate had to
+prove.
 
 ### Shape of the Norwegian column, for placement
 

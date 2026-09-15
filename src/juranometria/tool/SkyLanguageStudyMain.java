@@ -72,9 +72,9 @@ public final class SkyLanguageStudyMain {
      */
     private static final int PROMISED_PAGES = 14;
 
-    /** The manifest that says what the lead is. */
+    /** The manifest that says what those names are. */
     private static final Path MANIFEST =
-            Path.of("docs/studies/sky-language/lead.manifest");
+            Path.of("docs/studies/sky-language/names.manifest");
 
     /**
      * What the data says about itself.
@@ -154,9 +154,9 @@ public final class SkyLanguageStudyMain {
     private static final Path REPORT =
             Path.of("docs/studies/sky-language/placement.md");
 
-    /** The lead, read from its committed copy. */
-    private static final Path LEAD =
-            Path.of("docs/studies/sky-language/norwegian-lead.tsv");
+    /** The Norwegian names, and the account of where they came from. */
+    private static final Path NAMES =
+            Path.of("docs/studies/sky-language/norwegian-names.tsv");
 
     /**
      * Matched pages: the same centre and field in both languages.
@@ -440,7 +440,7 @@ public final class SkyLanguageStudyMain {
                 .append("so changing it without regenerating this report ")
                 .append("is a contract breach rather than a silent ")
                 .append("disagreement.\n\n")
-                .append("- lead digest: `").append(digestOf(LEAD))
+                .append("- name-list digest: `").append(digestOf(NAMES))
                 .append("`\n- matched pages: ").append(PAGES.size())
                 .append(" (all ").append(PROMISED_PAGES)
                 .append(" promised)\n- attachment observations: ")
@@ -463,7 +463,8 @@ public final class SkyLanguageStudyMain {
         // printing a summary instead made the contract compare a
         // one-line summary against a five-hundred-line report.
         System.out.print(report);
-        System.err.println("sky-language placement study (PROVISIONAL): "
+        System.err.println("sky-language placement study ("
+                + provenance.status() + "): "
                 + renamed + " renamed in place, " + moved + " moved, "
                 + omitted + " omitted, " + unchanged + " identical"
                 + " across " + PAGES.size() + " pages; "
@@ -779,19 +780,19 @@ public final class SkyLanguageStudyMain {
 
     private static Map<String, String> readLead() throws IOException {
         Map<String, String> lead = new LinkedHashMap<>();
-        for (String line : Files.readAllLines(LEAD)) {
+        for (String line : Files.readAllLines(NAMES)) {
             if (line.isBlank() || line.startsWith("#")) {
                 continue;
             }
             String[] columns = line.split("\t");
-            if (columns.length != 3 || columns[1].equals("IAU")) {
+            if (columns.length != 2 || columns[0].equals("IAU")) {
                 continue;
             }
-            lead.put(columns[1], columns[2]);
+            lead.put(columns[0], columns[1]);
         }
         if (lead.size() != 88) {
             throw new IllegalStateException(
-                    "the lead states 88 constellations; found "
+                    "the name list states 88 constellations; found "
                             + lead.size());
         }
         return lead;
