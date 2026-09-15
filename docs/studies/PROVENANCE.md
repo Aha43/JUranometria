@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**299 promoted artifacts.**
+**300 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -312,6 +312,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/sky-language/pair-sagittarius-120.png` | `9651bfc4011933d318e965c6e7ca790b64d2c6431c6a3254a5f8ba73ad5e6f4c` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-sagittarius-18.png` | `dfe5ded49540811ad59af82a2df83bd9a110f9e715e8484498be851add16d96e` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-sagittarius-globe-180.png` | `617c878d80c45faa0fc125474d9986ba72ca532a4470c1f4cba363f4faf89cb5` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-south-pole-globe-180.png` | `a1c724d994965df386fb4f7221539d42e58fb31e4ddb75e6552a6ed358878e1e` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/star-identity/crux-18.png` | `b7bfc8e256057e0852119a3c433769d246ed992c79ba8f6a7d9986613095d16e` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/m31-08.png` | `f84385e53e189d72d78f369b43ce73c8d3f777feac41690a42bbec06c192eb92` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/orion-08.png` | `9a0d3c6e9b3369fb5a088290831126c132489455c17169da8ce9a2c6992d611d` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |

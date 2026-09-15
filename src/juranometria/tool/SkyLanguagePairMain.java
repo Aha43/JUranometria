@@ -102,6 +102,17 @@ public final class SkyLanguagePairMain {
         PAGES.put("north-pole-globe-180", new ChartViewState(
                 new SkyPosition(0.0, 89.0), 180.0,
                 ChartViewState.defaultMagnitudeFor(180.0)));
+        // Added after owner testing. The checkpoint asked whether
+        // "Sørlige vannslange" - eighteen characters against Hydrus's
+        // six - stays comfortable at a globe's rim, and none of the
+        // first seven sheets could answer it: on the Sagittarius
+        // globe Hyi is one of the Norwegian OMISSIONS, so the index
+        // proved its absence while no page showed the name written.
+        // The study says it is written and moved here; owner testing
+        // has to see that rather than infer it from a report.
+        PAGES.put("south-pole-globe-180", new ChartViewState(
+                new SkyPosition(0.0, -89.0), 180.0,
+                ChartViewState.defaultMagnitudeFor(180.0)));
     }
 
     /**
@@ -136,9 +147,7 @@ public final class SkyLanguagePairMain {
         ALL_PAGES.put("south-pole-42", new ChartViewState(
                 new SkyPosition(0.0, -89.0), 42.0,
                 ChartViewState.defaultMagnitudeFor(42.0)));
-        ALL_PAGES.put("south-pole-globe-180", new ChartViewState(
-                new SkyPosition(0.0, -89.0), 180.0,
-                ChartViewState.defaultMagnitudeFor(180.0)));
+
     }
 
     /** One name written in one language and refused in the other. */

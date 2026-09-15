@@ -1,6 +1,6 @@
 # Ready for owner testing — the Norwegian sky
 
-Issue #347. Seven matched pages and an omission index, for the one
+Issue #347. Eight matched pages and an omission index, for the one
 question no measurement answers: **does this read as the familiar
 sky?**
 
@@ -10,7 +10,7 @@ these are study images.
 
 ## What you are looking at
 
-Seven sheets, `pair-*.png`. Latin on the left, Norwegian Bokmål on
+Eight sheets, `pair-*.png`. Latin on the left, Norwegian Bokmål on
 the right, at the same centre, field, options, size and white-paper
 palette. Each half is drawn **independently** through the production
 renderer and copied in at native resolution — the generator checks
@@ -31,12 +31,13 @@ study measured a disc a reader does not normally see.
 | `pair-orion-120` | holds the closest approach to the page edge, 2.6 px |
 | `pair-sagittarius-120` | the `Ser` / `Oph` attachment case |
 | `pair-ra-seam-42` | the seam on an ordinary page |
-| `pair-sagittarius-globe-180` | crowded globe, `Sørlige vannslange`, several omissions |
+| `pair-sagittarius-globe-180` | crowded globe, several omissions including `Hyi` at the limb |
 | `pair-north-pole-globe-180` | polar globe, a different cluster of cases |
+| `pair-south-pole-globe-180` | the only page that writes `Sørlige vannslange` in full |
 
 `omissions.png` holds **all ten** names written in one language and
 refused in the other — drawn from all fourteen study pages, not only
-these seven, because an absence is invisible on a full page by
+these eight, because an absence is invisible on a full page by
 definition. Each is a native-scale crop of the same place in both
 languages, captioned with the page, the identity, the language that
 lost it and the refusal that decided it.
@@ -59,9 +60,15 @@ Only things an eye can decide. The numbers are in `placement.md`.
    them. Watch also that the Latin side says `SERPENS CAPUT`, which
    is the catalogue defect #348 will correct: the Norwegian side
    already reads `SLANGEN`, the whole constellation.
-5. **Does `Sørlige vannslange` stay comfortable at the globe rim?**
-   Eighteen characters against `Hydrus`'s six, on a southern
-   constellation that lands where there is least room.
+5. **Does `Sørlige vannslange` stay comfortable?** Eighteen
+   characters against `Hydrus`'s six. Two pages answer different
+   halves of this, and neither answers it alone: on the **south-pole
+   globe** the name is written in full, inside the disc, where you
+   can judge its weight against its neighbours; on the **Sagittarius
+   globe** it reaches the limb and is omitted, which the index shows.
+   Added after owner testing found the first seven sheets could only
+   prove the absence — no page showed the name written, and that had
+   to be seen rather than inferred from the report.
 6. **Does Norwegian change the page's quietness or hierarchy?** The
    atlas is meant to be quiet. Do the longer names make it louder, or
    pull the eye away from the stars?
