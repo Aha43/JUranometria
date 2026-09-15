@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**293 promoted artifacts.**
+**299 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -192,14 +192,12 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/on-this-page-marks.png` | `4073b82a26937ceda99b64deb9729de0c0e10c39530c49a11ab8ab195537cd8a` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-horizon.png` | `2cb652b98dbe3ae63ba7488382fc74aa3ad39bbfef13c5229700c6ed3c5c3068` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-zenith.png` | `79f181512f064dee1f5e6d7c965661420d066aec1efe2cab26acd26fe84597f0` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/label-placement/census-before.tsv` | `a257d9597af4b00b9889f6b07b22d09f9b6c3dcf37bdd2cf89b4b47d2ee28a96` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-candidate.png` | `fe2815677cff74b5e5f5b9301ae2ad067f600f792f58a21fcc1dfd78e12eb47e` | 2026-09-14 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-today.png` | `4bcce3c0971294087a56a21dc0666c2c5213290b3750a740f1921ce482fff6f3` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/orion-90-candidate.png` | `0093b03d794841e3981dc378802634dd608c45d9cc6a63209c90f6bb5f2af87d` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/orion-90-today.png` | `15e352674709b7629ea34304c0a0f15be04f3bfb8dc74820e93fa369d054527c` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/sagittarius-120-candidate.png` | `d76a331084c09f50a91a21a8cb433e918d731de79cef1817a149b790d98c3720` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/sagittarius-120-today.png` | `3a366febb6e57723a651072c3620255ecfccd4e150e6dd92105ba4cb5f532b93` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/label-placement/text-before.tsv` | `c13f424f7ce6b61f59f7a4f469f1f74f14661fa346405a9fd74b0e76be171b69` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/overview-projection/equinox-060-gnomonic.png` | `44dc5bd5c51e75d192a1fdde70541bc786b5e2d153906f33093770a296b68841` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/overview-projection/equinox-060-orthographic.png` | `86512f5dd755f9969287fdd8984fdeb192d10b0a2887710c3afd02f88743386d` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/overview-projection/equinox-060-stereographic.png` | `97d39675321394df4f854c7cce15db7b3a3b588142f2af890b55e4722d9dcbb3` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
@@ -306,6 +304,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/regional-zoom/m45-18deg.png` | `156414a05e0a8008800491e84ef499dac9a6cd750e3d6c9952550c6eeb8d5391` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | RegionalStudyMain |
 | `docs/studies/regional-zoom/m45-36deg.png` | `e8be714495296cbfaf0df096afe0b298b928fadbec9b7254c7cf98a047e2b953` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | RegionalStudyMain |
 | `docs/studies/regional-zoom/polar-36deg.png` | `ee47fe87514c808f574d908236d99a9bf781d6fe199fbd7deeec60a5c320fcbc` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | RegionalStudyMain |
+| `docs/studies/sky-language/omissions.png` | `ba11f86bf1a0ec003483090e2f75ee5fdf8dcf18dc88084ce341e6cad8d3df28` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-north-pole-globe-180.png` | `ff277f2d388383006d149c54c5365137cb3a398e4695d06391b389a0cb6a378e` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-orion-120.png` | `2d237f281bc172c3c08a68199a72ce0f6a9bb3d84645c1cfdcbd5c4105185b8e` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-orion-18.png` | `96a31735c7b1408947188e11a863ea52c007e8d48cb7fd1fecfa08dd0e2c4a05` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-ra-seam-42.png` | `c38c75c406cb43b5b411a61480807ae97da58e52049d6b01ef77eb1af36a5f1f` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-sagittarius-120.png` | `9651bfc4011933d318e965c6e7ca790b64d2c6431c6a3254a5f8ba73ad5e6f4c` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-sagittarius-18.png` | `dfe5ded49540811ad59af82a2df83bd9a110f9e715e8484498be851add16d96e` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-sagittarius-globe-180.png` | `617c878d80c45faa0fc125474d9986ba72ca532a4470c1f4cba363f4faf89cb5` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/star-identity/crux-18.png` | `b7bfc8e256057e0852119a3c433769d246ed992c79ba8f6a7d9986613095d16e` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/m31-08.png` | `f84385e53e189d72d78f369b43ce73c8d3f777feac41690a42bbec06c192eb92` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/orion-08.png` | `9a0d3c6e9b3369fb5a088290831126c132489455c17169da8ce9a2c6992d611d` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |

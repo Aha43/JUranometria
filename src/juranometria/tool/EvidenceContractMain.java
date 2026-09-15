@@ -329,6 +329,13 @@ public final class EvidenceContractMain {
     }
 
     private static final List<String> IMAGE_MAINS = List.of(
+            // Sprint 33 (#347): the owner checkpoint's paired
+            // Latin/Norwegian pages and the omission index. Drawn by
+            // the production renderer into committed images, so they
+            // are held like any other renderer-drawn evidence - and
+            // they HAVE a generator, which is what keeps them from
+            // being promoted without an account of themselves.
+            "juranometria.tool.SkyLanguagePairMain",
             "juranometria.tool.IdentifyMockupMain",
             "juranometria.tool.OnThisPageMockupMain",
             "juranometria.tool.DeepSkyVocabularyMockupMain",
