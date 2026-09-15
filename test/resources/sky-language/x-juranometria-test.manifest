@@ -1,0 +1,22 @@
+# The fixture pack's manifest. It declares WHAT IT IS rather than
+# inventing a source: fabricating provenance to satisfy a schema is
+# exactly the dishonesty the provenance rules exist to prevent.
+#
+# Production loading must REFUSE a pack that says fixture=true. That
+# refusal is the point - it proves the schema cannot be satisfied by
+# a plausible-looking lie, only by an actual account.
+
+schema=1
+tag=x-juranometria-test
+display-name=JUranometria test fixture
+rows=88
+fixture=true
+
+# The fields a real contribution must fill in. Left deliberately
+# empty here, because this pack HAS no external source and will not
+# pretend to: the fixture-status flag above is its honest answer, and
+# production refuses it for exactly that reason.
+source=
+licence=
+retrieved=
+transformations=

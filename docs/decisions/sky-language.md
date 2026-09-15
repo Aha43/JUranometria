@@ -384,6 +384,118 @@ than something a later implementer invents.
 - **A different cultural sky is outside that contribution format**,
   as recorded above: it needs its own issue, geometry and provenance.
 
+## The language settings, and what they persist
+
+Owner ruling, 2026-09-15. Stated as meanings; the Java types may
+differ, the meanings may not.
+
+```
+language.interface = en | nb-NO | …whatever is installed
+language.chart     = follow-interface | latin | …whatever pack is found
+```
+
+**Availability is data, not a switch.** Only `follow-interface` and
+`latin` are fixed, because they are behaviours the atlas owns rather
+than things a contributor supplies — no pack may claim either name.
+Every actual language comes from what is installed: interface
+resource bundles, and packs discovered and validated by the
+contribution contract. A Swedish pack is selectable, drawable and
+persistable without editing Java, and `SkyLanguageChoiceTest` proves
+exactly that with a tag appearing in no constant, enum or switch.
+
+The same registry governs reading a stored value, creating a choice
+and persisting one. An unavailable value cannot be *built*, so it
+cannot be stored — validating on the way in but not on the way out
+would leave a door open beside a locked one.
+
+**Follow interface is an explicit third value, not an absence.** It is
+something a reader chose, and a store that could not tell "never
+chose" from "chose to follow" would have no way to change its default
+later without silently moving somebody's chart. `EclipticStore`
+already carries the `Optional` pattern this needs.
+
+### Migration
+
+- A missing `language.interface` reads as `en`.
+- A missing `language.chart` reads as `follow-interface`.
+- **Reading legacy preferences writes nothing.** A 2.0 reader who
+  never opens the setting keeps a store with no language keys in it.
+- Once the reader changes or saves either setting, the complete
+  explicit choice is persisted — both keys, no implied halves.
+- Absence and explicit `follow-interface` behave **identically
+  today**. That is what makes the upgrade invisible: the persisted
+  chart mode is `follow-interface`, which *resolves* to Latin names
+  under an English interface — exactly the page 2.0 drew. The mode
+  and its output are different things, and conflating them is how a
+  later change would move somebody's chart by accident.
+- **A future default change needs an explicit migration or version
+  rule.** It may not reinterpret old absence, because absence today
+  means "never asked" and reinterpreting it would change the chart of
+  a reader who never agreed to anything.
+
+### Malformed values
+
+An unknown or malformed stored value falls back deterministically and
+stays diagnosable. It is never passed to `Locale.getDefault()` and
+never accepted as an arbitrary language tag — the audit found no
+`Locale.getDefault()` in production at all, and that property has to
+survive this sprint.
+
+### `latin` is a nomenclature mode
+
+`latin` selects the official Latin names on the chart. It is **not**
+a claim that the interface speaks Latin, and it must not be disguised
+as an interface locale `la`. The chart language and the interface
+language answer different questions, and one of them has an answer
+the other cannot express.
+
+### Fallback
+
+| missing | falls back to |
+|---|---|
+| interface text | English |
+| localised constellation name | the official Latin name |
+| IAU abbreviation, canonical identity | **never falls back** |
+
+The last row is not an omission. An abbreviation is canonical data,
+not a translation; there is nothing for it to fall back *to*.
+
+## The contribution contract
+
+A further translation arrives as **reviewed data plus its
+provenance** — no edit to constellation identity, no renderer change,
+no entry in a hard-coded list of supported languages.
+
+A contribution carries: a schema version, a language tag, a display
+name, all 88 canonical abbreviations exactly once, and the same
+provenance fields production data requires — source, licence,
+retrieval date, transformations.
+
+It is rejected for a missing identity, a duplicate, an extra, or an
+unknown one. Eighty-seven names is not a language pack, and an
+eighty-ninth constellation does not exist.
+
+### The fixture language
+
+`x-juranometria-test` — an unmistakable private-use tag, living
+permanently under **test resources**, excluded from packaged
+resources and from every language selector.
+
+It exercises the whole contract: all 88 abbreviations, synthetic
+names visibly unlike Latin, non-ASCII coverage, and every required
+field. Its manifest **declares itself a fixture** rather than
+fabricating external provenance — inventing a source to satisfy a
+schema would be the exact dishonesty the provenance rules exist to
+prevent. Production loading rejects that fixture status, and a
+packaged-asset test proves the fixture never ships.
+
+**The mutation that matters is architectural**: adding the fixture
+data must make the naming service resolve it *without* editing
+constellation identity, `SceneAssembler`, `LabelGeometry`, renderer
+code or a supported-language enum. Removing one row, or adding an
+invented 89th identity, must fail at the data boundary. #348 owns
+the service; this gate owns the contract it must satisfy.
+
 ## Still open
 
 - Placement study: Latin against Norwegian on crowded Sagittarius,

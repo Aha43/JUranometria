@@ -1,0 +1,107 @@
+# A FIXTURE LANGUAGE. Not a language, not shipped, not selectable.
+#
+# It exists to exercise the contribution contract end to end: a
+# language pack arrives as reviewed DATA plus provenance, and must
+# resolve without editing constellation identity, SceneAssembler,
+# LabelGeometry, renderer code, or any hard-coded list of supported
+# languages. If adding this file is not enough to make a naming
+# service answer in it, the contract is not met.
+#
+# The names are deliberately unmistakable - no reader could confuse
+# "zzø-and-testnavn" for a constellation - and they carry the
+# non-ASCII letters a real pack needs, so glyph coverage is exercised
+# rather than assumed.
+#
+# It lives under test resources and is never copied into the build:
+# only src/resources reaches the packaged application, and
+# SkyLanguagePackTest proves this file is absent from both.
+#
+IAU	Name
+And	zzæ-and-testnavn
+Ant	zzø-ant-testnavn
+Aps	zzå-aps-testnavn
+Aql	zzÆ-aql-testnavn
+Aqr	zzØ-aqr-testnavn
+Ara	zzÅ-ara-testnavn
+Ari	zzß-ari-testnavn
+Aur	zzñ-aur-testnavn
+Boo	zzç-boo-testnavn
+CMa	zzü-cma-testnavn
+CMi	zzö-cmi-testnavn
+CVn	zzæ-cvn-testnavn
+Cae	zzø-cae-testnavn
+Cam	zzå-cam-testnavn
+Cap	zzÆ-cap-testnavn
+Car	zzØ-car-testnavn
+Cas	zzÅ-cas-testnavn
+Cen	zzß-cen-testnavn
+Cep	zzñ-cep-testnavn
+Cet	zzç-cet-testnavn
+Cha	zzü-cha-testnavn
+Cir	zzö-cir-testnavn
+Cnc	zzæ-cnc-testnavn
+Col	zzø-col-testnavn
+Com	zzå-com-testnavn
+CrA	zzÆ-cra-testnavn
+CrB	zzØ-crb-testnavn
+Crt	zzÅ-crt-testnavn
+Cru	zzß-cru-testnavn
+Crv	zzñ-crv-testnavn
+Cyg	zzç-cyg-testnavn
+Del	zzü-del-testnavn
+Dor	zzö-dor-testnavn
+Dra	zzæ-dra-testnavn
+Equ	zzø-equ-testnavn
+Eri	zzå-eri-testnavn
+For	zzÆ-for-testnavn
+Gem	zzØ-gem-testnavn
+Gru	zzÅ-gru-testnavn
+Her	zzß-her-testnavn
+Hor	zzñ-hor-testnavn
+Hya	zzç-hya-testnavn
+Hyi	zzü-hyi-testnavn
+Ind	zzö-ind-testnavn
+LMi	zzæ-lmi-testnavn
+Lac	zzø-lac-testnavn
+Leo	zzå-leo-testnavn
+Lep	zzÆ-lep-testnavn
+Lib	zzØ-lib-testnavn
+Lup	zzÅ-lup-testnavn
+Lyn	zzß-lyn-testnavn
+Lyr	zzñ-lyr-testnavn
+Men	zzç-men-testnavn
+Mic	zzü-mic-testnavn
+Mon	zzö-mon-testnavn
+Mus	zzæ-mus-testnavn
+Nor	zzø-nor-testnavn
+Oct	zzå-oct-testnavn
+Oph	zzÆ-oph-testnavn
+Ori	zzØ-ori-testnavn
+Pav	zzÅ-pav-testnavn
+Peg	zzß-peg-testnavn
+Per	zzñ-per-testnavn
+Phe	zzç-phe-testnavn
+Pic	zzü-pic-testnavn
+PsA	zzö-psa-testnavn
+Psc	zzæ-psc-testnavn
+Pup	zzø-pup-testnavn
+Pyx	zzå-pyx-testnavn
+Ret	zzÆ-ret-testnavn
+Scl	zzØ-scl-testnavn
+Sco	zzÅ-sco-testnavn
+Sct	zzß-sct-testnavn
+Ser	zzñ-ser-testnavn
+Sex	zzç-sex-testnavn
+Sge	zzü-sge-testnavn
+Sgr	zzö-sgr-testnavn
+Tau	zzæ-tau-testnavn
+Tel	zzø-tel-testnavn
+TrA	zzå-tra-testnavn
+Tri	zzÆ-tri-testnavn
+Tuc	zzØ-tuc-testnavn
+UMa	zzÅ-uma-testnavn
+UMi	zzß-umi-testnavn
+Vel	zzñ-vel-testnavn
+Vir	zzç-vir-testnavn
+Vol	zzü-vol-testnavn
+Vul	zzö-vul-testnavn
