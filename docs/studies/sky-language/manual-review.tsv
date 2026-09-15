@@ -67,6 +67,9 @@ d540471f0c131314	chart/DsoType.java	*Ass	unresolved: no route found, needs manua
 8542e24bde280d7f	geo/ConstellationGeography.java	constellation-geography	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 6130e58d0e232687	geo/ConstellationGeography.java	ICRS-J2000	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 6cd4ff7e430ecec0	geo/ConstellationGeography.java	checksum.	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+d525afcda7732e1d	geo/SkyNames.java	latin	declared name used, but never at a known sink	identifier	the chart mode token that selects official Latin nomenclature; a stored value, not a word a reader reads
+faa2a1e5daf0d9b9	geo/SkyNames.java	/resources/sky-language/index.tsv	declared name used, but never at a known sink	identifier	the classpath path of the generated pack index
+14a52e5dbbea579a	geo/SkyNames.java	/resources/sky-language/	declared name used, but never at a known sink	identifier	the classpath prefix the packs live under
 815a76a718d7ba3f	meridian/MeridianModule.java	meridian	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 45cca1fc920ac14d	project/DrawnPage.java	Shows one hemisphere of the sky, out to 90 degrees from	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
 77d02d4e0bd2fe21	project/DrawnPage.java	 the centre in every direction. Outside the	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page

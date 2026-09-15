@@ -1284,6 +1284,62 @@ public final class PackagedAcceptanceMain {
                 + " key samples " + java.util.Arrays.toString(keySamples)
                 + ")");
 
+        // The chart languages, inside the packaged image (Sprint 33,
+        // issue #348). build/classes is an intermediate; this is what
+        // a reader actually receives, so the packaged boundary is
+        // asserted here rather than observed once during development.
+        // A packaging change that dropped the pack, or that swept
+        // test data into the image, would otherwise reach a reader
+        // before anything said so.
+        juranometria.geo.SkyNames packaged =
+                juranometria.geo.SkyNames.discover();
+        require(packaged.chartLanguages().contains("nb-NO"),
+                "the packaged image carries the Norwegian chart"
+                        + " language: " + packaged.chartLanguages());
+        require(!packaged.chartLanguages()
+                        .contains("x-juranometria-test"),
+                "and carries no test fixture language: "
+                        + packaged.chartLanguages());
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/sky-language/nb-NO.manifest") != null,
+                "the packed names travel with their provenance, not"
+                        + " with provenance left behind in a source"
+                        + " tree no reader has");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/sky-language/"
+                                + "x-juranometria-test.tsv") == null,
+                "and no fixture data is packaged");
+        java.util.Map<String, String> packedLatin =
+                new java.util.TreeMap<>();
+        for (juranometria.geo.Constellation each
+                : juranometria.geo.ConstellationGeography.load()
+                        .constellations()) {
+            packedLatin.put(each.id(), each.latinName());
+        }
+        require("Serpens".equals(packedLatin.get("Ser"))
+                        && "Corona Australis".equals(
+                                packedLatin.get("CrA")),
+                "the packaged catalogue carries the corrected IAU"
+                        + " names: Ser=" + packedLatin.get("Ser")
+                        + ", CrA=" + packedLatin.get("CrA"));
+        java.util.Map<String, String> packedNorse =
+                packaged.namesFor("nb-NO", packedLatin);
+        require(packedNorse.size() == packedLatin.size()
+                        && "Skytten".equals(packedNorse.get("Sgr")),
+                "and names the whole sky in Norwegian through the"
+                        + " packaged classpath: " + packedNorse.size()
+                        + " names, Sgr=" + packedNorse.get("Sgr"));
+        require(new java.util.ArrayList<>(packedNorse.keySet())
+                        .equals(new java.util.ArrayList<>(
+                                packedLatin.keySet())),
+                "keyed and ordered by identity, unchanged by the"
+                        + " language");
+        System.out.println("chart languages OK (packaged image offers "
+                + packaged.chartLanguages() + ", names "
+                + packedNorse.size() + " constellations through its own"
+                + " classpath, carries their provenance, and packs no"
+                + " test fixture)");
+
         // The five deep-sky families, inside the packaged image: each
         // one hides its own marks and nobody else's, the master
         // governs all five, and the family flags round-trip through

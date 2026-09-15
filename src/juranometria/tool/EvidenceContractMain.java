@@ -617,15 +617,15 @@ public final class EvidenceContractMain {
             // says what they are, is a provenance event needing a
             // regenerated study - never a quiet edit. The manifest is
             // where "provisional" versus "verified" actually lives.
-            "docs/studies/sky-language/norwegian-names.tsv",
+            "src/resources/sky-language/nb-NO.tsv",
             "c181a95654c41055ed77e3623eb5b8cd004ae440"
                     + "7864f18769312b63c1af7341",
             "docs/studies/sky-language/iau-constellations.tsv",
             "ff06d67961a1ca12302f6385c61d86cc0b141fd8"
                     + "dd2f7bbf12095f390f2a8f5f",
-            "docs/studies/sky-language/names.manifest",
-            "3db24d7fa5676b70f9bf7da5ec6af99a9d49a0ad"
-                    + "4f4fe187699dd3ee9f2b9cfb");
+            "src/resources/sky-language/nb-NO.manifest",
+            "89679e8722e6680fa3f30e82a9d1e06b726dac6b"
+                    + "cb89354e8166f8f087558b3b");
 
     /** One committed file: its bytes and when it was last written. */
     record Snapshot(byte[] bytes,

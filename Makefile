@@ -136,6 +136,11 @@ classes: check-jdk check-libs
 		$(SOURCES)
 	@if [ -d $(SRC_DIR)/resources ]; then cp -r $(SRC_DIR)/resources $(CLASSES_DIR)/; fi
 	cp VERSION $(CLASSES_DIR)/
+	@# The language index is DERIVED from the packs present, never
+	@# maintained by hand: adding a pack under src/resources/sky-language
+	@# is enough, and nothing lists the languages anywhere (#348).
+	@$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.SkyLanguageIndexMain \
+		$(CLASSES_DIR)
 
 # FlatLaf loads a native library for platform window integration; on
 # JDK 24+ (JEP 472) that is a restricted call needing explicit

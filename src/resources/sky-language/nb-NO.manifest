@@ -1,5 +1,9 @@
-# Where JUranometria's Norwegian constellation names come from
-# (Sprint 33, issue #347).
+# JUranometria's Norwegian Bokmal chart language pack, and where its
+# names come from (Sprint 33, issues #347 and #348).
+#
+# This is a SHIPPED RESOURCE. It moved here from docs/studies in #348
+# so that one copy carries both the names and their account, rather
+# than a study copy that could drift from what a reader sees.
 #
 # The study READS ITS STATUS FROM HERE. It is not a banner in Java:
 # status=verified requires source, licence, retrieved and
@@ -37,6 +41,13 @@
 # the fact that Cru is called Sydkorset.
 #
 # ---------------------------------------------------------------
+
+# The pack's identity, read by the build's indexer and by the
+# naming service. A pack declares what it is; nothing lists it.
+schema=1
+tag=nb-NO
+display-name=Norsk bokmal
+names=nb-NO.tsv
 
 status=verified
 rows=88

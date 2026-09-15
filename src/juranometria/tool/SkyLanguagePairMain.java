@@ -74,7 +74,7 @@ public final class SkyLanguagePairMain {
             new File("docs/studies/sky-language");
 
     private static final Path NAMES =
-            Path.of("docs/studies/sky-language/norwegian-names.tsv");
+            Path.of("src/resources/sky-language/nb-NO.tsv");
 
     /** The seven, chosen for what each one can show a person. */
     private static final Map<String, ChartViewState> PAGES =

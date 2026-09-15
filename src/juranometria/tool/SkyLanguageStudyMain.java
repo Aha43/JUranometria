@@ -76,7 +76,7 @@ public final class SkyLanguageStudyMain {
 
     /** The manifest that says what those names are. */
     private static final Path MANIFEST =
-            Path.of("docs/studies/sky-language/names.manifest");
+            Path.of("src/resources/sky-language/nb-NO.manifest");
 
     /**
      * What the data says about itself.
@@ -156,9 +156,17 @@ public final class SkyLanguageStudyMain {
     private static final Path REPORT =
             Path.of("docs/studies/sky-language/placement.md");
 
-    /** The Norwegian names, and the account of where they came from. */
+    /**
+     * The Norwegian names, and the account of where they came from.
+     *
+     * <p>The SHIPPED resource, not a study copy. #348 moved the
+     * verified list into production resources so one file carries
+     * both the names and their provenance; a study measuring its own
+     * copy would drift from what a reader receives and nothing would
+     * say when.
+     */
     private static final Path NAMES =
-            Path.of("docs/studies/sky-language/norwegian-names.tsv");
+            Path.of("src/resources/sky-language/nb-NO.tsv");
 
     /**
      * Matched pages: the same centre and field in both languages.

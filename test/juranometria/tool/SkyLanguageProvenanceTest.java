@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SkyLanguageProvenanceTest {
 
     private static final Path MANIFEST =
-            Path.of("docs/studies/sky-language/names.manifest");
+            Path.of("src/resources/sky-language/nb-NO.manifest");
 
     private static final Path REPORT =
             Path.of("docs/studies/sky-language/placement.md");
