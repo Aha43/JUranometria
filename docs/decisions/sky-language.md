@@ -5,10 +5,12 @@ settled, what it has measured, and what is still open. **No production
 reader behaviour changes in this issue**; everything here is a
 contract for #348–#352 to build against.
 
-Status: **in progress.** The audit and its calibration are done and
-measured. The placement study, the source verification and the
-fallback model are outstanding, and are marked as such below rather
-than left to be inferred from silence.
+Status: **gate complete; awaiting final independent review.** The
+audit, the source verification, the placement study, the owner
+checkpoint, the language model and the contribution contract are all
+settled and recorded below. The component decisions were reviewed as
+they were made; the closed record on its final tree has not been
+reviewed, and this document does not claim otherwise.
 
 ## The reader's promise
 
@@ -48,20 +50,26 @@ issue, its own geometry and its own provenance.
 
 A mechanical classifier (`juranometria.tool.SkyLanguageScan`) over
 the whole tree, calibrated by `SkyLanguageScanTest` against synthetic
-input. **9,020 string literals**, partitioned by surface:
+input. **9,269 string literals**, partitioned by surface:
 
 | surface | literals |
 |---|---|
-| developer tools and generators | 4,809 |
-| confined diagnostics | 2,729 |
+| developer tools and generators | 4,998 |
+| confined diagnostics | 2,789 |
 | application | 1,197 |
 | export | 199 |
 | reader-reachable diagnostics | 86 |
 
-**The reader's own surface: 446 occurrences, 388 unique translation
-units** — 360/315 in the application and 86/73 in reader-reachable
-diagnostics. Occurrences and units are reported separately because
-`Cancel` appears six times and is one translation, not six.
+**The reader's own surface: 749 occurrences, 636 unique translation
+units** — 638/540 in the application, 86/73 in reader-reachable
+diagnostics, and 25/23 in export. Occurrences and units are reported
+separately because `Cancel` appears six times and is one translation,
+not six.
+
+Each occurrence carries how firmly it is known: **544 traced** to a
+named call, **184 recognised** as prose with no sink traced, and
+**21 manually reviewed** through the ledger. The recognised ones are
+*candidates*, and the label travels with them into #350.
 
 Three findings changed the shape of the sprint:
 
@@ -72,11 +80,13 @@ Three findings changed the shape of the sprint:
   a failure's cause chain and quotes up to four `getMessage` strings
   verbatim into a dialog. Calling those developer-only because they
   are thrown deep in production would have been wrong.
-- **The first honest-looking answer was wrong.** A rule set that knew
-  only `setText` found 86 strings and looked complete. The
-  application shows far more; the number was small because the rules
-  were, and the same shape would have recurred at every later stage
-  had the fixture not been built to defeat it.
+- **The first honest-looking answer was wrong, twice over.** A rule
+  set that knew only `setText` found 86 strings and looked complete.
+  Naming the routes it missed took that to 446 occurrences over 388
+  units — which also looked complete, and was not: draining the
+  residue took it to **749 over 636**. Nearly three hundred
+  reader-visible strings sat in a generic bucket while two successive
+  confident numbers stood in front of them.
 
 ### What the audit cannot see, stated rather than implied
 
@@ -342,7 +352,7 @@ This is required reading beside the attribution numbers, because it
 shows why nearest-line attribution is **informative but not
 absolute**. A Serpens label cannot avoid being nearer Ophiuchus' lines
 than to half of its own figure, and no placement policy could change
-that. The 25 negative margins are therefore published as
+that. The 23 negative margins are therefore published as
 **inspection candidates** with their distances and competing
 identity - never as acceptance failures.
 
@@ -496,19 +506,82 @@ code or a supported-language enum. Removing one row, or adding an
 invented 89th identity, must fail at the data boundary. #348 owns
 the service; this gate owns the contract it must satisfy.
 
-## Still open
+## Owner checkpoint — passed 2026-09-15
 
-- Placement study: Latin against Norwegian on crowded Sagittarius,
-  sparse Orion, both poles, the RA seam, 42°, 120° and the 180° globe
-  rim; labels retained, omitted and moved, collisions and candidate
-  ranks, bounds, font coverage, exported text, runtime.
-- The same-page-twice contract: with only chart language changed, all
-  non-text geometry, mark membership, hit testing and inventory
-  identities must be unchanged. Labels may move or be omitted; the
-  sky may not.
-- Source verification for all 88 names, and the `Sydkorset` question.
-- Language tags, and whether the first locale is explicitly `nb-NO`.
-- Defaults, persistence and fallback when a translation is absent.
-- The data-only contribution shape for a further translation.
-- Draining the unresolved application-surface residue to a
-  deliberately inspectable size.
+Eight matched Latin/Norwegian pages and an index of every asymmetric
+omission (`checkpoint.md`). All six questions pass, with **no
+production policy change requested**.
+
+- **The Norwegian sky reads naturally** — not as decoration laid over
+  a Latin atlas. *Skytten*, *Slangebæreren*, *Vannmannen*,
+  *Steinbukken*, *Svanen*, *Store bjørn* and *Lille bjørn* read as
+  names of the actual figures.
+- **Moved names remain attached.** No Norwegian name appears to
+  belong to a neighbouring figure, including `SLANGEN` above
+  `SLANGEBÆREREN` on Sagittarius 120° — despite that being the case
+  the nearest-line metric scores worst.
+- **The ten omissions leave honest space**, and none makes an
+  unexplained hole.
+- **The hierarchy stays quiet.** Longer words do not become louder;
+  constellation names keep their subdued place beneath stars, object
+  labels and figure lines.
+- **The globe stays balanced** at V 5.0: both languages read as the
+  same restrained hemisphere, and Norwegian does not rebuild the
+  crowded edge the limb treatment exists to avoid.
+- **The seam and wide flat pages hold.**
+
+### `Sørlige vannslange`, answered in two halves
+
+Neither half answers it alone, and the question as first written
+asked for something no page shows. On the **south-pole globe** the
+eighteen characters are written in full, comfortably inside the disc,
+at the same weight as *Smelteovnen* and *Paradisfuglen* beside them.
+On the **Sagittarius globe**, where that whole name cannot stay
+inside the limb, it is **omitted rather than compressed, clipped or
+pushed into another constellation**. That is the right cartographic
+behaviour.
+
+### All ten omissions are at a globe's limb
+
+Seven fall in Norwegian and three in Latin. The limb refuses
+whichever *whole word* cannot fit rather than favouring either
+language — the placement policy applying evenly under a language it
+was never designed for, not a translation tax.
+
+## Handoff to #348
+
+What this gate settled, #348 implements.
+
+**Correct the canonical Latin records**, each to the value
+`IauIdentityTest` already holds:
+
+- `Ser` → **`Serpens`** (the genitive `Serpentis` is already right);
+- `CrA` → **`Corona Australis`** with genitive **`Coronae
+  Australis`**.
+
+Both change existing labels, search results and pinned evidence on
+purpose. The exception list in `IauIdentityTest` must shrink as each
+lands — a stale allowance may not outlive the defect it was written
+for.
+
+**Build the naming service** from discovered, validated packs. Adding
+a pack must be enough: no edit to constellation identity, to
+`SceneAssembler`, to `LabelGeometry`, to renderer code, or to any
+list of supported languages. `SkyLanguagePack` holds the data
+contract; the service is #348's.
+
+**Preserve identity-keyed ordering.** `SceneGeography` sorts by
+constellation id, and chart language changes values, never keys or
+iteration order. Mutation-proved by sorting on the displayed name.
+
+**Implement the two preference keys** against the settled migration
+contract: absence means "never asked", reading writes nothing, saving
+writes both keys, and `follow-interface` is a value distinct from
+absence.
+
+**Ship English interface resources and the verified `nb-NO` chart
+pack**, keeping the deterministic fallbacks: interface text to
+English, localised names to official Latin, and identity never.
+
+**Keep `x-juranometria-test` outside production packaging** and
+outside every language selector.

@@ -167,4 +167,51 @@ class SkyLanguageProvenanceTest {
                             + " reached: " + failed, failed);
         }
     }
+
+    /**
+     * A verified report makes no provisional claim anywhere.
+     *
+     * <p>The gap this closes. The title and the status line took
+     * their standing from the manifest, and the opening paragraph was
+     * written into Java - so a verified study introduced itself as
+     * PROVISIONAL while its own title and footer said otherwise, and
+     * every existing assertion passed because none of them read the
+     * body. Three contradictory claims in one document, all green.
+     *
+     * <p>Checked in both directions, because a rule that only ever
+     * forbids the word would be satisfied by a report that had
+     * stopped saying it while its data was still unverified - the
+     * dangerous half.
+     */
+    @Test
+    void theReportMakesOneClaimAboutItselfThroughout() throws Exception {
+        String stated = stated().get("status");
+        String report = Files.readString(REPORT);
+        long says = report.lines()
+                .filter(line -> line.toUpperCase(java.util.Locale.ROOT)
+                        .contains("PROVISIONAL"))
+                .count();
+
+        if ("verified".equals(stated)) {
+            assertEquals(0, says,
+                    "a verified study calls itself provisional"
+                            + " nowhere - not in the title, not in the"
+                            + " opening, not in the status line: "
+                            + report.lines()
+                                    .filter(l -> l.toUpperCase(
+                                            java.util.Locale.ROOT)
+                                            .contains("PROVISIONAL"))
+                                    .toList());
+            assertTrue(report.contains("Verified names."),
+                    "and says positively what it was measured"
+                            + " against, rather than merely omitting"
+                            + " the warning");
+        } else {
+            assertTrue(says >= 2,
+                    "a provisional study says so where a reader meets"
+                            + " it - in its title and in its opening -"
+                            + " rather than once, quietly, at the"
+                            + " bottom: " + says);
+        }
+    }
 }

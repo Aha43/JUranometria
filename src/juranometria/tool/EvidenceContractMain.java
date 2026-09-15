@@ -77,13 +77,12 @@ public final class EvidenceContractMain {
                 "docs/studies/test-evidence/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PlaceAndTimeStudyMain",
                 "docs/studies/place-and-time/measurements.md");
-        // PROVISIONAL (Sprint 33, #347). Held to its bytes like any
-        // report, which is what makes "regenerate when the verified
-        // catalogue replaces the lead" a checkable promise rather
-        // than an intention: if the names move and the report does
-        // not, the contract says so. Its input,
-        // norwegian-lead.tsv, is owner-supplied working material and
-        // no production code reads it.
+        // Sprint 33 (#347). Held to its bytes like any report, which
+        // is what makes "regenerate when the names change" a
+        // checkable promise rather than an intention: if the names
+        // move and the report does not, the contract says so. Its
+        // inputs - norwegian-names.tsv and names.manifest - are
+        // pinned fixtures, and no production code reads either.
         REPORT_MAINS.put("juranometria.tool.SkyLanguageStudyMain",
                 "docs/studies/sky-language/placement.md");
         // Writes its renderer-drawn pages beside the report as it

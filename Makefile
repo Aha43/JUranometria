@@ -591,10 +591,11 @@ test-evidence-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.TestEvidenceStudyMain \
 		> docs/studies/test-evidence/measurements.md
 
-# PROVISIONAL (Sprint 33, #347): measured against an owner-supplied
-# lead, not a cited source. Regenerate when the verified catalogue
-# replaces docs/studies/sky-language/norwegian-lead.tsv.
-# Headless, so typing this command reproduces the committed bytes.
+# Sprint 33 (#347). Measured against
+# docs/studies/sky-language/norwegian-names.tsv, whose provenance is
+# recorded beside it in names.manifest; the report takes its standing
+# from that manifest rather than from this comment. Headless, so
+# typing this command reproduces the committed bytes.
 sky-language-study: classes
 	mkdir -p docs/studies/sky-language
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true \
