@@ -77,6 +77,15 @@ public final class EvidenceContractMain {
                 "docs/studies/test-evidence/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PlaceAndTimeStudyMain",
                 "docs/studies/place-and-time/measurements.md");
+        // PROVISIONAL (Sprint 33, #347). Held to its bytes like any
+        // report, which is what makes "regenerate when the verified
+        // catalogue replaces the lead" a checkable promise rather
+        // than an intention: if the names move and the report does
+        // not, the contract says so. Its input,
+        // norwegian-lead.tsv, is owner-supplied working material and
+        // no production code reads it.
+        REPORT_MAINS.put("juranometria.tool.SkyLanguageStudyMain",
+                "docs/studies/sky-language/placement.md");
         // Writes its renderer-drawn pages beside the report as it
         // runs (issue #246), so capturing the report regenerates
         // them too - byte-reproducible per machine, like every
@@ -590,7 +599,19 @@ public final class EvidenceContractMain {
                     + "238cf3147fec335489336b4b",
             "scripts/reference-vectors.c",
             "baf6f526f4f22997a0e2fc73d5574b9566f491df"
-                    + "b8a675c55ba56ca1300f1b3e");
+                    + "b8a675c55ba56ca1300f1b3e",
+            // Sprint 33 (#347). Owner-supplied working material, not
+            // a generated artifact and not a cited source: pinned by
+            // digest so that changing the names, or the manifest that
+            // says what they are, is a provenance event needing a
+            // regenerated study - never a quiet edit. The manifest is
+            // where "provisional" versus "verified" actually lives.
+            "docs/studies/sky-language/norwegian-lead.tsv",
+            "61becd536094a515499cc06d6ef1657452240e76"
+                    + "9595c22987f40637254be0ef",
+            "docs/studies/sky-language/lead.manifest",
+            "4ade3f45fffddf4b1f9440333212cf169842d654"
+                    + "04a36d42035c52c135796a7f");
 
     /** One committed file: its bytes and when it was last written. */
     record Snapshot(byte[] bytes,
