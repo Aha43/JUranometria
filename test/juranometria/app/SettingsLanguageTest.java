@@ -199,7 +199,7 @@ class SettingsLanguageTest {
                             InterfaceLanguages.discover()),
                     confirmed -> session.choose(confirmed.language()));
             select(chartBox(content), NORWEGIAN);
-            press(content);
+            confirming(content, session);
 
             assertEquals(NORWEGIAN, session.namesOnTheChart(),
                     "the session shows it");
@@ -230,7 +230,7 @@ class SettingsLanguageTest {
                             InterfaceLanguages.discover()),
                     confirmed -> session.choose(confirmed.language()));
             select(chartBox(content), NORWEGIAN);
-            press(content);
+            confirming(content, session);
 
             assertEquals(NORWEGIAN, session.namesOnTheChart());
             assertEquals(SkyLanguageChoice.ENGLISH,
@@ -304,18 +304,24 @@ class SettingsLanguageTest {
                         session.available(), SkyNames.discover(),
                         InterfaceLanguages.discover()),
                 confirmed -> session.choose(confirmed.language()));
-        press(content);
+        confirming(content, session);
     }
 
-    private static void press(JComponent content) {
-        for (javax.swing.JButton button : find(content,
-                javax.swing.JButton.class)) {
-            if ("OK".equals(button.getText())) {
-                button.doClick();
-                return;
-            }
-        }
-        throw new IllegalStateException("no OK button in the dialog");
+    /**
+     * What OK would confirm, taken from the dialog's own seam.
+     *
+     * <p>Not a synthetic click. What each selector means is visible
+     * here in tokens, which is what these tests are about; that the
+     * OK button reaches this seam is a different claim, asserted by
+     * a reader pressing the real button in a real window
+     * (PublicFaceJourneyTest). Driving the button here would prove
+     * both at once and would grow a back-door count that is allowed
+     * to shrink and not to grow - and a bound that bends when it is
+     * inconvenient is not a bound.
+     */
+    private static void confirming(JComponent content,
+                                   SkyLanguageSession session) {
+        session.choose(SettingsDialog.settled(content).language());
     }
 
     private static void select(JComboBox<?> box, String token) {

@@ -44,9 +44,17 @@ class PublicFaceJourneyTest {
                 juranometria.app.SwingSession.capture();
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-" + System.nanoTime());
+        // Held here so the journey can ask, after pressing the real
+        // button, whether the press reached the language seam (#348).
+        juranometria.ui.language.SkyLanguageSession language;
         JFrame[] frame = new JFrame[1];
         try {
             AppearanceStore store = AppearanceStore.forNode(node);
+            juranometria.ui.language.SkyLanguageStore languageStore =
+                    juranometria.ui.language.SkyLanguageStore
+                            .forNode(node);
+            language = juranometria.ui.language.SkyLanguageSession.begin(
+                    languageStore, Atlas.languages());
             AppearanceSession session = new AppearanceSession(store, false);
             ChartViewController controller = new ChartViewController();
             ChartViewState chartBefore = controller.state();
@@ -67,11 +75,7 @@ class PublicFaceJourneyTest {
                                 // it already removes in its finally -
                                 // a second node here would outlive the
                                 // run (#348).
-                                juranometria.ui.language.SkyLanguageSession
-                                        .begin(juranometria.ui.language
-                                                .SkyLanguageStore
-                                                .forNode(node),
-                                                Atlas.languages()),
+                                language,
                                 Atlas.names(),
                                 juranometria.ui.language.InterfaceLanguages
                                         .discover()),
@@ -101,6 +105,14 @@ class PublicFaceJourneyTest {
             assertSame(frame[0], settings.getOwner());
             juranometria.ui.ReaderInput.click(
                     findRadio(settings, "Dark appearance"));
+            // Change the sky language too, so that pressing OK has
+            // something to carry. Asserting the store afterwards only
+            // means anything if the dialog was showing something
+            // OTHER than what was already stored - otherwise an OK
+            // wired to the unchanged current choice would look
+            // exactly like an OK that read the controls (#348).
+            SwingUtilities.invokeAndWait(() ->
+                    chartLanguage(settings).setSelectedIndex(2));
             juranometria.ui.ReaderInput.click(
                     AboutDialogTest.button(settings.getContentPane(),
                             "OK"));
@@ -110,6 +122,23 @@ class PublicFaceJourneyTest {
                     "the accepted theme applied immediately");
             assertEquals(Optional.of("dark"), store.load(),
                     "the accepted choice persisted");
+            // And the same press reached the language seam. The
+            // headless tests say what each selector MEANS; this says
+            // the button a reader presses actually gets there, which
+            // no synthetic click could establish (#348).
+            assertEquals(java.util.Map.of(
+                            juranometria.ui.language.SkyLanguageChoice
+                                    .INTERFACE_KEY, "en",
+                            juranometria.ui.language.SkyLanguageChoice
+                                    .CHART_KEY, "nb-NO"),
+                    languageStore.stated(),
+                    "the real press reached the language seam and"
+                            + " carried what the selector was showing."
+                            + " An OK wired only to appearance leaves"
+                            + " this empty; an OK wired to the choice"
+                            + " the dialog opened with stores"
+                            + " follow-interface, not the language the"
+                            + " reader just picked");
 
             // The session boundary: a fresh session over the same node
             // decides the next launch; the override stays a non-writing
@@ -213,5 +242,28 @@ class PublicFaceJourneyTest {
     private static void flush() throws Exception {
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    /** The Names on chart selector inside a real Settings dialog. */
+    @SuppressWarnings("unchecked")
+    private static javax.swing.JComboBox<Object> chartLanguage(
+            JDialog settings) {
+        java.util.List<javax.swing.JComboBox<Object>> boxes =
+                new java.util.ArrayList<>();
+        collectBoxes(settings.getContentPane(), boxes);
+        return boxes.get(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void collectBoxes(java.awt.Container from,
+            java.util.List<javax.swing.JComboBox<Object>> into) {
+        for (java.awt.Component child : from.getComponents()) {
+            if (child instanceof javax.swing.JComboBox<?> box) {
+                into.add((javax.swing.JComboBox<Object>) box);
+            }
+            if (child instanceof java.awt.Container container) {
+                collectBoxes(container, into);
+            }
+        }
     }
 }

@@ -107,6 +107,50 @@ public final class SettingsDialog extends JDialog {
     }
 
     /**
+     * Where the dialog's controls are kept, so that reading them is
+     * one named thing rather than a walk over a component tree.
+     */
+    private static final String CONTROLS = "juranometria.settings.controls";
+
+    private record Controls(JRadioButton dark,
+                            JComboBox<juranometria.ui.language
+                                    .SkyLanguageChoices.Item> interfaceBox,
+                            JComboBox<juranometria.ui.language
+                                    .SkyLanguageChoices.Item> chartBox,
+                            Languages languages) {
+    }
+
+    /**
+     * What this dialog would confirm, as its controls now stand.
+     *
+     * <p>The confirmation seam, named so that both halves of the
+     * evidence can reach the same code. What each selector means -
+     * that Follow stays Follow rather than becoming the Latin it
+     * draws, that both keys travel together - is asserted here,
+     * headlessly, where the tokens are visible. That OK actually
+     * reaches this is asserted by a reader pressing the real button
+     * in a real window.
+     *
+     * <p>Splitting it this way is deliberate. Driving the button
+     * headlessly would have proven both at once and added another
+     * file to a back-door count that is allowed to shrink and not to
+     * grow; a bound that bends whenever it is inconvenient is not a
+     * bound. The semantics do not need a synthetic click to be true.
+     */
+    static Confirmed settled(JComponent content) {
+        Controls controls = (Controls)
+                ((JPanel) content).getClientProperty(CONTROLS);
+        if (controls == null) {
+            throw new IllegalStateException(
+                    "this is not a Settings panel");
+        }
+        return new Confirmed(controls.dark().isSelected(),
+                controls.languages().current()
+                        .withInterface(token(controls.interfaceBox()))
+                        .withChart(token(controls.chartBox())));
+    }
+
+    /**
      * The dialog content; headless-constructible for tests. The saved
      * preference is preselected - never a session override's effect -
      * and when an override is active a note says so. The
@@ -243,9 +287,7 @@ public final class SettingsDialog extends JDialog {
         ok.getAccessibleContext().setAccessibleName("OK");
         juranometria.ui.Explain.selfExplanatory(ok,
                 "Keeps the chosen appearance and closes this window");
-        ok.addActionListener(event -> confirm.accept(new Confirmed(
-                dark.isSelected(),
-                chosen(languages, interfaceBox, chartBox))));
+        ok.addActionListener(event -> confirm.accept(settled(panel)));
         JPanel buttons = new JPanel(new BorderLayout());
         JPanel right = new JPanel();
         right.setLayout(new BoxLayout(right, BoxLayout.X_AXIS));
@@ -255,28 +297,9 @@ public final class SettingsDialog extends JDialog {
         buttons.add(right, BorderLayout.EAST);
         buttons.setAlignmentX(0.0f);
         panel.add(buttons);
+        panel.putClientProperty(CONTROLS,
+                new Controls(dark, interfaceBox, chartBox, languages));
         return panel;
-    }
-
-    /**
-     * The choice the two selectors currently show.
-     *
-     * <p>Read from the controls at OK, never from the store: the
-     * dialog reports what the reader is looking at, and the session
-     * decides what to do about it.
-     */
-    private static juranometria.ui.language.SkyLanguageChoice chosen(
-            Languages languages,
-            JComboBox<juranometria.ui.language.SkyLanguageChoices.Item>
-                    interfaceBox,
-            JComboBox<juranometria.ui.language.SkyLanguageChoices.Item>
-                    chartBox) {
-        // Through the choice's own builders, so a token no longer
-        // available is refused here rather than stored and fallen
-        // back from later.
-        return languages.current()
-                .withInterface(token(interfaceBox))
-                .withChart(token(chartBox));
     }
 
     private static String token(
