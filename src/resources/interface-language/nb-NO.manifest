@@ -1,0 +1,50 @@
+# JUranometria's Norwegian Bokmal interface (Sprint 33, issue #350).
+#
+# Registering this language is what makes it selectable. Nothing
+# lists the interface languages: the build walks this directory and
+# writes the index runtime reads, so a language arrives by being
+# installed - the same contract the chart language packs keep.
+#
+# ---------------------------------------------------------------
+# status=draft, and what that means
+# ---------------------------------------------------------------
+#
+# The strings in nb-NO.properties are ORIGINAL TRANSLATIONS written
+# for this application. They are not taken from a source, so unlike
+# the constellation names next door they carry no citation and cannot
+# be corroborated against one: their accuracy is a matter of judgement
+# about Norwegian, and that judgement is the owner's.
+#
+# This says draft until a person who reads Norwegian has said these
+# are the words an atlas should use. The study reads status from here
+# rather than from a banner in Java, so nothing can call itself
+# reviewed by deleting a note.
+#
+# ---------------------------------------------------------------
+# Incomplete on purpose
+# ---------------------------------------------------------------
+#
+# The strings file covers the Settings surface and nothing else. Every
+# other key falls back to English, visibly and by the gate's rule, so
+# a half-translated interface is a legitimate state rather than a
+# broken one - and no key ever reaches a reader as itself.
+#
+# Making it complete is the rest of #350. Proving the mechanism on one
+# surface first is what this is.
+#
+# ---------------------------------------------------------------
+# Not a chart language
+# ---------------------------------------------------------------
+#
+# This governs the words on the controls. What the sky is called is a
+# separate setting a reader chooses separately, and lives under
+# resources/sky-language. Registering Norwegian here does, however,
+# make "Follow interface" mean something it could not mean before:
+# a reader whose chart language follows their interface now gets
+# Norwegian constellation names by choosing a Norwegian interface.
+
+interface-schema=1
+tag=nb-NO
+display-name=Norsk bokmål
+strings=nb-NO.properties
+status=draft

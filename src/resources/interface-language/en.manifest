@@ -47,13 +47,14 @@
 #                   not a policy: whether a selector shows the
 #                   autonym or a translated language name is #350's
 #                   to decide, and deciding it changes no availability
-# strings           where this language's words come from. "in-code"
-#                   says they are still Java literals; #350 replaces
-#                   this with a bundle without this file's role
-#                   changing
+# strings           where this language's words come from. #350
+#                   replaced "in-code" with the file beside this one;
+#                   this file's role did not change, which is what
+#                   registering English before it had strings was
+#                   for
 
 interface-schema=1
 tag=en
 display-name=English
-strings=in-code
-status=built-in
+strings=en.properties
+status=complete
