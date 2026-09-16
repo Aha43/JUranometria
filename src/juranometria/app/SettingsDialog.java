@@ -323,6 +323,58 @@ public final class SettingsDialog extends JDialog {
         control.setAlignmentX(0.0f);
         control.setMaximumSize(new java.awt.Dimension(
                 Integer.MAX_VALUE, control.getPreferredSize().height));
+        nameOwnControls(control, accessibleName);
         panel.add(control);
+    }
+
+    /**
+     * Names the controls the look and feel adds inside this one.
+     *
+     * <p>A combo box is not one component. The look and feel puts its
+     * own arrow button inside, and that button arrives with no
+     * accessible name - so a reader using assistive technology meets
+     * an operable control that says nothing about itself, sitting in
+     * a dialog where every other control introduces itself.
+     *
+     * <p>Which button it is depends on the theme, so this names
+     * whatever button it finds rather than a class it expects. It
+     * also follows the children, because {@code updateUI} replaces
+     * them wholesale when the appearance changes - and appearance is
+     * the setting immediately above this one.
+     *
+     * <p>Found by the accessibility surface test under Metal, which
+     * is what runs when no theme has been installed. The suite had
+     * been green because an earlier test installed FlatLaf and left
+     * it: the same JVM-global look-and-feel hazard the evidence gate
+     * already documents, hiding a real defect rather than causing
+     * one (#348, CI).
+     */
+    private static void nameOwnControls(JComponent control, String owner) {
+        nameChildren(control, owner);
+        control.addContainerListener(new java.awt.event.ContainerAdapter() {
+            @Override
+            public void componentAdded(java.awt.event.ContainerEvent event) {
+                if (event.getChild() instanceof javax.swing.AbstractButton
+                        button) {
+                    name(button, owner);
+                }
+            }
+        });
+    }
+
+    private static void nameChildren(java.awt.Container from, String owner) {
+        for (java.awt.Component child : from.getComponents()) {
+            if (child instanceof javax.swing.AbstractButton button) {
+                name(button, owner);
+            }
+        }
+    }
+
+    private static void name(javax.swing.AbstractButton button,
+                             String owner) {
+        String said = owner + ": show the choices";
+        button.getAccessibleContext().setAccessibleName(said);
+        button.getAccessibleContext().setAccessibleDescription(
+                "Opens the list of languages to choose from");
     }
 }

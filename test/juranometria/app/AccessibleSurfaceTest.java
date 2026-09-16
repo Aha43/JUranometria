@@ -133,14 +133,50 @@ class AccessibleSurfaceTest {
                 "the tab strip's own controls name themselves too");
     }
 
+    /**
+     * Every operable control names itself - under either theme.
+     *
+     * <p>Run twice on purpose. A look and feel supplies controls of
+     * its own inside the ones this code creates - a combo box's arrow
+     * button, a tab strip's scroll buttons - and they differ between
+     * themes, so which theme is installed decides what this test can
+     * see.
+     *
+     * <p>It used to run under whichever theme happened to be
+     * installed by then, which made its result depend on test order.
+     * That is how #348's unnamed combo-box arrows reached CI: the
+     * suite was green locally because an earlier test had installed
+     * FlatLaf and left it, and red on CI where the audit met Metal
+     * first. A gate whose answer depends on what ran before it is not
+     * a gate. Both themes are asked now, each borrowed and given
+     * back through the shared guard.
+     */
     @Test
     void everyControlTheReaderCanOperateCarriesAnAccessibleName()
+            throws Exception {
+        for (boolean applicationTheme : new boolean[] {false, true}) {
+            everyControlNamesItselfUnder(applicationTheme);
+        }
+    }
+
+    private void everyControlNamesItselfUnder(boolean applicationTheme)
             throws Exception {
         List<String> unnamed = new ArrayList<>();
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-a11y-" + System.nanoTime());
         try {
-            SwingUtilities.invokeAndWait(() -> {
+            SwingSession.restoring(() -> SwingUtilities.invokeAndWait(() -> {
+                if (applicationTheme) {
+                    UiTheme.apply(false);
+                } else {
+                    try {
+                        javax.swing.UIManager.setLookAndFeel(
+                                javax.swing.UIManager
+                                        .getCrossPlatformLookAndFeelClassName());
+                    } catch (Exception cannotSet) {
+                        throw new IllegalStateException(cannotSet);
+                    }
+                }
                 ChartViewController navigation =
                         new ChartViewController(Atlas.assembler()::fits);
                 SearchField search = new SearchField(Atlas.search(),
@@ -187,14 +223,18 @@ class AccessibleSurfaceTest {
                         }
                     }
                 }
-            });
+            }));
         } finally {
             node.removeNode();
         }
 
         assertEquals(List.of(), unnamed,
                 "every control a reader operates must name itself to"
-                        + " assistive technology");
+                        + " assistive technology - under "
+                        + (applicationTheme ? "the application's own"
+                                + " theme" : "the cross-platform theme,"
+                                + " which is what a fresh JVM installs"
+                                + " and what CI meets first"));
     }
 
     @Test
