@@ -1,6 +1,6 @@
 # Ready for owner testing — the Norwegian sky
 
-Issue #347. Eight matched pages and an omission index, for the one
+Issues #347 and #349. Nine matched pages and an omission index, for the one
 question no measurement answers: **does this read as the familiar
 sky?**
 
@@ -91,6 +91,72 @@ Only things an eye can decide. The numbers are in `placement.md`.
 6. **Does Norwegian change the page's quietness or hierarchy?** The
    atlas is meant to be quiet. Do the longer names make it louder, or
    pull the eye away from the stars?
+
+## The #349 checkpoint: Ophiuchus at the south pole, 120°
+
+`pair-south-pole-120.png`
+
+The study's fixtures went straight from 42° to 180° at the poles and
+the seam. The gap was not empty. At **120° on the south pole**, the
+atlas draws `OPHIUCHUS` in Latin and draws nothing in Norwegian —
+the first name a reader loses by choosing their own language.
+
+Measured through the production path, on a 1400 × 900 page:
+
+| | Latin | Norwegian |
+|---|---|---|
+| text | `OPHIUCHUS` | `SLANGEBÆREREN` |
+| outcome | placed | **omitted** |
+| candidate taken | 10 of 17 | none |
+| under duress | yes | yes |
+| refusals | 14 `PAGE_EDGE`, 1 `MARK`, 2 `OWNERSHIP` | **17 `PAGE_EDGE`** |
+| box | x 1323–1394, y 546–561 | — |
+| distance to its own figure ink | **1 px** | — |
+
+**The Latin label is attached, and barely on the paper.** Its box ends
+6 pixels from the right border, it was taken at the tenth candidate
+under duress, and it sits 1 pixel from Ophiuchus's own figure ink. It
+is a legitimate name, squeezed into the margin.
+
+**The Norwegian label has nowhere to go.** Every one of its seventeen
+candidates was refused by `PAGE_EDGE` — not one by `MARK`, `TEXT` or
+`OWNERSHIP`. Nothing is in its way; the page is. Ophiuchus shows only
+6 figure segments here, at the extreme rim, and a thirteen-character
+word does not fit in the strip of paper that remains beside them.
+
+So the answer to *"would any additional candidate remain clearly
+attached and inside the page?"* is **no**. Extending the candidate set
+could only offer positions that leave the paper or leave the figure,
+and both are refusals the decision makes on purpose. There is no
+Norwegian-specific fix to make, and there should not be one: a name
+squeezed to fit, or floated off its figure, would be worse than its
+absence.
+
+### Owner ruling, 2026-09-16: accepted
+
+The pair was inspected. **The omission is acceptable and remains.**
+
+On the Norwegian page it does not read as a hole. Ophiuchus enters
+only as a small fragment at the extreme right edge, among `SKYTTEN`,
+`SØRLIGE KRONE`, `TELESKOPET`, `ALTERET` and `SKORPIONEN`. A
+`SLANGEBÆREREN` label there would claim more ownership of the visible
+region than the fragment supports.
+
+That the Latin label succeeds — narrowly, at its tenth candidate,
+6 pixels from the paper's edge — creates no parity requirement.
+Norwegian is applying the policy correctly: **keep the whole word only
+where it can stay on the page and attached to its figure.**
+
+Settled, so that a later reader of this file does not reopen it:
+
+- **no Norwegian exception**;
+- **no extra candidates**;
+- **no squeezing or abbreviation**;
+- **no requirement that two languages retain equal label counts.**
+
+Equal label counts were never the contract. An honest omission is
+preferable to a detached or edge-crossing label, and this is what that
+rule looks like when it costs something.
 
 ## What is not being asked
 

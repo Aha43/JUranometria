@@ -123,11 +123,15 @@ class SkyLanguageDensityTest {
             throw new AssertionError("the study report is missing",
                     cannotRead);
         }
-        assertEquals(14, fixtures.size(),
+        assertEquals(17, fixtures.size(),
                 "the report states a limiting magnitude for every one"
-                        + " of its fourteen pages; a page that stated"
+                        + " of its seventeen pages; a page that stated"
                         + " none would pass every assertion here by"
-                        + " not being looked at");
+                        + " not being looked at. #349 added the three"
+                        + " at 120 degrees on the seam and the poles,"
+                        + " where the set had gone straight from 42 to"
+                        + " 180 - and where the first Norwegian"
+                        + " omission a reader loses turned out to be");
         return fixtures;
     }
 }

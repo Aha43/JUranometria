@@ -72,7 +72,10 @@ public final class SkyLanguageStudyMain {
      * prevent. Named here so removing a page is a failure rather
      * than a smaller report.
      */
-    private static final int PROMISED_PAGES = 14;
+    private static final int PROMISED_PAGES = 17;
+
+    /** The chart language this study measures against Latin. */
+    static final String NORWEGIAN = "nb-NO";
 
     /** The manifest that says what those names are. */
     private static final Path MANIFEST =
@@ -227,6 +230,19 @@ public final class SkyLanguageStudyMain {
         PAGES.put("the south pole, 180 degrees", new ChartViewState(
                 new SkyPosition(0.0, -89.0), 180.0,
                 ChartViewState.defaultMagnitudeFor(180.0)));
+        // 120 degrees at the seam and the poles (#349). The set went
+        // straight from 42 to 180 there, and the gap was not empty:
+        // the south pole at 120 is where OPHIUCHUS fits in Latin and
+        // SLANGEBAERKEN does not, which no other fixture could show.
+        PAGES.put("the RA seam, 120 degrees", new ChartViewState(
+                new SkyPosition(0.0, 20.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
+        PAGES.put("the north pole, 120 degrees", new ChartViewState(
+                new SkyPosition(0.0, 89.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
+        PAGES.put("the south pole, 120 degrees", new ChartViewState(
+                new SkyPosition(0.0, -89.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
     }
 
     /** One measured attachment, for the distribution. */
@@ -266,7 +282,6 @@ public final class SkyLanguageStudyMain {
                             + PAGES.size() + "; a fixture may not"
                             + " disappear quietly");
         }
-        Map<String, String> lead = readLead();
         Provenance provenance = Provenance.of(readManifest());
         boolean provisional = provenance.provisional();
         StringBuilder report = new StringBuilder();
@@ -346,10 +361,20 @@ public final class SkyLanguageStudyMain {
         String worstRimWhere = "";
 
         for (Map.Entry<String, ChartViewState> page : PAGES.entrySet()) {
-            ChartScene latinScene = Atlas.assembler()
+            // Both scenes through the production path (#349). This
+            // study used to read nb-NO.tsv itself and overlay the
+            // names onto a rebuilt scene, which measured a faithful
+            // equivalent of what a reader gets rather than what a
+            // reader gets - it never touched SkyNames, the generated
+            // index, or the fallback rule. The equivalence was real
+            // and is now asserted by SkyLanguagePlacementPathTest
+            // rather than assumed, so a return to the bypass is a
+            // failing test and not a quiet change of subject.
+            ChartScene latinScene = Atlas.assemblerNamedIn(
+                    juranometria.geo.SkyNames.LATIN)
                     .assemble(page.getValue(), WIDE_PX, HIGH_PX);
-            ChartScene norskScene = named(latinScene, localised(
-                    latinScene, lead));
+            ChartScene norskScene = Atlas.assemblerNamedIn(NORWEGIAN)
+                    .assemble(page.getValue(), WIDE_PX, HIGH_PX);
             Map<String, LabelPlacement.Placement> latin =
                     constellationPlacements(latinScene);
             Map<String, LabelPlacement.Placement> norsk =
@@ -803,6 +828,16 @@ public final class SkyLanguageStudyMain {
         return nearest;
     }
 
+    /**
+     * Which bytes were measured.
+     *
+     * <p>Recorded for the name list and the manifest both, so the
+     * report can be checked against its inputs rather than trusted.
+     */
+    private static String digestOf(Path file) throws IOException {
+        return juranometria.catalog.Sha256.hex(Files.readAllBytes(file));
+    }
+
     private static Map<String, LabelPlacement.Placement>
             constellationPlacements(ChartScene scene) {
         Map<String, LabelPlacement.Placement> placed = new LinkedHashMap<>();
@@ -825,23 +860,7 @@ public final class SkyLanguageStudyMain {
         return placed;
     }
 
-    private static ChartScene named(ChartScene scene,
-                                    Map<String, String> names) {
-        SceneGeography geography = scene.geography();
-        return new ChartScene(scene.viewport(), scene.stars(),
-                scene.deepSkyObjects(), scene.title(),
-                scene.limitingMagnitude(), scene.targetIdentity(),
-                new SceneGeography(geography.figureSegments(),
-                        geography.boundarySegments(), names));
-    }
 
-    private static Map<String, String> localised(ChartScene scene,
-                                                 Map<String, String> lead) {
-        Map<String, String> names = new LinkedHashMap<>();
-        scene.geography().latinNames().forEach((id, latin) ->
-                names.put(id, lead.getOrDefault(id, latin)));
-        return names;
-    }
 
     /**
      * The lead, read from its committed copy.
@@ -868,28 +887,4 @@ public final class SkyLanguageStudyMain {
         return stated;
     }
 
-    /** SHA-256 of a file, by the same idiom the provenance uses. */
-    private static String digestOf(Path file) throws IOException {
-        return juranometria.catalog.Sha256.hex(Files.readAllBytes(file));
-    }
-
-    private static Map<String, String> readLead() throws IOException {
-        Map<String, String> lead = new LinkedHashMap<>();
-        for (String line : Files.readAllLines(NAMES)) {
-            if (line.isBlank() || line.startsWith("#")) {
-                continue;
-            }
-            String[] columns = line.split("\t");
-            if (columns.length != 2 || columns[0].equals("IAU")) {
-                continue;
-            }
-            lead.put(columns[0], columns[1]);
-        }
-        if (lead.size() != 88) {
-            throw new IllegalStateException(
-                    "the name list states 88 constellations; found "
-                            + lead.size());
-        }
-        return lead;
-    }
 }
