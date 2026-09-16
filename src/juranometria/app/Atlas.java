@@ -39,8 +39,30 @@ public final class Atlas {
                     catalogue.manifest().maxObjectSemiExtentDegrees(), GEOGRAPHY);
         }
 
+        static final juranometria.ui.language.SkyLanguageChoice.Available
+                LANGUAGES = languages();
+
         private static SkyRegion wholeSky() {
             return new SkyRegion(DEFAULT_CENTRE, 180.0);
+        }
+
+        /**
+         * The one place the two language registries meet.
+         *
+         * <p>Each answers its own domain from its own resources:
+         * which languages the controls can speak, and which languages
+         * the sky can be named in. Neither imports the other, and
+         * this is the only code that holds both - so a chart pack
+         * cannot become an interface language anywhere, because
+         * nowhere else is in a position to confuse them.
+         */
+        private static juranometria.ui.language.SkyLanguageChoice.Available
+                languages() {
+            return new juranometria.ui.language.SkyLanguageChoice.Available(
+                    juranometria.ui.language.InterfaceLanguages
+                            .discover().tagSet(),
+                    java.util.Set.copyOf(juranometria.geo.SkyNames
+                            .discover().chartLanguages()));
         }
     }
 
@@ -52,5 +74,20 @@ public final class Atlas {
     /** The application's local search over the same bundled pack. */
     public static LocalSearch search() {
         return Holder.SEARCH;
+    }
+
+    /**
+     * What this installation can offer the reader, in both settings.
+     *
+     * <p>Assembled from the two registries rather than from either:
+     * interface languages from the descriptors that ship, chart
+     * languages from the packs that ship. A value a build cannot
+     * offer is what {@code SkyLanguageStore} resolves a stored
+     * choice against, so this is what decides whether a remembered
+     * language is honoured or fallen back from.
+     */
+    public static juranometria.ui.language.SkyLanguageChoice.Available
+            languages() {
+        return Holder.LANGUAGES;
     }
 }

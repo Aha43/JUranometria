@@ -110,6 +110,7 @@ a606bdeeb5031932	ui/Explain.java	&amp;	unresolved: no route found, needs manual 
 5156e247f7979f83	ui/Shortcuts.java	zoomIn	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 8755f94128fc9d1a	ui/Shortcuts.java	zoomOut	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 13f371d0092d6e83	ui/ecliptic/EclipticStore.java	eclipticShown	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+e068946e2323184a	ui/language/InterfaceLanguages.java	/resources/interface-language/index.tsv	declared name used, but never at a known sink	identifier	the classpath path of the generated interface-descriptor index
 0d3ceca52af3843d	ui/language/SkyLanguageChoice.java	en	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 7aa9b50ecd697e68	ui/language/SkyLanguageChoice.java	follow-interface	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 c1d9227e06090c40	ui/language/SkyLanguageChoice.java	latin	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
