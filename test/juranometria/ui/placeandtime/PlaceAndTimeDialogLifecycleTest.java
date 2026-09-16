@@ -165,11 +165,29 @@ class PlaceAndTimeDialogLifecycleTest {
                 "latitudeField");
         JTextField longitude = (JTextField) named(dialog.getContentPane(),
                 "longitudeField");
-        SwingUtilities.invokeAndWait(() -> {
-            dialog.toFront();
-            latitude.requestFocusInWindow();
-        });
-        flush();
+        // Ask, and then WAIT to be given it. Focus transfer is
+        // asynchronous: asking once and checking once cannot tell a
+        // desktop that refuses from one that has not got round to it
+        // yet, and the assumption below claims the former. Under xvfb
+        // it is granted almost always and almost at once - which is
+        // how this passed for a year and then aborted one run on
+        // main, on a tree identical to the one that had just passed
+        // on its pull request.
+        //
+        // The same 100 x 20ms discipline FocusedWindow documents for
+        // exactly this, inline because that helper is package-private
+        // to juranometria.ui and this dialog is not.
+        for (int attempt = 0; attempt < 100
+                && !latitude.isFocusOwner(); attempt++) {
+            SwingUtilities.invokeAndWait(() -> {
+                dialog.toFront();
+                latitude.requestFocusInWindow();
+            });
+            flush();
+            if (!latitude.isFocusOwner()) {
+                Thread.sleep(20);
+            }
+        }
         Assumptions.assumeTrue(latitude.isFocusOwner(),
                 "this desktop would not give the dialog the keyboard"
                         + " focus, so leaving a field cannot happen");
