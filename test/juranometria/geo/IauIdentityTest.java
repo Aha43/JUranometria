@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * exist or what they are called in Latin, and the IAU does not
  * establish what they are called in Norwegian.
  */
-class IauIdentityTest {
+public class IauIdentityTest {
 
     private static final Path OFFICIAL =
             Path.of("docs/studies/sky-language/iau-constellations.tsv");
@@ -150,6 +150,34 @@ class IauIdentityTest {
     }
 
     /** The official table: abbreviation to name and genitive. */
+    /**
+     * How many of the 88 records agree with the official list.
+     *
+     * <p>Exposed so that a claim made elsewhere about this data can
+     * be tied to the data rather than to a number copied beside it -
+     * the shipped Norwegian manifest says the two #347 defects were
+     * corrected, and that sentence has to fail when it stops being
+     * true (#348 review).
+     */
+    public static int agreementWithOfficial() throws Exception {
+        Map<String, String[]> official = official();
+        Map<String, Constellation> atlas = new TreeMap<>();
+        for (Constellation each
+                : ConstellationGeography.load().constellations()) {
+            atlas.put(each.id(), each);
+        }
+        int agreed = 0;
+        for (Map.Entry<String, String[]> row : official.entrySet()) {
+            Constellation held = atlas.get(row.getKey());
+            if (held != null
+                    && held.latinName().equals(row.getValue()[0])
+                    && held.genitive().equals(row.getValue()[1])) {
+                agreed++;
+            }
+        }
+        return agreed;
+    }
+
     private static Map<String, String[]> official() throws Exception {
         Map<String, String[]> rows = new TreeMap<>();
         for (String line : Files.readAllLines(OFFICIAL)) {

@@ -13,13 +13,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The application does not depend on its tooling (Sprint 33, #348).
+ * Application source does not depend on tooling (Sprint 33, #348).
  *
  * <p>{@code juranometria.tool} is where the build's generators,
  * indexers, scanners and evidence gates live. They run on a
  * developer's machine and in CI; several read and write files under
  * {@code docs/} and {@code build/} that no installed copy of the
- * atlas has. Nothing a reader runs may depend on them.
+ * atlas has. No code a reader runs may depend on them.
+ *
+ * <p><strong>What this does NOT claim.</strong> An earlier version of
+ * this paragraph said tooling "is not shipped". That was false and
+ * would have quietly justified the wrong conclusions: the jar target
+ * packages all of {@code build/classes}, so the application jar
+ * carries the {@code juranometria/tool/} classes along with
+ * everything else. They are dead weight in the artifact, not a
+ * dependency of it - nothing the atlas executes reaches them, which
+ * is exactly and only what the tests below establish.
+ *
+ * <p>Whether those classes should be excluded from the artifact is a
+ * packaging question with its own costs - the study mains are
+ * launched from the same classes directory the image is built from -
+ * and it belongs to an issue of its own rather than to #348. Recorded
+ * here so the premise of this file is the fact it proves, not a
+ * tidier claim nobody checked.
  *
  * <p>This was written because it had already been breached.
  * {@code SkyLanguageChoice} was placed in {@code tool} while #347
@@ -33,15 +49,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * <p>The direction is one way on purpose. Tooling may read the
  * application freely - a generator draws real charts, a gate reads
- * real registries - because tooling is not shipped and cannot make
- * the application depend on it by looking at it.
+ * real registries - because reading something cannot make it depend
+ * on you. The ban is on the application reaching the other way, and
+ * that is a fact about source, which is what is checked below.
  */
 class ToolingBoundaryTest {
 
-    /** Everything the shipped atlas is made of. */
+    /** Every package of the application's own source. */
     private static final String PRODUCTION = "src/juranometria";
 
-    /** The one package that is not shipped. */
+    /** The package no application code may reach into. */
     private static final String TOOLING = "src/juranometria/tool";
 
     @Test

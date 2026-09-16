@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,6 +38,51 @@ class SkyLanguageProvenanceTest {
 
     private static final Path REPORT =
             Path.of("docs/studies/sky-language/placement.md");
+
+    /**
+     * The shipped account of the two defects matches the data.
+     *
+     * <p>The manifest ships beside the Norwegian names and is read by
+     * anyone auditing where they came from, so what it says about the
+     * atlas's Latin records is a claim in production, not a note. It
+     * once said two defects existed and belonged to #348; #348 fixed
+     * them, and for a while the shipped account went on describing a
+     * state that had passed.
+     *
+     * <p>Tied here to the live comparison rather than to a number
+     * written down beside it. If the catalogue ever disagrees with
+     * the official list again, this fails - which is the only way a
+     * shipped claim about data can be kept honest as the data moves.
+     */
+    @Test
+    void theShippedAccountOfTheTwoDefectsMatchesTheData()
+            throws Exception {
+        String manifest = Files.readString(MANIFEST);
+
+        int agreement = juranometria.geo.IauIdentityTest.agreementWithOfficial();
+        assertEquals(88, agreement,
+                "the premise: the atlas agrees with the official list"
+                        + " on every record. If this ever falls, the"
+                        + " manifest paragraph below is the shipped"
+                        + " claim that has to change with it");
+
+        assertTrue(manifest.contains("HAVE BEEN CORRECTED"),
+                "the shipped provenance says the defects were fixed,"
+                        + " not that they are outstanding");
+        assertTrue(manifest.contains("all 88 records"),
+                "and states the comparison that is actually true"
+                        + " today");
+        assertFalse(manifest.contains("belong to #348"),
+                "and no longer assigns work that is done - a"
+                        + " provenance file describing a state that has"
+                        + " passed is worse than one describing none,"
+                        + " because a reader believes it");
+        assertTrue(manifest.contains("Serpens Caput")
+                        && manifest.contains("Corona Austrina"),
+                "while keeping what the gate found: provenance is an"
+                        + " account of how the data came to be right,"
+                        + " not only of its present state");
+    }
 
     /** The report repeats the status its input states. */
     @Test

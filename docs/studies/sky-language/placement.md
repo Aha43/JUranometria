@@ -410,7 +410,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Vol` | Volans | Flygefisken | renamed in place | candidate 16 |
 
 
-## What the lead costs, in total
+## What the Norwegian names cost, in total
 
 These are **placement observations across 14 pages**, not distinct constellations: one name measured on eight pages contributes eight observations.
 
@@ -480,10 +480,10 @@ The first attempt compared bounding-box **centres**. It reported 33 detached lab
 
 ## Why this report can be trusted to go stale
 
-The lead this study measures is pinned by digest, so changing it without regenerating this report is a contract breach rather than a silent disagreement.
+The name list this study measures is pinned by digest, so changing it without regenerating this report is a contract breach rather than a silent disagreement.
 
 - name-list digest: `c181a95654c41055ed77e3623eb5b8cd004ae4407864f18769312b63c1af7341`
 - matched pages: 14 (all 14 promised)
 - attachment observations: 287, unmeasurable 0
-- manifest digest: `d14b73d6ff8c050d120cbf04a29fbff9d875d10ac329be13d3877d12b74b4cc7`
+- manifest digest: `48378c2dea1a13c49d1e1b5dfca7bc81e1351b155ce327e8c79d81bebfcc6f51`
 - status, as the data states it: **VERIFIED** — source `Liste over stjernebilder (Norwegian Wikipedia), permanent revision 25182596 of 2025-06-10 18:33, https://no.wikipedia.org/w/index.php?title=Liste_over_stjernebilder&oldid=25182596 - used as the redistributable starting dataset for the Norwegian column`, licence `CC BY-SA 4.0 for the starting dataset. Attribution required: "Liste over stjernebilder", Norwegian Wikipedia contributors, revision 25182596, CC BY-SA 4.0. Share-alike applies to this derived name list.`, retrieved 2026-09-15
