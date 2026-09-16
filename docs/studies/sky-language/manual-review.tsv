@@ -67,6 +67,9 @@ d540471f0c131314	chart/DsoType.java	*Ass	unresolved: no route found, needs manua
 8542e24bde280d7f	geo/ConstellationGeography.java	constellation-geography	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 6130e58d0e232687	geo/ConstellationGeography.java	ICRS-J2000	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 6cd4ff7e430ecec0	geo/ConstellationGeography.java	checksum.	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+d525afcda7732e1d	geo/SkyNames.java	latin	declared name used, but never at a known sink	identifier	the chart mode token that selects official Latin nomenclature; a stored value, not a word a reader reads
+faa2a1e5daf0d9b9	geo/SkyNames.java	/resources/sky-language/index.tsv	declared name used, but never at a known sink	identifier	the classpath path of the generated pack index
+14a52e5dbbea579a	geo/SkyNames.java	/resources/sky-language/	declared name used, but never at a known sink	identifier	the classpath prefix the packs live under
 815a76a718d7ba3f	meridian/MeridianModule.java	meridian	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 45cca1fc920ac14d	project/DrawnPage.java	Shows one hemisphere of the sky, out to 90 degrees from	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
 77d02d4e0bd2fe21	project/DrawnPage.java	 the centre in every direction. Outside the	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
@@ -107,6 +110,10 @@ a606bdeeb5031932	ui/Explain.java	&amp;	unresolved: no route found, needs manual 
 5156e247f7979f83	ui/Shortcuts.java	zoomIn	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 8755f94128fc9d1a	ui/Shortcuts.java	zoomOut	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 13f371d0092d6e83	ui/ecliptic/EclipticStore.java	eclipticShown	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+e068946e2323184a	ui/language/InterfaceLanguages.java	/resources/interface-language/index.tsv	declared name used, but never at a known sink	identifier	the classpath path of the generated interface-descriptor index
+0d3ceca52af3843d	ui/language/SkyLanguageChoice.java	en	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+7aa9b50ecd697e68	ui/language/SkyLanguageChoice.java	follow-interface	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+c1d9227e06090c40	ui/language/SkyLanguageChoice.java	latin	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 06c6ca6ab7ee1ee0	ui/onthispage/OnThisPageModule.java	on-this-page	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 b774ab09bd649bc9	ui/onthispage/OnThisPageTable.java	Whether and why this object is drawn on the chart	declared name used, but never at a known sink	reader-prose	a column tooltip a reader reads
 d4df79100a7853a4	ui/onthispage/OnThisPageTable.java	\u25cf NGC 317A	unresolved: no route found, needs manual inspection	notation	a catalogue designation in a worked example

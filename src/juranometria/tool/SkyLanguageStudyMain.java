@@ -76,7 +76,7 @@ public final class SkyLanguageStudyMain {
 
     /** The manifest that says what those names are. */
     private static final Path MANIFEST =
-            Path.of("docs/studies/sky-language/names.manifest");
+            Path.of("src/resources/sky-language/nb-NO.manifest");
 
     /**
      * What the data says about itself.
@@ -112,7 +112,7 @@ public final class SkyLanguageStudyMain {
             String status = manifest.getOrDefault("status", "").strip();
             if (!status.equals("provisional") && !status.equals("verified")) {
                 throw new IllegalStateException(
-                        "the lead's manifest must state status="
+                        "the name list's manifest must state status="
                                 + "provisional or status=verified;"
                                 + " found \"" + status + "\"");
             }
@@ -156,9 +156,17 @@ public final class SkyLanguageStudyMain {
     private static final Path REPORT =
             Path.of("docs/studies/sky-language/placement.md");
 
-    /** The Norwegian names, and the account of where they came from. */
+    /**
+     * The Norwegian names, and the account of where they came from.
+     *
+     * <p>The SHIPPED resource, not a study copy. #348 moved the
+     * verified list into production resources so one file carries
+     * both the names and their provenance; a study measuring its own
+     * copy would drift from what a reader receives and nothing would
+     * say when.
+     */
     private static final Path NAMES =
-            Path.of("docs/studies/sky-language/norwegian-names.tsv");
+            Path.of("src/resources/sky-language/nb-NO.tsv");
 
     /**
      * Matched pages: the same centre and field in both languages.
@@ -429,7 +437,11 @@ public final class SkyLanguageStudyMain {
 
         margins.sort((a, b) -> Double.compare(a.toRival() - a.toOwn(),
                 b.toRival() - b.toOwn()));
-        report.append("\n## What the lead costs, in total\n\n")
+        // "The lead" was the retired owner-supplied working data.
+        // This list is the shipped, verified name list, and calling
+        // it a lead contradicts the status the report states two
+        // sections later (#348 review).
+        report.append("\n## What the Norwegian names cost, in total\n\n")
                 .append("These are **placement observations across ")
                 .append(PAGES.size()).append(" pages**, not distinct ")
                 .append("constellations: one name measured on eight ")
@@ -509,7 +521,8 @@ public final class SkyLanguageStudyMain {
                             + " became unmeasurable: " + unmeasurable);
         }
         report.append("\n## Why this report can be trusted to go stale\n\n")
-                .append("The lead this study measures is pinned by digest, ")
+                .append("The name list this study measures is pinned ")
+                .append("by digest, ")
                 .append("so changing it without regenerating this report ")
                 .append("is a contract breach rather than a silent ")
                 .append("disagreement.\n\n")

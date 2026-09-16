@@ -147,7 +147,13 @@ public final class ExportSheetSession {
                                         WorkingSelection working,
                                         ExportSheet.ReplaceDecision replace) {
         return ExportSheet.write(
-                juranometria.app.Atlas.assembler()::assemble,
+                // The chart's own assembler, not the application's.
+                // They were the same object until a reader could
+                // choose a sky language; asking the chart is what
+                // keeps screen and paper in one language by
+                // construction rather than by two call sites
+                // remembering to agree (#348).
+                chart.assembler()::assemble,
                 navigation.state(), options.options(),
                 SheetInk.reference(chart),
                 request.workingSelection()

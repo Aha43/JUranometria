@@ -54,11 +54,11 @@ Limiting magnitude **V 8.0**, which is the limit this rung arrives with (`ChartV
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
-| `CrA` | Corona Austrina | Sørlige krone | renamed in place | candidate 5 |
+| `CrA` | Corona Australis | Sørlige krone | renamed in place | candidate 5 |
 | `Oph` | Ophiuchus | Slangebæreren | moved | candidate 10 to 11, 89 px |
 | `Sco` | Scorpius | Skorpionen | renamed in place | candidate 13 |
 | `Sct` | Scutum | Skjoldet | renamed in place | candidate 4 |
-| `Ser` | Serpens Caput | Slangen | renamed in place | candidate 11 |
+| `Ser` | Serpens | Slangen | renamed in place | candidate 11 |
 | `Sgr` | Sagittarius | Skytten | moved | candidate 11 to 15, 40 px |
 
 ## Orion, 42 degrees
@@ -86,7 +86,7 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | `Cap` | Capricornus | Steinbukken | renamed in place | candidate 4 |
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 10 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 3 |
-| `CrA` | Corona Austrina | Sørlige krone | renamed in place | candidate 9 |
+| `CrA` | Corona Australis | Sørlige krone | moved | candidate 6 to 9, 63 px |
 | `Del` | Delphinus | Delfinen | renamed in place | candidate 5 |
 | `Equ` | Equuleus | Føllet | renamed in place | candidate 0 |
 | `Gru` | Grus | Tranen | renamed in place | candidate 3 |
@@ -102,7 +102,7 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 3 to 2, 45 px |
 | `Sco` | Scorpius | Skorpionen | moved | candidate 13 to 4, 85 px |
 | `Sct` | Scutum | Skjoldet | renamed in place | candidate 3 |
-| `Ser` | Serpens Caput | Slangen | moved | candidate 2 to 0, 20 px |
+| `Ser` | Serpens | Slangen | renamed in place | candidate 0 |
 | `Sge` | Sagitta | Pilen | moved | candidate 9 to 1, 20 px |
 | `Sgr` | Sagittarius | Skytten | moved | candidate 6 to 9, 63 px |
 | `Tel` | Telescopium | Teleskopet | renamed in place | candidate 5 |
@@ -155,7 +155,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 10 |
 | `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 10 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 4 |
-| `CrA` | Corona Austrina | Sørlige krone | moved | candidate 0 to 1, 20 px |
+| `CrA` | Corona Australis | Sørlige krone | moved | candidate 0 to 1, 20 px |
 | `CrB` | Corona Borealis | Nordlige krone | renamed in place | candidate 10 |
 | `Cru` | Crux | Sydkorset | moved | candidate 1 to 0, 20 px |
 | `Crv` | Corvus | Ravnen | renamed in place | candidate 4 |
@@ -185,7 +185,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Scl` | Sculptor | Billedhuggeren | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
 | `Sco` | Scorpius | Skorpionen | moved | candidate 4 to 8, 45 px |
 | `Sct` | Scutum | Skjoldet | renamed in place | candidate 3 |
-| `Ser` | Serpens Caput | Slangen | moved | candidate 3 to 11, 28 px |
+| `Ser` | Serpens | Slangen | moved | candidate 3 to 11, 28 px |
 | `Sge` | Sagitta | Pilen | renamed in place | candidate 1 |
 | `Sgr` | Sagittarius | Skytten | renamed in place | candidate 11 |
 | `Tel` | Telescopium | Teleskopet | renamed in place | candidate 6 |
@@ -340,7 +340,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Lyr` | Lyra | Lyren | moved | candidate 2 to 6, 20 px |
 | `Oph` | Ophiuchus | Slangebæreren | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
 | `Psc` | Pisces | Fiskene | moved | candidate 2 to 0, 20 px |
-| `Ser` | Serpens Caput | Slangen | renamed in place | candidate 10 |
+| `Ser` | Serpens | Slangen | renamed in place | candidate 10 |
 | `Sge` | Sagitta | Pilen | renamed in place | candidate 2 |
 | `Tau` | Taurus | Tyren | renamed in place | candidate 5 |
 | `Tri` | Triangulum | Triangelet | moved | candidate 0 to 8, 20 px |
@@ -369,7 +369,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 10 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 9 |
 | `Col` | Columba | Duen | renamed in place | candidate 9 |
-| `CrA` | Corona Austrina | Sørlige krone | renamed in place | candidate 10 |
+| `CrA` | Corona Australis | Sørlige krone | renamed in place | candidate 10 |
 | `Crt` | Crater | Begeret | renamed in place | candidate 9 |
 | `Cru` | Crux | Sydkorset | renamed in place | candidate 6 |
 | `Crv` | Corvus | Ravnen | renamed in place | candidate 9 |
@@ -400,7 +400,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Ret` | Reticulum | Nettet | renamed in place | candidate 9 |
 | `Scl` | Sculptor | Billedhuggeren | moved | candidate 1 to 0, 20 px |
 | `Sco` | Scorpius | Skorpionen | renamed in place | candidate 10 |
-| `Ser` | Serpens Caput | Slangen | moved | candidate 10 to 14, 40 px |
+| `Ser` | Serpens | Slangen | renamed in place | candidate 14 |
 | `Sgr` | Sagittarius | Skytten | renamed in place | candidate 12 |
 | `Tel` | Telescopium | Teleskopet | renamed in place | candidate 10 |
 | `TrA` | Triangulum Australe | Sørlige triangel | moved | candidate 2 to 0, 20 px |
@@ -410,14 +410,14 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Vol` | Volans | Flygefisken | renamed in place | candidate 16 |
 
 
-## What the lead costs, in total
+## What the Norwegian names cost, in total
 
 These are **placement observations across 14 pages**, not distinct constellations: one name measured on eight pages contributes eight observations.
 
 | outcome | observations |
 |---|---|
-| renamed in place (no cost) | 168 |
-| moved | 102 |
+| renamed in place (no cost) | 169 |
+| moved | 101 |
 | omitted in one language | 10 |
 | identical in both languages | 17 |
 
@@ -480,10 +480,10 @@ The first attempt compared bounding-box **centres**. It reported 33 detached lab
 
 ## Why this report can be trusted to go stale
 
-The lead this study measures is pinned by digest, so changing it without regenerating this report is a contract breach rather than a silent disagreement.
+The name list this study measures is pinned by digest, so changing it without regenerating this report is a contract breach rather than a silent disagreement.
 
 - name-list digest: `c181a95654c41055ed77e3623eb5b8cd004ae4407864f18769312b63c1af7341`
 - matched pages: 14 (all 14 promised)
 - attachment observations: 287, unmeasurable 0
-- manifest digest: `3db24d7fa5676b70f9bf7da5ec6af99a9d49a0ad4f4fe187699dd3ee9f2b9cfb`
+- manifest digest: `48378c2dea1a13c49d1e1b5dfca7bc81e1351b155ce327e8c79d81bebfcc6f51`
 - status, as the data states it: **VERIFIED** — source `Liste over stjernebilder (Norwegian Wikipedia), permanent revision 25182596 of 2025-06-10 18:33, https://no.wikipedia.org/w/index.php?title=Liste_over_stjernebilder&oldid=25182596 - used as the redistributable starting dataset for the Norwegian column`, licence `CC BY-SA 4.0 for the starting dataset. Attribution required: "Liste over stjernebilder", Norwegian Wikipedia contributors, revision 25182596, CC BY-SA 4.0. Share-alike applies to this derived name list.`, retrieved 2026-09-15

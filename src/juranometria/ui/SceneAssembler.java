@@ -76,6 +76,57 @@ public final class SceneAssembler {
         this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = false;
         this.geography = geography;
+        this.chartLanguage = juranometria.geo.SkyNames.LATIN;
+        this.names = null;
+    }
+
+    private SceneAssembler(Catalogue catalogue, SkyPosition dataCentre,
+                           double coverageRadiusDegrees,
+                           double objectExtentMarginDegrees,
+                           juranometria.geo.ConstellationGeography geography,
+                           String chartLanguage,
+                           juranometria.geo.SkyNames names) {
+        this.catalogue = catalogue;
+        this.dataCentre = dataCentre;
+        this.coverageRadiusDegrees = coverageRadiusDegrees;
+        this.objectExtentMarginDegrees = objectExtentMarginDegrees;
+        this.allSky = false;
+        this.geography = geography;
+        this.chartLanguage = chartLanguage;
+        this.names = names;
+    }
+
+    /**
+     * The chart language this assembler names constellations in, and
+     * the service that answers.
+     *
+     * <p>Injected, never looked up. A global "current language" would
+     * make every scene depend on when it was assembled rather than on
+     * what it was asked for, and two scenes built from one state could
+     * differ for reasons nothing recorded. An assembler told nothing
+     * resolves Latin, deliberately: the existing callers say what they
+     * mean rather than inheriting whatever the application happens to
+     * be set to.
+     */
+    private final String chartLanguage;
+
+    private final juranometria.geo.SkyNames names;
+
+    /** The same assembler, naming the sky in another language. */
+    public SceneAssembler namedIn(String chartLanguage,
+                                  juranometria.geo.SkyNames names) {
+        if (chartLanguage == null || names == null) {
+            throw new IllegalArgumentException(
+                    "a chart language is a choice and a service that"
+                            + " can answer it; neither is optional");
+        }
+        SceneAssembler told = allSky
+                ? new SceneAssembler(catalogue, objectExtentMarginDegrees,
+                        geography, chartLanguage, names)
+                : new SceneAssembler(catalogue, dataCentre,
+                        coverageRadiusDegrees, objectExtentMarginDegrees,
+                        geography, chartLanguage, names);
+        return told;
     }
 
     private SceneAssembler(Catalogue catalogue, double objectExtentMarginDegrees,
@@ -86,6 +137,23 @@ public final class SceneAssembler {
         this.objectExtentMarginDegrees = objectExtentMarginDegrees;
         this.allSky = true;
         this.geography = geography;
+        this.chartLanguage = juranometria.geo.SkyNames.LATIN;
+        this.names = null;
+    }
+
+    private SceneAssembler(Catalogue catalogue,
+                           double objectExtentMarginDegrees,
+                           juranometria.geo.ConstellationGeography geography,
+                           String chartLanguage,
+                           juranometria.geo.SkyNames names) {
+        this.catalogue = catalogue;
+        this.dataCentre = null;
+        this.coverageRadiusDegrees = Double.NaN;
+        this.objectExtentMarginDegrees = objectExtentMarginDegrees;
+        this.allSky = true;
+        this.geography = geography;
+        this.chartLanguage = chartLanguage;
+        this.names = names;
     }
 
     /**
@@ -206,6 +274,15 @@ public final class SceneAssembler {
                 if (present.contains(constellation.id())) {
                     names.put(constellation.id(), constellation.latinName());
                 }
+            }
+            if (this.names != null) {
+                // The scene is handed a COMPLETE map, keyed by
+                // canonical identity, with fallback already resolved:
+                // where a pack is silent the official Latin name
+                // stands in. Nothing downstream asks what language
+                // answered, and nothing downstream falls back.
+                names = new java.util.LinkedHashMap<>(
+                        this.names.namesFor(chartLanguage, names));
             }
         }
         return new SceneGeography(figures, boundaries, names);

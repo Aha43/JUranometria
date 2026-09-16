@@ -128,6 +128,47 @@ public final class PackagedAcceptanceMain {
                 + notices.length() + " chars of notices, version "
                 + AppInfo.version() + ")");
 
+        // Language availability, inside the image (#348). Both
+        // registries are resource discovery over generated indexes,
+        // and an index that the packaging step failed to carry is
+        // exactly the defect no unit test can see: on a developer's
+        // machine the build directory answers, and in the image
+        // nothing does. The interface side would then either throw
+        // at startup or - if anyone ever adds a fallback - silently
+        // offer English from a mechanism that never ran.
+        java.util.Set<String> interfaces =
+                Atlas.languages().interfaceLanguages();
+        java.util.Set<String> charts =
+                Atlas.languages().chartLanguages();
+        require(interfaces.equals(java.util.Set.of("en")),
+                "the packaged image offers the interface languages it"
+                        + " ships descriptors for: " + interfaces);
+        require(charts.equals(java.util.Set.of("nb-NO")),
+                "and the chart languages it ships packs for: " + charts);
+        require(!interfaces.contains("nb-NO") && !charts.contains("en"),
+                "with neither list leaking into the other - a"
+                        + " Norwegian sky does not put Norwegian in"
+                        + " the menus, and an English interface does"
+                        + " not claim English constellation names the"
+                        + " atlas has no pack for");
+        // Resolved through the real store semantics, against what
+        // this image actually installed rather than a fixture.
+        juranometria.ui.language.SkyLanguageChoice packaged =
+                juranometria.ui.language.SkyLanguageChoice.read(
+                        java.util.Map.of(
+                                juranometria.ui.language
+                                        .SkyLanguageChoice.CHART_KEY,
+                                "nb-NO"),
+                        Atlas.languages());
+        require("nb-NO".equals(packaged.namesOnTheChart())
+                        && "en".equals(packaged.interfaceLanguage()),
+                "and a stored Norwegian chart choice resolves inside"
+                        + " the image to a Norwegian sky under English"
+                        + " controls");
+        System.out.println("language availability OK (interface "
+                + interfaces + ", chart " + charts
+                + ", resolved independently)");
+
         // Preferences, changed and reloaded through the bundled
         // runtime against the application's real node - snapshot the
         // reader's actual choice, flip it, prove a FRESH store reads
@@ -1283,6 +1324,62 @@ public final class PackagedAcceptanceMain {
                 + " magnitude key drawn by the packaged renderer,"
                 + " key samples " + java.util.Arrays.toString(keySamples)
                 + ")");
+
+        // The chart languages, inside the packaged image (Sprint 33,
+        // issue #348). build/classes is an intermediate; this is what
+        // a reader actually receives, so the packaged boundary is
+        // asserted here rather than observed once during development.
+        // A packaging change that dropped the pack, or that swept
+        // test data into the image, would otherwise reach a reader
+        // before anything said so.
+        juranometria.geo.SkyNames packaged =
+                juranometria.geo.SkyNames.discover();
+        require(packaged.chartLanguages().contains("nb-NO"),
+                "the packaged image carries the Norwegian chart"
+                        + " language: " + packaged.chartLanguages());
+        require(!packaged.chartLanguages()
+                        .contains("x-juranometria-test"),
+                "and carries no test fixture language: "
+                        + packaged.chartLanguages());
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/sky-language/nb-NO.manifest") != null,
+                "the packed names travel with their provenance, not"
+                        + " with provenance left behind in a source"
+                        + " tree no reader has");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/sky-language/"
+                                + "x-juranometria-test.tsv") == null,
+                "and no fixture data is packaged");
+        java.util.Map<String, String> packedLatin =
+                new java.util.TreeMap<>();
+        for (juranometria.geo.Constellation each
+                : juranometria.geo.ConstellationGeography.load()
+                        .constellations()) {
+            packedLatin.put(each.id(), each.latinName());
+        }
+        require("Serpens".equals(packedLatin.get("Ser"))
+                        && "Corona Australis".equals(
+                                packedLatin.get("CrA")),
+                "the packaged catalogue carries the corrected IAU"
+                        + " names: Ser=" + packedLatin.get("Ser")
+                        + ", CrA=" + packedLatin.get("CrA"));
+        java.util.Map<String, String> packedNorse =
+                packaged.namesFor("nb-NO", packedLatin);
+        require(packedNorse.size() == packedLatin.size()
+                        && "Skytten".equals(packedNorse.get("Sgr")),
+                "and names the whole sky in Norwegian through the"
+                        + " packaged classpath: " + packedNorse.size()
+                        + " names, Sgr=" + packedNorse.get("Sgr"));
+        require(new java.util.ArrayList<>(packedNorse.keySet())
+                        .equals(new java.util.ArrayList<>(
+                                packedLatin.keySet())),
+                "keyed and ordered by identity, unchanged by the"
+                        + " language");
+        System.out.println("chart languages OK (packaged image offers "
+                + packaged.chartLanguages() + ", names "
+                + packedNorse.size() + " constellations through its own"
+                + " classpath, carries their provenance, and packs no"
+                + " test fixture)");
 
         // The five deep-sky families, inside the packaged image: each
         // one hides its own marks and nobody else's, the master

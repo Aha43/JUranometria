@@ -1,0 +1,59 @@
+# JUranometria's English interface language (Sprint 33, issue #348).
+#
+# This is a SHIPPED RESOURCE and it is the reason English is offered.
+# Interface availability is read from the descriptors present in this
+# directory - never inferred from the absence of anything, never
+# scanned out of Java, and never borrowed from the chart language
+# packs next door.
+#
+# ---------------------------------------------------------------
+# Why a descriptor exists before any translated strings do
+# ---------------------------------------------------------------
+#
+# English is currently the only interface language, and today its
+# strings live in Java rather than in a resource bundle. It would
+# have been less work to let discovery answer "en" when it found no
+# descriptors at all. That would have been a mechanism producing the
+# right answer for the wrong reason: nobody would learn it had never
+# run until a second language was added and failed to appear.
+#
+# So English registers here like any other interface language would,
+# the discovery path is exercised on every build, and #350 populates
+# the strings BEHIND this registration without touching availability.
+#
+# ---------------------------------------------------------------
+# Not a chart language
+# ---------------------------------------------------------------
+#
+# The sky's names and the controls' words are two settings a reader
+# chooses separately, and this file governs only the second. A chart
+# language pack lives under resources/sky-language, declares
+# schema=1, and carries a names file; an interface descriptor lives
+# here, declares interface-schema=1, and carries no names at all.
+# The two indexes have different paths AND different shapes, so
+# neither discovery can read the other's - a Norwegian chart pack
+# cannot make a Norwegian interface appear, which is the promise the
+# reader was given.
+#
+# ---------------------------------------------------------------
+# Fields
+# ---------------------------------------------------------------
+#
+# interface-schema  the descriptor format, and the marker that keeps
+#                   this out of chart discovery
+# tag               the language tag; what gets stored in
+#                   language.interface
+# display-name      what this language calls itself. Descriptor data,
+#                   not a policy: whether a selector shows the
+#                   autonym or a translated language name is #350's
+#                   to decide, and deciding it changes no availability
+# strings           where this language's words come from. "in-code"
+#                   says they are still Java literals; #350 replaces
+#                   this with a bundle without this file's role
+#                   changing
+
+interface-schema=1
+tag=en
+display-name=English
+strings=in-code
+status=built-in

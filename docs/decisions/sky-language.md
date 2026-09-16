@@ -48,9 +48,20 @@ issue, its own geometry and its own provenance.
 
 ## What the audit measured
 
+**These figures are frozen at the gate boundary.** They describe the
+tree #347 evaluated — merge commit **`8fb6789`** — and are not
+rewritten as later work adds strings. A decision record should say
+what was approved, not track a moving tree; #348 onwards would
+otherwise be editing a closed document until its numbers no longer
+explained anything.
+
+The scanner and the ledger stay **live**, and changes to the
+translation surface belong to #350, which owns that queue.
+
 A mechanical classifier (`juranometria.tool.SkyLanguageScan`) over
 the whole tree, calibrated by `SkyLanguageScanTest` against synthetic
-input. **9,282 string literals**, partitioned by surface:
+input. **9,282 string literals** at `8fb6789`, partitioned by
+surface:
 
 | surface | literals |
 |---|---|
@@ -60,8 +71,8 @@ input. **9,282 string literals**, partitioned by surface:
 | export | 199 |
 | reader-reachable diagnostics | 86 |
 
-**The reader's own surface: 749 occurrences, 636 unique translation
-units** — 638/540 in the application, 86/73 in reader-reachable
+**The localisation baseline #347 established: 749 occurrences, 636
+unique translation units** — 638/540 in the application, 86/73 in reader-reachable
 diagnostics, and 25/23 in export. Occurrences and units are reported
 separately because `Cancel` appears six times and is one translation,
 not six.
@@ -400,6 +411,18 @@ than something a later implementer invents.
 Owner ruling, 2026-09-15. Stated as meanings; the Java types may
 differ, the meanings may not.
 
+**Where the type lives.** `SkyLanguageChoice` was written here as a
+gate contract and first placed in `juranometria.tool`. It stopped
+being tooling the moment #348 persisted it: it now defines the
+application's language state and is read and written by
+`SkyLanguageStore`, so it lives in `juranometria.ui.language` with
+its test beside it. There is one implementation, not a gate model
+and a production copy — two would be free to drift, and the
+migration contract below is only worth anything if exactly one type
+decides what a stored value means. `SkyLanguagePack` and
+`SkyLanguageScan` stay in `juranometria.tool`: they validate and
+measure resource data and no application code depends on them.
+
 ```
 language.interface = en | nb-NO | …whatever is installed
 language.chart     = follow-interface | latin | …whatever pack is found
@@ -511,8 +534,10 @@ the service; this gate owns the contract it must satisfy.
 
 Stated before any figure is quoted, because the distinction was
 learned the hard way: a run on the Linux CI runner (`ubuntu-24.04`)
-measured **9 omissions and 98 moves** where this machine measures 10
-and 102, with neither machine wrong. Naming the runner matters: CI is
+measured **9 omissions and 98 moves** where this machine measured 10
+and 102, with neither machine wrong. Both were taken before #348
+corrected the canonical Latin names; that correction moved this
+machine's to 10 and 101, which does not disturb the point. Naming the runner matters: CI is
 an execution route, not a typography, and a different runner image or
 a font update would be another observation again.
 Placement depends on how wide a word is drawn, and fonts and

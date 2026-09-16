@@ -1,4 +1,4 @@
-package juranometria.tool;
+package juranometria.ui.language;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -41,9 +41,13 @@ import java.util.Set;
  * interface. It is deliberately not the language tag {@code la}: the
  * atlas does not speak Latin, it writes Latin names.
  *
- * <p>A value type with no store behind it. #347 changes no reader
- * behaviour; it settles what the tokens mean so #348 builds the
- * preference layer against a contract rather than an intention.
+ * <p>This began as a gate contract in {@code juranometria.tool},
+ * where #347 settled what the tokens mean without changing any
+ * reader behaviour. It stopped being tooling the moment
+ * {@link SkyLanguageStore} persisted it: this is now the
+ * application's language state, and production must not depend on
+ * evidence code for it. Promoted here in #348, before more of the
+ * application could take the dependency.
  */
 public final class SkyLanguageChoice {
 

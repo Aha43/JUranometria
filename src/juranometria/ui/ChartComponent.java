@@ -30,7 +30,7 @@ import juranometria.render.ChartRenderer;
 public final class ChartComponent extends JComponent {
 
     private final ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
-    private final SceneAssembler assembler;
+    private SceneAssembler assembler;
     private ChartViewState viewState = ChartViewState.DEFAULT;
     private juranometria.render.ChartOptions chartOptions =
             juranometria.render.ChartOptions.DEFAULTS;
@@ -72,6 +72,47 @@ public final class ChartComponent extends JComponent {
 
     public ChartViewState viewState() {
         return viewState;
+    }
+
+    /**
+     * What assembled this page, for whoever must reproduce it.
+     *
+     * <p>Export exists to put on paper the page the reader is looking
+     * at. It used to build its own scene from the application's
+     * assembler, which was the same object while there was only one
+     * language - and would quietly stop being the same object the
+     * moment a reader chose a different sky language, printing Latin
+     * names under a Norwegian screen.
+     *
+     * <p>Asking the chart what drew it makes screen and paper share
+     * one language state by construction, rather than by two call
+     * sites being careful to consult the same source (#348).
+     */
+    public SceneAssembler assembler() {
+        return assembler;
+    }
+
+    /**
+     * Draws this page again, from an assembler that names the sky
+     * differently (#348).
+     *
+     * <p>Reconstruction, not repaint. Names are resolved into a scene
+     * when it is assembled, so a page already built cannot be made to
+     * show a language it was not built in - asking for a repaint
+     * would leave the old names on screen and look like the setting
+     * had been ignored.
+     *
+     * <p>The view state is untouched: choosing a language is not
+     * navigation. The reader stays exactly where they were and the
+     * sky is relabelled around them.
+     */
+    public void setAssembler(SceneAssembler assembler) {
+        if (assembler == null) {
+            throw new IllegalArgumentException(
+                    "scene assembler must not be null");
+        }
+        this.assembler = assembler;
+        assembleScene();
     }
 
     /**

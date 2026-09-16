@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * exist or what they are called in Latin, and the IAU does not
  * establish what they are called in Norwegian.
  */
-class IauIdentityTest {
+public class IauIdentityTest {
 
     private static final Path OFFICIAL =
             Path.of("docs/studies/sky-language/iau-constellations.tsv");
@@ -49,18 +49,19 @@ class IauIdentityTest {
             new LinkedHashMap<>();
 
     static {
-        // The atlas's own record disagrees with itself: the genitive
-        // Serpentis belongs to "Serpens", not to "Serpens Caput".
-        // Caput and Cauda are two regions of one constellation, and
-        // the atlas already gives both to this single identity.
-        KNOWN_DEFECTS.put("Ser",
-                new String[] {"Serpens Caput", "Serpens"});
-        // Wrong twice: the name, and a genitive that is malformed
-        // Latin either way - Austrini is masculine against the
-        // feminine corona. A reader searching the standard
-        // "alpha Coronae Australis" finds nothing today.
-        KNOWN_DEFECTS.put("CrA",
-                new String[] {"Corona Austrina", "Corona Australis"});
+        // EMPTY, and that is the point.
+        //
+        // #347 recorded two: Ser named "Serpens Caput" for a whole
+        // constellation whose own genitive said otherwise, and CrA
+        // named "Corona Austrina" with a genitive that was malformed
+        // Latin either way. #348 corrected both at the source, as
+        // declared errata in the constellation pack.
+        //
+        // The list is kept rather than deleted because an empty one
+        // says something a missing one cannot: that nothing is
+        // excused. Adding an entry here is how a future defect gets
+        // recorded, and the test below refuses an entry that no
+        // longer describes the data.
     }
 
     @Test
@@ -103,15 +104,22 @@ class IauIdentityTest {
                 "and the other " + (88 - KNOWN_DEFECTS.size())
                         + " agree exactly, so this is a comparison"
                         + " rather than a formality");
+        assertTrue(agreed >= 88,
+                "every constellation now matches the IAU's own list;"
+                        + " if this ever falls below 88 the difference"
+                        + " is a defect to record, not a tolerance to"
+                        + " widen");
     }
 
     /**
-     * The known defects are still defects.
+     * No exception outlives the defect it was written for.
      *
-     * <p>The other half of the contract. Without it, #348 could
-     * correct the data and leave this list behind, and a stale
-     * exception would silently excuse a row that had become correct -
-     * which is how an allowance outlives the problem it was made for.
+     * <p>The other half of the contract, and the half that fired.
+     * When #348 corrected the two records at source, this test broke
+     * with "Ser still holds the name this exception was written for" -
+     * which is exactly what should happen. An allowance that survives
+     * its problem silently excuses a row that has become correct, and
+     * the next reader cannot tell the two apart.
      */
     @Test
     void theKnownDefectsAreStillPresentAndStillWrong() throws Exception {
@@ -133,12 +141,43 @@ class IauIdentityTest {
                     id + " should be corrected to the official name,"
                             + " which is what #348 will write");
         }
-        assertTrue(KNOWN_DEFECTS.size() == 2,
-                "two known defects, both assigned to #348: "
+        assertTrue(KNOWN_DEFECTS.isEmpty(),
+                "nothing is excused: the two records #347 found were"
+                        + " corrected at source by #348, so the"
+                        + " exception list is empty rather than"
+                        + " carrying entries that describe nothing: "
                         + KNOWN_DEFECTS.keySet());
     }
 
     /** The official table: abbreviation to name and genitive. */
+    /**
+     * How many of the 88 records agree with the official list.
+     *
+     * <p>Exposed so that a claim made elsewhere about this data can
+     * be tied to the data rather than to a number copied beside it -
+     * the shipped Norwegian manifest says the two #347 defects were
+     * corrected, and that sentence has to fail when it stops being
+     * true (#348 review).
+     */
+    public static int agreementWithOfficial() throws Exception {
+        Map<String, String[]> official = official();
+        Map<String, Constellation> atlas = new TreeMap<>();
+        for (Constellation each
+                : ConstellationGeography.load().constellations()) {
+            atlas.put(each.id(), each);
+        }
+        int agreed = 0;
+        for (Map.Entry<String, String[]> row : official.entrySet()) {
+            Constellation held = atlas.get(row.getKey());
+            if (held != null
+                    && held.latinName().equals(row.getValue()[0])
+                    && held.genitive().equals(row.getValue()[1])) {
+                agreed++;
+            }
+        }
+        return agreed;
+    }
+
     private static Map<String, String[]> official() throws Exception {
         Map<String, String[]> rows = new TreeMap<>();
         for (String line : Files.readAllLines(OFFICIAL)) {

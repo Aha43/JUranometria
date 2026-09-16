@@ -38,8 +38,13 @@ A control carrying no decision is reported as **UNDECIDED**, and the
 gate fails on one. That is the number worth holding: not how many
 tooltips there are, but whether anything has been left unconsidered.
 
-The audit found **79** operable controls across 11 surfaces. Their
-current split is in the study.
+The audit found **81** operable controls across 11 surfaces. Their
+current split is in the study. (#348 added the two language
+selectors in Settings, both hovered: a control labelled only
+"Language" would leave a reader who cannot see the layout
+guessing which of the two they were about to change, and the two
+do different things - one sets the words on the controls, the
+other the names printed on the chart.)
 
 The walk visits each component **once**, and the gate holds it to
 that by identity. The first version did not: it walked a tabbed

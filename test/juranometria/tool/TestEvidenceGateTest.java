@@ -369,14 +369,17 @@ class TestEvidenceGateTest {
                         "ChartOptionsStore.us" + "er(",
                         "EclipticStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
-                        "PlaceStore.us" + "er("),
+                        "PlaceStore.us" + "er(",
+                        "SkyLanguageStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the six production entry points to the reader's"
+                "the seven production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
-                        + " and arrives by this pin changing rather"
-                        + " than by a silent gap in a remembered"
-                        + " list");
+                        + " and the seventh is #348's, which keeps the"
+                        + " two language keys. Each arrived by this"
+                        + " pin changing rather than by a silent gap"
+                        + " in a remembered list, which is the whole"
+                        + " reason the set is derived");
         int offenders = 0;
         try (var tree = Files.walk(Path.of("test"))) {
             for (Path source : tree
@@ -561,7 +564,14 @@ class TestEvidenceGateTest {
                         + " running atlas; and #315's closing journey"
                         + " reaches Chart Options and the export item"
                         + " by the same convention on its way through"
-                        + " the sprint: " + doClick);
+                        + " the sprint; and #348 added none - its"
+                        + " Settings language controls reach the"
+                        + " dialog's own confirmation seam directly,"
+                        + " where the tokens each selector stores are"
+                        + " visible, while the public face journey"
+                        + " presses the real OK and proves it arrives"
+                        + " there. A bound that bends when it is"
+                        + " inconvenient is not a bound: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);
