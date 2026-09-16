@@ -485,5 +485,5 @@ The lead this study measures is pinned by digest, so changing it without regener
 - name-list digest: `c181a95654c41055ed77e3623eb5b8cd004ae4407864f18769312b63c1af7341`
 - matched pages: 14 (all 14 promised)
 - attachment observations: 287, unmeasurable 0
-- manifest digest: `89679e8722e6680fa3f30e82a9d1e06b726dac6bcb89354e8166f8f087558b3b`
+- manifest digest: `d14b73d6ff8c050d120cbf04a29fbff9d875d10ac329be13d3877d12b74b4cc7`
 - status, as the data states it: **VERIFIED** — source `Liste over stjernebilder (Norwegian Wikipedia), permanent revision 25182596 of 2025-06-10 18:33, https://no.wikipedia.org/w/index.php?title=Liste_over_stjernebilder&oldid=25182596 - used as the redistributable starting dataset for the Norwegian column`, licence `CC BY-SA 4.0 for the starting dataset. Attribution required: "Liste over stjernebilder", Norwegian Wikipedia contributors, revision 25182596, CC BY-SA 4.0. Share-alike applies to this derived name list.`, retrieved 2026-09-15

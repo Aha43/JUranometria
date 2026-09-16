@@ -62,7 +62,19 @@ class PublicFaceJourneyTest {
                                 effectiveDark -> {
                                     UiTheme.apply(effectiveDark);
                                     com.formdev.flatlaf.FlatLaf.updateUI();
-                                }),
+                                },
+                                // The journey's own scratch node, which
+                                // it already removes in its finally -
+                                // a second node here would outlive the
+                                // run (#348).
+                                juranometria.ui.language.SkyLanguageSession
+                                        .begin(juranometria.ui.language
+                                                .SkyLanguageStore
+                                                .forNode(node),
+                                                Atlas.languages()),
+                                Atlas.names(),
+                                juranometria.ui.language.InterfaceLanguages
+                                        .discover()),
                         null,
                         () -> AboutDialog.open(frame[0]));
                 frame[0].setJMenuBar(bar);

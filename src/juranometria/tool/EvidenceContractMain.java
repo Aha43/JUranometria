@@ -624,8 +624,8 @@ public final class EvidenceContractMain {
             "ff06d67961a1ca12302f6385c61d86cc0b141fd8"
                     + "dd2f7bbf12095f390f2a8f5f",
             "src/resources/sky-language/nb-NO.manifest",
-            "89679e8722e6680fa3f30e82a9d1e06b726dac6b"
-                    + "cb89354e8166f8f087558b3b");
+            "d14b73d6ff8c050d120cbf04a29fbff9d875d10a"
+                    + "c329be13d3877d12b74b4cc7");
 
     /** One committed file: its bytes and when it was last written. */
     record Snapshot(byte[] bytes,

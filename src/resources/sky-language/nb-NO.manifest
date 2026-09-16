@@ -46,7 +46,7 @@
 # naming service. A pack declares what it is; nothing lists it.
 schema=1
 tag=nb-NO
-display-name=Norsk bokmal
+display-name=Norsk bokmål
 names=nb-NO.tsv
 
 status=verified

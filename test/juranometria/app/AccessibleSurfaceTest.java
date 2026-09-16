@@ -148,6 +148,7 @@ class AccessibleSurfaceTest {
                 collectUnnamed(new AtlasToolbar(navigation, search),
                         "toolbar", unnamed);
                 collectUnnamed(SettingsDialog.content(false, false,
+                SettingsDialog.installed(),
                         dark -> { }), "Settings", unnamed);
                 collectUnnamed(ChartOptionsDialog.content(
                                 new ChartOptionsController(

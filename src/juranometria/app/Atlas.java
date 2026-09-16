@@ -95,6 +95,17 @@ public final class Atlas {
     }
 
     /**
+     * The chart-name registry, for a selector that must say what each
+     * language calls itself.
+     *
+     * <p>The same instance the assembler resolves names through, so a
+     * language a selector offers is one the atlas can actually draw.
+     */
+    public static juranometria.geo.SkyNames names() {
+        return Holder.NAMES;
+    }
+
+    /**
      * What this installation can offer the reader, in both settings.
      *
      * <p>Assembled from the two registries rather than from either:

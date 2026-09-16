@@ -175,7 +175,8 @@ class AppSurfaceTest {
     void onlyOkConfirmsAndItReportsTheSelectedAppearance() {
         java.util.List<Boolean> confirmed = new java.util.ArrayList<>();
         JComponent content = SettingsDialog.content(false, false,
-                confirmed::add);
+                SettingsDialog.installed(),
+                settled -> confirmed.add(settled.dark()));
 
         JRadioButton dark = radio(content, "Dark appearance");
         JRadioButton light = radio(content, "Light appearance");
@@ -192,7 +193,8 @@ class AppSurfaceTest {
         // Cancel on a fresh panel confirms nothing.
         java.util.List<Boolean> cancelled = new java.util.ArrayList<>();
         JComponent second = SettingsDialog.content(true, false,
-                cancelled::add);
+                SettingsDialog.installed(),
+                settled -> cancelled.add(settled.dark()));
         assertTrue(radio(second, "Dark appearance").isSelected(),
                 "a saved dark preference preselects Dark");
         AboutDialogTest.button(second, "Cancel").doClick();
@@ -202,11 +204,13 @@ class AppSurfaceTest {
 
     @Test
     void anActiveOverrideIsExplainedInsideTheDialog() {
-        JComponent overridden = SettingsDialog.content(false, true, b -> { });
+        JComponent overridden = SettingsDialog.content(false, true,
+                SettingsDialog.installed(), b -> { });
         assertTrue(hasLabelContaining(overridden, "--dark"),
                 "the dialog says the session is overridden and when the"
                         + " choice applies");
-        JComponent ordinary = SettingsDialog.content(false, false, b -> { });
+        JComponent ordinary = SettingsDialog.content(false, false,
+                SettingsDialog.installed(), b -> { });
         assertFalse(hasLabelContaining(ordinary, "--dark"),
                 "no note without an override");
     }

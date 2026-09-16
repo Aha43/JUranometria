@@ -48,7 +48,7 @@ class SkyNamesDiscoveryTest {
         assertTrue(names.chartLanguages().contains("nb-NO"),
                 "the Norwegian pack ships and is offered: "
                         + names.chartLanguages());
-        assertEquals("Norsk bokmal", names.displayName("nb-NO"),
+        assertEquals("Norsk bokm\u00e5l", names.displayName("nb-NO"),
                 "under the name it gives itself");
         assertFalse(names.chartLanguages().contains("x-juranometria-test"),
                 "and the test fixture is not a language a reader can"

@@ -58,6 +58,7 @@ class WorkingSelectionSurfacesJourneyTest {
     private AtlasToolbar toolbar;
     private juranometria.app.ChartOptionsController chartOptions;
     private juranometria.app.AppearanceSession appearance;
+    private juranometria.ui.language.SkyLanguageSession skyLanguage;
     private final List<juranometria.module.NavigationRequest> requests =
             new ArrayList<>();
     /** Every inventory rebuild: the catalogue-traffic meter. */
@@ -78,7 +79,7 @@ class WorkingSelectionSurfacesJourneyTest {
 
     /** The application's own wiring, in a window a reader could use. */
     private void openTheAtlas(int width) throws Exception {
-        openTheAtlas(width, null, null);
+        openTheAtlas(width, null, null, null);
     }
 
     /**
@@ -94,11 +95,14 @@ class WorkingSelectionSurfacesJourneyTest {
                               juranometria.app.ChartOptionsController
                                       options,
                               juranometria.app.AppearanceSession
-                                      appearanceSession) throws Exception {
+                                      appearanceSession,
+                              juranometria.ui.language.SkyLanguageSession
+                                      languageSession) throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "a reader's keys and clicks need a display");
         this.chartOptions = options;
         this.appearance = appearanceSession;
+        this.skyLanguage = languageSession;
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
             chart = new ChartComponent(Atlas.assembler());
@@ -148,7 +152,10 @@ class WorkingSelectionSurfacesJourneyTest {
                                             effectiveDark);
                                     com.formdev.flatlaf.FlatLaf
                                             .updateUI();
-                                }),
+                                }, skyLanguage,
+                                juranometria.app.Atlas.names(),
+                                juranometria.ui.language
+                                        .InterfaceLanguages.discover()),
                         () -> juranometria.app.ChartOptionsDialog.open(
                                 window, options),
                         () -> { }));
@@ -345,7 +352,14 @@ class WorkingSelectionSurfacesJourneyTest {
                     juranometria.app.AppearanceStore.forNode(node);
             openTheAtlas(1300,
                     new juranometria.app.ChartOptionsController(store),
-                    new juranometria.app.AppearanceSession(looks, false));
+                    new juranometria.app.AppearanceSession(looks, false),
+                    // On the journey's own node, which its finally
+                    // removes - a node of its own would outlive the
+                    // run (#348).
+                    juranometria.ui.language.SkyLanguageSession.begin(
+                            juranometria.ui.language.SkyLanguageStore
+                                    .forNode(node),
+                            juranometria.app.Atlas.languages()));
 
             // The page before any gesture: the before of every
             // painted-pixel accounting below.
@@ -561,7 +575,14 @@ class WorkingSelectionSurfacesJourneyTest {
 
             openTheAtlas(1300,
                     new juranometria.app.ChartOptionsController(store),
-                    new juranometria.app.AppearanceSession(looks, false));
+                    new juranometria.app.AppearanceSession(looks, false),
+                    // On the journey's own node, which its finally
+                    // removes - a node of its own would outlive the
+                    // run (#348).
+                    juranometria.ui.language.SkyLanguageSession.begin(
+                            juranometria.ui.language.SkyLanguageStore
+                                    .forNode(node),
+                            juranometria.app.Atlas.languages()));
             assertTrue(working().members().isEmpty(),
                     "a new session begins with no working selection");
             assertEquals(Selection.NOTHING, selection.selection());

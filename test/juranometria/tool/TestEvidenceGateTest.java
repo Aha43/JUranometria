@@ -522,7 +522,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 37,
+        assertTrue(doClick <= 38,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -564,7 +564,16 @@ class TestEvidenceGateTest {
                         + " running atlas; and #315's closing journey"
                         + " reaches Chart Options and the export item"
                         + " by the same convention on its way through"
-                        + " the sprint: " + doClick);
+                        + " the sprint; and #348's Settings language"
+                        + " controls are a control-mechanism file of"
+                        + " the #286 kind - the two selectors and OK"
+                        + " are driven headlessly here, where what"
+                        + " each item stores can be asserted, and the"
+                        + " same OK is pressed for real in the public"
+                        + " face journey through the shared route"
+                        + " helper with its premises proven, which now"
+                        + " runs the language path as well as the"
+                        + " appearance one: " + doClick);
         assertTrue(postAction <= 3,
                 "postActionEvent survives only in the named mechanism"
                         + " tests: " + postAction);

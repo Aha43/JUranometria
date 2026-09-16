@@ -64,6 +64,8 @@ public final class JUranometriaMain {
         // node again - a page that could change because something
         // wrote to preferences, with no application state having
         // passed through the call, is a page nothing can account for.
+        juranometria.ui.language.InterfaceLanguages interfaces =
+                juranometria.ui.language.InterfaceLanguages.discover();
         juranometria.ui.language.SkyLanguageSession language =
                 juranometria.ui.language.SkyLanguageSession.begin(
                         juranometria.ui.language.SkyLanguageStore.user(),
@@ -91,6 +93,15 @@ public final class JUranometriaMain {
         frame.setIconImages(ApplicationIcon.windowIcons());
         ChartComponent chart = new ChartComponent(assembler);
         controller.onChange(chart::setViewState);
+        // Choosing a language rebuilds the page in it. Reconstruction
+        // rather than repaint: names are resolved into a scene when
+        // it is assembled, so a page already drawn cannot be made to
+        // show a language it was not built in. The view state is not
+        // touched - choosing a language is not navigation, and the
+        // reader stays where they were while the sky is relabelled
+        // around them (#348).
+        language.onChange(chosen -> chart.setAssembler(
+                Atlas.assemblerNamedIn(chosen.namesOnTheChart())));
         // Hiding the family a searched target belongs to retires the
         // target (issue #196): the explicit hide is the later and
         // equally explicit request, so it wins. Ordinary family
@@ -169,7 +180,7 @@ public final class JUranometriaMain {
                         effectiveDark -> {
                             UiTheme.apply(effectiveDark);
                             com.formdev.flatlaf.FlatLaf.updateUI();
-                        }),
+                        }, language, Atlas.names(), interfaces),
                 () -> ChartOptionsDialog.open(frame, chartOptions),
                 () -> AboutDialog.open(frame),
                 () -> {
