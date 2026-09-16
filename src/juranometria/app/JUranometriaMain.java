@@ -57,19 +57,39 @@ public final class JUranometriaMain {
         UiTheme.apply(appearance.startupDark());
         ChartOptionsController chartOptions =
                 new ChartOptionsController(ChartOptionsStore.user());
+        // The reader's language, read from the store exactly once and
+        // owned by this session from here on (#348). The store says
+        // what the NEXT session starts with; the session says what
+        // THIS one is showing. Nothing below reads the preference
+        // node again - a page that could change because something
+        // wrote to preferences, with no application state having
+        // passed through the call, is a page nothing can account for.
+        juranometria.ui.language.SkyLanguageSession language =
+                juranometria.ui.language.SkyLanguageSession.begin(
+                        juranometria.ui.language.SkyLanguageStore.user(),
+                        Atlas.languages());
         // The catalogues verify themselves as they load, so they are
         // loaded before any window exists: a damaged download should
         // be explained, not half-drawn behind a frame that will never
         // be usable.
+        //
+        // One assembler for the running application, told the
+        // language once. Two would not differ today - navigation and
+        // search ask it geometric questions that no language changes
+        // - but a second one built without the language is a trap
+        // laid for whoever later adds something to those paths that
+        // does need a name.
+        juranometria.ui.SceneAssembler assembler =
+                Atlas.assemblerNamedIn(language.namesOnTheChart());
         ChartViewController controller =
-                new ChartViewController(Atlas.assembler()::fits);
+                new ChartViewController(assembler::fits);
         JFrame frame = new JFrame(AppInfo.NAME + " " + AppInfo.version());
         // The mark the gate chose, drawn at every size a window
         // manager might want (issue #202). Without this the title
         // bar, the task switcher and a portable launch all fall back
         // to Java's default cup.
         frame.setIconImages(ApplicationIcon.windowIcons());
-        ChartComponent chart = new ChartComponent(Atlas.assembler());
+        ChartComponent chart = new ChartComponent(assembler);
         controller.onChange(chart::setViewState);
         // Hiding the family a searched target belongs to retires the
         // target (issue #196): the explicit hide is the later and
@@ -209,7 +229,7 @@ public final class JUranometriaMain {
         });
         AppMenuBar.installZoomShortcuts(frame.getRootPane(), controller);
         juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
-                Atlas.search(), Atlas.assembler(), controller);
+                Atlas.search(), assembler, controller);
         // Finding an object by name selects it, so a reader with no
         // pointer can reach the inspector at all - and it joins the
         // working selection under the decided search semantics.

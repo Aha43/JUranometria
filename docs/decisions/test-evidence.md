@@ -76,8 +76,8 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **52 files** touch process-wide state —
-**28** use the shared guard, **23** restore locally,
+this document to them: **54 files** touch process-wide state —
+**28** use the shared guard, **25** restore locally,
 **0 flagged unprotected** — and **36 files** depend on a display,
 of which **19** state a focus premise and **27** a reachability
 premise through the shared route helper. (#246 added two
@@ -129,12 +129,17 @@ back by pressing the toolbar's own controls, points at a star to
 identify it through the projection's inverse, and exports both papers
 in all three formats through the real export dialog — none of which
 can be asked of a page nobody is looking at, and it aborts rather
-than passes where there is no display; and #348 added the sky-language
-store's test to the local-preference shape, because the question it
+than passes where there is no display; and #348 added three to the
+local-preference shape. The store's test, because the question it
 asks — that reading an absent key writes nothing, so a reader's
 silence survives to be migrated — can only be asked of a real
 preference node, and a node that answered it would be a node the test
-had itself written to.)
+had itself written to; the session's test, which proves the store is
+read once at startup and never consulted again, and so must watch a
+real store to count the reads; and the reader's own path, which
+chooses a sky language, restarts, and exports — a restart being
+precisely a second store over the same node, which a fixture cannot
+be.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -318,8 +323,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **418
-reads of live chart state** against **690 explicit hand-offs**
+own premise capture). The measurements count the traffic: **423
+reads of live chart state** against **692 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its

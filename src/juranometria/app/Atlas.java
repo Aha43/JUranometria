@@ -41,6 +41,8 @@ public final class Atlas {
 
         static final juranometria.ui.language.SkyLanguageChoice.Available
                 LANGUAGES = languages();
+        static final juranometria.geo.SkyNames NAMES =
+                juranometria.geo.SkyNames.discover();
 
         private static SkyRegion wholeSky() {
             return new SkyRegion(DEFAULT_CENTRE, 180.0);
@@ -74,6 +76,22 @@ public final class Atlas {
     /** The application's local search over the same bundled pack. */
     public static LocalSearch search() {
         return Holder.SEARCH;
+    }
+
+    /**
+     * The same assembler, naming the sky in a language a caller
+     * states.
+     *
+     * <p>The language is a parameter, never something read here. This
+     * class holds no session state and touches no preference node:
+     * what the reader is currently showing is
+     * {@code SkyLanguageSession}'s to know, and it hands the resolved
+     * answer in. An assembler that fetched the language itself would
+     * make every page depend on when it was assembled rather than on
+     * what it was asked for.
+     */
+    public static SceneAssembler assemblerNamedIn(String chartLanguage) {
+        return Holder.ASSEMBLER.namedIn(chartLanguage, Holder.NAMES);
     }
 
     /**

@@ -75,6 +75,24 @@ public final class ChartComponent extends JComponent {
     }
 
     /**
+     * What assembled this page, for whoever must reproduce it.
+     *
+     * <p>Export exists to put on paper the page the reader is looking
+     * at. It used to build its own scene from the application's
+     * assembler, which was the same object while there was only one
+     * language - and would quietly stop being the same object the
+     * moment a reader chose a different sky language, printing Latin
+     * names under a Norwegian screen.
+     *
+     * <p>Asking the chart what drew it makes screen and paper share
+     * one language state by construction, rather than by two call
+     * sites being careful to consult the same source (#348).
+     */
+    public SceneAssembler assembler() {
+        return assembler;
+    }
+
+    /**
      * Adopts the reader's chart options and repaints. Options are
      * presentation state consumed by the renderer: no scene assembly,
      * no catalogue or geography query, no navigation change
