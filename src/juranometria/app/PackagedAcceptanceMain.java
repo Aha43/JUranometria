@@ -136,21 +136,41 @@ public final class PackagedAcceptanceMain {
         // nothing does. The interface side would then either throw
         // at startup or - if anyone ever adds a fallback - silently
         // offer English from a mechanism that never ran.
-        java.util.Set<String> interfaces =
-                Atlas.languages().interfaceLanguages();
-        java.util.Set<String> charts =
-                Atlas.languages().chartLanguages();
-        require(interfaces.equals(java.util.Set.of("en")),
+        // Sorted for the message: a Set prints in whatever order it
+        // hashes, and a failure a reader of the log has to squint at
+        // is a failure that wastes their time.
+        java.util.List<String> interfaces = new java.util.TreeSet<>(
+                Atlas.languages().interfaceLanguages()).stream().toList();
+        java.util.List<String> charts = new java.util.TreeSet<>(
+                Atlas.languages().chartLanguages()).stream().toList();
+        require(interfaces.equals(java.util.List.of("en", "nb-NO")),
                 "the packaged image offers the interface languages it"
                         + " ships descriptors for: " + interfaces);
-        require(charts.equals(java.util.Set.of("nb-NO")),
+        require(charts.equals(java.util.List.of("nb-NO")),
                 "and the chart languages it ships packs for: " + charts);
-        require(!interfaces.contains("nb-NO") && !charts.contains("en"),
-                "with neither list leaking into the other - a"
-                        + " Norwegian sky does not put Norwegian in"
-                        + " the menus, and an English interface does"
-                        + " not claim English constellation names the"
-                        + " atlas has no pack for");
+        require(!charts.contains("en"),
+                "with neither list claiming what the other ships. The"
+                        + " two share nb-NO legitimately since #350 -"
+                        + " a pack AND a descriptor - so the direction"
+                        + " worth checking is the one with nothing"
+                        + " behind it: no English constellation names"
+                        + " exist, and a registry that borrowed from"
+                        + " its neighbour would claim a sky it cannot"
+                        + " draw");
+        // The words themselves, inside the image (#350). Resource
+        // discovery that worked on a developer's classpath and not in
+        // the packaged runtime is exactly the defect no unit test can
+        // see, and an interface that fell back to English everywhere
+        // would look like a translation nobody had written.
+        juranometria.ui.language.InterfaceText norsk =
+                juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+        require("Innstillinger".equals(norsk.say("settings.title")),
+                "the packaged image speaks Norwegian: settings.title"
+                        + " is \"" + norsk.say("settings.title") + "\"");
+        require("Latin (IAU)".equals(
+                        norsk.say("settings.language.chart.latin")),
+                "and falls back to English where a translation leaves"
+                        + " a key alone, rather than showing the key");
         // Resolved through the real store semantics, against what
         // this image actually installed rather than a fixture.
         juranometria.ui.language.SkyLanguageChoice packaged =
