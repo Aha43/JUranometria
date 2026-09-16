@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**300 promoted artifacts.**
+**301 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -304,7 +304,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/regional-zoom/m45-18deg.png` | `156414a05e0a8008800491e84ef499dac9a6cd750e3d6c9952550c6eeb8d5391` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | RegionalStudyMain |
 | `docs/studies/regional-zoom/m45-36deg.png` | `e8be714495296cbfaf0df096afe0b298b928fadbec9b7254c7cf98a047e2b953` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | RegionalStudyMain |
 | `docs/studies/regional-zoom/polar-36deg.png` | `ee47fe87514c808f574d908236d99a9bf781d6fe199fbd7deeec60a5c320fcbc` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | RegionalStudyMain |
-| `docs/studies/sky-language/omissions.png` | `f37a5b7f458a07ac831c328cfb95b93ac2defe3aa9874d1a4a5d926e1e209d8f` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/omissions.png` | `277d6d8844da05149931dc2148c3e20136333c540d45519ec4a6a8c25960acf0` | 2026-09-16 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-north-pole-globe-180.png` | `f88c1249e6e729f49cd41b34f011b6b9e176e37c622188e471d3bff365610ad1` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-orion-120.png` | `2d237f281bc172c3c08a68199a72ce0f6a9bb3d84645c1cfdcbd5c4105185b8e` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-orion-18.png` | `96a31735c7b1408947188e11a863ea52c007e8d48cb7fd1fecfa08dd0e2c4a05` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
@@ -312,6 +312,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/sky-language/pair-sagittarius-120.png` | `fef17ec79f8c8a5225dd09a74d86f3638b5fd0629084e66757a60469718c6ccf` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-sagittarius-18.png` | `dfe5ded49540811ad59af82a2df83bd9a110f9e715e8484498be851add16d96e` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-sagittarius-globe-180.png` | `823424084ebd10071ac541209eda2874cac8ff7257e2cacece74db9b1408f94d` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/sky-language/pair-south-pole-120.png` | `c35321cf285990d7bc70f62f138299a6abfcb9149ca9408a8f2167ffbd2338d0` | 2026-09-16 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/sky-language/pair-south-pole-globe-180.png` | `9755334f6d8fb3a91caa3dfc7d39bd6ad90fd2324ead044430acdb160645794f` | 2026-09-15 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/star-identity/crux-18.png` | `b7bfc8e256057e0852119a3c433769d246ed992c79ba8f6a7d9986613095d16e` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/m31-08.png` | `f84385e53e189d72d78f369b43ce73c8d3f777feac41690a42bbec06c192eb92` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |

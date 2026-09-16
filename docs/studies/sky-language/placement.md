@@ -409,17 +409,113 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Vir` | Virgo | Jomfruen | moved | candidate 3 to 7, 20 px |
 | `Vol` | Volans | Flygefisken | renamed in place | candidate 16 |
 
+## the RA seam, 120 degrees
+
+Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 22 constellation names asked in Latin, 22 in Norwegian.
+
+| id | Latin | Norwegian | outcome | detail |
+|---|---|---|---|---|
+| `Aql` | Aquila | Ørnen | renamed in place | candidate 2 |
+| `Aqr` | Aquarius | Vannmannen | renamed in place | candidate 3 |
+| `Ari` | Aries | Væren | renamed in place | candidate 0 |
+| `Aur` | Auriga | Kusken | renamed in place | candidate 0 |
+| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 3 |
+| `Cas` | Cassiopeia | Kassiopeia | renamed in place | candidate 3 |
+| `Cep` | Cepheus | Kefeus | renamed in place | candidate 0 |
+| `Cet` | Cetus | Hvalen | renamed in place | candidate 0 |
+| `Cyg` | Cygnus | Svanen | renamed in place | candidate 3 |
+| `Del` | Delphinus | Delfinen | renamed in place | candidate 5 |
+| `Equ` | Equuleus | Føllet | renamed in place | candidate 0 |
+| `Eri` | Eridanus | Floden | renamed in place | candidate 0 |
+| `Lac` | Lacerta | Øglen | moved | candidate 9 to 2, 60 px |
+| `Lyr` | Lyra | Lyren | renamed in place | candidate 2 |
+| `Psc` | Pisces | Fiskene | renamed in place | candidate 0 |
+| `Sge` | Sagitta | Pilen | moved | candidate 10 to 2, 20 px |
+| `Tau` | Taurus | Tyren | renamed in place | candidate 0 |
+| `Tri` | Triangulum | Triangelet | renamed in place | candidate 0 |
+| `Vul` | Vulpecula | Reven | moved | candidate 1 to 0, 20 px |
+
+## the north pole, 120 degrees
+
+Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 20 constellation names asked in Latin, 20 in Norwegian.
+
+| id | Latin | Norwegian | outcome | detail |
+|---|---|---|---|---|
+| `Aur` | Auriga | Kusken | renamed in place | candidate 0 |
+| `Boo` | Boötes | Oksedriveren | renamed in place | candidate 0 |
+| `Cam` | Camelopardalis | Sjiraffen | renamed in place | candidate 3 |
+| `Cas` | Cassiopeia | Kassiopeia | renamed in place | candidate 3 |
+| `Cep` | Cepheus | Kefeus | renamed in place | candidate 0 |
+| `Cnc` | Cancer | Krepsen | renamed in place | candidate 5 |
+| `CrB` | Corona Borealis | Nordlige krone | renamed in place | candidate 14 |
+| `Cyg` | Cygnus | Svanen | renamed in place | candidate 0 |
+| `Dra` | Draco | Dragen | renamed in place | candidate 0 |
+| `Gem` | Gemini | Tvillingene | moved | candidate 3 to 5, 40 px |
+| `Her` | Hercules | Herkules | renamed in place | candidate 5 |
+| `Lac` | Lacerta | Øglen | moved | candidate 5 to 3, 40 px |
+| `Lyn` | Lynx | Gaupen | renamed in place | candidate 0 |
+| `Lyr` | Lyra | Lyren | renamed in place | candidate 1 |
+| `UMa` | Ursa Major | Store bjørn | renamed in place | candidate 5 |
+| `UMi` | Ursa Minor | Lille bjørn | renamed in place | candidate 3 |
+| `Vul` | Vulpecula | Reven | renamed in place | candidate 6 |
+
+## the south pole, 120 degrees
+
+Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartViewState.defaultMagnitudeFor`). 41 constellation names asked in Latin, 41 in Norwegian.
+
+| id | Latin | Norwegian | outcome | detail |
+|---|---|---|---|---|
+| `Aps` | Apus | Paradisfuglen | moved | candidate 2 to 5, 45 px |
+| `Ara` | Ara | Alteret | renamed in place | candidate 10 |
+| `CMa` | Canis Major | Store hund | renamed in place | candidate 11 |
+| `Cae` | Caelum | Gravstikken | renamed in place | candidate 5 |
+| `Car` | Carina | Kjølen | renamed in place | candidate 4 |
+| `Cen` | Centaurus | Kentauren | renamed in place | candidate 0 |
+| `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 7 |
+| `Cir` | Circinus | Passeren | renamed in place | candidate 1 |
+| `Col` | Columba | Duen | moved | candidate 5 to 3, 40 px |
+| `CrA` | Corona Australis | Sørlige krone | moved | candidate 14 to 13, 80 px |
+| `Cru` | Crux | Sydkorset | moved | candidate 0 to 2, 20 px |
+| `Dor` | Dorado | Gullfisken | moved | candidate 1 to 3, 20 px |
+| `Eri` | Eridanus | Floden | renamed in place | candidate 0 |
+| `For` | Fornax | Smelteovnen | moved | candidate 2 to 10, 20 px |
+| `Gru` | Grus | Tranen | renamed in place | candidate 9 |
+| `Hor` | Horologium | Uret | renamed in place | candidate 0 |
+| `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 0 to 6, 28 px |
+| `Ind` | Indus | Inderen | renamed in place | candidate 1 |
+| `Lib` | Libra | Vekten | renamed in place | candidate 0 |
+| `Lup` | Lupus | Ulven | renamed in place | candidate 3 |
+| `Men` | Mensa | Taffelberget | moved | candidate 1 to 13, 45 px |
+| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 3 |
+| `Mus` | Musca | Fluen | renamed in place | candidate 10 |
+| `Nor` | Norma | Vinkelhaken | renamed in place | candidate 0 |
+| `Oct` | Octans | Oktanten | renamed in place | candidate 0 |
+| `Oph` | Ophiuchus | Slangebæreren | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the paper] |
+| `Pav` | Pavo | Påfuglen | renamed in place | candidate 0 |
+| `Phe` | Phoenix | Føniks | renamed in place | candidate 3 |
+| `Pic` | Pictor | Maleren | renamed in place | candidate 0 |
+| `Pup` | Puppis | Akterstavnen | renamed in place | candidate 0 |
+| `Pyx` | Pyxis | Kompasset | moved | candidate 2 to 3, 45 px |
+| `Ret` | Reticulum | Nettet | moved | candidate 9 to 0, 40 px |
+| `Sco` | Scorpius | Skorpionen | renamed in place | candidate 3 |
+| `Sgr` | Sagittarius | Skytten | moved | candidate 2 to 0, 20 px |
+| `Tel` | Telescopium | Teleskopet | renamed in place | candidate 5 |
+| `TrA` | Triangulum Australe | Sørlige triangel | moved | candidate 4 to 10, 28 px |
+| `Tuc` | Tucana | Tukanen | renamed in place | candidate 0 |
+| `Vel` | Vela | Seilet | renamed in place | candidate 0 |
+| `Vol` | Volans | Flygefisken | moved | candidate 16 to 10, 57 px |
+
 
 ## What the Norwegian names cost, in total
 
-These are **placement observations across 14 pages**, not distinct constellations: one name measured on eight pages contributes eight observations.
+These are **placement observations across 17 pages**, not distinct constellations: one name measured on eight pages contributes eight observations.
 
 | outcome | observations |
 |---|---|
-| renamed in place (no cost) | 169 |
-| moved | 101 |
-| omitted in one language | 10 |
-| identical in both languages | 17 |
+| renamed in place (no cost) | 225 |
+| moved | 119 |
+| omitted in one language | 11 |
+| identical in both languages | 22 |
 
 **Unique constellation identities affected** (moved, omitted or renamed at least once): 85 of 88.
 
@@ -429,7 +525,7 @@ Closest any written name comes to the page edge, measured from its whole box: 2.
 
 Vector distance from each Norwegian label's box to the projected, page-clipped figure segments of its own constellation, and to the nearest rival's. Positive margin means the label is nearer its own geography.
 
-Measured: 287 labels. Not measurable: 0 (premise: the constellation, or every rival, draws no visible segment on that page).
+Measured: 366 labels. Not measurable: 0 (premise: the constellation, or every rival, draws no visible segment on that page).
 
 | id | page | to own | to rival | rival | margin |
 |---|---|---|---|---|---|
@@ -448,7 +544,7 @@ Measured: 287 labels. Not measurable: 0 (premise: the constellation, or every ri
 
 *The twelve tightest margins, ascending.*
 
-**Negative margins: 23** — for owner inspection, not automatically a defect. Placement uses the constellation's visible geography, and where figures interlock or one contributes only a stub of line, the nearest line is an imperfect oracle for what a reader reads as belonging.
+**Negative margins: 24** — for owner inspection, not automatically a defect. Placement uses the constellation's visible geography, and where figures interlock or one contributes only a stub of line, the nearest line is an imperfect oracle for what a reader reads as belonging.
 
 - `Ser` on Sagittarius, 120 degrees: 74.1 px from its own figure, 0.0 px from `Oph` (margin -74.1 px)
 - `Pyx` on Orion, 120 degrees: 10.5 px from its own figure, 0.0 px from `Pup` (margin -10.5 px)
@@ -473,17 +569,18 @@ Measured: 287 labels. Not measurable: 0 (premise: the constellation, or every ri
 - `Mon` on the south pole, 180 degrees: 7.9 px from its own figure, 0.0 px from `CMa` (margin -7.9 px)
 - `Ser` on the south pole, 180 degrees: 3.1 px from its own figure, 0.0 px from `Oph` (margin -3.1 px)
 - `Vir` on the south pole, 180 degrees: 4.2 px from its own figure, 0.0 px from `Hya` (margin -4.2 px)
+- `CrA` on the south pole, 120 degrees: 1.9 px from its own figure, 0.0 px from `Sgr` (margin -1.9 px)
 
 ### Why the metric changed
 
-The first attempt compared bounding-box **centres**. It reported 33 detached labels on this corpus — a REJECTED METRIC, recorded only so its bias can be shown. Its count is not a measure of placement and a rise in it means nothing about the page. Their distribution gave it away: they clustered on 180-degree globes, which is exactly where a bounding box least resembles the figure inside it. The corrected metric measures to the real projected path and finds 23 negative margins, for a geometric reason rather than a change of threshold.
+The first attempt compared bounding-box **centres**. It reported 33 detached labels on this corpus — a REJECTED METRIC, recorded only so its bias can be shown. Its count is not a measure of placement and a rise in it means nothing about the page. Their distribution gave it away: they clustered on 180-degree globes, which is exactly where a bounding box least resembles the figure inside it. The corrected metric measures to the real projected path and finds 24 negative margins, for a geometric reason rather than a change of threshold.
 
 ## Why this report can be trusted to go stale
 
 The name list this study measures is pinned by digest, so changing it without regenerating this report is a contract breach rather than a silent disagreement.
 
 - name-list digest: `c181a95654c41055ed77e3623eb5b8cd004ae4407864f18769312b63c1af7341`
-- matched pages: 14 (all 14 promised)
-- attachment observations: 287, unmeasurable 0
+- matched pages: 17 (all 17 promised)
+- attachment observations: 366, unmeasurable 0
 - manifest digest: `48378c2dea1a13c49d1e1b5dfca7bc81e1351b155ce327e8c79d81bebfcc6f51`
 - status, as the data states it: **VERIFIED** — source `Liste over stjernebilder (Norwegian Wikipedia), permanent revision 25182596 of 2025-06-10 18:33, https://no.wikipedia.org/w/index.php?title=Liste_over_stjernebilder&oldid=25182596 - used as the redistributable starting dataset for the Norwegian column`, licence `CC BY-SA 4.0 for the starting dataset. Attribution required: "Liste over stjernebilder", Norwegian Wikipedia contributors, revision 25182596, CC BY-SA 4.0. Share-alike applies to this derived name list.`, retrieved 2026-09-15

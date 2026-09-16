@@ -113,6 +113,16 @@ public final class SkyLanguagePairMain {
         PAGES.put("south-pole-globe-180", new ChartViewState(
                 new SkyPosition(0.0, -89.0), 180.0,
                 ChartViewState.defaultMagnitudeFor(180.0)));
+        // The #349 checkpoint. The study's fixtures went straight
+        // from 42 to 180 at the poles, and the gap was not empty:
+        // here OPHIUCHUS fits in Latin at its tenth candidate and
+        // SLANGEBAEREREN is refused at all seventeen, so a reader
+        // choosing Norwegian loses a name they had. Whether that is
+        // an honest omission or a hole is a question about the
+        // picture, and no report can answer it.
+        PAGES.put("south-pole-120", new ChartViewState(
+                new SkyPosition(0.0, -89.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
     }
 
     /**
@@ -147,7 +157,16 @@ public final class SkyLanguagePairMain {
         ALL_PAGES.put("south-pole-42", new ChartViewState(
                 new SkyPosition(0.0, -89.0), 42.0,
                 ChartViewState.defaultMagnitudeFor(42.0)));
-
+        // The three fixtures #349 added to the study. The index
+        // promises every page the study measures, so it has to grow
+        // with it - a curated sheet set may be a selection, an index
+        // that silently omitted a page would be a false negative.
+        ALL_PAGES.put("ra-seam-120", new ChartViewState(
+                new SkyPosition(0.0, 20.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
+        ALL_PAGES.put("north-pole-120", new ChartViewState(
+                new SkyPosition(0.0, 89.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0)));
     }
 
     /** One name written in one language and refused in the other. */
