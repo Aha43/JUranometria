@@ -77,8 +77,8 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Settings | JRadioButton | Dark | &mdash; | Draws the window's own chrome dark. The chart is drawn the same either way; the black s... | self-explanatory |
 | Settings | JComboBox | (Interface language) | The language of the menus, buttons and dialogs - not the names printed on the chart | The language of the menus, buttons and dialogs - the words the application speaks to yo... | hovered |
 | Settings | JComboBox | (Names on chart) | The language of the constellation names printed on the chart - separate from the interf... | The language of the constellation names printed on the chart itself. Separate from the ... | hovered |
-| Settings | JButton | Cancel | &mdash; | Closes this window and changes nothing | self-explanatory |
-| Settings | JButton | OK | &mdash; | Keeps the chosen appearance and closes this window | self-explanatory |
+| Settings | JButton | Cancel | &mdash; | Closes this window without saving changes | self-explanatory |
+| Settings | JButton | OK | &mdash; | Saves the choices and closes this window | self-explanatory |
 | About | JTextArea | (read-only text) | &mdash; | The short form of what the atlas is built on and what that allows; the full texts are b... | self-explanatory |
 | About | JButton | Full notices and licences... | &mdash; | Opens the complete notices and licence texts for everything the atlas bundles | self-explanatory |
 | About | JButton | Close | &mdash; | Closes this window and returns to the chart | self-explanatory |

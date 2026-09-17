@@ -170,6 +170,37 @@ public final class SettingsDialog extends JDialog {
         return content(false, false, installed(), confirmed -> { });
     }
 
+    /**
+     * The same, in a given interface language and with the override
+     * note shown (#350).
+     *
+     * <p>For the sheet a person reads when deciding whether a
+     * translation is any good. The note is forced on because a
+     * conditional sentence a reviewer never sees is a sentence nobody
+     * reviewed.
+     *
+     * <p>A seam rather than public records: what the dialog is built
+     * from stays its own business, and a study needs the result, not
+     * the parts.
+     */
+    public static JComponent contentForStudy(String interfaceLanguage) {
+        juranometria.ui.language.SkyLanguageChoice.Available available =
+                Atlas.languages();
+        juranometria.ui.language.SkyLanguageChoice choice =
+                juranometria.ui.language.SkyLanguageChoice.read(
+                        java.util.Map.of(juranometria.ui.language
+                                .SkyLanguageChoice.INTERFACE_KEY,
+                                interfaceLanguage),
+                        available);
+        return content(false, true,
+                new Languages(choice, available, Atlas.names(),
+                        juranometria.ui.language.InterfaceLanguages
+                                .discover()),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        interfaceLanguage),
+                confirmed -> { });
+    }
+
     static JComponent content(boolean savedDark, boolean overrideActive,
                               Languages languages,
                               Consumer<Confirmed> confirm) {

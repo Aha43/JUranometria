@@ -289,10 +289,11 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
+                        "src/juranometria/tool/SettingsSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the nine widget photographers, whose font and theme"
+                "the ten widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -309,7 +310,14 @@ class TestEvidenceGateTest {
                         + " by #311's control audit, which builds every"
                         + " surface the application builds and so needs"
                         + " the look and feel those surfaces are built"
-                        + " under");
+                        + " under; and the tenth by #350's, the"
+                        + " Settings sheet, which draws that dialog in"
+                        + " each interface language for a person to"
+                        + " judge the translation by - and must draw"
+                        + " it under the look and feel a reader meets,"
+                        + " because whether a longer word fits a"
+                        + " control is a question about that look and"
+                        + " feel and no other");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
