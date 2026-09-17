@@ -109,6 +109,17 @@ class TestEvidenceGateTest {
                         || decision.contains(reads + "\nreads of live"),
                 "and the decision carries the same read count: "
                         + reads);
+        // BOTH figures, not just the first. This checked the reads
+        // and left the hand-offs unchecked, so the decision quoted
+        // 700 while the report said 702 and every test passed. A
+        // number nothing compares is a number that drifts, and the
+        // sentence carrying it goes on looking like evidence (#350).
+        assertTrue(decision.contains("**" + handOffs
+                        + " explicit hand-offs**"),
+                "and the same hand-off count: the report measured "
+                        + handOffs + ", and the decision quotes"
+                        + " whatever it quotes until something"
+                        + " compares them");
     }
 
     // ---- guard G1: global state is protected ------------------------
@@ -282,6 +293,7 @@ class TestEvidenceGateTest {
                 .filter(f -> !f.unprotectedState().isEmpty())
                 .map(TestEvidenceScan.File::path).sorted().toList();
         assertEquals(List.of(
+                        "src/juranometria/tool/ChartOptionsSheetMain.java",
                         "src/juranometria/tool/ControlExplanationStudyMain.java",
                         "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
                         "src/juranometria/tool/EclipticCandidateStudyMain.java",
@@ -293,7 +305,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the ten widget photographers, whose font and theme"
+                "the eleven widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -317,7 +329,14 @@ class TestEvidenceGateTest {
                         + " it under the look and feel a reader meets,"
                         + " because whether a longer word fits a"
                         + " control is a question about that look and"
-                        + " feel and no other");
+                        + " feel and no other; and the eleventh by"
+                        + " #350's Chart Options sheet, which packs"
+                        + " that dialog in a real window in each"
+                        + " language - a real window because this"
+                        + " surface wraps its descriptions against"
+                        + " font metrics, and a detached panel"
+                        + " pictured one line of each overlapping the"
+                        + " row beneath");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------

@@ -70,7 +70,22 @@ public enum SymbolFamily {
     }
 
     /** The name a reader sees, on the control and in the legend. */
-    public String label() {
+    /**
+     * The family's canonical name - identity, not reader text.
+     *
+     * <p>Owner ruling, #350: this enum owns identity, notation,
+     * symbol geometry and its catalogue examples. It does not own
+     * English labels, reader descriptions or sentence construction.
+     * Those live in {@code SymbolFamilyText}, backed by the
+     * interface-language resources, so the renderer never learns
+     * which language is selected.
+     *
+     * <p>Kept for evidence and tooling, which name families in
+     * reports a developer reads. Anything a READER sees comes from
+     * the presentation layer - and this returning English is exactly
+     * how it would quietly become reader text again.
+     */
+    public String canonicalName() {
         return label;
     }
 
@@ -85,25 +100,12 @@ public enum SymbolFamily {
         return mnemonic;
     }
 
-    /** What the family is, in one sentence. */
-    public String description() {
-        return description;
-    }
 
     /** Objects a reader may already know. */
     public String examples() {
         return examples;
     }
 
-    /**
-     * The whole explanation: the sentence and its examples. This is
-     * both the visible text of a legend row and the control's
-     * accessible description, so the two cannot come to differ and no
-     * meaning depends on hovering.
-     */
-    public String prose() {
-        return description + " For example: " + examples + ".";
-    }
 
     /** The family that draws this symbol, or null for one that draws none. */
     public static SymbolFamily of(ChartRenderer.Symbol symbol) {

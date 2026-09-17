@@ -35,20 +35,20 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Toolbar | (icon only) | Zoom in (<key:zoomIn>) |
 | Toolbar | (icon only) | Zoom out (<key:zoomOut>) |
 | Toolbar | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) |
-| Chart Options | Deep-sky objects | Draw deep-sky objects on the chart at all (<prefix> then D) |
+| Chart Options | Deep-sky objects | Draw deep-sky objects on the chart at all. Shortcut: <prefix> then D. |
 | Chart Options | Galaxies | Galaxies, drawn at their catalogued size and orientation, including close pairs, triple... |
 | Chart Options | Open clusters | Loose clusters of young stars in the plane of the Milky Way. For example: M 45, M 44, N... |
 | Chart Options | Globular clusters | Dense, ancient balls of stars in the galactic halo. For example: M 13, M 22, NGC 5139. ... |
 | Chart Options | Nebulae | Clouds of gas and dust: emission, reflection and dark nebulae, H II regions, supernova ... |
 | Chart Options | Planetary nebulae | Shells thrown off by dying stars, drawn small and crossed so they read apart from the o... |
-| Chart Options | Deep-sky labels | Name the deep-sky objects the chart draws (<prefix> then L) |
-| Chart Options | Star names | Traditional proper names such as Betelgeuse (<prefix> then S) |
-| Chart Options | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis (<prefix> then Y) |
-| Chart Options | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts (<prefix> then M) |
-| Chart Options | Constellation figures | The joined stick figures of the constellations (<prefix> then F) |
-| Chart Options | Constellation boundaries | The IAU boundaries, precessed from B1875 (<prefix> then B) |
-| Chart Options | Constellation names | The figure's name, drawn where the figure is (<prefix> then N) |
-| Chart Options | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels (<prefix> ... |
+| Chart Options | Deep-sky labels | Name the deep-sky objects the chart draws. Shortcut: <prefix> then L. |
+| Chart Options | Star names | Traditional proper names such as Betelgeuse. Shortcut: <prefix> then S. |
+| Chart Options | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis. Shortcut: <prefix> then Y. |
+| Chart Options | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts. Shortcut: <prefix> then M. |
+| Chart Options | Constellation figures | The joined stick figures of the constellations. Shortcut: <prefix> then F. |
+| Chart Options | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: <prefix> then B. |
+| Chart Options | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. |
+| Chart Options | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Shortcut:... |
 | Chart Options | Title block | The panel in the lower left stating the target, centre, frame, field width, limiting ma... |
 | Chart Options | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magni... |
 | Chart Options | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper char... |

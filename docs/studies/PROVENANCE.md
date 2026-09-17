@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**303 promoted artifacts.**
+**311 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -192,6 +192,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/on-this-page-marks.png` | `4073b82a26937ceda99b64deb9729de0c0e10c39530c49a11ab8ab195537cd8a` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-horizon.png` | `2cb652b98dbe3ae63ba7488382fc74aa3ad39bbfef13c5229700c6ed3c5c3068` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-zenith.png` | `79f181512f064dee1f5e6d7c965661420d066aec1efe2cab26acd26fe84597f0` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-en-1.png` | `6be97b3042aece398afe04d2702cb5b23bcdfc1227db1a1029bebb455aca6e9c` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-en-2.png` | `99abaea7d35723357c23997402ded9c8064c97e4381f645e5401ea0de37e08ce` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-en-3.png` | `e49ae3ea05d2e0f69534c501a2597d86931ae86ce19f6eac5902bb2196f57d1e` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-en-4.png` | `dbe3af97ff517f298025d7e5844e8b27391b3b880372d72cc081dc4180324138` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-nb-NO-1.png` | `a4403865c91b6be742ef8403e00cbcfae9bdbb1f0dc85e08c82220cfc4fc8a9e` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-nb-NO-2.png` | `d1b354e95c0279ea1579f9fa0da51b6afd967fcab027211e6c693775f882aab8` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-nb-NO-3.png` | `d571e484e30b35bf0488f866b7c96a4c8208ecb668139d3ce462a541a2c6d659` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartoptions-nb-NO-4.png` | `dd209754ce1c14656e16ae9ff61a5aa583c008dddd268afb5ab2a24add06794c` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-en.png` | `7c5fa92eacbfae9ddf2170dd5d0977322186f76d20f7c30eb6da750e8f5731b7` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-nb-NO.png` | `4c7ea9b8406534dee7021df4e6ec594efc3bd7069d523a4cca1ff0118e08adb1` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-candidate.png` | `fe2815677cff74b5e5f5b9301ae2ad067f600f792f58a21fcc1dfd78e12eb47e` | 2026-09-14 | Mac OS X aarch64, Java 21.0.11 | various |

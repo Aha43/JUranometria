@@ -246,10 +246,10 @@ public final class GlobeFamilyStudyMain {
                 continue;
             }
             System.out.printf(Locale.ROOT, "    %-20s %11d %11d%n",
-                    family.label(), mine.size(),
+                    family.canonicalName(), mine.size(),
                     colliding(mine, measured));
             split.machinef("    %-20s %9.2f%% %9.2f%%%n",
-                    family.label(),
+                    family.canonicalName(),
                     (GlobeFurnitureStudyMain.inkIn(all, 0.0, 0.5)
                             - GlobeFurnitureStudyMain.inkIn(without,
                                     0.0, 0.5)) * 100.0,
@@ -361,7 +361,7 @@ public final class GlobeFamilyStudyMain {
             // have no pixels to confirm anything with.
             System.out.printf(Locale.ROOT,
                     "    %-20s %8s %8s   no object to look at: %s%n",
-                    family.label(), band, "-",
+                    family.canonicalName(), band, "-",
                     inBand == 0 ? "none of this family in this band"
                             : unresolved == 0
                                     ? "every one of the " + inBand
@@ -379,7 +379,7 @@ public final class GlobeFamilyStudyMain {
             System.out.printf(Locale.ROOT,
                     "    %-20s %8s %8s   no object to look at: the"
                             + " crop window falls off the page%n",
-                    family.label(), band, "-");
+                    family.canonicalName(), band, "-");
             return;
         }
         // Drawn by itself, so the ink in the window is this object's
@@ -410,7 +410,7 @@ public final class GlobeFamilyStudyMain {
         javax.imageio.ImageIO.write(tile, "png", new File(DIR,
                 String.format(Locale.ROOT, "%s-%s-%s.png",
                         look.slug(),
-                        family.label().replace(' ', '-'), band)));
+                        family.canonicalName().replace(' ', '-'), band)));
 
         int minX = window;
         int minY = window;
@@ -428,7 +428,7 @@ public final class GlobeFamilyStudyMain {
         }
         System.out.printf(Locale.ROOT,
                 "    %-20s %8s %8.2f %6.1fx%-5.1f %10.1fpx%n",
-                family.label(), band, chosen.radiusOnDisc(),
+                family.canonicalName(), band, chosen.radiusOnDisc(),
                 chosen.majorPx(), chosen.minorPx(),
                 chosen.centreScalePx());
         if (maxX < 0) {
@@ -442,11 +442,11 @@ public final class GlobeFamilyStudyMain {
             split.machinef("    %-20s %8s   withdrawn: its projected"
                             + " footprint does not resolve and it is"
                             + " neither Messier nor the target%n",
-                    family.label(), band);
+                    family.canonicalName(), band);
             return;
         }
         split.machinef("    %-20s %8s %6dx%-4d%n",
-                family.label(), band, maxX - minX + 1, maxY - minY + 1);
+                family.canonicalName(), band, maxX - minX + 1, maxY - minY + 1);
     }
 
     private static java.awt.image.BufferedImage render(DrawnPage page,
@@ -526,7 +526,7 @@ public final class GlobeFamilyStudyMain {
                     .count();
             System.out.printf(Locale.ROOT,
                     "    %-20s %7d %9d %10d %9d %9.1fpx%n",
-                    entry.getKey().label(), today, corrected,
+                    entry.getKey().canonicalName(), today, corrected,
                     today - corrected, messier,
                     median(family, Measured::majorPx));
         }
@@ -644,9 +644,9 @@ public final class GlobeFamilyStudyMain {
             } finally {
                 g.dispose();
             }
-            drawn.put(family.label(), tile);
+            drawn.put(family.canonicalName(), tile);
             javax.imageio.ImageIO.write(tile, "png", new File(DIR,
-                    "glyph-" + family.label().replace(' ', '-')
+                    "glyph-" + family.canonicalName().replace(' ', '-')
                             + ".png"));
         }
 

@@ -501,7 +501,7 @@ class SprintThirtyJourneyTest {
                     "7. the View menu opened Chart Options");
             javax.swing.JCheckBox galaxies = onEdt(() -> checkBox(
                     dialog.getContentPane(),
-                    juranometria.render.SymbolFamily.GALAXIES.label()));
+                    juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(juranometria.render.SymbolFamily.GALAXIES)));
             assertTrue(galaxies != null,
                     "and the reader has a control for this option");
             assertEquals(before.galaxies(), onEdt(galaxies::isSelected),
@@ -841,7 +841,7 @@ class SprintThirtyJourneyTest {
                     SprintThirtyJourneyTest::optionsDialog);
             assertTrue(again != null, "10. Chart Options opens again");
             ReaderInput.click(onEdt(() -> checkBox(again.getContentPane(),
-                    juranometria.render.SymbolFamily.GALAXIES.label())));
+                    juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(juranometria.render.SymbolFamily.GALAXIES))));
             ReaderInput.click(onEdt(() -> mustFind(
                     again.getContentPane(), "OK")));
             assertEquals(before.galaxies(),

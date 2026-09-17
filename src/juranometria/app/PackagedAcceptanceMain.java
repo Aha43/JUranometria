@@ -1457,7 +1457,7 @@ public final class PackagedAcceptanceMain {
             require(withAll.getOrDefault(family.name(), 0) > 0,
                     "the page must draw " + family + " before hiding"
                             + " it can prove anything");
-            hidden.add(family.label() + " "
+            hidden.add(family.canonicalName() + " "
                     + withAll.getOrDefault(family.name(), 0) + "\u2192"
                     + survivors);
         }

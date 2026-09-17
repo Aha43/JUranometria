@@ -427,7 +427,7 @@ public final class ToggleShortcutStudyMain {
             return "Constellation figures";
         }
         for (SymbolFamily family : SymbolFamily.values()) {
-            if (family.label().equals(label)) {
+            if (family.canonicalName().equals(label)) {
                 return "Deep-sky objects";
             }
         }

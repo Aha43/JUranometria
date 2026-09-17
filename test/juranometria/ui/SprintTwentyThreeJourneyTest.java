@@ -573,8 +573,8 @@ class SprintTwentyThreeJourneyTest {
             openOptionsDialog();
         }
         javax.swing.JCheckBox box =
-                find(dialogPane, javax.swing.JCheckBox.class, family.label());
-        assertNotNull(box, family.label() + " is a control in the dialog");
+                find(dialogPane, javax.swing.JCheckBox.class, juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(family));
+        assertNotNull(box, juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(family) + " is a control in the dialog");
         SwingUtilities.invokeAndWait(box::doClick);
         flush();
         awaitSettled();

@@ -790,7 +790,7 @@ public final class OnThisPageStudyMain {
                 juranometria.render.SymbolFamily.of(dso);
         return family == null
                 ? dso.type().name().toLowerCase(Locale.ROOT).replace('_', ' ')
-                : family.label().toLowerCase(Locale.ROOT);
+                : family.canonicalName().toLowerCase(Locale.ROOT);
     }
 
     private static String magnitudeOf(double magnitude,

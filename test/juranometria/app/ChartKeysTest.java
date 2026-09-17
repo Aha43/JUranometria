@@ -162,8 +162,8 @@ class ChartKeysTest {
             }
         }
         for (SymbolFamily family : SymbolFamily.values()) {
-            if (!mapped.contains(family.label())) {
-                missing.add(family.label());
+            if (!mapped.contains(family.canonicalName())) {
+                missing.add(family.canonicalName());
             }
         }
         assertEquals(List.of(), missing,

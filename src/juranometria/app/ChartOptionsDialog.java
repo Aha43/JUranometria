@@ -79,11 +79,13 @@ public final class ChartOptionsDialog extends JDialog {
     public static final int WINDOW_CHROME = 60;
     public static final int MINIMUM_CEILING = 320;
 
-    private ChartOptionsDialog(Frame owner, ChartOptionsController controller) {
-        super(owner, "Chart Options", false);
-        getAccessibleContext().setAccessibleName("Chart Options");
+    private ChartOptionsDialog(Frame owner, ChartOptionsController controller,
+                               juranometria.ui.language.InterfaceText said) {
+        super(owner, said.say("chartoptions.title"), false);
+        getAccessibleContext().setAccessibleName(
+                said.say("chartoptions.title"));
         getAccessibleContext().setAccessibleDescription(
-                "Choose which chart content and labels draw");
+                said.say("chartoptions.a11y"));
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         ChartOptions snapshot = controller.options();
         Runnable cancel = () -> {
@@ -93,7 +95,7 @@ public final class ChartOptionsDialog extends JDialog {
         setContentPane(content(controller, cancel, () -> {
             controller.confirm();
             dispose();
-        }));
+        }, said));
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
@@ -109,12 +111,20 @@ public final class ChartOptionsDialog extends JDialog {
 
     /** Opens the dialog, or brings the existing one forward. */
     public static void open(Frame owner, ChartOptionsController controller) {
+        open(owner, controller,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        juranometria.ui.language.InterfaceText.ENGLISH));
+    }
+
+    /** The same, speaking a language the caller states (#350). */
+    public static void open(Frame owner, ChartOptionsController controller,
+                            juranometria.ui.language.InterfaceText said) {
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new ChartOptionsDialog(owner, controller);
+        current = new ChartOptionsDialog(owner, controller, said);
         current.setVisible(true);
     }
 
@@ -138,72 +148,95 @@ public final class ChartOptionsDialog extends JDialog {
      */
     static JComponent content(ChartOptionsController controller,
                               Runnable cancel, Runnable confirm) {
+        // No language stated, so English - explicitly, not by a
+        // lookup that would make the dialog depend on when it was
+        // built. The application states the reader's (#350).
+        return content(controller, cancel, confirm,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        juranometria.ui.language.InterfaceText.ENGLISH));
+    }
+
+    /** The same, speaking a language the caller states. */
+    static JComponent content(ChartOptionsController controller,
+                              Runnable cancel, Runnable confirm,
+                              juranometria.ui.language.InterfaceText said) {
         ChartOptions initial = controller.options();
 
-        JCheckBox dsos = checkBox("Deep-sky objects", 'D',
-                initial.deepSkyObjects(), "Deep-sky objects",
-                "Draw deep-sky objects on the chart at all",
-                ChartKeys.DEEP_SKY);
-        JCheckBox labels = checkBox("Deep-sky labels", 'l',
-                initial.deepSkyLabels(), "Deep-sky labels",
-                "Name the deep-sky objects the chart draws",
-                "chart.deepSkyLabels");
+        JCheckBox dsos = checkBox(
+                said.say("chartoptions.deepSkyObjects.label"), 'D',
+                initial.deepSkyObjects(),
+                said.say("chartoptions.deepSkyObjects.a11y"),
+                said.say("chartoptions.deepSkyObjects.explain"),
+                ChartKeys.DEEP_SKY, said);
+        JCheckBox labels = checkBox(said.say("chartoptions.deepSkyLabels.label"), 'l', initial.deepSkyLabels(),
+                said.say("chartoptions.deepSkyLabels.a11y"),
+                said.say("chartoptions.deepSkyLabels.explain"),
+                "chart.deepSkyLabels", said);
         List<JCheckBox> families = new ArrayList<>();
         for (SymbolFamily family : SymbolFamily.values()) {
-            families.add(checkBox(family.label(), family.mnemonic(),
-                    initial.family(family), family.label(),
-                    family.prose(), familyKey(family)));
+            // Through the shared family-text seam (owner ruling,
+            // #350): Chart Options, the Inspector, the legends and
+            // exported furniture all ask the same question, and a
+            // translation written twice is one that drifts.
+            juranometria.ui.language.SymbolFamilyText families_ =
+                    juranometria.ui.language.SymbolFamilyText.in(said);
+            families.add(checkBox(families_.label(family),
+                    family.mnemonic(), initial.family(family),
+                    families_.accessibleName(family),
+                    families_.description(family),
+                    familyKey(family), said));
         }
 
-        JCheckBox figures = checkBox("Constellation figures", 'f',
-                initial.constellationFigures(), "Constellation figures",
-                "The joined stick figures of the constellations",
-                ChartKeys.FIGURES);
-        JCheckBox boundaries = checkBox("Constellation boundaries", 'b',
-                initial.constellationBoundaries(),
-                "Constellation boundaries",
-                "The IAU boundaries, precessed from B1875",
-                "chart.constellationBoundaries");
-        JCheckBox names = checkBox("Constellation names", 'n',
-                initial.constellationNames(), "Constellation names",
-                "The figure's name, drawn where the figure is",
-                "chart.constellationNames");
-        JCheckBox starNames = checkBox("Star names", 'S',
-                initial.starNames(), "Star names",
-                "Traditional proper names such as Betelgeuse",
-                "chart.starNames");
-        JCheckBox bayerLetters = checkBox("Bayer letters", 'y',
-                initial.bayerLetters(), "Bayer letters",
-                "Greek and Latin Bayer designations such as alpha Orionis",
-                "chart.bayerLetters");
-        JCheckBox flamsteedNumbers = checkBox("Flamsteed numbers", 'F',
-                initial.flamsteedNumbers(), "Flamsteed numbers",
-                "Flamsteed catalogue numbers on the regional charts",
-                "chart.flamsteedNumbers");
-        JCheckBox grid = checkBox("Equatorial coordinate grid", 'E',
-                initial.equatorialGrid(), "Equatorial coordinate grid",
-                "ICRS/J2000 right-ascension and declination grid lines"
-                        + " with coordinate labels",
-                "chart.equatorialGrid");
-        JCheckBox titleBlock = checkBox("Title block", 'T',
-                initial.titleBlock(), "Title block",
-                "The panel in the lower left stating the target, centre,"
-                        + " frame, field width, limiting magnitude and"
-                        + " orientation",
-                "chart.titleBlock");
-        JCheckBox magnitudeKey = checkBox("Stellar-magnitude key", 'k',
-                initial.magnitudeKey(), "Stellar-magnitude key",
-                "A key in the upper right showing the circle size the"
-                        + " chart draws for three visual magnitudes,"
-                        + " including this page's limit",
-                "chart.magnitudeKey");
-        JCheckBox blackSky = checkBox("Black sky", 'B',
-                initial.palette() == ChartPalette.BLACK_SKY, "Black sky",
-                "White stars and restrained light ink on a black"
-                        + " ground, instead of the white-paper chart;"
-                        + " a chart choice, independent of the"
-                        + " application's light or dark appearance",
-                "chart.blackSky");
+        JCheckBox figures = checkBox(
+                said.say("chartoptions.constellationFigures.label"), 'f',
+                initial.constellationFigures(),
+                said.say("chartoptions.constellationFigures.a11y"),
+                said.say("chartoptions.constellationFigures.explain"),
+                ChartKeys.FIGURES, said);
+        JCheckBox boundaries = checkBox(said.say("chartoptions.constellationBoundaries.label"), 'b', initial.constellationBoundaries(),
+                said.say("chartoptions.constellationBoundaries.a11y"),
+                said.say("chartoptions.constellationBoundaries.explain"),
+                "chart.constellationBoundaries", said);
+        JCheckBox names = checkBox(said.say("chartoptions.constellationNames.label"), 'n', initial.constellationNames(),
+                said.say("chartoptions.constellationNames.a11y"),
+                said.say("chartoptions.constellationNames.explain"),
+                "chart.constellationNames", said);
+        JCheckBox starNames = checkBox(said.say("chartoptions.starNames.label"), 'S', initial.starNames(),
+                said.say("chartoptions.starNames.a11y"),
+                said.say("chartoptions.starNames.explain"),
+                "chart.starNames", said);
+        JCheckBox bayerLetters = checkBox(said.say("chartoptions.bayerLetters.label"), 'y', initial.bayerLetters(),
+                said.say("chartoptions.bayerLetters.a11y"),
+                said.say("chartoptions.bayerLetters.explain"),
+                "chart.bayerLetters", said);
+        JCheckBox flamsteedNumbers = checkBox(said.say("chartoptions.flamsteedNumbers.label"), 'F', initial.flamsteedNumbers(),
+                said.say("chartoptions.flamsteedNumbers.a11y"),
+                said.say("chartoptions.flamsteedNumbers.explain"),
+                "chart.flamsteedNumbers", said);
+        JCheckBox grid = checkBox(
+                said.say("chartoptions.equatorialGrid.label"), 'E',
+                initial.equatorialGrid(),
+                said.say("chartoptions.equatorialGrid.a11y"),
+                said.say("chartoptions.equatorialGrid.explain"),
+                "chart.equatorialGrid", said);
+        JCheckBox titleBlock = checkBox(
+                said.say("chartoptions.titleBlock.label"), 'T',
+                initial.titleBlock(),
+                said.say("chartoptions.titleBlock.a11y"),
+                said.say("chartoptions.titleBlock.explain"),
+                "chart.titleBlock", said);
+        JCheckBox magnitudeKey = checkBox(
+                said.say("chartoptions.magnitudeKey.label"), 'k',
+                initial.magnitudeKey(),
+                said.say("chartoptions.magnitudeKey.a11y"),
+                said.say("chartoptions.magnitudeKey.explain"),
+                "chart.magnitudeKey", said);
+        JCheckBox blackSky = checkBox(
+                said.say("chartoptions.blackSky.label"), 'B',
+                initial.palette() == ChartPalette.BLACK_SKY,
+                said.say("chartoptions.blackSky.a11y"),
+                said.say("chartoptions.blackSky.explain"),
+                "chart.blackSky", said);
 
         Runnable sync = () -> {
             // The two decided dependencies, and the five families,
@@ -248,37 +281,33 @@ public final class ChartOptionsDialog extends JDialog {
         // narrow width really did put Deep sky below Constellations -
         // a dialog that rearranges itself under the reader.
         tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabs.getAccessibleContext().setAccessibleName("Chart options");
+        tabs.getAccessibleContext().setAccessibleName(
+                said.say("chartoptions.tabs.a11y"));
         // The four titles are the whole meaning; a tooltip repeating
         // a tab's own word is a box in the way of reading it.
         juranometria.ui.Explain.selfExplanatory(tabs,
-                "Four groups of switches: deep sky, stars,"
-                        + " constellations, and the chart's own"
-                        + " furniture");
-        tabs.addTab("Deep sky", scrolling(deepSkyTab(dsos, families, labels)));
-        tabs.addTab("Stars", scrolling(column(starNames, bayerLetters,
+                said.say("chartoptions.tabs.explain"));
+        tabs.addTab(said.say("chartoptions.tab.deepsky"),
+                scrolling(deepSkyTab(dsos, families, labels, said)));
+        tabs.addTab(said.say("chartoptions.tab.stars"), scrolling(column(starNames, bayerLetters,
                 flamsteedNumbers)));
-        tabs.addTab("Constellations", scrolling(column(figures, boundaries,
+        tabs.addTab(said.say("chartoptions.tab.constellations"), scrolling(column(figures, boundaries,
                 names)));
-        tabs.addTab("Chart", scrolling(column(grid, titleBlock,
+        tabs.addTab(said.say("chartoptions.tab.chart"), scrolling(column(grid, titleBlock,
                 magnitudeKey, blackSky)));
         // After the tabs, not before: the strip builds its overflow
         // controls when it has tabs to overflow, so naming them first
         // named nothing at all and left the one control on this
         // window a reader cannot guess unexplained (#311 audit).
-        nameTabStripControls(tabs);
+        nameTabStripControls(tabs, said);
 
-        JButton restore = new JButton("Restore Defaults");
+        JButton restore = new JButton(said.say("chartoptions.defaults.label"));
         restore.setMnemonic('R');
-        restore.getAccessibleContext().setAccessibleName("Restore Defaults");
+        restore.getAccessibleContext().setAccessibleName(
+                said.say("chartoptions.defaults.a11y"));
         juranometria.ui.Explain.control(restore,
-                "Preview the released chart: every layer and every"
-                        + " deep-sky family on, the title block on,"
-                        + " the magnitude key off, on white paper",
-                "Puts every switch in this window back to what the"
-                        + " atlas ships with. It is a preview like any"
-                        + " other here: OK keeps it, Cancel leaves"
-                        + " your own choices alone.");
+                said.say("chartoptions.defaults.hover"),
+                said.say("chartoptions.defaults.explain"));
         restore.addActionListener(event -> {
             controller.restoreDefaults();
             ChartOptions defaults = controller.options();
@@ -303,17 +332,17 @@ public final class ChartOptionsDialog extends JDialog {
             labels.setEnabled(true);
             names.setEnabled(true);
         });
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.getAccessibleContext().setAccessibleName("Cancel");
+        JButton cancelButton = new JButton(said.say("chartoptions.cancel.label"));
+        cancelButton.getAccessibleContext().setAccessibleName(
+                said.say("chartoptions.cancel.a11y"));
         juranometria.ui.Explain.selfExplanatory(cancelButton,
-                "Puts the chart back the way it was and closes this"
-                        + " window");
+                said.say("chartoptions.cancel.explain"));
         cancelButton.addActionListener(event -> cancel.run());
-        JButton ok = new JButton("OK");
-        ok.getAccessibleContext().setAccessibleName("OK");
+        JButton ok = new JButton(said.say("chartoptions.ok.label"));
+        ok.getAccessibleContext().setAccessibleName(
+                said.say("chartoptions.ok.a11y"));
         juranometria.ui.Explain.selfExplanatory(ok,
-                "Keeps what the chart is showing now, and remembers it"
-                        + " for next time");
+                said.say("chartoptions.ok.explain"));
         ok.addActionListener(event -> confirm.run());
 
         JPanel buttons = new JPanel(new BorderLayout());
@@ -347,30 +376,35 @@ public final class ChartOptionsDialog extends JDialog {
      * <p>Found by the accessibility surface test on Linux, where the
      * titles need scrolling at a width that fits them on macOS.
      */
-    private static void nameTabStripControls(JTabbedPane tabs) {
+    private static void nameTabStripControls(JTabbedPane tabs,
+                                             juranometria.ui.language
+                                                     .InterfaceText said) {
         for (Component child : tabs.getComponents()) {
-            nameTabStripControl(child);
+            nameTabStripControl(child, said);
         }
         tabs.addContainerListener(new java.awt.event.ContainerAdapter() {
             @Override
             public void componentAdded(java.awt.event.ContainerEvent event) {
-                nameTabStripControl(event.getChild());
+                nameTabStripControl(event.getChild(), said);
             }
         });
     }
 
-    private static void nameTabStripControl(Component child) {
+    private static void nameTabStripControl(Component child,
+                                            juranometria.ui.language
+                                                    .InterfaceText said) {
         if (!(child instanceof javax.swing.AbstractButton button)) {
             return;
         }
         String name;
         if (child instanceof javax.swing.plaf.basic.BasicArrowButton arrow) {
             int direction = arrow.getDirection();
-            name = direction == javax.swing.SwingConstants.WEST
+            name = said.say(direction == javax.swing.SwingConstants.WEST
                     || direction == javax.swing.SwingConstants.NORTH
-                    ? "Show earlier tabs" : "Show later tabs";
+                    ? "chartoptions.tabstrip.earlier"
+                    : "chartoptions.tabstrip.later");
         } else {
-            name = "Show hidden tabs";
+            name = said.say("chartoptions.tabstrip.hidden");
         }
         button.getAccessibleContext().setAccessibleName(name);
         // Whatever the look and feel put there. Left alone it set a
@@ -378,19 +412,21 @@ public final class ChartOptionsDialog extends JDialog {
         // tooltip back as the description - the same words twice, to
         // the one reader who cannot see the first of them (#311).
         juranometria.ui.Explain.control(button, name,
-                "The tab titles do not all fit in the window; this"
-                        + " brings the rest into view");
+                said.say("chartoptions.tabstrip.explain"));
     }
 
     /** The Deep sky tab: master, five families as legend and control. */
     private static JComponent deepSkyTab(JCheckBox master,
                                          List<JCheckBox> families,
-                                         JCheckBox labels) {
+                                         JCheckBox labels,
+                                         juranometria.ui.language.InterfaceText
+                                                 said) {
         JPanel panel = column();
         panel.add(master);
         panel.add(Box.createVerticalStrut(8));
         for (int i = 0; i < families.size(); i++) {
-            panel.add(familyRow(SymbolFamily.values()[i], families.get(i)));
+            panel.add(familyRow(SymbolFamily.values()[i],
+                    families.get(i), said));
         }
         panel.add(Box.createVerticalStrut(8));
         panel.add(labels);
@@ -404,7 +440,9 @@ public final class ChartOptionsDialog extends JDialog {
      * reader who never hovers loses nothing.
      */
     private static JComponent familyRow(SymbolFamily family,
-                                        JCheckBox check) {
+                                        JCheckBox check,
+                                        juranometria.ui.language.InterfaceText
+                                                said) {
         JPanel row = column();
         row.setBorder(BorderFactory.createEmptyBorder(2, 16, 6, 0));
 
@@ -414,12 +452,14 @@ public final class ChartOptionsDialog extends JDialog {
         head.setAlignmentX(0.0f);
         head.add(check);
         head.add(Box.createHorizontalStrut(6));
-        head.add(new SymbolChip(family));
+        head.add(new SymbolChip(family, said));
         head.add(Box.createHorizontalGlue());
         row.add(head);
 
-        JLabel explains = new JLabel(family.prose());
-        explains.putClientProperty(WRAPPED_TEXT, family.prose());
+        String prose = juranometria.ui.language.SymbolFamilyText.in(said)
+                .description(family);
+        JLabel explains = new JLabel(prose);
+        explains.putClientProperty(WRAPPED_TEXT, prose);
         explains.setAlignmentX(0.0f);
         explains.setBorder(BorderFactory.createEmptyBorder(1, 22, 0, 0));
         explains.putClientProperty("FlatLaf.styleClass", "small");
@@ -447,7 +487,9 @@ public final class ChartOptionsDialog extends JDialog {
     private static JCheckBox checkBox(String text, char mnemonic,
                                       boolean selected,
                                       String accessibleName,
-                                      String description, String key) {
+                                      String description, String key,
+                                      juranometria.ui.language.InterfaceText
+                                              said) {
         JCheckBox box = new JCheckBox(text, selected);
         box.setMnemonic(mnemonic);
         box.setOpaque(false);
@@ -459,19 +501,130 @@ public final class ChartOptionsDialog extends JDialog {
                     "no switch on the chart keyboard is called " + key
                             + ", so a tooltip must not promise one");
         }
-        StringBuilder spoken = new StringBuilder(description)
-                .append(". Switched here, or from the chart by"
-                        + " pressing ")
-                .append(toggle.sequence()).append('.');
-        if (toggle.dependsOn() != null) {
-            spoken.append(" Needs ")
-                    .append(ChartKeys.toggle(toggle.dependsOn()).label()
-                            .toLowerCase(java.util.Locale.ROOT))
-                    .append(" on.");
-        }
+        // ONE pattern, not a frame glued to fragments (#350).
+        //
+        // This used to append ". Switched here..." to a description
+        // that already ended in a period, and five descriptions read
+        // "NGC 3628.." to a screen reader. It also lowercased a
+        // visible label with Locale.ROOT to drop it mid-sentence,
+        // which is English's rule about English words and no
+        // guarantee about anyone else's.
+        //
+        // The sequence is composed here too, because "then" is an
+        // English word sitting between two pieces of notation. The
+        // glyphs and the letter never change; the word between them
+        // is language.
+        String shortcut = said.say("chartoptions.shortcut",
+                ChartKeys.prefixText(), toggle.keyLetter());
+        String spoken = toggle.dependsOn() == null
+                ? said.say("chartoptions.switch.spoken",
+                        description, shortcut)
+                : said.say("chartoptions.switch.spoken.depends",
+                        description, shortcut,
+                        said.say(dependencyKey(toggle.dependsOn())));
+        // The hover text is its own complete pattern too. Wrapping a
+        // finished sentence in parentheses gave "Betelgeuse. (X)."
+        // - a fragment hanging off a sentence - and {0} is reused in
+        // both forms, so it has to stay a proper sentence in each.
         return juranometria.ui.Explain.control(box,
-                description + " (" + toggle.sequence() + ")",
-                spoken.toString());
+                said.say("chartoptions.switch.tooltip", description,
+                        shortcut),
+                spoken);
+    }
+
+    /**
+     * A dependency's name as this language writes it here.
+     *
+     * <p>Its own key rather than a visible label transformed at
+     * runtime. "Deep-sky objects" lowercases to "deep-sky objects"
+     * in English and that happens to read; nothing guarantees the
+     * same of another language, and a name's form inside a sentence
+     * is the translation's business.
+     */
+    private static String dependencyKey(String dependsOn) {
+        if (ChartKeys.DEEP_SKY.equals(dependsOn)) {
+            return "chartoptions.depends.deepsky";
+        }
+        if (ChartKeys.FIGURES.equals(dependsOn)) {
+            return "chartoptions.depends.figures";
+        }
+        throw new IllegalStateException("no dependency name is"
+                + " written for " + dependsOn + "; a switch that"
+                + " waits for a master a reader cannot be told about"
+                + " is a switch that looks broken");
+    }
+
+    /**
+     * The dialog, packed in a real window, for a study (#350).
+     *
+     * <p>A real {@code JFrame} and a real {@code pack()}, because
+     * this surface WRAPS its descriptions against font metrics and a
+     * label only computes a multi-line height inside a displayable
+     * hierarchy. Painting a detached panel showed one line of each
+     * wrapped sentence overlapping the row beneath - a picture of
+     * something no reader has ever seen.
+     *
+     * <p>The same technique {@code PlaceAndTimeDialogStudyMain}
+     * already uses, for the same reason.
+     */
+    public static ChartOptionsDialog packedForStudy(Frame owner,
+            String interfaceLanguage, ChartOptionsController controller) {
+        ChartOptionsDialog dialog = new ChartOptionsDialog(owner,
+                controller,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        interfaceLanguage));
+        settle(dialog);
+        return dialog;
+    }
+
+    /**
+     * Packs until the size stops moving.
+     *
+     * <p>Wrapping and packing feed each other: wrapping changes how
+     * tall a label is, packing changes how wide it may be, and one
+     * round of each leaves the window two pixels from where it will
+     * end up. A study that captured after one round produced a
+     * 420-pixel sheet for the first tab and 418 for the rest, so the
+     * same dialog photographed differently depending on how many
+     * times it had been packed - which would have made every one of
+     * these images irreproducible evidence.
+     */
+    public static void settle(ChartOptionsDialog dialog) {
+        java.awt.Dimension was = null;
+        for (int round = 0; round < 8; round++) {
+            rewrap((JComponent) dialog.getContentPane());
+            dialog.pack();
+            java.awt.Dimension now = dialog.getSize();
+            if (now.equals(was)) {
+                return;
+            }
+            was = now;
+        }
+    }
+
+    /**
+     * The dialog's content in a stated interface language (#350).
+     *
+     * <p>For the sheet a person reads when judging a translation. A
+     * seam rather than public internals: a study needs the result,
+     * not the parts.
+     */
+    public static JComponent contentForStudy(String interfaceLanguage) {
+        java.util.prefs.Preferences node = java.util.prefs.Preferences
+                .userRoot().node("juranometria-study-chartoptions");
+        try {
+            return content(new ChartOptionsController(
+                            ChartOptionsStore.forNode(node)),
+                    () -> { }, () -> { },
+                    juranometria.ui.language.InterfaceText.forLanguage(
+                            interfaceLanguage));
+        } finally {
+            try {
+                node.removeNode();
+            } catch (java.util.prefs.BackingStoreException cannotClear) {
+                throw new IllegalStateException(cannotClear);
+            }
+        }
     }
 
     /** The registry's name for a symbol family's switch. */

@@ -181,7 +181,9 @@ public final class JUranometriaMain {
                             UiTheme.apply(effectiveDark);
                             com.formdev.flatlaf.FlatLaf.updateUI();
                         }, language, Atlas.names(), interfaces),
-                () -> ChartOptionsDialog.open(frame, chartOptions),
+                () -> ChartOptionsDialog.open(frame, chartOptions,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())),
                 () -> AboutDialog.open(frame),
                 () -> {
                     inspectorToggle.toggle();

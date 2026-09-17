@@ -66,6 +66,20 @@ public final class ChartKeys {
             return prefixText() + " then "
                     + String.valueOf(key).toUpperCase(Locale.ROOT);
         }
+
+        /**
+         * The second keystroke on its own, as a reader sees it.
+         *
+         * <p>Exposed so a surface can say the sequence in its own
+         * language (#350). The glyphs and the letter are notation and
+         * never change; the word BETWEEN them is language, and
+         * "{@code then}" is English. A sequence frozen whole would
+         * have carried an English word into every translation as
+         * though it were part of the shortcut.
+         */
+        public String keyLetter() {
+            return String.valueOf(key).toUpperCase(Locale.ROOT);
+        }
     }
 
     /** Deep-sky objects, the master of the families and their labels. */

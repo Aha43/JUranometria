@@ -52,6 +52,13 @@ public final class SymbolChip extends JComponent {
     private final SymbolFamily family;
 
     public SymbolChip(SymbolFamily family) {
+        this(family, juranometria.ui.language.InterfaceText.forLanguage(
+                juranometria.ui.language.InterfaceText.ENGLISH));
+    }
+
+    /** The same, speaking a language the caller states (#350). */
+    public SymbolChip(SymbolFamily family,
+                      juranometria.ui.language.InterfaceText said) {
         if (family == null) {
             throw new IllegalArgumentException("a family is required");
         }
@@ -62,9 +69,14 @@ public final class SymbolChip extends JComponent {
         setPreferredSize(new Dimension(side, side));
         setMinimumSize(new Dimension(side, side));
         setMaximumSize(new Dimension(side, side));
+        // The same seam Chart Options uses, and one pattern rather
+        // than a name glued onto an English phrase (#350).
+        juranometria.ui.language.SymbolFamilyText words =
+                juranometria.ui.language.SymbolFamilyText.in(said);
         getAccessibleContext().setAccessibleName(
-                "The symbol the chart draws for " + family.label());
-        getAccessibleContext().setAccessibleDescription(family.prose());
+                said.say("symbolchip.a11y", words.label(family)));
+        getAccessibleContext().setAccessibleDescription(
+                words.description(family));
     }
 
     /** How far this session's text has been enlarged past the ordinary. */

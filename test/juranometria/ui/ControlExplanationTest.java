@@ -194,12 +194,24 @@ class ControlExplanationTest {
                 bound.add(toggle.sequence());
             }
 
-            // Every parenthesised keystroke a reader is shown.
+            // Every keystroke a reader is shown, however it is
+            // presented. This used to look only inside parentheses,
+            // because that was the one form the surfaces used - so
+            // when #350 gave Chart Options a proper sentence
+            // ("Shortcut: X.") the check stopped seeing seventeen
+            // tooltips and its own premise caught it. The contract is
+            // about keystrokes a reader is PROMISED, not about
+            // punctuation, so it no longer depends on the shape of
+            // the sentence around them.
             java.util.regex.Pattern named = java.util.regex.Pattern
                     .compile("\\(([^()]*"
                             + java.util.regex.Pattern.quote(
                                     Shortcuts.menuModifierText())
-                            + "[^()]*)\\)");
+                            + "[^()]*)\\)"
+                            + "|Shortcut: ([^.]*"
+                            + java.util.regex.Pattern.quote(
+                                    Shortcuts.menuModifierText())
+                            + "[^.]*)\\.");
             int found = 0;
             for (Control control
                     : ControlExplanationStudyMain.audit().controls()) {
@@ -210,7 +222,9 @@ class ControlExplanationTest {
                     }
                     var matcher = named.matcher(text);
                     while (matcher.find()) {
-                        String claimed = matcher.group(1).trim();
+                        String claimed = (matcher.group(1) != null
+                                ? matcher.group(1)
+                                : matcher.group(2)).trim();
                         found++;
                         assertTrue(bound.contains(claimed),
                                 control.surface() + " " + control.seen()
