@@ -145,7 +145,10 @@ public final class JUranometriaMain {
         // working, if these lines are deleted.
         juranometria.ui.onthispage.OnThisPageModule onThisPage =
                 modules.attach(
-                        new juranometria.ui.onthispage.OnThisPageModule());
+                        new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage(language
+                                                .interfaceLanguage())));
         // The second module (issue #228), begun through the one
         // seam that owns the session-start policy - the clock is
         // read exactly once, here, stated rather than hidden in a

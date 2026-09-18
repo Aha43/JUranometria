@@ -178,7 +178,8 @@ class SprintTwentyNineJourneyTest {
                         new juranometria.chart.SelectionModel(),
                         asked::add);
                 hostHolder[0].attach(new juranometria.ui.onthispage
-                        .OnThisPageModule());
+                        .OnThisPageModule(juranometria.ui.language
+                                .InterfaceText.forLanguage("en")));
                 juranometria.ui.SelectInteraction.install(chart,
                         new juranometria.chart.SelectionModel(),
                         hostHolder[0].workingSelection(),

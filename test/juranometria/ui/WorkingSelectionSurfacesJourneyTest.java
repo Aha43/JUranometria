@@ -127,7 +127,7 @@ class WorkingSelectionSurfacesJourneyTest {
             inspector.showWorkingSet(modules.workingSelection(),
                     modules::inventory);
             chart.onSceneChange(inspector::refresh);
-            page = modules.attach(new OnThisPageModule()).panel();
+            page = modules.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en"))).panel();
             inspector.showPageView(page);
             table = page.tableComponent();
             search = new SearchField(Atlas.search(), Atlas.assembler(),
@@ -866,7 +866,9 @@ class WorkingSelectionSurfacesJourneyTest {
             int measured = OnThisPageTable.stateColumnWidth(
                     table.getFontMetrics(table.getFont()),
                     table.getTableHeader().getFontMetrics(
-                            table.getTableHeader().getFont()));
+                            table.getTableHeader().getFont()),
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
             javax.swing.table.TableColumn state = null;
             for (int i = 0; i < table.getColumnModel()
                     .getColumnCount(); i++) {

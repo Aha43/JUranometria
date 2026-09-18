@@ -47,6 +47,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OnThisPageJourneyTest {
 
+    /** The states' words in English, stated rather than inherited (#350). */
+    private static final juranometria.ui.language.PageVisibilityText STATES =
+            juranometria.ui.language.PageVisibilityText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private JFrame window;
     private ChartComponent chart;
     private ChartModuleHost host;
@@ -77,7 +82,7 @@ class OnThisPageJourneyTest {
             chart.setViewState(ChartViewState.DEFAULT);
             selection = new SelectionModel();
             host = new ChartModuleHost(chart, selection, requests::add);
-            OnThisPageModule module = host.attach(new OnThisPageModule());
+            OnThisPageModule module = host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
             panel = module.panel();
             table = panel.tableComponent();
             window = new JFrame("on this page");
@@ -233,9 +238,9 @@ class OnThisPageJourneyTest {
         assertTrue(row >= 0, undrawn + " is on the page, so it is listed");
         // The cell hands out the row so the sorter can reach the
         // state's meaning (#257); the renderer shows its label.
-        assertEquals(OnThisPageTable.wordFor(state),
-                ((OnThisPageTable.Row) table.getValueAt(row, 3))
-                        .state().label(),
+        assertEquals(STATES.label(state),
+                STATES.label(((OnThisPageTable.Row)
+                        table.getValueAt(row, 3)).state()),
                 "the row says why it cannot be seen, in the decided"
                         + " words");
 

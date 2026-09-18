@@ -72,7 +72,7 @@ class WorkingSelectionTableGestureTest {
             chart = made[0];
             host = new ChartModuleHost(chart, new SelectionModel(),
                     request -> { });
-            panel = host.attach(new OnThisPageModule()).panel();
+            panel = host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en"))).panel();
             // In a real, shown window (post-approval review): the
             // shared pointer route's premises are only evidence of
             // reachability when the table is really on screen.

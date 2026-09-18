@@ -81,6 +81,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/EclipticControlStudyMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/InspectorSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
+| src/juranometria/tool/OnThisPageSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/PlaceAndTimeControlsMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeDialogStudyMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/SettingsSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
@@ -88,7 +89,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | preferences | protected-locally |
 
-**13 evidence executables** touch process-wide state; 12 carry an unpaired touch.
+**14 evidence executables** touch process-wide state; 13 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -130,9 +131,10 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/WorkingSelectionSurfacesJourneyTest.java | focus-owner, point-reachable, control-showing | pointer-events, back-door-click |
 | juranometria/ui/WorkingSelectionTableGestureTest.java | point-reachable, control-showing | none |
 | juranometria/ui/ecliptic/EclipticMenuSurfaceTest.java | control-showing | none |
+| juranometria/ui/onthispage/OnThisPageLanguageTest.java | none | none |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
-**37 display-dependent files.** 19 state a focused-window or focus-owner premise, 27 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**38 display-dependent files.** 19 state a focused-window or focus-owner premise, 27 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 
@@ -159,16 +161,16 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **431** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **705**
+- explicit event-thread hand-offs (invokeAndWait): **709**
 
 ## Generated evidence, classified
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 57 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 58 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 10 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 323 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 327 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 

@@ -25,6 +25,8 @@ import juranometria.chart.WorkingSelection;
 import juranometria.page.PageContents;
 import juranometria.page.PageEntry;
 import juranometria.page.PageVisibility;
+import juranometria.ui.language.InterfaceText;
+import juranometria.ui.language.PageVisibilityText;
 
 /**
  * The <strong>On this page</strong> table (Sprint 24, issue #216).
@@ -105,16 +107,24 @@ public final class OnThisPageTable extends JPanel {
                             event.getPoint().x);
                     return column >= 0 && columnModel.getColumn(column)
                             .getModelIndex() == 3
-                            ? CHART_COLUMN_QUESTION : null;
+                            ? chartColumnQuestion() : null;
                 }
             };
             return header;
         }
     };
 
-    /** The Chart column's complete question, kept whole (#257). */
-    public static final String CHART_COLUMN_QUESTION =
-            "Whether and why this object is drawn on the chart";
+    /**
+     * The Chart column's complete question, kept whole (#257) and now
+     * in the reader's language (#350).
+     *
+     * <p>Read when it is asked for, not when the table is built: the
+     * header renderer and the column model are field initialisers,
+     * and they run before {@code said} is assigned.
+     */
+    public String chartColumnQuestion() {
+        return said.say("onthispage.column.chart.explain");
+    }
     private final JLabel heading = new JLabel();
     private final JLabel empty = new JLabel();
     /**
@@ -128,9 +138,58 @@ public final class OnThisPageTable extends JPanel {
      */
     private final JLabel counted = new JLabel();
     private final JScrollPane scroll = new JScrollPane(table);
-    private final JButton centreHere = new JButton("Centre here");
-    private final JButton clearMarks = new JButton("Clear marks");
+    // Named in the constructor, not here: a field initialiser runs
+    // before `said` is assigned, so a label written at this point
+    // would be English whatever language was chosen (#350).
+    private final JButton centreHere = new JButton();
+    private final JButton clearMarks = new JButton();
     private final Runnable unsubscribe;
+    private final InterfaceText said;
+    private final PageVisibilityText states;
+
+    /**
+     * Sentences whose line breaks are measured, not written down.
+     *
+     * <p>Two labels here say whole sentences rather than values: the
+     * count of unnamed stars, and what an empty page means. Both used
+     * to carry a hard-coded {@code <br>} put where English wanted
+     * one - at 240 px a single line ran off the edge, and a counted
+     * line that cannot be counted is worse than none (#217). A break
+     * belongs to a width and to the language being read, so the whole
+     * sentence is kept here and broken against the width the label
+     * actually has.
+     */
+    private final java.util.Map<JLabel, String> wrapping =
+            new java.util.LinkedHashMap<>();
+
+    /**
+     * Breaks the sentences against the width they now have.
+     *
+     * <p>Called on every page change AND on every resize. A page
+     * change happens before the window is packed, where the width is
+     * still 0 - measure only there and the sentence never breaks, and
+     * the Norwegian count line is published cut off at the panel's
+     * edge, which is exactly what the first sheet showed.
+     */
+    private void rewrap() {
+        wrapping.forEach((label, prose) -> {
+            if (prose == null) {
+                label.setText("");
+                return;
+            }
+            int available = label.getParent() == null ? 0
+                    : label.getParent().getWidth();
+            label.setText(available > 40
+                    ? juranometria.ui.WrappedText.html(prose, available,
+                            label.getFontMetrics(label.getFont()))
+                    : prose);
+        });
+    }
+
+    /** What a wrapped label says, whole; for tests and inventories. */
+    public String sentenceOf(JLabel label) {
+        return wrapping.get(label);
+    }
 
     /** True while the table is following the model rather than leading it. */
     private boolean following;
@@ -146,28 +205,16 @@ public final class OnThisPageTable extends JPanel {
     private void sayWhatTheMarksAllow(boolean hasLead, boolean noMarks) {
         centreHere.setEnabled(hasLead);
         juranometria.ui.Explain.dynamic(centreHere,
-                hasLead
-                        ? "Centre the chart on the marked row you are"
-                                + " reading"
-                        : "Choose a row's mark first, and this centres"
-                                + " the chart on it",
-                hasLead
-                        ? "Moves the page so the row you are reading"
-                                + " sits at the centre; nothing else"
-                                + " about the chart changes"
-                        : "Unavailable until a row is marked: mark one"
-                                + " and this moves the page to it");
+                said.say(hasLead ? "onthispage.centre.hover"
+                        : "onthispage.centre.hover.none"),
+                said.say(hasLead ? "onthispage.centre.explain"
+                        : "onthispage.centre.explain.none"));
         clearMarks.setEnabled(!noMarks);
         juranometria.ui.Explain.dynamic(clearMarks,
-                noMarks
-                        ? "Nothing is marked yet"
-                        : "Remove every working mark",
-                noMarks
-                        ? "Unavailable: there are no working marks to"
-                                + " remove"
-                        : "Takes every working mark off the chart. The"
-                                + " page and your place in it are left"
-                                + " alone.");
+                said.say(noMarks ? "onthispage.clear.hover.none"
+                        : "onthispage.clear.hover"),
+                said.say(noMarks ? "onthispage.clear.explain.none"
+                        : "onthispage.clear.explain"));
     }
     /** True while the table is telling the model what a reader did. */
     private boolean publishing;
@@ -195,19 +242,36 @@ public final class OnThisPageTable extends JPanel {
      */
     private List<String> rangeSnapshotMembers;
 
-    public OnThisPageTable(ChartServices services) {
+    public OnThisPageTable(ChartServices services, InterfaceText said) {
         if (services == null) {
             throw new IllegalArgumentException(
                     "the table shows what the chart's services report");
         }
+        if (said == null) {
+            throw new IllegalArgumentException(
+                    "the table has to say its words in some language");
+        }
         this.services = services;
+        this.said = said;
+        this.states = PageVisibilityText.in(said);
+        // Now that there is a language, the columns can be named.
+        // They were built by the JTable field initialiser, which runs
+        // before any constructor argument is assigned.
+        model.fireTableStructureChanged();
+        centreHere.setText(said.say("onthispage.centre.label"));
+        clearMarks.setText(said.say("onthispage.clear.label"));
 
         setLayout(new BorderLayout());
-        getAccessibleContext().setAccessibleName("On this page");
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                rewrap();
+            }
+        });
+        getAccessibleContext().setAccessibleName(
+                said.say("onthispage.panel.a11y"));
         getAccessibleContext().setAccessibleDescription(
-                "Everything the atlas holds on the page you are"
-                        + " looking at, whether or not the chart draws"
-                        + " it");
+                said.say("onthispage.panel.explain"));
 
         heading.putClientProperty("FlatLaf.styleClass", "h3");
         heading.setAlignmentX(0.0f);
@@ -227,7 +291,7 @@ public final class OnThisPageTable extends JPanel {
         // magnitude limit" - the compact label supports scanning and
         // never becomes a private code.
         table.getColumnModel().getColumn(3).setCellRenderer(
-                new StateText());
+                new StateText(states));
         // The complete question belongs to the Chart HEADER CELL,
         // not the whole header (#257 review): a wrapper over the
         // look-and-feel's own header renderer sets the accessible
@@ -245,9 +309,10 @@ public final class OnThisPageTable extends JPanel {
             boolean chart = tbl.getColumnModel().getColumn(column)
                     .getModelIndex() == 3;
             cell.getAccessibleContext().setAccessibleName(
-                    chart ? "Chart" : String.valueOf(value));
+                    chart ? said.say("onthispage.column.chart")
+                            : String.valueOf(value));
             cell.getAccessibleContext().setAccessibleDescription(
-                    chart ? CHART_COLUMN_QUESTION : null);
+                    chart ? chartColumnQuestion() : null);
             return cell;
         };
         for (int column = 0; column < table.getColumnModel()
@@ -257,10 +322,10 @@ public final class OnThisPageTable extends JPanel {
         }
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setFillsViewportHeight(true);
-        table.getAccessibleContext().setAccessibleName("Objects on this page");
+        table.getAccessibleContext().setAccessibleName(
+                said.say("onthispage.table.a11y"));
         juranometria.ui.Explain.selfExplanatory(table,
-                "Choose rows to mark them on the chart. Marking does"
-                        + " not move the page.");
+                said.say("onthispage.table.explain"));
         // Sortable by any column, and stable: Swing's sorter keeps
         // equal keys in model order, and model order is the decided
         // default order - so an alternate sort sits on top of it
@@ -307,9 +372,11 @@ public final class OnThisPageTable extends JPanel {
         empty.setAlignmentX(0.0f);
         empty.setVisible(false);
 
-        centreHere.getAccessibleContext().setAccessibleName("Centre here");
+        centreHere.getAccessibleContext().setAccessibleName(
+                said.say("onthispage.centre.a11y"));
         centreHere.addActionListener(event -> centreOnLead());
-        clearMarks.getAccessibleContext().setAccessibleName("Clear marks");
+        clearMarks.getAccessibleContext().setAccessibleName(
+                said.say("onthispage.clear.a11y"));
         clearMarks.addActionListener(event ->
                 services.workingSelection().clear());
         // Both spend most of their life disabled, so both say why -
@@ -319,7 +386,7 @@ public final class OnThisPageTable extends JPanel {
         counted.setAlignmentX(0.0f);
         counted.setVisible(false);
         counted.getAccessibleContext().setAccessibleName(
-                "Stars with no catalogue name");
+                said.say("onthispage.unnamed.a11y"));
 
         JPanel actions = new JPanel();
         actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
@@ -328,6 +395,13 @@ public final class OnThisPageTable extends JPanel {
         actions.add(clearMarks);
         actions.add(Box.createHorizontalGlue());
         actions.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
+        // Both children left-aligned, or neither is. A BoxLayout
+        // column aligns its children against each other, so one at
+        // 0.0 beside one at the default 0.5 is pushed sideways and
+        // squeezed: the counted line was laid out 161 px wide at
+        // x=159 while asking for 230, and lost its ending. The old
+        // hard-coded <br> made it narrow enough to hide this (#350).
+        actions.setAlignmentX(0.0f);
 
         JPanel body = new JPanel(new BorderLayout());
         JPanel top = new JPanel();
@@ -410,12 +484,17 @@ public final class OnThisPageTable extends JPanel {
     private void sizeColumns() {
         java.awt.FontMetrics metrics = table.getFontMetrics(table.getFont());
         int object = metrics.stringWidth("\u25cf NGC 317A") + 12;
-        int magnitude = metrics.stringWidth("not recorded") + 12;
+        // The widest thing this column shows is its silence, and the
+        // silence is a word: measured in the language being read, not
+        // at the width English happens to need (#350).
+        int magnitude = metrics.stringWidth(
+                said.say("onthispage.magnitude.none")) + 12;
         int distance = metrics.stringWidth("00.00\u00b0") + 12;
         int state = stateColumnWidth(metrics,
                 table.getTableHeader() == null ? metrics
                         : table.getTableHeader().getFontMetrics(
-                                table.getTableHeader().getFont()));
+                                table.getTableHeader().getFont()),
+                said);
 
         // By model identity, not view position (#257 review): once
         // a reader drags a column somewhere else, the next resize
@@ -450,13 +529,23 @@ public final class OnThisPageTable extends JPanel {
      * vocabulary earns its narrowness at every text size rather
      * than assuming one machine's metrics. Shared with the study
      * that records the before/after widths.
+     *
+     * <p>It measures the words <strong>in the language being
+     * read</strong> (#350, owner ruling). Norwegian's "Uten tegn" is
+     * wider than "No mark", and the column must fit what it displays;
+     * constraining a translation to an English width would make the
+     * accurate word the one that gets cut. If the whole table then
+     * sits uncomfortably in a 240 px sidebar, that is a layout
+     * finding to report, not a reason to shorten the language.
      */
     public static int stateColumnWidth(java.awt.FontMetrics cells,
-                                       java.awt.FontMetrics header) {
-        int widest = header.stringWidth("Chart");
+                                       java.awt.FontMetrics header,
+                                       InterfaceText said) {
+        PageVisibilityText states = PageVisibilityText.in(said);
+        int widest = header.stringWidth(said.say("onthispage.column.chart"));
         for (PageVisibility state : PageVisibility.values()) {
             widest = Math.max(widest,
-                    cells.stringWidth(state.label()));
+                    cells.stringWidth(states.label(state)));
         }
         return widest + 12;
     }
@@ -508,20 +597,24 @@ public final class OnThisPageTable extends JPanel {
         // Two lines rather than one clipped one: at a 240 px
         // sidebar the single line ran off the edge, which is a
         // counted line that cannot be counted (#217 inspection).
-        counted.setText(anonymous == 0 ? "" : String.format(Locale.ROOT,
-                "<html>and %,d further stars,<br>none of them named</html>",
-                anonymous));
+        // The sentence, not a sentence with an English line break
+        // inside it. It used to carry its own <br>, placed where
+        // English happened to want one; where a line falls belongs
+        // to a width and to the language being read, so the break is
+        // measured at layout instead (#350).
+        wrapping.put(counted, anonymous == 0 ? null
+                : said.say("onthispage.unnamed.summary", anonymous));
         counted.setVisible(anonymous > 0);
         model.replaceWith(rows);
-        heading.setText(rows.isEmpty() ? "On this page"
-                : String.format(Locale.ROOT, "On this page · %,d",
-                        rows.size()));
+        // The count is data beside the heading, not a word inflected
+        // by it, and the separator is the atlas's own (#350).
+        heading.setText(rows.isEmpty()
+                ? said.say("onthispage.heading")
+                : said.say("onthispage.heading.counted", rows.size()));
         if (rows.isEmpty()) {
             // Said plainly, because an empty table with no words is
             // indistinguishable from a table that failed to load.
-            empty.setText("<html>Nothing catalogued is on this page."
-                    + "<br>The sky here is empty of anything the atlas"
-                    + " holds.</html>");
+            wrapping.put(empty, said.say("onthispage.empty"));
             empty.setVisible(true);
             scroll.setVisible(false);
         } else {
@@ -529,6 +622,7 @@ public final class OnThisPageTable extends JPanel {
             scroll.setVisible(true);
         }
         sizeColumns();
+        rewrap();
         following = false;
         // A new page ends any range transaction and never edits the
         // set: the rows the page holds show their membership - the
@@ -545,7 +639,9 @@ public final class OnThisPageTable extends JPanel {
      * inventory reports, in its order, and one counted line for the
      * stars the catalogue does not name.
      */
-    static List<Row> rowsOf(PageContents page) {
+    // No longer static: a row's magnitude may be a silence, and a
+    // silence is a word (#350).
+    List<Row> rowsOf(PageContents page) {
         List<Row> rows = new ArrayList<>();
         for (PageEntry.DeepSky entry : page.deepSky()) {
             rows.add(new Row(entry.identity(),
@@ -821,8 +917,8 @@ public final class OnThisPageTable extends JPanel {
     }
 
     /** The short word the table shows for a state (issue #257). */
-    public static String wordFor(PageVisibility state) {
-        return state.label();
+    public String wordFor(PageVisibility state) {
+        return states.label(state);
     }
 
     private static String nameOf(PageEntry.DeepSky entry) {
@@ -867,11 +963,11 @@ public final class OnThisPageTable extends JPanel {
      * magnitude the source never recorded says so rather than
      * showing a dash a reader could read as zero.
      */
-    static String magnitudeOf(double magnitude,
-                              juranometria.chart.DeepSkyObject.Recorded.Band
-                                      band) {
+    String magnitudeOf(double magnitude,
+                       juranometria.chart.DeepSkyObject.Recorded.Band
+                               band) {
         if (Double.isNaN(magnitude)) {
-            return "not recorded";
+            return said.say("onthispage.magnitude.none");
         }
         String suffix = band == null
                 || band == juranometria.chart.DeepSkyObject.Recorded.Band.VISUAL
@@ -888,13 +984,19 @@ public final class OnThisPageTable extends JPanel {
     private static final class StateText
             extends javax.swing.table.DefaultTableCellRenderer {
 
+        private final PageVisibilityText states;
+
+        StateText(PageVisibilityText states) {
+            this.states = states;
+        }
+
         @Override
         protected void setValue(Object value) {
             if (value instanceof Row row) {
-                setText(row.state().label());
-                setToolTipText(row.state().prose());
+                setText(states.label(row.state()));
+                setToolTipText(states.explanation(row.state()));
                 getAccessibleContext().setAccessibleDescription(
-                        row.state().prose());
+                        states.explanation(row.state()));
             } else {
                 setText("");
                 setToolTipText(null);
@@ -919,10 +1021,17 @@ public final class OnThisPageTable extends JPanel {
     }
 
     /** The four decided columns, and nothing else. */
-    private static final class Model extends AbstractTableModel {
+    private final class Model extends AbstractTableModel {
 
+        /**
+         * The columns' identities. What they are CALLED is asked of
+         * the language when the header is drawn (#350) - these are
+         * four fixed columns in a fixed order, and the order is not a
+         * translation's to change.
+         */
         private static final String[] COLUMNS =
-                {"Object", "Mag", "From", "Chart"};
+                {"onthispage.column.object", "onthispage.column.magnitude",
+                 "onthispage.column.from", "onthispage.column.chart"};
 
         private final List<Row> rows = new ArrayList<>();
 
@@ -941,7 +1050,12 @@ public final class OnThisPageTable extends JPanel {
         }
 
         @Override public String getColumnName(int column) {
-            return COLUMNS[column];
+            // JTable asks while it is being constructed, which is
+            // before the constructor has been given a language. The
+            // constructor rebuilds the columns as soon as it has one;
+            // an empty header here is never what a reader sees, and
+            // OnThisPageLanguageTest is what says so.
+            return said == null ? "" : said.say(COLUMNS[column]);
         }
 
         @Override public Object getValueAt(int row, int column) {

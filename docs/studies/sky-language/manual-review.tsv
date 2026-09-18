@@ -119,12 +119,8 @@ f58d063a813d4be0	ui/language/InterfaceText.java	/resources/interface-language/	d
 7aa9b50ecd697e68	ui/language/SkyLanguageChoice.java	follow-interface	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 c1d9227e06090c40	ui/language/SkyLanguageChoice.java	latin	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 06c6ca6ab7ee1ee0	ui/onthispage/OnThisPageModule.java	on-this-page	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
-b774ab09bd649bc9	ui/onthispage/OnThisPageTable.java	Whether and why this object is drawn on the chart	declared name used, but never at a known sink	reader-prose	a column tooltip a reader reads
 d4df79100a7853a4	ui/onthispage/OnThisPageTable.java	\u25cf NGC 317A	unresolved: no route found, needs manual inspection	notation	a catalogue designation in a worked example
 cf5e0da7934850e6	ui/onthispage/OnThisPageTable.java	\\s+	unresolved: no route found, needs manual inspection	false-positive	regular-expression: a regular expression, not words
 5d0b3f566d1faca3	ui/onthispage/OnThisPageTable.java	 V	declared name used, but never at a known sink	notation	a photometric band letter
 b4e65c9964bd2b15	ui/onthispage/OnThisPageTable.java	 B	declared name used, but never at a known sink	notation	a photometric band letter
-eebd7a16aabc2101	ui/onthispage/OnThisPageTable.java	Object	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-6a4e49858398c81d	ui/onthispage/OnThisPageTable.java	From	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-1ad6eaf1fea34b10	ui/onthispage/OnThisPageTable.java	Chart	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
 b12bded29a8ea584	ui/placeandtime/PlaceAndTimeDialog.java	 -90 to 90	unresolved: no route found, needs manual inspection	reader-prose	an input hint beside the latitude field

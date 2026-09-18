@@ -435,7 +435,9 @@ public final class ControlExplanationStudyMain {
                         new juranometria.chart.SelectionModel(),
                         request -> { });
         return host.attach(
-                new juranometria.ui.onthispage.OnThisPageModule())
+                new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage("en")))
                 .panel();
     }
 

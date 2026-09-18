@@ -47,7 +47,7 @@ class OnThisPageLifecycleTest {
         ChartComponent chart = chart();
         ChartModuleHost host = new ChartModuleHost(chart,
                 new SelectionModel(), request -> { });
-        OnThisPageModule module = host.attach(new OnThisPageModule());
+        OnThisPageModule module = host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
 
         String first = host.inventory().entries().get(0).identity();
         host.workingSelection().add(first);
@@ -83,10 +83,10 @@ class OnThisPageLifecycleTest {
         ChartComponent chart = chart();
         ChartModuleHost host = new ChartModuleHost(chart,
                 new SelectionModel(), request -> { });
-        host.attach(new OnThisPageModule());
+        host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         host.detachAll();
 
-        host.attach(new OnThisPageModule());
+        host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         assertTrue(chart.overlays().holds(OnThisPageModule.ID),
                 "attached again, on the same chart");
         host.detachAll();
@@ -97,7 +97,7 @@ class OnThisPageLifecycleTest {
         ChartComponent chart = chart();
         ChartModuleHost host = new ChartModuleHost(chart,
                 new SelectionModel(), request -> { });
-        host.attach(new OnThisPageModule());
+        host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         host.workingSelection().add(host.inventory().entries().get(0).identity());
         host.detachAll();
 

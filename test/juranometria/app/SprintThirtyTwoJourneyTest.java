@@ -129,7 +129,7 @@ class SprintThirtyTwoJourneyTest {
                 // this page shows rather than what its model would
                 // have said.
                 onThisPage[0] = hostHolder[0].attach(
-                        new juranometria.ui.onthispage.OnThisPageModule());
+                        new juranometria.ui.onthispage.OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
                 chart.setViewState(ChartViewState.DEFAULT);
                 chart.setPreferredSize(new java.awt.Dimension(900, 700));
                 searchHolder[0] = new SearchField(Atlas.search(),

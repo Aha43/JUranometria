@@ -466,7 +466,7 @@ class WorkingCrossTest {
             chart = made[0];
             services = new ChartModuleHost(chart, new SelectionModel(),
                     requests::add);
-            module = services.attach(new OnThisPageModule());
+            module = services.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         }
 
         void dispose() {
@@ -514,7 +514,7 @@ class WorkingCrossTest {
         if (withModule) {
             host = new ChartModuleHost(made[0], new SelectionModel(),
                     request -> { });
-            host.attach(new OnThisPageModule());
+            host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         }
         try {
             return paint(made[0]);

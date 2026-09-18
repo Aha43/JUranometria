@@ -735,7 +735,9 @@ public final class PackagedAcceptanceMain {
                         new juranometria.chart.SelectionModel(),
                         request -> { });
         juranometria.ui.onthispage.OnThisPageModule module =
-                host.attach(new juranometria.ui.onthispage.OnThisPageModule());
+                host.attach(new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage("en")));
 
         juranometria.page.PageContents inventory = host.inventory();
         require(inventory.entries().size() > 50,
@@ -845,7 +847,9 @@ public final class PackagedAcceptanceMain {
                             request -> { });
             juranometria.ui.onthispage.OnThisPageModule again =
                     second.attach(
-                            new juranometria.ui.onthispage.OnThisPageModule());
+                            new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage("en")));
             try {
                 require(second.workingSelection().members().isEmpty()
                                 && second.workingSelection().lead() == null,

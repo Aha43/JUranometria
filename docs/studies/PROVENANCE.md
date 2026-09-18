@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**323 promoted artifacts.**
+**327 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -212,6 +212,10 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/inspector-nb-NO-4-deepsky.png` | `1e631b62c39d09a9e2b814172a77c08ee39daeffd060a3f3712cd4f7ff67406b` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/inspector-nb-NO-5-ambiguous.png` | `dcc8e1a172ffce902d77f58318a67b3b526354732a2d5353d2103481ec6212f3` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/inspector-nb-NO-6-workingset.png` | `de0851f45940024cdd77dd1c151ba2ecdda9c68d9b51908e24d6ca1e09800f91` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/onthispage-en-1-populated.png` | `0b21755a26e48270a018d0af346952a79252a894c0601169d6f5278de82658d3` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/onthispage-en-2-empty.png` | `d3b2f93e89f004d80b5d66aa34b39875fe9ee7fc64b8046b6b34a6a8320262a8` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/onthispage-nb-NO-3-populated.png` | `b66a196b3a202373965caf10947445c2ef571c9d8b57123fa76bb9cda7ba3adc` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/onthispage-nb-NO-4-empty.png` | `16eb128a51741765c00c77498222350d60a2416dc25e93f43338dda53c60aa57` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-en.png` | `7c5fa92eacbfae9ddf2170dd5d0977322186f76d20f7c30eb6da750e8f5731b7` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-nb-NO.png` | `4c7ea9b8406534dee7021df4e6ec594efc3bd7069d523a4cca1ff0118e08adb1` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-candidate.png` | `fe2815677cff74b5e5f5b9301ae2ad067f600f792f58a21fcc1dfd78e12eb47e` | 2026-09-14 | Mac OS X aarch64, Java 21.0.11 | various |

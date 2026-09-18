@@ -288,7 +288,7 @@ class ControlExplanationTest {
                     new juranometria.chart.SelectionModel(),
                     request -> { });
             javax.swing.JComponent panel = host.attach(
-                    new juranometria.ui.onthispage.OnThisPageModule())
+                    new juranometria.ui.onthispage.OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")))
                     .panel();
 
             JButton centre = button(panel, "Centre here");

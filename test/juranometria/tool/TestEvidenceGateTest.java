@@ -300,13 +300,14 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/EclipticControlStudyMain.java",
                         "src/juranometria/tool/InspectorSheetMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
+                        "src/juranometria/tool/OnThisPageSheetMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
                         "src/juranometria/tool/SettingsSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the twelve widget photographers, whose font and theme"
+                "the thirteen widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -344,7 +345,15 @@ class TestEvidenceGateTest {
                         + " one of its facts is now broken against"
                         + " font metrics too, and a sentence measured"
                         + " without a window is measured against a"
-                        + " width nothing will honour");
+                        + " width nothing will honour; and the"
+                        + " thirteenth by #350's On This Page sheet,"
+                        + " which draws that table in each language"
+                        + " because it sizes its own columns from its"
+                        + " own words - the Chart column from five of"
+                        + " them and its header, the Mag column from"
+                        + " its silence - and a table measured"
+                        + " without a window reports widths nothing"
+                        + " honours");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -460,7 +469,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(37, display.size(),
+        assertEquals(38, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -511,7 +520,12 @@ class TestEvidenceGateTest {
                         + " component that is not displayable, so a"
                         + " panel measured without a window answers"
                         + " with a width nothing will honour; each"
-                        + " with its premises stated");
+                        + " with its premises stated; and #350's On"
+                        + " This Page language test, which reads the"
+                        + " headers a realised table builds and the"
+                        + " width its count line is given - both of"
+                        + " which exist only once a window has laid"
+                        + " the panel out");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

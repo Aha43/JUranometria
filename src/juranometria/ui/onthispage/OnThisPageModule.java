@@ -31,6 +31,26 @@ public final class OnThisPageModule implements ChartModule {
 
     private ChartServices services;
     private OnThisPageTable table;
+    private final juranometria.ui.language.InterfaceText said;
+    private final juranometria.ui.language.PageVisibilityText states;
+
+    /**
+     * The module speaks the language the session chose (#350).
+     *
+     * <p>It arrives here rather than at {@code attach}, which is the
+     * host's interface and answers to every module: a language is
+     * this module's own dependency, and a module that had to be
+     * attached before it knew its words would build its table in
+     * English and correct it afterwards.
+     */
+    public OnThisPageModule(juranometria.ui.language.InterfaceText said) {
+        if (said == null) {
+            throw new IllegalArgumentException(
+                    "the module has to say its words in some language");
+        }
+        this.said = said;
+        this.states = juranometria.ui.language.PageVisibilityText.in(said);
+    }
     private final List<Runnable> released = new ArrayList<>();
 
     @Override
@@ -44,7 +64,7 @@ public final class OnThisPageModule implements ChartModule {
             throw new IllegalStateException("already attached");
         }
         this.services = services;
-        this.table = new OnThisPageTable(services);
+        this.table = new OnThisPageTable(services, said);
         released.add(services.contribute(ID, this::crosses));
         released.add(services.onPageChange(this::pageChanged));
     }
@@ -95,8 +115,8 @@ public final class OnThisPageModule implements ChartModule {
                 continue;
             }
             geometry.add(new OverlayContribution.Point(entry.identity(),
-                    "working mark on " + entry.identity() + ", "
-                            + entry.visibility().prose(),
+                    said.say("onthispage.mark.a11y", entry.identity(),
+                            states.explanation(entry.visibility())),
                     entry.position(), InkRole.INTERACTION));
         }
         return geometry;
