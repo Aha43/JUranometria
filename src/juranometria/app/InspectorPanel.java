@@ -45,7 +45,7 @@ import juranometria.chart.StarIdentity;
  * magnitude, so "not recorded" is the common case rather than the
  * exception. A blank is never allowed to read as a zero.
  *
- * <p>Nothing here moves the chart except {@code Center here}, which
+ * <p>Nothing here moves the chart except {@code Centre here}, which
  * the reader presses deliberately.
  */
 public final class InspectorPanel extends JPanel {
@@ -60,7 +60,35 @@ public final class InspectorPanel extends JPanel {
             new DefaultListModel<>();
     private final JList<String> candidates = new JList<>(candidateNames);
     private final JScrollPane candidateScroll = new JScrollPane(candidates);
-    private final JButton centreHere = new JButton("Center here");
+    /**
+     * The reference frame, as canonical notation (#350).
+     *
+     * <p>Deliberately NOT an interface-language resource. A key whose
+     * only valid translation is the original token invites the one
+     * mistake it could ever suffer, and offers a translator a
+     * decision they should not be asked to make. ICRS J2000 names a
+     * coordinate system; it is the same six characters in every
+     * language the atlas speaks.
+     */
+    static final String FRAME = "ICRS J2000";
+
+    /**
+     * Between two names for one candidate: {@code M 42 · NGC 1976}.
+     *
+     * <p>Canonical identity presentation, not grammar. The order is
+     * atlas policy - preferred Messier identity, then catalogue
+     * identity - and no language may reverse it, so this carries no
+     * translation key.
+     *
+     * <p>It replaced three spaces, which were pretending to align a
+     * column in a proportional font and did not. Real alignment
+     * would need a list-cell renderer and a layout gap, not padding
+     * inside a string (#350).
+     */
+    static final String IDENTITY_PAIR = " \u00b7 ";
+
+    private final juranometria.ui.language.InterfaceText said;
+    private final JButton centreHere;
     /**
      * The pane's own dismissal (issue #197). The toolbar toggle
      * remains the obvious way back, and this is where a reader looks
@@ -106,12 +134,32 @@ public final class InspectorPanel extends JPanel {
             new java.util.HashMap<>();
     private final java.util.Map<String, JButton> removeButtons =
             new java.util.HashMap<>();
-    private final JButton clearSelection = new JButton("Clear selection");
+    private final JButton clearSelection;
 
     public InspectorPanel(SelectionModel selection,
                           Supplier<ChartScene> currentScene,
                           Supplier<juranometria.render.ChartOptions> options,
                           Consumer<Selection> centreOn) {
+        // No language stated, so English - explicitly, never by a
+        // lookup that would make the panel depend on when it was
+        // built. The application states the reader's (#350).
+        this(selection, currentScene, options, centreOn,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        juranometria.ui.language.InterfaceText.ENGLISH));
+    }
+
+    /** The same, speaking a language the caller states (#350). */
+    public InspectorPanel(SelectionModel selection,
+                          Supplier<ChartScene> currentScene,
+                          Supplier<juranometria.render.ChartOptions> options,
+                          Consumer<Selection> centreOn,
+                          juranometria.ui.language.InterfaceText said) {
+        this.said = said;
+        // Built here, not in a field initialiser: those run before
+        // the constructor body, so a button whose label comes from a
+        // resource cannot be one (#350).
+        this.centreHere = new JButton(said.say("inspector.centre.label"));
+        this.clearSelection = new JButton(said.say("inspector.clear.label"));
         if (selection == null || currentScene == null || options == null
                 || centreOn == null) {
             throw new IllegalArgumentException(
@@ -128,30 +176,37 @@ public final class InspectorPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         setPreferredSize(new Dimension(PREFERRED_PANEL_WIDTH, 400));
         setMinimumSize(new Dimension(240, 200));
-        getAccessibleContext().setAccessibleName("Inspector");
+        getAccessibleContext().setAccessibleName(said.say("inspector.a11y"));
         getAccessibleContext().setAccessibleDescription(
-                "What the selected chart mark is");
+                said.say("inspector.explain"));
 
         heading.putClientProperty("FlatLaf.styleClass", "h3");
         heading.setAlignmentX(0.0f);
-        heading.getAccessibleContext().setAccessibleName("Selected object");
+        heading.getAccessibleContext().setAccessibleName(
+                said.say("inspector.heading.a11y"));
 
         facts.setLayout(new BoxLayout(facts, BoxLayout.Y_AXIS));
         facts.setAlignmentX(0.0f);
         facts.setFocusable(true);
+        // An explanatory sentence is broken against the width it
+        // actually has, so it is re-broken whenever that width
+        // changes rather than once against whatever it was first.
+        facts.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                rewrapFacts();
+            }
+        });
         facts.getAccessibleContext().setAccessibleName(
-                "Details of the selected object");
+                said.say("inspector.details.a11y"));
 
         candidates.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION);
         candidates.getAccessibleContext().setAccessibleName(
-                "Objects at this point");
+                said.say("inspector.candidates.a11y"));
         juranometria.ui.Explain.control(candidates,
-                "Several objects lie within reach of that point;"
-                        + " choose one to inspect it",
-                "A list of everything within reach of the point you"
-                        + " clicked. Choosing one shows its facts here"
-                        + " and does not move the chart.");
+                said.say("inspector.candidates.hover"),
+                said.say("inspector.candidates.explain"));
         candidates.addListSelectionListener(event -> {
             if (updating || event.getValueIsAdjusting()) {
                 return;
@@ -164,23 +219,21 @@ public final class InspectorPanel extends JPanel {
         candidateScroll.setAlignmentX(0.0f);
         candidateScroll.setPreferredSize(new Dimension(280, 96));
 
-        centreHere.getAccessibleContext().setAccessibleName("Center here");
+        centreHere.getAccessibleContext().setAccessibleName(
+                said.say("inspector.centre.a11y"));
         juranometria.ui.Explain.control(centreHere,
-                "Center the chart on the selected object",
-                "Moves the page so the object shown here sits at the"
-                        + " centre; nothing about what the chart draws"
-                        + " changes");
+                said.say("inspector.centre.hover"),
+                said.say("inspector.centre.explain"));
         centreHere.setAlignmentX(0.0f);
         centreHere.addActionListener(event -> centreOn.accept(
                 selection.selection()));
 
-        close.getAccessibleContext().setAccessibleName("Close Inspector");
+        close.getAccessibleContext().setAccessibleName(
+                said.say("inspector.close.a11y"));
         juranometria.ui.Explain.control(close,
-                juranometria.ui.Shortcuts.saying("Close Inspector",
+                juranometria.ui.Shortcuts.saying(said.say("inspector.close.a11y"),
                         juranometria.ui.Shortcuts.INSPECTOR),
-                "Hides this pane. The chart keeps its place, its"
-                        + " target and your selection, and widens to"
-                        + " use the space.");
+                said.say("inspector.close.explain"));
         // Quiet: an icon and its hover, not a bordered button
         // competing with the heading beside it.
         close.putClientProperty("JButton.buttonType", "toolBarButton");
@@ -218,10 +271,10 @@ public final class InspectorPanel extends JPanel {
         workingSet.setLayout(new BoxLayout(workingSet, BoxLayout.Y_AXIS));
         workingSet.setAlignmentX(0.0f);
         workingSet.setVisible(false);
-        workingSet.getAccessibleContext().setAccessibleName("Working set");
+        workingSet.getAccessibleContext().setAccessibleName(
+                said.say("inspector.workingset.a11y"));
         workingSet.getAccessibleContext().setAccessibleDescription(
-                "Every object in the working selection, across pages,"
-                        + " in the order they joined");
+                said.say("inspector.workingset.explain"));
         selectedMode.add(workingSet);
         selectedMode.add(stretch());
         selectedMode.add(centreHere);
@@ -238,20 +291,16 @@ public final class InspectorPanel extends JPanel {
         showSelected.setSelected(true);
         modeGroup.add(showSelected);
         modeGroup.add(showPage);
-        showSelected.getAccessibleContext().setAccessibleName("Selected");
+        showSelected.getAccessibleContext().setAccessibleName(
+                said.say("inspector.tab.selected"));
         juranometria.ui.Explain.control(showSelected,
-                "The facts of the object you last chose",
-                "Shows what the atlas holds on the one object you"
-                        + " chose, rather than everything on the"
-                        + " page");
-        showPage.getAccessibleContext().setAccessibleName("On this page");
+                said.say("inspector.tab.selected.hover"),
+                said.say("inspector.tab.selected.explain"));
+        showPage.getAccessibleContext().setAccessibleName(
+                said.say("inspector.tab.page"));
         juranometria.ui.Explain.control(showPage,
-                "Everything on the page you are looking at, drawn or"
-                        + " not",
-                "Lists every object the atlas holds within this page,"
-                        + " including the ones the chart is not"
-                        + " drawing, and says why each is or is not"
-                        + " drawn");
+                said.say("inspector.tab.page.hover"),
+said.say("inspector.tab.page.explain"));
         showSelected.addActionListener(event -> showMode(SELECTED_MODE));
         showPage.addActionListener(event -> showMode(PAGE_MODE));
         modeSwitch.add(showSelected);
@@ -517,9 +566,8 @@ public final class InspectorPanel extends JPanel {
         List<String> members = working.members();
         workingSet.setVisible(!members.isEmpty());
         if (!members.isEmpty()) {
-            JLabel title = new JLabel(String.format(Locale.ROOT,
-                    "Working set · %d %s", members.size(),
-                    members.size() == 1 ? "object" : "objects"));
+            JLabel title = new JLabel(said.say("inspector.workingset.title",
+                    String.valueOf(members.size())));
             title.putClientProperty("FlatLaf.styleClass", "h4");
             title.setAlignmentX(0.0f);
             workingSet.add(title);
@@ -563,31 +611,46 @@ public final class InspectorPanel extends JPanel {
         if (leads) {
             name.setFont(name.getFont().deriveFont(java.awt.Font.BOLD));
         }
-        name.getAccessibleContext().setAccessibleName(member
-                + (leads ? ", lead" : "")
-                + (offPage ? ", off this page" : ""));
+        // Four whole forms, not a name with English clauses stuck
+        // on it. The old shape appended ", lead" and ", off this
+        // page" in that order with that punctuation, which is one
+        // language's way of qualifying a noun (#350).
+        name.getAccessibleContext().setAccessibleName(said.say(
+                leads ? (offPage ? "inspector.member.a11y.lead.offpage"
+                                 : "inspector.member.a11y.lead")
+                      : (offPage ? "inspector.member.a11y.offpage"
+                                 : "inspector.member.a11y"),
+                member));
         juranometria.ui.Explain.control(name,
-                "Show " + member + "'s facts",
-                "Makes this member the lead and shows its facts here."
-                        + " Membership is unchanged.");
+                // "Show M 31's facts" put an English possessive on a
+                // catalogue designation. A designation takes no
+                // inflection in any language the atlas speaks.
+                said.say("inspector.member.hover", member),
+                said.say("inspector.member.explain"));
         name.addActionListener(event -> working.lead(member));
         row.add(name);
         if (offPage) {
-            JLabel off = new JLabel(" off this page");
+            // The gap is the layout's, not the sentence's. This text
+            // used to begin with a space, which did the spacing and
+            // would have been stripped by the first translator who
+            // trimmed their line - taking the gap with it (#350).
+            row.add(Box.createHorizontalStrut(4));
+            JLabel off = new JLabel(said.say("inspector.member.offpage"));
             off.setFont(off.getFont().deriveFont(java.awt.Font.ITALIC));
             off.setEnabled(false);
             row.add(off);
         }
         row.add(Box.createHorizontalGlue());
-        JButton remove = new JButton("✕");
+        // The glyph is a control mark, not prose: it stays the same
+        // in every language, and only what is SAID about it is
+        // localised (#350).
+        JButton remove = new JButton("\u2715");
         remove.putClientProperty("JButton.buttonType", "toolBarButton");
         remove.getAccessibleContext().setAccessibleName(
-                "Remove " + member);
+                said.say("inspector.member.remove", member));
         juranometria.ui.Explain.control(remove,
-                "Remove " + member + " from the working selection",
-                "Takes " + member + " out of the working selection."
-                        + " The rest stay, and the page does not"
-                        + " move.");
+                said.say("inspector.member.remove.hover", member),
+                said.say("inspector.member.remove.explain", member));
         remove.addActionListener(event -> working.remove(member));
         row.add(remove);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE,
@@ -754,13 +817,25 @@ public final class InspectorPanel extends JPanel {
         unsubscribeWorking.run();
     }
 
-    /** The panel's current text, top to bottom; for tests. */
+    /**
+     * The panel's current text, top to bottom; for tests.
+     *
+     * <p>A wrapped fact answers with the sentence it was given, not
+     * with the markup layout broke it into. The line breaks belong to
+     * a width; the words do not, and a reader of this list - a test,
+     * an inventory, a translation review - is asking about the words.
+     * Chart Options learned this the other way round: its companion
+     * report deleted {@code <br>} rather than replacing it and welded
+     * "angitt i katalogen" into "angitt ikatalogen", which a person
+     * caught by reading it and no test did.
+     */
     public List<String> lines() {
         List<String> lines = new java.util.ArrayList<>();
         lines.add(heading.getText());
         for (java.awt.Component component : facts.getComponents()) {
             if (component instanceof JLabel label) {
-                lines.add(label.getText());
+                Object whole = label.getClientProperty(WRAPPED_FACT);
+                lines.add(whole == null ? label.getText() : (String) whole);
             }
         }
         return List.copyOf(lines);
@@ -792,19 +867,24 @@ public final class InspectorPanel extends JPanel {
         Selection current = change.selection();
         centreHere.setEnabled(!(current instanceof Selection.None));
         if (current instanceof Selection.None) {
-            setSelectedHeading("Nothing selected");
-            fact("Click a star or a deep-sky symbol to see what it is.");
+            setSelectedHeading(said.say("inspector.none.heading"));
+            fact(said.say("inspector.none.hint"));
         } else if (current instanceof Selection.EmptySky empty) {
-            setSelectedHeading("Empty sky");
+            setSelectedHeading(said.say("inspector.emptysky.heading"));
             fact(coordinates(empty.position()));
-            fact("ICRS J2000");
+            fact(FRAME);
             fact("");
-            fact("No catalogued object within reach of that point.");
+            fact(said.say("inspector.emptysky.fact"), true);
         } else {
             Selection.Object object = (Selection.Object) current;
             if (change.isAmbiguous()) {
-                setSelectedHeading(change.candidates().size()
-                        + " objects here");
+                // The count is data beside the heading, not a word
+                // inflected by it. Embedding a plural rule would
+                // encode English's - and then Norwegian's, and then
+                // every language whose rules this schema does not
+                // model (#350).
+                setSelectedHeading(said.say("inspector.objects.here",
+                        String.valueOf(change.candidates().size())));
             }
             SelectionDetails.star(scene, current)
                     .ifPresentOrElse(star -> describeStar(star, change),
@@ -814,6 +894,7 @@ public final class InspectorPanel extends JPanel {
                                                     scene, dso, object, change),
                                             () -> describeAbsent(object)));
         }
+        rewrapFacts();
         revalidate();
         repaint();
     }
@@ -827,17 +908,22 @@ public final class InspectorPanel extends JPanel {
             // withholds something the atlas knows.
             setSelectedHeading(bestName(identity, star.id()));
         }
+        // Whole forms, not a designation with an English word
+        // bracketed onto it (#350). The designation is canonical
+        // data and goes in as an argument; the framing around it is
+        // the translation's.
         fact(identity != null && identity.bayer() != null
-                ? identity.bayer() : "no Bayer designation");
+                ? said.say("inspector.star.bayer", identity.bayer())
+                : said.say("inspector.star.bayer.none"));
         fact(identity != null && identity.flamsteed() != null
-                ? identity.flamsteed() + " (Flamsteed)"
-                : "no Flamsteed number");
+                ? said.say("inspector.star.flamsteed", identity.flamsteed())
+                : said.say("inspector.star.flamsteed.none"));
         fact(star.id());
         fact("");
-        fact(String.format(Locale.ROOT, "V %.2f  (visual magnitude)",
-                star.magnitude()));
+        fact(said.say("inspector.magnitude.visual",
+                magnitudeValue(star.magnitude())));
         fact(coordinates(star.position()));
-        fact("ICRS J2000");
+        fact(FRAME);
     }
 
     private void describeDeepSky(DeepSkyObject dso,
@@ -858,10 +944,10 @@ public final class InspectorPanel extends JPanel {
         }
         fact(readableType(dso));
         fact("");
-        fact(magnitudeLine(dso));
-        fact(sizeLine(dso));
+        fact(magnitudeLine(dso, said));
+        fact(sizeLine(dso, said));
         fact(coordinates(dso.position()));
-        fact("ICRS J2000");
+        fact(FRAME);
     }
 
     /**
@@ -890,16 +976,35 @@ public final class InspectorPanel extends JPanel {
                 options.get())) {
             describeDeepSky(dso, change);
         } else {
-            describeAbsent(object);
+            // Held by the page, but the reader's own switches are
+            // keeping it off the chart. A different fact from being
+            // absent, and the one a reader can act on (#350).
+            describeUnshown(object,
+                    said.say("inspector.hidden.byoptions"));
         }
     }
 
     private void describeAbsent(Selection.Object object) {
+        // The identity is not in this scene at all. "Not on this page
+        // ANY MORE" assumed a navigation history the state does not
+        // prove: the reader may never have been anywhere else.
+        describeUnshown(object, said.say("inspector.absent"));
+    }
+
+    /**
+     * An object the chart is not showing, and why.
+     *
+     * <p>Two callers, two different reasons, one shape. Hidden by a
+     * switch is something the reader can undo; absent from the page
+     * is something they cannot, and telling them the same sentence
+     * for both leaves the actionable case looking hopeless.
+     */
+    private void describeUnshown(Selection.Object object, String why) {
         setSelectedHeading(object.catalogueId());
         fact(coordinates(object.position()));
-        fact("ICRS J2000");
+        fact(FRAME);
         fact("");
-        fact("Not on this page any more.");
+        fact(why, true);
     }
 
     /**
@@ -907,32 +1012,64 @@ public final class InspectorPanel extends JPanel {
      * labelled visual, and never a blank where the catalogue is
      * silent.
      */
-    static String magnitudeLine(DeepSkyObject dso) {
+    static String magnitudeLine(DeepSkyObject dso,
+                                juranometria.ui.language.InterfaceText said) {
         return switch (dso.recorded().band()) {
-            case VISUAL -> String.format(Locale.ROOT,
-                    "V %.2f  (visual magnitude)", dso.magnitude());
-            case BLUE -> String.format(Locale.ROOT,
-                    "B %.2f  (blue magnitude; no V recorded)",
-                    dso.magnitude());
-            case NONE -> "magnitude not recorded";
+            case VISUAL -> said.say("inspector.magnitude.visual",
+                    magnitudeValue(dso.magnitude()));
+            case BLUE -> said.say("inspector.magnitude.blue",
+                    magnitudeValue(dso.magnitude()));
+            case NONE -> said.say("inspector.magnitude.none");
         };
     }
 
+    /**
+     * A magnitude, formatted the same way everywhere.
+     *
+     * <p>Locale.ROOT on purpose. A magnitude is a measurement the
+     * atlas states, not a number the reader's desktop may punctuate:
+     * 2.96 is 2.96 in every language this atlas speaks, and a comma
+     * there would read as a different value to anyone comparing it
+     * with a catalogue.
+     */
+    static String magnitudeValue(double magnitude) {
+        return String.format(Locale.ROOT, "%.2f", magnitude);
+    }
+
     /** The extent and orientation, or the fact that neither is known. */
-    static String sizeLine(DeepSkyObject dso) {
+    static String sizeLine(DeepSkyObject dso,
+                           juranometria.ui.language.InterfaceText said) {
         if (!dso.recorded().hasSize()) {
-            return "size not recorded";
+            return said.say("inspector.size.none");
         }
-        String extent = dso.recorded().minorAxisArcmin() != null
-                ? String.format(Locale.ROOT, "%.1f′ × %.1f′",
-                        dso.recorded().majorAxisArcmin(),
+        // Four whole forms, not an extent with a clause appended.
+        // The measurements are arguments, formatted Locale.ROOT for
+        // the same reason magnitudes are: an arcminute figure is a
+        // value the atlas states, not a number the desktop
+        // punctuates (#350).
+        // Four forms. A single recorded axis may still carry a
+        // position angle: it states the orientation of the extent
+        // that WAS measured, even where the minor axis is unknown.
+        // The shipped pack happens to contain none, but the data
+        // model permits it, and dropping the form would discard
+        // recorded information from a later catalogue (#350).
+        boolean twoAxes = dso.recorded().minorAxisArcmin() != null;
+        String major = String.format(Locale.ROOT, "%.1f",
+                dso.recorded().majorAxisArcmin());
+        String minor = twoAxes
+                ? String.format(Locale.ROOT, "%.1f",
                         dso.recorded().minorAxisArcmin())
-                : String.format(Locale.ROOT, "%.1f′ across",
-                        dso.recorded().majorAxisArcmin());
-        return dso.recorded().hasPositionAngle()
-                ? extent + String.format(Locale.ROOT, "  at PA %.0f°",
-                        dso.recorded().positionAngleDegrees())
-                : extent + "  (orientation not recorded)";
+                : null;
+        if (!dso.recorded().hasPositionAngle()) {
+            return twoAxes
+                    ? said.say("inspector.size.axes", major, minor)
+                    : said.say("inspector.size.across", major);
+        }
+        String angle = String.format(Locale.ROOT, "%.0f",
+                dso.recorded().positionAngleDegrees());
+        return twoAxes
+                ? said.say("inspector.size.axes.pa", major, minor, angle)
+                : said.say("inspector.size.across.pa", major, angle);
     }
 
     /** The catalogue's type in words, not as an enum constant. */
@@ -983,17 +1120,79 @@ public final class InspectorPanel extends JPanel {
         }
         return SelectionDetails.deepSky(scene, candidate)
                 .map(dso -> messierName(dso)
-                        .map(m -> m + "   " + dso.id()).orElse(dso.id()))
+                        .map(m -> m + IDENTITY_PAIR + dso.id())
+                        .orElse(dso.id()))
                 .orElse(candidate.catalogueId());
     }
 
     private void fact(String text) {
+        fact(text, false);
+    }
+
+    /**
+     * A fact, optionally allowed to break across lines.
+     *
+     * <p>Designations, coordinates and magnitudes are short and fixed,
+     * and a break inside one would read as two values. An EXPLANATION
+     * is a sentence, and a sentence that runs past the panel's edge
+     * loses its ending - which a translation is likelier to do,
+     * because this width was settled against English (#350). There is
+     * ample vertical room here, so the sentence wraps rather than the
+     * translation being cut to fit an English measurement.
+     *
+     * <p>The spoken name stays the whole sentence either way. A screen
+     * reader must not inherit a layout's line breaks.
+     */
+    private void fact(String text, boolean explanatory) {
         JLabel label = new JLabel(text);
         label.setAlignmentX(0.0f);
         if (!text.isEmpty()) {
             label.getAccessibleContext().setAccessibleName(text);
         }
+        if (explanatory && !text.isEmpty()) {
+            label.putClientProperty(WRAPPED_FACT, text);
+        }
         facts.add(label);
+    }
+
+    /** Marks a fact whose text may be broken across lines. */
+    private static final String WRAPPED_FACT =
+            "juranometria.inspector.wrappedFact";
+
+    /**
+     * Breaks the explanatory facts against the width they have.
+     *
+     * <p>Done after layout, as Chart Options does it: a label knows
+     * its width only once it has one, and measuring before that wraps
+     * against a number nothing will honour. The unwrapped sentence is
+     * kept on the label, so a second pass re-breaks the original
+     * rather than re-breaking its own markup.
+     */
+    private void rewrapFacts() {
+        int available = facts.getWidth();
+        if (available <= 40) {
+            return;
+        }
+        boolean changed = false;
+        for (java.awt.Component child : facts.getComponents()) {
+            if (!(child instanceof JLabel label)) {
+                continue;
+            }
+            Object prose = label.getClientProperty(WRAPPED_FACT);
+            if (prose == null) {
+                continue;
+            }
+            String broken = juranometria.ui.WrappedText.html(
+                    (String) prose, available,
+                    label.getFontMetrics(label.getFont()));
+            if (!broken.equals(label.getText())) {
+                label.setText(broken);
+                changed = true;
+            }
+        }
+        if (changed) {
+            facts.revalidate();
+        }
     }
 
     private static String coordinates(SkyPosition position) {

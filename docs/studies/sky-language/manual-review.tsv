@@ -42,13 +42,11 @@ e78e16cb8ccb96fc	app/AboutDialog.java	Tabler icons licence	collection/alias flow
 15ed09bb3dac2f90	app/AppearanceStore.java	light	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 fee9e234b9f9bc8a	app/AppearanceStore.java	dark	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 715d0623c46acc1a	app/ChartKeyboard.java	chartKeyboard	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
-d68d9e9c23565c20	app/ChartOptionsDialog.java	&amp;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
-6e901911f9cf63fd	app/ChartOptionsDialog.java	&lt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
-ea474c04731970e2	app/ChartOptionsDialog.java	&gt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
 0f6356ab132877bb	app/InspectorPanel.java	page	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
-20cc9c2fe2c284bf	app/InspectorPanel.java	 (Flamsteed)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
 9dbfa63483f447a0	app/InspectorPanel.java	  (Bayer)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
 40681018e0b3d790	app/InspectorPanel.java	  (Flamsteed)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
+406c6435f3051454	app/InspectorPanel.java	ICRS J2000	declared name used, but never at a known sink	notation	canonical astronomical notation: the reference frame names a coordinate system, not a word, and is the same token in every language the atlas speaks
+eb0f57da452f60e5	app/InspectorPanel.java	 \u00b7 	declared name used, but never at a known sink	notation	the separator between two names for one candidate; canonical identity presentation, and its order is atlas policy no language may reverse
 93d25862bcbb26d6	app/StartupFailure.java	:/:juranometria/	unresolved: no route found, needs manual inspection	identifier	a stable key, path or stored value; no language changes it
 aea4d55f973e2351	catalog/PackManifest.java	radec-grid-30	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 6978b855fecb347d	catalog/StarIdentities.java	/resources/catalog/star-identities/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
@@ -109,10 +107,14 @@ a606bdeeb5031932	ui/Explain.java	&amp;	unresolved: no route found, needs manual 
 503e7e33e6fa2b02	ui/Shortcuts.java	inspector	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 5156e247f7979f83	ui/Shortcuts.java	zoomIn	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 8755f94128fc9d1a	ui/Shortcuts.java	zoomOut	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+3512abe052f29a41	ui/WrappedText.java	&amp;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+7d2273ca9f47951e	ui/WrappedText.java	&lt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
+75a87d9bc5e98c19	ui/WrappedText.java	&gt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
 13f371d0092d6e83	ui/ecliptic/EclipticStore.java	eclipticShown	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 e068946e2323184a	ui/language/InterfaceLanguages.java	/resources/interface-language/index.tsv	declared name used, but never at a known sink	identifier	the classpath path of the generated interface-descriptor index
 6e12ca36028fc24f	ui/language/InterfaceText.java	en	declared name used, but never at a known sink	identifier	the language tag every other one falls back to; a stored value and a resource name, not a word a reader reads
 f58d063a813d4be0	ui/language/InterfaceText.java	/resources/interface-language/	declared name used, but never at a known sink	identifier	the classpath prefix the interface strings live under
+08fab6e1e3d69e90	ui/language/InterfaceText.java	\\{(\\d+)[^}]*}	unresolved: no route found, needs manual inspection	false-positive	regular-expression: the numbered-placeholder pattern the arity check scans for
 0d3ceca52af3843d	ui/language/SkyLanguageChoice.java	en	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 7aa9b50ecd697e68	ui/language/SkyLanguageChoice.java	follow-interface	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 c1d9227e06090c40	ui/language/SkyLanguageChoice.java	latin	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it

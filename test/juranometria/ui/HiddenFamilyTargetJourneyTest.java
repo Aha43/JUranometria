@@ -174,7 +174,7 @@ class HiddenFamilyTargetJourneyTest {
                         + " changed");
         openInspector();
         assertTrue(String.join(" | ", inspector.lines())
-                        .contains("Not on this page any more"),
+                        .contains("Hidden by the current chart options"),
                 "the panel reports the absence: " + inspector.lines());
 
         // 5. Restoring the defaults brings the family back - and does

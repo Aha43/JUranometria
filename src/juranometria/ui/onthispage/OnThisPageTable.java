@@ -128,7 +128,7 @@ public final class OnThisPageTable extends JPanel {
      */
     private final JLabel counted = new JLabel();
     private final JScrollPane scroll = new JScrollPane(table);
-    private final JButton centreHere = new JButton("Center here");
+    private final JButton centreHere = new JButton("Centre here");
     private final JButton clearMarks = new JButton("Clear marks");
     private final Runnable unsubscribe;
 
@@ -147,7 +147,7 @@ public final class OnThisPageTable extends JPanel {
         centreHere.setEnabled(hasLead);
         juranometria.ui.Explain.dynamic(centreHere,
                 hasLead
-                        ? "Center the chart on the marked row you are"
+                        ? "Centre the chart on the marked row you are"
                                 + " reading"
                         : "Choose a row's mark first, and this centres"
                                 + " the chart on it",
@@ -307,7 +307,7 @@ public final class OnThisPageTable extends JPanel {
         empty.setAlignmentX(0.0f);
         empty.setVisible(false);
 
-        centreHere.getAccessibleContext().setAccessibleName("Center here");
+        centreHere.getAccessibleContext().setAccessibleName("Centre here");
         centreHere.addActionListener(event -> centreOnLead());
         clearMarks.getAccessibleContext().setAccessibleName("Clear marks");
         clearMarks.addActionListener(event ->

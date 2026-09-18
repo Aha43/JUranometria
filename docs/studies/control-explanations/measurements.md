@@ -66,7 +66,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Place and Time | JCheckBox | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) | Draws the circle where the sky would meet a flat and transparent Earth; your own horizo... | hovered |
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
 | Place and Time | JButton | Now | Read the clock once and freeze on this moment | Freezes on the present moment, read once; nothing ticks afterwards, so the lines stay w... | hovered |
-| Place and Time | JButton | Center on zenith | Move the chart to the point overhead | Moves the page to the point directly above you - the one control in this window that mo... | hovered |
+| Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you - the one control in this window that mo... | hovered |
 | Export Chart Sheet | JComboBox | (Format) | What kind of file to write: vector for printing and editing, PNG for sharing a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
 | Export Chart Sheet | JComboBox | (Paper) | The size of the page the chart is laid out on | Chooses the paper the sheet is laid out for. The chart is fitted to it; the page you ar... | hovered |
 | Export Chart Sheet | JComboBox | (Resolution) | How finely a PNG is drawn; ignored by SVG and PDF | Chooses how many dots per inch a PNG is drawn at. SVG and PDF keep the drawing as lines... | hovered |
@@ -88,12 +88,12 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Inspector | JToggleButton | Selected | The facts of the object you last chose | Shows what the atlas holds on the one object you chose, rather than everything on the page | hovered |
 | Inspector | JToggleButton | On this page | Everything on the page you are looking at, drawn or not | Lists every object the atlas holds within this page, including the ones the chart is no... | hovered |
 | Inspector | JList | (Objects at this point) | Several objects lie within reach of that point; choose one to inspect it | A list of everything within reach of the point you clicked. Choosing one shows its fact... | hovered |
-| Inspector | JButton | M 31 | Show M 31's facts | Makes this member the lead and shows its facts here. Membership is unchanged. | hovered |
+| Inspector | JButton | M 31 | Show the facts for M 31 | Makes this member the lead and shows its facts here. Membership is unchanged. | hovered |
 | Inspector | JButton | ✕ | Remove M 31 from the working selection | Takes M 31 out of the working selection. The rest stay, and the page does not move. | hovered |
 | Inspector | JButton | Clear selection | Remove every working mark | Empties the whole working selection. The page and your place in it are left alone. | hovered |
-| Inspector | JButton | Center here | Center the chart on the selected object | Moves the page so the object shown here sits at the centre; nothing about what the char... | hovered |
+| Inspector | JButton | Centre here | Centre the chart on the selected object | Moves the page so the object shown here sits at the centre; nothing about what the char... | hovered |
 | On this page | JTable | (Objects on this page) | &mdash; | Choose rows to mark them on the chart. Marking does not move the page. | self-explanatory |
-| On this page | JButton | Center here | Choose a row's mark first, and this centres the chart on it | Unavailable until a row is marked: mark one and this moves the page to it | dynamic |
+| On this page | JButton | Centre here | Choose a row's mark first, and this centres the chart on it | Unavailable until a row is marked: mark one and this moves the page to it | dynamic |
 | On this page | JButton | Clear marks | Nothing is marked yet | Unavailable: there are no working marks to remove | dynamic |
 
 ## The audit

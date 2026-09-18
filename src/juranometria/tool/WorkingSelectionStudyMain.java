@@ -177,11 +177,11 @@ public final class WorkingSelectionStudyMain {
                 + " Consumers: the On-this-page table (rows follow"
                 + " marks, marks follow rows), the module's cross"
                 + " contributions (only for marks the page does not"
-                + " draw), and Center here. **Pruned to the page on"
+                + " draw), and Centre here. **Pruned to the page on"
                 + " every page change.**");
         System.out.println("- The chart's cross painter takes its"
                 + " lead treatment from the *SelectionModel's*"
-                + " identity, while Center here takes its lead from"
+                + " identity, while Centre here takes its lead from"
                 + " the *marks model* - two leads that can disagree,"
                 + " photographed disagreeing in"
                 + " `today-two-leads.png`.");

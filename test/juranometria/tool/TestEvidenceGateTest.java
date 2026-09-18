@@ -298,6 +298,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
                         "src/juranometria/tool/EclipticCandidateStudyMain.java",
                         "src/juranometria/tool/EclipticControlStudyMain.java",
+                        "src/juranometria/tool/InspectorSheetMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
@@ -305,7 +306,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the eleven widget photographers, whose font and theme"
+                "the twelve widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -336,7 +337,14 @@ class TestEvidenceGateTest {
                         + " surface wraps its descriptions against"
                         + " font metrics, and a detached panel"
                         + " pictured one line of each overlapping the"
-                        + " row beneath");
+                        + " row beneath; and the twelfth by #350's"
+                        + " Inspector sheet, on the same ground and"
+                        + " for the same reason - it draws each"
+                        + " selection state in a real window because"
+                        + " one of its facts is now broken against"
+                        + " font metrics too, and a sentence measured"
+                        + " without a window is measured against a"
+                        + " width nothing will honour");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -452,7 +460,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(36, display.size(),
+        assertEquals(37, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -495,8 +503,15 @@ class TestEvidenceGateTest {
                         + " ladder by pressing the toolbar's own"
                         + " controls and exports through the real"
                         + " dialog, neither of which can be asked of"
-                        + " a page nobody is looking at; each with"
-                        + " its premises stated");
+                        + " a page nobody is looking at; and #350's"
+                        + " Inspector wrapping, which asks whether a"
+                        + " translated sentence fits the column it is"
+                        + " drawn in - a question about a laid-out"
+                        + " width, and validate() is a no-op on a"
+                        + " component that is not displayable, so a"
+                        + " panel measured without a window answers"
+                        + " with a width nothing will honour; each"
+                        + " with its premises stated");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

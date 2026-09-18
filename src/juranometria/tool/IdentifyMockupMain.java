@@ -225,7 +225,7 @@ public final class IdentifyMockupMain {
                         formatDec(star.position().decDegrees())),
                 "  ICRS J2000",
                 "",
-                "  [ Center here ]");
+                "  [ Centre here ]");
     }
 
     /**
@@ -312,7 +312,7 @@ public final class IdentifyMockupMain {
                         formatDec(dso.position().decDegrees())),
                 "  ICRS J2000",
                 "",
-                "  [ Center here ]");
+                "  [ Centre here ]");
     }
 
     /** One inspector state, painted at its real proportions. */

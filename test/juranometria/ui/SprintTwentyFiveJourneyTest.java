@@ -253,7 +253,7 @@ class SprintTwentyFiveJourneyTest {
         ReaderInput.click((javax.swing.JComponent) named(dialog,
                 "centreButton"));
         assertEquals(1, requests.size(),
-                "Center on zenith asked once");
+                "Centre on zenith asked once");
         assertEquals(new LocalSky(meridian.observer()).zenith(),
                 requests.get(0).centre(), "for the point overhead");
         assertTrue(navigation.state().centre().separationDegrees(

@@ -248,7 +248,7 @@ the geometry, never from a threshold in pixels.)*
   stays there. No ticking clock, no animation, no automatic
   movement.
 - **Two deliberate actions, and no others.** **Now** re-freezes on
-  the current moment. **Center on zenith** moves the chart, once,
+  the current moment. **Centre on zenith** moves the chart, once,
   because the reader asked — never as a side effect of setting a
   place or a time.
 - Changing latitude, longitude or the instant **redraws the lines
@@ -282,7 +282,7 @@ new thing, and the gate names it rather than pretending it does not:
 - the drawn label is the contribution's existing
   `accessibleName`, so a reader who cannot see the line is told the
   same word the line is drawn with, and no new field is needed;
-- **`Center on zenith`** is an ordinary `NavigationRequest`, which
+- **`Centre on zenith`** is an ordinary `NavigationRequest`, which
   already carries a reason.
 
 ### Amended in #227's review (PR #236)

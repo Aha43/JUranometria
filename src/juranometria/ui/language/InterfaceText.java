@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The words the application says, in the reader's language
@@ -152,8 +154,52 @@ public final class InterfaceText {
         if (values == null || values.length == 0) {
             return say(key);
         }
-        return new MessageFormat(say(key), formatting).format(values);
+        String pattern = say(key);
+        checkArguments(key, pattern, values.length);
+        try {
+            return new MessageFormat(pattern, formatting).format(values);
+        } catch (IllegalArgumentException malformed) {
+            throw new IllegalStateException("the interface text for \""
+                    + key + "\" is not a usable pattern: \"" + pattern
+                    + "\"", malformed);
+        }
     }
+
+    /**
+     * Refuses a pattern that asks for a value it was not given.
+     *
+     * <p>The gap this closes: the English/Norwegian comparison checks
+     * that two patterns agree with EACH OTHER, which cannot establish
+     * that either agrees with its caller. A pattern written {@code
+     * {2}} and called with two arguments printed the placeholder
+     * itself to a reader, in both languages equally, and no contract
+     * saw it.
+     *
+     * <p>Unused supplied arguments are allowed - a translation may
+     * legitimately not need a value English uses - and a repeated
+     * placeholder is allowed, because saying a value twice is a
+     * choice a language may need to make.
+     */
+    private static void checkArguments(String key, String pattern,
+                                       int supplied) {
+        Matcher placeholder = ARGUMENT.matcher(pattern);
+        while (placeholder.find()) {
+            int index = Integer.parseInt(placeholder.group(1));
+            if (index >= supplied) {
+                throw new IllegalStateException("the interface text for"
+                        + " \"" + key + "\" asks for argument {" + index
+                        + "} but was given " + supplied
+                        + (supplied == 1 ? " argument" : " arguments")
+                        + ": \"" + pattern + "\". A placeholder with"
+                        + " nothing behind it reaches a reader as"
+                        + " itself.");
+            }
+        }
+    }
+
+    /** A numbered placeholder: the {0} of a MessageFormat pattern. */
+    private static final Pattern ARGUMENT =
+            Pattern.compile("\\{(\\d+)[^}]*}");
 
     /** Every key this language defines, for a contract to check. */
     public Set<String> keys() {

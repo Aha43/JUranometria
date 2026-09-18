@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**311 promoted artifacts.**
+**323 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -200,6 +200,18 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/chartoptions-nb-NO-2.png` | `d1b354e95c0279ea1579f9fa0da51b6afd967fcab027211e6c693775f882aab8` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-3.png` | `d571e484e30b35bf0488f866b7c96a4c8208ecb668139d3ce462a541a2c6d659` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-4.png` | `dd209754ce1c14656e16ae9ff61a5aa583c008dddd268afb5ab2a24add06794c` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-en-1-none.png` | `099e147f4773b2ea29401c7a97776c5f1479094708f1040cf6204b24eb3600b3` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-en-2-emptysky.png` | `7ba51f661502957debcf24b5ac9e8cc425825c0c21c993690c74d628b683b5d6` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-en-3-star.png` | `16b9c190f28b282194b7aefba380edfdd0d35e7bb99ae39f166dee7cb52a8411` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-en-4-deepsky.png` | `0762acd5962cb0d5d8701199afaf08339f056deaeb2051a0be6702652b4d3146` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-en-5-ambiguous.png` | `606844ca9a8119602bb754ff3119b40739b6c70248a0c33877cf5041ca5c950a` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-en-6-workingset.png` | `d37e9359171ecff674ed057891d9a85cb9d735bc3f2df6bd48ea087a16e640e7` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-nb-NO-1-none.png` | `4d56ef00a38642d91e8318766e2b528b97b99973f6102dce8a1fe0f3bd51f87a` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-nb-NO-2-emptysky.png` | `b7c628457163db8dcc9258f47923b67837fdd1970ddcb06adfe89ef77dce2509` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-nb-NO-3-star.png` | `8b80e0a25e8deb761afeed751571aa5783f6136b6a26961a001b8a82bc6d04d1` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-nb-NO-4-deepsky.png` | `1e631b62c39d09a9e2b814172a77c08ee39daeffd060a3f3712cd4f7ff67406b` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-nb-NO-5-ambiguous.png` | `dcc8e1a172ffce902d77f58318a67b3b526354732a2d5353d2103481ec6212f3` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/inspector-nb-NO-6-workingset.png` | `de0851f45940024cdd77dd1c151ba2ecdda9c68d9b51908e24d6ca1e09800f91` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-en.png` | `7c5fa92eacbfae9ddf2170dd5d0977322186f76d20f7c30eb6da750e8f5731b7` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-nb-NO.png` | `4c7ea9b8406534dee7021df4e6ec594efc3bd7069d523a4cca1ff0118e08adb1` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-candidate.png` | `fe2815677cff74b5e5f5b9301ae2ad067f600f792f58a21fcc1dfd78e12eb47e` | 2026-09-14 | Mac OS X aarch64, Java 21.0.11 | various |
@@ -273,14 +285,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/point-and-identify/highlight-ring.png` | `ccdee2d70c0118b3d6623934dd4b57e7047acbe92ac530c495f28ff061528551` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/point-and-identify/inspector-ambiguous-dark.png` | `82cb7c31022806318510a86968dc27910376af98da513ef11e4fa298699f3089` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/point-and-identify/inspector-ambiguous-light.png` | `b3aa51499e7c16d46f54a2d81066fc5c48432d3ce98938a901e16e4040501e04` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/point-and-identify/inspector-deep-sky-dark.png` | `00e7a0d32bfe40ca95e8eeb43241fa091654c204db794e1201e66df6e1bf3ce1` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/point-and-identify/inspector-deep-sky-light.png` | `65868b81973b13d36d8ff83c1cb008a759abe09561c5f6492026d90acb0efef5` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/point-and-identify/inspector-deep-sky-unknowns-dark.png` | `8fa6b045d31a605fd9d86f7d83968d622daacf0ca3f71cfa89b3c16dec6136c6` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/point-and-identify/inspector-deep-sky-unknowns-light.png` | `1f474ec178ce5ecf0131db5015f07c26e884a56e8f3133ab3b8a0759d4cce306` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/point-and-identify/inspector-deep-sky-dark.png` | `eb77b974c37762926c6719d04a5c45fb3230ca36be8b81e5324e199660d5c02d` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/point-and-identify/inspector-deep-sky-light.png` | `7ae2406acacc0556d678f60d8d5245c4092895d52de033e047bf8c79ee06bbf3` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/point-and-identify/inspector-deep-sky-unknowns-dark.png` | `8cba0dccd2eecf1586050a86df70e4a245ae9a22caa1fee998a5f577fb9e8e7d` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/point-and-identify/inspector-deep-sky-unknowns-light.png` | `a85f5274bc150feed55e201b0774cc8f38f0af5950e3863df6ffed09ad1b8b4e` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/point-and-identify/inspector-empty-dark.png` | `9616e3884a6e9b7c4cc59babafd3b7044c44e0ceea8eca4ceac75a43d77e298c` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/point-and-identify/inspector-empty-light.png` | `86302fc99a1666fdc5e2646838a843993577abc4932c4154eddf227f381ef33e` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/point-and-identify/inspector-star-dark.png` | `1257b2703572c47e13e2e1484085b6128ed07313165b7c7f202ac794e8c82d39` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
-| `docs/studies/point-and-identify/inspector-star-light.png` | `0d1fe5e4a63acc0c7d1ea434c91657b49d164d1328729ee0f5fe3dd72f593347` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/point-and-identify/inspector-star-dark.png` | `757469a3608d8267615c07b1128adcdd542216a3834fb9aa5c0e39b61ac46dde` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/point-and-identify/inspector-star-light.png` | `066d05e566049a392e490ef40847451e9e491141f52ecd24dad8be664ef87860` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/printable-chart/page-black-36.png` | `0e5952e4e3d541615a557d11b7d9709771fcac75897325390fefcff9ecb0782c` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/printable-chart/page-black-48.png` | `7bd8c0d65c6b668e9aeaf800fb0567b6ef296cab9d1c19051a05cec18e8af55f` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/printable-chart/page-dense-36.png` | `409f67ffa8ee8bcd90ff5b756858285ddbdc6f3f38e179055499916f15dbbe6a` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |

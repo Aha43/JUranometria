@@ -87,7 +87,7 @@ class SprintThirtyJourneyTest {
     private static JButton centreButton(java.awt.Container root) {
         for (java.awt.Component child : root.getComponents()) {
             if (child instanceof JButton candidate
-                    && "Center here".equals(candidate.getText())) {
+                    && "Centre here".equals(candidate.getText())) {
                 return candidate;
             }
             if (child instanceof java.awt.Container inner) {
@@ -524,7 +524,7 @@ class SprintThirtyJourneyTest {
                     .getAccessibleDescription());
 
             // ---- 8. into a detailed page, carrying all of it -------
-            // Center here on the object identified in step 6, then
+            // Centre here on the object identified in step 6, then
             // down the ladder and across the rung where the
             // projection changes.
             SwingUtilities.invokeAndWait(() ->
@@ -534,7 +534,7 @@ class SprintThirtyJourneyTest {
                     centreButton(inspectorHolder[0])));
             // Onto whatever the reader has selected now, which after
             // marking is the last object they marked - not the one
-            // identified in step 6. Center here follows the reader,
+            // identified in step 6. Centre here follows the reader,
             // and a journey that asserted otherwise would be
             // asserting its own order rather than the atlas's rule.
             String lead = onEdt(() -> hostHolder[0].workingSelection()
@@ -544,7 +544,7 @@ class SprintThirtyJourneyTest {
             assertTrue(onEdt(() -> navigation.state().centre()
                             .separationDegrees(positionOf(
                                     chart.currentScene(), lead))) < 1e-6,
-                    "and Center here centred the chart on it");
+                    "and Centre here centred the chart on it");
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     > 8.0) {
                 ReaderInput.click(in);

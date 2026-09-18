@@ -253,7 +253,7 @@ class SprintTwentyThreeJourneyTest {
                 "the selection survives - it is not a property of a"
                         + " symbol being on the paper");
         assertTrue(String.join(" | ", inspector.lines())
-                        .contains("Not on this page any more"),
+                        .contains("Hidden by the current chart options"),
                 "and the Inspector says so plainly rather than"
                         + " reciting the facts of a mark nobody can"
                         + " see: " + inspector.lines());

@@ -850,26 +850,9 @@ public final class ChartOptionsDialog extends JDialog {
         return found;
     }
 
+    /** Shared with the Inspector since #350; one algorithm, not two. */
     private static String wrapped(String prose, int widthPx,
                                   java.awt.FontMetrics metrics) {
-        StringBuilder html = new StringBuilder("<html>");
-        StringBuilder line = new StringBuilder();
-        for (String word : prose.split(" ")) {
-            String candidate = line.isEmpty() ? word : line + " " + word;
-            if (!line.isEmpty()
-                    && metrics.stringWidth(candidate) > widthPx) {
-                html.append(escaped(line.toString())).append("<br>");
-                line = new StringBuilder(word);
-            } else {
-                line = new StringBuilder(candidate);
-            }
-        }
-        return html.append(escaped(line.toString())).append("</html>")
-                .toString();
-    }
-
-    private static String escaped(String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;")
-                .replace(">", "&gt;");
+        return juranometria.ui.WrappedText.html(prose, widthPx, metrics);
     }
 }

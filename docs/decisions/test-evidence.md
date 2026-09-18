@@ -78,7 +78,7 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **57 files** touch process-wide state —
 **29** use the shared guard, **27** restore locally,
-**0 flagged unprotected** — and **36 files** depend on a display,
+**0 flagged unprotected** — and **37 files** depend on a display,
 of which **19** state a focus premise and **27** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -151,7 +151,13 @@ language test, which reads a real store because the dialog it drives
 needs one, and which asks the platform what it calls a keystroke
 rather than writing the glyph down — the first version hard-coded it
 and passed alone while failing in the suite, the toolkit answering
-⌃K headless and ⌘K under a display.)
+⌃K headless and ⌘K under a display; and #350 added the Inspector
+wrapping test, which asks whether a translated explanation fits the
+column it is drawn in. That is a question about a laid-out width, and
+`validate()` is a no-op on a component that is not displayable, so a
+panel measured without a window answers with a width nothing will
+honour. It presses nothing and states no input premise, because it
+takes no input: it measures.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -336,7 +342,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **702 explicit hand-offs**
+reads of live chart state** against **705 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -347,7 +353,10 @@ chart keyboard, whose every question of the palette — is it open,
 what does its line say, how many listeners is the toolkit holding —
 is asked on the event thread and nowhere else; and for #315's
 closing journey, which reads the page a reader is looking at on
-every rung it visits). The discipline
+every rung it visits; and for #350's Inspector wrapping, which
+builds the panel, selects into it and measures the result each on
+the event thread, because a width read off any other thread is a
+width read while the layout may still be changing it). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

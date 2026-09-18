@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * an overlap and is offered the choice rather than given a guess;
  * clicks empty sky and is told where they clicked; travels to wide,
  * wrapped, polar and southern skies and points there too; presses
- * Center here once, deliberately; searches by name and finds that
+ * Centre here once, deliberately; searches by name and finds that
  * selected as well; works the panel by keyboard; closes and reopens
  * it; and comes Home to the exact released default.
  *
@@ -512,7 +512,7 @@ class MapExplorationJourneyTest {
                         "with the panel describing it");
             }
 
-            // 6. Center here: the one action that moves the chart, and
+            // 6. Centre here: the one action that moves the chart, and
             // only when pressed.
             searchFor("M31");
             zoomTo(8.0);
@@ -524,7 +524,7 @@ class MapExplorationJourneyTest {
             ReaderInput.click(centreButton(inspector));
             flush();
             assertFalse(wasCentred.equals(navigation.state().centre()),
-                    "Center here moved the chart");
+                    "Centre here moved the chart");
             assertTrue(navigation.state().centre().separationDegrees(
                             offCentre.star().position()) < 1e-6,
                     "onto the selected star");
@@ -552,7 +552,7 @@ class MapExplorationJourneyTest {
                 dragBy(-300, 0);
             }
             assertTrue(String.join(" ", inspector.lines())
-                            .contains("Not on this page any more"),
+                            .contains("This object is not on the current page"),
                     "the panel is honest about having lost sight of it: "
                             + inspector.lines());
 
@@ -1301,7 +1301,7 @@ class MapExplorationJourneyTest {
             java.awt.Container container) {
         for (java.awt.Component component : container.getComponents()) {
             if (component instanceof javax.swing.JButton button
-                    && "Center here".equals(button.getText())) {
+                    && "Centre here".equals(button.getText())) {
                 return button;
             }
             if (component instanceof java.awt.Container inner) {

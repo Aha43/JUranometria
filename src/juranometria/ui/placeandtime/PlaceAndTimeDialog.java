@@ -42,7 +42,7 @@ import juranometria.meridian.MeridianModule;
  * redraws the reference lines and leaves the page exactly where the
  * reader put it. The two deliberate actions are <em>Now</em>, which
  * re-freezes on the moment it is pressed (read once; it is a button,
- * not a state), and <em>Center on zenith</em>, the one thing here
+ * not a state), and <em>Centre on zenith</em>, the one thing here
  * that moves the chart, because the reader asked.
  *
  * <p>There is no Apply and no Cancel, because the gate decided two
@@ -282,11 +282,11 @@ public final class PlaceAndTimeDialog extends JDialog {
             module.observer(module.observer().at(clock.get()));
             instant.setText(SHOWN.format(module.observer().instant()));
         });
-        JButton centre = new JButton("Center on zenith");
+        JButton centre = new JButton("Centre on zenith");
         centre.setName("centreButton");
         centre.setMnemonic('C');
         centre.getAccessibleContext().setAccessibleName(
-                "Center on zenith");
+                "Centre on zenith");
         juranometria.ui.Explain.control(centre,
                 "Move the chart to the point overhead",
                 "Moves the page to the point directly above you - the"

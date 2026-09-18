@@ -256,7 +256,7 @@ class OverviewPageTest {
                     "the one that was under the pointer, read back"
                             + " through the overview's own projection");
 
-            // 3. Center here, then back down the ladder into the
+            // 3. Centre here, then back down the ladder into the
             // detailed atlas - both through the controls a reader has.
             // The Inspector is opened the way a reader opens it.
             javax.swing.SwingUtilities.invokeAndWait(() ->
@@ -411,7 +411,7 @@ class OverviewPageTest {
             java.awt.Container root) {
         for (java.awt.Component child : root.getComponents()) {
             if (child instanceof javax.swing.JButton candidate
-                    && "Center here".equals(candidate.getText())) {
+                    && "Centre here".equals(candidate.getText())) {
                 return candidate;
             }
             if (child instanceof java.awt.Container inner) {

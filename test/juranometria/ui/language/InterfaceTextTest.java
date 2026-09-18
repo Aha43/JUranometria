@@ -135,6 +135,68 @@ class InterfaceTextTest {
                 refused.getMessage());
     }
 
+    /**
+     * A pattern may not ask for a value it was not given.
+     *
+     * <p>The defect this was written for is exact: #350 shipped
+     * {@code inspector.size.across.pa} as {@code "{0}\u2032 across  at
+     * PA {2}\u00b0"} while its caller passed two arguments. A reader
+     * would have seen the placeholder itself.
+     *
+     * <p>It fails in ENGLISH, before any other language is loaded.
+     * The English/Norwegian comparison checks that two patterns agree
+     * with each other, which says nothing about whether either agrees
+     * with the code that calls it.
+     */
+    @Test
+    void aPatternMayNotAskForAnArgumentItWasNotGiven() {
+        InterfaceText english = InterfaceText.forLanguage("en",
+                path -> new ByteArrayInputStream(
+                        "t.gap = {0} across at PA {2}\n"
+                                .getBytes(StandardCharsets.UTF_8)));
+
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> english.say("t.gap", "3.4", "17"));
+        assertTrue(refused.getMessage().contains("t.gap")
+                        && refused.getMessage().contains("{2}")
+                        && refused.getMessage().contains("2 arguments"),
+                "the failure names the key, the index it asked for and"
+                        + " the count it was given: "
+                        + refused.getMessage());
+    }
+
+    /** What the check must NOT refuse. */
+    @Test
+    void repeatedAndUnusedArgumentsStayAllowed() {
+        InterfaceText said = InterfaceText.forLanguage("en",
+                path -> new ByteArrayInputStream(
+                        ("t.twice = {0} and {0} again\n"
+                                + "t.spare = only {0}\n")
+                                .getBytes(StandardCharsets.UTF_8)));
+
+        assertEquals("M 42 and M 42 again", said.say("t.twice", "M 42"),
+                "saying a value twice is a choice a language may need");
+        assertEquals("only first", said.say("t.spare", "first", "second"),
+                "and a translation may legitimately not need a value"
+                        + " that English uses");
+    }
+
+    /** A malformed pattern is reported against its key. */
+    @Test
+    void aMalformedPatternNamesTheKeyItCameFrom() {
+        InterfaceText said = InterfaceText.forLanguage("en",
+                path -> new ByteArrayInputStream(
+                        "t.broken = a {0 b\n"
+                                .getBytes(StandardCharsets.UTF_8)));
+
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> said.say("t.broken", "x"));
+        assertTrue(refused.getMessage().contains("t.broken"),
+                refused.getMessage());
+    }
+
     // ---- the shipped files ------------------------------------------
 
     /**

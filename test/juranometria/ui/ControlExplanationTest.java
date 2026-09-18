@@ -291,9 +291,9 @@ class ControlExplanationTest {
                     new juranometria.ui.onthispage.OnThisPageModule())
                     .panel();
 
-            JButton centre = button(panel, "Center here");
+            JButton centre = button(panel, "Centre here");
             JButton clear = button(panel, "Clear marks");
-            assertNotNull(centre, "the panel has its Center here");
+            assertNotNull(centre, "the panel has its Centre here");
             assertNotNull(clear, "and its Clear marks");
             assertFalse(centre.isEnabled(),
                     "nothing is marked, so it is grey");
