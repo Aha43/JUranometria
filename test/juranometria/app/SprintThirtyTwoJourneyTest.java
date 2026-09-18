@@ -160,7 +160,7 @@ class SprintThirtyTwoJourneyTest {
                         () -> ExportSheetSession.open(frame, navigation,
                                 chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0])));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en"))));
                 window[0] = frame;
                 chartHolder[0] = chart;
                 ChartKeyboardSession.install(frame.getRootPane(), options,
@@ -1175,7 +1175,7 @@ class SprintThirtyTwoJourneyTest {
                                Path folder, PaperSize paper,
                                SheetFormat format) throws Exception {
         List<Path> written = new ArrayList<>();
-        ExportSheetSession.Surfaces real = ExportSheetSession.onScreen();
+        ExportSheetSession.Surfaces real = ExportSheetSession.onScreen(juranometria.ui.language.InterfaceText.forLanguage("en"));
         exporting[0] = new ExportSheetSession.Surfaces() {
 
             @Override

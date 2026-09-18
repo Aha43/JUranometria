@@ -140,7 +140,7 @@ class ExportJourneyTest {
         List<ExportSheet.Request> chosen = new ArrayList<>();
         for (SheetFormat format : SheetFormat.values()) {
             JComponent dialog = ExportSheetDialog.content(
-                    ExportSheetSession.defaults(), chosen::add, () -> { });
+                    ExportSheetSession.defaults(), chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
             JComboBox<SheetFormat> box =
                     named(dialog, ExportSheetDialog.FORMAT_BOX);
             box.setSelectedItem(format);
@@ -161,7 +161,7 @@ class ExportJourneyTest {
                     ExportSheet.Outcome.Written.class,
                     ExportSheet.write(Atlas.assembler()::assemble, EQUINOX,
                             ChartOptions.DEFAULTS, modules(), request,
-                            destination, existing -> true),
+                            destination, existing -> true, juranometria.ui.language.InterfaceText.forLanguage("en")),
                     "3. " + request.format() + " is written");
             written.add(outcome.file());
         }
@@ -467,7 +467,7 @@ class ExportJourneyTest {
             JFrame frame = new JFrame("Export journey");
             frame.add(chart);
             frame.setSize(1100, 800);
-            ExportSheetSession.Surfaces real = ExportSheetSession.onScreen();
+            ExportSheetSession.Surfaces real = ExportSheetSession.onScreen(juranometria.ui.language.InterfaceText.forLanguage("en"));
             ExportSheetSession.Surfaces surfaces =
                     new ExportSheetSession.Surfaces() {
 
@@ -507,7 +507,7 @@ class ExportJourneyTest {
             frame.setJMenuBar(AppMenuBar.create(navigation, () -> { },
                     () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                     () -> ExportSheetSession.open(frame, navigation, chart,
-                            options, working, surfaces)));
+                            options, working, surfaces, juranometria.ui.language.InterfaceText.forLanguage("en"))));
             // Held before it is shown, so nothing that happens next
             // can lose it.
             made[0] = frame;

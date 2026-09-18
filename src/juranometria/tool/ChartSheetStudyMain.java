@@ -237,7 +237,7 @@ public final class ChartSheetStudyMain {
         Files.write(new File(DIR, name).toPath(), pdf);
         report.append(String.format(Locale.ROOT,
                 "| `%s` | %s | %d | %d as outlines |%n", name,
-                paper.readableName(), sheet.shapeCount(),
+                paper.identity(), sheet.shapeCount(),
                 sheet.textCount()));
         sized(name, pdf.length);
     }
@@ -250,7 +250,7 @@ public final class ChartSheetStudyMain {
         Files.write(new File(DIR, name).toPath(), png);
         report.append(String.format(Locale.ROOT,
                 "| `%s` | %s at %d dpi, %d x %d px | %d | %d |%n",
-                name, paper.readableName(), dpi,
+                name, paper.identity(), dpi,
                 PngSheetWriter.widePixels(paper, dpi),
                 PngSheetWriter.highPixels(paper, dpi),
                 sheet.shapeCount(), sheet.textCount()));
@@ -275,7 +275,7 @@ public final class ChartSheetStudyMain {
         Files.writeString(file.toPath(), svg, StandardCharsets.UTF_8);
         report.append(String.format(Locale.ROOT,
                 "| `%s` | %s | %d | %d |%n", name,
-                paper.readableName(), sheet.shapeCount(),
+                paper.identity(), sheet.shapeCount(),
                 text == SvgSheetWriter.Text.OUTLINES ? 0
                         : sheet.textCount()));
         sized(name, file.length());

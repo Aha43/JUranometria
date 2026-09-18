@@ -81,6 +81,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/DeepSkyVocabularyMockupMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/EclipticCandidateStudyMain.java | default-font | UNPROTECTED: default-font |
 | src/juranometria/tool/EclipticControlStudyMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
+| src/juranometria/tool/ExportSheetDialogSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/InspectorSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/OnThisPageSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
@@ -92,7 +93,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | preferences | protected-locally |
 
-**15 evidence executables** touch process-wide state; 14 carry an unpaired touch.
+**16 evidence executables** touch process-wide state; 15 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -103,6 +104,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/app/ChartKeyboardMatrixTest.java | point-reachable, control-showing | back-door-click |
 | juranometria/app/ChartOptionsDialogHeightTest.java | control-showing | none |
 | juranometria/app/ChartOptionsDialogTest.java | none | back-door-click |
+| juranometria/app/ExportLanguageTest.java | none | none |
 | juranometria/app/ExportSheetDialogTest.java | point-reachable, control-showing | back-door-click |
 | juranometria/app/InspectorCloseButtonTest.java | control-showing | pointer-events |
 | juranometria/app/InspectorWrappingTest.java | none | none |
@@ -139,7 +141,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/onthispage/OnThisPageLanguageTest.java | none | none |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
-**40 display-dependent files.** 19 state a focused-window or focus-owner premise, 27 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**41 display-dependent files.** 19 state a focused-window or focus-owner premise, 27 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 
@@ -166,16 +168,16 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **431** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **723**
+- explicit event-thread hand-offs (invokeAndWait): **727**
 
 ## Generated evidence, classified
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 59 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 60 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 10 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 335 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 341 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 

@@ -1658,7 +1658,12 @@ public final class PackagedAcceptanceMain {
                         // The acceptance writes into a temporary file
                         // it made itself, so replacing it is the
                         // whole point rather than a question.
-                        existing -> true);
+                        existing -> true,
+                        // English, stated: this acceptance asserts
+                        // what the packaged application writes, not
+                        // which language a reader chose (#350).
+                        juranometria.ui.language.InterfaceText
+                                .forLanguage("en"));
                 require(outcome
                                 instanceof ExportSheet.Outcome.Written,
                         "the packaged application writes " + format

@@ -194,7 +194,7 @@ class NorwegianSkyJourneyTest {
                     new ExportSheet.Request(format, PaperSize.A4, 300,
                             false),
                     navigation, chart[0], options, new WorkingSelection(),
-                    replacing -> true);
+                    replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en"));
             Path written = folder.resolve(stem + "."
                     + format.name().toLowerCase(Locale.ROOT));
             assertTrue(Files.size(written) > 1000,

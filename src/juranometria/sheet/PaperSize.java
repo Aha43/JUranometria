@@ -34,19 +34,29 @@ public enum PaperSize {
 
     private static final double POINTS_PER_MM = 72.0 / 25.4;
 
-    private final String readableName;
+    private final String identity;
     private final double widePoints;
     private final double highPoints;
 
-    PaperSize(String readableName, double widePoints, double highPoints) {
-        this.readableName = readableName;
+    PaperSize(String identity, double widePoints, double highPoints) {
+        this.identity = identity;
         this.widePoints = widePoints;
         this.highPoints = highPoints;
     }
 
     /** What a reader calls this paper. */
-    public String readableName() {
-        return readableName;
+    /**
+     * What this paper is CALLED, in every language (#350).
+     *
+     * <p>Owner ruling: {@code A4} and {@code US Letter} are paper
+     * identities in this atlas, like {@code SVG} and {@code PDF}. A
+     * Norwegian print shop knows both by these names, and a
+     * translated or reversed form would name nothing anyone could
+     * order. They are handed to sentences as arguments, so a
+     * translator is never invited to invent another paper name.
+     */
+    public String identity() {
+        return identity;
     }
 
     public double widePoints() {
@@ -115,7 +125,7 @@ public enum PaperSize {
         return String.format(Locale.ROOT,
                 "%s landscape, %.1f x %.1f mm, %.1f mm margins,"
                         + " chart %.1f x %.1f mm",
-                readableName, wideMm(), highMm(), marginMm(),
+                identity, wideMm(), highMm(), marginMm(),
                 chartWideMm(), chartHighMm());
     }
 }

@@ -219,7 +219,7 @@ class ReaderSkyLanguageTest {
                     navigation, chart[0],
                     new ChartOptionsController(
                             ChartOptionsStore.forNode(node)),
-                    new WorkingSelection(), replacing -> true);
+                    new WorkingSelection(), replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en"));
 
             String sheet = Files.readString(
                     folder.resolve("sagittarius.svg"));

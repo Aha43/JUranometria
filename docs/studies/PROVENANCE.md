@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**335 promoted artifacts.**
+**341 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -200,6 +200,12 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/chartoptions-nb-NO-2.png` | `d1b354e95c0279ea1579f9fa0da51b6afd967fcab027211e6c693775f882aab8` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-3.png` | `d571e484e30b35bf0488f866b7c96a4c8208ecb668139d3ce462a541a2c6d659` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-4.png` | `dd209754ce1c14656e16ae9ff61a5aa583c008dddd268afb5ab2a24add06794c` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/export-en-1-svg-a4.png` | `2b3b426f96210625b7712a2a65f315434f67b3c298fef41418230b4ec9507214` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/export-en-2-pdf-letter.png` | `a6c801f272eff622bb8f0187c9bb5f6d601ac94a7e86ff483aee71767b20bbd2` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/export-en-3-png-a4.png` | `ab43dcb9a4954a9a1e8dbb91f057cc6749d4f281b89e2752e2953131bd82cfc0` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/export-nb-NO-4-svg-a4.png` | `b25c8af357c183d727135689d42fc09ec721e363b00e9bf4541b9e58342a4d93` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/export-nb-NO-5-pdf-letter.png` | `f9a7f2d2e7482c07575b5d1a07496df26613be67f8ea91602482b858a9eef50b` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/export-nb-NO-6-png-a4.png` | `d1bc2cfc13d493138a08eedae179981c717d12fd8ceadbf7be1a26c7d09552c9` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/inspector-en-1-none.png` | `099e147f4773b2ea29401c7a97776c5f1479094708f1040cf6204b24eb3600b3` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/inspector-en-2-emptysky.png` | `7ba51f661502957debcf24b5ac9e8cc425825c0c21c993690c74d628b683b5d6` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/inspector-en-3-star.png` | `16b9c190f28b282194b7aefba380edfdd0d35e7bb99ae39f166dee7cb52a8411` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |

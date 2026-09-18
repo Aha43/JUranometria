@@ -67,12 +67,12 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
 | Place and Time | JButton | Now | Read the clock once and freeze on this moment | Freezes on the present moment, read once; nothing ticks afterwards, so the lines stay w... | hovered |
 | Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you - the one control in this window that mo... | hovered |
-| Export Chart Sheet | JComboBox | (Format) | What kind of file to write: vector for printing and editing, PNG for sharing a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
+| Export Chart Sheet | JComboBox | (Format) | Choose SVG or PDF for a line drawing, or PNG for a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
 | Export Chart Sheet | JComboBox | (Paper) | The size of the page the chart is laid out on | Chooses the paper the sheet is laid out for. The chart is fitted to it; the page you ar... | hovered |
 | Export Chart Sheet | JComboBox | (Resolution) | How finely a PNG is drawn; ignored by SVG and PDF | Chooses how many dots per inch a PNG is drawn at. SVG and PDF keep the drawing as lines... | hovered |
 | Export Chart Sheet | JCheckBox | Include the working selection's marks | Draw the rings and crosses on the objects you have marked | When on, the sheet carries the marks you made this session. Off by default, because a s... | hovered |
 | Export Chart Sheet | JButton | Cancel | &mdash; | Closes this window without writing anything | self-explanatory |
-| Export Chart Sheet | JButton | Export... | Choose where to save the sheet | Opens the file chooser, and writes the sheet where you put it | hovered |
+| Export Chart Sheet | JButton | Export... | Choose where to save the sheet | Opens the file chooser and writes the sheet where you save it | hovered |
 | Settings | JRadioButton | Light | &mdash; | Draws the window's own chrome light. The chart is drawn the same either way. | self-explanatory |
 | Settings | JRadioButton | Dark | &mdash; | Draws the window's own chrome dark. The chart is drawn the same either way; the black s... | self-explanatory |
 | Settings | JComboBox | (Interface language) | The language of the menus, buttons and dialogs - not the names printed on the chart | The language of the menus, buttons and dialogs - the words the application speaks to yo... | hovered |

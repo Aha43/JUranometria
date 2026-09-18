@@ -234,7 +234,7 @@ class SprintThirtyJourneyTest {
                         () -> ExportSheetSession.open(window[0],
                                 navigation, chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0])));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en"))));
                 window[0].pack();
                 window[0].setVisible(true);
                 chartHolder[0] = chart;
@@ -647,7 +647,7 @@ class SprintThirtyJourneyTest {
                         List<ExportSheet.Request> chosen =
                                 new ArrayList<>();
                         JComponent dialog = ExportSheetDialog.content(
-                                initial, chosen::add, () -> { });
+                                initial, chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                         javax.swing.JComboBox<SheetFormat> box =
                                 named(dialog, ExportSheetDialog.FORMAT_BOX);
                         box.setSelectedItem(format);

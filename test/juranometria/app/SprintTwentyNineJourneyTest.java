@@ -296,7 +296,7 @@ class SprintTwentyNineJourneyTest {
                         List<ExportSheet.Request> chosen =
                                 new ArrayList<>();
                         JComponent dialog = ExportSheetDialog.content(
-                                initial, chosen::add, () -> { });
+                                initial, chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                         JComboBox<SheetFormat> box = named(dialog,
                                 ExportSheetDialog.FORMAT_BOX);
                         box.setSelectedItem(format);
@@ -344,7 +344,7 @@ class SprintTwentyNineJourneyTest {
                         () -> { }, () -> { }, () -> {
                             opened.add("export");
                             ExportSheetSession.open(null, navigation,
-                                    chart, options, working, surfaces);
+                                    chart, options, working, surfaces, juranometria.ui.language.InterfaceText.forLanguage("en"));
                         }));
                 JMenuItem export = AppMenuBar.exportItem(bar);
                 assertTrue(export != null && export.isEnabled(),
@@ -391,7 +391,7 @@ class SprintTwentyNineJourneyTest {
                         new ExportSheet.Request(format, PaperSize.A4,
                                 300, false),
                         navigation, chart, options, working,
-                        replacing -> true);
+                        replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 plain.add(assertInstanceOf(
                         ExportSheet.Outcome.Written.class, outcome,
                         "a sheet with no module on it").file());
@@ -450,7 +450,7 @@ class SprintTwentyNineJourneyTest {
                         java.awt.Frame owner, ExportSheet.Request initial) {
                     List<ExportSheet.Request> chosen = new ArrayList<>();
                     JComponent dialog = ExportSheetDialog.content(
-                            initial, chosen::add, () -> { });
+                            initial, chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                     javax.swing.JCheckBox box = named(dialog,
                             ExportSheetDialog.WORKING_BOX);
                     assertFalse(box.isSelected(),
@@ -485,7 +485,7 @@ class SprintTwentyNineJourneyTest {
                 }
             };
             SwingUtilities.invokeAndWait(() -> ExportSheetSession.open(
-                    null, navigation, chart, options, working, asking));
+                    null, navigation, chart, options, working, asking, juranometria.ui.language.InterfaceText.forLanguage("en")));
             assertEquals(List.of(true), boxTicked,
                     "5b. the reader ticked the switch in the real"
                             + " dialog");
@@ -512,7 +512,7 @@ class SprintTwentyNineJourneyTest {
                             new ExportSheet.Request(SheetFormat.SVG,
                                     PaperSize.A4, 300, false),
                             navigation, chart, options, working,
-                            replacing -> true),
+                            replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en")),
                     "an unticked export is written too").file();
             assertEquals(1, marksMissingFrom(unmarked,
                             onEdt(navigation::state),
@@ -545,7 +545,7 @@ class SprintTwentyNineJourneyTest {
                         new ExportSheet.Request(format, PaperSize.A4,
                                 300, false),
                         navigation, chart, options, working,
-                        replacing -> true);
+                        replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 zodiac.add(assertInstanceOf(
                         ExportSheet.Outcome.Written.class, outcome,
                         "6b. the equinox page exports as " + format)

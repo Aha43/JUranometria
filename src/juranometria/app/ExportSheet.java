@@ -56,10 +56,24 @@ public final class ExportSheet {
         record Written(Path file, long bytes, SheetFormat format)
                 implements Outcome {
 
-            public String message() {
-                return String.format(Locale.ROOT,
-                        "%s written to %s (%,d bytes)",
-                        format.readableName(), file.getFileName(), bytes);
+            /**
+             * What was written, in the reader's language (#350).
+             *
+             * <p>The format identity, the file name and the byte
+             * count go in as arguments: none of them is a word, and
+             * the sentence around them is not this record's to build.
+             */
+            public String message(
+                    juranometria.ui.language.InterfaceText said) {
+                // The count goes in as a NUMBER. Formatted here in
+                // Locale.ROOT it arrived already grouped the English
+                // way - "194,460" - which is not language-neutral
+                // data but one language's punctuation, handed to
+                // every other. MessageFormat groups it in the
+                // language being read (#350).
+                return said.say("export.written.message",
+                        format.identity(), String.valueOf(file.getFileName()),
+                        bytes);
             }
         }
 
@@ -101,10 +115,11 @@ public final class ExportSheet {
                                 ChartViewState state, ChartOptions options,
                                 ChartRenderer.ReferenceLayer ink,
                                 Request request, File destination,
-                                ReplaceDecision replace) {
+                                ReplaceDecision replace,
+                                juranometria.ui.language.InterfaceText said) {
         return write(pages, state, options, ink,
                 ChartRenderer.ReferenceLayer.NONE, request, destination,
-                replace, SINK);
+                replace, SINK, said);
     }
 
     /** The same, with the reader's own marks over the chart. */
@@ -113,9 +128,10 @@ public final class ExportSheet {
                                 ChartRenderer.ReferenceLayer ink,
                                 ChartRenderer.ReferenceLayer overChart,
                                 Request request, File destination,
-                                ReplaceDecision replace) {
+                                ReplaceDecision replace,
+                                juranometria.ui.language.InterfaceText said) {
         return write(pages, state, options, ink, overChart, request,
-                destination, replace, SINK);
+                destination, replace, SINK, said);
     }
 
     /** The same, writing however it is told to - a seam for tests. */
@@ -124,9 +140,10 @@ public final class ExportSheet {
                          ChartRenderer.ReferenceLayer ink,
                          ChartRenderer.ReferenceLayer overChart,
                          Request request, File destination,
-                         ReplaceDecision replace, ByteSink sink) {
+                         ReplaceDecision replace, ByteSink sink,
+                         juranometria.ui.language.InterfaceText said) {
         if (destination == null) {
-            return new Outcome.Refused("No file was chosen.");
+            return new Outcome.Refused(said.say("export.refused.nofile"));
         }
         File file = withExtension(destination, request.format());
 
@@ -136,25 +153,29 @@ public final class ExportSheet {
         // half-written file with the reader told it worked.
         File parent = file.getAbsoluteFile().getParentFile();
         if (parent == null || !parent.isDirectory()) {
-            return new Outcome.Refused("There is no folder at "
-                    + (parent == null ? "that path" : parent.getPath())
-                    + " to write into.");
+            // Two whole sentences rather than one with a fragment
+            // substituted into it: "that path" is not a folder name,
+            // and a language may not want it in the same position
+            // (#350).
+            return new Outcome.Refused(parent == null
+                    ? said.say("export.refused.nofolder.unknown")
+                    : said.say("export.refused.nofolder", parent.getPath()));
         }
         if (file.isDirectory()) {
-            return new Outcome.Refused(file.getName()
-                    + " is a folder, not a file.");
+            return new Outcome.Refused(
+                    said.say("export.refused.isfolder", file.getName()));
         }
         if (file.exists() && !file.canWrite()) {
-            return new Outcome.Refused(file.getName()
-                    + " cannot be replaced: it is not writable.");
+            return new Outcome.Refused(
+                    said.say("export.refused.unwritable", file.getName()));
         }
         // Asked here rather than left to the file chooser, because
         // the name the chooser approved is not always the name that
         // gets written: choosing "orion" with SVG selected writes
         // "orion.svg", and the chooser never saw that one.
         if (file.exists() && !replace.mayReplace(file)) {
-            return new Outcome.Refused(file.getName()
-                    + " was left as it was.");
+            return new Outcome.Refused(
+                    said.say("export.refused.kept", file.getName()));
         }
         // A sheet is written completely or not at all, and that
         // needs somewhere beside the destination to write it. A
@@ -164,10 +185,8 @@ public final class ExportSheet {
         // helps a process that lives long enough to use it. A crash
         // does not grant that (PR #291 round 4).
         if (!parent.canWrite()) {
-            return new Outcome.Refused(parent.getPath()
-                    + " cannot be written to, so the sheet cannot be"
-                    + " written there safely. Choose another folder,"
-                    + " or make that one writable.");
+            return new Outcome.Refused(said.say(
+                    "export.refused.foldernotwritable", parent.getPath()));
         }
 
         byte[] bytes;
@@ -179,19 +198,25 @@ public final class ExportSheet {
         } catch (IOException | RuntimeException failure) {
             // Nothing has been written yet, so there is nothing to
             // clean up and nothing that looks finished.
-            return new Outcome.Refused("The sheet could not be made: "
-                    + failure.getMessage());
+            // The exception's own message is platform detail,
+             // written by whoever threw it and in whatever language
+             // that library uses. It is not spliced into a reader's
+             // sentence (#350); what a reader needs is that nothing
+             // was written, which is what this says.
+            return new Outcome.Refused(said.say("export.refused.notmade"));
         }
 
         boolean replacing = file.exists();
         try {
             place(bytes, file.toPath(), parent.toPath(), sink);
         } catch (IOException failure) {
-            return new Outcome.Refused(file.getName()
-                    + " could not be written: " + failure.getMessage()
-                    + (replacing
-                            ? " What was already there is unchanged."
-                            : ""));
+            // Two whole patterns rather than one with an optional
+            // clause glued on: whether a language puts the
+            // reassurance second, or in the same sentence at all, is
+            // its own decision (#350).
+            return new Outcome.Refused(replacing
+                    ? said.say("export.refused.notreplaced", file.getName())
+                    : said.say("export.refused.notwritten", file.getName()));
         }
         return new Outcome.Written(file.toPath(), bytes.length,
                 request.format());

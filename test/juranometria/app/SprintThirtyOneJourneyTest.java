@@ -172,7 +172,7 @@ class SprintThirtyOneJourneyTest {
                         () -> ExportSheetSession.open(frame, navigation,
                                 chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0])));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en"))));
                 // Held before it is shown, so nothing that happens
                 // next can lose the window.
                 window[0] = frame;
@@ -707,7 +707,7 @@ class SprintThirtyOneJourneyTest {
                                Path folder, PaperSize paper,
                                SheetFormat format) throws Exception {
         List<Path> written = new ArrayList<>();
-        ExportSheetSession.Surfaces real = ExportSheetSession.onScreen();
+        ExportSheetSession.Surfaces real = ExportSheetSession.onScreen(juranometria.ui.language.InterfaceText.forLanguage("en"));
         exporting[0] = new ExportSheetSession.Surfaces() {
 
             @Override

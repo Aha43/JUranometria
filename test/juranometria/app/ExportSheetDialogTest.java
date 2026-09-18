@@ -64,7 +64,7 @@ class ExportSheetDialogTest {
     void everyChoiceIsThereAndNothingElseIs() {
         List<ExportSheet.Request> chosen = new ArrayList<>();
         JComponent content = ExportSheetDialog.content(defaults(),
-                chosen::add, () -> { });
+                chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         JComboBox<SheetFormat> format =
                 named(content, ExportSheetDialog.FORMAT_BOX);
@@ -97,7 +97,7 @@ class ExportSheetDialogTest {
     @Test
     void resolutionIsOfferedOnlyWhereItMeansSomething() {
         JComponent content = ExportSheetDialog.content(defaults(),
-                request -> { }, () -> { });
+                request -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         JComboBox<SheetFormat> format =
                 named(content, ExportSheetDialog.FORMAT_BOX);
         JComboBox<Integer> resolution =
@@ -124,7 +124,7 @@ class ExportSheetDialogTest {
         List<ExportSheet.Request> chosen = new ArrayList<>();
         List<String> cancelled = new ArrayList<>();
         JComponent content = ExportSheetDialog.content(defaults(),
-                chosen::add, () -> cancelled.add("cancelled"));
+                chosen::add, () -> cancelled.add("cancelled"), juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         JComboBox<SheetFormat> format =
                 named(content, ExportSheetDialog.FORMAT_BOX);
@@ -157,7 +157,7 @@ class ExportSheetDialogTest {
         List<ExportSheet.Request> chosen = new ArrayList<>();
         List<String> cancelled = new ArrayList<>();
         JComponent content = ExportSheetDialog.content(defaults(),
-                chosen::add, () -> cancelled.add("cancelled"));
+                chosen::add, () -> cancelled.add("cancelled"), juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         ((JButton) named(content, ExportSheetDialog.CANCEL_BUTTON))
                 .doClick();
@@ -184,7 +184,7 @@ class ExportSheetDialogTest {
                     // suite run before this was fixed.
                     UiTheme.apply(dark);
                     JComponent content = ExportSheetDialog.content(
-                            defaults(), request -> { }, () -> { });
+                            defaults(), request -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                     // The text is enlarged on this tree rather than
                     // in UIManager: a global font override outlives
                     // the look and feel the guard restores, and the
@@ -229,7 +229,7 @@ class ExportSheetDialogTest {
             JComponent[] holder = new JComponent[1];
             SwingUtilities.invokeAndWait(() -> {
                 holder[0] = ExportSheetDialog.content(defaults(),
-                        chosen::add, () -> { });
+                        chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 window[0] = new JFrame("export-dialog");
                 window[0].setContentPane(holder[0]);
                 window[0].pack();
