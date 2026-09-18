@@ -305,9 +305,10 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
                         "src/juranometria/tool/SettingsSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
+                        "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the thirteen widget photographers, whose font and theme"
+                "the fourteen widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -353,7 +354,15 @@ class TestEvidenceGateTest {
                         + " them and its header, the Mag column from"
                         + " its silence - and a table measured"
                         + " without a window reports widths nothing"
-                        + " honours");
+                        + " honours; and the fourteenth by #350's"
+                        + " toolbar sheet, which photographs the bar"
+                        + " and its search field as the application"
+                        + " composes them - through AtlasControls,"
+                        + " from a stored language choice, because a"
+                        + " sheet that asked each component for"
+                        + " Norwegian would have photographed a"
+                        + " correct toolbar throughout the period the"
+                        + " application was handing it English");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -469,7 +478,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(39, display.size(),
+        assertEquals(40, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -533,7 +542,11 @@ class TestEvidenceGateTest {
                         + " the application's own theme installed it"
                         + " is the plain label's colour, which is"
                         + " what the first version of that test"
-                        + " measured");
+                        + " measured; and #350's search language test,"
+                        + " whose result list is a window of its own"
+                        + " rather than a child of the field - walked"
+                        + " through the field's children it finds the"
+                        + " idle state and calls it the surface");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

@@ -76,9 +76,9 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **58 files** touch process-wide state —
-**30** use the shared guard, **27** restore locally,
-**0 flagged unprotected** — and **39 files** depend on a display,
+this document to them: **59 files** touch process-wide state —
+**30** use the shared guard, **28** restore locally,
+**0 flagged unprotected** — and **40 files** depend on a display,
 of which **19** state a focus premise and **27** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -165,7 +165,14 @@ test to the shared-guard shape: it installs the application's own theme
 in both light and dark, because the version label's subdued colour is
 resolved per theme — written down once it would be wrong in the other,
 and measured without that theme installed it is simply the plain
-label's colour, which is what the first version of the test read.)
+label's colour, which is what the first version of the test read. #350
+also added the search language test: its result list is a popup window of
+its own rather than a child of the field, so a walk through the field's
+children finds the idle state and reports it as the whole surface. #350 added one more to the
+local-preference shape: the controls-composition test, which begins where
+startup begins — a stored language choice read once — because the defect it
+holds was an application that composed translated components in English
+while every component contract passed.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -350,7 +357,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **714 explicit hand-offs**
+reads of live chart state** against **723 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -361,7 +368,13 @@ chart keyboard, whose every question of the palette — is it open,
 what does its line say, how many listeners is the toolkit holding —
 is asked on the event thread and nowhere else; and for #315's
 closing journey, which reads the page a reader is looking at on
-every rung it visits; and for #350's toolbar language test, which
+every rung it visits; and for #350's controls-composition test, which
+builds both surfaces and reads their words on the event thread, because
+what it is checking is what a reader would see; and for #350's search
+language test, which hands
+each query to the field and reads the popup it opens on the event thread,
+because a popup read off it is a popup read while it is still being
+built; and for #350's toolbar language test, which
 builds the bar, steps its magnitude ladder to each end and reads the
 wording on the event thread, because the wording is written by the
 controller's own notification; and for #350's On This Page language

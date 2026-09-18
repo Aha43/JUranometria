@@ -43,9 +43,9 @@ public final class AtlasToolbar extends JToolBar {
     private JButton exit;
     private javax.swing.JComponent versionGap;
 
-    public AtlasToolbar(ChartViewController controller,
-                        SearchField searchField) {
-        this(controller, searchField, null);
+    AtlasToolbar(ChartViewController controller,
+                 SearchField searchField) {
+        this(controller, searchField, (InspectorToggle) null);
     }
 
     /**
@@ -54,9 +54,9 @@ public final class AtlasToolbar extends JToolBar {
      * and is told what happened, so it never learns anything about
      * windows, widths, or the inspector's lifecycle.
      */
-    public AtlasToolbar(ChartViewController controller,
-                        SearchField searchField,
-                        InspectorToggle inspector) {
+    AtlasToolbar(ChartViewController controller,
+                 SearchField searchField,
+                 InspectorToggle inspector) {
         this(controller, searchField, inspector, null, null);
     }
 
@@ -74,13 +74,13 @@ public final class AtlasToolbar extends JToolBar {
      * it cannot come to disagree with About or with the window's
      * close box.
      */
-    public AtlasToolbar(ChartViewController controller,
-                        SearchField searchField,
-                        InspectorToggle inspector,
-                        String versionText,
-                        Runnable requestExit) {
+    AtlasToolbar(ChartViewController controller,
+                 SearchField searchField,
+                 InspectorToggle inspector,
+                 String versionText,
+                 Runnable requestExit) {
         this(controller, searchField, inspector, versionText, requestExit,
-                null);
+                (juranometria.chart.SelectionMode) null);
     }
 
     /**
@@ -95,12 +95,41 @@ public final class AtlasToolbar extends JToolBar {
      * <p>The toolbar reads and writes the shared mode and holds no
      * state of its own, the same seam as every other control here.
      */
+    /**
+     * The bar with a language, and without the optional parts.
+     *
+     * <p>These exist so that the thing a caller outside this package
+     * may not omit is the LANGUAGE. An inspector toggle, a version, a
+     * way out and a selection mode are all genuinely optional; which
+     * words the bar says is not (#350).
+     */
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField,
+                        InterfaceText said) {
+        this(controller, searchField, null, null, null, null, said);
+    }
+
+    /** The bar with everything but the selection mode, in a language. */
     public AtlasToolbar(ChartViewController controller,
                         SearchField searchField,
                         InspectorToggle inspector,
                         String versionText,
                         Runnable requestExit,
-                        juranometria.chart.SelectionMode selectionMode) {
+                        InterfaceText said) {
+        this(controller, searchField, inspector, versionText, requestExit,
+                null, said);
+    }
+
+    // Package-private: these default to English, and a production
+    // caller that wanted English by accident is exactly the defect
+    // #350 found in the toolbar itself. Harnesses in this package
+    // may use them; anything outside states its language.
+    AtlasToolbar(ChartViewController controller,
+                 SearchField searchField,
+                 InspectorToggle inspector,
+                 String versionText,
+                 Runnable requestExit,
+                 juranometria.chart.SelectionMode selectionMode) {
         this(controller, searchField, inspector, versionText, requestExit,
                 selectionMode, InterfaceText.forLanguage("en"));
     }

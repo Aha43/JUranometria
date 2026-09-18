@@ -244,8 +244,20 @@ public final class JUranometriaMain {
             }
         });
         AppMenuBar.installZoomShortcuts(frame.getRootPane(), controller);
-        juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
-                Atlas.search(), assembler, controller);
+        // One way out, whichever surface asks (issue #198). The
+        // toolbar button, the window's close box and the platform's
+        // Quit all reach the same path, so leaving means one thing.
+        // Named here rather than below because the toolbar is built
+        // through the controls seam and needs it.
+        AppShutdown shutdown = AppShutdown.real();
+        // Both reader-facing controls are built through one seam, so
+        // that "does the application hand them the session's
+        // language?" is a question with an address (#350).
+        AtlasControls controls = AtlasControls.of(language, controller,
+                Atlas.search(), assembler, inspectorToggle,
+                AppInfo.version(), shutdown::request,
+                modules.selectionMode());
+        juranometria.ui.SearchField searchField = controls.searchField();
         // Finding an object by name selects it, so a reader with no
         // pointer can reach the inspector at all - and it joins the
         // working selection under the decided search semantics.
@@ -253,10 +265,6 @@ public final class JUranometriaMain {
         searchField.setWorkingSelection(modules.workingSelection(),
                 modules.selectionMode());
 
-        // One way out, whichever surface asks (issue #198). The
-        // toolbar button, the window's close box and the platform's
-        // Quit all reach the same path, so leaving means one thing.
-        AppShutdown shutdown = AppShutdown.real();
         shutdown.onShutdown(inspector::dispose);
         // And the modules, on the same path. Disposing the panel a
         // module put its table in is not releasing the module: it
@@ -280,9 +288,7 @@ public final class JUranometriaMain {
 
         // The same AppInfo.version() About prints, handed over
         // rather than looked up twice.
-        AtlasToolbar toolbar = new AtlasToolbar(controller, searchField,
-                inspectorToggle, AppInfo.version(), shutdown::request,
-                modules.selectionMode());
+        AtlasToolbar toolbar = controls.toolbar();
         frame.setLayout(new BorderLayout());
         frame.add(toolbar, BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);

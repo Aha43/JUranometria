@@ -101,8 +101,9 @@ d2a8ec1c8bd1f1c7	sheet/SvgSheetWriter.java	&quot;	unresolved: no route found, ne
 f0b888d68d4cee96	sheet/SvgSheetWriter.java	&apos;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
 a606bdeeb5031932	ui/Explain.java	&amp;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
 022e61b72054908c	ui/Explain.java	&lt;	unresolved: no route found, needs manual inspection	false-positive	markup-entity: an XML/HTML entity in an escaping table
-149c81bbec32ceea	ui/SearchField.java	No match in the bundled catalogue	declared name used, but never at a known sink	reader-prose	shown in the application; belongs in the translation queue
-9042f3da9957a235	ui/SearchField.java	Found, but beyond this pack's coverage	declared name used, but never at a known sink	reader-prose	shown in the application; belongs in the translation queue
+a48a204920fc4d32	ui/SearchField.java	M 31	unresolved: no route found, needs manual inspection	notation	catalogue designations offered as examples of what a reader may type; handed to the sentence as arguments so no translation owns a copy of them; never translated
+d03086f1ec7dc3f0	ui/SearchField.java	NGC 224	unresolved: no route found, needs manual inspection	notation	catalogue designations offered as examples of what a reader may type; handed to the sentence as arguments so no translation owns a copy of them; never translated
+5b7dec28f8ee94d2	ui/SearchField.java	TYC 2801-2090-1	unresolved: no route found, needs manual inspection	notation	catalogue designations offered as examples of what a reader may type; handed to the sentence as arguments so no translation owns a copy of them; never translated
 40dfc1042ecad961	ui/Shortcuts.java	export	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 503e7e33e6fa2b02	ui/Shortcuts.java	inspector	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 5156e247f7979f83	ui/Shortcuts.java	zoomIn	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it

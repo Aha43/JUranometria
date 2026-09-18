@@ -314,13 +314,18 @@ public final class ControlExplanationStudyMain {
         Map<String, Component> surfaces = new LinkedHashMap<>();
         juranometria.ui.ChartViewController navigation =
                 new juranometria.ui.ChartViewController();
+        // English, stated. This audit records what the released
+        // English surface says; asking the default locale would make
+        // the report change with the machine that generated it (#350).
+        juranometria.ui.language.InterfaceText english =
+                juranometria.ui.language.InterfaceText.forLanguage("en");
         juranometria.ui.SearchField search =
                 new juranometria.ui.SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
+                        Atlas.assembler(), navigation, english);
         surfaces.put("Toolbar", new juranometria.ui.AtlasToolbar(
                 navigation, search,
                 new juranometria.ui.InspectorToggle(), "0.0.0",
-                () -> { }, new juranometria.chart.SelectionMode()));
+                () -> { }, new juranometria.chart.SelectionMode(), english));
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }));

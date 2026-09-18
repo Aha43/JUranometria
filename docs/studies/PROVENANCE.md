@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**327 promoted artifacts.**
+**335 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -218,6 +218,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/onthispage-nb-NO-4-empty.png` | `16eb128a51741765c00c77498222350d60a2416dc25e93f43338dda53c60aa57` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-en.png` | `7c5fa92eacbfae9ddf2170dd5d0977322186f76d20f7c30eb6da750e8f5731b7` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-nb-NO.png` | `4c7ea9b8406534dee7021df4e6ec594efc3bd7069d523a4cca1ff0118e08adb1` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-en-1-idle.png` | `b9c14fe7d372dd8b92bfa0ec3d55f78787d99a78d834e480ad6eac817d676e5b` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-en-2-results.png` | `624cd0e460a6bf051c7216922e2b2b3fbd2d7af3c1c0b1ccfd7665bb1f2cd278` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-en-3-nomatch.png` | `1bd5560ed557dd1e640fdb99e4715c9d19e4747be580b13f67d2795cdc458f9c` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-en-4-nofit.png` | `f8d08f538bac4333eb3b3d969bd535820e29d6ebdef40a3a5ac7503f067a9911` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-nb-NO-5-idle.png` | `62f86dc62f03e3bc04ef80f5fa06a6188765fbf2bb0c4534f9c62dcba01210ad` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-nb-NO-6-results.png` | `81e588192ca51ff6c06b9fa5c48f9d0e3e7d92a397fab7fc17b240d876e0ffcf` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-nb-NO-7-nomatch.png` | `e6a59bbb310336bddf9886f4840d4984f31673f3dd4238cb02b8038f78c542b5` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/toolbar-nb-NO-8-nofit.png` | `5ab23f9047f5f912ce10a53f377a080be118d90eae6554a52bd5cb58355d1213` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-candidate.png` | `fe2815677cff74b5e5f5b9301ae2ad067f600f792f58a21fcc1dfd78e12eb47e` | 2026-09-14 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/home-today.png` | `4bcce3c0971294087a56a21dc0666c2c5213290b3750a740f1921ce482fff6f3` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/label-placement/orion-90-candidate.png` | `0093b03d794841e3981dc378802634dd608c45d9cc6a63209c90f6bb5f2af87d` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |

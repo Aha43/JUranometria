@@ -71,8 +71,8 @@ public final class ExitProbeMain {
             ChartViewController navigation = new ChartViewController();
             toolbar[0] = new AtlasToolbar(navigation,
                     new SearchField(Atlas.search(), Atlas.assembler(),
-                            navigation),
-                    null, AppInfo.version(), shutdown::request);
+                            navigation, juranometria.ui.language.InterfaceText.forLanguage("en")),
+                    null, AppInfo.version(), shutdown::request, juranometria.ui.language.InterfaceText.forLanguage("en"));
         });
 
         // A real activation of the real button.

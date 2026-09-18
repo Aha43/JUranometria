@@ -41,12 +41,19 @@ public final class SearchField extends JTextField {
      * fact true of both — no match in the bundled data — without implying
      * the query names a real object.
      */
-    private static final String NO_MATCH_MESSAGE =
-            "No match in the bundled catalogue";
-    /** Unreachable under an all-sky pack; kept for regional packs. */
-    private static final String NO_FIT_MESSAGE =
-            "Found, but beyond this pack's coverage";
+    private static final String NO_MATCH = "search.nomatch";
+    /**
+     * Unreachable under an all-sky pack; kept for regional packs.
+     *
+     * <p>{@code NO_FIT} is returned only when no field width fits a
+     * result's position, which cannot happen when every position fits
+     * at some rung. A regional catalogue can still produce it, so it
+     * is held by a constructed fixture in both languages rather than
+     * deleted for being quiet (#350).
+     */
+    private static final String NO_FIT = "search.nofit";
 
+    private final juranometria.ui.language.InterfaceText said;
     private final LocalSearch search;
     private final SceneAssembler assembler;
     private final ChartViewController controller;
@@ -73,28 +80,73 @@ public final class SearchField extends JTextField {
         this.mode = mode;
     }
 
+    /**
+     * English, for harnesses inside this package.
+     *
+     * <p><strong>Package-private on purpose</strong> (#350). A public
+     * constructor that quietly chose English is how the toolbar came
+     * to be externalised, translated, proved by eight passing
+     * contracts, and still shown in English to a reader who had asked
+     * for Norwegian: the application called the defaulting form and
+     * every test passed a language explicitly, so nothing could see
+     * it. Production and application journeys now cannot reach this;
+     * the compiler says so, which a grep could not.
+     */
+    SearchField(LocalSearch search, SceneAssembler assembler,
+                ChartViewController controller) {
+        this(search, assembler, controller,
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
+    }
+
+    /**
+     * The field in a language a caller states (issue #350).
+     *
+     * <p>A separate language surface from the toolbar it sits on: its
+     * grammar is its own, and the four examples below are canonical
+     * designations and a canonical coordinate pair rather than words.
+     */
     public SearchField(LocalSearch search, SceneAssembler assembler,
-                       ChartViewController controller) {
+                       ChartViewController controller,
+                       juranometria.ui.language.InterfaceText said) {
         super(14);
+        if (said == null) {
+            throw new IllegalArgumentException(
+                    "the field has to say its words in some language");
+        }
         this.search = search;
         this.assembler = assembler;
         this.controller = controller;
-        putClientProperty("JTextField.placeholderText", "Search");
-        getAccessibleContext().setAccessibleName("Search the atlas");
+        this.said = said;
+        putClientProperty("JTextField.placeholderText",
+                said.say("search.placeholder"));
+        getAccessibleContext().setAccessibleName(said.say("search.a11y"));
         // A field whose expected input is not obvious: the examples
         // are the explanation, and they belong where a reader who is
         // about to type can see them. The spoken form gives the same
         // four shapes without leaning on a placeholder nobody hears.
+        //
+        // The examples go in as arguments. They are designations and
+        // a coordinate pair, not words, and a translator handed a
+        // sentence with them already written into it would own a copy
+        // of the catalogue's spelling (#350).
         Explain.control(this,
-                "Find an object or coordinates, e.g. M 31, NGC 224,"
-                        + " TYC 2801-2090-1, or 0:42:44 +41:16:09",
-                "Type a Messier or NGC number, a star's catalogue"
-                        + " identity, or a right ascension and"
-                        + " declination, then press Enter; the chart"
-                        + " goes there and marks it");
+                said.say("search.hover", EXAMPLES[0], EXAMPLES[1],
+                        EXAMPLES[2], EXAMPLES[3]),
+                said.say("search.explain"));
         setMaximumSize(new Dimension(220, Integer.MAX_VALUE));
         addActionListener(event -> handle(getText()));
     }
+
+    /**
+     * The four shapes a reader may type, as the catalogue spells them.
+     *
+     * <p>Canonical: a Messier number, an NGC number, a Tycho identity
+     * and a right ascension with a declination. No language changes
+     * any of them, so they live here and are handed to whichever
+     * sentence needs them.
+     */
+    private static final String[] EXAMPLES = {
+            "M 31", "NGC 224", "TYC 2801-2090-1", "0:42:44 +41:16:09"};
 
     /** Clears the query text and any open result list. */
     public void clearSearch() {
@@ -110,13 +162,13 @@ public final class SearchField extends JTextField {
         }
         List<SearchResult> results = search.search(query);
         if (results.isEmpty()) {
-            showMessage(NO_MATCH_MESSAGE);
+            showMessage(NO_MATCH);
             return Outcome.NO_MATCH;
         }
         if (results.size() == 1) {
             Outcome outcome = apply(results.get(0));
             if (outcome == Outcome.NO_FIT) {
-                showMessage(NO_FIT_MESSAGE);
+                showMessage(NO_FIT);
             }
             return outcome;
         }
@@ -149,7 +201,7 @@ public final class SearchField extends JTextField {
             JMenuItem item = new JMenuItem(itemText(result));
             item.addActionListener(event -> {
                 if (apply(result) == Outcome.NO_FIT) {
-                    showMessage(NO_FIT_MESSAGE);
+                    showMessage(NO_FIT);
                 }
             });
             // The item's own words are the object's name and its
@@ -157,7 +209,7 @@ public final class SearchField extends JTextField {
             // tooltip over a list a reader is walking with the arrow
             // keys would be in the way of the list.
             Explain.selfExplanatory(item,
-                    "Goes to " + result.label() + " and marks it");
+                    said.say("search.result.explain", result.label()));
             menu.add(item);
         }
         return menu;
@@ -169,17 +221,27 @@ public final class SearchField extends JTextField {
                 : result.label() + " · " + result.identity();
     }
 
-    private void showMessage(String message) {
+    /**
+     * A failure, said whole.
+     *
+     * <p>The explanation used to be built as {@code "Nothing to
+     * choose: " + message.toLowerCase(ROOT) + ". Try another name, or
+     * coordinates."} - a whole sentence lowercased by an English rule
+     * and spliced into another sentence as a clause. German would
+     * capitalise the noun and Norwegian would not phrase it that way
+     * at all. Each message now owns a label and an explanation, and
+     * neither is derived from the other (#350).
+     */
+    private void showMessage(String stem) {
         JPopupMenu menu = new JPopupMenu();
-        JMenuItem item = new JMenuItem(message);
+        JMenuItem item = new JMenuItem(said.say(stem + ".label"));
         item.setEnabled(false);
         // Disabled, and the one place in the atlas where that is the
         // whole message rather than a control gone quiet - so it says
-        // what to do next instead of why it cannot be pressed.
-        Explain.selfExplanatory(item,
-                "Nothing to choose: " + message.toLowerCase(
-                        java.util.Locale.ROOT)
-                        + ". Try another name, or coordinates.");
+        // what to do next instead of why it cannot be pressed. Unlike
+        // the toolbar's version label, this really is unavailable:
+        // there is nothing to choose.
+        Explain.selfExplanatory(item, said.say(stem + ".explain"));
         menu.add(item);
         showPopup(menu);
     }

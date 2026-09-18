@@ -39,8 +39,8 @@ class ToolbarVersionAndExitTest {
             ChartViewController navigation = new ChartViewController();
             made[0] = new AtlasToolbar(navigation,
                     new SearchField(Atlas.search(), Atlas.assembler(),
-                            navigation),
-                    null, version, exit);
+                            navigation, juranometria.ui.language.InterfaceText.forLanguage("en")),
+                    null, version, exit, juranometria.ui.language.InterfaceText.forLanguage("en"));
         });
         return made[0];
     }

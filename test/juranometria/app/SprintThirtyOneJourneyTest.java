@@ -148,10 +148,10 @@ class SprintThirtyOneJourneyTest {
                         chosen -> navigation.recenter(chosen.position()));
                 chart.onSceneChange(inspectorHolder[0]::refresh);
                 searchHolder[0] = new SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
+                        Atlas.assembler(), navigation, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 searchHolder[0].setSelectionModel(selection);
                 toolbarHolder[0] = new AtlasToolbar(navigation,
-                        searchHolder[0]);
+                        searchHolder[0], juranometria.ui.language.InterfaceText.forLanguage("en"));
 
                 JFrame frame = new JFrame("sprint 31 journey");
                 frame.setLayout(new BorderLayout());

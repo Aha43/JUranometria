@@ -516,7 +516,7 @@ class FigureAnchorTest {
                 window[0].add(new juranometria.ui.AtlasToolbar(navigation,
                                 new juranometria.ui.SearchField(
                                         Atlas.search(), Atlas.assembler(),
-                                        navigation)),
+                                        navigation, juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")),
                         java.awt.BorderLayout.NORTH);
                 window[0].add(chart[0], java.awt.BorderLayout.CENTER);
                 window[0].setSize(1100, 800);

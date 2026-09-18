@@ -180,8 +180,8 @@ class AccessibleSurfaceTest {
                 ChartViewController navigation =
                         new ChartViewController(Atlas.assembler()::fits);
                 SearchField search = new SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
-                collectUnnamed(new AtlasToolbar(navigation, search),
+                        Atlas.assembler(), navigation, juranometria.ui.language.InterfaceText.forLanguage("en"));
+                collectUnnamed(new AtlasToolbar(navigation, search, juranometria.ui.language.InterfaceText.forLanguage("en")),
                         "toolbar", unnamed);
                 collectUnnamed(SettingsDialog.content(false, false,
                 SettingsDialog.installed(),

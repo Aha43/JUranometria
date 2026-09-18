@@ -190,9 +190,9 @@ class SprintTwentyNineJourneyTest {
                 chart.setViewState(ChartViewState.DEFAULT);
                 chart.setPreferredSize(new java.awt.Dimension(900, 700));
                 searchHolder[0] = new SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
+                        Atlas.assembler(), navigation, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 toolbarHolder[0] = new AtlasToolbar(navigation,
-                        searchHolder[0]);
+                        searchHolder[0], juranometria.ui.language.InterfaceText.forLanguage("en"));
                 window[0] = new JFrame("sprint-29-journey");
                 window[0].setLayout(new BorderLayout());
                 window[0].add(toolbarHolder[0], BorderLayout.NORTH);

@@ -212,7 +212,7 @@ class InspectorCloseButtonTest {
                 frame.setLayout(new BorderLayout());
                 frame.add(new juranometria.ui.AtlasToolbar(navigation,
                         new SearchField(Atlas.search(), Atlas.assembler(),
-                                navigation), toggle),
+                                navigation, juranometria.ui.language.InterfaceText.forLanguage("en")), toggle, null, null, null, juranometria.ui.language.InterfaceText.forLanguage("en")),
                         BorderLayout.NORTH);
                 frame.add(chart, BorderLayout.CENTER);
                 frame.add(inspector, BorderLayout.EAST);
