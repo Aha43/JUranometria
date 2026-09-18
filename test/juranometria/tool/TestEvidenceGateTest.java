@@ -469,7 +469,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(38, display.size(),
+        assertEquals(39, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -525,7 +525,15 @@ class TestEvidenceGateTest {
                         + " headers a realised table builds and the"
                         + " width its count line is given - both of"
                         + " which exist only once a window has laid"
-                        + " the panel out");
+                        + " the panel out; and #350's toolbar"
+                        + " language test, which reads a colour the"
+                        + " look and feel resolves - written down"
+                        + " once it would be right in one theme and"
+                        + " wrong in the other, and measured without"
+                        + " the application's own theme installed it"
+                        + " is the plain label's colour, which is"
+                        + " what the first version of that test"
+                        + " measured");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

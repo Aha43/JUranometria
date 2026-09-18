@@ -230,8 +230,13 @@ public final class InspectorPanel extends JPanel {
 
         close.getAccessibleContext().setAccessibleName(
                 said.say("inspector.close.a11y"));
+        // Through the language's own joining pattern (#350): the
+        // words were already translated here, but where the keystroke
+        // sat and whether it was bracketed were still decided in
+        // English for every language at once.
         juranometria.ui.Explain.control(close,
-                juranometria.ui.Shortcuts.saying(said.say("inspector.close.a11y"),
+                juranometria.ui.language.ShortcutText.in(said).withKeystroke(
+                        said.say("inspector.close.a11y"),
                         juranometria.ui.Shortcuts.INSPECTOR),
                 said.say("inspector.close.explain"));
         // Quiet: an icon and its hover, not a bordered button

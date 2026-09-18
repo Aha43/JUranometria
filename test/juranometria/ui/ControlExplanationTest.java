@@ -344,12 +344,15 @@ class ControlExplanationTest {
             }
             assertFalse(zoomIn.isEnabled(),
                     "the narrowest field the atlas draws");
-            assertTrue(zoomIn.getAccessibleContext()
-                            .getAccessibleDescription()
-                            .contains("unavailable"),
-                    "and the control says so rather than going quiet: "
-                            + zoomIn.getAccessibleContext()
-                                    .getAccessibleDescription());
+            // Asked of the resource, not pinned as a literal: the
+            // sentence belongs to the language now, and a test that
+            // froze the English would make the next translation a
+            // test failure instead of a translation (#350).
+            assertEquals(juranometria.ui.language.InterfaceText
+                            .forLanguage("en").say("toolbar.zoomIn.end"),
+                    zoomIn.getAccessibleContext()
+                            .getAccessibleDescription(),
+                    "and the control says so rather than going quiet");
         });
     }
 

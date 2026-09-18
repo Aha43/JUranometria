@@ -131,15 +131,16 @@ public final class Shortcuts {
         return modifiers.isEmpty() ? key : modifiers + key;
     }
 
-    /**
-     * A control's own explanation, with its keys named after it.
-     *
-     * <p>So that "Zoom in" and "Zoom in (⌘=)" are the same sentence
-     * with one source for the second half.
-     */
-    public static String saying(String what, String id) {
-        return what + " (" + text(id) + ")";
-    }
+    // saying(what, id) was removed in #350. It joined a description
+    // to a keystroke as `what + " (" + text(id) + ")"`, which made
+    // one helper decide for every language that a keystroke goes
+    // last and in round brackets. That is typography, and it belongs
+    // to whoever is writing the sentence. The joining now lives in
+    // juranometria.ui.language.ShortcutText, which asks the reader's
+    // language where the keystroke goes; this class keeps what is
+    // genuinely its own - which binding a control has, and how this
+    // platform spells those keys. It is deleted rather than left
+    // unused so that the English form is not an available path back.
 
     /**
      * The modifier this platform puts in front of a menu key, in the

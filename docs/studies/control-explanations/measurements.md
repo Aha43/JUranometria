@@ -16,10 +16,10 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 |---|---|---|---|---|---|
 | Toolbar | JButton | (icon only) | Zoom in (<key:zoomIn>) | Shows a narrower field, with fainter stars on it | dynamic |
 | Toolbar | JButton | (icon only) | Zoom out (<key:zoomOut>) | Shows a wider field, with fewer stars on it | dynamic |
-| Toolbar | JButton | (icon only) | Fewer stars (brighter magnitude limit) | Draws only the brighter stars, one step at a time | hovered |
-| Toolbar | JButton | (icon only) | More stars (fainter magnitude limit) | Draws fainter stars as well, one step at a time | hovered |
+| Toolbar | JButton | (icon only) | Show fewer stars with a brighter magnitude limit | Draws only the brighter stars, one step at a time | dynamic |
+| Toolbar | JButton | (icon only) | Unavailable: V 8.0 is the faintest magnitude limit | Unavailable: V 8.0 is the faintest magnitude limit the atlas draws | dynamic |
 | Toolbar | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
-| Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that names what you have chosen and what is on this page | dynamic |
+| Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that identifies what you selected and lists what is on ... | dynamic |
 | Toolbar | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Toolbar | SearchField | (a field) | Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Type a Messier or NGC number, a star's catalogue identity, or a right ascension and dec... | hovered |
 | Toolbar | JButton | (icon only) | Exit JUranometria | Closes the atlas; what you chose is remembered | hovered |
@@ -98,7 +98,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**81 operable controls** across 11 surfaces: **50** hovered, **5** dynamic, **26** left to their own visible words, **0 undecided**.
+**81 operable controls** across 11 surfaces: **48** hovered, **7** dynamic, **26** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

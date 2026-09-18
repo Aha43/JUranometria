@@ -10,6 +10,8 @@ import javax.swing.JToolBar;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 import juranometria.chart.ChartViewState;
+import juranometria.ui.language.InterfaceText;
+import juranometria.ui.language.ShortcutText;
 
 /**
  * The compact atlas toolbar: zoom, magnitude-limit, and reset controls
@@ -20,6 +22,8 @@ import juranometria.chart.ChartViewState;
  */
 public final class AtlasToolbar extends JToolBar {
 
+    private final InterfaceText said;
+    private final ShortcutText shortcuts;
     private final JButton zoomIn;
     private final JButton zoomOut;
     private final JButton fewerStars;
@@ -97,32 +101,58 @@ public final class AtlasToolbar extends JToolBar {
                         String versionText,
                         Runnable requestExit,
                         juranometria.chart.SelectionMode selectionMode) {
+        this(controller, searchField, inspector, versionText, requestExit,
+                selectionMode, InterfaceText.forLanguage("en"));
+    }
+
+    /**
+     * The toolbar in a language a caller states (issue #350).
+     *
+     * <p>Stated, never inherited: a bar that asked the default locale
+     * would speak whichever language the machine was set to rather
+     * than the one the reader chose. {@code SearchField} is added
+     * here but owns its own words and is not translated from this
+     * constructor.
+     */
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField,
+                        InspectorToggle inspector,
+                        String versionText,
+                        Runnable requestExit,
+                        juranometria.chart.SelectionMode selectionMode,
+                        InterfaceText said) {
+        if (said == null) {
+            throw new IllegalArgumentException(
+                    "the bar has to say its words in some language");
+        }
+        this.said = said;
+        this.shortcuts = ShortcutText.in(said);
         setFloatable(false);
 
         // The keys are named from the one registry that binds them,
         // so a tooltip cannot promise a stroke the menu does not
         // answer, or spell a modifier this platform does not use.
-        zoomIn = iconButton("zoom-in", "Zoom in",
-                Shortcuts.saying("Zoom in", Shortcuts.ZOOM_IN),
-                "Shows a narrower field, with fainter stars on it",
+        zoomIn = iconButton("zoom-in", said.say("toolbar.zoomIn.a11y"),
+                shortcuts.withKeystroke(said.say("toolbar.zoomIn.hover"),
+                        Shortcuts.ZOOM_IN),
+                said.say("toolbar.zoomIn.explain"),
                 controller::zoomIn);
-        zoomOut = iconButton("zoom-out", "Zoom out",
-                Shortcuts.saying("Zoom out", Shortcuts.ZOOM_OUT),
-                "Shows a wider field, with fewer stars on it",
+        zoomOut = iconButton("zoom-out", said.say("toolbar.zoomOut.a11y"),
+                shortcuts.withKeystroke(said.say("toolbar.zoomOut.hover"),
+                        Shortcuts.ZOOM_OUT),
+                said.say("toolbar.zoomOut.explain"),
                 controller::zoomOut);
-        fewerStars = iconButton("minus", "Fewer stars",
-                "Fewer stars (brighter magnitude limit)",
-                "Draws only the brighter stars, one step at a time",
+        fewerStars = iconButton("minus", said.say("toolbar.fewerStars.a11y"),
+                said.say("toolbar.fewerStars.hover"),
+                said.say("toolbar.fewerStars.explain"),
                 controller::decreaseMagnitudeLimit);
-        moreStars = iconButton("plus", "More stars",
-                "More stars (fainter magnitude limit)",
-                "Draws fainter stars as well, one step at a time",
+        moreStars = iconButton("plus", said.say("toolbar.moreStars.a11y"),
+                said.say("toolbar.moreStars.hover"),
+                said.say("toolbar.moreStars.explain"),
                 controller::increaseMagnitudeLimit);
-        resetView = iconButton("zoom-reset", "Reset view",
-                "Reset view: back to the atlas's first page",
-                "Returns the chart to where every reader begins, and"
-                        + " clears the search; what the chart draws is"
-                        + " left as you chose it",
+        resetView = iconButton("zoom-reset", said.say("toolbar.reset.a11y"),
+                said.say("toolbar.reset.hover"),
+                said.say("toolbar.reset.explain"),
                 () -> {
                     controller.reset();
                     searchField.clearSearch();
@@ -141,7 +171,7 @@ public final class AtlasToolbar extends JToolBar {
                     new FlatSVGIcon("resources/icons/list-details.svg", 16, 16));
             inspectorButton.setFocusable(true);
             inspectorButton.getAccessibleContext().setAccessibleName(
-                    "Inspector");
+                    said.say("toolbar.inspector.a11y"));
             inspectorButton.addActionListener(event -> {
                 // Ask, then let the answer come back through the
                 // shared switch: pressing does not decide the state.
@@ -153,22 +183,14 @@ public final class AtlasToolbar extends JToolBar {
             addSeparator();
         }
         if (selectionMode != null) {
-            accumulate = new javax.swing.JToggleButton("Accumulate");
+            accumulate = new javax.swing.JToggleButton(
+                    said.say("toolbar.accumulate.label"));
             accumulate.setFocusable(true);
             accumulate.getAccessibleContext().setAccessibleName(
-                    "Accumulate selection");
+                    said.say("toolbar.accumulate.a11y"));
             Explain.control(accumulate,
-                    "When on, choosing objects adds them to the working"
-                            + " selection and choosing them again"
-                            + " removes them, instead of replacing the"
-                            + " selection. The platform's"
-                            + " add-to-selection modifier always works.",
-                    "Off, each object you choose replaces the working"
-                            + " selection; on, it is added to it, and"
-                            + " choosing it again takes it out. Holding"
-                            + " the platform's add-to-selection"
-                            + " modifier does the same whether this is"
-                            + " on or off.");
+                    said.say("toolbar.accumulate.hover"),
+                    said.say("toolbar.accumulate.explain"));
             accumulate.addActionListener(event ->
                     selectionMode.accumulate(accumulate.isSelected()));
             // The mode is the truth; the button says what it holds,
@@ -190,20 +212,31 @@ public final class AtlasToolbar extends JToolBar {
             // Quiet, and beneath the controls in the hierarchy: an
             // identifier the reader can find when they need it, not
             // something competing with the chart's own readout.
+            //
+            // Quiet VISUALLY. It used to be quietened with
+            // setEnabled(false), which is a different claim: a screen
+            // reader announces a disabled control as unavailable, so
+            // the one thing here that is purely informative was
+            // spoken as something the reader could not use (#350
+            // inventory). The weight now comes from the theme's own
+            // subdued colour, resolved per theme so the dark palette
+            // gets the dark answer rather than a colour written down
+            // once in light.
             version.putClientProperty("FlatLaf.styleClass", "small");
-            version.setEnabled(false);
+            version.putClientProperty("FlatLaf.style",
+                    "foreground: $Label.disabledForeground");
             version.setFocusable(false);
             version.getAccessibleContext().setAccessibleName(
-                    "JUranometria version " + versionText);
+                    said.say("toolbar.version.a11y", versionText));
             version.setBorder(javax.swing.BorderFactory
                     .createEmptyBorder(0, 0, 0, 8));
             add(version);
 
         }
         if (requestExit != null) {
-            exit = iconButton("door-exit", "Exit JUranometria",
-                    "Exit JUranometria",
-                    "Closes the atlas; what you chose is remembered",
+            exit = iconButton("door-exit", said.say("toolbar.exit.a11y"),
+                    said.say("toolbar.exit.hover"),
+                    said.say("toolbar.exit.explain"),
                     requestExit);
             add(exit);
         }
@@ -375,23 +408,20 @@ public final class AtlasToolbar extends JToolBar {
         // atlas is broken or the window is small.
         if (!state.available()) {
             Explain.dynamic(inspectorButton,
-                    "The window is too narrow to show the Inspector",
-                    "Unavailable: widen the window and the Inspector"
-                            + " comes back with whatever it was"
-                            + " showing");
+                    said.say("toolbar.inspector.unavailable.hover"),
+                    said.say("toolbar.inspector.unavailable.explain"));
         } else if (state.showing()) {
             Explain.dynamic(inspectorButton,
-                    Shortcuts.saying("Hide the Inspector",
+                    shortcuts.withKeystroke(
+                            said.say("toolbar.inspector.showing.hover"),
                             Shortcuts.INSPECTOR),
-                    "Showing; press to give the whole window back to"
-                            + " the chart");
+                    said.say("toolbar.inspector.showing.explain"));
         } else {
             Explain.dynamic(inspectorButton,
-                    Shortcuts.saying("Show the Inspector: what the"
-                            + " selected mark is", Shortcuts.INSPECTOR),
-                    "Hidden; press to open the panel that names what"
-                            + " you have chosen and what is on this"
-                            + " page");
+                    shortcuts.withKeystroke(
+                            said.say("toolbar.inspector.hidden.hover"),
+                            Shortcuts.INSPECTOR),
+                    said.say("toolbar.inspector.hidden.explain"));
         }
     }
 
@@ -400,15 +430,41 @@ public final class AtlasToolbar extends JToolBar {
         zoomOut.setEnabled(controller.canZoomOut());
         fewerStars.setEnabled(controller.canDecreaseMagnitudeLimit());
         moreStars.setEnabled(controller.canIncreaseMagnitudeLimit());
-        readout.setText(String.format(Locale.ROOT,
-                "Field %.0f° · Stars to V %.1f",
-                state.fieldWidthDegrees(), state.limitingMagnitude()));
-        say(zoomOut, "Zoom out", Shortcuts.ZOOM_OUT,
-                "Shows a wider field, with fewer stars on it",
+
+        // The values are notation and are spelled once, in ROOT, then
+        // handed over already written. A language places them; none
+        // re-formats them, so a decimal point cannot become a comma
+        // in a magnitude (#350).
+        String field = String.format(Locale.ROOT, "%.0f",
+                state.fieldWidthDegrees());
+        String limit = String.format(Locale.ROOT, "%.1f",
+                state.limitingMagnitude());
+        readout.setText(said.say("toolbar.readout", field, limit));
+
+        say(zoomOut, "toolbar.zoomOut", Shortcuts.ZOOM_OUT,
                 controller.canZoomOut() ? state.zoomOut() : null, state);
-        say(zoomIn, "Zoom in", Shortcuts.ZOOM_IN,
-                "Shows a narrower field, with fainter stars on it",
+        say(zoomIn, "toolbar.zoomIn", Shortcuts.ZOOM_IN,
                 controller.canZoomIn() ? state.zoomIn() : null, state);
+
+        // A step the ladder will not take must say so. Zoom has said
+        // it since #203; the magnitude controls went grey and went on
+        // describing what they would do, which told a reader at the
+        // end of the ladder that the control does something it will
+        // not (#350 inventory).
+        sayLimit(fewerStars, "toolbar.fewerStars",
+                controller.canDecreaseMagnitudeLimit(), limit);
+        sayLimit(moreStars, "toolbar.moreStars",
+                controller.canIncreaseMagnitudeLimit(), limit);
+    }
+
+    /** A magnitude step, and what it says at the end of its ladder. */
+    private void sayLimit(JButton button, String stem, boolean canStep,
+                          String limit) {
+        Explain.dynamic(button,
+                canStep ? said.say(stem + ".hover")
+                        : said.say(stem + ".end.hover", limit),
+                canStep ? said.say(stem + ".explain")
+                        : said.say(stem + ".end.explain", limit));
     }
 
     /**
@@ -428,26 +484,30 @@ public final class AtlasToolbar extends JToolBar {
      * button that renamed itself at every rung would be a readout
      * pretending to be a control.
      */
-    private static void say(JButton button, String plain, String id,
-                            String spoken, ChartViewState next,
-                            ChartViewState state) {
-        String hovered = Shortcuts.saying(plain, id);
-        String heard = spoken;
+    private void say(JButton button, String stem, String id,
+                     ChartViewState next, ChartViewState state) {
+        // Four whole forms, one per situation, and no sentence built
+        // from pieces. The old end-of-ladder line was assembled by
+        // lowercasing the button's English label with Locale.ROOT -
+        // an English rule about English words, offered as though it
+        // were universal, and the same defect Chart Options had in
+        // its dependency clause (#350).
+        String hovered = shortcuts.withKeystroke(
+                said.say(stem + ".hover"), id);
+        String heard = said.say(stem + ".explain");
         if (next == null) {
-            heard = "As far as the ladder goes in that direction;"
-                    + " " + plain.toLowerCase(Locale.ROOT)
-                    + " is unavailable here";
+            heard = said.say(stem + ".end");
         } else if (next.overview() != state.overview()) {
-            hovered = Shortcuts.saying(next.overview()
-                    ? "Zoom out to the overview: the whole sky's shape,"
-                            + " wider than a detailed page"
-                    : "Zoom in to the detailed atlas", id);
-            heard = next.overview()
-                    ? "The next step out leaves the detailed atlas for"
-                            + " the overview, which shows the sky's"
-                            + " shape rather than a page to point a"
-                            + " telescope at"
-                    : "The next step in returns to the detailed atlas";
+            // Whole keys, not a stem with a fragment glued on. The
+            // schema is explicit keys so that every one of them can
+            // be found by searching for it; a key assembled at
+            // runtime is a key no grep will ever locate.
+            hovered = shortcuts.withKeystroke(said.say(next.overview()
+                    ? "toolbar.zoomOut.overview.hover"
+                    : "toolbar.zoomIn.overview.hover"), id);
+            heard = said.say(next.overview()
+                    ? "toolbar.zoomOut.overview.explain"
+                    : "toolbar.zoomIn.overview.explain");
         }
         Explain.dynamic(button, hovered, heard);
     }

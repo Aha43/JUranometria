@@ -76,9 +76,9 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **57 files** touch process-wide state —
-**29** use the shared guard, **27** restore locally,
-**0 flagged unprotected** — and **38 files** depend on a display,
+this document to them: **58 files** touch process-wide state —
+**30** use the shared guard, **27** restore locally,
+**0 flagged unprotected** — and **39 files** depend on a display,
 of which **19** state a focus premise and **27** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -160,7 +160,12 @@ honour. It presses nothing and states no input premise, because it
 takes no input: it measures. #350 added the On This Page language
 test on the same ground: the headers it reads are built when the table
 is realised, and the width its count line is given exists only once a
-window has laid the panel out.)
+window has laid the panel out. #350 also added the toolbar language
+test to the shared-guard shape: it installs the application's own theme
+in both light and dark, because the version label's subdued colour is
+resolved per theme — written down once it would be wrong in the other,
+and measured without that theme installed it is simply the plain
+label's colour, which is what the first version of the test read.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -345,7 +350,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **709 explicit hand-offs**
+reads of live chart state** against **714 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -356,7 +361,11 @@ chart keyboard, whose every question of the palette — is it open,
 what does its line say, how many listeners is the toolkit holding —
 is asked on the event thread and nowhere else; and for #315's
 closing journey, which reads the page a reader is looking at on
-every rung it visits; and for #350's On This Page language test,
+every rung it visits; and for #350's toolbar language test, which
+builds the bar, steps its magnitude ladder to each end and reads the
+wording on the event thread, because the wording is written by the
+controller's own notification; and for #350's On This Page language
+test,
 which builds the panel, reads its headers and measures its count line
 each on the event thread, because a header built off it is a header
 read while the table may still be rebuilding its columns; and for

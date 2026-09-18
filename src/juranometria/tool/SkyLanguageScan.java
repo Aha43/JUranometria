@@ -435,7 +435,10 @@ public final class SkyLanguageScan {
         SINKS.put("checkBox(", Kind.VISIBLE_PROSE);
         SINKS.put("addTab(", Kind.VISIBLE_PROSE);
         SINKS.put("iconButton(", Kind.VISIBLE_PROSE);
-        SINKS.put("Shortcuts.saying(", Kind.VISIBLE_PROSE);
+        // The real route. Shortcuts.saying was deleted in #350 - a
+        // sink registry naming a method nobody can call is a door
+        // watched where there is no longer a wall.
+        SINKS.put("withKeystroke(", Kind.VISIBLE_PROSE);
     }
 
     /** Astronomical notation, which no language changes. */
