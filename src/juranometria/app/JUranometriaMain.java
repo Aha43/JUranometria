@@ -26,7 +26,7 @@ public final class JUranometriaMain {
             // console, and an exception here would otherwise leave a
             // live process with no window (issue #145).
             try {
-                start(darkOverride);
+                start(darkOverride, StartupStores.user());
             } catch (Throwable failure) {
                 StartupFailure.reportAndExit(failure);
             }
@@ -47,16 +47,30 @@ public final class JUranometriaMain {
         navigation.recenter(chosen.position());
     }
 
-    private static void start(boolean darkOverride) {
+    /**
+     * The application, composed.
+     *
+     * <p>Package-private and handed its five preference stores rather
+     * than opening them, so a journey can run <em>these lines</em>
+     * instead of a reconstruction of them (#350). A replica that
+     * rebuilds the wiring in a fixture stays green when a call site
+     * below is broken, which is how a toolbar shipped in English
+     * behind eight passing contracts.
+     *
+     * <p>Returns the frame it built. {@code main} ignores it - the
+     * reader closes their own window - and a test owns disposing of
+     * the one it asked for.
+     */
+    static JFrame start(boolean darkOverride, StartupStores stores) {
         // The appearance session policy: the saved preference decides an
         // ordinary launch; an active --dark override keeps this whole
         // session dark and can never be converted into a stored choice
         // by merely confirming Settings (contract on AppearanceSession).
         AppearanceSession appearance = new AppearanceSession(
-                AppearanceStore.user(), darkOverride);
+                stores.appearance(), darkOverride);
         UiTheme.apply(appearance.startupDark());
         ChartOptionsController chartOptions =
-                new ChartOptionsController(ChartOptionsStore.user());
+                new ChartOptionsController(stores.chartOptions());
         // The reader's language, read from the store exactly once and
         // owned by this session from here on (#348). The store says
         // what the NEXT session starts with; the session says what
@@ -68,8 +82,7 @@ public final class JUranometriaMain {
                 juranometria.ui.language.InterfaceLanguages.discover();
         juranometria.ui.language.SkyLanguageSession language =
                 juranometria.ui.language.SkyLanguageSession.begin(
-                        juranometria.ui.language.SkyLanguageStore.user(),
-                        Atlas.languages());
+                        stores.language(), Atlas.languages());
         // The catalogues verify themselves as they load, so they are
         // loaded before any window exists: a damaged download should
         // be explained, not half-drawn behind a frame that will never
@@ -154,7 +167,7 @@ public final class JUranometriaMain {
         // read exactly once, here, stated rather than hidden in a
         // constructor.
         juranometria.ui.placeandtime.PlaceStore placeStore =
-                juranometria.ui.placeandtime.PlaceStore.user();
+                stores.place();
         juranometria.meridian.MeridianModule meridian =
                 juranometria.ui.placeandtime.PlaceAndTimeSession.begin(
                         modules, placeStore, java.time.Instant.now());
@@ -163,7 +176,7 @@ public final class JUranometriaMain {
         // who never chose gets the released default, which is
         // hidden.
         juranometria.ui.ecliptic.EclipticStore eclipticStore =
-                juranometria.ui.ecliptic.EclipticStore.user();
+                stores.ecliptic();
         juranometria.ecliptic.EclipticModule ecliptic =
                 juranometria.ui.ecliptic.EclipticSession.begin(modules);
         inspector.showPageView(onThisPage.panel());
@@ -178,12 +191,6 @@ public final class JUranometriaMain {
                 inspector::canShow);
         inspector.onVisibilityChange(inspectorToggle::report);
 
-        // One call, so the chart and the tick cannot disagree about
-        // what the reader last chose.
-        juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
-                eclipticStore,
-                AppMenuBar.eclipticItem(frame.getJMenuBar()));
-
         // The chart's own keyboard (issue #312): one key opens a
         // palette of every layer with its letter and its state, and
         // every letter reaches the same transition the reader's own
@@ -194,18 +201,6 @@ public final class JUranometriaMain {
                 juranometria.ui.ecliptic.EclipticSession.toggle(
                         ecliptic, eclipticStore),
                 meridian);
-        javax.swing.JCheckBoxMenuItem inspectorItem =
-                AppMenuBar.inspectorItem(frame.getJMenuBar());
-        if (inspectorItem != null) {
-            // The item shows what is actually on screen, including
-            // when a narrow window has closed the panel for the
-            // reader rather than at their asking - the same state the
-            // toolbar button shows, from the same switch.
-            inspectorToggle.onChange(state -> {
-                inspectorItem.setSelected(state.showing());
-                inspectorItem.setEnabled(state.available());
-            });
-        }
         // The reviewed layout rule: below 640 px of window the
         // inspector yields, and a window that widens again restores
         // what the reader asked for.
@@ -295,6 +290,31 @@ public final class JUranometriaMain {
                         chartOptions, modules.workingSelection(),
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage()))));
+        // Both of these read the bar, so both come AFTER it is set.
+        // They sat above the menu until the bar moved down to be
+        // built in the session's language (#350), and reading a bar
+        // that is not on the frame yet is a startup that ends in the
+        // failure reporter rather than a window. No test ran the real
+        // start, so 1445 of them passed over it.
+
+        // One call, so the chart and the tick cannot disagree about
+        // what the reader last chose.
+        juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
+                eclipticStore,
+                AppMenuBar.eclipticItem(frame.getJMenuBar()));
+        javax.swing.JCheckBoxMenuItem inspectorItem =
+                AppMenuBar.inspectorItem(frame.getJMenuBar());
+        if (inspectorItem != null) {
+            // The item shows what is actually on screen, including
+            // when a narrow window has closed the panel for the
+            // reader rather than at their asking - the same state the
+            // toolbar button shows, from the same switch.
+            inspectorToggle.onChange(state -> {
+                inspectorItem.setSelected(state.showing());
+                inspectorItem.setEnabled(state.available());
+            });
+        }
+
         frame.setLayout(new BorderLayout());
         frame.add(toolbar, BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);
@@ -302,5 +322,6 @@ public final class JUranometriaMain {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        return frame;
     }
 }

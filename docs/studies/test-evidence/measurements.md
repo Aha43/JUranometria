@@ -114,6 +114,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/app/SprintThirtyOneJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
 | juranometria/app/SprintThirtyTwoJourneyTest.java | focus-owner, point-reachable, control-showing | none |
 | juranometria/app/SprintTwentyNineJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
+| juranometria/app/StartupJourneyTest.java | control-showing | none |
 | juranometria/app/SwingSessionTest.java | none | none |
 | juranometria/ui/AtlasToolbarLanguageTest.java | none | none |
 | juranometria/ui/BlackSkyJourneyTest.java | point-reachable, control-showing | back-door-click |
@@ -142,7 +143,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/onthispage/OnThisPageLanguageTest.java | none | none |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
-**41 display-dependent files.** 19 state a focused-window or focus-owner premise, 27 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**42 display-dependent files.** 19 state a focused-window or focus-owner premise, 27 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 
@@ -169,7 +170,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **431** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **730**
+- explicit event-thread hand-offs (invokeAndWait): **734**
 
 ## Generated evidence, classified
 

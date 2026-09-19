@@ -489,7 +489,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(41, display.size(),
+        assertEquals(42, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -561,7 +561,18 @@ class TestEvidenceGateTest {
                         + " #350's export language test, which reads"
                         + " a label's relation to the control it"
                         + " names and a combo's rendered items, both"
-                        + " of which exist only on a built dialog");
+                        + " of which exist only on a built dialog;"
+                        + " and the startup journey, which is not a"
+                        + " surface test at all: it runs the real"
+                        + " JUranometriaMain.start with its five"
+                        + " stores injected, and starting the"
+                        + " application means making a window. It"
+                        + " exists because nothing ran start, and a"
+                        + " checkpoint shipped that could not launch"
+                        + " - the menu bar had moved down the method"
+                        + " and the two lines reading it back stayed"
+                        + " above it, which 1445 passing tests went"
+                        + " straight over");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

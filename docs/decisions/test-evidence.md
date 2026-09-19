@@ -78,7 +78,7 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **59 files** touch process-wide state —
 **30** use the shared guard, **28** restore locally,
-**0 flagged unprotected** — and **41 files** depend on a display,
+**0 flagged unprotected** — and **42 files** depend on a display,
 of which **19** state a focus premise and **27** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -174,7 +174,18 @@ startup begins — a stored language choice read once — because the defect it
 holds was an application that composed translated components in English
 while every component contract passed. #350 also added the export
 language test, which reads a label's `labelFor` relation and a combo's
-rendered items — neither of which exists until a dialog is built.)
+rendered items — neither of which exists until a dialog is built. And #350
+added the startup journey, which is not a surface test: it runs the real
+`JUranometriaMain.start` with its five preference stores injected, and
+starting the application means making a window. It exists because nothing
+ran `start`. A checkpoint shipped that could not launch — the menu bar had
+moved down the method to be built in the reader's language, and the two
+lines that read it back stayed above it, so `frame.getJMenuBar()` was null
+and a packaged application would have shown the failure reporter instead of
+a window. 1445 passing tests went straight over it. The ordering is held by
+consequence rather than by reading the source: the ecliptic's remembered
+choice has to arrive at its menu item, which cannot happen unless the bar is
+on the frame first.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -359,7 +370,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **730 explicit hand-offs**
+reads of live chart state** against **734 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
