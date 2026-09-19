@@ -26,14 +26,6 @@
 #   false-positive   not text at all, with the reason said plainly
 #
 identity	file	literal	scanner-reason	disposition	why
-21e53c185a6a0a2b	app/AboutDialog.java	Tycho-2 star data	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-257d81a34ecac668	app/AboutDialog.java	OpenNGC deep-sky data	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-58dd5732936a4212	app/AboutDialog.java	CC BY-SA 4.0 licence text	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-ab200a04642822d4	app/AboutDialog.java	Constellation geography	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-34bff71dfc94fd92	app/AboutDialog.java	Star identities	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-dbb75cd5992c5beb	app/AboutDialog.java	BSD-3-Clause licence text	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-e78e16cb8ccb96fc	app/AboutDialog.java	Tabler icons licence	collection/alias flow not traced	reader-prose	shown in the application; belongs in the translation queue
-78ceac80eb6f1698	app/AboutDialog.java	/resources/icons/LICENSE	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
 87d8572b24dee5c1	app/AppInfo.java	JUranometria	declared name has no use in this file	identifier	a stable key, path or stored value; no language changes it
 49e44a3b892b252d	app/AppInfo.java	https://github.com/Aha43/JUranometria	declared name has no use in this file	identifier	a stable key, path or stored value; no language changes it
 75ec4f72cfbdfd1e	app/AppMenuBar.java	inspectorItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
@@ -127,3 +119,8 @@ b4e65c9964bd2b15	ui/onthispage/OnThisPageTable.java	 B	declared name used, but n
 6d4f67271a7b6b3b	ui/language/ChartKeyboardText.java	chartkeyboard.	resource-key stem, never shown	identifier	a stable key, path or stored value; no language changes it
 bdeefc522cf13afe	ui/language/ChartKeyboardText.java	!none	the marker a pack writes where it has no note	identifier	a stable key, path or stored value; no language changes it
 ec385eacd9c4af9c	ui/language/ChartKeyboardText.java	note	the role half of a resource key	identifier	a stable key, path or stored value; no language changes it
+0230b7617d174847	app/AboutDialog.java	================================================\n	the rule between a heading and a bundled document	notation	a typographic rule, the same characters in every language; rendering, not words
+fa14b5ae5186cec7	ui/language/AboutText.java	notice.	resource-key fragment, never shown	identifier	a stable key, path or stored value; no language changes it
+c18ce3f4c9fce143	ui/language/AboutText.java	about.	resource-key stem, never shown	identifier	a stable key, path or stored value; no language changes it
+c4dcab779337ec98	ui/language/AboutText.java	/resources/interface-language/	where a language keeps its own summary document	identifier	a stable key, path or stored value; no language changes it
+a56146ee79531226	ui/language/AboutText.java	.label	the role half of a resource key	identifier	a stable key, path or stored value; no language changes it

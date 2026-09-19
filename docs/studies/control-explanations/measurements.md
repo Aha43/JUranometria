@@ -34,7 +34,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
-| Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window with the application's name, version and the software it is built on | self-explanatory |
+| Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window with the application's name, version and the software and data it is b... | self-explanatory |
 | Chart Options | JTabbedPane | Deep sky, Stars, Constellations, Chart | &mdash; | Four groups of choices: deep sky, stars, constellations and chart elements. | self-explanatory |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show earlier tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
@@ -79,10 +79,10 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Settings | JComboBox | (Names on chart) | The language of the constellation names printed on the chart - separate from the interf... | The language of the constellation names printed on the chart itself. Separate from the ... | hovered |
 | Settings | JButton | Cancel | &mdash; | Closes this window without saving changes | self-explanatory |
 | Settings | JButton | OK | &mdash; | Saves the choices and closes this window | self-explanatory |
-| About | JTextArea | (read-only text) | &mdash; | The short form of what the atlas is built on and what that allows; the full texts are b... | self-explanatory |
-| About | JButton | Full notices and licences... | &mdash; | Opens the complete notices and licence texts for everything the atlas bundles | self-explanatory |
+| About | JTextArea | (read-only text) | &mdash; | The short form of the atlas's licensing. The bundled data and icon notices are behind t... | self-explanatory |
+| About | JButton | Full notices and licences... | &mdash; | Opens the complete notices and licence texts for the data and icons bundled with the at... | self-explanatory |
 | About | JButton | Close | &mdash; | Closes this window and returns to the chart | self-explanatory |
-| About, notices | JTextArea | (read-only text) | &mdash; | The notices and licence texts of everything the atlas bundles, in full | self-explanatory |
+| About, notices | JTextArea | (read-only text) | &mdash; | The notices and licence texts for the data and icons bundled with the atlas, in full. | self-explanatory |
 | About, notices | JButton | Close | &mdash; | Closes this window and returns to the chart | self-explanatory |
 | Inspector | JButton | (icon only) | Close Inspector (<key:inspector>) | Hides this pane. The chart keeps its place, its target and your selection, and widens t... | hovered |
 | Inspector | JToggleButton | Selected | The facts of the object you last chose | Shows what the atlas holds on the one object you chose, rather than everything on the page | hovered |

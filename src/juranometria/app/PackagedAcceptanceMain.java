@@ -100,7 +100,7 @@ public final class PackagedAcceptanceMain {
                         && summary.contains("BSD-3-Clause")
                         && summary.contains("CC BY-SA 4.0"),
                 "About summary states the licence families");
-        String notices = AboutDialog.noticesText();
+        String notices = AboutDialog.noticesText(juranometria.ui.language.InterfaceText.forLanguage("en"));
         require(notices.contains("may not be used commercially")
                         && notices.contains("Redistribution and use in"
                                 + " source and binary forms"),
@@ -188,6 +188,76 @@ public final class PackagedAcceptanceMain {
         System.out.println("language availability OK (interface "
                 + interfaces + ", chart " + charts
                 + ", resolved independently)");
+
+        // The licensing summary, from inside the image (#350).
+        //
+        // A Norwegian summary that existed only in the source tree
+        // would be a legal statement the reader never sees, and a
+        // classpath check on a developer's machine cannot tell the
+        // two apart. So this asks the image: does a Norwegian
+        // document ship, is it the one selected for a Norwegian
+        // reader, does it still carry the whole licensing map, and
+        // does it still state the consequence that the packaged
+        // whole is non-commercial?
+        juranometria.ui.language.AboutText about =
+                juranometria.ui.language.AboutText.in(norsk);
+        require(about.hasOwnSummary(),
+                "a Norwegian licensing summary ships inside the"
+                        + " image, at " + about.summaryPath());
+        String norwegianSummary = about.summary();
+        require(!norwegianSummary.equals(
+                        juranometria.ui.language.AboutText
+                                .canonicalSummary()),
+                "and is the document a Norwegian reader is shown,"
+                        + " rather than the English one falling"
+                        + " through");
+        for (String identifier : new String[] {"MIT",
+                "CC BY-NC 3.0 IGO", "CC BY-SA 4.0", "BSD-3-Clause"}) {
+            require(norwegianSummary.contains(identifier),
+                    "the packaged Norwegian summary keeps the licence"
+                            + " identifier " + identifier
+                            + " exactly, untranslated");
+        }
+        for (String source : new String[] {"Tycho-2", "OpenNGC",
+                "d3-celestial", "Tabler"}) {
+            require(norwegianSummary.contains(source),
+                    "and names the source family " + source);
+        }
+        require(norwegianSummary.contains("bare brukes og"
+                        + " videredistribueres til\nikke-kommersielle"
+                        + " formål")
+                        || norwegianSummary.replaceAll("\\s+", " ")
+                                .contains("bare brukes og"
+                                        + " videredistribueres til"
+                                        + " ikke-kommersielle formål"),
+                "and states the approved Norwegian consequence: the"
+                        + " packaged whole may be used and"
+                        + " redistributed non-commercially only");
+
+        // And the documents behind the button, from the image, in
+        // the Norwegian route: translated headings over untranslated
+        // bodies.
+        String norwegianNotices = AboutDialog.noticesText(norsk);
+        require(norwegianNotices.contains("Stjernedata fra Tycho-2")
+                        && norwegianNotices.contains(
+                                "Lisens for Tabler-ikonene"),
+                "the notices view carries Norwegian headings inside"
+                        + " the image");
+        for (juranometria.app.AboutDialog.Notice notice
+                : AboutDialog.NOTICES) {
+            String body = juranometria.ui.language.AboutText
+                    .noticesBody(notice);
+            require(body.length() > 400
+                            && norwegianNotices.contains(body),
+                    "and the bundled document " + notice.id()
+                            + " is present and unchanged beneath it ("
+                            + body.length() + " characters)");
+        }
+        System.out.println("about licensing OK (Norwegian summary"
+                + " ships and is selected, " + norwegianSummary.length()
+                + " characters, every identifier exact; "
+                + AboutDialog.NOTICES.size() + " upstream documents"
+                + " unchanged under translated headings)");
 
         // Preferences, changed and reloaded through the bundled
         // runtime against the application's real node - snapshot the

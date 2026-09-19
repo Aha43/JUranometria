@@ -353,6 +353,21 @@ class StartupJourneyTest {
         return null;
     }
 
+    /** An item anywhere on the bar, by the words on it. */
+    private static JMenuItem itemOnTheBar(JMenuBar bar, String label) {
+        for (int m = 0; m < bar.getMenuCount(); m++) {
+            JMenu menu = bar.getMenu(m);
+            if (menu == null) {
+                continue;
+            }
+            JMenuItem found = itemNamed(menu, label);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
     private static JMenuItem itemNamed(JMenu menu, String label) {
         for (int i = 0; i < menu.getItemCount(); i++) {
             JMenuItem item = menu.getItem(i);
@@ -517,6 +532,148 @@ class StartupJourneyTest {
                 words(nested, shown, spoken);
             }
         }
+    }
+
+    // ---- About, both views, through the same route --------------
+
+    /**
+     * A Norwegian session opens About and presses through to the
+     * bundled documents.
+     *
+     * <p>Both views, reached the way a reader reaches them: the menu
+     * item, then the actual notices button. Nothing here constructs
+     * an {@code AboutDialog}; a test that did would be handed a
+     * language directly and would stay green with the application
+     * handing English to the real one (#350).
+     */
+    @Test
+    void theApplicationOpensAboutInTheStoredLanguage() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "About is a window");
+        InterfaceText norsk = InterfaceText.forLanguage("nb-NO");
+        InterfaceText english = InterfaceText.forLanguage("en");
+        juranometria.ui.language.AboutText saidNorsk =
+                juranometria.ui.language.AboutText.in(norsk);
+        juranometria.ui.language.AboutText saidEnglish =
+                juranometria.ui.language.AboutText.in(english);
+        Set<String> compact = new LinkedHashSet<>();
+        Set<String> full = new LinkedHashSet<>();
+        String[] window = new String[2];
+
+        running("nb-NO", true, app -> {
+            JMenuItem item = itemOnTheBar(app.menu(),
+                    norsk.say("menu.about.label",
+                            juranometria.app.AppInfo.NAME));
+            assertNotNull(item, "the premise: a Norwegian bar offers \""
+                    + norsk.say("menu.about.label",
+                            juranometria.app.AppInfo.NAME) + "\"");
+            SwingUtilities.invokeAndWait(item::doClick);
+            SwingUtilities.invokeAndWait(() -> { });
+
+            JDialog[] about = new JDialog[1];
+            SwingUtilities.invokeAndWait(() -> {
+                about[0] = dialogOf(app.frame());
+                assertNotNull(about[0], "About opened");
+                window[0] = about[0].getTitle();
+                window[1] = about[0].getAccessibleContext()
+                        .getAccessibleDescription();
+                aboutWords(about[0].getContentPane(), compact);
+            });
+
+            // The actual button, found by the words this language
+            // puts on it, and pressed through the shared helper.
+            javax.swing.JButton[] button = new javax.swing.JButton[1];
+            SwingUtilities.invokeAndWait(() -> button[0] = buttonNamed(
+                    about[0].getContentPane(),
+                    saidNorsk.noticesButton()));
+            assertNotNull(button[0], "the premise: the compact view"
+                    + " offers \"" + saidNorsk.noticesButton() + "\"");
+            ReaderInput.click(button[0]);
+            SwingUtilities.invokeAndWait(() ->
+                    aboutWords(about[0].getContentPane(), full));
+        });
+
+        assertTrue(compact.size() >= 6,
+                "the premise: the compact view said things - "
+                        + compact.size());
+        assertTrue(full.size() >= 3,
+                "and the notices view too - " + full.size());
+
+        assertEquals(saidNorsk.title(juranometria.app.AppInfo.NAME),
+                window[0], "the window is titled in the stored"
+                        + " language");
+        assertEquals(saidNorsk.windowExplain(), window[1],
+                "and describes itself in it");
+        assertTrue(compact.contains(saidNorsk.description()),
+                "the description reads in Norwegian: " + compact);
+        assertTrue(!compact.contains(saidEnglish.description()),
+                "and not in English");
+        assertTrue(compact.contains(saidNorsk.noticesButton()),
+                "so does the button that opens the documents");
+        assertTrue(full.contains(saidNorsk.closeButton()),
+                "and the way out of the notices view");
+
+        // The compact summary is this language's own document.
+        assertTrue(compact.stream().anyMatch(said ->
+                        said.contains("ikke-kommersielle")),
+                "the Norwegian summary is the one shown: " + compact);
+
+        // Identity and the bundled documents do not move.
+        assertTrue(compact.stream().anyMatch(said ->
+                        said.contains("CC BY-NC 3.0 IGO")),
+                "the licence identifiers are exact in every language");
+        assertTrue(full.stream().anyMatch(said ->
+                        said.contains("Redistribution and use in source")),
+                "and the upstream documents are untranslated: " + full);
+    }
+
+    /**
+     * Everything About shows or speaks.
+     *
+     * <p>Its own walker: About's words live on buttons and in two
+     * read-only text areas as well as on labels, and the chart
+     * keyboard's label-only walk found two of them.
+     */
+    private static void aboutWords(Container from, Set<String> said) {
+        for (Component child : from.getComponents()) {
+            if (child instanceof JComponent widget) {
+                if (widget instanceof javax.swing.AbstractButton button) {
+                    add(said, button.getText());
+                }
+                if (widget instanceof JLabel label) {
+                    add(said, label.getText());
+                }
+                if (widget instanceof javax.swing.JTextArea area) {
+                    add(said, area.getText());
+                }
+                if (widget.getAccessibleContext() != null) {
+                    add(said, widget.getAccessibleContext()
+                            .getAccessibleName());
+                    add(said, widget.getAccessibleContext()
+                            .getAccessibleDescription());
+                }
+            }
+            if (child instanceof Container nested) {
+                aboutWords(nested, said);
+            }
+        }
+    }
+
+    private static javax.swing.JButton buttonNamed(Container from,
+                                                   String text) {
+        for (Component child : from.getComponents()) {
+            if (child instanceof javax.swing.JButton button
+                    && text.equals(button.getText())) {
+                return button;
+            }
+            if (child instanceof Container nested) {
+                javax.swing.JButton found = buttonNamed(nested, text);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     static JMenu menuNamed(JMenuBar bar, String label) {

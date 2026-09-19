@@ -293,6 +293,7 @@ class TestEvidenceGateTest {
                 .filter(f -> !f.unprotectedState().isEmpty())
                 .map(TestEvidenceScan.File::path).sorted().toList();
         assertEquals(List.of(
+                        "src/juranometria/tool/AboutSheetMain.java",
                         "src/juranometria/tool/ChartKeyboardSheetMain.java",
                         "src/juranometria/tool/ChartOptionsSheetMain.java",
                         "src/juranometria/tool/ControlExplanationStudyMain.java",
@@ -312,7 +313,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the eighteen widget photographers, whose font and theme"
+                "the nineteen widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -393,7 +394,14 @@ class TestEvidenceGateTest {
                         + " rows waiting on a master are greyed, and"
                         + " a colour the look and feel resolves is"
                         + " right in one theme and wrong in the"
-                        + " other");
+                        + " other; and the nineteenth by #350's About"
+                        + " sheet, which opens the real dialog and"
+                        + " presses through to the bundled documents"
+                        + " with its own button, under both themes -"
+                        + " a page of read-only licence text takes"
+                        + " its ground and its ink from the look and"
+                        + " feel, and is the surface where low"
+                        + " contrast would be least noticed");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------

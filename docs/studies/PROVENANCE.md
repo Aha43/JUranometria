@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**377 promoted artifacts.**
+**385 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -192,6 +192,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/on-this-page-marks.png` | `4073b82a26937ceda99b64deb9729de0c0e10c39530c49a11ab8ab195537cd8a` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-horizon.png` | `2cb652b98dbe3ae63ba7488382fc74aa3ad39bbfef13c5229700c6ed3c5c3068` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-zenith.png` | `79f181512f064dee1f5e6d7c965661420d066aec1efe2cab26acd26fe84597f0` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-en-1-compact-light.png` | `95880f9d73537997e744cd6ea461315059fcfdba2d4f07b7ac3aac91cdf03b92` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-en-2-notices-light.png` | `5cfeaf53354c236e5377677de630428decc36a1275e367e56e76747bbfcb6ff2` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-en-3-compact-dark.png` | `2f66d2e48b7e967778158df3e2bab4f9c2c5c55e7613bef1a60824fb2ac0be5c` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-en-4-notices-dark.png` | `406fae62ae1f1a82ad3d90c247e45a17d7ba2359045f934604a1a21552c3e169` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-nb-NO-5-compact-light.png` | `1d0a534afbb8eed579f5d6e72ef1db2feafeb7ebe6b8b58b872445e92286da38` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-nb-NO-6-notices-light.png` | `28beb523916ee8d73a4e291f41ae6ee40ba269c53ee58f0019b9ab409d9b8c4c` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-nb-NO-7-compact-dark.png` | `6537f7383643da7f6b6d3b8e0b6c6524913a40777d7e04fd74e75a73270195dc` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/about-nb-NO-8-notices-dark.png` | `f8c79838e99e1d570c268d0cc4752265ec454391a979d19a52279dd4d2a22c3a` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartkeyboard-en-1-all-off-light.png` | `d5f7d46aad762defa3c3d8b5c69a846e319bb391763579a9ab559b93e5b9f7d8` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartkeyboard-en-2-all-on-light.png` | `c8b6ddfe50294633f268c5c14a0262b35e29e179f555213b18e5d017a2295bbb` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartkeyboard-en-3-deepsky-off-light.png` | `e198dfc756336e1dfe3f84f710d4c314a1e3a2e6fe252952ef4cf8816947bce3` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |

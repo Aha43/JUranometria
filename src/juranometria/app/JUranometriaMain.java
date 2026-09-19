@@ -272,7 +272,9 @@ public final class JUranometriaMain {
                 () -> ChartOptionsDialog.open(frame, chartOptions,
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage())),
-                () -> AboutDialog.open(frame),
+                () -> AboutDialog.open(frame,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())),
                 () -> {
                     inspectorToggle.toggle();
                     frame.revalidate();

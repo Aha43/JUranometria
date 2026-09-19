@@ -27,7 +27,7 @@ class AboutDialogTest {
         String packaged = Files.readString(Path.of("VERSION")).trim();
         assertEquals(packaged, AppInfo.version(),
                 "AppInfo reads the packaged VERSION resource");
-        JComponent content = AboutDialog.compactContent(() -> { });
+        JComponent content = AboutDialog.compactContent(() -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(labels(content).stream().anyMatch(text ->
                         text.equals(AppInfo.NAME + " " + AppInfo.version())),
                 "the compact view titles itself from AppInfo");
@@ -41,7 +41,7 @@ class AboutDialogTest {
         // the way to the notices all keep their room, and assistive
         // technology is told the application's name rather than the
         // position of three stars.
-        JComponent content = AboutDialog.compactContent(() -> { });
+        JComponent content = AboutDialog.compactContent(() -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         List<javax.swing.JLabel> marks = new ArrayList<>();
         collectIcons(content, marks);
         assertEquals(1, marks.size(),
@@ -90,16 +90,6 @@ class AboutDialogTest {
         assertTrue(summary.contains("Tabler"));
     }
 
-    /** The resource/licence pairings both documents must agree on. */
-    private static final String[][] PAIRINGS = {
-            {"code", "MIT"},
-            {"tycho", "CC BY-NC 3.0 IGO"},
-            {"openngc", "CC BY-SA 4.0"},
-            {"constellation", "BSD-3-Clause"},
-            {"star names|star-identity", "BSD-3-Clause"},
-            {"tabler|icons", "MIT"},
-    };
-
     @Test
     void eachLicenceStaysAttachedToItsResourceInBothDocuments() throws Exception {
         // The source-of-truth rule, semantically (Sprint 11 Codex
@@ -107,18 +97,18 @@ class AboutDialogTest {
         // each licence must appear in the same paragraph as its
         // resource, in the packaged summary and in LICENSING.md alike,
         // so a swapped assignment can never pass.
-        assertPairings("the packaged summary", AboutDialog.summaryText());
-        assertPairings("LICENSING.md",
+        LicensingMap.assertPairings("the packaged summary", AboutDialog.summaryText());
+        LicensingMap.assertPairings("LICENSING.md",
                 Files.readString(Path.of("LICENSING.md")));
-        assertPairings("the archive's packaging/LICENSING.md",
+        LicensingMap.assertPairings("the archive's packaging/LICENSING.md",
                 Files.readString(Path.of("packaging/LICENSING.md")));
         // The practical consequence rides with the Tycho-2 pairing.
-        assertTrue(paragraphWith(AboutDialog.summaryText(), "tycho")
-                        .contains(normalize("non-commercially")),
+        assertTrue(LicensingMap.paragraphWith(AboutDialog.summaryText(), "tycho")
+                        .contains(LicensingMap.normalize("non-commercially")),
                 "the summary's Tycho paragraph states the consequence");
-        assertTrue(paragraphWith(Files.readString(Path.of("LICENSING.md")),
+        assertTrue(LicensingMap.paragraphWith(Files.readString(Path.of("LICENSING.md")),
                         "tycho")
-                        .contains(normalize("may not be used commercially")),
+                        .contains(LicensingMap.normalize("may not be used commercially")),
                 "LICENSING.md's Tycho entry states the consequence");
     }
 
@@ -131,9 +121,9 @@ class AboutDialogTest {
         // ship a runtime, the portable archive ships none, and the
         // difference is part of the licensing statement.
         String map = Files.readString(Path.of("LICENSING.md"));
-        String runtimeParagraph = paragraphWith(map, "temurin|openjdk");
+        String runtimeParagraph = LicensingMap.paragraphWith(map, "temurin|openjdk");
 
-        assertTrue(runtimeParagraph.contains(normalize(
+        assertTrue(runtimeParagraph.contains(LicensingMap.normalize(
                         "GPLv2 with the Classpath Exception")),
                 "LICENSING.md must pair the bundled runtime with its"
                         + " licence: " + runtimeParagraph);
@@ -141,7 +131,7 @@ class AboutDialogTest {
                         .contains("classpath exception is what keeps")
                         || map.contains("Classpath Exception"),
                 "and say what that exception does for the MIT code");
-        assertTrue(normalize(map).contains(normalize(
+        assertTrue(LicensingMap.normalize(map).contains(LicensingMap.normalize(
                         "The portable archive contains no runtime")),
                 "and distinguish the self-contained images from the"
                         + " portable archive, which ships none");
@@ -167,43 +157,18 @@ class AboutDialogTest {
                         + " with the runtime");
     }
 
-    private static void assertPairings(String document, String text) {
-        for (String[] pairing : PAIRINGS) {
-            String paragraph = paragraphWith(text, pairing[0]);
-            assertTrue(paragraph.contains(normalize(pairing[1])),
-                    document + ": the paragraph naming '" + pairing[0]
-                            + "' must carry " + pairing[1]);
-        }
-    }
 
-    /**
-     * The first normalized paragraph (blank-line block or table row)
-     * mentioning any of the |-separated keywords; empty if none does,
-     * which fails the containing assertion.
-     */
-    private static String paragraphWith(String text, String keywords) {
-        for (String paragraph : text.split("\\n\\s*\\n|\\n(?=\\|)")) {
-            String normalized = normalize(paragraph);
-            for (String keyword : keywords.split("\\|")) {
-                if (normalized.contains(normalize(keyword))) {
-                    return normalized;
-                }
-            }
-        }
-        return "";
-    }
 
-    private static String normalize(String text) {
-        return text.toLowerCase(Locale.ROOT).replaceAll("[\\s-]+", "");
-    }
 
     @Test
     void everyBundledNoticeResourceExistsAndTheFullViewCarriesThem() {
-        for (String[] notice : AboutDialog.NOTICE_RESOURCES) {
-            assertNotNull(AboutDialog.class.getResource(notice[1]),
-                    notice[1] + " must ship on the classpath");
+        for (AboutDialog.Notice notice : AboutDialog.NOTICES) {
+            assertNotNull(
+                    AboutDialog.class.getResource(notice.resourcePath()),
+                    notice.resourcePath() + " must ship on the"
+                            + " classpath");
         }
-        String notices = AboutDialog.noticesText();
+        String notices = AboutDialog.noticesText(juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(notices.contains("may not be used commercially"),
                 "the Tycho-2 notice's restriction is present verbatim");
         assertTrue(notices.contains("CC-BY-SA-4.0"));
@@ -220,7 +185,7 @@ class AboutDialogTest {
     void theCompactViewWiresItsButtonsAndTouchesNoChartState() {
         int[] noticesOpened = new int[1];
         JComponent content = AboutDialog.compactContent(
-                () -> noticesOpened[0]++);
+                () -> noticesOpened[0]++, juranometria.ui.language.InterfaceText.forLanguage("en"));
         JButton notices = button(content, "Full notices and licences");
         JButton close = button(content, "Close");
         assertNotNull(close, "a Close button exists with an accessible name");

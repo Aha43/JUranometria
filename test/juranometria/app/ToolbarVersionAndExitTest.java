@@ -83,7 +83,7 @@ class ToolbarVersionAndExitTest {
         List<String>[] about = new List[1];
         SwingUtilities.invokeAndWait(
                 () -> about[0] = labelsIn(AboutDialog.compactContent(
-                        () -> { })));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"))));
         assertTrue(about[0].stream().anyMatch(t -> t.contains(version)),
                 "About prints AppInfo's version: " + about[0]);
 

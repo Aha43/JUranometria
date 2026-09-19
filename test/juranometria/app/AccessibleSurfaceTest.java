@@ -202,9 +202,9 @@ class AccessibleSurfaceTest {
                                         .DEFAULTS,
                                 chosen -> { }),
                         "Inspector", unnamed);
-                collectUnnamed(AboutDialog.compactContent(() -> { }),
+                collectUnnamed(AboutDialog.compactContent(() -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")),
                         "About", unnamed);
-                collectUnnamed(AboutDialog.noticesContent(),
+                collectUnnamed(AboutDialog.noticesContent(juranometria.ui.language.InterfaceText.forLanguage("en")),
                         "About notices", unnamed);
 
                 JMenuBar menuBar = AppMenuBar.create(navigation,

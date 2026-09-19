@@ -335,9 +335,9 @@ public final class ControlExplanationStudyMain {
         surfaces.put("Export Chart Sheet",
                 ExportSheetDialog.contentForStudy());
         surfaces.put("Settings", SettingsDialog.contentForStudy());
-        surfaces.put("About", AboutDialog.compactContentForStudy());
+        surfaces.put("About", AboutDialog.compactContentForStudy(juranometria.ui.language.InterfaceText.forLanguage("en")));
         surfaces.put("About, notices",
-                AboutDialog.noticesContentForStudy());
+                AboutDialog.noticesContentForStudy(juranometria.ui.language.InterfaceText.forLanguage("en")));
         surfaces.put("Inspector", inspector());
         surfaces.put("On this page", onThisPage());
         surfaces.put("Chart keyboard", chartKeyboard());
