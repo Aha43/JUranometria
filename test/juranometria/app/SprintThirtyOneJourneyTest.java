@@ -80,6 +80,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintThirtyOneJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /**
      * What the chart keyboard's two keystrokes read as, in English.
      *
@@ -104,7 +109,7 @@ class SprintThirtyOneJourneyTest {
     private static final String NAMALSADIRAH = "TYC 6867-2428-1";
 
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     @Test
     void theReaderFindsEveryLabelInItsOwnPlace(@TempDir Path folder)
@@ -149,7 +154,7 @@ class SprintThirtyOneJourneyTest {
                     .toggle(ecliptic, juranometria.ui.ecliptic
                             .EclipticStore.forNode(node));
             SwingUtilities.invokeAndWait(() -> {
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 options.onChange(chart::setChartOptions);
                 hostHolder[0] = new ChartModuleHost(chart, selection,
@@ -824,7 +829,7 @@ class SprintThirtyOneJourneyTest {
                     reader.readThePng(ImageIO.read(file.toFile()),
                             juranometria.sheet.ChartSheet.record(
                                     Atlas.assembler()::assemble, state,
-                                    options, ink, paper),
+                                    options, ink, paper, ENGLISH),
                             drawn, refused);
                 }
             }

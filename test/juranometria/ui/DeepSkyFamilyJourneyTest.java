@@ -61,8 +61,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class DeepSkyFamilyJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     /**
      * The real bundled catalogue, counting what is asked of it.
@@ -456,7 +461,7 @@ class DeepSkyFamilyJourneyTest {
             // a controller that ignored its store could have
             // regressed while this journey still said restart worked
             // (sprint review, P2).
-            ChartComponent restartedChart = new ChartComponent(assembler);
+            ChartComponent restartedChart = new ChartComponent(assembler, ENGLISH);
             ChartOptionsController restarted = new ChartOptionsController(
                     ChartOptionsStore.forNode(store));
             restarted.onChange(restartedChart::setChartOptions);
@@ -654,7 +659,7 @@ class DeepSkyFamilyJourneyTest {
         assembler = SceneAssembler.allSky(catalogue, 1.5,
                 juranometria.geo.ConstellationGeography.load());
         navigation = new ChartViewController(assembler::fits);
-        chart = new ChartComponent(assembler);
+        chart = new ChartComponent(assembler, ENGLISH);
         navigation.onChange(chart::setViewState);
         PanInteraction.install(chart, navigation);
         selection = new SelectionModel();

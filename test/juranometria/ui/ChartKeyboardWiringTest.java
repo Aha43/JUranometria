@@ -78,6 +78,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartKeyboardWiringTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /**
      * Sees every repaint request in the JVM while installed -
      * <strong>including the ones aimed at a window</strong>.
@@ -395,7 +400,7 @@ class ChartKeyboardWiringTest {
                     juranometria.app.Atlas.assembler()::fits);
             SwingUtilities.invokeAndWait(() -> {
                 chart = new ChartComponent(
-                        juranometria.app.Atlas.assembler());
+                        juranometria.app.Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 // The same one call that connects the options to the
                 // chart in the application.

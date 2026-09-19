@@ -57,6 +57,10 @@ import juranometria.render.LabelPlacement;
  */
 public final class GlobeNameStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private GlobeNameStudyMain() {
     }
 
@@ -319,7 +323,7 @@ public final class GlobeNameStudyMain {
         Graphics2D g = canvas.createGraphics();
         List<LabelPlacement.Placement> placements;
         try {
-            ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+            ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
             ChartRenderer.TextMetrics metrics =
                     ChartRenderer.TextMetrics.of(g);
             placements = toTheLimb

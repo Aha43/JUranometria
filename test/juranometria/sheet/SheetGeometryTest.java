@@ -43,6 +43,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SheetGeometryTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int SCREEN_WIDE = 900;
     private static final int SCREEN_HIGH = 700;
 
@@ -94,13 +99,13 @@ class SheetGeometryTest {
         ChartScene onScreen = Atlas.assembler().assemble(state,
                 SCREEN_WIDE, SCREEN_HIGH);
         List<ChartRenderer.DrawnMark> screenMarks =
-                new ChartRenderer(StarSizePolicy.DEFAULT)
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(onScreen, options);
 
         // The same chart as a sheet, written out and read back.
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, state, options, reference,
-                PaperSize.A4);
+                PaperSize.A4, ENGLISH);
         List<double[]> inFile = pathCentres(
                 SvgSheetWriter.write(sheet, SvgSheetWriter.Text.EDITABLE));
         assertTrue(inFile.size() > 100,
@@ -116,7 +121,7 @@ class SheetGeometryTest {
         // Every mark the paper render decided on has to be in the
         // file, at the place the sky puts it.
         List<ChartRenderer.DrawnMark> paperMarks =
-                new ChartRenderer(StarSizePolicy.DEFAULT)
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(sheet.scene(), sheet.options());
         int owed = 0;
         List<String> missing = new ArrayList<>();

@@ -33,6 +33,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class IdentifyMockupMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private IdentifyMockupMain() {
     }
 
@@ -47,7 +51,7 @@ public final class IdentifyMockupMain {
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
         ChartScene m31 = scene(new SkyPosition(10.68, 41.27), 8.0);
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         List<ChartRenderer.DrawnMark> marks =
                 renderer.drawnMarks(m31, ChartOptions.DEFAULTS);
 

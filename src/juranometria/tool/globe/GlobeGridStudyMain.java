@@ -44,6 +44,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class GlobeGridStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private GlobeGridStudyMain() {
     }
 
@@ -194,7 +198,7 @@ public final class GlobeGridStudyMain {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();

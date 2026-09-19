@@ -23,6 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ChartRendererTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     static final SkyPosition M31_CENTRE = new SkyPosition(10.684708, 41.268750);
     static final Star NU_AND = new Star("nu And", new SkyPosition(12.453526, 41.078911), 4.53);
 
@@ -30,7 +35,7 @@ class ChartRendererTest {
     static final ChartScene SCENE =
             new ChartScene(VIEWPORT, List.of(NU_AND), List.of(), "Test chart", 8.0);
 
-    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT);
+    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static int[] pixels(BufferedImage image) {
         return image.getRGB(0, 0, image.getWidth(), image.getHeight(),

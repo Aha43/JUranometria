@@ -911,7 +911,7 @@ said.say("inspector.tab.page.explain"));
             // letter, then its Flamsteed number, then its catalogue
             // identifier. Heading a lettered star merely "Star"
             // withholds something the atlas knows.
-            setSelectedHeading(bestName(identity, star.id()));
+            setSelectedHeading(bestName(identity, star.id(), said));
         }
         // Whole forms, not a designation with an English word
         // bracketed onto it (#350). The designation is canonical
@@ -1091,7 +1091,19 @@ said.say("inspector.tab.page.explain"));
     }
 
     /** The most telling name a star has, never less than its id. */
-    static String bestName(StarIdentity identity, String catalogueId) {
+    /**
+     * The most telling name a star has, never less than its id.
+     *
+     * <p>The designation is canonical - {@code Alpha And} and
+     * {@code 21 And} are the same to every reader - and the
+     * qualifier beside it is not: it says <em>which catalogue this
+     * designation is from</em>, which is a phrase. It was
+     * {@code "  (Bayer)"} concatenated here, brackets, spacing and
+     * all, so a Norwegian reader was told a Norwegian star's name
+     * followed by an English aside (#350).
+     */
+    static String bestName(StarIdentity identity, String catalogueId,
+                           juranometria.ui.language.InterfaceText said) {
         if (identity == null) {
             return catalogueId;
         }
@@ -1099,10 +1111,12 @@ said.say("inspector.tab.page.explain"));
             return identity.name();
         }
         if (identity.bayer() != null) {
-            return identity.bayer() + "  (Bayer)";
+            return said.say("inspector.designation.bayer",
+                    identity.bayer());
         }
         if (identity.flamsteed() != null) {
-            return identity.flamsteed() + "  (Flamsteed)";
+            return said.say("inspector.designation.flamsteed",
+                    identity.flamsteed());
         }
         return catalogueId;
     }
@@ -1118,7 +1132,7 @@ said.say("inspector.tab.page.explain"));
                     .map(star -> {
                         StarIdentity identity = star.identity();
                         return String.format(Locale.ROOT, "%s   V %.1f",
-                                bestName(identity, star.id()),
+                                bestName(identity, star.id(), said),
                                 star.magnitude());
                     })
                     .orElse(candidate.catalogueId());

@@ -57,6 +57,10 @@ import juranometria.render.LabelPlacement;
  */
 public final class SkyLanguagePairMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private SkyLanguagePairMain() {
     }
 
@@ -272,7 +276,7 @@ public final class SkyLanguagePairMain {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, scene, options);
         } finally {
             g.dispose();
@@ -450,7 +454,7 @@ public final class SkyLanguagePairMain {
         Graphics2D g = canvas.createGraphics();
         try {
             for (LabelPlacement.Placement one
-                    : new ChartRenderer(StarSizePolicy.DEFAULT)
+                    : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                             .textPlacements(ChartRenderer.TextMetrics.of(g),
                                     scene, options)) {
                 if (one.request().family()

@@ -42,8 +42,14 @@ public record Page(String slug, ChartScene scene, ChartOptions options,
         this(slug, scene, options, overlays, placed, selected, List.of());
     }
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     public Page(String slug, ChartScene scene, ChartOptions options,
                 List<OverlayRegistry.Owned> overlays) {

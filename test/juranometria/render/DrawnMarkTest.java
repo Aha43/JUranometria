@@ -29,8 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class DrawnMarkTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static ChartScene scene(double ra, double dec, double field) {
         return Atlas.assembler().assemble(
@@ -71,7 +76,7 @@ class DrawnMarkTest {
         // rather than by guessing where it sits.
         var titleGraphics = page.createGraphics();
         java.awt.Rectangle titleBlock =
-                ChartRenderer.titleBlockBounds(titleGraphics, scene);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(titleGraphics, scene);
         titleGraphics.dispose();
 
         int remaining = 0;

@@ -34,6 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class WiderFieldStepTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Path RELEASED_PAGES =
             Path.of("docs/studies/wider-field/released-pages.txt");
 
@@ -123,7 +128,7 @@ class WiderFieldStepTest {
         // pixel column is checked only on the exact platform the file
         // names, and skipped out loud everywhere else rather than
         // quietly passing.
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         List<String> rows = rows();
         assertEquals(80, rows.size(),
                 "ten released steps, four centres, two grounds");

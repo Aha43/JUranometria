@@ -70,6 +70,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartKeyboardMatrixTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /**
      * How the dialog names each switch, where that differs from the
      * registry's own label. The registry names things as a reader
@@ -669,7 +674,7 @@ class ChartKeyboardMatrixTest {
                     PAGES.get(SCENES.size()), WIDE, HIGH));
         }
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        ImageIO.write(new ChartRenderer(StarSizePolicy.DEFAULT)
+        ImageIO.write(new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                 .renderToImage(SCENES.get(page), options), "png", bytes);
         byte[] painted = bytes.toByteArray();
         PAINTED.put(key, painted);

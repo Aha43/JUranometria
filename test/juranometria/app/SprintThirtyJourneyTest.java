@@ -71,6 +71,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintThirtyJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition ORION = new SkyPosition(83.0, 0.0);
 
     private static JButton button(AtlasToolbar toolbar, String name) {
@@ -182,7 +187,7 @@ class SprintThirtyJourneyTest {
             EclipticModule ecliptic = new EclipticModule();
 
             SwingUtilities.invokeAndWait(() -> {
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 options.onChange(chart::setChartOptions);
                 hostHolder[0] = new ChartModuleHost(chart, selection,
@@ -298,7 +303,7 @@ class SprintThirtyJourneyTest {
                     Atlas.assembler()::assemble,
                     onEdt(navigation::state), ChartOptions.DEFAULTS,
                     juranometria.ui.SheetInk.reference(chart),
-                    PaperSize.A4);
+                    PaperSize.A4, ENGLISH);
             var drawnOn = new ViewportMapping(juranometria.project.DrawnPage.of(wideInk.scene()));
             var drawnBy = Projections.forViewport(
                     wideInk.scene().viewport());
@@ -585,7 +590,7 @@ class SprintThirtyJourneyTest {
             int placed = 0;
             for (String member : marked) {
                 for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                        StarSizePolicy.DEFAULT)
+                        StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(detailed, ChartOptions.DEFAULTS)) {
                     if (mark.star() == null
                             || !member.equals(mark.star().id())) {
@@ -773,7 +778,7 @@ class SprintThirtyJourneyTest {
                                                     juranometria.render
                                                             .ChartPalette
                                                             .WHITE_PAPER),
-                                    PaperSize.A4),
+                                    PaperSize.A4, ENGLISH),
                             SheetFormat.PNG, 150);
                     int[] along = inkAlong(withCircle, wideNow,
                             eclipticPole, 0.0);
@@ -1225,7 +1230,7 @@ class SprintThirtyJourneyTest {
             ChartViewState page, ChartComponent chart) {
         return ChartSheet.record(Atlas.assembler()::assemble, page,
                 ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4)
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH)
                 .metadata();
     }
 
@@ -1516,7 +1521,7 @@ class SprintThirtyJourneyTest {
     /** Where the catalogue puts the object this page drew. */
     private static SkyPosition positionOf(ChartScene scene, String id) {
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             if (mark.star() != null && id.equals(mark.star().id())) {
                 return mark.star().position();
@@ -1530,7 +1535,7 @@ class SprintThirtyJourneyTest {
             ChartScene scene, List<String> already, int nth) {
         List<ChartRenderer.DrawnMark> found = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             // An ordinary star of this page, not one kept below its
             // limit because a constellation figure is drawn to it
@@ -1559,7 +1564,7 @@ class SprintThirtyJourneyTest {
         ChartRenderer.DrawnMark best = null;
         double furthest = 0.0;
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             if (mark.star() == null || mark.centre().x() < 60
                     || mark.centre().x() > scene.viewport().widthPx() - 60

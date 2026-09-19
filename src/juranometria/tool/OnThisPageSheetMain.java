@@ -52,6 +52,10 @@ import juranometria.ui.onthispage.OnThisPageTable;
  */
 public final class OnThisPageSheetMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private OnThisPageSheetMain() {
     }
 
@@ -198,7 +202,7 @@ public final class OnThisPageSheetMain {
         try {
             SwingUtilities.invokeAndWait(() -> {
                 juranometria.app.UiTheme.apply(false);
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 chart.setSize(900, 700);
                 // An empty page is reached by pointing the chart at
                 // sky the catalogue is silent about, not by handing

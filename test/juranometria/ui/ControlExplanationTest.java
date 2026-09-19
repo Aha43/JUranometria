@@ -52,6 +52,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ControlExplanationTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Path REPORT = Path.of(
             "docs/studies/control-explanations/measurements.md");
 
@@ -280,7 +285,7 @@ class ControlExplanationTest {
         // not done the thing it waits for.
         SwingSession.restoring(() -> {
             ChartComponent chart = new ChartComponent(
-                    juranometria.app.Atlas.assembler());
+                    juranometria.app.Atlas.assembler(), ENGLISH);
             chart.setSize(900, 700);
             chart.setViewState(
                     juranometria.chart.ChartViewState.DEFAULT);

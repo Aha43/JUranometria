@@ -28,6 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ExplorationJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     @Test
     void searchZoomGrabPanExploreAndHome() throws Exception {
         ChartComponent[] chartHolder = new ChartComponent[1];
@@ -36,7 +41,7 @@ class ExplorationJourneyTest {
         SearchField[] searchHolder = new SearchField[1];
         AtlasToolbar[] toolbarHolder = new AtlasToolbar[1];
         SwingUtilities.invokeAndWait(() -> {
-            chartHolder[0] = new ChartComponent(Atlas.assembler());
+            chartHolder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             PanInteraction.install(chartHolder[0], controller);
             controller.onChange(chartHolder[0]::setViewState);
             searchHolder[0] = new SearchField(

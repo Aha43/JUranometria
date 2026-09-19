@@ -41,6 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class NamedStarJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     @Test
     void findNameAndKeepTheStarsHonest() throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
@@ -57,7 +62,7 @@ class NamedStarJourneyTest {
             SearchField[] search = new SearchField[1];
 
             SwingUtilities.invokeAndWait(() -> {
-                chart[0] = new ChartComponent(Atlas.assembler());
+                chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 PanInteraction.install(chart[0], navigation);
                 navigation.onChange(chart[0]::setViewState);
                 options.onChange(chart[0]::setChartOptions);
@@ -185,7 +190,7 @@ class NamedStarJourneyTest {
                     actual.deepSkyObjects(), actual.title(),
                     actual.limitingMagnitude(), null, actual.geography());
             var renderer = new juranometria.render.ChartRenderer(
-                    juranometria.chart.StarSizePolicy.DEFAULT);
+                    juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
             int w = actual.viewport().widthPx();
             int h = actual.viewport().heightPx();
             assertFalse(java.util.Arrays.equals(

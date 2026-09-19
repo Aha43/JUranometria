@@ -191,8 +191,14 @@ public final class ExportSheet {
 
         byte[] bytes;
         try {
+            // Resolved ONCE, here, from the language this export was
+            // already given. The same instance draws the title block
+            // and writes the file's own description, so a reader who
+            // exports what they are looking at gets a file that says
+            // what the screen said (#349, #350).
             SheetRecording sheet = ChartSheet.record(pages, state, options,
-                    ink, overChart, request.paper());
+                    ink, overChart, request.paper(),
+                    juranometria.ui.language.PageText.in(said));
             bytes = SheetWriters.write(sheet, request.format(),
                     request.dpi());
         } catch (IOException | RuntimeException failure) {

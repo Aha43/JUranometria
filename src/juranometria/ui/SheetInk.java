@@ -62,8 +62,9 @@ public final class SheetInk {
         }
         ChartOptions onPaper =
                 options.withPalette(ChartPalette.WHITE_PAPER);
+        // The chart's own words, not a language of its own (#350).
         ChartRenderer renderer = new ChartRenderer(
-                juranometria.chart.StarSizePolicy.DEFAULT);
+                juranometria.chart.StarSizePolicy.DEFAULT, chart.words());
         return (g, scene) -> {
             for (String member : members) {
                 renderer.drawSelectionHighlight(g, scene, onPaper, member);

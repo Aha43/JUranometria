@@ -56,6 +56,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartLanguageIndependenceTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDE_PX = 1000;
 
     private static final int HIGH_PX = 700;
@@ -249,7 +254,7 @@ class ChartLanguageIndependenceTest {
     private static List<String> markIdentities(ChartScene scene) {
         List<String> marks = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark
-                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             marks.add(mark.kind() + ":" + mark.subject());
         }
@@ -299,7 +304,7 @@ class ChartLanguageIndependenceTest {
         };
         SheetRecording recording = ChartSheet.record(pages, state,
                 ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
-                PaperSize.A4);
+                PaperSize.A4, ENGLISH);
         List<String> ink = new ArrayList<>();
         for (SheetRecorder.Operation operation
                 : recording.recorder().operations()) {
@@ -338,7 +343,7 @@ class ChartLanguageIndependenceTest {
     private static List<String> marksUnderThePointer(ChartScene scene) {
         List<String> hits = new ArrayList<>();
         ChartHitTest test = new ChartHitTest(
-                new ChartRenderer(StarSizePolicy.DEFAULT));
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH));
         for (int x = 50; x < WIDE_PX; x += 90) {
             for (int y = 50; y < HIGH_PX; y += 90) {
                 ChartHitTest.Hit hit =
@@ -368,7 +373,7 @@ class ChartLanguageIndependenceTest {
         Graphics2D g = canvas.createGraphics();
         try {
             for (LabelPlacement.Placement placed
-                    : new ChartRenderer(StarSizePolicy.DEFAULT)
+                    : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                             .textPlacements(
                                     ChartRenderer.TextMetrics.of(g),
                                     scene, ChartOptions.DEFAULTS)) {

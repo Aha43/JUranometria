@@ -29,6 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SheetFormatsTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     @Test
     void aPngWrittenNowStatesItsOwnResolution() throws Exception {
         // The committed sheet is checked elsewhere in this class, but
@@ -44,7 +49,7 @@ class SheetFormatsTest {
                             42.0, 6.0),
                     juranometria.render.ChartOptions.DEFAULTS,
                     juranometria.render.ChartRenderer.ReferenceLayer.NONE,
-                    PaperSize.A4), dpi);
+                    PaperSize.A4, ENGLISH), dpi);
 
             int[] physical = pngPhysicalResolution(png);
             long perMetre = Math.round(dpi / 0.0254);

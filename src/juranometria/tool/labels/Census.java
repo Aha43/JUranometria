@@ -36,6 +36,10 @@ import juranometria.chart.StarSizePolicy;
  */
 public final class Census {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** How far apart two pieces of ink may be and still be nominated. */
     private static final double NOMINATION_SLACK_PX = 2.0;
 
@@ -365,7 +369,7 @@ public final class Census {
         static Rectangle2D titleBlockOf(Page page) {
             java.awt.Graphics2D g = SCRATCH.createGraphics();
             try {
-                return ChartRenderer.titleBlockBounds(g, page.scene());
+                return new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(g, page.scene());
             } finally {
                 g.dispose();
             }
@@ -387,10 +391,10 @@ public final class Census {
             try {
                 return EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(page.scene()),
                         page.options().titleBlock()
-                                ? ChartRenderer.titleBlockBounds(g,
+                                ? new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(g,
                                         page.scene()) : null,
                         page.options().magnitudeKey()
-                                ? ChartRenderer.magnitudeKeyBounds(
+                                ? new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).magnitudeKeyBounds(
                                         g.getFontMetrics(
                                                 EquatorialGrid.GRID_LABEL_FONT),
                                         page.scene(), StarSizePolicy.DEFAULT)

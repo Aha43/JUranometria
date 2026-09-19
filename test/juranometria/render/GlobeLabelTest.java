@@ -40,6 +40,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeLabelTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int SIDE_PX = 900;
 
     private static final SkyPosition SAGITTARIUS =
@@ -269,7 +274,8 @@ class GlobeLabelTest {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            return what.run(new ChartRenderer(StarSizePolicy.DEFAULT),
+            return what.run(
+                    new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH),
                     ChartRenderer.TextMetrics.of(g));
         } finally {
             g.dispose();

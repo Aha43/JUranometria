@@ -44,6 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class LabelStabilityTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDE_PX = 1000;
 
     private static final int HIGH_PX = 700;
@@ -302,7 +307,7 @@ class LabelStabilityTest {
         Graphics2D g = canvas.createGraphics();
         try {
             return new ArrayList<>(
-                    new ChartRenderer(StarSizePolicy.DEFAULT)
+                    new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                             .textPlacements(
                                     ChartRenderer.TextMetrics.of(g),
                                     scene, ChartOptions.DEFAULTS));

@@ -32,13 +32,17 @@ import juranometria.search.SearchResult;
  */
 public final class ChartOptionsStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDTH = 900;
     private static final int HEIGHT = 700;
 
     public static void main(String[] args) throws Exception {
         File outDir = new File("build/chart-options-study");
         outDir.mkdirs();
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
         // M31 at the released 8-degree default: the byte-identity anchor.
         ChartScene m31 = Atlas.assembler().assemble(

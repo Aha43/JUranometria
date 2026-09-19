@@ -23,6 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PanInteractionTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** A full-page all-sky fixture with real mouse events on the EDT. */
     private static final class Fixture {
         final SceneAssemblerTest.CountingCatalogue catalogue =
@@ -41,7 +46,7 @@ class PanInteractionTest {
             ChartComponent[] chartHolder = new ChartComponent[1];
             PanInteraction[] interactionHolder = new PanInteraction[1];
             SwingUtilities.invokeAndWait(() -> {
-                chartHolder[0] = new ChartComponent(assembler);
+                chartHolder[0] = new ChartComponent(assembler, ENGLISH);
                 interactionHolder[0] = PanInteraction.install(
                         chartHolder[0], controller);
                 controller.onChange(chartHolder[0]::setViewState);
@@ -184,7 +189,7 @@ class PanInteractionTest {
         ChartComponent[] holder = new ChartComponent[1];
         PanInteraction[] interaction = new PanInteraction[1];
         SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(regional);
+            holder[0] = new ChartComponent(regional, ENGLISH);
             interaction[0] = PanInteraction.install(holder[0], controller);
             controller.onChange(holder[0]::setViewState);
             holder[0].setSize(400, 1000);

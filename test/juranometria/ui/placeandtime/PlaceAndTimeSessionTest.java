@@ -30,6 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PlaceAndTimeSessionTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Instant MOMENT =
             Instant.parse("2026-09-05T10:28:31Z");
 
@@ -44,7 +49,7 @@ class PlaceAndTimeSessionTest {
     private ChartComponent chart;
 
     private ChartModuleHost host() {
-        chart = new ChartComponent(Atlas.assembler());
+        chart = new ChartComponent(Atlas.assembler(), ENGLISH);
         chart.setSize(900, 700);
         chart.setViewState(ChartViewState.DEFAULT);
         return new ChartModuleHost(chart, new SelectionModel(),

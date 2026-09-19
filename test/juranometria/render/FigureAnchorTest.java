@@ -54,11 +54,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class FigureAnchorTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition ORION = new SkyPosition(83.0, 0.0);
     private static final int WIDE = 900;
     private static final int HIGH = 700;
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static ChartScene page(double field, double magnitude) {
         return Atlas.assembler().assemble(
@@ -508,7 +513,7 @@ class FigureAnchorTest {
         juranometria.app.SwingSession.guarded(() -> {
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 chart[0] = new juranometria.ui.ChartComponent(
-                        Atlas.assembler());
+                        Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart[0]::setViewState);
                 navigation.recenter(ORION, 120.0);
                 window[0] = new javax.swing.JFrame("figure anchors");

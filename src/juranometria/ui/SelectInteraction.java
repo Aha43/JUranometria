@@ -73,8 +73,11 @@ public final class SelectInteraction extends MouseAdapter {
         this.selection = selection;
         this.working = working;
         this.mode = mode;
+        // Hit testing draws no furniture, and still takes the
+        // chart's words rather than an exemption: an exempt
+        // constructor is a default wearing a different name (#350).
         this.hitTest = new ChartHitTest(
-                new ChartRenderer(StarSizePolicy.DEFAULT));
+                new ChartRenderer(StarSizePolicy.DEFAULT, chart.words()));
     }
 
     /** Installs point-and-identify-and-select on the chart. */

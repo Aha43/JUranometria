@@ -63,6 +63,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class NorwegianSkyJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final String NORWEGIAN = "nb-NO";
 
     /** Wide enough to carry constellation names, and dense with them. */
@@ -108,7 +113,7 @@ class NorwegianSkyJourneyTest {
                 new ChartViewController(assembler::fits);
         ChartComponent[] chart = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            chart[0] = new ChartComponent(assembler);
+            chart[0] = new ChartComponent(assembler, ENGLISH);
             chart[0].setSize(900, 700);
             chart[0].setViewState(navigation.state());
         });
@@ -167,7 +172,7 @@ class NorwegianSkyJourneyTest {
                 chart[0].assembler()::assemble, navigation.state(),
                 ChartOptions.DEFAULTS,
                 juranometria.render.ChartRenderer.ReferenceLayer.NONE,
-                PaperSize.A4);
+                PaperSize.A4, ENGLISH);
         List<String> printed = new ArrayList<>();
         for (SheetRecorder.Operation operation
                 : sheet.recorder().operations()) {

@@ -50,6 +50,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class PlaceAndTimeInkStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private PlaceAndTimeInkStudyMain() {
     }
 
@@ -58,7 +62,7 @@ public final class PlaceAndTimeInkStudyMain {
     private static final int HEIGHT = 700;
 
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     /** An observer, and the instant the study is drawn for. */
     private static final Instant WHEN = ZonedDateTime

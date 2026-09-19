@@ -46,6 +46,10 @@ import juranometria.ui.ChartComponent;
  */
 public final class GalleryPageMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private GalleryPageMain() {
     }
 
@@ -144,7 +148,7 @@ public final class GalleryPageMain {
             throws Exception {
         ChartComponent[] holder = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(Atlas.assembler());
+            holder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             holder[0].setSize(900, 700);
             holder[0].setViewState(state);
         });

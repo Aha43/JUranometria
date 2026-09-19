@@ -35,6 +35,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ExportSheetSessionTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static ChartViewController navigation() {
         ChartViewController navigation = new ChartViewController();
         navigation.recenter(new SkyPosition(83.0, 0.0), 42.0);
@@ -45,7 +50,7 @@ class ExportSheetSessionTest {
             throws Exception {
         ChartComponent[] holder = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(Atlas.assembler());
+            holder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             holder[0].setSize(770, 523);
             holder[0].setViewState(navigation.state());
         });

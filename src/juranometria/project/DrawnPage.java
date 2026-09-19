@@ -130,18 +130,34 @@ public record DrawnPage(ChartScene scene, Projection projection) {
      * name the projection that drew it - the same requirement the
      * title block and the exported sheet have, from the same source.
      */
-    public String describe() {
-        return String.format(Locale.ROOT,
-                "%s. Centre RA %.4f, Dec %+.4f (ICRS J2000)."
-                        + " Field %.1f degrees wide, %s projection."
-                        + " Stars to V %.1f. North up, east left.%s",
+    /**
+     * What this page is, spoken, in a stated language (#350).
+     *
+     * <p>The words are <strong>given</strong>, never held: a page is
+     * geometry and does not own a language, and one that remembered
+     * a preference could disagree with the sheet exported from it.
+     *
+     * <p>Every number is formatted here with {@code Locale.ROOT} and
+     * handed over as text. A declination keeps its sign and its four
+     * places in every language; a magnitude limit of 6.0 is not 6,0.
+     */
+    public String describe(PageWords words) {
+        if (words == null) {
+            throw new IllegalArgumentException("a page says what it is"
+                    + " in some language (#350)");
+        }
+        return words.spokenPage(
                 scene.title(),
-                scene.viewport().centre().raDegrees(),
-                scene.viewport().centre().decDegrees(),
-                scene.viewport().fieldWidthDegrees(),
-                projectionName(),
-                scene.limitingMagnitude(),
-                bounded() ? " " + HEMISPHERE : "");
+                String.format(Locale.ROOT, "%.4f",
+                        scene.viewport().centre().raDegrees()),
+                String.format(Locale.ROOT, "%+.4f",
+                        scene.viewport().centre().decDegrees()),
+                String.format(Locale.ROOT, "%.1f",
+                        scene.viewport().fieldWidthDegrees()),
+                words.projection(projectionName()),
+                String.format(Locale.ROOT, "%.1f",
+                        scene.limitingMagnitude()),
+                bounded());
     }
 
     /**
@@ -160,8 +176,8 @@ public record DrawnPage(ChartScene scene, Projection projection) {
      * interaction details a description should not carry; the
      * sentence gives the shape those behaviours follow from.
      */
-    static final String HEMISPHERE =
-            "Shows one hemisphere of the sky, out to 90 degrees from"
-                    + " the centre in every direction. Outside the"
-                    + " circular limb is paper, not sky.";
+    // The hemisphere sentence moved to the language pack (#350).
+    // It was appended to the description with a space, which is a
+    // language deciding where a clause goes; `page.spoken.bounded`
+    // is now a complete sentence of its own.
 }

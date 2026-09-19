@@ -73,6 +73,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintThirtyTwoJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** Andromeda, where Home opens. */
     private static final String M31 = "NGC 224";
 
@@ -117,7 +122,7 @@ class SprintThirtyTwoJourneyTest {
                             .EclipticStore.forNode(node));
 
             SwingUtilities.invokeAndWait(() -> {
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 TargetRetirement.connect(options, chart, navigation);
                 hostHolder[0] = new ChartModuleHost(chart, selection,
@@ -550,7 +555,7 @@ class SprintThirtyTwoJourneyTest {
     private static final int AROUND = 720;
 
     private static String describe(ChartComponent chart) throws Exception {
-        return onEdt(() -> DrawnPage.of(chart.currentScene()).describe());
+        return onEdt(() -> DrawnPage.of(chart.currentScene()).describe(ENGLISH));
     }
 
     /** The names this page writes, by the placement it publishes. */
@@ -563,7 +568,7 @@ class SprintThirtyTwoJourneyTest {
                     BufferedImage.TYPE_INT_RGB);
             java.awt.Graphics2D g = canvas.createGraphics();
             try {
-                for (var placed : new ChartRenderer(StarSizePolicy.DEFAULT)
+                for (var placed : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .textPlacements(ChartRenderer.TextMetrics.of(g),
                                 chart.currentScene(),
                                 chart.drawnOptions())) {
@@ -634,7 +639,7 @@ class SprintThirtyTwoJourneyTest {
             try {
                 g.setColor(java.awt.Color.WHITE);
                 g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-                new ChartRenderer(StarSizePolicy.DEFAULT)
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .render(g, scene, bare);
             } finally {
                 g.dispose();
@@ -715,7 +720,7 @@ class SprintThirtyTwoJourneyTest {
         try {
             g.setColor(java.awt.Color.WHITE);
             g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, scene, bare);
         } finally {
             g.dispose();
@@ -815,7 +820,7 @@ class SprintThirtyTwoJourneyTest {
         return onEdt(() -> {
             ChartScene scene = chart.currentScene();
             ChartHitTest pointing = new ChartHitTest(
-                    new ChartRenderer(StarSizePolicy.DEFAULT));
+                    new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH));
             for (double[] at : places) {
                 ChartHitTest.Hit hit = pointing.at(scene,
                         chart.drawnOptions(), at[0], at[1]);
@@ -876,7 +881,7 @@ class SprintThirtyTwoJourneyTest {
                                                   String id)
             throws Exception {
         double[] at = onEdt(() -> {
-            for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT)
+            for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .drawnMarks(chart.currentScene(),
                             chart.drawnOptions())) {
                 if (mark.kind() == ChartRenderer.DrawnMark.Kind.DEEP_SKY
@@ -935,7 +940,7 @@ class SprintThirtyTwoJourneyTest {
             throws Exception {
         return onEdt(() -> {
             ChartRenderer.DrawnMark best = null;
-            for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT)
+            for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .drawnMarks(chart.currentScene(),
                             chart.drawnOptions())) {
                 if (mark.kind() != ChartRenderer.DrawnMark.Kind.STAR) {
@@ -1106,8 +1111,8 @@ class SprintThirtyTwoJourneyTest {
         try {
             java.awt.FontMetrics metrics = g.getFontMetrics();
             return new java.awt.Rectangle[] {
-                    ChartRenderer.titleBlockBounds(metrics, scene),
-                    new ChartRenderer(StarSizePolicy.DEFAULT)
+                    new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(metrics, scene),
+                    new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                             .magnitudeKeyBounds(metrics, scene)};
         } finally {
             g.dispose();
@@ -1264,7 +1269,7 @@ class SprintThirtyTwoJourneyTest {
             try {
                 g.setColor(java.awt.Color.WHITE);
                 g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-                new ChartRenderer(StarSizePolicy.DEFAULT)
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .render(g, scene, chart.drawnOptions());
             } finally {
                 g.dispose();

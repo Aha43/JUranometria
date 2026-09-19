@@ -29,6 +29,10 @@ import juranometria.render.LabelPlacement;
  */
 public final class ReleasedTextMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private ReleasedTextMain() {
     }
 
@@ -70,7 +74,7 @@ public final class ReleasedTextMain {
                 + " at  duress  x        y        w      h     "
                 + " what\n");
 
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         for (double field : FIELDS) {
             for (double[] centre : CENTRES) {
                 ChartScene scene = Atlas.assembler().assemble(

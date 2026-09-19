@@ -54,6 +54,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ReaderSkyLanguageTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final String NORWEGIAN = "nb-NO";
 
     /**
@@ -202,7 +207,7 @@ class ReaderSkyLanguageTest {
 
             ChartComponent[] chart = new ChartComponent[1];
             SwingUtilities.invokeAndWait(() -> {
-                chart[0] = new ChartComponent(assembler);
+                chart[0] = new ChartComponent(assembler, ENGLISH);
                 chart[0].setSize(770, 523);
                 chart[0].setViewState(navigation.state());
             });

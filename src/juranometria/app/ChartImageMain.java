@@ -23,7 +23,10 @@ public final class ChartImageMain {
         File target = new File(args.length > 0 ? args[0] : "build/m31-chart.png");
         ChartScene scene = Atlas.assembler()
                 .assemble(ChartViewState.DEFAULT, 900, 700);
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        // A developer tool writing one English PNG, and it says so
+        // rather than inheriting it (#350).
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT,
+                juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en")));
         ImageIO.write(renderer.renderToImage(scene), "png", target);
         System.out.println("Wrote " + target.getPath());
     }

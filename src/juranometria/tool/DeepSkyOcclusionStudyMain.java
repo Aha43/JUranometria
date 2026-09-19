@@ -37,6 +37,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class DeepSkyOcclusionStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private DeepSkyOcclusionStudyMain() {
     }
 
@@ -192,7 +196,7 @@ public final class DeepSkyOcclusionStudyMain {
 
     private static void acrossPages() {
         ChartRenderer renderer =
-                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
         ChartOptions options = ChartOptions.DEFAULTS;
 
         System.out.println("## What each order does, at drawn sizes");
@@ -328,7 +332,7 @@ public final class DeepSkyOcclusionStudyMain {
         ChartScene scene = juranometria.app.Atlas.assembler()
                 .assemble(ChartViewState.DEFAULT, WIDTH, HEIGHT);
         ChartRenderer renderer =
-                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
         ChartOptions options = ChartOptions.DEFAULTS;
 
         System.out.println("## The released default page");

@@ -45,6 +45,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeMarkTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDE_PX = 1200;
 
     private static final int HIGH_PX = 800;
@@ -314,7 +319,7 @@ class GlobeMarkTest {
     }
 
     private static List<ChartRenderer.DrawnMark> marksOf(ChartScene scene) {
-        return new ChartRenderer(StarSizePolicy.DEFAULT)
+        return new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, symbolsOnly());
     }
 
@@ -403,7 +408,7 @@ class GlobeMarkTest {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, scene, symbolsOnly());
         } finally {
             g.dispose();

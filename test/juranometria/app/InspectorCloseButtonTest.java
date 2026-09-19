@@ -42,6 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class InspectorCloseButtonTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static ChartScene page() {
         return Atlas.assembler().assemble(
                 juranometria.chart.ChartViewState.DEFAULT, 900, 700);
@@ -161,7 +166,7 @@ class InspectorCloseButtonTest {
         // say happens, and it is why they do not promise that closing
         // changes nothing at all. No display, no window manager, no
         // race - so CI holds the claim.
-        ChartComponent chart = new ChartComponent(Atlas.assembler());
+        ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
         SwingUtilities.invokeAndWait(() -> chart.setSize(900, 700));
         flush();
         ChartScene narrow = chart.currentScene();
@@ -199,7 +204,7 @@ class InspectorCloseButtonTest {
                     new javax.swing.JCheckBoxMenuItem[1];
 
             SwingUtilities.invokeAndWait(() -> {
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 InspectorPanel inspector = new InspectorPanel(selection,
                         chart::currentScene, () -> ChartOptions.DEFAULTS,

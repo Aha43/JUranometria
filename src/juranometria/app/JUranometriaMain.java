@@ -104,7 +104,16 @@ public final class JUranometriaMain {
         // bar, the task switcher and a portable launch all fall back
         // to Java's default cup.
         frame.setIconImages(ApplicationIcon.windowIcons());
-        ChartComponent chart = new ChartComponent(assembler);
+        // The page's own language, resolved ONCE from the session
+        // and handed to the chart. The export path resolves it again
+        // from the same session state in ExportSheet.write; nothing
+        // downstream of either remembers a language, so the screen
+        // and the file cannot disagree (#349, #350).
+        juranometria.project.PageWords pageWords =
+                juranometria.ui.language.PageText.in(
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()));
+        ChartComponent chart = new ChartComponent(assembler, pageWords);
         controller.onChange(chart::setViewState);
         // Choosing a language rebuilds the page in it. Reconstruction
         // rather than repaint: names are resolved into a scene when

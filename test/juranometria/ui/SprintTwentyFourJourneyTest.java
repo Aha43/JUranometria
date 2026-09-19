@@ -60,13 +60,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintTwentyFourJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** The states' words in English, stated rather than inherited (#350). */
     private static final juranometria.ui.language.PageVisibilityText STATES =
             juranometria.ui.language.PageVisibilityText.in(
                     juranometria.ui.language.InterfaceText.forLanguage("en"));
 
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private JFrame window;
     private ChartComponent chart;
@@ -103,7 +108,7 @@ class SprintTwentyFourJourneyTest {
 
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
             selection = new SelectionModel();

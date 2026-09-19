@@ -58,6 +58,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ProjectedCurveOnASheetTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /**
      * A page the permanent circle crosses off-centre, and where it
      * runs under the title panel.
@@ -118,7 +123,7 @@ class ProjectedCurveOnASheetTest {
                 new ChartViewState(ABOVE_THE_CROSSING,
                         kind == ChartProjection.GNOMONIC ? SHEET : OVERVIEW,
                         6.0),
-                ChartOptions.DEFAULTS, ink, PaperSize.A4);
+                ChartOptions.DEFAULTS, ink, PaperSize.A4, ENGLISH);
     }
 
     private static SheetRecording sheet(ChartProjection kind) {

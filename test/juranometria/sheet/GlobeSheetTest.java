@@ -41,6 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeSheetTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition SAGITTARIUS =
             new SkyPosition(266.0, -28.0);
 
@@ -96,7 +101,7 @@ class GlobeSheetTest {
         // on screen and another in the file.
         ChartScene scene = Atlas.assembler().assemble(globe(),
                 PAPER.chartWideUnits(), PAPER.chartHighUnits());
-        String spoken = DrawnPage.of(scene).describe();
+        String spoken = DrawnPage.of(scene).describe(ENGLISH);
         assertTrue(spoken.contains("orthographic"),
                 "the page tells a reader who cannot see it what drew"
                         + " it: " + spoken);
@@ -227,7 +232,7 @@ class GlobeSheetTest {
     private static SheetRecording recorded(ChartOptions options) {
         return ChartSheet.record(Atlas.assembler()::assemble, globe(),
                 options, ChartRenderer.ReferenceLayer.NONE,
-                ChartRenderer.ReferenceLayer.NONE, PAPER);
+                ChartRenderer.ReferenceLayer.NONE, PAPER, ENGLISH);
     }
 
     /** The globe's settled page: every family on, boundaries off. */

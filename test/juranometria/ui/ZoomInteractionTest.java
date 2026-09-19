@@ -29,6 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ZoomInteractionTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** A full-page all-sky fixture with real wheel events on the EDT. */
     private static final class Fixture {
         final SceneAssemblerTest.CountingCatalogue catalogue =
@@ -47,7 +52,7 @@ class ZoomInteractionTest {
             ChartComponent[] chartHolder = new ChartComponent[1];
             ZoomInteraction[] interactionHolder = new ZoomInteraction[1];
             SwingUtilities.invokeAndWait(() -> {
-                chartHolder[0] = new ChartComponent(assembler);
+                chartHolder[0] = new ChartComponent(assembler, ENGLISH);
                 interactionHolder[0] = ZoomInteraction.install(
                         chartHolder[0], controller);
                 controller.onChange(chartHolder[0]::setViewState);

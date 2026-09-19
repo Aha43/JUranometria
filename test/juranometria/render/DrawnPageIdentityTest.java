@@ -44,6 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class DrawnPageIdentityTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition CENTRE = new SkyPosition(83.0, -1.0);
 
     /**
@@ -208,8 +213,8 @@ class DrawnPageIdentityTest {
         java.awt.Graphics2D g = canvas.createGraphics();
         try {
             ChartRenderer renderer = new ChartRenderer(
-                    StarSizePolicy.DEFAULT);
-            java.awt.Rectangle box = ChartRenderer.titleBlockLayout(
+                    StarSizePolicy.DEFAULT, ENGLISH);
+            java.awt.Rectangle box = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockLayout(
                     g.getFontMetrics(), page.scene(),
                     page.projectionName());
             assertTrue(box != null && box.width > 0,
@@ -221,7 +226,7 @@ class DrawnPageIdentityTest {
             // now. What replaces it is the positive rule - a renderer
             // draws whatever page it is handed, by that page's own
             // projection, and says so in the block.
-            java.awt.Rectangle other = ChartRenderer.titleBlockLayout(
+            java.awt.Rectangle other = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockLayout(
                     g.getFontMetrics(), sceneSayingStereographic(),
                     DrawnPage.of(sceneSayingStereographic())
                             .projectionName());
@@ -239,7 +244,7 @@ class DrawnPageIdentityTest {
 
     @Test
     void theAccessibleDescriptionNamesTheProjectionThatDrewIt() {
-        String said = mismatchedPage().describe();
+        String said = mismatchedPage().describe(ENGLISH);
         assertTrue(said.contains("orthographic projection"),
                 "a reader who cannot see the page is told what drew"
                         + " it: " + said);

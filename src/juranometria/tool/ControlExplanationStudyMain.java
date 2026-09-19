@@ -66,6 +66,10 @@ import juranometria.ui.Shortcuts;
  */
 public final class ControlExplanationStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private ControlExplanationStudyMain() {
     }
 
@@ -438,7 +442,7 @@ public final class ControlExplanationStudyMain {
 
     private static Component onThisPage() {
         juranometria.ui.ChartComponent chart =
-                new juranometria.ui.ChartComponent(Atlas.assembler());
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH);
         chart.setSize(900, 700);
         chart.setViewState(juranometria.chart.ChartViewState.DEFAULT);
         juranometria.ui.ChartModuleHost host =

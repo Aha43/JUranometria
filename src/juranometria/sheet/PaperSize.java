@@ -120,12 +120,10 @@ public enum PaperSize {
         return points / POINTS_PER_MM;
     }
 
-    /** How this paper describes itself on the sheet it produces. */
-    public String describe() {
-        return String.format(Locale.ROOT,
-                "%s landscape, %.1f x %.1f mm, %.1f mm margins,"
-                        + " chart %.1f x %.1f mm",
-                identity, wideMm(), highMm(), marginMm(),
-                chartWideMm(), chartHighMm());
-    }
+    // describe() moved to the language pack (#350). A paper is its
+    // identity and its measurements; "landscape", "margins" and
+    // "chart" are prose, and this type had no way to say them in
+    // anything but English. The numbers are still its own and are
+    // handed to the sentence as Locale.ROOT text.
+
 }

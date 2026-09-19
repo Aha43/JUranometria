@@ -48,8 +48,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class CoordinateGridJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private SearchField searchField;
     private ChartComponent chart;
@@ -71,7 +76,7 @@ class CoordinateGridJourneyTest {
             ChartComponent[] chartHolder = new ChartComponent[1];
             SearchField[] search = new SearchField[1];
             SwingUtilities.invokeAndWait(() -> {
-                chartHolder[0] = new ChartComponent(Atlas.assembler());
+                chartHolder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 PanInteraction.install(chartHolder[0], navigation);
                 ZoomInteraction.install(chartHolder[0], navigation);
                 navigation.onChange(chartHolder[0]::setViewState);

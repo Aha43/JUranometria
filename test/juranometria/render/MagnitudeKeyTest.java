@@ -30,8 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MagnitudeKeyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static ChartScene scene(double limit) {
         return Atlas.assembler().assemble(
@@ -206,7 +211,7 @@ class MagnitudeKeyTest {
         assertTrue(larger.radiusFor(0.0)
                         > StarSizePolicy.DEFAULT.radiusFor(0.0),
                 "the check needs a genuinely different policy");
-        ChartRenderer renderer = new ChartRenderer(larger);
+        ChartRenderer renderer = new ChartRenderer(larger, ENGLISH);
         ChartScene scene = scene(8.0);
 
         BufferedImage page = new BufferedImage(900, 700,
@@ -225,7 +230,7 @@ class MagnitudeKeyTest {
         assertNotNull(box);
 
         // The box the renderer publishes is sized for ITS policy...
-        Rectangle byDefault = ChartRenderer.magnitudeKeyBounds(
+        Rectangle byDefault = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).magnitudeKeyBounds(
                 page.createGraphics().getFontMetrics(
                         ChartRenderer.labelFont()), scene,
                 StarSizePolicy.DEFAULT);
@@ -297,7 +302,7 @@ class MagnitudeKeyTest {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = probe.createGraphics();
         try {
-            return ChartRenderer.titleBlockBounds(g, scene);
+            return new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(g, scene);
         } finally {
             g.dispose();
         }

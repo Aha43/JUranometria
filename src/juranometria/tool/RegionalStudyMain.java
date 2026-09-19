@@ -31,6 +31,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class RegionalStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final double[] FIELDS = {8.0, 12.0, 18.0, 24.0, 36.0};
     private static final double LIMIT_V = 8.0;
     private static final int WIDTH = 900;
@@ -61,7 +65,7 @@ public final class RegionalStudyMain {
         juranometria.ui.SceneAssembler assembler =
                 juranometria.ui.SceneAssembler.allSky(catalogue, margin,
                         juranometria.geo.ConstellationGeography.load());
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
         System.out.printf(Locale.ROOT,
                 "%-6s %5s | %6s %5s | %6s %5s %6s | %5s %5s | %4s %5s"

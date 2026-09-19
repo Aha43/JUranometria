@@ -61,6 +61,10 @@ import juranometria.render.SymbolFamily;
  */
 public final class GlobeFamilyStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private GlobeFamilyStudyMain() {
     }
 
@@ -457,7 +461,7 @@ public final class GlobeFamilyStudyMain {
         java.awt.Graphics2D g = canvas.createGraphics();
         try {
             new juranometria.render.ChartRenderer(
-                    juranometria.chart.StarSizePolicy.DEFAULT)
+                    juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();

@@ -38,6 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartOptionsJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     @Test
     void chooseTheChartExploreAndComeHome() throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
@@ -54,7 +59,7 @@ class ChartOptionsJourneyTest {
             SearchField[] search = new SearchField[1];
 
             SwingUtilities.invokeAndWait(() -> {
-                chart[0] = new ChartComponent(Atlas.assembler());
+                chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart[0]::setViewState);
                 options.onChange(chart[0]::setChartOptions);
                 search[0] = new SearchField(Atlas.search(),

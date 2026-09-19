@@ -41,6 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ProjectionCarriedThroughTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition ORION = new SkyPosition(83.0, 0.0);
 
     /** The narrowest rung the overview draws, and the widest the
@@ -327,7 +332,7 @@ class ProjectionCarriedThroughTest {
         Projection projection = Projections.forViewport(scene.viewport());
         var mapping = new juranometria.project.ViewportMapping(juranometria.project.DrawnPage.of(scene));
         List<ChartRenderer.DrawnMark> marks =
-                new ChartRenderer(StarSizePolicy.DEFAULT)
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(scene, ChartOptions.DEFAULTS);
 
         int checked = 0;
@@ -608,7 +613,7 @@ class ProjectionCarriedThroughTest {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, scene, options);
         } finally {
             g.dispose();

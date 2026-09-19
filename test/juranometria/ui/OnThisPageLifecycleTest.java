@@ -32,10 +32,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OnThisPageLifecycleTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static ChartComponent chart() throws Exception {
         ChartComponent[] made = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            made[0] = new ChartComponent(Atlas.assembler());
+            made[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             made[0].setSize(900, 700);
             made[0].setViewState(ChartViewState.DEFAULT);
         });

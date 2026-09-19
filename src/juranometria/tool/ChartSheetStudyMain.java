@@ -37,6 +37,10 @@ import juranometria.ui.ReferenceInk;
  */
 public final class ChartSheetStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private ChartSheetStudyMain() {
     }
 
@@ -262,7 +266,7 @@ public final class ChartSheetStudyMain {
         return ChartSheet.record(Atlas.assembler()::assemble, state,
                 ChartOptions.DEFAULTS,
                 modules ? modules() : ChartRenderer.ReferenceLayer.NONE,
-                paper);
+                paper, ENGLISH);
     }
 
     private static void svg(StringBuilder report, String name,

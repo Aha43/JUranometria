@@ -42,6 +42,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class OverviewInkStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private OverviewInkStudyMain() {
     }
 
@@ -110,7 +114,7 @@ public final class OverviewInkStudyMain {
                 + " is measured.\n\n");
         observed.append("## Ink by field and magnitude\n\n");
 
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         for (int at = 0; at < CENTRES.length; at++) {
             observed.append("### ").append(CENTRE_NAMES[at])
                     .append(String.format(Locale.ROOT,

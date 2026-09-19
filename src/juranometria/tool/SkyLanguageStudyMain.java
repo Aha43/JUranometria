@@ -60,6 +60,10 @@ import juranometria.render.LabelPlacement;
  */
 public final class SkyLanguageStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private SkyLanguageStudyMain() {
     }
 
@@ -665,7 +669,7 @@ public final class SkyLanguageStudyMain {
         Rectangle2D box = placed.at();
         double mine = centreGap(own.getBounds2D(), box);
         for (Map.Entry<String, ChartRenderer.FigureInk> rival
-                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .figureInk(scene, ChartOptions.DEFAULTS).entrySet()) {
             if (rival.getKey().equals(placed.request().id())
                     || rival.getValue().ink() == null) {
@@ -724,7 +728,7 @@ public final class SkyLanguageStudyMain {
     private static Attachment attachment(LabelPlacement.Placement placed,
                                          ChartScene scene) {
         Map<String, ChartRenderer.FigureInk> ink =
-                new ChartRenderer(StarSizePolicy.DEFAULT)
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .figureInk(scene, ChartOptions.DEFAULTS);
         Rectangle2D box = placed.at();
         ChartRenderer.FigureInk own = ink.get(placed.request().id());
@@ -846,7 +850,7 @@ public final class SkyLanguageStudyMain {
         Graphics2D g = canvas.createGraphics();
         try {
             for (LabelPlacement.Placement one
-                    : new ChartRenderer(StarSizePolicy.DEFAULT)
+                    : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                             .textPlacements(ChartRenderer.TextMetrics.of(g),
                                     scene, ChartOptions.DEFAULTS)) {
                 if (one.request().family()

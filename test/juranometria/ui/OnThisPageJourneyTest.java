@@ -47,6 +47,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OnThisPageJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** The states' words in English, stated rather than inherited (#350). */
     private static final juranometria.ui.language.PageVisibilityText STATES =
             juranometria.ui.language.PageVisibilityText.in(
@@ -77,7 +82,7 @@ class OnThisPageJourneyTest {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "a key has nowhere to arrive without a display");
         SwingUtilities.invokeAndWait(() -> {
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             chart.setSize(900, 700);
             chart.setViewState(ChartViewState.DEFAULT);
             selection = new SelectionModel();

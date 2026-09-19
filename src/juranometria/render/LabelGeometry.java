@@ -75,7 +75,7 @@ public final class LabelGeometry {
         }
         if (options.titleBlock()) {
             java.awt.Rectangle block =
-                    ChartRenderer.titleBlockBounds(metrics, scene);
+                    renderer.titleBlockBounds(metrics, scene);
             if (block != null) {
                 ink.add(new LabelPlacement.Obstacle(
                         LabelPlacement.Refusal.FURNITURE, "title block",

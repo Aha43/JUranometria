@@ -52,6 +52,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintTwentyFiveJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Instant EQUINOX =
             Instant.parse("2026-03-20T21:33:00Z");
 
@@ -91,7 +96,7 @@ class SprintTwentyFiveJourneyTest {
 
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
             SelectionModel selection = new SelectionModel();

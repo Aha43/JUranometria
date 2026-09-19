@@ -45,6 +45,10 @@ import juranometria.ui.ReferenceInk;
  */
 public final class WiderFieldPageMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private WiderFieldPageMain() {
     }
 
@@ -110,7 +114,7 @@ public final class WiderFieldPageMain {
         Graphics2D g = image.createGraphics();
         try {
             ChartRenderer renderer =
-                    new ChartRenderer(StarSizePolicy.DEFAULT);
+                    new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
             if (withModules) {
                 OverlayRegistry registry = new OverlayRegistry();
                 MeridianModule meridian = new MeridianModule(

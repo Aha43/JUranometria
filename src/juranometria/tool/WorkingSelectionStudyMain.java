@@ -31,6 +31,10 @@ import juranometria.ui.ChartComponent;
  */
 public final class WorkingSelectionStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private WorkingSelectionStudyMain() {
     }
 
@@ -89,7 +93,7 @@ public final class WorkingSelectionStudyMain {
     private static ChartComponent component() throws Exception {
         ChartComponent[] holder = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(Atlas.assembler());
+            holder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             holder[0].setSize(900, 700);
             holder[0].setViewState(ChartViewState.DEFAULT);
         });
@@ -135,7 +139,7 @@ public final class WorkingSelectionStudyMain {
                 chart.paint(g);
                 juranometria.render.ChartRenderer renderer =
                         new juranometria.render.ChartRenderer(
-                                juranometria.chart.StarSizePolicy.DEFAULT);
+                                juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
                 for (String identity : extraRings) {
                     renderer.drawSelectionHighlight(g,
                             chart.currentScene(), chart.chartOptions(),

@@ -41,6 +41,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class BlackSkyStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private BlackSkyStudyMain() {
     }
 
@@ -137,7 +141,7 @@ public final class BlackSkyStudyMain {
         observation.setLength(0);
         File outDir = new File("docs/studies/black-sky");
         outDir.mkdirs();
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
         System.out.println("# Black sky: the second intentional chart"
                 + " palette");

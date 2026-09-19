@@ -61,8 +61,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MapExplorationJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private ChartComponent chart;
     private ChartViewController navigation;
@@ -84,7 +89,7 @@ class MapExplorationJourneyTest {
         JFrame[] frame = new JFrame[1];
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             PanInteraction.install(chart, navigation);
             ZoomInteraction.install(chart, navigation);

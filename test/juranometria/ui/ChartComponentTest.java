@@ -15,6 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ChartComponentTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     static final SkyPosition M31 = new SkyPosition(10.684708, 41.268750);
 
     /**
@@ -27,7 +32,8 @@ class ChartComponentTest {
         ChartComponent[] holder = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
             holder[0] = new ChartComponent(
-                    new SceneAssembler(catalogue, M31, 10.0, 1.5));
+                    new SceneAssembler(catalogue, M31, 10.0, 1.5),
+                    ENGLISH);
             holder[0].setSize(300, 200);
         });
         flushEventQueue();
@@ -73,7 +79,8 @@ class ChartComponentTest {
     @Test
     void exposesAnAccessibleContextWithAName() {
         ChartComponent component = new ChartComponent(new SceneAssembler(
-                new SceneAssemblerTest.CountingCatalogue(), M31, 10.0, 1.5));
+                new SceneAssemblerTest.CountingCatalogue(), M31, 10.0, 1.5),
+                ENGLISH);
         assertNotNull(component.getAccessibleContext());
         assertEquals("Star chart", component.getAccessibleContext().getAccessibleName());
     }

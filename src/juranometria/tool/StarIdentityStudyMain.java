@@ -46,6 +46,10 @@ import juranometria.render.RegionalDetailPolicy;
  */
 public final class StarIdentityStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDTH = 900;
     private static final int HEIGHT = 700;
     private static final Font LABEL_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
@@ -83,7 +87,7 @@ public final class StarIdentityStudyMain {
 
         verifyPinnedInputs();
         Map<String, Identity> identities = joinIdentities();
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
         record Page(String name, double ra, double dec, double field) {
         }
@@ -149,7 +153,7 @@ public final class StarIdentityStudyMain {
         g.setColor(NAME_INK);
         List<Rectangle2D> occupied = new ArrayList<>();
         java.awt.Rectangle titleBlock =
-                ChartRenderer.titleBlockBounds(g, scene);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(g, scene);
         if (titleBlock != null) {
             occupied.add(titleBlock);
         }

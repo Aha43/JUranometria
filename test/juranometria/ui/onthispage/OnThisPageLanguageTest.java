@@ -53,6 +53,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OnThisPageLanguageTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final String NORWEGIAN = "nb-NO";
 
     /** Every column is named, in the language being read. */
@@ -255,7 +260,7 @@ class OnThisPageLanguageTest {
         try {
             SwingUtilities.invokeAndWait(() -> {
                 ChartComponent chart =
-                        new ChartComponent(Atlas.assembler());
+                        new ChartComponent(Atlas.assembler(), ENGLISH);
                 chart.setSize(900, 700);
                 chart.setViewState(ChartViewState.DEFAULT);
                 ChartModuleHost host = new ChartModuleHost(chart,

@@ -36,12 +36,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PlaceAndTimeGateTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     @Test
     void theGateChangesNothingTheChartDraws() {
         // The released page, rendered by production, with none of
         // this sprint's work in the picture. If the gate had reached
         // into the renderer, the two would differ.
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         ChartScene scene = Atlas.assembler()
                 .assemble(ChartViewState.DEFAULT, 900, 700);
 

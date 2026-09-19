@@ -42,9 +42,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class EclipticControlsJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final juranometria.render.ChartRenderer RENDERER =
             new juranometria.render.ChartRenderer(
-                    juranometria.chart.StarSizePolicy.DEFAULT);
+                    juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
 
     /** The March equinox page: the ecliptic crosses the equator here. */
     private static ChartViewState eclipticPage() {
@@ -83,7 +88,7 @@ class EclipticControlsJourneyTest {
                                           ChartComponent[] out)
             throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            out[0] = new ChartComponent(Atlas.assembler());
+            out[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             out[0].setSize(900, 700);
             out[0].setViewState(state);
         });

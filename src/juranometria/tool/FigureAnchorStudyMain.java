@@ -52,6 +52,10 @@ import juranometria.render.StarLabelPolicy;
  */
 public final class FigureAnchorStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private FigureAnchorStudyMain() {
     }
 
@@ -204,7 +208,7 @@ public final class FigureAnchorStudyMain {
                 int ordinary = 0;
                 int kept = 0;
                 double faintest = 0.0;
-                for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT)
+                for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(scene, ChartOptions.DEFAULTS)) {
                     if (mark.star() == null) {
                         continue;
@@ -245,7 +249,7 @@ public final class FigureAnchorStudyMain {
                 ChartViewState.DEFAULT, WIDE, HIGH);
         double smallestAtHome = Double.MAX_VALUE;
         double faintestAtHome = 0.0;
-        for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT)
+        for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(home, ChartOptions.DEFAULTS)) {
             if (mark.star() != null) {
                 smallestAtHome = Math.min(smallestAtHome, mark.reach());
@@ -361,7 +365,7 @@ public final class FigureAnchorStudyMain {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            return ChartRenderer.titleBlockBounds(g, scene);
+            return new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(g, scene);
         } finally {
             g.dispose();
         }
@@ -403,7 +407,7 @@ public final class FigureAnchorStudyMain {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT).render(g, scene,
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH).render(g, scene,
                     options);
         } finally {
             g.dispose();

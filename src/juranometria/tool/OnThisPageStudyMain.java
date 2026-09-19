@@ -45,6 +45,10 @@ import juranometria.render.RegionalDetailPolicy;
  */
 public final class OnThisPageStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private OnThisPageStudyMain() {
     }
 
@@ -581,7 +585,7 @@ public final class OnThisPageStudyMain {
 
     private static void visibilityBreakdown() {
         ChartRenderer renderer =
-                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
         ChartOptions defaults = ChartOptions.DEFAULTS;
         ChartOptions galaxiesOff = defaults.withFamily(
                 juranometria.render.SymbolFamily.GALAXIES, false);

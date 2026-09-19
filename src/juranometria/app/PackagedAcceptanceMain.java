@@ -89,6 +89,19 @@ public final class PackagedAcceptanceMain {
         void run() throws Exception;
     }
 
+    /**
+     * The language this acceptance run asserts the image renders in.
+     *
+     * <p>Named, not inherited. Packaged acceptance checks that the
+     * ENGLISH page is what ships and what it has always been; a
+     * Norwegian assertion joins it when the page vocabulary is
+     * translated. Stating it is the claim (#350).
+     */
+    private static final juranometria.project.PageWords ENGLISH_PAGE =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
+
     public static void main(String[] args) throws Exception {
         // About, through its real static content paths: the packaged
         // summary must state every licence family and the
@@ -331,7 +344,7 @@ public final class PackagedAcceptanceMain {
         // this page - the silence the decision asks for, exercised
         // on purpose.
         juranometria.ui.ChartComponent chart =
-                new juranometria.ui.ChartComponent(Atlas.assembler());
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
         chart.setSize(900, 700);
         chart.setViewState(ChartViewState.DEFAULT);
         java.util.List<juranometria.module.NavigationRequest> asked =
@@ -619,7 +632,7 @@ public final class PackagedAcceptanceMain {
                     "and gets the released default, hidden");
 
             juranometria.ui.ChartComponent nextSession =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             nextSession.setSize(900, 700);
             nextSession.setViewState(eclipticPage);
             juranometria.ui.ChartModuleHost nextHost =
@@ -663,7 +676,7 @@ public final class PackagedAcceptanceMain {
             require(reopened.shown().orElse(false),
                     "a fresh store reads the choice back");
             juranometria.ui.ChartComponent secondSession =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             secondSession.setSize(900, 700);
             secondSession.setViewState(eclipticPage);
             juranometria.ui.ChartModuleHost secondHost =
@@ -728,7 +741,7 @@ public final class PackagedAcceptanceMain {
             java.time.Instant secondSession =
                     java.time.Instant.parse("2026-09-05T10:28:31Z");
             juranometria.ui.ChartComponent nextEvening =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             nextEvening.setSize(900, 700);
             nextEvening.setViewState(ChartViewState.DEFAULT);
             juranometria.ui.ChartModuleHost secondHost =
@@ -801,7 +814,7 @@ public final class PackagedAcceptanceMain {
         // broken - which is the one thing a packaged acceptance
         // exists to catch.
         juranometria.ui.ChartComponent chart =
-                new juranometria.ui.ChartComponent(Atlas.assembler());
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
         chart.setSize(900, 700);
         chart.setViewState(ChartViewState.DEFAULT);
         juranometria.ui.ChartModuleHost host =
@@ -910,7 +923,7 @@ public final class PackagedAcceptanceMain {
         int[] hiddenByChoice = {0};
         withTemporaryOptions(ChartOptionsStore.user(), galaxiesOff, () -> {
             juranometria.ui.ChartComponent restarted =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             restarted.setSize(900, 700);
             restarted.setViewState(ChartViewState.DEFAULT);
             ChartOptions reloaded = ChartOptionsStore.user().load();
@@ -1039,7 +1052,7 @@ public final class PackagedAcceptanceMain {
     }
 
     private static void readerJourney() throws Exception {
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH_PAGE);
         ChartViewController navigation =
                 new ChartViewController(Atlas.assembler()::fits);
 

@@ -25,8 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GridRenderingTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     static final SkyPosition CENTRE = new SkyPosition(83.818667, -5.389667);
-    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT);
+    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static ChartScene scene(List<Star> stars) {
         return new ChartScene(new ChartViewport(CENTRE, 12.0, 900, 700),
@@ -78,7 +83,7 @@ class GridRenderingTest {
         BufferedImage with = RENDERER.renderToImage(empty);
         Graphics2D probe = with.createGraphics();
         java.awt.Rectangle title =
-                ChartRenderer.titleBlockBounds(probe, empty);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(probe, empty);
         probe.dispose();
         if (title != null) {
             title.grow(2, 2);
@@ -115,7 +120,7 @@ class GridRenderingTest {
         BufferedImage off = RENDERER.renderToImage(empty, gridOff);
         Graphics2D probe = off.createGraphics();
         java.awt.Rectangle title =
-                ChartRenderer.titleBlockBounds(probe, empty);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(probe, empty);
         probe.dispose();
         if (title != null) {
             title.grow(2, 2);

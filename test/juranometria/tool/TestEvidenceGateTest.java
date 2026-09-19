@@ -32,6 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TestEvidenceGateTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Path REPORT =
             Path.of("docs/studies/test-evidence/measurements.md");
     private static final Path DECISION =
@@ -41,7 +46,7 @@ class TestEvidenceGateTest {
 
     @Test
     void theGateChangesNothingTheChartDraws() {
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         var scene = Atlas.assembler()
                 .assemble(ChartViewState.DEFAULT, 900, 700);
         BufferedImage before = renderer.renderToImage(scene,

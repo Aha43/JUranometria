@@ -28,6 +28,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class FurnitureStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private FurnitureStudyMain() {
     }
 
@@ -174,7 +178,7 @@ public final class FurnitureStudyMain {
                 + " it would cover | star and symbol ink |\n");
         observed.append("|---|---|---:|---:|---:|\n");
         String[] oneBox = new String[1];
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         // Stars and deep-sky symbols alone: every other layer off, so
         // what remains in the box is what those two layers drew.
         ChartOptions marksOnly = new ChartOptions(true, false, false, false,
@@ -254,7 +258,7 @@ public final class FurnitureStudyMain {
 
     /** The pages themselves, with and without the key, in both themes. */
     private static void pages() throws IOException {
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         for (Page page : PAGES) {
             ChartScene scene = scene(page);
             write(new File(DIR, page.name() + "-without-key.png"),

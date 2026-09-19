@@ -34,6 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartSheetTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     static final ChartViewState ORION = new ChartViewState(
             new SkyPosition(83.0, 0.0), 42.0, 6.0);
 
@@ -101,7 +106,7 @@ class ChartSheetTest {
     static SheetRecording bare(ChartViewState state) {
         return ChartSheet.record(Atlas.assembler()::assemble, state,
                 ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
-                PaperSize.A4);
+                PaperSize.A4, ENGLISH);
     }
 
     /** The meridian and the ecliptic, as the screen carries them. */
@@ -160,7 +165,7 @@ class ChartSheetTest {
         // place.
         SheetRecording sheet = bare(ORION);
         List<ChartRenderer.DrawnMark> marks =
-                new ChartRenderer(StarSizePolicy.DEFAULT)
+                new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(sheet.scene(), sheet.options());
         assertTrue(marks.size() > 100,
                 "the page has marks to look for: " + marks.size());
@@ -196,7 +201,7 @@ class ChartSheetTest {
         SheetRecording without = bare(equinox);
         SheetRecording with = ChartSheet.record(
                 Atlas.assembler()::assemble, equinox, ChartOptions.DEFAULTS,
-                modules(), PaperSize.A4);
+                modules(), PaperSize.A4, ENGLISH);
 
         assertTrue(with.shapeCount() > without.shapeCount(),
                 "a chart carrying the meridian and the ecliptic puts"
@@ -275,7 +280,7 @@ class ChartSheetTest {
         assertThrows(IllegalArgumentException.class,
                 () -> ChartSheet.record(Atlas.assembler()::assemble,
                         ORION, ChartOptions.DEFAULTS, null,
-                        PaperSize.A4),
+                        PaperSize.A4, ENGLISH),
                 "an undecided reference layer is refused rather than"
                         + " defaulted");
     }
@@ -288,7 +293,7 @@ class ChartSheetTest {
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION,
                 ChartOptions.DEFAULTS.withPalette(ChartPalette.BLACK_SKY),
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
 
         assertEquals(ChartPalette.WHITE_PAPER, sheet.options().palette(),
                 "a sheet made from a black-sky chart is still paper");
@@ -318,7 +323,7 @@ class ChartSheetTest {
         // the reference layer, which put a reader's rings underneath
         // the stars they were marking (PR #292 review).
         SheetRecording plain = bare(ORION);
-        var renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        var renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         // From what the renderer draws, not from what the scene
         // holds: a scene carries objects whose symbols reach the page
         // from outside it, and a ring is only drawn for a mark that
@@ -332,7 +337,7 @@ class ChartSheetTest {
                 ChartRenderer.ReferenceLayer.NONE,
                 (g, scene) -> renderer.drawSelectionHighlight(g, scene,
                         ChartOptions.DEFAULTS, marked),
-                PaperSize.A4);
+                PaperSize.A4, ENGLISH);
 
         assertTrue(withMarks.shapeCount() > plain.shapeCount(),
                 "the ring reaches the sheet: " + withMarks.shapeCount()
@@ -393,7 +398,7 @@ class ChartSheetTest {
         SheetRecording a4 = bare(ORION);
         SheetRecording letter = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.LETTER);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.LETTER, ENGLISH);
         assertEquals(PaperSize.LETTER.chartWideUnits(),
                 letter.scene().viewport().widthPx(),
                 "Letter's chart is assembled at Letter's own width");

@@ -23,6 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class InspectorToggleTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private record Wiring(InspectorToggle toggle, InspectorPanel panel,
                           AtlasToolbar toolbar,
                           List<InspectorToggle.State> heard) {
@@ -35,7 +40,7 @@ class InspectorToggleTest {
         InspectorPanel[] panel = new InspectorPanel[1];
         AtlasToolbar[] toolbar = new AtlasToolbar[1];
         SwingUtilities.invokeAndWait(() -> {
-            ChartComponent chart = new ChartComponent(Atlas.assembler());
+            ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             panel[0] = new InspectorPanel(selection, chart::currentScene,
                     () -> juranometria.render.ChartOptions.DEFAULTS,
                     chosen -> { });

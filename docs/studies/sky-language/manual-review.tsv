@@ -35,8 +35,6 @@ identity	file	literal	scanner-reason	disposition	why
 fee9e234b9f9bc8a	app/AppearanceStore.java	dark	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 715d0623c46acc1a	app/ChartKeyboard.java	chartKeyboard	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 0f6356ab132877bb	app/InspectorPanel.java	page	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
-9dbfa63483f447a0	app/InspectorPanel.java	  (Bayer)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
-40681018e0b3d790	app/InspectorPanel.java	  (Flamsteed)	unresolved: no route found, needs manual inspection	reader-prose	a qualifier appended beside a star identifier
 406c6435f3051454	app/InspectorPanel.java	ICRS J2000	declared name used, but never at a known sink	notation	canonical astronomical notation: the reference frame names a coordinate system, not a word, and is the same token in every language the atlas speaks
 eb0f57da452f60e5	app/InspectorPanel.java	 \u00b7 	declared name used, but never at a known sink	notation	the separator between two names for one candidate; canonical identity presentation, and its order is atlas policy no language may reverse
 93d25862bcbb26d6	app/StartupFailure.java	:/:juranometria/	unresolved: no route found, needs manual inspection	identifier	a stable key, path or stored value; no language changes it
@@ -61,10 +59,6 @@ d525afcda7732e1d	geo/SkyNames.java	latin	declared name used, but never at a know
 faa2a1e5daf0d9b9	geo/SkyNames.java	/resources/sky-language/index.tsv	declared name used, but never at a known sink	identifier	the classpath path of the generated pack index
 14a52e5dbbea579a	geo/SkyNames.java	/resources/sky-language/	declared name used, but never at a known sink	identifier	the classpath prefix the packs live under
 815a76a718d7ba3f	meridian/MeridianModule.java	meridian	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
-45cca1fc920ac14d	project/DrawnPage.java	Shows one hemisphere of the sky, out to 90 degrees from	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
-77d02d4e0bd2fe21	project/DrawnPage.java	 the centre in every direction. Outside the	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
-bb575c95d9534a7b	project/DrawnPage.java	 circular limb is paper, not sky.	declared name used, but never at a known sink	reader-prose	spoken accessibility description of the globe page
-cf4f667e6ae2e06b	render/ChartRenderer.java	Stars, visual magnitude	declared name used, but never at a known sink	reader-prose	shown in the application; belongs in the translation queue
 2b42a0817c34dead	render/SymbolFamily.java	M 31, M 51, NGC 3628	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
 6dbd9f1eee6abcb2	render/SymbolFamily.java	M 45, M 44, NGC 869	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
 7da8e70f4ab2c1cf	render/SymbolFamily.java	M 13, M 22, NGC 5139	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
@@ -124,3 +118,4 @@ fa14b5ae5186cec7	ui/language/AboutText.java	notice.	resource-key fragment, never
 c18ce3f4c9fce143	ui/language/AboutText.java	about.	resource-key stem, never shown	identifier	a stable key, path or stored value; no language changes it
 c4dcab779337ec98	ui/language/AboutText.java	/resources/interface-language/	where a language keeps its own summary document	identifier	a stable key, path or stored value; no language changes it
 a56146ee79531226	ui/language/AboutText.java	.label	the role half of a resource key	identifier	a stable key, path or stored value; no language changes it
+4849f5693a513941	ui/language/PageText.java	page.	resource-key stem, never shown	identifier	a stable key, path or stored value; no language changes it
