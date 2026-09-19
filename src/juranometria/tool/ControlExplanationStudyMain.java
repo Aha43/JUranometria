@@ -328,7 +328,7 @@ public final class ControlExplanationStudyMain {
                 () -> { }, new juranometria.chart.SelectionMode(), english));
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }));
+                () -> { }, english));
         surfaces.put("Chart Options",
                 ChartOptionsDialog.contentForStudy(options()));
         surfaces.put("Place and Time", placeAndTime());

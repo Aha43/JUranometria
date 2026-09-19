@@ -84,7 +84,7 @@ class LetteredStarJourneyTest {
                 frame[0] = new JFrame("lettered-star-journey");
                 frame[0].setJMenuBar(AppMenuBar.create(navigation, null,
                         () -> ChartOptionsDialog.open(frame[0], options),
-                        () -> { }));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 frame[0].setLayout(new java.awt.BorderLayout());
                 frame[0].add(new AtlasToolbar(navigation, search[0]),
                         java.awt.BorderLayout.NORTH);

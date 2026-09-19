@@ -68,7 +68,7 @@ class DirectZoomJourneyTest {
                         Atlas.assembler(), navigation);
                 frame[0] = new JFrame("direct-zoom-journey");
                 frame[0].setJMenuBar(AppMenuBar.create(navigation, null,
-                        () -> { }, () -> { }));
+                        () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 AppMenuBar.installZoomShortcuts(frame[0].getRootPane(),
                         navigation);
                 frame[0].setLayout(new java.awt.BorderLayout());

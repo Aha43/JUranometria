@@ -685,7 +685,7 @@ class DeepSkyFamilyJourneyTest {
         window.add(inspector, BorderLayout.EAST);
         window.setJMenuBar(AppMenuBar.create(navigation, () -> { },
                 () -> ChartOptionsDialog.open(window, options),
-                () -> { }, toggle::toggle));
+                () -> { }, toggle::toggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
         javax.swing.JCheckBoxMenuItem item =
                 AppMenuBar.inspectorItem(window.getJMenuBar());
         toggle.onChange(state -> {

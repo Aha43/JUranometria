@@ -208,7 +208,7 @@ class AccessibleSurfaceTest {
                         "About notices", unnamed);
 
                 JMenuBar menuBar = AppMenuBar.create(navigation,
-                        () -> { }, () -> { }, () -> { });
+                        () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 for (int i = 0; i < menuBar.getMenuCount(); i++) {
                     JMenu menu = menuBar.getMenu(i);
                     if (menu.getAccessibleContext()

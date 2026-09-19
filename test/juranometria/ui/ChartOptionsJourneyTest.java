@@ -62,7 +62,7 @@ class ChartOptionsJourneyTest {
                 frame[0] = new JFrame("options-journey");
                 frame[0].setJMenuBar(AppMenuBar.create(null,
                         () -> ChartOptionsDialog.open(frame[0], options),
-                        () -> { }));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 frame[0].setLayout(new java.awt.BorderLayout());
                 frame[0].add(new AtlasToolbar(navigation, search[0]),
                         java.awt.BorderLayout.NORTH);

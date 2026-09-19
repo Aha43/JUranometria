@@ -376,7 +376,7 @@ class ChartKeyboardMatrixTest {
                 frame.add(page, BorderLayout.CENTER);
                 frame.setSize(900, 600);
                 bar = AppMenuBar.create(null, null, () -> { }, () -> { },
-                        () -> { }, () -> { }, theMenusOwnSwitch);
+                        () -> { }, () -> { }, theMenusOwnSwitch, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.setJMenuBar(bar);
                 ChartKeyboard.install(frame.getRootPane(),
                         ChartSwitches.of(

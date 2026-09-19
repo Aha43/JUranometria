@@ -565,7 +565,9 @@ public final class PackagedAcceptanceMain {
             javax.swing.JMenuBar nextBar = AppMenuBar.create(null, null,
                     () -> { }, () -> { }, () -> { }, () -> { },
                     juranometria.ui.ecliptic.EclipticSession.toggle(
-                            remembered, fresh));
+                            remembered, fresh),
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
             javax.swing.JCheckBoxMenuItem nextItem =
                     AppMenuBar.eclipticItem(nextBar);
             juranometria.ui.ecliptic.EclipticSession.restore(remembered,
@@ -606,7 +608,9 @@ public final class PackagedAcceptanceMain {
             javax.swing.JMenuBar secondBar = AppMenuBar.create(null, null,
                     () -> { }, () -> { }, () -> { }, () -> { },
                     juranometria.ui.ecliptic.EclipticSession.toggle(
-                            secondModule, reopened));
+                            secondModule, reopened),
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
             javax.swing.JCheckBoxMenuItem secondItem =
                     AppMenuBar.eclipticItem(secondBar);
             juranometria.ui.ecliptic.EclipticSession.restore(secondModule,

@@ -473,7 +473,7 @@ class SprintTwentyThreeJourneyTest {
             window.setJMenuBar(AppMenuBar.create(navigation, () -> { },
                     () -> juranometria.app.ChartOptionsDialog.open(
                             window, options),
-                    () -> { }, toggle::toggle));
+                    () -> { }, toggle::toggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
             inspectorItem = AppMenuBar.inspectorItem(window.getJMenuBar());
             toggle.onChange(state -> {
                 inspectorItem.setSelected(state.showing());

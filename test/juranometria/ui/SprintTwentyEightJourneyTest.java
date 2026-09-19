@@ -195,7 +195,7 @@ class SprintTwentyEightJourneyTest {
                 EclipticModule ecliptic = EclipticSession.begin(host);
                 JMenuBar bar = AppMenuBar.create(null, null, () -> { },
                         () -> { }, () -> { }, () -> { },
-                        EclipticSession.toggle(ecliptic, store));
+                        EclipticSession.toggle(ecliptic, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
                 JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
                 EclipticSession.restore(ecliptic, store, item);
 

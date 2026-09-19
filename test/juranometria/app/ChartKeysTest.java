@@ -62,7 +62,7 @@ class ChartKeysTest {
         Set<KeyStroke> taken = new LinkedHashSet<>();
         JMenuBar bar = AppMenuBar.create(new ChartViewController(),
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { });
+                () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (int menu = 0; menu < bar.getMenuCount(); menu++) {
             JMenu each = bar.getMenu(menu);
             for (int at = 0; at < each.getItemCount(); at++) {

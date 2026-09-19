@@ -217,7 +217,7 @@ class InspectorCloseButtonTest {
                 frame.add(chart, BorderLayout.CENTER);
                 frame.add(inspector, BorderLayout.EAST);
                 frame.setJMenuBar(AppMenuBar.create(navigation, () -> { },
-                        () -> { }, () -> { }, toggle::toggle));
+                        () -> { }, () -> { }, toggle::toggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 javax.swing.JCheckBoxMenuItem item =
                         AppMenuBar.inspectorItem(frame.getJMenuBar());
                 toggle.onChange(state -> {

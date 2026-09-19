@@ -345,7 +345,7 @@ class SprintTwentyNineJourneyTest {
                             opened.add("export");
                             ExportSheetSession.open(null, navigation,
                                     chart, options, working, surfaces, juranometria.ui.language.InterfaceText.forLanguage("en"));
-                        }));
+                        }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 JMenuItem export = AppMenuBar.exportItem(bar);
                 assertTrue(export != null && export.isEnabled(),
                         "4. File carries the export item");

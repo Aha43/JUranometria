@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * have caught the original defect either: it was valid Java calling a
  * real constructor.
  */
-class AtlasControlsCompositionTest {
+class AtlasChromeCompositionTest {
 
     /** A Norwegian session reaches both surfaces. */
     @Test
@@ -82,6 +82,49 @@ class AtlasControlsCompositionTest {
                         + " component tests, and composed in English");
     }
 
+    /**
+     * A Norwegian session reaches the menu bar too.
+     *
+     * <p>The menu was externalised after the toolbar, and the toolbar
+     * taught the lesson: a surface can be translated, proved by its
+     * own contracts, and still handed English by the application. So
+     * this goes through the seam the application uses, from a stored
+     * choice, and reads the bar it produces.
+     */
+    @Test
+    void aNorwegianSessionGivesTheMenuNorwegian() throws Exception {
+        List<String> said = new ArrayList<>();
+        inSession("nb-NO", controls -> said.addAll(menuWordsOf(
+                controls.menuBar(new ChartViewController(), () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }))));
+
+        // Now load-bearing. While the Norwegian menu values did not
+        // exist every key fell back to English, so a Norwegian
+        // session's menu was byte-identical to an English one and
+        // this could not fail whatever the seam did. That was
+        // recorded as owed rather than reported as proof; the values
+        // have landed, and the debt is discharged here.
+        InterfaceText norsk = InterfaceText.forLanguage("nb-NO");
+        InterfaceText english = InterfaceText.forLanguage("en");
+        String fileMenu = norsk.say("menu.file.label");
+
+        assertTrue(!fileMenu.equals(english.say("menu.file.label")),
+                "the premise: the File menu's name differs by"
+                        + " language - " + fileMenu);
+        assertTrue(said.contains(fileMenu),
+                "the composed menu speaks the session's language:"
+                        + " expected \"" + fileMenu + "\" among " + said);
+        assertTrue(!said.contains(english.say("menu.file.label")),
+                "with no English menu left on it");
+        assertEquals(menuWordsOf(
+                        AppMenuBar.create(new ChartViewController(),
+                                () -> { }, () -> { }, () -> { }, () -> { },
+                                () -> { }, () -> { }, () -> { }, norsk)),
+                said,
+                "and word for word what that language says");
+    }
+
     /** An English session still gets English, through the same seam. */
     @Test
     void anEnglishSessionGivesBothControlsEnglish() throws Exception {
@@ -102,7 +145,7 @@ class AtlasControlsCompositionTest {
     void thereIsNoWayToBuildTheseControlsWithoutALanguage() {
         IllegalArgumentException refused = org.junit.jupiter.api.Assertions
                 .assertThrows(IllegalArgumentException.class,
-                        () -> AtlasControls.of(null,
+                        () -> AtlasChrome.of(null,
                                 new ChartViewController(), Atlas.search(),
                                 Atlas.assembler(), new InspectorToggle(),
                                 "0.0.0", () -> { }, new SelectionMode()));
@@ -113,7 +156,7 @@ class AtlasControlsCompositionTest {
     // ---- the application's own starting point -------------------------
 
     private interface Check {
-        void on(AtlasControls controls);
+        void on(AtlasChrome controls);
     }
 
     /**
@@ -136,9 +179,9 @@ class AtlasControlsCompositionTest {
             assertEquals(language, session.interfaceLanguage(),
                     "the premise: the session really carries the stored"
                             + " choice");
-            AtlasControls[] controls = new AtlasControls[1];
+            AtlasChrome[] controls = new AtlasChrome[1];
             SwingUtilities.invokeAndWait(() -> controls[0] =
-                    AtlasControls.of(session, new ChartViewController(),
+                    AtlasChrome.of(session, new ChartViewController(),
                             Atlas.search(), Atlas.assembler(),
                             new InspectorToggle(), "0.0.0", () -> { },
                             new SelectionMode()));
@@ -147,6 +190,37 @@ class AtlasControlsCompositionTest {
         } finally {
             node.removeNode();
         }
+    }
+
+    /**
+     * Every word a menu says.
+     *
+     * <p>A menu keeps its items in a popup rather than as children,
+     * so walking the bar's component tree finds the menus and none of
+     * their items.
+     */
+    private static List<String> menuWordsOf(javax.swing.JMenuBar bar) {
+        List<String> said = new ArrayList<>();
+        for (int m = 0; m < bar.getMenuCount(); m++) {
+            javax.swing.JMenu menu = bar.getMenu(m);
+            if (menu == null) {
+                continue;
+            }
+            add(said, menu.getText());
+            add(said, menu.getAccessibleContext().getAccessibleName());
+            add(said, menu.getAccessibleContext().getAccessibleDescription());
+            for (int i = 0; i < menu.getItemCount(); i++) {
+                javax.swing.JMenuItem item = menu.getItem(i);
+                if (item == null) {
+                    continue;
+                }
+                add(said, item.getText());
+                add(said, item.getAccessibleContext().getAccessibleName());
+                add(said, item.getAccessibleContext()
+                        .getAccessibleDescription());
+            }
+        }
+        return said;
     }
 
     /** Every word a surface says, on every channel. */

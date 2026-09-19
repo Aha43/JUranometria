@@ -160,7 +160,7 @@ class SprintThirtyTwoJourneyTest {
                         () -> ExportSheetSession.open(frame, navigation,
                                 chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en"))));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
                 window[0] = frame;
                 chartHolder[0] = chart;
                 ChartKeyboardSession.install(frame.getRootPane(), options,

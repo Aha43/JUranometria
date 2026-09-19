@@ -514,8 +514,8 @@ public final class ChartOptionsDialog extends JDialog {
         // English word sitting between two pieces of notation. The
         // glyphs and the letter never change; the word between them
         // is language.
-        String shortcut = said.say("chartoptions.shortcut",
-                ChartKeys.prefixText(), toggle.keyLetter());
+        String shortcut = juranometria.ui.language.ShortcutText.in(said)
+                .sequence(ChartKeys.prefixText(), toggle.keyLetter());
         String spoken = toggle.dependsOn() == null
                 ? said.say("chartoptions.switch.spoken",
                         description, shortcut)

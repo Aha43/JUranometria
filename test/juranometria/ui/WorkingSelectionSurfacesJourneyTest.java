@@ -158,7 +158,7 @@ class WorkingSelectionSurfacesJourneyTest {
                                         .InterfaceLanguages.discover()),
                         () -> juranometria.app.ChartOptionsDialog.open(
                                 window, options),
-                        () -> { }));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
             }
             window.setLayout(new BorderLayout());
             window.add(toolbar, BorderLayout.NORTH);

@@ -172,7 +172,7 @@ class SprintThirtyOneJourneyTest {
                         () -> ExportSheetSession.open(frame, navigation,
                                 chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en"))));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
                 // Held before it is shown, so nothing that happens
                 // next can lose the window.
                 window[0] = frame;

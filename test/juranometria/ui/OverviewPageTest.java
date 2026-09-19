@@ -171,7 +171,7 @@ class OverviewPageTest {
                 frame[0].setJMenuBar(juranometria.app.AppMenuBar.create(
                         navigation[0], () -> { }, () -> { }, () -> { },
                         () -> inspector[0].setRequestedVisible(
-                                !inspector[0].isRequestedVisible())));
+                                !inspector[0].isRequestedVisible()), juranometria.ui.language.InterfaceText.forLanguage("en")));
                 frame[0].setSize(1280, 820);
                 frame[0].setVisible(true);
             });

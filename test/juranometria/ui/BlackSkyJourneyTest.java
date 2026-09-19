@@ -66,7 +66,7 @@ class BlackSkyJourneyTest {
                 frame[0] = new JFrame("black-sky-journey");
                 frame[0].setJMenuBar(AppMenuBar.create(null,
                         () -> ChartOptionsDialog.open(frame[0], options),
-                        () -> { }));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 frame[0].setLayout(new java.awt.BorderLayout());
                 frame[0].add(chart[0], java.awt.BorderLayout.CENTER);
                 frame[0].pack();

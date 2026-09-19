@@ -75,7 +75,7 @@ class EclipticMenuSurfaceTest {
                     frame[0] = new JFrame("menu surface");
                     frame[0].setJMenuBar(AppMenuBar.create(null, null,
                             () -> { }, () -> { }, () -> { }, () -> { },
-                            () -> { }));
+                            () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                     // The narrowest window the atlas supports: the
                     // point of the menu is that this does not decide
                     // the item's width.

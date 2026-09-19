@@ -178,35 +178,6 @@ public final class JUranometriaMain {
                 inspector::canShow);
         inspector.onVisibilityChange(inspectorToggle::report);
 
-        frame.setJMenuBar(AppMenuBar.create(controller,
-                () -> SettingsDialog.open(frame, appearance,
-                        effectiveDark -> {
-                            UiTheme.apply(effectiveDark);
-                            com.formdev.flatlaf.FlatLaf.updateUI();
-                        }, language, Atlas.names(), interfaces),
-                () -> ChartOptionsDialog.open(frame, chartOptions,
-                        juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())),
-                () -> AboutDialog.open(frame),
-                () -> {
-                    inspectorToggle.toggle();
-                    frame.revalidate();
-                    frame.repaint();
-                },
-                () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
-                        frame, meridian, placeStore,
-                        java.time.Instant::now),
-                // One switch, and its whole behaviour lives in the
-                // module's own seam so a test can drive exactly what
-                // a reader sets off.
-                juranometria.ui.ecliptic.EclipticSession.toggle(
-                        ecliptic, eclipticStore),
-                // File, Export Chart Sheet: the chart the reader is
-                // looking at, on paper (Sprint 29, issue #286).
-                () -> ExportSheetSession.open(frame, controller, chart,
-                        chartOptions, modules.workingSelection(),
-                        juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage()))));
         // One call, so the chart and the tick cannot disagree about
         // what the reader last chose.
         juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
@@ -255,7 +226,7 @@ public final class JUranometriaMain {
         // Both reader-facing controls are built through one seam, so
         // that "does the application hand them the session's
         // language?" is a question with an address (#350).
-        AtlasControls controls = AtlasControls.of(language, controller,
+        AtlasChrome controls = AtlasChrome.of(language, controller,
                 Atlas.search(), assembler, inspectorToggle,
                 AppInfo.version(), shutdown::request,
                 modules.selectionMode());
@@ -291,6 +262,39 @@ public final class JUranometriaMain {
         // The same AppInfo.version() About prints, handed over
         // rather than looked up twice.
         AtlasToolbar toolbar = controls.toolbar();
+
+        // Built after the controls seam, because the menu
+        // says its words in the same language the seam
+        // derived from the session (#350).
+        frame.setJMenuBar(controls.menuBar(controller,
+                () -> SettingsDialog.open(frame, appearance,
+                        effectiveDark -> {
+                            UiTheme.apply(effectiveDark);
+                            com.formdev.flatlaf.FlatLaf.updateUI();
+                        }, language, Atlas.names(), interfaces),
+                () -> ChartOptionsDialog.open(frame, chartOptions,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())),
+                () -> AboutDialog.open(frame),
+                () -> {
+                    inspectorToggle.toggle();
+                    frame.revalidate();
+                    frame.repaint();
+                },
+                () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
+                        frame, meridian, placeStore,
+                        java.time.Instant::now),
+                // One switch, and its whole behaviour lives in the
+                // module's own seam so a test can drive exactly what
+                // a reader sets off.
+                juranometria.ui.ecliptic.EclipticSession.toggle(
+                        ecliptic, eclipticStore),
+                // File, Export Chart Sheet: the chart the reader is
+                // looking at, on paper (Sprint 29, issue #286).
+                () -> ExportSheetSession.open(frame, controller, chart,
+                        chartOptions, modules.workingSelection(),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()))));
         frame.setLayout(new BorderLayout());
         frame.add(toolbar, BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);

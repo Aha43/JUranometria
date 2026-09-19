@@ -418,7 +418,7 @@ class ChartKeyboardWiringTest {
                 eclipticToggle = juranometria.ui.ecliptic.EclipticSession
                         .toggle(ecliptic, eclipticStore());
                 frame.setJMenuBar(AppMenuBar.create(null, null, () -> { },
-                        () -> { }, () -> { }, () -> { }, eclipticToggle));
+                        () -> { }, () -> { }, () -> { }, eclipticToggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 ChartKeyboardSession.install(frame.getRootPane(), options,
                         ecliptic, eclipticToggle, observer);
                 frame.setVisible(true);

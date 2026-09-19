@@ -81,7 +81,7 @@ class CoordinateGridJourneyTest {
                 frame[0] = new JFrame("coordinate-grid-journey");
                 frame[0].setJMenuBar(AppMenuBar.create(navigation, null,
                         () -> ChartOptionsDialog.open(frame[0], options),
-                        () -> { }));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 AppMenuBar.installZoomShortcuts(frame[0].getRootPane(),
                         navigation);
                 frame[0].setLayout(new java.awt.BorderLayout());

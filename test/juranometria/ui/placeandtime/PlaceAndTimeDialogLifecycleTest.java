@@ -111,7 +111,7 @@ class PlaceAndTimeDialogLifecycleTest {
             owner.setJMenuBar(juranometria.app.AppMenuBar.create(null,
                     () -> { }, () -> { }, () -> { }, null,
                     () -> PlaceAndTimeDialog.open(owner, module, store,
-                            () -> WHEN)));
+                            () -> WHEN), juranometria.ui.language.InterfaceText.forLanguage("en")));
             owner.setVisible(true);
         });
         SwingUtilities.invokeAndWait(() -> menuItem(owner,

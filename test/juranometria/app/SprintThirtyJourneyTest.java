@@ -234,7 +234,7 @@ class SprintThirtyJourneyTest {
                         () -> ExportSheetSession.open(window[0],
                                 navigation, chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en"))));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
                 window[0].pack();
                 window[0].setVisible(true);
                 chartHolder[0] = chart;

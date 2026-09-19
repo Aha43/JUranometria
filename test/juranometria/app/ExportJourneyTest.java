@@ -121,7 +121,7 @@ class ExportJourneyTest {
                 EQUINOX.fieldWidthDegrees());
         JMenuBar bar = AppMenuBar.create(navigation, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { },
-                () -> asked.add("export"));
+                () -> asked.add("export"), juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         JMenuItem export = AppMenuBar.exportItem(bar);
         assertTrue(export != null, "1. File carries an export item");
@@ -507,7 +507,7 @@ class ExportJourneyTest {
             frame.setJMenuBar(AppMenuBar.create(navigation, () -> { },
                     () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                     () -> ExportSheetSession.open(frame, navigation, chart,
-                            options, working, surfaces, juranometria.ui.language.InterfaceText.forLanguage("en"))));
+                            options, working, surfaces, juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
             // Held before it is shown, so nothing that happens next
             // can lose it.
             made[0] = frame;

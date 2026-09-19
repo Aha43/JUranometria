@@ -23,7 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import juranometria.app.Atlas;
-import juranometria.app.AtlasControls;
+import juranometria.app.AtlasChrome;
 import juranometria.chart.SelectionMode;
 import juranometria.chart.SkyPosition;
 import juranometria.ui.AtlasToolbar;
@@ -37,7 +37,7 @@ import juranometria.ui.language.SkyLanguageStore;
  * The toolbar and its search field, as the application composes them
  * (Sprint 33, issue #350).
  *
- * <p><strong>Through {@link AtlasControls}, from a stored choice.</strong>
+ * <p><strong>Through {@link AtlasChrome}, from a stored choice.</strong>
  * That is the whole point of this sheet rather than a convenience. The
  * toolbar was once externalised, translated and proved by eight
  * passing contracts while the application still showed it in English,
@@ -111,7 +111,7 @@ public final class ToolbarSheetMain {
 
                 ## Composed, not requested
 
-                Each capture is built through `AtlasControls`, the
+                Each capture is built through `AtlasChrome`, the
                 application's own composition seam, starting from a
                 language written to a preference node and read once by
                 `SkyLanguageSession`. Neither control is constructed
@@ -121,7 +121,7 @@ public final class ToolbarSheetMain {
                 for Norwegian would have photographed a correct
                 toolbar during the whole period when the application
                 was handing it English - which is exactly what
-                happened, and what `AtlasControlsCompositionTest` now
+                happened, and what `AtlasChromeCompositionTest` now
                 holds.
 
                 ## What is translated here, and what is not
@@ -165,7 +165,7 @@ public final class ToolbarSheetMain {
         Preferences node = Preferences.userRoot()
                 .node("juranometria-study-toolbar-" + System.nanoTime());
         JFrame[] owner = new JFrame[1];
-        AtlasControls[] controls = new AtlasControls[1];
+        AtlasChrome[] controls = new AtlasChrome[1];
         try {
             SwingUtilities.invokeAndWait(() -> {
                 // Before any component exists, and stated rather than
@@ -188,7 +188,7 @@ public final class ToolbarSheetMain {
                 InspectorToggle toggle = new InspectorToggle();
                 toggle.bind(() -> { }, () -> true);
 
-                controls[0] = AtlasControls.of(session, controller,
+                controls[0] = AtlasChrome.of(session, controller,
                         Atlas.search(), assembler, toggle, "2.0.0",
                         () -> { }, new SelectionMode());
 

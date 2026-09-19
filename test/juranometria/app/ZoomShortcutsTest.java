@@ -135,7 +135,7 @@ class ZoomShortcutsTest {
         ChartViewController navigation = new ChartViewController();
         navigation.recenter(new SkyPosition(10.684708, 41.268750), 180.0);
         JMenuBar bar = AppMenuBar.create(navigation, null, () -> { },
-                () -> { });
+                () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         JMenu view = bar.getMenu(0);
         assertEquals("View", view.getText());
         assertEquals("Chart Options...", view.getItem(0).getText(),

@@ -87,11 +87,83 @@ public final class AppMenuBar {
     }
 
     /** The menu bar without navigation; for wiring-level tests. */
+    /**
+     * The menu bar in a language a caller states.
+     *
+     * <p>One of these per arity that callers actually use, so the
+     * thing nobody outside this package may omit is the LANGUAGE.
+     * Every handler here is genuinely optional - a harness may want
+     * a bar with no Place and Time, no ecliptic, no export - but
+     * which words the bar says is not (#350).
+     */
+
+    /**
+     * The menu bar in a language a caller states, with no chart
+     * controller behind the zoom items.
+     *
+     * <p>One of these per arity that callers actually use, so the
+     * thing nobody may omit is the LANGUAGE. Every handler is
+     * genuinely optional; which words the bar says is not (#350).
+     */
     public static JMenuBar create(Runnable openSettings,
                                   Runnable openChartOptions,
-                                  Runnable openAbout) {
-        return create(null, openSettings, openChartOptions, openAbout);
+                                  Runnable openAbout,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(null, openSettings, openChartOptions, openAbout,
+                null, null, null, null, said);
     }
+
+    /** The same, with the chart controller behind the zoom items. */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                null, null, null, null, said);
+    }
+
+    /** The same, with the inspector toggle. */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, null, null, null, said);
+    }
+
+    /** The same, with Place and Time. */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, null, null, said);
+    }
+
+    /** The same, with the ecliptic switch. */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic, null,
+                said);
+    }
+
+    // Package-private since #350: these default to English, and a
+    // production caller that chose English by accident is exactly
+    // what shipped a translated toolbar in English. Harnesses in
+    // this package may use them; anything outside states a language.
 
     /**
      * @param navigation the chart-view controller backing the View
@@ -103,27 +175,12 @@ public final class AppMenuBar {
      *     item (may be null, omitting the View menu)
      * @param openAbout runs on the About item
      */
-    public static JMenuBar create(ChartViewController navigation,
-                                  Runnable openSettings,
-                                  Runnable openChartOptions,
-                                  Runnable openAbout) {
-        return create(navigation, openSettings, openChartOptions, openAbout,
-                null);
-    }
 
     /**
      * The menu bar with the inspector toggle (issue #170). Opening
      * and closing the inspector lives here rather than in the
      * toolbar, which stays the essential controls only.
      */
-    public static JMenuBar create(ChartViewController navigation,
-                                  Runnable openSettings,
-                                  Runnable openChartOptions,
-                                  Runnable openAbout,
-                                  Runnable toggleInspector) {
-        return create(navigation, openSettings, openChartOptions, openAbout,
-                toggleInspector, null);
-    }
 
     /**
      * The menu bar with Place and Time (Sprint 25, issue #228). A
@@ -135,15 +192,6 @@ public final class AppMenuBar {
      *     Time... item (may be null, omitting the item - which is
      *     what an atlas without the meridian module shows)
      */
-    public static JMenuBar create(ChartViewController navigation,
-                                  Runnable openSettings,
-                                  Runnable openChartOptions,
-                                  Runnable openAbout,
-                                  Runnable toggleInspector,
-                                  Runnable openPlaceAndTime) {
-        return create(navigation, openSettings, openChartOptions, openAbout,
-                toggleInspector, openPlaceAndTime, null);
-    }
 
     /**
      * The menu bar with the ecliptic switch (Sprint 28, issue #274).
@@ -161,16 +209,6 @@ public final class AppMenuBar {
      *     (may be null, omitting the item - which is what an atlas
      *     without the ecliptic module shows)
      */
-    public static JMenuBar create(ChartViewController navigation,
-                                  Runnable openSettings,
-                                  Runnable openChartOptions,
-                                  Runnable openAbout,
-                                  Runnable toggleInspector,
-                                  Runnable openPlaceAndTime,
-                                  Runnable toggleEcliptic) {
-        return create(navigation, openSettings, openChartOptions, openAbout,
-                toggleInspector, openPlaceAndTime, toggleEcliptic, null);
-    }
 
     /**
      * The menu bar with the export item (Sprint 29, issue #286).
@@ -190,34 +228,41 @@ public final class AppMenuBar {
                                   Runnable toggleInspector,
                                   Runnable openPlaceAndTime,
                                   Runnable toggleEcliptic,
-                                  Runnable exportSheet) {
+                                  Runnable exportSheet,
+                                  juranometria.ui.language.InterfaceText said) {
+        if (said == null) {
+            throw new IllegalArgumentException(
+                    "the menu has to say its words in some language");
+        }
+        // An access letter marks a letter in the item's own word, so
+        // it belongs to the language that wrote the word (#350).
+        juranometria.ui.language.MnemonicText letters =
+                juranometria.ui.language.MnemonicText.in(said);
         if (openAbout == null) {
             throw new IllegalArgumentException("about action is required");
         }
         JMenuBar bar = new JMenuBar();
 
         if (openSettings != null || exportSheet != null) {
-            JMenu application = new JMenu("File");
+            JMenu application = new JMenu(said.say("menu.file.label"));
             application.getAccessibleContext().setAccessibleName(
-                    "File menu");
+                    said.say("menu.file.a11y"));
             // A menu's own word is the whole of it, and a tooltip
             // over an open menu is a box between the reader and the
             // items they came for.
             juranometria.ui.Explain.selfExplanatory(application,
-                    "Making a file out of the chart, and the"
-                            + " application's own settings");
+                    said.say("menu.file.explain"));
             if (exportSheet != null) {
                 JMenuItem export =
-                        new JMenuItem("Export Chart Sheet...");
+                        new JMenuItem(said.say("menu.export.label"));
                 export.setName(EXPORT_ITEM);
-                export.setMnemonic('E');
+                letters.apply(export, "menu.export.mnemonic");
                 export.setAccelerator(juranometria.ui.Shortcuts.of(
                         juranometria.ui.Shortcuts.EXPORT).stroke());
                 export.getAccessibleContext().setAccessibleName(
-                        "Export Chart Sheet");
+                        said.say("menu.export.a11y"));
                 juranometria.ui.Explain.selfExplanatory(export,
-                        "Saves this chart as a sheet of paper: SVG,"
-                                + " PDF or PNG");
+                        said.say("menu.export.explain"));
                 export.addActionListener(event -> exportSheet.run());
                 application.add(export);
                 if (openSettings != null) {
@@ -225,13 +270,15 @@ public final class AppMenuBar {
                 }
             }
             if (openSettings != null) {
-                JMenuItem settings = new JMenuItem("Settings...");
+                JMenuItem settings =
+                        new JMenuItem(said.say("menu.settings.label"));
                 settings.getAccessibleContext().setAccessibleName(
-                        "Settings");
+                        said.say("menu.settings.a11y"));
+                // Since #348 this window also chooses the interface
+                // and chart languages; the old sentence named only
+                // light and dark (#350).
                 juranometria.ui.Explain.selfExplanatory(settings,
-                        "Opens the window that chooses the"
-                                + " application's light or dark"
-                                + " appearance");
+                        said.say("menu.settings.explain"));
                 settings.addActionListener(event -> openSettings.run());
                 application.add(settings);
             }
@@ -239,32 +286,31 @@ public final class AppMenuBar {
         }
 
         if (openChartOptions != null) {
-            JMenu view = new JMenu("View");
-            view.getAccessibleContext().setAccessibleName("View menu");
+            JMenu view = new JMenu(said.say("menu.view.label"));
+            view.getAccessibleContext().setAccessibleName(
+                    said.say("menu.view.a11y"));
             juranometria.ui.Explain.selfExplanatory(view,
-                    "What the chart draws, where you are looking from,"
-                            + " and how far out");
-            JMenuItem chartOptions = new JMenuItem("Chart Options...");
-            chartOptions.setMnemonic('C');
+                    said.say("menu.view.explain"));
+            JMenuItem chartOptions =
+                    new JMenuItem(said.say("menu.chartoptions.label"));
+            letters.apply(chartOptions, "menu.chartoptions.mnemonic");
             chartOptions.getAccessibleContext().setAccessibleName(
-                    "Chart Options");
+                    said.say("menu.chartoptions.a11y"));
             juranometria.ui.Explain.selfExplanatory(chartOptions,
-                    "Opens the window that chooses what the chart"
-                            + " draws and labels; the same switches"
-                            + " answer to " + ChartKeys.prefixText()
-                            + " from the chart itself");
+                    // The keystroke is an argument, not a fragment
+                    // glued into an English sentence (#350).
+                    said.say("menu.chartoptions.explain",
+                            ChartKeys.prefixText()));
             chartOptions.addActionListener(event -> openChartOptions.run());
             view.add(chartOptions);
             if (openPlaceAndTime != null) {
-                JMenuItem placeAndTime = new JMenuItem("Place and Time...");
-                placeAndTime.setMnemonic('P');
+                JMenuItem placeAndTime =
+                        new JMenuItem(said.say("menu.placeandtime.label"));
+                letters.apply(placeAndTime, "menu.placeandtime.mnemonic");
                 placeAndTime.getAccessibleContext().setAccessibleName(
-                        "Place and Time");
+                        said.say("menu.placeandtime.a11y"));
                 juranometria.ui.Explain.selfExplanatory(placeAndTime,
-                        "Opens the window that sets where you are and"
-                                + " the frozen instant your meridian,"
-                                + " horizon and zenith are drawn"
-                                + " for");
+                        said.say("menu.placeandtime.explain"));
                 placeAndTime.addActionListener(event ->
                         openPlaceAndTime.run());
                 view.add(placeAndTime);
@@ -274,17 +320,16 @@ public final class AppMenuBar {
                 // whether the inspector is showing - especially when
                 // a narrow window has closed it for them (review).
                 javax.swing.JCheckBoxMenuItem inspector =
-                        new javax.swing.JCheckBoxMenuItem("Inspector");
+                        new javax.swing.JCheckBoxMenuItem(
+                                said.say("menu.inspector.label"));
                 inspector.setName(INSPECTOR_ITEM);
-                inspector.setMnemonic('I');
+                letters.apply(inspector, "menu.inspector.mnemonic");
                 inspector.setAccelerator(juranometria.ui.Shortcuts.of(
                         juranometria.ui.Shortcuts.INSPECTOR).stroke());
                 inspector.getAccessibleContext().setAccessibleName(
-                        "Inspector");
+                        said.say("menu.inspector.a11y"));
                 juranometria.ui.Explain.selfExplanatory(inspector,
-                        "Shows or hides the panel that describes the"
-                                + " mark you have chosen and what is"
-                                + " on this page");
+                        said.say("menu.inspector.explain"));
                 inspector.addActionListener(event -> toggleInspector.run());
                 view.add(inspector);
             }
@@ -294,18 +339,22 @@ public final class AppMenuBar {
                 // a glyph, a zodiac sign or a colour to say what it
                 // is.
                 javax.swing.JCheckBoxMenuItem ecliptic =
-                        new javax.swing.JCheckBoxMenuItem("Ecliptic");
+                        new javax.swing.JCheckBoxMenuItem(
+                                said.say("menu.ecliptic.label"));
                 ecliptic.setName(ECLIPTIC_ITEM);
-                ecliptic.setMnemonic('E');
+                letters.apply(ecliptic, "menu.ecliptic.mnemonic");
                 ecliptic.getAccessibleContext().setAccessibleName(
-                        "Ecliptic");
+                        said.say("menu.ecliptic.a11y"));
                 juranometria.ui.Explain.selfExplanatory(ecliptic,
-                        "Shows or hides the ecliptic and its equinox"
-                                + " and solstice marks; the same"
-                                + " switch answers to "
-                                + ChartKeys.toggle("module.ecliptic")
-                                        .sequence()
-                                + " from the chart");
+                        // Through the shortcut seam, because
+                        // Toggle.sequence() freezes an English "then"
+                        // between two pieces of notation (#350).
+                        said.say("menu.ecliptic.explain",
+                                juranometria.ui.language.ShortcutText.in(said)
+                                        .sequence(ChartKeys.prefixText(),
+                                                ChartKeys.toggle(
+                                                        "module.ecliptic")
+                                                        .keyLetter())));
                 ecliptic.addActionListener(event -> toggleEcliptic.run());
                 view.add(ecliptic);
             }
@@ -318,11 +367,12 @@ public final class AppMenuBar {
                 // practical variants (shifted +, keypad add/subtract)
                 // bind through installZoomShortcuts.
                 view.addSeparator();
-                JMenuItem zoomIn = new JMenuItem("Zoom In");
-                zoomIn.getAccessibleContext().setAccessibleName("Zoom In");
+                JMenuItem zoomIn =
+                        new JMenuItem(said.say("menu.zoomIn.label"));
+                zoomIn.getAccessibleContext().setAccessibleName(
+                        said.say("menu.zoomIn.a11y"));
                 juranometria.ui.Explain.selfExplanatory(zoomIn,
-                        "Shows a narrower field, with fainter stars"
-                                + " on it");
+                        said.say("menu.zoomIn.explain"));
                 zoomIn.setAccelerator(juranometria.ui.Shortcuts.of(
                         juranometria.ui.Shortcuts.ZOOM_IN).stroke());
                 zoomIn.addActionListener(event -> {
@@ -330,11 +380,12 @@ public final class AppMenuBar {
                         navigation.zoomIn();
                     }
                 });
-                JMenuItem zoomOut = new JMenuItem("Zoom Out");
-                zoomOut.getAccessibleContext().setAccessibleName("Zoom Out");
+                JMenuItem zoomOut =
+                        new JMenuItem(said.say("menu.zoomOut.label"));
+                zoomOut.getAccessibleContext().setAccessibleName(
+                        said.say("menu.zoomOut.a11y"));
                 juranometria.ui.Explain.selfExplanatory(zoomOut,
-                        "Shows a wider field, with fewer stars on"
-                                + " it");
+                        said.say("menu.zoomOut.explain"));
                 zoomOut.setAccelerator(juranometria.ui.Shortcuts.of(
                         juranometria.ui.Shortcuts.ZOOM_OUT).stroke());
                 zoomOut.addActionListener(event -> {
@@ -342,26 +393,44 @@ public final class AppMenuBar {
                         navigation.zoomOut();
                     }
                 });
-                navigation.onChange(state -> {
-                    zoomIn.setEnabled(navigation.canZoomIn());
-                    zoomOut.setEnabled(navigation.canZoomOut());
-                });
+                // A step the ladder will not take says so, in this
+                // menu's own words. The toolbar was repaired first
+                // and the menu was not, so the two surfaces told a
+                // reader different things about the same ladder
+                // (#350 inventory).
+                Runnable sayWhatTheLadderAllows = () -> {
+                    boolean canIn = navigation.canZoomIn();
+                    boolean canOut = navigation.canZoomOut();
+                    zoomIn.setEnabled(canIn);
+                    zoomOut.setEnabled(canOut);
+                    juranometria.ui.Explain.selfExplanatory(zoomIn,
+                            said.say(canIn ? "menu.zoomIn.explain"
+                                    : "menu.zoomIn.end"));
+                    juranometria.ui.Explain.selfExplanatory(zoomOut,
+                            said.say(canOut ? "menu.zoomOut.explain"
+                                    : "menu.zoomOut.end"));
+                };
+                sayWhatTheLadderAllows.run();
+                navigation.onChange(state -> sayWhatTheLadderAllows.run());
                 view.add(zoomIn);
                 view.add(zoomOut);
             }
             bar.add(view);
         }
 
-        JMenu help = new JMenu("Help");
-        help.getAccessibleContext().setAccessibleName("Help menu");
+        JMenu help = new JMenu(said.say("menu.help.label"));
+        help.getAccessibleContext().setAccessibleName(
+                said.say("menu.help.a11y"));
         juranometria.ui.Explain.selfExplanatory(help,
-                "What this application is, and what it is built"
-                        + " on");
-        JMenuItem about = new JMenuItem("About " + AppInfo.NAME);
-        about.getAccessibleContext().setAccessibleName("About " + AppInfo.NAME);
+                said.say("menu.help.explain"));
+        // The product name is an identity handed to a pattern; the
+        // sentence around it belongs to the language (#350).
+        JMenuItem about =
+                new JMenuItem(said.say("menu.about.label", AppInfo.NAME));
+        about.getAccessibleContext().setAccessibleName(
+                said.say("menu.about.a11y", AppInfo.NAME));
         juranometria.ui.Explain.selfExplanatory(about,
-                "Opens the window naming the application, its version"
-                        + " and what it is built on");
+                said.say("menu.about.explain"));
         about.addActionListener(event -> openAbout.run());
         help.add(about);
         bar.add(help);

@@ -29,19 +29,38 @@ import juranometria.search.LocalSearch;
  * interface language from the session, and its delivery to both
  * surfaces that take it.
  *
- * <p>Deliberately narrow. This is not a home for the frame, the
- * chart, the modules or the menu bar; making all of
- * {@code JUranometriaMain} testable is a different and much larger
- * decision, and not one this defect justifies.
+ * <p><strong>What it owns.</strong> The session-derived words, and
+ * the composition of the application's chrome: the search field, the
+ * toolbar and the menu bar. Those are the three reader-facing
+ * surfaces that take a language, and one place deciding which
+ * language they get is the whole point.
+ *
+ * <p><strong>What it does not.</strong> The frame, the chart, the
+ * modules, the domain actions or any lifecycle. The menu's callbacks
+ * are handed in and never learned: this seam does not know what
+ * Settings opens or what Export writes, only which words the bar says
+ * while offering them. Making all of {@code JUranometriaMain}
+ * testable is a different and much larger decision, and not one this
+ * defect justifies.
+ *
+ * <p>It was called {@code AtlasControls} and said it was "not a home
+ * for the menu bar" - and then the menu was added to it, because the
+ * session's language has to reach the menu the same way it reaches
+ * the toolbar. The name and the contract were renamed to match what
+ * it does rather than the sentence being quietly deleted (#350).
  */
-public final class AtlasControls {
+public final class AtlasChrome {
 
     private final SearchField searchField;
     private final AtlasToolbar toolbar;
 
-    private AtlasControls(SearchField searchField, AtlasToolbar toolbar) {
+    private final InterfaceText said;
+
+    private AtlasChrome(SearchField searchField, AtlasToolbar toolbar,
+                          InterfaceText said) {
         this.searchField = searchField;
         this.toolbar = toolbar;
+        this.said = said;
     }
 
     /**
@@ -53,7 +72,7 @@ public final class AtlasControls {
      * neither asks the platform locale: what a reader chose is the
      * only answer either of them gets.
      */
-    public static AtlasControls of(SkyLanguageSession language,
+    public static AtlasChrome of(SkyLanguageSession language,
                                    ChartViewController controller,
                                    LocalSearch search,
                                    SceneAssembler assembler,
@@ -71,7 +90,7 @@ public final class AtlasControls {
                 said);
         AtlasToolbar bar = new AtlasToolbar(controller, field, inspector,
                 versionText, requestExit, selectionMode, said);
-        return new AtlasControls(field, bar);
+        return new AtlasChrome(field, bar, said);
     }
 
     /** The field a reader types into. */
@@ -82,5 +101,27 @@ public final class AtlasControls {
     /** The bar the field sits on. */
     public AtlasToolbar toolbar() {
         return toolbar;
+    }
+
+    /**
+     * The menu bar, in the same language as everything else.
+     *
+     * <p>Here for the same reason the toolbar is: the menu is a
+     * reader-facing surface the application composes, and "does the
+     * application hand it the session's language?" needs an address.
+     * The handlers stay the application's - this seam does not learn
+     * what Settings or Export do, only which words the bar says.
+     */
+    public javax.swing.JMenuBar menuBar(ChartViewController navigation,
+                                        Runnable openSettings,
+                                        Runnable openChartOptions,
+                                        Runnable openAbout,
+                                        Runnable toggleInspector,
+                                        Runnable openPlaceAndTime,
+                                        Runnable toggleEcliptic,
+                                        Runnable exportSheet) {
+        return AppMenuBar.create(navigation, openSettings, openChartOptions,
+                openAbout, toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, said);
     }
 }

@@ -120,7 +120,7 @@ class MapExplorationJourneyTest {
             frame[0].setJMenuBar(AppMenuBar.create(navigation,
                     () -> { }, () -> { }, () -> { },
                     () -> inspector.setRequestedVisible(
-                            !inspector.isRequestedVisible())));
+                            !inspector.isRequestedVisible()), juranometria.ui.language.InterfaceText.forLanguage("en")));
             javax.swing.JCheckBoxMenuItem item =
                     AppMenuBar.inspectorItem(frame[0].getJMenuBar());
             inspector.onVisibilityChange(item::setSelected);

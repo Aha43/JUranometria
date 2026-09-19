@@ -23,18 +23,18 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Toolbar | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Toolbar | SearchField | (a field) | Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Type a Messier or NGC number, a star's catalogue identity, or a right ascension and dec... | hovered |
 | Toolbar | JButton | (icon only) | Exit JUranometria | Closes the atlas; what you chose is remembered | hovered |
-| Menu bar | JMenu | File | &mdash; | Making a file out of the chart, and the application's own settings | self-explanatory |
-| Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Saves this chart as a sheet of paper: SVG, PDF or PNG | self-explanatory |
-| Menu bar | JMenuItem | Settings... | &mdash; | Opens the window that chooses the application's light or dark appearance | self-explanatory |
+| Menu bar | JMenu | File | &mdash; | Exporting the chart and changing application settings | self-explanatory |
+| Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Exports this chart as an SVG, PDF or PNG sheet | self-explanatory |
+| Menu bar | JMenuItem | Settings... | &mdash; | Opens the window for appearance and for the languages used by the application and chart | self-explanatory |
 | Menu bar | JMenu | View | &mdash; | What the chart draws, where you are looking from, and how far out | self-explanatory |
-| Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels; the same switches answer... | self-explanatory |
-| Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets where you are and the frozen instant your meridian, horizon ... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the mark you have chosen and what is on this page | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks; the same switch answers... | self-explanatory |
+| Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels. Chart shortcuts begin wi... | self-explanatory |
+| Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets your location and the instant used to draw the meridian, hor... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
-| Menu bar | JMenu | Help | &mdash; | What this application is, and what it is built on | self-explanatory |
-| Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window naming the application, its version and what it is built on | self-explanatory |
+| Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
+| Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window with the application's name, version and the software it is built on | self-explanatory |
 | Chart Options | JTabbedPane | Deep sky, Stars, Constellations, Chart | &mdash; | Four groups of choices: deep sky, stars, constellations and chart elements. | self-explanatory |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show earlier tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |

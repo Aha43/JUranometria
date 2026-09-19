@@ -359,7 +359,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **727 explicit hand-offs**
+reads of live chart state** against **730 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -370,7 +370,10 @@ chart keyboard, whose every question of the palette — is it open,
 what does its line say, how many listeners is the toolkit holding —
 is asked on the event thread and nowhere else; and for #315's
 closing journey, which reads the page a reader is looking at on
-every rung it visits; and for #350's export language test, which
+every rung it visits; and for #350's menu mnemonic test, which builds
+the bar and reads each item's access letter on the event thread, because
+a mnemonic is set while the item is being built; and for #350's export
+language test, which
 builds the dialog and reads its relations and rendered items on the
 event thread; and for #350's controls-composition test, which
 builds both surfaces and reads their words on the event thread, because

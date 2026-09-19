@@ -53,4 +53,24 @@ public final class ShortcutText {
         return said.say("shortcut.hovered", description,
                 Shortcuts.text(shortcutId));
     }
+
+    /**
+     * Two keystrokes pressed one after the other.
+     *
+     * <p>{@code ChartKeys.Toggle.sequence()} freezes this as
+     * {@code prefixText() + " then " + keyLetter()}, and
+     * <strong>"then" is an English word</strong> sitting between two
+     * pieces of notation. Frozen there it rides into every
+     * translation as though it were part of the shortcut - which is
+     * how it reached a translated menu pattern disguised as data
+     * (#350).
+     *
+     * <p>The glyphs and the letter are notation and never change; the
+     * word between them belongs to whoever is writing the sentence.
+     * Chart Options and the menu bar both ask here, so there is one
+     * answer rather than two that can drift.
+     */
+    public String sequence(String prefix, String keyLetter) {
+        return said.say("shortcut.sequence", prefix, keyLetter);
+    }
 }

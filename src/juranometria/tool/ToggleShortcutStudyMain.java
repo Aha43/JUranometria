@@ -437,10 +437,14 @@ public final class ToggleShortcutStudyMain {
     /** Every stroke the window binds, from the window's own parts. */
     private static List<Bound> bindings() throws Exception {
         List<Bound> found = new ArrayList<>();
+        // English, stated: this study records the keystrokes the
+        // released English surface binds, and asking the default
+        // locale would make it change with the machine (#350).
         JMenuBar bar = AppMenuBar.create(
                 new juranometria.ui.ChartViewController(),
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { });
+                () -> { }, () -> { },
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (int menu = 0; menu < bar.getMenuCount(); menu++) {
             JMenu each = bar.getMenu(menu);
             for (int at = 0; at < each.getItemCount(); at++) {

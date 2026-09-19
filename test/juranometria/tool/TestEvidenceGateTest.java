@@ -300,6 +300,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/EclipticControlStudyMain.java",
                         "src/juranometria/tool/ExportSheetDialogSheetMain.java",
                         "src/juranometria/tool/InspectorSheetMain.java",
+                        "src/juranometria/tool/MenuSheetMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/OnThisPageSheetMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
@@ -309,7 +310,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the fifteen widget photographers, whose font and theme"
+                "the sixteen widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -358,7 +359,7 @@ class TestEvidenceGateTest {
                         + " honours; and the fourteenth by #350's"
                         + " toolbar sheet, which photographs the bar"
                         + " and its search field as the application"
-                        + " composes them - through AtlasControls,"
+                        + " composes them - through AtlasChrome,"
                         + " from a stored language choice, because a"
                         + " sheet that asked each component for"
                         + " Norwegian would have photographed a"
@@ -367,7 +368,12 @@ class TestEvidenceGateTest {
                         + " the fifteenth by #350's export sheet,"
                         + " which draws that dialog in each language"
                         + " because the explanation under its format"
-                        + " control wraps against font metrics");
+                        + " control wraps against font metrics; and"
+                        + " the sixteenth by #350's menu sheet, which"
+                        + " lays out each menu's popup and paints it -"
+                        + " a menu keeps its items in a popup rather"
+                        + " than as children, so a bar painted alone"
+                        + " is a picture of three words");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
