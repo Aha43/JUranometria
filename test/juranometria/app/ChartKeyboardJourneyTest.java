@@ -476,7 +476,7 @@ class ChartKeyboardJourneyTest {
                 frame.add(new javax.swing.JScrollPane(table),
                         BorderLayout.SOUTH);
                 frame.setSize(900, 600);
-                ChartKeyboard.install(frame.getRootPane(), switches(),
+                ChartKeyboard.install(frame.getRootPane(), switches(), juranometria.ui.language.InterfaceText.forLanguage("en"),
                         keyboard -> {
                             opened.add(keyboard);
                             keyboard.showIn(frame.getRootPane());
@@ -623,7 +623,11 @@ class ChartKeyboardJourneyTest {
     }
 
     private static String refusedLine(ChartKeyboard keyboard) {
-        return found(keyboard, "chartKeyboard.refused.Zenith");
+        // By identity. The name was the English word, so a
+        // translated resource would have renamed the component the
+        // reader's screen reader finds (#350).
+        return found(keyboard, "chartKeyboard.refused."
+                + ChartKeys.refused().get(0).id());
     }
 
     private static String found(Container root, String name) {

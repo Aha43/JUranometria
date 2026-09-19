@@ -293,6 +293,7 @@ class TestEvidenceGateTest {
                 .filter(f -> !f.unprotectedState().isEmpty())
                 .map(TestEvidenceScan.File::path).sorted().toList();
         assertEquals(List.of(
+                        "src/juranometria/tool/ChartKeyboardSheetMain.java",
                         "src/juranometria/tool/ChartOptionsSheetMain.java",
                         "src/juranometria/tool/ControlExplanationStudyMain.java",
                         "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
@@ -311,7 +312,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the seventeen widget photographers, whose font and theme"
+                "the eighteen widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -385,7 +386,14 @@ class TestEvidenceGateTest {
                         + " because it restores the reviewed width"
                         + " the peer takes back from an unshown"
                         + " window, without which it drew a"
-                        + " different set of images on each run");
+                        + " different set of images on each run; and"
+                        + " the eighteenth by #350's chart keyboard"
+                        + " sheet, which shows the palette in a real"
+                        + " window under both themes because the"
+                        + " rows waiting on a master are greyed, and"
+                        + " a colour the look and feel resolves is"
+                        + " right in one theme and wrong in the"
+                        + " other");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------

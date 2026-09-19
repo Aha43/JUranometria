@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**361 promoted artifacts.**
+**377 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -192,6 +192,22 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/on-this-page-marks.png` | `4073b82a26937ceda99b64deb9729de0c0e10c39530c49a11ab8ab195537cd8a` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-horizon.png` | `2cb652b98dbe3ae63ba7488382fc74aa3ad39bbfef13c5229700c6ed3c5c3068` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/gallery/place-and-time-zenith.png` | `79f181512f064dee1f5e6d7c965661420d066aec1efe2cab26acd26fe84597f0` | 2026-09-10 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-1-all-off-light.png` | `d5f7d46aad762defa3c3d8b5c69a846e319bb391763579a9ab559b93e5b9f7d8` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-2-all-on-light.png` | `c8b6ddfe50294633f268c5c14a0262b35e29e179f555213b18e5d017a2295bbb` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-3-deepsky-off-light.png` | `e198dfc756336e1dfe3f84f710d4c314a1e3a2e6fe252952ef4cf8816947bce3` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-4-figures-off-light.png` | `637ab5782ffa9c66186ca8330a8705ca09d478c65ac2794277859100bdf8d231` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-5-all-off-dark.png` | `5ba069c511704feb1e8f8a941440867e7076db4c1c7b0053f5a67d9cdb24e348` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-6-all-on-dark.png` | `8fa9172d2109c2fbd6e55d0b1d389c4e9f332de0e810b5cf33c2b95a13754cf0` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-7-deepsky-off-dark.png` | `198e8de2dbe13ccc1ad7f414c1ee6bc851d9e94e86206e8613e6c45070c86cf4` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-en-8-figures-off-dark.png` | `c0d063b3c824b39c658c091ebec7317bd70267a11c5879ee6057f7dd45f3adb5` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-10-all-on-light.png` | `d5b62f6b487523b7a67827c12120d8239472dea1bd64e0fb2f4a6b76af9e02a7` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-11-deepsky-off-light.png` | `0f47c77246f9956e72c2ba3547d0142cec6a597dba7b8f885e7422841e0cfb9e` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-12-figures-off-light.png` | `40b66ab9437083d6e6e6afe72248bfe6c532b0d1350f57d528e2a28390c5a446` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-13-all-off-dark.png` | `fabbbe87ffc73d26f89b7e1e8bb3f9c6d59b0b2be8788b56faea83d03844c0dd` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-14-all-on-dark.png` | `24fa47d1f17bd5d4d0f80e366a92eb090d35f3046ab571e8f28a230d28575db6` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-15-deepsky-off-dark.png` | `1fc790a07358d215818446b80bb93c01c3c7015263d6b16c62eef89edfd19be2` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-16-figures-off-dark.png` | `398699c6164f27e06fd702304862f6f831c060ab9be9e64521817c5603c55a97` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/chartkeyboard-nb-NO-9-all-off-light.png` | `b2a9b24381a99e798fbe4e9c3deab4d7597cbcd839a1ee8a8f04f3b1b4301b36` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartoptions-en-1.png` | `6be97b3042aece398afe04d2702cb5b23bcdfc1227db1a1029bebb455aca6e9c` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartoptions-en-2.png` | `99abaea7d35723357c23997402ded9c8064c97e4381f645e5401ea0de37e08ce` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/chartoptions-en-3.png` | `e49ae3ea05d2e0f69534c501a2597d86931ae86ce19f6eac5902bb2196f57d1e` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |

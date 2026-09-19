@@ -131,7 +131,7 @@ class ChartKeyboardMatrixTest {
     /** One switch, from one start, by both routes. */
     private void oneSwitch(Chart chart, ChartKeys.Toggle toggle,
                            boolean from) throws Exception {
-        String what = toggle.label() + " from " + (from ? "on" : "off");
+        String what = toggle.id() + " from " + (from ? "on" : "off");
         ChartOptions start = starting(toggle, from);
 
         chart.store(start);
@@ -230,7 +230,7 @@ class ChartKeyboardMatrixTest {
                 frame.setSize(900, 600);
                 ChartKeyboard.install(frame.getRootPane(),
                         ChartSwitches.of(options,
-                                new NoEcliptic(), new NoLines()),
+                                new NoEcliptic(), new NoLines()), juranometria.ui.language.InterfaceText.forLanguage("en"),
                         keyboard -> {
                             palette = keyboard;
                             keyboard.showIn(frame.getRootPane());
@@ -266,8 +266,15 @@ class ChartKeyboardMatrixTest {
             JDialog dialog = dialogTitled("Chart Options");
             assertNotNull(dialog, "the reader's own dialog opens");
             try {
+                // Reader-facing: this finds a checkbox by the
+                // words on it, so it asks the adapter in a stated
+                // language rather than keeping its own copy (#350).
                 String text = AS_THE_DIALOG_SAYS.getOrDefault(
-                        toggle.id(), toggle.label());
+                        toggle.id(),
+                        juranometria.ui.language.ChartKeyboardText
+                                .in(juranometria.ui.language
+                                        .InterfaceText.forLanguage("en"))
+                                .label(toggle));
                 JTabbedPane tabs = onEdt(() -> tabs(dialog));
                 for (String tab : List.of("Deep sky", "Stars",
                         "Constellations", "Chart")) {
@@ -317,7 +324,7 @@ class ChartKeyboardMatrixTest {
             letter(open, toggle.key());
             assertEquals(!was, ChartSwitches.of(options, new NoEcliptic(),
                             new NoLines()).on(toggle.id()),
-                    toggle.label() + ": the letter " + toggle.key()
+                    toggle.id() + ": the letter " + toggle.key()
                             + " reached its switch through the"
                             + " palette's own binding");
             SwingUtilities.invokeAndWait(open::close);
@@ -410,7 +417,7 @@ class ChartKeyboardMatrixTest {
                                         observer.showing(line, horizon,
                                                 observer.zenithShowing());
                                     }
-                                }),
+                                }), juranometria.ui.language.InterfaceText.forLanguage("en"),
                         keyboard -> {
                             palette = keyboard;
                             keyboard.showIn(frame.getRootPane());
@@ -477,7 +484,7 @@ class ChartKeyboardMatrixTest {
          */
         void observerLine(String id, boolean from) throws Exception {
             ChartKeys.Toggle toggle = ChartKeys.toggle(id);
-            String what = toggle.label() + " from " + (from ? "on" : "off");
+            String what = toggle.id() + " from " + (from ? "on" : "off");
             String control = "module.meridian".equals(id)
                     ? "Meridian" : "Mathematical horizon";
 

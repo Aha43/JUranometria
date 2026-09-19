@@ -124,3 +124,6 @@ d4df79100a7853a4	ui/onthispage/OnThisPageTable.java	\u25cf NGC 317A	unresolved: 
 cf5e0da7934850e6	ui/onthispage/OnThisPageTable.java	\\s+	unresolved: no route found, needs manual inspection	false-positive	regular-expression: a regular expression, not words
 5d0b3f566d1faca3	ui/onthispage/OnThisPageTable.java	 V	declared name used, but never at a known sink	notation	a photometric band letter
 b4e65c9964bd2b15	ui/onthispage/OnThisPageTable.java	 B	declared name used, but never at a known sink	notation	a photometric band letter
+6d4f67271a7b6b3b	ui/language/ChartKeyboardText.java	chartkeyboard.	resource-key stem, never shown	identifier	a stable key, path or stored value; no language changes it
+bdeefc522cf13afe	ui/language/ChartKeyboardText.java	!none	the marker a pack writes where it has no note	identifier	a stable key, path or stored value; no language changes it
+ec385eacd9c4af9c	ui/language/ChartKeyboardText.java	note	the role half of a resource key	identifier	a stable key, path or stored value; no language changes it

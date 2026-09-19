@@ -191,7 +191,7 @@ class ControlExplanationTest {
                     Shortcuts.all().stream().map(Shortcuts.Shortcut::text)
                             .toList());
             for (ChartKeys.Toggle toggle : ChartKeys.toggles()) {
-                bound.add(toggle.sequence());
+                bound.add(juranometria.ui.language.ChartKeyboardText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).sequence(toggle));
             }
 
             // Every keystroke a reader is shown, however it is

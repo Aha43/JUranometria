@@ -340,7 +340,13 @@ public final class ControlExplanationStudyMain {
                 AboutDialog.noticesContentForStudy());
         surfaces.put("Inspector", inspector());
         surfaces.put("On this page", onThisPage());
-        surfaces.put("Chart keyboard", ChartKeyboard.of(
+        surfaces.put("Chart keyboard", chartKeyboard());
+        return surfaces;
+    }
+
+    /** The palette, in the language this report is written in. */
+    private static ChartKeyboard chartKeyboard() {
+        return ChartKeyboard.of(
                 ChartSwitches.of(options(), new ChartSwitches.Ecliptic() {
                     @Override
                     public boolean showing() {
@@ -364,8 +370,8 @@ public final class ControlExplanationStudyMain {
                     @Override
                     public void showing(boolean line, boolean horizon) {
                     }
-                })));
-        return surfaces;
+                }),
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
     }
 
     private static ChartOptionsController options() {

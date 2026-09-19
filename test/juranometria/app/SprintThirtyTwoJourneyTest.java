@@ -164,7 +164,7 @@ class SprintThirtyTwoJourneyTest {
                 window[0] = frame;
                 chartHolder[0] = chart;
                 ChartKeyboardSession.install(frame.getRootPane(), options,
-                        ecliptic, eclipticToggle[0], meridian);
+                        ecliptic, eclipticToggle[0], meridian, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.pack();
                 frame.setVisible(true);
             });

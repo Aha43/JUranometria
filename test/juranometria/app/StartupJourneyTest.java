@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import juranometria.ui.ecliptic.EclipticStore;
 import juranometria.ui.ReaderInput;
+import juranometria.app.ChartKeys;
+import juranometria.ui.language.ChartKeyboardText;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.SkyLanguageStore;
 
@@ -359,6 +361,162 @@ class StartupJourneyTest {
             }
         }
         return null;
+    }
+
+    // ---- the chart's own keyboard, through the same route -------
+
+    /**
+     * A Norwegian session presses the chart keyboard's own prefix.
+     *
+     * <p>The palette is built when the prefix is pressed, by an
+     * action the application installed on the chart window's root
+     * pane - so it can only be reached the way a reader reaches it.
+     * Nothing here constructs a {@code ChartKeyboard}: a test that
+     * did would be handed a language directly and would stay green
+     * with the application handing English to the real one, which is
+     * how the toolbar shipped untranslated behind eight passing
+     * contracts (#350).
+     */
+    @Test
+    void theApplicationOpensTheChartKeyboardInTheStoredLanguage()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a palette has to be on screen to say anything");
+        InterfaceText norsk = InterfaceText.forLanguage("nb-NO");
+        InterfaceText english = InterfaceText.forLanguage("en");
+        ChartKeyboardText saidNorsk = ChartKeyboardText.in(norsk);
+        ChartKeyboardText saidEnglish = ChartKeyboardText.in(english);
+        Set<String> shown = new LinkedHashSet<>();
+        Set<String> spoken = new LinkedHashSet<>();
+        String[] palette = new String[2];
+
+        String[] announced = new String[1];
+        running("nb-NO", true, app -> {
+            JComponent opened = openPalette(app);
+            SwingUtilities.invokeAndWait(() -> {
+                palette[0] = opened.getAccessibleContext()
+                        .getAccessibleName();
+                palette[1] = opened.getAccessibleContext()
+                        .getAccessibleDescription();
+            });
+            // The dependent rows only exist when their master is off,
+            // and the released default has deep-sky objects on. So the
+            // reader turns it off, which is also the only way to reach
+            // an announcement: the palette says what it did as it does
+            // it, because there is nothing to take back.
+            juranometria.ui.ReaderInput.shortcutOn(opened,
+                    java.awt.event.KeyEvent.VK_D, 0);
+            SwingUtilities.invokeAndWait(() -> {
+                announced[0] = ((juranometria.app.ChartKeyboard) opened)
+                        .announcement();
+                words(opened, shown, spoken);
+            });
+        });
+
+        assertEquals(saidNorsk.announce(deepSkyOf(), false), announced[0],
+                "pressing a letter says what it did, and how long it"
+                        + " lasts, in the stored language");
+
+        assertTrue(shown.size() >= 20,
+                "the premise: the palette showed its rows - "
+                        + shown.size());
+        assertTrue(spoken.size() >= 20,
+                "and spoke them - " + spoken.size());
+
+        // The panel's own two channels, which no walk of its rows
+        // would find.
+        assertEquals(saidNorsk.title(), palette[0],
+                "the palette names itself in the stored language");
+        assertEquals(saidNorsk.explain(), palette[1],
+                "and says what it is for in it");
+
+        ChartKeys.Toggle galaxies = ChartKeys.toggle("chart.galaxies");
+        ChartKeys.Toggle deepSky = deepSkyOf();
+        // Collapsed the same way the walk collapses what it reads:
+        // the row pads the letter with spaces, and a comparison that
+        // kept them would be comparing layout, not words.
+        assertTrue(shown.contains(collapsed(saidNorsk.row(galaxies,
+                        saidNorsk.stateUnavailable(deepSky)))),
+                "the dependent row reads in Norwegian: " + shown);
+        assertTrue(!shown.contains(collapsed(saidEnglish.row(galaxies,
+                        saidEnglish.stateUnavailable(deepSky)))),
+                "and not in English");
+        assertTrue(spoken.contains(
+                        saidNorsk.spokenUnavailable(galaxies, deepSky)),
+                "and so does what a screen reader is told: "
+                        + saidNorsk.spokenUnavailable(galaxies, deepSky));
+
+        // Notation is not language.
+        assertTrue(shown.stream().anyMatch(w -> w.startsWith("G ")),
+                "the letters are the letters, and the letter is the"
+                        + " same letter in every language: " + shown);
+        assertTrue(spoken.stream().anyMatch(w -> w.contains("⌘K")),
+                "and the prefix is what this desktop calls it");
+        assertTrue(spoken.stream().noneMatch(w -> w.contains(" then ")),
+                "with no English word joining two keystrokes");
+    }
+
+    private static String collapsed(String text) {
+        return text.replaceAll("\\s+", " ").trim();
+    }
+
+    private static ChartKeys.Toggle deepSkyOf() {
+        return ChartKeys.toggle("chart.deepSkyObjects");
+    }
+
+    /**
+     * The palette a reader gets by pressing the prefix.
+     *
+     * <p>Through {@code ReaderInput}, which states its premises: the
+     * window exists and the desktop gave it the keyboard focus, or
+     * the journey aborts with a reason rather than pretending.
+     */
+    private static JComponent openPalette(Running app) throws Exception {
+        juranometria.ui.ReaderInput.shortcut(app.frame().getRootPane(),
+                java.awt.event.KeyEvent.VK_K,
+                juranometria.app.AppMenuBar.menuShortcutMask());
+        SwingUtilities.invokeAndWait(() -> { });
+        JComponent[] found = new JComponent[1];
+        SwingUtilities.invokeAndWait(() -> found[0] = namedBelow(
+                app.frame().getLayeredPane(),
+                juranometria.app.ChartKeyboard.NAME));
+        assertNotNull(found[0],
+                "the premise: pressing the prefix opened the palette");
+        return found[0];
+    }
+
+    private static JComponent namedBelow(Container from, String name) {
+        for (Component child : from.getComponents()) {
+            if (child instanceof JComponent widget
+                    && name.equals(widget.getName())) {
+                return widget;
+            }
+            if (child instanceof Container nested) {
+                JComponent found = namedBelow(nested, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void words(Container from, Set<String> shown,
+                              Set<String> spoken) {
+        for (Component child : from.getComponents()) {
+            if (child instanceof JLabel label) {
+                add(shown, label.getText());
+                if (label.getAccessibleContext() != null) {
+                    add(spoken, label.getAccessibleContext()
+                            .getAccessibleName());
+                    add(spoken, label.getAccessibleContext()
+                            .getAccessibleDescription());
+                }
+            }
+            if (child instanceof Container nested) {
+                words(nested, shown, spoken);
+            }
+        }
     }
 
     static JMenu menuNamed(JMenuBar bar, String label) {

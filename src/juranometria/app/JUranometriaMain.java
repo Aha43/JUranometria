@@ -200,7 +200,9 @@ public final class JUranometriaMain {
                 ecliptic,
                 juranometria.ui.ecliptic.EclipticSession.toggle(
                         ecliptic, eclipticStore),
-                meridian);
+                meridian,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()));
         // The reviewed layout rule: below 640 px of window the
         // inspector yields, and a window that widens again restores
         // what the reader asked for.

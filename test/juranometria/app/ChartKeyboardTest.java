@@ -26,7 +26,7 @@ class ChartKeyboardTest {
     @Test
     void everyLineSaysWhatItIsAndWhetherItIsOn() {
         ChartKeyboard keyboard = ChartKeyboard.of(
-                ChartKeysTest.switches(ChartOptions.DEFAULTS));
+                ChartKeysTest.switches(ChartOptions.DEFAULTS), juranometria.ui.language.InterfaceText.forLanguage("en"));
         List<String> lines = keyboard.lines();
         assertEquals(ChartKeys.toggles().size(), lines.size(),
                 "a line for every switch");
@@ -46,7 +46,7 @@ class ChartKeyboardTest {
     void aLetterSwitchesTheThingItNames() {
         ChartSwitches switches =
                 ChartKeysTest.switches(ChartOptions.DEFAULTS);
-        ChartKeyboard keyboard = ChartKeyboard.of(switches);
+        ChartKeyboard keyboard = ChartKeyboard.of(switches, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(switches.on("chart.equatorialGrid"),
                 "the grid is on to begin with");
         assertTrue(keyboard.press('E'), "E reaches it");
@@ -69,7 +69,7 @@ class ChartKeyboardTest {
     void aLetterNobodyMappedDoesNothingAtAll() {
         ChartSwitches switches =
                 ChartKeysTest.switches(ChartOptions.DEFAULTS);
-        ChartKeyboard keyboard = ChartKeyboard.of(switches);
+        ChartKeyboard keyboard = ChartKeyboard.of(switches, juranometria.ui.language.InterfaceText.forLanguage("en"));
         List<String> before = keyboard.lines();
         assertFalse(keyboard.press('Q'), "Q is not on the map");
         assertEquals("", keyboard.announcement(),
@@ -86,7 +86,7 @@ class ChartKeyboardTest {
                 true, true, true, true, true, true, false, true, true,
                 true, true, true, ChartPalette.WHITE_PAPER);
         ChartSwitches switches = ChartKeysTest.switches(noDeepSky);
-        ChartKeyboard keyboard = ChartKeyboard.of(switches);
+        ChartKeyboard keyboard = ChartKeyboard.of(switches, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(keyboard.lines().stream().anyMatch(line ->
                         line.equals("G   Galaxies — unavailable — enable"
                                 + " deep-sky objects first")),
@@ -111,12 +111,16 @@ class ChartKeyboardTest {
     @Test
     void whatIsNotSwitchableHereSaysWhereItLives() {
         ChartKeyboard keyboard = ChartKeyboard.of(
-                ChartKeysTest.switches(ChartOptions.DEFAULTS));
-        String zenith = ChartKeys.refused().get("Zenith");
-        assertEquals("controlled in Place and Time — no independent"
-                        + " shortcut", zenith,
+                ChartKeysTest.switches(ChartOptions.DEFAULTS), juranometria.ui.language.InterfaceText.forLanguage("en"));
+        String zenith = juranometria.ui.language.ChartKeyboardText
+                .in(juranometria.ui.language.InterfaceText
+                        .forLanguage("en"))
+                .refusedRow(ChartKeys.refused().get(0));
+        assertEquals("Zenith — controlled in Place and Time — no"
+                        + " independent shortcut", zenith,
                 "the refusal says where it lives and that it has no"
-                        + " key of its own");
+                        + " key of its own - as one whole value, not"
+                        + " a name joined to a reason in Java (#350)");
         assertFalse(zenith.toLowerCase(java.util.Locale.ROOT)
                         .contains("persist"),
                 "and gives the reason it is refused for - it is part of"
@@ -134,13 +138,13 @@ class ChartKeyboardTest {
         // then opens the keyboard must see what they just did.
         ChartSwitches switches =
                 ChartKeysTest.switches(ChartOptions.DEFAULTS);
-        ChartKeyboard first = ChartKeyboard.of(switches);
+        ChartKeyboard first = ChartKeyboard.of(switches, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(first.lines().contains("T   Title block — on"));
 
         // Somebody else's route - the dialog's own transition.
         switches.toggle("chart.titleBlock");
 
-        ChartKeyboard second = ChartKeyboard.of(switches);
+        ChartKeyboard second = ChartKeyboard.of(switches, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(second.lines().contains("T   Title block — off"),
                 "the palette opens on the chart as it is now: "
                         + second.lines());
@@ -156,7 +160,7 @@ class ChartKeyboardTest {
         // is the only place that knows, so it is the place that says.
         ChartSwitches switches =
                 ChartKeysTest.switches(ChartOptions.DEFAULTS);
-        ChartKeyboard keyboard = ChartKeyboard.of(switches);
+        ChartKeyboard keyboard = ChartKeyboard.of(switches, juranometria.ui.language.InterfaceText.forLanguage("en"));
         keyboard.press('R');
         assertEquals("Your meridian on — for this session.",
                 keyboard.announcement(),

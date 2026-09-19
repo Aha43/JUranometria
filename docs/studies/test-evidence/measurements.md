@@ -77,6 +77,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 
 | executable | touches | protection |
 |---|---|---|
+| src/juranometria/tool/ChartKeyboardSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ChartOptionsSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ControlExplanationStudyMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/DeepSkyVocabularyMockupMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
@@ -96,7 +97,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | preferences | protected-locally |
 
-**18 evidence executables** touch process-wide state; 17 carry an unpaired touch.
+**19 evidence executables** touch process-wide state; 18 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -161,28 +162,29 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 - juranometria/app/ChartKeyboardMatrixTest.java: menu-shortcut-mask
 - juranometria/app/ChartKeysTest.java: menu-shortcut-mask
 - juranometria/app/SprintThirtyOneJourneyTest.java: menu-shortcut-mask
+- juranometria/app/StartupJourneyTest.java: menu-shortcut-mask
 - juranometria/app/ZoomShortcutsTest.java: menu-shortcut-mask
 - juranometria/ui/ChartKeyboardWiringTest.java: menu-shortcut-mask
 - juranometria/ui/CoordinateGridJourneyTest.java: menu-shortcut-mask
 - juranometria/ui/DirectZoomJourneyTest.java: menu-shortcut-mask
 
-**8 files** name a look and feel, a shortcut mask or an operating system.
+**9 files** name a look and feel, a shortcut mask or an operating system.
 
 ## Event-thread traffic, counted not judged
 
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **431** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **748**
+- explicit event-thread hand-offs (invokeAndWait): **752**
 
 ## Generated evidence, classified
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 62 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 63 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 10 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 361 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 377 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 

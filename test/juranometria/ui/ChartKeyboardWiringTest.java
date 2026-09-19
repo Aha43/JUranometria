@@ -166,7 +166,7 @@ class ChartKeyboardWiringTest {
             // a matrix against the options cannot reach at all: they
             // do not live in the chart's options and never did.
             for (char letter : new char[] {'I', 'R', 'H'}) {
-                String what = ChartKeys.forKey(letter).label();
+                String what = ChartKeys.forKey(letter).id();
                 // On a page the module's own geometry crosses. A line
                 // drawn somewhere else is still not drawn here, and
                 // the default page is the study's own "page-nothing".
@@ -228,7 +228,7 @@ class ChartKeyboardWiringTest {
                 "the reader's own controls are pressed in a window");
         withTheAtlasRunning((atlas, repaints) -> {
             for (char letter : new char[] {'I', 'R', 'H'}) {
-                String what = ChartKeys.forKey(letter).label();
+                String what = ChartKeys.forKey(letter).id();
                 atlas.goTo(pageFor(atlas, letter));
 
                 atlas.hide(letter);
@@ -420,7 +420,7 @@ class ChartKeyboardWiringTest {
                 frame.setJMenuBar(AppMenuBar.create(null, null, () -> { },
                         () -> { }, () -> { }, () -> { }, eclipticToggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 ChartKeyboardSession.install(frame.getRootPane(), options,
-                        ecliptic, eclipticToggle, observer);
+                        ecliptic, eclipticToggle, observer, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.setVisible(true);
                 chart.setViewState(ChartViewState.DEFAULT);
             });

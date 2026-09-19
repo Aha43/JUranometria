@@ -80,6 +80,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintThirtyOneJourneyTest {
 
+    /**
+     * What the chart keyboard's two keystrokes read as, in English.
+     *
+     * <p>Asked of the production adapter in a stated language, not
+     * composed here: where the keystrokes sit in a sentence and what
+     * joins them are the language's, and a test that rebuilt them
+     * would agree with itself after the atlas stopped agreeing (#350).
+     */
+    private static String shortcutFor(String id) {
+        return juranometria.ui.language.ChartKeyboardText.in(
+                        juranometria.ui.language.InterfaceText
+                                .forLanguage("en"))
+                .sequence(ChartKeys.toggle(id));
+    }
+
     /** The sky the defect was reported on. */
     private static final SkyPosition SAGITTARIUS =
             new SkyPosition(281.0, -26.0);
@@ -180,7 +195,7 @@ class SprintThirtyOneJourneyTest {
                 // The chart's own keyboard (#312), installed by the
                 // same call the application makes.
                 ChartKeyboardSession.install(frame.getRootPane(), options,
-                        ecliptic, eclipticToggle[0], meridian);
+                        ecliptic, eclipticToggle[0], meridian, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.pack();
                 frame.setVisible(true);
             });
@@ -298,8 +313,8 @@ class SprintThirtyOneJourneyTest {
             String hovered = ReaderInput.hover(names);
             assertTrue(hovered != null && !hovered.isBlank(),
                     "and every family says what it is: " + hovered);
-            assertTrue(hovered.contains(ChartKeys.toggle(
-                            "chart.constellationNames").sequence()),
+            assertTrue(hovered.contains(shortcutFor(
+                            "chart.constellationNames")),
                     "4. naming the keys that reach the same switch"
                             + " from the chart, from the registry that"
                             + " binds them: " + hovered);
@@ -470,8 +485,8 @@ class SprintThirtyOneJourneyTest {
             JCheckBox meridianBox = onEdt(() ->
                     named(place, "showMeridian"));
             String meridianSaid = ReaderInput.hover(meridianBox);
-            assertTrue(meridianSaid.contains(ChartKeys.toggle(
-                            "module.meridian").sequence()),
+            assertTrue(meridianSaid.contains(
+                            shortcutFor("module.meridian")),
                     "5. the meridian's control names the keys that"
                             + " reach it: " + meridianSaid);
             String meridianHeard = onEdt(() -> meridianBox

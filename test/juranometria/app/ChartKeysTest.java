@@ -45,9 +45,9 @@ class ChartKeysTest {
         Map<Character, String> byLetter = new LinkedHashMap<>();
         for (ChartKeys.Toggle toggle : ChartKeys.toggles()) {
             char letter = Character.toUpperCase(toggle.key());
-            String taken = byLetter.put(letter, toggle.label());
+            String taken = byLetter.put(letter, toggle.id());
             assertEquals(null, taken, letter + " reaches one switch,"
-                    + " not " + taken + " and " + toggle.label());
+                    + " not " + taken + " and " + toggle.id());
         }
         assertEquals(ChartKeys.toggles().size(), byLetter.size(),
                 "and every switch has a letter of its own");
@@ -97,7 +97,7 @@ class ChartKeysTest {
         // the keyboard while it is; nothing binds them globally, and
         // this is the test that would fail if something did.
         JRootPane root = new JRootPane();
-        ChartKeyboard.install(root, switches(ChartOptions.DEFAULTS),
+        ChartKeyboard.install(root, switches(ChartOptions.DEFAULTS), juranometria.ui.language.InterfaceText.forLanguage("en"),
                 keyboard -> { });
         var window = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         List<String> global = new ArrayList<>();
@@ -131,13 +131,13 @@ class ChartKeysTest {
                 ChartKeys.prefix(),
                 "and with the platform's own menu modifier");
         for (ChartKeys.Toggle toggle : ChartKeys.toggles()) {
-            assertTrue(toggle.sequence().startsWith(prefix),
-                    toggle.label() + " is spelled from the prefix: "
-                            + toggle.sequence());
-            assertTrue(toggle.sequence().endsWith(
+            assertTrue(juranometria.ui.language.ChartKeyboardText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).sequence(toggle).startsWith(prefix),
+                    toggle.id() + " is spelled from the prefix: "
+                            + juranometria.ui.language.ChartKeyboardText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).sequence(toggle));
+            assertTrue(juranometria.ui.language.ChartKeyboardText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).sequence(toggle).endsWith(
                             String.valueOf(toggle.key())
                                     .toUpperCase(Locale.ROOT)),
-                    "and its own letter: " + toggle.sequence());
+                    "and its own letter: " + juranometria.ui.language.ChartKeyboardText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).sequence(toggle));
         }
     }
 
@@ -149,35 +149,45 @@ class ChartKeysTest {
         // reason a reader can read.
         Set<String> mapped = new LinkedHashSet<>();
         for (ChartKeys.Toggle toggle : ChartKeys.toggles()) {
-            mapped.add(toggle.label());
+            mapped.add(toggle.id());
         }
+        // By identity. This listed the chart's layers by their
+        // English names, which stopped being a thing the registry
+        // knows when the prose moved out of it (#350) - and a
+        // coverage claim that can be satisfied by renaming a label
+        // was never checking coverage anyway.
         List<String> missing = new ArrayList<>();
-        for (String layer : List.of("Deep-sky objects", "Deep-sky labels",
-                "Constellation figures", "Constellation boundaries",
-                "Constellation names", "Star names", "Bayer letters",
-                "Flamsteed numbers", "Equatorial grid", "Title block",
-                "Stellar-magnitude key", "Black sky")) {
+        for (String layer : List.of("chart.deepSkyObjects",
+                "chart.deepSkyLabels", "chart.constellationFigures",
+                "chart.constellationBoundaries",
+                "chart.constellationNames", "chart.starNames",
+                "chart.bayerLetters", "chart.flamsteedNumbers",
+                "chart.equatorialGrid", "chart.titleBlock",
+                "chart.magnitudeKey", "chart.blackSky",
+                "chart.galaxies", "chart.openClusters",
+                "chart.globularClusters", "chart.nebulae",
+                "chart.planetaryNebulae")) {
             if (!mapped.contains(layer)) {
                 missing.add(layer);
             }
         }
-        for (SymbolFamily family : SymbolFamily.values()) {
-            if (!mapped.contains(family.canonicalName())) {
-                missing.add(family.canonicalName());
-            }
-        }
+        assertEquals(SymbolFamily.values().length, 5,
+                "the premise: all five families are listed above -"
+                        + " a family added to the chart must be added"
+                        + " to this list or refused");
         assertEquals(List.of(), missing,
                 "every layer of the chart is on the map");
-        assertTrue(mapped.contains("The ecliptic")
-                        && mapped.contains("Your meridian")
-                        && mapped.contains("Your horizon"),
+        assertTrue(mapped.contains("module.ecliptic")
+                        && mapped.contains("module.meridian")
+                        && mapped.contains("module.horizon"),
                 "and the modules a reader switches from the chart");
-        assertEquals(Set.of("Zenith"), ChartKeys.refused().keySet(),
-                "and what is not is refused by name");
-        assertTrue(ChartKeys.refused().get("Zenith")
-                        .contains("Place and Time"),
-                "with somewhere for the reader to go: "
-                        + ChartKeys.refused().get("Zenith"));
+        // By identity. The refusal was keyed by the English word
+        // "Zenith", which was also the Swing component name, so
+        // translating a resource would have renamed a component
+        // (#350).
+        assertEquals(List.of("zenith"), ChartKeys.refused().stream()
+                        .map(ChartKeys.Refusal::id).toList(),
+                "and what is not switchable is refused by identity");
     }
 
     private static Set<KeyStroke> editingStrokes() {

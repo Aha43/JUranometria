@@ -140,7 +140,7 @@ all, so what it prints for itself is the fallback: **<prefix>**.
 | Your meridian | `R` | for this session | — | the control's own |
 | Your horizon | `H` | for this session | — | the control's own |
 
-**Zenith** is refused: controlled in Place and Time — no independent shortcut.
+The keyboard refuses one row, and prints it so that "everything the chart shows" stays a claim somebody can check: **Zenith — controlled in Place and Time — no independent shortcut**
 
 Three of the twenty letters differ from the control's own mnemonic, for the reason
 the table gives - and the palette gives the same reason beside the same letter,
