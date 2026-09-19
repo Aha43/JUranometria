@@ -115,6 +115,22 @@ public final class InterfaceText {
         InputStream open(String path);
     }
 
+    /**
+     * What THIS language says for a key, or null if it says nothing.
+     *
+     * <p>{@link #say} falls back to English, which is right for a
+     * surface that would rather show a reader something than nothing.
+     * It is wrong where the question is "has this language written
+     * this yet?" - the startup failure reporter has to know, because
+     * it may show a language's own headline only when that language
+     * can also supply the whole remedy beneath it, and an English
+     * headline arriving here would be indistinguishable from a
+     * translated one (#350).
+     */
+    public String sayIfDefined(String key) {
+        return chosen.get(key);
+    }
+
     /** Which language these words are in. */
     public String language() {
         return tag;

@@ -119,3 +119,5 @@ c18ce3f4c9fce143	ui/language/AboutText.java	about.	resource-key stem, never show
 c4dcab779337ec98	ui/language/AboutText.java	/resources/interface-language/	where a language keeps its own summary document	identifier	a stable key, path or stored value; no language changes it
 a56146ee79531226	ui/language/AboutText.java	.label	the role half of a resource key	identifier	a stable key, path or stored value; no language changes it
 4849f5693a513941	ui/language/PageText.java	page.	resource-key stem, never shown	identifier	a stable key, path or stored value; no language changes it
+7909008ec4416f39	app/StartupFailure.java	JUranometria could not start.	the embedded English headline, the last line of defence	reader-prose	translated as startup.failed; this copy is reached without opening a file, a preference node or a language class, each of which this surface may be reporting the failure of
+a702d20659072681	ui/language/StartupText.java	/resources/interface-language/	where a language keeps its startup documents	identifier	a stable key, path or stored value; no language changes it

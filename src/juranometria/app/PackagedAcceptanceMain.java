@@ -266,6 +266,58 @@ public final class PackagedAcceptanceMain {
                             + " is present and unchanged beneath it ("
                             + body.length() + " characters)");
         }
+        // The failure reporter, from inside the image (#350).
+        //
+        // This is the surface that runs when everything else has
+        // failed, so "the files are there" is not the claim worth
+        // making: the claim is that the ATOMIC ADAPTER composes a
+        // whole Norwegian message from this packaged classpath, and
+        // that removing one document turns the whole message English
+        // rather than mixing the two.
+        Throwable[] failures = {
+            new juranometria.catalog.PackIntegrityException(
+                    "acceptance-probe"),
+            new java.util.prefs.BackingStoreException(
+                    "acceptance-probe"),
+            new IllegalStateException("acceptance-probe"),
+        };
+        for (Throwable failure : failures) {
+            String composed = StartupFailure.message(failure, "nb-NO",
+                    juranometria.ui.language.StartupText.PACKAGED);
+            require(composed.startsWith("JUranometria kunne ikke"
+                            + " starte."),
+                    "the packaged image reports a startup failure in"
+                            + " Norwegian: " + composed.substring(0,
+                                    Math.min(60, composed.length())));
+            require(!composed.contains("could not start"),
+                    "and does not also say it in English");
+            require(composed.split("acceptance-probe", -1).length - 1
+                            == 1,
+                    "with the technical cause exactly once");
+        }
+        // Each document, read through the adapter rather than listed.
+        for (juranometria.ui.language.StartupText.Remedy remedy
+                : juranometria.ui.language.StartupText.Remedy.values()) {
+            var said = juranometria.ui.language.StartupText.forFailure(
+                    "nb-NO", remedy);
+            require(said != null && !said.remedy().isBlank()
+                            && said.remedy().length() > 120,
+                    "the packaged image carries a readable Norwegian"
+                            + " remedy for " + remedy + " ("
+                            + remedy.documentFor("nb-NO") + ")");
+        }
+        require(StartupFailure.message(failures[1], "nb-NO",
+                        path -> path.endsWith("startup-settings.txt")
+                                ? null
+                                : juranometria.ui.language.StartupText
+                                        .PACKAGED.open(path))
+                        .startsWith("JUranometria could not start."),
+                "and a missing document turns the WHOLE message"
+                        + " English rather than mixing languages");
+        System.out.println("startup failure OK (three Norwegian"
+                + " remedies composed from the packaged classpath;"
+                + " a missing document falls back whole)");
+
         System.out.println("about licensing OK (Norwegian summary"
                 + " ships and is selected, " + norwegianSummary.length()
                 + " characters, every identifier exact; "

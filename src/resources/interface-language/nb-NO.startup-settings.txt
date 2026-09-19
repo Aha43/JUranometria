@@ -1,0 +1,17 @@
+Dette er lagringsområdet for dine egne innstillinger – utseende og kartvalg –
+ikke selve atlaset. Hvis du fjerner JUranometrias egne innstillinger, starter
+programmet på nytt med standardvalgene; ingenting annet går tapt.
+
+Linux:   slett katalogen
+         ~/.java/.userPrefs/juranometria
+Windows: slett registernøkkelen
+         HKEY_CURRENT_USER\Software\JavaSoft\Prefs\juranometria
+macOS:   Java lagrer innstillingene for alle Java-programmer i ÉN felles fil.
+         Ikke slett den. Fjern bare oppføringen for dette programmet mens
+         atlaset er lukket:
+
+  /usr/libexec/PlistBuddy -c 'Delete ":/:juranometria/"' \
+    ~/Library/Preferences/com.apple.java.util.prefs.plist
+
+Hvis lagringsområdet ikke kan skrives til i det hele tatt, kontroller at
+hjemmekatalogen til brukerkontoen din finnes og kan skrives til.
