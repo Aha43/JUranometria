@@ -409,7 +409,7 @@ public final class ControlExplanationStudyMain {
                             @Override
                             public void flush() {
                             }
-                        });
+                        }, juranometria.ui.language.InterfaceText.forLanguage("en"));
     }
 
     private static Component inspector() {

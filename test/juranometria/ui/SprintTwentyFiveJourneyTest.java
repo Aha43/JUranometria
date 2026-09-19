@@ -116,7 +116,7 @@ class SprintTwentyFiveJourneyTest {
             window.setJMenuBar(AppMenuBar.create(navigation,
                     () -> { }, () -> { }, () -> { }, null,
                     () -> PlaceAndTimeDialog.open(window, meridian,
-                            placeStore, () -> sessionClock), juranometria.ui.language.InterfaceText.forLanguage("en")));
+                            placeStore, () -> sessionClock, juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
             window.setSize(1100, 820);
             window.setVisible(true);
         });

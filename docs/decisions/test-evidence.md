@@ -76,10 +76,10 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **59 files** touch process-wide state —
-**30** use the shared guard, **28** restore locally,
-**0 flagged unprotected** — and **42 files** depend on a display,
-of which **19** state a focus premise and **27** a reachability
+this document to them: **60 files** touch process-wide state —
+**31** use the shared guard, **28** restore locally,
+**0 flagged unprotected** — and **43 files** depend on a display,
+of which **19** state a focus premise and **28** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -185,7 +185,15 @@ and a packaged application would have shown the failure reporter instead of
 a window. 1445 passing tests went straight over it. The ordering is held by
 consequence rather than by reading the source: the ecliptic's remembered
 choice has to arrive at its menu item, which cannot happen unless the bar is
-on the frame first.)
+on the frame first. #350 then added the frozen-note test to the
+shared-guard shape: it installs the application's own theme in both light
+and dark, because the note's subdued colour is resolved per theme, and a
+colour written down once would be right in one theme and wrong in the
+other. The startup journey also gained a second question in the same
+file — it opens Place and Time from the composed menu in a stored
+Norwegian session — because a surface is not translated until the
+application hands it the language, and every other test on that surface
+hands the dialog its language directly.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -370,7 +378,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **734 explicit hand-offs**
+reads of live chart state** against **748 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its

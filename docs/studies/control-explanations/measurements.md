@@ -61,12 +61,12 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | JButton | OK | &mdash; | Keeps what the chart is showing now, and remembers it for next time. | self-explanatory |
 | Place and Time | CommitField | (a field) | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Degrees north of the equator, negative south, -90 to 90 | hovered |
 | Place and Time | CommitField | (a field) | Degrees east of Greenwich, e.g. 10.752; west is negative | Degrees east of Greenwich; west is negative | hovered |
-| Place and Time | CommitField | (a field) | The moment the lines are drawn for, as 2026-03-20 21:33:00 | The frozen moment the lines are drawn for; nothing ticks, so it stays where you put it | hovered |
+| Place and Time | CommitField | (a field) | The moment the lines are drawn for, as 2026-03-20 21:33:00 | The instant used to draw the reference lines. Time does not advance until you change it. | hovered |
 | Place and Time | JCheckBox | Meridian | Draw the great circle through both celestial poles and your zenith (<prefix> then R) | Draws the line that runs from due north, through the point overhead, to due south. It l... | hovered |
 | Place and Time | JCheckBox | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) | Draws the circle where the sky would meet a flat and transparent Earth; your own horizo... | hovered |
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
-| Place and Time | JButton | Now | Read the clock once and freeze on this moment | Freezes on the present moment, read once; nothing ticks afterwards, so the lines stay w... | hovered |
-| Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you - the one control in this window that mo... | hovered |
+| Place and Time | JButton | Now | Reads the clock once and freezes the chart at that instant | Freezes the reference lines at the present moment. The clock is read once; nothing move... | hovered |
+| Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you. This is the only control in this window... | hovered |
 | Export Chart Sheet | JComboBox | (Format) | Choose SVG or PDF for a line drawing, or PNG for a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
 | Export Chart Sheet | JComboBox | (Paper) | The size of the page the chart is laid out on | Chooses the paper the sheet is laid out for. The chart is fitted to it; the page you ar... | hovered |
 | Export Chart Sheet | JComboBox | (Resolution) | How finely a PNG is drawn; ignored by SVG and PDF | Chooses how many dots per inch a PNG is drawn at. SVG and PDF keep the drawing as lines... | hovered |

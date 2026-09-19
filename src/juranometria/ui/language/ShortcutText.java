@@ -73,4 +73,23 @@ public final class ShortcutText {
     public String sequence(String prefix, String keyLetter) {
         return said.say("shortcut.sequence", prefix, keyLetter);
     }
+
+    /**
+     * A description, and the two keystrokes that do the same thing.
+     *
+     * <p>Both layers through the seam that owns them: the connector
+     * between the keystrokes from {@link #sequence}, and the
+     * placement of the whole thing beside the description from the
+     * same {@code shortcut.hovered} pattern a single keystroke uses.
+     *
+     * <p>It exists because the alternative was a second generic
+     * "description plus shortcut" pattern living on one surface -
+     * two copies of one typography policy, free to drift, which is
+     * exactly what this class was extracted to prevent (#350).
+     */
+    public String withSequence(String description, String prefix,
+                               String keyLetter) {
+        return said.say("shortcut.hovered", description,
+                sequence(prefix, keyLetter));
+    }
 }

@@ -278,7 +278,9 @@ public final class JUranometriaMain {
                 },
                 () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
                         frame, meridian, placeStore,
-                        java.time.Instant::now),
+                        java.time.Instant::now,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())),
                 // One switch, and its whole behaviour lives in the
                 // module's own seam so a test can drive exactly what
                 // a reader sets off.

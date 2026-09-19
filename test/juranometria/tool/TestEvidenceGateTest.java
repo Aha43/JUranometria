@@ -305,12 +305,13 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/OnThisPageSheetMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
+                        "src/juranometria/tool/PlaceAndTimeSheetMain.java",
                         "src/juranometria/tool/SettingsSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the sixteen widget photographers, whose font and theme"
+                "the seventeen widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -373,7 +374,18 @@ class TestEvidenceGateTest {
                         + " lays out each menu's popup and paints it -"
                         + " a menu keeps its items in a popup rather"
                         + " than as children, so a bar painted alone"
-                        + " is a picture of three words");
+                        + " is a picture of three words; and the"
+                        + " seventeenth by #350's Place and Time"
+                        + " sheet, which photographs the real packed"
+                        + " dialog in each language rather than its"
+                        + " content pane, because a window's title"
+                        + " and the description a screen reader"
+                        + " reads when it opens are channels no walk"
+                        + " of a content pane will find - and"
+                        + " because it restores the reviewed width"
+                        + " the peer takes back from an unshown"
+                        + " window, without which it drew a"
+                        + " different set of images on each run");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -489,7 +501,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(42, display.size(),
+        assertEquals(43, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -572,7 +584,15 @@ class TestEvidenceGateTest {
                         + " - the menu bar had moved down the method"
                         + " and the two lines reading it back stayed"
                         + " above it, which 1445 passing tests went"
-                        + " straight over");
+                        + " straight over - and which now also opens"
+                        + " Place and Time from the composed menu in"
+                        + " a stored Norwegian session, because a"
+                        + " surface is not translated until the"
+                        + " application hands it the language; and"
+                        + " #350's frozen-note test, which reads a"
+                        + " colour the look and feel resolves, under"
+                        + " both themes, because a subdued colour"
+                        + " written down once is wrong in the other");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

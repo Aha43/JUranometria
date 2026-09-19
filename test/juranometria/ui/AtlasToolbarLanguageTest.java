@@ -21,10 +21,12 @@ import juranometria.app.Atlas;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SelectionMode;
 import juranometria.chart.SkyPosition;
+import juranometria.ui.language.InterfaceLanguages;
 import juranometria.ui.language.InterfaceText;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -189,6 +191,140 @@ class AtlasToolbarLanguageTest {
         assertTrue(!english.contains("Zoom inn") && !norsk.contains("Zoom in ("),
                 "with no English text left in the Norwegian form: "
                         + norsk);
+    }
+
+    /**
+     * A two-keystroke hint is composed from both patterns, not one.
+     *
+     * <p>Two layers can freeze independently: the connector between
+     * the keystrokes, and the placement of the whole thing beside the
+     * description. The connector is caught by Norwegian, because the
+     * two packs word it differently. The placement is not: both
+     * declare {@code {0} ({1})}, so a hard-coded English parenthesis
+     * is byte-identical in either language and comparing them proves
+     * nothing.
+     *
+     * <p>So it is held against the patterns themselves. If
+     * {@code withSequence} ever composes the placement itself, this
+     * stops matching what the pack says - in English, without waiting
+     * for a language that punctuates differently to exist.
+     */
+    @Test
+    void aTwoKeystrokeHintUsesBothPatternsAndComposesNeither()
+            throws Exception {
+        for (InterfaceText said : List.of(EN, NB)) {
+            juranometria.ui.language.ShortcutText shortcuts =
+                    juranometria.ui.language.ShortcutText.in(said);
+            String composed = shortcuts.withSequence("Do the thing",
+                    "\u2318K", "I");
+            // Consistency, not proof: with both packs declaring
+            // {0} ({1}), a hard-coded English parenthesis produces
+            // the identical string, and this assertion passes under
+            // that mutation. Mutation-tested, and it did.
+            assertEquals(said.say("shortcut.hovered", "Do the thing",
+                            said.say("shortcut.sequence", "\u2318K", "I")),
+                    composed,
+                    "the hint agrees with the two patterns");
+            assertTrue(composed.contains("\u2318K") && composed.contains("I"),
+                    "with the keystrokes unchanged: " + composed);
+        }
+        assertNotEquals(
+                EN.say("shortcut.sequence", "\u2318K", "I"),
+                NB.say("shortcut.sequence", "\u2318K", "I"),
+                "the premise for the connector half: the two packs"
+                        + " really do join two keystrokes differently");
+
+        // The placement half, proved at RUNTIME against a pack that
+        // punctuates it differently. No shipped language does - both
+        // declare "{0} ({1})" - so a hard-coded English parenthesis
+        // produces a byte-identical string and comparing the two
+        // shipped packs proves nothing. Mutation-tested: it did not.
+        //
+        // The pack lives here, reaches InterfaceText through its own
+        // resource route, and is outside production discovery and the
+        // packaged resources entirely.
+        InterfaceText reordered = InterfaceText.forLanguage("x-placement",
+                AtlasToolbarLanguageTest::testPack);
+        String placed = juranometria.ui.language.ShortcutText.in(reordered)
+                .withSequence("Do the thing", "\u2318K", "I");
+        assertEquals("[\u2318K then I] Do the thing", placed,
+                "the language decides where the keystrokes go, and"
+                        + " this one puts them first and in square"
+                        + " brackets: " + placed);
+
+        // And the source guard, as a second line rather than the
+        // proof.
+        String code = Files.readString(Path.of(
+                "src/juranometria/ui/language/ShortcutText.java"))
+                .replaceAll("(?s)/\\*.*?\\*/", " ")
+                .replaceAll("(?m)//.*$", " ");
+        assertTrue(!code.contains("\" (\""),
+                "with no parenthesis written into the class");
+    }
+
+    /**
+     * A language that punctuates a shortcut hint differently.
+     *
+     * <p>Test-only: it is served from here rather than from the
+     * classpath, so production discovery and the packaged resources
+     * never see it. English is supplied because every language falls
+     * back to it.
+     */
+    private static java.io.InputStream testPack(String path) {
+        String pack = path.endsWith("en.properties")
+                ? "shortcut.hovered = {0} ({1})\n"
+                        + "shortcut.sequence = {0} then {1}\n"
+                : path.endsWith("x-placement.properties")
+                        ? "shortcut.hovered = [{1}] {0}\n"
+                        : null;
+        return pack == null ? null : new java.io.ByteArrayInputStream(
+                pack.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    /**
+     * The reordering pack is a test instrument and never ships.
+     *
+     * <p>It exists because the two real packs punctuate a shortcut
+     * hint identically, so freezing the placement into
+     * {@code ShortcutText} changes no output either of them can
+     * produce - English compared to English, which is how three
+     * surfaces passed with a defect in them (#350).
+     *
+     * <p>An instrument that reached production would be a language
+     * offered to a reader that nobody wrote and nobody reviewed. So
+     * three claims, not one: discovery does not list it, the
+     * classpath does not carry it, and the resource directory the
+     * image is built from has no file with that name. The first
+     * alone would pass if the file were present but unlisted.
+     */
+    @Test
+    void theReorderingPackIsAnInstrumentAndNeverShips() throws Exception {
+        List<String> offered = InterfaceLanguages.discover().tags();
+        assertTrue(!offered.isEmpty(),
+                "the premise: discovery found the real languages - "
+                        + offered);
+        assertTrue(!offered.contains("x-placement"),
+                "no reader is offered the test pack: " + offered);
+
+        // Not on the classpath the packaged image is built from, by
+        // the same route InterfaceText.forLanguage(tag) uses.
+        assertNull(InterfaceText.class.getResourceAsStream(
+                        "/resources/interface-language/"
+                                + "x-placement.properties"),
+                "and the classpath carries no such resource");
+
+        // And not in the directory that becomes that classpath.
+        try (java.util.stream.Stream<Path> files =
+                     Files.list(Path.of(
+                             "src/resources/interface-language"))) {
+            List<String> names = files.map(each ->
+                    each.getFileName().toString()).sorted().toList();
+            assertTrue(names.size() >= 4,
+                    "the premise: the real packs are there - " + names);
+            assertTrue(names.stream().noneMatch(each ->
+                            each.startsWith("x-placement")),
+                    "and nothing named for the instrument: " + names);
+        }
     }
 
     /** Every zoom form exists in both languages, and they differ. */

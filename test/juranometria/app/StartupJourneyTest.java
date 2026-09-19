@@ -1,17 +1,29 @@
 package juranometria.app;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Window;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
+import javax.swing.AbstractButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import juranometria.ui.ecliptic.EclipticStore;
+import juranometria.ui.ReaderInput;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.SkyLanguageStore;
 
@@ -58,6 +70,12 @@ class StartupJourneyTest {
 
     /** What a caller needs from a started application. */
     record Running(JFrame frame, JMenuBar menu, InterfaceText words) {
+    }
+
+    /** Everything a channel said, in the order it was found. */
+    private record Channels(String title, String windowDescription,
+                            Set<String> shown, Set<String> spoken,
+                            List<String> letters) {
     }
 
     @Test
@@ -144,6 +162,203 @@ class StartupJourneyTest {
     /** What a caller does with a started application. */
     interface Body {
         void run(Running app) throws Exception;
+    }
+
+
+    // ---- the surface that made the seam necessary --------------
+
+    @Test
+    void theApplicationOpensPlaceAndTimeInTheStoredLanguage()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a window has to exist for its channels to");
+        InterfaceText norsk = InterfaceText.forLanguage("nb-NO");
+        InterfaceText english = InterfaceText.forLanguage("en");
+        Channels[] found = new Channels[1];
+        running("nb-NO", true, app -> {
+            press(app, norsk);
+            found[0] = read(app.frame());
+        });
+        Channels said = found[0];
+
+        // The premises. Each channel is asserted non-empty before it
+        // is asserted correct: "no English found" is worth nothing
+        // from a channel that was never read, which is how three
+        // surfaces passed with whole channels untranslated (#350).
+        assertTrue(said.shown().size() >= 8,
+                "the premise: the dialog showed words - "
+                        + said.shown().size());
+        assertTrue(said.spoken().size() >= 3,
+                "the premise: it spoke some too - "
+                        + said.spoken().size());
+        assertEquals(8, said.letters().size(),
+                "the premise: all eight access letters were set - "
+                        + said.letters());
+
+        // The window itself, which is a channel an inventory that
+        // walks the content pane never reads (#350).
+        assertEquals(norsk.say("placeandtime.title"), said.title(),
+                "the window is titled in the language the reader"
+                        + " stored, not the one the call site names");
+        assertEquals(norsk.say("placeandtime.explain"),
+                said.windowDescription(),
+                "and describes itself in it");
+
+        // Shown, hovered and spoken.
+        for (String key : List.of("placeandtime.latitude.label",
+                "placeandtime.longitude.label",
+                "placeandtime.centre.label")) {
+            assertTrue(said.shown().contains(norsk.say(key)),
+                    key + " reads \"" + norsk.say(key) + "\"");
+            assertTrue(!said.shown().contains(english.say(key)),
+                    key + " does not read \"" + english.say(key) + "\"");
+        }
+        assertTrue(said.spoken().contains(norsk.say(
+                        "placeandtime.meridian.a11y")),
+                "the meridian switch answers a screen reader in"
+                        + " Norwegian: " + said.spoken());
+
+        // Access letters belong to the translated word, so they are
+        // the Norwegian ones and they are in the words shown.
+        assertTrue(said.letters().contains(
+                        norsk.say("placeandtime.latitude.mnemonic")),
+                "the latitude letter is the one Norwegian declares, "
+                        + norsk.say("placeandtime.latitude.mnemonic")
+                        + " for " + norsk.say("placeandtime.latitude.label")
+                        + ", and not English's "
+                        + english.say("placeandtime.latitude.mnemonic")
+                        + " - " + said.letters());
+
+        // Notation is not language and does not move.
+        assertTrue(said.shown().stream()
+                        .anyMatch(word -> word.contains("⌘")),
+                "the keystrokes are spelled by this desktop: "
+                        + said.shown());
+        assertTrue(said.shown().stream()
+                        .noneMatch(word -> word.contains(" then ")),
+                "and nothing joins two of them with an English word");
+        assertTrue(said.shown().stream().anyMatch(word ->
+                        word.matches(".*\\d{4}-\\d{2}-\\d{2}.*")),
+                "the instant is written as an instant: " + said.shown());
+    }
+
+    /**
+     * Opens the View menu and clicks the item, as a reader does.
+     *
+     * <p>Not {@code doClick()}. The convention allows it on a menu
+     * item, and the gate's back-door counts are being driven down
+     * rather than up, so this journey pays the price of a real press:
+     * the popup is shown, the item is proven on screen and sized, and
+     * the click goes through the shared helper that states those
+     * premises before it dispatches anything.
+     */
+    private static void press(Running app, InterfaceText norsk)
+            throws Exception {
+        JMenuBar bar = app.menu();
+        assertTrue(bar != null, "the premise: the application has a menu");
+        JMenu view = menuNamed(bar, norsk.say("menu.view.label"));
+        assertTrue(view != null, "the premise: a Norwegian session's bar"
+                + " carries \"" + norsk.say("menu.view.label") + "\"");
+        JMenuItem item = itemNamed(view,
+                norsk.say("menu.placeandtime.label"));
+        assertTrue(item != null, "the premise: that menu offers \""
+                + norsk.say("menu.placeandtime.label") + "\"");
+        try {
+            SwingUtilities.invokeAndWait(() ->
+                    view.setPopupMenuVisible(true));
+            SwingUtilities.invokeAndWait(() -> { });
+            assertTrue(view.getPopupMenu().isShowing(),
+                    "the premise: the menu is open, because a popup"
+                            + " paints nothing until it is shown");
+            ReaderInput.click(item);
+        } finally {
+            SwingUtilities.invokeAndWait(() ->
+                    view.setPopupMenuVisible(false));
+        }
+        SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    /** Every channel of the dialog the press opened. */
+    private static Channels read(JFrame frame) throws Exception {
+        Channels[] channels = new Channels[1];
+        SwingUtilities.invokeAndWait(() -> {
+            JDialog dialog = dialogOf(frame);
+            assertTrue(dialog != null,
+                    "the premise: pressing the item opened a window");
+            Set<String> shown = new LinkedHashSet<>();
+            Set<String> spoken = new LinkedHashSet<>();
+            List<String> letters = new ArrayList<>();
+            walk(dialog.getContentPane(), shown, spoken, letters);
+            channels[0] = new Channels(dialog.getTitle(),
+                    dialog.getAccessibleContext()
+                            .getAccessibleDescription(),
+                    shown, spoken, letters);
+        });
+        return channels[0];
+    }
+
+    private static void walk(Container from, Set<String> shown,
+                             Set<String> spoken, List<String> letters) {
+        for (Component child : from.getComponents()) {
+            if (child instanceof JComponent widget) {
+                if (widget instanceof AbstractButton button) {
+                    add(shown, button.getText());
+                    letter(letters, button.getMnemonic());
+                }
+                if (widget instanceof JLabel label) {
+                    add(shown, label.getText());
+                    letter(letters, label.getDisplayedMnemonic());
+                }
+                if (widget instanceof javax.swing.JTextField field) {
+                    add(shown, field.getText());
+                }
+                // A hover is a shown channel: a reader reads it.
+                add(shown, widget.getToolTipText());
+                if (widget.getAccessibleContext() != null) {
+                    add(spoken, widget.getAccessibleContext()
+                            .getAccessibleName());
+                    add(spoken, widget.getAccessibleContext()
+                            .getAccessibleDescription());
+                }
+            }
+            if (child instanceof Container nested) {
+                walk(nested, shown, spoken, letters);
+            }
+        }
+    }
+
+    private static void letter(List<String> letters, int keyCode) {
+        if (keyCode != 0) {
+            letters.add(String.valueOf((char) keyCode));
+        }
+    }
+
+    private static void add(Set<String> said, String text) {
+        if (text != null && !text.isBlank()) {
+            // A wrap becomes a space and is never deleted: Chart
+            // Options once published "angitt ikatalogen" that way.
+            said.add(text.replaceAll("<[^>]*>", " ")
+                    .replaceAll("\\s+", " ").trim());
+        }
+    }
+
+    private static JDialog dialogOf(JFrame frame) {
+        for (Window window : frame.getOwnedWindows()) {
+            if (window instanceof JDialog dialog && dialog.isShowing()) {
+                return dialog;
+            }
+        }
+        return null;
+    }
+
+    private static JMenuItem itemNamed(JMenu menu, String label) {
+        for (int i = 0; i < menu.getItemCount(); i++) {
+            JMenuItem item = menu.getItem(i);
+            if (item != null && label.equals(item.getText())) {
+                return item;
+            }
+        }
+        return null;
     }
 
     static JMenu menuNamed(JMenuBar bar, String label) {

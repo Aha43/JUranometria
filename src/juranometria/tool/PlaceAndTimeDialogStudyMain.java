@@ -86,7 +86,7 @@ public final class PlaceAndTimeDialogStudyMain {
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 owner[0] = new JFrame("study");
                 dialog[0] = PlaceAndTimeDialog.packedForStudy(owner[0],
-                        module, PlaceStore.forNode(throwaway));
+                        module, PlaceStore.forNode(throwaway), juranometria.ui.language.InterfaceText.forLanguage("en"));
                 java.awt.Container content = dialog[0].getContentPane();
                 size[0] = content.getWidth();
                 size[1] = content.getHeight();

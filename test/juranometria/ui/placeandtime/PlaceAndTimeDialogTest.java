@@ -64,7 +64,7 @@ class PlaceAndTimeDialogTest {
             content = PlaceAndTimeDialog.content(module, store, () -> {
                 clockReads.add(clockAnswer);
                 return clockAnswer;
-            });
+            }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         }
 
         JTextField field(String name) {

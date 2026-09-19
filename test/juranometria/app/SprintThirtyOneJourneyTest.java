@@ -167,7 +167,7 @@ class SprintThirtyOneJourneyTest {
                                 .open(frame, meridian,
                                         juranometria.ui.placeandtime.PlaceStore
                                                 .forNode(node),
-                                        java.time.Instant::now),
+                                        java.time.Instant::now, juranometria.ui.language.InterfaceText.forLanguage("en")),
                         eclipticToggle[0],
                         () -> ExportSheetSession.open(frame, navigation,
                                 chartHolder[0], options,

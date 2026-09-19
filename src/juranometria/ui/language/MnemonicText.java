@@ -57,6 +57,29 @@ public final class MnemonicText {
     }
 
     /**
+     * Gives a field's label the access letter its language declares.
+     *
+     * <p>The same policy, not a second one. A {@code JLabel} carries
+     * its letter through {@code setDisplayedMnemonic} and is not an
+     * {@code AbstractButton}, which is why an inventory that walked
+     * only buttons found five of Place and Time's eight letters and
+     * missed the three on its field labels (#350).
+     *
+     * <p>The label must already know which control it names: an
+     * access letter on a label that targets nothing moves focus
+     * nowhere, which is a keyboard route that looks present and is
+     * not.
+     */
+    public void apply(javax.swing.JLabel label, String key) {
+        if (label.getLabelFor() == null) {
+            throw new IllegalStateException("the label for \"" + key
+                    + "\" names no control, so its access letter would"
+                    + " move focus nowhere");
+        }
+        label.setDisplayedMnemonic(letterFor(key, label.getText()));
+    }
+
+    /**
      * The declared letter, checked against the rendered label.
      *
      * @throws IllegalStateException if the resource declares more or

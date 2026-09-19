@@ -124,4 +124,3 @@ d4df79100a7853a4	ui/onthispage/OnThisPageTable.java	\u25cf NGC 317A	unresolved: 
 cf5e0da7934850e6	ui/onthispage/OnThisPageTable.java	\\s+	unresolved: no route found, needs manual inspection	false-positive	regular-expression: a regular expression, not words
 5d0b3f566d1faca3	ui/onthispage/OnThisPageTable.java	 V	declared name used, but never at a known sink	notation	a photometric band letter
 b4e65c9964bd2b15	ui/onthispage/OnThisPageTable.java	 B	declared name used, but never at a known sink	notation	a photometric band letter
-b12bded29a8ea584	ui/placeandtime/PlaceAndTimeDialog.java	 -90 to 90	unresolved: no route found, needs manual inspection	reader-prose	an input hint beside the latitude field

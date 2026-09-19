@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**349 promoted artifacts.**
+**361 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -230,6 +230,18 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/onthispage-en-2-empty.png` | `d3b2f93e89f004d80b5d66aa34b39875fe9ee7fc64b8046b6b34a6a8320262a8` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/onthispage-nb-NO-3-populated.png` | `b66a196b3a202373965caf10947445c2ef571c9d8b57123fa76bb9cda7ba3adc` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/onthispage-nb-NO-4-empty.png` | `16eb128a51741765c00c77498222350d60a2416dc25e93f43338dda53c60aa57` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-en-1-default.png` | `bd00d198753dbb353bf8bd9edbae511d258b3fcb950b23108a446adcc7d4ddeb` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-en-2-oslo.png` | `99e7c0dffe823397c3b41cee8467f7959dd394d3a17c1cf89bcee5acebf95b90` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-en-3-santiago.png` | `bcad6007d2a5d13bec14340d848d85d60c6369b82268b2ebc6b212ed0a2cff44` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-en-4-lines-off.png` | `ebb4e6d0b4d540559535fd607364cd24b233060bb7f2ffdc671a1fc56d793cdf` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-en-5-lines-on.png` | `569aa268ee73bfbae3cb3ca9d92a27ab87ea07ad1bac96e2f21929490cc97789` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-en-6-dark.png` | `2bbc19637ac03799299b6c98fe16c0b8875303946d0284ee69ca67c8f6af6e33` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-10-lines-off.png` | `d1f0e0813474d583ee78bb8128b154f9dd49205c808e25d709852ea2253399fc` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-11-lines-on.png` | `ffc06278d22d8c09c69c290ca1ee850a8909d59f1b518aed4da5527f1375dac1` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-12-dark.png` | `de66a4b62da8cbaeb8a6156469fb844e64a4218fa1c08efb56fb81670d06b10e` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-7-default.png` | `b4d2b834bca4e5e36a0f912dac0733ecaa4d8282ea94e5094deb29c4feadd13c` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-8-oslo.png` | `f155c4d8f0c2a33fbe41da8cfc5b376edc408d24a4de1da5e32043cb5b1ab2bd` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-9-santiago.png` | `904efe8f3291a17da5b535e440640329e90046420f01a56685a275f4509ffe1e` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-en.png` | `7c5fa92eacbfae9ddf2170dd5d0977322186f76d20f7c30eb6da750e8f5731b7` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/settings-nb-NO.png` | `4c7ea9b8406534dee7021df4e6ec594efc3bd7069d523a4cca1ff0118e08adb1` | 2026-09-17 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/toolbar-en-1-idle.png` | `b9c14fe7d372dd8b92bfa0ec3d55f78787d99a78d834e480ad6eac817d676e5b` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |

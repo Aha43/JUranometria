@@ -544,7 +544,7 @@ class ChartKeyboardMatrixTest {
             SwingUtilities.invokeAndWait(() ->
                     juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
                             frame, observer, placeStore(),
-                            () -> observer.observer().instant()));
+                            () -> observer.observer().instant(), juranometria.ui.language.InterfaceText.forLanguage("en")));
             flush();
             JDialog dialog = dialogTitled("Place and Time");
             assertNotNull(dialog, "the reader's own dialog opens");

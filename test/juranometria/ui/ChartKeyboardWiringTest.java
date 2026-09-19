@@ -502,7 +502,7 @@ class ChartKeyboardWiringTest {
             SwingUtilities.invokeAndWait(() ->
                     juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
                             frame, observer, placeStore(),
-                            () -> observer.observer().instant()));
+                            () -> observer.observer().instant(), juranometria.ui.language.InterfaceText.forLanguage("en")));
             flush();
             placeAndTime = onEdt(() -> {
                 for (java.awt.Window open : java.awt.Window.getWindows()) {
