@@ -47,7 +47,17 @@ public final class SwingChromeSheetMain {
     private SwingChromeSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     /** One dialog form, and the atlas's own sentence inside it. */
@@ -78,11 +88,14 @@ public final class SwingChromeSheetMain {
                             + " listed in the companion."));
 
     public static void main(String[] args) throws Exception {
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
         if (java.awt.GraphicsEnvironment.isHeadless()) {
             System.err.println("these are dialogs and need a display");
             System.exit(1);
         }
-        Files.createDirectories(OUT);
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # The toolkit's own words, in both languages
@@ -123,17 +136,18 @@ public final class SwingChromeSheetMain {
                 said.append("### ").append(form.title()).append("\n\n")
                         .append(form.note()).append("\n\n")
                         .append(draw(language, words, form,
-                                OUT.resolve("swing-" + language + "-"
+                                out.resolve("swing-" + language + "-"
                                         + (sheet++) + "-" + form.name()
                                         + ".png")))
                         .append('\n');
             }
         }
         said.append(everyKey());
-        Files.writeString(OUT.resolve("swing-chrome-strings.md"),
+        Files.writeString(out.resolve("swing-chrome-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
+        removeFixtures();
         System.out.println("swing chrome sheets: 6 images and "
-                + OUT.resolve("swing-chrome-strings.md"));
+                + out.resolve("swing-chrome-strings.md"));
     }
 
     /** All forty-one, side by side, hovers and spoken names included. */
@@ -172,46 +186,42 @@ public final class SwingChromeSheetMain {
                                Form form, Path to) throws Exception {
         Set<String> said = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
-        SwingUtilities.invokeAndWait(() -> {
-            // The application's own ordered pair (#362, #350): a look
-            // and feel first, then the words, because installing a
-            // look and feel replaces the defaults table.
-            juranometria.app.UiTheme.apply(false);
-            SwingText.in(words).installInto(UIManager.getDefaults());
+        Container[] probe = new Container[1];
+        JDialog[] holder = new JDialog[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                // The application's own ordered pair (#362, #350): a
+                // look and feel first, then the words, because
+                // installing a look and feel replaces the defaults
+                // table.
+                juranometria.app.UiTheme.apply(false);
+                SwingText.in(words).installInto(UIManager.getDefaults());
 
-            Container probe = form.name().equals("chooser")
-                    ? chooser(words)
-                    : pane(form, words);
-            JDialog holder = new JDialog();
-            try {
-                holder.setContentPane(probe);
-                holder.pack();
-                BufferedImage drawn = new BufferedImage(
-                        Math.max(1, probe.getWidth()),
-                        Math.max(1, probe.getHeight()),
-                        BufferedImage.TYPE_INT_RGB);
-                Graphics2D g = drawn.createGraphics();
-                try {
-                    g.setRenderingHint(
-                            RenderingHints.KEY_TEXT_ANTIALIASING,
-                            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                    g.setColor(probe.getBackground() == null
-                            ? Color.WHITE : probe.getBackground());
-                    g.fillRect(0, 0, drawn.getWidth(),
-                            drawn.getHeight());
-                    probe.paint(g);
-                } finally {
-                    g.dispose();
-                }
-                image[0] = drawn;
-                walk(probe, said);
+                probe[0] = form.name().equals("chooser")
+                        ? chooser(words)
+                        : pane(form, words);
+                holder[0] = new JDialog();
+                holder[0].setContentPane(probe[0]);
+            });
+            // Building and painting are two steps, not one, because
+            // the rule has to run between them: pack to a fixed
+            // point, drain, settle, and own focus nowhere. A dialog
+            // packed once is a guess at its own size.
+            image[0] = juranometria.tool.SheetCapture.of(holder[0],
+                    (JComponent) probe[0]);
+            SwingUtilities.invokeAndWait(() -> {
+                walk(probe[0], said);
                 if (form.name().equals("chooser")) {
                     requireSaveState(said, SwingText.in(words));
                 }
-            } finally {
-                holder.dispose();
-            }
-        });
+            });
+        } finally {
+            SwingUtilities.invokeAndWait(() -> {
+                if (holder[0] != null) {
+                    holder[0].dispose();
+                }
+            });
+        }
         ImageIO.write(image[0], "png", to.toFile());
 
         StringBuilder out = new StringBuilder();
@@ -250,11 +260,61 @@ public final class SwingChromeSheetMain {
      * it does show unreviewed.
      */
     private static Container chooser(InterfaceText words) {
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = new JFileChooser(fixture());
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
         chooser.setDialogTitle(words.say("export.chooser.title"));
         chooser.setSelectedFile(new java.io.File("orion.svg"));
         return chooser;
+    }
+
+    /**
+     * A folder of example reader data, made for the photograph.
+     *
+     * <p>This sheet used to open on whatever {@code JFileChooser}
+     * opens on by default, which is the <strong>home directory of
+     * whoever ran it</strong>. The committed sheets therefore
+     * carried a listing of my machine - including scratch
+     * directories with generated names - and could never reproduce:
+     * 11,019 pixels of the Norwegian sheet changed between two
+     * commits because files had come and gone in my home folder.
+     *
+     * <p>Evidence may not depend on the machine's contents. This is
+     * a fixed set of plausible names in a folder with a fixed name,
+     * built fresh each run and removed afterwards, so the picture is
+     * of the chooser rather than of a desk.
+     */
+    private static java.io.File fixture() {
+        try {
+            Path parent = Files.createTempDirectory("chrome-fixture");
+            Path folder = Files.createDirectory(
+                    parent.resolve("Documents"));
+            FIXTURES.add(parent);
+            for (String name : List.of("Kart", "Notater")) {
+                Files.createDirectory(folder.resolve(name));
+            }
+            for (String name : List.of("andromeda.pdf", "orion.svg",
+                    "perseus.png")) {
+                Files.writeString(folder.resolve(name), "");
+            }
+            return folder.toFile();
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("the chooser needs a"
+                    + " folder to show, and one could not be made", e);
+        }
+    }
+
+    /** Fixture folders to remove when the sheets are written. */
+    private static final List<Path> FIXTURES = new java.util.ArrayList<>();
+
+    /** Removes every fixture this run created. */
+    private static void removeFixtures() throws java.io.IOException {
+        for (Path parent : FIXTURES) {
+            try (var files = Files.walk(parent)) {
+                files.sorted(java.util.Comparator.reverseOrder())
+                        .forEach(one -> one.toFile().delete());
+            }
+        }
+        FIXTURES.clear();
     }
 
     /**

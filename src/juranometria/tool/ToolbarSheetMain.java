@@ -63,7 +63,17 @@ public final class ToolbarSheetMain {
     private ToolbarSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     /** One arrangement of the bar, and how it was reached. */
@@ -95,7 +105,10 @@ public final class ToolbarSheetMain {
                             + " Andromeda."));
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # Every word the toolbar and its search field say
@@ -148,16 +161,16 @@ public final class ToolbarSheetMain {
                 }
                 said.append("\n\n").append(state.note()).append("\n\n")
                         .append(draw(language, state,
-                                OUT.resolve("toolbar-" + language + "-"
+                                out.resolve("toolbar-" + language + "-"
                                         + (sheet++) + "-" + state.name()
                                         + ".png")))
                         .append('\n');
             }
         }
-        Files.writeString(OUT.resolve("toolbar-strings.md"),
+        Files.writeString(out.resolve("toolbar-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("toolbar sheets: 8 images and "
-                + OUT.resolve("toolbar-strings.md"));
+                + out.resolve("toolbar-strings.md"));
     }
 
     /** Draws one state in one language and returns its strings. */
@@ -194,6 +207,7 @@ public final class ToolbarSheetMain {
                         () -> { }, new SelectionMode());
 
                 owner[0] = new JFrame("study");
+                SheetCapture.prepareShownWindow(owner[0]);
                 owner[0].setContentPane(controls[0].toolbar());
                 owner[0].pack();
                 owner[0].setVisible(true);
@@ -230,9 +244,15 @@ public final class ToolbarSheetMain {
      */
     private static String capture(JFrame owner, AtlasToolbar bar, Path to)
             throws Exception {
+        // The shared rule first: queue drained, window packed to a
+        // fixed point, layout settled, focus owned by nobody. This
+        // sheet composes two windows into one image and so paints
+        // itself, but it may not decide for itself WHEN.
+        SheetCapture.settle(owner, bar);
         Set<String> said = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
         SwingUtilities.invokeAndWait(() -> {
+            SheetCapture.neutralFocusNow();
             Component popup = openListOf(owner);
             int width = Math.max(bar.getWidth(),
                     popup == null ? 0 : popup.getWidth());

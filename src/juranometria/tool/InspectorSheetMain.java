@@ -52,10 +52,24 @@ public final class InspectorSheetMain {
     private InspectorSheetMain() {
     }
 
-    private static final Path OUT = Path.of("docs/studies/interface-language");
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
+            Path.of("docs/studies/interface-language");
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
         SwingUtilities.invokeAndWait(() -> juranometria.app.UiTheme.apply(false));
 
         StringBuilder said = new StringBuilder("""
@@ -127,15 +141,15 @@ public final class InspectorSheetMain {
                         .append("| shown | hovered | spoken as | read out |\n")
                         .append("|---|---|---|---|\n")
                         .append(draw(language, state, scene,
-                                OUT.resolve("inspector-" + language + "-"
+                                out.resolve("inspector-" + language + "-"
                                         + (sheet++) + "-" + state + ".png")))
                         .append('\n');
             }
         }
-        Files.writeString(OUT.resolve("inspector-strings.md"),
+        Files.writeString(out.resolve("inspector-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("inspector sheets: 12 images and "
-                + OUT.resolve("inspector-strings.md"));
+                + out.resolve("inspector-strings.md"));
     }
 
     private static String title(String state) {
@@ -171,7 +185,12 @@ public final class InspectorSheetMain {
                 owner[0].pack();
             });
             SwingUtilities.invokeAndWait(() -> { });
-            JComponent content = panel[0];
+                JComponent content = panel[0];
+            // The shared rule: nothing is photographed until the
+            // queue is empty, the window has packed to a fixed
+            // point, the layout has stopped moving and focus is
+            // owned by nobody.
+            SheetCapture.settle(content);
             BufferedImage image = new BufferedImage(
                     Math.max(1, content.getWidth()),
                     Math.max(1, content.getHeight()),

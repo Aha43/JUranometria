@@ -286,18 +286,14 @@ public final class ExportSheetDialogSheetMain {
                     box.setSelected(state.marks());
                 }
             });
-            // Pack AFTER the queue has drained, not in the same
-            // block as the choices. Changing the format updates the
-            // rows beneath it through a listener, and that listener
-            // sometimes runs on the next event rather than inside
-            // the setter: packing in the same block measured the
-            // dialog as it was before the change about one run in
-            // six, and reported the previous state's width. Five
-            // runs agreeing is not determinism - it is five runs
-            // agreeing.
-            SwingUtilities.invokeAndWait(() -> { });
-            SwingUtilities.invokeAndWait(() -> owner[0].pack());
-            SwingUtilities.invokeAndWait(() -> { });
+            // The shared rule rather than this generator's own idea
+            // of when a dialog is ready. Packing in the same block
+            // as the format choice reported the previous format's
+            // width about one run in six; packing once after a
+            // drain was better and still a guess, because a wrapped
+            // label's preferred width depends on having been laid
+            // out. SheetCapture packs until the size repeats.
+            SheetCapture.settle(owner[0], content[0]);
             return capture(content[0], to);
         } finally {
             SwingUtilities.invokeAndWait(() -> {

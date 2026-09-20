@@ -70,6 +70,36 @@ public final class ChartOptionsDialog extends JDialog {
 
     /** What the dialog packs to, and its floor at a narrow screen. */
     public static final int ORDINARY_WIDTH = 420;
+
+    /**
+     * The line width an explanation is broken to (#350).
+     *
+     * <p><strong>The dialog owns this, not the label.</strong> Until
+     * this constant existed, each explanation was re-wrapped to the
+     * width it had been given on the previous layout pass - and that
+     * width depends on whether a scroll bar is showing, which
+     * depends on how tall the wrapped text turned out, which depends
+     * on the width. The comment on {@code tallestTab} has described
+     * that circle since #311 and re-wrapped twice to get round it.
+     *
+     * <p>Twice is not enough, because the circle has
+     * <strong>two</strong> solutions rather than none. The dialog
+     * settled at 419 px wide on 25 runs in 30 and at 420 on the
+     * other 5, from identical inputs, and both answers were
+     * self-consistent: packing again confirmed whichever one the run
+     * had found. A reader could meet either.
+     *
+     * <p>Breaking the prose to a width the dialog <em>declares</em>
+     * removes the feedback entirely: the label's preferred width is
+     * its longest line, the same in every run, so the pack has one
+     * answer. The number is the space an explanation has inside the
+     * scroll pane at {@link #ORDINARY_WIDTH} <em>with a scroll bar
+     * present</em> - the narrower of the two states, so the text
+     * fits whether or not the bar appears, and the bar can no longer
+     * change the words. {@code ChartOptionsLayoutTest} holds it to
+     * actually fitting, in both languages.
+     */
+    public static final int EXPLANATION_WIDTH = 300;
     public static final int MINIMUM_WIDTH = 320;
 
     /**
@@ -590,16 +620,19 @@ public final class ChartOptionsDialog extends JDialog {
      * these images irreproducible evidence.
      */
     public static void settle(ChartOptionsDialog dialog) {
-        java.awt.Dimension was = null;
-        for (int round = 0; round < 8; round++) {
-            rewrap((JComponent) dialog.getContentPane());
-            dialog.pack();
-            java.awt.Dimension now = dialog.getSize();
-            if (now.equals(was)) {
-                return;
-            }
-            was = now;
-        }
+        // Re-apply the dialog's own sizing policy, rather than pack
+        // it. Packing sizes a window to what its layout PREFERS,
+        // and this dialog's width is something it DECLARES:
+        // ORDINARY_WIDTH, chosen for reading rather than for fitting
+        // the widest row. The two answers differ - 394 px preferred
+        // against 420 declared - and a loop that packed until the
+        // size repeated could settle on either, which is how the
+        // same dialog came out 394 wide on some runs and 420 on
+        // others from identical inputs.
+        //
+        // The height is still computed, because it depends on which
+        // tab is showing; only the width is policy.
+        sizeToScreen(dialog, ORDINARY_WIDTH);
     }
 
     /**
@@ -828,10 +861,16 @@ public final class ChartOptionsDialog extends JDialog {
             Object prose = label.getClientProperty(WRAPPED_TEXT);
             Insets insets = label.getInsets();
             int available = label.getWidth() - insets.left - insets.right;
-            if (available > 40) {
-                label.setText(wrapped((String) prose, available,
-                        label.getFontMetrics(label.getFont())));
-            }
+            // The declared width, except when a reader has made the
+            // dialog narrower than it - then the words have to fit
+            // the room they actually have. At the packed width the
+            // answer is the constant, so packing has nothing to feed
+            // back into.
+            int target = available > 40
+                    ? Math.min(EXPLANATION_WIDTH, available)
+                    : EXPLANATION_WIDTH;
+            label.setText(wrapped((String) prose, target,
+                    label.getFontMetrics(label.getFont())));
         }
         root.revalidate();
     }

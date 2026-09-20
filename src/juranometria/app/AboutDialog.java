@@ -102,7 +102,32 @@ public final class AboutDialog extends JDialog {
     /** Opens the dialog owned by and centred on the atlas window. */
     public static void open(Frame owner,
                             juranometria.ui.language.InterfaceText words) {
-        new AboutDialog(owner, words).setVisible(true);
+        open(owner, words, dialog -> { });
+    }
+
+    /**
+     * The same, with the dialog handed to a caller before it is shown
+     * (#350).
+     *
+     * <p>For the study that photographs it. A shown window is given
+     * focus by the desktop, which hands it to a button, and the
+     * button's focus ring is in the picture on some runs and not
+     * others. Making the window unfocusable afterwards does not
+     * help - by then it already holds focus, and clearing it does
+     * not take effect in time to paint.
+     *
+     * <p>So the one moment that works is before {@code setVisible},
+     * and only the code that shows the dialog has it. A reader's
+     * About is unaffected: the ordinary {@code open} passes a
+     * callback that does nothing, and the dialog takes focus and
+     * draws its focus ring exactly as before.
+     */
+    public static void open(Frame owner,
+                            juranometria.ui.language.InterfaceText words,
+                            java.util.function.Consumer<JDialog> before) {
+        AboutDialog dialog = new AboutDialog(owner, words);
+        before.accept(dialog);
+        dialog.setVisible(true);
     }
 
     private void showNotices() {

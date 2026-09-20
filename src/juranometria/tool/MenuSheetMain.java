@@ -58,7 +58,17 @@ public final class MenuSheetMain {
     private MenuSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     /** One arrangement of the bar, and what to call it. */
@@ -74,7 +84,10 @@ public final class MenuSheetMain {
             new State("narrowest", "View at the narrowest field", 1.0, false));
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # Every word the menu bar says
@@ -124,16 +137,16 @@ public final class MenuSheetMain {
             for (State state : STATES) {
                 said.append("### ").append(state.title()).append("\n\n")
                         .append(draw(language, state,
-                                OUT.resolve("menu-" + language + "-"
+                                out.resolve("menu-" + language + "-"
                                         + (sheet++) + "-" + state.name()
                                         + ".png")))
                         .append('\n');
             }
         }
-        Files.writeString(OUT.resolve("menu-strings.md"),
+        Files.writeString(out.resolve("menu-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("menu sheets: 8 images and "
-                + OUT.resolve("menu-strings.md"));
+                + out.resolve("menu-strings.md"));
     }
 
     private static String draw(String language, State state, Path to)
@@ -198,6 +211,7 @@ public final class MenuSheetMain {
      * open at a time anyway.
      */
     private static String capture(JMenuBar bar, Path to) throws Exception {
+        SheetCapture.settle(bar);
         Set<String> said = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
         int[] widest = {0};

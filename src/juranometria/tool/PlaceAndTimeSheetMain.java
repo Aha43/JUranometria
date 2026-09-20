@@ -54,7 +54,17 @@ public final class PlaceAndTimeSheetMain {
     private PlaceAndTimeSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     /** The frozen moment every sheet is taken at. */
@@ -107,12 +117,15 @@ public final class PlaceAndTimeSheetMain {
                             + " not make."));
 
     public static void main(String[] args) throws Exception {
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
         if (java.awt.GraphicsEnvironment.isHeadless()) {
             System.err.println("a packed dialog needs a display, and a"
                     + " stand-in panel is what the review rejected");
             System.exit(1);
         }
-        Files.createDirectories(OUT);
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # Every word Place and Time says
@@ -178,7 +191,7 @@ public final class PlaceAndTimeSheetMain {
                 said.append("### ").append(state.title()).append("\n\n")
                         .append(state.note()).append("\n\n")
                         .append(draw(language, text, state, false,
-                                OUT.resolve("placeandtime-" + language
+                                out.resolve("placeandtime-" + language
                                         + "-" + (sheet++) + "-"
                                         + state.name() + ".png")))
                         .append('\n');
@@ -200,15 +213,15 @@ public final class PlaceAndTimeSheetMain {
 
                             """)
                     .append(draw(language, text, STATES.get(1), true,
-                            OUT.resolve("placeandtime-" + language + "-"
+                            out.resolve("placeandtime-" + language + "-"
                                     + (sheet++) + "-dark.png")))
                     .append('\n');
             said.append(letters(text)).append(deferred());
         }
-        Files.writeString(OUT.resolve("placeandtime-strings.md"),
+        Files.writeString(out.resolve("placeandtime-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("place and time sheets: 12 images and "
-                + OUT.resolve("placeandtime-strings.md"));
+                + out.resolve("placeandtime-strings.md"));
     }
 
     /** The eight access letters, and the words they mark. */
@@ -318,6 +331,8 @@ public final class PlaceAndTimeSheetMain {
     private static String capture(PlaceAndTimeDialog dialog,
                                   String language, Path to)
             throws Exception {
+        SheetCapture.settle((javax.swing.JComponent)
+                dialog.getContentPane());
         Set<String> shown = new LinkedHashSet<>();
         Set<String> spoken = new LinkedHashSet<>();
         List<String> letters = new ArrayList<>();

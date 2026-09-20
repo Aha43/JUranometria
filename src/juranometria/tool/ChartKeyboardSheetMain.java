@@ -51,7 +51,17 @@ public final class ChartKeyboardSheetMain {
     private ChartKeyboardSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     /** One arrangement of the switches, and why it is here. */
@@ -83,13 +93,16 @@ public final class ChartKeyboardSheetMain {
                             + " figures."));
 
     public static void main(String[] args) throws Exception {
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
         if (java.awt.GraphicsEnvironment.isHeadless()) {
             System.err.println("a palette has to be on screen to be"
                     + " photographed, and a panel drawn without a"
                     + " window is not the palette");
             System.exit(1);
         }
-        Files.createDirectories(OUT);
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # Every word the chart's keyboard says
@@ -152,7 +165,7 @@ public final class ChartKeyboardSheetMain {
                             .append("\n\n")
                             .append(draw(language, text, state,
                                     theme.equals("dark"),
-                                    OUT.resolve("chartkeyboard-"
+                                    out.resolve("chartkeyboard-"
                                             + language + "-"
                                             + (sheet++) + "-"
                                             + state.name() + "-"
@@ -171,10 +184,10 @@ public final class ChartKeyboardSheetMain {
                     + " reports a smaller thing under the name of the"
                     + " whole.");
         }
-        Files.writeString(OUT.resolve("chartkeyboard-strings.md"),
+        Files.writeString(out.resolve("chartkeyboard-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("chart keyboard sheets: " + drawn
-                + " images and " + OUT.resolve("chartkeyboard-strings.md"));
+                + " images and " + out.resolve("chartkeyboard-strings.md"));
     }
 
     /** The palette's own two channels, and the words around the rows. */
@@ -296,6 +309,7 @@ public final class ChartKeyboardSheetMain {
 
                 palette[0] = ChartKeyboard.of(switches, text);
                 owner[0] = new JFrame("study");
+                SheetCapture.prepareShownWindow(owner[0]);
                 owner[0].setSize(900, 700);
                 owner[0].setVisible(true);
                 palette[0].showIn(owner[0].getRootPane());
@@ -373,10 +387,12 @@ public final class ChartKeyboardSheetMain {
 
     private static String capture(ChartKeyboard palette, String language,
                                   Path to) throws Exception {
+        SheetCapture.settle(palette);
         Set<String> shown = new LinkedHashSet<>();
         List<String> spoken = new ArrayList<>();
         BufferedImage[] image = new BufferedImage[1];
         SwingUtilities.invokeAndWait(() -> {
+            SheetCapture.neutralFocusNow();
             BufferedImage drawn = new BufferedImage(
                     Math.max(1, palette.getWidth()),
                     Math.max(1, palette.getHeight()),

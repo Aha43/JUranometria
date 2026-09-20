@@ -41,7 +41,18 @@ public final class ChartOptionsSheetMain {
     private ChartOptionsSheetMain() {
     }
 
-    private static final Path OUT = Path.of("docs/studies/interface-language");
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
+            Path.of("docs/studies/interface-language");
 
     /**
      * The width the dialog actually packs to.
@@ -55,7 +66,10 @@ public final class ChartOptionsSheetMain {
     private static final int WIDE = ChartOptionsDialog.ORDINARY_WIDTH;
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
         SwingUtilities.invokeAndWait(() -> juranometria.app.UiTheme.apply(false));
 
         StringBuilder said = new StringBuilder("""
@@ -111,8 +125,9 @@ public final class ChartOptionsSheetMain {
                         ChartOptionsDialog.settle(dialog[0]);
                     });
                     SwingUtilities.invokeAndWait(() -> { });
-                    draw(content, OUT.resolve("chartoptions-" + language
-                            + "-" + (tab + 1) + ".png"));
+                    draw(dialog[0], content,
+                            out.resolve("chartoptions-" + language
+                                    + "-" + (tab + 1) + ".png"));
                     said.append("### ").append(tabs.getTitleAt(tab))
                             .append("\n\n")
                             .append("| shown | hovered | spoken as | read out |\n")
@@ -160,30 +175,26 @@ public final class ChartOptionsSheetMain {
             }
         }
 
-        Files.writeString(OUT.resolve("chartoptions-strings.md"),
+        Files.writeString(out.resolve("chartoptions-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("chart options sheets: 8 images and "
-                + OUT.resolve("chartoptions-strings.md"));
+                + out.resolve("chartoptions-strings.md"));
     }
 
-    private static void draw(JComponent content, Path to)
-            throws IOException {
-        int wide = content.getWidth();
-        int high = content.getHeight();
-
-        BufferedImage sheet = new BufferedImage(Math.max(1, wide),
-                Math.max(1, high), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = sheet.createGraphics();
-        try {
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, wide, high);
-            content.paint(g);
-        } finally {
-            g.dispose();
-        }
-        ImageIO.write(sheet, "png", to.toFile());
+    /**
+     * One sheet, taken once its state is established.
+     *
+     * <p>This used to paint as soon as the tab had been selected and
+     * the queue given one round-trip. About one run in six that was
+     * too early: the button row came out a pixel to the right,
+     * everything left of x=192 identical and everything from x=253
+     * moved. `SheetCapture` requires the layout to reach a fixed
+     * point first, and refuses rather than guessing.
+     */
+    private static void draw(java.awt.Window window,
+                             JComponent content, Path to)
+            throws Exception {
+        SheetCapture.writeSelfSized(window, content, to);
     }
 
     private static void layoutDeeply(Container from) {

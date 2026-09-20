@@ -51,7 +51,17 @@ public final class PageLanguageSheetMain {
     private PageLanguageSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     /** Wide enough that the sky has names to rename. */
@@ -73,7 +83,10 @@ public final class PageLanguageSheetMain {
             new Cell("nb-NO", "nb-NO", "nb-nbsky"));
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
 
         // The premise, before anything is written: both chart
         // languages must actually place names on this page, or the
@@ -125,11 +138,11 @@ public final class PageLanguageSheetMain {
         said.append(comparisons()).append(palettePhrases())
                 .append(refusals());
 
-        Files.writeString(OUT.resolve("page-language-strings.md"),
+        Files.writeString(out.resolve("page-language-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("page language sheets: " + CELLS.size()
                 + " images and "
-                + OUT.resolve("page-language-strings.md"));
+                + out.resolve("page-language-strings.md"));
     }
 
     /** One cell drawn, with every channel it produces written down. */
@@ -150,7 +163,7 @@ public final class PageLanguageSheetMain {
         } finally {
             g.dispose();
         }
-        Path to = OUT.resolve("page-" + cell.name() + ".png");
+        Path to = out.resolve("page-" + cell.name() + ".png");
         ImageIO.write(image, "png", to.toFile());
 
         // The exported file's own words, from the same resolved

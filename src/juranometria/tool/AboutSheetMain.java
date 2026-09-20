@@ -53,19 +53,32 @@ public final class AboutSheetMain {
     private AboutSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     /** What was reached, so a partial run cannot be reported. */
     private static final Set<String> reached = new LinkedHashSet<>();
 
     public static void main(String[] args) throws Exception {
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
         if (java.awt.GraphicsEnvironment.isHeadless()) {
             System.err.println("About is a window, and a panel drawn"
                     + " without one is not the dialog");
             System.exit(1);
         }
-        Files.createDirectories(OUT);
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # Every word About says
@@ -109,11 +122,11 @@ public final class AboutSheetMain {
                 said.append("### ").append(dark ? "Dark" : "Light")
                         .append("\n\n")
                         .append(draw(language, words, dark, false,
-                                OUT.resolve("about-" + language + "-"
+                                out.resolve("about-" + language + "-"
                                         + (sheet++) + "-compact-"
                                         + theme + ".png")))
                         .append(draw(language, words, dark, true,
-                                OUT.resolve("about-" + language + "-"
+                                out.resolve("about-" + language + "-"
                                         + (sheet++) + "-notices-"
                                         + theme + ".png")))
                         .append('\n');
@@ -130,10 +143,10 @@ public final class AboutSheetMain {
         for (AboutDialog.Notice notice : AboutDialog.NOTICES) {
             require("heading/" + notice.id(), "body/" + notice.id());
         }
-        Files.writeString(OUT.resolve("about-strings.md"),
+        Files.writeString(out.resolve("about-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("about sheets: 8 images and "
-                + OUT.resolve("about-strings.md"));
+                + out.resolve("about-strings.md"));
     }
 
     /** The twelve translated values. */
@@ -233,9 +246,11 @@ public final class AboutSheetMain {
             SwingUtilities.invokeAndWait(() -> {
                 juranometria.app.UiTheme.apply(dark);
                 owner[0] = new JFrame("study");
+                SheetCapture.prepareShownWindow(owner[0]);
                 owner[0].setSize(900, 700);
                 owner[0].setVisible(true);
-                AboutDialog.open(owner[0], words);
+                AboutDialog.open(owner[0], words,
+                        SheetCapture::prepareShownWindow);
             });
             SwingUtilities.invokeAndWait(() -> { });
             SwingUtilities.invokeAndWait(() -> {
@@ -243,6 +258,7 @@ public final class AboutSheetMain {
                 if (about[0] == null) {
                     throw new IllegalStateException("About did not open");
                 }
+
                 if (notices) {
                     JButton button = buttonNamed(
                             about[0].getContentPane(),
@@ -273,10 +289,13 @@ public final class AboutSheetMain {
     private static String capture(JDialog dialog, String language,
                                   boolean notices, Path to)
             throws Exception {
+        SheetCapture.settle((javax.swing.JComponent)
+                dialog.getContentPane());
         Set<String> shown = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
         String[] window = new String[2];
         SwingUtilities.invokeAndWait(() -> {
+            SheetCapture.neutralFocusNow();
             Container content = dialog.getContentPane();
             window[0] = dialog.getTitle();
             window[1] = dialog.getAccessibleContext()

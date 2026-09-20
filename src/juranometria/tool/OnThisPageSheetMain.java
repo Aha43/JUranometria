@@ -59,11 +59,24 @@ public final class OnThisPageSheetMain {
     private OnThisPageSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # Every word On This Page says
@@ -109,15 +122,15 @@ public final class OnThisPageSheetMain {
             for (String state : List.of("populated", "empty")) {
                 said.append("### ").append(title(state)).append("\n\n")
                         .append(draw(language, state,
-                                OUT.resolve("onthispage-" + language + "-"
+                                out.resolve("onthispage-" + language + "-"
                                         + (sheet++) + "-" + state + ".png")))
                         .append('\n');
             }
         }
-        Files.writeString(OUT.resolve("onthispage-strings.md"),
+        Files.writeString(out.resolve("onthispage-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("on this page sheets: 4 images and "
-                + OUT.resolve("onthispage-strings.md"));
+                + out.resolve("onthispage-strings.md"));
     }
 
     /** The five answers side by side, both registers, both languages. */
@@ -227,7 +240,12 @@ public final class OnThisPageSheetMain {
                 owner[0].pack();
             });
             SwingUtilities.invokeAndWait(() -> { });
-            JComponent content = panel[0];
+                JComponent content = panel[0];
+            // The shared rule: nothing is photographed until the
+            // queue is empty, the window has packed to a fixed
+            // point, the layout has stopped moving and focus is
+            // owned by nobody.
+            SheetCapture.settle(content);
             BufferedImage image = new BufferedImage(
                     Math.max(1, content.getWidth()),
                     Math.max(1, content.getHeight()),

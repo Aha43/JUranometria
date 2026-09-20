@@ -51,12 +51,26 @@ public final class SettingsSheetMain {
     private SettingsSheetMain() {
     }
 
-    private static final Path OUT = Path.of("docs/studies/interface-language");
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>`InterfaceEvidenceGateTest` runs every one of these into a
+     * scratch directory and compares the result with what is
+     * committed. It can only do that if a generator can be told
+     * where to write; one that always writes over the evidence
+     * cannot be used to check it.
+     */
+    private static Path out =
+            Path.of("docs/studies/interface-language");
 
     private static final int WIDE = 560;
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
         // The application's own look and feel, so the controls are
         // the ones a reader meets rather than a platform default
         // nothing ships.
@@ -88,16 +102,16 @@ public final class SettingsSheetMain {
             SwingUtilities.invokeAndWait(() ->
                     content[0] = build(language));
             SwingUtilities.invokeAndWait(() -> { });
-            draw(content[0], OUT.resolve("settings-" + language + ".png"));
+                draw(content[0], out.resolve("settings-" + language + ".png"));
             said.append(describe(language, content[0]));
         }
 
-        Files.writeString(OUT.resolve("settings-strings.md"),
+        Files.writeString(out.resolve("settings-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("settings sheets: "
-                + OUT.resolve("settings-en.png") + ", "
-                + OUT.resolve("settings-nb-NO.png") + ", and "
-                + OUT.resolve("settings-strings.md"));
+                + out.resolve("settings-en.png") + ", "
+                + out.resolve("settings-nb-NO.png") + ", and "
+                + out.resolve("settings-strings.md"));
     }
 
     /**
@@ -112,7 +126,8 @@ public final class SettingsSheetMain {
     }
 
     private static void draw(JComponent content, Path to)
-            throws IOException {
+            throws Exception {
+        SheetCapture.settle(content);
         // Lay out at the real width FIRST, then ask how tall it
         // became. Asking before laying out reported a height from a
         // different width and cropped the buttons off the sheet - a
