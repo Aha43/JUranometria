@@ -121,6 +121,9 @@ class InterfaceEvidenceGateTest {
                     unstable.add(name);
                     continue;
                 }
+                if (!recordingMachine()) {
+                    continue;
+                }
                 Path committed = COMMITTED.resolve(name);
                 if (!Files.exists(committed)
                         || !java.util.Arrays.equals(one,
@@ -143,6 +146,18 @@ class InterfaceEvidenceGateTest {
             assertEquals(List.of(), wrong,
                     "the display-owned evidence does not match its"
                             + " generators");
+            // What this run covered, and what it did not. A narrower
+            // check has to say so where the narrowing happens.
+            System.out.println(recordingMachine()
+                    ? "interface evidence: " + listing(first).size()
+                            + " artifacts, reproduced twice here AND"
+                            + " held to their committed bytes"
+                    : "interface evidence: " + listing(first).size()
+                            + " artifacts reproduced twice on this"
+                            + " machine. Their committed bytes were"
+                            + " recorded elsewhere and are NOT"
+                            + " compared here - another desktop's"
+                            + " font metrics are not a defect");
         } finally {
             remove(first);
             remove(second);
@@ -235,6 +250,38 @@ class InterfaceEvidenceGateTest {
                         + " generator is a report nothing checks -"
                         + " which is the state this whole class of"
                         + " evidence was in for an entire sprint");
+    }
+
+    /**
+     * Whether this is the machine the committed evidence was
+     * recorded on.
+     *
+     * <p>These are photographs of real widgets, so their bytes are a
+     * desktop's answer as much as the atlas's - the portable
+     * evidence contract says the same of its renderings, holding
+     * them "to reproducing here, never to another machine's pixels".
+     * This gate compared them to the committed bytes everywhere, and
+     * CI duly reported 104 of 106 artifacts stale: Linux had simply
+     * drawn them, correctly, in its own fonts.
+     *
+     * <p>So the two halves have different reaches, and it is worth
+     * being exact about which:
+     *
+     * <ul>
+     *   <li><strong>reproduced twice</strong> - everywhere. On CI's
+     *       Linux display, all 106 agreed run to run, which is the
+     *       claim that matters and the one nondeterminism breaks;</li>
+     *   <li><strong>equals the committed bytes</strong> - only where
+     *       those bytes were recorded. Elsewhere it would be
+     *       comparing two machines and calling the difference a
+     *       defect.</li>
+     * </ul>
+     *
+     * <p>The run says which of the two it performed rather than
+     * leaving a reader of the log to assume the stronger one.
+     */
+    private static boolean recordingMachine() {
+        return System.getenv("CI") == null;
     }
 
     /** Runs every registered generator into one directory. */
