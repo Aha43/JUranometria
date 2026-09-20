@@ -16,7 +16,7 @@ it reads out - the longest strings on the surface and
 the ones a translation most easily gets wrong,
 because nobody looks at them.
 
-Norwegian is **draft**.
+**Norsk bokmål — reviewed.** A person who reads the language has been through these surfaces and said these are the words an atlas should use. This is linguistic judgement, not corroboration against a source: unlike the constellation names next door, these are original translations written for this application and there is no citation to check them against. Recorded in `nb-NO.manifest`, and read from there rather than written here.
 
 ## English (`en`)
 

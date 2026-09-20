@@ -72,7 +72,7 @@ public final class OnThisPageSheetMain {
                 `juranometria.tool.OnThisPageSheetMain`, in a real
                 window, because this surface measures its own columns.
 
-                Norwegian is **draft**.
+                %s
 
                 ## What is translated here, and what is not
 
@@ -95,7 +95,8 @@ public final class OnThisPageSheetMain {
                 scans down a column, and the whole answer on hover and
                 in the spoken channel.
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         appendWords(said);
         appendWidths(said);

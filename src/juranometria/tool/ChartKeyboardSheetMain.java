@@ -101,7 +101,7 @@ public final class ChartKeyboardSheetMain {
                 that the interface language resources ship in the
                 application image.
 
-                Norwegian is **draft**.
+                %s
 
                 ## A palette, not a window
 
@@ -130,7 +130,8 @@ public final class ChartKeyboardSheetMain {
                 language declares a note or declares `!none`, and a
                 key simply missing is a fault rather than a silence.
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         int sheet = 1;
         int drawn = 0;

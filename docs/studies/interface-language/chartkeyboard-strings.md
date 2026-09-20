@@ -7,7 +7,7 @@ resources. Packaged acceptance separately verifies
 that the interface language resources ship in the
 application image.
 
-Norwegian is **draft**.
+**Norsk bokmål — reviewed.** A person who reads the language has been through these surfaces and said these are the words an atlas should use. This is linguistic judgement, not corroboration against a source: unlike the constellation names next door, these are original translations written for this application and there is no citation to check them against. Recorded in `nb-NO.manifest`, and read from there rather than written here.
 
 ## A palette, not a window
 

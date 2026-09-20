@@ -77,9 +77,10 @@ public final class ChartOptionsSheetMain {
                 the ones a translation most easily gets wrong,
                 because nobody looks at them.
 
-                Norwegian is **draft**.
+                %s
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         for (String language : List.of("en", "nb-NO")) {
             java.util.prefs.Preferences node = java.util.prefs.Preferences

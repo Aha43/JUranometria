@@ -87,7 +87,7 @@ public final class MenuSheetMain {
                 the interface language resources ship in the
                 application image.
 
-                Norwegian is **draft**.
+                %s
 
                 ## Four channels, not three
 
@@ -113,7 +113,8 @@ public final class MenuSheetMain {
                 either language. That is deliberate: a tooltip over an
                 open menu would cover the thing it explains.
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         int sheet = 1;
         for (String language : List.of("en", "nb-NO")) {

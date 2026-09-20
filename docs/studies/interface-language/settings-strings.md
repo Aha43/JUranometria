@@ -13,8 +13,7 @@ names and descriptions are read aloud rather than
 painted, and they are the half of a translation most
 easily left in English without anyone noticing.
 
-Norwegian is **draft**. Nothing here has been reviewed
-by a person who reads it.
+**Norsk bokmål — reviewed.** A person who reads the language has been through these surfaces and said these are the words an atlas should use. This is linguistic judgement, not corroboration against a source: unlike the constellation names next door, these are original translations written for this application and there is no citation to check them against. Recorded in `nb-NO.manifest`, and read from there rather than written here.
 
 ## English (`en`)
 

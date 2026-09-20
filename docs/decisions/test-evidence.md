@@ -78,7 +78,7 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **62 files** touch process-wide state —
 **33** use the shared guard, **28** restore locally,
-**0 flagged unprotected** — and **44 files** depend on a display,
+**0 flagged unprotected** — and **45 files** depend on a display,
 of which **19** state a focus premise and **28** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer

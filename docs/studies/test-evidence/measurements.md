@@ -123,6 +123,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/app/SprintTwentyNineJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
 | juranometria/app/StartupJourneyTest.java | point-reachable, control-showing | none |
 | juranometria/app/SwingSessionTest.java | none | none |
+| juranometria/tool/ExportCompanionTest.java | none | none |
 | juranometria/ui/AtlasToolbarLanguageTest.java | none | none |
 | juranometria/ui/BlackSkyJourneyTest.java | point-reachable, control-showing | back-door-click |
 | juranometria/ui/ChartFurnitureJourneyTest.java | point-reachable, control-showing | pointer-events, back-door-click |
@@ -152,7 +153,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/placeandtime/FrozenNoteTest.java | none | none |
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 
-**44 display-dependent files.** 19 state a focused-window or focus-owner premise, 28 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**45 display-dependent files.** 19 state a focused-window or focus-owner premise, 28 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 

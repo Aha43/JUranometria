@@ -7,7 +7,30 @@ resources. Packaged acceptance separately verifies
 that the interface language resources ship in the
 application image.
 
-Norwegian is **draft**.
+**Norsk bokmål — reviewed.** A person who reads the language has been through these surfaces and said these are the words an atlas should use. This is linguistic judgement, not corroboration against a source: unlike the constellation names next door, these are original translations written for this application and there is no citation to check them against. Recorded in `nb-NO.manifest`, and read from there rather than written here.
+
+**This is one machine's answer.** The packed pixel
+sizes below are measured from real windows, and a
+desktop with different font metrics packs them
+differently; the exported byte counts are this
+build's. The contract holds this to reproducing
+*here*, never across two machines. Every WORD in it
+is the atlas's own and is portable - that half is
+held by `ExportLanguageTest`.
+
+| the machine | |
+|---|---|
+| operating system | Mac OS X |
+| architecture | aarch64 |
+| Java | 21.0.11 |
+
+Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+
+The folder named in the replace question is
+`~/Documents` - example reader data, chosen because it
+is the same in every run. The writes this page
+reports really happen, in a scratch directory that is
+never named here.
 
 ## What is translated, and what is not
 
@@ -146,7 +169,7 @@ Packed 295 × 206 px.
 |---|---|
 | chooser title | Export chart sheet |
 | replace title | Replace the existing file? |
-| replace question | orion.svg already exists in /var/folders/3z/hpnwxx314z73zm446j0f3nlm0000gn/T/export-sheet2953726618181998464. / Replace it? |
+| replace question | orion.svg already exists in ~/Documents. / Replace it? |
 | written title | Chart sheet exported |
 | written message | SVG written to orion.svg (194,460 bytes) |
 | refused title | The chart sheet was not written |
@@ -281,7 +304,7 @@ Packed 332 × 206 px.
 |---|---|
 | chooser title | Eksporter kartark |
 | replace title | Erstatte eksisterende fil? |
-| replace question | orion.svg finnes allerede i /var/folders/3z/hpnwxx314z73zm446j0f3nlm0000gn/T/export-sheet12670791903244946308. / Vil du erstatte den? |
+| replace question | orion.svg finnes allerede i ~/Documents. / Vil du erstatte den? |
 | written title | Kartarket er eksportert |
 | written message | SVG lagret som orion.svg (194 484 byte) |
 | refused title | Kartarket ble ikke lagret |

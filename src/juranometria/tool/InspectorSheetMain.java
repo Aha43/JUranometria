@@ -73,7 +73,7 @@ public final class InspectorSheetMain {
                 and a single screenshot would review almost none of
                 it.
 
-                Norwegian is **draft**.
+                %s
 
                 ## A shape no picture here can show
 
@@ -109,7 +109,8 @@ public final class InspectorSheetMain {
                 truncates. It behaves as a hint, and it truncates in
                 both languages rather than in one.
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         ChartViewState where = new ChartViewState(new SkyPosition(83.8, 0.0),
                 42.0, ChartViewState.defaultMagnitudeFor(42.0));

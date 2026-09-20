@@ -124,7 +124,7 @@ public final class PlaceAndTimeSheetMain {
                 interface language resources ship in the application
                 image.
 
-                Norwegian is **draft**.
+                %s
 
                 ## The window, not a panel
 
@@ -165,7 +165,8 @@ public final class PlaceAndTimeSheetMain {
                 below, and the application refuses a letter that is
                 not in the label it marks rather than guessing one.
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         int sheet = 1;
         for (String language : List.of("en", "nb-NO")) {

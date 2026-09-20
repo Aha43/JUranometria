@@ -52,8 +52,28 @@ public final class ExportSheetDialogSheetMain {
     private ExportSheetDialogSheetMain() {
     }
 
-    private static final Path OUT =
+    /**
+     * Where the sheets go: the committed directory by default, or a
+     * directory a caller names as {@code args[0]}.
+     *
+     * <p>{@code ExportCompanionTest} runs this into a scratch
+     * directory so it can hold two runs against each other without
+     * writing over committed evidence. The contract cannot do that
+     * job: it runs headless, and this generator packs a real window
+     * because the explanation beneath the format control wraps
+     * against font metrics.
+     */
+    private static Path out =
             Path.of("docs/studies/interface-language");
+
+    /**
+     * The folder the replace question names, in the report.
+     *
+     * <p>Reader data, deliberately fixed. The real writes go to a
+     * scratch directory whose name changes every run; naming that in
+     * a committed report made two runs impossible to compare.
+     */
+    private static final String READER_FOLDER = "~/Documents";
 
     private record State(String name, String title, SheetFormat format,
                          PaperSize paper, boolean marks) {
@@ -68,7 +88,10 @@ public final class ExportSheetDialogSheetMain {
                     SheetFormat.PNG, PaperSize.A4, false));
 
     public static void main(String[] args) throws Exception {
-        Files.createDirectories(OUT);
+        if (args.length > 0 && !args[0].isBlank()) {
+            out = Path.of(args[0]);
+        }
+        Files.createDirectories(out);
         StringBuilder said = new StringBuilder();
         said.append("""
                 # Every word exporting a chart sheet says
@@ -80,7 +103,30 @@ public final class ExportSheetDialogSheetMain {
                 that the interface language resources ship in the
                 application image.
 
-                Norwegian is **draft**.
+                %s
+
+                **This is one machine's answer.** The packed pixel
+                sizes below are measured from real windows, and a
+                desktop with different font metrics packs them
+                differently; the exported byte counts are this
+                build's. The contract holds this to reproducing
+                *here*, never across two machines. Every WORD in it
+                is the atlas's own and is portable - that half is
+                held by `ExportLanguageTest`.
+
+                | the machine | |
+                |---|---|
+                | operating system | %s |
+                | architecture | %s |
+                | Java | %s |
+
+                Recorded on: `%s`
+
+                The folder named in the replace question is
+                `%s` - example reader data, chosen because it
+                is the same in every run. The writes this page
+                reports really happen, in a scratch directory that is
+                never named here.
 
                 ## What is translated, and what is not
 
@@ -91,7 +137,14 @@ public final class ExportSheetDialogSheetMain {
                 are data. The byte count goes in as a NUMBER, so each
                 language groups it its own way.
 
-                """);
+                """.formatted(
+                juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO"),
+                System.getProperty("os.name"),
+                System.getProperty("os.arch"),
+                System.getProperty("java.version"),
+                juranometria.tool.WiderFieldStudyMain.platform(),
+                READER_FOLDER));
 
         int sheet = 1;
         for (String language : List.of("en", "nb-NO")) {
@@ -102,7 +155,7 @@ public final class ExportSheetDialogSheetMain {
             for (State state : STATES) {
                 said.append("### ").append(state.title()).append("\n\n")
                         .append(draw(text, state,
-                                OUT.resolve("export-" + language + "-"
+                                out.resolve("export-" + language + "-"
                                         + (sheet++) + "-" + state.name()
                                         + ".png")))
                         .append('\n');
@@ -110,10 +163,10 @@ public final class ExportSheetDialogSheetMain {
             said.append(journey(text));
         }
         said.append(supportedButUnobserved());
-        Files.writeString(OUT.resolve("export-strings.md"),
+        Files.writeString(out.resolve("export-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
         System.out.println("export sheets: 6 images and "
-                + OUT.resolve("export-strings.md"));
+                + out.resolve("export-strings.md"));
     }
 
     /** The rest of the journey, which has no window of its own here. */
@@ -123,8 +176,15 @@ public final class ExportSheetDialogSheetMain {
                 "#### After Export is pressed\n\n| what | words |\n|---|---|\n");
         row(out, "chooser title", said.say("export.chooser.title"));
         row(out, "replace title", said.say("export.replace.title"));
+        // The folder the question names is EXAMPLE READER DATA, not
+        // the scratch directory the writes below really use. Putting
+        // the real one here wrote a fresh random path into the
+        // committed companion on every run, so two runs could never
+        // be byte-identical and the report could not be held to
+        // anything - which is how it drifted for four commits
+        // without a signal.
         row(out, "replace question", said.say("export.replace.question",
-                "orion.svg", folder.toString()));
+                "orion.svg", READER_FOLDER));
         row(out, "written title", said.say("export.written.title"));
 
         ExportSheet.Outcome written = write(folder.resolve("orion.svg").toFile(),
@@ -225,8 +285,18 @@ public final class ExportSheetDialogSheetMain {
                 if (marks instanceof JCheckBox box) {
                     box.setSelected(state.marks());
                 }
-                owner[0].pack();
             });
+            // Pack AFTER the queue has drained, not in the same
+            // block as the choices. Changing the format updates the
+            // rows beneath it through a listener, and that listener
+            // sometimes runs on the next event rather than inside
+            // the setter: packing in the same block measured the
+            // dialog as it was before the change about one run in
+            // six, and reported the previous state's width. Five
+            // runs agreeing is not determinism - it is five runs
+            // agreeing.
+            SwingUtilities.invokeAndWait(() -> { });
+            SwingUtilities.invokeAndWait(() -> owner[0].pack());
             SwingUtilities.invokeAndWait(() -> { });
             return capture(content[0], to);
         } finally {

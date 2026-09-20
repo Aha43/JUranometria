@@ -78,10 +78,10 @@ public final class SettingsSheetMain {
                 painted, and they are the half of a translation most
                 easily left in English without anyone noticing.
 
-                Norwegian is **draft**. Nothing here has been reviewed
-                by a person who reads it.
+                %s
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         for (String language : List.of("en", "nb-NO")) {
             JComponent[] content = new JComponent[1];

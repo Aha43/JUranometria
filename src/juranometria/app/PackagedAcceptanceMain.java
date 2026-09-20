@@ -170,6 +170,34 @@ public final class PackagedAcceptanceMain {
                         + " exist, and a registry that borrowed from"
                         + " its neighbour would claim a sky it cannot"
                         + " draw");
+
+        // The status the image actually ships (#350). The twelve
+        // study companions state the Norwegian translation is
+        // reviewed, and they read that from the descriptor rather
+        // than asserting it. This is the other end of the same
+        // claim: that the descriptor reaching a reader's machine
+        // says what the evidence beside the source says. An image
+        // built from a tree whose manifest still said draft would
+        // ship a reviewed-looking set of reports over a draft
+        // language, and nothing outside the image could tell.
+        String manifest = packagedManifest("nb-NO");
+        require(manifest.contains("\nstatus=reviewed"),
+                "the packaged nb-NO descriptor records the reviewed"
+                        + " status the committed companions state");
+        require(manifest.contains("\ntag=nb-NO")
+                        && manifest.contains("\ninterface-schema=1"),
+                "and is a real interface descriptor, not a chart pack"
+                        + " read by the wrong discovery");
+        require(interfaces.contains("nb-NO")
+                        && Atlas.languages().interfaceLanguages()
+                                .contains("nb-NO"),
+                "with availability still discovered from the"
+                        + " descriptors present rather than from any"
+                        + " list in Java - the reason English was"
+                        + " registered before it had strings (#348)");
+        System.out.println("interface manifest OK (the packaged nb-NO"
+                + " descriptor says status=reviewed, and availability"
+                + " is still read from the descriptors themselves)");
         // The words themselves, inside the image (#350). Resource
         // discovery that worked on a developer's classpath and not in
         // the packaged runtime is exactly the defect no unit test can
@@ -1160,6 +1188,22 @@ public final class PackagedAcceptanceMain {
             }
         }
         return false;
+    }
+
+    /** One interface descriptor, as the image actually ships it. */
+    private static String packagedManifest(String tag) throws Exception {
+        String path = "/resources/interface-language/" + tag
+                + ".manifest";
+        try (java.io.InputStream in =
+                     PackagedAcceptanceMain.class
+                             .getResourceAsStream(path)) {
+            require(in != null, "the packaged image carries " + path
+                    + ". A language is available because its"
+                    + " descriptor is installed; if this is missing,"
+                    + " discovery answered from something else");
+            return new String(in.readAllBytes(),
+                    java.nio.charset.StandardCharsets.UTF_8);
+        }
     }
 
     /**

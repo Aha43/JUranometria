@@ -12,7 +12,7 @@ drawn separately because a reader meets one at a time
 and a single screenshot would review almost none of
 it.
 
-Norwegian is **draft**.
+**Norsk bokmål — reviewed.** A person who reads the language has been through these surfaces and said these are the words an atlas should use. This is linguistic judgement, not corroboration against a source: unlike the constellation names next door, these are original translations written for this application and there is no citation to check them against. Recorded in `nb-NO.manifest`, and read from there rather than written here.
 
 ## A shape no picture here can show
 

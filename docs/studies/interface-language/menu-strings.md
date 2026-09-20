@@ -8,7 +8,7 @@ choice. Packaged acceptance separately verifies that
 the interface language resources ship in the
 application image.
 
-Norwegian is **draft**.
+**Norsk bokmål — reviewed.** A person who reads the language has been through these surfaces and said these are the words an atlas should use. This is linguistic judgement, not corroboration against a source: unlike the constellation names next door, these are original translations written for this application and there is no citation to check them against. Recorded in `nb-NO.manifest`, and read from there rather than written here.
 
 ## Four channels, not three
 
@@ -87,7 +87,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu spoken description \| Information about this application and what it is built on |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
-| item spoken description \| Opens the window with the application's name, version and the software it is built on |
+| item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
 
 ### View with Inspector and Ecliptic on
 
@@ -140,7 +140,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu spoken description \| Information about this application and what it is built on |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
-| item spoken description \| Opens the window with the application's name, version and the software it is built on |
+| item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
 
 ### View at the widest field
 
@@ -193,7 +193,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu spoken description \| Information about this application and what it is built on |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
-| item spoken description \| Opens the window with the application's name, version and the software it is built on |
+| item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
 
 ### View at the narrowest field
 
@@ -246,7 +246,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu spoken description \| Information about this application and what it is built on |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
-| item spoken description \| Opens the window with the application's name, version and the software it is built on |
+| item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
 
 ## Norsk bokmål (`nb-NO`)
 
@@ -301,7 +301,7 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
-| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren det er bygd på |
+| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
 
 ### View with Inspector and Ecliptic on
 
@@ -354,7 +354,7 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
-| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren det er bygd på |
+| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
 
 ### View at the widest field
 
@@ -407,7 +407,7 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
-| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren det er bygd på |
+| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
 
 ### View at the narrowest field
 
@@ -460,5 +460,5 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
-| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren det er bygd på |
+| item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
 

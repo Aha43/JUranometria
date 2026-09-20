@@ -107,7 +107,7 @@ public final class ToolbarSheetMain {
                 interface language resources ship in the application
                 image.
 
-                Norwegian is **draft**.
+                %s
 
                 ## Composed, not requested
 
@@ -133,7 +133,8 @@ public final class ToolbarSheetMain {
                 are handed to sentences as arguments. `V`, `·` and the
                 numbers are notation.
 
-                """);
+                """.formatted(juranometria.tool.InterfaceLanguageStatus
+                        .statement("nb-NO")));
 
         int sheet = 1;
         for (String language : List.of("en", "nb-NO")) {

@@ -6,7 +6,7 @@
 # installed - the same contract the chart language packs keep.
 #
 # ---------------------------------------------------------------
-# status=draft, and what that means
+# status=reviewed, and what that means
 # ---------------------------------------------------------------
 #
 # The strings in nb-NO.properties are ORIGINAL TRANSLATIONS written
@@ -15,22 +15,70 @@
 # be corroborated against one: their accuracy is a matter of judgement
 # about Norwegian, and that judgement is the owner's.
 #
-# This says draft until a person who reads Norwegian has said these
-# are the words an atlas should use. The study reads status from here
-# rather than from a banner in Java, so nothing can call itself
-# reviewed by deleting a note.
+# The owner, who reads Norwegian, has now been through every surface
+# this sprint covers and said these are the words an atlas should
+# use. That is what "reviewed" records - and it is deliberately not
+# "verified", which in this repository means checked against a source
+# that could contradict it. There is no such source here. Calling
+# linguistic judgement "verified" would borrow a word that promises
+# corroboration nobody can perform.
+#
+# This file is the single place that status lives. The twelve study
+# companions read it through juranometria.tool.InterfaceLanguageStatus
+# and none of them states a status of its own, so a companion cannot
+# say one thing while the descriptor says another. An unrecognised
+# status refuses rather than printing itself.
 #
 # ---------------------------------------------------------------
-# Incomplete on purpose
+# What is covered
 # ---------------------------------------------------------------
 #
-# The strings file covers the Settings surface and nothing else. Every
-# other key falls back to English, visibly and by the gate's rule, so
-# a half-translated interface is a legitimate state rather than a
-# broken one - and no key ever reaches a reader as itself.
+# Every reader-facing surface the application owns: the menu bar,
+# Settings, Chart Options, the Chart Keyboard, the toolbar and its
+# search field, the Inspector, On This Page, Place and Time, About
+# (summary and notices), exporting a sheet, the drawn and exported
+# page's own words, the words Swing puts around the atlas's dialogs,
+# and the startup failure reporter.
 #
-# Making it complete is the rest of #350. Proving the mechanism on one
-# surface first is what this is.
+# A key with no Norwegian value falls back to English, visibly and by
+# the gate's rule, and no key ever reaches a reader as itself. That
+# rule has not changed; what has changed is that no reader-facing
+# application prose is relying on it any more.
+#
+# ---------------------------------------------------------------
+# Deliberately excluded, and why
+# ---------------------------------------------------------------
+#
+# canonical notation and identity
+#     ICRS J2000, V, B, M 31, TYC 2801-2090-1, Cl+N, SVG, PDF, A4,
+#     US Letter. The same to every reader in every language. These
+#     are handed to sentences as arguments and written into no
+#     translated value.
+#
+# technical evidence
+#     The studies under docs/studies, this repository's decision
+#     records, and the developer entry points that generate them.
+#     They address a maintainer, not a reader.
+#
+# the operating system's own menu
+#     On macOS the application menu's first items - About, Services,
+#     Hide, Quit - are drawn by the platform from its own resources
+#     in the desktop's language. The atlas does not own them and
+#     cannot translate them without lying about what it controls.
+#
+# the emergency English fallback
+#     StartupFailure carries one embedded English headline, reached
+#     when opening a file, a preference node or a language class is
+#     what failed. It is translated as startup.failed and used when
+#     the machinery works; the embedded copy is the half that must
+#     survive the machinery not working.
+#
+# four surfaces deferred by review
+#     The eighteen access letters and Swing's mnemonic keys; the
+#     Chart Keyboard's stable-help and transient-status split; Place
+#     and Time's silent restoration of invalid input; and the
+#     constellation search of #356. Each is a behaviour change as
+#     much as a translation, and each is recorded in its own issue.
 #
 # ---------------------------------------------------------------
 # Not a chart language
@@ -47,4 +95,4 @@ interface-schema=1
 tag=nb-NO
 display-name=Norsk bokmål
 strings=nb-NO.properties
-status=draft
+status=reviewed

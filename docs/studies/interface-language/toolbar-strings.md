@@ -7,11 +7,11 @@ Packaged acceptance separately verifies that the
 interface language resources ship in the application
 image.
 
-Norwegian is **draft**.
+**Norsk bokmål — reviewed.** A person who reads the language has been through these surfaces and said these are the words an atlas should use. This is linguistic judgement, not corroboration against a source: unlike the constellation names next door, these are original translations written for this application and there is no citation to check them against. Recorded in `nb-NO.manifest`, and read from there rather than written here.
 
 ## Composed, not requested
 
-Each capture is built through `AtlasControls`, the
+Each capture is built through `AtlasChrome`, the
 application's own composition seam, starting from a
 language written to a preference node and read once by
 `SkyLanguageSession`. Neither control is constructed
@@ -21,7 +21,7 @@ That is deliberate. A sheet that asked each component
 for Norwegian would have photographed a correct
 toolbar during the whole period when the application
 was handing it English - which is exactly what
-happened, and what `AtlasControlsCompositionTest` now
+happened, and what `AtlasChromeCompositionTest` now
 holds.
 
 ## What is translated here, and what is not
