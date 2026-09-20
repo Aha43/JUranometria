@@ -87,7 +87,7 @@ class SkyLanguageStoreTest {
         }
     }
 
-    /** Saving writes both keys, never half a choice. */
+    /** Saving writes the settled key, and leaves the other absent. */
     @Test
     void savingWritesTheWholeChoice() throws Exception {
         Preferences node = scratch();
@@ -97,14 +97,18 @@ class SkyLanguageStoreTest {
             store.save(SkyLanguageChoice.read(Map.of(), INSTALLED)
                     .withChart(NORWEGIAN));
 
-            assertEquals(Map.of(
-                            SkyLanguageChoice.INTERFACE_KEY, "en",
-                            SkyLanguageChoice.CHART_KEY, "nb-NO"),
+            assertEquals(Map.of(SkyLanguageChoice.CHART_KEY, "nb-NO"),
                     store.stated(),
-                    "choosing a chart language records the interface"
-                            + " too, because leaving it absent would"
-                            + " say the reader was never asked about"
-                            + " something they have just settled");
+                    "choosing a chart language records the CHART"
+                            + " language and nothing else. These are"
+                            + " two questions, and answering one is"
+                            + " not answering the other: a reader who"
+                            + " names the sky in Norwegian has not"
+                            + " chosen English for the application"
+                            + " merely because English was showing"
+                            + " beside it. Writing it would pin an"
+                            + " upgrading reader to a value they"
+                            + " never picked");
             assertTrue(store.everChosen());
         } finally {
             node.removeNode();

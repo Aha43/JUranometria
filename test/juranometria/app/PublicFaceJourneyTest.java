@@ -128,8 +128,6 @@ class PublicFaceJourneyTest {
             // no synthetic click could establish (#348).
             assertEquals(java.util.Map.of(
                             juranometria.ui.language.SkyLanguageChoice
-                                    .INTERFACE_KEY, "en",
-                            juranometria.ui.language.SkyLanguageChoice
                                     .CHART_KEY, "nb-NO"),
                     languageStore.stated(),
                     "the real press reached the language seam and"

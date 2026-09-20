@@ -187,7 +187,7 @@ class SettingsLanguageTest {
         }
     }
 
-    /** Choosing Norwegian names updates, saves both keys, rebuilds. */
+    /** Choosing Norwegian names updates, saves that key, rebuilds. */
     @Test
     void choosingNorwegianNamesSavesBothKeysAndRebuildsThePage()
             throws Exception {
@@ -209,9 +209,11 @@ class SettingsLanguageTest {
 
             assertEquals(NORWEGIAN, session.namesOnTheChart(),
                     "the session shows it");
-            assertEquals(Map.of(SkyLanguageChoice.INTERFACE_KEY, "en",
-                            SkyLanguageChoice.CHART_KEY, NORWEGIAN),
-                    store.stated(), "both keys are written");
+            assertEquals(Map.of(SkyLanguageChoice.CHART_KEY, NORWEGIAN),
+                    store.stated(),
+                    "the chart key is written and the interface key"
+                            + " is not: the reader acted on one"
+                            + " selector, and consent is per key");
             assertEquals(List.of(NORWEGIAN), rebuilt,
                     "and the page was rebuilt once, in the new"
                             + " language");

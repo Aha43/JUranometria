@@ -31,7 +31,10 @@ import java.util.prefs.Preferences;
  * being answered on their behalf the first time the application
  * starts.
  *
- * <p><strong>Saving writes both keys.</strong> Persisting half a
+ * <p><strong>Saving writes what was settled.</strong> This once
+ * wrote both keys whenever either was chosen; per-key consent
+ * replaced that, because confirming a dialog is not acting on every
+ * control in it. Persisting half a
  * choice would leave the other an absence, and absence is reserved
  * for "never asked" - a reader who picked a chart language would
  * otherwise be recorded as never having been asked about the
@@ -47,7 +50,7 @@ public interface SkyLanguageStore {
     /** What the store holds, unresolved: absent keys stay absent. */
     Map<String, String> stated();
 
-    /** Remembers the whole choice, both keys together. */
+    /** Remembers a choice - each key only if it was settled. */
     void save(SkyLanguageChoice choice);
 
     /** Whether the reader has ever chosen either setting. */

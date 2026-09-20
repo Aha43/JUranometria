@@ -157,13 +157,15 @@ class ReaderSkyLanguageTest {
                     "and the session still speaks Norwegian: Reset"
                             + " view is about where they are, not"
                             + " what the sky is called");
-            assertEquals(Map.of(SkyLanguageChoice.INTERFACE_KEY, "en",
-                            SkyLanguageChoice.CHART_KEY, NORWEGIAN),
+            assertEquals(Map.of(SkyLanguageChoice.CHART_KEY, NORWEGIAN),
                     store.stated(),
                     "and their stored preference was not quietly"
                             + " reset with the view - a setting a"
                             + " reader chose must not be undone by a"
-                            + " button that says it returns a page");
+                            + " button that says it returns a page."
+                            + " The interface key is absent because"
+                            + " they never chose one, which Reset"
+                            + " View must not manufacture either");
 
             assertEquals(ChartViewState.DEFAULT.fieldWidthDegrees(),
                     navigation.state().fieldWidthDegrees(),

@@ -139,17 +139,57 @@ public final class SkyLanguageChoice {
 
     private final String chartLanguage;
 
-    private final boolean everChosen;
 
     private final Available available;
 
     private SkyLanguageChoice(String interfaceLanguage,
-                              String chartLanguage, boolean everChosen,
+                              String chartLanguage,
+                              boolean interfaceChosen,
+                              boolean chartChosen,
                               Available available) {
         this.interfaceLanguage = interfaceLanguage;
         this.chartLanguage = chartLanguage;
-        this.everChosen = everChosen;
+        this.interfaceChosen = interfaceChosen;
+        this.chartChosen = chartChosen;
         this.available = available;
+    }
+
+    /**
+     * Whether the reader has settled the interface question.
+     *
+     * <p><strong>Consent is per key</strong>, because the two
+     * settings are two questions. A reader who chooses Norwegian
+     * constellation names has answered the sky's question; they have
+     * not chosen English for the application merely because English
+     * is the fallback displayed beside it. Opening Settings and
+     * confirming something else is not an answer either.
+     *
+     * <p>This decides what is written down. An upgrading reader has
+     * no interface key, because the setting did not exist when they
+     * last used the atlas, and {@code SkyLanguageStore} is careful
+     * not to answer that silence when it reads - "the moment a read
+     * writes a default, the reader's silence has been answered for
+     * them and can never be migrated". A confirmation that wrote
+     * {@code en} would answer it just as finally.
+     *
+     * <p>Set by an explicit act - {@link #withInterface} - and never
+     * inferred from the value. Choosing the English already showing
+     * IS a choice, and must be recorded as one; it simply changes
+     * nothing a reader can see.
+     */
+    private final boolean interfaceChosen;
+
+    /** The same question, asked of the sky's names. */
+    private final boolean chartChosen;
+
+    /** Whether an interface language was ever actually chosen. */
+    public boolean interfaceChosen() {
+        return interfaceChosen;
+    }
+
+    /** Whether a chart language was ever actually chosen. */
+    public boolean chartChosen() {
+        return chartChosen;
     }
 
     /**
@@ -171,13 +211,13 @@ public final class SkyLanguageChoice {
                                          Available available) {
         String statedInterface = stored.get(INTERFACE_KEY);
         String statedChart = stored.get(CHART_KEY);
-        boolean chosen = statedInterface != null || statedChart != null;
         return new SkyLanguageChoice(
                 available.offers(INTERFACE_KEY, trim(statedInterface))
                         ? trim(statedInterface) : ENGLISH,
                 available.offers(CHART_KEY, trim(statedChart))
                         ? trim(statedChart) : FOLLOW,
-                chosen, available);
+                statedInterface != null, statedChart != null,
+                available);
     }
 
     private static String trim(String value) {
@@ -186,7 +226,10 @@ public final class SkyLanguageChoice {
 
     /** Whether either key was stored at all. */
     public boolean everChosen() {
-        return everChosen;
+        // Derived, not stored. Its only valid value is the OR of the
+        // two per-key facts, and a field beside them is a state the
+        // constructor can build and the model says cannot exist.
+        return interfaceChosen || chartChosen;
     }
 
     public String interfaceLanguage() {
@@ -228,16 +271,32 @@ public final class SkyLanguageChoice {
     }
 
     /**
-     * The complete explicit choice, for saving.
+     * What the reader has actually settled, for saving.
      *
-     * <p>Both keys, always. Persisting half a choice would leave the
-     * other an absence, and absence is reserved to mean "never
-     * asked".
+     * <p><strong>Each key is written only if that question was
+     * answered.</strong> This once said "both keys, always", on the
+     * reasoning that a half-written choice would leave the other an
+     * absence and absence is reserved to mean "never asked". The
+     * reasoning was right about what absence means and wrong about
+     * who had answered: confirming a dialog is not acting on every
+     * control in it, and under the old rule a reader upgrading from
+     * 2.0.0 who opened Settings and pressed OK was recorded as having
+     * chosen English - the one thing the absence exists to prevent.
+     *
+     * <p>So an unwritten key still means "never asked", and now it
+     * is true per question rather than per dialog.
      */
     public Map<String, String> toStore() {
+        // Only what has been settled. A key left out is a reader who
+        // has not answered that question, which stays true until
+        // they do - and stays migratable.
         Map<String, String> stored = new LinkedHashMap<>();
-        stored.put(INTERFACE_KEY, interfaceLanguage);
-        stored.put(CHART_KEY, chartLanguage);
+        if (interfaceChosen) {
+            stored.put(INTERFACE_KEY, interfaceLanguage);
+        }
+        if (chartChosen) {
+            stored.put(CHART_KEY, chartLanguage);
+        }
         return stored;
     }
 
@@ -251,16 +310,21 @@ public final class SkyLanguageChoice {
      * the way in and not on the way out.
      */
     public SkyLanguageChoice withInterface(String language) {
+        // An explicit act, so it settles the interface question -
+        // even when the value chosen is the fallback already
+        // showing. The chart question is left exactly as it was.
         return chosen(INTERFACE_KEY, language,
-                new SkyLanguageChoice(language, chartLanguage, true,
-                        available));
+                new SkyLanguageChoice(language, chartLanguage,
+                        true, chartChosen, available));
     }
 
     /** The same choice with a different chart language or mode. */
     public SkyLanguageChoice withChart(String language) {
+        // And the mirror of it: settling the sky's names says
+        // nothing about the application's own words.
         return chosen(CHART_KEY, language,
-                new SkyLanguageChoice(interfaceLanguage, language, true,
-                        available));
+                new SkyLanguageChoice(interfaceLanguage, language,
+                        interfaceChosen, true, available));
     }
 
     private SkyLanguageChoice chosen(String key, String value,

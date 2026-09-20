@@ -76,7 +76,7 @@ class SkyLanguageChoiceTest {
                         + " what its silence meant");
     }
 
-    /** Saving writes the whole choice, never half of it. */
+    /** Saving writes the question that was answered, not both. */
     @Test
     void savingPersistsBothKeysExplicitly() {
         Map<String, String> stored = new LinkedHashMap<>(
@@ -84,13 +84,14 @@ class SkyLanguageChoiceTest {
                         .withInterface(NORWEGIAN)
                         .toStore());
 
-        assertEquals(Map.of(
-                        SkyLanguageChoice.INTERFACE_KEY, "nb-NO",
-                        SkyLanguageChoice.CHART_KEY, "follow-interface"),
+        assertEquals(Map.of(SkyLanguageChoice.INTERFACE_KEY, "nb-NO"),
                 stored,
-                "changing one setting persists both, because leaving"
-                        + " the other absent would say 'never asked'"
-                        + " about something the reader just decided");
+                "changing one setting persists THAT setting. The"
+                        + " other question is still unanswered, and"
+                        + " an unanswered question is worth keeping:"
+                        + " it is what lets a later default reach a"
+                        + " reader who never chose, instead of"
+                        + " redefining what their silence meant");
     }
 
     /** Following is live: the chart moves with the interface. */
@@ -241,11 +242,12 @@ class SkyLanguageChoiceTest {
                     "nor the chart to \"" + refused + "\"");
         }
 
-        assertEquals(Map.of(SkyLanguageChoice.INTERFACE_KEY, "en",
-                        SkyLanguageChoice.CHART_KEY, "follow-interface"),
-                held.toStore(),
-                "and after all of that the choice is unchanged, so"
-                        + " nothing invalid could reach a store");
+        assertEquals(Map.of(), held.toStore(),
+                "and after all of that the choice is unchanged - a"
+                        + " read that refused every invalid value has"
+                        + " settled nothing, so there is nothing to"
+                        + " write and nothing invalid could reach a"
+                        + " store");
     }
 
     /** A pack may not claim to be one of the two chart modes. */

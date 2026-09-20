@@ -67,9 +67,10 @@ public final class SettingsDialog extends JDialog {
                     // back to it.
                     String wasInterface =
                             language.current().interfaceLanguage();
-                    // Both keys, always - and the choice the reader
-                    // is looking at even if they changed nothing,
-                    // because confirming an explicit Follow must
+                    // Whatever the reader settled - per key, and
+                    // only where they acted on that selector. When
+                    // they did act, it is the choice they are
+                    // looking at: confirming an explicit Follow must
                     // persist follow-interface rather than the Latin
                     // it happens to draw today.
                     language.choose(confirmed.language());
@@ -158,12 +159,27 @@ public final class SettingsDialog extends JDialog {
      */
     private static final String CONTROLS = "juranometria.settings.controls";
 
+    /**
+     * The dialog's controls, and which language questions the reader
+     * actually acted on.
+     *
+     * <p>Consent is per key and comes from the <strong>control's own
+     * event</strong>, never from comparing values. A reader may
+     * deliberately open the interface selector and choose the English
+     * already showing: that settles the question and must be written
+     * down, and no comparison of before and after could tell it apart
+     * from never touching the selector at all.
+     */
     private record Controls(JRadioButton dark,
                             JComboBox<juranometria.ui.language
                                     .SkyLanguageChoices.Item> interfaceBox,
                             JComboBox<juranometria.ui.language
                                     .SkyLanguageChoices.Item> chartBox,
-                            Languages languages) {
+                            Languages languages,
+                            java.util.concurrent.atomic.AtomicBoolean
+                                    interfaceActedOn,
+                            java.util.concurrent.atomic.AtomicBoolean
+                                    chartActedOn) {
     }
 
     /**
@@ -172,7 +188,8 @@ public final class SettingsDialog extends JDialog {
      * <p>The confirmation seam, named so that both halves of the
      * evidence can reach the same code. What each selector means -
      * that Follow stays Follow rather than becoming the Latin it
-     * draws, that both keys travel together - is asserted here,
+     * draws, and that each key travels only when its own selector
+     * was acted on - is asserted here,
      * headlessly, where the tokens are visible. That OK actually
      * reaches this is asserted by a reader pressing the real button
      * in a real window.
@@ -190,10 +207,19 @@ public final class SettingsDialog extends JDialog {
             throw new IllegalStateException(
                     "this is not a Settings panel");
         }
-        return new Confirmed(controls.dark().isSelected(),
-                controls.languages().current()
-                        .withInterface(token(controls.interfaceBox()))
-                        .withChart(token(controls.chartBox())));
+        // Per key, and only where the reader acted. Confirming a
+        // dialog is not answering every question in it: an upgrading
+        // reader who presses OK has settled nothing, and their absent
+        // interface key stays absent and migratable.
+        juranometria.ui.language.SkyLanguageChoice settled =
+                controls.languages().current();
+        if (controls.interfaceActedOn().get()) {
+            settled = settled.withInterface(token(controls.interfaceBox()));
+        }
+        if (controls.chartActedOn().get()) {
+            settled = settled.withChart(token(controls.chartBox()));
+        }
+        return new Confirmed(controls.dark().isSelected(), settled);
     }
 
     /**
@@ -385,8 +411,18 @@ public final class SettingsDialog extends JDialog {
         buttons.add(right, BorderLayout.EAST);
         buttons.setAlignmentX(0.0f);
         panel.add(buttons);
+        java.util.concurrent.atomic.AtomicBoolean interfaceActedOn =
+                new java.util.concurrent.atomic.AtomicBoolean();
+        java.util.concurrent.atomic.AtomicBoolean chartActedOn =
+                new java.util.concurrent.atomic.AtomicBoolean();
+        // Added AFTER the selectors are preset, so presetting them is
+        // not mistaken for the reader acting.
+        interfaceBox.addActionListener(
+                event -> interfaceActedOn.set(true));
+        chartBox.addActionListener(event -> chartActedOn.set(true));
         panel.putClientProperty(CONTROLS,
-                new Controls(dark, interfaceBox, chartBox, languages));
+                new Controls(dark, interfaceBox, chartBox, languages,
+                        interfaceActedOn, chartActedOn));
         return panel;
     }
 
