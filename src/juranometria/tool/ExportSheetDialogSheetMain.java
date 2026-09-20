@@ -88,6 +88,11 @@ public final class ExportSheetDialogSheetMain {
                     SheetFormat.PNG, PaperSize.A4, false));
 
     public static void main(String[] args) throws Exception {
+        // ONCE, before any dialog exists - not per sheet. Installing
+        // a look and feel replaces the defaults table under whatever
+        // is already laid out, and these six sheets are drawn one
+        // after another in a single JVM.
+        SwingUtilities.invokeAndWait(() -> juranometria.app.UiTheme.apply(false));
         if (args.length > 0 && !args[0].isBlank()) {
             out = Path.of(args[0]);
         }
@@ -274,7 +279,6 @@ public final class ExportSheetDialogSheetMain {
         JComponent[] content = new JComponent[1];
         try {
             SwingUtilities.invokeAndWait(() -> {
-                juranometria.app.UiTheme.apply(false);
                 content[0] = ExportSheetDialog.contentForStudy(said);
                 owner[0] = new JFrame("study");
                 owner[0].setContentPane(content[0]);
@@ -294,6 +298,7 @@ public final class ExportSheetDialogSheetMain {
             // label's preferred width depends on having been laid
             // out. SheetCapture packs until the size repeats.
             SheetCapture.settle(owner[0], content[0]);
+            requireState(content[0], state);
             return capture(content[0], to);
         } finally {
             SwingUtilities.invokeAndWait(() -> {
@@ -302,6 +307,60 @@ public final class ExportSheetDialogSheetMain {
                 }
             });
         }
+    }
+
+    /**
+     * The state this sheet says it is a picture of.
+     *
+     * <p>A premise, because a sheet captured before its controls
+     * caught up is a picture of the previous state wearing this
+     * one's caption. About one run in a dozen reported one sheet at
+     * the size of the state before it - 326x206 where 333x223 was
+     * expected - and nothing in the file said so; the run simply
+     * disagreed with the run beside it.
+     *
+     * <p>Asserted after settling and before painting. If the dialog
+     * does not hold what was asked of it, nothing is written: a
+     * missing sheet is a question, and a mislabelled one is an
+     * answer nobody checks.
+     */
+    private static void requireState(JComponent content, State state)
+            throws Exception {
+        String[] wrong = new String[1];
+        SwingUtilities.invokeAndWait(() ->
+                wrong[0] = disagreement(content, state));
+        if (wrong[0] != null) {
+            throw new IllegalStateException("this sheet claims to show"
+                    + " \"" + state.title() + "\" and the dialog does"
+                    + " not agree: " + wrong[0]);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String disagreement(JComponent content, State state) {
+        Component format = find(content, "export.format");
+        Component paper = find(content, "export.paper");
+        Component marks = find(content, "export.working");
+        if (!(format instanceof JComboBox)
+                || !(paper instanceof JComboBox)
+                || !(marks instanceof JCheckBox box)) {
+            return "the dialog has no format, paper or marks control";
+        }
+        Object shownFormat =
+                ((JComboBox<Object>) format).getSelectedItem();
+        Object shownPaper = ((JComboBox<Object>) paper).getSelectedItem();
+        if (!state.format().equals(shownFormat)) {
+            return "format is " + shownFormat + ", not "
+                    + state.format();
+        }
+        if (!state.paper().equals(shownPaper)) {
+            return "paper is " + shownPaper + ", not " + state.paper();
+        }
+        if (box.isSelected() != state.marks()) {
+            return "marks is " + box.isSelected() + ", not "
+                    + state.marks();
+        }
+        return null;
     }
 
     private static String capture(JComponent content, Path to)

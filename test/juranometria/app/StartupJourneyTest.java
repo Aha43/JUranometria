@@ -121,6 +121,84 @@ class StartupJourneyTest {
     }
 
     /**
+     * The drawn page speaks the language the last session stored.
+     *
+     * <p>The owner found this the honest way: they chose Norsk
+     * bokmål, and the chart's title block went on saying
+     * <em>Centre</em> and <em>Field</em>. Nothing was missing - the
+     * words existed, and restarting produced them - so the question
+     * was never whether the translation was there but whether it
+     * reached the thing that draws.
+     *
+     * <p>Which is why this asks the <strong>started application's
+     * own chart</strong> rather than a {@code PageText} built here.
+     * A unit test on the resources would have passed throughout the
+     * defect. What matters is the instance the renderer holds after
+     * a real startup from a stored choice.
+     */
+    @Test
+    void theStartedApplicationDrawsItsTitleBlockInTheStoredLanguage()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a window has to exist for a chart to be in it");
+        running("nb-NO", true, app -> {
+            juranometria.ui.ChartComponent chart = chartIn(app.frame());
+            assertNotNull(chart, "the application has a chart");
+            juranometria.project.PageWords words = chart.words();
+
+            // The premise, so this cannot pass vacuously: the title
+            // block is really two lines of real prose.
+            String centre = words.titleCentre("00h 42m 44s",
+                    "+41° 16′ 09″");
+            String facts = words.titleFacts("8.0", "8.0",
+                    words.projection("gnomonic"));
+            assertTrue(centre.length() > 20 && facts.length() > 20,
+                    "the title block says something: \"" + centre
+                            + "\" / \"" + facts + "\"");
+
+            assertTrue(centre.startsWith("Sentrum"),
+                    "the centre line is Norwegian: " + centre);
+            assertTrue(facts.startsWith("Felt"),
+                    "and so is the facts line: " + facts);
+            assertTrue(!centre.startsWith("Centre")
+                            && !facts.startsWith("Field"),
+                    "with the English the owner actually saw absent:"
+                            + " \"" + centre + "\" / \"" + facts + "\"");
+            assertTrue(!words.magnitudeKeyHeading()
+                            .equals("Stars, visual magnitude"),
+                    "and the magnitude key heading translated too: "
+                            + words.magnitudeKeyHeading());
+
+            // What a screen reader is told about the same page.
+            assertTrue(chart.getAccessibleContext()
+                            .getAccessibleName() != null
+                            && !chart.getAccessibleContext()
+                                    .getAccessibleName()
+                                    .equals("Star chart"),
+                    "the chart's spoken name is the reader's too: "
+                            + chart.getAccessibleContext()
+                                    .getAccessibleName());
+        });
+    }
+
+    /** The chart inside a started application. */
+    private static juranometria.ui.ChartComponent chartIn(
+            java.awt.Container from) {
+        for (java.awt.Component child : from.getComponents()) {
+            if (child instanceof juranometria.ui.ChartComponent chart) {
+                return chart;
+            }
+            if (child instanceof java.awt.Container nested) {
+                juranometria.ui.ChartComponent found = chartIn(nested);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Starts the real application with scratch stores and hands the
      * result to a caller.
      *

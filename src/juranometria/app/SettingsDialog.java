@@ -62,6 +62,11 @@ public final class SettingsDialog extends JDialog {
                 confirmed -> {
                     applyTheme.accept(
                             session.confirmChoice(confirmed.dark()));
+                    // Read BEFORE choosing: this is the language the
+                    // reader had, and afterwards there is no way
+                    // back to it.
+                    String wasInterface =
+                            language.current().interfaceLanguage();
                     // Both keys, always - and the choice the reader
                     // is looking at even if they changed nothing,
                     // because confirming an explicit Follow must
@@ -69,10 +74,46 @@ public final class SettingsDialog extends JDialog {
                     // it happens to draw today.
                     language.choose(confirmed.language());
                     dispose();
+                    // Last, and after the choice is saved. The
+                    // interface language is restart-bound and the
+                    // session it leaves behind is a mixed one -
+                    // dialogs opened from here on speak the new
+                    // language, while the menu bar, the toolbar and
+                    // the drawn page keep the language they were
+                    // built in. The owner met exactly that and
+                    // reasonably read it as a bug.
+                    tellAboutRestart(owner, wasInterface,
+                            confirmed.language().interfaceLanguage());
                 }));
         AboutDialog.installEscapeToClose(this);
         pack();
         setLocationRelativeTo(owner);
+    }
+
+    /**
+     * Says that the interface language needs a restart, once.
+     *
+     * <p>Nothing here may break saving. The choice is already
+     * persisted when this runs, so a language that will not load, or
+     * a toolkit that will not open a dialog, must cost the reader a
+     * sentence and not their settings.
+     */
+    private static void tellAboutRestart(Frame owner, String was,
+                                         String now) {
+        try {
+            juranometria.ui.language.InterfaceRestartNotice.Said said =
+                    juranometria.ui.language.InterfaceRestartNotice
+                            .forChoice(was, now);
+            if (said == null) {
+                return;
+            }
+            javax.swing.JOptionPane.showMessageDialog(owner,
+                    said.message(), said.title(),
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        } catch (RuntimeException | Error ignored) {
+            // Deliberately swallowed, and deliberately narrow in
+            // effect: the reader loses a notice, never a setting.
+        }
     }
 
     /** Opens the dialog owned by and centred on the atlas window. */

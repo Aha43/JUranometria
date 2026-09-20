@@ -25,7 +25,7 @@ easily left in English without anyone noticing.
 | label | This session was started with --dark; the chosen appearance applies from the next launch. | Dark override note | — |
 | label | Language | Language | — |
 | label | Interface language | Interface language | — |
-| selector | English · Norsk bokmål | Interface language | The language used by menus, dialogs and other application controls. It does not change the names printed on the chart, which are chosen separately below. Takes effect the next time JUranometria starts. |
+| selector | English · Norsk bokmål | Interface language | The language used by menus, dialogs and other application controls. It does not change the names printed on the chart, which are chosen separately below. Takes effect throughout the application the next time JUranometria starts. |
 | label | Names on chart | Names on chart | — |
 | selector | Follow interface — currently Latin (IAU) · Latin (IAU) · Norsk bokmål | Names on chart | The language of the constellation names printed on the chart itself. Separate from the interface language, so the sky can be named in your own language while the menus stay in another. "Follow interface" keeps the two together whatever the interface is set to; it says what it currently draws, because with one interface language installed it draws the same page as Latin. |
 | button | Cancel | Cancel | Closes this window without saving changes |
@@ -41,7 +41,7 @@ easily left in English without anyone noticing.
 | label | Denne økten ble startet med --dark. Valgt utseende brukes fra neste oppstart. | Merknad om overstyrt mørkt utseende | — |
 | label | Språk | Språk | — |
 | label | Språk i programmet | Språk i programmet | — |
-| selector | English · Norsk bokmål | Språk i programmet | Språket i menyer, dialogvinduer og andre kontroller. Det endrer ikke navnene på kartet; de velges separat nedenfor. Tas i bruk neste gang JUranometria starter. |
+| selector | English · Norsk bokmål | Språk i programmet | Språket i menyer, dialogvinduer og andre kontroller. Det endrer ikke navnene på kartet; de velges separat nedenfor. Tas i bruk i hele programmet neste gang JUranometria starter. |
 | label | Navn på kartet | Navn på kartet | — |
 | selector | Følg grensesnittet — nå: Norsk bokmål · Latin (IAU) · Norsk bokmål | Navn på kartet | Språket for stjernebildenavn på selve kartet. Det kan velges uavhengig av språket i programmet. «Følg grensesnittet» bruker samme språk når et navnesett for kartet finnes, ellers latin, og viser hvilket språk kartet bruker nå. |
 | button | Avbryt | Avbryt | Lukker vinduet uten å lagre endringene. |

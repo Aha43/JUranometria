@@ -285,8 +285,16 @@ public final class SwingChromeSheetMain {
      */
     private static java.io.File fixture() {
         try {
-            Path parent = Files.createTempDirectory("chrome-fixture");
-            Path folder = Files.createDirectory(
+            // A FIXED location, not a temp directory with a
+            // generated name. CI found the difference: this sheet
+            // disagreed between two runs on Linux, where the
+            // chooser's directory control shows more of the path
+            // than macOS does - so the random parent's name was in
+            // the picture. A fixture whose own name changes every
+            // run is not a fixture.
+            Path parent = Path.of("build", "chrome-fixture");
+            removeTree(parent);
+            Path folder = Files.createDirectories(
                     parent.resolve("Documents"));
             FIXTURES.add(parent);
             for (String name : List.of("Kart", "Notater")) {
@@ -309,12 +317,20 @@ public final class SwingChromeSheetMain {
     /** Removes every fixture this run created. */
     private static void removeFixtures() throws java.io.IOException {
         for (Path parent : FIXTURES) {
-            try (var files = Files.walk(parent)) {
-                files.sorted(java.util.Comparator.reverseOrder())
-                        .forEach(one -> one.toFile().delete());
-            }
+            removeTree(parent);
         }
         FIXTURES.clear();
+    }
+
+    /** Clears a fixture, whether or not a previous run left one. */
+    private static void removeTree(Path parent) throws java.io.IOException {
+        if (!Files.exists(parent)) {
+            return;
+        }
+        try (var files = Files.walk(parent)) {
+            files.sorted(java.util.Comparator.reverseOrder())
+                    .forEach(one -> one.toFile().delete());
+        }
     }
 
     /**
