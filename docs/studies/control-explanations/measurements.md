@@ -75,7 +75,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Export Chart Sheet | JButton | Export... | Choose where to save the sheet | Opens the file chooser and writes the sheet where you save it | hovered |
 | Settings | JRadioButton | Light | &mdash; | Draws the window's own chrome light. The chart is drawn the same either way. | self-explanatory |
 | Settings | JRadioButton | Dark | &mdash; | Draws the window's own chrome dark. The chart is drawn the same either way; the black s... | self-explanatory |
-| Settings | JComboBox | (Interface language) | The language of the menus, buttons and dialogs - not the names printed on the chart | The language of the menus, buttons and dialogs - the words the application speaks to yo... | hovered |
+| Settings | JComboBox | (Interface language) | The language of the menus, buttons and dialogs - not the names printed on the chart | The language used by menus, dialogs and other application controls. It does not change ... | hovered |
 | Settings | JComboBox | (Names on chart) | The language of the constellation names printed on the chart - separate from the interf... | The language of the constellation names printed on the chart itself. Separate from the ... | hovered |
 | Settings | JButton | Cancel | &mdash; | Closes this window without saving changes | self-explanatory |
 | Settings | JButton | OK | &mdash; | Saves the choices and closes this window | self-explanatory |

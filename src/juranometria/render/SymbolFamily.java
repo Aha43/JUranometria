@@ -23,44 +23,32 @@ import juranometria.chart.DsoType;
 public enum SymbolFamily {
 
     GALAXIES(ChartRenderer.Symbol.ELLIPSE, "Galaxies", 'G',
-            "Galaxies, drawn at their catalogued size and orientation,"
-                    + " including close pairs, triplets and groups.",
             "M 31, M 51, NGC 3628"),
 
     OPEN_CLUSTERS(ChartRenderer.Symbol.DOTTED_CIRCLE, "Open clusters", 'O',
-            "Loose clusters of young stars in the plane of the Milky"
-                    + " Way.",
             "M 45, M 44, NGC 869"),
 
     GLOBULAR_CLUSTERS(ChartRenderer.Symbol.CROSSED_CIRCLE,
             "Globular clusters", 'C',
-            "Dense, ancient balls of stars in the galactic halo.",
             "M 13, M 22, NGC 5139"),
 
     NEBULAE(ChartRenderer.Symbol.BOX, "Nebulae", 'U',
-            "Clouds of gas and dust: emission, reflection and dark"
-                    + " nebulae, H II regions, supernova remnants, and"
-                    + " clusters still wrapped in nebulosity.",
             "M 42, M 1, NGC 7000"),
 
     PLANETARY_NEBULAE(ChartRenderer.Symbol.PLANETARY, "Planetary nebulae",
             'P',
-            "Shells thrown off by dying stars, drawn small and crossed"
-                    + " so they read apart from the other nebulae.",
             "M 57, M 27, NGC 7009");
 
     private final ChartRenderer.Symbol symbol;
     private final String label;
     private final char mnemonic;
-    private final String description;
     private final String examples;
 
     SymbolFamily(ChartRenderer.Symbol symbol, String label, char mnemonic,
-                 String description, String examples) {
+                 String examples) {
         this.symbol = symbol;
         this.label = label;
         this.mnemonic = mnemonic;
-        this.description = description;
         this.examples = examples;
     }
 

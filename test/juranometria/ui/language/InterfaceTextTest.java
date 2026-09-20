@@ -313,4 +313,76 @@ class InterfaceTextTest {
                 "the premise: both languages ship strings - " + tags);
         return tags;
     }
+    /**
+     * One escape, and the shipped values that use it.
+     *
+     * <p>This file is one line per key, so a value needing two lines
+     * had no way to say so - and the overwrite question had been
+     * saying so since the export surface was written, showing a
+     * reader a literal backslash and n in English and Norwegian
+     * alike for as long as it shipped. The resource was right; the
+     * reader of it was not.
+     */
+    @Test
+    void theOnlySupportedEscapeIsALineBreak() throws Exception {
+        for (String tag : java.util.List.of("en", "nb-NO")) {
+            String question = InterfaceText.forLanguage(tag)
+                    .say("export.replace.question", "orion.svg",
+                            "~/Documents");
+            assertTrue(question.contains("\n"),
+                    tag + ": the question is two lines: " + question);
+            assertTrue(!question.contains("\\n"),
+                    tag + ": and shows no backslash: " + question);
+            assertEquals(2, question.split("\n").length,
+                    tag + ": exactly two, in order");
+        }
+
+        // The premise: these two are the ONLY shipped values using an
+        // escape, so the grammar stays one narrow decision rather
+        // than a general properties reader arriving by the back door.
+        java.util.List<String> escaped = new java.util.ArrayList<>();
+        for (String pack : java.util.List.of("en", "nb-NO")) {
+            java.nio.file.Path file = java.nio.file.Path.of(
+                    "src/resources/interface-language/" + pack
+                            + ".properties");
+            int line = 0;
+            for (String one : java.nio.file.Files.readAllLines(file)) {
+                line++;
+                if (one.contains("\\") && !one.strip().startsWith("#")) {
+                    escaped.add(pack + ":" + line + " "
+                            + one.split("=")[0].strip());
+                }
+            }
+        }
+        assertEquals(java.util.List.of(
+                        "en:427 export.replace.question",
+                        "nb-NO:373 export.replace.question"),
+                escaped,
+                "only the overwrite question uses an escape, in each"
+                        + " language: " + escaped);
+    }
+
+    /** Anything else is refused, with its key and its file. */
+    @Test
+    void anUnsupportedEscapeIsRefusedRatherThanAlteredOrPrinted() {
+        IllegalStateException thrown = assertThrows(
+                IllegalStateException.class,
+                () -> InterfaceText.forLanguage("x-escape",
+                        InterfaceTextTest::escapePack)
+                        .say("settings.title"));
+        assertTrue(thrown.getMessage().contains("x-escape")
+                        && thrown.getMessage().contains("tab.key"),
+                "it names the file and the key: "
+                        + thrown.getMessage());
+    }
+
+    private static java.io.InputStream escapePack(String path) {
+        String pack = path.endsWith("x-escape.properties")
+                ? "tab.key = one\\ttwo\n" : null;
+        if (pack == null) {
+            return InterfaceText.class.getResourceAsStream(path);
+        }
+        return new java.io.ByteArrayInputStream(pack.getBytes(
+                java.nio.charset.StandardCharsets.UTF_8));
+    }
 }

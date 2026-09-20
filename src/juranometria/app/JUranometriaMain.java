@@ -83,6 +83,27 @@ public final class JUranometriaMain {
         juranometria.ui.language.SkyLanguageSession language =
                 juranometria.ui.language.SkyLanguageSession.begin(
                         stores.language(), Atlas.languages());
+        // The toolkit's own words, before any component exists.
+        //
+        // Swing resolves its buttons, its chooser and every hover and
+        // spoken name in them against Locale.getDefault() - the
+        // operating system - so a reader was asked a Norwegian
+        // question and answered it with "Yes". These are installed
+        // over the toolkit's, in whichever language the reader chose,
+        // and the language cannot move beneath them: it is read once
+        // above and never consulted again.
+        //
+        // UiTheme knows nothing about language and must not: a look
+        // and feel is a look and feel. The two are PAIRED here, and
+        // everywhere else `apply` is called, because installing a
+        // look and feel replaces the defaults table and takes these
+        // with it (#350).
+        juranometria.ui.language.SwingText toolkitWords =
+                juranometria.ui.language.SwingText.in(
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()));
+        toolkitWords.installInto(javax.swing.UIManager.getDefaults());
+
         // The catalogues verify themselves as they load, so they are
         // loaded before any window exists: a damaged download should
         // be explained, not half-drawn behind a frame that will never
@@ -275,7 +296,14 @@ public final class JUranometriaMain {
         frame.setJMenuBar(controls.menuBar(controller,
                 () -> SettingsDialog.open(frame, appearance,
                         effectiveDark -> {
+                            // The ordered pair, again. A new look and
+                            // feel replaces the defaults table, so
+                            // the toolkit's words have to be put back
+                            // before anything is refreshed with them
+                            // (#350).
                             UiTheme.apply(effectiveDark);
+                            toolkitWords.installInto(
+                                    javax.swing.UIManager.getDefaults());
                             com.formdev.flatlaf.FlatLaf.updateUI();
                         }, language, Atlas.names(), interfaces),
                 () -> ChartOptionsDialog.open(frame, chartOptions,

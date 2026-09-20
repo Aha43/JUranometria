@@ -87,8 +87,13 @@ public final class ExportSheetSession {
             public java.util.Optional<File> chooseWhere(Frame owner,
                     String suggestedName) {
                 JFileChooser chooser = new JFileChooser();
-                // Ours; the chooser's buttons, places and filename
-                // field belong to the platform (#350).
+                // Ours - and since #350 so are the chooser's own
+                // forty-one words: its buttons, labels, hovers and
+                // spoken names are installed from the reader's
+                // interface language at startup, where Swing used to
+                // take them from the operating system. What remains
+                // the platform's is filesystem DATA: volume and
+                // folder names, and the list of places.
                 chooser.setDialogTitle(said.say("export.chooser.title"));
                 chooser.setSelectedFile(new File(suggestedName));
                 return chooser.showSaveDialog(owner)

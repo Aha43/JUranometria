@@ -239,6 +239,61 @@ public final class InterfaceText {
         return english.get(key);
     }
 
+    /**
+     * One escape, and only one: {@code \n} becomes a line break.
+     *
+     * <p>This file is one line per key, and a value that needs two
+     * lines had no way to say so. The overwrite question did say so -
+     * it has carried {@code .\nReplace it?} since the export
+     * surface was written - and a reader was shown the backslash and
+     * the n, in English and in Norwegian alike. The resource was
+     * right; the reader of it was not.
+     *
+     * <p><strong>Deliberately not general escaping.</strong> Java
+     * properties decode tabs, unicode escapes, line
+     * continuations and more, and adopting all of that would make
+     * every existing value in every language pay for one surface's
+     * shape - and would quietly change any value that happens to
+     * contain a backslash. So exactly one escape is supported, and
+     * anything else is <strong>refused with its key and its file</strong>
+     * rather than silently altered or silently printed. The startup
+     * remedies stay whole documents; this does not invite them back
+     * (#350).
+     *
+     * <p>Decoding happens on the pattern, before {@code MessageFormat}
+     * inserts anything, so an argument containing a backslash - a
+     * Windows path a reader chose - is untouched.
+     */
+    private static String decode(String path, String key, String value) {
+        int at = value.indexOf('\\');
+        if (at < 0) {
+            return value;
+        }
+        StringBuilder out = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c != '\\') {
+                out.append(c);
+                continue;
+            }
+            char next = i + 1 < value.length() ? value.charAt(i + 1) : 0;
+            if (next != 'n') {
+                throw new IllegalStateException(path + " defines \""
+                        + key + "\" with the escape \"\\" + (next == 0
+                                ? "" : String.valueOf(next))
+                        + "\", which this reader does not support. It"
+                        + " understands \\n and nothing else, on"
+                        + " purpose: a value that quietly meant"
+                        + " something other than it said is how a"
+                        + " reader came to be shown a backslash and an"
+                        + " n for two years (#350).");
+            }
+            out.append('\n');
+            i++;
+        }
+        return out.toString();
+    }
+
     private static Map<String, String> read(Resources resources,
                                             String tag) {
         String path = STRINGS + tag + ".properties";
@@ -262,8 +317,8 @@ public final class InterfaceText {
                                 + line + "\"");
                     }
                     String key = line.substring(0, is).strip();
-                    if (said.put(key, line.substring(is + 1).strip())
-                            != null) {
+                    if (said.put(key, decode(path, key,
+                            line.substring(is + 1).strip())) != null) {
                         throw new IllegalStateException(path
                                 + " defines \"" + key + "\" twice, so"
                                 + " one of the two is never said");

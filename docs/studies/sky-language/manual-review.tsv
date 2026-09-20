@@ -59,11 +59,11 @@ d525afcda7732e1d	geo/SkyNames.java	latin	declared name used, but never at a know
 faa2a1e5daf0d9b9	geo/SkyNames.java	/resources/sky-language/index.tsv	declared name used, but never at a known sink	identifier	the classpath path of the generated pack index
 14a52e5dbbea579a	geo/SkyNames.java	/resources/sky-language/	declared name used, but never at a known sink	identifier	the classpath prefix the packs live under
 815a76a718d7ba3f	meridian/MeridianModule.java	meridian	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
-2b42a0817c34dead	render/SymbolFamily.java	M 31, M 51, NGC 3628	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
-6dbd9f1eee6abcb2	render/SymbolFamily.java	M 45, M 44, NGC 869	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
-7da8e70f4ab2c1cf	render/SymbolFamily.java	M 13, M 22, NGC 5139	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
-2ad4f5cd3da6ba2f	render/SymbolFamily.java	M 42, M 1, NGC 7000	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
-ff85096f134bcd53	render/SymbolFamily.java	M 57, M 27, NGC 7009	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+4b1e27082972644d	render/SymbolFamily.java	M 31, M 51, NGC 3628	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+a55f72d575977d8c	render/SymbolFamily.java	M 45, M 44, NGC 869	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+b2a9f86f4740c1ea	render/SymbolFamily.java	M 13, M 22, NGC 5139	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+09374252a6cdeecb	render/SymbolFamily.java	M 42, M 1, NGC 7000	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
+ce64949292039ca0	render/SymbolFamily.java	M 57, M 27, NGC 7009	unresolved: no route found, needs manual inspection	notation	catalogue designations shown as examples; never translated
 1a1fee49b6ca4285	search/LocalSearch.java	\\d+$	declared name used, but never at a known sink	false-positive	regular-expression: a regular expression, not words
 dc5dc035114e38ac	search/LocalSearch.java	\\s+	declared name used, but never at a known sink	false-positive	regular-expression: a regular expression, not words
 5758dde4362a06f8	search/LocalSearch.java	\\s*,\\s*|\\s+	collection/alias flow not traced	false-positive	regular-expression: a regular expression, not words

@@ -676,6 +676,84 @@ class StartupJourneyTest {
         return null;
     }
 
+    // ---- the toolkit's own words, installed by the application --
+
+    /**
+     * Starting the application installs the toolkit's words.
+     *
+     * <p>Packaged acceptance can prove the adapter and the packaged
+     * resources; only this proves the <em>wiring</em> - that
+     * {@code JUranometriaMain} performs the install, and performs it
+     * before a reader could meet a dialog.
+     *
+     * <p>Under a <strong>German default locale</strong>, because on
+     * an English machine "the atlas installed Norwegian" and "the
+     * platform happened to agree" are the same observation. German is
+     * a locale the JDK really translates, so anything not installed
+     * comes back as {@code Nein} or {@code Abbrechen}.
+     */
+    @Test
+    void startingTheApplicationInstallsTheToolkitWords()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "starting the application means making a window");
+        java.util.Locale before = java.util.Locale.getDefault();
+        java.util.Map<String, Object> saved =
+                new java.util.LinkedHashMap<>();
+        for (String key : juranometria.ui.language.SwingText
+                .toolkitKeys()) {
+            saved.put(key, javax.swing.UIManager.getDefaults().get(key));
+        }
+        // Through the shared guard, which is what the evidence gate
+        // counts: two process-wide things move here - the default
+        // locale and forty-one entries in the defaults table - and
+        // restoring them on the success path only is the shape the
+        // gate exists to catch.
+        // Through the guards the evidence gate counts:
+        // restoringLocale for the default locale, and a cleanup that
+        // puts back forty-one defaults entries - including the ones
+        // that were ABSENT, which is most of them.
+        SwingSession.restoringLocale(() -> SwingSession.guarded(() -> {
+            java.util.Locale.setDefault(java.util.Locale.GERMANY);
+            running("nb-NO", true, app -> {
+                for (String key : juranometria.ui.language.SwingText
+                        .toolkitKeys()) {
+                    Object value =
+                            javax.swing.UIManager.getDefaults().get(key);
+                    assertNotNull(value, key + " was installed by the"
+                            + " application itself");
+                }
+                assertEquals("Nei", javax.swing.UIManager.getString(
+                                "OptionPane.noButtonText"),
+                        "a Norwegian session answers in Norwegian on a"
+                                + " German desktop");
+                assertEquals("Avbryt", javax.swing.UIManager.getString(
+                                "FileChooser.cancelButtonText"),
+                        "and so does its file chooser");
+                assertEquals("Opp ett nivå",
+                        javax.swing.UIManager.getString(
+                                "FileChooser.upFolderToolTipText"),
+                        "including what it says to a pointer");
+                assertEquals("Opp", javax.swing.UIManager.getString(
+                                "FileChooser.upFolderAccessibleName"),
+                        "and what it says to a screen reader");
+            });
+        }, () -> {
+            java.util.Locale.setDefault(before);
+            // Absence restored as absence: these are not in the table
+            // until something puts them there.
+            for (var entry : saved.entrySet()) {
+                if (entry.getValue() == null) {
+                    javax.swing.UIManager.getDefaults()
+                            .remove(entry.getKey());
+                } else {
+                    javax.swing.UIManager.getDefaults()
+                            .put(entry.getKey(), entry.getValue());
+                }
+            }
+        }));
+    }
+
     static JMenu menuNamed(JMenuBar bar, String label) {
         for (int i = 0; i < bar.getMenuCount(); i++) {
             JMenu menu = bar.getMenu(i);

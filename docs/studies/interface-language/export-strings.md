@@ -146,7 +146,7 @@ Packed 295 × 206 px.
 |---|---|
 | chooser title | Export chart sheet |
 | replace title | Replace the existing file? |
-| replace question | orion.svg already exists in /var/folders/3z/hpnwxx314z73zm446j0f3nlm0000gn/T/export-sheet7360867486274427691.\nReplace it? |
+| replace question | orion.svg already exists in /var/folders/3z/hpnwxx314z73zm446j0f3nlm0000gn/T/export-sheet2953726618181998464. / Replace it? |
 | written title | Chart sheet exported |
 | written message | SVG written to orion.svg (194,460 bytes) |
 | refused title | The chart sheet was not written |
@@ -281,9 +281,9 @@ Packed 332 × 206 px.
 |---|---|
 | chooser title | Eksporter kartark |
 | replace title | Erstatte eksisterende fil? |
-| replace question | orion.svg finnes allerede i /var/folders/3z/hpnwxx314z73zm446j0f3nlm0000gn/T/export-sheet12693321045556057940.\nVil du erstatte den? |
+| replace question | orion.svg finnes allerede i /var/folders/3z/hpnwxx314z73zm446j0f3nlm0000gn/T/export-sheet12670791903244946308. / Vil du erstatte den? |
 | written title | Kartarket er eksportert |
-| written message | SVG lagret som orion.svg (194 460 byte) |
+| written message | SVG lagret som orion.svg (194 484 byte) |
 | refused title | Kartarket ble ikke lagret |
 | refusal: no file | Ingen fil ble valgt. |
 | refusal: a folder | a.svg er en mappe, ikke en fil. |

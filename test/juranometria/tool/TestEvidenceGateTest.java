@@ -314,11 +314,12 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
                         "src/juranometria/tool/PlaceAndTimeSheetMain.java",
                         "src/juranometria/tool/SettingsSheetMain.java",
+                        "src/juranometria/tool/SwingChromeSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the nineteen widget photographers, whose font and theme"
+                "the twenty widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -406,7 +407,14 @@ class TestEvidenceGateTest {
                         + " a page of read-only licence text takes"
                         + " its ground and its ink from the look and"
                         + " feel, and is the surface where low"
-                        + " contrast would be least noticed");
+                        + " contrast would be least noticed; and the"
+                        + " twentieth by #350's Swing chrome sheet,"
+                        + " which builds a real option pane and a real"
+                        + " file chooser under the application's own"
+                        + " look and feel with the toolkit's words"
+                        + " installed over Swing's - the words a"
+                        + " reader answers a question with, which came"
+                        + " from the operating system until now");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -522,7 +530,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(43, display.size(),
+        assertEquals(44, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -613,7 +621,16 @@ class TestEvidenceGateTest {
                         + " #350's frozen-note test, which reads a"
                         + " colour the look and feel resolves, under"
                         + " both themes, because a subdued colour"
-                        + " written down once is wrong in the other");
+                        + " written down once is wrong in the other;"
+                        + " and #350's Swing chrome test, which builds"
+                        + " a real option pane and a real file chooser"
+                        + " because a defaults table proves only what"
+                        + " was written, not what a reader is shown -"
+                        + " and runs them under a German default"
+                        + " locale, since on an English machine \"the"
+                        + " atlas installed Norwegian\" and \"the"
+                        + " platform happened to agree\" are the same"
+                        + " observation");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

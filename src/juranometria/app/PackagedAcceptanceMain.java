@@ -403,6 +403,7 @@ public final class PackagedAcceptanceMain {
                 + " (equatorialGrid flipped and restored through the"
                 + " bundled runtime's preference backend)");
 
+        toolkitChromeJourney();
         readerJourney();
         onThisPageJourney();
         meridianJourney();
@@ -1159,6 +1160,170 @@ public final class PackagedAcceptanceMain {
             }
         }
         return false;
+    }
+
+    /**
+     * The toolkit's own words, inside the image (#350).
+     *
+     * <p>Every sentence in the export dialogs was already the
+     * atlas's; the buttons and labels around them came from Swing's
+     * bundle, resolved against {@code Locale.getDefault()} - the
+     * operating system, not the reader's choice. The JDK ships no
+     * Norwegian bundle at all, so a Norwegian reader answered a
+     * Norwegian question with <strong>Yes</strong> on every machine,
+     * and on a German desktop got German.
+     *
+     * <p>The image is where that can actually be asked. A unit test
+     * reads the pack off the build directory; only the packaged
+     * runtime answers whether the forty-one values shipped, and
+     * whether the runtime it was linked against still resolves them.
+     * The default locale is set to <strong>Germany</strong> first,
+     * because English compared against English proves nothing - the
+     * JDK has a real German bundle, so anything not genuinely
+     * overridden comes back German and is visible.
+     *
+     * <p>Real components, walked, not a table read back: the
+     * confirmation a reader answers, the message that reports what
+     * happened, and the <strong>save</strong> chooser the export
+     * shows. Both channels of the up-folder button are required,
+     * because a pointer and a screen reader are told different words
+     * and one can ship without the other.
+     *
+     * <p>This proves the <em>adapter</em> inside the image. It does
+     * not prove that startup installs it - the ordered pair after a
+     * look and feel change is the fresh-JVM startup journey's claim,
+     * and this journey installs the words itself.
+     */
+    private static void toolkitChromeJourney() throws Exception {
+        java.util.Locale was = java.util.Locale.getDefault();
+        javax.swing.LookAndFeel wasLookAndFeel =
+                javax.swing.UIManager.getLookAndFeel();
+        javax.swing.UIDefaults defaults =
+                javax.swing.UIManager.getDefaults();
+        java.util.Map<String, Object> before =
+                new java.util.LinkedHashMap<>();
+        for (String key : juranometria.ui.language.SwingText
+                .toolkitKeys()) {
+            // Absence is a value here: none of these are in the
+            // table to begin with - Swing resolves them through a
+            // ResourceBundle - so a restore that wrote back an empty
+            // string would leave the image different from how it
+            // was found.
+            before.put(key, defaults.get(key));
+        }
+        try {
+            java.util.Locale.setDefault(java.util.Locale.GERMANY);
+            juranometria.app.UiTheme.apply(false);
+            juranometria.ui.language.SwingText norsk =
+                    juranometria.ui.language.SwingText.in(
+                            juranometria.ui.language.InterfaceText
+                                    .forLanguage("nb-NO"));
+            norsk.installInto(javax.swing.UIManager.getDefaults());
+
+            require(norsk.words().size() == 41,
+                    "the packaged pack carries all forty-one toolkit"
+                            + " values: " + norsk.words().size());
+
+            java.util.Set<String> said = new java.util.LinkedHashSet<>();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                collect(new javax.swing.JOptionPane("Erstatt?",
+                        javax.swing.JOptionPane.WARNING_MESSAGE,
+                        javax.swing.JOptionPane.YES_NO_OPTION), said);
+                collect(new javax.swing.JOptionPane("Skrevet.",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE,
+                        javax.swing.JOptionPane.DEFAULT_OPTION), said);
+                javax.swing.JFileChooser chooser =
+                        new javax.swing.JFileChooser();
+                chooser.setDialogType(
+                        javax.swing.JFileChooser.SAVE_DIALOG);
+                collect(chooser, said);
+            });
+
+            for (String expected : java.util.List.of(
+                    "shown: Nei", "shown: Avbryt", "shown: Lagre i:",
+                    "shown: Lagre", "hovered: Opp ett nivå",
+                    "spoken: Opp")) {
+                require(said.contains(expected),
+                        "the packaged image says \"" + expected
+                                + "\" on a real component under a"
+                                + " German default locale. It said: "
+                                + said);
+            }
+            for (String german : java.util.List.of("shown: Nein",
+                    "shown: Abbrechen", "shown: Speichern",
+                    "shown: Speichern in:")) {
+                require(!said.contains(german),
+                        "and nothing German survives where the atlas"
+                                + " has spoken: " + german);
+            }
+            System.out.println("toolkit chrome OK (41 packaged values,"
+                    + " confirm/message/save chooser walked under a"
+                    + " German default locale, " + said.size()
+                    + " words met, both up-folder channels Norwegian)");
+        } finally {
+            for (java.util.Map.Entry<String, Object> entry
+                    : before.entrySet()) {
+                defaults.put(entry.getKey(), entry.getValue());
+            }
+            // A look and feel is JVM-global and the journeys after
+            // this one draw real pages, so what was installed goes
+            // back. Both halves are needed and neither is enough:
+            // reinstalling rebuilds the defaults table and clears
+            // the forty-one by itself, but only if the look and feel
+            // actually differs, and putting the entries back leaves
+            // the reader journeys under this one's look and feel.
+            if (wasLookAndFeel != null) {
+                javax.swing.UIManager.setLookAndFeel(wasLookAndFeel);
+            }
+            java.util.Locale.setDefault(was);
+        }
+    }
+
+    /**
+     * What a reader meets on one real component, by channel.
+     *
+     * <p>No window: the look and feel's delegate builds a pane's
+     * buttons and a chooser's labels when the component is
+     * constructed, which is the moment these values are read. The
+     * image is accepted headless, and a holder frame would fail
+     * there for a reason that has nothing to do with the words.
+     */
+    private static void collect(java.awt.Container probe,
+                                java.util.Set<String> said) {
+        walkChrome(probe, said);
+    }
+
+    private static void walkChrome(java.awt.Container from,
+                                   java.util.Set<String> said) {
+        for (java.awt.Component child : from.getComponents()) {
+            if (child instanceof javax.swing.AbstractButton button) {
+                addChrome(said, "shown", button.getText());
+                addChrome(said, "hovered", button.getToolTipText());
+                if (button.getAccessibleContext() != null) {
+                    addChrome(said, "spoken", button
+                            .getAccessibleContext().getAccessibleName());
+                }
+            }
+            if (child instanceof javax.swing.JLabel label) {
+                addChrome(said, "shown", label.getText());
+            }
+            if (child instanceof javax.swing.JComponent widget) {
+                addChrome(said, "hovered", widget.getToolTipText());
+            }
+            if (child instanceof java.awt.Container nested) {
+                walkChrome(nested, said);
+            }
+        }
+    }
+
+    private static void addChrome(java.util.Set<String> said,
+                                  String channel, String text) {
+        if (text == null || text.isBlank()
+                || text.chars().noneMatch(Character::isLetter)) {
+            return;
+        }
+        said.add(channel + ": " + text.replaceAll("<[^>]*>", " ")
+                .replaceAll("\\s+", " ").trim());
     }
 
     private static void readerJourney() throws Exception {
