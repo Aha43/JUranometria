@@ -78,6 +78,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartKeyboardWiringTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /**
      * Sees every repaint request in the JVM while installed -
      * <strong>including the ones aimed at a window</strong>.
@@ -166,7 +171,7 @@ class ChartKeyboardWiringTest {
             // a matrix against the options cannot reach at all: they
             // do not live in the chart's options and never did.
             for (char letter : new char[] {'I', 'R', 'H'}) {
-                String what = ChartKeys.forKey(letter).label();
+                String what = ChartKeys.forKey(letter).id();
                 // On a page the module's own geometry crosses. A line
                 // drawn somewhere else is still not drawn here, and
                 // the default page is the study's own "page-nothing".
@@ -228,7 +233,7 @@ class ChartKeyboardWiringTest {
                 "the reader's own controls are pressed in a window");
         withTheAtlasRunning((atlas, repaints) -> {
             for (char letter : new char[] {'I', 'R', 'H'}) {
-                String what = ChartKeys.forKey(letter).label();
+                String what = ChartKeys.forKey(letter).id();
                 atlas.goTo(pageFor(atlas, letter));
 
                 atlas.hide(letter);
@@ -395,7 +400,7 @@ class ChartKeyboardWiringTest {
                     juranometria.app.Atlas.assembler()::fits);
             SwingUtilities.invokeAndWait(() -> {
                 chart = new ChartComponent(
-                        juranometria.app.Atlas.assembler());
+                        juranometria.app.Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 // The same one call that connects the options to the
                 // chart in the application.
@@ -418,9 +423,9 @@ class ChartKeyboardWiringTest {
                 eclipticToggle = juranometria.ui.ecliptic.EclipticSession
                         .toggle(ecliptic, eclipticStore());
                 frame.setJMenuBar(AppMenuBar.create(null, null, () -> { },
-                        () -> { }, () -> { }, () -> { }, eclipticToggle));
+                        () -> { }, () -> { }, () -> { }, eclipticToggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 ChartKeyboardSession.install(frame.getRootPane(), options,
-                        ecliptic, eclipticToggle, observer);
+                        ecliptic, eclipticToggle, observer, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.setVisible(true);
                 chart.setViewState(ChartViewState.DEFAULT);
             });
@@ -502,7 +507,7 @@ class ChartKeyboardWiringTest {
             SwingUtilities.invokeAndWait(() ->
                     juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
                             frame, observer, placeStore(),
-                            () -> observer.observer().instant()));
+                            () -> observer.observer().instant(), juranometria.ui.language.InterfaceText.forLanguage("en")));
             flush();
             placeAndTime = onEdt(() -> {
                 for (java.awt.Window open : java.awt.Window.getWindows()) {

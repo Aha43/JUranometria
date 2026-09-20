@@ -32,13 +32,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SheetInkTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartViewState ORION = new ChartViewState(
             new SkyPosition(83.0, 0.0), 42.0, 6.0);
 
     private static ChartComponent chart() throws Exception {
         ChartComponent[] holder = new ChartComponent[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(Atlas.assembler());
+            holder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             holder[0].setSize(PaperSize.A4.chartWideUnits(),
                     PaperSize.A4.chartHighUnits());
             holder[0].setViewState(ORION);
@@ -52,7 +57,7 @@ class SheetInkTest {
         ChartScene scene = Atlas.assembler().assemble(ORION,
                 PaperSize.A4.chartWideUnits(),
                 PaperSize.A4.chartHighUnits());
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         List<ChartRenderer.DrawnMark> marks =
                 renderer.drawnMarks(scene, ChartOptions.DEFAULTS);
 
@@ -194,7 +199,7 @@ class SheetInkTest {
         ChartScene scene = Atlas.assembler().assemble(ORION,
                 PaperSize.A4.chartWideUnits(),
                 PaperSize.A4.chartHighUnits());
-        String marked = new ChartRenderer(StarSizePolicy.DEFAULT)
+        String marked = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.star() != null)
                 .findFirst().orElseThrow().star().id();

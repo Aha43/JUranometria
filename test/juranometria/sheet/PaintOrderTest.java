@@ -41,6 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PaintOrderTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** Orion at the sheet field, where the name meets the panel. */
     private static final ChartViewState ORION = new ChartViewState(
             new SkyPosition(83.0, 0.0), 42.0, 6.0);
@@ -50,7 +55,7 @@ class PaintOrderTest {
     private static SheetRecording sheet() {
         return ChartSheet.record(Atlas.assembler()::assemble, ORION,
                 ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
     }
 
     /** The opaque panel the title block lays down. */

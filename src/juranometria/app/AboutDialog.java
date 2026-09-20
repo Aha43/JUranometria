@@ -4,10 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -40,41 +36,102 @@ import javax.swing.KeyStroke;
  */
 public final class AboutDialog extends JDialog {
 
-    static final String SUMMARY_RESOURCE = "/resources/about/licensing-summary.txt";
+    public static final String SUMMARY_RESOURCE = "/resources/about/licensing-summary.txt";
+
+    /**
+     * One bundled document: what it is, and where it ships.
+     *
+     * <p><strong>No heading.</strong> This was a
+     * {@code String[][]} pairing an English title with a resource
+     * path - half prose, half identity, in one array - and the
+     * heading is gone rather than kept beside the path, so nothing
+     * can read an English title off the registry. The words live in
+     * {@link juranometria.ui.language.AboutText}, keyed by the id
+     * below; tests and diagnostics use the id.
+     *
+     * @param id canonical, stable, never shown to a reader
+     * @param resourcePath the packaged document, shown byte for byte
+     *     in every language
+     */
+    public record Notice(String id, String resourcePath) {
+
+        public Notice {
+            if (id == null || id.isBlank()
+                    || resourcePath == null || resourcePath.isBlank()) {
+                throw new IllegalArgumentException(
+                        "a bundled document has a name of its own and"
+                                + " somewhere it ships from, and blank"
+                                + " is neither");
+            }
+        }
+    }
 
     /** The bundled notices shown by the fuller view, in display order. */
-    static final String[][] NOTICE_RESOURCES = {
-            {"Tycho-2 star data", "/resources/catalog/bright-sky/NOTICE-tycho2.md"},
-            {"OpenNGC deep-sky data", "/resources/catalog/bright-sky/NOTICE-openngc.md"},
-            {"CC BY-SA 4.0 licence text", "/resources/catalog/bright-sky/LICENSE-CC-BY-SA-4.0.txt"},
-            {"Constellation geography", "/resources/geo/constellations/NOTICE-constellations.md"},
-            {"Star identities", "/resources/catalog/star-identities/NOTICE-star-identities.md"},
-            {"BSD-3-Clause licence text", "/resources/geo/constellations/LICENSE-BSD-3-Clause.txt"},
-            {"Tabler icons licence", "/resources/icons/LICENSE"},
-    };
+    public static final java.util.List<Notice> NOTICES = java.util.List.of(
+            new Notice("tycho2",
+                    "/resources/catalog/bright-sky/NOTICE-tycho2.md"),
+            new Notice("openngc",
+                    "/resources/catalog/bright-sky/NOTICE-openngc.md"),
+            new Notice("ccbysa",
+                    "/resources/catalog/bright-sky/LICENSE-CC-BY-SA-4.0.txt"),
+            new Notice("constellations",
+                    "/resources/geo/constellations/NOTICE-constellations.md"),
+            new Notice("staridentities",
+                    "/resources/catalog/star-identities/NOTICE-star-identities.md"),
+            new Notice("bsd3",
+                    "/resources/geo/constellations/LICENSE-BSD-3-Clause.txt"),
+            new Notice("tabler", "/resources/icons/LICENSE"));
 
-    static final String DESCRIPTION =
-            "A quiet, interactive atlas for learning the geography of the sky.";
+    private final juranometria.ui.language.AboutText said;
 
-    AboutDialog(Frame owner) {
-        super(owner, "About " + AppInfo.NAME, false);
-        getAccessibleContext().setAccessibleName("About " + AppInfo.NAME);
+    AboutDialog(Frame owner,
+                juranometria.ui.language.InterfaceText words) {
+        super(owner, juranometria.ui.language.AboutText.in(words)
+                .title(AppInfo.NAME), false);
+        this.said = juranometria.ui.language.AboutText.in(words);
+        getAccessibleContext().setAccessibleName(said.title(AppInfo.NAME));
         getAccessibleContext().setAccessibleDescription(
-                "Application identity, version, and licensing information");
+                said.windowExplain());
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setContentPane(compactContent(this::showNotices));
+        setContentPane(compactContent(this::showNotices, words));
         installEscapeToClose(this);
         pack();
         setLocationRelativeTo(owner);
     }
 
     /** Opens the dialog owned by and centred on the atlas window. */
-    public static void open(Frame owner) {
-        new AboutDialog(owner).setVisible(true);
+    public static void open(Frame owner,
+                            juranometria.ui.language.InterfaceText words) {
+        open(owner, words, dialog -> { });
+    }
+
+    /**
+     * The same, with the dialog handed to a caller before it is shown
+     * (#350).
+     *
+     * <p>For the study that photographs it. A shown window is given
+     * focus by the desktop, which hands it to a button, and the
+     * button's focus ring is in the picture on some runs and not
+     * others. Making the window unfocusable afterwards does not
+     * help - by then it already holds focus, and clearing it does
+     * not take effect in time to paint.
+     *
+     * <p>So the one moment that works is before {@code setVisible},
+     * and only the code that shows the dialog has it. A reader's
+     * About is unaffected: the ordinary {@code open} passes a
+     * callback that does nothing, and the dialog takes focus and
+     * draws its focus ring exactly as before.
+     */
+    public static void open(Frame owner,
+                            juranometria.ui.language.InterfaceText words,
+                            java.util.function.Consumer<JDialog> before) {
+        AboutDialog dialog = new AboutDialog(owner, words);
+        before.accept(dialog);
+        dialog.setVisible(true);
     }
 
     private void showNotices() {
-        setContentPane(noticesContent());
+        setContentPane(noticesContent(said.words()));
         revalidate();
         pack();
         setLocationRelativeTo(getOwner());
@@ -85,16 +142,21 @@ public final class AboutDialog extends JDialog {
      * The two views' content, for the audit that reads what every
      * control says (#311).
      */
-    public static JComponent compactContentForStudy() {
-        return compactContent(() -> { });
+    public static JComponent compactContentForStudy(
+            juranometria.ui.language.InterfaceText words) {
+        return compactContent(() -> { }, words);
     }
 
     /** The notices view, for the same audit. */
-    public static JComponent noticesContentForStudy() {
-        return noticesContent();
+    public static JComponent noticesContentForStudy(
+            juranometria.ui.language.InterfaceText words) {
+        return noticesContent(words);
     }
 
-    static JComponent compactContent(Runnable showNotices) {
+    static JComponent compactContent(Runnable showNotices,
+            juranometria.ui.language.InterfaceText words) {
+        juranometria.ui.language.AboutText said =
+                juranometria.ui.language.AboutText.in(words);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
@@ -117,7 +179,8 @@ public final class AboutDialog extends JDialog {
         mark.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 12));
         heading.add(mark);
 
-        JLabel title = new JLabel(AppInfo.NAME + " " + AppInfo.version());
+        JLabel title = new JLabel(said.heading(AppInfo.NAME,
+                AppInfo.version()));
         title.putClientProperty("FlatLaf.styleClass", "h2");
         title.setAlignmentX(0.0f);
         heading.add(title);
@@ -125,42 +188,30 @@ public final class AboutDialog extends JDialog {
         panel.add(heading);
         panel.add(Box.createVerticalStrut(6));
 
-        JLabel description = new JLabel(DESCRIPTION);
+        JLabel description = new JLabel(said.description());
         description.setAlignmentX(0.0f);
         panel.add(description);
         panel.add(Box.createVerticalStrut(12));
 
-        JTextArea summary = readOnlyText(summaryText(), 14, 46);
-        summary.getAccessibleContext().setAccessibleName("Licensing summary");
+        JTextArea summary = readOnlyText(said.summary(), 14, 46);
+        summary.getAccessibleContext().setAccessibleName(
+                said.summaryName());
         // Read-only prose. Its own words are the whole of it, and a
         // tooltip over a page of text is a box in the way of reading.
         juranometria.ui.Explain.selfExplanatory(summary,
-                "The short form of what the atlas is built on and"
-                        + " what that allows; the full texts are"
-                        + " behind the button below");
+                said.summaryExplain());
         JScrollPane summaryScroll = new JScrollPane(summary);
         summaryScroll.setAlignmentX(0.0f);
         panel.add(summaryScroll);
         panel.add(Box.createVerticalStrut(12));
 
-        JButton notices = new JButton("Full notices and licences...");
+        JButton notices = new JButton(said.noticesButton());
         notices.getAccessibleContext().setAccessibleName(
-                "Full notices and licences");
+                said.noticesButtonName());
         juranometria.ui.Explain.selfExplanatory(notices,
-                "Opens the complete notices and licence texts for"
-                        + " everything the atlas bundles");
+                said.noticesButtonExplain());
         notices.addActionListener(event -> showNotices.run());
-        JButton close = new JButton("Close");
-        close.getAccessibleContext().setAccessibleName("Close");
-        juranometria.ui.Explain.selfExplanatory(close,
-                "Closes this window and returns to the chart");
-        close.addActionListener(event -> {
-            java.awt.Window window =
-                    javax.swing.SwingUtilities.getWindowAncestor(close);
-            if (window != null) {
-                window.dispose();
-            }
-        });
+        JButton close = closeButton(said);
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
         buttons.setAlignmentX(0.0f);
@@ -172,22 +223,74 @@ public final class AboutDialog extends JDialog {
     }
 
     /** The fuller notices view; headless-constructible for tests. */
-    static JComponent noticesContent() {
+    static JComponent noticesContent(
+            juranometria.ui.language.InterfaceText words) {
+        juranometria.ui.language.AboutText said =
+                juranometria.ui.language.AboutText.in(words);
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        JTextArea text = readOnlyText(noticesText(), 24, 66);
+        JTextArea text = readOnlyText(noticesText(words), 24, 66);
         text.getAccessibleContext().setAccessibleName(
-                "Bundled notices and licence texts");
+                said.noticesName());
         juranometria.ui.Explain.selfExplanatory(text,
-                "The notices and licence texts of everything the"
-                        + " atlas bundles, in full");
+                said.noticesExplain());
         JScrollPane scroll = new JScrollPane(text);
         scroll.setPreferredSize(new Dimension(560, 420));
         panel.add(scroll, BorderLayout.CENTER);
-        JButton close = new JButton("Close");
-        close.getAccessibleContext().setAccessibleName("Close");
+        JButton close = closeButton(said);
+        JPanel south = new JPanel(new BorderLayout());
+        south.add(close, BorderLayout.EAST);
+        panel.add(south, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    /**
+     * The canonical English compact summary, verbatim.
+     *
+     * <p>The document the licensing-map contract is written on, and
+     * what any language falls back to whole.
+     */
+    public static String summaryText() {
+        return juranometria.ui.language.AboutText.canonicalSummary();
+    }
+
+    /**
+     * Every bundled notice and licence, ready to show.
+     *
+     * <p>Translated heading, immutable body, and a rule between them.
+     * The rules and the blank lines are <strong>rendering</strong> -
+     * they are the same characters in every language - and the bodies
+     * are passed through untouched: nothing here reflows, trims or
+     * re-encodes 25 235 bytes of somebody else's licence text.
+     */
+    public static String noticesText(
+            juranometria.ui.language.InterfaceText words) {
+        juranometria.ui.language.AboutText said =
+                juranometria.ui.language.AboutText.in(words);
+        StringBuilder out = new StringBuilder();
+        for (Notice notice : NOTICES) {
+            out.append(RULE)
+                    .append(said.heading(notice)).append('\n')
+                    .append(RULE).append('\n')
+                    .append(juranometria.ui.language.AboutText
+                            .noticesBody(notice))
+                    .append("\n\n");
+        }
+        return out.toString();
+    }
+
+    /** Rendering, not language: the same characters everywhere. */
+    private static final String RULE =
+            "================================================\n";
+
+    /** The way out, identical on both views and built once. */
+    private static JButton closeButton(
+            juranometria.ui.language.AboutText said) {
+        JButton close = new JButton(said.closeButton());
+        close.getAccessibleContext().setAccessibleName(
+                said.closeButton());
         juranometria.ui.Explain.selfExplanatory(close,
-                "Closes this window and returns to the chart");
+                said.closeExplain());
         close.addActionListener(event -> {
             java.awt.Window window =
                     javax.swing.SwingUtilities.getWindowAncestor(close);
@@ -195,39 +298,7 @@ public final class AboutDialog extends JDialog {
                 window.dispose();
             }
         });
-        JPanel south = new JPanel(new BorderLayout());
-        south.add(close, BorderLayout.EAST);
-        panel.add(south, BorderLayout.SOUTH);
-        return panel;
-    }
-
-    /** The packaged compact licensing summary, verbatim. */
-    static String summaryText() {
-        return resourceText(SUMMARY_RESOURCE);
-    }
-
-    /** Every bundled notice and licence text, concatenated for display. */
-    static String noticesText() {
-        StringBuilder out = new StringBuilder();
-        for (String[] notice : NOTICE_RESOURCES) {
-            out.append("================================================\n")
-                    .append(notice[0]).append('\n')
-                    .append("================================================\n\n")
-                    .append(resourceText(notice[1])).append("\n\n");
-        }
-        return out.toString();
-    }
-
-    private static String resourceText(String resource) {
-        try (InputStream stream = AboutDialog.class.getResourceAsStream(resource)) {
-            if (stream == null) {
-                throw new IllegalStateException(
-                        "missing packaged notice resource: " + resource);
-            }
-            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return close;
     }
 
     private static JTextArea readOnlyText(String text, int rows, int columns) {

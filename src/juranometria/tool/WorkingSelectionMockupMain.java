@@ -32,6 +32,22 @@ import javax.swing.UIManager;
  * with invented rows tests nothing (the on-this-page rule) - and
  * one of them is off the current page, which is the surface's whole
  * reason to exist.
+ *
+ * <p><strong>It installs its own look and feel</strong> (#350). It
+ * used not to, and a look and feel is JVM-global: what a peer
+ * generator installed before this one ran decided what these buttons
+ * looked like. Run under the contract it drew square Metal buttons;
+ * run alone it drew the rounded ones the application actually has.
+ * Both were reproducible, so neither looked like a fault - the
+ * difference surfaced only by putting the two pictures side by side,
+ * and it read exactly like a content change.
+ *
+ * <p>That made the committed images an accidental baseline: a
+ * picture of whichever peer happened to run first, promoted as
+ * though it were a picture of this surface. Reverting them because
+ * the text was unchanged would have preserved the accident. So the
+ * theme is installed here, explicitly, before any component exists,
+ * and these images now show the controls a reader meets.
  */
 public final class WorkingSelectionMockupMain {
 
@@ -65,6 +81,7 @@ public final class WorkingSelectionMockupMain {
     /** The Inspector's working-set section. */
     private static void write(String name, int width, int textSize,
                               boolean dark) throws IOException {
+        juranometria.app.UiTheme.apply(dark);
         UIManager.put("defaultFont",
                 new Font(Font.SANS_SERIF, Font.PLAIN, textSize));
         Font plain = new Font(Font.SANS_SERIF, Font.PLAIN, textSize);
@@ -129,6 +146,7 @@ public final class WorkingSelectionMockupMain {
     /** The Accumulate toggle, off and on, side by side. */
     private static void accumulate(String name, int textSize)
             throws IOException {
+        juranometria.app.UiTheme.apply(false);
         UIManager.put("defaultFont",
                 new Font(Font.SANS_SERIF, Font.PLAIN, textSize));
         JPanel strip = new JPanel();

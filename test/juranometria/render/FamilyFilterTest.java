@@ -33,8 +33,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class FamilyFilterTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     /** A page carrying members of several families at once. */
     private static ChartScene sagittarius() {

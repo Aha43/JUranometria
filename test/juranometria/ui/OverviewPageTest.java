@@ -49,6 +49,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OverviewPageTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition ORION = new SkyPosition(83.0, 0.0);
     private static final int WIDE = 900;
     private static final int HIGH = 700;
@@ -149,7 +154,7 @@ class OverviewPageTest {
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 navigation[0] = new ChartViewController(
                         Atlas.assembler()::fits);
-                chart[0] = new ChartComponent(Atlas.assembler());
+                chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation[0].onChange(chart[0]::setViewState);
                 SelectInteraction.install(chart[0], selection,
                         new juranometria.chart.WorkingSelection(),
@@ -171,7 +176,7 @@ class OverviewPageTest {
                 frame[0].setJMenuBar(juranometria.app.AppMenuBar.create(
                         navigation[0], () -> { }, () -> { }, () -> { },
                         () -> inspector[0].setRequestedVisible(
-                                !inspector[0].isRequestedVisible())));
+                                !inspector[0].isRequestedVisible()), juranometria.ui.language.InterfaceText.forLanguage("en")));
                 frame[0].setSize(1280, 820);
                 frame[0].setVisible(true);
             });
@@ -256,7 +261,7 @@ class OverviewPageTest {
                     "the one that was under the pointer, read back"
                             + " through the overview's own projection");
 
-            // 3. Center here, then back down the ladder into the
+            // 3. Centre here, then back down the ladder into the
             // detailed atlas - both through the controls a reader has.
             // The Inspector is opened the way a reader opens it.
             javax.swing.SwingUtilities.invokeAndWait(() ->
@@ -367,7 +372,7 @@ class OverviewPageTest {
         ChartRenderer.DrawnMark best = null;
         double furthest = 0.0;
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             if (mark.star() == null || mark.centre().x() < 40
                     || mark.centre().x() > scene.viewport().widthPx() - 40
@@ -411,7 +416,7 @@ class OverviewPageTest {
             java.awt.Container root) {
         for (java.awt.Component child : root.getComponents()) {
             if (child instanceof javax.swing.JButton candidate
-                    && "Center here".equals(candidate.getText())) {
+                    && "Centre here".equals(candidate.getText())) {
                 return candidate;
             }
             if (child instanceof java.awt.Container inner) {
@@ -548,7 +553,7 @@ class OverviewPageTest {
         ChartScene page = Atlas.assembler().assemble(state, WIDE, HIGH);
         List<String> marked = new java.util.ArrayList<>();
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(page, ChartOptions.DEFAULTS)) {
             if (mark.star() != null && marked.size() < 2) {
                 marked.add(mark.star().id());
@@ -559,7 +564,7 @@ class OverviewPageTest {
         ChartRenderer.ReferenceLayer modules = (g, scene) ->
                 ReferenceInk.paint(g, juranometria.project.DrawnPage.of(scene), registry.collect(),
                         ChartPalette.WHITE_PAPER);
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         ChartRenderer.ReferenceLayer working = (g, scene) -> {
             for (String member : marked) {
                 renderer.drawSelectionHighlight(g, scene,
@@ -608,7 +613,7 @@ class OverviewPageTest {
         for (String member : marked) {
             juranometria.project.PixelPoint at = null;
             for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                    StarSizePolicy.DEFAULT)
+                    StarSizePolicy.DEFAULT, ENGLISH)
                     .drawnMarks(page, ChartOptions.DEFAULTS)) {
                 if (mark.star() != null && member.equals(mark.star().id())) {
                     at = mark.centre();
@@ -652,7 +657,7 @@ class OverviewPageTest {
         juranometria.sheet.SheetRecorder recorder =
                 new juranometria.sheet.SheetRecorder(WIDE, HIGH);
         ChartScene scene = Atlas.assembler().assemble(state, WIDE, HIGH);
-        new ChartRenderer(StarSizePolicy.DEFAULT).render(recorder, scene,
+        new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH).render(recorder, scene,
                 ChartOptions.DEFAULTS, reference);
         Graphics2D over = (Graphics2D) recorder.create();
         try {
@@ -836,7 +841,7 @@ class OverviewPageTest {
                 new ChartViewState(ORION, 120.0,
                         ChartViewState.defaultMagnitudeFor(120.0)),
                 ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         assertEquals(120.0, sheet.scene().viewport().fieldWidthDegrees(),
                 "the sheet is the page the reader was on");
         assertEquals(ChartProjection.STEREOGRAPHIC,

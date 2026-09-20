@@ -42,7 +42,7 @@ import juranometria.meridian.MeridianModule;
  * redraws the reference lines and leaves the page exactly where the
  * reader put it. The two deliberate actions are <em>Now</em>, which
  * re-freezes on the moment it is pressed (read once; it is a button,
- * not a state), and <em>Center on zenith</em>, the one thing here
+ * not a state), and <em>Centre on zenith</em>, the one thing here
  * that moves the chart, because the reader asked.
  *
  * <p>There is no Apply and no Cancel, because the gate decided two
@@ -90,18 +90,19 @@ public final class PlaceAndTimeDialog extends JDialog {
             .withZone(ZoneOffset.UTC);
 
     private PlaceAndTimeDialog(Frame owner, MeridianModule module,
-                               PlaceStore store, Supplier<Instant> clock) {
-        super(owner, "Place and Time", false);
-        getAccessibleContext().setAccessibleName("Place and Time");
+                               PlaceStore store, Supplier<Instant> clock,
+                               juranometria.ui.language.InterfaceText said) {
+        super(owner, said.say("placeandtime.title"), false);
+        getAccessibleContext().setAccessibleName(
+                said.say("placeandtime.a11y"));
         getAccessibleContext().setAccessibleDescription(
-                "Set where you are and the frozen instant the reference"
-                        + " lines are drawn for");
+                said.say("placeandtime.explain"));
         // One closing mechanism, not two: an earlier version also
         // disposed from a window listener, and the redundancy made
         // the close box unbreakable by mutation - either half could
         // rot and the other would cover for it.
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setContentPane(content(module, store, clock));
+        setContentPane(content(module, store, clock, said));
         getRootPane().registerKeyboardAction(event -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -119,13 +120,14 @@ public final class PlaceAndTimeDialog extends JDialog {
 
     /** Opens the dialog, or brings the existing one forward. */
     public static void open(Frame owner, MeridianModule module,
-                            PlaceStore store, Supplier<Instant> clock) {
+                            PlaceStore store, Supplier<Instant> clock,
+                            juranometria.ui.language.InterfaceText said){
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new PlaceAndTimeDialog(owner, module, store, clock);
+        current = new PlaceAndTimeDialog(owner, module, store, clock, said);
         current.setVisible(true);
     }
 
@@ -140,9 +142,10 @@ public final class PlaceAndTimeDialog extends JDialog {
      */
     public static PlaceAndTimeDialog packedForStudy(Frame owner,
                                                     MeridianModule module,
-                                                    PlaceStore store) {
+                                                    PlaceStore store,
+                                                    juranometria.ui.language.InterfaceText said) {
         return new PlaceAndTimeDialog(owner, module, store,
-                () -> module.observer().instant());
+                () -> module.observer().instant(), said);
     }
 
     /**
@@ -158,13 +161,26 @@ public final class PlaceAndTimeDialog extends JDialog {
      * control says (#311). The clock is the module's own frozen
      * instant, because an inventory is not a session.
      */
+    /**
+     * The dialog's content, in a language a caller states.
+     *
+     * <p>There is no overload that means "English if omitted" (#350).
+     * A door like that is how a production-shaped caller forgets a
+     * language and still compiles, which is exactly how a translated
+     * toolbar shipped in English.
+     */
     public static JComponent contentForStudy(MeridianModule module,
-                                             PlaceStore store) {
-        return content(module, store, () -> module.observer().instant());
+                                             PlaceStore store,
+                                             juranometria.ui.language.InterfaceText said) {
+        return content(module, store, () -> module.observer().instant(),
+                said);
     }
 
     static JComponent content(MeridianModule module, PlaceStore store,
-                              Supplier<Instant> clock) {
+                              Supplier<Instant> clock,
+                              juranometria.ui.language.InterfaceText said) {
+        juranometria.ui.language.MnemonicText letters =
+                juranometria.ui.language.MnemonicText.in(said);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
@@ -176,34 +192,45 @@ public final class PlaceAndTimeDialog extends JDialog {
         CommitField instant = new CommitField("instantField",
                 SHOWN.format(module.observer().instant()));
 
-        panel.add(row("Latitude", 'L', latitude,
-                "Degrees north of the equator, e.g. 59.913;"
-                        + " south is negative, -90 to 90",
-                "Degrees north of the equator, negative south,"
-                        + " -90 to 90"));
+        panel.add(row(said.say("placeandtime.latitude.label"),
+                "placeandtime.latitude.mnemonic", latitude,
+                said.say("placeandtime.latitude.hover"),
+                said.say("placeandtime.latitude.explain"), letters));
         panel.add(strut(6));
         // East-positive in the label, per the gate: the one easiest
         // thing to get wrong, stated where the number is typed.
-        panel.add(row("Longitude, east positive", 'G', longitude,
-                "Degrees east of Greenwich, e.g. 10.752;"
-                        + " west is negative",
-                "Degrees east of Greenwich; west is negative"));
+        panel.add(row(said.say("placeandtime.longitude.label"),
+                "placeandtime.longitude.mnemonic", longitude,
+                said.say("placeandtime.longitude.hover"),
+                said.say("placeandtime.longitude.explain"), letters));
         panel.add(strut(6));
-        panel.add(row("Instant (UTC)", 'U', instant,
-                "The moment the lines are drawn for, as"
-                        + " 2026-03-20 21:33:00",
-                "The frozen moment the lines are drawn for; nothing"
-                        + " ticks, so it stays where you put it"));
+        // UTC is a time-scale identity handed to the label, not a
+        // word inside it (#350).
+        panel.add(row(said.say("placeandtime.instant.label", "UTC"),
+                "placeandtime.instant.mnemonic", instant,
+                said.say("placeandtime.instant.hover"),
+                said.say("placeandtime.instant.explain"), letters));
         panel.add(strut(10));
 
         // A stated width, so the HTML wraps instead of clipping: at
         // enlarged text the sentence is wider than the dialog, and a
         // note half of which is missing reads as a promise cut off.
-        JLabel frozen = new JLabel("<html><body style='width: 240px'>"
-                + "The chart is drawn for that instant and stays"
-                + " there. Nothing ticks.</body></html>");
+        // Broken against real font metrics, not a CSS width: a
+        // declared width does not bound a label's preferred width.
+        JLabel frozen = new JLabel();
+        frozen.setText(juranometria.ui.WrappedText.html(
+                said.say("placeandtime.frozen.note"), 240,
+                frozen.getFontMetrics(frozen.getFont())));
         frozen.setName("frozenNote");
-        frozen.setEnabled(false);
+        // Quiet VISUALLY. setEnabled(false) told a screen reader this
+        // sentence was unavailable, when it is the one thing here a
+        // reader can only read - the same defect the toolbar's
+        // version label carried (#350). The weight now comes from the
+        // theme's own subdued colour, resolved per theme so the dark
+        // palette gets the dark answer.
+        frozen.putClientProperty("FlatLaf.style",
+                "foreground: $Label.disabledForeground");
+        frozen.setFocusable(false);
         frozen.setAlignmentX(0.0f);
         panel.add(frozen);
         panel.add(strut(12));
@@ -214,30 +241,35 @@ public final class PlaceAndTimeDialog extends JDialog {
         // is why the chart keyboard refuses it (#312), and a tooltip
         // promising it a key would be the promise that decision
         // deliberately does not make.
-        JCheckBox meridian = show("Meridian", 'M',
+        // Both halves through the shortcut seam: the connector
+        // between two keystrokes is a word, and where the keystroke
+        // sits beside a description is typography. Frozen here they
+        // were an English "then" inside English parentheses (#350).
+        juranometria.ui.language.ShortcutText shortcuts =
+                juranometria.ui.language.ShortcutText.in(said);
+        JCheckBox meridian = show("placeandtime.meridian",
                 module.meridianShowing(),
-                "Draw the great circle through both celestial poles"
-                        + " and your zenith ("
-                        + juranometria.app.ChartKeys.toggle(
-                                "module.meridian").sequence() + ")",
-                "Draws the line that runs from due north, through the"
-                        + " point overhead, to due south. It lasts as"
-                        + " long as this session.");
-        JCheckBox horizon = show("Mathematical horizon", 'H',
+                shortcuts.withSequence(
+                        said.say("placeandtime.meridian.hover"),
+                        juranometria.app.ChartKeys.prefixText(),
+                        juranometria.app.ChartKeys.toggle(
+                                "module.meridian").keyLetter()),
+                said.say("placeandtime.meridian.explain"),
+                said, letters, "showMeridian");
+        JCheckBox horizon = show("placeandtime.horizon",
                 module.horizonShowing(),
-                "Draw where the sky meets a perfectly flat,"
-                        + " transparent Earth ("
-                        + juranometria.app.ChartKeys.toggle(
-                                "module.horizon").sequence() + ")",
-                "Draws the circle where the sky would meet a flat and"
-                        + " transparent Earth; your own horizon has"
-                        + " hills and air in it. It lasts as long as"
-                        + " this session.");
-        JCheckBox zenith = show("Zenith", 'Z', module.zenithShowing(),
-                "Mark the point overhead",
-                "Marks the point directly above you. It is drawn with"
-                        + " the observer's lines and has no shortcut"
-                        + " of its own.");
+                shortcuts.withSequence(
+                        said.say("placeandtime.horizon.hover"),
+                        juranometria.app.ChartKeys.prefixText(),
+                        juranometria.app.ChartKeys.toggle(
+                                "module.horizon").keyLetter()),
+                said.say("placeandtime.horizon.explain"),
+                said, letters, "showMathematicalhorizon");
+        JCheckBox zenith = show("placeandtime.zenith",
+                module.zenithShowing(),
+                said.say("placeandtime.zenith.hover"),
+                said.say("placeandtime.zenith.explain"),
+                said, letters, "showZenith");
         Runnable showing = () -> module.showing(meridian.isSelected(),
                 horizon.isSelected(), zenith.isSelected());
         for (JCheckBox box : new JCheckBox[] {meridian, horizon, zenith}) {
@@ -269,29 +301,27 @@ public final class PlaceAndTimeDialog extends JDialog {
         }, () -> SHOWN.format(module.observer().instant()));
 
         // The two deliberate actions, and no others.
-        JButton now = new JButton("Now");
+        JButton now = new JButton(said.say("placeandtime.now.label"));
         now.setName("nowButton");
-        now.setMnemonic('N');
-        now.getAccessibleContext().setAccessibleName("Now");
+        now.getAccessibleContext().setAccessibleName(
+                said.say("placeandtime.now.a11y"));
+        letters.apply(now, "placeandtime.now.mnemonic");
         juranometria.ui.Explain.control(now,
-                "Read the clock once and freeze on this moment",
-                "Freezes on the present moment, read once; nothing"
-                        + " ticks afterwards, so the lines stay where"
-                        + " this put them");
+                said.say("placeandtime.now.hover"),
+                said.say("placeandtime.now.explain"));
         now.addActionListener(event -> {
             module.observer(module.observer().at(clock.get()));
             instant.setText(SHOWN.format(module.observer().instant()));
         });
-        JButton centre = new JButton("Center on zenith");
+        JButton centre =
+                new JButton(said.say("placeandtime.centre.label"));
         centre.setName("centreButton");
-        centre.setMnemonic('C');
         centre.getAccessibleContext().setAccessibleName(
-                "Center on zenith");
+                said.say("placeandtime.centre.a11y"));
+        letters.apply(centre, "placeandtime.centre.mnemonic");
         juranometria.ui.Explain.control(centre,
-                "Move the chart to the point overhead",
-                "Moves the page to the point directly above you - the"
-                        + " one control in this window that moves the"
-                        + " chart");
+                said.say("placeandtime.centre.hover"),
+                said.say("placeandtime.centre.explain"));
         centre.addActionListener(event -> module.centreOnZenith());
 
         JPanel actions = new JPanel(new GridLayout(1, 2, 8, 0));
@@ -383,15 +413,19 @@ public final class PlaceAndTimeDialog extends JDialog {
                 : text;
     }
 
-    private static JPanel row(String label, char mnemonic,
+    private static JPanel row(String label, String mnemonicKey,
                               JTextField field, String hovered,
-                              String description) {
+                              String description,
+                              juranometria.ui.language.MnemonicText letters) {
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
         row.setAlignmentX(0.0f);
         JLabel name = new JLabel(label);
         name.setLabelFor(field);
-        name.setDisplayedMnemonic(mnemonic);
+        // The same validated policy the menu uses: a letter that is
+        // not in the label it marks, or a label that names no
+        // control, is refused rather than applied (#350).
+        letters.apply(name, mnemonicKey);
         field.getAccessibleContext().setAccessibleName(label);
         // A field whose expected format is not obvious gets the
         // format where a reader about to type can see it, without
@@ -405,14 +439,24 @@ public final class PlaceAndTimeDialog extends JDialog {
         return row;
     }
 
-    private static JCheckBox show(String what, char mnemonic,
-                                  boolean showing, String hovered,
-                                  String description) {
+    private static JCheckBox show(String stem, boolean showing,
+                                  String hovered, String description,
+                                  juranometria.ui.language.InterfaceText said,
+                                  juranometria.ui.language.MnemonicText letters,
+                                  String componentName) {
+        String what = said.say(stem + ".label");
         JCheckBox box = new JCheckBox(what, showing);
-        box.setName("show" + what.replace(" ", ""));
-        box.setMnemonic(mnemonic);
+        box.setName(componentName);
         box.setAlignmentX(0.0f);
-        box.getAccessibleContext().setAccessibleName("Show " + what);
+        // A whole value per control, not a pattern taking the
+        // label. "Show {0}" reads correctly in English only because
+        // the visible label happens to have the form the sentence
+        // needs; Norwegian wants the definite "Vis meridianen", and
+        // a checkbox label and the object of a verb are not the same
+        // resource (#350).
+        box.getAccessibleContext().setAccessibleName(
+                said.say(stem + ".a11y"));
+        letters.apply(box, stem + ".mnemonic");
         return juranometria.ui.Explain.control(box, hovered, description);
     }
 

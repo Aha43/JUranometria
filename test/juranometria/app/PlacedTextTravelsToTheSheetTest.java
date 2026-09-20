@@ -82,13 +82,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PlacedTextTravelsToTheSheetTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /** A crowded sky, where placement has work to do. */
     private static final ChartViewState SAGITTARIUS = new ChartViewState(
             new SkyPosition(281.0, -26.0), 120.0,
             ChartViewState.defaultMagnitudeFor(120.0));
 
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     /** The chart options a sheet is drawn with: the reader's, on paper. */
     private static final ChartOptions ON_PAPER =
@@ -114,7 +119,7 @@ class PlacedTextTravelsToTheSheetTest {
     void everyFormatShowsTheDecisionBeingBroken() throws Exception {
         SheetRecording sheet = ChartSheet.record(Atlas.assembler()::assemble,
                 SAGITTARIUS, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         List<LabelPlacement.Placement> placed = decision();
         LabelPlacement.Placement refused = placed.stream()
                 .filter(LabelPlacement.Placement::omitted)
@@ -137,7 +142,7 @@ class PlacedTextTravelsToTheSheetTest {
                         "this page has a constellation name with a mark"
                                 + " drawn over it"));
         Rectangle2D would = refused.request().candidates().get(0);
-        Rectangle2D block = ChartRenderer.titleBlockBounds(
+        Rectangle2D block = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(
                 ChartRenderer.TextMetrics.offscreen().labels(),
                 sheet.scene());
 
@@ -225,7 +230,7 @@ class PlacedTextTravelsToTheSheetTest {
         // say so.
         SheetRecording sheet = ChartSheet.record(Atlas.assembler()::assemble,
                 SAGITTARIUS, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
 
         // A mark is drawn over a constellation name. Taking the
         // name away changes nothing where the mark covers it - and
@@ -253,7 +258,7 @@ class PlacedTextTravelsToTheSheetTest {
     void thePngHidesWhatTheFurnitureCovers() throws Exception {
         SheetRecording sheet = ChartSheet.record(Atlas.assembler()::assemble,
                 SAGITTARIUS, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         // The furniture is opaque and drawn last, so a label
         // under it is not on the paper at all. The page places
         // nothing under the block, so the label is put there - and
@@ -263,7 +268,7 @@ class PlacedTextTravelsToTheSheetTest {
         // and hide it in both orders. Then the difference measured
         // would be whatever else the moved block uncovered, credited
         // to an order it had nothing to do with (review).
-        Rectangle2D block = ChartRenderer.titleBlockBounds(
+        Rectangle2D block = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(
                 ChartRenderer.TextMetrics.offscreen().labels(),
                 sheet.scene());
         List<SheetRecorder.Operation> theBlock = new ArrayList<>();

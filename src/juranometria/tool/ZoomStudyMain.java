@@ -32,6 +32,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class ZoomStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDTH = 900;
     private static final int HEIGHT = 700;
 
@@ -345,7 +349,7 @@ public final class ZoomStudyMain {
         // Realistic burst: five notches outward from the searched-star
         // page, each notch a full accepted transition through
         // query-to-pixels - state, assembly, render.
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         ChartViewState state = new ChartViewState(
                 new SkyPosition(83.818667, -5.389667), 6.0, 8.0, null, null);
         // Warm the tiles and the renderer once.

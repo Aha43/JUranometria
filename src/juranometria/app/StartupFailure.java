@@ -83,12 +83,85 @@ final class StartupFailure {
      * screen.
      */
     static String message(Throwable failure) {
-        return "JUranometria could not start.\n\n"
-                + describe(failure) + "\n\n"
-                + remedy(classify(failure));
+        return message(failure, readersLanguage(),
+                juranometria.ui.language.StartupText.PACKAGED);
     }
 
-    private static String remedy(Kind kind) {
+    /**
+     * What the reader is told, in their language when all of it can
+     * be read and in English otherwise.
+     *
+     * <p><strong>The framing is atomic.</strong> A headline and its
+     * remedy are one piece of writing: a Norwegian headline over an
+     * English remedy would look like a defect inside the report of a
+     * defect, and would leave a reader unsure which half to believe.
+     * So both are asked for together and either both are used or
+     * neither is.
+     *
+     * <p>The technical cause between them is the loader's own words
+     * and is never translated - it is what a reader quotes in an
+     * issue - and it appears exactly once whichever framing is used.
+     */
+    static String message(Throwable failure, String language,
+                          juranometria.ui.language.StartupText.Documents
+                                  documents) {
+        Kind kind = classify(failure);
+        String cause = describe(failure);
+        juranometria.ui.language.StartupText.Said said = null;
+        try {
+            said = juranometria.ui.language.StartupText.forFailure(
+                    language, remedyOf(kind), documents);
+        } catch (Throwable reportingFailed) {
+            // A failure while reporting a failure must not replace
+            // it, and must not leave the process silent. English is
+            // embedded below and cannot fail to be reached.
+            said = null;
+        }
+        return said == null
+                ? ENGLISH_FAILED + "\n\n" + cause + "\n\n"
+                        + englishRemedy(kind)
+                : said.headline() + "\n\n" + cause + "\n\n"
+                        + said.remedy();
+    }
+
+    /**
+     * The headline in English: embedded, and the last line of
+     * defence.
+     *
+     * <p>This and {@link #englishRemedy} are the one place in the
+     * atlas where a hard-coded reader sentence is right. They are
+     * reached without opening a file, a preference node or a language
+     * class, because each of those is something this surface may be
+     * reporting the failure of.
+     */
+    static final String ENGLISH_FAILED = "JUranometria could not start.";
+
+    /** The reader's stored language, or null if it cannot be read. */
+    private static String readersLanguage() {
+        try {
+            return juranometria.ui.language.SkyLanguageStore.user()
+                    .choice(Atlas.languages()).interfaceLanguage();
+        } catch (Throwable unavailable) {
+            // The settings store is one of the three things that may
+            // have failed; asking it here must not fail again.
+            return null;
+        }
+    }
+
+    private static juranometria.ui.language.StartupText.Remedy remedyOf(
+            Kind kind) {
+        return switch (kind) {
+            case BUNDLED_DATA -> juranometria.ui.language.StartupText
+                    .Remedy.BUNDLED_DATA;
+            case SETTINGS -> juranometria.ui.language.StartupText
+                    .Remedy.SETTINGS;
+            case UNRECOGNISED -> juranometria.ui.language.StartupText
+                    .Remedy.UNRECOGNISED;
+        };
+    }
+
+    /** The remedy in English: embedded, and the last line of defence. */
+    static String englishRemedy(Kind kind) {
         return switch (kind) {
             case BUNDLED_DATA -> """
                     The application verifies its bundled star catalogue, \

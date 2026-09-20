@@ -14,19 +14,19 @@ in their head.
 
 | control | its own key in the dialog | depends on | what it says |
 |---|---|---|---|
-| Deep-sky objects | `D` | — | Draw deep-sky objects on the chart at all (<prefix> then D) |
+| Deep-sky objects | `D` | — | Draw deep-sky objects on the chart at all. Shortcut: <pre... |
 | Galaxies | `G` | Deep-sky objects | Galaxies, drawn at their catalogued size and orientation,... |
 | Open clusters | `O` | Deep-sky objects | Loose clusters of young stars in the plane of the Milky W... |
 | Globular clusters | `C` | Deep-sky objects | Dense, ancient balls of stars in the galactic halo. For e... |
 | Nebulae | `U` | Deep-sky objects | Clouds of gas and dust: emission, reflection and dark neb... |
 | Planetary nebulae | `P` | Deep-sky objects | Shells thrown off by dying stars, drawn small and crossed... |
-| Deep-sky labels | `L` | Deep-sky objects | Name the deep-sky objects the chart draws (<prefix> then L) |
-| Star names | `S` | — | Traditional proper names such as Betelgeuse (<prefix> the... |
-| Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis ... |
-| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts (<pref... |
-| Constellation figures | `F` | — | The joined stick figures of the constellations (<prefix> ... |
-| Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875 (<prefix> then B) |
-| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is (<prefix> th... |
+| Deep-sky labels | `L` | Deep-sky objects | Name the deep-sky objects the chart draws. Shortcut: <pre... |
+| Star names | `S` | — | Traditional proper names such as Betelgeuse. Shortcut: <p... |
+| Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis.... |
+| Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts. Short... |
+| Constellation figures | `F` | — | The joined stick figures of the constellations. Shortcut:... |
+| Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875. Shortcut: <pref... |
+| Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is. Shortcut: <... |
 | Equatorial coordinate grid | `E` | — | ICRS/J2000 right-ascension and declination grid lines wit... |
 | Title block | `T` | — | The panel in the lower left stating the target, centre, f... |
 | Stellar-magnitude key | `K` | — | A key in the upper right showing the circle size the char... |
@@ -140,7 +140,7 @@ all, so what it prints for itself is the fallback: **<prefix>**.
 | Your meridian | `R` | for this session | — | the control's own |
 | Your horizon | `H` | for this session | — | the control's own |
 
-**Zenith** is refused: controlled in Place and Time — no independent shortcut.
+The keyboard refuses one row, and prints it so that "everything the chart shows" stays a claim somebody can check: **Zenith — controlled in Place and Time — no independent shortcut**
 
 Three of the twenty letters differ from the control's own mnemonic, for the reason
 the table gives - and the palette gives the same reason beside the same letter,

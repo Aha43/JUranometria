@@ -343,24 +343,38 @@ public final class ToggleShortcutStudyMain {
         out.append("| switch | key | remembered | needs | why this"
                 + " letter |\n");
         out.append("|---|---|---|---|---|\n");
+        // The words come from the production adapter, in a stated
+        // language, because a report that kept its own copy of the
+        // labels would go on agreeing with itself after the atlas
+        // stopped agreeing with it (#350).
+        juranometria.ui.language.ChartKeyboardText said =
+                juranometria.ui.language.ChartKeyboardText.in(
+                        juranometria.ui.language.InterfaceText
+                                .forLanguage("en"));
         for (var toggle : juranometria.app.ChartKeys.toggles()) {
             var master = toggle.dependsOn() == null ? null
                     : juranometria.app.ChartKeys.toggle(toggle.dependsOn());
             out.append(String.format(Locale.ROOT,
-                    "| %s | `%s` | %s | %s | %s |%n", toggle.label(),
-                    String.valueOf(toggle.key())
-                            .toUpperCase(Locale.ROOT),
+                    "| %s | `%s` | %s | %s | %s |%n", said.label(toggle),
+                    toggle.keyLetter(),
                     toggle.persistent() ? "between sessions"
                             : "for this session",
-                    master == null ? "—" : master.label(),
-                    toggle.note() == null ? "the control's own"
-                            : toggle.note()));
+                    master == null ? "—" : said.label(master),
+                    said.note(toggle) == null ? "the control's own"
+                            : said.note(toggle)));
         }
         out.append("\n");
-        for (var refused : juranometria.app.ChartKeys.refused()
-                .entrySet()) {
-            out.append("**" + refused.getKey() + "** is refused: "
-                    + refused.getValue() + ".\n\n");
+        for (var refused : juranometria.app.ChartKeys.refused()) {
+            // The row as the palette prints it, quoted whole. The
+            // report used to join the name to the reason itself -
+            // "**Zenith** is refused: ..." - and that join was a
+            // sentence the report owned about words it did not
+            // (#350). It quotes now, and says the refusing in its
+            // own voice around the quotation.
+            out.append("The keyboard refuses one row, and prints it"
+                    + " so that \"everything the chart shows\" stays a"
+                    + " claim somebody can check: **"
+                    + said.refusedRow(refused) + "**\n\n");
         }
         out.append("Three of the twenty letters differ from the"
                 + " control's own mnemonic, for the reason\nthe table"
@@ -427,7 +441,7 @@ public final class ToggleShortcutStudyMain {
             return "Constellation figures";
         }
         for (SymbolFamily family : SymbolFamily.values()) {
-            if (family.label().equals(label)) {
+            if (family.canonicalName().equals(label)) {
                 return "Deep-sky objects";
             }
         }
@@ -437,10 +451,14 @@ public final class ToggleShortcutStudyMain {
     /** Every stroke the window binds, from the window's own parts. */
     private static List<Bound> bindings() throws Exception {
         List<Bound> found = new ArrayList<>();
+        // English, stated: this study records the keystrokes the
+        // released English surface binds, and asking the default
+        // locale would make it change with the machine (#350).
         JMenuBar bar = AppMenuBar.create(
                 new juranometria.ui.ChartViewController(),
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { });
+                () -> { }, () -> { },
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (int menu = 0; menu < bar.getMenuCount(); menu++) {
             JMenu each = bar.getMenu(menu);
             for (int at = 0; at < each.getItemCount(); at++) {

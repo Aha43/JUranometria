@@ -27,7 +27,7 @@ class AppSurfaceTest {
         int[] chartOptions = new int[1];
         int[] about = new int[1];
         JMenuBar bar = AppMenuBar.create(() -> settings[0]++,
-                () -> chartOptions[0]++, () -> about[0]++);
+                () -> chartOptions[0]++, () -> about[0]++, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertEquals(3, bar.getMenuCount(),
                 "File, View, and Help - nothing else");
         assertEquals("File", bar.getMenu(0).getText());
@@ -67,7 +67,7 @@ class AppSurfaceTest {
         // is showing - and a narrow window can close it without the
         // reader asking.
         javax.swing.JMenuBar bar = AppMenuBar.create(null, () -> { },
-                () -> { }, () -> { }, () -> { });
+                () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         javax.swing.JCheckBoxMenuItem item = AppMenuBar.inspectorItem(bar);
 
         assertNotNull(item, "View carries an Inspector item");
@@ -86,7 +86,7 @@ class AppSurfaceTest {
 
     @Test
     void withoutOptionalActionsTheMenuBarCarriesHelpAlone() {
-        JMenuBar bar = AppMenuBar.create(null, null, () -> { });
+        JMenuBar bar = AppMenuBar.create(null, null, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertEquals(1, bar.getMenuCount());
         assertEquals("Help", bar.getMenu(0).getText());
     }

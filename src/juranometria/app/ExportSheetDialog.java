@@ -53,17 +53,17 @@ public final class ExportSheetDialog extends JDialog {
     public static final String CANCEL_BUTTON = "export.cancel";
 
     ExportSheetDialog(Frame owner, ExportSheet.Request initial,
-                      Consumer<ExportSheet.Request> confirm) {
-        super(owner, "Export chart sheet", true);
-        getAccessibleContext().setAccessibleName("Export chart sheet");
+                      Consumer<ExportSheet.Request> confirm,
+                      juranometria.ui.language.InterfaceText said) {
+        super(owner, said.say("export.title"), true);
+        getAccessibleContext().setAccessibleName(said.say("export.a11y"));
         getAccessibleContext().setAccessibleDescription(
-                "Choose the format, the paper and the resolution for a"
-                        + " chart sheet");
+                said.say("export.explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(content(initial, chosen -> {
             dispose();
             confirm.accept(chosen);
-        }, this::dispose));
+        }, this::dispose, said));
         AboutDialog.installEscapeToClose(this);
         pack();
         setLocationRelativeTo(owner);
@@ -71,8 +71,10 @@ public final class ExportSheetDialog extends JDialog {
 
     /** Opens the dialog owned by and centred on the atlas window. */
     public static void open(Frame owner, ExportSheet.Request initial,
-                            Consumer<ExportSheet.Request> confirm) {
-        new ExportSheetDialog(owner, initial, confirm).setVisible(true);
+                            Consumer<ExportSheet.Request> confirm,
+                            juranometria.ui.language.InterfaceText said) {
+        new ExportSheetDialog(owner, initial, confirm, said)
+                .setVisible(true);
     }
 
     /**
@@ -88,44 +90,51 @@ public final class ExportSheetDialog extends JDialog {
      * that do nothing: an inventory is not a session.
      */
     public static JComponent contentForStudy() {
+        return contentForStudy(
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
+    }
+
+    /** The same content, in a language a caller states (#350). */
+    public static JComponent contentForStudy(
+            juranometria.ui.language.InterfaceText said) {
         return content(ExportSheetSession.defaults(), request -> { },
-                () -> { });
+                () -> { }, said);
     }
 
     static JComponent content(ExportSheet.Request initial,
                               Consumer<ExportSheet.Request> confirm,
-                              Runnable cancel) {
+                              Runnable cancel,
+                              juranometria.ui.language.InterfaceText said) {
+        juranometria.ui.language.ExportText words =
+                juranometria.ui.language.ExportText.in(said);
         JComboBox<SheetFormat> format =
                 new JComboBox<>(SheetFormat.values());
         format.setName(FORMAT_BOX);
         format.setSelectedItem(initial.format());
-        format.getAccessibleContext().setAccessibleName("Format");
+        format.getAccessibleContext().setAccessibleName(
+                said.say("export.format.a11y"));
         // The combo's own words are a file format's name, which
         // means nothing about what the file is *for*; the tooltip is
         // where that fits without widening the box (see below).
         juranometria.ui.Explain.control(format,
-                "What kind of file to write: vector for printing and"
-                        + " editing, PNG for sharing a picture",
-                "Chooses the file the sheet is written as. SVG and PDF"
-                        + " keep the drawing as lines; PNG is a"
-                        + " picture at a chosen resolution.");
+                said.say("export.format.hover"),
+                said.say("export.format.explain"));
         // The name only. The explanation used to live in here, and
         // a combo is as wide as its widest entry: on a machine with
         // wider fonts at enlarged text the dialog grew past the
         // narrowest window the atlas supports (CI on PR #291). It is
         // a line of its own below now, where it can wrap.
-        format.setRenderer(described(SheetFormat::readableName));
+        format.setRenderer(described(words::name));
 
         JComboBox<PaperSize> paper = new JComboBox<>(PaperSize.values());
         paper.setName(PAPER_BOX);
         paper.setSelectedItem(initial.paper());
-        paper.getAccessibleContext().setAccessibleName("Paper");
+        paper.getAccessibleContext().setAccessibleName(
+                said.say("export.paper.a11y"));
         juranometria.ui.Explain.control(paper,
-                "The size of the page the chart is laid out on",
-                "Chooses the paper the sheet is laid out for. The"
-                        + " chart is fitted to it; the page you are"
-                        + " looking at does not move.");
-        paper.setRenderer(described(PaperSize::readableName));
+                said.say("export.paper.hover"),
+                said.say("export.paper.explain"));
+        paper.setRenderer(described(words::name));
 
         JComboBox<Integer> resolution = new JComboBox<>();
         for (int dpi : PngSheetWriter.RESOLUTIONS) {
@@ -133,37 +142,43 @@ public final class ExportSheetDialog extends JDialog {
         }
         resolution.setName(RESOLUTION_BOX);
         resolution.setSelectedItem(initial.dpi());
-        resolution.getAccessibleContext().setAccessibleName("Resolution");
+        resolution.getAccessibleContext().setAccessibleName(
+                said.say("export.resolution.a11y"));
+        // Kept whole when the control goes grey: it explains the
+        // ignoring rather than describing an action the control will
+        // not perform, which is the opposite of the mistake the
+        // toolbar's magnitude buttons made (#350).
         juranometria.ui.Explain.control(resolution,
-                "How finely a PNG is drawn; ignored by SVG and PDF",
-                "Chooses how many dots per inch a PNG is drawn at."
-                        + " SVG and PDF keep the drawing as lines and"
-                        + " ignore this.");
-        resolution.setRenderer(described(dpi -> dpi + " dots per inch"));
+                said.say("export.resolution.hover"),
+                said.say("export.resolution.explain"));
+        resolution.setRenderer(described(words::resolution));
 
-        JCheckBox working = new JCheckBox("<html><body"
-                + " style='width:260px'>Include the working"
-                + " selection's marks</body></html>");
+        // Broken against real font metrics rather than a CSS width:
+        // a width declared on an HTML body does NOT bound a label's
+        // preferred width, which is why WrappedText exists (#350).
+        JCheckBox working = new JCheckBox();
+        working.setText(juranometria.ui.WrappedText.html(
+                said.say("export.working.label"), 260,
+                working.getFontMetrics(working.getFont())));
         working.setName(WORKING_BOX);
         working.setSelected(initial.workingSelection());
         working.getAccessibleContext().setAccessibleName(
-                "Include working selection marks");
+                said.say("export.working.a11y"));
         juranometria.ui.Explain.control(working,
-                "Draw the rings and crosses on the objects you have"
-                        + " marked",
-                "When on, the sheet carries the marks you made this"
-                        + " session. Off by default, because a sheet"
-                        + " outlives the session that made it.");
+                said.say("export.working.hover"),
+                said.say("export.working.explain"));
 
         JLabel explanation = new JLabel();
         explanation.setName("export.explanation");
-        Runnable explain = () -> explanation.setText("<html><body"
-                + " style='width:220px'>"
-                + ((SheetFormat) format.getSelectedItem()).explanation()
-                + "</body></html>");
+        Runnable explain = () -> explanation.setText(
+                juranometria.ui.WrappedText.html(
+                        words.explanation(
+                                (SheetFormat) format.getSelectedItem()),
+                        220,
+                        explanation.getFontMetrics(explanation.getFont())));
         explain.run();
 
-        JLabel resolutionLabel = new JLabel("Resolution:");
+        JLabel resolutionLabel = new JLabel(said.say("export.resolution.label"));
         resolutionLabel.setLabelFor(resolution);
         Runnable followFormat = () -> {
             boolean pixels = ((SheetFormat) format.getSelectedItem())
@@ -183,7 +198,7 @@ public final class ExportSheetDialog extends JDialog {
         at.anchor = GridBagConstraints.LINE_START;
         at.gridx = 0;
         at.gridy = 0;
-        JLabel formatLabel = new JLabel("Format:");
+        JLabel formatLabel = new JLabel(said.say("export.format.label"));
         formatLabel.setLabelFor(format);
         fields.add(formatLabel, at);
         at.gridx = 1;
@@ -200,7 +215,7 @@ public final class ExportSheetDialog extends JDialog {
         at.gridy = 2;
         at.fill = GridBagConstraints.NONE;
         at.weightx = 0;
-        JLabel paperLabel = new JLabel("Paper:");
+        JLabel paperLabel = new JLabel(said.say("export.paper.label"));
         paperLabel.setLabelFor(paper);
         fields.add(paperLabel, at);
         at.gridx = 1;
@@ -230,13 +245,13 @@ public final class ExportSheetDialog extends JDialog {
         at.fill = GridBagConstraints.NONE;
         fields.add(working, at);
 
-        JButton export = new JButton("Export...");
+        JButton export = new JButton(said.say("export.confirm.label"));
         export.setName(EXPORT_BUTTON);
-        export.getAccessibleContext().setAccessibleName("Export");
+        export.getAccessibleContext().setAccessibleName(
+                said.say("export.confirm.a11y"));
         juranometria.ui.Explain.control(export,
-                "Choose where to save the sheet",
-                "Opens the file chooser, and writes the sheet where"
-                        + " you put it");
+                said.say("export.confirm.hover"),
+                said.say("export.confirm.explain"));
         export.addActionListener(event -> confirm.accept(
                 new ExportSheet.Request(
                         (SheetFormat) format.getSelectedItem(),
@@ -244,11 +259,12 @@ public final class ExportSheetDialog extends JDialog {
                         (Integer) resolution.getSelectedItem(),
                         working.isSelected())));
 
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton(said.say("export.cancel.label"));
         cancelButton.setName(CANCEL_BUTTON);
-        cancelButton.getAccessibleContext().setAccessibleName("Cancel");
+        cancelButton.getAccessibleContext().setAccessibleName(
+                said.say("export.cancel.a11y"));
         juranometria.ui.Explain.selfExplanatory(cancelButton,
-                "Closes this window without writing anything");
+                said.say("export.cancel.explain"));
         cancelButton.addActionListener(event -> cancel.run());
 
         JPanel buttons = new JPanel();

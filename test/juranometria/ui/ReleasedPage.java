@@ -38,6 +38,11 @@ import juranometria.render.ChartRenderer;
  */
 final class ReleasedPage {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private ReleasedPage() {
     }
 
@@ -47,7 +52,7 @@ final class ReleasedPage {
 
     /** The default page, drawn here, at the reference's geometry. */
     static byte[] here() throws Exception {
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ImageIO.write(renderer.renderToImage(Atlas.assembler().assemble(
                 ChartViewState.DEFAULT, WIDTH, HEIGHT)), "png", bytes);

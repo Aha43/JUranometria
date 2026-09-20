@@ -43,8 +43,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class WorkingSelectionChartGestureTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private record Fixture(ChartComponent chart, SelectionModel selection,
                            WorkingSelection working, SelectionMode mode) {
@@ -57,7 +62,7 @@ class WorkingSelectionChartGestureTest {
         WorkingSelection working = new WorkingSelection();
         SelectionMode mode = new SelectionMode();
         SwingUtilities.invokeAndWait(() -> {
-            chart[0] = new ChartComponent(Atlas.assembler());
+            chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             chart[0].setSize(900, 760);
             chart[0].setViewState(new juranometria.chart.ChartViewState(
                     new SkyPosition(ra, dec), field, 8.0));

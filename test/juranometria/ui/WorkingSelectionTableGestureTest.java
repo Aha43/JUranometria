@@ -42,6 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class WorkingSelectionTableGestureTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition M31 = new SkyPosition(10.684, 41.269);
 
     /** An identity no row of this page carries. */
@@ -65,14 +70,14 @@ class WorkingSelectionTableGestureTest {
             ChartComponent[] made = new ChartComponent[1];
             JFrame[] shown = new JFrame[1];
             SwingUtilities.invokeAndWait(() -> {
-                made[0] = new ChartComponent(Atlas.assembler());
+                made[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 made[0].setSize(900, 700);
                 made[0].setViewState(new ChartViewState(M31, 8.0, 8.0));
             });
             chart = made[0];
             host = new ChartModuleHost(chart, new SelectionModel(),
                     request -> { });
-            panel = host.attach(new OnThisPageModule()).panel();
+            panel = host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en"))).panel();
             // In a real, shown window (post-approval review): the
             // shared pointer route's premises are only evidence of
             // reachability when the table is really on screen.

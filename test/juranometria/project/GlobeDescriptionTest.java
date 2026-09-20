@@ -31,6 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeDescriptionTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDE_PX = 900;
 
     private static final int HIGH_PX = 700;
@@ -40,7 +45,7 @@ class GlobeDescriptionTest {
 
     @Test
     void aGlobeSaysItIsOneHemisphereWithACircularEdge() {
-        String said = DrawnPage.of(sceneAt(180.0)).describe();
+        String said = DrawnPage.of(sceneAt(180.0)).describe(ENGLISH);
 
         assertTrue(said.contains("one hemisphere"),
                 "a globe says how much sky it shows: " + said);
@@ -63,7 +68,7 @@ class GlobeDescriptionTest {
         // has learned to expect, and this sentence is not theirs to
         // carry: a 42-degree page has no limb and no hidden half.
         for (double field : new double[] {6.0, 42.0, 120.0}) {
-            String said = DrawnPage.of(sceneAt(field)).describe();
+            String said = DrawnPage.of(sceneAt(field)).describe(ENGLISH);
             assertFalse(said.contains("hemisphere"),
                     field + " degrees says nothing about a hemisphere:"
                             + " " + said);
@@ -92,7 +97,7 @@ class GlobeDescriptionTest {
                 new juranometria.ui.ChartComponent[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             chart[0] = new juranometria.ui.ChartComponent(
-                    Atlas.assembler());
+                    Atlas.assembler(), ENGLISH);
             chart[0].setSize(WIDE_PX, HIGH_PX);
             chart[0].setViewState(
                     new ChartViewState(SAGITTARIUS, 180.0, 5.0));
@@ -101,7 +106,7 @@ class GlobeDescriptionTest {
         String spoken = onEdt(() -> chart[0].getAccessibleContext()
                 .getAccessibleDescription());
         String said = onEdt(() ->
-                DrawnPage.of(chart[0].currentScene()).describe());
+                DrawnPage.of(chart[0].currentScene()).describe(ENGLISH));
 
         assertEquals(said, spoken,
                 "the chart tells a reader exactly what the page says"

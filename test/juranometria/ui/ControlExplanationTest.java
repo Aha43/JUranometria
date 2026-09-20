@@ -52,6 +52,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ControlExplanationTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Path REPORT = Path.of(
             "docs/studies/control-explanations/measurements.md");
 
@@ -191,15 +196,27 @@ class ControlExplanationTest {
                     Shortcuts.all().stream().map(Shortcuts.Shortcut::text)
                             .toList());
             for (ChartKeys.Toggle toggle : ChartKeys.toggles()) {
-                bound.add(toggle.sequence());
+                bound.add(juranometria.ui.language.ChartKeyboardText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).sequence(toggle));
             }
 
-            // Every parenthesised keystroke a reader is shown.
+            // Every keystroke a reader is shown, however it is
+            // presented. This used to look only inside parentheses,
+            // because that was the one form the surfaces used - so
+            // when #350 gave Chart Options a proper sentence
+            // ("Shortcut: X.") the check stopped seeing seventeen
+            // tooltips and its own premise caught it. The contract is
+            // about keystrokes a reader is PROMISED, not about
+            // punctuation, so it no longer depends on the shape of
+            // the sentence around them.
             java.util.regex.Pattern named = java.util.regex.Pattern
                     .compile("\\(([^()]*"
                             + java.util.regex.Pattern.quote(
                                     Shortcuts.menuModifierText())
-                            + "[^()]*)\\)");
+                            + "[^()]*)\\)"
+                            + "|Shortcut: ([^.]*"
+                            + java.util.regex.Pattern.quote(
+                                    Shortcuts.menuModifierText())
+                            + "[^.]*)\\.");
             int found = 0;
             for (Control control
                     : ControlExplanationStudyMain.audit().controls()) {
@@ -210,7 +227,9 @@ class ControlExplanationTest {
                     }
                     var matcher = named.matcher(text);
                     while (matcher.find()) {
-                        String claimed = matcher.group(1).trim();
+                        String claimed = (matcher.group(1) != null
+                                ? matcher.group(1)
+                                : matcher.group(2)).trim();
                         found++;
                         assertTrue(bound.contains(claimed),
                                 control.surface() + " " + control.seen()
@@ -231,7 +250,7 @@ class ControlExplanationTest {
     void everyShortcutTheRegistryNamesIsOneTheMenuActuallyBinds() {
         JMenuBar bar = AppMenuBar.create(new ChartViewController(),
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { });
+                () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (Shortcuts.Shortcut shortcut : Shortcuts.all()) {
             assertTrue(accelerators(bar).contains(shortcut.stroke()),
                     shortcut.label() + " is named by the registry, so"
@@ -266,7 +285,7 @@ class ControlExplanationTest {
         // not done the thing it waits for.
         SwingSession.restoring(() -> {
             ChartComponent chart = new ChartComponent(
-                    juranometria.app.Atlas.assembler());
+                    juranometria.app.Atlas.assembler(), ENGLISH);
             chart.setSize(900, 700);
             chart.setViewState(
                     juranometria.chart.ChartViewState.DEFAULT);
@@ -274,12 +293,12 @@ class ControlExplanationTest {
                     new juranometria.chart.SelectionModel(),
                     request -> { });
             javax.swing.JComponent panel = host.attach(
-                    new juranometria.ui.onthispage.OnThisPageModule())
+                    new juranometria.ui.onthispage.OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")))
                     .panel();
 
-            JButton centre = button(panel, "Center here");
+            JButton centre = button(panel, "Centre here");
             JButton clear = button(panel, "Clear marks");
-            assertNotNull(centre, "the panel has its Center here");
+            assertNotNull(centre, "the panel has its Centre here");
             assertNotNull(clear, "and its Clear marks");
             assertFalse(centre.isEnabled(),
                     "nothing is marked, so it is grey");
@@ -330,12 +349,15 @@ class ControlExplanationTest {
             }
             assertFalse(zoomIn.isEnabled(),
                     "the narrowest field the atlas draws");
-            assertTrue(zoomIn.getAccessibleContext()
-                            .getAccessibleDescription()
-                            .contains("unavailable"),
-                    "and the control says so rather than going quiet: "
-                            + zoomIn.getAccessibleContext()
-                                    .getAccessibleDescription());
+            // Asked of the resource, not pinned as a literal: the
+            // sentence belongs to the language now, and a test that
+            // froze the English would make the next translation a
+            // test failure instead of a translation (#350).
+            assertEquals(juranometria.ui.language.InterfaceText
+                            .forLanguage("en").say("toolbar.zoomIn.end"),
+                    zoomIn.getAccessibleContext()
+                            .getAccessibleDescription(),
+                    "and the control says so rather than going quiet");
         });
     }
 

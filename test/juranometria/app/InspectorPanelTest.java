@@ -19,6 +19,7 @@ import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,8 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class InspectorPanelTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static ChartScene page() {
         return juranometria.app.Atlas.assembler().assemble(
@@ -144,17 +150,51 @@ class InspectorPanelTest {
                 DeepSkyObject.Recorded.NOTHING);
 
         assertEquals("magnitude not recorded",
-                InspectorPanel.magnitudeLine(noPhotometry));
-        assertTrue(InspectorPanel.magnitudeLine(blueOnly)
+                InspectorPanel.magnitudeLine(noPhotometry, english()));
+        assertTrue(InspectorPanel.magnitudeLine(blueOnly, english())
                 .contains("blue magnitude; no V recorded"));
         assertEquals("size not recorded",
-                InspectorPanel.sizeLine(nothingKnown));
-        assertTrue(InspectorPanel.sizeLine(blueOnly)
+                InspectorPanel.sizeLine(nothingKnown, english()));
+        assertTrue(InspectorPanel.sizeLine(blueOnly, english())
                         .contains("orientation not recorded"),
-                InspectorPanel.sizeLine(blueOnly));
-        assertTrue(InspectorPanel.sizeLine(noPhotometry).contains("PA 30"),
+                InspectorPanel.sizeLine(blueOnly, english()));
+        assertTrue(InspectorPanel.sizeLine(noPhotometry, english()).contains("PA 30"),
                 "and a recorded orientation is stated: "
-                        + InspectorPanel.sizeLine(noPhotometry));
+                        + InspectorPanel.sizeLine(noPhotometry, english()));
+        // The fourth size form: ONE axis AND a recorded orientation.
+        // No fixture reached it, so the pattern behind it was never
+        // formatted - and a defect in it ({2} where two arguments are
+        // supplied) survived every test until the arity check was
+        // written AND this case existed to fire it (#350).
+        DeepSkyObject oneAxisWithAngle = new DeepSkyObject("NGC 0004",
+                List.of(), juranometria.chart.DsoType.GALAXY,
+                new SkyPosition(1.0, 1.0), 2.0, 1.0, 45.0, 11.0, 3,
+                new DeepSkyObject.Recorded(3.4, null, 17.0,
+                        DeepSkyObject.Recorded.Band.VISUAL));
+        // SYNTHETIC ONLY, and deliberately so. A single recorded axis
+        // may carry a position angle - it states the orientation of
+        // the extent that was measured - and the data model permits
+        // it, but the shipped catalogue contains zero such records
+        // (0 of 13,371). So this shape is reachable only from a
+        // constructed object, and is exercised here in BOTH
+        // languages because no visual checkpoint can show it without
+        // fabricating a catalogue state (#350).
+        String oneAxis = InspectorPanel.sizeLine(oneAxisWithAngle, english());
+        assertTrue(oneAxis.contains("3.4") && oneAxis.contains("across")
+                        && oneAxis.contains("PA 17"),
+                "one axis and an orientation, both stated: " + oneAxis);
+        String oneAxisNorsk = InspectorPanel.sizeLine(oneAxisWithAngle,
+                juranometria.ui.language.InterfaceText.forLanguage("nb-NO"));
+        assertTrue(oneAxisNorsk.contains("3.4")
+                        && oneAxisNorsk.contains("tvers over")
+                        && oneAxisNorsk.contains("PA 17"),
+                "and in Norwegian, with the measurements unchanged: "
+                        + oneAxisNorsk);
+        assertNotEquals(oneAxis, oneAxisNorsk,
+                "the two languages say it differently, so the pattern"
+                        + " is genuinely formatted in each rather than"
+                        + " falling back");
+
         assertEquals("type not classified",
                 InspectorPanel.readableType(nothingKnown));
     }
@@ -209,7 +249,7 @@ class InspectorPanelTest {
                 firstDeepSky(fixture.scene()));
         fixture.model().selectAmong(List.of(star, dso));
 
-        assertEquals("2 objects here", fixture.panel().lines().get(0));
+        assertEquals("Objects here \u00b7 2", fixture.panel().lines().get(0));
         assertEquals(2, fixture.panel().candidateLines().size(),
                 "both candidates are offered: "
                         + fixture.panel().candidateLines());
@@ -223,7 +263,7 @@ class InspectorPanelTest {
     }
 
     @Test
-    void onlyCenterHereEverAsksToMoveTheChart() throws Exception {
+    void onlyCentreHereEverAsksToMoveTheChart() throws Exception {
         Fixture fixture = fixture();
         Selection.Object star = ChartHitTest.selectionFor(
                 firstStar(fixture.scene()));
@@ -273,7 +313,7 @@ class InspectorPanelTest {
                 .getAccessibleName());
         assertNotNull(fixture.panel().getAccessibleContext()
                 .getAccessibleDescription());
-        assertEquals("Center here", centreButton(fixture.panel())
+        assertEquals("Centre here", centreButton(fixture.panel())
                 .getAccessibleContext().getAccessibleName());
         assertNotNull(fixture.panel().getInputMap(
                         javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
@@ -353,7 +393,7 @@ class InspectorPanelTest {
         SwingUtilities.invokeAndWait(() -> {
             juranometria.ui.ChartComponent chart =
                     new juranometria.ui.ChartComponent(
-                            juranometria.app.Atlas.assembler());
+                            juranometria.app.Atlas.assembler(), ENGLISH);
             InspectorPanel panel = new InspectorPanel(model,
                     chart::currentScene,
                     () -> juranometria.render.ChartOptions.DEFAULTS,
@@ -421,7 +461,7 @@ class InspectorPanelTest {
                 "and the facts can actually take focus");
         assertFalse(fixture.panel().focusTarget()
                         instanceof javax.swing.JButton,
-                "Enter must not land the reader on Center here, which"
+                "Enter must not land the reader on Centre here, which"
                         + " is the one control that moves the chart");
         assertEquals("Details of the selected object",
                 fixture.panel().focusTarget().getAccessibleContext()
@@ -457,7 +497,7 @@ class InspectorPanelTest {
         SwingUtilities.invokeAndWait(panel[0]::refresh);
 
         String all = String.join(" | ", panel[0].lines());
-        assertTrue(all.contains("Not on this page any more"),
+        assertTrue(all.contains("This object is not on the current page"),
                 "and afterwards it says so plainly: " + all);
         assertFalse(all.contains("visual magnitude"),
                 "rather than repeating facts it can no longer read: "
@@ -532,7 +572,7 @@ class InspectorPanelTest {
             java.awt.Container container) {
         for (java.awt.Component component : container.getComponents()) {
             if (component instanceof javax.swing.JButton button
-                    && "Center here".equals(button.getText())) {
+                    && "Centre here".equals(button.getText())) {
                 return button;
             }
             if (component instanceof java.awt.Container inner) {
@@ -544,4 +584,10 @@ class InspectorPanelTest {
         }
         return null;
     }
+    /** The English words, stated rather than inherited (#350). */
+    private static juranometria.ui.language.InterfaceText english() {
+        return juranometria.ui.language.InterfaceText.forLanguage(
+                juranometria.ui.language.InterfaceText.ENGLISH);
+    }
+
 }

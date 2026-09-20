@@ -29,7 +29,8 @@ import juranometria.render.ChartRenderer;
  */
 public final class ChartComponent extends JComponent {
 
-    private final ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+    private final juranometria.project.PageWords words;
+    private final ChartRenderer renderer;
     private SceneAssembler assembler;
     private ChartViewState viewState = ChartViewState.DEFAULT;
     private juranometria.render.ChartOptions chartOptions =
@@ -42,17 +43,32 @@ public final class ChartComponent extends JComponent {
     private final java.util.List<Runnable> sceneListeners =
             new java.util.ArrayList<>();
 
-    public ChartComponent(SceneAssembler assembler) {
+    /**
+     * The chart, drawn and described in a stated language (#350).
+     *
+     * @param words what this page is called. Held only to pass on -
+     *     the component does not read a preference, and the language
+     *     it was given is the one the exported sheet will use,
+     *     because both come from the same resolution.
+     */
+    public ChartComponent(SceneAssembler assembler,
+                          juranometria.project.PageWords words) {
         if (assembler == null) {
             throw new IllegalArgumentException("scene assembler must not be null");
         }
+        if (words == null) {
+            throw new IllegalArgumentException("a chart says what it"
+                    + " is in some language (#350)");
+        }
+        this.words = words;
+        this.renderer = new ChartRenderer(StarSizePolicy.DEFAULT, words);
         this.assembler = assembler;
         setOpaque(true);
         setPreferredSize(new Dimension(900, 700));
         setBackground(javax.swing.UIManager.getColor("Panel.background") != null
                 ? javax.swing.UIManager.getColor("Panel.background")
                 : java.awt.Color.LIGHT_GRAY);
-        getAccessibleContext().setAccessibleName("Star chart");
+        getAccessibleContext().setAccessibleName(words.chartName());
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent event) {
@@ -261,10 +277,24 @@ public final class ChartComponent extends JComponent {
      * there is no page whose silence a reader could compare against
      * another page's word.
      */
-    private static String describe(ChartScene scene) {
+    /**
+     * The words this chart was given, for what draws over it.
+     *
+     * <p>Selection ink and sheet ink build renderers of their own and
+     * must not resolve a language to do it: they take the one the
+     * chart they are drawing on already has, so nothing downstream
+     * can end up speaking differently from the page underneath
+     * (#350).
+     */
+    public juranometria.project.PageWords words() {
+        return words;
+    }
+
+    private String describe(ChartScene scene) {
         // One source for what a page says it is, shared with the
-        // title block and the exported sheet (#301).
-        return juranometria.project.DrawnPage.of(scene).describe();
+        // title block and the exported sheet (#301), and now in one
+        // language with them too (#350).
+        return juranometria.project.DrawnPage.of(scene).describe(words);
     }
 
     /** Top of the paper page inside the (possibly letterboxed) canvas. */

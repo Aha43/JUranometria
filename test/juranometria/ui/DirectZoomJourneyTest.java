@@ -44,6 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class DirectZoomJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final double DRIFT_TOLERANCE_PX = 1e-2;
 
     private SearchField searchField;
@@ -60,7 +65,7 @@ class DirectZoomJourneyTest {
             ChartComponent[] chartHolder = new ChartComponent[1];
             SearchField[] search = new SearchField[1];
             SwingUtilities.invokeAndWait(() -> {
-                chartHolder[0] = new ChartComponent(Atlas.assembler());
+                chartHolder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 PanInteraction.install(chartHolder[0], navigation);
                 ZoomInteraction.install(chartHolder[0], navigation);
                 navigation.onChange(chartHolder[0]::setViewState);
@@ -68,7 +73,7 @@ class DirectZoomJourneyTest {
                         Atlas.assembler(), navigation);
                 frame[0] = new JFrame("direct-zoom-journey");
                 frame[0].setJMenuBar(AppMenuBar.create(navigation, null,
-                        () -> { }, () -> { }));
+                        () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 AppMenuBar.installZoomShortcuts(frame[0].getRootPane(),
                         navigation);
                 frame[0].setLayout(new java.awt.BorderLayout());
@@ -258,7 +263,7 @@ class DirectZoomJourneyTest {
         JFrame[] fencedFrame = new JFrame[1];
         try {
             SwingUtilities.invokeAndWait(() -> {
-                fencedChart[0] = new ChartComponent(Atlas.assembler());
+                fencedChart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 ZoomInteraction.install(fencedChart[0], fenced);
                 fenced.onChange(fencedChart[0]::setViewState);
                 fencedFrame[0] = new JFrame("coverage-refusal");

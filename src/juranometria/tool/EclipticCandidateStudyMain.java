@@ -81,6 +81,10 @@ import juranometria.ui.ReferenceInk;
  */
 public final class EclipticCandidateStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private EclipticCandidateStudyMain() {
     }
 
@@ -257,7 +261,7 @@ public final class EclipticCandidateStudyMain {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT).render(g, scene,
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH).render(g, scene,
                     options, (layerG, layerScene) -> {
                         ReferenceInk.paint(layerG, layerScene, meridian,
                                 palette);

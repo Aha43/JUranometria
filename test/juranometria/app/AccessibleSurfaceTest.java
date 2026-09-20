@@ -180,8 +180,8 @@ class AccessibleSurfaceTest {
                 ChartViewController navigation =
                         new ChartViewController(Atlas.assembler()::fits);
                 SearchField search = new SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
-                collectUnnamed(new AtlasToolbar(navigation, search),
+                        Atlas.assembler(), navigation, juranometria.ui.language.InterfaceText.forLanguage("en"));
+                collectUnnamed(new AtlasToolbar(navigation, search, juranometria.ui.language.InterfaceText.forLanguage("en")),
                         "toolbar", unnamed);
                 collectUnnamed(SettingsDialog.content(false, false,
                 SettingsDialog.installed(),
@@ -202,13 +202,13 @@ class AccessibleSurfaceTest {
                                         .DEFAULTS,
                                 chosen -> { }),
                         "Inspector", unnamed);
-                collectUnnamed(AboutDialog.compactContent(() -> { }),
+                collectUnnamed(AboutDialog.compactContent(() -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")),
                         "About", unnamed);
-                collectUnnamed(AboutDialog.noticesContent(),
+                collectUnnamed(AboutDialog.noticesContent(juranometria.ui.language.InterfaceText.forLanguage("en")),
                         "About notices", unnamed);
 
                 JMenuBar menuBar = AppMenuBar.create(navigation,
-                        () -> { }, () -> { }, () -> { });
+                        () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 for (int i = 0; i < menuBar.getMenuCount(); i++) {
                     JMenu menu = menuBar.getMenu(i);
                     if (menu.getAccessibleContext()

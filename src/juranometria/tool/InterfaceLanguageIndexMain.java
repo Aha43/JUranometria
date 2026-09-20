@@ -118,6 +118,27 @@ public final class InterfaceLanguageIndexMain {
                         + " output; fixtures live under test resources"
                         + " and must not ship");
             }
+            // A declared strings file must ship (#350). "The words
+            // are in <file>" and no such file is a language that
+            // registers, is offered, and then says nothing of its
+            // own - which reads to a reader as a language that did
+            // not work rather than one that is not finished.
+            String strings = stated.getOrDefault("strings", "").strip();
+            if (!strings.isEmpty()
+                    && !Files.isRegularFile(dir.resolve(strings))) {
+                throw new IllegalStateException(file + " declares its"
+                        + " words are in " + strings + ", which is not"
+                        + " beside it. A language that registers and"
+                        + " then has nothing to say reads as broken,"
+                        + " not as unfinished.");
+            }
+            if ("en".equals(tag) && strings.isEmpty()) {
+                throw new IllegalStateException(file + " declares no"
+                        + " strings file. English is the language"
+                        + " every other one falls back to, so it is"
+                        + " the one language that cannot be a"
+                        + " registration alone.");
+            }
             byTag.put(tag, stated.getOrDefault("display-name", tag).strip());
         }
 

@@ -27,6 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class CelestialGlobeRungTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition SAGITTARIUS =
             new SkyPosition(266.0, -28.0);
 
@@ -218,8 +223,8 @@ class CelestialGlobeRungTest {
                 java.util.List.of(), java.util.List.of(),
                 "Sagittarius", 5.0));
         assertEquals("orthographic", page.projectionName());
-        assertTrue(page.describe().contains("orthographic projection"),
-                "the accessible description names it: " + page.describe());
+        assertTrue(page.describe(ENGLISH).contains("orthographic projection"),
+                "the accessible description names it: " + page.describe(ENGLISH));
         assertNotNull(page.projection());
         assertTrue(page.bounded(),
                 "and the page knows its sky ends inside the paper");

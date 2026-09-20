@@ -80,6 +80,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintThirtyOneJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
+    /**
+     * What the chart keyboard's two keystrokes read as, in English.
+     *
+     * <p>Asked of the production adapter in a stated language, not
+     * composed here: where the keystrokes sit in a sentence and what
+     * joins them are the language's, and a test that rebuilt them
+     * would agree with itself after the atlas stopped agreeing (#350).
+     */
+    private static String shortcutFor(String id) {
+        return juranometria.ui.language.ChartKeyboardText.in(
+                        juranometria.ui.language.InterfaceText
+                                .forLanguage("en"))
+                .sequence(ChartKeys.toggle(id));
+    }
+
     /** The sky the defect was reported on. */
     private static final SkyPosition SAGITTARIUS =
             new SkyPosition(281.0, -26.0);
@@ -89,7 +109,7 @@ class SprintThirtyOneJourneyTest {
     private static final String NAMALSADIRAH = "TYC 6867-2428-1";
 
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     @Test
     void theReaderFindsEveryLabelInItsOwnPlace(@TempDir Path folder)
@@ -134,7 +154,7 @@ class SprintThirtyOneJourneyTest {
                     .toggle(ecliptic, juranometria.ui.ecliptic
                             .EclipticStore.forNode(node));
             SwingUtilities.invokeAndWait(() -> {
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 options.onChange(chart::setChartOptions);
                 hostHolder[0] = new ChartModuleHost(chart, selection,
@@ -148,10 +168,10 @@ class SprintThirtyOneJourneyTest {
                         chosen -> navigation.recenter(chosen.position()));
                 chart.onSceneChange(inspectorHolder[0]::refresh);
                 searchHolder[0] = new SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
+                        Atlas.assembler(), navigation, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 searchHolder[0].setSelectionModel(selection);
                 toolbarHolder[0] = new AtlasToolbar(navigation,
-                        searchHolder[0]);
+                        searchHolder[0], juranometria.ui.language.InterfaceText.forLanguage("en"));
 
                 JFrame frame = new JFrame("sprint 31 journey");
                 frame.setLayout(new BorderLayout());
@@ -167,12 +187,12 @@ class SprintThirtyOneJourneyTest {
                                 .open(frame, meridian,
                                         juranometria.ui.placeandtime.PlaceStore
                                                 .forNode(node),
-                                        java.time.Instant::now),
+                                        java.time.Instant::now, juranometria.ui.language.InterfaceText.forLanguage("en")),
                         eclipticToggle[0],
                         () -> ExportSheetSession.open(frame, navigation,
                                 chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0])));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
                 // Held before it is shown, so nothing that happens
                 // next can lose the window.
                 window[0] = frame;
@@ -180,7 +200,7 @@ class SprintThirtyOneJourneyTest {
                 // The chart's own keyboard (#312), installed by the
                 // same call the application makes.
                 ChartKeyboardSession.install(frame.getRootPane(), options,
-                        ecliptic, eclipticToggle[0], meridian);
+                        ecliptic, eclipticToggle[0], meridian, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.pack();
                 frame.setVisible(true);
             });
@@ -298,8 +318,8 @@ class SprintThirtyOneJourneyTest {
             String hovered = ReaderInput.hover(names);
             assertTrue(hovered != null && !hovered.isBlank(),
                     "and every family says what it is: " + hovered);
-            assertTrue(hovered.contains(ChartKeys.toggle(
-                            "chart.constellationNames").sequence()),
+            assertTrue(hovered.contains(shortcutFor(
+                            "chart.constellationNames")),
                     "4. naming the keys that reach the same switch"
                             + " from the chart, from the registry that"
                             + " binds them: " + hovered);
@@ -470,8 +490,8 @@ class SprintThirtyOneJourneyTest {
             JCheckBox meridianBox = onEdt(() ->
                     named(place, "showMeridian"));
             String meridianSaid = ReaderInput.hover(meridianBox);
-            assertTrue(meridianSaid.contains(ChartKeys.toggle(
-                            "module.meridian").sequence()),
+            assertTrue(meridianSaid.contains(
+                            shortcutFor("module.meridian")),
                     "5. the meridian's control names the keys that"
                             + " reach it: " + meridianSaid);
             String meridianHeard = onEdt(() -> meridianBox
@@ -707,7 +727,7 @@ class SprintThirtyOneJourneyTest {
                                Path folder, PaperSize paper,
                                SheetFormat format) throws Exception {
         List<Path> written = new ArrayList<>();
-        ExportSheetSession.Surfaces real = ExportSheetSession.onScreen();
+        ExportSheetSession.Surfaces real = ExportSheetSession.onScreen(juranometria.ui.language.InterfaceText.forLanguage("en"));
         exporting[0] = new ExportSheetSession.Surfaces() {
 
             @Override
@@ -809,7 +829,7 @@ class SprintThirtyOneJourneyTest {
                     reader.readThePng(ImageIO.read(file.toFile()),
                             juranometria.sheet.ChartSheet.record(
                                     Atlas.assembler()::assemble, state,
-                                    options, ink, paper),
+                                    options, ink, paper, ENGLISH),
                             drawn, refused);
                 }
             }

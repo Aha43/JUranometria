@@ -38,12 +38,15 @@ public final class ChartKeyboardSession {
      *     where the remembering lives
      * @param observer the attached module whose lines Place and Time
      *     switches
+     * @param words the session's language, because the palette names
+     *     twenty switches and says what each one just did (#350)
      */
     public static void install(JRootPane root,
                                ChartOptionsController options,
                                EclipticModule ecliptic,
                                Runnable eclipticToggle,
-                               MeridianModule observer) {
+                               MeridianModule observer,
+                               juranometria.ui.language.InterfaceText words) {
         if (ecliptic == null || eclipticToggle == null
                 || observer == null) {
             throw new IllegalArgumentException(
@@ -86,7 +89,7 @@ public final class ChartKeyboardSession {
                         observer.showing(showMeridian, showHorizon,
                                 observer.zenithShowing());
                     }
-                }),
+                }), words,
                 keyboard -> keyboard.showIn(root));
     }
 }

@@ -41,6 +41,10 @@ import juranometria.ui.SceneAssembler;
  */
 public final class ConstellationStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final double[] FIELDS = {8.0, 12.0, 18.0, 24.0, 36.0};
     private static final double LIMIT_V = 8.0;
     private static final int WIDTH = 900;
@@ -132,7 +136,7 @@ public final class ConstellationStudyMain {
         TiledCatalogue catalogue = TiledCatalogue.load();
         SceneAssembler assembler = SceneAssembler.allSky(
                 catalogue, catalogue.manifest().maxObjectSemiExtentDegrees());
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
         System.out.printf(Locale.ROOT, "%-7s %5s | %7s %7s %6s %6s | %5s%n",
                 "target", "field", "figSeg", "bndSeg", "nameB", "nameA", "rnd");

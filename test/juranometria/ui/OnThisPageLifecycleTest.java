@@ -32,10 +32,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OnThisPageLifecycleTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static ChartComponent chart() throws Exception {
         ChartComponent[] made = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            made[0] = new ChartComponent(Atlas.assembler());
+            made[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             made[0].setSize(900, 700);
             made[0].setViewState(ChartViewState.DEFAULT);
         });
@@ -47,7 +52,7 @@ class OnThisPageLifecycleTest {
         ChartComponent chart = chart();
         ChartModuleHost host = new ChartModuleHost(chart,
                 new SelectionModel(), request -> { });
-        OnThisPageModule module = host.attach(new OnThisPageModule());
+        OnThisPageModule module = host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
 
         String first = host.inventory().entries().get(0).identity();
         host.workingSelection().add(first);
@@ -83,10 +88,10 @@ class OnThisPageLifecycleTest {
         ChartComponent chart = chart();
         ChartModuleHost host = new ChartModuleHost(chart,
                 new SelectionModel(), request -> { });
-        host.attach(new OnThisPageModule());
+        host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         host.detachAll();
 
-        host.attach(new OnThisPageModule());
+        host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         assertTrue(chart.overlays().holds(OnThisPageModule.ID),
                 "attached again, on the same chart");
         host.detachAll();
@@ -97,7 +102,7 @@ class OnThisPageLifecycleTest {
         ChartComponent chart = chart();
         ChartModuleHost host = new ChartModuleHost(chart,
                 new SelectionModel(), request -> { });
-        host.attach(new OnThisPageModule());
+        host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         host.workingSelection().add(host.inventory().entries().get(0).identity());
         host.detachAll();
 

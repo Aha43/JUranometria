@@ -46,10 +46,15 @@ public final class SettingsDialog extends JDialog {
                    juranometria.ui.language.SkyLanguageSession language,
                    juranometria.geo.SkyNames names,
                    juranometria.ui.language.InterfaceLanguages interfaces) {
-        super(owner, "Settings", false);
-        getAccessibleContext().setAccessibleName("Settings");
+        super(owner, juranometria.ui.language.InterfaceText
+                .forLanguage(language.current().interfaceLanguage())
+                .say("settings.title"), false);
+        juranometria.ui.language.InterfaceText said =
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.current().interfaceLanguage());
+        getAccessibleContext().setAccessibleName(said.say("settings.title"));
         getAccessibleContext().setAccessibleDescription(
-                "Application appearance and language settings");
+                said.say("settings.a11y"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(content(session.savedDark(), session.overrideActive(),
                 new Languages(language.current(), language.available(),
@@ -57,6 +62,11 @@ public final class SettingsDialog extends JDialog {
                 confirmed -> {
                     applyTheme.accept(
                             session.confirmChoice(confirmed.dark()));
+                    // Read BEFORE choosing: this is the language the
+                    // reader had, and afterwards there is no way
+                    // back to it.
+                    String wasInterface =
+                            language.current().interfaceLanguage();
                     // Both keys, always - and the choice the reader
                     // is looking at even if they changed nothing,
                     // because confirming an explicit Follow must
@@ -64,10 +74,46 @@ public final class SettingsDialog extends JDialog {
                     // it happens to draw today.
                     language.choose(confirmed.language());
                     dispose();
+                    // Last, and after the choice is saved. The
+                    // interface language is restart-bound and the
+                    // session it leaves behind is a mixed one -
+                    // dialogs opened from here on speak the new
+                    // language, while the menu bar, the toolbar and
+                    // the drawn page keep the language they were
+                    // built in. The owner met exactly that and
+                    // reasonably read it as a bug.
+                    tellAboutRestart(owner, wasInterface,
+                            confirmed.language().interfaceLanguage());
                 }));
         AboutDialog.installEscapeToClose(this);
         pack();
         setLocationRelativeTo(owner);
+    }
+
+    /**
+     * Says that the interface language needs a restart, once.
+     *
+     * <p>Nothing here may break saving. The choice is already
+     * persisted when this runs, so a language that will not load, or
+     * a toolkit that will not open a dialog, must cost the reader a
+     * sentence and not their settings.
+     */
+    private static void tellAboutRestart(Frame owner, String was,
+                                         String now) {
+        try {
+            juranometria.ui.language.InterfaceRestartNotice.Said said =
+                    juranometria.ui.language.InterfaceRestartNotice
+                            .forChoice(was, now);
+            if (said == null) {
+                return;
+            }
+            javax.swing.JOptionPane.showMessageDialog(owner,
+                    said.message(), said.title(),
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        } catch (RuntimeException | Error ignored) {
+            // Deliberately swallowed, and deliberately narrow in
+            // effect: the reader loses a notice, never a setting.
+        }
     }
 
     /** Opens the dialog owned by and centred on the atlas window. */
@@ -165,33 +211,84 @@ public final class SettingsDialog extends JDialog {
         return content(false, false, installed(), confirmed -> { });
     }
 
+    /**
+     * The same, in a given interface language and with the override
+     * note shown (#350).
+     *
+     * <p>For the sheet a person reads when deciding whether a
+     * translation is any good. The note is forced on because a
+     * conditional sentence a reviewer never sees is a sentence nobody
+     * reviewed.
+     *
+     * <p>A seam rather than public records: what the dialog is built
+     * from stays its own business, and a study needs the result, not
+     * the parts.
+     */
+    public static JComponent contentForStudy(String interfaceLanguage) {
+        juranometria.ui.language.SkyLanguageChoice.Available available =
+                Atlas.languages();
+        juranometria.ui.language.SkyLanguageChoice choice =
+                juranometria.ui.language.SkyLanguageChoice.read(
+                        java.util.Map.of(juranometria.ui.language
+                                .SkyLanguageChoice.INTERFACE_KEY,
+                                interfaceLanguage),
+                        available);
+        return content(false, true,
+                new Languages(choice, available, Atlas.names(),
+                        juranometria.ui.language.InterfaceLanguages
+                                .discover()),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        interfaceLanguage),
+                confirmed -> { });
+    }
+
     static JComponent content(boolean savedDark, boolean overrideActive,
                               Languages languages,
+                              Consumer<Confirmed> confirm) {
+        return content(savedDark, overrideActive, languages,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        languages.current().interfaceLanguage()),
+                confirm);
+    }
+
+    /**
+     * The same, in a language a caller states (#350).
+     *
+     * <p>Every reader-visible string here is asked for by key. The
+     * words arrive as a parameter rather than being fetched, for the
+     * reason the chart language is a parameter too: a dialog that
+     * looked up its own language would depend on when it was built
+     * rather than on what it was asked for.
+     */
+    static JComponent content(boolean savedDark, boolean overrideActive,
+                              Languages languages,
+                              juranometria.ui.language.InterfaceText said,
                               Consumer<Confirmed> confirm) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
-        JLabel heading = new JLabel("Appearance");
+        JLabel heading = new JLabel(said.say("settings.appearance.heading"));
         heading.putClientProperty("FlatLaf.styleClass", "h3");
         heading.setAlignmentX(0.0f);
         panel.add(heading);
         panel.add(Box.createVerticalStrut(8));
 
-        JRadioButton light = new JRadioButton("Light", !savedDark);
-        light.getAccessibleContext().setAccessibleName("Light appearance");
+        JRadioButton light = new JRadioButton(
+                said.say("settings.appearance.light.label"), !savedDark);
+        light.getAccessibleContext().setAccessibleName(
+                said.say("settings.appearance.light.a11y"));
         // "Light" and "Dark" are the whole meaning of the words on
         // them; what is worth saying is what they do *not* change,
         // which is the chart, and that has nowhere to be seen.
         juranometria.ui.Explain.selfExplanatory(light,
-                "Draws the window's own chrome light. The chart is"
-                        + " drawn the same either way.");
-        JRadioButton dark = new JRadioButton("Dark", savedDark);
-        dark.getAccessibleContext().setAccessibleName("Dark appearance");
+                said.say("settings.appearance.light.explain"));
+        JRadioButton dark = new JRadioButton(
+                said.say("settings.appearance.dark.label"), savedDark);
+        dark.getAccessibleContext().setAccessibleName(
+                said.say("settings.appearance.dark.a11y"));
         juranometria.ui.Explain.selfExplanatory(dark,
-                "Draws the window's own chrome dark. The chart is"
-                        + " drawn the same either way; the black sky"
-                        + " is a chart option of its own.");
+                said.say("settings.appearance.dark.explain"));
         ButtonGroup group = new ButtonGroup();
         group.add(light);
         group.add(dark);
@@ -202,10 +299,9 @@ public final class SettingsDialog extends JDialog {
         if (overrideActive) {
             panel.add(Box.createVerticalStrut(8));
             JLabel note = new JLabel(
-                    "This session was started with --dark; the chosen"
-                            + " appearance applies from the next launch.");
+                    said.say("settings.appearance.override.note"));
             note.getAccessibleContext().setAccessibleName(
-                    "Dark override note");
+                    said.say("settings.appearance.override.a11y"));
             note.putClientProperty("FlatLaf.styleClass", "small");
             note.setAlignmentX(0.0f);
             panel.add(note);
@@ -213,7 +309,8 @@ public final class SettingsDialog extends JDialog {
         panel.add(Box.createVerticalStrut(20));
 
         // ---- the two languages ---------------------------------
-        JLabel languageHeading = new JLabel("Language");
+        JLabel languageHeading = new JLabel(
+                said.say("settings.language.heading"));
         languageHeading.putClientProperty("FlatLaf.styleClass", "h3");
         languageHeading.setAlignmentX(0.0f);
         panel.add(languageHeading);
@@ -231,15 +328,12 @@ public final class SettingsDialog extends JDialog {
         interfaceBox.setSelectedItem(juranometria.ui.language
                 .SkyLanguageChoices.selected(interfaceItems,
                         languages.current().interfaceLanguage()));
-        label(panel, "Interface language", interfaceBox,
-                "Interface language",
-                "The language of the menus, buttons and dialogs - not"
-                        + " the names printed on the chart",
-                "The language of the menus, buttons and dialogs -"
-                        + " the words the application speaks to you."
-                        + " It does not change the names printed on"
-                        + " the chart, which are chosen separately"
-                        + " below.");
+        label(panel, said.say("settings.language.interface.label"),
+                interfaceBox,
+                said.say("settings.language.interface.a11y"),
+                said.say("settings.language.interface.hover"),
+                said.say("settings.language.interface.explain"),
+                said);
 
         panel.add(Box.createVerticalStrut(10));
 
@@ -247,7 +341,8 @@ public final class SettingsDialog extends JDialog {
                 chartItems = juranometria.ui.language.SkyLanguageChoices
                         .forTheChart(languages.names(),
                                 languages.available(),
-                                languages.current().interfaceLanguage());
+                                languages.current().interfaceLanguage(),
+                                said);
         JComboBox<juranometria.ui.language.SkyLanguageChoices.Item>
                 chartBox = new JComboBox<>(chartItems.toArray(
                         new juranometria.ui.language.SkyLanguageChoices
@@ -255,27 +350,19 @@ public final class SettingsDialog extends JDialog {
         chartBox.setSelectedItem(juranometria.ui.language
                 .SkyLanguageChoices.selected(chartItems,
                         languages.current().chartLanguage()));
-        label(panel, "Names on chart", chartBox, "Names on chart",
-                "The language of the constellation names printed on"
-                        + " the chart - separate from the interface"
-                        + " language",
-                "The language of the constellation names printed on"
-                        + " the chart itself. Separate from the"
-                        + " interface language, so the sky can be"
-                        + " named in your own language while the"
-                        + " menus stay in another. \"Follow"
-                        + " interface\" keeps the two together"
-                        + " whatever the interface is set to; it says"
-                        + " what it currently draws, because with one"
-                        + " interface language installed it draws the"
-                        + " same page as Latin.");
+        label(panel, said.say("settings.language.chart.label"),
+                chartBox, said.say("settings.language.chart.a11y"),
+                said.say("settings.language.chart.hover"),
+                said.say("settings.language.chart.explain"),
+                said);
 
         panel.add(Box.createVerticalStrut(16));
 
-        JButton cancel = new JButton("Cancel");
-        cancel.getAccessibleContext().setAccessibleName("Cancel");
+        JButton cancel = new JButton(said.say("settings.cancel.label"));
+        cancel.getAccessibleContext().setAccessibleName(
+                said.say("settings.cancel.a11y"));
         juranometria.ui.Explain.selfExplanatory(cancel,
-                "Closes this window and changes nothing");
+                said.say("settings.cancel.explain"));
         cancel.addActionListener(event -> {
             java.awt.Window window =
                     javax.swing.SwingUtilities.getWindowAncestor(cancel);
@@ -283,10 +370,11 @@ public final class SettingsDialog extends JDialog {
                 window.dispose();
             }
         });
-        JButton ok = new JButton("OK");
-        ok.getAccessibleContext().setAccessibleName("OK");
+        JButton ok = new JButton(said.say("settings.ok.label"));
+        ok.getAccessibleContext().setAccessibleName(
+                said.say("settings.ok.a11y"));
         juranometria.ui.Explain.selfExplanatory(ok,
-                "Keeps the chosen appearance and closes this window");
+                said.say("settings.ok.explain"));
         ok.addActionListener(event -> confirm.accept(settled(panel)));
         JPanel buttons = new JPanel(new BorderLayout());
         JPanel right = new JPanel();
@@ -312,7 +400,8 @@ public final class SettingsDialog extends JDialog {
     /** A captioned control, with the caption bound to it for screen readers. */
     private static void label(JPanel panel, String caption,
                               JComponent control, String accessibleName,
-                              String hovered, String explanation) {
+                              String hovered, String explanation,
+                              juranometria.ui.language.InterfaceText said) {
         JLabel captionLabel = new JLabel(caption);
         captionLabel.setLabelFor(control);
         captionLabel.setAlignmentX(0.0f);
@@ -323,7 +412,7 @@ public final class SettingsDialog extends JDialog {
         control.setAlignmentX(0.0f);
         control.setMaximumSize(new java.awt.Dimension(
                 Integer.MAX_VALUE, control.getPreferredSize().height));
-        nameOwnControls(control, accessibleName);
+        nameOwnControls(control, accessibleName, said);
         panel.add(control);
     }
 
@@ -349,32 +438,37 @@ public final class SettingsDialog extends JDialog {
      * already documents, hiding a real defect rather than causing
      * one (#348, CI).
      */
-    private static void nameOwnControls(JComponent control, String owner) {
-        nameChildren(control, owner);
+    private static void nameOwnControls(JComponent control, String owner,
+                                        juranometria.ui.language
+                                                .InterfaceText said) {
+        nameChildren(control, owner, said);
         control.addContainerListener(new java.awt.event.ContainerAdapter() {
             @Override
             public void componentAdded(java.awt.event.ContainerEvent event) {
                 if (event.getChild() instanceof javax.swing.AbstractButton
                         button) {
-                    name(button, owner);
+                    name(button, owner, said);
                 }
             }
         });
     }
 
-    private static void nameChildren(java.awt.Container from, String owner) {
+    private static void nameChildren(java.awt.Container from, String owner,
+                                     juranometria.ui.language
+                                             .InterfaceText said) {
         for (java.awt.Component child : from.getComponents()) {
             if (child instanceof javax.swing.AbstractButton button) {
-                name(button, owner);
+                name(button, owner, said);
             }
         }
     }
 
     private static void name(javax.swing.AbstractButton button,
-                             String owner) {
-        String said = owner + ": show the choices";
-        button.getAccessibleContext().setAccessibleName(said);
+                             String owner,
+                             juranometria.ui.language.InterfaceText said) {
+        button.getAccessibleContext().setAccessibleName(
+                owner + ": " + said.say("settings.language.selector.explain"));
         button.getAccessibleContext().setAccessibleDescription(
-                "Opens the list of languages to choose from");
+                said.say("settings.language.selector.explain"));
     }
 }

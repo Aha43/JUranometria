@@ -80,7 +80,7 @@ class PublicFaceJourneyTest {
                                 juranometria.ui.language.InterfaceLanguages
                                         .discover()),
                         null,
-                        () -> AboutDialog.open(frame[0]));
+                        () -> AboutDialog.open(frame[0], juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame[0].setJMenuBar(bar);
                 frame[0].pack();
                 // About, through the real Help menu item.

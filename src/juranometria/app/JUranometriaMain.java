@@ -26,7 +26,7 @@ public final class JUranometriaMain {
             // console, and an exception here would otherwise leave a
             // live process with no window (issue #145).
             try {
-                start(darkOverride);
+                start(darkOverride, StartupStores.user());
             } catch (Throwable failure) {
                 StartupFailure.reportAndExit(failure);
             }
@@ -47,16 +47,30 @@ public final class JUranometriaMain {
         navigation.recenter(chosen.position());
     }
 
-    private static void start(boolean darkOverride) {
+    /**
+     * The application, composed.
+     *
+     * <p>Package-private and handed its five preference stores rather
+     * than opening them, so a journey can run <em>these lines</em>
+     * instead of a reconstruction of them (#350). A replica that
+     * rebuilds the wiring in a fixture stays green when a call site
+     * below is broken, which is how a toolbar shipped in English
+     * behind eight passing contracts.
+     *
+     * <p>Returns the frame it built. {@code main} ignores it - the
+     * reader closes their own window - and a test owns disposing of
+     * the one it asked for.
+     */
+    static JFrame start(boolean darkOverride, StartupStores stores) {
         // The appearance session policy: the saved preference decides an
         // ordinary launch; an active --dark override keeps this whole
         // session dark and can never be converted into a stored choice
         // by merely confirming Settings (contract on AppearanceSession).
         AppearanceSession appearance = new AppearanceSession(
-                AppearanceStore.user(), darkOverride);
+                stores.appearance(), darkOverride);
         UiTheme.apply(appearance.startupDark());
         ChartOptionsController chartOptions =
-                new ChartOptionsController(ChartOptionsStore.user());
+                new ChartOptionsController(stores.chartOptions());
         // The reader's language, read from the store exactly once and
         // owned by this session from here on (#348). The store says
         // what the NEXT session starts with; the session says what
@@ -68,8 +82,28 @@ public final class JUranometriaMain {
                 juranometria.ui.language.InterfaceLanguages.discover();
         juranometria.ui.language.SkyLanguageSession language =
                 juranometria.ui.language.SkyLanguageSession.begin(
-                        juranometria.ui.language.SkyLanguageStore.user(),
-                        Atlas.languages());
+                        stores.language(), Atlas.languages());
+        // The toolkit's own words, before any component exists.
+        //
+        // Swing resolves its buttons, its chooser and every hover and
+        // spoken name in them against Locale.getDefault() - the
+        // operating system - so a reader was asked a Norwegian
+        // question and answered it with "Yes". These are installed
+        // over the toolkit's, in whichever language the reader chose,
+        // and the language cannot move beneath them: it is read once
+        // above and never consulted again.
+        //
+        // UiTheme knows nothing about language and must not: a look
+        // and feel is a look and feel. The two are PAIRED here, and
+        // everywhere else `apply` is called, because installing a
+        // look and feel replaces the defaults table and takes these
+        // with it (#350).
+        juranometria.ui.language.SwingText toolkitWords =
+                juranometria.ui.language.SwingText.in(
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()));
+        toolkitWords.installInto(javax.swing.UIManager.getDefaults());
+
         // The catalogues verify themselves as they load, so they are
         // loaded before any window exists: a damaged download should
         // be explained, not half-drawn behind a frame that will never
@@ -91,7 +125,16 @@ public final class JUranometriaMain {
         // bar, the task switcher and a portable launch all fall back
         // to Java's default cup.
         frame.setIconImages(ApplicationIcon.windowIcons());
-        ChartComponent chart = new ChartComponent(assembler);
+        // The page's own language, resolved ONCE from the session
+        // and handed to the chart. The export path resolves it again
+        // from the same session state in ExportSheet.write; nothing
+        // downstream of either remembers a language, so the screen
+        // and the file cannot disagree (#349, #350).
+        juranometria.project.PageWords pageWords =
+                juranometria.ui.language.PageText.in(
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()));
+        ChartComponent chart = new ChartComponent(assembler, pageWords);
         controller.onChange(chart::setViewState);
         // Choosing a language rebuilds the page in it. Reconstruction
         // rather than repaint: names are resolved into a scene when
@@ -145,13 +188,16 @@ public final class JUranometriaMain {
         // working, if these lines are deleted.
         juranometria.ui.onthispage.OnThisPageModule onThisPage =
                 modules.attach(
-                        new juranometria.ui.onthispage.OnThisPageModule());
+                        new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage(language
+                                                .interfaceLanguage())));
         // The second module (issue #228), begun through the one
         // seam that owns the session-start policy - the clock is
         // read exactly once, here, stated rather than hidden in a
         // constructor.
         juranometria.ui.placeandtime.PlaceStore placeStore =
-                juranometria.ui.placeandtime.PlaceStore.user();
+                stores.place();
         juranometria.meridian.MeridianModule meridian =
                 juranometria.ui.placeandtime.PlaceAndTimeSession.begin(
                         modules, placeStore, java.time.Instant.now());
@@ -160,7 +206,7 @@ public final class JUranometriaMain {
         // who never chose gets the released default, which is
         // hidden.
         juranometria.ui.ecliptic.EclipticStore eclipticStore =
-                juranometria.ui.ecliptic.EclipticStore.user();
+                stores.ecliptic();
         juranometria.ecliptic.EclipticModule ecliptic =
                 juranometria.ui.ecliptic.EclipticSession.begin(modules);
         inspector.showPageView(onThisPage.panel());
@@ -175,37 +221,6 @@ public final class JUranometriaMain {
                 inspector::canShow);
         inspector.onVisibilityChange(inspectorToggle::report);
 
-        frame.setJMenuBar(AppMenuBar.create(controller,
-                () -> SettingsDialog.open(frame, appearance,
-                        effectiveDark -> {
-                            UiTheme.apply(effectiveDark);
-                            com.formdev.flatlaf.FlatLaf.updateUI();
-                        }, language, Atlas.names(), interfaces),
-                () -> ChartOptionsDialog.open(frame, chartOptions),
-                () -> AboutDialog.open(frame),
-                () -> {
-                    inspectorToggle.toggle();
-                    frame.revalidate();
-                    frame.repaint();
-                },
-                () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
-                        frame, meridian, placeStore,
-                        java.time.Instant::now),
-                // One switch, and its whole behaviour lives in the
-                // module's own seam so a test can drive exactly what
-                // a reader sets off.
-                juranometria.ui.ecliptic.EclipticSession.toggle(
-                        ecliptic, eclipticStore),
-                // File, Export Chart Sheet: the chart the reader is
-                // looking at, on paper (Sprint 29, issue #286).
-                () -> ExportSheetSession.open(frame, controller, chart,
-                        chartOptions, modules.workingSelection())));
-        // One call, so the chart and the tick cannot disagree about
-        // what the reader last chose.
-        juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
-                eclipticStore,
-                AppMenuBar.eclipticItem(frame.getJMenuBar()));
-
         // The chart's own keyboard (issue #312): one key opens a
         // palette of every layer with its letter and its state, and
         // every letter reaches the same transition the reader's own
@@ -215,19 +230,9 @@ public final class JUranometriaMain {
                 ecliptic,
                 juranometria.ui.ecliptic.EclipticSession.toggle(
                         ecliptic, eclipticStore),
-                meridian);
-        javax.swing.JCheckBoxMenuItem inspectorItem =
-                AppMenuBar.inspectorItem(frame.getJMenuBar());
-        if (inspectorItem != null) {
-            // The item shows what is actually on screen, including
-            // when a narrow window has closed the panel for the
-            // reader rather than at their asking - the same state the
-            // toolbar button shows, from the same switch.
-            inspectorToggle.onChange(state -> {
-                inspectorItem.setSelected(state.showing());
-                inspectorItem.setEnabled(state.available());
-            });
-        }
+                meridian,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()));
         // The reviewed layout rule: below 640 px of window the
         // inspector yields, and a window that widens again restores
         // what the reader asked for.
@@ -239,8 +244,20 @@ public final class JUranometriaMain {
             }
         });
         AppMenuBar.installZoomShortcuts(frame.getRootPane(), controller);
-        juranometria.ui.SearchField searchField = new juranometria.ui.SearchField(
-                Atlas.search(), assembler, controller);
+        // One way out, whichever surface asks (issue #198). The
+        // toolbar button, the window's close box and the platform's
+        // Quit all reach the same path, so leaving means one thing.
+        // Named here rather than below because the toolbar is built
+        // through the controls seam and needs it.
+        AppShutdown shutdown = AppShutdown.real();
+        // Both reader-facing controls are built through one seam, so
+        // that "does the application hand them the session's
+        // language?" is a question with an address (#350).
+        AtlasChrome controls = AtlasChrome.of(language, controller,
+                Atlas.search(), assembler, inspectorToggle,
+                AppInfo.version(), shutdown::request,
+                modules.selectionMode());
+        juranometria.ui.SearchField searchField = controls.searchField();
         // Finding an object by name selects it, so a reader with no
         // pointer can reach the inspector at all - and it joins the
         // working selection under the decided search semantics.
@@ -248,10 +265,6 @@ public final class JUranometriaMain {
         searchField.setWorkingSelection(modules.workingSelection(),
                 modules.selectionMode());
 
-        // One way out, whichever surface asks (issue #198). The
-        // toolbar button, the window's close box and the platform's
-        // Quit all reach the same path, so leaving means one thing.
-        AppShutdown shutdown = AppShutdown.real();
         shutdown.onShutdown(inspector::dispose);
         // And the modules, on the same path. Disposing the panel a
         // module put its table in is not releasing the module: it
@@ -275,9 +288,76 @@ public final class JUranometriaMain {
 
         // The same AppInfo.version() About prints, handed over
         // rather than looked up twice.
-        AtlasToolbar toolbar = new AtlasToolbar(controller, searchField,
-                inspectorToggle, AppInfo.version(), shutdown::request,
-                modules.selectionMode());
+        AtlasToolbar toolbar = controls.toolbar();
+
+        // Built after the controls seam, because the menu
+        // says its words in the same language the seam
+        // derived from the session (#350).
+        frame.setJMenuBar(controls.menuBar(controller,
+                () -> SettingsDialog.open(frame, appearance,
+                        effectiveDark -> {
+                            // The ordered pair, again. A new look and
+                            // feel replaces the defaults table, so
+                            // the toolkit's words have to be put back
+                            // before anything is refreshed with them
+                            // (#350).
+                            UiTheme.apply(effectiveDark);
+                            toolkitWords.installInto(
+                                    javax.swing.UIManager.getDefaults());
+                            com.formdev.flatlaf.FlatLaf.updateUI();
+                        }, language, Atlas.names(), interfaces),
+                () -> ChartOptionsDialog.open(frame, chartOptions,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())),
+                () -> AboutDialog.open(frame,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())),
+                () -> {
+                    inspectorToggle.toggle();
+                    frame.revalidate();
+                    frame.repaint();
+                },
+                () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
+                        frame, meridian, placeStore,
+                        java.time.Instant::now,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())),
+                // One switch, and its whole behaviour lives in the
+                // module's own seam so a test can drive exactly what
+                // a reader sets off.
+                juranometria.ui.ecliptic.EclipticSession.toggle(
+                        ecliptic, eclipticStore),
+                // File, Export Chart Sheet: the chart the reader is
+                // looking at, on paper (Sprint 29, issue #286).
+                () -> ExportSheetSession.open(frame, controller, chart,
+                        chartOptions, modules.workingSelection(),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()))));
+        // Both of these read the bar, so both come AFTER it is set.
+        // They sat above the menu until the bar moved down to be
+        // built in the session's language (#350), and reading a bar
+        // that is not on the frame yet is a startup that ends in the
+        // failure reporter rather than a window. No test ran the real
+        // start, so 1445 of them passed over it.
+
+        // One call, so the chart and the tick cannot disagree about
+        // what the reader last chose.
+        juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
+                eclipticStore,
+                AppMenuBar.eclipticItem(frame.getJMenuBar()));
+        javax.swing.JCheckBoxMenuItem inspectorItem =
+                AppMenuBar.inspectorItem(frame.getJMenuBar());
+        if (inspectorItem != null) {
+            // The item shows what is actually on screen, including
+            // when a narrow window has closed the panel for the
+            // reader rather than at their asking - the same state the
+            // toolbar button shows, from the same switch.
+            inspectorToggle.onChange(state -> {
+                inspectorItem.setSelected(state.showing());
+                inspectorItem.setEnabled(state.available());
+            });
+        }
+
         frame.setLayout(new BorderLayout());
         frame.add(toolbar, BorderLayout.NORTH);
         frame.add(chart, BorderLayout.CENTER);
@@ -285,5 +365,6 @@ public final class JUranometriaMain {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        return frame;
     }
 }

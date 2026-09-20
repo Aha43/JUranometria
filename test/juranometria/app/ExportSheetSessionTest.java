@@ -35,6 +35,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ExportSheetSessionTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static ChartViewController navigation() {
         ChartViewController navigation = new ChartViewController();
         navigation.recenter(new SkyPosition(83.0, 0.0), 42.0);
@@ -45,7 +50,7 @@ class ExportSheetSessionTest {
             throws Exception {
         ChartComponent[] holder = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(Atlas.assembler());
+            holder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             holder[0].setSize(770, 523);
             holder[0].setViewState(navigation.state());
         });
@@ -86,13 +91,15 @@ class ExportSheetSessionTest {
                         replacing -> {
                             asked.add(replacing.getName());
                             return false;
-                        }),
+                        }, juranometria.ui.language.InterfaceText.forLanguage("en")),
                 "the session's own path refuses when the reader says"
                         + " no");
         assertEquals(List.of("orion.svg"), asked,
                 "and asks about the file that would actually be"
                         + " replaced");
-        assertTrue(refused.reason().contains("left as it was"),
+        assertTrue(refused.reason().contains(juranometria.ui.language.InterfaceText.forLanguage("en")
+                        .say("export.refused.kept", "").trim()
+                        .replace("{0}", "")),
                 "saying so: " + refused.reason());
         assertEquals("a chart the reader already had",
                 Files.readString(existing),
@@ -105,7 +112,7 @@ class ExportSheetSessionTest {
                         new ExportSheet.Request(SheetFormat.SVG,
                                 PaperSize.A4, 300, false),
                         navigation, chart, options,
-                        new WorkingSelection(), replacing -> true),
+                        new WorkingSelection(), replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en")),
                 "and writes when they say yes");
         assertTrue(Files.readString(existing).startsWith("<svg"),
                 "the chart the reader was looking at");
@@ -127,7 +134,7 @@ class ExportSheetSessionTest {
                         (owner, question, title) -> {
                             asked.add(title + " | " + question);
                             return javax.swing.JOptionPane.YES_OPTION;
-                        });
+                        }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(yes.mayReplace(existing),
                 "a reader who says yes replaces their file");
         assertEquals(1, asked.size(), "having been asked once");
@@ -144,7 +151,7 @@ class ExportSheetSessionTest {
                 javax.swing.JOptionPane.CANCEL_OPTION,
                 javax.swing.JOptionPane.CLOSED_OPTION}) {
             assertTrue(!ExportSheetSession.replaceDecision(null,
-                            (owner, question, title) -> answer)
+                            (owner, question, title) -> answer, juranometria.ui.language.InterfaceText.forLanguage("en"))
                     .mayReplace(existing),
                     "and anything other than yes - including closing"
                             + " the question unanswered - leaves the"
@@ -163,11 +170,19 @@ class ExportSheetSessionTest {
         // guarding against is a one-line edit that this sees.
         String source = Files.readString(Path.of(
                 "src/juranometria/app/ExportSheetSession.java"));
-        String surfaces = source.substring(
-                source.indexOf("public static Surfaces onScreen()"),
-                source.indexOf("/** Opens the dialog"));
+        // The signature carries a language since #350, so the
+        // anchor names the method rather than its whole declaration:
+        // a substring search that silently failed would hand
+        // indexOf(-1) to substring and throw, which is how this was
+        // caught rather than passing over an empty region.
+        int from = source.indexOf("public static Surfaces onScreen(");
+        int to = source.indexOf("/** Opens the dialog");
+        assertTrue(from >= 0 && to > from,
+                "the premise: the route is still where this reads it"
+                        + " - from " + from + " to " + to);
+        String surfaces = source.substring(from, to);
 
-        assertTrue(surfaces.contains("replaceDecision(owner)"),
+        assertTrue(surfaces.contains("replaceDecision(owner"),
                 "the running application asks through the decision"
                         + " that puts a question on the screen:\n"
                         + surfaces);
@@ -189,9 +204,9 @@ class ExportSheetSessionTest {
         // different objects that close over their owner, which a
         // constant would not be.
         ExportSheet.ReplaceDecision one =
-                ExportSheetSession.replaceDecision(null);
+                ExportSheetSession.replaceDecision(null, juranometria.ui.language.InterfaceText.forLanguage("en"));
         ExportSheet.ReplaceDecision two =
-                ExportSheetSession.replaceDecision(null);
+                ExportSheetSession.replaceDecision(null, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertTrue(one != two,
                 "the decision is built per export rather than being"
                         + " one shared answer");

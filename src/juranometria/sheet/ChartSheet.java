@@ -83,9 +83,10 @@ public final class ChartSheet {
                                         ChartViewState state,
                                         ChartOptions options,
                                         ChartRenderer.ReferenceLayer reference,
-                                        PaperSize paper) {
+                                        PaperSize paper,
+                                        juranometria.project.PageWords words) {
         return record(pages, state, options, reference,
-                ChartRenderer.ReferenceLayer.NONE, paper);
+                ChartRenderer.ReferenceLayer.NONE, paper, words);
     }
 
     /**
@@ -105,9 +106,10 @@ public final class ChartSheet {
                                         ChartOptions options,
                                         ChartRenderer.ReferenceLayer reference,
                                         ChartRenderer.ReferenceLayer overChart,
-                                        PaperSize paper) {
+                                        PaperSize paper,
+                                        juranometria.project.PageWords words) {
         if (pages == null || state == null || options == null
-                || paper == null) {
+                || paper == null || words == null) {
             throw new IllegalArgumentException(
                     "pages, state, options and paper are required");
         }
@@ -150,7 +152,11 @@ public final class ChartSheet {
                 paper.chartHighUnits());
         Graphics2D g = (Graphics2D) recorder.create();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            // One words instance, two consumers. The renderer draws
+            // the title block with it and the metadata is written
+            // from it, so the pixels and the file's own description
+            // cannot end up in different languages (#350).
+            new ChartRenderer(StarSizePolicy.DEFAULT, words)
                     .render(g, scene, onPaper, reference);
             // After the chart, in the order the screen paints it.
             overChart.paint(g, scene);
@@ -158,6 +164,6 @@ public final class ChartSheet {
             g.dispose();
         }
         return new SheetRecording(recorder, paper, scene, onPaper,
-                SheetMetadata.of(scene, state, onPaper, paper));
+                SheetMetadata.of(scene, state, onPaper, paper, words));
     }
 }

@@ -61,8 +61,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class DeepSkyFamilyJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     /**
      * The real bundled catalogue, counting what is asked of it.
@@ -190,19 +195,25 @@ class DeepSkyFamilyJourneyTest {
             for (SymbolFamily family : SymbolFamily.values()) {
                 JCheckBox box = familyBox(family);
                 assertNotNull(box, family + " has a control");
-                assertEquals(family.label(), box.getText(),
+                assertEquals(words().label(family), box.getText(),
                         "named the way a reader reads it");
                 String heard = box.getAccessibleContext()
                         .getAccessibleDescription();
-                assertTrue(heard.startsWith(family.prose()),
+                assertTrue(heard.startsWith(words().description(family)),
                         family + " explains itself without hovering: "
                                 + heard);
-                assertTrue(heard.contains("Needs deep-sky objects on"),
+                // The wording the frame uses since #350. A literal
+                // rather than the resource itself: what is held is
+                // that a reader who cannot see the greying is TOLD,
+                // and a test asserting the resource against itself
+                // would hold nothing.
+                assertTrue(heard.contains(
+                                "Requires deep-sky objects to be on"),
                         family + " also says which master it waits"
                                 + " for, because the greying that"
                                 + " tells a sighted reader is not a"
                                 + " sentence (#311): " + heard);
-                assertTrue(visibleProse().contains(family.description()
+                assertTrue(visibleProse().contains(words().description(family)
                                 .substring(0, 20)),
                         family + " explains itself on the page too");
             }
@@ -450,7 +461,7 @@ class DeepSkyFamilyJourneyTest {
             // a controller that ignored its store could have
             // regressed while this journey still said restart worked
             // (sprint review, P2).
-            ChartComponent restartedChart = new ChartComponent(assembler);
+            ChartComponent restartedChart = new ChartComponent(assembler, ENGLISH);
             ChartOptionsController restarted = new ChartOptionsController(
                     ChartOptionsStore.forNode(store));
             restarted.onChange(restartedChart::setChartOptions);
@@ -648,7 +659,7 @@ class DeepSkyFamilyJourneyTest {
         assembler = SceneAssembler.allSky(catalogue, 1.5,
                 juranometria.geo.ConstellationGeography.load());
         navigation = new ChartViewController(assembler::fits);
-        chart = new ChartComponent(assembler);
+        chart = new ChartComponent(assembler, ENGLISH);
         navigation.onChange(chart::setViewState);
         PanInteraction.install(chart, navigation);
         selection = new SelectionModel();
@@ -679,7 +690,7 @@ class DeepSkyFamilyJourneyTest {
         window.add(inspector, BorderLayout.EAST);
         window.setJMenuBar(AppMenuBar.create(navigation, () -> { },
                 () -> ChartOptionsDialog.open(window, options),
-                () -> { }, toggle::toggle));
+                () -> { }, toggle::toggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
         javax.swing.JCheckBoxMenuItem item =
                 AppMenuBar.inspectorItem(window.getJMenuBar());
         toggle.onChange(state -> {
@@ -886,7 +897,7 @@ class DeepSkyFamilyJourneyTest {
     // ---- reaching into the dialog ----------------------------------
 
     private JCheckBox familyBox(SymbolFamily family) {
-        return find(dialogPane, JCheckBox.class, family.label());
+        return find(dialogPane, JCheckBox.class, words().label(family));
     }
 
     private JCheckBox masterBox() {
@@ -1001,4 +1012,18 @@ class DeepSkyFamilyJourneyTest {
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> { });
     }
+    /**
+     * The family words a reader is shown, in English (#350).
+     *
+     * <p>Asked of the presentation layer in a stated language, as a
+     * reader-facing test must. Not a local prose() - that method was
+     * removed because the enum should not construct sentences, and
+     * rebuilding it here under another name would keep the
+     * architecture it was removed for.
+     */
+    private static juranometria.ui.language.SymbolFamilyText words() {
+        return juranometria.ui.language.SymbolFamilyText.in(
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
+    }
+
 }

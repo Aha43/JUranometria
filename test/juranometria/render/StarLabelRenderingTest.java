@@ -31,8 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class StarLabelRenderingTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     static final SkyPosition CENTRE = new SkyPosition(83.818667, -5.389667);
-    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT);
+    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     static final Star BRIGHT = new Star("TYC 1-1-1", CENTRE, 1.0,
             new StarIdentity("Brightstar", "α", null, "Ori"));

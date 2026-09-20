@@ -2,10 +2,8 @@ package juranometria.app;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.swing.KeyStroke;
 
@@ -35,15 +33,27 @@ public final class ChartKeys {
 
     /**
      * One switch a reader can reach: what it does, the letter that
-     * does it, and - where the letter is not the one on its own
-     * control - why.
+     * does it, and what the atlas promises about remembering it.
+     *
+     * <p><strong>No words.</strong> This carried a {@code label} and a
+     * {@code note} until #350, and both were English sentences living
+     * in an application registry. They are gone rather than
+     * deprecated: a member that still exists is a member a new
+     * consumer will read, and the whole point of the boundary is that
+     * the English cannot be recovered from this type. The words live
+     * in {@link juranometria.ui.language.ChartKeyboardText}, keyed by
+     * the ids below.
+     *
+     * <p>{@code sequence()} went the same way. It joined the prefix
+     * and the letter with the English word "then", which rode into
+     * every translation looking like part of the shortcut. The glyphs
+     * and the letter are notation and stay here; where they sit in a
+     * sentence, and what goes between them, belong to
+     * {@code ShortcutText}.
      *
      * @param id the semantic action, the same string the switches
      *     seam answers to
-     * @param label the switch's own name, as its control says it
      * @param key the letter, pressed after the prefix
-     * @param note why this letter differs from the control's own
-     *     mnemonic, or null when it does not
      * @param dependsOn the switch that must be on before this one
      *     shows anything, or null
      * @param persistent whether the atlas remembers this switch
@@ -51,20 +61,52 @@ public final class ChartKeys {
      *     do, the observer's lines do not, and the palette says which
      *     rather than letting a reader assume
      */
-    public record Toggle(String id, String label, char key, String note,
-                         String dependsOn, boolean persistent) {
+    public record Toggle(String id, char key, String dependsOn,
+                         boolean persistent) {
 
         public Toggle {
-            if (id == null || label == null) {
+            if (id == null) {
                 throw new IllegalArgumentException(
-                        "a switch needs an action and a name");
+                        "a switch needs an action");
             }
         }
 
-        /** What a reader presses, in this platform's own words. */
-        public String sequence() {
-            return prefixText() + " then "
-                    + String.valueOf(key).toUpperCase(Locale.ROOT);
+        /**
+         * The second keystroke on its own, as a reader sees it.
+         *
+         * <p>Notation, and the only reader-facing thing this record
+         * still produces: a letter is the same letter in every
+         * language.
+         */
+        public String keyLetter() {
+            return String.valueOf(key).toUpperCase(Locale.ROOT);
+        }
+    }
+
+    /**
+     * Something the chart shows that the keyboard deliberately does
+     * not switch (#312).
+     *
+     * <p>Its id is <strong>not</strong> a switch id, and that is the
+     * point. {@code chart.zenith} would name a switch
+     * {@code ChartSwitches} does not answer to and would throw if
+     * anything asked; {@code module.zenith} would suggest the
+     * meridian module offers one. This is keyboard policy - a line the
+     * palette prints so that "everything the chart shows" stays a
+     * claim somebody can check - so it has an identity of its own,
+     * and neither the component name nor the resource lookup touches
+     * the English word.
+     *
+     * @param id canonical, lower case, no namespace shared with a
+     *     switch
+     */
+    public record Refusal(String id) {
+
+        public Refusal {
+            if (id == null || id.isBlank()) {
+                throw new IllegalArgumentException(
+                        "a refusal is still something with a name");
+            }
         }
     }
 
@@ -74,44 +116,32 @@ public final class ChartKeys {
     public static final String FIGURES = "chart.constellationFigures";
 
     private static final List<Toggle> TOGGLES = List.of(
-            new Toggle(DEEP_SKY, "Deep-sky objects", 'D', null, null,
-                    true),
-            new Toggle("chart.galaxies", "Galaxies", 'G', null, DEEP_SKY,
-                    true),
-            new Toggle("chart.openClusters", "Open clusters", 'O', null,
-                    DEEP_SKY, true),
-            new Toggle("chart.globularClusters", "Globular clusters", 'C',
-                    null, DEEP_SKY, true),
-            new Toggle("chart.nebulae", "Nebulae", 'U', null, DEEP_SKY, true),
-            new Toggle("chart.planetaryNebulae", "Planetary nebulae", 'P',
-                    null, DEEP_SKY, true),
-            new Toggle("chart.deepSkyLabels", "Deep-sky labels", 'L', null,
-                    DEEP_SKY, true),
-            new Toggle("chart.starNames", "Star names", 'S', null, null, true),
-            new Toggle("chart.bayerLetters", "Bayer letters", 'Y', null,
-                    null, true),
-            new Toggle("chart.flamsteedNumbers", "Flamsteed numbers", 'M',
-                    "F names the figures", null, true),
-            new Toggle(FIGURES, "Constellation figures", 'F', null, null, true),
-            new Toggle("chart.constellationBoundaries",
-                    "Constellation boundaries", 'B', null, null, true),
-            new Toggle("chart.constellationNames", "Constellation names",
-                    'N', null, FIGURES, true),
-            new Toggle("chart.equatorialGrid", "Equatorial grid", 'E', null,
-                    null, true),
-            new Toggle("chart.titleBlock", "Title block", 'T', null, null, true),
-            new Toggle("chart.magnitudeKey", "Stellar-magnitude key",
-                    'J', "K darkens the sky", null, true),
-            new Toggle("chart.blackSky", "Black sky", 'K',
-                    "B bounds the constellations", null, true),
-            new Toggle("module.ecliptic", "The ecliptic", 'I', null, null,
-                    true),
+            new Toggle(DEEP_SKY, 'D', null, true),
+            new Toggle("chart.galaxies", 'G', DEEP_SKY, true),
+            new Toggle("chart.openClusters", 'O', DEEP_SKY, true),
+            new Toggle("chart.globularClusters", 'C', DEEP_SKY, true),
+            new Toggle("chart.nebulae", 'U', DEEP_SKY, true),
+            new Toggle("chart.planetaryNebulae", 'P', DEEP_SKY, true),
+            new Toggle("chart.deepSkyLabels", 'L', DEEP_SKY, true),
+            new Toggle("chart.starNames", 'S', null, true),
+            new Toggle("chart.bayerLetters", 'Y', null, true),
+            new Toggle("chart.flamsteedNumbers", 'M', null, true),
+            new Toggle(FIGURES, 'F', null, true),
+            new Toggle("chart.constellationBoundaries", 'B', null, true),
+            new Toggle("chart.constellationNames", 'N', FIGURES, true),
+            new Toggle("chart.equatorialGrid", 'E', null, true),
+            new Toggle("chart.titleBlock", 'T', null, true),
+            new Toggle("chart.magnitudeKey", 'J', null, true),
+            new Toggle("chart.blackSky", 'K', null, true),
+            new Toggle("module.ecliptic", 'I', null, true),
             // The observer's lines are not written down: Place and
             // Time keeps a place, not a picture.
-            new Toggle("module.meridian", "Your meridian", 'R', null, null,
-                    false),
-            new Toggle("module.horizon", "Your horizon", 'H', null, null,
-                    false));
+            new Toggle("module.meridian", 'R', null, false),
+            new Toggle("module.horizon", 'H', null, false));
+
+    /** The one thing the palette lists and will not switch. */
+    private static final List<Refusal> REFUSED =
+            List.of(new Refusal("zenith"));
 
     /**
      * Every switch the keyboard reaches, in the order the palette
@@ -161,15 +191,17 @@ public final class ChartKeys {
     }
 
     /**
-     * What the atlas deliberately does not reach from the keyboard,
-     * and why - so that "everything the chart shows" stays a claim
-     * somebody can check.
+     * What the atlas deliberately does not reach from the keyboard -
+     * so that "everything the chart shows" stays a claim somebody can
+     * check.
+     *
+     * <p>Identities only. This was a {@code Map<String, String>} whose
+     * key and value were both English, and the key doubled as a Swing
+     * component name, so translating the map would have renamed a
+     * component (#350).
      */
-    public static Map<String, String> refused() {
-        Map<String, String> refused = new LinkedHashMap<>();
-        refused.put("Zenith", "controlled in Place and Time — no"
-                + " independent shortcut");
-        return refused;
+    public static List<Refusal> refused() {
+        return REFUSED;
     }
 
     /**

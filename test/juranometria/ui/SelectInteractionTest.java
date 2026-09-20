@@ -29,8 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SelectInteractionTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private record Fixture(ChartComponent chart, ChartViewController navigation,
                            SelectionModel selection,
@@ -49,7 +54,7 @@ class SelectInteractionTest {
         juranometria.chart.SelectionMode mode =
                 new juranometria.chart.SelectionMode();
         SwingUtilities.invokeAndWait(() -> {
-            chart[0] = new ChartComponent(Atlas.assembler());
+            chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart[0]::setViewState);
             PanInteraction.install(chart[0], navigation);
             SelectInteraction.install(chart[0], selection, working, mode);
@@ -164,7 +169,7 @@ class SelectInteractionTest {
                 new ChartViewController(Atlas.assembler()::fits);
         SelectionModel selection = new SelectionModel();
         SwingUtilities.invokeAndWait(() -> {
-            chart[0] = new ChartComponent(Atlas.assembler());
+            chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart[0]::setViewState);
             SelectInteraction.install(chart[0], selection,
                     new juranometria.chart.WorkingSelection(),

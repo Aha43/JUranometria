@@ -64,7 +64,7 @@ class PlaceAndTimeDialogTest {
             content = PlaceAndTimeDialog.content(module, store, () -> {
                 clockReads.add(clockAnswer);
                 return clockAnswer;
-            });
+            }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         }
 
         JTextField field(String name) {
@@ -501,10 +501,11 @@ class PlaceAndTimeDialogTest {
         // built without the meridian module must not offer a dialog
         // that reaches nothing.
         javax.swing.JMenuBar without = juranometria.app.AppMenuBar
-                .create(null, () -> { }, () -> { }, () -> { }, null);
+                .create(null, () -> { }, () -> { }, () -> { }, null,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"));
         javax.swing.JMenuBar with = juranometria.app.AppMenuBar
                 .create(null, () -> { }, () -> { }, () -> { }, null,
-                        () -> { });
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         assertEquals(false, hasItem(without, "Place and Time..."),
                 "no module, no item");

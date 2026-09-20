@@ -42,6 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class BlackSkyJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     @Test
     void chooseTheBlackSkyCancelItConfirmItAndKeepItThroughThemes()
             throws Exception {
@@ -59,14 +64,14 @@ class BlackSkyJourneyTest {
             ChartComponent[] chart = new ChartComponent[1];
 
             SwingUtilities.invokeAndWait(() -> {
-                chart[0] = new ChartComponent(Atlas.assembler());
+                chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart[0]::setViewState);
                 // The production wiring, not a hand copy of it.
                 TargetRetirement.connect(options, chart[0], navigation);
                 frame[0] = new JFrame("black-sky-journey");
                 frame[0].setJMenuBar(AppMenuBar.create(null,
                         () -> ChartOptionsDialog.open(frame[0], options),
-                        () -> { }));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 frame[0].setLayout(new java.awt.BorderLayout());
                 frame[0].add(chart[0], java.awt.BorderLayout.CENTER);
                 frame[0].pack();

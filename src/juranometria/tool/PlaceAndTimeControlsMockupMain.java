@@ -104,7 +104,7 @@ public final class PlaceAndTimeControlsMockupMain {
         JPanel actions = new JPanel(new GridLayout(1, 2, 8, 0));
         actions.setAlignmentX(0.0f);
         JButton now = new JButton("Now");
-        JButton centre = new JButton("Center on zenith");
+        JButton centre = new JButton("Centre on zenith");
         for (JButton button : new JButton[] {now, centre}) {
             button.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, points));
         }

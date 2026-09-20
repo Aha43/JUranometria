@@ -125,9 +125,13 @@ class ControlExplanationJourneyTest {
                     assertNotNull(said,
                             "a checkbox whose label names a layer says"
                                     + " what the layer is");
-                    assertTrue(said.contains(juranometria.app.ChartKeys
-                                    .toggle("chart.deepSkyObjects")
-                                    .sequence()),
+                    assertTrue(said.contains(
+                            juranometria.ui.language.ChartKeyboardText
+                                    .in(juranometria.ui.language
+                                            .InterfaceText
+                                            .forLanguage("en"))
+                                    .sequence(juranometria.app.ChartKeys
+                                            .toggle("chart.deepSkyObjects"))),
                             "and names the keys that reach the same"
                                     + " switch from the chart: " + said);
 

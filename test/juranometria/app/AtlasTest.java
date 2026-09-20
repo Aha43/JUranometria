@@ -24,7 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class AtlasTest {
 
-    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT);
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
+    static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static int[] render(SkyPosition centre) {
         SceneAssembler assembler = Atlas.assembler();

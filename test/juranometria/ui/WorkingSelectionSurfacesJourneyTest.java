@@ -43,8 +43,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class WorkingSelectionSurfacesJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private JFrame window;
     private ChartComponent chart;
@@ -105,7 +110,7 @@ class WorkingSelectionSurfacesJourneyTest {
         this.skyLanguage = languageSession;
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
             if (options != null) {
@@ -127,7 +132,7 @@ class WorkingSelectionSurfacesJourneyTest {
             inspector.showWorkingSet(modules.workingSelection(),
                     modules::inventory);
             chart.onSceneChange(inspector::refresh);
-            page = modules.attach(new OnThisPageModule()).panel();
+            page = modules.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en"))).panel();
             inspector.showPageView(page);
             table = page.tableComponent();
             search = new SearchField(Atlas.search(), Atlas.assembler(),
@@ -158,7 +163,7 @@ class WorkingSelectionSurfacesJourneyTest {
                                         .InterfaceLanguages.discover()),
                         () -> juranometria.app.ChartOptionsDialog.open(
                                 window, options),
-                        () -> { }));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en")));
             }
             window.setLayout(new BorderLayout());
             window.add(toolbar, BorderLayout.NORTH);
@@ -866,7 +871,9 @@ class WorkingSelectionSurfacesJourneyTest {
             int measured = OnThisPageTable.stateColumnWidth(
                     table.getFontMetrics(table.getFont()),
                     table.getTableHeader().getFontMetrics(
-                            table.getTableHeader().getFont()));
+                            table.getTableHeader().getFont()),
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
             javax.swing.table.TableColumn state = null;
             for (int i = 0; i < table.getColumnModel()
                     .getColumnCount(); i++) {

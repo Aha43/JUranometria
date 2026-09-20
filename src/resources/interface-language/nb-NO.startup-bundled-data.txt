@@ -1,0 +1,7 @@
+Under oppstart kontrollerer programmet den medfølgende stjernekatalogen,
+stjernebildenes geografi og stjerneidentitetene mot kontrollsummene i de
+tilhørende manifestene. Denne feilen betyr derfor at filene på disken ikke
+er de samme som filene som ble publisert.
+
+Last ned utgivelsen på nytt, kontroller den mot den publiserte
+SHA-256-sjekksummen, og pakk den ut på nytt i en tom mappe.

@@ -56,6 +56,21 @@ public final class DeepSkyVocabularyStudyMain {
             java.util.List.of(SymbolFamily.values());
 
 
+    /**
+     * The family's reader sentence, in English.
+     *
+     * <p>From the presentation layer since #350: the enum owns
+     * identity and examples, not words. A study measuring how long a
+     * sentence is must measure the sentence a reader is actually
+     * shown.
+     */
+    private static String prose(SymbolFamily family) {
+        return juranometria.ui.language.SymbolFamilyText.in(
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        juranometria.ui.language.InterfaceText.ENGLISH))
+                .description(family);
+    }
+
     public static void main(String[] args) throws IOException {
         DIR.mkdirs();
         System.out.println("# Deep-sky vocabulary study (issue #184)");
@@ -118,7 +133,7 @@ public final class DeepSkyVocabularyStudyMain {
                             .name().toLowerCase(Locale.ROOT)
                             .replace('_', ' '),
                     family == null ? "**none — deliberately undrawn**"
-                            : family.label());
+                            : family.canonicalName());
         }
         System.out.println();
         System.out.println("`Other` is OpenNGC's own word for a row it"
@@ -138,8 +153,8 @@ public final class DeepSkyVocabularyStudyMain {
         Map<String, Integer> rows = new LinkedHashMap<>();
         Map<String, Integer> types = new LinkedHashMap<>();
         for (SymbolFamily family : FAMILIES) {
-            rows.put(family.label(), 0);
-            types.put(family.label(), 0);
+            rows.put(family.canonicalName(), 0);
+            types.put(family.canonicalName(), 0);
         }
         int undrawn = 0;
         int undrawnTypes = 0;
@@ -148,7 +163,7 @@ public final class DeepSkyVocabularyStudyMain {
             if (family == null) {
                 undrawn++;
             } else {
-                rows.merge(family.label(), 1, Integer::sum);
+                rows.merge(family.canonicalName(), 1, Integer::sum);
             }
         }
         for (DsoType type : DsoType.values()) {
@@ -156,7 +171,7 @@ public final class DeepSkyVocabularyStudyMain {
             if (family == null) {
                 undrawnTypes++;
             } else {
-                types.merge(family.label(), 1, Integer::sum);
+                types.merge(family.canonicalName(), 1, Integer::sum);
             }
         }
 
@@ -168,10 +183,10 @@ public final class DeepSkyVocabularyStudyMain {
         int drawableTypes = 0;
         for (SymbolFamily family : FAMILIES) {
             System.out.printf(Locale.ROOT, "| %s | %d | %,d |%n",
-                    family.label(), types.get(family.label()),
-                    rows.get(family.label()));
-            drawable += rows.get(family.label());
-            drawableTypes += types.get(family.label());
+                    family.canonicalName(), types.get(family.canonicalName()),
+                    rows.get(family.canonicalName()));
+            drawable += rows.get(family.canonicalName());
+            drawableTypes += types.get(family.canonicalName());
         }
         System.out.printf(Locale.ROOT,
                 "| **drawable** | **%d** | **%,d** |%n",
@@ -213,7 +228,7 @@ public final class DeepSkyVocabularyStudyMain {
             List<String> claiming = new ArrayList<>();
             for (SymbolFamily family : FAMILIES) {
                 if (family.symbol() == symbol) {
-                    claiming.add(family.label());
+                    claiming.add(family.canonicalName());
                 }
             }
             List<String> drawn = new ArrayList<>();
@@ -279,7 +294,7 @@ public final class DeepSkyVocabularyStudyMain {
                     ChartRenderer.legendShapeFor(family.symbol());
             java.util.Collections.sort(ratios);
             System.out.printf(Locale.ROOT,
-                    "| %s | %,d | %s | %.2f | %.0f° |%n", family.label(),
+                    "| %s | %,d | %s | %.2f | %.0f° |%n", family.canonicalName(),
                     ratios.size(),
                     ratios.isEmpty() ? "-"
                             : String.format(Locale.ROOT, "%.3f",
@@ -318,7 +333,7 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println();
         System.out.print("| size |");
         for (SymbolFamily family : FAMILIES) {
-            System.out.printf(" %s |", family.label());
+            System.out.printf(" %s |", family.canonicalName());
         }
         System.out.println();
         System.out.print("|---:|");
@@ -382,7 +397,7 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println();
         System.out.print("| size |");
         for (SymbolFamily family : FAMILIES) {
-            System.out.printf(" %s |", family.label());
+            System.out.printf(" %s |", family.canonicalName());
         }
         System.out.println(" nearest pair |");
         System.out.print("|---:|");
@@ -411,8 +426,8 @@ public final class DeepSkyVocabularyStudyMain {
                     }
                     if (difference < worst) {
                         worst = difference;
-                        worstPair = FAMILIES.get(i).label() + " / "
-                                + FAMILIES.get(j).label();
+                        worstPair = FAMILIES.get(i).canonicalName() + " / "
+                                + FAMILIES.get(j).canonicalName();
                     }
                 }
                 System.out.printf(Locale.ROOT, " %.0f%% |", nearest);
@@ -555,7 +570,7 @@ public final class DeepSkyVocabularyStudyMain {
             Color darkest = darkest(swatch(family,
                     (int) SymbolChip.SYMBOL_PX, 60));
             System.out.printf(Locale.ROOT, "| %s | %s | %.2f:1 |%n",
-                    family.label(), hex(darkest),
+                    family.canonicalName(), hex(darkest),
                     ratio(darkest, Color.WHITE));
         }
         System.out.println();
@@ -705,7 +720,7 @@ public final class DeepSkyVocabularyStudyMain {
             SymbolFamily family = SymbolFamily.of(type);
             System.out.printf(Locale.ROOT, "| %s | `%s` | %s | %s |%n",
                     example.id(), type.openNgcToken(),
-                    family == null ? "nothing" : family.label(),
+                    family == null ? "nothing" : family.canonicalName(),
                     type == DsoType.OTHER ? "type not classified"
                             : readable(type));
         }
@@ -831,7 +846,7 @@ public final class DeepSkyVocabularyStudyMain {
         System.out.println();
         SymbolFamily longest = FAMILIES.get(0);
         for (SymbolFamily family : FAMILIES) {
-            if (family.prose().length() > longest.prose().length()) {
+            if (prose(family).length() > prose(longest).length()) {
                 longest = family;
             }
         }
@@ -841,7 +856,7 @@ public final class DeepSkyVocabularyStudyMain {
                         + " than in one of its own: the row that wraps"
                         + " worst is the row the narrow and the"
                         + " enlarged layouts have to survive.%n%n",
-                longest.label(), longest.prose().length());
+                longest.canonicalName(), prose(longest).length());
         System.out.println("Why each one exists:");
         System.out.println();
         for (DeepSkyVocabularyMockupMain.Shot shot

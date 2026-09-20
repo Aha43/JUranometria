@@ -72,6 +72,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintTwentyNineJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static BufferedImage paint(ChartComponent chart)
             throws Exception {
         BufferedImage image = new BufferedImage(chart.getWidth(),
@@ -168,7 +173,7 @@ class SprintTwentyNineJourneyTest {
             SearchField[] searchHolder = new SearchField[1];
 
             SwingUtilities.invokeAndWait(() -> {
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 options.onChange(chart::setChartOptions);
                 // The host owns the working selection, as it does in
@@ -178,7 +183,8 @@ class SprintTwentyNineJourneyTest {
                         new juranometria.chart.SelectionModel(),
                         asked::add);
                 hostHolder[0].attach(new juranometria.ui.onthispage
-                        .OnThisPageModule());
+                        .OnThisPageModule(juranometria.ui.language
+                                .InterfaceText.forLanguage("en")));
                 juranometria.ui.SelectInteraction.install(chart,
                         new juranometria.chart.SelectionModel(),
                         hostHolder[0].workingSelection(),
@@ -189,9 +195,9 @@ class SprintTwentyNineJourneyTest {
                 chart.setViewState(ChartViewState.DEFAULT);
                 chart.setPreferredSize(new java.awt.Dimension(900, 700));
                 searchHolder[0] = new SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
+                        Atlas.assembler(), navigation, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 toolbarHolder[0] = new AtlasToolbar(navigation,
-                        searchHolder[0]);
+                        searchHolder[0], juranometria.ui.language.InterfaceText.forLanguage("en"));
                 window[0] = new JFrame("sprint-29-journey");
                 window[0].setLayout(new BorderLayout());
                 window[0].add(toolbarHolder[0], BorderLayout.NORTH);
@@ -295,7 +301,7 @@ class SprintTwentyNineJourneyTest {
                         List<ExportSheet.Request> chosen =
                                 new ArrayList<>();
                         JComponent dialog = ExportSheetDialog.content(
-                                initial, chosen::add, () -> { });
+                                initial, chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                         JComboBox<SheetFormat> box = named(dialog,
                                 ExportSheetDialog.FORMAT_BOX);
                         box.setSelectedItem(format);
@@ -343,8 +349,8 @@ class SprintTwentyNineJourneyTest {
                         () -> { }, () -> { }, () -> {
                             opened.add("export");
                             ExportSheetSession.open(null, navigation,
-                                    chart, options, working, surfaces);
-                        }));
+                                    chart, options, working, surfaces, juranometria.ui.language.InterfaceText.forLanguage("en"));
+                        }, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 JMenuItem export = AppMenuBar.exportItem(bar);
                 assertTrue(export != null && export.isEnabled(),
                         "4. File carries the export item");
@@ -390,7 +396,7 @@ class SprintTwentyNineJourneyTest {
                         new ExportSheet.Request(format, PaperSize.A4,
                                 300, false),
                         navigation, chart, options, working,
-                        replacing -> true);
+                        replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 plain.add(assertInstanceOf(
                         ExportSheet.Outcome.Written.class, outcome,
                         "a sheet with no module on it").file());
@@ -449,7 +455,7 @@ class SprintTwentyNineJourneyTest {
                         java.awt.Frame owner, ExportSheet.Request initial) {
                     List<ExportSheet.Request> chosen = new ArrayList<>();
                     JComponent dialog = ExportSheetDialog.content(
-                            initial, chosen::add, () -> { });
+                            initial, chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                     javax.swing.JCheckBox box = named(dialog,
                             ExportSheetDialog.WORKING_BOX);
                     assertFalse(box.isSelected(),
@@ -484,7 +490,7 @@ class SprintTwentyNineJourneyTest {
                 }
             };
             SwingUtilities.invokeAndWait(() -> ExportSheetSession.open(
-                    null, navigation, chart, options, working, asking));
+                    null, navigation, chart, options, working, asking, juranometria.ui.language.InterfaceText.forLanguage("en")));
             assertEquals(List.of(true), boxTicked,
                     "5b. the reader ticked the switch in the real"
                             + " dialog");
@@ -511,7 +517,7 @@ class SprintTwentyNineJourneyTest {
                             new ExportSheet.Request(SheetFormat.SVG,
                                     PaperSize.A4, 300, false),
                             navigation, chart, options, working,
-                            replacing -> true),
+                            replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en")),
                     "an unticked export is written too").file();
             assertEquals(1, marksMissingFrom(unmarked,
                             onEdt(navigation::state),
@@ -544,7 +550,7 @@ class SprintTwentyNineJourneyTest {
                         new ExportSheet.Request(format, PaperSize.A4,
                                 300, false),
                         navigation, chart, options, working,
-                        replacing -> true);
+                        replacing -> true, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 zodiac.add(assertInstanceOf(
                         ExportSheet.Outcome.Written.class, outcome,
                         "6b. the equinox page exports as " + format)
@@ -784,7 +790,7 @@ class SprintTwentyNineJourneyTest {
     private static ChartRenderer.DrawnMark markOf(ChartScene scene,
                                                   double brighter,
                                                   double fainter) {
-        return new ChartRenderer(StarSizePolicy.DEFAULT)
+        return new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS).stream()
                 .filter(mark -> mark.star() != null)
                 .filter(mark -> mark.star().magnitude() > brighter
@@ -826,7 +832,7 @@ class SprintTwentyNineJourneyTest {
                         Atlas.assembler()::assemble, state,
                         ChartOptions.DEFAULTS,
                         ChartRenderer.ReferenceLayer.NONE,
-                        PaperSize.A4);
+                        PaperSize.A4, ENGLISH);
         var at = new GnomonicProjection(page.scene().viewport().centre())
                 .project(position)
                 .map(new ViewportMapping(juranometria.project.DrawnPage.of(page.scene()))::toPixel)
@@ -861,7 +867,7 @@ class SprintTwentyNineJourneyTest {
                         Atlas.assembler()::assemble, state,
                         ChartOptions.DEFAULTS,
                         ChartRenderer.ReferenceLayer.NONE,
-                        PaperSize.A4);
+                        PaperSize.A4, ENGLISH);
         String svg = Files.readString(sheet, StandardCharsets.UTF_8);
         // Centre and width together: a star's own disc is centred on
         // the object too, so ink at the right place proves nothing.
@@ -875,7 +881,7 @@ class SprintTwentyNineJourneyTest {
 
         List<String> missing = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark
-                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(page.scene(), page.options())) {
             if (mark.star() == null
                     || !marked.contains(mark.star().id())) {
@@ -942,7 +948,7 @@ class SprintTwentyNineJourneyTest {
                         Atlas.assembler()::assemble, state,
                         ChartOptions.DEFAULTS,
                         ChartRenderer.ReferenceLayer.NONE,
-                        PaperSize.A4);
+                        PaperSize.A4, ENGLISH);
         String svg = Files.readString(sheets.get(0),
                 StandardCharsets.UTF_8);
         BufferedImage png = javax.imageio.ImageIO.read(
@@ -968,7 +974,7 @@ class SprintTwentyNineJourneyTest {
         int missingFromPdf = 0;
         int blankInPng = 0;
         for (ChartRenderer.DrawnMark mark
-                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(sheet.scene(), sheet.options())) {
             var at = projection.project(mark.star() != null
                             ? mark.star().position()

@@ -21,6 +21,8 @@ zoom-where-you-point. The 1.0 promise is recorded in
   export formats, the paper, and when to use each
 - [Application appearance](docs/application-appearance.md)
 - [Technical architecture](docs/architecture.md)
+- [How JUranometria works](docs/how/README.md) — explanatory tours of the
+  architecture through working features
 - [Catalogue strategy](docs/catalogues.md)
 - [Development workflow](docs/development.md)
 - [First sprint](docs/sprint-01.md) — Sprint 1's product document;

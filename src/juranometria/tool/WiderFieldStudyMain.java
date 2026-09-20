@@ -33,6 +33,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class WiderFieldStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private WiderFieldStudyMain() {
     }
 
@@ -164,7 +168,7 @@ public final class WiderFieldStudyMain {
         observed.append("field  ra           dec          ground "
                 + " pixels\n");
 
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         for (double field : RELEASED_FIELDS) {
             for (double[] centre : CENTRES) {
                 for (boolean black : new boolean[] {false, true}) {
@@ -208,7 +212,7 @@ public final class WiderFieldStudyMain {
     public static String inkFingerprint(double[] centre, double field,
                                         boolean black) throws Exception {
         SheetRecorder recorder = new SheetRecorder(WIDE, HIGH);
-        new ChartRenderer(StarSizePolicy.DEFAULT).render(recorder,
+        new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH).render(recorder,
                 scene(centre, field),
                 black ? ChartOptions.DEFAULTS.withPalette(
                         ChartPalette.BLACK_SKY) : ChartOptions.DEFAULTS);
@@ -219,7 +223,7 @@ public final class WiderFieldStudyMain {
         // same chart (PR #289, third round). It is named and skipped
         // rather than quietly widening the tolerance - the pixel
         // digest still covers it where pixels mean anything.
-        java.awt.Rectangle titleBlock = ChartRenderer.titleBlockLayout(
+        java.awt.Rectangle titleBlock = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockLayout(
                 new BufferedImage(WIDE, HIGH, BufferedImage.TYPE_INT_RGB)
                         .createGraphics(), scene(centre, field));
 

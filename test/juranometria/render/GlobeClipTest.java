@@ -51,6 +51,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeClipTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDE_PX = 1200;
 
     private static final int HIGH_PX = 800;
@@ -143,7 +148,7 @@ class GlobeClipTest {
         ChartScene scene = globe();
         ChartOptions figures = only(o -> o.constellationFigures());
         assertTrue(reachesBeyondTheLimb(
-                        new ChartRenderer(StarSizePolicy.DEFAULT)
+                        new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                                 .figureInk(scene, figures).values().stream()
                                 .map(ChartRenderer.FigureInk::ink)
                                 .toList()),
@@ -347,7 +352,7 @@ class GlobeClipTest {
                 BufferedImage.TYPE_INT_RGB);
         java.awt.Graphics2D g = canvas.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, scene, options);
         } finally {
             g.dispose();

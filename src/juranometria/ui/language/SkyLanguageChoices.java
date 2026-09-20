@@ -51,14 +51,19 @@ public final class SkyLanguageChoices {
     public static List<Item> forTheChart(
             juranometria.geo.SkyNames names,
             SkyLanguageChoice.Available available,
-            String interfaceLanguage) {
+            String interfaceLanguage,
+            InterfaceText said) {
         List<Item> items = new ArrayList<>();
+        // One pattern with a numbered argument, not a sentence glued
+        // to a name: Norwegian may want the language elsewhere in the
+        // phrase, and only the translation can decide that (#350).
         items.add(new Item(SkyLanguageChoice.FOLLOW,
-                "Follow interface — currently "
-                        + displayed(names,
+                said.say("settings.language.chart.follow",
+                        displayed(names, said,
                                 followWouldDraw(available,
-                                        interfaceLanguage))));
-        items.add(new Item(SkyLanguageChoice.LATIN, "Latin (IAU)"));
+                                        interfaceLanguage)))));
+        items.add(new Item(SkyLanguageChoice.LATIN,
+                said.say("settings.language.chart.latin")));
         for (String tag : available.chartLanguages().stream().sorted()
                 .toList()) {
             items.add(new Item(tag, names.displayName(tag)));
@@ -117,9 +122,9 @@ public final class SkyLanguageChoices {
     }
 
     private static String displayed(juranometria.geo.SkyNames names,
-                                    String token) {
+                                    InterfaceText said, String token) {
         return SkyLanguageChoice.LATIN.equals(token)
-                ? "Latin (IAU)"
+                ? said.say("settings.language.chart.latin")
                 : names.displayName(token);
     }
 }

@@ -32,6 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChartModuleBoundaryTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     /**
      * The chart core: what the atlas is without any module at all.
      * These packages may know nothing of pages, modules, tables or
@@ -125,7 +130,7 @@ class ChartModuleBoundaryTest {
         // ships if every module is deleted.
         ChartScene scene = Atlas.assembler()
                 .assemble(ChartViewState.DEFAULT, 900, 700);
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
         java.awt.image.BufferedImage page =
                 renderer.renderToImage(scene, ChartOptions.DEFAULTS);

@@ -77,6 +77,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ExportJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartViewState EQUINOX = new ChartViewState(
             new SkyPosition(0.0, 0.0), 42.0, 6.0);
 
@@ -121,7 +126,7 @@ class ExportJourneyTest {
                 EQUINOX.fieldWidthDegrees());
         JMenuBar bar = AppMenuBar.create(navigation, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { },
-                () -> asked.add("export"));
+                () -> asked.add("export"), juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         JMenuItem export = AppMenuBar.exportItem(bar);
         assertTrue(export != null, "1. File carries an export item");
@@ -140,7 +145,7 @@ class ExportJourneyTest {
         List<ExportSheet.Request> chosen = new ArrayList<>();
         for (SheetFormat format : SheetFormat.values()) {
             JComponent dialog = ExportSheetDialog.content(
-                    ExportSheetSession.defaults(), chosen::add, () -> { });
+                    ExportSheetSession.defaults(), chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
             JComboBox<SheetFormat> box =
                     named(dialog, ExportSheetDialog.FORMAT_BOX);
             box.setSelectedItem(format);
@@ -161,7 +166,7 @@ class ExportJourneyTest {
                     ExportSheet.Outcome.Written.class,
                     ExportSheet.write(Atlas.assembler()::assemble, EQUINOX,
                             ChartOptions.DEFAULTS, modules(), request,
-                            destination, existing -> true),
+                            destination, existing -> true, juranometria.ui.language.InterfaceText.forLanguage("en")),
                     "3. " + request.format() + " is written");
             written.add(outcome.file());
         }
@@ -211,7 +216,7 @@ class ExportJourneyTest {
             throws Exception {
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, EQUINOX, ChartOptions.DEFAULTS,
-                modules(), PaperSize.A4);
+                modules(), PaperSize.A4, ENGLISH);
         String svg = Files.readString(svgFile, StandardCharsets.UTF_8);
         List<double[]> inSvg = pathCentres(svg);
 
@@ -226,7 +231,7 @@ class ExportJourneyTest {
         List<String> missingFromSvg = new ArrayList<>();
         List<String> blankInPng = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark
-                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(sheet.scene(), sheet.options())) {
             var at = projection.project(mark.star() != null
                             ? mark.star().position()
@@ -370,7 +375,7 @@ class ExportJourneyTest {
     private static List<LabelPlacement.Placement> decision() {
         ChartScene scene = Atlas.assembler().assemble(SAGITTARIUS,
                 PaperSize.A4.chartWideUnits(), PaperSize.A4.chartHighUnits());
-        return new ChartRenderer(StarSizePolicy.DEFAULT).textPlacements(
+        return new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH).textPlacements(
                 ChartRenderer.TextMetrics.offscreen(), scene,
                 ChartOptions.DEFAULTS.withPalette(ChartPalette.WHITE_PAPER));
     }
@@ -420,7 +425,7 @@ class ExportJourneyTest {
         // The bytes the route wrote, and the one recording they are of.
         SheetRecording sheet = ChartSheet.record(Atlas.assembler()::assemble,
                 SAGITTARIUS, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         for (SheetFormat format : SheetFormat.values()) {
             assertTrue(java.util.Arrays.equals(
                             Files.readAllBytes(written.get(format)),
@@ -456,7 +461,7 @@ class ExportJourneyTest {
         SwingUtilities.invokeAndWait(() -> {
             ChartViewController navigation = new ChartViewController(
                     Atlas.assembler()::fits);
-            ChartComponent chart = new ChartComponent(Atlas.assembler());
+            ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             navigation.recenter(SAGITTARIUS.centre(),
                     SAGITTARIUS.fieldWidthDegrees());
@@ -467,7 +472,7 @@ class ExportJourneyTest {
             JFrame frame = new JFrame("Export journey");
             frame.add(chart);
             frame.setSize(1100, 800);
-            ExportSheetSession.Surfaces real = ExportSheetSession.onScreen();
+            ExportSheetSession.Surfaces real = ExportSheetSession.onScreen(juranometria.ui.language.InterfaceText.forLanguage("en"));
             ExportSheetSession.Surfaces surfaces =
                     new ExportSheetSession.Surfaces() {
 
@@ -507,7 +512,7 @@ class ExportJourneyTest {
             frame.setJMenuBar(AppMenuBar.create(navigation, () -> { },
                     () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                     () -> ExportSheetSession.open(frame, navigation, chart,
-                            options, working, surfaces)));
+                            options, working, surfaces, juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
             // Held before it is shown, so nothing that happens next
             // can lose it.
             made[0] = frame;

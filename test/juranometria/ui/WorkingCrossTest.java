@@ -41,8 +41,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class WorkingCrossTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private static ChartScene page(SkyPosition centre, double field) {
         return Atlas.assembler().assemble(
@@ -459,14 +464,14 @@ class WorkingCrossTest {
         Host() throws Exception {
             ChartComponent[] made = new ChartComponent[1];
             SwingUtilities.invokeAndWait(() -> {
-                made[0] = new ChartComponent(Atlas.assembler());
+                made[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 made[0].setSize(900, 700);
                 made[0].setViewState(ChartViewState.DEFAULT);
             });
             chart = made[0];
             services = new ChartModuleHost(chart, new SelectionModel(),
                     requests::add);
-            module = services.attach(new OnThisPageModule());
+            module = services.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         }
 
         void dispose() {
@@ -506,7 +511,7 @@ class WorkingCrossTest {
             throws Exception {
         ChartComponent[] made = new ChartComponent[1];
         SwingUtilities.invokeAndWait(() -> {
-            made[0] = new ChartComponent(Atlas.assembler());
+            made[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             made[0].setSize(900, 700);
             made[0].setViewState(ChartViewState.DEFAULT);
         });
@@ -514,7 +519,7 @@ class WorkingCrossTest {
         if (withModule) {
             host = new ChartModuleHost(made[0], new SelectionModel(),
                     request -> { });
-            host.attach(new OnThisPageModule());
+            host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en")));
         }
         try {
             return paint(made[0]);

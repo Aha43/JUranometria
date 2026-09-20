@@ -42,7 +42,8 @@ import juranometria.project.ViewportMapping;
 public final class ChartRenderer {
 
     /** The key's heading: visual magnitude, said plainly. */
-    private static final String KEY_HEADING = "Stars, visual magnitude";
+    // The magnitude key's heading is prose and lives in the
+    // language pack (#350); it is read through `words`.
     /** Room for the widest sample circle, plus breathing space. */
     private static final int KEY_CIRCLE_COLUMN_PX = 20;
 
@@ -71,12 +72,35 @@ public final class ChartRenderer {
 
     private final StarSizePolicy starSizePolicy;
 
-    public ChartRenderer(StarSizePolicy starSizePolicy) {
+    /**
+     * A renderer that draws in a stated language (#350).
+     *
+     * <p>There is no form of this that omits the words. The title
+     * block and the magnitude key are prose, and a constructor that
+     * quietly chose English is how a translated toolbar shipped in
+     * English behind eight passing contracts: every caller -
+     * application, tool, study, test - names its language, and the
+     * compiler finds the ones that do not.
+     *
+     * @param words what this page is called; never null, never
+     *     defaulted, and never held by a lower layer on a caller's
+     *     behalf
+     */
+    public ChartRenderer(StarSizePolicy starSizePolicy,
+                         juranometria.project.PageWords words) {
         if (starSizePolicy == null) {
             throw new IllegalArgumentException("star size policy must not be null");
         }
+        if (words == null) {
+            throw new IllegalArgumentException("a page says what it"
+                    + " says in some language, and a renderer without"
+                    + " words would have to invent one (#350)");
+        }
         this.starSizePolicy = starSizePolicy;
+        this.words = words;
     }
+
+    private final juranometria.project.PageWords words;
 
     /**
      * The projection this page is drawn by.
@@ -2191,18 +2215,28 @@ public final class ChartRenderer {
      * change actually costs is one phrase in the title block of every
      * printed page, which is the thing the gate asked for.
      */
-    private static String[] titleLines(ChartScene scene,
-                                       String projectionName) {
-        String shape = " · " + projectionName;
+    /**
+     * The three lines of the title block.
+     *
+     * <p>The first is the page's own title - a target's name, which
+     * already follows the <em>chart</em> language, or coordinates in
+     * the chart's notation - and is passed through untouched. The
+     * other two are prose with notation in them: every number is
+     * formatted here with {@code Locale.ROOT} and handed over as
+     * text, so no language can turn a magnitude limit into 6,0.
+     */
+    private String[] titleLines(ChartScene scene, String projectionId) {
         return new String[] {
                 scene.title(),
-                "Centre " + formatRa(scene.viewport().centre().raDegrees())
-                        + ", " + formatDec(scene.viewport().centre().decDegrees())
-                        + " · ICRS J2000",
-                String.format(Locale.ROOT,
-                        "Field %.1f° · Stars to V %.1f · North up, east left%s",
-                        scene.viewport().fieldWidthDegrees(),
-                        scene.limitingMagnitude(), shape),
+                words.titleCentre(
+                        formatRa(scene.viewport().centre().raDegrees()),
+                        formatDec(scene.viewport().centre().decDegrees())),
+                words.titleFacts(
+                        String.format(Locale.ROOT, "%.1f",
+                                scene.viewport().fieldWidthDegrees()),
+                        String.format(Locale.ROOT, "%.1f",
+                                scene.limitingMagnitude()),
+                        words.projection(projectionId)),
         };
     }
 
@@ -2265,12 +2299,12 @@ public final class ChartRenderer {
      * built with a larger maximum radius would then have drawn rows
      * that outgrew the box it published.
      */
-    public static java.awt.Rectangle magnitudeKeyBounds(FontMetrics metrics,
-                                                        ChartScene scene,
-                                                        StarSizePolicy policy) {
+    public java.awt.Rectangle magnitudeKeyBounds(FontMetrics metrics,
+                                                 ChartScene scene,
+                                                 StarSizePolicy policy) {
         double[] samples = magnitudeKeySamples(scene.limitingMagnitude());
         int lineHeight = keyLineHeight(metrics, policy);
-        int widest = metrics.stringWidth(KEY_HEADING);
+        int widest = metrics.stringWidth(words.magnitudeKeyHeading());
         for (double sample : samples) {
             widest = Math.max(widest, metrics.stringWidth(
                     sampleLabel(sample)));
@@ -2342,7 +2376,8 @@ public final class ChartRenderer {
             g2.setFont(LABEL_FONT);
             g2.setColor(palette.starInk());
             int baseline = box.y + TITLE_PADDING_PX + metrics.getAscent();
-            g2.drawString(KEY_HEADING, box.x + TITLE_PADDING_PX, baseline);
+            g2.drawString(words.magnitudeKeyHeading(),
+                    box.x + TITLE_PADDING_PX, baseline);
 
             for (double sample : samples) {
                 baseline += lineHeight;
@@ -2361,14 +2396,14 @@ public final class ChartRenderer {
         }
     }
 
-    public static java.awt.Rectangle titleBlockBounds(Graphics2D g,
-                                                      ChartScene scene) {
+    public java.awt.Rectangle titleBlockBounds(Graphics2D g,
+                                               ChartScene scene) {
         return titleBlockBounds(g.getFontMetrics(LABEL_FONT), scene);
     }
 
     /** The block's layout box, from a graphics context. */
-    public static java.awt.Rectangle titleBlockLayout(Graphics2D g,
-                                                      ChartScene scene) {
+    public java.awt.Rectangle titleBlockLayout(Graphics2D g,
+                                               ChartScene scene) {
         return titleBlockLayout(g.getFontMetrics(LABEL_FONT), scene);
     }
 
@@ -2398,8 +2433,8 @@ public final class ChartRenderer {
      * {@link #titleBlockBox}, which is what draws it, so no released
      * page moves.
      */
-    public static java.awt.Rectangle titleBlockBounds(FontMetrics metrics,
-                                                      ChartScene scene) {
+    public java.awt.Rectangle titleBlockBounds(FontMetrics metrics,
+                                               ChartScene scene) {
         java.awt.Rectangle box = titleBlockLayout(metrics, scene);
         return box == null ? null : new java.awt.Rectangle(box.x, box.y,
                 box.width + 1, box.height + 1);
@@ -2413,8 +2448,8 @@ public final class ChartRenderer {
      * the released-page digest skips exactly the two shapes this
      * rectangle names.
      */
-    public static java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
-                                                      ChartScene scene) {
+    public java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
+                                               ChartScene scene) {
         return titleBlockLayout(metrics, scene,
                 DrawnPage.of(scene).projection().name());
     }
@@ -2427,10 +2462,10 @@ public final class ChartRenderer {
      * globe measured with the name of a projection that did not draw
      * it would report a title block the page never had.
      */
-    public static java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
-                                                      ChartScene scene,
-                                                      String projectionName) {
-        String[] lines = titleLines(scene, projectionName);
+    public java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
+                                               ChartScene scene,
+                                               String projectionId) {
+        String[] lines = titleLines(scene, projectionId);
         int lineHeight = metrics.getHeight();
         int textWidth = 0;
         for (String line : lines) {

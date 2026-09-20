@@ -66,6 +66,10 @@ import juranometria.ui.Shortcuts;
  */
 public final class ControlExplanationStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private ControlExplanationStudyMain() {
     }
 
@@ -314,28 +318,39 @@ public final class ControlExplanationStudyMain {
         Map<String, Component> surfaces = new LinkedHashMap<>();
         juranometria.ui.ChartViewController navigation =
                 new juranometria.ui.ChartViewController();
+        // English, stated. This audit records what the released
+        // English surface says; asking the default locale would make
+        // the report change with the machine that generated it (#350).
+        juranometria.ui.language.InterfaceText english =
+                juranometria.ui.language.InterfaceText.forLanguage("en");
         juranometria.ui.SearchField search =
                 new juranometria.ui.SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
+                        Atlas.assembler(), navigation, english);
         surfaces.put("Toolbar", new juranometria.ui.AtlasToolbar(
                 navigation, search,
                 new juranometria.ui.InspectorToggle(), "0.0.0",
-                () -> { }, new juranometria.chart.SelectionMode()));
+                () -> { }, new juranometria.chart.SelectionMode(), english));
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }));
+                () -> { }, english));
         surfaces.put("Chart Options",
                 ChartOptionsDialog.contentForStudy(options()));
         surfaces.put("Place and Time", placeAndTime());
         surfaces.put("Export Chart Sheet",
                 ExportSheetDialog.contentForStudy());
         surfaces.put("Settings", SettingsDialog.contentForStudy());
-        surfaces.put("About", AboutDialog.compactContentForStudy());
+        surfaces.put("About", AboutDialog.compactContentForStudy(juranometria.ui.language.InterfaceText.forLanguage("en")));
         surfaces.put("About, notices",
-                AboutDialog.noticesContentForStudy());
+                AboutDialog.noticesContentForStudy(juranometria.ui.language.InterfaceText.forLanguage("en")));
         surfaces.put("Inspector", inspector());
         surfaces.put("On this page", onThisPage());
-        surfaces.put("Chart keyboard", ChartKeyboard.of(
+        surfaces.put("Chart keyboard", chartKeyboard());
+        return surfaces;
+    }
+
+    /** The palette, in the language this report is written in. */
+    private static ChartKeyboard chartKeyboard() {
+        return ChartKeyboard.of(
                 ChartSwitches.of(options(), new ChartSwitches.Ecliptic() {
                     @Override
                     public boolean showing() {
@@ -359,8 +374,8 @@ public final class ControlExplanationStudyMain {
                     @Override
                     public void showing(boolean line, boolean horizon) {
                     }
-                })));
-        return surfaces;
+                }),
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
     }
 
     private static ChartOptionsController options() {
@@ -404,7 +419,7 @@ public final class ControlExplanationStudyMain {
                             @Override
                             public void flush() {
                             }
-                        });
+                        }, juranometria.ui.language.InterfaceText.forLanguage("en"));
     }
 
     private static Component inspector() {
@@ -427,7 +442,7 @@ public final class ControlExplanationStudyMain {
 
     private static Component onThisPage() {
         juranometria.ui.ChartComponent chart =
-                new juranometria.ui.ChartComponent(Atlas.assembler());
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH);
         chart.setSize(900, 700);
         chart.setViewState(juranometria.chart.ChartViewState.DEFAULT);
         juranometria.ui.ChartModuleHost host =
@@ -435,7 +450,9 @@ public final class ControlExplanationStudyMain {
                         new juranometria.chart.SelectionModel(),
                         request -> { });
         return host.attach(
-                new juranometria.ui.onthispage.OnThisPageModule())
+                new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage("en")))
                 .panel();
     }
 

@@ -60,8 +60,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintTwentyFourJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
+    /** The states' words in English, stated rather than inherited (#350). */
+    private static final juranometria.ui.language.PageVisibilityText STATES =
+            juranometria.ui.language.PageVisibilityText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(StarSizePolicy.DEFAULT);
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
     private JFrame window;
     private ChartComponent chart;
@@ -98,7 +108,7 @@ class SprintTwentyFourJourneyTest {
 
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
             selection = new SelectionModel();
@@ -119,7 +129,7 @@ class SprintTwentyFourJourneyTest {
             // selection, the host's, drives clicks, ink and table.
             SelectInteraction.install(chart, selection,
                     modules.workingSelection(), modules.selectionMode());
-            page = modules.attach(new OnThisPageModule()).panel();
+            page = modules.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en"))).panel();
             inspector.showPageView(page);
             table = page.tableComponent();
 
@@ -155,10 +165,10 @@ class SprintTwentyFourJourneyTest {
         PageContents contents = modules.inventory();
         PageEntry drawn = firstWith(contents, true);
         PageEntry hidden = firstWith(contents, false);
-        assertEquals(juranometria.page.PageVisibility.DRAWN.label(),
+        assertEquals(STATES.label(juranometria.page.PageVisibility.DRAWN),
                 stateShownFor(drawn.identity()),
                 drawn.identity() + " is drawn, and says so");
-        assertEquals(OnThisPageTable.wordFor(hidden.visibility()),
+        assertEquals(STATES.label(hidden.visibility()),
                 stateShownFor(hidden.identity()),
                 hidden.identity() + " is here and not drawn, and the"
                         + " table says which silence that is");
@@ -339,7 +349,7 @@ class SprintTwentyFourJourneyTest {
         assertEquals(present, identities(modules.inventory()),
                 "the page holds the same objects with a family hidden:"
                         + " presence is a fact about the sky");
-        assertEquals(PageVisibility.FAMILY_HIDDEN.label(),
+        assertEquals(STATES.label(PageVisibility.FAMILY_HIDDEN),
                 stateShownFor(drawn.identity()),
                 drawn.identity() + " is still here, and the table says"
                         + " why it cannot be seen");
@@ -415,7 +425,7 @@ class SprintTwentyFourJourneyTest {
         SwingUtilities.invokeAndWait(() -> {
             for (OnThisPageTable.Row row : page.rows()) {
                 if (row.identity().equals(identity)) {
-                    said[0] = row.state().label();
+                    said[0] = STATES.label(row.state());
                     return;
                 }
             }

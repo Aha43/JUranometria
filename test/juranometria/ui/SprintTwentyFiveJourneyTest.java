@@ -52,6 +52,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintTwentyFiveJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Instant EQUINOX =
             Instant.parse("2026-03-20T21:33:00Z");
 
@@ -91,7 +96,7 @@ class SprintTwentyFiveJourneyTest {
 
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             chart.setViewState(ChartViewState.DEFAULT);
             SelectionModel selection = new SelectionModel();
@@ -116,7 +121,7 @@ class SprintTwentyFiveJourneyTest {
             window.setJMenuBar(AppMenuBar.create(navigation,
                     () -> { }, () -> { }, () -> { }, null,
                     () -> PlaceAndTimeDialog.open(window, meridian,
-                            placeStore, () -> sessionClock)));
+                            placeStore, () -> sessionClock, juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
             window.setSize(1100, 820);
             window.setVisible(true);
         });
@@ -253,7 +258,7 @@ class SprintTwentyFiveJourneyTest {
         ReaderInput.click((javax.swing.JComponent) named(dialog,
                 "centreButton"));
         assertEquals(1, requests.size(),
-                "Center on zenith asked once");
+                "Centre on zenith asked once");
         assertEquals(new LocalSky(meridian.observer()).zenith(),
                 requests.get(0).centre(), "for the point overhead");
         assertTrue(navigation.state().centre().separationDegrees(

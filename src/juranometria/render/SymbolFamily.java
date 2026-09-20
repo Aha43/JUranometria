@@ -23,44 +23,32 @@ import juranometria.chart.DsoType;
 public enum SymbolFamily {
 
     GALAXIES(ChartRenderer.Symbol.ELLIPSE, "Galaxies", 'G',
-            "Galaxies, drawn at their catalogued size and orientation,"
-                    + " including close pairs, triplets and groups.",
             "M 31, M 51, NGC 3628"),
 
     OPEN_CLUSTERS(ChartRenderer.Symbol.DOTTED_CIRCLE, "Open clusters", 'O',
-            "Loose clusters of young stars in the plane of the Milky"
-                    + " Way.",
             "M 45, M 44, NGC 869"),
 
     GLOBULAR_CLUSTERS(ChartRenderer.Symbol.CROSSED_CIRCLE,
             "Globular clusters", 'C',
-            "Dense, ancient balls of stars in the galactic halo.",
             "M 13, M 22, NGC 5139"),
 
     NEBULAE(ChartRenderer.Symbol.BOX, "Nebulae", 'U',
-            "Clouds of gas and dust: emission, reflection and dark"
-                    + " nebulae, H II regions, supernova remnants, and"
-                    + " clusters still wrapped in nebulosity.",
             "M 42, M 1, NGC 7000"),
 
     PLANETARY_NEBULAE(ChartRenderer.Symbol.PLANETARY, "Planetary nebulae",
             'P',
-            "Shells thrown off by dying stars, drawn small and crossed"
-                    + " so they read apart from the other nebulae.",
             "M 57, M 27, NGC 7009");
 
     private final ChartRenderer.Symbol symbol;
     private final String label;
     private final char mnemonic;
-    private final String description;
     private final String examples;
 
     SymbolFamily(ChartRenderer.Symbol symbol, String label, char mnemonic,
-                 String description, String examples) {
+                 String examples) {
         this.symbol = symbol;
         this.label = label;
         this.mnemonic = mnemonic;
-        this.description = description;
         this.examples = examples;
     }
 
@@ -70,7 +58,22 @@ public enum SymbolFamily {
     }
 
     /** The name a reader sees, on the control and in the legend. */
-    public String label() {
+    /**
+     * The family's canonical name - identity, not reader text.
+     *
+     * <p>Owner ruling, #350: this enum owns identity, notation,
+     * symbol geometry and its catalogue examples. It does not own
+     * English labels, reader descriptions or sentence construction.
+     * Those live in {@code SymbolFamilyText}, backed by the
+     * interface-language resources, so the renderer never learns
+     * which language is selected.
+     *
+     * <p>Kept for evidence and tooling, which name families in
+     * reports a developer reads. Anything a READER sees comes from
+     * the presentation layer - and this returning English is exactly
+     * how it would quietly become reader text again.
+     */
+    public String canonicalName() {
         return label;
     }
 
@@ -85,25 +88,12 @@ public enum SymbolFamily {
         return mnemonic;
     }
 
-    /** What the family is, in one sentence. */
-    public String description() {
-        return description;
-    }
 
     /** Objects a reader may already know. */
     public String examples() {
         return examples;
     }
 
-    /**
-     * The whole explanation: the sentence and its examples. This is
-     * both the visible text of a legend row and the control's
-     * accessible description, so the two cannot come to differ and no
-     * meaning depends on hovering.
-     */
-    public String prose() {
-        return description + " For example: " + examples + ".";
-    }
 
     /** The family that draws this symbol, or null for one that draws none. */
     public static SymbolFamily of(ChartRenderer.Symbol symbol) {

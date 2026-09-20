@@ -39,8 +39,8 @@ class ToolbarVersionAndExitTest {
             ChartViewController navigation = new ChartViewController();
             made[0] = new AtlasToolbar(navigation,
                     new SearchField(Atlas.search(), Atlas.assembler(),
-                            navigation),
-                    null, version, exit);
+                            navigation, juranometria.ui.language.InterfaceText.forLanguage("en")),
+                    null, version, exit, juranometria.ui.language.InterfaceText.forLanguage("en"));
         });
         return made[0];
     }
@@ -83,7 +83,7 @@ class ToolbarVersionAndExitTest {
         List<String>[] about = new List[1];
         SwingUtilities.invokeAndWait(
                 () -> about[0] = labelsIn(AboutDialog.compactContent(
-                        () -> { })));
+                        () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"))));
         assertTrue(about[0].stream().anyMatch(t -> t.contains(version)),
                 "About prints AppInfo's version: " + about[0]);
 

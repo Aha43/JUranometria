@@ -170,7 +170,9 @@ public final class OnThisPageMockupMain {
                                     table.getFontMetrics(table.getFont()),
                                     table.getTableHeader().getFontMetrics(
                                             table.getTableHeader()
-                                                    .getFont())));
+                                                    .getFont()),
+                                    juranometria.ui.language.InterfaceText
+                                            .forLanguage("en")));
             table.getColumnModel().getColumn(3).setMinWidth(
                     table.getColumnModel().getColumn(3)
                             .getPreferredWidth());

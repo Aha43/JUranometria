@@ -71,6 +71,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintThirtyJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition ORION = new SkyPosition(83.0, 0.0);
 
     private static JButton button(AtlasToolbar toolbar, String name) {
@@ -87,7 +92,7 @@ class SprintThirtyJourneyTest {
     private static JButton centreButton(java.awt.Container root) {
         for (java.awt.Component child : root.getComponents()) {
             if (child instanceof JButton candidate
-                    && "Center here".equals(candidate.getText())) {
+                    && "Centre here".equals(candidate.getText())) {
                 return candidate;
             }
             if (child instanceof java.awt.Container inner) {
@@ -182,7 +187,7 @@ class SprintThirtyJourneyTest {
             EclipticModule ecliptic = new EclipticModule();
 
             SwingUtilities.invokeAndWait(() -> {
-                ChartComponent chart = new ChartComponent(Atlas.assembler());
+                ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
                 options.onChange(chart::setChartOptions);
                 hostHolder[0] = new ChartModuleHost(chart, selection,
@@ -210,10 +215,10 @@ class SprintThirtyJourneyTest {
                 chart.setViewState(ChartViewState.DEFAULT);
                 chart.setPreferredSize(new java.awt.Dimension(900, 700));
                 searchHolder[0] = new SearchField(Atlas.search(),
-                        Atlas.assembler(), navigation);
+                        Atlas.assembler(), navigation, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 searchHolder[0].setSelectionModel(selection);
                 toolbarHolder[0] = new AtlasToolbar(navigation,
-                        searchHolder[0]);
+                        searchHolder[0], juranometria.ui.language.InterfaceText.forLanguage("en"));
 
                 window[0] = new JFrame("sprint 30 journey");
                 window[0].setLayout(new BorderLayout());
@@ -234,7 +239,7 @@ class SprintThirtyJourneyTest {
                         () -> ExportSheetSession.open(window[0],
                                 navigation, chartHolder[0], options,
                                 hostHolder[0].workingSelection(),
-                                exporting[0])));
+                                exporting[0], juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
                 window[0].pack();
                 window[0].setVisible(true);
                 chartHolder[0] = chart;
@@ -298,7 +303,7 @@ class SprintThirtyJourneyTest {
                     Atlas.assembler()::assemble,
                     onEdt(navigation::state), ChartOptions.DEFAULTS,
                     juranometria.ui.SheetInk.reference(chart),
-                    PaperSize.A4);
+                    PaperSize.A4, ENGLISH);
             var drawnOn = new ViewportMapping(juranometria.project.DrawnPage.of(wideInk.scene()));
             var drawnBy = Projections.forViewport(
                     wideInk.scene().viewport());
@@ -501,7 +506,7 @@ class SprintThirtyJourneyTest {
                     "7. the View menu opened Chart Options");
             javax.swing.JCheckBox galaxies = onEdt(() -> checkBox(
                     dialog.getContentPane(),
-                    juranometria.render.SymbolFamily.GALAXIES.label()));
+                    juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(juranometria.render.SymbolFamily.GALAXIES)));
             assertTrue(galaxies != null,
                     "and the reader has a control for this option");
             assertEquals(before.galaxies(), onEdt(galaxies::isSelected),
@@ -524,7 +529,7 @@ class SprintThirtyJourneyTest {
                     .getAccessibleDescription());
 
             // ---- 8. into a detailed page, carrying all of it -------
-            // Center here on the object identified in step 6, then
+            // Centre here on the object identified in step 6, then
             // down the ladder and across the rung where the
             // projection changes.
             SwingUtilities.invokeAndWait(() ->
@@ -534,7 +539,7 @@ class SprintThirtyJourneyTest {
                     centreButton(inspectorHolder[0])));
             // Onto whatever the reader has selected now, which after
             // marking is the last object they marked - not the one
-            // identified in step 6. Center here follows the reader,
+            // identified in step 6. Centre here follows the reader,
             // and a journey that asserted otherwise would be
             // asserting its own order rather than the atlas's rule.
             String lead = onEdt(() -> hostHolder[0].workingSelection()
@@ -544,7 +549,7 @@ class SprintThirtyJourneyTest {
             assertTrue(onEdt(() -> navigation.state().centre()
                             .separationDegrees(positionOf(
                                     chart.currentScene(), lead))) < 1e-6,
-                    "and Center here centred the chart on it");
+                    "and Centre here centred the chart on it");
             while (onEdt(() -> navigation.state().fieldWidthDegrees())
                     > 8.0) {
                 ReaderInput.click(in);
@@ -585,7 +590,7 @@ class SprintThirtyJourneyTest {
             int placed = 0;
             for (String member : marked) {
                 for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                        StarSizePolicy.DEFAULT)
+                        StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(detailed, ChartOptions.DEFAULTS)) {
                     if (mark.star() == null
                             || !member.equals(mark.star().id())) {
@@ -647,7 +652,7 @@ class SprintThirtyJourneyTest {
                         List<ExportSheet.Request> chosen =
                                 new ArrayList<>();
                         JComponent dialog = ExportSheetDialog.content(
-                                initial, chosen::add, () -> { });
+                                initial, chosen::add, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
                         javax.swing.JComboBox<SheetFormat> box =
                                 named(dialog, ExportSheetDialog.FORMAT_BOX);
                         box.setSelectedItem(format);
@@ -773,7 +778,7 @@ class SprintThirtyJourneyTest {
                                                     juranometria.render
                                                             .ChartPalette
                                                             .WHITE_PAPER),
-                                    PaperSize.A4),
+                                    PaperSize.A4, ENGLISH),
                             SheetFormat.PNG, 150);
                     int[] along = inkAlong(withCircle, wideNow,
                             eclipticPole, 0.0);
@@ -841,7 +846,7 @@ class SprintThirtyJourneyTest {
                     SprintThirtyJourneyTest::optionsDialog);
             assertTrue(again != null, "10. Chart Options opens again");
             ReaderInput.click(onEdt(() -> checkBox(again.getContentPane(),
-                    juranometria.render.SymbolFamily.GALAXIES.label())));
+                    juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(juranometria.render.SymbolFamily.GALAXIES))));
             ReaderInput.click(onEdt(() -> mustFind(
                     again.getContentPane(), "OK")));
             assertEquals(before.galaxies(),
@@ -1225,7 +1230,7 @@ class SprintThirtyJourneyTest {
             ChartViewState page, ChartComponent chart) {
         return ChartSheet.record(Atlas.assembler()::assemble, page,
                 ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4)
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH)
                 .metadata();
     }
 
@@ -1516,7 +1521,7 @@ class SprintThirtyJourneyTest {
     /** Where the catalogue puts the object this page drew. */
     private static SkyPosition positionOf(ChartScene scene, String id) {
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             if (mark.star() != null && id.equals(mark.star().id())) {
                 return mark.star().position();
@@ -1530,7 +1535,7 @@ class SprintThirtyJourneyTest {
             ChartScene scene, List<String> already, int nth) {
         List<ChartRenderer.DrawnMark> found = new ArrayList<>();
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             // An ordinary star of this page, not one kept below its
             // limit because a constellation figure is drawn to it
@@ -1559,7 +1564,7 @@ class SprintThirtyJourneyTest {
         ChartRenderer.DrawnMark best = null;
         double furthest = 0.0;
         for (ChartRenderer.DrawnMark mark : new ChartRenderer(
-                StarSizePolicy.DEFAULT)
+                StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             if (mark.star() == null || mark.centre().x() < 60
                     || mark.centre().x() > scene.viewport().widthPx() - 60

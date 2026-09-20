@@ -71,7 +71,7 @@ public final class ExportSheetSession {
     }
 
     /** The surfaces the running application uses: real windows. */
-    public static Surfaces onScreen() {
+    public static Surfaces onScreen(juranometria.ui.language.InterfaceText said) {
         return new Surfaces() {
 
             @Override
@@ -79,7 +79,7 @@ public final class ExportSheetSession {
                     Frame owner, ExportSheet.Request initial) {
                 java.util.List<ExportSheet.Request> chosen =
                         new java.util.ArrayList<>();
-                ExportSheetDialog.open(owner, initial, chosen::add);
+                ExportSheetDialog.open(owner, initial, chosen::add, said);
                 return chosen.stream().findFirst();
             }
 
@@ -87,7 +87,14 @@ public final class ExportSheetSession {
             public java.util.Optional<File> chooseWhere(Frame owner,
                     String suggestedName) {
                 JFileChooser chooser = new JFileChooser();
-                chooser.setDialogTitle("Export chart sheet");
+                // Ours - and since #350 so are the chooser's own
+                // forty-one words: its buttons, labels, hovers and
+                // spoken names are installed from the reader's
+                // interface language at startup, where Swing used to
+                // take them from the operating system. What remains
+                // the platform's is filesystem DATA: volume and
+                // folder names, and the list of places.
+                chooser.setDialogTitle(said.say("export.chooser.title"));
                 chooser.setSelectedFile(new File(suggestedName));
                 return chooser.showSaveDialog(owner)
                         == JFileChooser.APPROVE_OPTION
@@ -97,12 +104,12 @@ public final class ExportSheetSession {
 
             @Override
             public ExportSheet.ReplaceDecision replace(Frame owner) {
-                return replaceDecision(owner);
+                return replaceDecision(owner, said);
             }
 
             @Override
             public void report(Frame owner, ExportSheet.Outcome outcome) {
-                ExportSheetSession.report(owner, outcome);
+                ExportSheetSession.report(owner, outcome, said);
             }
         };
     }
@@ -111,15 +118,18 @@ public final class ExportSheetSession {
     public static void open(Frame owner, ChartViewController navigation,
                             ChartComponent chart,
                             ChartOptionsController options,
-                            WorkingSelection working) {
-        open(owner, navigation, chart, options, working, onScreen());
+                            WorkingSelection working,
+                            juranometria.ui.language.InterfaceText said) {
+        open(owner, navigation, chart, options, working, onScreen(said),
+                said);
     }
 
     /** The same route, asking through whatever surfaces it is given. */
     public static void open(Frame owner, ChartViewController navigation,
                             ChartComponent chart,
                             ChartOptionsController options,
-                            WorkingSelection working, Surfaces surfaces) {
+                            WorkingSelection working, Surfaces surfaces,
+                            juranometria.ui.language.InterfaceText said) {
         surfaces.chooseWhat(owner, defaults()).ifPresent(request ->
                 surfaces.chooseWhere(owner, SheetFileName.suggest(
                                 navigation.state(), chart.currentScene(),
@@ -127,7 +137,7 @@ public final class ExportSheetSession {
                         .ifPresent(destination -> surfaces.report(owner,
                                 exportTo(destination, request, navigation,
                                         chart, options, working,
-                                        surfaces.replace(owner)))));
+                                        surfaces.replace(owner), said))));
     }
 
     /**
@@ -145,7 +155,8 @@ public final class ExportSheetSession {
                                         ChartComponent chart,
                                         ChartOptionsController options,
                                         WorkingSelection working,
-                                        ExportSheet.ReplaceDecision replace) {
+                                        ExportSheet.ReplaceDecision replace,
+                                        juranometria.ui.language.InterfaceText said) {
         return ExportSheet.write(
                 // The chart's own assembler, not the application's.
                 // They were the same object until a reader could
@@ -160,7 +171,7 @@ public final class ExportSheetSession {
                         ? SheetInk.working(chart, working.members(),
                                 working.lead(), options.options())
                         : ChartRenderer.ReferenceLayer.NONE,
-                request, destination, replace);
+                request, destination, replace, said);
     }
 
     /**
@@ -192,33 +203,38 @@ public final class ExportSheetSession {
      * replace a reader's file without a word and would look exactly
      * like this from the outside, so it is a named thing that asks.
      */
-    static ExportSheet.ReplaceDecision replaceDecision(Frame owner) {
-        return replaceDecision(owner, ExportSheetSession::confirmOnScreen);
+    static ExportSheet.ReplaceDecision replaceDecision(Frame owner,
+                                                       juranometria.ui.language.InterfaceText said) {
+        return replaceDecision(owner, ExportSheetSession::confirmOnScreen,
+                said);
     }
 
     /** The same decision, asking however it is told to ask. */
     static ExportSheet.ReplaceDecision replaceDecision(Frame owner,
-                                                       Confirmer confirmer) {
+                                                       Confirmer confirmer,
+                                                       juranometria.ui.language.InterfaceText said) {
+        juranometria.ui.language.ExportText words =
+                juranometria.ui.language.ExportText.in(said);
         return existing -> confirmer.ask(owner,
-                existing.getName() + " already exists in "
-                        + existing.getAbsoluteFile().getParent()
-                        + ".\nReplace it?",
-                "Replace the existing file?")
+                words.replaceQuestion(existing.getName(),
+                        existing.getAbsoluteFile().getParent()),
+                words.replaceTitle())
                 == JOptionPane.YES_OPTION;
     }
 
     /** Says what happened, in the reader's own terms. */
-    static void report(Frame owner, ExportSheet.Outcome outcome) {
+    static void report(Frame owner, ExportSheet.Outcome outcome,
+                       juranometria.ui.language.InterfaceText said) {
         if (outcome instanceof ExportSheet.Outcome.Written written) {
-            JOptionPane.showMessageDialog(owner, written.message(),
-                    "Chart sheet exported",
+            JOptionPane.showMessageDialog(owner, written.message(said),
+                    said.say("export.written.title"),
                     JOptionPane.INFORMATION_MESSAGE);
         } else if (outcome instanceof ExportSheet.Outcome.Refused refused) {
             // A refusal is not a crash and not a silence: the reader
             // is told what did not happen and why, and no file is
             // left behind looking finished.
             JOptionPane.showMessageDialog(owner, refused.reason(),
-                    "The chart sheet was not written",
+                    said.say("export.refused.title"),
                     JOptionPane.WARNING_MESSAGE);
         }
     }

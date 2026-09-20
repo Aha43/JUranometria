@@ -37,6 +37,10 @@ import juranometria.render.EquatorialGrid;
  */
 public final class GridStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     // The geometry lives in production (render.EquatorialGrid, issue
     // #133); the study is a consumer - measurements and pages come
     // from the same implementation the renderer draws, never a
@@ -45,7 +49,7 @@ public final class GridStudyMain {
     public static void main(String[] args) throws Exception {
         File outDir = new File("build/grid-study");
         outDir.mkdirs();
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
 
         record Page(String name, double ra, double dec, double field,
                     int width, int height) {
@@ -87,7 +91,7 @@ public final class GridStudyMain {
 
             Graphics2D probe = chart.createGraphics();
             java.awt.Rectangle titleBlock =
-                    ChartRenderer.titleBlockBounds(probe, scene);
+                    new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(probe, scene);
             probe.dispose();
             long t0 = System.nanoTime();
             EquatorialGrid.Grid grid = EquatorialGrid.gridFor(

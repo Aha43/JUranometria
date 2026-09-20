@@ -51,7 +51,7 @@ class ExportSheetTest {
         return ExportSheet.write(Atlas.assembler()::assemble, ORION,
                 ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
                 new ExportSheet.Request(format, PaperSize.A4, 150, false),
-                destination, replace);
+                destination, replace, juranometria.ui.language.InterfaceText.forLanguage("en"));
     }
 
     @Test
@@ -185,7 +185,7 @@ class ExportSheetTest {
         assertEquals(List.of("orion.svg"), asked,
                 "and is asked about the file that would actually be"
                         + " replaced, extension and all");
-        assertTrue(refused.reason().contains("left as it was"),
+        assertTrue(refused.reason().contains("left unchanged"),
                 "told plainly: " + refused.reason());
         assertEquals("a chart the reader already had",
                 Files.readString(existing),
@@ -261,7 +261,7 @@ class ExportSheetTest {
                             replacing -> true),
                     "the export is refused rather than written"
                             + " unsafely");
-            assertTrue(refused.reason().contains("cannot be written to"),
+            assertTrue(refused.reason().contains("is not writable"),
                     "and says why: " + refused.reason());
             assertTrue(refused.reason().contains("Choose another"),
                     "and what to do about it: " + refused.reason());

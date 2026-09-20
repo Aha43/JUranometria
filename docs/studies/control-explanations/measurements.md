@@ -16,89 +16,89 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 |---|---|---|---|---|---|
 | Toolbar | JButton | (icon only) | Zoom in (<key:zoomIn>) | Shows a narrower field, with fainter stars on it | dynamic |
 | Toolbar | JButton | (icon only) | Zoom out (<key:zoomOut>) | Shows a wider field, with fewer stars on it | dynamic |
-| Toolbar | JButton | (icon only) | Fewer stars (brighter magnitude limit) | Draws only the brighter stars, one step at a time | hovered |
-| Toolbar | JButton | (icon only) | More stars (fainter magnitude limit) | Draws fainter stars as well, one step at a time | hovered |
+| Toolbar | JButton | (icon only) | Show fewer stars with a brighter magnitude limit | Draws only the brighter stars, one step at a time | dynamic |
+| Toolbar | JButton | (icon only) | Unavailable: V 8.0 is the faintest magnitude limit | Unavailable: V 8.0 is the faintest magnitude limit the atlas draws | dynamic |
 | Toolbar | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
-| Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that names what you have chosen and what is on this page | dynamic |
+| Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that identifies what you selected and lists what is on ... | dynamic |
 | Toolbar | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Toolbar | SearchField | (a field) | Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Type a Messier or NGC number, a star's catalogue identity, or a right ascension and dec... | hovered |
 | Toolbar | JButton | (icon only) | Exit JUranometria | Closes the atlas; what you chose is remembered | hovered |
-| Menu bar | JMenu | File | &mdash; | Making a file out of the chart, and the application's own settings | self-explanatory |
-| Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Saves this chart as a sheet of paper: SVG, PDF or PNG | self-explanatory |
-| Menu bar | JMenuItem | Settings... | &mdash; | Opens the window that chooses the application's light or dark appearance | self-explanatory |
+| Menu bar | JMenu | File | &mdash; | Exporting the chart and changing application settings | self-explanatory |
+| Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Exports this chart as an SVG, PDF or PNG sheet | self-explanatory |
+| Menu bar | JMenuItem | Settings... | &mdash; | Opens the window for appearance and for the languages used by the application and chart | self-explanatory |
 | Menu bar | JMenu | View | &mdash; | What the chart draws, where you are looking from, and how far out | self-explanatory |
-| Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels; the same switches answer... | self-explanatory |
-| Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets where you are and the frozen instant your meridian, horizon ... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the mark you have chosen and what is on this page | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks; the same switch answers... | self-explanatory |
+| Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels. Chart shortcuts begin wi... | self-explanatory |
+| Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets your location and the instant used to draw the meridian, hor... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
-| Menu bar | JMenu | Help | &mdash; | What this application is, and what it is built on | self-explanatory |
-| Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window naming the application, its version and what it is built on | self-explanatory |
-| Chart Options | JTabbedPane | Deep sky, Stars, Constellations, Chart | &mdash; | Four groups of switches: deep sky, stars, constellations, and the chart's own furniture | self-explanatory |
-| Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
-| Chart Options | FlatScrollableTabButton | (icon only) | Show earlier tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
-| Chart Options | FlatMoreTabsButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view | hovered |
-| Chart Options | JCheckBox | Deep-sky objects | Draw deep-sky objects on the chart at all (<prefix> then D) | Draw deep-sky objects on the chart at all. Switched here, or from the chart by pressing... | hovered |
+| Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
+| Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window with the application's name, version and the software and data it is b... | self-explanatory |
+| Chart Options | JTabbedPane | Deep sky, Stars, Constellations, Chart | &mdash; | Four groups of choices: deep sky, stars, constellations and chart elements. | self-explanatory |
+| Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
+| Chart Options | FlatScrollableTabButton | (icon only) | Show earlier tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
+| Chart Options | FlatMoreTabsButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
+| Chart Options | JCheckBox | Deep-sky objects | Draw deep-sky objects on the chart at all. Shortcut: <prefix> then D. | Draw deep-sky objects on the chart at all. Switch it here or from the chart with <prefi... | hovered |
 | Chart Options | JCheckBox | Galaxies | Galaxies, drawn at their catalogued size and orientation, including close pairs, triple... | Galaxies, drawn at their catalogued size and orientation, including close pairs, triple... | hovered |
 | Chart Options | JCheckBox | Open clusters | Loose clusters of young stars in the plane of the Milky Way. For example: M 45, M 44, N... | Loose clusters of young stars in the plane of the Milky Way. For example: M 45, M 44, N... | hovered |
-| Chart Options | JCheckBox | Globular clusters | Dense, ancient balls of stars in the galactic halo. For example: M 13, M 22, NGC 5139. ... | Dense, ancient balls of stars in the galactic halo. For example: M 13, M 22, NGC 5139..... | hovered |
+| Chart Options | JCheckBox | Globular clusters | Dense, ancient balls of stars in the galactic halo. For example: M 13, M 22, NGC 5139. ... | Dense, ancient balls of stars in the galactic halo. For example: M 13, M 22, NGC 5139. ... | hovered |
 | Chart Options | JCheckBox | Nebulae | Clouds of gas and dust: emission, reflection and dark nebulae, H II regions, supernova ... | Clouds of gas and dust: emission, reflection and dark nebulae, H II regions, supernova ... | hovered |
 | Chart Options | JCheckBox | Planetary nebulae | Shells thrown off by dying stars, drawn small and crossed so they read apart from the o... | Shells thrown off by dying stars, drawn small and crossed so they read apart from the o... | hovered |
-| Chart Options | JCheckBox | Deep-sky labels | Name the deep-sky objects the chart draws (<prefix> then L) | Name the deep-sky objects the chart draws. Switched here, or from the chart by pressing... | hovered |
-| Chart Options | JCheckBox | Star names | Traditional proper names such as Betelgeuse (<prefix> then S) | Traditional proper names such as Betelgeuse. Switched here, or from the chart by pressi... | hovered |
-| Chart Options | JCheckBox | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis (<prefix> then Y) | Greek and Latin Bayer designations such as alpha Orionis. Switched here, or from the ch... | hovered |
-| Chart Options | JCheckBox | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts (<prefix> then M) | Flamsteed catalogue numbers on the regional charts. Switched here, or from the chart by... | hovered |
-| Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations (<prefix> then F) | The joined stick figures of the constellations. Switched here, or from the chart by pre... | hovered |
-| Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875 (<prefix> then B) | The IAU boundaries, precessed from B1875. Switched here, or from the chart by pressing ... | hovered |
-| Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is (<prefix> then N) | The figure's name, drawn where the figure is. Switched here, or from the chart by press... | hovered |
-| Chart Options | JCheckBox | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels (<prefix> ... | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Switched ... | hovered |
+| Chart Options | JCheckBox | Deep-sky labels | Name the deep-sky objects the chart draws. Shortcut: <prefix> then L. | Name the deep-sky objects the chart draws. Switch it here or from the chart with <prefi... | hovered |
+| Chart Options | JCheckBox | Star names | Traditional proper names such as Betelgeuse. Shortcut: <prefix> then S. | Traditional proper names such as Betelgeuse. Switch it here or from the chart with <pre... | hovered |
+| Chart Options | JCheckBox | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis. Shortcut: <prefix> then Y. | Greek and Latin Bayer designations such as alpha Orionis. Switch it here or from the ch... | hovered |
+| Chart Options | JCheckBox | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts. Shortcut: <prefix> then M. | Flamsteed catalogue numbers on the regional charts. Switch it here or from the chart wi... | hovered |
+| Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations. Shortcut: <prefix> then F. | The joined stick figures of the constellations. Switch it here or from the chart with <... | hovered |
+| Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: <prefix> then B. | The IAU boundaries, precessed from B1875. Switch it here or from the chart with <prefix... | hovered |
+| Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. | The figure's name, drawn where the figure is. Switch it here or from the chart with <pr... | hovered |
+| Chart Options | JCheckBox | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Shortcut:... | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Switch it... | hovered |
 | Chart Options | JCheckBox | Title block | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | hovered |
 | Chart Options | JCheckBox | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magni... | A key in the upper right showing the circle size the chart draws for three visual magni... | hovered |
 | Chart Options | JCheckBox | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper char... | White stars and restrained light ink on a black ground, instead of the white-paper char... | hovered |
-| Chart Options | JButton | Restore Defaults | Preview the released chart: every layer and every deep-sky family on, the title block o... | Puts every switch in this window back to what the atlas ships with. It is a preview lik... | hovered |
-| Chart Options | JButton | Cancel | &mdash; | Puts the chart back the way it was and closes this window | self-explanatory |
-| Chart Options | JButton | OK | &mdash; | Keeps what the chart is showing now, and remembers it for next time | self-explanatory |
+| Chart Options | JButton | Restore Defaults | Preview the atlas defaults: every layer and deep-sky family in this window on, the titl... | Returns every choice in this window to the atlas defaults. Like every change here, this... | hovered |
+| Chart Options | JButton | Cancel | &mdash; | Puts the chart back the way it was and closes this window. | self-explanatory |
+| Chart Options | JButton | OK | &mdash; | Keeps what the chart is showing now, and remembers it for next time. | self-explanatory |
 | Place and Time | CommitField | (a field) | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Degrees north of the equator, negative south, -90 to 90 | hovered |
 | Place and Time | CommitField | (a field) | Degrees east of Greenwich, e.g. 10.752; west is negative | Degrees east of Greenwich; west is negative | hovered |
-| Place and Time | CommitField | (a field) | The moment the lines are drawn for, as 2026-03-20 21:33:00 | The frozen moment the lines are drawn for; nothing ticks, so it stays where you put it | hovered |
+| Place and Time | CommitField | (a field) | The moment the lines are drawn for, as 2026-03-20 21:33:00 | The instant used to draw the reference lines. Time does not advance until you change it. | hovered |
 | Place and Time | JCheckBox | Meridian | Draw the great circle through both celestial poles and your zenith (<prefix> then R) | Draws the line that runs from due north, through the point overhead, to due south. It l... | hovered |
 | Place and Time | JCheckBox | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) | Draws the circle where the sky would meet a flat and transparent Earth; your own horizo... | hovered |
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
-| Place and Time | JButton | Now | Read the clock once and freeze on this moment | Freezes on the present moment, read once; nothing ticks afterwards, so the lines stay w... | hovered |
-| Place and Time | JButton | Center on zenith | Move the chart to the point overhead | Moves the page to the point directly above you - the one control in this window that mo... | hovered |
-| Export Chart Sheet | JComboBox | (Format) | What kind of file to write: vector for printing and editing, PNG for sharing a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
+| Place and Time | JButton | Now | Reads the clock once and freezes the chart at that instant | Freezes the reference lines at the present moment. The clock is read once; nothing move... | hovered |
+| Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you. This is the only control in this window... | hovered |
+| Export Chart Sheet | JComboBox | (Format) | Choose SVG or PDF for a line drawing, or PNG for a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
 | Export Chart Sheet | JComboBox | (Paper) | The size of the page the chart is laid out on | Chooses the paper the sheet is laid out for. The chart is fitted to it; the page you ar... | hovered |
 | Export Chart Sheet | JComboBox | (Resolution) | How finely a PNG is drawn; ignored by SVG and PDF | Chooses how many dots per inch a PNG is drawn at. SVG and PDF keep the drawing as lines... | hovered |
 | Export Chart Sheet | JCheckBox | Include the working selection's marks | Draw the rings and crosses on the objects you have marked | When on, the sheet carries the marks you made this session. Off by default, because a s... | hovered |
 | Export Chart Sheet | JButton | Cancel | &mdash; | Closes this window without writing anything | self-explanatory |
-| Export Chart Sheet | JButton | Export... | Choose where to save the sheet | Opens the file chooser, and writes the sheet where you put it | hovered |
+| Export Chart Sheet | JButton | Export... | Choose where to save the sheet | Opens the file chooser and writes the sheet where you save it | hovered |
 | Settings | JRadioButton | Light | &mdash; | Draws the window's own chrome light. The chart is drawn the same either way. | self-explanatory |
 | Settings | JRadioButton | Dark | &mdash; | Draws the window's own chrome dark. The chart is drawn the same either way; the black s... | self-explanatory |
-| Settings | JComboBox | (Interface language) | The language of the menus, buttons and dialogs - not the names printed on the chart | The language of the menus, buttons and dialogs - the words the application speaks to yo... | hovered |
+| Settings | JComboBox | (Interface language) | The language of the menus, buttons and dialogs - not the names printed on the chart | The language used by menus, dialogs and other application controls. It does not change ... | hovered |
 | Settings | JComboBox | (Names on chart) | The language of the constellation names printed on the chart - separate from the interf... | The language of the constellation names printed on the chart itself. Separate from the ... | hovered |
-| Settings | JButton | Cancel | &mdash; | Closes this window and changes nothing | self-explanatory |
-| Settings | JButton | OK | &mdash; | Keeps the chosen appearance and closes this window | self-explanatory |
-| About | JTextArea | (read-only text) | &mdash; | The short form of what the atlas is built on and what that allows; the full texts are b... | self-explanatory |
-| About | JButton | Full notices and licences... | &mdash; | Opens the complete notices and licence texts for everything the atlas bundles | self-explanatory |
+| Settings | JButton | Cancel | &mdash; | Closes this window without saving changes | self-explanatory |
+| Settings | JButton | OK | &mdash; | Saves the choices and closes this window | self-explanatory |
+| About | JTextArea | (read-only text) | &mdash; | The short form of the atlas's licensing. The bundled data and icon notices are behind t... | self-explanatory |
+| About | JButton | Full notices and licences... | &mdash; | Opens the complete notices and licence texts for the data and icons bundled with the at... | self-explanatory |
 | About | JButton | Close | &mdash; | Closes this window and returns to the chart | self-explanatory |
-| About, notices | JTextArea | (read-only text) | &mdash; | The notices and licence texts of everything the atlas bundles, in full | self-explanatory |
+| About, notices | JTextArea | (read-only text) | &mdash; | The notices and licence texts for the data and icons bundled with the atlas, in full. | self-explanatory |
 | About, notices | JButton | Close | &mdash; | Closes this window and returns to the chart | self-explanatory |
 | Inspector | JButton | (icon only) | Close Inspector (<key:inspector>) | Hides this pane. The chart keeps its place, its target and your selection, and widens t... | hovered |
 | Inspector | JToggleButton | Selected | The facts of the object you last chose | Shows what the atlas holds on the one object you chose, rather than everything on the page | hovered |
 | Inspector | JToggleButton | On this page | Everything on the page you are looking at, drawn or not | Lists every object the atlas holds within this page, including the ones the chart is no... | hovered |
 | Inspector | JList | (Objects at this point) | Several objects lie within reach of that point; choose one to inspect it | A list of everything within reach of the point you clicked. Choosing one shows its fact... | hovered |
-| Inspector | JButton | M 31 | Show M 31's facts | Makes this member the lead and shows its facts here. Membership is unchanged. | hovered |
+| Inspector | JButton | M 31 | Show the facts for M 31 | Makes this member the lead and shows its facts here. Membership is unchanged. | hovered |
 | Inspector | JButton | ✕ | Remove M 31 from the working selection | Takes M 31 out of the working selection. The rest stay, and the page does not move. | hovered |
 | Inspector | JButton | Clear selection | Remove every working mark | Empties the whole working selection. The page and your place in it are left alone. | hovered |
-| Inspector | JButton | Center here | Center the chart on the selected object | Moves the page so the object shown here sits at the centre; nothing about what the char... | hovered |
+| Inspector | JButton | Centre here | Centre the chart on the selected object | Moves the page so the object shown here sits at the centre; nothing about what the char... | hovered |
 | On this page | JTable | (Objects on this page) | &mdash; | Choose rows to mark them on the chart. Marking does not move the page. | self-explanatory |
-| On this page | JButton | Center here | Choose a row's mark first, and this centres the chart on it | Unavailable until a row is marked: mark one and this moves the page to it | dynamic |
+| On this page | JButton | Centre here | Choose a row's mark first, and this centres the chart on it | Unavailable until a row is marked: mark one and this moves the page to it | dynamic |
 | On this page | JButton | Clear marks | Nothing is marked yet | Unavailable: there are no working marks to remove | dynamic |
 
 ## The audit
 
-**81 operable controls** across 11 surfaces: **50** hovered, **5** dynamic, **26** left to their own visible words, **0 undecided**.
+**81 operable controls** across 11 surfaces: **48** hovered, **7** dynamic, **26** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

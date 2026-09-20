@@ -31,6 +31,10 @@ import juranometria.ui.SceneAssembler;
  */
 public final class PanStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDTH = 900;
     private static final int HEIGHT = 700;
     private static final double[] FIELDS = {8.0, 18.0, 36.0};
@@ -254,7 +258,7 @@ public final class PanStudyMain {
         SceneAssembler assembler = SceneAssembler.allSky(catalogue,
                 catalogue.manifest().maxObjectSemiExtentDegrees(),
                 ConstellationGeography.load());
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         System.out.println("drag burst: 120 events, the pointer advancing"
                 + " 5 px per event (4 right, 3 down), solve + assemble"
                 + " + render per event (warm):");

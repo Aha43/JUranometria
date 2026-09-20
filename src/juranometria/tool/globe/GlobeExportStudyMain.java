@@ -60,6 +60,10 @@ import juranometria.ui.ReferenceInk;
  */
 public final class GlobeExportStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private GlobeExportStudyMain() {
     }
 
@@ -327,7 +331,7 @@ public final class GlobeExportStudyMain {
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, globeState(), only,
                 ChartRenderer.ReferenceLayer.NONE,
-                ChartRenderer.ReferenceLayer.NONE, paper);
+                ChartRenderer.ReferenceLayer.NONE, paper, ENGLISH);
         BufferedImage whole = ImageIO.read(new ByteArrayInputStream(
                 SheetWriters.write(sheet, SheetFormat.PNG, 300)));
 
@@ -617,7 +621,7 @@ public final class GlobeExportStudyMain {
                     high / (double) paper.chartHighUnits());
             g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                     java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT)
+            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();
@@ -636,7 +640,7 @@ public final class GlobeExportStudyMain {
             g.setColor(ChartPalette.WHITE_PAPER.ground());
             g.fillRect(0, 0, paper.chartWideUnits(),
                     paper.chartHighUnits());
-            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT)
+            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, page.scene(), options);
         } finally {
             g.dispose();
@@ -714,7 +718,7 @@ public final class GlobeExportStudyMain {
         // its own to be asked what a globe exports.
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, globeState(), settled(),
-                reference, ChartRenderer.ReferenceLayer.NONE, paper);
+                reference, ChartRenderer.ReferenceLayer.NONE, paper, ENGLISH);
         byte[] written = SheetWriters.write(sheet, format, 300);
         File file = new File(DIR, String.format(Locale.ROOT,
                 "globe-%s.%s", withModules ? "modules" : "core",
@@ -762,7 +766,7 @@ public final class GlobeExportStudyMain {
         SheetRecording bare = ChartSheet.record(
                 Atlas.assembler()::assemble, globeState(),
                 furnitureOnly(), ChartRenderer.ReferenceLayer.NONE,
-                ChartRenderer.ReferenceLayer.NONE, paper);
+                ChartRenderer.ReferenceLayer.NONE, paper, ENGLISH);
         return beyondTheLimbIn(
                 SheetWriters.write(bare, SheetFormat.PNG, 300), paper);
     }

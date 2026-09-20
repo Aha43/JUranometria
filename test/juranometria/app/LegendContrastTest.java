@@ -48,7 +48,7 @@ class LegendContrastTest {
             Color darkest = darkest(swatch(family));
             double contrast = ratio(darkest, Color.WHITE);
             assertTrue(contrast >= FLOOR * MARGIN,
-                    family.label() + " draws at " + round(contrast)
+                    family.canonicalName() + " draws at " + round(contrast)
                             + ":1 against the chart's paper, which does"
                             + " not clear " + FLOOR + ":1 with the"
                             + " margin the decision requires (darkest"

@@ -1,0 +1,7 @@
+JUranometria kjenner ikke igjen denne typen feil og kan derfor ikke foreslå
+noen løsning. Det er mer sannsynlig at dette er en feil i programmet enn et
+problem med nedlastingen eller innstillingene dine.
+
+Rapporter gjerne feilen sammen med meldingen ovenfor, plattformen din og denne
+versjonen på:
+https://github.com/Aha43/JUranometria/issues

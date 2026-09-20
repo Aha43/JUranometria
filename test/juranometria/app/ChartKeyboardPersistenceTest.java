@@ -59,7 +59,7 @@ class ChartKeyboardPersistenceTest {
                 });
         ChartKeyboard keyboard = ChartKeyboard.of(
                 ChartSwitches.of(options, new NoEcliptic(),
-                        new NoLines()));
+                        new NoLines()), juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         keyboard.press('T');
         assertFalse(options.options().titleBlock(),
@@ -112,7 +112,7 @@ class ChartKeyboardPersistenceTest {
                         saved.add(showing[0]);
                     }
                 },
-                new NoLines()));
+                new NoLines()), juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         keyboard.press('I');
         assertTrue(showing[0], "the ecliptic is drawn");
@@ -159,7 +159,7 @@ class ChartKeyboardPersistenceTest {
                         lines[0] = meridian;
                         lines[1] = horizon;
                     }
-                }));
+                }), juranometria.ui.language.InterfaceText.forLanguage("en"));
 
         keyboard.press('R');
         keyboard.press('H');

@@ -105,7 +105,7 @@ class ChartKeyboardLifecycleTest {
                 // The way out nobody plans for.
                 show(window, elsewhere, 3);
                 ChartKeyboard open = ChartKeyboard.of(
-                        ChartKeysTest.switches(ChartOptions.DEFAULTS));
+                        ChartKeysTest.switches(ChartOptions.DEFAULTS), juranometria.ui.language.InterfaceText.forLanguage("en"));
                 SwingUtilities.invokeAndWait(() ->
                         open.showIn(window[0].getRootPane()));
                 flush();
@@ -148,7 +148,7 @@ class ChartKeyboardLifecycleTest {
     private void leaveBy(String how, JFrame window, Exit exit)
             throws Exception {
         ChartKeyboard keyboard = ChartKeyboard.of(
-                ChartKeysTest.switches(ChartOptions.DEFAULTS));
+                ChartKeysTest.switches(ChartOptions.DEFAULTS), juranometria.ui.language.InterfaceText.forLanguage("en"));
         SwingUtilities.invokeAndWait(() ->
                 keyboard.showIn(window.getRootPane()));
         flush();

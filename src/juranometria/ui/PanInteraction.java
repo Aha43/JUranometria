@@ -91,10 +91,11 @@ public final class PanInteraction extends MouseAdapter {
                         interaction.cancelGesture();
                     }
                 });
+        // The chart's own words, taken from the component rather
+        // than resolved here: what a reader is told about moving the
+        // page is in the same language as the page (#350).
         chart.getAccessibleContext().setAccessibleDescription(
-                "Press and drag the chart to pan across the sky;"
-                        + " scroll to zoom where you point;"
-                        + " Reset view returns home.");
+                chart.words().chartInstructions());
         return interaction;
     }
 

@@ -42,9 +42,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class EclipticControlsJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final juranometria.render.ChartRenderer RENDERER =
             new juranometria.render.ChartRenderer(
-                    juranometria.chart.StarSizePolicy.DEFAULT);
+                    juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
 
     /** The March equinox page: the ecliptic crosses the equator here. */
     private static ChartViewState eclipticPage() {
@@ -83,7 +88,7 @@ class EclipticControlsJourneyTest {
                                           ChartComponent[] out)
             throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            out[0] = new ChartComponent(Atlas.assembler());
+            out[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             out[0].setSize(900, 700);
             out[0].setViewState(state);
         });
@@ -96,7 +101,7 @@ class EclipticControlsJourneyTest {
     @Test
     void withNoEclipticModuleThereIsNoEclipticControl() {
         JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                () -> { }, () -> { }, () -> { });
+                () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertNull(AppMenuBar.eclipticItem(bar),
                 "an atlas without the module offers no switch for it:"
                         + " a tick for something that cannot be drawn"
@@ -109,7 +114,7 @@ class EclipticControlsJourneyTest {
     @Test
     void theControlIsACheckboxOnTheViewMenuUnderTheInspector() {
         JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                () -> { }, () -> { }, () -> { }, () -> { });
+                () -> { }, () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
         assertNotNull(item, "the ecliptic has a switch");
         assertEquals("Ecliptic", item.getText(),
@@ -158,7 +163,7 @@ class EclipticControlsJourneyTest {
     void pointerAndKeyboardBothReachIt() {
         int[] toggles = {0};
         JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                () -> { }, () -> { }, () -> { }, () -> toggles[0]++);
+                () -> { }, () -> { }, () -> { }, () -> toggles[0]++, juranometria.ui.language.InterfaceText.forLanguage("en"));
         JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
 
         // The pointer route: what a click on the item does.
@@ -208,7 +213,7 @@ class EclipticControlsJourneyTest {
 
             JMenuBar bar = AppMenuBar.create(null, null, () -> { },
                     () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(module, store));
+                    EclipticSession.toggle(module, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
             JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
             // Production's own restore, not a rehearsal of it: one
             // call sets both the chart and the tick from one read of
@@ -256,7 +261,7 @@ class EclipticControlsJourneyTest {
             EclipticModule module = EclipticSession.begin(host);
             JMenuBar bar = AppMenuBar.create(null, null, () -> { },
                     () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(module, store));
+                    EclipticSession.toggle(module, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
             EclipticSession.restore(module, store,
                     AppMenuBar.eclipticItem(bar));
 
@@ -301,7 +306,7 @@ class EclipticControlsJourneyTest {
             // A bar built with no View menu has no item either, and
             // is caught the same way rather than silently drawing.
             JMenuBar noViewMenu = AppMenuBar.create(null, null, null,
-                    () -> { }, () -> { }, () -> { }, () -> { });
+                    () -> { }, () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
             assertNull(AppMenuBar.eclipticItem(noViewMenu),
                     "a bar with no View menu carries no item");
             assertThrows(IllegalArgumentException.class,
@@ -498,7 +503,7 @@ class EclipticControlsJourneyTest {
             EclipticModule one = EclipticSession.begin(hostOne);
             JMenuBar barOne = AppMenuBar.create(null, null, () -> { },
                     () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(one, store));
+                    EclipticSession.toggle(one, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
             JCheckBoxMenuItem itemOne = AppMenuBar.eclipticItem(barOne);
             EclipticSession.restore(one, store, itemOne);
             assertFalse(one.showing(),
@@ -521,7 +526,7 @@ class EclipticControlsJourneyTest {
             JMenuBar barTwo = AppMenuBar.create(null, null, () -> { },
                     () -> { }, () -> { }, () -> { },
                     EclipticSession.toggle(two,
-                            EclipticStore.forNode(node)));
+                            EclipticStore.forNode(node)), juranometria.ui.language.InterfaceText.forLanguage("en"));
             JCheckBoxMenuItem itemTwo = AppMenuBar.eclipticItem(barTwo);
             EclipticSession.restore(two, EclipticStore.forNode(node),
                     itemTwo);
@@ -544,7 +549,7 @@ class EclipticControlsJourneyTest {
             JMenuBar barThree = AppMenuBar.create(null, null, () -> { },
                     () -> { }, () -> { }, () -> { },
                     EclipticSession.toggle(three,
-                            EclipticStore.forNode(node)));
+                            EclipticStore.forNode(node)), juranometria.ui.language.InterfaceText.forLanguage("en"));
             EclipticSession.restore(three, EclipticStore.forNode(node),
                     AppMenuBar.eclipticItem(barThree));
             assertFalse(three.showing(),

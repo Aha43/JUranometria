@@ -48,6 +48,10 @@ import juranometria.render.RegionalDetailPolicy;
  */
 public final class BayerStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final int WIDTH = 900;
     private static final int HEIGHT = 700;
 
@@ -167,7 +171,7 @@ public final class BayerStudyMain {
         outDir.mkdirs();
         inventory();
 
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         record Page(String name, double ra, double dec, double field) {
         }
         List<Page> pages = List.of(
@@ -421,7 +425,7 @@ public final class BayerStudyMain {
         StarSizePolicy sizes = StarSizePolicy.DEFAULT;
 
         List<Rectangle2D> occupied = new ArrayList<>();
-        var title = ChartRenderer.titleBlockBounds(g, scene);
+        var title = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(g, scene);
         if (title != null) {
             occupied.add(title);
         }

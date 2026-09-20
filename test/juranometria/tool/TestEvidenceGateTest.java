@@ -32,6 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TestEvidenceGateTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final Path REPORT =
             Path.of("docs/studies/test-evidence/measurements.md");
     private static final Path DECISION =
@@ -41,7 +46,7 @@ class TestEvidenceGateTest {
 
     @Test
     void theGateChangesNothingTheChartDraws() {
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
         var scene = Atlas.assembler()
                 .assemble(ChartViewState.DEFAULT, 900, 700);
         BufferedImage before = renderer.renderToImage(scene,
@@ -109,6 +114,17 @@ class TestEvidenceGateTest {
                         || decision.contains(reads + "\nreads of live"),
                 "and the decision carries the same read count: "
                         + reads);
+        // BOTH figures, not just the first. This checked the reads
+        // and left the hand-offs unchecked, so the decision quoted
+        // 700 while the report said 702 and every test passed. A
+        // number nothing compares is a number that drifts, and the
+        // sentence carrying it goes on looking like evidence (#350).
+        assertTrue(decision.contains("**" + handOffs
+                        + " explicit hand-offs**"),
+                "and the same hand-off count: the report measured "
+                        + handOffs + ", and the decision quotes"
+                        + " whatever it quotes until something"
+                        + " compares them");
     }
 
     // ---- guard G1: global state is protected ------------------------
@@ -282,17 +298,28 @@ class TestEvidenceGateTest {
                 .filter(f -> !f.unprotectedState().isEmpty())
                 .map(TestEvidenceScan.File::path).sorted().toList();
         assertEquals(List.of(
+                        "src/juranometria/tool/AboutSheetMain.java",
+                        "src/juranometria/tool/ChartKeyboardSheetMain.java",
+                        "src/juranometria/tool/ChartOptionsSheetMain.java",
                         "src/juranometria/tool/ControlExplanationStudyMain.java",
                         "src/juranometria/tool/DeepSkyVocabularyMockupMain.java",
                         "src/juranometria/tool/EclipticCandidateStudyMain.java",
                         "src/juranometria/tool/EclipticControlStudyMain.java",
+                        "src/juranometria/tool/ExportSheetDialogSheetMain.java",
+                        "src/juranometria/tool/InspectorSheetMain.java",
+                        "src/juranometria/tool/MenuSheetMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
+                        "src/juranometria/tool/OnThisPageSheetMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
+                        "src/juranometria/tool/PlaceAndTimeSheetMain.java",
+                        "src/juranometria/tool/SettingsSheetMain.java",
+                        "src/juranometria/tool/SwingChromeSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
+                        "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the nine widget photographers, whose font and theme"
+                "the twenty widget photographers, whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -309,7 +336,85 @@ class TestEvidenceGateTest {
                         + " by #311's control audit, which builds every"
                         + " surface the application builds and so needs"
                         + " the look and feel those surfaces are built"
-                        + " under");
+                        + " under; and the tenth by #350's, the"
+                        + " Settings sheet, which draws that dialog in"
+                        + " each interface language for a person to"
+                        + " judge the translation by - and must draw"
+                        + " it under the look and feel a reader meets,"
+                        + " because whether a longer word fits a"
+                        + " control is a question about that look and"
+                        + " feel and no other; and the eleventh by"
+                        + " #350's Chart Options sheet, which packs"
+                        + " that dialog in a real window in each"
+                        + " language - a real window because this"
+                        + " surface wraps its descriptions against"
+                        + " font metrics, and a detached panel"
+                        + " pictured one line of each overlapping the"
+                        + " row beneath; and the twelfth by #350's"
+                        + " Inspector sheet, on the same ground and"
+                        + " for the same reason - it draws each"
+                        + " selection state in a real window because"
+                        + " one of its facts is now broken against"
+                        + " font metrics too, and a sentence measured"
+                        + " without a window is measured against a"
+                        + " width nothing will honour; and the"
+                        + " thirteenth by #350's On This Page sheet,"
+                        + " which draws that table in each language"
+                        + " because it sizes its own columns from its"
+                        + " own words - the Chart column from five of"
+                        + " them and its header, the Mag column from"
+                        + " its silence - and a table measured"
+                        + " without a window reports widths nothing"
+                        + " honours; and the fourteenth by #350's"
+                        + " toolbar sheet, which photographs the bar"
+                        + " and its search field as the application"
+                        + " composes them - through AtlasChrome,"
+                        + " from a stored language choice, because a"
+                        + " sheet that asked each component for"
+                        + " Norwegian would have photographed a"
+                        + " correct toolbar throughout the period the"
+                        + " application was handing it English; and"
+                        + " the fifteenth by #350's export sheet,"
+                        + " which draws that dialog in each language"
+                        + " because the explanation under its format"
+                        + " control wraps against font metrics; and"
+                        + " the sixteenth by #350's menu sheet, which"
+                        + " lays out each menu's popup and paints it -"
+                        + " a menu keeps its items in a popup rather"
+                        + " than as children, so a bar painted alone"
+                        + " is a picture of three words; and the"
+                        + " seventeenth by #350's Place and Time"
+                        + " sheet, which photographs the real packed"
+                        + " dialog in each language rather than its"
+                        + " content pane, because a window's title"
+                        + " and the description a screen reader"
+                        + " reads when it opens are channels no walk"
+                        + " of a content pane will find - and"
+                        + " because it restores the reviewed width"
+                        + " the peer takes back from an unshown"
+                        + " window, without which it drew a"
+                        + " different set of images on each run; and"
+                        + " the eighteenth by #350's chart keyboard"
+                        + " sheet, which shows the palette in a real"
+                        + " window under both themes because the"
+                        + " rows waiting on a master are greyed, and"
+                        + " a colour the look and feel resolves is"
+                        + " right in one theme and wrong in the"
+                        + " other; and the nineteenth by #350's About"
+                        + " sheet, which opens the real dialog and"
+                        + " presses through to the bundled documents"
+                        + " with its own button, under both themes -"
+                        + " a page of read-only licence text takes"
+                        + " its ground and its ink from the look and"
+                        + " feel, and is the surface where low"
+                        + " contrast would be least noticed; and the"
+                        + " twentieth by #350's Swing chrome sheet,"
+                        + " which builds a real option pane and a real"
+                        + " file chooser under the application's own"
+                        + " look and feel with the toolkit's words"
+                        + " installed over Swing's - the words a"
+                        + " reader answers a question with, which came"
+                        + " from the operating system until now");
     }
 
     // ---- guard G2: nobody opens the reader's real store -------------
@@ -425,7 +530,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(36, display.size(),
+        assertEquals(47, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -468,8 +573,64 @@ class TestEvidenceGateTest {
                         + " ladder by pressing the toolbar's own"
                         + " controls and exports through the real"
                         + " dialog, neither of which can be asked of"
-                        + " a page nobody is looking at; each with"
-                        + " its premises stated");
+                        + " a page nobody is looking at; and #350's"
+                        + " Inspector wrapping, which asks whether a"
+                        + " translated sentence fits the column it is"
+                        + " drawn in - a question about a laid-out"
+                        + " width, and validate() is a no-op on a"
+                        + " component that is not displayable, so a"
+                        + " panel measured without a window answers"
+                        + " with a width nothing will honour; each"
+                        + " with its premises stated; and #350's On"
+                        + " This Page language test, which reads the"
+                        + " headers a realised table builds and the"
+                        + " width its count line is given - both of"
+                        + " which exist only once a window has laid"
+                        + " the panel out; and #350's toolbar"
+                        + " language test, which reads a colour the"
+                        + " look and feel resolves - written down"
+                        + " once it would be right in one theme and"
+                        + " wrong in the other, and measured without"
+                        + " the application's own theme installed it"
+                        + " is the plain label's colour, which is"
+                        + " what the first version of that test"
+                        + " measured; and #350's search language test,"
+                        + " whose result list is a window of its own"
+                        + " rather than a child of the field - walked"
+                        + " through the field's children it finds the"
+                        + " idle state and calls it the surface; and"
+                        + " #350's export language test, which reads"
+                        + " a label's relation to the control it"
+                        + " names and a combo's rendered items, both"
+                        + " of which exist only on a built dialog;"
+                        + " and the startup journey, which is not a"
+                        + " surface test at all: it runs the real"
+                        + " JUranometriaMain.start with its five"
+                        + " stores injected, and starting the"
+                        + " application means making a window. It"
+                        + " exists because nothing ran start, and a"
+                        + " checkpoint shipped that could not launch"
+                        + " - the menu bar had moved down the method"
+                        + " and the two lines reading it back stayed"
+                        + " above it, which 1445 passing tests went"
+                        + " straight over - and which now also opens"
+                        + " Place and Time from the composed menu in"
+                        + " a stored Norwegian session, because a"
+                        + " surface is not translated until the"
+                        + " application hands it the language; and"
+                        + " #350's frozen-note test, which reads a"
+                        + " colour the look and feel resolves, under"
+                        + " both themes, because a subdued colour"
+                        + " written down once is wrong in the other;"
+                        + " and #350's Swing chrome test, which builds"
+                        + " a real option pane and a real file chooser"
+                        + " because a defaults table proves only what"
+                        + " was written, not what a reader is shown -"
+                        + " and runs them under a German default"
+                        + " locale, since on an English machine \"the"
+                        + " atlas installed Norwegian\" and \"the"
+                        + " platform happened to agree\" are the same"
+                        + " observation");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

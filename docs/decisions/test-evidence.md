@@ -76,10 +76,10 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **56 files** touch process-wide state —
-**29** use the shared guard, **26** restore locally,
-**0 flagged unprotected** — and **36 files** depend on a display,
-of which **19** state a focus premise and **27** a reachability
+this document to them: **63 files** touch process-wide state —
+**33** use the shared guard, **29** restore locally,
+**0 flagged unprotected** — and **47 files** depend on a display,
+of which **19** state a focus premise and **28** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
 test and its journey — and the journey to the display corpus,
@@ -146,7 +146,54 @@ dialog behaved. #349 then added the sky-language closing journey to
 the shared guard: it installs the application's own theme and reads
 its own preference node on purpose, because a journey that inherited
 either from whatever ran before it could report the same false pass
-the #348 accessibility audit did.)
+the #348 accessibility audit did; and #350 added the Chart Options
+language test, which reads a real store because the dialog it drives
+needs one, and which asks the platform what it calls a keystroke
+rather than writing the glyph down — the first version hard-coded it
+and passed alone while failing in the suite, the toolkit answering
+⌃K headless and ⌘K under a display; and #350 added the Inspector
+wrapping test, which asks whether a translated explanation fits the
+column it is drawn in. That is a question about a laid-out width, and
+`validate()` is a no-op on a component that is not displayable, so a
+panel measured without a window answers with a width nothing will
+honour. It presses nothing and states no input premise, because it
+takes no input: it measures. #350 added the On This Page language
+test on the same ground: the headers it reads are built when the table
+is realised, and the width its count line is given exists only once a
+window has laid the panel out. #350 also added the toolbar language
+test to the shared-guard shape: it installs the application's own theme
+in both light and dark, because the version label's subdued colour is
+resolved per theme — written down once it would be wrong in the other,
+and measured without that theme installed it is simply the plain
+label's colour, which is what the first version of the test read. #350
+also added the search language test: its result list is a popup window of
+its own rather than a child of the field, so a walk through the field's
+children finds the idle state and reports it as the whole surface. #350 added one more to the
+local-preference shape: the controls-composition test, which begins where
+startup begins — a stored language choice read once — because the defect it
+holds was an application that composed translated components in English
+while every component contract passed. #350 also added the export
+language test, which reads a label's `labelFor` relation and a combo's
+rendered items — neither of which exists until a dialog is built. And #350
+added the startup journey, which is not a surface test: it runs the real
+`JUranometriaMain.start` with its five preference stores injected, and
+starting the application means making a window. It exists because nothing
+ran `start`. A checkpoint shipped that could not launch — the menu bar had
+moved down the method to be built in the reader's language, and the two
+lines that read it back stayed above it, so `frame.getJMenuBar()` was null
+and a packaged application would have shown the failure reporter instead of
+a window. 1445 passing tests went straight over it. The ordering is held by
+consequence rather than by reading the source: the ecliptic's remembered
+choice has to arrive at its menu item, which cannot happen unless the bar is
+on the frame first. #350 then added the frozen-note test to the
+shared-guard shape: it installs the application's own theme in both light
+and dark, because the note's subdued colour is resolved per theme, and a
+colour written down once would be right in one theme and wrong in the
+other. The startup journey also gained a second question in the same
+file — it opens Place and Time from the composed menu in a stored
+Norwegian session — because a surface is not translated until the
+application hands it the language, and every other test on that surface
+hands the dialog its language directly.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -331,7 +378,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **700 explicit hand-offs**
+reads of live chart state** against **772 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -342,7 +389,29 @@ chart keyboard, whose every question of the palette — is it open,
 what does its line say, how many listeners is the toolkit holding —
 is asked on the event thread and nowhere else; and for #315's
 closing journey, which reads the page a reader is looking at on
-every rung it visits). The discipline
+every rung it visits; and for #350's menu mnemonic test, which builds
+the bar and reads each item's access letter on the event thread, because
+a mnemonic is set while the item is being built; and for #350's export
+language test, which
+builds the dialog and reads its relations and rendered items on the
+event thread; and for #350's controls-composition test, which
+builds both surfaces and reads their words on the event thread, because
+what it is checking is what a reader would see; and for #350's search
+language test, which hands
+each query to the field and reads the popup it opens on the event thread,
+because a popup read off it is a popup read while it is still being
+built; and for #350's toolbar language test, which
+builds the bar, steps its magnitude ladder to each end and reads the
+wording on the event thread, because the wording is written by the
+controller's own notification; and for #350's On This Page language
+test,
+which builds the panel, reads its headers and measures its count line
+each on the event thread, because a header built off it is a header
+read while the table may still be rebuilding its columns; and for
+#350's Inspector wrapping, which
+builds the panel, selects into it and measures the result each on
+the event thread, because a width read off any other thread is a
+width read while the layout may still be changing it). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

@@ -49,6 +49,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class StartupTargetTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final String M31 = "NGC 224";
 
     private static final int WIDE_PX = 900;
@@ -210,7 +215,7 @@ class StartupTargetTest {
                                          ChartOptions options) {
         Set<String> drawn = new LinkedHashSet<>();
         for (ChartRenderer.DrawnMark mark
-                : new ChartRenderer(StarSizePolicy.DEFAULT)
+                : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                         .drawnMarks(scene, options)) {
             if (mark.kind() == ChartRenderer.DrawnMark.Kind.DEEP_SKY) {
                 drawn.add(mark.deepSky().id());
@@ -226,7 +231,7 @@ class StartupTargetTest {
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = canvas.createGraphics();
         try {
-            for (var placed : new ChartRenderer(StarSizePolicy.DEFAULT)
+            for (var placed : new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .textPlacements(ChartRenderer.TextMetrics.of(g),
                             scene, options)) {
                 if (!placed.omitted()) {

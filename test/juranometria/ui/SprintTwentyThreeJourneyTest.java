@@ -53,8 +53,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SprintTwentyThreeJourneyTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartRenderer RENDERER =
-            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT);
+            new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
     private static final String M31 = "NGC 224";
     private static final String M32 = "NGC 221";
     private static final String M110 = "NGC 205";
@@ -253,7 +258,7 @@ class SprintTwentyThreeJourneyTest {
                 "the selection survives - it is not a property of a"
                         + " symbol being on the paper");
         assertTrue(String.join(" | ", inspector.lines())
-                        .contains("Not on this page any more"),
+                        .contains("Hidden by the current chart options"),
                 "and the Inspector says so plainly rather than"
                         + " reciting the facts of a mark nobody can"
                         + " see: " + inspector.lines());
@@ -434,7 +439,7 @@ class SprintTwentyThreeJourneyTest {
 
         SwingUtilities.invokeAndWait(() -> {
             navigation = new ChartViewController(Atlas.assembler()::fits);
-            chart = new ChartComponent(Atlas.assembler());
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             navigation.onChange(chart::setViewState);
             selection = new SelectionModel();
             SelectInteraction.install(chart, selection,
@@ -473,7 +478,7 @@ class SprintTwentyThreeJourneyTest {
             window.setJMenuBar(AppMenuBar.create(navigation, () -> { },
                     () -> juranometria.app.ChartOptionsDialog.open(
                             window, options),
-                    () -> { }, toggle::toggle));
+                    () -> { }, toggle::toggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
             inspectorItem = AppMenuBar.inspectorItem(window.getJMenuBar());
             toggle.onChange(state -> {
                 inspectorItem.setSelected(state.showing());
@@ -573,8 +578,8 @@ class SprintTwentyThreeJourneyTest {
             openOptionsDialog();
         }
         javax.swing.JCheckBox box =
-                find(dialogPane, javax.swing.JCheckBox.class, family.label());
-        assertNotNull(box, family.label() + " is a control in the dialog");
+                find(dialogPane, javax.swing.JCheckBox.class, juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(family));
+        assertNotNull(box, juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(family) + " is a control in the dialog");
         SwingUtilities.invokeAndWait(box::doClick);
         flush();
         awaitSettled();
@@ -645,7 +650,7 @@ class SprintTwentyThreeJourneyTest {
         SwingUtilities.invokeAndWait(() -> {
             ChartViewController nav =
                     new ChartViewController(Atlas.assembler()::fits);
-            ChartComponent page = new ChartComponent(Atlas.assembler());
+            ChartComponent page = new ChartComponent(Atlas.assembler(), ENGLISH);
             nav.onChange(page::setViewState);
             SelectionModel chosen = new SelectionModel();
             SelectInteraction.install(page, chosen,

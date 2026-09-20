@@ -430,12 +430,12 @@ class ChartOptionsDialogTest {
 
             for (juranometria.render.SymbolFamily family
                     : juranometria.render.SymbolFamily.values()) {
-                JCheckBox box = box(content, family.label());
+                JCheckBox box = box(content, words().label(family));
                 assertNotNull(box, family + " has a control");
                 assertTrue(box.isSelected(), family + " starts drawn");
                 String heard = box.getAccessibleContext()
                         .getAccessibleDescription();
-                assertTrue(heard.startsWith(family.prose()),
+                assertTrue(heard.startsWith(words().description(family)),
                         family + " explains itself to a screen reader:"
                                 + " " + heard);
                 assertTrue(heard.contains(juranometria.app.ChartKeys
@@ -480,7 +480,7 @@ class ChartOptionsDialogTest {
             assertFalse(controller.options().deepSkyObjects());
             for (juranometria.render.SymbolFamily family
                     : juranometria.render.SymbolFamily.values()) {
-                assertFalse(box(content, family.label()).isEnabled(),
+                assertFalse(box(content, words().label(family)).isEnabled(),
                         family + " is ineffective while the master is"
                                 + " off");
             }
@@ -518,7 +518,7 @@ class ChartOptionsDialogTest {
                     "Restore Defaults previews the released chart");
             for (juranometria.render.SymbolFamily family
                     : juranometria.render.SymbolFamily.values()) {
-                JCheckBox box = box(content, family.label());
+                JCheckBox box = box(content, words().label(family));
                 assertTrue(box.isSelected(), family + " is back");
                 assertTrue(box.isEnabled(),
                         family + " is usable again");
@@ -618,4 +618,18 @@ class ChartOptionsDialogTest {
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> { });
     }
+    /**
+     * The family words a reader is shown, in English (#350).
+     *
+     * <p>Asked of the presentation layer in a stated language, as a
+     * reader-facing test must. Not a local prose() - that method was
+     * removed because the enum should not construct sentences, and
+     * rebuilding it here under another name would keep the
+     * architecture it was removed for.
+     */
+    private static juranometria.ui.language.SymbolFamilyText words() {
+        return juranometria.ui.language.SymbolFamilyText.in(
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
+    }
+
 }

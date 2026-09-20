@@ -31,6 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SvgSheetWriterTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final ChartViewState ORION = new ChartViewState(
             new SkyPosition(83.0, 0.0), 42.0, 6.0);
 
@@ -38,7 +43,7 @@ class SvgSheetWriterTest {
                               SvgSheetWriter.Text text) {
         return SvgSheetWriter.write(ChartSheet.record(
                 Atlas.assembler()::assemble, state, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, paper), text);
+                ChartRenderer.ReferenceLayer.NONE, paper, ENGLISH), text);
     }
 
     @Test
@@ -132,7 +137,7 @@ class SvgSheetWriterTest {
     void everyLayerIsThereUnderTheNameProductionGaveIt() {
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         String svg = SvgSheetWriter.write(sheet,
                 SvgSheetWriter.Text.EDITABLE);
 
@@ -213,7 +218,7 @@ class SvgSheetWriterTest {
         // hierarchy is gone (PR #290 review).
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         String svg = SvgSheetWriter.write(sheet,
                 SvgSheetWriter.Text.EDITABLE);
 
@@ -240,7 +245,7 @@ class SvgSheetWriterTest {
         // is given a recording that does contain one, and asked.
         SheetRecording page = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         assertEquals(0, page.recorder().text().stream()
                         .filter(run -> run.font().isItalic()).count(),
                 "the chart itself draws no italic - which is why this"
@@ -304,7 +309,7 @@ class SvgSheetWriterTest {
 
         SheetRecording page = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         String svg = SvgSheetWriter.write(new SheetRecording(recorder,
                         PaperSize.A4, page.scene(), page.options(),
                         page.metadata()),
@@ -329,7 +334,7 @@ class SvgSheetWriterTest {
     void theOutlineVariantIsForAMachineWhoseFontsAreUnknown() {
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         String outlined = SvgSheetWriter.write(sheet,
                 SvgSheetWriter.Text.OUTLINES);
 
@@ -366,7 +371,7 @@ class SvgSheetWriterTest {
         // margin. Nothing else here would notice.
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         String svg = SvgSheetWriter.write(sheet,
                 SvgSheetWriter.Text.EDITABLE);
         double chartWide = PaperSize.A4.chartWideUnits();
@@ -446,7 +451,7 @@ class SvgSheetWriterTest {
         // JDK's own XML reader - and asks it what is there.
         SheetRecording sheet = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4);
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH);
         String svg = SvgSheetWriter.write(sheet,
                 SvgSheetWriter.Text.EDITABLE);
 

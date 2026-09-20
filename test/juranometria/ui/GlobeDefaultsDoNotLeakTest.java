@@ -34,6 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeDefaultsDoNotLeakTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition SAGITTARIUS =
             new SkyPosition(266.0, -28.0);
 
@@ -272,7 +277,7 @@ class GlobeDefaultsDoNotLeakTest {
         // inventory and the ink both have to ask the second.
         ChartComponent[] holder = new ChartComponent[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> {
-            holder[0] = new ChartComponent(juranometria.app.Atlas.assembler());
+            holder[0] = new ChartComponent(juranometria.app.Atlas.assembler(), ENGLISH);
             holder[0].setSize(900, 700);
             holder[0].setChartOptions(THE_READERS_OWN);
             holder[0].setViewState(

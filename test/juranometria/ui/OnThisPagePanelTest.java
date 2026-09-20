@@ -36,6 +36,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OnThisPagePanelTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
+    /** The words in English, stated rather than inherited (#350). */
+    private static final juranometria.ui.language.InterfaceText EN =
+            juranometria.ui.language.InterfaceText.forLanguage("en");
+    private static final juranometria.ui.language.PageVisibilityText STATES =
+            juranometria.ui.language.PageVisibilityText.in(EN);
+
     /** A panel over a real page, at a given size. */
     private static final class Fixture implements AutoCloseable {
         final ChartComponent chart;
@@ -46,7 +57,7 @@ class OnThisPagePanelTest {
                 throws Exception {
             ChartComponent[] made = new ChartComponent[1];
             SwingUtilities.invokeAndWait(() -> {
-                made[0] = new ChartComponent(Atlas.assembler());
+                made[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
                 made[0].setSize(900, 700);
                 made[0].setViewState(
                         new ChartViewState(centre, field, 8.0));
@@ -54,7 +65,7 @@ class OnThisPagePanelTest {
             chart = made[0];
             host = new ChartModuleHost(chart, new SelectionModel(),
                     request -> { });
-            panel = host.attach(new OnThisPageModule()).panel();
+            panel = host.attach(new OnThisPageModule(juranometria.ui.language.InterfaceText.forLanguage("en"))).panel();
             SwingUtilities.invokeAndWait(() -> {
                 panel.setSize(width, height);
                 layOut(panel);
@@ -161,15 +172,15 @@ class OnThisPagePanelTest {
                 state[0] = ((OnThisPageTable.Row)
                         table.getValueAt(0, 0)).state();
             });
-            assertEquals(OnThisPageTable.CHART_COLUMN_QUESTION,
+            assertEquals(EN.say("onthispage.column.chart.explain"),
                     chartHeader[0],
                     "the Chart header cell carries the complete"
                             + " question, wherever the column sits");
             assertEquals(null, objectHeader[0],
                     "and no other header inherits it");
-            assertEquals(state[0].prose(), cellTip[0],
+            assertEquals(STATES.explanation(state[0]), cellTip[0],
                     "a cell's tooltip is the whole answer");
-            assertEquals(state[0].prose(), cellAccessible[0],
+            assertEquals(STATES.explanation(state[0]), cellAccessible[0],
                     "and so is its accessible description");
         }
     }
@@ -211,7 +222,9 @@ class OnThisPagePanelTest {
                     table.getFontMetrics(table.getFont());
             int chartWidth = OnThisPageTable.stateColumnWidth(cells,
                     table.getTableHeader().getFontMetrics(
-                            table.getTableHeader().getFont()));
+                            table.getTableHeader().getFont()),
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
             assertEquals(chartWidth, table.getColumnModel()
                             .getColumn(0).getPreferredWidth(),
                     "the Chart column keeps the Chart width at the"
@@ -263,7 +276,7 @@ class OnThisPagePanelTest {
             for (juranometria.page.PageVisibility state
                     : juranometria.page.PageVisibility.values()) {
                 widestLabel = Math.max(widestLabel,
-                        metrics.stringWidth(state.label()));
+                        metrics.stringWidth(STATES.label(state)));
             }
             assertTrue(table.getColumnModel().getColumn(3).getWidth()
                             >= widestLabel,
@@ -510,7 +523,8 @@ class OnThisPagePanelTest {
             SwingUtilities.invokeAndWait(() ->
                     fixture.panel.pageChanged(PageContents.EMPTY));
             assertTrue(fixture.panel.rows().isEmpty());
-            assertTrue(hasText(fixture.panel, "Nothing catalogued"),
+            assertTrue(hasText(fixture.panel,
+                            EN.say("onthispage.empty")),
                     "an empty table with no words is indistinguishable"
                             + " from one that failed to load");
         }

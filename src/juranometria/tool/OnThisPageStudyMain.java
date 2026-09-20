@@ -45,6 +45,10 @@ import juranometria.render.RegionalDetailPolicy;
  */
 public final class OnThisPageStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private OnThisPageStudyMain() {
     }
 
@@ -581,7 +585,7 @@ public final class OnThisPageStudyMain {
 
     private static void visibilityBreakdown() {
         ChartRenderer renderer =
-                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT);
+                new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH);
         ChartOptions defaults = ChartOptions.DEFAULTS;
         ChartOptions galaxiesOff = defaults.withFamily(
                 juranometria.render.SymbolFamily.GALAXIES, false);
@@ -790,7 +794,7 @@ public final class OnThisPageStudyMain {
                 juranometria.render.SymbolFamily.of(dso);
         return family == null
                 ? dso.type().name().toLowerCase(Locale.ROOT).replace('_', ' ')
-                : family.label().toLowerCase(Locale.ROOT);
+                : family.canonicalName().toLowerCase(Locale.ROOT);
     }
 
     private static String magnitudeOf(double magnitude,
@@ -819,9 +823,18 @@ public final class OnThisPageStudyMain {
                         : " " + identity.constellation());
     }
 
-    /** The short word the table shows for a state: its one home. */
+    /**
+     * The short word the table shows for a state: its one home.
+     *
+     * <p>In English, explicitly. This is an evidence report a
+     * developer reads, and it records what the released English
+     * surface says; asking the default locale would make the report
+     * change with the machine that generated it (#350).
+     */
     static String wordFor(PageVisibility state) {
-        return state.label();
+        return juranometria.ui.language.PageVisibilityText.in(
+                juranometria.ui.language.InterfaceText.forLanguage("en"))
+                .label(state);
     }
 
     /** The released page, for the mock-ups to draw the real thing. */

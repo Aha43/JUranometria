@@ -50,23 +50,29 @@ class SettingsLanguageTest {
                         InterfaceLanguages.discover());
         List<SkyLanguageChoices.Item> charts =
                 SkyLanguageChoices.forTheChart(SkyNames.discover(),
-                        Atlas.languages(), SkyLanguageChoice.ENGLISH);
+                        Atlas.languages(), SkyLanguageChoice.ENGLISH,
+                        english());
 
-        assertEquals(List.of("en"), interfaces.stream()
+        assertEquals(List.of("en", "nb-NO"), interfaces.stream()
                         .map(SkyLanguageChoices.Item::token).toList(),
                 "the interface selector lists the descriptors that"
-                        + " ship - one today, and still a selector,"
-                        + " because a control fed by the real registry"
-                        + " proves the registry reaches the interface"
-                        + " where a hard-coded label would not");
+                        + " ship. #348 registered English alone so the"
+                        + " registry would be exercised before there"
+                        + " was anything to choose between; #350 made"
+                        + " it a real choice without touching this"
+                        + " code, which is what that was for");
         assertEquals(List.of("follow-interface", "latin", NORWEGIAN),
                 charts.stream().map(SkyLanguageChoices.Item::token)
                         .toList(),
                 "and the chart selector lists the two modes the atlas"
                         + " owns, then the packs that ship");
-        assertFalse(interfaces.stream()
-                        .anyMatch(i -> i.token().equals(NORWEGIAN)),
-                "a chart pack is not an interface language");
+        assertEquals(List.of("en", "nb-NO"), interfaces.stream()
+                        .map(SkyLanguageChoices.Item::token).toList(),
+                "and Norwegian is there because an interface"
+                        + " DESCRIPTOR ships for it, not because a"
+                        + " chart pack does - the refusal of a chart"
+                        + " pack dropped into the interface directory"
+                        + " is held in InterfaceLanguagesTest");
     }
 
     /** Follow says what it currently draws. */
@@ -74,7 +80,7 @@ class SettingsLanguageTest {
     void followSaysWhatItCurrentlyResolvesTo() {
         SkyLanguageChoices.Item follow = SkyLanguageChoices.forTheChart(
                 SkyNames.discover(), Atlas.languages(),
-                SkyLanguageChoice.ENGLISH).get(0);
+                SkyLanguageChoice.ENGLISH, english()).get(0);
 
         assertEquals("Follow interface — currently Latin (IAU)",
                 follow.label(),
@@ -104,7 +110,7 @@ class SettingsLanguageTest {
                         java.util.Set.of(NORWEGIAN));
 
         SkyLanguageChoices.Item follow = SkyLanguageChoices.forTheChart(
-                SkyNames.discover(), bilingual, NORWEGIAN).get(0);
+                SkyNames.discover(), bilingual, NORWEGIAN, english()).get(0);
 
         assertEquals("Follow interface — currently Norsk bokmål",
                 follow.label(),
@@ -374,6 +380,11 @@ class SettingsLanguageTest {
             }
         }
         return found;
+    }
+
+    /** The English words, stated rather than inherited (#350). */
+    private static juranometria.ui.language.InterfaceText english() {
+        return juranometria.ui.language.InterfaceText.forLanguage("en");
     }
 
     private static Preferences scratch() {

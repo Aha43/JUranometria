@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -51,38 +50,35 @@ public final class ChartKeyboard extends JPanel {
     public static final String NAME = "chartKeyboard";
 
     private final ChartSwitches switches;
+    private final juranometria.ui.language.ChartKeyboardText said;
     private final List<Line> lines = new ArrayList<>();
-    private final JLabel said = new JLabel(" ");
+    private final JLabel announced = new JLabel(" ");
     private String announcement = "";
 
     private record Line(ChartKeys.Toggle toggle, JLabel label) {
     }
 
-    private ChartKeyboard(ChartSwitches switches) {
+    private ChartKeyboard(ChartSwitches switches,
+                          juranometria.ui.language.InterfaceText words) {
         this.switches = switches;
+        this.said = juranometria.ui.language.ChartKeyboardText.in(words);
         setName(NAME);
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(
                         javax.swing.UIManager.getColor("Separator.foreground")),
                 BorderFactory.createEmptyBorder(12, 14, 12, 14)));
-        getAccessibleContext().setAccessibleName("Chart keyboard");
-        getAccessibleContext().setAccessibleDescription(
-                "Every layer the chart can show, with the letter that"
-                        + " switches it and whether it is on. Press a"
-                        + " letter to switch one, or Escape or "
-                        + ChartKeys.prefixText() + " to close.");
+        getAccessibleContext().setAccessibleName(said.title());
+        getAccessibleContext().setAccessibleDescription(said.explain());
 
         JPanel column = new JPanel();
         column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
         column.setOpaque(false);
-        JLabel heading = new JLabel("Show on the chart");
+        JLabel heading = new JLabel(said.heading());
         heading.putClientProperty("FlatLaf.styleClass", "h4");
         heading.setAlignmentX(0.0f);
         column.add(heading);
-        JLabel how = new JLabel("Press a letter. Escape or "
-                + ChartKeys.prefixText() + " closes without changing"
-                + " anything.");
+        JLabel how = new JLabel(said.instruction());
         how.putClientProperty("FlatLaf.styleClass", "small");
         how.setAlignmentX(0.0f);
         column.add(how);
@@ -97,22 +93,24 @@ public final class ChartKeyboard extends JPanel {
         }
 
         column.add(Box.createVerticalStrut(8));
-        for (var refused : ChartKeys.refused().entrySet()) {
-            JLabel line = new JLabel(refused.getKey() + " — "
-                    + refused.getValue());
+        for (ChartKeys.Refusal refused : ChartKeys.refused()) {
+            JLabel line = new JLabel(said.refusedRow(refused));
             line.putClientProperty("FlatLaf.styleClass", "small");
             line.setAlignmentX(0.0f);
-            line.setName("chartKeyboard.refused." + refused.getKey());
+            // Named from the identity, not from the word. The name
+            // was "chartKeyboard.refused.Zenith" and would have been
+            // renamed by translating a resource (#350).
+            line.setName("chartKeyboard.refused." + refused.id());
             line.getAccessibleContext().setAccessibleDescription(
-                    refused.getKey() + ", " + refused.getValue());
+                    said.refusedSpoken(refused));
             column.add(line);
         }
 
-        said.setAlignmentX(0.0f);
-        said.putClientProperty("FlatLaf.styleClass", "small");
-        said.setName("chartKeyboard.said");
+        announced.setAlignmentX(0.0f);
+        announced.putClientProperty("FlatLaf.styleClass", "small");
+        announced.setName("chartKeyboard.said");
         column.add(Box.createVerticalStrut(6));
-        column.add(said);
+        column.add(announced);
 
         add(column, BorderLayout.CENTER);
         bindLetters();
@@ -125,12 +123,17 @@ public final class ChartKeyboard extends JPanel {
      * <p>Headless-constructible, because what it says about the
      * chart's state is a thing to test without a screen.
      */
-    public static ChartKeyboard of(ChartSwitches switches) {
+    public static ChartKeyboard of(ChartSwitches switches,
+            juranometria.ui.language.InterfaceText words) {
         if (switches == null) {
             throw new IllegalArgumentException(
                     "the keyboard needs the chart's switches");
         }
-        return new ChartKeyboard(switches);
+        if (words == null) {
+            throw new IllegalArgumentException(
+                    "and it says what it says in some language (#350)");
+        }
+        return new ChartKeyboard(switches, words);
     }
 
     /**
@@ -150,8 +153,10 @@ public final class ChartKeyboard extends JPanel {
      * the same key twice (review, #312).
      */
     public static void install(JRootPane root, ChartSwitches switches,
+                               juranometria.ui.language.InterfaceText words,
                                Opener opener) {
-        if (root == null || switches == null || opener == null) {
+        if (root == null || switches == null || words == null
+                || opener == null) {
             throw new IllegalArgumentException(
                     "installing the chart keyboard needs a window, the"
                             + " switches and somewhere to show it");
@@ -170,7 +175,8 @@ public final class ChartKeyboard extends JPanel {
                     showing[0] = null;
                     return;
                 }
-                ChartKeyboard keyboard = ChartKeyboard.of(switches);
+                ChartKeyboard keyboard =
+                        ChartKeyboard.of(switches, words);
                 showing[0] = keyboard;
                 opener.open(keyboard);
             }
@@ -216,8 +222,7 @@ public final class ChartKeyboard extends JPanel {
             return false;
         }
         if (!switches.available(toggle.id())) {
-            announce(toggle.label() + " unavailable — enable "
-                    + masterName(toggle) + " first.");
+            announce(said.announceUnavailable(toggle, master(toggle)));
             refresh();
             return false;
         }
@@ -227,10 +232,7 @@ public final class ChartKeyboard extends JPanel {
         // one who switches the galaxies off and finds them still off
         // was not told either. The palette says which every time,
         // because the palette is the only place that knows.
-        announce(toggle.label() + " "
-                + (switches.on(toggle.id()) ? "on" : "off")
-                + (toggle.persistent() ? " — saved."
-                        : " — for this session."));
+        announce(said.announce(toggle, switches.on(toggle.id())));
         refresh();
         return true;
     }
@@ -239,42 +241,66 @@ public final class ChartKeyboard extends JPanel {
     public void refresh() {
         for (Line line : lines) {
             ChartKeys.Toggle toggle = line.toggle();
-            String letter = String.valueOf(toggle.key())
-                    .toUpperCase(Locale.ROOT);
+            boolean available = switches.available(toggle.id());
             String state;
             String spoken;
-            if (!switches.available(toggle.id())) {
-                state = "unavailable — enable " + masterName(toggle)
-                        + " first";
-                spoken = toggle.label() + ", unavailable until "
-                        + masterName(toggle) + " is on, "
-                        + toggle.sequence();
+            if (!available) {
+                ChartKeys.Toggle master = master(toggle);
+                state = said.stateUnavailable(master);
+                spoken = said.spokenUnavailable(toggle, master);
             } else {
                 boolean on = switches.on(toggle.id());
-                state = on ? "on" : "off";
-                spoken = toggle.label() + ", " + state + ", "
-                        + toggle.sequence();
+                state = said.state(on);
+                spoken = said.spoken(toggle, on);
             }
-            String note = toggle.note() == null ? ""
-                    : "  (" + toggle.note() + ")";
-            line.label().setText(letter + "   " + toggle.label() + " — "
-                    + state + note);
+            line.label().setText(said.row(toggle, state));
             line.label().getAccessibleContext().setAccessibleName(spoken);
-            line.label().setEnabled(switches.available(toggle.id()));
+            line.label().setEnabled(available);
         }
     }
 
-    /** The switch this one waits for, in a reader's own words. */
-    private static String masterName(ChartKeys.Toggle toggle) {
+    /**
+     * The switch this one waits for.
+     *
+     * <p>Returned as the switch, not as words. This handed back
+     * {@code master.label().toLowerCase(Locale.ROOT)} - the
+     * application deciding that a noun is lower case inside a
+     * sentence, which is a language's rule and not the atlas's, and
+     * {@code Locale.ROOT} is the locale for data that is never read
+     * aloud (#350). Each master now declares the forms it needs.
+     */
+    private static ChartKeys.Toggle master(ChartKeys.Toggle toggle) {
         ChartKeys.Toggle master = ChartKeys.toggle(toggle.dependsOn());
-        return master == null ? String.valueOf(toggle.dependsOn())
-                : master.label().toLowerCase(Locale.ROOT);
+        if (master == null) {
+            throw new IllegalStateException(toggle.id() + " waits for \""
+                    + toggle.dependsOn() + "\", which is not a switch"
+                    + " this keyboard knows");
+        }
+        return master;
     }
 
+    /**
+     * Says what just happened, in words and to a screen reader.
+     *
+     * <p><strong>Deferred finding, recorded rather than fixed
+     * (#350).</strong> The last line below overwrites the panel's
+     * accessible DESCRIPTION, which until the first keystroke carried
+     * the palette's standing instructions. One accessible property is
+     * therefore doing two jobs - stable help, and transient status -
+     * and after a reader's first action the help is gone for the rest
+     * of the session.
+     *
+     * <p>This checkpoint translates both and changes neither. Pulling
+     * them apart needs an announcement seam that has been proved to
+     * reach a screen reader, which is an accessibility question and
+     * not a localisation one; localising it first at least means the
+     * eventual repair is repairing one language's worth of behaviour
+     * rather than two.
+     */
     private void announce(String sentence) {
         announcement = sentence;
-        said.setText(sentence);
-        said.getAccessibleContext().setAccessibleName(sentence);
+        announced.setText(sentence);
+        announced.getAccessibleContext().setAccessibleName(sentence);
         // Said by the palette itself as well, so a reader whose
         // attention is on the panel rather than on one line hears
         // what changed.

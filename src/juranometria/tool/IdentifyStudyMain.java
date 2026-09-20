@@ -25,6 +25,10 @@ import juranometria.render.ChartRenderer;
  */
 public final class IdentifyStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private IdentifyStudyMain() {
     }
 
@@ -82,7 +86,7 @@ public final class IdentifyStudyMain {
     }
 
     private static List<ChartRenderer.DrawnMark> marks(Page page) {
-        return new ChartRenderer(StarSizePolicy.DEFAULT)
+        return new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                 .drawnMarks(scene(page), ChartOptions.DEFAULTS);
     }
 

@@ -31,6 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeSheetIdentityTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition CENTRE = new SkyPosition(83.0, -1.0);
 
     @Test
@@ -44,7 +49,7 @@ class GlobeSheetIdentityTest {
                 "orthographic"));
 
         SheetMetadata metadata = SheetMetadata.of(page, 180.0, 6.0,
-                ChartOptions.DEFAULTS, PaperSize.A4);
+                ChartOptions.DEFAULTS, PaperSize.A4, ENGLISH);
 
         assertTrue(metadata.description().contains("orthographic"),
                 "the sheet states the projection that drew the page: "
@@ -129,7 +134,7 @@ class GlobeSheetIdentityTest {
                 "Orion", 6.0, null);
 
         SheetMetadata metadata = SheetMetadata.of(DrawnPage.of(scene),
-                90.0, 6.0, ChartOptions.DEFAULTS, PaperSize.A4);
+                90.0, 6.0, ChartOptions.DEFAULTS, PaperSize.A4, ENGLISH);
 
         assertTrue(metadata.description().contains("stereographic"),
                 "an ordinary overview sheet says stereographic: "

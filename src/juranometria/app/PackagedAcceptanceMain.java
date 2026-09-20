@@ -89,6 +89,19 @@ public final class PackagedAcceptanceMain {
         void run() throws Exception;
     }
 
+    /**
+     * The language this acceptance run asserts the image renders in.
+     *
+     * <p>Named, not inherited. Packaged acceptance checks that the
+     * ENGLISH page is what ships and what it has always been; a
+     * Norwegian assertion joins it when the page vocabulary is
+     * translated. Stating it is the claim (#350).
+     */
+    private static final juranometria.project.PageWords ENGLISH_PAGE =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
+
     public static void main(String[] args) throws Exception {
         // About, through its real static content paths: the packaged
         // summary must state every licence family and the
@@ -100,7 +113,7 @@ public final class PackagedAcceptanceMain {
                         && summary.contains("BSD-3-Clause")
                         && summary.contains("CC BY-SA 4.0"),
                 "About summary states the licence families");
-        String notices = AboutDialog.noticesText();
+        String notices = AboutDialog.noticesText(juranometria.ui.language.InterfaceText.forLanguage("en"));
         require(notices.contains("may not be used commercially")
                         && notices.contains("Redistribution and use in"
                                 + " source and binary forms"),
@@ -136,21 +149,69 @@ public final class PackagedAcceptanceMain {
         // nothing does. The interface side would then either throw
         // at startup or - if anyone ever adds a fallback - silently
         // offer English from a mechanism that never ran.
-        java.util.Set<String> interfaces =
-                Atlas.languages().interfaceLanguages();
-        java.util.Set<String> charts =
-                Atlas.languages().chartLanguages();
-        require(interfaces.equals(java.util.Set.of("en")),
+        // Sorted for the message: a Set prints in whatever order it
+        // hashes, and a failure a reader of the log has to squint at
+        // is a failure that wastes their time.
+        java.util.List<String> interfaces = new java.util.TreeSet<>(
+                Atlas.languages().interfaceLanguages()).stream().toList();
+        java.util.List<String> charts = new java.util.TreeSet<>(
+                Atlas.languages().chartLanguages()).stream().toList();
+        require(interfaces.equals(java.util.List.of("en", "nb-NO")),
                 "the packaged image offers the interface languages it"
                         + " ships descriptors for: " + interfaces);
-        require(charts.equals(java.util.Set.of("nb-NO")),
+        require(charts.equals(java.util.List.of("nb-NO")),
                 "and the chart languages it ships packs for: " + charts);
-        require(!interfaces.contains("nb-NO") && !charts.contains("en"),
-                "with neither list leaking into the other - a"
-                        + " Norwegian sky does not put Norwegian in"
-                        + " the menus, and an English interface does"
-                        + " not claim English constellation names the"
-                        + " atlas has no pack for");
+        require(!charts.contains("en"),
+                "with neither list claiming what the other ships. The"
+                        + " two share nb-NO legitimately since #350 -"
+                        + " a pack AND a descriptor - so the direction"
+                        + " worth checking is the one with nothing"
+                        + " behind it: no English constellation names"
+                        + " exist, and a registry that borrowed from"
+                        + " its neighbour would claim a sky it cannot"
+                        + " draw");
+
+        // The status the image actually ships (#350). The twelve
+        // study companions state the Norwegian translation is
+        // reviewed, and they read that from the descriptor rather
+        // than asserting it. This is the other end of the same
+        // claim: that the descriptor reaching a reader's machine
+        // says what the evidence beside the source says. An image
+        // built from a tree whose manifest still said draft would
+        // ship a reviewed-looking set of reports over a draft
+        // language, and nothing outside the image could tell.
+        String manifest = packagedManifest("nb-NO");
+        require(manifest.contains("\nstatus=reviewed"),
+                "the packaged nb-NO descriptor records the reviewed"
+                        + " status the committed companions state");
+        require(manifest.contains("\ntag=nb-NO")
+                        && manifest.contains("\ninterface-schema=1"),
+                "and is a real interface descriptor, not a chart pack"
+                        + " read by the wrong discovery");
+        require(interfaces.contains("nb-NO")
+                        && Atlas.languages().interfaceLanguages()
+                                .contains("nb-NO"),
+                "with availability still discovered from the"
+                        + " descriptors present rather than from any"
+                        + " list in Java - the reason English was"
+                        + " registered before it had strings (#348)");
+        System.out.println("interface manifest OK (the packaged nb-NO"
+                + " descriptor says status=reviewed, and availability"
+                + " is still read from the descriptors themselves)");
+        // The words themselves, inside the image (#350). Resource
+        // discovery that worked on a developer's classpath and not in
+        // the packaged runtime is exactly the defect no unit test can
+        // see, and an interface that fell back to English everywhere
+        // would look like a translation nobody had written.
+        juranometria.ui.language.InterfaceText norsk =
+                juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+        require("Innstillinger".equals(norsk.say("settings.title")),
+                "the packaged image speaks Norwegian: settings.title"
+                        + " is \"" + norsk.say("settings.title") + "\"");
+        require("Latin (IAU)".equals(
+                        norsk.say("settings.language.chart.latin")),
+                "and falls back to English where a translation leaves"
+                        + " a key alone, rather than showing the key");
         // Resolved through the real store semantics, against what
         // this image actually installed rather than a fixture.
         juranometria.ui.language.SkyLanguageChoice packaged =
@@ -168,6 +229,186 @@ public final class PackagedAcceptanceMain {
         System.out.println("language availability OK (interface "
                 + interfaces + ", chart " + charts
                 + ", resolved independently)");
+
+        // The licensing summary, from inside the image (#350).
+        //
+        // A Norwegian summary that existed only in the source tree
+        // would be a legal statement the reader never sees, and a
+        // classpath check on a developer's machine cannot tell the
+        // two apart. So this asks the image: does a Norwegian
+        // document ship, is it the one selected for a Norwegian
+        // reader, does it still carry the whole licensing map, and
+        // does it still state the consequence that the packaged
+        // whole is non-commercial?
+        juranometria.ui.language.AboutText about =
+                juranometria.ui.language.AboutText.in(norsk);
+        require(about.hasOwnSummary(),
+                "a Norwegian licensing summary ships inside the"
+                        + " image, at " + about.summaryPath());
+        String norwegianSummary = about.summary();
+        require(!norwegianSummary.equals(
+                        juranometria.ui.language.AboutText
+                                .canonicalSummary()),
+                "and is the document a Norwegian reader is shown,"
+                        + " rather than the English one falling"
+                        + " through");
+        for (String identifier : new String[] {"MIT",
+                "CC BY-NC 3.0 IGO", "CC BY-SA 4.0", "BSD-3-Clause"}) {
+            require(norwegianSummary.contains(identifier),
+                    "the packaged Norwegian summary keeps the licence"
+                            + " identifier " + identifier
+                            + " exactly, untranslated");
+        }
+        for (String source : new String[] {"Tycho-2", "OpenNGC",
+                "d3-celestial", "Tabler"}) {
+            require(norwegianSummary.contains(source),
+                    "and names the source family " + source);
+        }
+        require(norwegianSummary.contains("bare brukes og"
+                        + " videredistribueres til\nikke-kommersielle"
+                        + " formål")
+                        || norwegianSummary.replaceAll("\\s+", " ")
+                                .contains("bare brukes og"
+                                        + " videredistribueres til"
+                                        + " ikke-kommersielle formål"),
+                "and states the approved Norwegian consequence: the"
+                        + " packaged whole may be used and"
+                        + " redistributed non-commercially only");
+
+        // And the documents behind the button, from the image, in
+        // the Norwegian route: translated headings over untranslated
+        // bodies.
+        String norwegianNotices = AboutDialog.noticesText(norsk);
+        require(norwegianNotices.contains("Stjernedata fra Tycho-2")
+                        && norwegianNotices.contains(
+                                "Lisens for Tabler-ikonene"),
+                "the notices view carries Norwegian headings inside"
+                        + " the image");
+        for (juranometria.app.AboutDialog.Notice notice
+                : AboutDialog.NOTICES) {
+            String body = juranometria.ui.language.AboutText
+                    .noticesBody(notice);
+            require(body.length() > 400
+                            && norwegianNotices.contains(body),
+                    "and the bundled document " + notice.id()
+                            + " is present and unchanged beneath it ("
+                            + body.length() + " characters)");
+        }
+        // The drawn page's own words, from inside the image (#350).
+        //
+        // Not read from a file: composed through the adapter the
+        // renderer and the exporter both use, so what is proved here
+        // is what a reader would actually be shown and what an
+        // exported file would actually say.
+        juranometria.project.PageWords norwegianPage =
+                juranometria.ui.language.PageText.in(norsk);
+        String facts = norwegianPage.titleFacts("60.0", "6.0",
+                norwegianPage.projection("stereographic"));
+        require(facts.contains("Stjerner ned til V 6.0"),
+                "the packaged image draws its title block in"
+                        + " Norwegian: " + facts);
+        require(facts.contains("60.0") && !facts.contains("60,0"),
+                "and a chart value keeps its decimal point: " + facts);
+        require("stereografisk".equals(
+                        norwegianPage.projection("stereographic"))
+                        && "gnomonisk".equals(
+                                norwegianPage.projection("gnomonic"))
+                        && "ortografisk".equals(
+                                norwegianPage.projection("orthographic")),
+                "every projection has its Norwegian name in the image");
+        String paper = norwegianPage.paper("A4", "297.0", "210.0",
+                "10.0", "277.0", "190.0");
+        require(paper.contains("i liggende format")
+                        && paper.contains("marger på")
+                        && paper.contains("297.0 x 210.0 mm"),
+                "the paper sentence is Norwegian and its measurements"
+                        + " are untouched: " + paper);
+        require("hvitt papir".equals(
+                        norwegianPage.ground("white-paper"))
+                        && "svart himmel".equals(
+                                norwegianPage.ground("black-sky")),
+                "and both grounds read as phrases rather than tokens");
+        require(norsk.say("inspector.designation.bayer", "α And")
+                        .endsWith("(Bayer-betegnelse)")
+                        && norsk.say("inspector.designation.flamsteed",
+                                "21 And").endsWith("(Flamsteed-nummer)"),
+                "the designation qualifiers are the approved forms");
+        boolean projectionRefused = false;
+        try {
+            norwegianPage.projection("spherical-mercator");
+        } catch (RuntimeException refused) {
+            projectionRefused = true;
+        }
+        boolean groundRefused = false;
+        try {
+            norwegianPage.ground("grey-dusk");
+        } catch (RuntimeException refused) {
+            groundRefused = true;
+        }
+        require(projectionRefused && groundRefused,
+                "and an unknown projection or ground is refused inside"
+                        + " the image rather than printed as its id");
+        System.out.println("page vocabulary OK (Norwegian title block,"
+                + " paper, grounds and designations composed from the"
+                + " packaged classpath; unknown identities refused)");
+
+        // The failure reporter, from inside the image (#350).
+        //
+        // This is the surface that runs when everything else has
+        // failed, so "the files are there" is not the claim worth
+        // making: the claim is that the ATOMIC ADAPTER composes a
+        // whole Norwegian message from this packaged classpath, and
+        // that removing one document turns the whole message English
+        // rather than mixing the two.
+        Throwable[] failures = {
+            new juranometria.catalog.PackIntegrityException(
+                    "acceptance-probe"),
+            new java.util.prefs.BackingStoreException(
+                    "acceptance-probe"),
+            new IllegalStateException("acceptance-probe"),
+        };
+        for (Throwable failure : failures) {
+            String composed = StartupFailure.message(failure, "nb-NO",
+                    juranometria.ui.language.StartupText.PACKAGED);
+            require(composed.startsWith("JUranometria kunne ikke"
+                            + " starte."),
+                    "the packaged image reports a startup failure in"
+                            + " Norwegian: " + composed.substring(0,
+                                    Math.min(60, composed.length())));
+            require(!composed.contains("could not start"),
+                    "and does not also say it in English");
+            require(composed.split("acceptance-probe", -1).length - 1
+                            == 1,
+                    "with the technical cause exactly once");
+        }
+        // Each document, read through the adapter rather than listed.
+        for (juranometria.ui.language.StartupText.Remedy remedy
+                : juranometria.ui.language.StartupText.Remedy.values()) {
+            var said = juranometria.ui.language.StartupText.forFailure(
+                    "nb-NO", remedy);
+            require(said != null && !said.remedy().isBlank()
+                            && said.remedy().length() > 120,
+                    "the packaged image carries a readable Norwegian"
+                            + " remedy for " + remedy + " ("
+                            + remedy.documentFor("nb-NO") + ")");
+        }
+        require(StartupFailure.message(failures[1], "nb-NO",
+                        path -> path.endsWith("startup-settings.txt")
+                                ? null
+                                : juranometria.ui.language.StartupText
+                                        .PACKAGED.open(path))
+                        .startsWith("JUranometria could not start."),
+                "and a missing document turns the WHOLE message"
+                        + " English rather than mixing languages");
+        System.out.println("startup failure OK (three Norwegian"
+                + " remedies composed from the packaged classpath;"
+                + " a missing document falls back whole)");
+
+        System.out.println("about licensing OK (Norwegian summary"
+                + " ships and is selected, " + norwegianSummary.length()
+                + " characters, every identifier exact; "
+                + AboutDialog.NOTICES.size() + " upstream documents"
+                + " unchanged under translated headings)");
 
         // Preferences, changed and reloaded through the bundled
         // runtime against the application's real node - snapshot the
@@ -190,6 +431,7 @@ public final class PackagedAcceptanceMain {
                 + " (equatorialGrid flipped and restored through the"
                 + " bundled runtime's preference backend)");
 
+        toolkitChromeJourney();
         readerJourney();
         onThisPageJourney();
         meridianJourney();
@@ -241,7 +483,7 @@ public final class PackagedAcceptanceMain {
         // this page - the silence the decision asks for, exercised
         // on purpose.
         juranometria.ui.ChartComponent chart =
-                new juranometria.ui.ChartComponent(Atlas.assembler());
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
         chart.setSize(900, 700);
         chart.setViewState(ChartViewState.DEFAULT);
         java.util.List<juranometria.module.NavigationRequest> asked =
@@ -529,7 +771,7 @@ public final class PackagedAcceptanceMain {
                     "and gets the released default, hidden");
 
             juranometria.ui.ChartComponent nextSession =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             nextSession.setSize(900, 700);
             nextSession.setViewState(eclipticPage);
             juranometria.ui.ChartModuleHost nextHost =
@@ -545,7 +787,9 @@ public final class PackagedAcceptanceMain {
             javax.swing.JMenuBar nextBar = AppMenuBar.create(null, null,
                     () -> { }, () -> { }, () -> { }, () -> { },
                     juranometria.ui.ecliptic.EclipticSession.toggle(
-                            remembered, fresh));
+                            remembered, fresh),
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
             javax.swing.JCheckBoxMenuItem nextItem =
                     AppMenuBar.eclipticItem(nextBar);
             juranometria.ui.ecliptic.EclipticSession.restore(remembered,
@@ -571,7 +815,7 @@ public final class PackagedAcceptanceMain {
             require(reopened.shown().orElse(false),
                     "a fresh store reads the choice back");
             juranometria.ui.ChartComponent secondSession =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             secondSession.setSize(900, 700);
             secondSession.setViewState(eclipticPage);
             juranometria.ui.ChartModuleHost secondHost =
@@ -586,7 +830,9 @@ public final class PackagedAcceptanceMain {
             javax.swing.JMenuBar secondBar = AppMenuBar.create(null, null,
                     () -> { }, () -> { }, () -> { }, () -> { },
                     juranometria.ui.ecliptic.EclipticSession.toggle(
-                            secondModule, reopened));
+                            secondModule, reopened),
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
             javax.swing.JCheckBoxMenuItem secondItem =
                     AppMenuBar.eclipticItem(secondBar);
             juranometria.ui.ecliptic.EclipticSession.restore(secondModule,
@@ -634,7 +880,7 @@ public final class PackagedAcceptanceMain {
             java.time.Instant secondSession =
                     java.time.Instant.parse("2026-09-05T10:28:31Z");
             juranometria.ui.ChartComponent nextEvening =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             nextEvening.setSize(900, 700);
             nextEvening.setViewState(ChartViewState.DEFAULT);
             juranometria.ui.ChartModuleHost secondHost =
@@ -707,7 +953,7 @@ public final class PackagedAcceptanceMain {
         // broken - which is the one thing a packaged acceptance
         // exists to catch.
         juranometria.ui.ChartComponent chart =
-                new juranometria.ui.ChartComponent(Atlas.assembler());
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
         chart.setSize(900, 700);
         chart.setViewState(ChartViewState.DEFAULT);
         juranometria.ui.ChartModuleHost host =
@@ -715,7 +961,9 @@ public final class PackagedAcceptanceMain {
                         new juranometria.chart.SelectionModel(),
                         request -> { });
         juranometria.ui.onthispage.OnThisPageModule module =
-                host.attach(new juranometria.ui.onthispage.OnThisPageModule());
+                host.attach(new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage("en")));
 
         juranometria.page.PageContents inventory = host.inventory();
         require(inventory.entries().size() > 50,
@@ -814,7 +1062,7 @@ public final class PackagedAcceptanceMain {
         int[] hiddenByChoice = {0};
         withTemporaryOptions(ChartOptionsStore.user(), galaxiesOff, () -> {
             juranometria.ui.ChartComponent restarted =
-                    new juranometria.ui.ChartComponent(Atlas.assembler());
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
             restarted.setSize(900, 700);
             restarted.setViewState(ChartViewState.DEFAULT);
             ChartOptions reloaded = ChartOptionsStore.user().load();
@@ -825,7 +1073,9 @@ public final class PackagedAcceptanceMain {
                             request -> { });
             juranometria.ui.onthispage.OnThisPageModule again =
                     second.attach(
-                            new juranometria.ui.onthispage.OnThisPageModule());
+                            new juranometria.ui.onthispage.OnThisPageModule(
+                                juranometria.ui.language.InterfaceText
+                                        .forLanguage("en")));
             try {
                 require(second.workingSelection().members().isEmpty()
                                 && second.workingSelection().lead() == null,
@@ -940,8 +1190,188 @@ public final class PackagedAcceptanceMain {
         return false;
     }
 
+    /** One interface descriptor, as the image actually ships it. */
+    private static String packagedManifest(String tag) throws Exception {
+        String path = "/resources/interface-language/" + tag
+                + ".manifest";
+        try (java.io.InputStream in =
+                     PackagedAcceptanceMain.class
+                             .getResourceAsStream(path)) {
+            require(in != null, "the packaged image carries " + path
+                    + ". A language is available because its"
+                    + " descriptor is installed; if this is missing,"
+                    + " discovery answered from something else");
+            return new String(in.readAllBytes(),
+                    java.nio.charset.StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
+     * The toolkit's own words, inside the image (#350).
+     *
+     * <p>Every sentence in the export dialogs was already the
+     * atlas's; the buttons and labels around them came from Swing's
+     * bundle, resolved against {@code Locale.getDefault()} - the
+     * operating system, not the reader's choice. The JDK ships no
+     * Norwegian bundle at all, so a Norwegian reader answered a
+     * Norwegian question with <strong>Yes</strong> on every machine,
+     * and on a German desktop got German.
+     *
+     * <p>The image is where that can actually be asked. A unit test
+     * reads the pack off the build directory; only the packaged
+     * runtime answers whether the forty-one values shipped, and
+     * whether the runtime it was linked against still resolves them.
+     * The default locale is set to <strong>Germany</strong> first,
+     * because English compared against English proves nothing - the
+     * JDK has a real German bundle, so anything not genuinely
+     * overridden comes back German and is visible.
+     *
+     * <p>Real components, walked, not a table read back: the
+     * confirmation a reader answers, the message that reports what
+     * happened, and the <strong>save</strong> chooser the export
+     * shows. Both channels of the up-folder button are required,
+     * because a pointer and a screen reader are told different words
+     * and one can ship without the other.
+     *
+     * <p>This proves the <em>adapter</em> inside the image. It does
+     * not prove that startup installs it - the ordered pair after a
+     * look and feel change is the fresh-JVM startup journey's claim,
+     * and this journey installs the words itself.
+     */
+    private static void toolkitChromeJourney() throws Exception {
+        java.util.Locale was = java.util.Locale.getDefault();
+        javax.swing.LookAndFeel wasLookAndFeel =
+                javax.swing.UIManager.getLookAndFeel();
+        javax.swing.UIDefaults defaults =
+                javax.swing.UIManager.getDefaults();
+        java.util.Map<String, Object> before =
+                new java.util.LinkedHashMap<>();
+        for (String key : juranometria.ui.language.SwingText
+                .toolkitKeys()) {
+            // Absence is a value here: none of these are in the
+            // table to begin with - Swing resolves them through a
+            // ResourceBundle - so a restore that wrote back an empty
+            // string would leave the image different from how it
+            // was found.
+            before.put(key, defaults.get(key));
+        }
+        try {
+            java.util.Locale.setDefault(java.util.Locale.GERMANY);
+            juranometria.app.UiTheme.apply(false);
+            juranometria.ui.language.SwingText norsk =
+                    juranometria.ui.language.SwingText.in(
+                            juranometria.ui.language.InterfaceText
+                                    .forLanguage("nb-NO"));
+            norsk.installInto(javax.swing.UIManager.getDefaults());
+
+            require(norsk.words().size() == 41,
+                    "the packaged pack carries all forty-one toolkit"
+                            + " values: " + norsk.words().size());
+
+            java.util.Set<String> said = new java.util.LinkedHashSet<>();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                collect(new javax.swing.JOptionPane("Erstatt?",
+                        javax.swing.JOptionPane.WARNING_MESSAGE,
+                        javax.swing.JOptionPane.YES_NO_OPTION), said);
+                collect(new javax.swing.JOptionPane("Skrevet.",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE,
+                        javax.swing.JOptionPane.DEFAULT_OPTION), said);
+                javax.swing.JFileChooser chooser =
+                        new javax.swing.JFileChooser();
+                chooser.setDialogType(
+                        javax.swing.JFileChooser.SAVE_DIALOG);
+                collect(chooser, said);
+            });
+
+            for (String expected : java.util.List.of(
+                    "shown: Nei", "shown: Avbryt", "shown: Lagre i:",
+                    "shown: Lagre", "hovered: Opp ett nivå",
+                    "spoken: Opp")) {
+                require(said.contains(expected),
+                        "the packaged image says \"" + expected
+                                + "\" on a real component under a"
+                                + " German default locale. It said: "
+                                + said);
+            }
+            for (String german : java.util.List.of("shown: Nein",
+                    "shown: Abbrechen", "shown: Speichern",
+                    "shown: Speichern in:")) {
+                require(!said.contains(german),
+                        "and nothing German survives where the atlas"
+                                + " has spoken: " + german);
+            }
+            System.out.println("toolkit chrome OK (41 packaged values,"
+                    + " confirm/message/save chooser walked under a"
+                    + " German default locale, " + said.size()
+                    + " words met, both up-folder channels Norwegian)");
+        } finally {
+            for (java.util.Map.Entry<String, Object> entry
+                    : before.entrySet()) {
+                defaults.put(entry.getKey(), entry.getValue());
+            }
+            // A look and feel is JVM-global and the journeys after
+            // this one draw real pages, so what was installed goes
+            // back. Both halves are needed and neither is enough:
+            // reinstalling rebuilds the defaults table and clears
+            // the forty-one by itself, but only if the look and feel
+            // actually differs, and putting the entries back leaves
+            // the reader journeys under this one's look and feel.
+            if (wasLookAndFeel != null) {
+                javax.swing.UIManager.setLookAndFeel(wasLookAndFeel);
+            }
+            java.util.Locale.setDefault(was);
+        }
+    }
+
+    /**
+     * What a reader meets on one real component, by channel.
+     *
+     * <p>No window: the look and feel's delegate builds a pane's
+     * buttons and a chooser's labels when the component is
+     * constructed, which is the moment these values are read. The
+     * image is accepted headless, and a holder frame would fail
+     * there for a reason that has nothing to do with the words.
+     */
+    private static void collect(java.awt.Container probe,
+                                java.util.Set<String> said) {
+        walkChrome(probe, said);
+    }
+
+    private static void walkChrome(java.awt.Container from,
+                                   java.util.Set<String> said) {
+        for (java.awt.Component child : from.getComponents()) {
+            if (child instanceof javax.swing.AbstractButton button) {
+                addChrome(said, "shown", button.getText());
+                addChrome(said, "hovered", button.getToolTipText());
+                if (button.getAccessibleContext() != null) {
+                    addChrome(said, "spoken", button
+                            .getAccessibleContext().getAccessibleName());
+                }
+            }
+            if (child instanceof javax.swing.JLabel label) {
+                addChrome(said, "shown", label.getText());
+            }
+            if (child instanceof javax.swing.JComponent widget) {
+                addChrome(said, "hovered", widget.getToolTipText());
+            }
+            if (child instanceof java.awt.Container nested) {
+                walkChrome(nested, said);
+            }
+        }
+    }
+
+    private static void addChrome(java.util.Set<String> said,
+                                  String channel, String text) {
+        if (text == null || text.isBlank()
+                || text.chars().noneMatch(Character::isLetter)) {
+            return;
+        }
+        said.add(channel + ": " + text.replaceAll("<[^>]*>", " ")
+                .replaceAll("\\s+", " ").trim());
+    }
+
     private static void readerJourney() throws Exception {
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT);
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH_PAGE);
         ChartViewController navigation =
                 new ChartViewController(Atlas.assembler()::fits);
 
@@ -1437,7 +1867,7 @@ public final class PackagedAcceptanceMain {
             require(withAll.getOrDefault(family.name(), 0) > 0,
                     "the page must draw " + family + " before hiding"
                             + " it can prove anything");
-            hidden.add(family.label() + " "
+            hidden.add(family.canonicalName() + " "
                     + withAll.getOrDefault(family.name(), 0) + "\u2192"
                     + survivors);
         }
@@ -1634,7 +2064,12 @@ public final class PackagedAcceptanceMain {
                         // The acceptance writes into a temporary file
                         // it made itself, so replacing it is the
                         // whole point rather than a question.
-                        existing -> true);
+                        existing -> true,
+                        // English, stated: this acceptance asserts
+                        // what the packaged application writes, not
+                        // which language a reader chose (#350).
+                        juranometria.ui.language.InterfaceText
+                                .forLanguage("en"));
                 require(outcome
                                 instanceof ExportSheet.Outcome.Written,
                         "the packaged application writes " + format

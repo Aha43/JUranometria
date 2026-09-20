@@ -39,12 +39,15 @@ class InterfaceLanguagesTest {
     void theBuildOffersTheInterfacesItShipsDescriptorsFor() {
         InterfaceLanguages offered = InterfaceLanguages.discover();
 
-        assertEquals(List.of("en"), offered.tags(),
-                "one interface descriptor ships, so one interface"
-                        + " language is offered");
+        assertEquals(List.of("en", "nb-NO"), offered.tags(),
+                "two interface descriptors ship, so two interface"
+                        + " languages are offered - sorted by tag, not"
+                        + " by the order a directory enumerates");
         assertEquals("English", offered.displayName("en"),
                 "under the name it gives itself - descriptor data,"
                         + " not a decision this code makes");
+        assertEquals("Norsk bokm\u00e5l", offered.displayName("nb-NO"),
+                "and so does the one #350 added");
     }
 
     /**
@@ -91,12 +94,15 @@ class InterfaceLanguagesTest {
     void anInterfaceNobodyWroteJavaForIsOffered() throws Exception {
         Path shipped = Files.createTempDirectory("interfaces");
         try {
+            // No strings of its own: a language may register and read
+            // entirely in English, which is how a translation starts
+            // (#350). Declaring a strings file that does not ship is
+            // what the indexer refuses.
             write(shipped.resolve("xx-invented.manifest"), """
                     interface-schema=1
                     tag=xx-invented
                     display-name=An invented tongue
-                    strings=in-code
-                    status=built-in
+                    status=draft
                     """);
             index(shipped);
 
@@ -270,10 +276,13 @@ class InterfaceLanguagesTest {
                         && descriptor.contains("tag=en")
                         && descriptor.contains("display-name=English"),
                 "the fields discovery reads");
-        assertTrue(descriptor.contains("strings=in-code"),
-                "and an honest account of where English's words"
-                        + " actually live today, so #350 replaces a"
-                        + " stated fact rather than discovering one");
+        assertTrue(descriptor.contains("strings=en.properties"),
+                "and says where its words live. #348 shipped this"
+                        + " saying strings=in-code, which was true"
+                        + " then; #350 replaced a stated fact rather"
+                        + " than discovering one, which is what"
+                        + " registering English before it had strings"
+                        + " was for");
     }
 
     // ---- helpers ---------------------------------------------------

@@ -34,6 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class LabelPlacementGateTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+
     private static final SkyPosition SAGITTARIUS =
             new SkyPosition(266.0, -28.0);
 
@@ -251,7 +256,7 @@ class LabelPlacementGateTest {
         // and drawn last, so the label is behind it. The study's own
         // pass writes its text over the furniture and so keeps a label
         // production covers.
-        java.awt.geom.Rectangle2D block = ChartRenderer.titleBlockBounds(
+        java.awt.geom.Rectangle2D block = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(
                 Census.Metrics.forFont(ChartRenderer.labelFont()),
                 page.scene());
         java.util.Set<String> explained = new java.util.LinkedHashSet<>();
@@ -303,7 +308,7 @@ class LabelPlacementGateTest {
                 BufferedImage.TYPE_INT_RGB);
         java.awt.Graphics2D g = theirs.createGraphics();
         try {
-            new ChartRenderer(StarSizePolicy.DEFAULT)
+            new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH)
                     .render(g, page.scene(), ChartOptions.DEFAULTS);
         } finally {
             g.dispose();
