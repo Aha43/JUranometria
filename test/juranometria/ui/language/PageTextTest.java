@@ -26,6 +26,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PageTextTest {
 
+    private static String source(String path) throws Exception {
+        return Files.readString(Path.of(path))
+                .replaceAll("(?s)/\\*.*?\\*/", " ")
+                .replaceAll("(?m)//.*$", " ");
+    }
+
+    private static int occurrences(String text, String needle) {
+        int count = 0;
+        for (int at = text.indexOf(needle); at >= 0;
+                at = text.indexOf(needle, at + needle.length())) {
+            count++;
+        }
+        return count;
+    }
+
     private static final PageWords EN =
             PageText.in(InterfaceText.forLanguage("en"));
 
@@ -262,6 +277,36 @@ class PageTextTest {
                         + " ExportSheet - and two named developer"
                         + " entry points that state English as a claim"
                         + " rather than inheriting it");
+    }
+
+    /**
+     * The screen and the export are given the same instance.
+     *
+     * <p>Not "the same language" - the same object. Two resolutions
+     * from one session would agree today and could drift the moment
+     * either side gained a fallback, and the reader would meet a
+     * chart drawn in one language whose exported file described
+     * itself in another. So `ExportSheet` resolves once and
+     * `ChartSheet.record` hands that one reference to both the
+     * renderer and the metadata.
+     */
+    @Test
+    void oneResolvedInstanceReachesBothTheRendererAndTheMetadata()
+            throws Exception {
+        String export = source("src/juranometria/app/ExportSheet.java");
+        assertEquals(1, occurrences(export, "PageText.in("),
+                "the export path resolves a language exactly once");
+
+        String sheet = source("src/juranometria/sheet/ChartSheet.java");
+        assertTrue(sheet.contains("new ChartRenderer(StarSizePolicy"
+                        + ".DEFAULT, words)"),
+                "and hands it to the renderer");
+        assertTrue(sheet.contains("SheetMetadata.of(scene, state,"
+                        + " onPaper, paper, words)"),
+                "and to the metadata - the same `words`, not a second"
+                        + " lookup");
+        assertEquals(0, occurrences(sheet, "PageText"),
+                "ChartSheet resolves nothing of its own");
     }
 
     /**

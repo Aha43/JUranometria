@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**385 promoted artifacts.**
+**389 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -254,6 +254,10 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/onthispage-en-2-empty.png` | `d3b2f93e89f004d80b5d66aa34b39875fe9ee7fc64b8046b6b34a6a8320262a8` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/onthispage-nb-NO-3-populated.png` | `b66a196b3a202373965caf10947445c2ef571c9d8b57123fa76bb9cda7ba3adc` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/onthispage-nb-NO-4-empty.png` | `16eb128a51741765c00c77498222350d60a2416dc25e93f43338dda53c60aa57` | 2026-09-18 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/page-en-latin.png` | `33d314ab13d4b8583c63ec45ee9cc2c8176fd8cab4c630654051a9aea2cc3dfe` | 2026-09-20 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/page-en-nbsky.png` | `f67ad8ce0c5d780983ce8b710fc9bd648c4320077fbeb9efa019455526cd67c0` | 2026-09-20 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/page-nb-latin.png` | `202338acb2808783f697832e22f7aa1eeabd27d57cd99903f4cbd8dc71929148` | 2026-09-20 | Mac OS X aarch64, Java 21.0.11 | various |
+| `docs/studies/interface-language/page-nb-nbsky.png` | `6d98a7a382126bf28f62c3e4c6bf04f74fb852fc42410051127791ed94c10965` | 2026-09-20 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/placeandtime-en-1-default.png` | `bd00d198753dbb353bf8bd9edbae511d258b3fcb950b23108a446adcc7d4ddeb` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/placeandtime-en-2-oslo.png` | `99e7c0dffe823397c3b41cee8467f7959dd394d3a17c1cf89bcee5acebf95b90` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/interface-language/placeandtime-en-3-santiago.png` | `bcad6007d2a5d13bec14340d848d85d60c6369b82268b2ebc6b212ed0a2cff44` | 2026-09-19 | Mac OS X aarch64, Java 21.0.11 | various |

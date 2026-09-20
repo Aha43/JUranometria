@@ -266,6 +266,64 @@ public final class PackagedAcceptanceMain {
                             + " is present and unchanged beneath it ("
                             + body.length() + " characters)");
         }
+        // The drawn page's own words, from inside the image (#350).
+        //
+        // Not read from a file: composed through the adapter the
+        // renderer and the exporter both use, so what is proved here
+        // is what a reader would actually be shown and what an
+        // exported file would actually say.
+        juranometria.project.PageWords norwegianPage =
+                juranometria.ui.language.PageText.in(norsk);
+        String facts = norwegianPage.titleFacts("60.0", "6.0",
+                norwegianPage.projection("stereographic"));
+        require(facts.contains("Stjerner ned til V 6.0"),
+                "the packaged image draws its title block in"
+                        + " Norwegian: " + facts);
+        require(facts.contains("60.0") && !facts.contains("60,0"),
+                "and a chart value keeps its decimal point: " + facts);
+        require("stereografisk".equals(
+                        norwegianPage.projection("stereographic"))
+                        && "gnomonisk".equals(
+                                norwegianPage.projection("gnomonic"))
+                        && "ortografisk".equals(
+                                norwegianPage.projection("orthographic")),
+                "every projection has its Norwegian name in the image");
+        String paper = norwegianPage.paper("A4", "297.0", "210.0",
+                "10.0", "277.0", "190.0");
+        require(paper.contains("i liggende format")
+                        && paper.contains("marger på")
+                        && paper.contains("297.0 x 210.0 mm"),
+                "the paper sentence is Norwegian and its measurements"
+                        + " are untouched: " + paper);
+        require("hvitt papir".equals(
+                        norwegianPage.ground("white-paper"))
+                        && "svart himmel".equals(
+                                norwegianPage.ground("black-sky")),
+                "and both grounds read as phrases rather than tokens");
+        require(norsk.say("inspector.designation.bayer", "α And")
+                        .endsWith("(Bayer-betegnelse)")
+                        && norsk.say("inspector.designation.flamsteed",
+                                "21 And").endsWith("(Flamsteed-nummer)"),
+                "the designation qualifiers are the approved forms");
+        boolean projectionRefused = false;
+        try {
+            norwegianPage.projection("spherical-mercator");
+        } catch (RuntimeException refused) {
+            projectionRefused = true;
+        }
+        boolean groundRefused = false;
+        try {
+            norwegianPage.ground("grey-dusk");
+        } catch (RuntimeException refused) {
+            groundRefused = true;
+        }
+        require(projectionRefused && groundRefused,
+                "and an unknown projection or ground is refused inside"
+                        + " the image rather than printed as its id");
+        System.out.println("page vocabulary OK (Norwegian title block,"
+                + " paper, grounds and designations composed from the"
+                + " packaged classpath; unknown identities refused)");
+
         // The failure reporter, from inside the image (#350).
         //
         // This is the surface that runs when everything else has
