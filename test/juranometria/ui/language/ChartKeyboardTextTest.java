@@ -268,8 +268,13 @@ class ChartKeyboardTextTest {
     void theEnglishReadsAsEnglish() {
         ChartKeys.Toggle galaxies = ChartKeys.toggle("chart.galaxies");
         ChartKeys.Toggle deepSky = ChartKeys.toggle("chart.deepSkyObjects");
+        // The keystroke is NOTATION and is whatever this desktop
+        // calls it: the Mac glyph here passed locally and failed on
+        // Linux, which spells the same modifier Ctrl. The English
+        // around it is what this test is about.
+        String prefix = ChartKeys.prefixText();
         assertEquals("Galaxies, unavailable until deep-sky objects are"
-                        + " on, ⌘K then G",
+                        + " on, " + prefix + " then G",
                 SAID.spokenUnavailable(galaxies, deepSky),
                 "the stress case: a name, a condition naming another"
                         + " switch, and two keystrokes");
@@ -289,14 +294,15 @@ class ChartKeyboardTextTest {
                 SAID.announce(ChartKeys.toggle("chart.equatorialGrid"),
                         true),
                 "and about something it will");
-        assertEquals("Press a letter to switch a layer. Escape or ⌘K"
-                        + " closes the palette.", SAID.instruction(),
+        assertEquals("Press a letter to switch a layer. Escape or "
+                        + prefix + " closes the palette.",
+                SAID.instruction(),
                 "the instruction no longer reads as though the letters"
                         + " changed nothing either");
         assertEquals("The chart's layers, their shortcuts where"
                         + " available, and their current state. Press a"
                         + " listed letter to switch a layer, or Escape"
-                        + " or ⌘K to close.", SAID.explain(),
+                        + " or " + prefix + " to close.", SAID.explain(),
                 "and the description covers both what the palette"
                         + " switches and the row it deliberately does"
                         + " not: it claimed to list \"every layer the"

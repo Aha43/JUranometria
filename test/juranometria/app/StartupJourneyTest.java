@@ -231,9 +231,16 @@ class StartupJourneyTest {
                         + english.say("placeandtime.latitude.mnemonic")
                         + " - " + said.letters());
 
-        // Notation is not language and does not move.
+        // Notation is not language and does not move - but what
+        // this desktop CALLS it does. The prefix comes from the platform, spelled by the same
+        // source production asks - ChartKeys.prefixText(), the
+        // WHOLE first keystroke. Hard-coding the Mac glyph made
+        // this pass here and fail on Linux, where the desktop
+        // spells it Ctrl. ChartOptionsLanguageTest learned this
+        // once already; the lesson had not reached here.
         assertTrue(said.shown().stream()
-                        .anyMatch(word -> word.contains("⌘")),
+                        .anyMatch(word -> word.contains(
+                                juranometria.app.ChartKeys.prefixText())),
                 "the keystrokes are spelled by this desktop: "
                         + said.shown());
         assertTrue(said.shown().stream()
@@ -465,8 +472,10 @@ class StartupJourneyTest {
         assertTrue(shown.stream().anyMatch(w -> w.startsWith("G ")),
                 "the letters are the letters, and the letter is the"
                         + " same letter in every language: " + shown);
-        assertTrue(spoken.stream().anyMatch(w -> w.contains("⌘K")),
-                "and the prefix is what this desktop calls it");
+        assertTrue(spoken.stream().anyMatch(w -> w.contains(
+                        juranometria.app.ChartKeys.prefixText())),
+                "and the prefix is what this desktop calls it: "
+                        + juranometria.app.ChartKeys.prefixText());
         assertTrue(spoken.stream().noneMatch(w -> w.contains(" then ")),
                 "with no English word joining two keystrokes");
     }

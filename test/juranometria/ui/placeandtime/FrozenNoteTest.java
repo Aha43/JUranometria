@@ -159,8 +159,12 @@ class FrozenNoteTest {
                 "it says the Norwegian label: " + said);
         assertTrue(!said.contains(english.say("placeandtime.latitude.label")),
                 "and no English one");
-        assertTrue(said.stream().anyMatch(w -> w.contains("⌘K")),
-                "the keystroke reaches a reader unchanged: " + said);
+        assertTrue(said.stream().anyMatch(w -> w.contains(
+                        juranometria.app.ChartKeys.prefixText())),
+                "the keystroke reaches a reader unchanged, spelled as"
+                        + " this desktop spells it ("
+                        + juranometria.app.ChartKeys.prefixText()
+                        + "): " + said);
         assertTrue(said.stream().noneMatch(w -> w.contains(" then ")),
                 "with no English connector between two keystrokes: "
                         + said.stream().filter(w -> w.contains(" then "))

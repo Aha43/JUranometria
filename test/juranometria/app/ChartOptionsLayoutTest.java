@@ -100,6 +100,7 @@ class ChartOptionsLayoutTest {
         withDialog("nb-NO", (frame, dialog) -> {
             JComponent content = (JComponent) dialog.getContentPane();
             String canonical = geometryOf(content);
+            String switchPlaces = switchPlacesOf(content);
 
             assertTrue(everyLineFits(content),
                     "at the size the dialog chooses, every wrapped"
@@ -123,6 +124,8 @@ class ChartOptionsLayoutTest {
                             + " started as. A layout that remembered"
                             + " how wide it had been is the defect"
                             + " this is here for");
+            assertEquals(switchPlaces, switchPlacesOf(content),
+                    "with every switch back where it was");
         });
     }
 
@@ -308,7 +311,49 @@ class ChartOptionsLayoutTest {
         return out.toString();
     }
 
+    /**
+     * Where every switch sits, which is what a reader reaches for.
+     *
+     * <p>Asserted beside the full geometry rather than instead of
+     * it. The two together say the dialog came back the same size
+     * AND that its controls came back to the same places.
+     */
+    private static String switchPlacesOf(JComponent content)
+            throws Exception {
+        StringBuilder out = new StringBuilder();
+        SwingUtilities.invokeAndWait(() -> {
+            for (JCheckBox box : switchesIn(content)) {
+                out.append(box.getText()).append('@')
+                        .append(SwingUtilities.convertPoint(box, 0, 0,
+                                content))
+                        .append(' ').append(box.getWidth()).append('x')
+                        .append(box.getHeight()).append(';');
+            }
+        });
+        return out.toString();
+    }
+
+    /**
+     * Every component's bounds, except the tab strip's own arrows.
+     *
+     * <p>{@code ScrollableTabButton} is the pair of arrows a
+     * {@code JTabbedPane} shows when its tabs do not fit. Dragging
+     * the dialog to 300 px realises them, and Swing does not
+     * un-realise them when it is dragged back - on Linux they stay
+     * at 16x16 where they had been 0x0. That is the toolkit's
+     * behaviour and it is reader-visible, but it is not this
+     * dialog's layout answer: the dialog and the tabbed pane come
+     * back to exactly the bounds they had, and so does every
+     * switch.
+     *
+     * <p>Excluded by NAME and for a stated reason, rather than by
+     * loosening the comparison. Anything else moving still fails.
+     */
     private static void append(StringBuilder out, Component from) {
+        if (from.getClass().getSimpleName()
+                .equals("ScrollableTabButton")) {
+            return;
+        }
         out.append(from.getClass().getSimpleName()).append('@')
                 .append(from.getX()).append(',').append(from.getY())
                 .append(' ').append(from.getWidth()).append('x')
