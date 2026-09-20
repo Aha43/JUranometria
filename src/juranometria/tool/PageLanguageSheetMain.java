@@ -48,6 +48,17 @@ import juranometria.ui.language.PageText;
  */
 public final class PageLanguageSheetMain {
 
+    /**
+     * What this photographer holds still: there is no window to size: the canvas width is the
+     * study’s own choice.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.FIXED_CANVAS;
+
     private PageLanguageSheetMain() {
     }
 

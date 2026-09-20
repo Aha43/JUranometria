@@ -44,6 +44,17 @@ import juranometria.ui.language.SwingText;
  */
 public final class SwingChromeSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     private SwingChromeSheetMain() {
     }
 
@@ -208,7 +219,7 @@ public final class SwingChromeSheetMain {
             // point, drain, settle, and own focus nowhere. A dialog
             // packed once is a guess at its own size.
             image[0] = juranometria.tool.SheetCapture.of(holder[0],
-                    (JComponent) probe[0]);
+                    (JComponent) probe[0], SheetCapture.packed());
             SwingUtilities.invokeAndWait(() -> {
                 walk(probe[0], said);
                 if (form.name().equals("chooser")) {

@@ -54,8 +54,20 @@ class InterfaceEvidenceGateTest {
             Path.of("docs/studies/interface-language");
 
     /**
-     * Every generator that owns part of this directory, and the
-     * companion it writes.
+     * One photographer: what it writes, and what it holds still.
+     *
+     * <p>The kind is declared and never defaulted. Chart Options was
+     * photographed at its packed 394 px and Place and Time at 326 -
+     * both widths no reader meets - because the coordinator assumed
+     * every window was a packed one, and an undeclared default is
+     * how that assumption gets made again.
+     */
+    record Photographer(String companion,
+                        SheetCapture.Kind kind) {
+    }
+
+    /**
+     * Every generator that owns part of this directory.
      *
      * <p>One registry, in one place. The inventory checks below read
      * this and the committed directory and require them to describe
@@ -63,28 +75,50 @@ class InterfaceEvidenceGateTest {
      * registered and an artifact nobody generates are the same
      * defect seen from two ends.
      */
-    private static final Map<String, String> GENERATORS =
+    private static final Map<String, Photographer> GENERATORS =
             new LinkedHashMap<>();
 
     static {
-        GENERATORS.put("AboutSheetMain", "about-strings.md");
-        GENERATORS.put("ChartKeyboardSheetMain",
-                "chartkeyboard-strings.md");
-        GENERATORS.put("ChartOptionsSheetMain",
-                "chartoptions-strings.md");
+        // Dialogs that production only packs.
+        GENERATORS.put("AboutSheetMain",
+                new Photographer("about-strings.md", SheetCapture.Kind.PACKED));
         GENERATORS.put("ExportSheetDialogSheetMain",
-                "export-strings.md");
-        GENERATORS.put("InspectorSheetMain", "inspector-strings.md");
-        GENERATORS.put("MenuSheetMain", "menu-strings.md");
-        GENERATORS.put("OnThisPageSheetMain", "onthispage-strings.md");
-        GENERATORS.put("PageLanguageSheetMain",
-                "page-language-strings.md");
-        GENERATORS.put("PlaceAndTimeSheetMain",
-                "placeandtime-strings.md");
-        GENERATORS.put("SettingsSheetMain", "settings-strings.md");
+                new Photographer("export-strings.md", SheetCapture.Kind.PACKED));
         GENERATORS.put("SwingChromeSheetMain",
-                "swing-chrome-strings.md");
-        GENERATORS.put("ToolbarSheetMain", "toolbar-strings.md");
+                new Photographer("swing-chrome-strings.md",
+                        SheetCapture.Kind.PACKED));
+        // Components inside a packed study frame.
+        GENERATORS.put("ChartKeyboardSheetMain",
+                new Photographer("chartkeyboard-strings.md",
+                        SheetCapture.Kind.PACKED));
+        GENERATORS.put("InspectorSheetMain",
+                new Photographer("inspector-strings.md", SheetCapture.Kind.PACKED));
+        GENERATORS.put("MenuSheetMain",
+                new Photographer("menu-strings.md", SheetCapture.Kind.PACKED));
+        GENERATORS.put("OnThisPageSheetMain",
+                new Photographer("onthispage-strings.md", SheetCapture.Kind.PACKED));
+        GENERATORS.put("ToolbarSheetMain",
+                new Photographer("toolbar-strings.md", SheetCapture.Kind.PACKED));
+        // Dialogs whose size the application states.
+        GENERATORS.put("ChartOptionsSheetMain",
+                new Photographer("chartoptions-strings.md",
+                        SheetCapture.Kind.APPLICATION_SIZED));
+        GENERATORS.put("PlaceAndTimeSheetMain",
+                new Photographer("placeandtime-strings.md",
+                        SheetCapture.Kind.APPLICATION_SIZED));
+        // No window to size.
+        GENERATORS.put("SettingsSheetMain",
+                new Photographer("settings-strings.md",
+                        SheetCapture.Kind.FIXED_CANVAS));
+        GENERATORS.put("PageLanguageSheetMain",
+                new Photographer("page-language-strings.md",
+                        SheetCapture.Kind.FIXED_CANVAS));
+    }
+
+    /** Every companion this registry owns. */
+    private static List<String> companions() {
+        return GENERATORS.values().stream()
+                .map(Photographer::companion).toList();
     }
 
     /**
@@ -106,6 +140,7 @@ class InterfaceEvidenceGateTest {
                 "these generators pack real windows");
         Path first = Files.createTempDirectory("interface-gate-1");
         Path second = Files.createTempDirectory("interface-gate-2");
+        boolean[] keep = {false};
         try {
             generateAll(first);
             generateAll(second);
@@ -143,6 +178,21 @@ class InterfaceEvidenceGateTest {
             stale.forEach(one -> wrong.add(one + ": committed bytes"
                     + " are not what the generator produces -"
                     + " regenerate it, do not edit it"));
+            if (!wrong.isEmpty()) {
+                // Keep everything, BEFORE the assertion throws. Both
+                // occurrences of #364 were discovered after the runs
+                // that produced them had been deleted, so the one
+                // artifact anybody wanted no longer existed.
+                keep[0] = true;
+                Path kept = retain(first, second, wrong);
+                assertEquals(List.of(), wrong,
+                        "the display-owned evidence does not match its"
+                                + " generators. Both complete runs and"
+                                + " their capture traces are kept at "
+                                + kept.toAbsolutePath()
+                                + " - inspect them rather than running"
+                                + " this again");
+            }
             assertEquals(List.of(), wrong,
                     "the display-owned evidence does not match its"
                             + " generators");
@@ -159,8 +209,76 @@ class InterfaceEvidenceGateTest {
                             + " compared here - another desktop's"
                             + " font metrics are not a defect");
         } finally {
-            remove(first);
-            remove(second);
+            // Only when there was nothing to look at.
+            if (!keep[0]) {
+                remove(first);
+                remove(second);
+            }
+            Files.deleteIfExists(traceFor(first));
+            Files.deleteIfExists(traceFor(second));
+        }
+    }
+
+    /**
+     * Keeps both runs where a person can open them.
+     *
+     * <p>A gate that finds a disagreement and then deletes the
+     * evidence has told you only that something is wrong. This
+     * writes both complete trees, the capture traces taken while
+     * each layout was still settled, and a summary naming what
+     * differed, into a directory that survives the test.
+     */
+    private static Path retain(Path first, Path second,
+                               List<String> wrong) throws Exception {
+        Path kept = Path.of("build", "interface-gate-evidence");
+        remove(kept);
+        Files.createDirectories(kept);
+        copyTree(first, kept.resolve("run-1"));
+        copyTree(second, kept.resolve("run-2"));
+        for (Path tree : List.of(first, second)) {
+            Path trace = traceFor(tree);
+            if (Files.exists(trace)) {
+                Files.copy(trace, kept.resolve(
+                        tree == first ? "run-1-trace.tsv"
+                                : "run-2-trace.tsv"));
+            }
+        }
+
+        StringBuilder said = new StringBuilder(
+                "# Display evidence disagreement\n\n"
+                        + "Kept because the gate failed. Two complete"
+                        + " runs, and the capture traces written while"
+                        + " each layout was still settled.\n\n");
+        for (String one : wrong) {
+            said.append("- ").append(one).append('\n');
+        }
+        said.append("\n## Differing artifacts, byte by byte\n\n");
+        for (String name : listing(kept.resolve("run-1"))) {
+            Path a = kept.resolve("run-1").resolve(name);
+            Path b = kept.resolve("run-2").resolve(name);
+            if (Files.exists(b) && !java.util.Arrays.equals(
+                    Files.readAllBytes(a), Files.readAllBytes(b))) {
+                said.append("- `").append(name).append("`: ")
+                        .append(Files.size(a)).append(" vs ")
+                        .append(Files.size(b)).append(" bytes\n");
+            }
+        }
+        Files.writeString(kept.resolve("SUMMARY.md"), said.toString(),
+                StandardCharsets.UTF_8);
+        return kept;
+    }
+
+    /** Where a run's capture trace goes: beside the tree, not in it. */
+    private static Path traceFor(Path tree) {
+        return tree.resolveSibling(tree.getFileName() + "-trace.tsv");
+    }
+
+    private static void copyTree(Path from, Path to) throws Exception {
+        Files.createDirectories(to);
+        try (var files = Files.list(from)) {
+            for (Path one : files.toList()) {
+                Files.copy(one, to.resolve(one.getFileName()));
+            }
         }
     }
 
@@ -202,15 +320,15 @@ class InterfaceEvidenceGateTest {
         List<String> silent = new ArrayList<>();
         Path made = Files.createTempDirectory("interface-gate-claims");
         try {
-            for (Map.Entry<String, String> entry
+            for (Map.Entry<String, Photographer> entry
                     : GENERATORS.entrySet()) {
                 Path alone = Files.createDirectory(
                         made.resolve(entry.getKey()));
                 run(entry.getKey(), alone);
                 List<String> wrote = listing(alone);
-                if (!wrote.contains(entry.getValue())) {
+                if (!wrote.contains(entry.getValue().companion())) {
                     silent.add(entry.getKey() + " wrote no "
-                            + entry.getValue());
+                            + entry.getValue().companion());
                 } else if (wrote.size() < 2
                         && !entry.getKey().equals("SettingsSheetMain")) {
                     silent.add(entry.getKey() + " wrote a companion"
@@ -230,7 +348,7 @@ class InterfaceEvidenceGateTest {
     @Test
     void theRegistryAndTheCommittedCompanionsAgree() throws Exception {
         List<String> missing = new ArrayList<>();
-        for (String companion : GENERATORS.values()) {
+        for (String companion : companions()) {
             if (!Files.exists(COMMITTED.resolve(companion))) {
                 missing.add(companion);
             }
@@ -241,7 +359,7 @@ class InterfaceEvidenceGateTest {
         List<String> unregistered = new ArrayList<>();
         for (String name : listing(COMMITTED)) {
             if (name.endsWith("-strings.md")
-                    && !GENERATORS.containsValue(name)) {
+                    && !companions().contains(name)) {
                 unregistered.add(name);
             }
         }
@@ -284,6 +402,171 @@ class InterfaceEvidenceGateTest {
         return System.getenv("CI") == null;
     }
 
+    /**
+     * A failure keeps what it found.
+     *
+     * <p>Both occurrences of #364 were discovered after the runs
+     * that produced them had been deleted, so the one artifact
+     * anybody wanted no longer existed. This is release
+     * infrastructure now, and an evidence mechanism nobody has seen
+     * work is not known to work.
+     *
+     * <p>Driven with synthetic trees rather than a real double
+     * generation: what is being pinned is that a disagreement is
+     * <em>kept</em>, not that the generators disagree.
+     */
+    @Test
+    void aFailureKeepsBothRunsAndTheirTraces() throws Exception {
+        Path first = Files.createTempDirectory("retain-1");
+        Path second = Files.createTempDirectory("retain-2");
+        try {
+            Files.writeString(first.resolve("same.md"), "identical",
+                    StandardCharsets.UTF_8);
+            Files.writeString(second.resolve("same.md"), "identical",
+                    StandardCharsets.UTF_8);
+            Files.writeString(first.resolve("moved.png"), "one",
+                    StandardCharsets.UTF_8);
+            Files.writeString(second.resolve("moved.png"), "another",
+                    StandardCharsets.UTF_8);
+            Files.writeString(traceFor(first), "settled\tfirst\n",
+                    StandardCharsets.UTF_8);
+            Files.writeString(traceFor(second), "settled\tsecond\n",
+                    StandardCharsets.UTF_8);
+
+            Path kept = retain(first, second,
+                    List.of("moved.png: two runs disagreed"));
+
+            assertTrue(Files.exists(kept.resolve("run-1/moved.png")),
+                    "the first run is kept whole");
+            assertTrue(Files.exists(kept.resolve("run-2/moved.png")),
+                    "and so is the second - a single artifact is not"
+                            + " a pair, and a pair is the whole point");
+            assertTrue(Files.exists(kept.resolve("run-1-trace.tsv"))
+                            && Files.exists(
+                                    kept.resolve("run-2-trace.tsv")),
+                    "with the capture traces written while each"
+                            + " layout was still settled");
+
+            String summary = Files.readString(kept.resolve("SUMMARY.md"),
+                    StandardCharsets.UTF_8);
+            assertTrue(summary.contains("moved.png"),
+                    "the summary names what differed: " + summary);
+            assertTrue(!summary.contains("same.md"),
+                    "and not what did not, so a reader is pointed"
+                            + " somewhere: " + summary);
+        } finally {
+            remove(first);
+            remove(second);
+            remove(Path.of("build", "interface-gate-evidence"));
+        }
+    }
+
+    /**
+     * Every photographer declares its kind, and honours it.
+     *
+     * <p>Two halves, because either alone is decorative. The
+     * generator's own {@code CAPTURE_KIND} constant is read
+     * <strong>reflectively</strong>, so the compiler carries it and
+     * this registry cannot drift from it; and the source must ask
+     * the coordinator for the matching operation, so a declaration
+     * cannot be a label over a capture that does something else.
+     *
+     * <p>All three kinds can fail. Declaring About a fixed canvas,
+     * or Settings a packed window, breaks both halves - which the
+     * mutations in `SheetCaptureSizingTest` pin.
+     */
+    @Test
+    void everyPhotographerDeclaresItsKindAndHonoursIt()
+            throws Exception {
+        List<String> wrong = new ArrayList<>();
+        for (Map.Entry<String, Photographer> entry
+                : GENERATORS.entrySet()) {
+            SheetCapture.Kind declared = entry.getValue().kind();
+
+            SheetCapture.Kind own = (SheetCapture.Kind) Class
+                    .forName("juranometria.tool." + entry.getKey())
+                    .getField("CAPTURE_KIND").get(null);
+            if (own != declared) {
+                wrong.add(entry.getKey() + " declares " + own
+                        + " and this registry says " + declared);
+                continue;
+            }
+
+            String code = Files.readString(
+                            Path.of("src/juranometria/tool",
+                                    entry.getKey() + ".java"),
+                            StandardCharsets.UTF_8)
+                    .replaceAll("(?s)/\\*.*?\\*/", " ")
+                    .replaceAll("(?m)//.*$", " ");
+            String operation = switch (declared) {
+                case PACKED -> "SheetCapture.packed()";
+                case APPLICATION_SIZED ->
+                        "SheetCapture.applicationSized(";
+                case FIXED_CANVAS -> "SheetCapture.fixedCanvas()";
+            };
+            boolean asks = code.contains(operation);
+            // PageLanguage draws renderer output and calls the
+            // coordinator for nothing, so its constant is its whole
+            // declaration. Everything with a component hierarchy has
+            // to ask.
+            boolean capturesAnything =
+                    code.contains("SheetCapture.settle(")
+                            || code.contains("SheetCapture.of(")
+                            || code.contains("SheetCapture.write(");
+            if (capturesAnything && !asks) {
+                wrong.add(entry.getKey() + " declares " + declared
+                        + " and never calls " + operation);
+            }
+            for (String other : List.of("SheetCapture.packed()",
+                    "SheetCapture.applicationSized(",
+                    "SheetCapture.fixedCanvas()")) {
+                if (!other.equals(operation) && code.contains(other)) {
+                    wrong.add(entry.getKey() + " declares " + declared
+                            + " and calls " + other);
+                }
+            }
+        }
+        assertEquals(List.of(), wrong,
+                "a kind is a choice the capture actually makes, not a"
+                        + " row in a table. Both defects this"
+                        + " distinction exists for were a coordinator"
+                        + " assuming the kind");
+    }
+
+    /**
+     * A thirteenth photographer cannot arrive undeclared.
+     *
+     * <p>Every generator that writes into this directory is in the
+     * registry with a kind. The registry is the audit boundary, so
+     * arriving without one has to be impossible rather than
+     * discouraged.
+     */
+    @Test
+    void noPhotographerOfThisEvidenceIsUndeclared() throws Exception {
+        List<String> undeclared = new ArrayList<>();
+        try (var files = Files.walk(Path.of("src/juranometria/tool"))) {
+            for (Path file : files.filter(f ->
+                    f.toString().endsWith(".java")).toList()) {
+                String code = Files.readString(file,
+                        StandardCharsets.UTF_8);
+                if (!code.contains("docs/studies/interface-language")) {
+                    continue;
+                }
+                String name = file.getFileName().toString()
+                        .replace(".java", "");
+                if (!GENERATORS.containsKey(name)) {
+                    undeclared.add(name);
+                }
+            }
+        }
+        assertEquals(List.of(), undeclared,
+                "these write into the display-owned evidence"
+                        + " directory and declare no capture kind."
+                        + " Add them to GENERATORS with the kind they"
+                        + " really are - packed, application-sized,"
+                        + " or a fixed canvas");
+    }
+
     /** Runs every registered generator into one directory. */
     private static void generateAll(Path into) throws Exception {
         for (String generator : GENERATORS.keySet()) {
@@ -297,6 +580,10 @@ class InterfaceEvidenceGateTest {
                 Path.of(System.getProperty("java.home"), "bin", "java")
                         .toString(),
                 "-cp", System.getProperty("java.class.path"),
+                // A SIBLING of the tree, never inside it: a trace
+                // is not an artifact, and one living among them
+                // would be compared as though it were.
+                "-Djuranometria.capture.trace=" + traceFor(into),
                 "juranometria.tool." + generator, into.toString())
                 .redirectErrorStream(true)
                 .start();
@@ -318,6 +605,9 @@ class InterfaceEvidenceGateTest {
     }
 
     private static void remove(Path directory) throws Exception {
+        if (!Files.exists(directory)) {
+            return;
+        }
         try (var files = Files.walk(directory)) {
             files.sorted(Comparator.reverseOrder())
                     .forEach(one -> one.toFile().delete());

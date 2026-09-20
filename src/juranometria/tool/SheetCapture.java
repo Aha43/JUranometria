@@ -114,6 +114,259 @@ public final class SheetCapture {
     }
 
     /**
+     * What a photographer is holding still.
+     *
+     * <p>Declared by each generator as a typed constant, so the
+     * compiler carries it and the evidence gate reads it rather than
+     * a table someone maintains beside the code. Chart Options was
+     * photographed at its packed 394 px and Place and Time at 326 -
+     * widths no reader meets - because the kind was assumed.
+     */
+    public enum Kind {
+        /** The size is the layout's preference. */
+        PACKED,
+        /** The size is a policy the application states. */
+        APPLICATION_SIZED,
+        /** No window: a component laid out at a chosen width. */
+        FIXED_CANVAS
+    }
+
+    /**
+     * How a window comes by its size, declared rather than assumed.
+     *
+     * <p>Two kinds, and a photographer must say which it is holding:
+     *
+     * <ul>
+     *   <li><strong>packed</strong> - the size is the layout's
+     *       preference, and packing to a fixed point is right;</li>
+     *   <li><strong>application-sized</strong> - the size is a
+     *       <em>policy</em> the application states, and packing
+     *       overrides it with a preference the reader never
+     *       meets.</li>
+     * </ul>
+     *
+     * <p>The distinction was learned twice. Chart Options declares
+     * {@code ORDINARY_WIDTH} through {@code sizeToScreen} and was
+     * photographed at its packed 394 px until it was classified.
+     * Place and Time raises its packed width to the same floor, and
+     * was photographed at 326 px - under load, once in two runs -
+     * because the coordinator packed it and the generator kept its
+     * own copy of the arithmetic to undo that. A reader meets
+     * neither width.
+     *
+     * <p>So the photographer no longer decides how big the
+     * application is. It says which kind of window this is, and for
+     * an application-sized one hands over the application's own
+     * policy, which is re-applied until the size stops changing.
+     */
+    public interface Sizing {
+
+        /** Brings the window to its size, or throws if it cannot. */
+        void bring(Window window, JComponent content) throws Exception;
+
+        /**
+         * Holds that size in the block that paints.
+         *
+         * <p>Bringing a window to its size and painting it later is
+         * not enough, and this is the second time that lesson has
+         * been learned here: focus had to be declared in the paint
+         * block because the desktop grants it asynchronously, and a
+         * size has to be held there because <strong>the peer pulls
+         * an unshown window back to its packed size an event cycle
+         * later</strong>. Place and Time's generator carried a
+         * hand-written restore for exactly that, immediately before
+         * painting, and it was right to.
+         *
+         * <p>Runs on the event thread, with nothing between it and
+         * the paint.
+         */
+        default void hold(Window window, JComponent content) {
+        }
+    }
+
+    /** A window whose size is its layout's preference. */
+    public static Sizing packed() {
+        return SheetCapture::packToFixedPoint;
+    }
+
+    /**
+     * A window whose size is a policy the application states.
+     *
+     * @param policy the application's own sizing, re-applied here
+     *     rather than imitated
+     */
+    public static Sizing applicationSized(String name,
+                                          Runnable policy) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("a policy is named so"
+                    + " that a refusal points at something a reader"
+                    + " can open. A lambda's generated class name"
+                    + " does not");
+        }
+        if (policy == null) {
+            throw new IllegalArgumentException("an application-sized"
+                    + " window is sized by the application, so there"
+                    + " has to be a policy to apply");
+        }
+        return new Sizing() {
+
+            @Override
+            public void hold(Window window, JComponent content) {
+                // Idempotent, and applied where nothing can undo it.
+                policy.run();
+            }
+
+            @Override
+            public void bring(Window window, JComponent content)
+                    throws Exception {
+                requireWindow(window);
+                java.awt.Dimension was = null;
+                for (int round = 0; round < ROUNDS; round++) {
+                    java.awt.Dimension[] now =
+                            new java.awt.Dimension[1];
+                    SwingUtilities.invokeAndWait(() -> {
+                        policy.run();
+                        now[0] = window.getSize();
+                    });
+                    drain();
+                    if (now[0].equals(was)) {
+                        return;
+                    }
+                    was = now[0];
+                }
+                throw new IllegalStateException("this window never"
+                        + " settled under its own sizing policy in "
+                        + ROUNDS + " applications: "
+                        + name
+                        + " last brought the window to " + was
+                        + ", while its content is "
+                        + sizeOf(content) + " and prefers "
+                        + preferredOf(content) + ". A photograph would"
+                        + " be of one of the sizes it passed"
+                        + " through.");
+            }
+        };
+    }
+
+    /**
+     * Settles a component and its window, with the kind stated.
+     *
+     * <p>The form most photographers use. The window is whatever
+     * contains the component - {@code null} for a fixed canvas.
+     */
+    public static void settle(JComponent content, Sizing sizing)
+            throws Exception {
+        if (content == null) {
+            throw new IllegalArgumentException(
+                    "there is nothing to settle");
+        }
+        settle(SwingUtilities.getWindowAncestor(content), content,
+                sizing);
+    }
+
+    /**
+     * Establishes the state for a window of a stated kind, for a
+     * photographer that paints by a route of its own.
+     */
+    public static void settle(Window window, JComponent content,
+                              Sizing sizing) throws Exception {
+        if (sizing == null) {
+            throw new IllegalArgumentException("a photographer says"
+                    + " which kind of window this is");
+        }
+        drain();
+        canonicalise(content);
+        sizing.bring(window, content);
+        settleLayout(window, content);
+    }
+
+    /** An application policy needs a window to apply itself to. */
+    private static void requireWindow(Window window) {
+        if (window == null) {
+            throw new IllegalArgumentException("an application-sized"
+                    + " capture has no window to size. A component"
+                    + " with no window of its own is a fixed canvas,"
+                    + " not a window with a policy, and declaring it"
+                    + " one makes an impossible claim look valid.");
+        }
+    }
+
+    private static String sizeOf(JComponent content) throws Exception {
+        String[] said = new String[1];
+        SwingUtilities.invokeAndWait(() -> said[0] =
+                content.getWidth() + "x" + content.getHeight());
+        return said[0];
+    }
+
+    private static String preferredOf(JComponent content)
+            throws Exception {
+        String[] said = new String[1];
+        SwingUtilities.invokeAndWait(() -> said[0] =
+                content.getPreferredSize().width + "x"
+                        + content.getPreferredSize().height);
+        return said[0];
+    }
+
+    /**
+     * A component laid out at a width the study chose.
+     *
+     * <p>No window, and therefore no window policy: Settings
+     * photographs its content at a declared width, and the
+     * page-language sheets are renderer output with no component
+     * hierarchy to size at all. Calling this says so, where
+     * defaulting to a packed window would have said something
+     * untrue.
+     *
+     * <p>It brings nothing, because the caller has already chosen
+     * the canvas. What it does is make the choice <em>visible</em> -
+     * in the source, where the compiler carries it, rather than in a
+     * table that can drift.
+     */
+    public static Sizing fixedCanvas() {
+        return (window, content) -> {
+            if (window != null) {
+                throw new IllegalArgumentException("a fixed canvas"
+                        + " has no window. This one has "
+                        + window.getClass().getSimpleName()
+                        + ", so it is a window with a size, and its"
+                        + " kind should say which");
+            }
+        };
+    }
+
+    /** Photographs a window of a stated kind. */
+    public static void write(Window window, JComponent content,
+                             Sizing sizing, Path to) throws Exception {
+        BufferedImage drawn = of(window, content, sizing);
+        ImageIO.write(drawn, "png", to.toFile());
+    }
+
+    /** The same, returning the image. */
+    public static BufferedImage of(Window window, JComponent content,
+                                   Sizing sizing) throws Exception {
+        if (SwingUtilities.isEventDispatchThread()) {
+            throw new IllegalStateException("capture drives the event"
+                    + " queue and cannot run on it");
+        }
+        if (sizing == null) {
+            throw new IllegalArgumentException("a photographer says"
+                    + " which kind of window this is");
+        }
+        drain();
+        canonicalise(content);
+        sizing.bring(window, content);
+        settleLayout(window, content);
+        BufferedImage[] drawn = new BufferedImage[1];
+        SwingUtilities.invokeAndWait(() -> {
+            sizing.hold(window, content);
+            neutralFocusNow();
+            tracePrePaint(window, content);
+            drawn[0] = paint(content);
+        });
+        return drawn[0];
+    }
+
+    /**
      * Photographs a window that decides its own size.
      *
      * <p>Most windows here are packed, so their size is their
@@ -161,7 +414,44 @@ public final class SheetCapture {
         settleLayout(window, content);
     }
 
-    /** Validates until validating again moves nothing. */
+    /**
+     * Where a trace of every settled capture is appended, or null.
+     *
+     * <p>Set by {@code -Djuranometria.capture.trace=<file>}. Off by
+     * default and written by nothing in production.
+     *
+     * <p>It exists because the two occurrences of #364 were both
+     * discovered <em>after</em> the state that produced them had
+     * been disposed: the gate compares artifacts once both runs are
+     * finished, and by then the windows are gone. A trace written
+     * while the layout is still settled is the only record that can
+     * outlive it.
+     */
+    private static String traceFile() {
+        // Read when used, not once at class-init: a contract that
+        // points the trace at its own file would otherwise be
+        // writing to wherever the first loader happened to look.
+        return System.getProperty("juranometria.capture.trace");
+    }
+
+    /** Records one settled capture, if anybody asked for a trace. */
+    static void trace(String what, String detail) {
+        String file = traceFile();
+        if (file == null) {
+            return;
+        }
+        try {
+            java.nio.file.Files.writeString(java.nio.file.Path.of(file),
+                    what + "\t" + detail + "\n",
+                    java.nio.charset.StandardCharsets.UTF_8,
+                    java.nio.file.StandardOpenOption.CREATE,
+                    java.nio.file.StandardOpenOption.APPEND);
+        } catch (java.io.IOException ignored) {
+            // A trace that cannot be written must not change what is
+            // being traced.
+        }
+    }
+
     private static void settleLayout(Window window, JComponent content)
             throws Exception {
         String geometry = geometryOf(content);
@@ -175,6 +465,7 @@ public final class SheetCapture {
             drain();
             String now = geometryOf(content);
             if (now.equals(geometry)) {
+                traceSettled(window, content, now, round);
                 // A fixed point: validating again moved nothing, and
                 // the queue is empty. This is the earliest moment the
                 // picture can be said to be OF something.
@@ -291,6 +582,76 @@ public final class SheetCapture {
                 + " the width it was last given, and a photograph"
                 + " would be of one of the answers rather than of"
                 + " the dialog.");
+    }
+
+    /**
+     * What is about to be painted, recorded where nothing can move
+     * it.
+     *
+     * <p>Distinct from the `settled` record, and both are kept. For
+     * an application-sized window {@code Sizing.hold} runs between
+     * them and may change the size: a retained failure whose trace
+     * described only the settled geometry would describe a state
+     * other than the one in the pixels, which is the exact ambiguity
+     * a trace exists to remove.
+     *
+     * <p>Called on the event thread, with nothing between it and the
+     * paint.
+     */
+    public static void tracePrePaint(Window window,
+                                     JComponent content) {
+        String file = traceFile();
+        if (file == null) {
+            return;
+        }
+        java.awt.KeyboardFocusManager manager =
+                java.awt.KeyboardFocusManager
+                        .getCurrentKeyboardFocusManager();
+        StringBuilder geometry = new StringBuilder();
+        append(geometry, content);
+        trace("pre-paint", "content=" + content.getWidth() + "x"
+                + content.getHeight()
+                + " preferred=" + content.getPreferredSize().width
+                + "x" + content.getPreferredSize().height
+                + " window=" + (window == null ? "none"
+                        : window.getWidth() + "x" + window.getHeight())
+                + " focusOwner=" + describe(manager.getFocusOwner())
+                + " geometry=" + geometry.toString().hashCode()
+                + " | " + geometry);
+    }
+
+    /** What the capture was of, while it is still true. */
+    private static void traceSettled(Window window, JComponent content,
+                                     String geometry, int rounds)
+            throws Exception {
+        String file = traceFile();
+        if (file == null) {
+            return;
+        }
+        String[] state = new String[1];
+        SwingUtilities.invokeAndWait(() -> {
+            java.awt.KeyboardFocusManager manager =
+                    java.awt.KeyboardFocusManager
+                            .getCurrentKeyboardFocusManager();
+            state[0] = "rounds=" + rounds
+                    + " content=" + content.getWidth() + "x"
+                    + content.getHeight()
+                    + " preferred=" + content.getPreferredSize().width
+                    + "x" + content.getPreferredSize().height
+                    + " window=" + (window == null ? "none"
+                            : window.getWidth() + "x"
+                                    + window.getHeight()
+                                    + " insets=" + window.getInsets()
+                                    + " showing=" + window.isShowing()
+                                    + " focusable="
+                                    + window.getFocusableWindowState())
+                    + " focusOwner=" + describe(manager.getFocusOwner())
+                    + " permanent="
+                    + describe(manager.getPermanentFocusOwner())
+                    + " geometry=" + geometry.hashCode()
+                    + " | " + geometry;
+        });
+        trace("settled", state[0]);
     }
 
     /**

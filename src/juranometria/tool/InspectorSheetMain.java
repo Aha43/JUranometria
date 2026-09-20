@@ -49,6 +49,17 @@ import juranometria.ui.language.InterfaceText;
  */
 public final class InspectorSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     private InspectorSheetMain() {
     }
 
@@ -190,7 +201,7 @@ public final class InspectorSheetMain {
             // queue is empty, the window has packed to a fixed
             // point, the layout has stopped moving and focus is
             // owned by nobody.
-            SheetCapture.settle(content);
+            SheetCapture.settle(content, SheetCapture.packed());
             BufferedImage image = new BufferedImage(
                     Math.max(1, content.getWidth()),
                     Math.max(1, content.getHeight()),

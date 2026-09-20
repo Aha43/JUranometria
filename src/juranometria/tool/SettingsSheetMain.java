@@ -48,6 +48,17 @@ import juranometria.ui.language.InterfaceText;
  */
 public final class SettingsSheetMain {
 
+    /**
+     * What this photographer holds still: there is no window to size: the canvas width is the
+     * study’s own choice.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.FIXED_CANVAS;
+
     private SettingsSheetMain() {
     }
 
@@ -127,7 +138,7 @@ public final class SettingsSheetMain {
 
     private static void draw(JComponent content, Path to)
             throws Exception {
-        SheetCapture.settle(content);
+        SheetCapture.settle(content, SheetCapture.fixedCanvas());
         // Lay out at the real width FIRST, then ask how tall it
         // became. Asking before laying out reported a height from a
         // different width and cropped the buttons off the sheet - a

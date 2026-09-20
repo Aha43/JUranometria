@@ -51,6 +51,17 @@ import juranometria.ui.placeandtime.PlaceStore;
  */
 public final class PlaceAndTimeSheetMain {
 
+    /**
+     * What this photographer holds still: the application states this window’s size, and packing
+     * it would photograph a width no reader meets.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.APPLICATION_SIZED;
+
     private PlaceAndTimeSheetMain() {
     }
 
@@ -331,36 +342,34 @@ public final class PlaceAndTimeSheetMain {
     private static String capture(PlaceAndTimeDialog dialog,
                                   String language, Path to)
             throws Exception {
-        SheetCapture.settle((javax.swing.JComponent)
-                dialog.getContentPane());
+        // Application-sized: this dialog raises its packed width to
+        // its own reviewed floor, so its size is a policy. The
+        // coordinator re-applies that policy rather than packing
+        // over it - and the SAME policy object holds it in the block
+        // that paints, because the peer pulls an unshown window back
+        // to its packed width an event cycle later.
+        SheetCapture.Sizing sizing =
+                SheetCapture.applicationSized(
+                        "PlaceAndTimeDialog.applySizePolicy",
+                        dialog::applySizePolicy);
+        SheetCapture.settle(dialog,
+                (javax.swing.JComponent) dialog.getContentPane(),
+                sizing);
         Set<String> shown = new LinkedHashSet<>();
         Set<String> spoken = new LinkedHashSet<>();
         List<String> letters = new ArrayList<>();
         BufferedImage[] image = new BufferedImage[1];
         String[] window = new String[2];
         SwingUtilities.invokeAndWait(() -> {
-            // The floor, put back before anything is painted.
-            //
-            // The constructor packs, raises the width to the
-            // reviewed 420 px, and lays out again - and an event
-            // cycle later the peer pulls an unshown window back to
-            // its packed 326 px, because there is no window on
-            // screen for the larger size to have reached. So the
-            // picture depended on how many event cycles had passed,
-            // and three runs of this generator produced three
-            // different sets of images.
-            //
-            // A reader never meets 326 px: `open` shows the dialog,
-            // and a shown one holds 420 px in both languages -
-            // measured, before concluding this was a photographer's
-            // problem rather than theirs. What is restored here is
-            // the width the reader gets.
-            if (dialog.getWidth() < PlaceAndTimeDialog.ORDINARY_WIDTH) {
-                dialog.setSize(PlaceAndTimeDialog.ORDINARY_WIDTH,
-                        dialog.getHeight());
-                dialog.invalidate();
-                dialog.validate();
-            }
+            // The policy, held where nothing can undo it. This was
+            // once a hand-written copy of the same arithmetic; the
+            // copy was right to exist and wrong to be a copy. The
+            // dialog states the policy, and this applies it with
+            // nothing between here and the paint.
+            sizing.hold(dialog,
+                    (javax.swing.JComponent) dialog.getContentPane());
+            SheetCapture.tracePrePaint(dialog,
+                    (javax.swing.JComponent) dialog.getContentPane());
             Container content = dialog.getContentPane();
             window[0] = dialog.getTitle();
             window[1] = dialog.getAccessibleContext()

@@ -38,6 +38,17 @@ import juranometria.app.ChartOptionsDialog;
  */
 public final class ChartOptionsSheetMain {
 
+    /**
+     * What this photographer holds still: the application states this window’s size, and packing
+     * it would photograph a width no reader meets.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.APPLICATION_SIZED;
+
     private ChartOptionsSheetMain() {
     }
 
@@ -194,7 +205,16 @@ public final class ChartOptionsSheetMain {
     private static void draw(java.awt.Window window,
                              JComponent content, Path to)
             throws Exception {
-        SheetCapture.writeSelfSized(window, content, to);
+        // Application-sized: this dialog states ORDINARY_WIDTH
+        // through sizeToScreen, so packing it would photograph a
+        // preference of 394 px that no reader meets.
+        SheetCapture.write(window, content,
+                SheetCapture.applicationSized(
+                        "ChartOptionsDialog.settle", () ->
+                        juranometria.app.ChartOptionsDialog.settle(
+                                (juranometria.app.ChartOptionsDialog)
+                                        window)),
+                to);
     }
 
     private static void layoutDeeply(Container from) {

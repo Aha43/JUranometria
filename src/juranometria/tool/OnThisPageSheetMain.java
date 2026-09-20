@@ -52,6 +52,17 @@ import juranometria.ui.onthispage.OnThisPageTable;
  */
 public final class OnThisPageSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     /** English, stated: a study says which language it renders (#350). */
     private static final juranometria.project.PageWords ENGLISH =
             juranometria.ui.language.PageText.in(juranometria.ui.language.InterfaceText.forLanguage("en"));
@@ -245,7 +256,7 @@ public final class OnThisPageSheetMain {
             // queue is empty, the window has packed to a fixed
             // point, the layout has stopped moving and focus is
             // owned by nobody.
-            SheetCapture.settle(content);
+            SheetCapture.settle(content, SheetCapture.packed());
             BufferedImage image = new BufferedImage(
                     Math.max(1, content.getWidth()),
                     Math.max(1, content.getHeight()),

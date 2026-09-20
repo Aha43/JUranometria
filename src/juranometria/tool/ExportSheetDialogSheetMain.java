@@ -49,6 +49,17 @@ import juranometria.ui.language.InterfaceText;
  */
 public final class ExportSheetDialogSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     private ExportSheetDialogSheetMain() {
     }
 
@@ -297,7 +308,8 @@ public final class ExportSheetDialogSheetMain {
             // drain was better and still a guess, because a wrapped
             // label's preferred width depends on having been laid
             // out. SheetCapture packs until the size repeats.
-            SheetCapture.settle(owner[0], content[0]);
+            SheetCapture.settle(owner[0], content[0],
+                    SheetCapture.packed());
             requireState(content[0], state);
             return capture(content[0], to);
         } finally {

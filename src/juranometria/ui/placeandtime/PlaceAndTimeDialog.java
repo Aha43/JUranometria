@@ -65,6 +65,33 @@ public final class PlaceAndTimeDialog extends JDialog {
     /** The one live instance; guarded on the EDT. */
     private static PlaceAndTimeDialog current;
 
+    /**
+     * The size this dialog gives itself, in one place.
+     *
+     * <p>Packing asks the layout what it would like; this dialog
+     * then raises the width to the reviewed {@link #ORDINARY_WIDTH}
+     * floor, so its size is a <strong>policy</strong> rather than a
+     * preference. A reader never meets the narrower packed width.
+     *
+     * <p>Public so the photographer can re-apply it rather than
+     * guess at it. It used to be inlined in the constructor, and the
+     * study kept its own copy of the same arithmetic to undo a pack
+     * the coordinator had done - which failed under load and
+     * produced a 326 px picture of a dialog no reader has seen.
+     * One definition, applied by whoever needs it.
+     */
+    public void applySizePolicy() {
+        pack();
+        setSize(Math.max(getWidth(), ORDINARY_WIDTH), getHeight());
+        // And laid out again at that size - invalidate first,
+        // because setSize leaves the tree marked valid and a bare
+        // validate() is then a no-op: the floor was applied to the
+        // window but not to the controls inside it, which the
+        // study's dark photograph showed at 344 px.
+        invalidate();
+        validate();
+    }
+
     /** What the reviewed mock-up was drawn at. */
     public static final int ORDINARY_WIDTH = 420;
 
@@ -106,15 +133,7 @@ public final class PlaceAndTimeDialog extends JDialog {
         getRootPane().registerKeyboardAction(event -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
-        pack();
-        setSize(Math.max(getWidth(), ORDINARY_WIDTH), getHeight());
-        // And laid out again at that size - invalidate first,
-        // because setSize leaves the tree marked valid and a bare
-        // validate() is then a no-op: the floor was applied to the
-        // window but not to the controls inside it, which the
-        // study's dark photograph showed at 344 px.
-        invalidate();
-        validate();
+        applySizePolicy();
         setLocationRelativeTo(owner);
     }
 
