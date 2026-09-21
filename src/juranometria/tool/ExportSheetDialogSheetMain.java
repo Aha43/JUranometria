@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -302,16 +303,13 @@ public final class ExportSheetDialogSheetMain {
                 }
             });
             // The shared rule rather than this generator's own idea
-            // of when a dialog is ready. Packing in the same block
-            // as the format choice reported the previous format's
-            // width about one run in six; packing once after a
-            // drain was better and still a guess, because a wrapped
-            // label's preferred width depends on having been laid
-            // out. SheetCapture packs until the size repeats.
-            SheetCapture.settle(owner[0], content[0],
-                    SheetCapture.packed());
-            requireState(content[0], state);
-            return capture(content[0], to);
+            // of when a dialog is ready, and in ONE sequence: the
+            // coordinator settles the packed size, holds it, asks
+            // this sheet's premise, records the geometry and paints,
+            // with no event cycle anywhere between. Settling here
+            // and painting in a block of this generator's own is
+            // what #364 was.
+            return capture(owner[0], content[0], state, to);
         } finally {
             SwingUtilities.invokeAndWait(() -> {
                 if (owner[0] != null) {
@@ -331,23 +329,20 @@ public final class ExportSheetDialogSheetMain {
      * expected - and nothing in the file said so; the run simply
      * disagreed with the run beside it.
      *
-     * <p>Asserted after settling and before painting. If the dialog
-     * does not hold what was asked of it, nothing is written: a
-     * missing sheet is a question, and a mislabelled one is an
-     * answer nobody checks.
+     * <p>Handed to the coordinator as this sheet's premise, so it is
+     * asked <strong>inside</strong> the block that holds the size and
+     * paints. It used to be asserted in an event cycle of its own,
+     * between settling and painting, and that cycle is where #364's
+     * recurrence happened - the controls agreed, and the dialog was
+     * painted at the previous state's geometry anyway. A premise
+     * checked in its own cycle describes a moment that has passed.
+     *
+     * <p>It asks about format, paper and marks, and never about size:
+     * on its own it could not have caught that recurrence, and is not
+     * what now prevents it. Nothing is written when it disagrees - a
+     * missing sheet is a question, and a mislabelled one is an answer
+     * nobody checks.
      */
-    private static void requireState(JComponent content, State state)
-            throws Exception {
-        String[] wrong = new String[1];
-        SwingUtilities.invokeAndWait(() ->
-                wrong[0] = disagreement(content, state));
-        if (wrong[0] != null) {
-            throw new IllegalStateException("this sheet claims to show"
-                    + " \"" + state.title() + "\" and the dialog does"
-                    + " not agree: " + wrong[0]);
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private static String disagreement(JComponent content, State state) {
         Component format = find(content, "export.format");
@@ -375,33 +370,43 @@ public final class ExportSheetDialogSheetMain {
         return null;
     }
 
-    private static String capture(JComponent content, Path to)
+    private static String capture(Window owner, JComponent content,
+                                  State state, Path to)
             throws Exception {
         Set<String> said = new LinkedHashSet<>();
-        BufferedImage[] image = new BufferedImage[1];
-        SwingUtilities.invokeAndWait(() -> {
-            BufferedImage drawn = new BufferedImage(
-                    Math.max(1, content.getWidth()),
-                    Math.max(1, content.getHeight()),
-                    BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = drawn.createGraphics();
-            try {
-                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                g.setColor(Color.WHITE);
-                g.fillRect(0, 0, drawn.getWidth(), drawn.getHeight());
-                content.paint(g);
-            } finally {
-                g.dispose();
-            }
-            image[0] = drawn;
-            collect(content, said);
-        });
-        ImageIO.write(image[0], "png", to.toFile());
+        BufferedImage image = SheetCapture.take(owner, content,
+                SheetCapture.packed(),
+                held -> {
+                    String wrong = disagreement(held, state);
+                    return wrong == null ? null
+                            : "it claims \"" + state.title()
+                                    + "\" and " + wrong;
+                },
+                () -> {
+                    BufferedImage drawn = new BufferedImage(
+                            Math.max(1, content.getWidth()),
+                            Math.max(1, content.getHeight()),
+                            BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g = drawn.createGraphics();
+                    try {
+                        g.setRenderingHint(
+                                RenderingHints.KEY_TEXT_ANTIALIASING,
+                                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                        g.setColor(Color.WHITE);
+                        g.fillRect(0, 0, drawn.getWidth(),
+                                drawn.getHeight());
+                        content.paint(g);
+                    } finally {
+                        g.dispose();
+                    }
+                    collect(content, said);
+                    return drawn;
+                });
+        ImageIO.write(image, "png", to.toFile());
         StringBuilder out = new StringBuilder();
         out.append("![](").append(to.getFileName()).append(")\n\n")
-                .append("Packed ").append(image[0].getWidth()).append(" × ")
-                .append(image[0].getHeight()).append(" px.\n\n")
+                .append("Packed ").append(image.getWidth()).append(" × ")
+                .append(image.getHeight()).append(" px.\n\n")
                 .append("| shown, hovered or spoken |\n|---|\n");
         for (String one : said) {
             out.append("| ").append(one.replace("|", "\\|")).append(" |\n");

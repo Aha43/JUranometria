@@ -61,57 +61,15 @@ public final class SheetCapture {
      */
     private static final int ROUNDS = 40;
 
-    /**
-     * Photographs a component once its state is established.
-     *
-     * <p>Call from off the event thread: this drives the event queue
-     * and would deadlock on it.
-     *
-     * @param window the realised window the component lives in, or
-     *     {@code null} for a component with no window of its own
-     * @param content what to paint
-     * @param to where the PNG goes
+    /*
+     * There is no capture that does not say which kind of window it
+     * is photographing. The forms that did - write(window, content,
+     * to) and of(window, content) - packed whatever they were given,
+     * which is right for eight of these twelve photographers and
+     * wrong for the other four. Chart Options and Place and Time
+     * were each photographed at a width no reader meets before their
+     * kinds were declared.
      */
-    public static void write(Window window, JComponent content, Path to)
-            throws Exception {
-        BufferedImage drawn = of(window, content);
-        ImageIO.write(drawn, "png", to.toFile());
-    }
-
-    /** The same, when a caller wants the image rather than a file. */
-    public static BufferedImage of(Window window, JComponent content)
-            throws Exception {
-        if (SwingUtilities.isEventDispatchThread()) {
-            throw new IllegalStateException("capture drives the event"
-                    + " queue and cannot run on it");
-        }
-        if (content == null) {
-            throw new IllegalArgumentException(
-                    "there is nothing to photograph");
-        }
-        settle(window, content);
-        BufferedImage[] drawn = new BufferedImage[1];
-        SwingUtilities.invokeAndWait(() -> {
-            neutralFocusNow();
-            drawn[0] = paint(content);
-        });
-        return drawn[0];
-    }
-
-    /**
-     * Settles a component and whatever window it lives in.
-     *
-     * <p>The form most of the photographers use: they already hold
-     * the component they are about to paint, and the window is
-     * whatever contains it.
-     */
-    public static void settle(JComponent content) throws Exception {
-        if (content == null) {
-            throw new IllegalArgumentException(
-                    "there is nothing to settle");
-        }
-        settle(SwingUtilities.getWindowAncestor(content), content);
-    }
 
     /**
      * What a photographer is holding still.
@@ -165,6 +123,28 @@ public final class SheetCapture {
         void bring(Window window, JComponent content) throws Exception;
 
         /**
+         * Records what bringing actually settled on.
+         *
+         * <p>Called on the event thread in the <strong>same
+         * block</strong> that confirms the fixed point. Not after it:
+         * reading the geometry and remembering it were two blocks
+         * once, and a run slipped through the gap - painted 326x206
+         * with a pre-paint record reading preferred=332x206, because
+         * what {@code hold} put back was a geometry that had already
+         * drifted before it was recorded.
+         *
+         * <p>This exists so that {@code hold} can restore a proved
+         * geometry rather than derive one again. Re-deriving is what
+         * the fixed point was reached to avoid: a wrapped label's
+         * preferred width depends on the width it was last laid out
+         * at, so a fresh pack can settle on the other answer - 326
+         * where 333 was proved - and a hold that re-packs would
+         * reintroduce exactly the defect it is there to prevent.
+         */
+        default void proved(Window window, JComponent content) {
+        }
+
+        /**
          * Holds that size in the block that paints.
          *
          * <p>Bringing a window to its size and painting it later is
@@ -184,9 +164,125 @@ public final class SheetCapture {
         }
     }
 
-    /** A window whose size is its layout's preference. */
+    /**
+     * What a photograph claims to be a picture of.
+     *
+     * <p>Checked <strong>inside</strong> the block that holds the
+     * size and paints, because a premise checked anywhere else is a
+     * statement about a moment that has already passed. Export's was
+     * asserted between settling and painting, in an event cycle of
+     * its own, and that cycle is where #364's recurrence happened:
+     * the dialog agreed about its format, paper and marks, and was
+     * then painted 326x206 where its own settled record said
+     * 333x223.
+     *
+     * <p>A premise that disagrees means nothing is written. A missing
+     * sheet is a question; a mislabelled one is an answer nobody
+     * checks.
+     */
+    @FunctionalInterface
+    public interface Premise {
+
+        /**
+         * What disagrees with what was asked, or {@code null}.
+         *
+         * <p>Runs on the event thread, with nothing between it and
+         * the paint.
+         */
+        String disagreement(JComponent content);
+
+        /** A photograph that claims nothing beyond its geometry. */
+        static Premise none() {
+            return content -> null;
+        }
+    }
+
+    /**
+     * The picture itself, drawn where the state cannot move.
+     *
+     * <p>The coordinator owns the <em>sequence</em>; a photographer
+     * owns the <em>picture</em>. That division is deliberate: these
+     * studies do not all paint one component onto one image. The menu
+     * sheet composites a bar and its popups at computed offsets, the
+     * toolbar sizes to whichever of bar and popup is wider, the
+     * settings study paints at a width it chose, and several collect
+     * the words they show while the components still exist. None of
+     * that is the coordinator's business, and absorbing it would have
+     * moved bytes for no reason.
+     *
+     * <p>What is the coordinator's business is that no event cycle
+     * runs between settling the size and drawing it.
+     */
+    @FunctionalInterface
+    public interface Picture {
+
+        /**
+         * Draws, on the event thread, inside the held block.
+         *
+         * @return the image, which is written exactly as returned
+         */
+        BufferedImage draw() throws Exception;
+    }
+
+    /**
+     * A window whose size is its layout's preference.
+     *
+     * <p>Holds by <strong>restoring the geometry already proved
+     * stable</strong>, never by deriving one again. A packed
+     * window's hold was empty until #364 recurred, which made "hold
+     * that size" vacuous for eight of the twelve photographers - the
+     * size was brought to a fixed point and then simply hoped to
+     * stay there across whatever event cycles the photographer took
+     * to paint.
+     *
+     * <p>The first repair of that held by re-packing, which is worse
+     * than empty. Packing is how the fixed point is <em>found</em>,
+     * and for a layout with two answers it can find either: a
+     * wrapped label's preferred width depends on the width it was
+     * last laid out at. A hold that packs afresh can therefore
+     * choose 326 where 333 was proved, which is the defect, arriving
+     * through the repair. So what was proved is remembered and put
+     * back.
+     */
     public static Sizing packed() {
-        return SheetCapture::packToFixedPoint;
+        return new Sizing() {
+
+            private java.awt.Dimension windowWas;
+            private java.awt.Dimension contentWas;
+
+            @Override
+            public void bring(Window window, JComponent content)
+                    throws Exception {
+                packToFixedPoint(window, content);
+            }
+
+            @Override
+            public void proved(Window window, JComponent content) {
+                windowWas = window == null ? null : window.getSize();
+                contentWas = content.getSize();
+            }
+
+            @Override
+            public void hold(Window window, JComponent content) {
+                if (contentWas == null) {
+                    // Nothing was proved, so there is nothing to put
+                    // back. Refusing here would turn a capture that
+                    // never settled into a confusing second failure.
+                    return;
+                }
+                if (window != null && windowWas != null
+                        && !windowWas.equals(window.getSize())) {
+                    window.setSize(windowWas);
+                }
+                if (!contentWas.equals(content.getSize())) {
+                    content.setSize(contentWas);
+                }
+                // Lays the children out AT that size, which is how a
+                // wrapped label comes back to the width it was proved
+                // at rather than to the one it drifted to.
+                content.validate();
+            }
+        };
     }
 
     /**
@@ -248,37 +344,20 @@ public final class SheetCapture {
         };
     }
 
-    /**
-     * Settles a component and its window, with the kind stated.
+    /*
+     * There is deliberately no public "settle here, paint later".
      *
-     * <p>The form most photographers use. The window is whatever
-     * contains the component - {@code null} for a fixed canvas.
+     * <p>There was, and nine photographers used it: they settled
+     * through this coordinator and then painted in event blocks of
+     * their own. Every one of those was a gap, and #364 is what came
+     * through one - a sheet whose own settled record said 333x223
+     * beside pixels that were 326x206. Two of them were painting off
+     * the event thread entirely.
+     *
+     * <p>So the sequence is not offered in halves. A photographer
+     * hands over what to draw and gets back an image; where and when
+     * it is drawn is not its decision to make.
      */
-    public static void settle(JComponent content, Sizing sizing)
-            throws Exception {
-        if (content == null) {
-            throw new IllegalArgumentException(
-                    "there is nothing to settle");
-        }
-        settle(SwingUtilities.getWindowAncestor(content), content,
-                sizing);
-    }
-
-    /**
-     * Establishes the state for a window of a stated kind, for a
-     * photographer that paints by a route of its own.
-     */
-    public static void settle(Window window, JComponent content,
-                              Sizing sizing) throws Exception {
-        if (sizing == null) {
-            throw new IllegalArgumentException("a photographer says"
-                    + " which kind of window this is");
-        }
-        drain();
-        canonicalise(content);
-        sizing.bring(window, content);
-        settleLayout(window, content);
-    }
 
     /** An application policy needs a window to apply itself to. */
     private static void requireWindow(Window window) {
@@ -344,74 +423,123 @@ public final class SheetCapture {
     /** The same, returning the image. */
     public static BufferedImage of(Window window, JComponent content,
                                    Sizing sizing) throws Exception {
+        return take(window, content, sizing, Premise.none(),
+                () -> paint(content));
+    }
+
+    /**
+     * One uninterrupted capture, which is the whole point of it.
+     *
+     * <p>Five steps, and the reason they are one sequence rather than
+     * five things a photographer does in order:
+     *
+     * <ol>
+     *   <li>settle the declared size;</li>
+     *   <li>hold it;</li>
+     *   <li>verify the state the photograph claims;</li>
+     *   <li>record what is about to be painted;</li>
+     *   <li>paint.</li>
+     * </ol>
+     *
+     * <p>Steps 2 to 5 run in a single event block, with nothing
+     * between them. Steps 1 drives the queue and cannot.
+     *
+     * <p>#364 is what a split sequence costs. Nine photographers
+     * settled through this coordinator and then painted in blocks of
+     * their own, one or more event cycles later. Export was the one
+     * that got caught: its settled record said 333x223, its pixels
+     * were 326x206 - the geometry of the previous state, whose note
+     * label had not yet wrapped to two lines - and the premise it
+     * asserted in between agreed, because it asked about format,
+     * paper and marks and never about size. Between the fixed point
+     * and the paint there were event cycles, and something used them.
+     *
+     * <p>The repair is not to guess what. It is that there are no
+     * cycles left to use.
+     */
+    public static BufferedImage take(Window window, JComponent content,
+                                     Sizing sizing, Premise premise,
+                                     Picture picture) throws Exception {
         if (SwingUtilities.isEventDispatchThread()) {
             throw new IllegalStateException("capture drives the event"
                     + " queue and cannot run on it");
+        }
+        if (content == null) {
+            throw new IllegalArgumentException(
+                    "there is nothing to photograph");
         }
         if (sizing == null) {
             throw new IllegalArgumentException("a photographer says"
                     + " which kind of window this is");
         }
-        drain();
-        canonicalise(content);
-        sizing.bring(window, content);
-        settleLayout(window, content);
-        BufferedImage[] drawn = new BufferedImage[1];
-        SwingUtilities.invokeAndWait(() -> {
-            sizing.hold(window, content);
-            neutralFocusNow();
-            tracePrePaint(window, content);
-            drawn[0] = paint(content);
-        });
-        return drawn[0];
-    }
-
-    /**
-     * Photographs a window that decides its own size.
-     *
-     * <p>Most windows here are packed, so their size is their
-     * layout's preference and re-packing to a fixed point is the
-     * right rule. Chart Options is not: it calls
-     * {@code sizeToScreen(this, ORDINARY_WIDTH)}, so its width is a
-     * <strong>policy</strong> the dialog states, and packing it
-     * overrides that policy with a preference. That is what this
-     * coordinator was doing - photographing the dialog 394 px wide
-     * on some runs and 420 on others, the first being what pack
-     * wanted and the second what the dialog had asked for.
-     *
-     * <p>A photographer may decide when to take the picture. It may
-     * not decide how big the application is.
-     */
-    public static void writeSelfSized(Window window, JComponent content,
-                                      Path to) throws Exception {
-        if (SwingUtilities.isEventDispatchThread()) {
-            throw new IllegalStateException("capture drives the event"
-                    + " queue and cannot run on it");
+        if (premise == null || picture == null) {
+            throw new IllegalArgumentException("a capture needs what"
+                    + " it claims to show and what to draw. Premise"
+                    + " .none() says a photograph claims nothing"
+                    + " beyond its geometry; null says nothing at"
+                    + " all");
         }
         drain();
         canonicalise(content);
-        settleLayout(window, content);
+        sizing.bring(window, content);
+        // Settling reaches the fixed point AND records it, in the
+        // same event block, so nothing can move between confirming
+        // the geometry and remembering it.
+        settleLayout(window, content, sizing);
+
+        String[] wrong = new String[1];
         BufferedImage[] drawn = new BufferedImage[1];
+        Exception[] failed = new Exception[1];
         SwingUtilities.invokeAndWait(() -> {
+            sizing.hold(window, content);
             neutralFocusNow();
-            drawn[0] = paint(content);
+            wrong[0] = premise.disagreement(content);
+            if (wrong[0] != null) {
+                // Traced anyway: a refusal is exactly when somebody
+                // wants to know what the geometry was.
+                tracePrePaint(window, content);
+                return;
+            }
+            tracePrePaint(window, content);
+            try {
+                drawn[0] = picture.draw();
+            } catch (Exception cannot) {
+                failed[0] = cannot;
+            }
         });
-        ImageIO.write(drawn[0], "png", to.toFile());
+        if (wrong[0] != null) {
+            throw new IllegalStateException("this photograph does not"
+                    + " show what it says it does: " + wrong[0]);
+        }
+        if (failed[0] != null) {
+            throw failed[0];
+        }
+        return drawn[0];
+    }
+
+    /** The same, writing the image where the study keeps it. */
+    public static void take(Window window, JComponent content,
+                            Sizing sizing, Premise premise,
+                            Picture picture, Path to) throws Exception {
+        ImageIO.write(take(window, content, sizing, premise, picture),
+                "png", to.toFile());
     }
 
     /**
-     * Establishes the state a photograph is allowed to be taken in.
+     * The same, for a photographer that holds only the component.
      *
-     * <p>Public because a generator that paints by another route -
-     * one that needs the image at a size of its own - still has to
-     * establish the same state first.
+     * <p>The window is whatever contains it, which for a fixed
+     * canvas is nothing.
      */
-    public static void settle(Window window, JComponent content)
+    public static BufferedImage take(JComponent content, Sizing sizing,
+                                     Premise premise, Picture picture)
             throws Exception {
-        drain();
-        canonicalise(content);
-        packToFixedPoint(window, content);
-        settleLayout(window, content);
+        if (content == null) {
+            throw new IllegalArgumentException(
+                    "there is nothing to photograph");
+        }
+        return take(SwingUtilities.getWindowAncestor(content), content,
+                sizing, premise, picture);
     }
 
     /**
@@ -452,8 +580,8 @@ public final class SheetCapture {
         }
     }
 
-    private static void settleLayout(Window window, JComponent content)
-            throws Exception {
+    private static void settleLayout(Window window, JComponent content,
+                                     Sizing sizing) throws Exception {
         String geometry = geometryOf(content);
         for (int round = 0; round < ROUNDS; round++) {
             SwingUtilities.invokeAndWait(() -> {
@@ -463,7 +591,24 @@ public final class SheetCapture {
                 content.validate();
             });
             drain();
-            String now = geometryOf(content);
+            // Reading the geometry and remembering it must be ONE
+            // block. They were two, and the gap between them was
+            // enough: a run photographed 326x206 whose pre-paint
+            // record said preferred=332x206, because the drift
+            // arrived after the fixed point was read and before it
+            // was remembered, so the "proved" geometry that hold put
+            // back was already the wrong one.
+            String was = geometry;
+            String[] seen = new String[1];
+            SwingUtilities.invokeAndWait(() -> {
+                StringBuilder out = new StringBuilder();
+                append(out, content);
+                seen[0] = out.toString();
+                if (seen[0].equals(was)) {
+                    sizing.proved(window, content);
+                }
+            });
+            String now = seen[0];
             if (now.equals(geometry)) {
                 traceSettled(window, content, now, round);
                 // A fixed point: validating again moved nothing, and

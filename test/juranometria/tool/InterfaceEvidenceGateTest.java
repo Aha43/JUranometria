@@ -510,7 +510,7 @@ class InterfaceEvidenceGateTest {
             // declaration. Everything with a component hierarchy has
             // to ask.
             boolean capturesAnything =
-                    code.contains("SheetCapture.settle(")
+                    code.contains("SheetCapture.take(")
                             || code.contains("SheetCapture.of(")
                             || code.contains("SheetCapture.write(");
             if (capturesAnything && !asks) {
@@ -531,6 +531,97 @@ class InterfaceEvidenceGateTest {
                         + " row in a table. Both defects this"
                         + " distinction exists for were a coordinator"
                         + " assuming the kind");
+    }
+
+    /**
+     * No photographer paints outside the coordinator's block.
+     *
+     * <p>The structural half of #364's repair. The kind contract
+     * above says a photographer declares how big its window is; this
+     * says it does not decide <em>when</em> the picture is taken.
+     * Nine of these twelve settled through the coordinator and then
+     * painted in event blocks of their own, one or more cycles
+     * later, and two painted off the event thread altogether. Export
+     * is the one that got caught: 326x206 pixels beside a settled
+     * record that said 333x223.
+     *
+     * <p>Every {@code paint(} a photographer performs must lie
+     * inside a call to {@code SheetCapture.take}, {@code of} or
+     * {@code write} - textually inside, so a future generator that
+     * reintroduces the gap fails here rather than once in sixteen
+     * runs under load.
+     */
+    @Test
+    void noPhotographerPaintsOutsideTheCoordinatorsBlock()
+            throws Exception {
+        List<String> wrong = new ArrayList<>();
+        for (String name : GENERATORS.keySet()) {
+            // Page Language draws renderer output directly and owns
+            // no component hierarchy, so it has no block to be
+            // inside. It is the declared exception, named here so
+            // the exception is visible rather than implied.
+            if (name.equals("PageLanguageSheetMain")) {
+                continue;
+            }
+            String code = Files.readString(
+                            Path.of("src/juranometria/tool",
+                                    name + ".java"),
+                            StandardCharsets.UTF_8)
+                    .replaceAll("(?s)/\\*.*?\\*/", " ")
+                    .replaceAll("(?m)//.*$", " ");
+            List<int[]> blocks = capturesIn(code);
+            for (int at = code.indexOf(".paint("); at >= 0;
+                    at = code.indexOf(".paint(", at + 1)) {
+                boolean inside = false;
+                for (int[] block : blocks) {
+                    if (at > block[0] && at < block[1]) {
+                        inside = true;
+                        break;
+                    }
+                }
+                if (!inside) {
+                    wrong.add(name + " paints at offset " + at
+                            + ", outside any SheetCapture call");
+                }
+            }
+        }
+        assertEquals(List.of(), wrong,
+                "a photographer hands over what to draw and gets back"
+                        + " an image. Where and when it is drawn is"
+                        + " not its decision, because every one of"
+                        + " those decisions was an event cycle"
+                        + " something else could use");
+    }
+
+    /**
+     * The extent of each {@code SheetCapture} call in a source file.
+     *
+     * <p>From the opening parenthesis to the one that closes it, so
+     * "inside the call" means inside the lambda it was handed.
+     */
+    private static List<int[]> capturesIn(String code) {
+        List<int[]> blocks = new ArrayList<>();
+        for (String entry : List.of("SheetCapture.take(",
+                "SheetCapture.of(", "SheetCapture.write(")) {
+            for (int at = code.indexOf(entry); at >= 0;
+                    at = code.indexOf(entry, at + 1)) {
+                int open = at + entry.length() - 1;
+                int depth = 0;
+                for (int scan = open; scan < code.length(); scan++) {
+                    char one = code.charAt(scan);
+                    if (one == '(') {
+                        depth++;
+                    } else if (one == ')') {
+                        depth--;
+                        if (depth == 0) {
+                            blocks.add(new int[] {open, scan});
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return blocks;
     }
 
     /**

@@ -352,24 +352,20 @@ public final class PlaceAndTimeSheetMain {
                 SheetCapture.applicationSized(
                         "PlaceAndTimeDialog.applySizePolicy",
                         dialog::applySizePolicy);
-        SheetCapture.settle(dialog,
-                (javax.swing.JComponent) dialog.getContentPane(),
-                sizing);
         Set<String> shown = new LinkedHashSet<>();
         Set<String> spoken = new LinkedHashSet<>();
         List<String> letters = new ArrayList<>();
         BufferedImage[] image = new BufferedImage[1];
         String[] window = new String[2];
-        SwingUtilities.invokeAndWait(() -> {
-            // The policy, held where nothing can undo it. This was
-            // once a hand-written copy of the same arithmetic; the
-            // copy was right to exist and wrong to be a copy. The
-            // dialog states the policy, and this applies it with
-            // nothing between here and the paint.
-            sizing.hold(dialog,
-                    (javax.swing.JComponent) dialog.getContentPane());
-            SheetCapture.tracePrePaint(dialog,
-                    (javax.swing.JComponent) dialog.getContentPane());
+        // The policy is held, and the geometry recorded, where
+        // nothing can undo them - by the coordinator, in the block
+        // that paints. This generator did both by hand, correctly
+        // and alone; #364 showed that eight others did neither, so
+        // the sequence belongs in one place rather than in the one
+        // photographer that had learned it.
+        image[0] = SheetCapture.take(dialog,
+                (javax.swing.JComponent) dialog.getContentPane(),
+                sizing, SheetCapture.Premise.none(), () -> {
             Container content = dialog.getContentPane();
             window[0] = dialog.getTitle();
             window[1] = dialog.getAccessibleContext()
@@ -389,8 +385,8 @@ public final class PlaceAndTimeSheetMain {
             } finally {
                 g.dispose();
             }
-            image[0] = drawn;
             collect(content, shown, spoken, letters);
+            return drawn;
         });
         ImageIO.write(image[0], "png", to.toFile());
 

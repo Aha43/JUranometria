@@ -196,26 +196,35 @@ public final class InspectorSheetMain {
                 owner[0].pack();
             });
             SwingUtilities.invokeAndWait(() -> { });
-                JComponent content = panel[0];
-            // The shared rule: nothing is photographed until the
-            // queue is empty, the window has packed to a fixed
-            // point, the layout has stopped moving and focus is
-            // owned by nobody.
-            SheetCapture.settle(content, SheetCapture.packed());
-            BufferedImage image = new BufferedImage(
-                    Math.max(1, content.getWidth()),
-                    Math.max(1, content.getHeight()),
-                    BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = image.createGraphics();
-            try {
-                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                g.setColor(Color.WHITE);
-                g.fillRect(0, 0, image.getWidth(), image.getHeight());
-                content.paint(g);
-            } finally {
-                g.dispose();
-            }
+            JComponent content = panel[0];
+            // The shared rule, in one sequence: the queue is empty,
+            // the window has packed to a fixed point, the layout has
+            // stopped moving, focus is owned by nobody, the size is
+            // held - and the paint happens there, with no event
+            // cycle in between. This painted off the event thread
+            // altogether until #364; the coordinator now owns where
+            // it happens.
+            BufferedImage image = SheetCapture.take(owner[0], content,
+                    SheetCapture.packed(), SheetCapture.Premise.none(),
+                    () -> {
+                BufferedImage drawn = new BufferedImage(
+                        Math.max(1, content.getWidth()),
+                        Math.max(1, content.getHeight()),
+                        BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = drawn.createGraphics();
+                try {
+                    g.setRenderingHint(
+                            RenderingHints.KEY_TEXT_ANTIALIASING,
+                            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                    g.setColor(Color.WHITE);
+                    g.fillRect(0, 0, drawn.getWidth(),
+                            drawn.getHeight());
+                    content.paint(g);
+                } finally {
+                    g.dispose();
+                }
+                return drawn;
+            });
             ImageIO.write(image, "png", to.toFile());
             return describe(content);
         } finally {

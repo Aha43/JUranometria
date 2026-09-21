@@ -300,13 +300,13 @@ public final class AboutSheetMain {
     private static String capture(JDialog dialog, String language,
                                   boolean notices, Path to)
             throws Exception {
-        SheetCapture.settle((javax.swing.JComponent)
-                dialog.getContentPane(), SheetCapture.packed());
         Set<String> shown = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
         String[] window = new String[2];
-        SwingUtilities.invokeAndWait(() -> {
-            SheetCapture.neutralFocusNow();
+        image[0] = SheetCapture.take(dialog,
+                (javax.swing.JComponent) dialog.getContentPane(),
+                SheetCapture.packed(), SheetCapture.Premise.none(),
+                () -> {
             Container content = dialog.getContentPane();
             window[0] = dialog.getTitle();
             window[1] = dialog.getAccessibleContext()
@@ -326,8 +326,8 @@ public final class AboutSheetMain {
             } finally {
                 g.dispose();
             }
-            image[0] = drawn;
             collect(content, shown);
+            return drawn;
         });
         ImageIO.write(image[0], "png", to.toFile());
 

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,6 +41,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * omitted that and still produced 324 px three times in sixteen.
  */
 class SheetCaptureSizingTest {
+
+    /** Draws a component at whatever size it currently has. */
+    private static java.awt.image.BufferedImage draw(JPanel content) {
+        java.awt.image.BufferedImage drawn =
+                new java.awt.image.BufferedImage(
+                        Math.max(1, content.getWidth()),
+                        Math.max(1, content.getHeight()),
+                        java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = drawn.createGraphics();
+        try {
+            content.paint(g);
+        } finally {
+            g.dispose();
+        }
+        return drawn;
+    }
 
     /** A panel whose preference is its own, and known. */
     private static JPanel canvas(int wide, int high) {
@@ -286,6 +303,267 @@ class SheetCaptureSizingTest {
         } finally {
             dispose(dialog[0], owner[0]);
             Files.deleteIfExists(trace);
+        }
+    }
+
+    /**
+     * A layout with two answers, which is what #364 was made of.
+     *
+     * <p>The export dialog's note label wraps to two lines for one
+     * paper size and one for another, and a wrapped label's
+     * preferred width depends on the width it was last laid out at.
+     * So the same dialog has two stable geometries - 333x223 and
+     * 326x206, the exact pair the recurrence disagreed over - and
+     * which one a fresh pack finds depends on where it starts.
+     *
+     * <p>A flag stands in for the wrap, so the bistability is
+     * deterministic instead of once in sixteen runs under load.
+     */
+    private static final class Bistable extends JPanel {
+
+        private boolean narrow;
+
+        @Override
+        public Dimension getPreferredSize() {
+            return narrow ? new Dimension(326, 206)
+                    : new Dimension(333, 223);
+        }
+    }
+
+    /** Wraps a sizing so a change can be posted at a chosen moment. */
+    private static SheetCapture.Sizing changing(
+            SheetCapture.Sizing inner, Runnable atProved) {
+        return new SheetCapture.Sizing() {
+            @Override
+            public void bring(java.awt.Window window,
+                              javax.swing.JComponent panel)
+                    throws Exception {
+                inner.bring(window, panel);
+            }
+
+            @Override
+            public void proved(java.awt.Window window,
+                               javax.swing.JComponent panel) {
+                inner.proved(window, panel);
+                // Posted once the geometry is proved and before the
+                // block that paints: pending BETWEEN settling and
+                // painting, which is where #364 lived.
+                SwingUtilities.invokeLater(atProved);
+            }
+
+            @Override
+            public void hold(java.awt.Window window,
+                             javax.swing.JComponent panel) {
+                inner.hold(window, panel);
+            }
+        };
+    }
+
+    /**
+     * A change between settling and painting does not reach the
+     * picture.
+     *
+     * <p>The deterministic model of the recurrence. The layout is
+     * proved at 333x223; a re-layout to the other answer becomes
+     * pending before the paint block runs; the picture must still be
+     * the proved one.
+     *
+     * <p>This fails if {@code hold} is empty - which it was, for
+     * eight of twelve photographers - and it fails just as surely if
+     * {@code hold} re-packs, because packing is how a fixed point is
+     * <em>found</em> and a bistable layout has two to find. Putting
+     * back what was proved is the only hold that passes.
+     */
+    @Test
+    void aChangeBetweenSettlingAndPaintingDoesNotReachThePicture()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        Bistable[] content = new Bistable[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new JDialog(owner[0]);
+                content[0] = new Bistable();
+                content[0].setOpaque(true);
+                dialog[0].setContentPane(content[0]);
+                dialog[0].pack();
+            });
+            SheetCapture.Sizing packed = SheetCapture.packed();
+            SheetCapture.Sizing drifting = changing(packed, () -> {
+                content[0].narrow = true;
+                // A re-layout invalidates up the tree, which is what
+                // makes the new answer reachable at all: a valid
+                // container returns its CACHED preferred size, so a
+                // pack alone would quietly keep the old one.
+                content[0].invalidate();
+                dialog[0].invalidate();
+                dialog[0].pack();
+            });
+
+            var drawn = SheetCapture.of(dialog[0], content[0], drifting);
+
+            assertEquals(333, drawn.getWidth(),
+                    "the picture is of the geometry that was proved."
+                            + " 326 here is the other stable answer -"
+                            + " the one the recurrence painted while"
+                            + " its own settled record said 333");
+            assertEquals(223, drawn.getHeight());
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /**
+     * Nothing runs between verifying the state and painting it.
+     *
+     * <p>The other half of the sequence. Here the change becomes
+     * pending from inside the block, after the premise has agreed:
+     * if the paint is in that same block it cannot land, and if the
+     * paint is moved to a block of its own it lands in between - a
+     * dialog that agreed about its format and was then painted at
+     * another state's geometry, which is what the retained pair
+     * showed.
+     */
+    @Test
+    void nothingRunsBetweenVerifyingTheStateAndPaintingIt()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        Bistable[] content = new Bistable[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new JDialog(owner[0]);
+                content[0] = new Bistable();
+                content[0].setOpaque(true);
+                dialog[0].setContentPane(content[0]);
+                dialog[0].pack();
+            });
+
+            var drawn = SheetCapture.take(dialog[0], content[0],
+                    SheetCapture.packed(),
+                    held -> {
+                        SwingUtilities.invokeLater(() -> {
+                            content[0].narrow = true;
+                            content[0].invalidate();
+                            dialog[0].invalidate();
+                            dialog[0].pack();
+                        });
+                        return null;
+                    },
+                    () -> draw(content[0]));
+
+            assertEquals(333, drawn.getWidth(),
+                    "the premise agreed and the paint followed it in"
+                            + " the same block, so the change queued"
+                            + " between them had nowhere to run");
+            assertEquals(223, drawn.getHeight());
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /**
+     * The premise is asked inside the same block, and refuses there.
+     *
+     * <p>Export asserted its premise in an event cycle of its own,
+     * between settling and painting. It agreed, and the sheet was
+     * wrong anyway. A premise is only a statement about the moment
+     * it is asked in.
+     */
+    @Test
+    void aPremiseThatDisagreesRefusesAndNothingIsDrawn()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JPanel[] content = new JPanel[1];
+        boolean[] drew = {false};
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("premise");
+                content[0] = canvas(300, 200);
+                owner[0].setContentPane(content[0]);
+            });
+            IllegalStateException refused = assertThrows(
+                    IllegalStateException.class,
+                    () -> SheetCapture.take(owner[0], content[0],
+                            SheetCapture.packed(),
+                            held -> "the format is letter, not a4",
+                            () -> {
+                                drew[0] = true;
+                                return new java.awt.image.BufferedImage(
+                                        1, 1, java.awt.image.BufferedImage
+                                                .TYPE_INT_RGB);
+                            }));
+            assertTrue(refused.getMessage().contains("letter"),
+                    "the refusal carries what disagreed: "
+                            + refused.getMessage());
+            assertFalse(drew[0],
+                    "and nothing is drawn. A missing sheet is a"
+                            + " question; a mislabelled one is an"
+                            + " answer nobody checks");
+        } finally {
+            dispose(owner[0]);
+        }
+    }
+
+    /**
+     * The premise sees the size that will be painted, not the
+     * settled one.
+     *
+     * <p>It is asked after {@code hold}, so an application-sized
+     * window's premise can reason about the geometry the reader
+     * actually gets.
+     */
+    @Test
+    void thePremiseSeesTheHeldGeometry() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        JPanel[] content = new JPanel[1];
+        int[] sawWidth = {-1};
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new JDialog(owner[0]);
+                content[0] = canvas(300, 200);
+                dialog[0].setContentPane(content[0]);
+                dialog[0].pack();
+            });
+            SheetCapture.Sizing widening = new SheetCapture.Sizing() {
+                @Override
+                public void bring(java.awt.Window window,
+                                  javax.swing.JComponent panel) {
+                    dialog[0].pack();
+                }
+
+                @Override
+                public void hold(java.awt.Window window,
+                                 javax.swing.JComponent panel) {
+                    content[0].setSize(480, content[0].getHeight());
+                    content[0].validate();
+                }
+            };
+            SheetCapture.take(dialog[0], content[0], widening,
+                    held -> {
+                        sawWidth[0] = held.getWidth();
+                        return null;
+                    },
+                    () -> new java.awt.image.BufferedImage(1, 1,
+                            java.awt.image.BufferedImage.TYPE_INT_RGB));
+            assertEquals(480, sawWidth[0],
+                    "the premise is asked after hold, so it sees the"
+                            + " geometry the picture will have rather"
+                            + " than the one it was settled at");
+        } finally {
+            dispose(dialog[0], owner[0]);
         }
     }
 

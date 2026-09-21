@@ -398,12 +398,11 @@ public final class ChartKeyboardSheetMain {
 
     private static String capture(ChartKeyboard palette, String language,
                                   Path to) throws Exception {
-        SheetCapture.settle(palette, SheetCapture.packed());
         Set<String> shown = new LinkedHashSet<>();
         List<String> spoken = new ArrayList<>();
         BufferedImage[] image = new BufferedImage[1];
-        SwingUtilities.invokeAndWait(() -> {
-            SheetCapture.neutralFocusNow();
+        image[0] = SheetCapture.take(palette, SheetCapture.packed(),
+                SheetCapture.Premise.none(), () -> {
             BufferedImage drawn = new BufferedImage(
                     Math.max(1, palette.getWidth()),
                     Math.max(1, palette.getHeight()),
@@ -419,8 +418,8 @@ public final class ChartKeyboardSheetMain {
             } finally {
                 g.dispose();
             }
-            image[0] = drawn;
             collect(palette, shown, spoken);
+            return drawn;
         });
         ImageIO.write(image[0], "png", to.toFile());
 
