@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -200,49 +201,86 @@ class SheetCaptureSizingTest {
     /**
      * A policy that never settles refuses, and says enough to act on.
      *
-     * <p>The refusal used to say only that it had not settled in N
-     * applications, which tells the next reader nothing about what
-     * to look at.
+     * <p>Driven through the convergence seam with in-memory sizes
+     * rather than a real dialog. The earlier version invented widths
+     * on an unshown native window and trusted it to keep them; under
+     * a virtual display it does not always, so the policy appeared
+     * to settle and the refusal never came. That test passed on one
+     * machine and failed on another from identical inputs - which is
+     * the defect this whole issue is about, committed in a test.
+     *
+     * <p>What is worth holding here is the loop's own rule: a size
+     * that is different every time it is asked for has no answer to
+     * photograph. That rule is arithmetic, and needs no window.
      */
     @Test
     void aPolicyThatNeverSettlesRefusesAndNamesTheGeometry()
             throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a real window has to be sized");
-        JFrame[] owner = new JFrame[1];
-        JDialog[] dialog = new JDialog[1];
-        JPanel[] content = new JPanel[1];
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                owner[0] = new JFrame("owner");
-                dialog[0] = new JDialog(owner[0]);
-                content[0] = canvas(300, 200);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
-            });
-            int[] grows = {400};
-            Runnable never = () -> dialog[0].setSize(grows[0]++,
-                    dialog[0].getHeight());
+        int[] wider = {400};
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> SheetCapture.converge("test.neverSettles",
+                        new SheetCapture.Settling() {
+                            @Override
+                            public void apply() {
+                            }
 
-            IllegalStateException refused = assertThrows(
-                    IllegalStateException.class,
-                    () -> SheetCapture.of(dialog[0], content[0],
-                            SheetCapture.applicationSized("test.neverSettles", never, never)));
-            String said = refused.getMessage();
-            assertTrue(said.contains("never") && said.contains("settled"),
-                    said);
-            assertTrue(said.contains("prefers") && said.contains("300x200"),
-                    "the refusal names what the content prefers: "
-                            + said);
-            assertTrue(said.contains("brought the window to"),
-                    "and the size the policy last produced: " + said);
-            assertTrue(said.contains("test.neverSettles"),
-                    "and NAMES the policy - a lambda's generated"
-                            + " class name points nowhere a reader"
-                            + " can open: " + said);
-        } finally {
-            dispose(dialog[0], owner[0]);
-        }
+                            @Override
+                            public void letTheQueueRun() {
+                            }
+
+                            @Override
+                            public Dimension observe() {
+                                return new Dimension(wider[0]++, 200);
+                            }
+
+                            @Override
+                            public String describe() {
+                                return "its content is 300x200 and"
+                                        + " prefers 300x200";
+                            }
+                        }));
+        String said = refused.getMessage();
+        assertTrue(said.contains("never") && said.contains("settled"),
+                said);
+        assertTrue(said.contains("test.neverSettles"),
+                "the refusal NAMES the policy - a lambda's generated"
+                        + " class name points nowhere a reader can"
+                        + " open: " + said);
+        assertTrue(said.contains("300x200"),
+                "and says what the content is and prefers: " + said);
+    }
+
+    /**
+     * A settled policy is one whose answer survives its own queue.
+     *
+     * <p>The other half of the same rule, so the refusal above is
+     * not passing for want of any answer at all.
+     */
+    @Test
+    void aPolicyWhoseAnswerRepeatsHasSettled() throws Exception {
+        int[] asked = {0};
+        Dimension settled = SheetCapture.converge("test.steady",
+                new SheetCapture.Settling() {
+                    @Override
+                    public void apply() {
+                    }
+
+                    @Override
+                    public void letTheQueueRun() {
+                    }
+
+                    @Override
+                    public Dimension observe() {
+                        asked[0]++;
+                        return new Dimension(420, 263);
+                    }
+                });
+        assertEquals(new Dimension(420, 263), settled,
+                "the size it settled on is returned");
+        assertEquals(2, asked[0],
+                "and it took two observations to know that, which is"
+                        + " the least that can establish a repeat");
     }
 
     /** An application policy with no window is an impossible claim. */
@@ -662,78 +700,73 @@ class SheetCaptureSizingTest {
     }
 
     /**
-     * A size that only exists until the queue runs is not a size.
+     * A size that only lasts until the queue runs is not a size.
      *
      * <p>The second failure mode. An application policy sets the
      * window to 420 and the peer answers, an event cycle later, by
-     * pulling an unshown window back to its packed width. Read
-     * inside the block that applied it, the answer is 420 every
-     * time and the capture settles immediately on a width the
-     * window does not have by the time anything is painted. Read
-     * after the queue has been drained, the answer is what the
-     * window actually kept.
+     * pulling an unshown window back to its packed width - landing
+     * somewhere slightly different each time, as this dialog's two
+     * stable widths do. Observed inside the block that applied the
+     * policy, the answer is 420 every round and the capture settles
+     * at once on a width the window does not have by the time
+     * anything is painted. Observed after the queue has run, the
+     * answer is what the window actually kept.
      *
-     * <p>So this policy must never settle, and must refuse naming
-     * itself - rather than reporting a confident 420 that was true
-     * for one event cycle. This is the shape of what was
-     * photographed: 324x263 with 420x263 recorded as proved.
+     * <p>Held in memory rather than through a real dialog. The
+     * earlier version relied on an unshown native window keeping
+     * invented sizes, which under a virtual display it does not
+     * always do - so the transient never appeared, the refusal never
+     * came, and the contract passed on one machine and failed on
+     * another from identical inputs.
      */
     @Test
     void aSizeThatOnlyLastsUntilTheQueueRunsIsNotSettled()
             throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a real window has to be sized");
-        JFrame[] owner = new JFrame[1];
-        JDialog[] dialog = new JDialog[1];
-        JPanel[] content = new JPanel[1];
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                owner[0] = new JFrame("owner");
-                dialog[0] = new JDialog(owner[0]);
-                content[0] = canvas(326, 263);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
-            });
-            // States 420, and something undoes it on the next
-            // cycle - which is precisely what the peer does to an
-            // unshown window - landing somewhere slightly different
-            // each time, as this dialog's two stable widths do.
-            //
-            // Read inside the block that applied it, the answer is
-            // 420 every round and the policy looks settled at once.
-            // Read after the queue has run, the answer is what the
-            // window kept, and it is never twice the same.
-            int[] kept = {324};
-            Runnable transient420 = () -> {
-                dialog[0].setSize(420, dialog[0].getHeight());
-                dialog[0].invalidate();
-                dialog[0].validate();
-                int back = kept[0]++;
-                SwingUtilities.invokeLater(() -> {
-                    dialog[0].setSize(back, dialog[0].getHeight());
-                    dialog[0].invalidate();
-                    dialog[0].validate();
-                });
-            };
+        // What the window "is", as the policy and the peer take
+        // turns with it.
+        Dimension[] size = {new Dimension(326, 263)};
+        int[] peerKeeps = {324};
+        List<String> order = new ArrayList<>();
 
-            IllegalStateException refused = assertThrows(
-                    IllegalStateException.class,
-                    () -> SheetCapture.of(dialog[0], content[0],
-                            SheetCapture.applicationSized(
-                                    "test.transientFloor", transient420,
-                                    transient420)));
-            assertTrue(refused.getMessage()
-                            .contains("test.transientFloor"),
-                    "the refusal names the policy: "
-                            + refused.getMessage());
-            assertTrue(refused.getMessage().contains("never")
-                            && refused.getMessage().contains("settled"),
-                    "and says it never settled, rather than reporting"
-                            + " the 420 it held for one event cycle: "
-                            + refused.getMessage());
-        } finally {
-            dispose(dialog[0], owner[0]);
-        }
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> SheetCapture.converge("test.transientFloor",
+                        new SheetCapture.Settling() {
+                            @Override
+                            public void apply() {
+                                order.add("apply");
+                                size[0] = new Dimension(420, 263);
+                            }
+
+                            @Override
+                            public void letTheQueueRun() {
+                                order.add("queue");
+                                // The peer's answer, a cycle later.
+                                size[0] = new Dimension(peerKeeps[0]++,
+                                        263);
+                            }
+
+                            @Override
+                            public Dimension observe() {
+                                order.add("observe");
+                                return size[0];
+                            }
+                        }));
+
+        assertTrue(refused.getMessage().contains("test.transientFloor"),
+                "the refusal names the policy: "
+                        + refused.getMessage());
+        assertTrue(refused.getMessage().contains("never")
+                        && refused.getMessage().contains("settled"),
+                "and says it never settled, rather than reporting the"
+                        + " 420 it held for one event cycle: "
+                        + refused.getMessage());
+        assertEquals(List.of("apply", "queue", "observe"),
+                order.subList(0, 3),
+                "because the size is observed AFTER the queue has"
+                        + " run. Observing before it is how a 420 the"
+                        + " peer had already answered with 324 got"
+                        + " recorded as settled");
     }
 
     /** Runs a body with the capture trace pointed at a file. */
