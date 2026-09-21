@@ -119,56 +119,53 @@ public final class SheetCapture {
      */
     public interface Sizing {
 
-        /** Brings the window to its size, or throws if it cannot. */
-        void bring(Window window, JComponent content) throws Exception;
+        /**
+         * Discovers the geometry. May pack.
+         *
+         * <p>Packing is how a size is <em>found</em>, and finding is
+         * allowed to be expensive and allowed to be repeated until
+         * it stops moving. What it may not be is repeated later, in
+         * the block that paints, because a layout with more than one
+         * stable answer can be found at a different one.
+         */
+        void establish(Window window, JComponent content)
+                throws Exception;
 
         /**
-         * Records what bringing actually settled on.
+         * The second stage of establishing: states the size at the
+         * fixed point, without packing.
          *
-         * <p>Called on the event thread in the <strong>same
-         * block</strong> that confirms the fixed point. Not after it:
-         * reading the geometry and remembering it were two blocks
-         * once, and a run slipped through the gap - painted 326x206
-         * with a pre-paint record reading preferred=332x206, because
-         * what {@code hold} put back was a geometry that had already
-         * drifted before it was recorded.
+         * <p>Called on the event thread in the same block that
+         * confirms the fixed point, <strong>immediately before the
+         * geometry is proved</strong> - so what gets proved is the
+         * policy's answer rather than whatever the layout drifted to
+         * while it settled. Establishing converged on 420 and the
+         * fixed point found 326, and 326 was what got written down,
+         * until this stage existed.
          *
-         * <p>This exists so that {@code hold} can restore a proved
-         * geometry rather than derive one again. Re-deriving is what
-         * the fixed point was reached to avoid: a wrapped label's
-         * preferred width depends on the width it was last laid out
-         * at, so a fresh pack can settle on the other answer - 326
-         * where 333 was proved - and a hold that re-packs would
-         * reintroduce exactly the defect it is there to prevent.
+         * <p>It must not pack. Packing is stage one's business,
+         * because packing is how a size is <em>discovered</em> and a
+         * layout with two stable answers can be discovered at
+         * either. Stage two only says the size that stage one
+         * arrived at.
+         *
+         * <p>This does <strong>not</strong> run in the block that
+         * paints. Nothing does: the paint block restores the proved
+         * snapshot and draws it, and an earlier version of this
+         * method which ran there was measurably destructive - it
+         * addressed the unshown native window and its validation
+         * pulled the content back to 324 px, undoing a restoration
+         * that had already succeeded.
          */
-        default void proved(Window window, JComponent content) {
-        }
-
-        /**
-         * Holds that size in the block that paints.
-         *
-         * <p>Bringing a window to its size and painting it later is
-         * not enough, and this is the second time that lesson has
-         * been learned here: focus had to be declared in the paint
-         * block because the desktop grants it asynchronously, and a
-         * size has to be held there because <strong>the peer pulls
-         * an unshown window back to its packed size an event cycle
-         * later</strong>. Place and Time's generator carried a
-         * hand-written restore for exactly that, immediately before
-         * painting, and it was right to.
-         *
-         * <p>Runs on the event thread, with nothing between it and
-         * the paint.
-         */
-        default void hold(Window window, JComponent content) {
+        default void restate(Window window, JComponent content) {
         }
     }
 
     /**
      * What a photograph claims to be a picture of.
      *
-     * <p>Checked <strong>inside</strong> the block that holds the
-     * size and paints, because a premise checked anywhere else is a
+     * <p>Checked <strong>inside</strong> the block that restores
+     * the geometry and paints, because a premise checked anywhere else is a
      * statement about a moment that has already passed. Export's was
      * asserted between settling and painting, in an event cycle of
      * its own, and that cycle is where #364's recurrence happened:
@@ -227,104 +224,83 @@ public final class SheetCapture {
     /**
      * A window whose size is its layout's preference.
      *
-     * <p>Holds by <strong>restoring the geometry already proved
-     * stable</strong>, never by deriving one again. A packed
-     * window's hold was empty until #364 recurred, which made "hold
-     * that size" vacuous for eight of the twelve photographers - the
-     * size was brought to a fixed point and then simply hoped to
-     * stay there across whatever event cycles the photographer took
-     * to paint.
+     * <p>One stage only: packing to a fixed point <em>is</em> the
+     * establishment. Nothing is restated afterwards, and the
+     * geometry proved at that fixed point is put back by the
+     * coordinator in the block that paints.
      *
-     * <p>The first repair of that held by re-packing, which is worse
-     * than empty. Packing is how the fixed point is <em>found</em>,
-     * and for a layout with two answers it can find either: a
-     * wrapped label's preferred width depends on the width it was
-     * last laid out at. A hold that packs afresh can therefore
-     * choose 326 where 333 was proved, which is the defect, arriving
-     * through the repair. So what was proved is remembered and put
-     * back.
+     * <p>Where that restoration lives was learned in four steps. It
+     * did not exist, which made holding a size vacuous for eight of
+     * twelve photographers. Restoring by re-packing was worse than
+     * nothing: packing is how a fixed point is <em>found</em>, and a
+     * layout with two answers can be found at either, so a fresh
+     * pack could choose 326 where 333 had been proved. Keeping the
+     * restoration in the packed policy alone left the
+     * application-sized captures without it. And calling any policy
+     * in the paint block, before or after the restoration, was
+     * destructive in both orders.
      */
     public static Sizing packed() {
-        return new Sizing() {
-
-            private java.awt.Dimension windowWas;
-            private java.awt.Dimension contentWas;
-
-            @Override
-            public void bring(Window window, JComponent content)
-                    throws Exception {
-                packToFixedPoint(window, content);
-            }
-
-            @Override
-            public void proved(Window window, JComponent content) {
-                windowWas = window == null ? null : window.getSize();
-                contentWas = content.getSize();
-            }
-
-            @Override
-            public void hold(Window window, JComponent content) {
-                if (contentWas == null) {
-                    // Nothing was proved, so there is nothing to put
-                    // back. Refusing here would turn a capture that
-                    // never settled into a confusing second failure.
-                    return;
-                }
-                if (window != null && windowWas != null
-                        && !windowWas.equals(window.getSize())) {
-                    window.setSize(windowWas);
-                }
-                if (!contentWas.equals(content.getSize())) {
-                    content.setSize(contentWas);
-                }
-                // Lays the children out AT that size, which is how a
-                // wrapped label comes back to the width it was proved
-                // at rather than to the one it drifted to.
-                content.validate();
-            }
-        };
+        return SheetCapture::packToFixedPoint;
     }
 
     /**
      * A window whose size is a policy the application states.
      *
-     * @param policy the application's own sizing, re-applied here
-     *     rather than imitated
+     * <p>Two operations, because discovering a size and re-stating
+     * one are different acts. Establishing may pack - that is how
+     * the height is found. Re-stating may not, because packing a
+     * layout with more than one stable answer can return a
+     * different one, and on an unshown window the peer can answer a
+     * pack before the floor is applied.
+     *
+     * @param name the policy's name, so a refusal points somewhere
+     *     a reader can open
+     * @param establish the application's own sizing, applied until
+     *     it stops changing
+     * @param restate stage two: the same size stated at the fixed
+     *     point, without packing
      */
     public static Sizing applicationSized(String name,
-                                          Runnable policy) {
+                                          Runnable establish,
+                                          Runnable restate) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("a policy is named so"
                     + " that a refusal points at something a reader"
                     + " can open. A lambda's generated class name"
                     + " does not");
         }
-        if (policy == null) {
+        if (establish == null || restate == null) {
             throw new IllegalArgumentException("an application-sized"
                     + " window is sized by the application, so there"
-                    + " has to be a policy to apply");
+                    + " has to be a policy to apply and a way to say"
+                    + " it again without packing");
         }
         return new Sizing() {
 
             @Override
-            public void hold(Window window, JComponent content) {
-                // Idempotent, and applied where nothing can undo it.
-                policy.run();
+            public void restate(Window window, JComponent content) {
+                restate.run();
             }
 
             @Override
-            public void bring(Window window, JComponent content)
+            public void establish(Window window, JComponent content)
                     throws Exception {
                 requireWindow(window);
                 java.awt.Dimension was = null;
                 for (int round = 0; round < ROUNDS; round++) {
+                    SwingUtilities.invokeAndWait(establish);
+                    drain();
+                    // Observed AFTER the queue is drained, never
+                    // inside the block that applied it. A size read
+                    // in that block can be a 420 the peer has
+                    // already answered with 324 - a transient, and
+                    // recording it as settled is how a capture came
+                    // to hold a geometry the window no longer had.
                     java.awt.Dimension[] now =
                             new java.awt.Dimension[1];
-                    SwingUtilities.invokeAndWait(() -> {
-                        policy.run();
-                        now[0] = window.getSize();
-                    });
-                    drain();
+                    SwingUtilities.invokeAndWait(() ->
+                            now[0] = window.getSize());
                     if (now[0].equals(was)) {
                         return;
                     }
@@ -402,6 +378,35 @@ public final class SheetCapture {
      * table that can drift.
      */
     public static Sizing fixedCanvas() {
+        return fixedCanvas(() -> { });
+    }
+
+    /**
+     * A canvas the study sizes itself, with the operation that does
+     * it.
+     *
+     * <p>A fixed canvas means <strong>the study owns the canvas
+     * geometry</strong> - not that the geometry may first be chosen
+     * while drawing. The settings study laid itself out inside its
+     * picture, moving from 0x0 to 560x309 as it drew, and under the
+     * movement contract that is drawing establishing state. It was
+     * legitimate in the old model and is in the wrong phase in this
+     * one.
+     *
+     * <p>So the canvas is established here, before anything is
+     * proved, and the picture allocates and paints from a geometry
+     * that was already settled on.
+     *
+     * @param establish sizes the component and lays it out, on the
+     *     event thread
+     */
+    public static Sizing fixedCanvas(Runnable establish) {
+        if (establish == null) {
+            throw new IllegalArgumentException("a fixed canvas is"
+                    + " sized by the study, so there has to be an"
+                    + " operation that sizes it - or the no-argument"
+                    + " form, for a canvas already established");
+        }
         return (window, content) -> {
             if (window != null) {
                 throw new IllegalArgumentException("a fixed canvas"
@@ -410,6 +415,8 @@ public final class SheetCapture {
                         + ", so it is a window with a size, and its"
                         + " kind should say which");
             }
+            SwingUtilities.invokeAndWait(establish);
+            drain();
         };
     }
 
@@ -435,7 +442,7 @@ public final class SheetCapture {
      *
      * <ol>
      *   <li>settle the declared size;</li>
-     *   <li>hold it;</li>
+     *   <li>restore it;</li>
      *   <li>verify the state the photograph claims;</li>
      *   <li>record what is about to be painted;</li>
      *   <li>paint.</li>
@@ -479,24 +486,107 @@ public final class SheetCapture {
                     + " beyond its geometry; null says nothing at"
                     + " all");
         }
+        holding = true;
+        try {
+            return photograph(window, content, sizing, premise,
+                    picture);
+        } finally {
+            // Written once the picture is taken, never between the
+            // steps it describes.
+            flushCheckpoints();
+        }
+    }
+
+    private static BufferedImage photograph(Window window,
+                                            JComponent content,
+                                            Sizing sizing,
+                                            Premise premise,
+                                            Picture picture)
+            throws Exception {
         drain();
         canonicalise(content);
-        sizing.bring(window, content);
+        sizing.establish(window, content);
         // Settling reaches the fixed point AND records it, in the
         // same event block, so nothing can move between confirming
-        // the geometry and remembering it.
-        settleLayout(window, content, sizing);
+        // the geometry and remembering it. The COORDINATOR records
+        // it, not the sizing: every kind of capture has a geometry
+        // that was proved, so every kind gets it put back, and a
+        // policy cannot forget to.
+        java.awt.Dimension[] proved = new java.awt.Dimension[2];
+        settleLayout(window, content, sizing, proved);
 
         String[] wrong = new String[1];
         BufferedImage[] drawn = new BufferedImage[1];
         Exception[] failed = new Exception[1];
+        String[] moved = new String[1];
         SwingUtilities.invokeAndWait(() -> {
-            sizing.hold(window, content);
+            // FOCUS FIRST, before the geometry is settled on.
+            //
+            // It used to run between the policy and the paint, and
+            // it was the only active operation in that gap - the gap
+            // where a dialog whose policy had just stated 420 was
+            // photographed at 326, with no drift recorded because
+            // the geometry was still right when the restoration
+            // looked. Clearing the focus owner reaches the peer, and
+            // a peer asked about an unshown window can answer by
+            // resizing it. So focus is declared first and the
+            // geometry is established after it, leaving nothing
+            // between the geometry and the paint.
             neutralFocusNow();
+
+            // The proved snapshot is put back, for every kind of
+            // capture, and that is the whole of it. No sizing
+            // operation runs here.
+            //
+            // Both halves of that are measured. Calling the
+            // application's policy after the restoration undid it:
+            // the content pane was already back at the proved 420,
+            // and addressing the unshown window pulled it to 324.
+            // And calling the policy BEFORE the restoration was
+            // worse still - Place and Time disagreed with its
+            // committed bytes in 23 of 32 runs, because the geometry
+            // recorded at the fixed point was sometimes the packed
+            // width the peer had pulled it back to. Both problems
+            // belong to establishment, and that is where they are
+            // now solved.
+            // The proved snapshot is put back, and NOTHING else
+            // touches the geometry after it.
+            //
+            // A policy call used to follow this, and it was the last
+            // thing left doing harm: the coordinator had already
+            // restored the content pane to the proved 420, and
+            // re-stating the size through the window pulled it back
+            // to 324, because on an unshown window the peer answers
+            // setSize with the packed width. The correction was
+            // succeeding and the policy was undoing it. So the
+            // policy establishes the geometry BEFORE the proof, and
+            // the block that paints only puts the snapshot back.
+            restoreProved(window, content, proved);
+
+            // Checked, not assumed: if the geometry is not what was
+            // proved even after restoring it, nothing may be
+            // painted.
+            moved[0] = whatMoved("restoring its geometry", content,
+                    proved[1]);
+            if (moved[0] != null) {
+                tracePrePaint(window, content);
+                return;
+            }
+
+            // From here the geometry is the answer, and anything
+            // that changes it invalidates the photograph rather than
+            // altering it.
+            java.awt.Dimension settledOn = content.getSize();
             wrong[0] = premise.disagreement(content);
             if (wrong[0] != null) {
-                // Traced anyway: a refusal is exactly when somebody
-                // wants to know what the geometry was.
+                // Recorded anyway: a refusal is exactly when
+                // somebody wants to know what the geometry was.
+                tracePrePaint(window, content);
+                return;
+            }
+            moved[0] = whatMoved("asking its premise", content,
+                    settledOn);
+            if (moved[0] != null) {
                 tracePrePaint(window, content);
                 return;
             }
@@ -505,11 +595,21 @@ public final class SheetCapture {
                 drawn[0] = picture.draw();
             } catch (Exception cannot) {
                 failed[0] = cannot;
+                return;
             }
+            moved[0] = whatMoved("drawing", content, settledOn);
         });
+        // Cleared once the capture is over, so the next one cannot
+        // inherit this one's name. A stale subject is worse than
+        // none: it labels a line with the wrong sheet, and a
+        // diagnosis that trusts it reads the wrong window.
+        tracing(null);
         if (wrong[0] != null) {
             throw new IllegalStateException("this photograph does not"
                     + " show what it says it does: " + wrong[0]);
+        }
+        if (moved[0] != null) {
+            throw new IllegalStateException(moved[0]);
         }
         if (failed[0] != null) {
             throw failed[0];
@@ -563,14 +663,65 @@ public final class SheetCapture {
     }
 
     /** Records one settled capture, if anybody asked for a trace. */
-    static void trace(String what, String detail) {
+    /**
+     * What the next trace lines are about, in the generator's words.
+     *
+     * <p>A trace used to be read by counting lines: the fourth
+     * `settled` was the fourth sheet, and a reader had to know the
+     * generator's order to say which. That is exactly the kind of
+     * knowledge a diagnostic should not require - the one occurrence
+     * anybody needed to read was mapped to its sheet by hand, from
+     * the order the sheets happen to be written in.
+     *
+     * <p>Set by the generator before each capture; every line
+     * afterwards carries it. Off by default, like the rest of the
+     * trace, and it changes nothing that is written to a study.
+     */
+    private static volatile String subject = "";
+
+    /** Names what is about to be captured, for the trace. */
+    public static void tracing(String what) {
+        subject = what == null ? "" : what;
+    }
+
+    /**
+     * Checkpoints held in memory until the picture is taken.
+     *
+     * <p>Writing a trace line is file I/O, and doing it on the event
+     * thread between the steps being traced changes their timing.
+     * That is not a theory: a Place and Time disagreement reproduced
+     * 2 times in 32 with six checkpoints, and 0 in 32 with eight -
+     * the instrument moved what it was measuring, and the extra
+     * writes hid the race rather than explaining it.
+     *
+     * <p>So checkpoints are appended to a list while a capture runs
+     * and written once it is over. The record is identical; the
+     * timing of the thing recorded is left alone.
+     */
+    private static final java.util.List<String> CHECKPOINTS =
+            new java.util.ArrayList<>();
+
+    /** Whether checkpoints are being held rather than written. */
+    private static volatile boolean holding;
+
+    /** Writes everything held, and stops holding. */
+    private static void flushCheckpoints() {
+        holding = false;
+        java.util.List<String> said;
+        synchronized (CHECKPOINTS) {
+            if (CHECKPOINTS.isEmpty()) {
+                return;
+            }
+            said = new java.util.ArrayList<>(CHECKPOINTS);
+            CHECKPOINTS.clear();
+        }
         String file = traceFile();
         if (file == null) {
             return;
         }
         try {
             java.nio.file.Files.writeString(java.nio.file.Path.of(file),
-                    what + "\t" + detail + "\n",
+                    String.join("", said),
                     java.nio.charset.StandardCharsets.UTF_8,
                     java.nio.file.StandardOpenOption.CREATE,
                     java.nio.file.StandardOpenOption.APPEND);
@@ -580,8 +731,118 @@ public final class SheetCapture {
         }
     }
 
+    static void trace(String what, String detail) {
+        String file = traceFile();
+        if (file == null) {
+            return;
+        }
+        if (holding) {
+            synchronized (CHECKPOINTS) {
+                CHECKPOINTS.add(what + "\t"
+                        + (subject.isEmpty() ? ""
+                                : "subject=" + subject + " ")
+                        + detail + "\n");
+            }
+            return;
+        }
+        try {
+            java.nio.file.Files.writeString(java.nio.file.Path.of(file),
+                    what + "\t" + (subject.isEmpty() ? ""
+                            : "subject=" + subject + " ") + detail + "\n",
+                    java.nio.charset.StandardCharsets.UTF_8,
+                    java.nio.file.StandardOpenOption.CREATE,
+                    java.nio.file.StandardOpenOption.APPEND);
+        } catch (java.io.IOException ignored) {
+            // A trace that cannot be written must not change what is
+            // being traced.
+        }
+    }
+
+    /**
+     * Whether the geometry moved under a step that must not move it.
+     *
+     * <p>Asking a premise and drawing are both reads. If either
+     * changes the size, the pixels are of one state and the record
+     * of another - and a sheet that disagrees with its own trace is
+     * the thing this whole issue is about. So it refuses rather than
+     * writes, and names the step, which is more than any of #364's
+     * occurrences said for themselves.
+     */
+    private static String whatMoved(String step, JComponent content,
+                                    java.awt.Dimension settledOn) {
+        java.awt.Dimension now = content.getSize();
+        if (now.equals(settledOn)) {
+            return null;
+        }
+        return "the layout moved while " + step + ": it was "
+                + settledOn.width + "x" + settledOn.height
+                + " and is " + now.width + "x" + now.height
+                + ". A photograph taken now would disagree with the"
+                + " record of what it is a photograph of.";
+    }
+
+    /**
+     * Puts back the geometry the fixed point proved.
+     *
+     * <p>Runs on the event thread, before anything is recorded or
+     * painted, for <strong>every</strong> kind of capture. No sizing
+     * operation runs beside it. Which is the point: a packed window had this
+     * and an application-sized one did not, and it was an
+     * application-sized one - Place and Time - that was next
+     * photographed at 326 px where its policy states 420 and its own
+     * settled record said 420.
+     *
+     * <p>Restoring is not the same as re-deriving. Packing afresh
+     * asks a bistable layout a question that has two answers;
+     * reapplying a policy asks the application a question whose
+     * answer depends on the size it is asked at. The geometry that
+     * survived {@code packToFixedPoint} and {@code settleLayout} is
+     * the answer, and it is put back rather than sought again.
+     *
+     * <p>A restoration that had to change something is traced,
+     * because that is the drift itself - the moment a retained pair
+     * exists to explain.
+     */
+    private static void restoreProved(Window window, JComponent content,
+                                      java.awt.Dimension[] proved) {
+        java.awt.Dimension contentWas = proved[1];
+        if (contentWas == null) {
+            // Nothing was proved, so there is nothing to put back.
+            return;
+        }
+        java.awt.Dimension windowWas = proved[0];
+        boolean moved = false;
+        if (window != null && windowWas != null
+                && !windowWas.equals(window.getSize())) {
+            trace("drift", "window was " + windowWas.width + "x"
+                    + windowWas.height + " and is "
+                    + window.getWidth() + "x" + window.getHeight());
+            window.setSize(windowWas);
+            moved = true;
+        }
+        if (!contentWas.equals(content.getSize())) {
+            trace("drift", "content was " + contentWas.width + "x"
+                    + contentWas.height + " and is "
+                    + content.getWidth() + "x" + content.getHeight());
+            content.setSize(contentWas);
+            moved = true;
+        }
+        if (moved) {
+            // Laid out AT the restored size, which is how a wrapped
+            // label comes back to the width it was proved at.
+            content.validate();
+            trace("restored", "content=" + content.getWidth() + "x"
+                    + content.getHeight()
+                    + " window=" + (window == null ? "none"
+                            : window.getWidth() + "x"
+                                    + window.getHeight()));
+        }
+    }
+
     private static void settleLayout(Window window, JComponent content,
-                                     Sizing sizing) throws Exception {
+                                     Sizing sizing,
+                                     java.awt.Dimension[] proved)
+            throws Exception {
         String geometry = geometryOf(content);
         for (int round = 0; round < ROUNDS; round++) {
             SwingUtilities.invokeAndWait(() -> {
@@ -596,16 +857,51 @@ public final class SheetCapture {
             // enough: a run photographed 326x206 whose pre-paint
             // record said preferred=332x206, because the drift
             // arrived after the fixed point was read and before it
-            // was remembered, so the "proved" geometry that hold put
-            // back was already the wrong one.
+            // was remembered, so the "proved" geometry the paint
+            // block put back was already the wrong one.
             String was = geometry;
+            int at = round;
             String[] seen = new String[1];
             SwingUtilities.invokeAndWait(() -> {
                 StringBuilder out = new StringBuilder();
                 append(out, content);
                 seen[0] = out.toString();
                 if (seen[0].equals(was)) {
-                    sizing.proved(window, content);
+                    // The policy states its size once more before
+                    // anything is recorded, without packing. For a
+                    // packed or fixed-canvas capture this does
+                    // nothing; for an application-sized one it is
+                    // the difference between recording the geometry
+                    // the application asks for and recording the
+                    // one the peer drifted to while the layout was
+                    // settling. Establish converged at 420 and this
+                    // fixed point found 326, and 326 was what got
+                    // written down.
+                    java.awt.Dimension beforeStageTwo =
+                            content.getSize();
+                    sizing.restate(window, content);
+                    if (!beforeStageTwo.equals(content.getSize())) {
+                        // Stage two moved the layout, which is the
+                        // whole reason it exists: what gets proved
+                        // below is the policy's answer rather than
+                        // whatever settling drifted to.
+                        trace("restated", "content was "
+                                + beforeStageTwo.width + "x"
+                                + beforeStageTwo.height + " and is "
+                                + content.getWidth() + "x"
+                                + content.getHeight());
+                    }
+                    proved[0] = window == null ? null : window.getSize();
+                    proved[1] = content.getSize();
+                    trace("proved", "round=" + at
+                            + " content=" + content.getWidth() + "x"
+                            + content.getHeight()
+                            + " preferred="
+                            + content.getPreferredSize().width + "x"
+                            + content.getPreferredSize().height
+                            + " window=" + (window == null ? "none"
+                                    : window.getWidth() + "x"
+                                            + window.getHeight()));
                 }
             });
             String now = seen[0];
@@ -653,8 +949,37 @@ public final class SheetCapture {
      */
     private static void canonicalise(JComponent content)
             throws Exception {
+        traceGeometry("before-canonicalise", content);
         SwingUtilities.invokeAndWait(() -> rebuildHtml(content));
         drain();
+        traceGeometry("after-canonicalise", content);
+    }
+
+    /**
+     * One component's size and preference, at a named stage.
+     *
+     * <p>Rebuilding a wrapping label's view is where this layout's
+     * two answers are decided, so the geometry either side of it is
+     * the first thing a diagnosis wants and the first thing the
+     * trace did not have.
+     */
+    private static void traceGeometry(String stage, JComponent content) {
+        if (traceFile() == null) {
+            return;
+        }
+        try {
+            String[] said = new String[1];
+            SwingUtilities.invokeAndWait(() -> said[0] =
+                    "content=" + content.getWidth() + "x"
+                            + content.getHeight()
+                            + " preferred="
+                            + content.getPreferredSize().width + "x"
+                            + content.getPreferredSize().height);
+            trace(stage, said[0]);
+        } catch (Exception ignored) {
+            // A trace that cannot be written must not change what is
+            // being traced.
+        }
     }
 
     private static void rebuildHtml(Component from) {
@@ -716,6 +1041,11 @@ public final class SheetCapture {
                         .equals(content.getPreferredSize());
             });
             drain();
+            trace("pack-round", "round=" + round
+                    + " window=" + now[0].width + "x" + now[0].height
+                    + " wasWindow=" + (was == null ? "none"
+                            : was.width + "x" + was.height)
+                    + " contentIsItsPreference=" + wanted[0]);
             if (wanted[0] && now[0].equals(was)) {
                 return;
             }
@@ -733,9 +1063,9 @@ public final class SheetCapture {
      * What is about to be painted, recorded where nothing can move
      * it.
      *
-     * <p>Distinct from the `settled` record, and both are kept. For
-     * an application-sized window {@code Sizing.hold} runs between
-     * them and may change the size: a retained failure whose trace
+     * <p>Distinct from the `settled` record, and both are kept. The
+     * proved snapshot is restored between them, and a restoration
+     * that had work to do says so - a retained failure whose trace
      * described only the settled geometry would describe a state
      * other than the one in the pixels, which is the exact ambiguity
      * a trace exists to remove.

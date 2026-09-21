@@ -348,10 +348,34 @@ public final class PlaceAndTimeSheetMain {
         // over it - and the SAME policy object holds it in the block
         // that paints, because the peer pulls an unshown window back
         // to its packed width an event cycle later.
+        // Names this sheet in the capture trace. Without it a
+        // retained pair can only be mapped by counting lines and
+        // knowing the order sheets are written in - which is how the
+        // first retained Place and Time pair could not be read at
+        // all, because two runs' line N are not necessarily the same
+        // sheet.
+        SheetCapture.tracing(to.getFileName() + " language=" + language);
         SheetCapture.Sizing sizing =
                 SheetCapture.applicationSized(
                         "PlaceAndTimeDialog.applySizePolicy",
-                        dialog::applySizePolicy);
+                        // Establishing this dialog's size takes two
+                        // stages, and both happen before anything is
+                        // proved. Stage one packs, because that is
+                        // how the height is found. Stage two states
+                        // the reviewed width once more as the layout
+                        // settles, and does NOT pack: a second pack
+                        // can return the other stable width, and on
+                        // an unshown window the peer can answer it
+                        // before the floor is applied - which is how
+                        // this dialog was photographed at 324 px
+                        // with 420 settled on.
+                        //
+                        // Both are the dialog's own methods. A
+                        // photographer that copied the arithmetic
+                        // instead is how the width drifted in the
+                        // first place.
+                        dialog::applySizePolicy,
+                        dialog::restateSizePolicy);
         Set<String> shown = new LinkedHashSet<>();
         Set<String> spoken = new LinkedHashSet<>();
         List<String> letters = new ArrayList<>();

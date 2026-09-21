@@ -139,26 +139,33 @@ public final class SettingsSheetMain {
     private static void draw(JComponent content, Path to)
             throws Exception {
         // A fixed canvas: no window, and the width is the study's
-        // own choice. The laying out and the painting happen in the
-        // coordinator's held block rather than on this thread, which
-        // is where every other photographer now draws.
+        // own choice.
         BufferedImage sheet = SheetCapture.take(content,
-                SheetCapture.fixedCanvas(), SheetCapture.Premise.none(),
+                // The study owns this canvas, so it establishes it -
+                // before anything is proved, rather than while
+                // drawing.
+                //
+                // Lay out at the real width FIRST, then ask how tall
+                // it became. Asking before laying out reported a
+                // height from a different width and cropped the
+                // buttons off the sheet - a reviewer would have been
+                // shown a dialog with no OK on it and no way to tell
+                // that was the capture's fault.
+                // Lay out every container, not just the outer one.
+                // validate() does nothing useful for a component
+                // that was never added to a displayable window: the
+                // outer panel positioned its children while the
+                // nested button row never did, so OK and Cancel were
+                // placed at 0x0 and the sheet showed a dialog with
+                // no way to accept it.
+                SheetCapture.fixedCanvas(() -> {
+                    content.setSize(WIDE,
+                            content.getPreferredSize().height);
+                    layoutDeeply(content);
+                }),
+                SheetCapture.Premise.none(),
                 () -> {
-            // Lay out at the real width FIRST, then ask how tall it
-            // became. Asking before laying out reported a height
-            // from a different width and cropped the buttons off the
-            // sheet - a reviewer would have been shown a dialog with
-            // no OK on it and no way to tell that was the capture's
-            // fault.
-            // Lay out every container, not just the outer one.
-            // validate() does nothing useful for a component that
-            // was never added to a displayable window: the outer
-            // panel positioned its children while the nested button
-            // row never did, so OK and Cancel were placed at 0x0 and
-            // the sheet showed a dialog with no way to accept it.
-            content.setSize(WIDE, content.getPreferredSize().height);
-            layoutDeeply(content);
+            // Allocates and paints from the established geometry.
             BufferedImage drawn = new BufferedImage(WIDE,
                     content.getHeight(), BufferedImage.TYPE_INT_RGB);
             Graphics2D g = drawn.createGraphics();

@@ -289,6 +289,15 @@ public final class ExportSheetDialogSheetMain {
             throws Exception {
         JFrame[] owner = new JFrame[1];
         JComponent[] content = new JComponent[1];
+        // Names this sheet in the capture trace, so a retained
+        // failure maps to nb-NO / PNG / A4 by reading rather than by
+        // counting lines and knowing the order sheets are written in
+        // - which is how the one occurrence anybody needed to read
+        // had to be mapped, by hand.
+        SheetCapture.tracing(to.getFileName() + " state=" + state.name()
+                + " format=" + state.format()
+                + " paper=" + state.paper()
+                + " marks=" + state.marks());
         try {
             SwingUtilities.invokeAndWait(() -> {
                 content[0] = ExportSheetDialog.contentForStudy(said);

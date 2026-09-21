@@ -502,7 +502,7 @@ class InterfaceEvidenceGateTest {
                 case PACKED -> "SheetCapture.packed()";
                 case APPLICATION_SIZED ->
                         "SheetCapture.applicationSized(";
-                case FIXED_CANVAS -> "SheetCapture.fixedCanvas()";
+                case FIXED_CANVAS -> "SheetCapture.fixedCanvas(";
             };
             boolean asks = code.contains(operation);
             // PageLanguage draws renderer output and calls the
@@ -519,7 +519,7 @@ class InterfaceEvidenceGateTest {
             }
             for (String other : List.of("SheetCapture.packed()",
                     "SheetCapture.applicationSized(",
-                    "SheetCapture.fixedCanvas()")) {
+                    "SheetCapture.fixedCanvas(")) {
                 if (!other.equals(operation) && code.contains(other)) {
                     wrong.add(entry.getKey() + " declares " + declared
                             + " and calls " + other);

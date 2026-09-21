@@ -210,8 +210,17 @@ public final class ChartOptionsSheetMain {
         // preference of 394 px that no reader meets.
         SheetCapture.write(window, content,
                 SheetCapture.applicationSized(
-                        "ChartOptionsDialog.settle", () ->
-                        juranometria.app.ChartOptionsDialog.settle(
+                        "ChartOptionsDialog.settle",
+                        // Establishing and re-stating are the same
+                        // operation here, and may be: settle() does
+                        // not pack. It computes the height for the
+                        // tab that is showing and sets the declared
+                        // ORDINARY_WIDTH, so saying it twice says
+                        // the same thing.
+                        () -> juranometria.app.ChartOptionsDialog.settle(
+                                (juranometria.app.ChartOptionsDialog)
+                                        window),
+                        () -> juranometria.app.ChartOptionsDialog.settle(
                                 (juranometria.app.ChartOptionsDialog)
                                         window)),
                 to);
