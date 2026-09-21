@@ -28,7 +28,8 @@ import java.util.function.Consumer;
  *
  * <p>So the store is read <strong>once</strong>, at startup, into a
  * choice this object owns. Changing the selector updates that choice,
- * saves both keys, and tells whoever is listening to rebuild the
+ * saves what was settled, and tells whoever is listening to rebuild
+ * the
  * page. Nothing else reads the store for the rest of the session.
  *
  * <p>The same shape as {@code AppearanceSession} and
@@ -109,8 +110,9 @@ public final class SkyLanguageSession {
      * right alone: this session now shows the choice, the next
      * session will start with it, and the page is rebuilt.
      *
-     * <p>Both keys are saved, never one - absence is reserved for
-     * "never asked", and a reader who has just settled a language
+     * <p>Each key is saved only if that question was answered, and
+     * absence stays reserved for "never asked" - per question rather
+     * than per dialog. A reader who has just settled a language
      * must not be recorded as never having been asked about the
      * other.
      *

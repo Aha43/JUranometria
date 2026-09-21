@@ -55,6 +55,17 @@ import juranometria.ui.language.SkyLanguageStore;
  */
 public final class MenuSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     private MenuSheetMain() {
     }
 
@@ -211,11 +222,11 @@ public final class MenuSheetMain {
      * open at a time anyway.
      */
     private static String capture(JMenuBar bar, Path to) throws Exception {
-        SheetCapture.settle(bar);
         Set<String> said = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
         int[] widest = {0};
-        SwingUtilities.invokeAndWait(() -> {
+        image[0] = SheetCapture.take(bar, SheetCapture.packed(),
+                SheetCapture.Premise.none(), () -> {
             // Each popup gets its own column. Drawn at its menu's x
             // they overlapped, because a popup is wider than the
             // word that opens it - the first picture showed three
@@ -263,8 +274,8 @@ public final class MenuSheetMain {
             } finally {
                 g.dispose();
             }
-            image[0] = drawn;
             collect(bar, said);
+            return drawn;
         });
         ImageIO.write(image[0], "png", to.toFile());
 

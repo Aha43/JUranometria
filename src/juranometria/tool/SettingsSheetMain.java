@@ -48,6 +48,17 @@ import juranometria.ui.language.InterfaceText;
  */
 public final class SettingsSheetMain {
 
+    /**
+     * What this photographer holds still: there is no window to size: the canvas width is the
+     * study’s own choice.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.FIXED_CANVAS;
+
     private SettingsSheetMain() {
     }
 
@@ -127,33 +138,48 @@ public final class SettingsSheetMain {
 
     private static void draw(JComponent content, Path to)
             throws Exception {
-        SheetCapture.settle(content);
-        // Lay out at the real width FIRST, then ask how tall it
-        // became. Asking before laying out reported a height from a
-        // different width and cropped the buttons off the sheet - a
-        // reviewer would have been shown a dialog with no OK on it
-        // and no way to tell that was the capture's fault.
-        // Lay out every container, not just the outer one.
-        // validate() does nothing useful for a component that was
-        // never added to a displayable window: the outer panel
-        // positioned its children while the nested button row never
-        // did, so OK and Cancel were placed at 0x0 and the sheet
-        // showed a dialog with no way to accept it. A reviewer would
-        // have had no way to tell that was the capture's fault.
-        content.setSize(WIDE, content.getPreferredSize().height);
-        layoutDeeply(content);
-        BufferedImage sheet = new BufferedImage(WIDE,
-                content.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = sheet.createGraphics();
-        try {
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, WIDE, content.getHeight());
-            content.paint(g);
-        } finally {
-            g.dispose();
-        }
+        // A fixed canvas: no window, and the width is the study's
+        // own choice.
+        BufferedImage sheet = SheetCapture.take(content,
+                // The study owns this canvas, so it establishes it -
+                // before anything is proved, rather than while
+                // drawing.
+                //
+                // Lay out at the real width FIRST, then ask how tall
+                // it became. Asking before laying out reported a
+                // height from a different width and cropped the
+                // buttons off the sheet - a reviewer would have been
+                // shown a dialog with no OK on it and no way to tell
+                // that was the capture's fault.
+                // Lay out every container, not just the outer one.
+                // validate() does nothing useful for a component
+                // that was never added to a displayable window: the
+                // outer panel positioned its children while the
+                // nested button row never did, so OK and Cancel were
+                // placed at 0x0 and the sheet showed a dialog with
+                // no way to accept it.
+                SheetCapture.fixedCanvas(() -> {
+                    content.setSize(WIDE,
+                            content.getPreferredSize().height);
+                    layoutDeeply(content);
+                }),
+                SheetCapture.Premise.none(),
+                () -> {
+            // Allocates and paints from the established geometry.
+            BufferedImage drawn = new BufferedImage(WIDE,
+                    content.getHeight(), BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = drawn.createGraphics();
+            try {
+                g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g.setColor(Color.WHITE);
+                g.fillRect(0, 0, WIDE, content.getHeight());
+                content.paint(g);
+            } finally {
+                g.dispose();
+            }
+            return drawn;
+        });
         ImageIO.write(sheet, "png", to.toFile());
     }
 

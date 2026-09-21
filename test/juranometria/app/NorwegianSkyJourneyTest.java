@@ -138,10 +138,10 @@ class NorwegianSkyJourneyTest {
         assertEquals(NORWEGIAN, session.namesOnTheChart(),
                 "Reset view returns the reader home; it does not"
                         + " return the sky to Latin");
-        assertEquals(Map.of(SkyLanguageChoice.INTERFACE_KEY, "en",
-                        SkyLanguageChoice.CHART_KEY, NORWEGIAN),
+        assertEquals(Map.of(SkyLanguageChoice.CHART_KEY, NORWEGIAN),
                 SkyLanguageStore.forNode(chosen).stated(),
-                "nor quietly undo what they chose");
+                "nor quietly undo what they chose - and nor invent an"
+                        + " interface choice they never made");
         navigation.recenter(SAGITTARIUS.centre(),
                 SAGITTARIUS.fieldWidthDegrees());
         SwingUtilities.invokeAndWait(() ->

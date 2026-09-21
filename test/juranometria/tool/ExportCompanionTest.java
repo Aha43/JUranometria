@@ -73,14 +73,23 @@ class ExportCompanionTest {
                         + " font metrics");
         Path first = Files.createTempDirectory("export-companion-1");
         Path second = Files.createTempDirectory("export-companion-2");
+        Path firstTrace = beside(first);
+        Path secondTrace = beside(second);
         try {
-            String one = generateInto(first);
-            String two = generateInto(second);
-            assertEquals(one, two,
-                    "two runs of the export companion have to agree."
-                            + " A report that cannot reproduce on the"
-                            + " machine that wrote it cannot be held"
-                            + " to anything, anywhere");
+            String one = generateInto(first, firstTrace);
+            String two = generateInto(second, secondTrace);
+            if (!one.equals(two)) {
+                Path kept = retain(first, second, firstTrace,
+                        secondTrace, difference(one, two));
+                assertEquals(one, two,
+                        "two runs of the export companion have to"
+                                + " agree. A report that cannot"
+                                + " reproduce on the machine that"
+                                + " wrote it cannot be held to"
+                                + " anything, anywhere. BOTH runs and"
+                                + " their capture traces are kept at "
+                                + kept);
+            }
             assertTrue(one.contains("Recorded on: `"),
                     "and it names the machine it came from, because"
                             + " its packed sizes and byte counts are"
@@ -91,8 +100,13 @@ class ExportCompanionTest {
                             + " writes are real, the folder the"
                             + " question names is reader data");
         } finally {
+            // Only on success. A failure's directories are the
+            // evidence, and deleting them is what left the two
+            // recorded occurrences of #364 unreadable.
             remove(first);
             remove(second);
+            java.nio.file.Files.deleteIfExists(firstTrace);
+            java.nio.file.Files.deleteIfExists(secondTrace);
         }
     }
 
@@ -156,26 +170,129 @@ class ExportCompanionTest {
                         + " parser learned to decode it");
     }
 
-    /** One run of the generator, in a directory of its own. */
-    private static String generateInto(Path directory) throws Exception {
+    /**
+     * One run of the generator, in a directory of its own, traced.
+     *
+     * <p>The trace goes <strong>beside</strong> the directory, not
+     * inside it: what is inside is the run's own output, and a file
+     * that is neither image nor report would be one more thing to
+     * explain when the two trees are compared.
+     */
+    private static String generateInto(Path directory, Path trace)
+            throws Exception {
         Process run = new ProcessBuilder(
                 Path.of(System.getProperty("java.home"), "bin", "java")
                         .toString(),
                 "-cp", System.getProperty("java.class.path"),
+                "-Djuranometria.capture.trace=" + trace,
                 "juranometria.tool.ExportSheetDialogSheetMain",
                 directory.toString())
                 .redirectErrorStream(true)
                 .start();
         String output = new String(run.getInputStream().readAllBytes(),
                 StandardCharsets.UTF_8);
-        assertTrue(run.waitFor(5, TimeUnit.MINUTES),
-                "the generator finishes");
-        assertEquals(0, run.exitValue(),
-                "the generator succeeds. It said:\n" + output);
+        Files.writeString(directory.resolve("generator-output.log"),
+                output, StandardCharsets.UTF_8);
+        boolean finished = run.waitFor(5, TimeUnit.MINUTES);
+        if (!finished || run.exitValue() != 0) {
+            Path kept = retain(directory, directory, trace, trace,
+                    "the generator did not succeed:\n" + output);
+            assertTrue(finished,
+                    "the generator finishes. Kept at " + kept);
+            assertEquals(0, run.exitValue(),
+                    "the generator succeeds. It said:\n" + output
+                            + "\nKept at " + kept);
+        }
         Path written = directory.resolve("export-strings.md");
         assertTrue(Files.exists(written),
                 "and writes its report where it was told to");
         return Files.readString(written, StandardCharsets.UTF_8);
+    }
+
+    /** A trace file beside a run's directory, named for it. */
+    private static Path beside(Path directory) {
+        return directory.resolveSibling(
+                directory.getFileName() + "-trace.tsv");
+    }
+
+    /** The lines on which two reports disagree, and nothing else. */
+    private static String difference(String one, String two) {
+        List<String> a = one.lines().toList();
+        List<String> b = two.lines().toList();
+        StringBuilder said = new StringBuilder();
+        said.append("run A has ").append(a.size())
+                .append(" lines, run B has ").append(b.size())
+                .append("\n\n");
+        for (int at = 0; at < Math.max(a.size(), b.size()); at++) {
+            String x = at < a.size() ? a.get(at) : "<missing>";
+            String y = at < b.size() ? b.get(at) : "<missing>";
+            if (!x.equals(y)) {
+                said.append("line ").append(at + 1).append('\n')
+                        .append("  A: ").append(x).append('\n')
+                        .append("  B: ").append(y).append('\n');
+            }
+        }
+        return said.toString();
+    }
+
+    /**
+     * Keeps everything a diagnosis needs, and says where.
+     *
+     * <p>#364's first two occurrences were both found after the runs
+     * that produced them had been deleted - this method's absence is
+     * the reason the artifact anybody wanted no longer existed. The
+     * third was caught here, by this contract, and kept nothing
+     * either: both scratch trees went in a {@code finally} and the
+     * child JVMs ran without traces, so the one run that failed was
+     * the one run that recorded nothing.
+     */
+    private static Path retain(Path first, Path second,
+                               Path firstTrace, Path secondTrace,
+                               String difference) throws Exception {
+        Path kept = Path.of("build", "export-companion-evidence");
+        if (Files.exists(kept)) {
+            remove(kept);
+        }
+        Files.createDirectories(kept);
+        copyInto(first, kept.resolve("run-A"));
+        if (!second.equals(first)) {
+            copyInto(second, kept.resolve("run-B"));
+        }
+        copyBeside(firstTrace, kept.resolve("run-A-trace.tsv"));
+        if (!secondTrace.equals(firstTrace)) {
+            copyBeside(secondTrace, kept.resolve("run-B-trace.tsv"));
+        }
+        Files.writeString(kept.resolve("DIFFERENCE.md"),
+                "# The export companion did not reproduce\n\n"
+                        + "Both complete runs are here, with the"
+                        + " capture trace each one wrote. Every trace"
+                        + " line names the sheet it belongs to, so a"
+                        + " line maps to nb-NO / PNG / A4 by reading"
+                        + " rather than by counting.\n\n"
+                        + difference,
+                StandardCharsets.UTF_8);
+        return kept.toAbsolutePath();
+    }
+
+    private static void copyInto(Path from, Path to) throws Exception {
+        try (var files = Files.walk(from)) {
+            for (Path one : files.toList()) {
+                Path at = to.resolve(from.relativize(one).toString());
+                if (Files.isDirectory(one)) {
+                    Files.createDirectories(at);
+                } else {
+                    Files.createDirectories(at.getParent());
+                    Files.copy(one, at);
+                }
+            }
+        }
+    }
+
+    private static void copyBeside(Path from, Path to) throws Exception {
+        if (Files.exists(from)) {
+            Files.createDirectories(to.getParent());
+            Files.copy(from, to);
+        }
     }
 
     private static void remove(Path directory) throws Exception {

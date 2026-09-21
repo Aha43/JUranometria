@@ -122,11 +122,12 @@ class SkyLanguageSessionTest {
 
             assertEquals(NORWEGIAN, session.namesOnTheChart(),
                     "this session now shows it");
-            assertEquals(Map.of(SkyLanguageChoice.INTERFACE_KEY, "en",
-                            SkyLanguageChoice.CHART_KEY, NORWEGIAN),
+            assertEquals(Map.of(SkyLanguageChoice.CHART_KEY, NORWEGIAN),
                     store.stated(),
-                    "the next session will start with it - both keys,"
-                            + " because absence means never asked");
+                    "the next session will start with it - and with"
+                            + " the interface question still open,"
+                            + " because choosing the sky's names did"
+                            + " not answer it");
             assertEquals(List.of(NORWEGIAN), rebuilds,
                     "and the page was rebuilt, in the new language."
                             + " Names are resolved into a scene when it"
@@ -139,15 +140,29 @@ class SkyLanguageSessionTest {
     }
 
     /**
-     * Confirming the current language is still an answer.
+     * Confirming without acting on a selector is not an answer.
      *
-     * <p>A reader who opens the selector and picks what is already
-     * showing has been asked and has answered. That is a different
-     * state from never having been asked, and it is the distinction
-     * every future default change depends on.
+     * <p>This test used to assert the opposite, and the behaviour it
+     * protected has not been dropped - it has moved to where it can
+     * be true. A reader who <em>opens the selector and picks what is
+     * already showing</em> has answered, and
+     * {@code InterfaceLanguageMigrationTest} holds exactly that
+     * through the real control, where the act is visible.
+     *
+     * <p>What could not be true is the version asserted here:
+     * {@code choose(current())} is what the dialog does when the
+     * reader touched nothing, and treating it as an answer made
+     * every confirmation answer every question in the dialog. An
+     * upgrading reader who pressed OK was recorded as having chosen
+     * English, which is the one thing the absent key exists to
+     * prevent.
+     *
+     * <p>So the distinction every future default change depends on
+     * is still here - it is simply drawn around the act rather than
+     * around the dialog.
      */
     @Test
-    void confirmingWhatIsAlreadyShowingIsStillAnAnswer()
+    void confirmingWhatIsAlreadyShowingIsNotAnAnswerOnItsOwn()
             throws Exception {
         Preferences node = scratch();
         try {
@@ -158,9 +173,13 @@ class SkyLanguageSessionTest {
 
             session.choose(session.current());
 
-            assertTrue(store.everChosen(),
-                    "and now somebody has answered, even though the"
-                            + " page did not change");
+            assertFalse(store.everChosen(),
+                    "and nobody has answered yet: confirming a dialog"
+                            + " is not acting on every control in it."
+                            + " The reader who really does pick the"
+                            + " language already showing is held by"
+                            + " InterfaceLanguageMigrationTest,"
+                            + " through the selector itself");
         } finally {
             node.removeNode();
         }

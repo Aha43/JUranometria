@@ -50,6 +50,17 @@ import juranometria.ui.language.InterfaceText;
  */
 public final class AboutSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     private AboutSheetMain() {
     }
 
@@ -289,13 +300,13 @@ public final class AboutSheetMain {
     private static String capture(JDialog dialog, String language,
                                   boolean notices, Path to)
             throws Exception {
-        SheetCapture.settle((javax.swing.JComponent)
-                dialog.getContentPane());
         Set<String> shown = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
         String[] window = new String[2];
-        SwingUtilities.invokeAndWait(() -> {
-            SheetCapture.neutralFocusNow();
+        image[0] = SheetCapture.take(dialog,
+                (javax.swing.JComponent) dialog.getContentPane(),
+                SheetCapture.packed(), SheetCapture.Premise.none(),
+                () -> {
             Container content = dialog.getContentPane();
             window[0] = dialog.getTitle();
             window[1] = dialog.getAccessibleContext()
@@ -315,8 +326,8 @@ public final class AboutSheetMain {
             } finally {
                 g.dispose();
             }
-            image[0] = drawn;
             collect(content, shown);
+            return drawn;
         });
         ImageIO.write(image[0], "png", to.toFile());
 

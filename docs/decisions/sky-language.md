@@ -456,6 +456,17 @@ already carries the `Optional` pattern this needs.
   never opens the setting keeps a store with no language keys in it.
 - Once the reader changes or saves either setting, the complete
   explicit choice is persisted — both keys, no implied halves.
+
+  > **Superseded in the 2.1.0 release sprint.** Consent is now per
+  > key: each key is written only if the reader acted on *that*
+  > selector. The reasoning above was right about what absence means
+  > and wrong about who had answered — confirming a dialog is not
+  > acting on every control in it, and under the coupled rule a
+  > reader upgrading from 2.0.0 who opened Settings and pressed OK
+  > was recorded as having chosen English, which is the one thing
+  > the absence exists to prevent. "Explicit" is taken from the
+  > control's own event, so choosing the English already showing
+  > still counts and still writes.
 - Absence and explicit `follow-interface` behave **identically
   today**. That is what makes the upgrade invisible: the persisted
   chart mode is `follow-interface`, which *resolves* to Latin names
@@ -642,8 +653,9 @@ iteration order. Mutation-proved by sorting on the displayed name.
 
 **Implement the two preference keys** against the settled migration
 contract: absence means "never asked", reading writes nothing, saving
-writes both keys, and `follow-interface` is a value distinct from
-absence.
+writes the settled key (both, under the original coupled rule —
+**superseded**, see the amendment above), and `follow-interface` is a
+value distinct from absence.
 
 **Ship English interface resources and the verified `nb-NO` chart
 pack**, keeping the deterministic fallbacks: interface text to

@@ -48,6 +48,17 @@ import juranometria.ui.language.InterfaceText;
  */
 public final class ChartKeyboardSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     private ChartKeyboardSheetMain() {
     }
 
@@ -387,12 +398,11 @@ public final class ChartKeyboardSheetMain {
 
     private static String capture(ChartKeyboard palette, String language,
                                   Path to) throws Exception {
-        SheetCapture.settle(palette);
         Set<String> shown = new LinkedHashSet<>();
         List<String> spoken = new ArrayList<>();
         BufferedImage[] image = new BufferedImage[1];
-        SwingUtilities.invokeAndWait(() -> {
-            SheetCapture.neutralFocusNow();
+        image[0] = SheetCapture.take(palette, SheetCapture.packed(),
+                SheetCapture.Premise.none(), () -> {
             BufferedImage drawn = new BufferedImage(
                     Math.max(1, palette.getWidth()),
                     Math.max(1, palette.getHeight()),
@@ -408,8 +418,8 @@ public final class ChartKeyboardSheetMain {
             } finally {
                 g.dispose();
             }
-            image[0] = drawn;
             collect(palette, shown, spoken);
+            return drawn;
         });
         ImageIO.write(image[0], "png", to.toFile());
 

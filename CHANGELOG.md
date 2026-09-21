@@ -7,6 +7,149 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-20
+
+**The atlas speaks Norwegian.** Sprints 32–33 — the language gate,
+the foundation (#348), the constellation names (#349) and the
+application's own words (#350).
+
+A reader can now choose **Norsk bokmål** — and choose it twice, because
+the atlas asks two separate questions. One setting decides the words
+the application says: its menus, dialogs, controls and the sentences
+it speaks to a screen reader. The other decides what the *sky* is
+called on the chart, where the choice is Latin or Norwegian Bokmål.
+They are independent because they answer to different things: a reader
+may want the application in their own language while keeping the Latin
+names an atlas is usually read in, or the reverse. A third option,
+**Follow interface**, ties the chart to the application for anyone who
+wants one decision instead of two, and says which language that
+currently means.
+
+The Norwegian names are a reviewed set carried with its own notice,
+licence and provenance, and they change what a constellation is
+*called* without touching what it *is*. IAU abbreviations, canonical
+identity, designations such as M 31 and TYC 2801-2090-1, notation like
+ICRS J2000 and V, and the format and paper identities SVG, PDF, A4 and
+US Letter are the same in every language, because they are notation
+rather than words. A reader switching languages sees the same sky with
+different labels on it. Search behaviour is unchanged; exports retain
+the same canonical identities while their chart labels and descriptive
+metadata follow the chosen languages.
+
+The ordinary visible and spoken prose the application presents is
+Norwegian too: the menu bar, Settings, Chart Options, the Chart
+Keyboard, the toolbar and its search field, the Inspector, On This
+Page, Place and Time, About with its licence notices, exporting a
+sheet, and the reporter that explains a failed start — which is
+translated whenever the resources it needs can be read, and keeps one
+embedded English sentence for the case where they cannot, since that
+is the half which has to survive the language machinery being the
+thing that failed. So does the page itself — the title block above the
+chart, the magnitude key, what a screen reader is told about the page,
+and the metadata written inside every exported SVG, PDF and PNG, so a
+chart drawn in one language cannot describe itself in another.
+
+Two things surprised us and are worth stating plainly. The buttons a
+reader presses to answer a dialog — **Yes**, **No**, **Cancel**, and
+every label in the file chooser — were never the atlas's to begin with:
+they came from the toolkit, which resolves them against the operating
+system rather than the language a reader chose. The JDK ships no
+Norwegian for those at all, so a Norwegian reader answered a Norwegian
+question with **Yes** on every machine, and a reader on a German
+desktop met German under Norwegian sentences. The atlas now supplies
+its own forty-one of them, in both languages — an English interface on
+a German desktop had the same fault in the other direction.
+
+**The interface language applies fully at the next start.** Some
+windows take it immediately, because a dialog chooses its words when it
+opens; the menu bar, the toolbar and the drawn page keep the language
+they were built in until the application is restarted. The Settings
+explanation says so before the choice is made, and a notice says so
+after it: *"Programmet må startes på nytt — Språket i programmet er
+lagret. Start JUranometria på nytt for å ta det i bruk i hele
+programmet."* The chart language needs no restart and applies at once.
+
+**Nothing a reader stored is invalidated.** Upgrading from 2.0.0
+preserves every preference, page and view. A 2.0.0 installation has no
+interface-language setting at all, because the setting did not exist;
+that reader starts in English, silently, with no notice and nothing to
+answer, and their chart language and page state untouched.
+
+Some things are deliberately not translated, and the descriptor beside
+the Norwegian text says why. Canonical notation and identity stay as
+they are, above. On macOS the first items of the application menu —
+About, Services, Hide, Quit — are drawn by the operating system in the
+desktop's own language, and the atlas does not own them. The startup
+reporter's embedded English headline, described above, is the third.
+
+Four parts of the reader's experience are **not** in this release and
+are tracked separately: the keyboard access letters and the toolkit's
+mnemonics; how the Chart Keyboard separates its standing help from its
+changing status for a screen reader; what Place and Time says when a
+reader types a latitude it cannot use; and finding a constellation by
+name — by its Latin name, its Norwegian name or its abbreviation —
+which does not exist yet and is
+[#356](https://github.com/Aha43/JUranometria/issues/356).
+
+**macOS downloads remain unsigned and not notarised.** A browser
+download is quarantined, and macOS may refuse it as "damaged" — the
+archive is not corrupt, and `SHA256SUMS.txt` answers that. Ordinary
+Finder installation is **not supported** for this release either;
+[#282](https://github.com/Aha43/JUranometria/issues/282) stays open, and
+the documented quarantine-removal step is a workaround rather than the
+accepted route. Nothing in this release changes how it is installed.
+
+**Still not printed.** No page has been read on paper, and no globe at
+arm's length.
+[#293](https://github.com/Aha43/JUranometria/issues/293) is open for
+anyone who prints one.
+
+### Added
+
+- Norwegian Bokmål constellation names on the chart, from a reviewed
+  set bundled with its notice, licence and provenance, offered beside
+  Latin. They reach the constellation labels a reader sees on screen
+  and in every exported chart; identity, order, marks and geometry are
+  unchanged, so the same page is drawn with different names written on
+  it.
+- A chart-language setting independent of the application's language,
+  with **Follow interface** for a reader who wants one decision, and a
+  note saying which language that currently means.
+- Norsk bokmål for the ordinary visible and spoken prose the
+  application presents, including the page's title block, magnitude
+  key, spoken description and the metadata inside exported files.
+- The words the toolkit puts around the atlas's dialogs — the answer
+  buttons and the whole file chooser — supplied by the application in
+  both languages rather than by the operating system.
+- An explicit restart boundary for the interface language: stated in
+  Settings before the choice, and confirmed by a notice afterwards.
+- Languages arrive by being installed: the application discovers what
+  it offers from the descriptors it ships, rather than from a list
+  written in code, and a language with no translation for a phrase
+  falls back to English visibly rather than showing a resource key.
+
+### Fixed
+
+- Two of the 88 canonical Latin constellation names were wrong, and had
+  been: **Serpens** was recorded as "Serpens Caput", the name of half of
+  itself, and **Corona Australis** as "Corona Austrina" with the
+  malformed genitive "Coronae Austrini". Found by comparing all 88
+  against the IAU's own list, and corrected where they enter the atlas
+  rather than where they are read.
+- Chart Options could settle at either of two widths from identical
+  inputs — a wrapped explanation asked how wide it should be and was
+  answered with how wide it had been. The dialog now states the line
+  width its prose is broken to, so it has one answer.
+
+### Changed
+
+- The evidence that shows these surfaces is held by a gate of its own:
+  twelve photographers share one capture rule, and every companion and
+  image is regenerated and compared rather than trusted. This is
+  developer-facing and changes nothing a reader sees, but it is why the
+  Norwegian screens in this release can be shown to have been checked.
+
+
 ## [2.0.0] - 2026-09-14
 
 **The sky as a sphere.** Sprint 32 — Hold the celestial sphere.

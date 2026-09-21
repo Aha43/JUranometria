@@ -65,6 +65,62 @@ public final class PlaceAndTimeDialog extends JDialog {
     /** The one live instance; guarded on the EDT. */
     private static PlaceAndTimeDialog current;
 
+    /**
+     * The size this dialog gives itself, in one place.
+     *
+     * <p>Packing asks the layout what it would like; this dialog
+     * then raises the width to the reviewed {@link #ORDINARY_WIDTH}
+     * floor, so its size is a <strong>policy</strong> rather than a
+     * preference. A reader never meets the narrower packed width.
+     *
+     * <p>Public so the photographer can re-apply it rather than
+     * guess at it. It used to be inlined in the constructor, and the
+     * study kept its own copy of the same arithmetic to undo a pack
+     * the coordinator had done - which failed under load and
+     * produced a 326 px picture of a dialog no reader has seen.
+     * One definition, applied by whoever needs it.
+     */
+    public void applySizePolicy() {
+        pack();
+        restateSizePolicy();
+    }
+
+    /**
+     * States the reviewed width again, without asking the layout
+     * anything.
+     *
+     * <p>The half of the policy that may be repeated. Packing is how
+     * the height is <em>discovered</em>, and discovery has more than
+     * one answer here: this dialog's wrapped label reports 324 px on
+     * some runs and 326 on others, so a pack repeated later can
+     * return a width the first one did not choose - and on an
+     * unshown window the peer can answer the pack before the floor
+     * is applied, leaving the dialog at its packed width inside the
+     * very call meant to raise it. That was photographed: 324x263
+     * where 420x263 had been settled on moments earlier.
+     *
+     * <p>So re-stating the size does not pack. It applies the floor
+     * to the width the window already has and lays the controls out
+     * at it.
+     *
+     * <p>Used twice, both times while a size is being established:
+     * by {@link #applySizePolicy()} after its pack, and by a study
+     * photographing this dialog, which states the width once more
+     * as the layout settles so that the geometry it records is this
+     * policy's answer. Nothing calls it while anything is being
+     * painted.
+     */
+    public void restateSizePolicy() {
+        setSize(Math.max(getWidth(), ORDINARY_WIDTH), getHeight());
+        // And laid out again at that size - invalidate first,
+        // because setSize leaves the tree marked valid and a bare
+        // validate() is then a no-op: the floor was applied to the
+        // window but not to the controls inside it, which the
+        // study's dark photograph showed at 344 px.
+        invalidate();
+        validate();
+    }
+
     /** What the reviewed mock-up was drawn at. */
     public static final int ORDINARY_WIDTH = 420;
 
@@ -106,15 +162,7 @@ public final class PlaceAndTimeDialog extends JDialog {
         getRootPane().registerKeyboardAction(event -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
-        pack();
-        setSize(Math.max(getWidth(), ORDINARY_WIDTH), getHeight());
-        // And laid out again at that size - invalidate first,
-        // because setSize leaves the tree marked valid and a bare
-        // validate() is then a no-op: the floor was applied to the
-        // window but not to the controls inside it, which the
-        // study's dark photograph showed at 344 px.
-        invalidate();
-        validate();
+        applySizePolicy();
         setLocationRelativeTo(owner);
     }
 

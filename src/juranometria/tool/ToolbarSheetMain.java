@@ -60,6 +60,17 @@ import juranometria.ui.language.SkyLanguageStore;
  */
 public final class ToolbarSheetMain {
 
+    /**
+     * What this photographer holds still: production only packs this window, so its size is its
+     * layout’s preference.
+     *
+     * <p>Read by the display evidence gate, which refuses a
+     * generator that declares one kind and asks the capture
+     * coordinator for another.
+     */
+    public static final SheetCapture.Kind CAPTURE_KIND =
+            SheetCapture.Kind.PACKED;
+
     private ToolbarSheetMain() {
     }
 
@@ -248,11 +259,10 @@ public final class ToolbarSheetMain {
         // fixed point, layout settled, focus owned by nobody. This
         // sheet composes two windows into one image and so paints
         // itself, but it may not decide for itself WHEN.
-        SheetCapture.settle(owner, bar);
         Set<String> said = new LinkedHashSet<>();
         BufferedImage[] image = new BufferedImage[1];
-        SwingUtilities.invokeAndWait(() -> {
-            SheetCapture.neutralFocusNow();
+        image[0] = SheetCapture.take(owner, bar, SheetCapture.packed(),
+                SheetCapture.Premise.none(), () -> {
             Component popup = openListOf(owner);
             int width = Math.max(bar.getWidth(),
                     popup == null ? 0 : popup.getWidth());
@@ -274,11 +284,11 @@ public final class ToolbarSheetMain {
             } finally {
                 g.dispose();
             }
-            image[0] = drawn;
             collect(bar, said);
             if (popup instanceof Container list) {
                 collect(list, said);
             }
+            return drawn;
         });
         ImageIO.write(image[0], "png", to.toFile());
 
