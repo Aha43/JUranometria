@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-20
+
 **The atlas speaks Norwegian.** Sprints 32–33 — the language gate,
 the foundation (#348), the constellation names (#349) and the
 application's own words (#350).

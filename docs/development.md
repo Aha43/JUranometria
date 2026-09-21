@@ -190,8 +190,13 @@ Use semantic versions:
 7. Close the sprint milestone if it is not already closed.
 
 **`VERSION` is an input to committed artifacts, not only a number.**
-Both of these were missed at 1.12.0 and had to be corrected afterwards,
-once in the release branch and once on the published site:
+The first two were missed at 1.12.0 and had to be corrected afterwards,
+once in the release branch and once on the published site. The third
+surfaced during 2.1.0 only because the images had been regenerated
+while their provenance rows had not, so the contract reported bytes
+disagreeing with their record — an accident of ordering, not a check
+for staleness. Had both been done, or neither, nothing would have
+asked:
 
 - **The chart sheets.** `juranometria.sheet.SheetMetadata` writes
   `AppInfo.version()` into every exported sheet — the SVG `<metadata>`
@@ -205,9 +210,19 @@ once in the release branch and once on the published site:
   workflow is path-filtered, so a release that touches no gallery file
   never rebuilds the site and it goes on advertising the previous
   version.
+- **The About sheets.** The dialog draws the running version into
+  itself, so the four images under
+  `docs/studies/interface-language/about-*-compact-*.png` show the
+  digits of whatever release drew them. Run
+  `juranometria.tool.AboutSheetMain`, then `make evidence-provenance`.
+  At 2.1.0 each changed exactly 127 pixels, all inside the same 10×15
+  version-digit box, with no size or other content change — which is
+  what a version bump should look like here, and a useful shape to
+  compare against: anything wider than that box moved for some other
+  reason and is not a version bump.
 
-**Neither is caught by the evidence contract**, and not by oversight:
-the portable route holds a rendering to reproducing on the runner that
+**None of them is caught by the evidence contract**, and not by
+oversight: the portable route holds a rendering to reproducing on the runner that
 drew it, so a sheet drawn twice at the new version agrees with itself,
 and provenance compares the committed bytes with the record of those
 same committed bytes. Both pass while the artifacts are stale. Issue
