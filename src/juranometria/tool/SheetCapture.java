@@ -245,6 +245,74 @@ public final class SheetCapture {
     }
 
     /**
+     * The three things converging on an application's size needs.
+     *
+     * <p>Named separately from the window so the loop below can be
+     * driven without one. Two contracts used to reach that loop
+     * through a real unshown dialog, inventing sizes and relying on
+     * the window to keep them; under a virtual display it does not
+     * always, and both passed on one machine and failed on another
+     * from identical inputs - which is the defect they exist to
+     * catch, committed in the tests themselves.
+     */
+    interface Settling {
+
+        /** Applies the application's own sizing policy once. */
+        void apply() throws Exception;
+
+        /** Lets everything the policy queued actually run. */
+        void letTheQueueRun() throws Exception;
+
+        /**
+         * The size now.
+         *
+         * <p>Called after the queue has run, never inside the block
+         * that applied the policy: a size read there can be a 420
+         * the peer has already answered with 324, and recording
+         * that transient is how a capture came to hold a geometry
+         * the window no longer had.
+         */
+        java.awt.Dimension observe() throws Exception;
+
+        /** What else a refusal should say. */
+        default String describe() throws Exception {
+            return "nothing further is known about it";
+        }
+    }
+
+    /**
+     * Applies a policy until the size it produces stops changing.
+     *
+     * <p>Apply, let the queue run, observe - in that order, every
+     * round. A policy whose answer survives its own queue twice
+     * running has settled; one that does not has no answer to
+     * photograph, and this refuses rather than choosing one of the
+     * sizes it passed through.
+     *
+     * @return the size it settled on
+     */
+    static java.awt.Dimension converge(String name, Settling settling)
+            throws Exception {
+        java.awt.Dimension was = null;
+        for (int round = 0; round < ROUNDS; round++) {
+            settling.apply();
+            settling.letTheQueueRun();
+            java.awt.Dimension now = settling.observe();
+            if (now.equals(was)) {
+                return now;
+            }
+            was = now;
+        }
+        throw new IllegalStateException("this window never settled"
+                + " under its own sizing policy in " + ROUNDS
+                + " applications: " + name
+                + " last brought the window to " + was
+                + ", while " + settling.describe()
+                + ". A photograph would be of one of the sizes it"
+                + " passed through.");
+    }
+
+    /**
      * A window whose size is a policy the application states.
      *
      * <p>Two operations, because discovering a size and re-stating
@@ -287,35 +355,34 @@ public final class SheetCapture {
             public void establish(Window window, JComponent content)
                     throws Exception {
                 requireWindow(window);
-                java.awt.Dimension was = null;
-                for (int round = 0; round < ROUNDS; round++) {
-                    SwingUtilities.invokeAndWait(establish);
-                    drain();
-                    // Observed AFTER the queue is drained, never
-                    // inside the block that applied it. A size read
-                    // in that block can be a 420 the peer has
-                    // already answered with 324 - a transient, and
-                    // recording it as settled is how a capture came
-                    // to hold a geometry the window no longer had.
-                    java.awt.Dimension[] now =
-                            new java.awt.Dimension[1];
-                    SwingUtilities.invokeAndWait(() ->
-                            now[0] = window.getSize());
-                    if (now[0].equals(was)) {
-                        return;
+                converge(name, new Settling() {
+
+                    @Override
+                    public void apply() throws Exception {
+                        SwingUtilities.invokeAndWait(establish);
                     }
-                    was = now[0];
-                }
-                throw new IllegalStateException("this window never"
-                        + " settled under its own sizing policy in "
-                        + ROUNDS + " applications: "
-                        + name
-                        + " last brought the window to " + was
-                        + ", while its content is "
-                        + sizeOf(content) + " and prefers "
-                        + preferredOf(content) + ". A photograph would"
-                        + " be of one of the sizes it passed"
-                        + " through.");
+
+                    @Override
+                    public void letTheQueueRun() throws Exception {
+                        drain();
+                    }
+
+                    @Override
+                    public java.awt.Dimension observe() throws Exception {
+                        java.awt.Dimension[] now =
+                                new java.awt.Dimension[1];
+                        SwingUtilities.invokeAndWait(() ->
+                                now[0] = window.getSize());
+                        return now[0];
+                    }
+
+                    @Override
+                    public String describe() throws Exception {
+                        return "its content is " + sizeOf(content)
+                                + " and prefers "
+                                + preferredOf(content);
+                    }
+                });
             }
         };
     }
