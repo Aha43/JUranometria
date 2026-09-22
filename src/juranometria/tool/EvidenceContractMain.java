@@ -350,7 +350,22 @@ public final class EvidenceContractMain {
             "juranometria.tool.GalleryPageMain",
             // The working-selection surface mock-ups (issue #258):
             // widget-rendered inspection, the selection- prefix.
-            "juranometria.tool.WorkingSelectionMockupMain");
+            "juranometria.tool.WorkingSelectionMockupMain",
+            // The printable-chart and ecliptic pages. Their studies
+            // are report generators that draw nothing; the Makefile
+            // invokes these page writers as a second command, and
+            // the contract did not reproduce it. So twenty-five
+            // committed pages sat in the "legacy-baseline (held as
+            // committed)" class for a year of sprints - held, never
+            // checked - and fell a projection behind the atlas
+            // without anything saying so. Registering the writers is
+            // what turns those pages back into evidence: the
+            // canonical run redraws them and compares them with the
+            // bytes somebody agreed to, and the portable run draws
+            // them twice. Found while measuring #360, which had no
+            // business discovering it.
+            "juranometria.tool.WiderFieldPageMain",
+            "juranometria.tool.EclipticInkStudyMain");
 
     /**
      * The legacy generators: they write under build/, and their
