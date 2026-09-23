@@ -29,6 +29,15 @@ public enum ChartStructure {
     CONSTELLATION_FIGURES;
 
     /**
+     * This structure as a stable lowercase token - the form metadata
+     * and resource keys carry, e.g. {@code equatorial-grid}.
+     */
+    public String token() {
+        return name().toLowerCase(java.util.Locale.ROOT)
+                .replace('_', '-');
+    }
+
+    /**
      * The structure a module's contributed identity belongs to, or
      * empty for an identity the chart does not know.
      *

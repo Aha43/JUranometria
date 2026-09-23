@@ -40,6 +40,18 @@ public final class ChartComponent extends JComponent {
     private List<String> selected = List.of();
     /** The lead identity, wearing the cross vocabulary's treatment. */
     private String highlighted;
+    /**
+     * The reader's transient emphasis (issue #361): at most one
+     * semantic structure raised in ink. Presentation context beside
+     * the options, never inside them and never persisted - it
+     * survives panning and zooming and dies with the session. It is
+     * cleared the moment its structure stops being available, so no
+     * invisible latent mode outlives a hidden layer or a detached
+     * module.
+     */
+    private juranometria.render.ChartStructure emphasized;
+    private final java.util.List<Runnable> emphasisListeners =
+            new java.util.ArrayList<>();
     private final java.util.List<Runnable> sceneListeners =
             new java.util.ArrayList<>();
 
@@ -145,6 +157,7 @@ public final class ChartComponent extends JComponent {
         for (Runnable listener : List.copyOf(optionsListeners)) {
             listener.run();
         }
+        revalidateEmphasis();
         repaint();
     }
 
@@ -242,6 +255,12 @@ public final class ChartComponent extends JComponent {
         repaint();
     }
 
+    /** The selected members, in membership order; package-visible
+     * so the emphasis contracts can hold the independence rule. */
+    List<String> selectedMembers() {
+        return selected;
+    }
+
     private void assembleScene() {
         if (getWidth() <= 0 || getHeight() <= 0) {
             return;
@@ -254,6 +273,7 @@ public final class ChartComponent extends JComponent {
         // Consumers that describe the page - the inspector - need to
         // know it changed, because what the page can say about the
         // selection changes with it (issue #170).
+        revalidateEmphasis();
         for (Runnable listener : java.util.List.copyOf(sceneListeners)) {
             listener.run();
         }
@@ -331,6 +351,79 @@ public final class ChartComponent extends JComponent {
         return overlays;
     }
 
+    /**
+     * Raises one semantic structure in ink, or settles the page.
+     *
+     * <p>{@code null} - or a structure the page cannot currently
+     * show - is the canonical chart. Selecting and emphasizing are
+     * independent by ruling: this touches no selection, and no
+     * selection touches this.
+     */
+    public void emphasize(juranometria.render.ChartStructure structure) {
+        juranometria.render.ChartStructure next =
+                structure != null && emphasisAvailable(structure)
+                        ? structure : null;
+        if (next == emphasized) {
+            return;
+        }
+        emphasized = next;
+        for (Runnable listener : java.util.List.copyOf(emphasisListeners)) {
+            listener.run();
+        }
+        repaint();
+    }
+
+    /** The emphasized structure, or null for the canonical page. */
+    public juranometria.render.ChartStructure emphasized() {
+        return emphasized;
+    }
+
+    /** Told when emphasis changes, including a forced settle. */
+    public void onEmphasisChange(Runnable listener) {
+        if (listener != null) {
+            emphasisListeners.add(listener);
+        }
+    }
+
+    /**
+     * Whether this structure could take emphasis right now: its
+     * layer is switched on and drawn at this field, or some module
+     * is contributing geometry the chart maps to it.
+     */
+    public boolean emphasisAvailable(
+            juranometria.render.ChartStructure structure) {
+        if (structure == null) {
+            return false;
+        }
+        juranometria.render.ChartOptions drawn = drawnOptions();
+        var policy = new juranometria.render.GeographyDetailPolicy(
+                viewState.fieldWidthDegrees());
+        return switch (structure) {
+            case EQUATORIAL_GRID -> drawn.equatorialGrid();
+            case CONSTELLATION_BOUNDARIES ->
+                    drawn.constellationBoundaries()
+                            && policy.boundariesDrawn();
+            case CONSTELLATION_FIGURES ->
+                    drawn.constellationFigures() && policy.figuresDrawn();
+            default -> overlays.collect().stream().anyMatch(owned ->
+                    juranometria.render.ChartStructure
+                            .ofIdentity(owned.geometry().identity())
+                            .filter(s -> s == structure).isPresent());
+        };
+    }
+
+    /**
+     * Settles the page if the emphasized structure has become
+     * unavailable. Called wherever availability can change - an
+     * options change, a scene change, a module contributing or
+     * withdrawing - and never during painting.
+     */
+    void revalidateEmphasis() {
+        if (emphasized != null && !emphasisAvailable(emphasized)) {
+            emphasize(null);
+        }
+    }
+
     public int pageOffsetY() {
         return scene == null ? 0
                 : (getHeight() - scene.viewport().heightPx()) / 2;
@@ -391,7 +484,9 @@ public final class ChartComponent extends JComponent {
                             spokenDirections = ReferenceInk.paint(
                                     layerG, layerScene,
                                     overlays.collect(),
-                                    drawn.palette(), words, reserved));
+                                    drawn.palette(), words, reserved,
+                                    emphasized),
+                    null, emphasized);
             // What a reader who cannot see the page is told follows
             // what the page actually rendered (#359): the base
             // description, and then every cardinal direction this

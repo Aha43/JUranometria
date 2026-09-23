@@ -1,10 +1,10 @@
 # Temporary cartographic emphasis: the seam and the frozen palette
 
-Issue #361, phase 1. The atlas's canonical chart stays the authored
+Issue #361. The atlas's canonical chart stays the authored
 default; while reading, a person may let exactly one semantic
 structure rise from the page, and the atlas settles back. This
-record freezes the ink decisions that phase 2 (the transient control
-and the explicit emphasized export) builds on.
+record freezes the ink decisions of phase 1 and the interaction and
+export rules phase 2 settled on top of them.
 
 ## The boundary the discovery proved
 
@@ -92,9 +92,60 @@ The study harness (`EmphasisStudyMain`) regenerates the whole
 matrix and the measurement tables into `build/emphasis-study`;
 study output only, promoted nowhere.
 
+## The transient control (phase 2)
+
+One compact **Emphasis** button in the chart toolbar, before the
+search field, opening one radio menu: Normal and the six structures
+in the order above. The menu is built fresh each time it opens, so
+it reads the chart rather than remembering it.
+
+- **Transient, never persisted.** The emphasized structure lives on
+  the chart component beside the options, survives panning and
+  zooming, and dies with the session. No preference key exists;
+  the persisted chart options carry no trace of it.
+- **Availability and clearing.** A target is choosable only while
+  its layer is switched on and drawn at the current field, or some
+  module is contributing geometry the chart maps to it; unavailable
+  targets arrive disabled. The moment an emphasized structure stops
+  being available - its layer switched off, the detail policy
+  narrowing past it, its module hiding its lines or detaching - the
+  emphasis settles immediately. No invisible latent mode survives,
+  and an unavailable ask settles rather than being held.
+- **Choosing Normal, or the active target again, settles the page**
+  - one named rule, held by contract.
+- **Selection independence, both directions.** Selecting an object
+  never changes emphasis; emphasizing never changes the selection
+  or the working set.
+- No keyboard shortcut and no press-and-hold in this phase, by
+  ruling: the visible control establishes the interaction first.
+
+## The explicit emphasized export (phase 2)
+
+Ordinary export is the canonical chart whatever the screen shows -
+byte for byte, by the same code path, held by contract. While
+something is emphasized, the export dialog offers one explicit
+choice, **Include current emphasis**, always starting unchecked and
+absent entirely otherwise; nothing about it is remembered between
+exports. When the reader checks it:
+
+- one recording is made and SVG, PDF and PNG all write it, so the
+  three formats cannot disagree about what was emphasized;
+- each format records the semantic target as the stable token of
+  the structure (`emphasis:equatorial-grid` and its kin) - SVG in a
+  metadata element, PDF as a Keywords entry, PNG as an Emphasis
+  text entry. A token, not prose, so the record survives any
+  interface language, and absent entirely from an ordinary sheet;
+- the sheet stays white paper, as every sheet is, drawn with the
+  paper accents.
+
+Cancel, ordinary export, and clearing emphasis all leave the
+canonical export bytes untouched.
+
 ## Observed limitation
 
 A structure appears only where its geometry crosses the page - at
 the study's Oslo instant the meridian misses the Orion pages and
-shows on Sagittarius. Phase 2's control must disable unavailable
-targets rather than emphasize an absent line.
+shows on Sagittarius. The control therefore disables unavailable
+targets rather than emphasizing an absent line; availability is
+read from the layers and the contributed geometry, not from
+whether the page's frame happens to intersect the structure.

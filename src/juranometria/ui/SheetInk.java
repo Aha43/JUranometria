@@ -31,6 +31,16 @@ public final class SheetInk {
      */
     public static ChartRenderer.ReferenceLayer reference(
             ChartComponent chart) {
+        return reference(chart, null);
+    }
+
+    /**
+     * The same ink, with the reader's explicitly exported emphasis
+     * (#361). {@code null} is the canonical layer by the same path.
+     */
+    public static ChartRenderer.ReferenceLayer reference(
+            ChartComponent chart,
+            juranometria.render.ChartStructure emphasized) {
         if (chart == null) {
             throw new IllegalArgumentException("a chart is required");
         }
@@ -38,7 +48,7 @@ public final class SheetInk {
         // and the ink has to match the ground it is on.
         return (g, scene, reserved) -> ReferenceInk.paint(g, scene,
                 chart.overlays().collect(), ChartPalette.WHITE_PAPER,
-                chart.words(), reserved);
+                chart.words(), reserved, emphasized);
     }
 
     /**

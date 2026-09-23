@@ -83,6 +83,14 @@ public final class SvgSheetWriter {
                 .append("</desc>\n");
         svg.append("  <metadata>").append(escape(about.producedBy()))
                 .append("</metadata>\n");
+        if (about.emphasis() != null) {
+            // An explicitly emphasized export records its target
+            // (#361); an ordinary sheet carries no such element and
+            // is byte-identical to every sheet before it.
+            svg.append("  <metadata>emphasis:")
+                    .append(escape(about.emphasis()))
+                    .append("</metadata>\n");
+        }
 
         // Production's own clips, as clip paths. The renderer cuts
         // its ink at the paper's edge; dropping that would let a line

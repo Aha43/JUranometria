@@ -289,6 +289,9 @@ public final class JUranometriaMain {
         // The same AppInfo.version() About prints, handed over
         // rather than looked up twice.
         AtlasToolbar toolbar = controls.toolbar();
+        // The reader's transient emphasis control (#361): the chart
+        // is the truth it reads, and nothing about it is persisted.
+        toolbar.attachEmphasis(chart);
 
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
