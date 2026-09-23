@@ -282,11 +282,23 @@ class FigureAnchorTest {
 
     /** The same options with the page's own furniture switched off. */
     private static ChartOptions withoutFurniture() {
+        return withFurniture(false, false);
+    }
+
+    /**
+     * The defaults with each furniture piece chosen separately. The
+     * furniture is two blocks with their own switches - the title
+     * block and the magnitude key - and what each is answerable for
+     * is measured apart, not lumped as one mask.
+     */
+    private static ChartOptions withFurniture(boolean titleBlock,
+                                              boolean magnitudeKey) {
         ChartOptions on = ChartOptions.DEFAULTS;
         return new ChartOptions(on.deepSkyObjects(), on.deepSkyLabels(),
                 on.constellationFigures(), on.constellationBoundaries(),
                 on.constellationNames(), on.starNames(), on.bayerLetters(),
-                on.flamsteedNumbers(), on.equatorialGrid(), false, false,
+                on.flamsteedNumbers(), on.equatorialGrid(), titleBlock,
+                magnitudeKey,
                 on.galaxies(), on.openClusters(), on.globularClusters(),
                 on.nebulae(), on.planetaryNebulae(), on.palette());
     }
@@ -309,7 +321,10 @@ class FigureAnchorTest {
                             + " check: " + endpoints.size());
             Painted reader = painted(scene, ChartOptions.DEFAULTS);
             Painted bare = painted(scene, withoutFurniture());
-            int covered = 0;
+            Painted noTitle = painted(scene, withFurniture(false, true));
+            Painted noKey = painted(scene, withFurniture(true, false));
+            int byTitle = 0;
+            int byKey = 0;
             for (SkyPosition endpoint : endpoints) {
                 if (reader.nodeAt(endpoint)) {
                     continue;
@@ -318,18 +333,35 @@ class FigureAnchorTest {
                 // the chart's own furniture, painted opaque over the
                 // sky and switched off here to see underneath. It
                 // happens on the released 42-degree page too, where
-                // no star is held back for a figure at all.
-                covered++;
+                // no star is held back for a figure at all. Counted
+                // by the piece that answers for it, so a piece that
+                // grows says so in its own name.
                 assertTrue(bare.nodeAt(endpoint),
                         field + " degrees at V "
                                 + ChartViewState.defaultMagnitudeFor(field)
                                 + ": the endpoint at " + endpoint
                                 + " has no star painted at it, with the"
                                 + " page's furniture off");
+                boolean titleCovers = noTitle.nodeAt(endpoint);
+                boolean keyCovers = noKey.nodeAt(endpoint);
+                assertTrue(titleCovers || keyCovers,
+                        field + " degrees at " + endpoint + ": a"
+                                + " covered endpoint is covered by a"
+                                + " piece that answers for it alone");
+                if (titleCovers) {
+                    byTitle++;
+                }
+                if (keyCovers) {
+                    byKey++;
+                }
             }
-            assertTrue(covered <= 6, field + " degrees: the furniture"
-                    + " covers a handful of nodes, not a page of them: "
-                    + covered);
+            assertTrue(byTitle <= 7, field + " degrees: the title"
+                    + " block covers a handful of nodes, not a page of"
+                    + " them: " + byTitle + ", against 2, 7 and 5 at"
+                    + " 60, 90 and 120 degrees when this was measured"
+                    + " with #359's wider facts line");
+            assertEquals(0, byKey, field + " degrees: the key hides"
+                    + " no figure star on these pages");
         }
     }
 
@@ -570,23 +602,33 @@ class FigureAnchorTest {
             // The two paintings are the same page at two limits, so a
             // pixel that changed is a star the control admitted - with
             // one exception, which is not a star and is not sky: the
-            // title block states the limiting magnitude and the key
-            // draws its rows down to it, so both restate themselves.
-            // The furniture's own region is measured rather than
-            // guessed - it is where switching the furniture off
-            // changes the page - and counted apart from the sky.
-            boolean[] furniture = furnitureMask(bright, deeper);
+            // furniture restating itself. Each furniture piece is
+            // measured apart, in its own region - where switching
+            // that piece off changes the page - because the two
+            // pieces behave differently: the title's facts line
+            // carries the limit, and everything after the limit's
+            // digits moves when they change, wider since #359 put the
+            // celestial-orientation wording on that line; the key
+            // names its whole scale and does not redraw with the
+            // limit at all.
+            boolean[] title = maskOf(withFurniture(false, true),
+                    bright, deeper);
+            boolean[] key = maskOf(withFurniture(true, false),
+                    bright, deeper);
             int offset = onEdt(chart[0]::pageOffsetY);
             long sky = 0;
-            long block = 0;
+            long inTitle = 0;
+            long inKey = 0;
             for (int y = 0; y < bright.viewport().heightPx(); y++) {
                 for (int x = 0; x < bright.viewport().widthPx(); x++) {
                     if (before.getRGB(x, y + offset)
                             == after.getRGB(x, y + offset)) {
                         continue;
                     }
-                    if (furniture[y * bright.viewport().widthPx() + x]) {
-                        block++;
+                    if (title[y * bright.viewport().widthPx() + x]) {
+                        inTitle++;
+                    } else if (key[y * bright.viewport().widthPx() + x]) {
+                        inKey++;
                     } else {
                         sky++;
                     }
@@ -595,12 +637,16 @@ class FigureAnchorTest {
             assertTrue(sky > 10000, "and the surrounding field came in:"
                     + " " + sky + " pixels of sky changed, against"
                     + " 35691 when this was measured");
-            assertTrue(block > 0 && block < sky / 100, "while the"
-                    + " furniture restates the limit it now draws to,"
-                    + " which is neither a star nor sky: " + block
-                    + " pixels, against 185 when this was measured -"
-                    + " inside the blocks' own region and nowhere"
-                    + " else");
+            assertTrue(inTitle > 0 && inTitle < sky / 10, "while the"
+                    + " title restates the limit it now draws to,"
+                    + " which is neither a star nor sky: " + inTitle
+                    + " pixels, against 719 when this was measured"
+                    + " with #359's wider facts line - inside the"
+                    + " title's own region and dwarfed by the field");
+            assertTrue(inKey < sky / 100, "and the key, naming its"
+                    + " whole scale, redraws next to nothing for a"
+                    + " changed limit: " + inKey + " pixels, against 0"
+                    + " when this was measured");
         }, () -> javax.swing.SwingUtilities.invokeAndWait(() -> {
             if (window[0] != null) {
                 window[0].dispose();
@@ -659,21 +705,22 @@ class FigureAnchorTest {
     }
 
     /**
-     * Where the page's own furniture lands, in page pixels.
+     * Where a furniture piece lands, in page pixels.
      *
      * <p>Measured, not taken from the blocks' published bounds: what
-     * matters here is which pixels the furniture is answerable for,
-     * and that is exactly where switching it off changes the page.
+     * matters here is which pixels that piece is answerable for, and
+     * that is exactly where switching it off changes the page.
      * Grown by two pixels so an antialiased edge belongs to the block
      * that drew it rather than to the sky.
      */
-    private static boolean[] furnitureMask(ChartScene... scenes) {
+    private static boolean[] maskOf(ChartOptions bareOfThePiece,
+                                    ChartScene... scenes) {
         int wide = scenes[0].viewport().widthPx();
         int high = scenes[0].viewport().heightPx();
         boolean[] drawn = new boolean[wide * high];
         for (ChartScene scene : scenes) {
             var page = paint(scene, ChartOptions.DEFAULTS);
-            var bare = paint(scene, withoutFurniture());
+            var bare = paint(scene, bareOfThePiece);
             for (int y = 0; y < high; y++) {
                 for (int x = 0; x < wide; x++) {
                     if (page.getRGB(x, y) != bare.getRGB(x, y)) {

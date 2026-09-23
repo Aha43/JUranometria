@@ -180,6 +180,23 @@ class LocalSkyTest {
 
     // ---- what the model refuses ------------------------------------
 
+    /**
+     * The distinction the gate draws, made explicit by #359: a
+     * parameter may name <em>which</em> answer is asked for, never
+     * <em>how well</em> it is computed. {@code Cardinal} selects one
+     * of four full-fidelity questions - which point of the horizon -
+     * so it is an identity, not a mode. A fidelity or mode enum
+     * would let a caller choose a lesser astronomical answer, which
+     * is what the rejected shortcut taught to refuse.
+     */
+    private static final java.util.Set<Class<?>> IDENTITY_PARAMETERS =
+            java.util.Set.of(juranometria.chart.Cardinal.class);
+
+    private static boolean allowedParameter(Class<?> parameter) {
+        return !parameter.isEnum()
+                || IDENTITY_PARAMETERS.contains(parameter);
+    }
+
     @Test
     void thereIsNoWayToAskForTheAnswerTheGateRejected() throws Exception {
         // The shortcut - RA = local sidereal time, plotted on a
@@ -197,12 +214,21 @@ class LocalSkyTest {
                         type.getSimpleName() + "." + method.getName()
                                 + " offers a lesser answer");
                 for (Class<?> parameter : method.getParameterTypes()) {
-                    assertTrue(!parameter.isEnum(),
+                    assertTrue(allowedParameter(parameter),
                             type.getSimpleName() + "." + method.getName()
                                     + " takes a mode: " + parameter);
                 }
             }
         }
+        // Both sides of the distinction, proved rather than assumed:
+        // a fidelity enum is exactly what the sweep refuses, and the
+        // cardinal identity is exactly what it permits.
+        enum SyntheticFidelity { FAST, EXACT }
+        assertTrue(!allowedParameter(SyntheticFidelity.class),
+                "a fidelity enum is a mode, and the sweep refuses it");
+        assertTrue(allowedParameter(juranometria.chart.Cardinal.class),
+                "the cardinal identity names which point of the"
+                        + " horizon, at full fidelity, and stays");
         // And the difference is real, so this is not vacuous.
         LocalSky here = sky(59.913, 10.752);
         SkyPosition shortcut = new SkyPosition(

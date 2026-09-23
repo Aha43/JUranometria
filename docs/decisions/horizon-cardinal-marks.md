@@ -80,6 +80,20 @@ size come from captures of different dialog widths and whose width
 flips between desktop sessions - capture instability of the #364
 family, not feature effect.
 
+Re-measured in the repair that followed this issue's incomplete
+checkpoint: the #364 holdout applies to the unstable **image
+capture**, not to truthful text. `export-strings.md` regenerates
+byte-identically across fresh processes; the pre-#359 build
+reproduces its committed bytes exactly, so it was never stale; and
+its only #359 delta is the two quoted byte sizes of the written
+`orion.svg`, which an SVG diff pins to one changed text element -
+the facts line carrying this issue's approved celestial wording.
+(The committed screenshot itself reproduced byte-identically at
+332 px in the same sessions; the "326" beside it is the English
+sheet's own packed width, not an inconsistency.) The deterministic
+companion is therefore promoted with the repair, and the holdout
+keeps only the capture-session instability it was written for.
+
 ## Promotion: 195 paths, not 212
 
 Physical promotion was derived mechanically as the manifest minus the

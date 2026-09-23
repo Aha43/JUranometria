@@ -383,13 +383,17 @@ class SprintTwentyEightJourneyTest {
                 for (OverlayRegistry.Owned owned : chart.overlays().collect()) {
                     together.add(owned.geometry().identity());
                 }
-                assertEquals(List.of("december-solstice", "ecliptic",
-                                "horizon", "june-solstice", "march-equinox",
-                                "meridian", "september-equinox", "zenith"),
+                assertEquals(List.of("cardinal-east", "cardinal-north",
+                                "cardinal-south", "cardinal-west",
+                                "december-solstice", "ecliptic", "horizon",
+                                "june-solstice", "march-equinox", "meridian",
+                                "september-equinox", "zenith"),
                         together.stream().sorted().toList(),
                         "4. every contributed line is accounted for: five"
-                                + " of the fixed sky and three of the"
-                                + " observer's, and nothing else");
+                                + " of the fixed sky and seven of the"
+                                + " observer's - the shown horizon brings"
+                                + " its four cardinal landmarks (#359) -"
+                                + " and nothing else");
                 assertTrue(ecliptic.showing() && meridian.meridianShowing(),
                         "both modules are showing, neither having touched"
                                 + " the other's state");

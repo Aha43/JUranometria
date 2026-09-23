@@ -378,7 +378,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **431
-reads of live chart state** against **786 explicit hand-offs**
+reads of live chart state** against **792 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -411,7 +411,11 @@ read while the table may still be rebuilding its columns; and for
 #350's Inspector wrapping, which
 builds the panel, selects into it and measures the result each on
 the event thread, because a width read off any other thread is a
-width read while the layout may still be changing it). The discipline
+width read while the layout may still be changing it; and for #359's
+cardinal-marks and chart-speaks-directions proofs, which build the
+real component, paint it, and read its accessible description each
+on the event thread, because what they check is the sentence a
+screen reader is actually handed). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

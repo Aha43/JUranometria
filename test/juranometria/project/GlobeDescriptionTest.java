@@ -75,9 +75,14 @@ class GlobeDescriptionTest {
             assertFalse(said.contains("limb"),
                     field + " degrees says nothing about a limb: "
                             + said);
-            assertTrue(said.endsWith("North up, east left."),
-                    field + " degrees ends where it always ended: "
-                            + said);
+            // The closing sentence is #359's approved wording: the
+            // page's north is celestial, said so, because the drawn N
+            // on an observer's horizon is a different north.
+            assertTrue(said.endsWith(
+                            "Celestial north is up, and celestial east"
+                                    + " is left."),
+                    field + " degrees ends with the approved"
+                            + " orientation sentence: " + said);
         }
     }
 
