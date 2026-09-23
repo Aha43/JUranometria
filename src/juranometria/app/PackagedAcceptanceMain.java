@@ -435,6 +435,7 @@ public final class PackagedAcceptanceMain {
         readerJourney();
         onThisPageJourney();
         meridianJourney();
+        emphasisJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -1124,6 +1125,86 @@ public final class PackagedAcceptanceMain {
     }
 
     /** The component's own painting, into an image. */
+    /**
+     * Temporary cartographic emphasis, demonstrated INSIDE the
+     * packaged runtime on real pages (issue #361): the meridian, the
+     * ecliptic, the equatorial grid and the constellation figures
+     * each rise from the page through chart-owned ink, and choosing
+     * Normal settles the page byte-exactly. Two released pages carry
+     * the four: the opening M31 page holds the grid and, at the
+     * meridian journey's stated observer, the meridian; a 120-degree
+     * Orion page holds the figures and the ecliptic.
+     */
+    private static void emphasisJourney() throws Exception {
+        // Page one: the opening page, with the stated observer's
+        // meridian laid across it.
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        ENGLISH_PAGE);
+        chart.setSize(900, 700);
+        chart.setViewState(ChartViewState.DEFAULT);
+        juranometria.ui.ChartModuleHost host =
+                new juranometria.ui.ChartModuleHost(chart,
+                        new juranometria.chart.SelectionModel(),
+                        request -> { });
+        juranometria.meridian.MeridianModule meridian =
+                host.attach(new juranometria.meridian.MeridianModule(
+                        new juranometria.sky.Observer(42.5, -130.994,
+                                java.time.Instant.parse(
+                                        "2026-03-20T21:33:00Z"))));
+        meridian.showing(true, false, false);
+
+        java.awt.image.BufferedImage canonical = paint(chart);
+        chart.emphasize(juranometria.render.ChartStructure
+                .EQUATORIAL_GRID);
+        int gridInk = differingPixels(canonical, paint(chart));
+        require(gridInk > 100, "the grid rises from the page: "
+                + gridInk + " pixels of ink change, geometry none");
+        chart.emphasize(juranometria.render.ChartStructure.MERIDIAN);
+        int meridianInk = differingPixels(canonical, paint(chart));
+        require(meridianInk > 50, "the meridian rises with its"
+                + " module's own line: " + meridianInk + " pixels");
+        chart.emphasize(null);
+        require(differingPixels(canonical, paint(chart)) == 0,
+                "and Normal settles the page byte-exactly");
+        meridian.detach();
+
+        // Page two: a 120-degree Orion page, where the detail policy
+        // draws the figures and the ecliptic crosses the paper.
+        chart = new juranometria.ui.ChartComponent(Atlas.assembler(),
+                ENGLISH_PAGE);
+        chart.setSize(900, 700);
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(83.0, 0.0), 120.0, 4.0));
+        host = new juranometria.ui.ChartModuleHost(chart,
+                new juranometria.chart.SelectionModel(), request -> { });
+        juranometria.ecliptic.EclipticModule ecliptic =
+                host.attach(new juranometria.ecliptic.EclipticModule());
+        ecliptic.showing(true);
+
+        canonical = paint(chart);
+        chart.emphasize(juranometria.render.ChartStructure
+                .CONSTELLATION_FIGURES);
+        int figureInk = differingPixels(canonical, paint(chart));
+        require(figureInk > 100, "the constellation figures rise: "
+                + figureInk + " pixels, their stars and names"
+                + " untouched by contract");
+        chart.emphasize(juranometria.render.ChartStructure.ECLIPTIC);
+        int eclipticInk = differingPixels(canonical, paint(chart));
+        require(eclipticInk > 50, "the ecliptic rises with its"
+                + " landmarks: " + eclipticInk + " pixels");
+        chart.emphasize(null);
+        require(differingPixels(canonical, paint(chart)) == 0,
+                "and Normal settles this page byte-exactly too");
+        ecliptic.detach();
+
+        System.out.println("emphasis OK (grid " + gridInk
+                + ", meridian " + meridianInk + ", figures "
+                + figureInk + ", ecliptic " + eclipticInk
+                + " px raised on real pages; Normal settles"
+                + " byte-exactly; nothing persisted)");
+    }
+
     private static java.awt.image.BufferedImage paint(
             juranometria.ui.ChartComponent chart) {
         java.awt.image.BufferedImage image =
