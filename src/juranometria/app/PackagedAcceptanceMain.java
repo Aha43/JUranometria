@@ -547,9 +547,15 @@ public final class PackagedAcceptanceMain {
         for (var owned : chart.overlays().collect()) {
             offered.add(owned.geometry().identity());
         }
+        // Three lines - and with the horizon shown, its four
+        // cardinal landmarks ride with it (#359): the observer's N,
+        // E, S and W are the horizon's own, contributed and
+        // withdrawn with it.
         require(offered.equals(java.util.List.of("meridian", "horizon",
-                        "zenith")),
-                "the module offers its three geometries: " + offered);
+                        "cardinal-north", "cardinal-east",
+                        "cardinal-south", "cardinal-west", "zenith")),
+                "the module offers its lines and the shown horizon's"
+                        + " landmarks: " + offered);
 
         // And the zenith ring is drawn where the model puts it.
         double[] at = host.projection()
@@ -725,8 +731,10 @@ public final class PackagedAcceptanceMain {
         // one leaves the other's alone.
         host.attach(module);
         module.showing(true, true, true);
-        require(chart.overlays().collect().size() == 8,
-                "the two modules compose: three geometries and five");
+        // Three lines plus the shown horizon's four cardinal
+        // landmarks (#359), and the ecliptic's five.
+        require(chart.overlays().collect().size() == 12,
+                "the two modules compose: seven geometries and five");
         java.awt.image.BufferedImage both = paint(chart);
 
         ecliptic.detach();
@@ -735,9 +743,11 @@ public final class PackagedAcceptanceMain {
             leftBehind.add(owned.geometry().identity());
         }
         require(leftBehind.equals(java.util.List.of("meridian",
-                        "horizon", "zenith")),
+                        "horizon", "cardinal-north", "cardinal-east",
+                        "cardinal-south", "cardinal-west", "zenith")),
                 "detaching the ecliptic removes its own contributions"
-                        + " and leaves the other module's: "
+                        + " and leaves the other module's, the shown"
+                        + " horizon's landmarks included: "
                         + leftBehind);
         // Asked of the page as the difference detaching made, not of
         // whether the meridian happens to cross this sky: an earlier
