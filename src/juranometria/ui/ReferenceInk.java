@@ -121,8 +121,20 @@ public final class ReferenceInk {
                       juranometria.render.ChartPalette palette,
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved) {
+        return paint(g, scene, contributions, palette, words, reserved,
+                null);
+    }
+
+    /** The same page with one structure emphasized (#361). */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      ChartScene scene,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      juranometria.render.ChartStructure emphasized) {
         return paint(g, DrawnPage.of(scene), contributions, palette,
-                words, reserved);
+                words, reserved, emphasized);
     }
 
     /**
@@ -140,6 +152,27 @@ public final class ReferenceInk {
                       juranometria.render.ChartPalette palette,
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved) {
+        return paint(g, page, contributions, palette, words, reserved,
+                null);
+    }
+
+    /**
+     * The same, with the reader's emphasized structure - if any -
+     * taking its accent (#361).
+     *
+     * <p>The chart maps each contribution's identity centrally
+     * ({@code ChartStructure.ofIdentity}); an identity the chart
+     * does not know keeps canonical ink under every selection.
+     * Emphasis is ink only: order, clipping, placement, precedence
+     * and the line names' ink stay exactly canonical.
+     */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      DrawnPage page,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      juranometria.render.ChartStructure emphasized) {
         ChartScene scene = page.scene();
         if (contributions.isEmpty()) {
             return List.of();
@@ -201,7 +234,7 @@ public final class ReferenceInk {
                 if (owned.geometry()
                         instanceof OverlayContribution.GreatCircle circle) {
                     drawCircle(g2, projection, mapping, region, circle,
-                            palette);
+                            palette, emphasized);
                 }
             }
             // The names are the published decision, written rather
@@ -237,17 +270,32 @@ public final class ReferenceInk {
                 if (owned.geometry()
                         instanceof OverlayContribution.Point point) {
                     drawPoint(g2, projection, mapping, paper, sky,
-                            bounded, point, taken, palette);
+                            bounded, point, taken, palette, emphasized);
                 }
             }
             // The cardinal ink itself, still under the sky clip: the
             // limb halves a limb mark's diamond, which is #331's law
-            // and a boundary tick's honest shape.
+            // and a boundary tick's honest shape. The cardinal
+            // landmarks read with the horizon (#361's central map),
+            // so they take the horizon's accent with it - mark and
+            // letter both, as the grid's notation does with its
+            // curves - and placement never moves.
+            boolean horizonRaised = emphasized
+                    == juranometria.render.ChartStructure.HORIZON;
+            juranometria.render.StructureStyle.Style mark =
+                    juranometria.render.StructureStyle.resolve(palette,
+                            juranometria.render.ChartStructure.HORIZON,
+                            horizonRaised, palette.figureInk(), SOLID);
+            java.awt.Color letterInk =
+                    juranometria.render.StructureStyle.resolve(palette,
+                            juranometria.render.ChartStructure.HORIZON,
+                            horizonRaised, palette.gridLabelInk(), SOLID)
+                            .color();
             for (DirectionPlacement placed : laid.directions()) {
-                g2.setColor(palette.figureInk());
-                g2.setStroke(SOLID);
+                g2.setColor(mark.color());
+                g2.setStroke(mark.stroke());
                 g2.draw(diamond(placed.at()));
-                g2.setColor(palette.gridLabelInk());
+                g2.setColor(letterInk);
                 g2.drawString(placed.letter(),
                         (float) placed.box().getMinX(),
                         (float) (placed.box().getMaxY()
@@ -522,7 +570,9 @@ public final class ReferenceInk {
                                    ViewportMapping mapping,
                                    PageRegion region,
                                    OverlayContribution.GreatCircle circle,
-                                   juranometria.render.ChartPalette palette) {
+                                   juranometria.render.ChartPalette palette,
+                                   juranometria.render.ChartStructure
+                                           emphasized) {
         List<CurveRun> runs = GreatCirclePage.clip(projection, mapping,
                 region, circle.pole());
         if (runs.isEmpty()) {
@@ -531,8 +581,23 @@ public final class ReferenceInk {
             // made.
             return;
         }
-        g.setColor(palette.figureInk());
-        g.setStroke(strokeFor(circle.reference()));
+        // The chart's central identity map decides whether this line
+        // belongs to the emphasized structure; an unknown identity
+        // keeps canonical ink (#361). The stroke's solid/dashed/
+        // dash-dot identity survives emphasis by the resolver's rule.
+        juranometria.render.StructureStyle.Style style =
+                juranometria.render.ChartStructure
+                        .ofIdentity(circle.identity())
+                        .map(s -> juranometria.render.StructureStyle
+                                .resolve(palette, s, s == emphasized,
+                                        palette.figureInk(),
+                                        strokeFor(circle.reference())))
+                        .orElseGet(() ->
+                                new juranometria.render.StructureStyle
+                                        .Style(palette.figureInk(),
+                                        strokeFor(circle.reference())));
+        g.setColor(style.color());
+        g.setStroke(style.stroke());
         for (CurveRun run : runs) {
             g.draw(shapeOf(run));
         }
@@ -912,14 +977,29 @@ public final class ReferenceInk {
                                   boolean bounded,
                                   OverlayContribution.Point point,
                                   List<Rectangle2D> taken,
-                                  juranometria.render.ChartPalette palette) {
+                                  juranometria.render.ChartPalette palette,
+                                  juranometria.render.ChartStructure
+                                          emphasized) {
         PixelPoint at = projection.project(point.at())
                 .map(mapping::toPixel).orElse(null);
         if (at == null || !sky.contains(at.x(), at.y())) {
             return;
         }
-        g.setColor(palette.figureInk());
-        g.setStroke(SOLID);
+        // A landmark takes its structure's accent with the line it
+        // belongs to - the ecliptic's seasonal marks with the
+        // ecliptic, a zenith with the meridian - and an unknown
+        // identity keeps canonical ink (#361).
+        juranometria.render.StructureStyle.Style style =
+                juranometria.render.ChartStructure
+                        .ofIdentity(point.identity())
+                        .map(s -> juranometria.render.StructureStyle
+                                .resolve(palette, s, s == emphasized,
+                                        palette.figureInk(), SOLID))
+                        .orElseGet(() ->
+                                new juranometria.render.StructureStyle
+                                        .Style(palette.figureInk(), SOLID));
+        g.setColor(style.color());
+        g.setStroke(style.stroke());
         switch (point.mark()) {
             case PLACE -> {
                 g.draw(new Ellipse2D.Double(at.x() - RING, at.y() - RING,

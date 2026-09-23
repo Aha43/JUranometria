@@ -49,7 +49,7 @@ public final class ChartRenderer {
 
     private static final java.awt.BasicStroke SELECTION_STROKE =
             new java.awt.BasicStroke(1.2f);
-    private static final java.awt.Stroke BOUNDARY_STROKE = new BasicStroke(
+    private static final BasicStroke BOUNDARY_STROKE = new BasicStroke(
             1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
             new float[] {1.0f, 3.0f}, 0.0f);
     private static final Font CONSTELLATION_NAME_FONT =
@@ -60,7 +60,7 @@ public final class ChartRenderer {
     /** The symbol families of docs/chart-conventions.md. */
     public enum Symbol { ELLIPSE, DOTTED_CIRCLE, CROSSED_CIRCLE, BOX, PLANETARY, NONE }
 
-    private static final java.awt.Stroke OUTLINE_STROKE = new BasicStroke(1.0f);
+    private static final BasicStroke OUTLINE_STROKE = new BasicStroke(1.0f);
     private static final java.awt.Stroke DOTTED_STROKE = new BasicStroke(
             1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
             new float[] {2.5f, 2.5f}, 0.0f);
@@ -536,6 +536,23 @@ public final class ChartRenderer {
     public void render(Graphics2D g, ChartScene scene, ChartOptions options,
                        ReferenceLayer reference,
                        java.util.List<LabelPlacement.Placement> given) {
+        render(g, scene, options, reference, given, null);
+    }
+
+    /**
+     * The page, with one semantic structure optionally emphasized
+     * (issue #361).
+     *
+     * <p>{@code emphasized} is transient presentation context, never
+     * part of {@link ChartOptions} and never persisted: it changes
+     * ink only, through {@link StructureStyle}, and no geometry,
+     * placement, membership or clipping. {@code null} is the
+     * canonical page, by the same code path.
+     */
+    public void render(Graphics2D g, ChartScene scene, ChartOptions options,
+                       ReferenceLayer reference,
+                       java.util.List<LabelPlacement.Placement> given,
+                       ChartStructure emphasized) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
         ChartPalette palette = options.palette();
@@ -583,10 +600,11 @@ public final class ChartRenderer {
             // PageRegion, which already ends at the limb, so a clip
             // here would hide a regression rather than prevent one.
             EquatorialGrid.draw(g, gridFor(g.getFontMetrics(LABEL_FONT),
-                    scene, options), palette);
+                    scene, options), palette,
+                    emphasized == ChartStructure.EQUATORIAL_GRID);
         }
         drawGeography(g, scene, options, projection, mapping,
-                constellationNamesIn(placedText), sky, paper);
+                constellationNamesIn(placedText), sky, paper, emphasized);
         // Above the grid and the figures, below every mark: a
         // reference line is read across the chart and must not hide
         // an object (docs/decisions/place-and-time.md).
@@ -773,13 +791,20 @@ public final class ChartRenderer {
                                               ConstellationNamePlacement>
                                               names,
                                       java.awt.Shape sky,
-                                      java.awt.Shape paper) {
+                                      java.awt.Shape paper,
+                                      ChartStructure emphasized) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
         ChartPalette palette = options.palette();
         if (options.constellationBoundaries() && policy.boundariesDrawn()) {
-            g.setColor(palette.boundaryInk());
-            g.setStroke(BOUNDARY_STROKE);
+            // Boundaries are lines only: emphasis alters their ink
+            // and nothing else on the page (issue #361).
+            StructureStyle.Style boundaries = StructureStyle.resolve(
+                    palette, ChartStructure.CONSTELLATION_BOUNDARIES,
+                    emphasized == ChartStructure.CONSTELLATION_BOUNDARIES,
+                    palette.boundaryInk(), BOUNDARY_STROKE);
+            g.setColor(boundaries.color());
+            g.setStroke(boundaries.stroke());
             g.setClip(sky);
             for (GeoSegment segment : scene.geography().boundarySegments()) {
                 drawGeographySegment(g, segment, scene, projection, mapping, null);
@@ -787,8 +812,14 @@ public final class ChartRenderer {
             g.setClip(paper);
         }
         if (options.constellationFigures() && policy.figuresDrawn()) {
-            g.setColor(palette.figureInk());
-            g.setStroke(OUTLINE_STROKE);
+            // Only the figure strokes are emphasized: anchored stars
+            // and constellation names keep canonical ink (issue #361).
+            StructureStyle.Style figures = StructureStyle.resolve(
+                    palette, ChartStructure.CONSTELLATION_FIGURES,
+                    emphasized == ChartStructure.CONSTELLATION_FIGURES,
+                    palette.figureInk(), OUTLINE_STROKE);
+            g.setColor(figures.color());
+            g.setStroke(figures.stroke());
             java.util.Map<String, double[]> visibleInk =
                     new java.util.LinkedHashMap<>();
             g.setClip(sky);
@@ -1022,6 +1053,21 @@ public final class ChartRenderer {
         Graphics2D g = image.createGraphics();
         try {
             render(g, scene, options);
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    /** The page with one structure emphasized, as an image (#361). */
+    public BufferedImage renderToImage(ChartScene scene, ChartOptions options,
+                                       ChartStructure emphasized) {
+        BufferedImage image = new BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        try {
+            render(g, scene, options, ReferenceLayer.NONE, null, emphasized);
         } finally {
             g.dispose();
         }

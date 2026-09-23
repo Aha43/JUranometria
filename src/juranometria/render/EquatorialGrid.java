@@ -816,18 +816,35 @@ public final class EquatorialGrid {
      * limitation.
      */
     public static void draw(Graphics2D g, Grid grid, ChartPalette palette) {
+        draw(g, grid, palette, false);
+    }
+
+    /**
+     * The same grid, optionally as the reader's emphasized structure
+     * (issue #361). Emphasis is ink only: the computed grid, its
+     * geometry and its notation placement are exactly the canonical
+     * ones. It includes the coordinate notation with the curves,
+     * because a grid a reader is following is read through its
+     * numbers.
+     */
+    public static void draw(Graphics2D g, Grid grid, ChartPalette palette,
+                            boolean emphasized) {
         g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        drawCurves(g, grid, palette);
-        drawNotation(g, grid, palette);
+        drawCurves(g, grid, palette, emphasized);
+        drawNotation(g, grid, palette, emphasized);
     }
 
     private static void drawCurves(Graphics2D g, Grid grid,
-                                   ChartPalette palette) {
-        g.setColor(palette.gridInk());
-        g.setStroke(new BasicStroke(1.0f));
+                                   ChartPalette palette,
+                                   boolean emphasized) {
+        StructureStyle.Style style = StructureStyle.resolve(palette,
+                ChartStructure.EQUATORIAL_GRID, emphasized,
+                palette.gridInk(), new BasicStroke(1.0f));
+        g.setColor(style.color());
+        g.setStroke(style.stroke());
         for (List<List<PixelPoint>> family
                 : List.of(grid.meridians(), grid.parallels())) {
             for (List<PixelPoint> piece : family) {
@@ -841,8 +858,11 @@ public final class EquatorialGrid {
     }
 
     private static void drawNotation(Graphics2D g, Grid grid,
-                                     ChartPalette palette) {
-        g.setColor(palette.gridLabelInk());
+                                     ChartPalette palette,
+                                     boolean emphasized) {
+        g.setColor(StructureStyle.resolve(palette,
+                ChartStructure.EQUATORIAL_GRID, emphasized,
+                palette.gridLabelInk(), new BasicStroke(1.0f)).color());
         g.setFont(GRID_LABEL_FONT);
         for (Label label : grid.labels()) {
             g.drawString(label.text(), (float) label.x(), (float) label.y());
