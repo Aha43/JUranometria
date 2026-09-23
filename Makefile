@@ -605,6 +605,14 @@ test-evidence-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.TestEvidenceStudyMain \
 		> docs/studies/test-evidence/measurements.md
 
+# Sprint 35 (#361). Draws the emphasis matrix into
+# build/emphasis-study and writes the measurement tables the
+# promoted comparison set carries.
+emphasis-study: classes
+	mkdir -p docs/studies/structure-emphasis
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.EmphasisStudyMain \
+		> docs/studies/structure-emphasis/measurements.md
+
 # Sprint 33 (#347). Measured against
 # docs/studies/sky-language/norwegian-names.tsv, whose provenance is
 # recorded beside it in names.manifest; the report takes its standing

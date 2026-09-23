@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**395 promoted artifacts.**
+**402 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -417,5 +417,12 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/star-identity/pleiades-08.png` | `1db6838c289b361a19f1fa97112c8b94cb443d4503e269e10163f3f7a567adbd` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/polaris-08.png` | `b06e9cc942c61edf782f734712c3e9ac8f9c289cd62275d8535b278d66f45005` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/polaris-36.png` | `7f5c6e6b78896dc1bad9e400fbf70579e239c452d2db4f27ab177bc1d0dd6d49` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
+| `docs/studies/structure-emphasis/orion-120-paper-horizon.png` | `512941f5acd0998446e104c2405d108ca0bba367575afff1a16f88060f601fce` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
+| `docs/studies/structure-emphasis/strip-orion-120-paper-ecliptic.png` | `71d369b355aaa146a83ff8a6ee224bb4625cd420a140bb0f4782da783ad472e7` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
+| `docs/studies/structure-emphasis/strip-orion-120-paper-horizon.png` | `6e2725fdf091c9372cb6f27b5c5d152072407dc17053e538c80addb66efa3910` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
+| `docs/studies/structure-emphasis/strip-orion-42-black-constellation_figures.png` | `5e648a9bc7d9b529a73b1950d34774677c14111dcdc453c0009d1e589fa1fc71` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
+| `docs/studies/structure-emphasis/strip-orion-42-paper-equatorial_grid.png` | `1dffcf441a71ed4195a920527abb710d8f5936b179d72a91c9eab32c49818d10` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
+| `docs/studies/structure-emphasis/strip-sagittarius-120-black-meridian.png` | `ce836d12c01afcccd7d7f924f17eaa7d84d7cb6a4a23c7d3b8dce6aa79e10a45` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
+| `docs/studies/structure-emphasis/strip-sagittarius-42-paper-constellation_boundaries.png` | `c6383648bb8d90276b0956b13fd9bf505897926fe44248c87ff72ea289de2b70` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
 | `docs/studies/working-selection/decided-members.png` | `0eac464db7f7d53a9c3728379956a7f03bc789d550ce43950153bc21acb7dd2f` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | various |
 | `docs/studies/working-selection/today-two-leads.png` | `af12a2eb5eca1a650ac8bf59942372751308f9ff53809eff83a3e653ef62d9b1` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | various |

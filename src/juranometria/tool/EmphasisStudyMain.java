@@ -78,10 +78,11 @@ public final class EmphasisStudyMain {
 
     public static void main(String[] args) throws Exception {
         DIR.mkdirs();
-        try (PrintStream said = new PrintStream(
-                new File(DIR, "measurements.md"), "UTF-8")) {
-            measurements(said);
-        }
+        // The measurement tables are this study's deterministic
+        // report: printed to stdout, promoted as
+        // docs/studies/structure-emphasis/measurements.md, and held
+        // to its bytes by the evidence contract's report route.
+        measurements(System.out);
         for (Page page : PAGES) {
             ChartScene scene = Atlas.assembler().assemble(
                     new ChartViewState(page.centre(), page.field(),
@@ -108,9 +109,9 @@ public final class EmphasisStudyMain {
                             "strip-" + stem);
                 }
             }
-            System.out.println("  " + page.name() + " done");
+            System.err.println("  " + page.name() + " done");
         }
-        System.out.println("EMPHASIS_STUDY_DONE " + DIR);
+        System.err.println("EMPHASIS_STUDY_DONE " + DIR);
     }
 
     /** The page with both modules attached, optionally emphasized. */

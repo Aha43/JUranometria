@@ -63,6 +63,8 @@ public final class EvidenceContractMain {
     private static final Map<String, String> REPORT_MAINS =
             new LinkedHashMap<>();
     static {
+        REPORT_MAINS.put("juranometria.tool.EmphasisStudyMain",
+                "docs/studies/structure-emphasis/measurements.md");
         REPORT_MAINS.put("juranometria.tool.FurnitureStudyMain",
                 "docs/studies/chart-furniture/measurements.md");
         REPORT_MAINS.put("juranometria.tool.IdentifyStudyMain",
@@ -394,6 +396,13 @@ public final class EvidenceContractMain {
                 "build/grid-study");
         BUILD_WRITERS.put("juranometria.tool.BayerStudyMain",
                 "build/bayer-study");
+        // #361: the emphasis study draws its whole matrix into
+        // build/emphasis-study; the reviewed comparison set is
+        // promoted from it, and this registration is what lets the
+        // contract regenerate and judge those bytes rather than
+        // holding them as committed.
+        BUILD_WRITERS.put("juranometria.tool.EmphasisStudyMain",
+                "build/emphasis-study");
     }
 
     /** Each promoted docs directory and the build output it mirrors. */
@@ -418,6 +427,8 @@ public final class EvidenceContractMain {
                 "build/chart-options-study");
         PROMOTED_DIRECTORIES.put("docs/studies/star-identity/",
                 "build/star-identity-study");
+        PROMOTED_DIRECTORIES.put("docs/studies/structure-emphasis/",
+                "build/emphasis-study");
     }
 
     /**
