@@ -709,8 +709,9 @@ public final class GlobeExportStudyMain {
         OverlayRegistry registry = withModules ? modules() : null;
         ChartRenderer.ReferenceLayer reference = registry == null
                 ? ChartRenderer.ReferenceLayer.NONE
-                : (g, drawn) -> ReferenceInk.paint(g, drawn,
-                        registry.collect(), ChartPalette.WHITE_PAPER);
+                : (g, drawn, reserved) -> ReferenceInk.paint(g, drawn,
+                        registry.collect(), ChartPalette.WHITE_PAPER,
+                        ENGLISH, reserved);
 
         // The production route (#331, step five). A reader can reach
         // a hemisphere and a view state can describe one since #329

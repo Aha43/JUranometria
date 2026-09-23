@@ -78,7 +78,7 @@ class SheetInkTest {
         SheetInk.working(chart(), members,
                         members.get(members.size() - 1),
                         ChartOptions.DEFAULTS)
-                .paint(g, scene);
+                .paint(g, scene, java.util.List.of());
         g.dispose();
 
         assertTrue(recorder.drawn().size() >= 3,
@@ -136,7 +136,7 @@ class SheetInkTest {
                 PaperSize.A4.chartHighUnits());
         Graphics2D g = (Graphics2D) recorder.create();
         SheetInk.working(chart, List.of(), null, ChartOptions.DEFAULTS)
-                .paint(g, scene);
+                .paint(g, scene, java.util.List.of());
         g.dispose();
 
         var at = new juranometria.project.GnomonicProjection(
@@ -185,7 +185,7 @@ class SheetInkTest {
                 PaperSize.A4.chartHighUnits());
         Graphics2D g = (Graphics2D) recorder.create();
         SheetInk.working(chart(), List.of(), null, ChartOptions.DEFAULTS)
-                .paint(g, scene);
+                .paint(g, scene, java.util.List.of());
         g.dispose();
 
         assertEquals(0, recorder.drawn().size(),
@@ -212,7 +212,7 @@ class SheetInkTest {
         SheetInk.working(chart(), List.of(marked), marked,
                         ChartOptions.DEFAULTS.withPalette(
                                 ChartPalette.BLACK_SKY))
-                .paint(g, scene);
+                .paint(g, scene, java.util.List.of());
         g.dispose();
 
         assertTrue(recorder.drawn().stream().allMatch(drawn ->

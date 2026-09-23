@@ -290,6 +290,26 @@ public final class ChartComponent extends JComponent {
         return words;
     }
 
+    /** The directions the last paint accepted, for the description. */
+    private java.util.List<ReferenceInk.DirectionPlacement>
+            spokenDirections = java.util.List.of();
+
+    /**
+     * The accessible description: the page, then its rendered
+     * cardinal directions in the page's own language (#359).
+     */
+    static String withDirections(String base,
+            java.util.List<ReferenceInk.DirectionPlacement> directions) {
+        if (directions.isEmpty()) {
+            return base;
+        }
+        StringBuilder said = new StringBuilder(base);
+        for (ReferenceInk.DirectionPlacement placed : directions) {
+            said.append(' ').append(placed.spokenName()).append('.');
+        }
+        return said.toString();
+    }
+
     private String describe(ChartScene scene) {
         // One source for what a page says it is, shared with the
         // title block and the exported sheet (#301), and now in one
@@ -367,9 +387,20 @@ public final class ChartComponent extends JComponent {
             // released page.
             juranometria.render.ChartOptions drawn = drawnOptions();
             renderer.render(g2, scene, drawn,
-                    (layerG, layerScene) -> ReferenceInk.paint(layerG,
-                            layerScene, overlays.collect(),
-                            drawn.palette()));
+                    (layerG, layerScene, reserved) ->
+                            spokenDirections = ReferenceInk.paint(
+                                    layerG, layerScene,
+                                    overlays.collect(),
+                                    drawn.palette(), words, reserved));
+            // What a reader who cannot see the page is told follows
+            // what the page actually rendered (#359): the base
+            // description, and then every cardinal direction this
+            // paint accepted, each by its full localized spoken name.
+            // A direction the page omitted is not spoken, because a
+            // description of ink that is not there would be the lie
+            // accessibility exists to prevent.
+            getAccessibleContext().setAccessibleDescription(
+                    withDirections(describe(scene), spokenDirections));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its

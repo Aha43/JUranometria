@@ -60,9 +60,10 @@ class ReferenceInkTest {
         Graphics2D g = image.createGraphics();
         try {
             RENDERER.render(g, SCENE, ChartOptions.DEFAULTS,
-                    (layerG, scene) ->
+                    (layerG, scene, reserved) ->
                             ReferenceInk.paint(layerG, juranometria.project.DrawnPage.of(scene), ink,
-                                    ChartOptions.DEFAULTS.palette()));
+                                    ChartOptions.DEFAULTS.palette(),
+                                    ENGLISH, reserved));
         } finally {
             g.dispose();
         }
@@ -711,7 +712,8 @@ class ReferenceInkTest {
             g.setRenderingHints(layerHints(scene));
             g.setClip(layerClip(scene));
             ReferenceInk.paint(g, juranometria.project.DrawnPage.of(scene), ink,
-                    ChartOptions.DEFAULTS.palette());
+                    ChartOptions.DEFAULTS.palette(), ENGLISH,
+                    java.util.List.of());
         } finally {
             g.dispose();
         }
@@ -729,7 +731,7 @@ class ReferenceInkTest {
     private static java.awt.RenderingHints layerHints(ChartScene scene) {
         java.awt.RenderingHints[] captured =
                 new java.awt.RenderingHints[1];
-        throughTheLayer(scene, (layerG, painted) ->
+        throughTheLayer(scene, (layerG, painted, reserved) ->
                 captured[0] = (java.awt.RenderingHints)
                         layerG.getRenderingHints());
         return captured[0];
@@ -738,7 +740,7 @@ class ReferenceInkTest {
     /** The clip the renderer has in force at the same moment. */
     private static java.awt.Shape layerClip(ChartScene scene) {
         java.awt.Shape[] captured = new java.awt.Shape[1];
-        throughTheLayer(scene, (layerG, painted) ->
+        throughTheLayer(scene, (layerG, painted, reserved) ->
                 captured[0] = layerG.getClip());
         return captured[0];
     }
@@ -782,8 +784,10 @@ class ReferenceInkTest {
         Graphics2D g = image.createGraphics();
         try {
             RENDERER.render(g, scene, ChartOptions.DEFAULTS,
-                    (layerG, painted) -> ReferenceInk.paint(layerG,
-                            painted, ink, ChartOptions.DEFAULTS.palette()));
+                    (layerG, painted, reserved) -> ReferenceInk.paint(
+                            layerG, painted, ink,
+                            ChartOptions.DEFAULTS.palette(), ENGLISH,
+                            reserved));
         } finally {
             g.dispose();
         }

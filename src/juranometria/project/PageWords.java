@@ -79,6 +79,25 @@ public interface PageWords {
     /** The heading over the magnitude key. */
     String magnitudeKeyHeading();
 
+    // ---- the observer's directions, on the horizon (#359) ------
+
+    /**
+     * The letter drawn at a cardinal horizon mark.
+     *
+     * <p>A language owns its letters - N/E/S/W in English, N/\u00d8/S/V
+     * in Norwegian Bokm\u00e5l - so they arrive through this seam and
+     * never from the module that computed where the mark is.
+     */
+    String directionLetter(juranometria.chart.Cardinal direction);
+
+    /**
+     * What a screen reader calls the mark: full and explicit, such
+     * as "North on your horizon", and never the drawn abbreviation.
+     * The page's celestial north and the observer's N are different
+     * norths, and only words keep them apart.
+     */
+    String directionSpoken(juranometria.chart.Cardinal direction);
+
     // ---- what a screen reader is told --------------------------
 
     /**

@@ -31,11 +31,11 @@ language choices differ.
 |---|---|
 | title line 1 — the page's own title | 0h 42.7m, +41° 16′ |
 | title line 2 — centre | Centre 0h 42.7m, +41° 16′ · ICRS J2000 |
-| title line 3 — facts | Field 60.0° · Stars to V 6.0 · North up, east left · stereographic |
+| title line 3 — facts | Field 60.0° · Stars to V 6.0 · Celestial north up · celestial east left · stereographic |
 | magnitude-key heading | Stars, visual magnitude |
 | chart, spoken name | Star chart |
 | chart, spoken instructions | Press and drag the chart to pan across the sky; scroll to zoom where you point; Reset view returns home. |
-| page, spoken in full | 0h 42.7m, +41° 16′. Centre RA 10.6847, Dec +41.2688 (ICRS J2000). Field 60.0 degrees wide, stereographic projection. Stars to V 6.0. North up, east left. |
+| page, spoken in full | 0h 42.7m, +41° 16′. Centre RA 10.6847, Dec +41.2688 (ICRS J2000). Field 60.0 degrees wide, stereographic projection. Stars to V 6.0. Celestial north is up, and celestial east is left. |
 | exported file: title | JUranometria chart sheet: 0h 42.7m, +41° 16′ |
 | exported file: description | 0h 42.7m, +41° 16′. Centre RA 10.6847, Dec +41.2688 (ICRS/J2000). Field 60 degrees wide, stereographic. Stars to V 6.0. A4 landscape, 297.0 x 210.0 mm, 12.7 mm margins, chart 271.6 x 184.6 mm. Ground: white-paper. |
 | exported file: producer | JUranometria 2.1.0, https://github.com/Aha43/JUranometria - drawn by the application's own chart renderer; no external resources. |
@@ -49,11 +49,11 @@ language choices differ.
 |---|---|
 | title line 1 — the page's own title | 0h 42.7m, +41° 16′ |
 | title line 2 — centre | Centre 0h 42.7m, +41° 16′ · ICRS J2000 |
-| title line 3 — facts | Field 60.0° · Stars to V 6.0 · North up, east left · stereographic |
+| title line 3 — facts | Field 60.0° · Stars to V 6.0 · Celestial north up · celestial east left · stereographic |
 | magnitude-key heading | Stars, visual magnitude |
 | chart, spoken name | Star chart |
 | chart, spoken instructions | Press and drag the chart to pan across the sky; scroll to zoom where you point; Reset view returns home. |
-| page, spoken in full | 0h 42.7m, +41° 16′. Centre RA 10.6847, Dec +41.2688 (ICRS J2000). Field 60.0 degrees wide, stereographic projection. Stars to V 6.0. North up, east left. |
+| page, spoken in full | 0h 42.7m, +41° 16′. Centre RA 10.6847, Dec +41.2688 (ICRS J2000). Field 60.0 degrees wide, stereographic projection. Stars to V 6.0. Celestial north is up, and celestial east is left. |
 | exported file: title | JUranometria chart sheet: 0h 42.7m, +41° 16′ |
 | exported file: description | 0h 42.7m, +41° 16′. Centre RA 10.6847, Dec +41.2688 (ICRS/J2000). Field 60 degrees wide, stereographic. Stars to V 6.0. A4 landscape, 297.0 x 210.0 mm, 12.7 mm margins, chart 271.6 x 184.6 mm. Ground: white-paper. |
 | exported file: producer | JUranometria 2.1.0, https://github.com/Aha43/JUranometria - drawn by the application's own chart renderer; no external resources. |
@@ -67,11 +67,11 @@ language choices differ.
 |---|---|
 | title line 1 — the page's own title | 0h 42.7m, +41° 16′ |
 | title line 2 — centre | Sentrum 0h 42.7m, +41° 16′ · ICRS J2000 |
-| title line 3 — facts | Felt 60.0° · Stjerner ned til V 6.0 · Nord opp, øst til venstre · stereografisk |
+| title line 3 — facts | Felt 60.0° · Stjerner ned til V 6.0 · Himmelsk nord opp · himmelsk øst til venstre · stereografisk |
 | magnitude-key heading | Stjerner, visuell magnitude |
 | chart, spoken name | Stjernekart |
 | chart, spoken instructions | Trykk og dra i kartet for å panorere over himmelen; rull for å zoome der du peker; Tilbakestill visningen tar deg tilbake til utgangspunktet. |
-| page, spoken in full | 0h 42.7m, +41° 16′. Sentrum RA 10.6847, Dec +41.2688 (ICRS J2000). Felt 60.0 grader bredt, stereografisk projeksjon. Stjerner ned til V 6.0. Nord opp, øst til venstre. |
+| page, spoken in full | 0h 42.7m, +41° 16′. Sentrum RA 10.6847, Dec +41.2688 (ICRS J2000). Felt 60.0 grader bredt, stereografisk projeksjon. Stjerner ned til V 6.0. Himmelsk nord er opp, og himmelsk øst er til venstre. |
 | exported file: title | JUranometria kartark: 0h 42.7m, +41° 16′ |
 | exported file: description | 0h 42.7m, +41° 16′. Sentrum RA 10.6847, Dec +41.2688 (ICRS/J2000). Felt 60 grader bredt, stereografisk. Stjerner ned til V 6.0. A4 i liggende format, 297.0 x 210.0 mm, marger på 12.7 mm, kart 271.6 x 184.6 mm. Bakgrunn: hvitt papir. |
 | exported file: producer | JUranometria 2.1.0, https://github.com/Aha43/JUranometria – tegnet av programmets egen kartmotor; ingen eksterne ressurser. |
@@ -85,11 +85,11 @@ language choices differ.
 |---|---|
 | title line 1 — the page's own title | 0h 42.7m, +41° 16′ |
 | title line 2 — centre | Sentrum 0h 42.7m, +41° 16′ · ICRS J2000 |
-| title line 3 — facts | Felt 60.0° · Stjerner ned til V 6.0 · Nord opp, øst til venstre · stereografisk |
+| title line 3 — facts | Felt 60.0° · Stjerner ned til V 6.0 · Himmelsk nord opp · himmelsk øst til venstre · stereografisk |
 | magnitude-key heading | Stjerner, visuell magnitude |
 | chart, spoken name | Stjernekart |
 | chart, spoken instructions | Trykk og dra i kartet for å panorere over himmelen; rull for å zoome der du peker; Tilbakestill visningen tar deg tilbake til utgangspunktet. |
-| page, spoken in full | 0h 42.7m, +41° 16′. Sentrum RA 10.6847, Dec +41.2688 (ICRS J2000). Felt 60.0 grader bredt, stereografisk projeksjon. Stjerner ned til V 6.0. Nord opp, øst til venstre. |
+| page, spoken in full | 0h 42.7m, +41° 16′. Sentrum RA 10.6847, Dec +41.2688 (ICRS J2000). Felt 60.0 grader bredt, stereografisk projeksjon. Stjerner ned til V 6.0. Himmelsk nord er opp, og himmelsk øst er til venstre. |
 | exported file: title | JUranometria kartark: 0h 42.7m, +41° 16′ |
 | exported file: description | 0h 42.7m, +41° 16′. Sentrum RA 10.6847, Dec +41.2688 (ICRS/J2000). Felt 60 grader bredt, stereografisk. Stjerner ned til V 6.0. A4 i liggende format, 297.0 x 210.0 mm, marger på 12.7 mm, kart 271.6 x 184.6 mm. Bakgrunn: hvitt papir. |
 | exported file: producer | JUranometria 2.1.0, https://github.com/Aha43/JUranometria – tegnet av programmets egen kartmotor; ingen eksterne ressurser. |

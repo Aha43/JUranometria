@@ -1240,7 +1240,6 @@
     <g class="labels">
       <text x="623.08" y="535.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="10" fill="#969696">4h 30m</text>
       <text x="494.80" y="535.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="10" fill="#969696">5h</text>
-      <text x="371.18" y="535.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="10" fill="#969696">5h 30m</text>
       <text x="3.00" y="444.13" clip-path="url(#clip0)" font-family="sans-serif" font-size="10" fill="#969696">−10°</text>
       <text x="3.00" y="267.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="10" fill="#969696">+0°</text>
       <text x="3.00" y="89.87" clip-path="url(#clip0)" font-family="sans-serif" font-size="10" fill="#969696">+10°</text>
@@ -2220,7 +2219,7 @@
       <text x="6.66" y="508.39" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">CANIS MAJOR</text>
       <text x="570.83" y="354.46" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">ERIDANUS</text>
       <text x="41.67" y="20.79" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">GEMINI</text>
-      <text x="354.52" y="518.02" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">LEPUS</text>
+      <text x="334.52" y="518.02" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">LEPUS</text>
       <text x="70.80" y="242.17" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">MONOCEROS</text>
       <text x="328.04" y="164.28" clip-path="url(#clip0)" font-family="sans-serif" font-size="12" fill="#787878">ORION</text>
     </g>
@@ -2513,13 +2512,13 @@
       <text x="359.78" y="362.99" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">M 42</text>
     </g>
     <g class="ink" fill="none">
-      <path d="M12.00 470.00 L333.00 470.00 L333.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" fill="#ffffff"/>
-      <path d="M12.00 470.00 L333.00 470.00 L333.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" stroke="#333333" stroke-width="1.00" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10.00"/>
+      <path d="M12.00 470.00 L429.00 470.00 L429.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" fill="#ffffff"/>
+      <path d="M12.00 470.00 L429.00 470.00 L429.00 528.00 L12.00 528.00 L12.00 470.00 Z" clip-path="url(#clip0)" stroke="#333333" stroke-width="1.00" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10.00"/>
     </g>
     <g class="labels">
       <text x="20.00" y="489.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" font-weight="bold" fill="#222222">5h 32.0m, +0° 00′</text>
       <text x="20.00" y="503.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Centre 5h 32.0m, +0° 00′ · ICRS J2000</text>
-      <text x="20.00" y="517.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Field 42.0° · Stars to V 6.0 · North up, east left · gnomonic</text>
+      <text x="20.00" y="517.00" clip-path="url(#clip0)" font-family="sans-serif" font-size="11" fill="#222222">Field 42.0° · Stars to V 6.0 · Celestial north up · celestial east left · gnomonic</text>
     </g>
     <g class="ink" fill="none">
       <path d="M0.50 0.50 L719.50 0.50 L719.50 539.50 L0.50 539.50 L0.50 0.50 Z" stroke="#333333" stroke-width="1.00" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="10.00"/>

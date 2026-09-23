@@ -509,8 +509,11 @@ class SprintThirtyOneJourneyTest {
                     "5. and the zenith promises no key of its own,"
                             + " because it has none: " + zenithSaid);
             List<ReferenceInk.NamePlacement> referenceNames =
-                    ReferenceInk.namePlacements(onEdt(chart::currentScene),
-                            onEdt(() -> chart.overlays().collect()));
+                    ReferenceInk.namePlacements(
+                            juranometria.project.DrawnPage.of(
+                                    onEdt(chart::currentScene)),
+                            onEdt(() -> chart.overlays().collect()),
+                            ENGLISH, java.util.List.of());
             assertFalse(referenceNames.isEmpty(),
                     "so the reference layer names its lines");
             assertEquals(boxes(before),

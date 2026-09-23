@@ -59,8 +59,9 @@ class EclipticModuleTest {
         Graphics2D g = image.createGraphics();
         try {
             RENDERER.render(g, scene, options,
-                    (layerG, painted) -> ReferenceInk.paint(layerG,
-                            painted, ink, options.palette()));
+                    (layerG, painted, reserved) -> ReferenceInk.paint(
+                            layerG, painted, ink, options.palette(),
+                            ENGLISH, reserved));
         } finally {
             g.dispose();
         }
@@ -139,7 +140,8 @@ class EclipticModuleTest {
         assertEquals(List.of("March equinox", "June solstice",
                         "September equinox", "December solstice"),
                 offered.stream().skip(1)
-                        .map(OverlayContribution::accessibleName).toList(),
+                        .map(each -> ((OverlayContribution.Point) each)
+                                .accessibleName()).toList(),
                 "and the model's own reader-facing names, so no second"
                         + " list of names exists to drift from it");
         assertTrue(offered.stream().skip(1).allMatch(each ->
@@ -161,10 +163,13 @@ class EclipticModuleTest {
         SkyPosition pole = ((OverlayContribution.GreatCircle)
                 offered.get(0)).pole();
         for (OverlayContribution each : offered.subList(1, 5)) {
-            SkyPosition at = ((OverlayContribution.Point) each).at();
-            assertEquals(90.0, pole.separationDegrees(at), 1.0e-9,
-                    each.accessibleName() + " lies on the circle the"
-                            + " module offered, not on some other one");
+            OverlayContribution.Point landmark =
+                    (OverlayContribution.Point) each;
+            assertEquals(90.0,
+                    pole.separationDegrees(landmark.at()), 1.0e-9,
+                    landmark.accessibleName() + " lies on the circle"
+                            + " the module offered, not on some other"
+                            + " one");
         }
     }
 
@@ -209,11 +214,12 @@ class EclipticModuleTest {
         EclipticModule ecliptic = attached(services);
         ecliptic.showing(true);
 
-        assertEquals(8, services.overlays.collect().size(),
-                "three from the meridian, five from the ecliptic");
+        assertEquals(12, services.overlays.collect().size(),
+                "three lines and four cardinal marks from the"
+                        + " meridian, five from the ecliptic (#359)");
 
         ecliptic.detach();
-        assertEquals(3, services.overlays.collect().size(),
+        assertEquals(7, services.overlays.collect().size(),
                 "detaching one removes only its own contribution");
         assertTrue(services.overlays.holds(MeridianModule.ID),
                 "and leaves the other module holding its ink");

@@ -159,7 +159,10 @@ public final class ChartSheet {
             new ChartRenderer(StarSizePolicy.DEFAULT, words)
                     .render(g, scene, onPaper, reference);
             // After the chart, in the order the screen paints it.
-            overChart.paint(g, scene);
+            // Nothing is reserved against it: the reader's own marks
+            // belong OVER the finished chart, which is the whole of
+            // their contract.
+            overChart.paint(g, scene, java.util.List.of());
         } finally {
             g.dispose();
         }

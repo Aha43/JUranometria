@@ -128,9 +128,9 @@ public final class WiderFieldPageMain {
                 registry.offer(EclipticModule.ID,
                         ecliptic::contributedGeometry);
                 renderer.render(g, scene, options,
-                        (layerG, painted) -> ReferenceInk.paint(layerG,
-                                painted, registry.collect(),
-                                options.palette()));
+                        (layerG, painted, reserved) -> ReferenceInk.paint(
+                                layerG, painted, registry.collect(),
+                                options.palette(), ENGLISH, reserved));
             } else {
                 renderer.render(g, scene, options);
             }

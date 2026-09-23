@@ -19,13 +19,13 @@ Regenerate with `make chart-sheet-study`.
 
 | file | paper | shapes | labels |
 |---|---|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 27 |
-| `sheet-letter.svg` | US Letter | 2472 | 27 |
+| `sheet-a4.svg` | A4 | 2267 | 26 |
+| `sheet-letter.svg` | US Letter | 2472 | 26 |
 | `sheet-a4-outlines.svg` | A4 | 2267 | 0 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 17 |
-| `sheet-a4.pdf` | A4 | 2267 | 27 as outlines |
-| `sheet-a4-modules.pdf` | A4 | 1966 | 17 as outlines |
-| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 27 |
+| `sheet-a4-modules.svg` | A4 | 1966 | 16 |
+| `sheet-a4.pdf` | A4 | 2267 | 26 as outlines |
+| `sheet-a4-modules.pdf` | A4 | 1966 | 16 as outlines |
+| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 26 |
 
 `sheet-a4-outlines.svg` is the same chart with every label converted to
 its outline, for a machine whose fonts are unknown. It is larger and it

@@ -561,11 +561,11 @@ class OverviewPageTest {
         }
         assertEquals(2, marked.size(), "two objects to mark");
 
-        ChartRenderer.ReferenceLayer modules = (g, scene) ->
+        ChartRenderer.ReferenceLayer modules = (g, scene, reserved) ->
                 ReferenceInk.paint(g, juranometria.project.DrawnPage.of(scene), registry.collect(),
-                        ChartPalette.WHITE_PAPER);
+                        ChartPalette.WHITE_PAPER, ENGLISH, reserved);
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
-        ChartRenderer.ReferenceLayer working = (g, scene) -> {
+        ChartRenderer.ReferenceLayer working = (g, scene, reserved) -> {
             for (String member : marked) {
                 renderer.drawSelectionHighlight(g, scene,
                         ChartOptions.DEFAULTS, member);
@@ -661,7 +661,7 @@ class OverviewPageTest {
                 ChartOptions.DEFAULTS, reference);
         Graphics2D over = (Graphics2D) recorder.create();
         try {
-            overChart.paint(over, scene);
+            overChart.paint(over, scene, java.util.List.of());
         } finally {
             over.dispose();
         }

@@ -304,7 +304,8 @@ public final class ChartSheetStudyMain {
         EclipticModule ecliptic = new EclipticModule();
         ecliptic.showing(true);
         registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
-        return (g, painted) -> ReferenceInk.paint(g, painted,
-                registry.collect(), ChartPalette.WHITE_PAPER);
+        return (g, painted, reserved) -> ReferenceInk.paint(g, painted,
+                registry.collect(), ChartPalette.WHITE_PAPER, ENGLISH,
+                reserved);
     }
 }

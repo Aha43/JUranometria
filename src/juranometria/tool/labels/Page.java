@@ -172,9 +172,10 @@ public record Page(String slug, ChartScene scene, ChartOptions options,
             g.translate(-window.x, -window.y);
         }
         try {
-            RENDERER.render(g, scene, options, (layerG, layerScene) ->
+            RENDERER.render(g, scene, options,
+                    (layerG, layerScene, reserved) ->
                     ReferenceInk.paint(layerG, layerScene, overlays,
-                            options.palette()),
+                            options.palette(), ENGLISH, reserved),
                     text.isEmpty() ? null : text);
             // One ring per selected member, after the chart and before
             // the study's own text - which is where the chart

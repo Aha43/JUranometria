@@ -93,4 +93,71 @@ public record LocalSky(Observer observer) {
     public double altitudeDegrees(SkyPosition position) {
         return 90.0 - zenith().separationDegrees(position);
     }
+
+    /**
+     * Where this direction meets the mathematical horizon, in sky
+     * coordinates (issue #359).
+     *
+     * <p>Derived, never tabulated: north is the horizon point on the
+     * zenith's great circle towards the north celestial pole, east
+     * is a quarter turn along the horizon in the direction of the
+     * sky's rotation, and the other two are their opposites. Each
+     * result is on this observer's own horizon -
+     * {@link #altitudeDegrees} of it is zero - which is what a test
+     * holds it to.
+     *
+     * <p>The geographic poles are refused. At latitude \u00b190 every
+     * horizon point is the same distance from the celestial pole,
+     * "towards the pole" picks nothing, and a mark drawn anyway would
+     * be an invention.
+     */
+    public SkyPosition cardinal(juranometria.chart.Cardinal direction) {
+        if (Math.abs(observer.latitudeDegrees()) >= 90.0 - 1e-9) {
+            throw new IllegalArgumentException(
+                    "at the geographic pole the horizon has no"
+                            + " cardinal directions");
+        }
+        double[] z = unitOf(zenith());
+        double dot = z[2];
+        double[] north = normalised(new double[] {
+                -dot * z[0], -dot * z[1], 1.0 - dot * z[2]});
+        // P x Z, not Z x P: east is the direction the sky RISES
+        // from, a quarter turn from north with the zenith on the
+        // left hand - and the two cross products differ by exactly
+        // an east-west swap, which no altitude or separation check
+        // can see. The contract pins the chirality itself.
+        double[] east = normalised(new double[] {
+                -z[1], z[0], 0.0});
+        return switch (direction) {
+            case NORTH -> positionOf(north);
+            case EAST -> positionOf(east);
+            case SOUTH -> positionOf(new double[] {
+                    -north[0], -north[1], -north[2]});
+            case WEST -> positionOf(new double[] {
+                    -east[0], -east[1], -east[2]});
+        };
+    }
+
+    private static double[] unitOf(SkyPosition position) {
+        double ra = Math.toRadians(position.raDegrees());
+        double dec = Math.toRadians(position.decDegrees());
+        return new double[] {Math.cos(dec) * Math.cos(ra),
+                Math.cos(dec) * Math.sin(ra), Math.sin(dec)};
+    }
+
+    private static double[] normalised(double[] v) {
+        double length = Math.sqrt(
+                v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+        return new double[] {v[0] / length, v[1] / length,
+                v[2] / length};
+    }
+
+    private static SkyPosition positionOf(double[] v) {
+        double ra = Math.toDegrees(Math.atan2(v[1], v[0]));
+        if (ra < 0) {
+            ra += 360.0;
+        }
+        return new SkyPosition(ra, Math.toDegrees(Math.asin(
+                Math.max(-1.0, Math.min(1.0, v[2])))));
+    }
 }

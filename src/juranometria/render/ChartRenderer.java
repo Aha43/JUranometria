@@ -492,9 +492,19 @@ public final class ChartRenderer {
     public interface ReferenceLayer {
 
         /** Nothing to draw, which is what an atlas with no module has. */
-        ReferenceLayer NONE = (g, scene) -> { };
+        ReferenceLayer NONE = (g, scene, reserved) -> { };
 
-        void paint(Graphics2D g, ChartScene scene);
+        /**
+         * @param reserved the page's own ink and text - every drawn
+         *     mark's outline, the furniture that will draw, the
+         *     grid's notation, and every placed label box - so
+         *     subordinate reference text (#359's cardinal letters)
+         *     can refuse to be written through any of it. The layer
+         *     paints BELOW all of this; what it may not do is place
+         *     new words where the page has already spoken.
+         */
+        void paint(Graphics2D g, ChartScene scene,
+                   java.util.List<java.awt.Shape> reserved);
     }
 
     public void render(Graphics2D g, ChartScene scene, ChartOptions options) {
@@ -549,9 +559,10 @@ public final class ChartRenderer {
         // marks and labels over them, and one decision that knows the
         // whole page is what keeps the two out of each other's way
         // (Sprint 31, issue #314).
+        TextMetrics textMetrics = TextMetrics.of(g);
         java.util.List<LabelPlacement.Placement> placedText =
                 given != null ? given
-                        : textPlacements(TextMetrics.of(g), scene, options);
+                        : textPlacements(textMetrics, scene, options);
 
         g.setClip(1, 1, width - 2, height - 2);
         // Where this page's sky ends, and the shape every piece of
@@ -579,12 +590,38 @@ public final class ChartRenderer {
         // Above the grid and the figures, below every mark: a
         // reference line is read across the chart and must not hide
         // an object (docs/decisions/place-and-time.md).
-        reference.paint(g, scene);
+        // What the page has already spoken for, handed to the layer
+        // so its subordinate words (#359) can yield to it. The set is
+        // the ruled P2: all text, furniture, grid notation and
+        // deep-sky glyphs - but NOT anonymous star dots. The measured
+        // alternative that included them left the wide pages with no
+        // cardinal letters at all, and the letters that P2 admits sit
+        // over 2-26 px of dots and stay readable, with the dots
+        // painting over them exactly as this layer's ordering says.
+        java.util.List<DrawnMark> marks =
+                drawnMarks(scene, options, policy, projection, mapping);
+        java.util.List<java.awt.Shape> reserved =
+                new java.util.ArrayList<>();
+        for (LabelPlacement.Obstacle obstacle
+                : textObstacles(textMetrics, scene, options)) {
+            if (obstacle.kind() != LabelPlacement.Refusal.MARK) {
+                reserved.add(obstacle.ink());
+            }
+        }
+        for (DrawnMark mark : marks) {
+            if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
+                reserved.add(mark.ink());
+            }
+        }
+        for (LabelPlacement.Placement placedOne : placedText) {
+            if (placedOne.at() != null) {
+                reserved.add(placedOne.at());
+            }
+        }
+        reference.paint(g, scene, java.util.List.copyOf(reserved));
         // Symbols and stars are drawn from the published placements
         // (issue #168), so what a reader can point at is exactly
         // what the reader can see - there is no second geometry.
-        java.util.List<DrawnMark> marks =
-                drawnMarks(scene, options, policy, projection, mapping);
         g.setClip(sky);
         // Painted from the published mark's own decision (#331), so
         // there is no second geometry to drift from the first. A

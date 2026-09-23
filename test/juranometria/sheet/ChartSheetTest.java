@@ -119,8 +119,9 @@ class ChartSheetTest {
         EclipticModule ecliptic = new EclipticModule();
         ecliptic.showing(true);
         registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
-        return (g, painted) -> ReferenceInk.paint(g, painted,
-                registry.collect(), ChartPalette.WHITE_PAPER);
+        return (g, painted, reserved) -> ReferenceInk.paint(g, painted,
+                registry.collect(), ChartPalette.WHITE_PAPER,
+                ENGLISH, reserved);
     }
 
     @Test
@@ -335,8 +336,8 @@ class ChartSheetTest {
         SheetRecording withMarks = ChartSheet.record(
                 Atlas.assembler()::assemble, ORION, ChartOptions.DEFAULTS,
                 ChartRenderer.ReferenceLayer.NONE,
-                (g, scene) -> renderer.drawSelectionHighlight(g, scene,
-                        ChartOptions.DEFAULTS, marked),
+                (g, scene, reserved) -> renderer.drawSelectionHighlight(
+                        g, scene, ChartOptions.DEFAULTS, marked),
                 PaperSize.A4, ENGLISH);
 
         assertTrue(withMarks.shapeCount() > plain.shapeCount(),
