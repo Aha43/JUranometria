@@ -214,6 +214,368 @@ class EquatorialGridTest {
      * A viewport as the page it would draw: these tests are about the
      * grid's geometry, and a grid is drawn on a page (#301).
      */
+    /**
+     * A curve that never reaches its preferred edge names itself
+     * elsewhere (issue #360).
+     *
+     * <p>The reading problem this sprint exists for: on a wide page a
+     * coordinate line can be drawn the whole way across and never
+     * touch the edge its figure is allowed to live on. It was
+     * anonymous, and a reader had to find a labelled neighbour and
+     * count.
+     */
+    @Test
+    void aCurveThatMissesItsPreferredEdgeIsNamedElsewhere() {
+        ChartViewport viewport = page(0.3, 20.0, 120.0);
+        var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
+
+        var offPreferred = grid.labels().stream()
+                .filter(label -> !onPreferredEdge(label, viewport))
+                .toList();
+        // Both kinds, separately. #360 says fixing only declination
+        // would leave the same failure rotated ninety degrees, and a
+        // test that accepted either would not notice.
+        assertTrue(offPreferred.stream()
+                        .anyMatch(label -> label.text().contains("h")),
+                "a right-ascension meridian that misses the bottom"
+                        + " names itself elsewhere: " + grid.labels());
+        assertTrue(offPreferred.stream()
+                        .anyMatch(label -> !label.text().contains("h")),
+                "and so does a declination parallel that misses the"
+                        + " left: " + grid.labels());
+        for (var label : offPreferred) {
+            assertTrue(EquatorialGrid.fitsPaper(label,
+                            EquatorialGrid.labelMetrics(), viewport),
+                    "and it is on the paper: " + label);
+        }
+    }
+
+    /**
+     * The established convention is not disturbed where it works.
+     *
+     * <p><strong>Equatorial</strong> narrow pages, and the word is
+     * load-bearing. Whether a curve reaches its preferred edge turns
+     * out to depend on declination rather than on field width: at
+     * Dec +60 an eighteen-degree page already has meridians that
+     * curve away and never meet the bottom, and they are rescued -
+     * see {@link #aNarrowPageAtHighDeclinationAlsoHasMissedEdges()}.
+     *
+     * <p>So this holds the case the convention was designed for and
+     * says so, rather than claiming every narrow page is untouched.
+     */
+    @Test
+    void equatorialNarrowPagesKeepTheEstablishedPreferredEdges() {
+        for (double field : new double[] {8.0, 12.0, 18.0}) {
+            ChartViewport viewport = page(83.818667, -5.389667, field);
+            var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
+            for (var label : grid.labels()) {
+                assertTrue(onPreferredEdge(label, viewport),
+                        "at " + field + "° every figure keeps the"
+                                + " established edge: " + label);
+            }
+        }
+    }
+
+    /**
+     * The failure is declination-driven, not width-driven.
+     *
+     * <p>Discovered by measuring committed pages rather than by
+     * reasoning: `dec60-18` is an eighteen-degree page, and two of
+     * its meridians curve away from the bottom edge entirely. The
+     * sprint's discovery matrix was centred on the equator and
+     * missed this, which is why the inventory was re-run against the
+     * committed study pages before anything was promoted.
+     *
+     * <p>Recorded as a contract so the next reader does not repeat
+     * "wide pages only".
+     */
+    @Test
+    void aNarrowPageAtHighDeclinationAlsoHasMissedEdges() {
+        ChartViewport viewport = page(37.946619, 60.0, 18.0);
+        var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
+        assertTrue(grid.labels().stream()
+                        .anyMatch(label -> !onPreferredEdge(label, viewport)),
+                "at Dec +60 an 18-degree page already needs the"
+                        + " fallback: " + grid.labels());
+    }
+
+    /**
+     * A suppressed preferred figure is NOT rescued elsewhere.
+     *
+     * <p>The scope boundary, and the one most easily lost. A curve
+     * that reaches its preferred edge and has its figure refused -
+     * by the title block or by paper containment - stays unlabelled.
+     * That refusal is a decision about furniture, and #360 does not
+     * reopen it; rescuing it would move committed narrow pages that
+     * nobody reviewed.
+     *
+     * <p>Structural rather than remembered: the fallback lives in
+     * the {@code else} of "a preferred crossing exists". Moving it
+     * out of that branch fails here.
+     */
+    @Test
+    void aSuppressedPreferredFigureIsNotRescuedElsewhere() {
+        ChartViewport viewport = page(83.818667, -5.389667, 8.0);
+        var metrics = EquatorialGrid.labelMetrics();
+        // Reserve the whole bottom edge: every RA figure that WOULD
+        // have been placed there is now suppressed, and none of them
+        // may reappear on another edge.
+        var wholeBottom = new java.awt.Rectangle(
+                0, (int) viewport.heightPx() - 40,
+                (int) viewport.widthPx(), 40);
+        var grid = EquatorialGrid.gridFor(pageOf(viewport), wholeBottom);
+
+        for (var label : grid.labels()) {
+            assertTrue(!label.text().contains("h"),
+                    "an RA figure whose bottom placement was"
+                            + " suppressed does not reappear on"
+                            + " another edge: " + label);
+        }
+        assertTrue(grid.suppressedLabels() > 0,
+                "the premise: reserving the bottom really did"
+                        + " suppress RA figures");
+    }
+
+    /**
+     * Both crossings of a re-entering curve are found, and both
+     * refusals are named.
+     *
+     * <p>Orion's minus-45 parallel at 120°: it reaches neither
+     * vertical edge, dips below the frame and returns, so it crosses
+     * the bottom twice. A search that stopped at the first crossing
+     * would describe half of it.
+     *
+     * <p>It is <strong>not</strong> rescued, and that is the point.
+     * One crossing collides with an existing figure and the other
+     * with the title block, so it stays honestly anonymous rather
+     * than being given room by moving something else.
+     */
+    @Test
+    void aReenteringCurveOffersBothCrossingsAndMayStillBeRefused() {
+        ChartViewport viewport = page(83.818667, -5.389667, 120.0);
+        var metrics = EquatorialGrid.labelMetrics();
+        var page = pageOf(viewport);
+        var grid = EquatorialGrid.gridFor(page, null);
+
+        var minus45 = grid.labels().stream()
+                .filter(label -> label.text().contains("45")
+                        && label.text().contains("\u2212"))
+                .toList();
+        assertEquals(java.util.List.of(), minus45,
+                "the minus-45 parallel stays anonymous: both of its"
+                        + " crossings are refused, and nothing is"
+                        + " moved to make room");
+    }
+
+    /** One figure per curve, and never two figures in one place. */
+    @Test
+    void everyCurveIsNamedAtMostOnceAndFiguresDoNotOverlap() {
+        var metrics = EquatorialGrid.labelMetrics();
+        for (double field : new double[] {42.0, 60.0, 90.0, 120.0}) {
+            ChartViewport viewport = page(0.3, 20.0, field);
+            var grid = EquatorialGrid.gridFor(pageOf(viewport), null);
+
+            var seen = new java.util.ArrayList<String>();
+            for (var label : grid.labels()) {
+                assertTrue(!seen.contains(label.text()),
+                        "at " + field + "° no curve is named twice: "
+                                + label.text());
+                seen.add(label.text());
+            }
+            for (int i = 0; i < grid.labels().size(); i++) {
+                for (int j = i + 1; j < grid.labels().size(); j++) {
+                    var one = EquatorialGrid.labelBounds(
+                            grid.labels().get(i), metrics);
+                    var other = EquatorialGrid.labelBounds(
+                            grid.labels().get(j), metrics);
+                    assertTrue(!one.intersects(other),
+                            "at " + field + "° two figures overlap: "
+                                    + grid.labels().get(i) + " and "
+                                    + grid.labels().get(j));
+                }
+            }
+        }
+    }
+
+    /** A crossing too shallow or too near a corner is refused. */
+    @Test
+    void shallowAndCornerCrossingsAreRefused() {
+        var metrics = EquatorialGrid.labelMetrics();
+        for (double field : new double[] {42.0, 60.0, 90.0, 120.0}) {
+            ChartViewport viewport = page(0.3, 20.0, field);
+            var page = pageOf(viewport);
+            var grid = EquatorialGrid.gridFor(page, null);
+            for (var label : grid.labels()) {
+                if (onPreferredEdge(label, viewport)) {
+                    continue;
+                }
+                // Every fallback figure came from a candidate that
+                // passed both gates; none sits in a corner.
+                double x = label.x();
+                double y = label.y();
+                boolean nearLeft = x < EquatorialGrid.CORNER_CLEARANCE_PX
+                        && y < EquatorialGrid.CORNER_CLEARANCE_PX;
+                boolean nearRight =
+                        x > viewport.widthPx()
+                                        - EquatorialGrid.CORNER_CLEARANCE_PX
+                                && y < EquatorialGrid.CORNER_CLEARANCE_PX;
+                assertTrue(!nearLeft && !nearRight,
+                        "no fallback figure straddles a corner: "
+                                + label);
+            }
+        }
+    }
+
+    /** The convention: RA along the bottom, Dec down the left. */
+    /**
+     * Every centre this file uses, both poles, and all four widths.
+     *
+     * <p>The corpus is the point. The all-pairs check already existed
+     * and was correct, but it ran at one centre - {@code (0.3, 20)} -
+     * and never at a pole, so it could not see a rescued figure land
+     * on a parallel's own notation. The defect it missed was real:
+     * {@code 6h} drawn through {@code -30} on the released south-pole
+     * page (issue #360).
+     *
+     * <p>What is asserted here is the hierarchy, not mere tidiness: a
+     * rescued figure is a repair of last resort and yields to every
+     * ordinary preferred-edge figure and to every rescue accepted
+     * before it. Ordinary figures are not asserted against each other
+     * here - see {@link #onlyOneOverlapPredatesThisSprint}.
+     */
+    @Test
+    void aRescuedFigureYieldsToEveryOtherFigure() {
+        var metrics = EquatorialGrid.labelMetrics();
+        for (double[] centre : CENTRES) {
+            for (double field : FIELDS) {
+                ChartViewport viewport =
+                        page(centre[0], centre[1], field);
+                var labels = EquatorialGrid.gridFor(
+                        pageOf(viewport), null).labels();
+                for (int i = 0; i < labels.size(); i++) {
+                    for (int j = i + 1; j < labels.size(); j++) {
+                        var one = labels.get(i);
+                        var two = labels.get(j);
+                        if (onPreferredEdge(one, viewport)
+                                && onPreferredEdge(two, viewport)) {
+                            continue;
+                        }
+                        assertTrue(!EquatorialGrid.labelBounds(one, metrics)
+                                        .intersects(EquatorialGrid
+                                                .labelBounds(two, metrics)),
+                                "at centre " + centre[0] + "," + centre[1]
+                                        + " field " + field
+                                        + " a rescued figure overlaps: "
+                                        + one + " and " + two);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The named fixture for the defect two-pass ordering repairs.
+     *
+     * <p>Kept as its own test, at the exact page that failed, so the
+     * regression has a name rather than being one iteration of a
+     * sweep. On this page no figure may overlap any other.
+     *
+     * <p>Placing rescues inside the RA loop - before any parallel has
+     * an ordinary figure - makes it fail: {@code 18h} is rescued to a
+     * spot that looks clear because no parallel has spoken yet, and
+     * the parallel's {@code -30} is then added on top of it, an
+     * ordinary figure never being overlap-checked itself.
+     *
+     * <p>With both passes the hour is not named on this page at all.
+     * That is the hierarchy, not a loss: the rescue can now see the
+     * parallel's notation, finds nowhere that clears it, and yields.
+     * A curve unnamed is the honest outcome of a repair with no room;
+     * a curve named illegibly on top of another is not.
+     */
+    @Test
+    void theSouthPoleWidePageDrawsNoFigureThroughAnother() {
+        var metrics = EquatorialGrid.labelMetrics();
+        ChartViewport viewport = page(180.0, -89.9, 120.0);
+        var labels = EquatorialGrid.gridFor(pageOf(viewport), null).labels();
+        assertTrue(labels.size() >= 2,
+                "the page carries figures to hold apart");
+        for (int i = 0; i < labels.size(); i++) {
+            for (int j = i + 1; j < labels.size(); j++) {
+                assertTrue(!EquatorialGrid
+                                .labelBounds(labels.get(i), metrics)
+                                .intersects(EquatorialGrid
+                                        .labelBounds(labels.get(j), metrics)),
+                        "south-pole 120 degrees drew "
+                                + labels.get(i).text() + " through "
+                                + labels.get(j).text());
+            }
+        }
+    }
+
+    /**
+     * One overlap survives, and it is not this sprint's.
+     *
+     * <p>Two ordinary preferred-edge figures meet near the bottom-left
+     * corner of one page. Measured against the code without #360, it
+     * is there too, so the repair neither caused it nor is chartered
+     * to fix it. Pinning the set is what stops a new ordinary-figure
+     * collision hiding behind a known one: another arrival fails here
+     * as a visible change rather than passing unnoticed.
+     */
+    @Test
+    void onlyOneOverlapPredatesThisSprint() {
+        var metrics = EquatorialGrid.labelMetrics();
+        var found = new java.util.TreeSet<String>();
+        for (double[] centre : CENTRES) {
+            for (double field : FIELDS) {
+                ChartViewport viewport =
+                        page(centre[0], centre[1], field);
+                var labels = EquatorialGrid.gridFor(
+                        pageOf(viewport), null).labels();
+                for (int i = 0; i < labels.size(); i++) {
+                    for (int j = i + 1; j < labels.size(); j++) {
+                        var one = labels.get(i);
+                        var two = labels.get(j);
+                        if (!onPreferredEdge(one, viewport)
+                                || !onPreferredEdge(two, viewport)) {
+                            continue;
+                        }
+                        if (EquatorialGrid.labelBounds(one, metrics)
+                                .intersects(EquatorialGrid
+                                        .labelBounds(two, metrics))) {
+                            found.add(one.text() + "/" + two.text()
+                                    + " at " + centre[0] + ","
+                                    + centre[1] + " " + field);
+                        }
+                    }
+                }
+            }
+        }
+        assertEquals(java.util.Set.of(
+                        "7h/\u221220\u00b0 at 83.818667,-5.389667 42.0"),
+                found,
+                "the pre-existing ordinary-figure overlaps are pinned;"
+                        + " a new one is a visible change, not a silence");
+    }
+
+    /** Every centre this file exercises, plus both poles. */
+    private static final double[][] CENTRES = {
+            {0.3, 20.0}, {0.3, 45.0},
+            {10.684708, 41.268750}, {37.946619, 60.0},
+            {37.946619, 89.9}, {83.818667, -5.389667},
+            {0.3, -89.9}, {180.0, -89.9}, {180.0, 89.9}, {0.3, 89.9}};
+
+    /** The widths the fallback policy was settled at. */
+    private static final double[] FIELDS = {42.0, 60.0, 90.0, 120.0};
+
+    private static boolean onPreferredEdge(EquatorialGrid.Label label,
+                                           ChartViewport viewport) {
+        if (label.text().contains("h")) {
+            return Math.abs(label.y() - (viewport.heightPx() - 5.0)) < 1.0;
+        }
+        return Math.abs(label.x() - 3.0) < 1.0;
+    }
+
     private static juranometria.project.DrawnPage pageOf(
             ChartViewport viewport) {
         return juranometria.project.DrawnPage.of(

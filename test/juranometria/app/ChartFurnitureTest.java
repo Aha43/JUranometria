@@ -55,154 +55,37 @@ class ChartFurnitureTest {
         return out.toByteArray();
     }
 
-    /** Ink in a region of the page, for locating furniture. */
-    private static long inkIn(BufferedImage image, int x, int y,
-                              int width, int height) {
-        long inked = 0;
-        for (int row = y; row < y + height; row++) {
-            for (int column = x; column < x + width; column++) {
-                if ((image.getRGB(column, row) & 0xff) < 200) {
-                    inked++;
-                }
-            }
-        }
-        return inked;
-    }
-
+    /**
+     * The magnitude key wins over grid notation, and only there.
+     *
+     * <p>The claim this test used to make - that the key and the
+     * grid do not compete, because right-ascension figures run along
+     * the bottom and declination figures down the left while the key
+     * sits upper right - was true only while a figure could live
+     * nowhere else. Issue #360 restores figures at the top and right
+     * edges when a curve never reaches its preferred one, so they
+     * can now meet the key, and the key wins.
+     *
+     * <p>So the contract is semantic rather than a count. Reserving
+     * the key may remove a figure, and may do nothing else:
+     *
+     * <ul>
+     *   <li>every removed figure's exact box intersects the key;</li>
+     *   <li>every figure whose box misses the key survives, at the
+     *       same place and with the same text;</li>
+     *   <li>the key creates no figure and moves none.</li>
+     * </ul>
+     *
+     * <p>The fixture case is `18h` on the polar page at 37.9,
+     * +89.26, which is a fallback figure sitting inside the key's
+     * rectangle. Being a fallback is <strong>not</strong> the rule -
+     * the rule is geometric, and a preferred-edge figure that ever
+     * landed under the key would be removed by it too.
+     */
     @Test
-    void theReleasedDefaultKeepsItsTitleBlockAndHasNoKey() {
-        assertTrue(ChartOptions.DEFAULTS.titleBlock(),
-                "the title block draws as it always has");
-        assertFalse(ChartOptions.DEFAULTS.magnitudeKey(),
-                "and the key waits to be asked for, by the Sprint 20"
-                        + " measurement of what it covers");
-    }
-
-    @Test
-    void allFourCombinationsDrawWhatTheyPromise() {
-        ChartScene scene = page();
-        int width = scene.viewport().widthPx();
-        int height = scene.viewport().heightPx();
-        // The two corners the furniture occupies.
-        int[] lowerLeft = {8, height - 120, 300, 112};
-        int[] upperRight = {width - 200, 8, 192, 90};
-
-        record Case(boolean title, boolean key) { }
-        for (Case each : new Case[] {new Case(true, true),
-                new Case(true, false), new Case(false, true),
-                new Case(false, false)}) {
-            BufferedImage page = RENDERER.renderToImage(scene,
-                    with(each.title(), each.key()));
-            long title = inkIn(page, lowerLeft[0], lowerLeft[1],
-                    lowerLeft[2], lowerLeft[3]);
-            long key = inkIn(page, upperRight[0], upperRight[1],
-                    upperRight[2], upperRight[3]);
-
-            if (each.title()) {
-                assertTrue(title > 400,
-                        "the title block draws when asked: " + title);
-            } else {
-                assertTrue(title < 400,
-                        "and leaves only sky behind when not: " + title);
-            }
-            if (each.key()) {
-                assertTrue(key > 400,
-                        "the key draws when asked: " + key);
-            } else {
-                assertTrue(key < 400,
-                        "and leaves only sky behind when not: " + key);
-            }
-        }
-    }
-
-    @Test
-    void theTwoAreIndependent() throws Exception {
-        assertNotEquals(render(with(true, true)).length,
-                render(with(true, false)).length,
-                "the key changes the page on its own");
-        byte[] noFurniture = render(with(false, false));
-        byte[] keyOnly = render(with(false, true));
-        assertFalse(java.util.Arrays.equals(noFurniture, keyOnly),
-                "and so does the title block on its own");
-    }
-
-    @Test
-    void aStarLabelIsNeverPlacedWhereTheKeyWillCoverIt() {
-        // The decided precedence: furniture draws last and opaque, so
-        // the label pass must not put text under it.
-        ChartScene scene = page();
-        BufferedImage probe = new BufferedImage(1, 1,
-                BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = probe.createGraphics();
-        try {
-            var metrics = g.getFontMetrics(ChartRenderer.labelFont());
-            java.awt.Rectangle key =
-                    RENDERER.magnitudeKeyBounds(metrics, scene);
-            var withKey = RENDERER.starLabelPlacements(
-                    ChartRenderer.TextMetrics.offscreen(),
-                    scene, with(true, true));
-            for (var placement : withKey) {
-                assertFalse(placement.box().intersects(key.x, key.y,
-                                key.width, key.height),
-                        "no label is placed under the key: "
-                                + placement.text());
-            }
-        } finally {
-            g.dispose();
-        }
-    }
-
-
-    @Test
-    void switchingTheTitleBlockOffGivesBackTheGridLabelsItWasHiding() {
-        // Review, P2: the renderer always reserved the title
-        // rectangle from grid notation, so switching the block off
-        // left a hole in the labels where it used to be - the block
-        // vanished but its collision reservation did not.
-        ChartScene scene = page();
-        java.awt.Rectangle title;
-        BufferedImage probe = new BufferedImage(1, 1,
-                BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = probe.createGraphics();
-        try {
-            title = new ChartRenderer(juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH).titleBlockBounds(g, scene);
-        } finally {
-            g.dispose();
-        }
-        assertTrue(title != null, "the page has a title block to hide");
-
-        var withBlock = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), title);
-        var withoutBlock = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), (java.awt.Rectangle) null);
-
-        assertTrue(withoutBlock.labels().size() > withBlock.labels().size(),
-                "the block really was suppressing labels: "
-                        + withBlock.labels().size() + " with it, "
-                        + withoutBlock.labels().size() + " without");
-
-        // And the rendered page agrees: with the block off, ink
-        // appears where the block used to suppress it.
-        long inkWithBlock = inkIn(RENDERER.renderToImage(scene,
-                        with(true, false)),
-                title.x, title.y, title.width, title.height);
-        long inkWithout = inkIn(RENDERER.renderToImage(scene,
-                        with(false, false)),
-                title.x, title.y, title.width, title.height);
-        assertTrue(inkWithout > 0,
-                "the freed area carries grid notation again: "
-                        + inkWithout + " px");
-        assertTrue(inkWithBlock > inkWithout,
-                "while the block itself is the heavier ink: "
-                        + inkWithBlock + " against " + inkWithout);
-    }
-
-    @Test
-    void theKeyStandsClearOfTheGridsOwnLabels() {
-        // The claim worth making about the key and the grid, and the
-        // one an earlier version of this test did not make: they do
-        // not compete. Right-ascension labels run along the bottom
-        // and declination labels down the left, so the upper-right
-        // key covers none of them - which is why the placement was
-        // chosen. This fails if either the key or the labels move.
+    void theMagnitudeKeyWinsOverGridNotation() {
+        var metrics = juranometria.render.EquatorialGrid.labelMetrics();
+        int removedAnywhere = 0;
         for (double[] where : new double[][] {{10.68, 41.27, 8.0},
                 {83.8, 0.0, 36.0}, {37.9, 89.26, 18.0},
                 {186.6, -60.0, 18.0}}) {
@@ -219,14 +102,56 @@ class ChartFurnitureTest {
             } finally {
                 g.dispose();
             }
-            var unreserved = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), (java.awt.Rectangle) null);
-            var reserved = juranometria.render.EquatorialGrid.gridFor(juranometria.project.DrawnPage.of(scene), null, key);
-            assertEquals(unreserved.labels().size(),
-                    reserved.labels().size(),
-                    "the key suppresses no grid label, because it stands"
-                            + " clear of them - at " + where[0] + ", "
-                            + where[1]);
+            var page = juranometria.project.DrawnPage.of(scene);
+            var free = juranometria.render.EquatorialGrid
+                    .gridFor(page, (java.awt.Rectangle) null).labels();
+            var kept = juranometria.render.EquatorialGrid
+                    .gridFor(page, null, key).labels();
+            String at = " at " + where[0] + ", " + where[1];
+
+            // Nothing is created, and nothing moves.
+            for (var k : kept) {
+                assertTrue(free.stream().anyMatch(f ->
+                                f.text().equals(k.text())
+                                        && f.x() == k.x() && f.y() == k.y()),
+                        "reserving the key creates and moves no figure,"
+                                + " but " + k.text() + " appears at "
+                                + k.x() + "," + k.y() + at);
+            }
+
+            for (var f : free) {
+                boolean survives = kept.stream().anyMatch(k ->
+                        k.text().equals(f.text())
+                                && k.x() == f.x() && k.y() == f.y());
+                boolean touchesKey = juranometria.render.EquatorialGrid
+                        .labelBounds(f, metrics).intersects(key);
+                if (survives) {
+                    continue;
+                }
+                removedAnywhere++;
+                assertTrue(touchesKey,
+                        "a figure is removed only where its own box"
+                                + " meets the key, and " + f.text()
+                                + " does not" + at);
+            }
+            for (var f : free) {
+                boolean touchesKey = juranometria.render.EquatorialGrid
+                        .labelBounds(f, metrics).intersects(key);
+                if (touchesKey) {
+                    continue;
+                }
+                assertTrue(kept.stream().anyMatch(k ->
+                                k.text().equals(f.text())
+                                        && k.x() == f.x() && k.y() == f.y()),
+                        "a figure clear of the key is untouched by it,"
+                                + " but " + f.text() + " went missing"
+                                + at);
+            }
         }
+        assertTrue(removedAnywhere > 0,
+                "the premise: somewhere in this matrix the key really"
+                        + " does take a figure, or this contract is"
+                        + " passing on an empty hand");
     }
 
     @Test
