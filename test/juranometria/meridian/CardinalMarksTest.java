@@ -266,7 +266,12 @@ class CardinalMarksTest {
     // ---- the globe: all four at the limb, letters inward ---------
 
     @Test
-    void theGlobeCarriesAllFourAtItsLimbWithLettersInward() {
+    void theGlobeCarriesAllFourAtItsLimbWithLettersOutward() {
+        // The #359 completion ruling: on a zenith-centred globe the
+        // horizon is the limb, and a limb mark's letter goes outward
+        // into the unused paper - inward only where paper or
+        // furniture refuses every outward box. The mark itself stays
+        // at its exact limb point, halved by the limb.
         LocalSky sky = new LocalSky(OSLO);
         ChartViewport viewport =
                 new ChartViewport(sky.zenith(), 180.0, 900, 700);
@@ -284,25 +289,36 @@ class CardinalMarksTest {
                 List.of());
         DrawnPage page = DrawnPage.of(scene);
         ViewportMapping mapping = new ViewportMapping(page);
+        List<ReferenceInk.DirectionPlacement> placed =
+                ReferenceInk.directionPlacements(page, registry.collect(),
+                        ENGLISH, List.of());
+        assertEquals(4, placed.size(), "all four on the bare globe");
         double cx = 450.0;
         double cy = 350.0;
-        for (Cardinal direction : Cardinal.values()) {
+        java.awt.geom.Rectangle2D paper =
+                new java.awt.geom.Rectangle2D.Double(0, 0, 900, 700);
+        for (ReferenceInk.DirectionPlacement one : placed) {
             PixelPoint at = page.projection()
-                    .project(sky.cardinal(direction))
+                    .project(sky.cardinal(one.cardinal()))
                     .map(mapping::toPixel).orElseThrow();
-            double fromCentre = Math.hypot(at.x() - cx, at.y() - cy);
+            double limb = Math.hypot(at.x() - cx, at.y() - cy);
             assertTrue(inkNear(image, at.x(), at.y(), 9) > 0,
-                    direction + " sits at its exact limb point");
-            // The letter is inward: some ink beyond the diamond,
-            // and every changed pixel no further from the centre
-            // than the limb itself - nothing outside suggesting a
-            // page-edge direction.
-            assertTrue(inkNear(image, at.x(), at.y(), 30)
-                            > inkNear(image, at.x(), at.y(), 9),
-                    direction + " carries a letter beside the mark");
-            assertEquals(0, inkOutsideRadius(image, cx, cy,
-                            fromCentre + 10.0, at, 40),
-                    direction + " puts nothing outside the limb");
+                    one.cardinal() + " sits at its exact limb point");
+            assertTrue(paper.contains(one.box()),
+                    one.cardinal() + "'s letter stays on the paper");
+            double nearest = Math.hypot(
+                    Math.max(Math.max(one.box().getMinX() - cx,
+                            cx - one.box().getMaxX()), 0.0),
+                    Math.max(Math.max(one.box().getMinY() - cy,
+                            cy - one.box().getMaxY()), 0.0));
+            assertTrue(nearest >= limb,
+                    one.cardinal() + "'s letter lies wholly outside"
+                            + " the circular sky: nearest " + nearest
+                            + " against a limb of " + limb);
+            assertTrue(inkOutsideRadius(image, cx, cy, limb + 1.0, at,
+                            40) > 0,
+                    one.cardinal() + "'s letter is drawn out there,"
+                            + " not clipped away by the sky");
         }
     }
 
