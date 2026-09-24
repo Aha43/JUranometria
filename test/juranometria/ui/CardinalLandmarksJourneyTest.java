@@ -14,6 +14,8 @@ import java.util.TreeMap;
 
 import org.junit.jupiter.api.Test;
 
+import javax.swing.SwingUtilities;
+
 import juranometria.app.Atlas;
 import juranometria.chart.Cardinal;
 import juranometria.chart.ChartViewState;
@@ -48,8 +50,33 @@ import juranometria.sky.Observer;
  * and on a narrower page, the exact cardinal point in view carrying
  * its letter, while a horizon segment with no cardinal point in view
  * rightly carries none.
+ *
+ * <p>Every journey runs on the event thread, as the application
+ * does: a chart built and painted off it can race the toolkit's own
+ * work and paint the opening page instead of the one asked for.
  */
 class CardinalLandmarksJourneyTest {
+
+    /** Runs a journey on the event thread, rethrowing what it throws. */
+    private static void onEdt(Runnable journey) throws Exception {
+        Throwable[] thrown = new Throwable[1];
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                journey.run();
+            } catch (Throwable failure) {
+                thrown[0] = failure;
+            }
+        });
+        if (thrown[0] instanceof Error error) {
+            throw error;
+        }
+        if (thrown[0] instanceof RuntimeException runtime) {
+            throw runtime;
+        }
+        if (thrown[0] != null) {
+            throw new AssertionError(thrown[0]);
+        }
+    }
 
     private static final Observer OSLO = new Observer(59.913, 10.752,
             Instant.parse("2026-03-20T21:33:00Z"));
@@ -115,13 +142,21 @@ class CardinalLandmarksJourneyTest {
     // ---- the zenith globe -------------------------------------------
 
     @Test
-    void theZenithGlobeCarriesAllFourDirectionsInEnglish() {
+    void theZenithGlobeCarriesAllFourDirectionsInEnglish() throws Exception {
+        onEdt(() -> theZenithGlobeCarriesAllFourDirectionsInEnglishJourney());
+    }
+
+    private static void theZenithGlobeCarriesAllFourDirectionsInEnglishJourney() {
         holdsAllFour("en", Map.of(Cardinal.NORTH, "N", Cardinal.EAST, "E",
                 Cardinal.SOUTH, "S", Cardinal.WEST, "W"));
     }
 
     @Test
-    void theZenithGlobeCarriesAllFourDirectionsInNorwegian() {
+    void theZenithGlobeCarriesAllFourDirectionsInNorwegian() throws Exception {
+        onEdt(() -> theZenithGlobeCarriesAllFourDirectionsInNorwegianJourney());
+    }
+
+    private static void theZenithGlobeCarriesAllFourDirectionsInNorwegianJourney() {
         holdsAllFour("nb-NO", Map.of(Cardinal.NORTH, "N",
                 Cardinal.EAST, "Ø", Cardinal.SOUTH, "S",
                 Cardinal.WEST, "V"));
@@ -161,7 +196,11 @@ class CardinalLandmarksJourneyTest {
     // ---- off means gone ---------------------------------------------
 
     @Test
-    void horizonOffRemovesTheLineAndEveryMark() {
+    void horizonOffRemovesTheLineAndEveryMark() throws Exception {
+        onEdt(() -> horizonOffRemovesTheLineAndEveryMarkJourney());
+    }
+
+    private static void horizonOffRemovesTheLineAndEveryMarkJourney() {
         Chart c = chart("en", ChartPalette.WHITE_PAPER, zenithGlobe());
         BufferedImage on = paint(c.component());
         c.module().showing(false, false, false);
@@ -179,7 +218,11 @@ class CardinalLandmarksJourneyTest {
     // ---- emphasis carries mark and letter ---------------------------
 
     @Test
-    void horizonEmphasisCarriesMarkAndLetter() {
+    void horizonEmphasisCarriesMarkAndLetter() throws Exception {
+        onEdt(() -> horizonEmphasisCarriesMarkAndLetterJourney());
+    }
+
+    private static void horizonEmphasisCarriesMarkAndLetterJourney() {
         for (ChartPalette ground : ChartPalette.values()) {
             Chart c = chart("en", ground, zenithGlobe());
             BufferedImage plain = paint(c.component());
@@ -214,7 +257,11 @@ class CardinalLandmarksJourneyTest {
     // ---- a narrower page --------------------------------------------
 
     @Test
-    void aNarrowPageNearACardinalPointCarriesItsLetter() {
+    void aNarrowPageNearACardinalPointCarriesItsLetter() throws Exception {
+        onEdt(() -> aNarrowPageNearACardinalPointCarriesItsLetterJourney());
+    }
+
+    private static void aNarrowPageNearACardinalPointCarriesItsLetterJourney() {
         LocalSky sky = new LocalSky(OSLO);
         SkyPosition north = sky.cardinal(Cardinal.NORTH);
         // Ten degrees above the north point, towards the zenith: the
@@ -241,7 +288,11 @@ class CardinalLandmarksJourneyTest {
     }
 
     @Test
-    void aHorizonSegmentWithNoCardinalPointInViewCarriesNone() {
+    void aHorizonSegmentWithNoCardinalPointInViewCarriesNone() throws Exception {
+        onEdt(() -> aHorizonSegmentWithNoCardinalPointInViewCarriesNoneJourney());
+    }
+
+    private static void aHorizonSegmentWithNoCardinalPointInViewCarriesNoneJourney() {
         LocalSky sky = new LocalSky(OSLO);
         // The horizon due north-east, half-way between two exact
         // cardinal points: the line crosses the page and no landmark
