@@ -99,7 +99,8 @@ public final class ReferenceInk {
     private static final double TICK = 4.0;
 
     /** Half the diagonal of a landmark's diamond, in pixels. */
-    private static final double DIAMOND = 6.0;
+    private static final double DIAMOND =
+            juranometria.render.CardinalLandmark.DIAMOND;
 
     /** How far a label sits off the paper's edge. */
     private static final double LABEL_INSET = 4.0;
@@ -560,7 +561,7 @@ public final class ReferenceInk {
             double h, Rectangle2D paper, java.awt.Shape sky,
             boolean bounded, List<Rectangle2D> taken,
             List<java.awt.Shape> reserved) {
-        double gap = DIAMOND + 3.0;
+        double gap = juranometria.render.CardinalLandmark.GAP;
         List<List<Rectangle2D>> tiers = List.of(
                 adjacent(at, w, h, gap), diagonal(at, w, h, gap),
                 adjacent(at, w, h, 2.0 * gap),

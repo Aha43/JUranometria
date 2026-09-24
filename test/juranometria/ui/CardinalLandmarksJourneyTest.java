@@ -189,7 +189,91 @@ class CardinalLandmarksJourneyTest {
                                 + where + ", not " + placed.at());
                 assertTrue(paper.contains(placed.box()),
                         direction + "'s letter stays on the paper");
+                // On the zenith globe every landmark is on the limb,
+                // and its letter lies outward, wholly beyond the
+                // circular sky.
+                PixelPoint centre = exact(c.component(),
+                        new LocalSky(OSLO).zenith());
+                double limb = Math.hypot(placed.at().x() - centre.x(),
+                        placed.at().y() - centre.y());
+                Rectangle2D box = placed.box();
+                double nearest = Math.hypot(
+                        Math.max(Math.max(box.getMinX() - centre.x(),
+                                centre.x() - box.getMaxX()), 0.0),
+                        Math.max(Math.max(box.getMinY() - centre.y(),
+                                centre.y() - box.getMaxY()), 0.0));
+                assertTrue(nearest >= limb,
+                        direction + "'s letter lies outside the circular"
+                                + " sky");
             }
+        }
+    }
+
+    @Test
+    void theNorwegianSouthClearsTheWrappedTitleBlock() throws Exception {
+        onEdt(() -> theNorwegianSouthClearsTheWrappedTitleBlockJourney());
+    }
+
+    private static void theNorwegianSouthClearsTheWrappedTitleBlockJourney() {
+        // The longer Norwegian caption used to run the lower-left
+        // title block past the page centre and over the exact south
+        // point. On a bounded page it now wraps, and its right edge
+        // stays left of the south point by the landmark's clearance.
+        for (ChartPalette ground : ChartPalette.values()) {
+            Chart c = chart("nb-NO", ground, zenithGlobe());
+            Map<Cardinal, ReferenceInk.DirectionPlacement> by =
+                    rendered(c.component());
+            ReferenceInk.DirectionPlacement south = by.get(Cardinal.SOUTH);
+            assertTrue(south != null, "the south landmark is placed");
+            juranometria.chart.ChartScene scene =
+                    c.component().currentScene();
+            juranometria.render.ChartRenderer renderer =
+                    new juranometria.render.ChartRenderer(
+                            juranometria.chart.StarSizePolicy.DEFAULT,
+                            c.component().words());
+            BufferedImage probe = new BufferedImage(1, 1,
+                    BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics2D g = probe.createGraphics();
+            java.awt.Rectangle block;
+            java.awt.FontMetrics letters;
+            try {
+                block = renderer.titleBlockBounds(g, scene);
+            } finally {
+                g.dispose();
+            }
+            letters = juranometria.render.EquatorialGrid.labelMetrics();
+            double clearance = juranometria.render.CardinalLandmark
+                    .clearance(letters, c.component().words());
+            assertTrue(block.getMaxX() <= south.at().x() - clearance,
+                    "the block ends " + block.getMaxX() + ", clear of the"
+                            + " south point at " + south.at().x()
+                            + " by the landmark's " + clearance);
+            assertTrue(!block.intersects(south.box()),
+                    "the south letter does not touch the title block");
+            Rectangle2D diamond = new Rectangle2D.Double(
+                    south.at().x() - 6, south.at().y() - 6, 12, 12);
+            assertTrue(!block.intersects(diamond),
+                    "the south mark is not drawn through the title");
+            // The same caption on an unbounded page keeps its three
+            // lines; the globe's block is taller because it wrapped.
+            juranometria.chart.ChartScene open = Atlas.assembler()
+                    .assemble(new ChartViewState(
+                            new LocalSky(OSLO).zenith(), 120.0,
+                            ChartViewState.defaultMagnitudeFor(120.0)),
+                            900, 700);
+            java.awt.Graphics2D g2 = probe.createGraphics();
+            java.awt.Rectangle unwrapped;
+            try {
+                unwrapped = new juranometria.render.ChartRenderer(
+                        juranometria.chart.StarSizePolicy.DEFAULT,
+                        c.component().words()).titleBlockBounds(g2, open);
+            } finally {
+                g2.dispose();
+            }
+            assertTrue(block.height > unwrapped.height,
+                    "the Norwegian caption really wrapped: "
+                            + block.height + " px against "
+                            + unwrapped.height + " unwrapped");
         }
     }
 
@@ -236,6 +320,7 @@ class CardinalLandmarksJourneyTest {
                     ground, ChartStructure.HORIZON, true,
                     java.awt.Color.BLACK, new java.awt.BasicStroke(1f))
                     .color().getRGB();
+            int groundInk = ground.ground().getRGB();
             int offset = c.component().pageOffsetY();
             for (ReferenceInk.DirectionPlacement one : placed) {
                 Rectangle2D mark = new Rectangle2D.Double(
@@ -244,10 +329,10 @@ class CardinalLandmarksJourneyTest {
                 Rectangle2D letter = new Rectangle2D.Double(
                         one.box().getX(), one.box().getY() + offset,
                         one.box().getWidth(), one.box().getHeight());
-                assertTrue(carries(plain, raised, mark, accent),
+                assertTrue(carries(plain, raised, mark, accent, groundInk),
                         ground.storedAs() + ": " + one.cardinal()
                                 + "'s mark takes the horizon accent");
-                assertTrue(carries(plain, raised, letter, accent),
+                assertTrue(carries(plain, raised, letter, accent, groundInk),
                         ground.storedAs() + ": " + one.cardinal()
                                 + "'s letter takes the horizon accent");
             }
@@ -348,24 +433,49 @@ class CardinalLandmarksJourneyTest {
                         null, 0, other.getWidth()));
     }
 
-    /** Some pixel in the box changed to exactly the accent. */
+    /**
+     * Some pixel in the box changed to the accent laid on the ground:
+     * a glyph's antialiased edge is a blend of the two, one blend
+     * factor across all three channels, and a curved letter may have
+     * no pixel of pure accent at all.
+     */
     private static boolean carries(BufferedImage plain,
                                    BufferedImage raised, Rectangle2D box,
-                                   int accent) {
+                                   int accent, int ground) {
         for (int y = (int) Math.floor(box.getMinY());
              y <= (int) Math.ceil(box.getMaxY()); y++) {
             for (int x = (int) Math.floor(box.getMinX());
                  x <= (int) Math.ceil(box.getMaxX()); x++) {
                 if (x < 0 || y < 0 || x >= plain.getWidth()
-                        || y >= plain.getHeight()) {
+                        || y >= plain.getHeight()
+                        || plain.getRGB(x, y) == raised.getRGB(x, y)) {
                     continue;
                 }
-                if (plain.getRGB(x, y) != raised.getRGB(x, y)
-                        && raised.getRGB(x, y) == accent) {
+                if (blendOf(raised.getRGB(x, y), accent, ground)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    /** Whether a colour is ground-to-accent at one factor, mostly ink. */
+    private static boolean blendOf(int colour, int accent, int ground) {
+        double factor = Double.NaN;
+        for (int shift = 0; shift <= 16; shift += 8) {
+            int c = (colour >> shift) & 0xff;
+            int a = (accent >> shift) & 0xff;
+            int g = (ground >> shift) & 0xff;
+            if (Math.abs(a - g) < 32) {
+                continue;
+            }
+            double f = (double) (c - g) / (a - g);
+            if (Double.isNaN(factor)) {
+                factor = f;
+            } else if (Math.abs(f - factor) > 0.03) {
+                return false;
+            }
+        }
+        return !Double.isNaN(factor) && factor > 0.5 && factor < 1.03;
     }
 }

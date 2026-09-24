@@ -2343,6 +2343,71 @@ public final class ChartRenderer {
      * printed page, which is the thing the gate asked for.
      */
     /**
+     * The title block's lines as this page carries them (#359
+     * completion, owner ruling 2).
+     *
+     * <p>On a bounded page the horizon of a zenith-centred globe is
+     * the limb, and its south landmark sits at the limb's
+     * bottom-centre - where a lower-left title block wide enough for
+     * a long caption would cover it. So there the block's right edge
+     * stays left of that point by the room a landmark needs
+     * ({@link CardinalLandmark#clearance}), and the fact lines wrap
+     * at their separators to fit. The width comes from the page's
+     * geometry and the landmark's own size, never from any one
+     * language's caption. An unbounded page keeps its three lines.
+     */
+    private String[] fittedTitleLines(FontMetrics metrics,
+                                      ChartScene scene,
+                                      String projectionId) {
+        String[] lines = titleLines(scene, projectionId);
+        DrawnPage page = page(scene);
+        if (!Double.isFinite(page.projection().visiblePlaneRadius())) {
+            return lines;
+        }
+        double bottomCentre = new ViewportMapping(page)
+                .toPixel(new juranometria.project.PlanePoint(0.0, 0.0))
+                .x();
+        double clearance = CardinalLandmark.clearance(
+                EquatorialGrid.labelMetrics(), words);
+        // The block covers one pixel beyond its laid-out width.
+        double widest = bottomCentre - clearance - TITLE_MARGIN_PX
+                - 2 * TITLE_PADDING_PX - 1.0;
+        java.util.List<String> fitted = new java.util.ArrayList<>();
+        fitted.add(lines[0]);
+        for (int i = 1; i < lines.length; i++) {
+            fitted.addAll(wrapped(lines[i], metrics, widest));
+        }
+        return fitted.toArray(new String[0]);
+    }
+
+    /** A fact line wrapped at its separators to fit a width. */
+    private static java.util.List<String> wrapped(String line,
+                                                  FontMetrics metrics,
+                                                  double widest) {
+        if (metrics.stringWidth(line) <= widest) {
+            return java.util.List.of(line);
+        }
+        String separator = " \u00b7 ";
+        String[] facts = line.split(java.util.regex.Pattern.quote(
+                separator));
+        java.util.List<String> out = new java.util.ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        for (String fact : facts) {
+            String candidate = current.length() == 0 ? fact
+                    : current + separator + fact;
+            if (current.length() > 0
+                    && metrics.stringWidth(candidate) > widest) {
+                out.add(current.toString());
+                current = new StringBuilder(fact);
+            } else {
+                current = new StringBuilder(candidate);
+            }
+        }
+        out.add(current.toString());
+        return out;
+    }
+
+    /**
      * The three lines of the title block.
      *
      * <p>The first is the page's own title - a target's name, which
@@ -2592,7 +2657,7 @@ public final class ChartRenderer {
     public java.awt.Rectangle titleBlockLayout(FontMetrics metrics,
                                                ChartScene scene,
                                                String projectionId) {
-        String[] lines = titleLines(scene, projectionId);
+        String[] lines = fittedTitleLines(metrics, scene, projectionId);
         int lineHeight = metrics.getHeight();
         int textWidth = 0;
         for (String line : lines) {
@@ -2621,9 +2686,9 @@ public final class ChartRenderer {
         if (box == null) {
             return;
         }
-        String[] lines = titleLines(scene, projectionName);
         g.setFont(LABEL_FONT);
         FontMetrics metrics = g.getFontMetrics();
+        String[] lines = fittedTitleLines(metrics, scene, projectionName);
         int lineHeight = metrics.getHeight();
 
         g.setColor(palette.ground());
