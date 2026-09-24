@@ -1249,9 +1249,13 @@ public final class PackagedAcceptanceMain {
                 new juranometria.ui.ChartModuleHost(chart,
                         new juranometria.chart.SelectionModel(),
                         request -> { });
+        // An observer whose local meridian stands at the page's
+        // right ascension and whose horizon runs through its
+        // declinations, so both lines - and their crossing - are
+        // visibly on the page being judged.
         juranometria.meridian.MeridianModule meridian =
                 host.attach(new juranometria.meridian.MeridianModule(
-                        new juranometria.sky.Observer(42.5, -130.994,
+                        new juranometria.sky.Observer(80.0, -58.7,
                                 java.time.Instant.parse(
                                         "2026-03-20T21:33:00Z"))));
         meridian.showing(true, true, false);
@@ -1312,12 +1316,26 @@ public final class PackagedAcceptanceMain {
         require(chart.emphasizedSet().size() == 6,
                 "panning and zooming keep the whole combination");
 
-        // 4. Selection is independent both ways.
-        chart.setWorkingSelection(java.util.List.of("star:hip-24436"),
-                "star:hip-24436");
+        // 4. Selection is independent both ways - on a member the
+        // page really draws, so the ring's ink is on the page and
+        // the independence is not vacuously true.
+        SkyPosition pageCentre = chart.viewState().centre();
+        String starId = chart.currentScene().stars().stream()
+                .filter(star -> Math.abs(star.position().decDegrees()
+                        - pageCentre.decDegrees()) < 8.0
+                        && Math.abs(((star.position().raDegrees()
+                                - pageCentre.raDegrees() + 540.0) % 360.0)
+                                - 180.0) < 8.0)
+                .min(java.util.Comparator.comparingDouble(
+                        juranometria.chart.Star::magnitude))
+                .orElseThrow().id();
+        java.awt.image.BufferedImage plain = paint(chart);
+        chart.setWorkingSelection(java.util.List.of(starId), starId);
         require(chart.emphasizedSet().size() == 6,
                 "selecting changes no emphasis");
         java.awt.image.BufferedImage selected = paint(chart);
+        require(differingPixels(plain, selected) > 8,
+                "the reader's ring reaches the emphasized page");
         chart.toggleEmphasis(juranometria.render.ChartStructure
                 .EQUATORIAL_GRID);
         chart.toggleEmphasis(juranometria.render.ChartStructure
