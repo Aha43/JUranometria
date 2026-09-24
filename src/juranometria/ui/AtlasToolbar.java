@@ -584,40 +584,33 @@ public final class AtlasToolbar extends JToolBar {
 
     /** The menu, reading the chart at the moment it opens. */
     javax.swing.JPopupMenu emphasisMenu(ChartComponent chart) {
-        juranometria.render.ChartStructure current = chart.emphasized();
+        java.util.Set<juranometria.render.ChartStructure> raised =
+                chart.emphasizedSet();
         javax.swing.JPopupMenu menu = new javax.swing.JPopupMenu();
-        javax.swing.JRadioButtonMenuItem normal =
-                new javax.swing.JRadioButtonMenuItem(
-                        said.say("emphasis.normal"), current == null);
+        javax.swing.JMenuItem normal = new javax.swing.JMenuItem(
+                said.say("emphasis.normal"));
         normal.getAccessibleContext().setAccessibleName(
                 said.say("emphasis.normal"));
-        normal.addActionListener(event -> chart.emphasize(null));
+        normal.setEnabled(!raised.isEmpty());
+        normal.addActionListener(event -> chart.clearEmphasis());
         menu.add(normal);
         menu.addSeparator();
         for (juranometria.render.ChartStructure structure
                 : juranometria.render.ChartStructure.values()) {
             String name = said.say("emphasis." + structure.token());
-            javax.swing.JRadioButtonMenuItem item =
-                    new javax.swing.JRadioButtonMenuItem(name,
-                            structure == current);
+            javax.swing.JCheckBoxMenuItem item =
+                    new javax.swing.JCheckBoxMenuItem(name,
+                            raised.contains(structure));
             item.getAccessibleContext().setAccessibleName(name);
-            item.setEnabled(chart.emphasisAvailable(structure));
+            item.setEnabled(raised.contains(structure)
+                    || chart.emphasisAvailable(structure));
+            // Choosing a structure toggles only that structure
+            // (multiple-emphasis ruling).
             item.addActionListener(event ->
-                    chart.emphasize(chosen(current, structure)));
+                    chart.toggleEmphasis(structure));
             menu.add(item);
         }
         return menu;
-    }
-
-    /**
-     * What picking an entry means: choosing the active target again
-     * settles the page, anything else raises it (#361). Named so the
-     * rule is a fact a test can hold, not a lambda's private habit.
-     */
-    static juranometria.render.ChartStructure chosen(
-            juranometria.render.ChartStructure current,
-            juranometria.render.ChartStructure picked) {
-        return picked == current ? null : picked;
     }
 
     /**

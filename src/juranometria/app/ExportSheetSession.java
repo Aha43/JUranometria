@@ -134,7 +134,8 @@ public final class ExportSheetSession {
                             WorkingSelection working,
                             juranometria.ui.language.InterfaceText said) {
         open(owner, navigation, chart, options, working,
-                onScreen(said, () -> chart.emphasized() != null), said);
+                onScreen(said,
+                        () -> !chart.emphasizedSet().isEmpty()), said);
     }
 
     /** The same route, asking through whatever surfaces it is given. */
@@ -174,8 +175,9 @@ public final class ExportSheetSession {
         // moment, and only for a request that explicitly asked; an
         // ordinary export is canonical whatever the screen shows
         // (#361). No preference is stored anywhere on this path.
-        juranometria.render.ChartStructure emphasized =
-                request.includeEmphasis() ? chart.emphasized() : null;
+        java.util.Set<juranometria.render.ChartStructure> emphasized =
+                request.includeEmphasis() ? chart.emphasizedSet()
+                        : java.util.Set.of();
         return ExportSheet.write(
                 // The chart's own assembler, not the application's.
                 // They were the same object until a reader could

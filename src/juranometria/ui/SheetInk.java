@@ -40,7 +40,7 @@ public final class SheetInk {
      */
     public static ChartRenderer.ReferenceLayer reference(
             ChartComponent chart,
-            juranometria.render.ChartStructure emphasized) {
+            java.util.Set<juranometria.render.ChartStructure> emphasized) {
         if (chart == null) {
             throw new IllegalArgumentException("a chart is required");
         }

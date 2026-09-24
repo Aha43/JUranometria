@@ -195,7 +195,7 @@ Whether a particular read happens on the event thread is control flow, which tex
 | deterministic-report | regenerates byte-for-byte on the same tree | 67 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 10 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 402 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 407 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 

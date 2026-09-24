@@ -436,6 +436,7 @@ public final class PackagedAcceptanceMain {
         onThisPageJourney();
         meridianJourney();
         emphasisJourney();
+        combinedEmphasisJourney();
         horizonPanJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
@@ -1166,16 +1167,19 @@ public final class PackagedAcceptanceMain {
         meridian.showing(true, false, false);
 
         java.awt.image.BufferedImage canonical = paint(chart);
-        chart.emphasize(juranometria.render.ChartStructure
+        chart.toggleEmphasis(juranometria.render.ChartStructure
                 .EQUATORIAL_GRID);
         int gridInk = differingPixels(canonical, paint(chart));
         require(gridInk > 100, "the grid rises from the page: "
                 + gridInk + " pixels of ink change, geometry none");
-        chart.emphasize(juranometria.render.ChartStructure.MERIDIAN);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .EQUATORIAL_GRID);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .MERIDIAN);
         int meridianInk = differingPixels(canonical, paint(chart));
         require(meridianInk > 50, "the meridian rises with its"
                 + " module's own line: " + meridianInk + " pixels");
-        chart.emphasize(null);
+        chart.clearEmphasis();
         require(differingPixels(canonical, paint(chart)) == 0,
                 "and Normal settles the page byte-exactly");
         meridian.detach();
@@ -1194,17 +1198,20 @@ public final class PackagedAcceptanceMain {
         ecliptic.showing(true);
 
         canonical = paint(chart);
-        chart.emphasize(juranometria.render.ChartStructure
+        chart.toggleEmphasis(juranometria.render.ChartStructure
                 .CONSTELLATION_FIGURES);
         int figureInk = differingPixels(canonical, paint(chart));
         require(figureInk > 100, "the constellation figures rise: "
                 + figureInk + " pixels, their stars and names"
                 + " untouched by contract");
-        chart.emphasize(juranometria.render.ChartStructure.ECLIPTIC);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .CONSTELLATION_FIGURES);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .ECLIPTIC);
         int eclipticInk = differingPixels(canonical, paint(chart));
         require(eclipticInk > 50, "the ecliptic rises with its"
                 + " landmarks: " + eclipticInk + " pixels");
-        chart.emphasize(null);
+        chart.clearEmphasis();
         require(differingPixels(canonical, paint(chart)) == 0,
                 "and Normal settles this page byte-exactly too");
         ecliptic.detach();
@@ -1214,6 +1221,221 @@ public final class PackagedAcceptanceMain {
                 + figureInk + ", ecliptic " + eclipticInk
                 + " px raised on real pages; Normal settles"
                 + " byte-exactly; nothing persisted)");
+    }
+
+    /**
+     * The combinations journey (the multiple-emphasis follow-up to
+     * #361), walking the owner's scripted list mechanically: grid
+     * alone, horizon with meridian, grid with figures, then all six
+     * at once; pan and zoom with the combination active; hiding one
+     * active structure clears only it; selection independent;
+     * export checked and unchecked in all three formats with the
+     * enum-ordered token join; a chart-language switch relabelling
+     * the sky under an untouched set; and Normal settling the page
+     * byte-exactly at the end of it all.
+     */
+    private static void combinedEmphasisJourney() throws Exception {
+        // One page where all six structures are available: a wide
+        // orion field draws grid, boundaries and figures, the
+        // meridian module contributes its meridian and horizon with
+        // the cardinal marks, and the ecliptic module its ecliptic.
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        ENGLISH_PAGE);
+        chart.setSize(900, 700);
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(83.0, 0.0), 42.0, 6.0));
+        juranometria.ui.ChartModuleHost host =
+                new juranometria.ui.ChartModuleHost(chart,
+                        new juranometria.chart.SelectionModel(),
+                        request -> { });
+        // An observer whose local meridian stands at the page's
+        // right ascension and whose horizon runs through its
+        // declinations, so both lines - and their crossing - are
+        // visibly on the page being judged.
+        juranometria.meridian.MeridianModule meridian =
+                host.attach(new juranometria.meridian.MeridianModule(
+                        new juranometria.sky.Observer(80.0, -58.7,
+                                java.time.Instant.parse(
+                                        "2026-03-20T21:33:00Z"))));
+        meridian.showing(true, true, false);
+        juranometria.ecliptic.EclipticModule ecliptic =
+                host.attach(new juranometria.ecliptic.EclipticModule());
+        ecliptic.showing(true);
+        for (juranometria.render.ChartStructure structure
+                : juranometria.render.ChartStructure.values()) {
+            require(chart.emphasisAvailable(structure),
+                    "the journey page must offer " + structure.token());
+        }
+        java.awt.image.BufferedImage canonical = paint(chart);
+
+        // 1. Grid alone; horizon + meridian; grid + figures.
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .EQUATORIAL_GRID);
+        int gridInk = differingPixels(canonical, paint(chart));
+        require(gridInk > 100, "the grid rises alone: " + gridInk);
+        chart.clearEmphasis();
+        chart.toggleEmphasis(juranometria.render.ChartStructure.HORIZON);
+        chart.toggleEmphasis(juranometria.render.ChartStructure.MERIDIAN);
+        require(chart.emphasizedSet().equals(java.util.Set.of(
+                        juranometria.render.ChartStructure.HORIZON,
+                        juranometria.render.ChartStructure.MERIDIAN)),
+                "horizon and meridian rise together");
+        int skyInk = differingPixels(canonical, paint(chart));
+        require(skyInk > 100, "and their ink rises with them: "
+                + skyInk);
+        chart.clearEmphasis();
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .EQUATORIAL_GRID);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .CONSTELLATION_FIGURES);
+        int pairInk = differingPixels(canonical, paint(chart));
+        require(pairInk > gridInk, "grid with figures raises more ink"
+                + " than the grid alone: " + pairInk + " over "
+                + gridInk);
+
+        // 2. All six at once.
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .MERIDIAN);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .ECLIPTIC);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .HORIZON);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .CONSTELLATION_BOUNDARIES);
+        require(chart.emphasizedSet().size() == 6,
+                "all six structures are raised at once");
+        int allInk = differingPixels(canonical, paint(chart));
+        require(allInk > pairInk, "all six raise more ink than the"
+                + " pair: " + allInk + " over " + pairInk);
+
+        // 3. Pan and zoom while the combination stays active; the
+        // page stays wide enough for every layer, so nothing leaves.
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(88.0, 4.0), 36.0, 6.0));
+        require(chart.emphasizedSet().size() == 6,
+                "panning and zooming keep the whole combination");
+
+        // 4. Selection is independent both ways - on a member the
+        // page really draws, so the ring's ink is on the page and
+        // the independence is not vacuously true.
+        SkyPosition pageCentre = chart.viewState().centre();
+        String starId = chart.currentScene().stars().stream()
+                .filter(star -> Math.abs(star.position().decDegrees()
+                        - pageCentre.decDegrees()) < 8.0
+                        && Math.abs(((star.position().raDegrees()
+                                - pageCentre.raDegrees() + 540.0) % 360.0)
+                                - 180.0) < 8.0)
+                .min(java.util.Comparator.comparingDouble(
+                        juranometria.chart.Star::magnitude))
+                .orElseThrow().id();
+        java.awt.image.BufferedImage plain = paint(chart);
+        chart.setWorkingSelection(java.util.List.of(starId), starId);
+        require(chart.emphasizedSet().size() == 6,
+                "selecting changes no emphasis");
+        java.awt.image.BufferedImage selected = paint(chart);
+        require(differingPixels(plain, selected) > 8,
+                "the reader's ring reaches the emphasized page");
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .EQUATORIAL_GRID);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .EQUATORIAL_GRID);
+        require(differingPixels(selected, paint(chart)) == 0,
+                "and an emphasis round trip leaves the reader's"
+                        + " marks byte-exactly where they were");
+        chart.setWorkingSelection(java.util.List.of(), null);
+
+        // 5. Export, checked and unchecked, in all three formats.
+        String joined = juranometria.render.ChartStructure
+                .joinedTokens(chart.emphasizedSet()).orElseThrow();
+        require(joined.equals("meridian+ecliptic+equatorial-grid"
+                        + "+horizon+constellation-boundaries"
+                        + "+constellation-figures"),
+                "the six tokens join in the enum's one order: "
+                        + joined);
+        var emphasizedSheet = juranometria.sheet.ChartSheet.record(
+                chart.assembler()::assemble, chart.viewState(),
+                chart.chartOptions(),
+                juranometria.ui.SheetInk.reference(chart,
+                        chart.emphasizedSet()),
+                juranometria.render.ChartRenderer.ReferenceLayer.NONE,
+                juranometria.sheet.PaperSize.A4, ENGLISH_PAGE,
+                chart.emphasizedSet());
+        var canonicalSheet = juranometria.sheet.ChartSheet.record(
+                chart.assembler()::assemble, chart.viewState(),
+                chart.chartOptions(),
+                juranometria.ui.SheetInk.reference(chart, null),
+                juranometria.render.ChartRenderer.ReferenceLayer.NONE,
+                juranometria.sheet.PaperSize.A4, ENGLISH_PAGE,
+                java.util.Set.of());
+        require(joined.equals(emphasizedSheet.metadata().emphasis()),
+                "the recording names the whole set");
+        require(canonicalSheet.metadata().emphasis() == null,
+                "and the unchecked recording names none of it");
+        for (juranometria.sheet.SheetFormat format
+                : juranometria.sheet.SheetFormat.values()) {
+            byte[] checkedBytes = juranometria.sheet.SheetWriters
+                    .write(emphasizedSheet, format, 300);
+            byte[] uncheckedBytes = juranometria.sheet.SheetWriters
+                    .write(canonicalSheet, format, 300);
+            require(!java.util.Arrays.equals(checkedBytes,
+                            uncheckedBytes),
+                    format + ": the checked export differs from the"
+                            + " canonical sheet");
+            String body = new String(checkedBytes,
+                    java.nio.charset.StandardCharsets.ISO_8859_1);
+            require(body.contains(joined), format
+                    + ": the checked export carries the whole joined"
+                    + " token");
+            require(!new String(uncheckedBytes,
+                            java.nio.charset.StandardCharsets.ISO_8859_1)
+                            .contains("emphasis:"),
+                    format + ": the unchecked export carries no"
+                            + " emphasis record");
+        }
+
+        // 6. A chart-language switch relabels the sky around an
+        // untouched combination.
+        String other = Atlas.languages().chartLanguages().stream()
+                .filter(tag -> !tag.startsWith("en"))
+                .findFirst().orElseThrow(() -> new IllegalStateException(
+                        "the packaged image ships more than English"));
+        chart.setAssembler(Atlas.assemblerNamedIn(other));
+        require(chart.emphasizedSet().size() == 6,
+                "switching the chart language keeps the combination");
+        chart.setAssembler(Atlas.assembler());
+        require(chart.emphasizedSet().size() == 6,
+                "and switching back keeps it too");
+
+        // 7. Hiding one active structure clears only it.
+        meridian.showing(false, true, false);
+        require(chart.emphasizedSet().equals(java.util.EnumSet
+                        .complementOf(java.util.EnumSet.of(
+                                juranometria.render.ChartStructure
+                                        .MERIDIAN))),
+                "hiding the meridian settles only the meridian");
+        meridian.showing(true, true, false);
+
+        // 8. Normal settles the page byte-exactly.
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(83.0, 0.0), 42.0, 6.0));
+        java.awt.image.BufferedImage before = paint(chart);
+        chart.clearEmphasis();
+        java.awt.image.BufferedImage settled = paint(chart);
+        require(differingPixels(before, settled) > 0,
+                "the combination was really on the page");
+        require(differingPixels(canonical, settled) == 0,
+                "and Normal settles the page byte-exactly");
+        meridian.detach();
+        ecliptic.detach();
+
+        System.out.println("combined emphasis OK (grid " + gridInk
+                + ", horizon+meridian " + skyInk + ", grid+figures "
+                + pairInk + ", all six " + allInk
+                + " px raised; pan, zoom, selection and a language"
+                + " switch preserved the set; one hidden structure"
+                + " left alone; the export named " + joined
+                + " in three formats; Normal settled byte-exactly)");
     }
 
     /**

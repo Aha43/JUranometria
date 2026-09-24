@@ -45,12 +45,14 @@ class StructureEmphasisSessionTest {
     @Test
     void emphasisSurvivesTheReadersNavigation() {
         ChartComponent chart = chart();
-        chart.emphasize(ChartStructure.EQUATORIAL_GRID);
-        assertEquals(ChartStructure.EQUATORIAL_GRID, chart.emphasized());
+        chart.toggleEmphasis(ChartStructure.EQUATORIAL_GRID);
+        assertEquals(java.util.Set.of(ChartStructure.EQUATORIAL_GRID),
+                chart.emphasizedSet());
 
         chart.setViewState(new ChartViewState(
                 new SkyPosition(271.0, -24.0), 42.0, 6.0));
-        assertEquals(ChartStructure.EQUATORIAL_GRID, chart.emphasized(),
+        assertEquals(java.util.Set.of(ChartStructure.EQUATORIAL_GRID),
+                chart.emphasizedSet(),
                 "panning and zooming keep the structure the reader is"
                         + " following");
         // And nothing was persisted: the options the dialog edits and
@@ -62,12 +64,12 @@ class StructureEmphasisSessionTest {
     @Test
     void settlingIsTheSameCallAndAnUnavailableAskSettlesToo() {
         ChartComponent chart = chart();
-        chart.emphasize(ChartStructure.EQUATORIAL_GRID);
-        chart.emphasize(null);
-        assertNull(chart.emphasized(), "Normal settles the page");
+        chart.toggleEmphasis(ChartStructure.EQUATORIAL_GRID);
+        chart.clearEmphasis();
+        assertTrue(chart.emphasizedSet().isEmpty(), "Normal settles the page");
 
-        chart.emphasize(ChartStructure.MERIDIAN);
-        assertNull(chart.emphasized(),
+        chart.toggleEmphasis(ChartStructure.MERIDIAN);
+        assertTrue(chart.emphasizedSet().isEmpty(),
                 "no module contributes a meridian here, so there is"
                         + " nothing to raise and no latent mode to"
                         + " hold");
@@ -76,8 +78,9 @@ class StructureEmphasisSessionTest {
     @Test
     void aSwitchedOffLayerSettlesTheEmphasisImmediately() {
         ChartComponent chart = chart();
-        chart.emphasize(ChartStructure.EQUATORIAL_GRID);
-        assertEquals(ChartStructure.EQUATORIAL_GRID, chart.emphasized());
+        chart.toggleEmphasis(ChartStructure.EQUATORIAL_GRID);
+        assertEquals(java.util.Set.of(ChartStructure.EQUATORIAL_GRID),
+                chart.emphasizedSet());
 
         ChartOptions on = ChartOptions.DEFAULTS;
         chart.setChartOptions(new ChartOptions(on.deepSkyObjects(),
@@ -87,7 +90,7 @@ class StructureEmphasisSessionTest {
                 false, on.titleBlock(), on.magnitudeKey(), on.galaxies(),
                 on.openClusters(), on.globularClusters(), on.nebulae(),
                 on.planetaryNebulae(), on.palette()));
-        assertNull(chart.emphasized(),
+        assertTrue(chart.emphasizedSet().isEmpty(),
                 "a hidden grid cannot stay emphasized: the mode"
                         + " settles with the layer");
     }
@@ -99,15 +102,16 @@ class StructureEmphasisSessionTest {
         // is below the policy's narrowest figure field.
         chart.setViewState(new ChartViewState(
                 new SkyPosition(83.0, 0.0), 42.0, 8.0));
-        chart.emphasize(ChartStructure.CONSTELLATION_FIGURES);
-        assertEquals(ChartStructure.CONSTELLATION_FIGURES,
-                chart.emphasized());
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_FIGURES);
+        assertEquals(java.util.Set.of(
+                        ChartStructure.CONSTELLATION_FIGURES),
+                chart.emphasizedSet());
 
         // Below the policy's narrowest figure field the page draws
         // no figures, so the emphasis settles with them.
         chart.setViewState(new ChartViewState(
                 new SkyPosition(83.0, 0.0), 8.0, 8.0));
-        assertNull(chart.emphasized(),
+        assertTrue(chart.emphasizedSet().isEmpty(),
                 "a field the policy keeps figures off cannot keep"
                         + " them emphasized");
     }
@@ -122,13 +126,14 @@ class StructureEmphasisSessionTest {
                         Instant.parse("2026-03-20T21:33:00Z"))));
         module.showing(true, true, true);
 
-        chart.emphasize(ChartStructure.MERIDIAN);
-        assertEquals(ChartStructure.MERIDIAN, chart.emphasized(),
+        chart.toggleEmphasis(ChartStructure.MERIDIAN);
+        assertEquals(java.util.Set.of(ChartStructure.MERIDIAN),
+                chart.emphasizedSet(),
                 "the module's meridian is on the chart, so it can"
                         + " be raised");
 
         module.detach();
-        assertNull(chart.emphasized(),
+        assertTrue(chart.emphasizedSet().isEmpty(),
                 "a detached module's structure settles immediately -"
                         + " never an invisible latent mode");
     }
@@ -142,10 +147,10 @@ class StructureEmphasisSessionTest {
                 new Observer(59.9, 10.7,
                         Instant.parse("2026-03-20T21:33:00Z"))));
         module.showing(true, true, true);
-        chart.emphasize(ChartStructure.MERIDIAN);
+        chart.toggleEmphasis(ChartStructure.MERIDIAN);
 
         module.showing(false, false, false);
-        assertNull(chart.emphasized(),
+        assertTrue(chart.emphasizedSet().isEmpty(),
                 "hiding the lines settles the emphasis with them");
         module.detach();
     }
@@ -153,14 +158,15 @@ class StructureEmphasisSessionTest {
     @Test
     void selectionAndEmphasisNeverTouchEachOther() {
         ChartComponent chart = chart();
-        chart.emphasize(ChartStructure.EQUATORIAL_GRID);
+        chart.toggleEmphasis(ChartStructure.EQUATORIAL_GRID);
 
         chart.setWorkingSelection(java.util.List.of("star:hip-24436"),
                 "star:hip-24436");
-        assertEquals(ChartStructure.EQUATORIAL_GRID, chart.emphasized(),
+        assertEquals(java.util.Set.of(ChartStructure.EQUATORIAL_GRID),
+                chart.emphasizedSet(),
                 "selecting changes no emphasis");
 
-        chart.emphasize(ChartStructure.CONSTELLATION_FIGURES);
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_FIGURES);
         assertEquals(java.util.List.of("star:hip-24436"),
                 chart.selectedMembers(),
                 "and emphasizing changes no selection");
@@ -169,7 +175,10 @@ class StructureEmphasisSessionTest {
     @Test
     void theMenuSaysWhatCanBeRaisedAndWhatIsRaised() {
         ChartComponent chart = chart();
-        chart.emphasize(ChartStructure.EQUATORIAL_GRID);
+        // Wide enough that the geography policy draws the figures.
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(271.0, -24.0), 42.0, 6.0));
+        chart.toggleEmphasis(ChartStructure.EQUATORIAL_GRID);
 
         AtlasToolbar bar = new AtlasToolbar(
                 new ChartViewController(Atlas.assembler()::fits),
@@ -182,35 +191,41 @@ class StructureEmphasisSessionTest {
         javax.swing.JPopupMenu menu = bar.emphasisMenu(chart);
 
         // Normal, a separator, then the six structures in the ruled
-        // order.
-        javax.swing.JRadioButtonMenuItem normal =
-                (javax.swing.JRadioButtonMenuItem) menu.getComponent(0);
-        assertTrue(!normal.isSelected(),
-                "something is raised, so Normal is not marked");
-        javax.swing.JRadioButtonMenuItem meridian =
-                (javax.swing.JRadioButtonMenuItem) menu.getComponent(2);
+        // order, each an independent checkmark.
+        javax.swing.JMenuItem normal =
+                (javax.swing.JMenuItem) menu.getComponent(0);
+        assertTrue(normal.isEnabled(),
+                "something is raised, so Normal has work to do");
+        javax.swing.JCheckBoxMenuItem meridian =
+                (javax.swing.JCheckBoxMenuItem) menu.getComponent(2);
         assertTrue(!meridian.isEnabled(),
                 "no module offers a meridian, so it cannot be chosen");
-        javax.swing.JRadioButtonMenuItem grid =
-                (javax.swing.JRadioButtonMenuItem) menu.getComponent(4);
+        javax.swing.JCheckBoxMenuItem grid =
+                (javax.swing.JCheckBoxMenuItem) menu.getComponent(4);
         assertTrue(grid.isEnabled() && grid.isSelected(),
-                "the raised grid is marked and choosable");
+                "the raised grid is checked and choosable");
+        javax.swing.JCheckBoxMenuItem figures =
+                (javax.swing.JCheckBoxMenuItem) menu.getComponent(7);
+        assertTrue(figures.isEnabled() && !figures.isSelected(),
+                "an unraised available structure is unchecked");
 
-        // The choice rule the items are wired to, held by name:
-        // the active target settles, anything else raises.
-        assertNull(AtlasToolbar.chosen(
-                        ChartStructure.EQUATORIAL_GRID,
-                        ChartStructure.EQUATORIAL_GRID),
-                "choosing the active target again settles the page");
-        assertEquals(ChartStructure.MERIDIAN, AtlasToolbar.chosen(
-                        ChartStructure.EQUATORIAL_GRID,
-                        ChartStructure.MERIDIAN),
-                "choosing another raises it instead");
+        // Toggling adds without touching the grid's membership;
+        // toggling again removes only itself.
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_FIGURES);
+        assertEquals(java.util.Set.of(ChartStructure.EQUATORIAL_GRID,
+                        ChartStructure.CONSTELLATION_FIGURES),
+                chart.emphasizedSet(),
+                "choosing a structure toggles only that structure");
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_FIGURES);
+        assertEquals(java.util.Set.of(ChartStructure.EQUATORIAL_GRID),
+                chart.emphasizedSet(),
+                "and toggling it again removes only itself");
 
-        // And with nothing raised, Normal is the marked state.
-        chart.emphasize(null);
-        assertTrue(((javax.swing.JRadioButtonMenuItem) bar
-                        .emphasisMenu(chart).getComponent(0)).isSelected(),
-                "the settled page reads as Normal");
+        // With nothing raised, Normal rests.
+        chart.clearEmphasis();
+        assertTrue(!((javax.swing.JMenuItem) bar
+                        .emphasisMenu(chart).getComponent(0))
+                        .isEnabled(),
+                "the settled page gives Normal nothing to do");
     }
 }

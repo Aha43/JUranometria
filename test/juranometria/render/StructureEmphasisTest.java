@@ -140,7 +140,8 @@ class StructureEmphasisTest {
             ChartOptions options = ChartOptions.DEFAULTS
                     .withPalette(palette);
             assertTrue(identical(RENDERER.renderToImage(scene, options),
-                            RENDERER.renderToImage(scene, options, null)),
+                            RENDERER.renderToImage(scene, options,
+                                    java.util.Set.<ChartStructure>of())),
                     "no emphasis is the canonical page, byte for byte,"
                             + " on " + palette);
         }
@@ -245,7 +246,9 @@ class StructureEmphasisTest {
 
     private static BufferedImage layerAlone(ChartScene scene,
                                             OverlayContribution geometry,
-                                            ChartStructure emphasized) {
+                                            ChartStructure target) {
+        java.util.Set<ChartStructure> emphasized = target == null
+                ? java.util.Set.of() : java.util.Set.of(target);
         BufferedImage image = new BufferedImage(900, 700,
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
@@ -293,7 +296,9 @@ class StructureEmphasisTest {
     private static BufferedImage painted(ChartScene scene,
                                          List<OverlayContribution>
                                                  contributions,
-                                         ChartStructure emphasized) {
+                                         ChartStructure target) {
+        java.util.Set<ChartStructure> emphasized = target == null
+                ? java.util.Set.of() : java.util.Set.of(target);
         OverlayRegistry registry = new OverlayRegistry();
         registry.offer("test-module", () -> contributions);
         BufferedImage image = new BufferedImage(900, 700,

@@ -46,6 +46,17 @@ import juranometria.ui.ReferenceInk;
  * <p>Every page carries the Place and Time and ecliptic modules, so
  * the meridian/horizon and ecliptic/grid crossings the issue names
  * are on the pages being judged.
+ *
+ * <p>The multiple-emphasis follow-up leaves that matrix as it was
+ * and draws only the owner-reviewed combinations beside it: the
+ * three crossing pairs the contracts hold and all six structures at
+ * once, each on the page where it was judged. A combination's strip
+ * ends with the
+ * colour-vision simulation under which its least-separated pair of
+ * active accents is hardest to tell apart, and the report gains the
+ * pairwise accent distances - when several accents share a page,
+ * what matters is no longer only each accent against its canonical
+ * ink but every accent against every other.
  */
 public final class EmphasisStudyMain {
 
@@ -73,6 +84,43 @@ public final class EmphasisStudyMain {
             new Page("orion-120", new SkyPosition(83.0, 0.0), 120.0),
             new Page("globe-180", new SkyPosition(83.0, 0.0), 180.0));
 
+    /**
+     * The ruled combinations: the three crossing pairs the
+     * combination contracts hold, and the whole set at once.
+     */
+    private static final List<java.util.Set<ChartStructure>> COMBINATIONS =
+            List.of(
+                    java.util.Set.of(ChartStructure.EQUATORIAL_GRID,
+                            ChartStructure.CONSTELLATION_FIGURES),
+                    java.util.Set.of(ChartStructure.EQUATORIAL_GRID,
+                            ChartStructure.ECLIPTIC),
+                    java.util.Set.of(ChartStructure.MERIDIAN,
+                            ChartStructure.HORIZON),
+                    java.util.EnumSet.allOf(ChartStructure.class));
+
+    /** A combination drawn for visual evidence, on one page and ground. */
+    private record Reviewed(Page page, ChartPalette ground,
+                            java.util.Set<ChartStructure> combination) { }
+
+    /**
+     * The owner-reviewed combinations - drawn alone, not as a matrix:
+     * the pairwise tables below are analytic, and only these few
+     * need pictures. Sagittarius at 120 degrees is the one page where
+     * every combination's members all ink; the globe pair records
+     * multiple emphasis across the orthographic horizon path.
+     */
+    private static final List<Reviewed> REVIEWED = List.of(
+            new Reviewed(PAGES.get(2), ChartPalette.WHITE_PAPER,
+                    COMBINATIONS.get(0)),
+            new Reviewed(PAGES.get(2), ChartPalette.WHITE_PAPER,
+                    COMBINATIONS.get(1)),
+            new Reviewed(PAGES.get(2), ChartPalette.BLACK_SKY,
+                    COMBINATIONS.get(2)),
+            new Reviewed(PAGES.get(2), ChartPalette.WHITE_PAPER,
+                    COMBINATIONS.get(3)),
+            new Reviewed(PAGES.get(6), ChartPalette.WHITE_PAPER,
+                    COMBINATIONS.get(2)));
+
     private EmphasisStudyMain() {
     }
 
@@ -94,7 +142,8 @@ public final class EmphasisStudyMain {
                         ? "black" : "paper";
                 ChartOptions options =
                         ChartOptions.DEFAULTS.withPalette(ground);
-                BufferedImage canonical = painted(scene, options, null);
+                BufferedImage canonical = painted(scene, options,
+                        java.util.Set.<ChartStructure>of());
                 write(canonical, page.name() + "-" + g + "-canonical");
                 for (ChartStructure structure : ChartStructure.values()) {
                     BufferedImage emphasized =
@@ -108,16 +157,51 @@ public final class EmphasisStudyMain {
                                             .of(emphasized)),
                             "strip-" + stem);
                 }
+
             }
             System.err.println("  " + page.name() + " done");
         }
+        for (Reviewed reviewed : REVIEWED) {
+            Page page = reviewed.page();
+            ChartScene scene = Atlas.assembler().assemble(
+                    new ChartViewState(page.centre(), page.field(),
+                            ChartViewState.defaultMagnitudeFor(
+                                    page.field())),
+                    WIDE, HIGH);
+            ChartOptions options =
+                    ChartOptions.DEFAULTS.withPalette(reviewed.ground());
+            BufferedImage canonical = painted(scene, options,
+                    java.util.Set.<ChartStructure>of());
+            BufferedImage emphasized = painted(scene, options,
+                    reviewed.combination());
+            write(strip(canonical, emphasized,
+                            Vision.MONOCHROME.of(emphasized),
+                            limitingPair(reviewed.ground(),
+                                    reviewed.combination())
+                                    .of(emphasized)),
+                    "strip-" + page.name() + "-"
+                            + (reviewed.ground() == ChartPalette.BLACK_SKY
+                                    ? "black" : "paper")
+                            + "-" + comboStem(reviewed.combination()));
+        }
+        System.err.println("  reviewed combinations done");
         System.err.println("EMPHASIS_STUDY_DONE " + DIR);
     }
 
     /** The page with both modules attached, optionally emphasized. */
     private static BufferedImage painted(ChartScene scene,
                                          ChartOptions options,
-                                         ChartStructure emphasized) {
+                                         ChartStructure target) {
+        return painted(scene, options, target == null
+                ? java.util.Set.<ChartStructure>of()
+                : java.util.Set.of(target));
+    }
+
+    /** The same page with a whole combination raised. */
+    private static BufferedImage painted(ChartScene scene,
+                                         ChartOptions options,
+                                         java.util.Set<ChartStructure>
+                                                 emphasized) {
         OverlayRegistry registry = new OverlayRegistry();
         MeridianModule meridian = new MeridianModule(OSLO);
         meridian.showing(true, true, true);
@@ -139,6 +223,52 @@ public final class EmphasisStudyMain {
             g.dispose();
         }
         return image;
+    }
+
+    /** File stem for a combination: lowercased names joined '+'. */
+    private static String comboStem(
+            java.util.Set<ChartStructure> combination) {
+        StringBuilder stem = new StringBuilder();
+        for (ChartStructure structure : ChartStructure.values()) {
+            if (combination.contains(structure)) {
+                if (stem.length() > 0) {
+                    stem.append('+');
+                }
+                stem.append(structure.name().toLowerCase(Locale.ROOT));
+            }
+        }
+        return stem.toString();
+    }
+
+    /**
+     * The simulation under which the combination's least-separated
+     * pair of active accents is hardest to tell apart.
+     */
+    private static Vision limitingPair(ChartPalette ground,
+            java.util.Set<ChartStructure> combination) {
+        Vision worst = Vision.PROTANOPIA;
+        double least = Double.MAX_VALUE;
+        List<ChartStructure> active = new java.util.ArrayList<>();
+        for (ChartStructure structure : ChartStructure.values()) {
+            if (combination.contains(structure)) {
+                active.add(structure);
+            }
+        }
+        for (Vision vision : List.of(Vision.PROTANOPIA,
+                Vision.DEUTERANOPIA, Vision.TRITANOPIA)) {
+            for (int i = 0; i < active.size(); i++) {
+                for (int j = i + 1; j < active.size(); j++) {
+                    double apart = distance(
+                            vision.of(accent(ground, active.get(i))),
+                            vision.of(accent(ground, active.get(j))));
+                    if (apart < least) {
+                        least = apart;
+                        worst = vision;
+                    }
+                }
+            }
+        }
+        return worst;
     }
 
     // ---- vision -----------------------------------------------------
@@ -308,6 +438,111 @@ public final class EmphasisStudyMain {
                                         Color.BLACK,
                                         new java.awt.BasicStroke(1.0f))
                                 .stroke().getLineWidth() - 1.0));
+            }
+            pairwise(said, ground);
+        }
+        combinations(said);
+    }
+
+    /**
+     * Accent against accent (multiple emphasis): when several
+     * structures rise together, the reader also has to tell the
+     * accents from each other, so every pair is measured raw and
+     * under its own hardest simulation.
+     */
+    private static void pairwise(PrintStream said, ChartPalette ground) {
+        said.println();
+        said.println("Accent pairs (distance raw, then under the"
+                + " pair's own limiting simulation):");
+        ChartStructure[] all = ChartStructure.values();
+        for (int i = 0; i < all.length; i++) {
+            for (int j = i + 1; j < all.length; j++) {
+                Color one = accent(ground, all[i]);
+                Color other = accent(ground, all[j]);
+                Vision worst = Vision.PROTANOPIA;
+                double least = Double.MAX_VALUE;
+                for (Vision vision : List.of(Vision.PROTANOPIA,
+                        Vision.DEUTERANOPIA, Vision.TRITANOPIA)) {
+                    double apart = distance(vision.of(one),
+                            vision.of(other));
+                    if (apart < least) {
+                        least = apart;
+                        worst = vision;
+                    }
+                }
+                said.println(String.format(Locale.ROOT,
+                        "- %s / %s: %.1f, %.1f under %s",
+                        all[i], all[j], distance(one, other), least,
+                        worst));
+            }
+        }
+    }
+
+    /**
+     * The ruled combinations, each summarised by its weakest link:
+     * the least-separated pair of active accents, raw and under the
+     * pair's hardest simulation, on both grounds.
+     */
+    private static void combinations(PrintStream said) {
+        said.println();
+        said.println("## Combinations (multiple emphasis)");
+        said.println();
+        said.println("The three crossing pairs the combination"
+                + " contracts hold, and all six at once; each is only"
+                + " as tellable as its least-separated pair of"
+                + " accents.");
+        said.println();
+        said.println("Finding, accepted by the owner: multiple emphasis"
+                + " does not promise that every active structure can"
+                + " be identified by hue alone. Under the common"
+                + " dichromacies some co-raised accents sit close"
+                + " together - most of all when all six are raised."
+                + " Every accent stays separated from its own"
+                + " canonical ink (the tables above), and geometry,"
+                + " dash pattern, position and the menu's checked"
+                + " identities remain part of the reading system.");
+        for (ChartPalette ground : ChartPalette.values()) {
+            said.println();
+            said.println("On " + ground + ":");
+            for (java.util.Set<ChartStructure> combination
+                    : COMBINATIONS) {
+                double leastRaw = Double.MAX_VALUE;
+                ChartStructure firstOf = null;
+                ChartStructure secondOf = null;
+                List<ChartStructure> active = new java.util.ArrayList<>();
+                for (ChartStructure structure : ChartStructure.values()) {
+                    if (combination.contains(structure)) {
+                        active.add(structure);
+                    }
+                }
+                for (int i = 0; i < active.size(); i++) {
+                    for (int j = i + 1; j < active.size(); j++) {
+                        double apart = distance(
+                                accent(ground, active.get(i)),
+                                accent(ground, active.get(j)));
+                        if (apart < leastRaw) {
+                            leastRaw = apart;
+                            firstOf = active.get(i);
+                            secondOf = active.get(j);
+                        }
+                    }
+                }
+                Vision worst = limitingPair(ground, combination);
+                double leastSimulated = Double.MAX_VALUE;
+                for (int i = 0; i < active.size(); i++) {
+                    for (int j = i + 1; j < active.size(); j++) {
+                        leastSimulated = Math.min(leastSimulated,
+                                distance(worst.of(accent(ground,
+                                                active.get(i))),
+                                        worst.of(accent(ground,
+                                                active.get(j)))));
+                    }
+                }
+                said.println(String.format(Locale.ROOT,
+                        "- %s: weakest pair %s / %s at %.1f raw,"
+                                + " %.1f under %s",
+                        comboStem(combination), firstOf, secondOf,
+                        leastRaw, leastSimulated, worst));
             }
         }
     }

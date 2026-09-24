@@ -49,7 +49,9 @@ public final class ChartComponent extends JComponent {
      * invisible latent mode outlives a hidden layer or a detached
      * module.
      */
-    private juranometria.render.ChartStructure emphasized;
+    private final java.util.EnumSet<juranometria.render.ChartStructure>
+            emphasized = java.util.EnumSet.noneOf(
+                    juranometria.render.ChartStructure.class);
     private final java.util.List<Runnable> emphasisListeners =
             new java.util.ArrayList<>();
     private final java.util.List<Runnable> sceneListeners =
@@ -352,30 +354,48 @@ public final class ChartComponent extends JComponent {
     }
 
     /**
-     * Raises one semantic structure in ink, or settles the page.
-     *
-     * <p>{@code null} - or a structure the page cannot currently
-     * show - is the canonical chart. Selecting and emphasizing are
-     * independent by ruling: this touches no selection, and no
-     * selection touches this.
+     * Toggles one semantic structure's membership in the raised set
+     * (multiple-emphasis ruling): choosing a structure toggles only
+     * that structure, and an unavailable structure cannot enter.
+     * Selecting and emphasizing stay independent: this touches no
+     * selection, and no selection touches this.
      */
-    public void emphasize(juranometria.render.ChartStructure structure) {
-        juranometria.render.ChartStructure next =
-                structure != null && emphasisAvailable(structure)
-                        ? structure : null;
-        if (next == emphasized) {
+    public void toggleEmphasis(
+            juranometria.render.ChartStructure structure) {
+        if (structure == null) {
             return;
         }
-        emphasized = next;
-        for (Runnable listener : java.util.List.copyOf(emphasisListeners)) {
+        if (emphasized.contains(structure)) {
+            emphasized.remove(structure);
+        } else if (emphasisAvailable(structure)) {
+            emphasized.add(structure);
+        } else {
+            return;
+        }
+        emphasisChanged();
+    }
+
+    /** Normal: the whole set settles at once. */
+    public void clearEmphasis() {
+        if (emphasized.isEmpty()) {
+            return;
+        }
+        emphasized.clear();
+        emphasisChanged();
+    }
+
+    /** The raised structures, in the enum's own order; never null. */
+    public java.util.Set<juranometria.render.ChartStructure>
+            emphasizedSet() {
+        return java.util.Collections.unmodifiableSet(emphasized);
+    }
+
+    private void emphasisChanged() {
+        for (Runnable listener
+                : java.util.List.copyOf(emphasisListeners)) {
             listener.run();
         }
         repaint();
-    }
-
-    /** The emphasized structure, or null for the canonical page. */
-    public juranometria.render.ChartStructure emphasized() {
-        return emphasized;
     }
 
     /** Told when emphasis changes, including a forced settle. */
@@ -419,8 +439,10 @@ public final class ChartComponent extends JComponent {
      * withdrawing - and never during painting.
      */
     void revalidateEmphasis() {
-        if (emphasized != null && !emphasisAvailable(emphasized)) {
-            emphasize(null);
+        boolean changed = emphasized.removeIf(
+                structure -> !emphasisAvailable(structure));
+        if (changed) {
+            emphasisChanged();
         }
     }
 

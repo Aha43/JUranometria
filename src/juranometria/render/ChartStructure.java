@@ -38,6 +38,39 @@ public enum ChartStructure {
     }
 
     /**
+     * Membership in a raised set, as the painters ask it; a
+     * {@code null} set raises nothing.
+     */
+    public static java.util.function.Predicate<ChartStructure> membersOf(
+            java.util.Set<ChartStructure> active) {
+        return active == null ? structure -> false : active::contains;
+    }
+
+    /**
+     * The active set as one deterministic string: tokens in this
+     * enum's own order, joined with {@code +} - and a single target
+     * is the bare token, so one-target metadata is byte-identical
+     * to the released #361 form (multiple-emphasis ruling).
+     * Empty means none, and callers write nothing.
+     */
+    public static java.util.Optional<String> joinedTokens(
+            java.util.Set<ChartStructure> active) {
+        if (active == null || active.isEmpty()) {
+            return java.util.Optional.empty();
+        }
+        StringBuilder joined = new StringBuilder();
+        for (ChartStructure structure : values()) {
+            if (active.contains(structure)) {
+                if (joined.length() > 0) {
+                    joined.append('+');
+                }
+                joined.append(structure.token());
+            }
+        }
+        return java.util.Optional.of(joined.toString());
+    }
+
+    /**
      * The structure a module's contributed identity belongs to, or
      * empty for an identity the chart does not know.
      *

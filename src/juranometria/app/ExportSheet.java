@@ -158,7 +158,7 @@ public final class ExportSheet {
                                 Request request, File destination,
                                 ReplaceDecision replace,
                                 juranometria.ui.language.InterfaceText said,
-                                juranometria.render.ChartStructure
+                                java.util.Set<juranometria.render.ChartStructure>
                                         emphasized) {
         return write(pages, state, options, ink, overChart, request,
                 destination, replace, SINK, said, emphasized);
@@ -184,7 +184,7 @@ public final class ExportSheet {
                          Request request, File destination,
                          ReplaceDecision replace, ByteSink sink,
                          juranometria.ui.language.InterfaceText said,
-                         juranometria.render.ChartStructure emphasized) {
+                         java.util.Set<juranometria.render.ChartStructure> emphasized) {
         if (destination == null) {
             return new Outcome.Refused(said.say("export.refused.nofile"));
         }

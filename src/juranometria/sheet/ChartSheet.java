@@ -109,7 +109,7 @@ public final class ChartSheet {
                                         PaperSize paper,
                                         juranometria.project.PageWords words) {
         return record(pages, state, options, reference, overChart, paper,
-                words, null);
+                words, java.util.Set.of());
     }
 
     /**
@@ -127,8 +127,57 @@ public final class ChartSheet {
                                         ChartRenderer.ReferenceLayer overChart,
                                         PaperSize paper,
                                         juranometria.project.PageWords words,
+                                        java.util.Set<juranometria.render
+                                                .ChartStructure>
+                                                emphasized) {
+        return recorded(pages, state, options, reference, overChart, paper,
+                words, (renderer, g, scene, onPaper) -> renderer.render(
+                        g, scene, onPaper, reference, null, emphasized),
+                juranometria.render.ChartStructure.joinedTokens(emphasized));
+    }
+
+    /**
+     * The released one-target form (#361): one structure, or
+     * {@code null} for the canonical sheet. Its ink goes through the
+     * renderer's one-target route and its metadata is the target's
+     * own token, never a joined set - an independent route the set
+     * form is held equal to wherever both run.
+     */
+    public static SheetRecording record(Pages pages,
+                                        ChartViewState state,
+                                        ChartOptions options,
+                                        ChartRenderer.ReferenceLayer reference,
+                                        ChartRenderer.ReferenceLayer overChart,
+                                        PaperSize paper,
+                                        juranometria.project.PageWords words,
                                         juranometria.render.ChartStructure
                                                 emphasized) {
+        return recorded(pages, state, options, reference, overChart, paper,
+                words, (renderer, g, scene, onPaper) -> renderer.render(
+                        g, scene, onPaper, reference, null, emphasized),
+                java.util.Optional.ofNullable(emphasized)
+                        .map(juranometria.render.ChartStructure::token));
+    }
+
+    /** How a recording's chart is drawn, by whichever route asked. */
+    private interface Draw {
+        void chart(ChartRenderer renderer, Graphics2D g, ChartScene scene,
+                   ChartOptions onPaper);
+    }
+
+    private static SheetRecording recorded(Pages pages,
+                                           ChartViewState state,
+                                           ChartOptions options,
+                                           ChartRenderer.ReferenceLayer
+                                                   reference,
+                                           ChartRenderer.ReferenceLayer
+                                                   overChart,
+                                           PaperSize paper,
+                                           juranometria.project.PageWords
+                                                   words,
+                                           Draw draw,
+                                           java.util.Optional<String>
+                                                   emphasis) {
         if (pages == null || state == null || options == null
                 || paper == null || words == null) {
             throw new IllegalArgumentException(
@@ -177,9 +226,8 @@ public final class ChartSheet {
             // the title block with it and the metadata is written
             // from it, so the pixels and the file's own description
             // cannot end up in different languages (#350).
-            new ChartRenderer(StarSizePolicy.DEFAULT, words)
-                    .render(g, scene, onPaper, reference, null,
-                            emphasized);
+            draw.chart(new ChartRenderer(StarSizePolicy.DEFAULT, words),
+                    g, scene, onPaper);
             // After the chart, in the order the screen paints it.
             // Nothing is reserved against it: the reader's own marks
             // belong OVER the finished chart, which is the whole of
@@ -191,7 +239,6 @@ public final class ChartSheet {
         SheetMetadata about =
                 SheetMetadata.of(scene, state, onPaper, paper, words);
         return new SheetRecording(recorder, paper, scene, onPaper,
-                emphasized == null ? about
-                        : about.withEmphasis(emphasized.token()));
+                emphasis.map(about::withEmphasis).orElse(about));
     }
 }
