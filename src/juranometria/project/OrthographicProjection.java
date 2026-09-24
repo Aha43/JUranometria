@@ -178,6 +178,44 @@ public final class OrthographicProjection extends AzimuthalProjection {
      * pole approaches square, and the ecliptic seen from the vernal
      * equinox would ask for 5.6e15.
      */
+    /**
+     * The visible half, exactly (owner ruling on the pan
+     * regression). With the pole's frame direction
+     * {@code (along, east, north)}: the circle point nearest the
+     * page centre projects to {@code -along * unit(east, north)},
+     * the semi-major axis lies square to that with the limb's own
+     * length, and the near half is the symmetric window about that
+     * nearest point. No conic is extracted, so the degeneracy the
+     * measurement found - overshoot growing as the inverse of
+     * det/quadratic-squared until it crossed the limb guard's graze
+     * at about 0.002 degrees from square - is not conditioned
+     * against but never entered. At {@code along = 0} the same
+     * expressions give the diameter, traversed once: the continuous
+     * limit the ruling requires, from the formula itself.
+     *
+     * <p>A pole within rounding of the page centre means the circle
+     * IS the limb, every point of it ninety degrees out and equally
+     * visible: that one case stays with the conic path, which is
+     * exact and well-conditioned there.
+     */
+    @Override
+    public Optional<VisibleGreatCircle> greatCircleVisibleHalf(
+            SkyPosition pole) {
+        Direction direction = frame().directionTo(pole);
+        double planePart = Math.hypot(direction.east(),
+                direction.north());
+        if (planePart < POLE_AT_CENTRE) {
+            return Optional.empty();
+        }
+        double xi = direction.east() / planePart;
+        double eta = direction.north() / planePart;
+        return Optional.of(new VisibleGreatCircle(eta, -xi,
+                -direction.along() * xi, -direction.along() * eta));
+    }
+
+    /** Below this the circle is the limb itself; the conic says so. */
+    private static final double POLE_AT_CENTRE = 1.0e-12;
+
     @Override
     public Optional<PlaneConic> greatCircle(SkyPosition pole) {
         Direction direction = frame().directionTo(pole);

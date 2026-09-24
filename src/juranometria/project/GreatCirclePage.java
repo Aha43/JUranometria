@@ -68,6 +68,17 @@ public final class GreatCirclePage {
         // itself, from its own basis vectors, and then draw whatever
         // came back as a straight line between two endpoints - which
         // is a gnomonic consequence rather than a universal model.
+        // The one upstream decision (owner ruling on the pan
+        // regression): a bounded projection states its great
+        // circle's visible half in closed form, so the invisible
+        // hemisphere is excluded before drawing and no near-square
+        // conic is ever extracted. A projection with nothing to
+        // state falls through to the conic path it always had.
+        Optional<Projection.VisibleGreatCircle> half =
+                projection.greatCircleVisibleHalf(pole);
+        if (half.isPresent()) {
+            return visibleArc(half.get(), mapping, region);
+        }
         Optional<PlaneConic> stated = projection.greatCircle(pole);
         if (stated.isEmpty()) {
             // The circle has no image at all: under a tangent plane,
@@ -76,5 +87,34 @@ public final class GreatCirclePage {
             return List.of();
         }
         return mapping.onPage(stated.get(), region).clipTo(region);
+    }
+
+    /**
+     * The stated half, carried into page pixels. The plane-to-pixel
+     * map negates both axes, which cannot change the arc as a set:
+     * the window is symmetric about the nearest point, so only the
+     * mid vector's sign carries meaning and it is preserved.
+     */
+    private static List<CurveRun> visibleArc(
+            Projection.VisibleGreatCircle half,
+            ViewportMapping mapping, PageRegion region) {
+        double scale = mapping.pixelsPerPlaneUnit();
+        PixelPoint centre = mapping.toPixel(new PlanePoint(0.0, 0.0));
+        double majorX = -scale * half.majorXi();
+        double majorY = -scale * half.majorEta();
+        double midX = -scale * half.midXi();
+        double midY = -scale * half.midEta();
+        double radiusAcross = Math.hypot(majorX, majorY);
+        double radiusAlong = Math.hypot(midX, midY);
+        double tilt = radiusAlong > 0.0
+                ? Math.atan2(midY, midX)
+                : Math.atan2(majorY, majorX) - Math.PI / 2.0;
+        // The frame's across-direction is the along-direction turned
+        // a quarter left; the stated major axis is that or its
+        // negation, and either reading draws the same set because
+        // the window is symmetric.
+        return new PlaneCurve.EllipticalArc(centre.x(), centre.y(),
+                radiusAlong, radiusAcross, tilt,
+                -Math.PI / 2.0, Math.PI / 2.0).clipTo(region);
     }
 }

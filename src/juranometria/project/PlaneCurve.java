@@ -267,6 +267,139 @@ public sealed interface PlaneCurve {
     }
 
     /**
+     * An elliptical arc: the visible half of a bounded projection's
+     * great circle, carried with its own parameter window so the
+     * invisible half is excluded before anything is drawn (owner
+     * ruling on the pan regression).
+     *
+     * <p>{@code radiusAlong} may be zero: that is the degeneracy's
+     * continuous limit - the arc IS the diameter - and it is reached
+     * by the same formula rather than by substitution. Clipping
+     * works exactly as the full ellipse's does, in the frame where
+     * the curve is a unit circle, with the window's two ends joining
+     * the page's crossings; the limb guard is the same test with the
+     * same graze, unrelaxed.
+     */
+    record EllipticalArc(double centreX, double centreY,
+                         double radiusAlong, double radiusAcross,
+                         double tiltRadians, double fromRadians,
+                         double toRadians)
+            implements PlaneCurve {
+
+        public EllipticalArc {
+            if (!Double.isFinite(centreX) || !Double.isFinite(centreY)
+                    || !Double.isFinite(tiltRadians)
+                    || !Double.isFinite(radiusAlong)
+                    || !Double.isFinite(radiusAcross)
+                    || radiusAlong < 0.0 || radiusAcross <= 0.0
+                    || !(fromRadians < toRadians)
+                    || toRadians - fromRadians > 2.0 * Math.PI + 1e-9) {
+                throw new IllegalArgumentException(
+                        "an elliptical arc has a centre, two radii and"
+                                + " a window: " + centreX + "," + centreY
+                                + " " + radiusAlong + " by " + radiusAcross
+                                + " over [" + fromRadians + ","
+                                + toRadians + "]");
+            }
+        }
+
+        @Override
+        public String form() {
+            return "elliptical-arc";
+        }
+
+        /** A point at an angle in the ellipse's own frame. */
+        public PixelPoint at(double angle) {
+            double cos = Math.cos(tiltRadians);
+            double sin = Math.sin(tiltRadians);
+            double along = radiusAlong * Math.cos(angle);
+            double across = radiusAcross * Math.sin(angle);
+            return new PixelPoint(centreX + along * cos - across * sin,
+                    centreY + along * sin + across * cos);
+        }
+
+        /**
+         * Thinner than any line the atlas draws: clipped as the
+         * segment it is, capped at its own window ends rather than
+         * carried to the page edge as an infinite line would be.
+         */
+        private static final double SLIVER_PX = 1.0e-6;
+
+        @Override
+        public List<CurveRun> clipTo(PageRegion region) {
+            if (radiusAlong < SLIVER_PX) {
+                return sliver(region);
+            }
+            double cos = Math.cos(tiltRadians);
+            double sin = Math.sin(tiltRadians);
+            double[][] corners = new double[4][];
+            double[][] page = {
+                    {region.minX(), region.minY()},
+                    {region.maxX(), region.minY()},
+                    {region.maxX(), region.maxY()},
+                    {region.minX(), region.maxY()}};
+            for (int at = 0; at < 4; at++) {
+                double dx = page[at][0] - centreX;
+                double dy = page[at][1] - centreY;
+                corners[at] = new double[] {
+                        (dx * cos + dy * sin) / radiusAlong,
+                        (-dx * sin + dy * cos) / radiusAcross};
+            }
+            List<Double> crossings = new ArrayList<>();
+            for (int at = 0; at < 4; at++) {
+                crossings.addAll(Elliptical.meets(corners[at],
+                        corners[(at + 1) % 4]));
+            }
+            Elliptical.refuseALimbThisCannotCut(centreX, centreY,
+                    Math.max(radiusAlong, radiusAcross), region);
+            return CurveRuns.ofWindow(crossings, this::at,
+                    (start, span, one, other) -> new CurveRun.Arc(
+                            centreX, centreY, radiusAlong, radiusAcross,
+                            tiltRadians, start, span, one, other),
+                    region, fromRadians, toRadians);
+        }
+
+        /** The degenerate limit: a diameter segment, param-clipped. */
+        private List<CurveRun> sliver(PageRegion region) {
+            PixelPoint one = at(fromRadians);
+            PixelPoint other = at(toRadians);
+            double dx = other.x() - one.x();
+            double dy = other.y() - one.y();
+            double t0 = 0.0;
+            double t1 = 1.0;
+            double[][] walls = {
+                    {1.0, 0.0, region.minX(), region.maxX()},
+                    {0.0, 1.0, region.minY(), region.maxY()}};
+            for (double[] wall : walls) {
+                double p0 = wall[0] * one.x() + wall[1] * one.y();
+                double d = wall[0] * dx + wall[1] * dy;
+                if (Math.abs(d) < 1e-12) {
+                    if (p0 < wall[2] || p0 > wall[3]) {
+                        return List.of();
+                    }
+                    continue;
+                }
+                double enter = (wall[2] - p0) / d;
+                double leave = (wall[3] - p0) / d;
+                if (enter > leave) {
+                    double swap = enter;
+                    enter = leave;
+                    leave = swap;
+                }
+                t0 = Math.max(t0, enter);
+                t1 = Math.min(t1, leave);
+            }
+            if (t0 >= t1) {
+                return List.of();
+            }
+            return List.of(new CurveRun.Segment(
+                    new PixelPoint(one.x() + t0 * dx, one.y() + t0 * dy),
+                    new PixelPoint(one.x() + t1 * dx,
+                            one.y() + t1 * dy)));
+        }
+    }
+
+    /**
      * An elliptical run: what a projection showing a hemisphere makes
      * of a great circle.
      *
@@ -359,12 +492,20 @@ public sealed interface PlaneCurve {
          * clipping never looked at.
          */
         private void refuseALimbThisCannotCut(PageRegion region) {
+            refuseALimbThisCannotCut(centreX, centreY,
+                    Math.max(radiusAlong, radiusAcross), region);
+        }
+
+        static void refuseALimbThisCannotCut(double centreX,
+                                             double centreY,
+                                             double maxRadius,
+                                             PageRegion region) {
             if (!region.bounded()) {
                 return;
             }
             double apart = Math.hypot(centreX - region.limbX(),
                     centreY - region.limbY());
-            double outermost = apart + Math.max(radiusAlong, radiusAcross);
+            double outermost = apart + maxRadius;
             if (outermost <= region.limbRadius()
                     * (1.0 + CurveRuns.GRAZE)) {
                 return;

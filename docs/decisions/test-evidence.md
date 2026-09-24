@@ -377,7 +377,7 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **431
+own premise capture). The measurements count the traffic: **437
 reads of live chart state** against **792 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
@@ -415,7 +415,11 @@ width read while the layout may still be changing it; and for #359's
 cardinal-marks and chart-speaks-directions proofs, which build the
 real component, paint it, and read its accessible description each
 on the event thread, because what they check is the sentence a
-screen reader is actually handed). The discipline
+screen reader is actually handed; and for the horizon-pan
+regression journeys, which drag a headless chart through the
+controller's own atomic pans and read the view state they steered -
+reads of a component no event thread is painting, counted with the
+rest). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already
