@@ -127,7 +127,8 @@ public final class ChartSheet {
                                         ChartRenderer.ReferenceLayer overChart,
                                         PaperSize paper,
                                         juranometria.project.PageWords words,
-                                        juranometria.render.ChartStructure
+                                        java.util.Set<juranometria.render
+                                                .ChartStructure>
                                                 emphasized) {
         if (pages == null || state == null || options == null
                 || paper == null || words == null) {
@@ -191,7 +192,8 @@ public final class ChartSheet {
         SheetMetadata about =
                 SheetMetadata.of(scene, state, onPaper, paper, words);
         return new SheetRecording(recorder, paper, scene, onPaper,
-                emphasized == null ? about
-                        : about.withEmphasis(emphasized.token()));
+                juranometria.render.ChartStructure
+                        .joinedTokens(emphasized)
+                        .map(about::withEmphasis).orElse(about));
     }
 }

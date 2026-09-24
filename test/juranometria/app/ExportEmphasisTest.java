@@ -40,12 +40,13 @@ class ExportEmphasisTest {
             juranometria.ui.language.PageText.in(
                     juranometria.ui.language.InterfaceText.forLanguage("en"));
 
-    private static SheetRecording recorded(ChartStructure emphasized) {
+    private static SheetRecording recorded(ChartStructure target) {
         return ChartSheet.record(Atlas.assembler()::assemble,
                 ChartViewState.DEFAULT, ChartOptions.DEFAULTS,
                 ChartRenderer.ReferenceLayer.NONE,
                 ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH,
-                emphasized);
+                target == null ? java.util.Set.of()
+                        : java.util.Set.of(target));
     }
 
     @Test

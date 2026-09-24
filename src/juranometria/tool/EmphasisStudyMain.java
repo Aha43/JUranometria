@@ -117,7 +117,9 @@ public final class EmphasisStudyMain {
     /** The page with both modules attached, optionally emphasized. */
     private static BufferedImage painted(ChartScene scene,
                                          ChartOptions options,
-                                         ChartStructure emphasized) {
+                                         ChartStructure target) {
+        java.util.Set<ChartStructure> emphasized = target == null
+                ? java.util.Set.of() : java.util.Set.of(target);
         OverlayRegistry registry = new OverlayRegistry();
         MeridianModule meridian = new MeridianModule(OSLO);
         meridian.showing(true, true, true);

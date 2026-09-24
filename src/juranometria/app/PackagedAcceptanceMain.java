@@ -1166,16 +1166,19 @@ public final class PackagedAcceptanceMain {
         meridian.showing(true, false, false);
 
         java.awt.image.BufferedImage canonical = paint(chart);
-        chart.emphasize(juranometria.render.ChartStructure
+        chart.toggleEmphasis(juranometria.render.ChartStructure
                 .EQUATORIAL_GRID);
         int gridInk = differingPixels(canonical, paint(chart));
         require(gridInk > 100, "the grid rises from the page: "
                 + gridInk + " pixels of ink change, geometry none");
-        chart.emphasize(juranometria.render.ChartStructure.MERIDIAN);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .EQUATORIAL_GRID);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .MERIDIAN);
         int meridianInk = differingPixels(canonical, paint(chart));
         require(meridianInk > 50, "the meridian rises with its"
                 + " module's own line: " + meridianInk + " pixels");
-        chart.emphasize(null);
+        chart.clearEmphasis();
         require(differingPixels(canonical, paint(chart)) == 0,
                 "and Normal settles the page byte-exactly");
         meridian.detach();
@@ -1194,17 +1197,20 @@ public final class PackagedAcceptanceMain {
         ecliptic.showing(true);
 
         canonical = paint(chart);
-        chart.emphasize(juranometria.render.ChartStructure
+        chart.toggleEmphasis(juranometria.render.ChartStructure
                 .CONSTELLATION_FIGURES);
         int figureInk = differingPixels(canonical, paint(chart));
         require(figureInk > 100, "the constellation figures rise: "
                 + figureInk + " pixels, their stars and names"
                 + " untouched by contract");
-        chart.emphasize(juranometria.render.ChartStructure.ECLIPTIC);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .CONSTELLATION_FIGURES);
+        chart.toggleEmphasis(juranometria.render.ChartStructure
+                .ECLIPTIC);
         int eclipticInk = differingPixels(canonical, paint(chart));
         require(eclipticInk > 50, "the ecliptic rises with its"
                 + " landmarks: " + eclipticInk + " pixels");
-        chart.emphasize(null);
+        chart.clearEmphasis();
         require(differingPixels(canonical, paint(chart)) == 0,
                 "and Normal settles this page byte-exactly too");
         ecliptic.detach();
