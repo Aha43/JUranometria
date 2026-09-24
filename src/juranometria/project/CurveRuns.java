@@ -153,6 +153,70 @@ final class CurveRuns {
         return runs;
     }
 
+    /**
+     * The runs of a curve over a stated parameter window (an
+     * elliptical arc: the visible half of a bounded projection's
+     * great circle). The window's own ends join the page's
+     * crossings, intervals never wrap, and midpoint containment
+     * decides exactly as {@link #of} decides.
+     */
+    static List<CurveRun> ofWindow(List<Double> crossings,
+                                   DoubleFunction<PixelPoint> at,
+                                   ArcOf arc, PageRegion region,
+                                   double from, double to) {
+        List<Double> sorted = new ArrayList<>();
+        sorted.add(from);
+        for (double crossing : crossings) {
+            double inWindow = crossing;
+            while (inWindow > to) {
+                inWindow -= 2.0 * Math.PI;
+            }
+            while (inWindow < from) {
+                inWindow += 2.0 * Math.PI;
+            }
+            if (inWindow > from && inWindow < to) {
+                sorted.add(inWindow);
+            }
+        }
+        sorted.add(to);
+        sorted.sort(Double::compare);
+        for (int i = sorted.size() - 1; i > 0; i--) {
+            if (sorted.get(i) - sorted.get(i - 1) < GRAZE) {
+                sorted.remove(i);
+            }
+        }
+        if (sorted.size() < 2) {
+            return List.of();
+        }
+        List<CurveRun> runs = new ArrayList<>();
+        int count = sorted.size() - 1;
+        int i = 0;
+        while (i < count) {
+            double start = sorted.get(i);
+            double middle = (start + sorted.get(i + 1)) / 2.0;
+            PixelPoint probe = at.apply(middle);
+            if (!region.contains(probe.x(), probe.y())) {
+                i++;
+                continue;
+            }
+            int last = i;
+            while (last + 1 < count) {
+                double next = (sorted.get(last + 1)
+                        + sorted.get(last + 2)) / 2.0;
+                PixelPoint nextProbe = at.apply(next);
+                if (!region.contains(nextProbe.x(), nextProbe.y())) {
+                    break;
+                }
+                last++;
+            }
+            double through = sorted.get(last + 1) - start;
+            runs.add(arc.from(start, through, at.apply(start),
+                    at.apply(start + through)));
+            i = last + 1;
+        }
+        return runs;
+    }
+
     static double span(double end, double start) {
         double span = end - start;
         return span <= 0.0 ? span + 2.0 * Math.PI : span;

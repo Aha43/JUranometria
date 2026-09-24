@@ -840,21 +840,57 @@ public final class ReferenceInk {
      * in the same place.
      */
     private static double awayFrom(List<CurveRun> runs, Rectangle2D box) {
+        // Against the chords between samples, not the samples alone.
+        // Points seventeen pixels apart can miss a five-pixel
+        // approach entirely, and near a crossing that mismeasurement
+        // let a name pass the attribution test while a finer look -
+        // the contract's own - put it nearer the rival (found by the
+        // pan repair, whose corrected arcs re-anchored a horizon
+        // name at such a crossing). A chord's distance to a box is
+        // exact, and its sag from the true curve is under a tenth of
+        // a pixel at this sampling.
         double nearest = Double.NaN;
         for (CurveRun run : runs) {
+            PixelPoint previous = null;
             for (int at = 0; at <= ATTRIBUTION_SAMPLES; at++) {
                 PixelPoint point = run.at(at / (double) ATTRIBUTION_SAMPLES);
-                double dx = Math.max(0.0, Math.max(
-                        box.getMinX() - point.x(),
-                        point.x() - box.getMaxX()));
-                double dy = Math.max(0.0, Math.max(
-                        box.getMinY() - point.y(),
-                        point.y() - box.getMaxY()));
-                double away = Math.hypot(dx, dy);
+                double away = previous == null
+                        ? pointToBox(point, box)
+                        : segmentToBox(previous, point, box);
                 if (Double.isNaN(nearest) || away < nearest) {
                     nearest = away;
                 }
+                previous = point;
             }
+        }
+        return nearest;
+    }
+
+    private static double pointToBox(PixelPoint point, Rectangle2D box) {
+        double dx = Math.max(0.0, Math.max(box.getMinX() - point.x(),
+                point.x() - box.getMaxX()));
+        double dy = Math.max(0.0, Math.max(box.getMinY() - point.y(),
+                point.y() - box.getMaxY()));
+        return Math.hypot(dx, dy);
+    }
+
+    /** Exact distance from a segment to a rectangle. */
+    private static double segmentToBox(PixelPoint one, PixelPoint other,
+                                       Rectangle2D box) {
+        Line2D chord = new Line2D.Double(one.x(), one.y(), other.x(),
+                other.y());
+        if (chord.intersects(box)) {
+            return 0.0;
+        }
+        double nearest = Math.min(pointToBox(one, box),
+                pointToBox(other, box));
+        for (double[] corner : new double[][] {
+                {box.getMinX(), box.getMinY()},
+                {box.getMaxX(), box.getMinY()},
+                {box.getMaxX(), box.getMaxY()},
+                {box.getMinX(), box.getMaxY()}}) {
+            nearest = Math.min(nearest,
+                    chord.ptSegDist(corner[0], corner[1]));
         }
         return nearest;
     }

@@ -43,6 +43,39 @@ public interface Projection {
     Optional<SkyPosition> unproject(PlanePoint point);
 
     /**
+     * The visible half of the great circle with this pole, in closed
+     * form - or empty for a projection whose whole conic is already
+     * the right answer (issue #359 pan regression; owner ruling).
+     *
+     * <p>This is the one upstream decision that chooses the
+     * numerically stable representation before any conic extraction:
+     * a bounded projection folds both hemispheres onto one ellipse,
+     * so the conic alone cannot say which half a reader may see, and
+     * near the pole-square-to-centre degeneracy extracting that
+     * ellipse from its equation loses exactly the digits the limb
+     * guard checks. A projection that can state the visible arc
+     * directly states it here, exactly, at every obliquity - and the
+     * degenerate case is the same formula's own continuous limit, a
+     * diameter, not a substituted chord.
+     *
+     * <p>The arc is {@code sin t * major + cos t * mid} for
+     * {@code t} in {@code [-pi/2, pi/2]}, in plane units:
+     * {@code major} has the limb's own length and {@code mid} points
+     * at the circle's nearest approach to the page centre. The sign
+     * of {@code major} is meaningless (the window is symmetric); the
+     * sign of {@code mid} is the whole of near-against-far.
+     */
+    default Optional<VisibleGreatCircle> greatCircleVisibleHalf(
+            SkyPosition pole) {
+        return Optional.empty();
+    }
+
+    /** The closed-form visible half: see greatCircleVisibleHalf. */
+    record VisibleGreatCircle(double majorXi, double majorEta,
+                              double midXi, double midEta) {
+    }
+
+    /**
      * How far from the centre a position that far from the centre
      * lands, in plane units.
      *

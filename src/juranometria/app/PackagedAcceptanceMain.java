@@ -436,6 +436,7 @@ public final class PackagedAcceptanceMain {
         onThisPageJourney();
         meridianJourney();
         emphasisJourney();
+        horizonPanJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -1213,6 +1214,134 @@ public final class PackagedAcceptanceMain {
                 + figureInk + ", ecliptic " + eclipticInk
                 + " px raised on real pages; Normal settles"
                 + " byte-exactly; nothing persisted)");
+    }
+
+    /**
+     * The pan-regression journey (fix/horizon-pan-regression, owner
+     * ruling): drag repeatedly across the horizon, through the page
+     * centre and near Polaris, and hold three things every frame -
+     * the horizon never crosses Polaris, the reference lines stay
+     * glued to their sky (every drawn point unprojects onto its own
+     * circle at altitude zero), and nothing throws on the paint
+     * path. The drags are the controller's own atomic pans, which is
+     * what a mouse drag reduces to.
+     */
+    private static void horizonPanJourney() throws Exception {
+        juranometria.chart.SkyPosition polaris =
+                new juranometria.chart.SkyPosition(37.954, 89.264);
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(
+                59.9, 10.7,
+                java.time.Instant.parse("2026-03-20T21:33:00Z"));
+        juranometria.chart.SkyPosition pole =
+                new juranometria.sky.LocalSky(oslo).zenith();
+
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        ENGLISH_PAGE);
+        chart.setSize(920, 920);
+        // Start where a far-half fold would land on Polaris' pixel:
+        // the page the defect was seen on.
+        juranometria.chart.SkyPosition start =
+                new juranometria.chart.SkyPosition(152.686364,
+                        30.171839);
+        chart.setViewState(new ChartViewState(start, 180.0, 4.0));
+        juranometria.ui.ChartModuleHost host =
+                new juranometria.ui.ChartModuleHost(chart,
+                        new SelectionModel(), request -> { });
+        juranometria.meridian.MeridianModule module = host.attach(
+                new juranometria.meridian.MeridianModule(oslo));
+        module.showing(true, true, true);
+
+        juranometria.ui.ChartViewController controller =
+                new juranometria.ui.ChartViewController(
+                        Atlas.assembler()::fits);
+        controller.onChange(chart::setViewState);
+        controller.recenter(start, 180.0);
+
+        double worstAltitude = 0.0;
+        double nearestPolaris = Double.MAX_VALUE;
+        int frames = 0;
+        // Four drag directions, each carrying the page across the
+        // horizon and (for the first) the pole-to-centre angle
+        // through ninety - the degeneracy every drag over the page
+        // centre crosses.
+        double[][] pulls = {{1.2e-4, 0.0}, {-1.2e-4, 0.0},
+                {0.0, 1.2e-4}, {6.0e-5, 6.0e-5}};
+        for (double[] pull : pulls) {
+            var viewport = chart.currentScene().viewport();
+            juranometria.project.PlanePoint plane0 =
+                    juranometria.project.PanSolver.planeFromPixel(
+                            viewport, new juranometria.project
+                                    .PixelPoint(460.0, 300.0));
+            juranometria.chart.SkyPosition grabbed =
+                    juranometria.project.PanSolver.skyAt(viewport,
+                            plane0).orElseThrow();
+            for (int step = 1; step <= 60; step++) {
+                controller.pan(grabbed,
+                        new juranometria.project.PlanePoint(
+                                plane0.xiEast() + step * pull[0],
+                                plane0.etaNorth() + step * pull[1]));
+                frames++;
+                try {
+                    paint(chart);
+                } catch (RuntimeException thrown) {
+                    require(false, "a drag frame threw on the paint"
+                            + " path: " + thrown.getMessage());
+                }
+                var scene = chart.currentScene();
+                var projection = juranometria.project.Projections
+                        .forViewport(scene.viewport());
+                var mapping = new juranometria.project.ViewportMapping(
+                        scene.viewport(), projection);
+                var region = mapping.regionFor(scene.viewport(),
+                        projection);
+                var polarisPx = projection.project(polaris)
+                        .map(mapping::toPixel).orElse(null);
+                var centrePx = mapping.toPixel(
+                        new juranometria.project.PlanePoint(0, 0));
+                double scale = mapping.pixelsPerPlaneUnit();
+                for (var run : juranometria.project.GreatCirclePage
+                        .clip(projection, mapping, region, pole)) {
+                    for (int s = 0; s <= 120; s++) {
+                        var at = run.at(s / 120.0);
+                        if (polarisPx != null) {
+                            nearestPolaris = Math.min(nearestPolaris,
+                                    Math.hypot(at.x() - polarisPx.x(),
+                                            at.y() - polarisPx.y()));
+                        }
+                        var un = projection.unproject(
+                                new juranometria.project.PlanePoint(
+                                        (centrePx.x() - at.x()) / scale,
+                                        (centrePx.y() - at.y())
+                                                / scale));
+                        if (un.isPresent()) {
+                            worstAltitude = Math.max(worstAltitude,
+                                    Math.abs(90.0 - pole
+                                            .separationDegrees(
+                                                    un.get())));
+                        }
+                    }
+                }
+            }
+        }
+        require(nearestPolaris > 8.0,
+                "the horizon never crosses Polaris: nearest approach "
+                        + String.format(java.util.Locale.ROOT, "%.1f",
+                                nearestPolaris) + " px across "
+                        + frames + " dragged frames");
+        require(worstAltitude < 0.05,
+                "and stays glued to its own sky: worst drawn-point"
+                        + " altitude " + String.format(
+                                java.util.Locale.ROOT, "%.4f",
+                                worstAltitude) + " degrees");
+        module.detach();
+        System.out.println("horizon pan OK (" + frames + " dragged"
+                + " frames across the page centre and past Polaris;"
+                + " nearest approach " + String.format(
+                        java.util.Locale.ROOT, "%.1f", nearestPolaris)
+                + " px, worst altitude " + String.format(
+                        java.util.Locale.ROOT, "%.4f", worstAltitude)
+                + " deg, no exceptions)");
     }
 
     private static java.awt.image.BufferedImage paint(
