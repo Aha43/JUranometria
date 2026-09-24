@@ -14,10 +14,14 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.SkyPosition;
 import juranometria.chart.StarSizePolicy;
+import juranometria.module.InkRole;
+import juranometria.module.OverlayContribution;
+import juranometria.module.OverlayRegistry;
 import juranometria.sheet.ChartSheet;
 import juranometria.sheet.PaperSize;
 import juranometria.sheet.SheetFormat;
 import juranometria.sheet.SheetWriters;
+import juranometria.ui.ReferenceInk;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -207,37 +211,36 @@ class CombinedEmphasisTest {
      */
     @Test
     void awayFromCrossingsEachStructureIsExactlyItsSingleton() {
-        for (ChartPalette ground : ChartPalette.values()) {
-            Renders r = renders(ground);
-            int checkedGrid = 0;
-            int checkedFigures = 0;
-            for (int y = 0; y < r.height(); y++) {
-                for (int x = 0; x < r.width(); x++) {
-                    if (r.gridMask()[y][x]
-                            && !near(r.figuresMask(), x, y)) {
-                        assertEquals(r.grid().getRGB(x, y),
-                                r.both().getRGB(x, y),
-                                "away from the figures, the grid's"
-                                        + " combined ink at (" + x + ","
-                                        + y + ") on " + ground.storedAs()
-                                        + " is its singleton ink");
-                        checkedGrid++;
+        for (Pair pair : pairs()) {
+            int checkedEarlier = 0;
+            int checkedLater = 0;
+            for (int y = 0; y < pair.height(); y++) {
+                for (int x = 0; x < pair.width(); x++) {
+                    if (pair.earlierMask()[y][x]
+                            && !near(pair.laterMask(), x, y)) {
+                        assertEquals(pair.earlier().getRGB(x, y),
+                                pair.both().getRGB(x, y),
+                                pair.name() + ": away from the other"
+                                        + " structure, combined ink at ("
+                                        + x + "," + y
+                                        + ") is the singleton ink");
+                        checkedEarlier++;
                     }
-                    if (r.figuresMask()[y][x]
-                            && !near(r.gridMask(), x, y)) {
-                        assertEquals(r.figures().getRGB(x, y),
-                                r.both().getRGB(x, y),
-                                "away from the grid, the figures'"
-                                        + " combined ink at (" + x + ","
-                                        + y + ") on " + ground.storedAs()
-                                        + " is their singleton ink");
-                        checkedFigures++;
+                    if (pair.laterMask()[y][x]
+                            && !near(pair.earlierMask(), x, y)) {
+                        assertEquals(pair.later().getRGB(x, y),
+                                pair.both().getRGB(x, y),
+                                pair.name() + ": away from the other"
+                                        + " structure, combined ink at ("
+                                        + x + "," + y
+                                        + ") is the singleton ink");
+                        checkedLater++;
                     }
                 }
             }
-            assertTrue(checkedGrid > 0 && checkedFigures > 0,
-                    "the contract must have pixels to hold on "
-                            + ground.storedAs());
+            assertTrue(checkedEarlier > 0 && checkedLater > 0,
+                    pair.name() + ": the contract must have pixels"
+                            + " to hold");
         }
     }
 
@@ -248,17 +251,16 @@ class CombinedEmphasisTest {
      */
     @Test
     void aCombinationChangesNothingOutsideTheSingletonEnvelopes() {
-        for (ChartPalette ground : ChartPalette.values()) {
-            Renders r = renders(ground);
-            for (int y = 0; y < r.height(); y++) {
-                for (int x = 0; x < r.width(); x++) {
-                    if (r.both().getRGB(x, y)
-                            != r.canonical().getRGB(x, y)) {
-                        assertTrue(near(r.gridMask(), x, y)
-                                        || near(r.figuresMask(), x, y),
-                                "a combined change at (" + x + "," + y
-                                        + ") on " + ground.storedAs()
-                                        + " lies outside every"
+        for (Pair pair : pairs()) {
+            for (int y = 0; y < pair.height(); y++) {
+                for (int x = 0; x < pair.width(); x++) {
+                    if (pair.both().getRGB(x, y)
+                            != pair.canonical().getRGB(x, y)) {
+                        assertTrue(near(pair.earlierMask(), x, y)
+                                        || near(pair.laterMask(), x, y),
+                                pair.name() + ": a combined change at ("
+                                        + x + "," + y
+                                        + ") lies outside every"
                                         + " singleton's envelope");
                     }
                 }
@@ -268,62 +270,60 @@ class CombinedEmphasisTest {
 
     /**
      * At crossings the existing painter order stands and each
-     * structure keeps its own frozen accent: the figures are painted
-     * after the grid, so wherever the figures' singleton laid down
-     * their pure accent inside the grid's envelope, the combination
+     * structure keeps its own frozen accent: wherever the
+     * later-painted structure's singleton laid down its pure accent
+     * inside the earlier structure's envelope, the combination
      * carries that same pixel - the lower stroke never rises above
-     * the upper one, and no blended accent replaces either. Both
-     * pure accents must also survive somewhere on the combined page.
+     * the upper one, and no blended accent replaces either. Every
+     * pair must actually cross. A thin antialiased stroke may never
+     * cover a whole pixel, so pure-accent presence is only demanded
+     * of the later stroke at its crossings; the earlier structure's
+     * fidelity is the first contract's business.
      */
     @Test
     void crossingsKeepThePainterOrderAndTheFrozenAccents() {
-        for (ChartPalette ground : ChartPalette.values()) {
-            Renders r = renders(ground);
-            int gridAccent = StructureStyle.accent(ground,
-                    ChartStructure.EQUATORIAL_GRID).getRGB();
-            int figuresAccent = StructureStyle.accent(ground,
-                    ChartStructure.CONSTELLATION_FIGURES).getRGB();
+        for (Pair pair : pairs()) {
             int crossings = 0;
-            boolean gridAccentSeen = false;
-            boolean figuresAccentSeen = false;
-            for (int y = 0; y < r.height(); y++) {
-                for (int x = 0; x < r.width(); x++) {
-                    int combined = r.both().getRGB(x, y);
-                    gridAccentSeen |= combined == gridAccent;
-                    figuresAccentSeen |= combined == figuresAccent;
-                    if (r.figures().getRGB(x, y) == figuresAccent
-                            && near(r.gridMask(), x, y)) {
-                        assertEquals(figuresAccent, combined,
-                                "at the crossing (" + x + "," + y
-                                        + ") on " + ground.storedAs()
-                                        + " the later-painted figures"
-                                        + " keep their frozen accent"
-                                        + " on top");
+            boolean crossingRegion = false;
+            for (int y = 0; y < pair.height(); y++) {
+                for (int x = 0; x < pair.width(); x++) {
+                    int combined = pair.both().getRGB(x, y);
+                    boolean nearEarlier = near(pair.earlierMask(), x, y);
+                    crossingRegion |= nearEarlier
+                            && near(pair.laterMask(), x, y);
+                    if (pair.later().getRGB(x, y) == pair.laterAccent()
+                            && nearEarlier) {
+                        assertEquals(pair.laterAccent(), combined,
+                                pair.name() + ": at the crossing (" + x
+                                        + "," + y + ") the later-painted"
+                                        + " structure keeps its frozen"
+                                        + " accent on top");
                         crossings++;
                     }
                 }
             }
+            assertTrue(crossingRegion,
+                    pair.name() + ": the structures must actually"
+                            + " cross on this page");
             assertTrue(crossings > 0,
-                    "the page must actually cross on "
-                            + ground.storedAs());
-            assertTrue(gridAccentSeen && figuresAccentSeen,
-                    "both frozen accents survive on the combined page"
-                            + " on " + ground.storedAs());
+                    pair.name() + ": the later stroke must show its"
+                            + " pure accent at a crossing");
         }
     }
 
     // ---- the pixel arithmetic ---------------------------------------
 
     /**
-     * The orion page at 42 degrees carries both an equatorial grid
-     * and constellation figures, crossing many times; canonical,
-     * each singleton, and the combination are rendered once per
-     * ground and compared pixel for pixel.
+     * One ruled combination: canonical, each singleton, and the
+     * pair, rendered on the same page, with the painter order
+     * stated - {@code later} is the structure the chart paints
+     * after {@code earlier}.
      */
-    private record Renders(BufferedImage canonical, BufferedImage grid,
-                           BufferedImage figures, BufferedImage both,
-                           boolean[][] gridMask,
-                           boolean[][] figuresMask) {
+    private record Pair(String name, BufferedImage canonical,
+                        BufferedImage earlier, BufferedImage later,
+                        BufferedImage both, boolean[][] earlierMask,
+                        boolean[][] laterMask, int earlierAccent,
+                        int laterAccent) {
         int width() {
             return canonical.getWidth();
         }
@@ -332,20 +332,98 @@ class CombinedEmphasisTest {
         }
     }
 
-    private static Renders renders(ChartPalette ground) {
-        ChartScene scene = scene(PAGES[0]);
+    /**
+     * The ruled crossing pages, on both grounds: the grid under the
+     * figures (both chart layers, orion at 42 degrees), the grid
+     * under the ecliptic (a module's line of reference paints above
+     * the grid, on the sagittarius page the ecliptic actually
+     * crosses), and a meridian under a horizon (two module circles
+     * crossing on the orion page).
+     */
+    private static java.util.List<Pair> pairs() {
+        java.util.List<Pair> pairs = new java.util.ArrayList<>();
+        OverlayContribution ecliptic =
+                new OverlayContribution.GreatCircle("ecliptic",
+                        "Ecliptic", new SkyPosition(270.0, 66.56),
+                        OverlayContribution.Reference.LINE,
+                        InkRole.REFERENCE_LINE);
+        OverlayContribution meridian =
+                new OverlayContribution.GreatCircle("meridian",
+                        "Meridian", new SkyPosition(173.0, 0.0),
+                        OverlayContribution.Reference.LINE,
+                        InkRole.REFERENCE_LINE);
+        OverlayContribution horizon =
+                new OverlayContribution.GreatCircle("horizon",
+                        "Mathematical horizon",
+                        new SkyPosition(83.0, 85.0),
+                        OverlayContribution.Reference.LINE,
+                        InkRole.REFERENCE_LINE);
+        for (ChartPalette ground : ChartPalette.values()) {
+            pairs.add(pair("grid+figures on " + ground.storedAs(),
+                    scene(PAGES[0]), ground, java.util.List.of(),
+                    ChartStructure.EQUATORIAL_GRID,
+                    ChartStructure.CONSTELLATION_FIGURES));
+            pairs.add(pair("grid+ecliptic on " + ground.storedAs(),
+                    scene(PAGES[1]), ground,
+                    java.util.List.of(ecliptic),
+                    ChartStructure.EQUATORIAL_GRID,
+                    ChartStructure.ECLIPTIC));
+            pairs.add(pair("meridian+horizon on " + ground.storedAs(),
+                    scene(PAGES[0]), ground,
+                    java.util.List.of(meridian, horizon),
+                    ChartStructure.MERIDIAN, ChartStructure.HORIZON));
+        }
+        return pairs;
+    }
+
+    private static Pair pair(String name, ChartScene scene,
+                             ChartPalette ground,
+                             java.util.List<OverlayContribution>
+                                     contributions,
+                             ChartStructure earlier,
+                             ChartStructure later) {
         ChartOptions options = ChartOptions.DEFAULTS.withPalette(ground);
-        BufferedImage canonical = RENDERER.renderToImage(scene, options,
-                Set.<ChartStructure>of());
-        BufferedImage grid = RENDERER.renderToImage(scene, options,
-                Set.of(ChartStructure.EQUATORIAL_GRID));
-        BufferedImage figures = RENDERER.renderToImage(scene, options,
-                Set.of(ChartStructure.CONSTELLATION_FIGURES));
-        BufferedImage both = RENDERER.renderToImage(scene, options,
-                Set.of(ChartStructure.EQUATORIAL_GRID,
-                        ChartStructure.CONSTELLATION_FIGURES));
-        return new Renders(canonical, grid, figures, both,
-                changed(canonical, grid), changed(canonical, figures));
+        BufferedImage canonical =
+                painted(scene, options, contributions, Set.of());
+        BufferedImage earlierAlone = painted(scene, options,
+                contributions, Set.of(earlier));
+        BufferedImage laterAlone = painted(scene, options,
+                contributions, Set.of(later));
+        BufferedImage both = painted(scene, options, contributions,
+                Set.of(earlier, later));
+        return new Pair(name, canonical, earlierAlone, laterAlone, both,
+                changed(canonical, earlierAlone),
+                changed(canonical, laterAlone),
+                StructureStyle.accent(ground, earlier).getRGB(),
+                StructureStyle.accent(ground, later).getRGB());
+    }
+
+    private static BufferedImage painted(ChartScene scene,
+                                         ChartOptions options,
+                                         java.util.List
+                                                 <OverlayContribution>
+                                                 contributions,
+                                         Set<ChartStructure> emphasized) {
+        if (contributions.isEmpty()) {
+            return RENDERER.renderToImage(scene, options, emphasized);
+        }
+        OverlayRegistry registry = new OverlayRegistry();
+        registry.offer("test-module", () -> contributions);
+        BufferedImage image = new BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            RENDERER.render(g, scene, options,
+                    (layerG, painted, reserved) -> ReferenceInk.paint(
+                            layerG, painted, registry.collect(),
+                            options.palette(), ENGLISH, reserved,
+                            emphasized),
+                    null, emphasized);
+        } finally {
+            g.dispose();
+        }
+        return image;
     }
 
     private static boolean[][] changed(BufferedImage canonical,
