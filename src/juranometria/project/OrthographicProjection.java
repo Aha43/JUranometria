@@ -57,26 +57,31 @@ public final class OrthographicProjection extends AzimuthalProjection {
      * {@code +6.1e-17}, so a bare {@code < 0} test drops half the
      * limb. This test found exactly that.
      *
-     * <p>So the bound is the arithmetic's own. The direction is a
-     * unit vector built from trigonometry, and its components carry
-     * an absolute error of a few ulps of one; anything within that of
-     * zero is a right angle that rounded, not far-side sky. What it
-     * admits beyond the limb is about two femtoradians - four
-     * hundred-millionths of a milliarcsecond - and what it would
-     * otherwise drop is half of the page's own edge.
+     * <p>So the bound is the arithmetic's own, derived for each
+     * position from the computation that produced {@code along}
+     * ({@link CentreFrame#alongUncertainty}): anything within it of
+     * zero is a right angle that rounded, not far-side sky, and
+     * anything beyond it is refused. At its worst over every
+     * position and centre it admits about six and a half
+     * femtoradians beyond the limb; what it would otherwise drop is
+     * half of the page's own edge. It knows nothing of where a
+     * position came from: a position that arrives already wrong by
+     * more than this, because an earlier calculation lost precision,
+     * is that calculation's to repair.
      */
     @Override
     public Optional<PlanePoint> project(SkyPosition position) {
         Direction direction = frame().directionTo(position);
-        if (direction.along() < -LIMB_ROUNDING) {
+        if (direction.along() < 0.0
+                && (direction.along()
+                        < -CentreFrame.ALONG_UNCERTAINTY_CEILING
+                        || direction.along()
+                                < -frame().alongUncertainty(position))) {
             return Optional.empty();
         }
         return Optional.of(new PlanePoint(direction.east(),
                 direction.north()));
     }
-
-    /** A few ulps of a unit vector's component. */
-    private static final double LIMB_ROUNDING = 8.0 * Math.ulp(1.0);
 
     /**
      * The angle a plane radius stands for, or NaN beyond the limb.
