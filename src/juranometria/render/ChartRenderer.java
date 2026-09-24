@@ -2374,36 +2374,40 @@ public final class ChartRenderer {
                 - 2 * TITLE_PADDING_PX - 1.0;
         java.util.List<String> fitted = new java.util.ArrayList<>();
         fitted.add(lines[0]);
+        String separator = words.titleFactSeparator();
         for (int i = 1; i < lines.length; i++) {
-            fitted.addAll(wrapped(lines[i], metrics, widest));
+            fitted.addAll(wrapped(lines[i], separator, metrics, widest));
         }
         return fitted.toArray(new String[0]);
     }
 
-    /** A fact line wrapped at its separators to fit a width. */
+    /**
+     * A fact line wrapped at its language's separators to fit. The
+     * pieces keep the spacing the language wrote around its
+     * separator; a wrapped line only loses what would lead or trail
+     * it.
+     */
     private static java.util.List<String> wrapped(String line,
+                                                  String separator,
                                                   FontMetrics metrics,
                                                   double widest) {
         if (metrics.stringWidth(line) <= widest) {
             return java.util.List.of(line);
         }
-        String separator = " \u00b7 ";
-        String[] facts = line.split(java.util.regex.Pattern.quote(
+        String[] pieces = line.split(java.util.regex.Pattern.quote(
                 separator));
         java.util.List<String> out = new java.util.ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        for (String fact : facts) {
-            String candidate = current.length() == 0 ? fact
-                    : current + separator + fact;
-            if (current.length() > 0
-                    && metrics.stringWidth(candidate) > widest) {
-                out.add(current.toString());
-                current = new StringBuilder(fact);
+        String current = pieces[0];
+        for (int i = 1; i < pieces.length; i++) {
+            String candidate = current + separator + pieces[i];
+            if (metrics.stringWidth(candidate.strip()) > widest) {
+                out.add(current.strip());
+                current = pieces[i];
             } else {
-                current = new StringBuilder(candidate);
+                current = candidate;
             }
         }
-        out.add(current.toString());
+        out.add(current.strip());
         return out;
     }
 

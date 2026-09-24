@@ -76,6 +76,14 @@ public interface PageWords {
     String titleFacts(String fieldDegrees, String magnitude,
                       String projection);
 
+    /**
+     * The separator between the facts of {@link #titleFacts}, as this
+     * language writes it - where a fact line may be broken when the
+     * page has less room than the line (#359 completion). It is the
+     * language's because the facts are.
+     */
+    String titleFactSeparator();
+
     /** The heading over the magnitude key. */
     String magnitudeKeyHeading();
 

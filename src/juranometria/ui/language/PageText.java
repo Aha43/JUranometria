@@ -81,6 +81,11 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String titleFactSeparator() {
+        return said.say(STEM + "title.facts.separator");
+    }
+
+    @Override
     public String magnitudeKeyHeading() {
         return said.say(STEM + "magnitudeKey.heading");
     }
