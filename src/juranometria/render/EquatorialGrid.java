@@ -155,6 +155,7 @@ public final class EquatorialGrid {
 
         List<List<PixelPoint>> meridians = new ArrayList<>();
         List<Label> labels = new ArrayList<>();
+        List<Missed> missed = new ArrayList<>();
         int[] samples = {0};
         double[] worstError = {0.0};
         int suppressed = 0;
@@ -186,6 +187,16 @@ public final class EquatorialGrid {
                     } else {
                         labels.add(label);
                     }
+                } else {
+                    // Only here: the bottom edge is never crossed.
+                    // A bottom figure that existed and was
+                    // suppressed took the branch above and stays
+                    // suppressed (issue #360).
+                    //
+                    // Held for the second pass. Placing it now would
+                    // let it choose a spot no parallel has claimed
+                    // yet, because the Dec loop below has not run.
+                    missed.add(new Missed(pieces, raLabel(ra), ra, true));
                 }
             }
         }
@@ -207,9 +218,9 @@ public final class EquatorialGrid {
                     projection, mapping, viewport, samples, worstError);
             parallels.addAll(pieces);
             if (!pieces.isEmpty()) {
-                Label label = edgeLabel(pieces,
-                        decLabel(parallelDec, spec.decStepDegrees()),
-                        viewport, false);
+                String notation = decLabel(parallelDec,
+                        spec.decStepDegrees());
+                Label label = edgeLabel(pieces, notation, viewport, false);
                 if (label != null) {
                     if (!fitsPaper(label, metrics, viewport)
                             || intersectsFurniture(label, metrics, furniture)) {
@@ -217,11 +228,45 @@ public final class EquatorialGrid {
                     } else {
                         labels.add(label);
                     }
+                } else {
+                    // Only here: the left edge is never crossed.
+                    missed.add(new Missed(pieces, notation, parallelDec,
+                            false));
                 }
+            }
+        }
+        // ---- second pass: the curves that missed their edge -------
+        // Every ordinary figure now exists, for meridians AND
+        // parallels, so a fallback can be held to all of them. Run
+        // inside the RA loop, a rescued meridian figure could only
+        // see other meridian figures, and a parallel's ordinary
+        // figure - added afterwards, and never overlap-checked
+        // itself - would land on top of it. That is how `6h` came to
+        // be drawn through `-30°` on the south-pole page (#360).
+        //
+        // A fallback still only ever adds. It never moves or
+        // suppresses an ordinary figure: the hierarchy is that a
+        // preferred-edge figure outranks a repair, and a repair that
+        // cannot find room simply does not appear.
+        for (Missed curve : missed) {
+            Label elsewhere = fallbackLabel(curve.pieces(),
+                    curve.notation(), curve.coordinate(),
+                    curve.meridian(), viewport, metrics, labels,
+                    furniture);
+            if (elsewhere != null) {
+                labels.add(elsewhere);
             }
         }
         return new Grid(spec, meridians, parallels, labels, suppressed,
                 samples[0], worstError[0]);
+    }
+
+    /**
+     * A visible curve whose preferred edge was never crossed, held
+     * until every ordinary figure has been placed.
+     */
+    private record Missed(List<List<PixelPoint>> pieces, String notation,
+                          double coordinate, boolean meridian) {
     }
 
     /** RA grid notation: whole hours bare, otherwise hours+minutes. */
@@ -480,6 +525,252 @@ public final class EquatorialGrid {
         return null;
     }
 
+    /**
+     * How close to an edge's end a figure may not be placed.
+     *
+     * <p>A figure straddling a corner belongs to neither edge, and a
+     * reader cannot tell which line it names.
+     */
+    static final double CORNER_CLEARANCE_PX = 28.0;
+
+    /**
+     * How square a crossing must be before a figure may claim it.
+     *
+     * <p>Text laid along a curve that only grazes the frame reads as
+     * belonging to the frame rather than to the line, however exact
+     * the mathematical intersection is.
+     *
+     * <p>Twenty degrees, and the number is deliberately uninteresting:
+     * measured over the discovery matrix, 15, 20 and 25 degrees
+     * rescue the same fourteen curves and 30 rescues thirteen. The
+     * classification existed before the result was seen, and nothing
+     * in the result pulls it either way. It separates two genuinely
+     * shallow pairs - one at 17 degrees, one at 3 - from Orion's
+     * 26-degree parallel.
+     */
+    static final double MINIMUM_INCIDENCE_DEGREES = 20.0;
+
+    /** Which side of the frame a crossing is on. */
+    enum Edge { BOTTOM, TOP, LEFT, RIGHT }
+
+    /**
+     * One real crossing of a grid curve with the rectangular frame.
+     *
+     * <p>The seam issue #360 asked for: a curve publishes where it
+     * genuinely meets the frame, and one selection policy chooses
+     * among those crossings. The projection mathematics stays in the
+     * sampled curve - nothing here computes a second one.
+     */
+    record Candidate(boolean meridian, double coordinate, String notation,
+                     Edge edge, double x, double y,
+                     double incidenceDegrees, double cornerClearancePx,
+                     Label label, java.awt.geom.Rectangle2D bounds) {
+    }
+
+    /**
+     * Every genuine crossing of a sampled curve with the frame.
+     *
+     * <p>All four edges, every piece, every segment - including a
+     * curve that leaves and re-enters, which produces two crossings
+     * of the same edge. Orion's minus-45 parallel does exactly that,
+     * and a search that stopped at the first would have described
+     * half of it.
+     */
+    static List<Candidate> candidates(List<List<PixelPoint>> pieces,
+                                      String notation, double coordinate,
+                                      boolean meridian,
+                                      ChartViewport viewport,
+                                      java.awt.FontMetrics metrics) {
+        double w = viewport.widthPx();
+        double h = viewport.heightPx();
+        List<Candidate> found = new ArrayList<>();
+        for (List<PixelPoint> piece : pieces) {
+            for (int i = 1; i < piece.size(); i++) {
+                PixelPoint a = piece.get(i - 1);
+                PixelPoint b = piece.get(i);
+                crossHorizontal(found, a, b, h - 1.0, Edge.BOTTOM, w, h,
+                        notation, coordinate, meridian, viewport, metrics);
+                crossHorizontal(found, a, b, 0.0, Edge.TOP, w, h,
+                        notation, coordinate, meridian, viewport, metrics);
+                crossVertical(found, a, b, 0.0, Edge.LEFT, w, h,
+                        notation, coordinate, meridian, viewport, metrics);
+                crossVertical(found, a, b, w - 1.0, Edge.RIGHT, w, h,
+                        notation, coordinate, meridian, viewport, metrics);
+            }
+        }
+        return found;
+    }
+
+    private static void crossHorizontal(List<Candidate> found, PixelPoint a,
+                                        PixelPoint b, double edgeY, Edge edge,
+                                        double w, double h, String notation,
+                                        double coordinate, boolean meridian,
+                                        ChartViewport viewport,
+                                        java.awt.FontMetrics metrics) {
+        if (Math.min(a.y(), b.y()) > edgeY || Math.max(a.y(), b.y()) < edgeY
+                || Math.abs(b.y() - a.y()) < 1e-9) {
+            return;
+        }
+        double t = (edgeY - a.y()) / (b.y() - a.y());
+        double x = a.x() + t * (b.x() - a.x());
+        if (x < 0 || x >= w) {
+            return;
+        }
+        double incidence = Math.toDegrees(Math.atan2(
+                Math.abs(b.y() - a.y()), Math.abs(b.x() - a.x())));
+        found.add(at(meridian, coordinate, notation, edge, x, edgeY,
+                incidence, Math.min(x, w - x), viewport, metrics));
+    }
+
+    private static void crossVertical(List<Candidate> found, PixelPoint a,
+                                      PixelPoint b, double edgeX, Edge edge,
+                                      double w, double h, String notation,
+                                      double coordinate, boolean meridian,
+                                      ChartViewport viewport,
+                                      java.awt.FontMetrics metrics) {
+        if (Math.min(a.x(), b.x()) > edgeX || Math.max(a.x(), b.x()) < edgeX
+                || Math.abs(b.x() - a.x()) < 1e-9) {
+            return;
+        }
+        double t = (edgeX - a.x()) / (b.x() - a.x());
+        double y = a.y() + t * (b.y() - a.y());
+        if (y < 0 || y >= h) {
+            return;
+        }
+        double incidence = Math.toDegrees(Math.atan2(
+                Math.abs(b.x() - a.x()), Math.abs(b.y() - a.y())));
+        found.add(at(meridian, coordinate, notation, edge, edgeX, y,
+                incidence, Math.min(y, h - y), viewport, metrics));
+    }
+
+    /** Where a figure sits for a crossing, and what it then occupies. */
+    private static Candidate at(boolean meridian, double coordinate,
+                                String notation, Edge edge, double x, double y,
+                                double incidence, double clearance,
+                                ChartViewport viewport,
+                                java.awt.FontMetrics metrics) {
+        Label label = switch (edge) {
+            case BOTTOM -> new Label(notation, x + 3.0,
+                    viewport.heightPx() - 1.0 - 4.0);
+            case TOP -> new Label(notation, x + 3.0,
+                    metrics.getAscent() + 3.0);
+            case LEFT -> new Label(notation, 3.0, y - 3.0);
+            case RIGHT -> new Label(notation,
+                    viewport.widthPx() - metrics.stringWidth(notation) - 3.0,
+                    y - 3.0);
+        };
+        return new Candidate(meridian, coordinate, notation, edge, x, y,
+                incidence, clearance, label, labelBounds(label, metrics));
+    }
+
+    /**
+     * A figure for a curve that never reaches its preferred edge.
+     *
+     * <p>Called <strong>only</strong> when {@code edgeLabel} found no
+     * crossing at all of the preferred edge. A preferred figure that
+     * was found and then suppressed - by the title block or by paper
+     * containment - stays suppressed: that is a different decision,
+     * about furniture, and issue #360 does not reopen it. Putting
+     * this in the {@code else} of "a preferred crossing exists" is
+     * what makes that structural rather than remembered.
+     *
+     * <p>Order, from the measured pages: the opposite parallel edge
+     * first - top for a meridian, right for a parallel - because a
+     * curve that leaves by one side usually arrives at the other, and
+     * the figure reads in the same orientation the reader already
+     * learned. Then the perpendicular edges, ranked by incidence,
+     * then by corner clearance, then by position so that two runs of
+     * the same page cannot disagree.
+     *
+     * <p>Orion's minus-45 parallel reaches neither vertical edge and
+     * is rescued by neither: both of its bottom crossings are
+     * refused, one by the title block and one by an existing figure.
+     * It stays anonymous, and honestly so.
+     *
+     * <p><strong>A figure restored here participates in placement
+     * before ordinary sky labels, and they yield to it.</strong> So
+     * restoring a figure can change the lower-priority solution:
+     * when the grid takes edge space it had not taken before, the
+     * placement pass finds a different valid arrangement for star
+     * and constellation names. Promoting this repair moved the
+     * label-placement study's counts from 239 star labels to 238
+     * and from 200 constellation names to 201 - not one label lost,
+     * but a different answer to a constrained problem.
+     *
+     * <p>That is the stated hierarchy doing what it says, and it is
+     * recorded rather than tidied away: requiring those counts to
+     * stay fixed would be a second constraint, and it would
+     * sometimes contradict the first.
+     */
+    private static Label fallbackLabel(List<List<PixelPoint>> pieces,
+                                       String notation, double coordinate,
+                                       boolean meridian,
+                                       ChartViewport viewport,
+                                       java.awt.FontMetrics metrics,
+                                       List<Label> accepted,
+                                       java.awt.Rectangle... furniture) {
+        Edge preferred = meridian ? Edge.BOTTOM : Edge.LEFT;
+        Edge opposite = meridian ? Edge.TOP : Edge.RIGHT;
+        List<Candidate> sameOrientation = new ArrayList<>();
+        List<Candidate> perpendicular = new ArrayList<>();
+        for (Candidate candidate : candidates(pieces, notation, coordinate,
+                meridian, viewport, metrics)) {
+            if (candidate.edge() == preferred) {
+                // The preferred edge had its chance and was refused,
+                // so it does not get a second one here. Stated
+                // rather than inferred: the only crossings
+                // `edgeLabel` rejects but this would see are on the
+                // left edge within ten pixels of an end, and the
+                // corner clearance below refuses those too. No page
+                // in the discovery matrix distinguishes the two
+                // rules - this one says which is meant.
+                continue;
+            }
+            if (candidate.edge() == opposite) {
+                sameOrientation.add(candidate);
+            } else {
+                perpendicular.add(candidate);
+            }
+        }
+        java.util.Comparator<Candidate> rank = java.util.Comparator
+                .comparingDouble(Candidate::incidenceDegrees).reversed()
+                .thenComparing(java.util.Comparator
+                        .comparingDouble(Candidate::cornerClearancePx)
+                        .reversed())
+                .thenComparingDouble(Candidate::x)
+                .thenComparingDouble(Candidate::y);
+        sameOrientation.sort(rank);
+        perpendicular.sort(rank);
+
+        List<Candidate> order = new ArrayList<>(sameOrientation);
+        order.addAll(perpendicular);
+        for (Candidate candidate : order) {
+            if (candidate.cornerClearancePx() < CORNER_CLEARANCE_PX
+                    || candidate.incidenceDegrees()
+                            < MINIMUM_INCIDENCE_DEGREES
+                    || !fitsPaper(candidate.label(), metrics, viewport)
+                    || intersectsFurniture(candidate.label(), metrics,
+                            furniture)
+                    || overlapsAccepted(candidate, metrics, accepted)) {
+                continue;
+            }
+            return candidate.label();
+        }
+        return null;
+    }
+
+    /** One figure per curve, and never on top of another curve's. */
+    private static boolean overlapsAccepted(Candidate candidate,
+                                            java.awt.FontMetrics metrics,
+                                            List<Label> accepted) {
+        for (Label other : accepted) {
+            if (candidate.bounds().intersects(labelBounds(other, metrics))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean intersectsFurniture(Label label,
                                            java.awt.FontMetrics metrics,
                                            java.awt.Rectangle... furniture) {
@@ -525,18 +816,35 @@ public final class EquatorialGrid {
      * limitation.
      */
     public static void draw(Graphics2D g, Grid grid, ChartPalette palette) {
+        draw(g, grid, palette, false);
+    }
+
+    /**
+     * The same grid, optionally as the reader's emphasized structure
+     * (issue #361). Emphasis is ink only: the computed grid, its
+     * geometry and its notation placement are exactly the canonical
+     * ones. It includes the coordinate notation with the curves,
+     * because a grid a reader is following is read through its
+     * numbers.
+     */
+    public static void draw(Graphics2D g, Grid grid, ChartPalette palette,
+                            boolean emphasized) {
         g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        drawCurves(g, grid, palette);
-        drawNotation(g, grid, palette);
+        drawCurves(g, grid, palette, emphasized);
+        drawNotation(g, grid, palette, emphasized);
     }
 
     private static void drawCurves(Graphics2D g, Grid grid,
-                                   ChartPalette palette) {
-        g.setColor(palette.gridInk());
-        g.setStroke(new BasicStroke(1.0f));
+                                   ChartPalette palette,
+                                   boolean emphasized) {
+        StructureStyle.Style style = StructureStyle.resolve(palette,
+                ChartStructure.EQUATORIAL_GRID, emphasized,
+                palette.gridInk(), new BasicStroke(1.0f));
+        g.setColor(style.color());
+        g.setStroke(style.stroke());
         for (List<List<PixelPoint>> family
                 : List.of(grid.meridians(), grid.parallels())) {
             for (List<PixelPoint> piece : family) {
@@ -550,8 +858,11 @@ public final class EquatorialGrid {
     }
 
     private static void drawNotation(Graphics2D g, Grid grid,
-                                     ChartPalette palette) {
-        g.setColor(palette.gridLabelInk());
+                                     ChartPalette palette,
+                                     boolean emphasized) {
+        g.setColor(StructureStyle.resolve(palette,
+                ChartStructure.EQUATORIAL_GRID, emphasized,
+                palette.gridLabelInk(), new BasicStroke(1.0f)).color());
         g.setFont(GRID_LABEL_FONT);
         for (Label label : grid.labels()) {
             g.drawString(label.text(), (float) label.x(), (float) label.y());

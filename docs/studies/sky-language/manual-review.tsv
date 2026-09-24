@@ -67,8 +67,6 @@ ce64949292039ca0	render/SymbolFamily.java	M 57, M 27, NGC 7009	unresolved: no ro
 1a1fee49b6ca4285	search/LocalSearch.java	\\d+$	declared name used, but never at a known sink	false-positive	regular-expression: a regular expression, not words
 dc5dc035114e38ac	search/LocalSearch.java	\\s+	declared name used, but never at a known sink	false-positive	regular-expression: a regular expression, not words
 5758dde4362a06f8	search/LocalSearch.java	\\s*,\\s*|\\s+	collection/alias flow not traced	false-positive	regular-expression: a regular expression, not words
-cd6d3e9b1b7bdd56	sheet/PdfSheetWriter.java	 /Title 	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
-d503f8d5d14c4566	sheet/PdfSheetWriter.java	 /Subject 	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
 c014b289e3cc9fc9	sheet/PdfSheetWriter.java	 0 obj\n	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
 3cec86091e370ff4	sheet/PdfSheetWriter.java	0000000000 65535 f \n	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
 43f3f9ba67742ee0	sheet/PdfSheetWriter.java	W n\n	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
@@ -121,3 +119,14 @@ a56146ee79531226	ui/language/AboutText.java	.label	the role half of a resource k
 4849f5693a513941	ui/language/PageText.java	page.	resource-key stem, never shown	identifier	a stable key, path or stored value; no language changes it
 7909008ec4416f39	app/StartupFailure.java	JUranometria could not start.	the embedded English headline, the last line of defence	reader-prose	translated as startup.failed; this copy is reached without opening a file, a preference node or a language class, each of which this surface may be reporting the failure of
 a702d20659072681	ui/language/StartupText.java	/resources/interface-language/	where a language keeps its startup documents	identifier	a stable key, path or stored value; no language changes it
+e8f9052696e6d248	sheet/PdfSheetWriter.java	 /Keywords 	declared name used, but never at a known sink	false-positive	pdf-structure: PDF file structure emitted by the writer
+80ed4168a507d05b	sheet/PdfSheetWriter.java	emphasis:	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+3e75ebd4d85fa3b4	sheet/PdfSheetWriter.java	 /Title 	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+ca3e789bc6b61f03	sheet/PdfSheetWriter.java	 /Subject 	unresolved: no route found, needs manual inspection	false-positive	pdf-structure: PDF file structure emitted by the writer
+6db8a2a752b75db7	sheet/PngSheetWriter.java	Title	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+27da0c887757dad6	sheet/PngSheetWriter.java	Description	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+decc0d3475c4dd44	sheet/PngSheetWriter.java	Software	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+d6ec4403b577d737	sheet/PngSheetWriter.java	Title	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+715ef47ebffe1748	sheet/PngSheetWriter.java	Description	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+36aa094f9216be00	sheet/PngSheetWriter.java	Software	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+3a05bc44cc171e52	sheet/PngSheetWriter.java	Emphasis	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it

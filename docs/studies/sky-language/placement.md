@@ -98,7 +98,7 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 0 |
 | `Nor` | Norma | Vinkelhaken | moved | candidate 1 to 9, 20 px |
 | `Oph` | Ophiuchus | Slangebæreren | moved | candidate 4 to 5, 57 px |
-| `Pav` | Pavo | Påfuglen | renamed in place | candidate 0 |
+| `Pav` | Pavo | Påfuglen | renamed in place | candidate 1 |
 | `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 3 to 2, 45 px |
 | `Sco` | Scorpius | Skorpionen | moved | candidate 13 to 4, 85 px |
 | `Sct` | Scutum | Skjoldet | renamed in place | candidate 3 |
@@ -236,7 +236,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Tri` | Triangulum | Triangelet | renamed in place | candidate 10 |
 | `UMa` | Ursa Major | Store bjørn | renamed in place | candidate 16 |
 | `Vel` | Vela | Seilet | renamed in place | candidate 0 |
-| `Vol` | Volans | Flygefisken | moved | candidate 0 to 1, 20 px |
+| `Vol` | Volans | Flygefisken | renamed in place | candidate 1 |
 
 ## the RA seam, 42 degrees
 
@@ -274,7 +274,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Lac` | Lacerta | Øglen | moved | candidate 10 to 2, 20 px |
 | `Lyr` | Lyra | Lyren | renamed in place | candidate 8 |
 | `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 4 |
-| `Phe` | Phoenix | Føniks | moved | candidate 9 to 5, 28 px |
+| `Phe` | Phoenix | Føniks | moved | candidate 10 to 5, 63 px |
 | `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 1 to 0, 20 px |
 | `Psc` | Pisces | Fiskene | renamed in place | candidate 0 |
 | `Scl` | Sculptor | Billedhuggeren | moved | candidate 10 to 0, 40 px |
@@ -339,7 +339,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Lyn` | Lynx | Gaupen | renamed in place | candidate 2 |
 | `Lyr` | Lyra | Lyren | moved | candidate 2 to 6, 20 px |
 | `Oph` | Ophiuchus | Slangebæreren | omitted in Norwegian | 17 candidates refused, first: Refused[candidate=0, kind=PAGE_EDGE, by=the limb] |
-| `Psc` | Pisces | Fiskene | moved | candidate 2 to 0, 20 px |
+| `Psc` | Pisces | Fiskene | moved | candidate 1 to 0, 20 px |
 | `Ser` | Serpens | Slangen | renamed in place | candidate 10 |
 | `Sge` | Sagitta | Pilen | renamed in place | candidate 2 |
 | `Tau` | Taurus | Tyren | renamed in place | candidate 5 |
@@ -512,8 +512,8 @@ These are **placement observations across 17 pages**, not distinct constellation
 
 | outcome | observations |
 |---|---|
-| renamed in place (no cost) | 225 |
-| moved | 119 |
+| renamed in place (no cost) | 226 |
+| moved | 118 |
 | omitted in one language | 11 |
 | identical in both languages | 22 |
 

@@ -262,9 +262,9 @@ public final class EclipticCandidateStudyMain {
         Graphics2D g = image.createGraphics();
         try {
             new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH).render(g, scene,
-                    options, (layerG, layerScene) -> {
+                    options, (layerG, layerScene, reserved) -> {
                         ReferenceInk.paint(layerG, layerScene, meridian,
-                                palette);
+                                palette, ENGLISH, reserved);
                         drawCandidate(layerG, layerScene, palette, line,
                                 landmark);
                     });

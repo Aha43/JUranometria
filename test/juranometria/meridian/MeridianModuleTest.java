@@ -102,11 +102,17 @@ class MeridianModuleTest {
         module.showing(true, false, false);
         assertEquals(List.of("meridian"), identities(module));
         module.showing(false, true, false);
-        assertEquals(List.of("horizon"), identities(module));
+        assertEquals(List.of("horizon", "cardinal-north",
+                        "cardinal-east", "cardinal-south",
+                        "cardinal-west"), identities(module),
+                "the horizon brings the observer's cardinal marks"
+                        + " with it (#359)");
         module.showing(false, false, true);
         assertEquals(List.of("zenith"), identities(module));
         module.showing(true, true, true);
-        assertEquals(List.of("meridian", "horizon", "zenith"),
+        assertEquals(List.of("meridian", "horizon", "cardinal-north",
+                        "cardinal-east", "cardinal-south",
+                        "cardinal-west", "zenith"),
                 identities(module));
     }
 
@@ -207,8 +213,9 @@ class MeridianModuleTest {
             }
         };
         other.attach(services);
-        assertEquals(4, services.overlays.collect().size(),
-                "three lines and the other module's mark");
+        assertEquals(8, services.overlays.collect().size(),
+                "three lines, four cardinal marks (#359), and the"
+                        + " other module's mark");
 
         module.detach();
 

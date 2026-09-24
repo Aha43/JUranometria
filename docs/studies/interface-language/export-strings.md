@@ -171,7 +171,7 @@ Packed 295 × 206 px.
 | replace title | Replace the existing file? |
 | replace question | orion.svg already exists in ~/Documents. / Replace it? |
 | written title | Chart sheet exported |
-| written message | SVG written to orion.svg (194,460 bytes) |
+| written message | SVG written to orion.svg (194,482 bytes) |
 | refused title | The chart sheet was not written |
 | refusal: no file | No file was chosen. |
 | refusal: a folder | a.svg is a folder, not a file. |
@@ -306,7 +306,7 @@ Packed 332 × 206 px.
 | replace title | Erstatte eksisterende fil? |
 | replace question | orion.svg finnes allerede i ~/Documents. / Vil du erstatte den? |
 | written title | Kartarket er eksportert |
-| written message | SVG lagret som orion.svg (194 484 byte) |
+| written message | SVG lagret som orion.svg (194 377 byte) |
 | refused title | Kartarket ble ikke lagret |
 | refusal: no file | Ingen fil ble valgt. |
 | refusal: a folder | a.svg er en mappe, ikke en fil. |

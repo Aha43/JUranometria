@@ -95,11 +95,37 @@ class ExportJourneyTest {
         EclipticModule ecliptic = new EclipticModule();
         ecliptic.showing(true);
         registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
-        return (g, painted) -> ReferenceInk.paint(g, painted,
-                registry.collect(), ChartPalette.WHITE_PAPER);
+        return (g, painted, reserved) -> ReferenceInk.paint(g, painted,
+                registry.collect(), ChartPalette.WHITE_PAPER,
+                ENGLISH, reserved);
     }
 
     @SuppressWarnings("unchecked")
+    @org.junit.jupiter.api.Test
+    void theEmphasisChoiceIsWiredToTheRequest() {
+        // The dialog offers the explicit choice only on an emphasized
+        // screen (#361); driven here, where the dialog's controls are
+        // already driven. Unchecked is the canonical sheet; checked
+        // carries the emphasis for this export alone - nothing is
+        // remembered between the two presses.
+        java.util.List<ExportSheet.Request> chosen =
+                new java.util.ArrayList<>();
+        JComponent content = (JComponent) ExportSheetDialog.content(
+                ExportSheetSession.defaults(), chosen::add, () -> { },
+                juranometria.ui.language.InterfaceText.forLanguage("en"),
+                true);
+        javax.swing.JCheckBox include =
+                named(content, ExportSheetDialog.EMPHASIS_BOX);
+        JButton export = named(content, ExportSheetDialog.EXPORT_BUTTON);
+        export.doClick();
+        assertFalse(chosen.get(0).includeEmphasis(),
+                "unchecked exports the canonical sheet");
+        include.setSelected(true);
+        export.doClick();
+        assertTrue(chosen.get(1).includeEmphasis(),
+                "checked carries the emphasis, once");
+    }
+
     private static <T extends JComponent> T named(JComponent root,
                                                   String name) {
         if (name.equals(root.getName())) {

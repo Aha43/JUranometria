@@ -115,18 +115,67 @@ public final class ReferenceInk {
      * produce the same page.
      */
     /** The ordinary entry point (review of #335). */
-    public static void paint(Graphics2D g, ChartScene scene,
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      ChartScene scene,
                       List<OverlayRegistry.Owned> contributions,
-                      juranometria.render.ChartPalette palette) {
-        paint(g, DrawnPage.of(scene), contributions, palette);
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved) {
+        return paint(g, scene, contributions, palette, words, reserved,
+                null);
     }
 
-    public static void paint(Graphics2D g, DrawnPage page,
+    /** The same page with one structure emphasized (#361). */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      ChartScene scene,
                       List<OverlayRegistry.Owned> contributions,
-                      juranometria.render.ChartPalette palette) {
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      juranometria.render.ChartStructure emphasized) {
+        return paint(g, DrawnPage.of(scene), contributions, palette,
+                words, reserved, emphasized);
+    }
+
+    /**
+     * @param words the page's language, which owns the cardinal
+     *     letters and spoken names (#359); required, like the page's
+     *     other words, because a fallback language would be a quiet
+     *     lie about what the reader asked for
+     * @param reserved ink and text the page has already placed -
+     *     subordinate reference words refuse to be written through
+     *     any of it
+     */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      DrawnPage page,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved) {
+        return paint(g, page, contributions, palette, words, reserved,
+                null);
+    }
+
+    /**
+     * The same, with the reader's emphasized structure - if any -
+     * taking its accent (#361).
+     *
+     * <p>The chart maps each contribution's identity centrally
+     * ({@code ChartStructure.ofIdentity}); an identity the chart
+     * does not know keeps canonical ink under every selection.
+     * Emphasis is ink only: order, clipping, placement, precedence
+     * and the line names' ink stay exactly canonical.
+     */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      DrawnPage page,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      juranometria.render.ChartStructure emphasized) {
         ChartScene scene = page.scene();
         if (contributions.isEmpty()) {
-            return;
+            return List.of();
         }
         List<OverlayRegistry.Owned> reference = new ArrayList<>();
         for (OverlayRegistry.Owned owned : contributions) {
@@ -135,7 +184,7 @@ public final class ReferenceInk {
             }
         }
         if (reference.isEmpty()) {
-            return;
+            return List.of();
         }
         reference.sort(Comparator.comparing(OverlayRegistry.Owned::key));
 
@@ -185,7 +234,7 @@ public final class ReferenceInk {
                 if (owned.geometry()
                         instanceof OverlayContribution.GreatCircle circle) {
                     drawCircle(g2, projection, mapping, region, circle,
-                            palette);
+                            palette, emphasized);
                 }
             }
             // The names are the published decision, written rather
@@ -194,17 +243,25 @@ public final class ReferenceInk {
             if (bounded) {
                 g2.setClip(wholePaper);
             }
-            List<Rectangle2D> taken = new ArrayList<>();
+            // One layout for everything this layer writes (#313,
+            // #359): the cardinals choose first against the page's
+            // own ink alone - the ruled precedence, an accepted
+            // cardinal outranks the layer's generic line names - and
+            // the names then relocate through their existing
+            // candidates or are omitted around them. On a page with
+            // no accepted cardinal the seed is empty and every name
+            // lands exactly where it always did.
             g2.setColor(palette.gridLabelInk());
             g2.setFont(EquatorialGrid.GRID_LABEL_FONT);
             FontMetrics metrics = g2.getFontMetrics();
-            for (NamePlacement placed
-                    : namePlacements(scene, contributions)) {
+            Laid laid = layoutWith(projection, mapping, paper, region,
+                    sky, bounded, reference, words, reserved, metrics);
+            List<Rectangle2D> taken = laid.taken();
+            for (NamePlacement placed : laid.names()) {
                 g2.drawString(placed.name(),
                         (float) placed.box().getMinX(),
                         (float) (placed.box().getMaxY()
                                 - metrics.getDescent()));
-                taken.add(placed.box());
             }
             if (bounded) {
                 g2.clip(sky);
@@ -213,12 +270,275 @@ public final class ReferenceInk {
                 if (owned.geometry()
                         instanceof OverlayContribution.Point point) {
                     drawPoint(g2, projection, mapping, paper, sky,
-                            bounded, point, taken, palette);
+                            bounded, point, taken, palette, emphasized);
                 }
             }
+            // The cardinal ink itself, still under the sky clip: the
+            // limb halves a limb mark's diamond, which is #331's law
+            // and a boundary tick's honest shape. The cardinal
+            // landmarks read with the horizon (#361's central map),
+            // so they take the horizon's accent with it - mark and
+            // letter both, as the grid's notation does with its
+            // curves - and placement never moves.
+            boolean horizonRaised = emphasized
+                    == juranometria.render.ChartStructure.HORIZON;
+            juranometria.render.StructureStyle.Style mark =
+                    juranometria.render.StructureStyle.resolve(palette,
+                            juranometria.render.ChartStructure.HORIZON,
+                            horizonRaised, palette.figureInk(), SOLID);
+            java.awt.Color letterInk =
+                    juranometria.render.StructureStyle.resolve(palette,
+                            juranometria.render.ChartStructure.HORIZON,
+                            horizonRaised, palette.gridLabelInk(), SOLID)
+                            .color();
+            for (DirectionPlacement placed : laid.directions()) {
+                g2.setColor(mark.color());
+                g2.setStroke(mark.stroke());
+                g2.draw(diamond(placed.at()));
+                g2.setColor(letterInk);
+                g2.drawString(placed.letter(),
+                        (float) placed.box().getMinX(),
+                        (float) (placed.box().getMaxY()
+                                - metrics.getDescent()));
+            }
+            return laid.directions();
         } finally {
             g2.dispose();
         }
+    }
+
+    /**
+     * A rendered cardinal direction: which direction, the letter the
+     * page's language draws for it, the spoken name that language
+     * gives a reader who cannot see it, the exact horizon point, and
+     * the box the letter takes (#359).
+     *
+     * <p>Both texts ride the decision so that every surface reads
+     * the same answer: a direction that is rendered carries its
+     * localized visible and spoken words here, and a direction that
+     * is not rendered appears nowhere at all.
+     */
+    public record DirectionPlacement(juranometria.chart.Cardinal cardinal,
+            String letter, String spokenName, PixelPoint at,
+            Rectangle2D box) {
+    }
+
+    /**
+     * Everything this layer writes on a page, decided without
+     * drawing it (#313's pattern, #359): the cardinal marks first,
+     * against the page's own reserved ink alone, and the line names
+     * around them - the ruled precedence, applied only when a
+     * cardinal is actually accepted, because an empty seed leaves
+     * every name where it always was.
+     */
+    public static List<DirectionPlacement> directionPlacements(
+            DrawnPage page, List<OverlayRegistry.Owned> contributions,
+            juranometria.project.PageWords words,
+            List<java.awt.Shape> reserved) {
+        return laidOut(page, contributions, words, reserved)
+                .directions();
+    }
+
+    /**
+     * Where this page's reference-line names go - after the accepted
+     * cardinals have taken their boxes (#359), which is why the
+     * page's words and reserved ink are part of the question.
+     */
+    public static List<NamePlacement> namePlacements(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions,
+            juranometria.project.PageWords words,
+            List<java.awt.Shape> reserved) {
+        return laidOut(page, contributions, words, reserved).names();
+    }
+
+    /** One layout, drawn by paint and readable by anyone. */
+    private record Laid(List<DirectionPlacement> directions,
+            List<NamePlacement> names, List<Rectangle2D> taken) {
+    }
+
+    private static Laid laidOut(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions,
+            juranometria.project.PageWords words,
+            List<java.awt.Shape> reserved) {
+        ChartScene scene = page.scene();
+        List<OverlayRegistry.Owned> reference =
+                referenceOf(contributions);
+        if (reference.isEmpty()) {
+            return new Laid(List.of(), List.of(), new ArrayList<>());
+        }
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(scene);
+        PageRegion region = mapping.regionFor(scene.viewport(),
+                projection);
+        return layoutWith(projection, mapping, paper, region,
+                skyOf(region, paper), region.bounded(), reference,
+                words, reserved, EquatorialGrid.labelMetrics());
+    }
+
+    private static Laid layoutWith(Projection projection,
+            ViewportMapping mapping, Rectangle2D paper,
+            PageRegion region, java.awt.Shape sky, boolean bounded,
+            List<OverlayRegistry.Owned> reference,
+            juranometria.project.PageWords words,
+            List<java.awt.Shape> reserved, FontMetrics metrics) {
+        List<Rectangle2D> taken = new ArrayList<>();
+        List<DirectionPlacement> directions = decideDirections(
+                projection, mapping, paper, sky, bounded,
+                directionMarksIn(reference), words, taken, reserved,
+                metrics);
+        List<Named> names = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : reference) {
+            if (owned.geometry()
+                    instanceof OverlayContribution.GreatCircle circle) {
+                List<CurveRun> runs = GreatCirclePage.clip(projection,
+                        mapping, region, circle.pole());
+                PixelPoint anchor = labelAnchor(runs);
+                if (anchor != null) {
+                    CurveRun on = runCarrying(runs, anchor);
+                    names.add(new Named(anchor,
+                            circle.accessibleName(), owned.moduleId(),
+                            on, startsAt(on, anchor), runs,
+                            everyOtherCurve(reference, owned,
+                                    projection, mapping, region)));
+                }
+            }
+        }
+        List<NamePlacement> placedNames = new ArrayList<>();
+        for (Named named : names) {
+            Rectangle2D box = boxAlong(paper, sky, named, metrics,
+                    taken);
+            if (box != null) {
+                taken.add(box);
+                placedNames.add(new NamePlacement(named.moduleId(),
+                        named.name(), box));
+            }
+        }
+        return new Laid(List.copyOf(directions),
+                List.copyOf(placedNames), taken);
+    }
+
+    /** The direction marks, in the order the page considers them. */
+    private static List<OverlayContribution.DirectionMark>
+            directionMarksIn(List<OverlayRegistry.Owned> reference) {
+        List<OverlayContribution.DirectionMark> marks =
+                new ArrayList<>();
+        for (OverlayRegistry.Owned owned : reference) {
+            if (owned.geometry()
+                    instanceof OverlayContribution.DirectionMark mark) {
+                marks.add(mark);
+            }
+        }
+        return marks;
+    }
+
+    /**
+     * One cardinal mark each, or nothing (#359).
+     *
+     * <p>The diamond stays at the exact computed horizon point - on
+     * the limb itself when the horizon is the limb, which is the one
+     * narrow widening of the sky rule here: {@code contains} is
+     * false on its own boundary, so a bounded page also accepts a
+     * point within a pixel and a half of it. Everything that is not
+     * a cardinal mark keeps the strict rule.
+     *
+     * <p>The letter takes the first clean box of four adjacent
+     * candidates - ordered inward on a bounded page, so a limb
+     * mark's letter sits inside the mapped sky - and a box is clean
+     * only when it is wholly on the sky, wholly on the paper, and
+     * touches nothing in {@code taken} or {@code reserved}. When no
+     * candidate is clean the whole landmark is omitted: an
+     * unexplained diamond and a letter through other ink are both
+     * worse than absence, and the mark never slides to a friendlier
+     * spot, because where it is IS what it says.
+     *
+     * <p>Accepted boxes and diamonds join {@code taken}, so the four
+     * yield to one another in their stated order.
+     */
+    private static List<DirectionPlacement> decideDirections(
+            Projection projection, ViewportMapping mapping,
+            Rectangle2D paper, java.awt.Shape sky, boolean bounded,
+            List<OverlayContribution.DirectionMark> marks,
+            juranometria.project.PageWords words,
+            List<Rectangle2D> taken, List<java.awt.Shape> reserved,
+            FontMetrics metrics) {
+        if (!marks.isEmpty() && words == null) {
+            throw new IllegalArgumentException(
+                    "a cardinal mark's words are the page's language:"
+                            + " the page's PageWords are required to"
+                            + " place " + marks.get(0).identity());
+        }
+        List<DirectionPlacement> placed = new ArrayList<>();
+        for (OverlayContribution.DirectionMark mark : marks) {
+            PixelPoint at = projection.project(mark.at())
+                    .map(mapping::toPixel).orElse(null);
+            if (at == null || !paper.contains(at.x(), at.y())) {
+                continue;
+            }
+            boolean onSky = sky.contains(at.x(), at.y())
+                    || (bounded && sky.intersects(at.x() - 1.5,
+                            at.y() - 1.5, 3.0, 3.0));
+            if (!onSky) {
+                continue;
+            }
+            String letter = words.directionLetter(mark.direction());
+            double w = metrics.stringWidth(letter);
+            double h = metrics.getAscent() + metrics.getDescent();
+            double gap = DIAMOND + 3.0;
+            List<Rectangle2D> candidates = new ArrayList<>(List.of(
+                    new Rectangle2D.Double(at.x() + gap,
+                            at.y() - h / 2.0, w, h),
+                    new Rectangle2D.Double(at.x() - gap - w,
+                            at.y() - h / 2.0, w, h),
+                    new Rectangle2D.Double(at.x() - w / 2.0,
+                            at.y() + gap, w, h),
+                    new Rectangle2D.Double(at.x() - w / 2.0,
+                            at.y() - gap - h, w, h)));
+            if (bounded) {
+                // Inward first: on the globe the mark is on the limb
+                // and its letter belongs inside the mapped sky, never
+                // outside it where it would read as a page-edge
+                // direction.
+                double cx = paper.getCenterX();
+                double cy = paper.getCenterY();
+                candidates.sort(java.util.Comparator.comparingDouble(
+                        box -> Math.hypot(box.getCenterX() - cx,
+                                box.getCenterY() - cy)));
+            }
+            Rectangle2D box = null;
+            for (Rectangle2D candidate : candidates) {
+                if (!paper.contains(candidate)
+                        || !sky.contains(candidate)) {
+                    continue;
+                }
+                if (overlaps(candidate, taken)
+                        || touchesAny(candidate, reserved)) {
+                    continue;
+                }
+                box = candidate;
+                break;
+            }
+            if (box == null) {
+                continue;
+            }
+            taken.add(box);
+            taken.add(new Rectangle2D.Double(at.x() - DIAMOND,
+                    at.y() - DIAMOND, 2.0 * DIAMOND, 2.0 * DIAMOND));
+            placed.add(new DirectionPlacement(mark.direction(),
+                    letter, words.directionSpoken(mark.direction()),
+                    at, box));
+        }
+        return List.copyOf(placed);
+    }
+
+    private static boolean touchesAny(Rectangle2D box,
+                                      List<java.awt.Shape> reserved) {
+        for (java.awt.Shape shape : reserved) {
+            if (shape.intersects(box)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -250,7 +570,9 @@ public final class ReferenceInk {
                                    ViewportMapping mapping,
                                    PageRegion region,
                                    OverlayContribution.GreatCircle circle,
-                                   juranometria.render.ChartPalette palette) {
+                                   juranometria.render.ChartPalette palette,
+                                   juranometria.render.ChartStructure
+                                           emphasized) {
         List<CurveRun> runs = GreatCirclePage.clip(projection, mapping,
                 region, circle.pole());
         if (runs.isEmpty()) {
@@ -259,8 +581,23 @@ public final class ReferenceInk {
             // made.
             return;
         }
-        g.setColor(palette.figureInk());
-        g.setStroke(strokeFor(circle.reference()));
+        // The chart's central identity map decides whether this line
+        // belongs to the emphasized structure; an unknown identity
+        // keeps canonical ink (#361). The stroke's solid/dashed/
+        // dash-dot identity survives emphasis by the resolver's rule.
+        juranometria.render.StructureStyle.Style style =
+                juranometria.render.ChartStructure
+                        .ofIdentity(circle.identity())
+                        .map(s -> juranometria.render.StructureStyle
+                                .resolve(palette, s, s == emphasized,
+                                        palette.figureInk(),
+                                        strokeFor(circle.reference())))
+                        .orElseGet(() ->
+                                new juranometria.render.StructureStyle
+                                        .Style(palette.figureInk(),
+                                        strokeFor(circle.reference())));
+        g.setColor(style.color());
+        g.setStroke(style.stroke());
         for (CurveRun run : runs) {
             g.draw(shapeOf(run));
         }
@@ -281,56 +618,6 @@ public final class ReferenceInk {
      * way the star-label pass has published its since #154, and
      * {@link #paint} writes precisely this list.
      */
-    /** The ordinary entry point (review of #335). */
-    public static List<NamePlacement> namePlacements(ChartScene scene,
-            List<OverlayRegistry.Owned> contributions) {
-        return namePlacements(DrawnPage.of(scene), contributions);
-    }
-
-    public static List<NamePlacement> namePlacements(DrawnPage page,
-            List<OverlayRegistry.Owned> contributions) {
-        ChartScene scene = page.scene();
-        List<OverlayRegistry.Owned> reference = referenceOf(contributions);
-        if (reference.isEmpty()) {
-            return List.of();
-        }
-        Projection projection = page.projection();
-        ViewportMapping mapping = new ViewportMapping(page);
-        Rectangle2D paper = ChartRenderer.paperOf(scene);
-        PageRegion region = mapping.regionFor(scene.viewport(), projection);
-        List<Named> names = new ArrayList<>();
-        for (OverlayRegistry.Owned owned : reference) {
-            if (owned.geometry()
-                    instanceof OverlayContribution.GreatCircle circle) {
-                List<CurveRun> runs = GreatCirclePage.clip(projection,
-                        mapping, region, circle.pole());
-                PixelPoint anchor = labelAnchor(runs);
-                if (anchor != null) {
-                    CurveRun on = runCarrying(runs, anchor);
-                    names.add(new Named(anchor,
-                            circle.accessibleName(), owned.moduleId(),
-                            on, startsAt(on, anchor), runs,
-                            everyOtherCurve(reference, owned,
-                                    projection, mapping, region)));
-                }
-            }
-        }
-        FontMetrics metrics = EquatorialGrid.labelMetrics();
-        java.awt.Shape sky = skyOf(region, paper);
-        List<NamePlacement> placed = new ArrayList<>();
-        List<Rectangle2D> taken = new ArrayList<>();
-        for (Named named : names) {
-            Rectangle2D box = boxAlong(paper, sky, named, metrics,
-                    taken);
-            if (box != null) {
-                taken.add(box);
-                placed.add(new NamePlacement(named.moduleId(),
-                        named.name(), box));
-            }
-        }
-        return List.copyOf(placed);
-    }
-
     private static List<OverlayRegistry.Owned> referenceOf(
             List<OverlayRegistry.Owned> contributions) {
         List<OverlayRegistry.Owned> reference = new ArrayList<>();
@@ -690,14 +977,29 @@ public final class ReferenceInk {
                                   boolean bounded,
                                   OverlayContribution.Point point,
                                   List<Rectangle2D> taken,
-                                  juranometria.render.ChartPalette palette) {
+                                  juranometria.render.ChartPalette palette,
+                                  juranometria.render.ChartStructure
+                                          emphasized) {
         PixelPoint at = projection.project(point.at())
                 .map(mapping::toPixel).orElse(null);
         if (at == null || !sky.contains(at.x(), at.y())) {
             return;
         }
-        g.setColor(palette.figureInk());
-        g.setStroke(SOLID);
+        // A landmark takes its structure's accent with the line it
+        // belongs to - the ecliptic's seasonal marks with the
+        // ecliptic, a zenith with the meridian - and an unknown
+        // identity keeps canonical ink (#361).
+        juranometria.render.StructureStyle.Style style =
+                juranometria.render.ChartStructure
+                        .ofIdentity(point.identity())
+                        .map(s -> juranometria.render.StructureStyle
+                                .resolve(palette, s, s == emphasized,
+                                        palette.figureInk(), SOLID))
+                        .orElseGet(() ->
+                                new juranometria.render.StructureStyle
+                                        .Style(palette.figureInk(), SOLID));
+        g.setColor(style.color());
+        g.setStroke(style.stroke());
         switch (point.mark()) {
             case PLACE -> {
                 g.draw(new Ellipse2D.Double(at.x() - RING, at.y() - RING,

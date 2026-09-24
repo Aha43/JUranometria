@@ -770,14 +770,16 @@ class SprintThirtyJourneyTest {
                     byte[] withoutCircle = SheetWriters.write(
                             ChartSheet.record(Atlas.assembler()::assemble,
                                     wideNow, onEdt(options::options),
-                                    (g, sc) -> juranometria.ui.ReferenceInk
+                                    (g, sc, reserved) ->
+                                            juranometria.ui.ReferenceInk
                                             .paint(g, sc,
                                                     withoutTheCircle(
                                                             offered,
                                                             eclipticPole),
                                                     juranometria.render
                                                             .ChartPalette
-                                                            .WHITE_PAPER),
+                                                            .WHITE_PAPER,
+                                                    ENGLISH, reserved),
                                     PaperSize.A4, ENGLISH),
                             SheetFormat.PNG, 150);
                     int[] along = inkAlong(withCircle, wideNow,

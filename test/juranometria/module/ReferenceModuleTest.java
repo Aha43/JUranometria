@@ -111,11 +111,13 @@ class ReferenceModuleTest {
         OverlayContribution ink = collected.get(0).geometry();
         assertEquals(InkRole.INTERACTION, ink.role(),
                 "interaction ink, not cartographic vocabulary");
-        assertTrue(ink.accessibleName().contains(first),
-                "and a reader who cannot see it is told what it is: "
-                        + ink.accessibleName());
         assertTrue(ink instanceof OverlayContribution.Point,
                 "typed geometry, never a drawing callback");
+        OverlayContribution.Point pointInk =
+                (OverlayContribution.Point) ink;
+        assertTrue(pointInk.accessibleName().contains(first),
+                "and a reader who cannot see it is told what it is: "
+                        + pointInk.accessibleName());
     }
 
     @Test

@@ -42,6 +42,8 @@ public final class AtlasToolbar extends JToolBar {
     private JLabel version;
     private JButton exit;
     private javax.swing.JComponent versionGap;
+    private JButton emphasis;
+    private SearchField searchFieldComponent;
 
     AtlasToolbar(ChartViewController controller,
                  SearchField searchField) {
@@ -156,6 +158,7 @@ public final class AtlasToolbar extends JToolBar {
         }
         this.said = said;
         this.shortcuts = ShortcutText.in(said);
+        this.searchFieldComponent = searchField;
         setFloatable(false);
 
         // The keys are named from the one registry that binds them,
@@ -539,6 +542,82 @@ public final class AtlasToolbar extends JToolBar {
                     : "toolbar.zoomIn.overview.explain");
         }
         Explain.dynamic(button, hovered, heard);
+    }
+
+    /**
+     * Installs the compact Emphasis control (issue #361), before the
+     * search field.
+     *
+     * <p>One button opening one radio menu: Normal and the six
+     * semantic structures, in the ruled order. The chart's transient
+     * state is the only truth - the menu is built fresh each time it
+     * opens, so it reads the chart rather than remembering it, and
+     * unavailable targets arrive disabled. Choosing Normal, or
+     * choosing the active target again, settles the page. Nothing
+     * here is persisted, and nothing here touches the selection.
+     */
+    public void attachEmphasis(ChartComponent chart) {
+        if (chart == null) {
+            throw new IllegalArgumentException("a chart is required");
+        }
+        if (emphasis != null) {
+            throw new IllegalStateException(
+                    "the emphasis control is attached once");
+        }
+        emphasis = new JButton(said.say("toolbar.emphasis.label"));
+        emphasis.setFocusable(true);
+        emphasis.getAccessibleContext().setAccessibleName(
+                said.say("toolbar.emphasis.a11y"));
+        Explain.control(emphasis, said.say("toolbar.emphasis.hover"),
+                said.say("toolbar.emphasis.explain"));
+        emphasis.addActionListener(event -> emphasisMenu(chart)
+                .show(emphasis, 0, emphasis.getHeight()));
+        int before = getComponentIndex(searchFieldComponent);
+        add(emphasis, before);
+        add(new javax.swing.JToolBar.Separator(), before + 1);
+    }
+
+    /** The installed control; package-visible for its contracts. */
+    JButton emphasisButton() {
+        return emphasis;
+    }
+
+    /** The menu, reading the chart at the moment it opens. */
+    javax.swing.JPopupMenu emphasisMenu(ChartComponent chart) {
+        juranometria.render.ChartStructure current = chart.emphasized();
+        javax.swing.JPopupMenu menu = new javax.swing.JPopupMenu();
+        javax.swing.JRadioButtonMenuItem normal =
+                new javax.swing.JRadioButtonMenuItem(
+                        said.say("emphasis.normal"), current == null);
+        normal.getAccessibleContext().setAccessibleName(
+                said.say("emphasis.normal"));
+        normal.addActionListener(event -> chart.emphasize(null));
+        menu.add(normal);
+        menu.addSeparator();
+        for (juranometria.render.ChartStructure structure
+                : juranometria.render.ChartStructure.values()) {
+            String name = said.say("emphasis." + structure.token());
+            javax.swing.JRadioButtonMenuItem item =
+                    new javax.swing.JRadioButtonMenuItem(name,
+                            structure == current);
+            item.getAccessibleContext().setAccessibleName(name);
+            item.setEnabled(chart.emphasisAvailable(structure));
+            item.addActionListener(event ->
+                    chart.emphasize(chosen(current, structure)));
+            menu.add(item);
+        }
+        return menu;
+    }
+
+    /**
+     * What picking an entry means: choosing the active target again
+     * settles the page, anything else raises it (#361). Named so the
+     * rule is a fact a test can hold, not a lambda's private habit.
+     */
+    static juranometria.render.ChartStructure chosen(
+            juranometria.render.ChartStructure current,
+            juranometria.render.ChartStructure picked) {
+        return picked == current ? null : picked;
     }
 
     /**

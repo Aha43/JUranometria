@@ -23,27 +23,27 @@ evidence for the globe's furniture default, and the decision document
 cites it as one machine's measurement.
 
 page          without                     disc limb band
-sagittarius   nothing (as drawn)         24.8%     41.2%
-              constellation boundaries     21.4%     35.7%
-              the coordinate grid        21.1%     35.4%
-              constellation figures      19.0%     34.2%
-              constellation names        22.1%     38.5%
-              star names and letters     22.4%     38.0%
-orion         nothing (as drawn)         22.8%     38.1%
-              constellation boundaries     19.7%     33.7%
-              the coordinate grid        19.5%     32.4%
-              constellation figures      18.1%     32.4%
-              constellation names        20.8%     36.4%
-              star names and letters     20.3%     34.8%
-south-pole    nothing (as drawn)         25.7%     36.8%
-              constellation boundaries     22.2%     32.4%
-              the coordinate grid        22.7%     32.8%
-              constellation figures      19.6%     30.2%
-              constellation names        22.9%     34.9%
-              star names and letters     23.1%     33.8%
-sparse        nothing (as drawn)         23.9%     44.9%
-              constellation boundaries     20.5%     39.8%
-              the coordinate grid        20.3%     39.3%
-              constellation figures      18.8%     38.2%
-              constellation names        21.7%     42.2%
-              star names and letters     21.5%     40.1%
+sagittarius   nothing (as drawn)         24.6%     40.2%
+              constellation boundaries     21.3%     34.8%
+              the coordinate grid        21.0%     34.5%
+              constellation figures      18.9%     33.4%
+              constellation names        21.9%     37.6%
+              star names and letters     22.3%     37.0%
+orion         nothing (as drawn)         22.6%     37.0%
+              constellation boundaries     19.5%     32.7%
+              the coordinate grid        19.4%     31.4%
+              constellation figures      17.9%     31.4%
+              constellation names        20.6%     35.3%
+              star names and letters     20.1%     33.6%
+south-pole    nothing (as drawn)         25.6%     36.1%
+              constellation boundaries     22.0%     31.7%
+              the coordinate grid        22.6%     32.2%
+              constellation figures      19.5%     29.7%
+              constellation names        22.8%     34.2%
+              star names and letters     22.9%     33.1%
+sparse        nothing (as drawn)         23.6%     43.4%
+              constellation boundaries     20.3%     38.4%
+              the coordinate grid        20.1%     38.0%
+              constellation figures      18.6%     37.3%
+              constellation names        21.5%     41.1%
+              star names and letters     21.2%     38.9%

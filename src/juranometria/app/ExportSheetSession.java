@@ -72,6 +72,18 @@ public final class ExportSheetSession {
 
     /** The surfaces the running application uses: real windows. */
     public static Surfaces onScreen(juranometria.ui.language.InterfaceText said) {
+        return onScreen(said, () -> false);
+    }
+
+    /**
+     * The same, on a screen that can say whether its chart is
+     * currently emphasized (#361) - asked at the moment the dialog
+     * opens, so the choice offered is about the page the reader is
+     * looking at.
+     */
+    public static Surfaces onScreen(juranometria.ui.language.InterfaceText said,
+                                    java.util.function.BooleanSupplier
+                                            emphasisActive) {
         return new Surfaces() {
 
             @Override
@@ -79,7 +91,8 @@ public final class ExportSheetSession {
                     Frame owner, ExportSheet.Request initial) {
                 java.util.List<ExportSheet.Request> chosen =
                         new java.util.ArrayList<>();
-                ExportSheetDialog.open(owner, initial, chosen::add, said);
+                ExportSheetDialog.open(owner, initial, chosen::add, said,
+                        emphasisActive.getAsBoolean());
                 return chosen.stream().findFirst();
             }
 
@@ -120,8 +133,8 @@ public final class ExportSheetSession {
                             ChartOptionsController options,
                             WorkingSelection working,
                             juranometria.ui.language.InterfaceText said) {
-        open(owner, navigation, chart, options, working, onScreen(said),
-                said);
+        open(owner, navigation, chart, options, working,
+                onScreen(said, () -> chart.emphasized() != null), said);
     }
 
     /** The same route, asking through whatever surfaces it is given. */
@@ -157,6 +170,12 @@ public final class ExportSheetSession {
                                         WorkingSelection working,
                                         ExportSheet.ReplaceDecision replace,
                                         juranometria.ui.language.InterfaceText said) {
+        // The structure carried is the one the screen holds at this
+        // moment, and only for a request that explicitly asked; an
+        // ordinary export is canonical whatever the screen shows
+        // (#361). No preference is stored anywhere on this path.
+        juranometria.render.ChartStructure emphasized =
+                request.includeEmphasis() ? chart.emphasized() : null;
         return ExportSheet.write(
                 // The chart's own assembler, not the application's.
                 // They were the same object until a reader could
@@ -166,12 +185,12 @@ public final class ExportSheetSession {
                 // remembering to agree (#348).
                 chart.assembler()::assemble,
                 navigation.state(), options.options(),
-                SheetInk.reference(chart),
+                SheetInk.reference(chart, emphasized),
                 request.workingSelection()
                         ? SheetInk.working(chart, working.members(),
                                 working.lead(), options.options())
                         : ChartRenderer.ReferenceLayer.NONE,
-                request, destination, replace, said);
+                request, destination, replace, said, emphasized);
     }
 
     /**

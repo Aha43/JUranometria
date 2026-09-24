@@ -26,7 +26,7 @@ import juranometria.render.ChartOptions;
  * not be checked.
  */
 public record SheetMetadata(String title, String description,
-                            String producedBy) {
+                            String producedBy, String emphasis) {
 
     public SheetMetadata {
         if (title == null || title.isBlank()
@@ -38,12 +38,32 @@ public record SheetMetadata(String title, String description,
         }
     }
 
+    /**
+     * The ordinary sheet: no emphasis recorded, which is every sheet
+     * the atlas wrote before #361 and every sheet a reader exports
+     * without asking for the screen's emphasis.
+     */
+    public SheetMetadata(String title, String description,
+                         String producedBy) {
+        this(title, description, producedBy, null);
+    }
+
     static SheetMetadata of(ChartScene scene, ChartViewState state,
                             ChartOptions options, PaperSize paper,
                             juranometria.project.PageWords words) {
         return of(juranometria.project.DrawnPage.of(scene),
                 state.fieldWidthDegrees(), state.limitingMagnitude(),
                 options, paper, words);
+    }
+
+    /**
+     * The same statement, recording the semantic structure an
+     * explicitly emphasized export carries (#361): a stable token,
+     * not prose, so the record survives any interface language, and
+     * absent entirely from an ordinary sheet.
+     */
+    public SheetMetadata withEmphasis(String token) {
+        return new SheetMetadata(title, description, producedBy, token);
     }
 
     /**

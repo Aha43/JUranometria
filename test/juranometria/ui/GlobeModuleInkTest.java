@@ -46,6 +46,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class GlobeModuleInkTest {
 
+    /** English, stated: a test says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
+
     private static final int SIDE_PX = 900;
 
     /**
@@ -143,7 +149,8 @@ class GlobeModuleInkTest {
             Ellipse2D disc = limbOf(page);
             for (ReferenceInk.NamePlacement placed
                     : ReferenceInk.namePlacements(page,
-                            modules().collect())) {
+                            modules().collect(), ENGLISH,
+                            java.util.List.of())) {
                 written++;
                 assertTrue(disc.contains(placed.box()),
                         placed.name() + " is written at "
@@ -166,7 +173,7 @@ class GlobeModuleInkTest {
         DrawnPage page = globe(HORIZON_SOUTH);
         Ellipse2D disc = limbOf(page);
         List<ReferenceInk.NamePlacement> placed =
-                ReferenceInk.namePlacements(page, modules().collect());
+                ReferenceInk.namePlacements(page, modules().collect(), ENGLISH, java.util.List.of());
         assertTrue(!placed.isEmpty(),
                 "this page carries a reference name");
         for (ReferenceInk.NamePlacement each : placed) {
@@ -194,7 +201,8 @@ class GlobeModuleInkTest {
             DrawnPage page = globe(centre);
             var contributions = modules().collect();
             for (ReferenceInk.NamePlacement placed
-                    : ReferenceInk.namePlacements(page, contributions)) {
+                    : ReferenceInk.namePlacements(page, contributions,
+                            ENGLISH, java.util.List.of())) {
                 Double own = null;
                 double nearestOther = Double.MAX_VALUE;
                 String rival = "-";
@@ -296,7 +304,8 @@ class GlobeModuleInkTest {
                     SIDE_PX, SIDE_PX);
             for (ReferenceInk.NamePlacement placed
                     : ReferenceInk.namePlacements(page,
-                            modules().collect())) {
+                            modules().collect(), ENGLISH,
+                            java.util.List.of())) {
                 assertTrue(paper.contains(placed.box()),
                         field + " degrees: " + placed.name()
                                 + " is on the paper, as it always was");
@@ -313,7 +322,8 @@ class GlobeModuleInkTest {
             g.setColor(java.awt.Color.WHITE);
             g.fillRect(0, 0, SIDE_PX, SIDE_PX);
             ReferenceInk.paint(g, page, modules().collect(),
-                    ChartPalette.WHITE_PAPER);
+                    ChartPalette.WHITE_PAPER, ENGLISH,
+                    java.util.List.of());
         } finally {
             g.dispose();
         }

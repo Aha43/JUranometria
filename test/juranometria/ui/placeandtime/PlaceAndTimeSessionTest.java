@@ -102,9 +102,10 @@ class PlaceAndTimeSessionTest {
         assertEquals(0, chart.overlays().collect().size(),
                 "quiet at first, and registered: nothing to ink yet");
         module.showing(true, true, true);
-        assertEquals(3, chart.overlays().collect().size(),
+        assertEquals(7, chart.overlays().collect().size(),
                 "showing reaches the chart, so the module was really"
-                        + " attached");
+                        + " attached: the three lines, and the shown"
+                        + " horizon's four cardinal landmarks (#359)");
         module.detach();
         assertEquals(0, chart.overlays().collect().size(),
                 "and detach withdraws it");

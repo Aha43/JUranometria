@@ -126,8 +126,8 @@ never near. The distinction is in the footnote under the table.
 
 | text family | grid | boundary | figure | const. name | reference | dso symbol | star disc | star label | dso label | ring | title | key |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| const. name | 155 | 72 | 200 | — | 2 | 6 | 62 | 8 | · | · | 6 | · |
-| star label | 221 | 162 | 239 | 8 | 6 | 15 | 32 | — | · | · | 22 | · |
+| const. name | 148 | 71 | 194 | — | 2 | 6 | 60 | 9 | · | · | 17 | · |
+| star label | 218 | 161 | 237 | 9 | 6 | 15 | 32 | — | · | · | 23 | · |
 | dso label | 94 | 17 | 6 | · | 15 | 5 | 7 | · | — | · | · | · |
 
 A dot is no collision anywhere in the corpus. Since #314 one decision places
@@ -166,28 +166,28 @@ the migration section, and the two are different questions.
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `home` | 3 | 3 | 0 | 2 | 0 | 146 | 0 | 0.00 |
 | `orion-08` | 12 | 12 | 6 | 8 | 55 | 88 | 13 | 1.00 |
-| `orion-18` | 15 | 19 | 10 | 23 | 117 | 261 | 20 | 1.00 |
+| `orion-18` | 15 | 19 | 11 | 23 | 147 | 261 | 30 | 1.00 |
 | `orion-36` | 17 | 17 | 23 | 32 | 235 | 348 | 25 | 0.98 |
 | `orion-42` | 24 | 24 | 31 | 69 | 323 | 685 | 29 | 1.20 |
 | `orion-60` | 41 | 39 | 32 | 51 | 467 | 913 | 55 | 0.96 |
-| `orion-90` | 100 | 96 | 54 | 63 | 830 | 1371 | 62 | 1.00 |
-| `orion-120` | 175 | 174 | 128 | 169 | 2216 | 3438 | 70 | 1.00 |
-| `sagittarius-90` | 97 | 88 | 83 | 84 | 1016 | 1091 | 95 | 0.94 |
-| `sagittarius-120` | 122 | 106 | 126 | 147 | 2075 | 2516 | 97 | 1.04 |
-| `cygnus-90` | 57 | 54 | 54 | 69 | 677 | 1315 | 73 | 1.00 |
-| `crux-90` | 78 | 74 | 79 | 74 | 1082 | 1319 | 61 | 1.00 |
-| `pole-120` | 119 | 95 | 88 | 114 | 1232 | 2545 | 93 | 1.00 |
-| `seam-120` | 145 | 101 | 77 | 91 | 1320 | 1442 | 94 | 0.95 |
-| `orion-120-small` | 197 | 195 | 105 | 263 | 1761 | 3414 | 65 | 1.12 |
-| `orion-42-a4` | 21 | 21 | 26 | 63 | 251 | 610 | 29 | 1.00 |
-| `orion-42-letter` | 21 | 24 | 37 | 84 | 293 | 821 | 19 | 1.00 |
-| `orion-90-black` | 100 | 96 | 54 | 63 | 830 | 1365 | 62 | 1.00 |
-| `sagittarius-90-key` | 96 | 87 | 83 | 84 | 1016 | 1091 | 95 | 0.94 |
-| `sagittarius-90-ecliptic` | 97 | 88 | 101 | 102 | 1626 | 1701 | 95 | 1.06 |
-| `orion-90-observer` | 100 | 96 | 59 | 68 | 892 | 1440 | 62 | 1.06 |
-| `nunki-searched` | 94 | 83 | 86 | 81 | 1189 | 1100 | 54 | 0.94 |
-| `orion-18-selected` | 15 | 19 | 10 | 23 | 117 | 261 | 20 | 1.00 |
-| **all 23 pages** | | | **1352** | **1827** | **19620** | **29281** | | **1.20** |
+| `orion-90` | 99 | 96 | 55 | 63 | 888 | 1371 | 98 | 1.00 |
+| `orion-120` | 173 | 174 | 121 | 169 | 2116 | 3438 | 70 | 1.00 |
+| `sagittarius-90` | 97 | 88 | 82 | 84 | 1006 | 1091 | 95 | 0.94 |
+| `sagittarius-120` | 122 | 106 | 129 | 147 | 2118 | 2516 | 97 | 1.04 |
+| `cygnus-90` | 57 | 54 | 53 | 69 | 726 | 1315 | 73 | 1.00 |
+| `crux-90` | 78 | 74 | 81 | 74 | 1118 | 1319 | 61 | 1.00 |
+| `pole-120` | 116 | 95 | 87 | 114 | 1270 | 2545 | 106 | 1.00 |
+| `seam-120` | 143 | 101 | 73 | 91 | 1215 | 1442 | 94 | 0.95 |
+| `orion-120-small` | 197 | 195 | 104 | 263 | 1907 | 3414 | 86 | 1.07 |
+| `orion-42-a4` | 21 | 21 | 27 | 63 | 296 | 610 | 45 | 1.00 |
+| `orion-42-letter` | 20 | 24 | 36 | 84 | 290 | 821 | 19 | 1.00 |
+| `orion-90-black` | 99 | 96 | 55 | 63 | 887 | 1365 | 97 | 1.00 |
+| `sagittarius-90-key` | 96 | 87 | 82 | 84 | 1006 | 1091 | 95 | 0.94 |
+| `sagittarius-90-ecliptic` | 97 | 88 | 100 | 102 | 1616 | 1701 | 95 | 1.06 |
+| `orion-90-observer` | 99 | 96 | 60 | 68 | 950 | 1440 | 98 | 1.06 |
+| `nunki-searched` | 93 | 83 | 84 | 81 | 1203 | 1100 | 54 | 0.94 |
+| `orion-18-selected` | 15 | 19 | 11 | 23 | 147 | 261 | 30 | 1.00 |
+| **all 23 pages** | | | **1343** | **1827** | **19986** | **29281** | | **1.20** |
 
 The collision measure does not depend on who is on top: each participant's ink is
 measured with the other absent, and the collision is the intersection. Which of the
@@ -210,25 +210,25 @@ grid and reference notation lighter still.
 
 | what covers what | how often | pixels |
 |---|---:|---:|
-| star label over figure | 239 | 2721 |
-| star label over grid | 221 | 3184 |
-| const. name over figure | 200 | 3700 |
-| star label over boundary | 162 | 1650 |
-| const. name over grid | 155 | 3220 |
+| star label over figure | 237 | 2725 |
+| star label over grid | 218 | 3137 |
+| const. name over figure | 194 | 3493 |
+| star label over boundary | 161 | 1655 |
+| const. name over grid | 148 | 2923 |
 | dso label over grid | 94 | 1133 |
-| const. name over boundary | 72 | 1037 |
-| star disc over const. name | 62 | 677 |
+| const. name over boundary | 71 | 1032 |
+| star disc over const. name | 60 | 683 |
 | star label over star disc | 32 | 264 |
-| title over star label | 22 | 741 |
+| title over star label | 23 | 777 |
 | dso label over boundary | 17 | 121 |
+| title over const. name | 17 | 899 |
 | dso label over reference | 15 | 526 |
 | star label over dso symbol | 15 | 125 |
-| star label over const. name | 8 | 111 |
+| star label over const. name | 9 | 145 |
 | dso label over star disc | 7 | 51 |
 | dso label over figure | 6 | 22 |
 | dso symbol over const. name | 6 | 72 |
 | star label over reference | 6 | 61 |
-| title over const. name | 6 | 62 |
 | dso label over dso symbol | 5 | 57 |
 | reference over const. name | 2 | 85 |
 
@@ -250,7 +250,7 @@ else rather than folded into a total that a hairline crossing could dominate.
 | `sagittarius-90` | 1 | 2 | 0 | 5 | excluded |
 | `sagittarius-120` | 2 | 9 | 0 | 14 | excluded |
 | `cygnus-90` | 0 | 5 | 0 | 2 | excluded |
-| `crux-90` | 0 | 2 | 0 | 7 | excluded |
+| `crux-90` | 1 | 2 | 0 | 7 | excluded |
 | `pole-120` | 0 | 3 | 0 | 11 | excluded |
 | `seam-120` | 0 | 2 | 0 | 3 | excluded |
 | `orion-120-small` | 0 | 5 | 2 | 23 | excluded |
@@ -262,7 +262,7 @@ else rather than folded into a total that a hairline crossing could dominate.
 | `orion-90-observer` | 0 | 4 | 0 | 7 | excluded |
 | `nunki-searched` | 2 | 3 | 1 | 4 | excluded |
 | `orion-18-selected` | 0 | 0 | 0 | 7 | excluded |
-| **all pages** | **8** | **56** | **32** | **252** | |
+| **all pages** | **9** | **56** | **32** | **252** | |
 
 The last column says what is deliberately not counted: a star's own disc, which its
 name is anchored beside by decision. Counting it would bury the defect the owner
@@ -272,7 +272,7 @@ the page.
 A constellation name is also covered by star **discs**, which is the same defect
 with the layers the other way up: the name is drawn during the geography pass
 and every mark on the page is drawn after it. Over the corpus that pair went from
-228 to 62 when the families migrated, and what is left of it is the
+228 to 60 when the families migrated, and what is left of it is the
 fallback: a name whose figure leaves it nowhere free takes the least bad of its own
 candidates rather than leaving the constellation unnamed.
 
@@ -361,30 +361,30 @@ marking its own work.
 | | greedy, star labels first, avoiding every line | 0 | 0 | 13 | 0 | 3 | 33 px | 177 |
 | | greedy, star labels first, keeping what it cannot place | 30 | 14 | 0 | 0 | 7 | 47 px | 126 |
 | | greedy, star labels first, least bad when nothing is free | 22 | 6 | 0 | 0 | 7 | 47 px | 126 |
-| `orion-90` | the atlas itself | 54 | 0 | — | — | — | — | — |
-| | greedy, star labels first | 45 | 0 | 39 | 0 | 28 | 87 px | 522 |
-| | greedy, constellation names first | 46 | 0 | 34 | 2 | 32 | 87 px | 512 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 63 | 0 | 29 | 90 px | 781 |
-| | greedy, star labels first, keeping what it cannot place | 195 | 3 | 0 | 3 | 29 | 87 px | 540 |
-| | greedy, star labels first, least bad when nothing is free | 62 | 1 | 0 | 2 | 28 | 87 px | 540 |
-| `orion-120` | the atlas itself | 128 | 0 | — | — | — | — | — |
-| | greedy, star labels first | 84 | 0 | 73 | 0 | 55 | 88 px | 967 |
-| | greedy, constellation names first | 84 | 0 | 75 | 24 | 52 | 88 px | 943 |
-| | greedy, star labels first, avoiding every line | 2 | 0 | 114 | 0 | 51 | 89 px | 1385 |
-| | greedy, star labels first, keeping what it cannot place | 117 | 10 | 0 | 5 | 56 | 88 px | 982 |
-| | greedy, star labels first, least bad when nothing is free | 429 | 2 | 0 | 5 | 48 | 88 px | 1011 |
-| `sagittarius-120` | the atlas itself | 126 | 12 | — | — | — | — | — |
-| | greedy, star labels first | 83 | 0 | 14 | 0 | 40 | 116 px | 422 |
-| | greedy, constellation names first | 86 | 0 | 11 | 0 | 45 | 90 px | 419 |
-| | greedy, star labels first, avoiding every line | 0 | 0 | 52 | 0 | 58 | 71 px | 887 |
-| | greedy, star labels first, keeping what it cannot place | 149 | 21 | 0 | 2 | 41 | 116 px | 433 |
-| | greedy, star labels first, least bad when nothing is free | 133 | 13 | 0 | 2 | 41 | 116 px | 432 |
-| `crux-90` | the atlas itself | 79 | 1 | — | — | — | — | — |
-| | greedy, star labels first | 71 | 0 | 4 | 0 | 24 | 92 px | 251 |
-| | greedy, constellation names first | 70 | 0 | 3 | 0 | 26 | 92 px | 230 |
+| `orion-90` | the atlas itself | 55 | 0 | — | — | — | — | — |
+| | greedy, star labels first | 45 | 0 | 39 | 0 | 28 | 87 px | 529 |
+| | greedy, constellation names first | 46 | 0 | 34 | 2 | 32 | 87 px | 519 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 63 | 0 | 28 | 90 px | 786 |
+| | greedy, star labels first, keeping what it cannot place | 196 | 3 | 0 | 4 | 29 | 87 px | 547 |
+| | greedy, star labels first, least bad when nothing is free | 64 | 1 | 0 | 3 | 28 | 87 px | 547 |
+| `orion-120` | the atlas itself | 121 | 0 | — | — | — | — | — |
+| | greedy, star labels first | 82 | 0 | 71 | 0 | 55 | 88 px | 972 |
+| | greedy, constellation names first | 82 | 0 | 73 | 24 | 52 | 88 px | 948 |
+| | greedy, star labels first, avoiding every line | 2 | 0 | 113 | 0 | 50 | 89 px | 1388 |
+| | greedy, star labels first, keeping what it cannot place | 112 | 10 | 0 | 7 | 56 | 88 px | 987 |
+| | greedy, star labels first, least bad when nothing is free | 424 | 2 | 0 | 7 | 48 | 88 px | 1016 |
+| `sagittarius-120` | the atlas itself | 129 | 13 | — | — | — | — | — |
+| | greedy, star labels first | 84 | 0 | 14 | 0 | 40 | 116 px | 424 |
+| | greedy, constellation names first | 87 | 0 | 11 | 0 | 45 | 90 px | 421 |
+| | greedy, star labels first, avoiding every line | 0 | 0 | 53 | 0 | 57 | 71 px | 902 |
+| | greedy, star labels first, keeping what it cannot place | 151 | 21 | 0 | 2 | 41 | 116 px | 435 |
+| | greedy, star labels first, least bad when nothing is free | 136 | 14 | 0 | 2 | 41 | 116 px | 434 |
+| `crux-90` | the atlas itself | 81 | 2 | — | — | — | — | — |
+| | greedy, star labels first | 72 | 0 | 4 | 0 | 25 | 92 px | 254 |
+| | greedy, constellation names first | 70 | 0 | 3 | 0 | 27 | 92 px | 233 |
 | | greedy, star labels first, avoiding every line | 0 | 0 | 30 | 0 | 34 | 73 px | 570 |
-| | greedy, star labels first, keeping what it cannot place | 83 | 2 | 0 | 2 | 24 | 92 px | 251 |
-| | greedy, star labels first, least bad when nothing is free | 83 | 1 | 0 | 2 | 24 | 92 px | 251 |
+| | greedy, star labels first, keeping what it cannot place | 84 | 2 | 0 | 2 | 25 | 92 px | 254 |
+| | greedy, star labels first, least bad when nothing is free | 84 | 1 | 0 | 2 | 25 | 92 px | 254 |
 
 "Of the two defects" counts only the owner's two: a constellation name and a
 star label sharing pixels either way up, and a star's name across another
@@ -429,14 +429,14 @@ it and without it:
 |  | free | 0 | 0 | 0 px | 0 | 0 | 1 |
 | `orion-36` | owned | 5 | 2 | 18 px | 0 | 1 | 22 |
 |  | free | 5 | 2 | 18 px | 1 | 2 | 26 |
-| `orion-90` | owned | 18 | 8 | 82 px | 0 | 8 | 62 |
-|  | free | 18 | 12 | 82 px | 5 | 9 | 57 |
-| `orion-120` | owned | 27 | 14 | 82 px | 0 | 12 | 429 |
-|  | free | 27 | 16 | 82 px | 6 | 13 | 426 |
-| `sagittarius-120` | owned | 30 | 14 | 73 px | 0 | 15 | 133 |
-|  | free | 30 | 17 | 92 px | 10 | 17 | 116 |
-| `crux-90` | owned | 27 | 11 | 57 px | 0 | 16 | 83 |
-|  | free | 27 | 15 | 62 px | 6 | 17 | 81 |
+| `orion-90` | owned | 18 | 8 | 82 px | 0 | 8 | 64 |
+|  | free | 18 | 11 | 82 px | 4 | 8 | 61 |
+| `orion-120` | owned | 27 | 14 | 82 px | 0 | 12 | 424 |
+|  | free | 27 | 15 | 82 px | 5 | 13 | 422 |
+| `sagittarius-120` | owned | 30 | 14 | 73 px | 0 | 15 | 136 |
+|  | free | 30 | 17 | 92 px | 10 | 17 | 117 |
+| `crux-90` | owned | 27 | 12 | 57 px | 0 | 17 | 84 |
+|  | free | 27 | 16 | 62 px | 6 | 18 | 82 |
 
 The rule the policy enforces is that a name's box **overlaps** the region its own
 figure owns. Overlap rather than "its centre is inside", because a figure can be
@@ -530,24 +530,24 @@ a loss and a gain.
 | `orion-36` | 18 | 16 | 4 | 12 | 66 px | 2 | 0 |
 | `orion-42` | 22 | 22 | 5 | 16 | 65 px | 1 | 1 |
 | `orion-60` | 33 | 35 | 22 | 9 | 83 px | 2 | 4 |
-| `orion-90` | 56 | 64 | 31 | 23 | 84 px | 2 | 10 |
+| `orion-90` | 56 | 64 | 30 | 24 | 84 px | 2 | 10 |
 | `orion-120` | 87 | 98 | 45 | 39 | 83 px | 3 | 14 |
 | `sagittarius-90` | 73 | 81 | 50 | 22 | 100 px | 1 | 9 |
 | `sagittarius-120` | 101 | 118 | 59 | 41 | 113 px | 1 | 18 |
-| `cygnus-90` | 52 | 54 | 32 | 19 | 80 px | 1 | 3 |
-| `crux-90` | 75 | 78 | 47 | 26 | 89 px | 2 | 5 |
+| `cygnus-90` | 52 | 54 | 30 | 21 | 80 px | 1 | 3 |
+| `crux-90` | 75 | 78 | 46 | 27 | 89 px | 2 | 5 |
 | `pole-120` | 86 | 91 | 50 | 33 | 76 px | 3 | 8 |
 | `seam-120` | 66 | 68 | 41 | 24 | 53 px | 1 | 3 |
-| `orion-120-small` | 72 | 89 | 28 | 41 | 83 px | 3 | 20 |
+| `orion-120-small` | 72 | 89 | 27 | 42 | 83 px | 3 | 20 |
 | `orion-42-a4` | 18 | 18 | 3 | 14 | 85 px | 1 | 1 |
-| `orion-42-letter` | 19 | 18 | 2 | 15 | 85 px | 2 | 1 |
-| `orion-90-black` | 56 | 64 | 31 | 23 | 84 px | 2 | 10 |
+| `orion-42-letter` | 19 | 18 | 3 | 14 | 85 px | 2 | 1 |
+| `orion-90-black` | 56 | 64 | 30 | 24 | 84 px | 2 | 10 |
 | `sagittarius-90-key` | 72 | 81 | 49 | 22 | 100 px | 1 | 10 |
 | `sagittarius-90-ecliptic` | 73 | 81 | 50 | 22 | 100 px | 1 | 9 |
-| `orion-90-observer` | 56 | 64 | 31 | 23 | 84 px | 2 | 10 |
-| `nunki-searched` | 69 | 79 | 42 | 27 | 100 px | 0 | 10 |
+| `orion-90-observer` | 56 | 64 | 30 | 24 | 84 px | 2 | 10 |
+| `nunki-searched` | 69 | 79 | 43 | 26 | 100 px | 0 | 10 |
 | `orion-18-selected` | 16 | 16 | 8 | 8 | 86 px | 0 | 0 |
-| **all pages** | **1152** | **1267** | **646** | **473** | **113 px** | **33** | **148** |
+| **all pages** | **1152** | **1267** | **641** | **478** | **113 px** | **33** | **148** |
 
 The atlas draws **115 more** pieces of text than it did, and the two directions
 are different things. What it stopped drawing is the clipping decision being
@@ -605,7 +605,7 @@ the same question, which is worth more than asking either of them twice.
 |---|---:|---:|---:|---:|---:|
 | `home` | 4 | 4 | 2 | 2 | 0 |
 | `orion-36` | 16 | 16 | 10 | 6 | 2 |
-| `orion-90` | 64 | 61 | 45 | 8 | 2 |
+| `orion-90` | 64 | 61 | 45 | 10 | 2 |
 | `orion-120` | 97 | 89 | 67 | 12 | 3 |
 | `sagittarius-120` | 118 | 113 | 86 | 14 | 1 |
 | `crux-90` | 78 | 76 | 53 | 4 | 2 |
@@ -647,24 +647,24 @@ the thing it names, which is the jump a reader notices.
 | `orion-36` | 16 | 2 | 13% | met | 8 |
 | `orion-42` | 20 | 5 | 25% | **over** | 8 |
 | `orion-60` | 35 | 3 | 9% | met | 15 |
-| `orion-90` | 63 | 7 | 11% | met | 16 |
-| `orion-120` | 96 | 13 | 14% | met | 29 |
+| `orion-90` | 63 | 6 | 10% | met | 16 |
+| `orion-120` | 96 | 14 | 15% | met | 28 |
 | `sagittarius-90` | 79 | 5 | 6% | met | 14 |
-| `sagittarius-120` | 116 | 18 | 16% | **over** | 21 |
+| `sagittarius-120` | 116 | 17 | 15% | met | 22 |
 | `cygnus-90` | 52 | 5 | 10% | met | 8 |
-| `crux-90` | 76 | 12 | 16% | **over** | 19 |
-| `pole-120` | 90 | 19 | 21% | **over** | 12 |
-| `seam-120` | 63 | 11 | 17% | **over** | 7 |
+| `crux-90` | 76 | 11 | 14% | met | 18 |
+| `pole-120` | 90 | 19 | 21% | **over** | 16 |
+| `seam-120` | 63 | 11 | 17% | **over** | 8 |
 | `orion-120-small` | 86 | 13 | 15% | **over** | 23 |
-| `orion-42-a4` | 18 | 3 | 17% | **over** | 7 |
+| `orion-42-a4` | 18 | 3 | 17% | **over** | 8 |
 | `orion-42-letter` | 18 | 5 | 28% | **over** | 4 |
-| `orion-90-black` | 63 | 7 | 11% | met | 16 |
+| `orion-90-black` | 63 | 6 | 10% | met | 16 |
 | `sagittarius-90-key` | 79 | 6 | 8% | met | 14 |
 | `sagittarius-90-ecliptic` | 79 | 5 | 6% | met | 14 |
-| `orion-90-observer` | 63 | 7 | 11% | met | 16 |
-| `nunki-searched` | 75 | 11 | 15% | met | 14 |
+| `orion-90-observer` | 63 | 6 | 10% | met | 16 |
+| `nunki-searched` | 75 | 10 | 13% | met | 14 |
 | `orion-18-selected` | 15 | 1 | 7% | met | 2 |
-| **all pages** | **1233** | **160** | **13%** | **met** | |
+| **all pages** | **1233** | **155** | **13%** | **met** | |
 
 Over the corpus the budget is met. On eleven pages it is not, and the two facts
 are not in tension: a page of eighteen labels moves five of them and reads as 28%,
@@ -675,12 +675,13 @@ the position it held on the first one:
 
 | what refused the position it had | labels |
 |---|---:|
-| a star's mark or a symbol | 44 |
-| another label, itself displaced or newly there | 21 |
-| nothing - it took an earlier candidate the pan had freed | 65 |
+| a star's mark or a symbol | 43 |
+| another label, itself displaced or newly there | 22 |
+| its own figure's region | 1 |
+| nothing - it took an earlier candidate the pan had freed | 55 |
 | the paper's edge | 20 |
-| the title block or the key | 10 |
-| **all** | **160** |
+| the title block or the key | 14 |
+| **all** | **155** |
 
 The largest group is not a collision at all: those labels moved to an **earlier**
 candidate that the pan had freed - a label going back to the side it prefers, as
@@ -704,10 +705,10 @@ orders, placed by the same pass and counted by the same rule as the table above:
 
 | candidate order | displaced by a pan | of |
 |---|---:|---:|
-| the gate's: east, west, then the diagonals | 160 | 1233 |
-| neighbours first | 166 | 1233 |
+| the gate's: east, west, then the diagonals | 155 | 1233 |
+| neighbours first | 164 | 1233 |
 
-Better on 3 pages, worse on 8, and no improvement over the corpus. The stated
+Better on 3 pages, worse on 9, and no improvement over the corpus. The stated
 order stands.
 
 So the budget is amended rather than met, with the measurement above as its
@@ -728,10 +729,10 @@ on every machine. The budget is a tenth.
 |---|---:|---:|---:|---:|---:|---:|---|
 | `home` | 5 | 56 | 280 | 66 | 13 | 23.6% | **over** |
 | `orion-36` | 18 | 1566 | 28188 | 1561 | 86 | 5.5% | met |
-| `orion-90` | 66 | 174 | 11484 | 503 | 7 | 4.4% | met |
-| `orion-120` | 101 | 249 | 25149 | 828 | 8 | 3.3% | met |
-| `sagittarius-120` | 119 | 271 | 32249 | 976 | 8 | 3.0% | met |
-| `crux-90` | 80 | 166 | 13280 | 228 | 2 | 1.7% | met |
+| `orion-90` | 66 | 174 | 11484 | 545 | 8 | 4.7% | met |
+| `orion-120` | 101 | 249 | 25149 | 838 | 8 | 3.3% | met |
+| `sagittarius-120` | 119 | 271 | 32249 | 988 | 8 | 3.1% | met |
+| `crux-90` | 80 | 166 | 13280 | 232 | 2 | 1.7% | met |
 
 The index is a uniform grid of 64-pixel cells: a candidate box asks the cells it
 covers and nothing else, so a label at the top of the page never hears about a
@@ -771,7 +772,7 @@ must not get worse.
 
 ## What this cost to measure
 
-23 pages and 16829 painted renders for the census alone. Every collision in this
+23 pages and 16789 painted renders for the census alone. Every collision in this
 document is one of those renders differenced against another, which is what a
 collision nobody can dispute costs.
 

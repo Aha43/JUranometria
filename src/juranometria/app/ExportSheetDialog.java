@@ -49,12 +49,20 @@ public final class ExportSheetDialog extends JDialog {
     public static final String PAPER_BOX = "export.paper";
     public static final String RESOLUTION_BOX = "export.resolution";
     public static final String WORKING_BOX = "export.working";
+    public static final String EMPHASIS_BOX = "export.emphasis";
     public static final String EXPORT_BUTTON = "export.confirm";
     public static final String CANCEL_BUTTON = "export.cancel";
 
     ExportSheetDialog(Frame owner, ExportSheet.Request initial,
                       Consumer<ExportSheet.Request> confirm,
                       juranometria.ui.language.InterfaceText said) {
+        this(owner, initial, confirm, said, false);
+    }
+
+    ExportSheetDialog(Frame owner, ExportSheet.Request initial,
+                      Consumer<ExportSheet.Request> confirm,
+                      juranometria.ui.language.InterfaceText said,
+                      boolean emphasisActive) {
         super(owner, said.say("export.title"), true);
         getAccessibleContext().setAccessibleName(said.say("export.a11y"));
         getAccessibleContext().setAccessibleDescription(
@@ -63,7 +71,7 @@ public final class ExportSheetDialog extends JDialog {
         setContentPane(content(initial, chosen -> {
             dispose();
             confirm.accept(chosen);
-        }, this::dispose, said));
+        }, this::dispose, said, emphasisActive));
         AboutDialog.installEscapeToClose(this);
         pack();
         setLocationRelativeTo(owner);
@@ -73,8 +81,22 @@ public final class ExportSheetDialog extends JDialog {
     public static void open(Frame owner, ExportSheet.Request initial,
                             Consumer<ExportSheet.Request> confirm,
                             juranometria.ui.language.InterfaceText said) {
-        new ExportSheetDialog(owner, initial, confirm, said)
-                .setVisible(true);
+        open(owner, initial, confirm, said, false);
+    }
+
+    /**
+     * The same, on a screen whose chart is currently emphasized
+     * (#361): the dialog then offers the explicit, unchecked choice
+     * to carry that emphasis onto paper. With no emphasis active the
+     * choice does not exist, and the dialog is the dialog it always
+     * was.
+     */
+    public static void open(Frame owner, ExportSheet.Request initial,
+                            Consumer<ExportSheet.Request> confirm,
+                            juranometria.ui.language.InterfaceText said,
+                            boolean emphasisActive) {
+        new ExportSheetDialog(owner, initial, confirm, said,
+                emphasisActive).setVisible(true);
     }
 
     /**
@@ -101,10 +123,30 @@ public final class ExportSheetDialog extends JDialog {
                 () -> { }, said);
     }
 
+    /**
+     * The surface an emphasized screen gets (#361), for the same
+     * audits: the dialog with the explicit choice present, actions
+     * that do nothing.
+     */
+    public static JComponent contentForStudy(
+            juranometria.ui.language.InterfaceText said,
+            boolean emphasisActive) {
+        return content(ExportSheetSession.defaults(), request -> { },
+                () -> { }, said, emphasisActive);
+    }
+
     static JComponent content(ExportSheet.Request initial,
                               Consumer<ExportSheet.Request> confirm,
                               Runnable cancel,
                               juranometria.ui.language.InterfaceText said) {
+        return content(initial, confirm, cancel, said, false);
+    }
+
+    static JComponent content(ExportSheet.Request initial,
+                              Consumer<ExportSheet.Request> confirm,
+                              Runnable cancel,
+                              juranometria.ui.language.InterfaceText said,
+                              boolean emphasisActive) {
         juranometria.ui.language.ExportText words =
                 juranometria.ui.language.ExportText.in(said);
         JComboBox<SheetFormat> format =
@@ -245,6 +287,31 @@ public final class ExportSheetDialog extends JDialog {
         at.fill = GridBagConstraints.NONE;
         fields.add(working, at);
 
+        // The explicit choice to carry the screen's emphasis onto
+        // paper (#361): present only while something is emphasized,
+        // never remembered, and off unless this reader turns it on
+        // for this export. Absent, the dialog is byte-identical to
+        // the dialog before the choice existed.
+        JCheckBox emphasis = null;
+        if (emphasisActive) {
+            emphasis = new JCheckBox();
+            emphasis.setText(juranometria.ui.WrappedText.html(
+                    said.say("export.includeEmphasis.label"), 260,
+                    working.getFontMetrics(working.getFont())));
+            emphasis.setName(EMPHASIS_BOX);
+            emphasis.setSelected(false);
+            emphasis.getAccessibleContext().setAccessibleName(
+                    said.say("export.includeEmphasis.a11y"));
+            juranometria.ui.Explain.selfExplanatory(emphasis,
+                    said.say("export.includeEmphasis.explain"));
+            at.gridx = 0;
+            at.gridy = 5;
+            at.gridwidth = 2;
+            at.fill = GridBagConstraints.NONE;
+            fields.add(emphasis, at);
+        }
+        JCheckBox includeEmphasis = emphasis;
+
         JButton export = new JButton(said.say("export.confirm.label"));
         export.setName(EXPORT_BUTTON);
         export.getAccessibleContext().setAccessibleName(
@@ -257,7 +324,9 @@ public final class ExportSheetDialog extends JDialog {
                         (SheetFormat) format.getSelectedItem(),
                         (PaperSize) paper.getSelectedItem(),
                         (Integer) resolution.getSelectedItem(),
-                        working.isSelected())));
+                        working.isSelected(),
+                        includeEmphasis != null
+                                && includeEmphasis.isSelected())));
 
         JButton cancelButton = new JButton(said.say("export.cancel.label"));
         cancelButton.setName(CANCEL_BUTTON);

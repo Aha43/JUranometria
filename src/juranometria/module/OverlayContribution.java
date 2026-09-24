@@ -2,6 +2,7 @@ package juranometria.module;
 
 import java.util.List;
 
+import juranometria.chart.Cardinal;
 import juranometria.chart.SkyPosition;
 
 /**
@@ -11,8 +12,11 @@ import juranometria.chart.SkyPosition;
  * Handing one out makes the chart a generic canvas, lets a module
  * invent cartography the atlas has not decided, and puts painting
  * policy in two places. So a module contributes typed geometry with
- * an {@link InkRole}, an identity for hit testing and an accessible
- * name - and the chart owns how each role is inked, in what order,
+ * an {@link InkRole}, an identity for hit testing and - where the
+ * geometry carries one - a reader-facing name; a variant whose words
+ * belong to the page's language, such as a cardinal direction,
+ * carries no name at all and is resolved by type where language
+ * lives. The chart owns how each role is inked, in what order,
  * and whether it appears in ordinary and reference rendering at all.
  *
  * <p>Positions are given in <strong>sky</strong> coordinates, not
@@ -27,8 +31,6 @@ public sealed interface OverlayContribution {
     /** Stable identity, so a reader can point at it. */
     String identity();
 
-    /** What a reader is told this is, in words. */
-    String accessibleName();
 
     /**
      * What a reference line <em>is</em>, so the chart can decide
@@ -187,6 +189,57 @@ public sealed interface OverlayContribution {
             }
             return Mark.PLACE;
         }
+    }
+
+    /**
+     * The observer's cardinal direction on the mathematical horizon
+     * (issue #359).
+     *
+     * <p>It carries the direction's identity and its exact sky
+     * position, and <strong>no words - not even an accessible
+     * name</strong>. This variant deliberately does not promise one:
+     * the drawn letter and the spoken name are the page's language -
+     * {@code PageWords.directionLetter} and {@code directionSpoken} -
+     * and the rendering and accessibility layer resolves the mark by
+     * type ({@code ReferenceInk.directionPlacements}), so every
+     * rendered direction carries both localized texts. A module that
+     * shipped an N would be choosing a language, which is not its to
+     * choose; a contract method that threw would make valid domain
+     * data unsafe to inspect (review).
+     *
+     * <p>The mark stays at this exact horizon point. Its letter may
+     * take one of a few adjacent boxes, but the mark itself is the
+     * direction and never moves to the frame or to a friendlier spot
+     * on the horizon; where no adjacent box is clean the whole
+     * landmark is omitted rather than left as an unexplained diamond.
+     * That rule is the chart's ({@code ReferenceInk}); what is stated
+     * here is only what the mark is.
+     */
+    record DirectionMark(Cardinal direction, SkyPosition at)
+            implements OverlayContribution {
+
+        public DirectionMark {
+            if (direction == null) {
+                throw new IllegalArgumentException(
+                        "a cardinal mark says which direction it is");
+            }
+            if (at == null) {
+                throw new IllegalArgumentException(
+                        "a cardinal mark is somewhere: "
+                                + direction.identity());
+            }
+        }
+
+        @Override
+        public InkRole role() {
+            return InkRole.REFERENCE_LINE;
+        }
+
+        @Override
+        public String identity() {
+            return direction.identity();
+        }
+
     }
 
     /** An open run of sky positions. */

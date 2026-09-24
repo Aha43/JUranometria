@@ -137,10 +137,19 @@ public final class PngSheetWriter {
         IIOMetadataNode root = new IIOMetadataNode(format);
         root.appendChild(physical);
         IIOMetadataNode text = new IIOMetadataNode("iTXt");
-        for (String[] said : new String[][] {
-                {"Title", about.title()},
-                {"Description", about.description()},
-                {"Software", about.producedBy()}}) {
+        // An explicitly emphasized export records its target (#361);
+        // an ordinary sheet carries no such entry.
+        String[][] entries = about.emphasis() == null
+                ? new String[][] {
+                        {"Title", about.title()},
+                        {"Description", about.description()},
+                        {"Software", about.producedBy()}}
+                : new String[][] {
+                        {"Title", about.title()},
+                        {"Description", about.description()},
+                        {"Software", about.producedBy()},
+                        {"Emphasis", about.emphasis()}};
+        for (String[] said : entries) {
             IIOMetadataNode entry = new IIOMetadataNode("iTXtEntry");
             entry.setAttribute("keyword", said[0]);
             entry.setAttribute("compressionFlag", "FALSE");

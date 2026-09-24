@@ -108,6 +108,27 @@ public final class ChartSheet {
                                         ChartRenderer.ReferenceLayer overChart,
                                         PaperSize paper,
                                         juranometria.project.PageWords words) {
+        return record(pages, state, options, reference, overChart, paper,
+                words, null);
+    }
+
+    /**
+     * The same, carrying the screen's emphasized structure onto the
+     * paper - only when the reader explicitly asked (#361). One
+     * recording is made, and every format writes it, so SVG, PDF
+     * and PNG cannot disagree about what was emphasized; the
+     * metadata records the semantic target as a stable token.
+     * {@code null} is the canonical sheet, by the same code path.
+     */
+    public static SheetRecording record(Pages pages,
+                                        ChartViewState state,
+                                        ChartOptions options,
+                                        ChartRenderer.ReferenceLayer reference,
+                                        ChartRenderer.ReferenceLayer overChart,
+                                        PaperSize paper,
+                                        juranometria.project.PageWords words,
+                                        juranometria.render.ChartStructure
+                                                emphasized) {
         if (pages == null || state == null || options == null
                 || paper == null || words == null) {
             throw new IllegalArgumentException(
@@ -157,13 +178,20 @@ public final class ChartSheet {
             // from it, so the pixels and the file's own description
             // cannot end up in different languages (#350).
             new ChartRenderer(StarSizePolicy.DEFAULT, words)
-                    .render(g, scene, onPaper, reference);
+                    .render(g, scene, onPaper, reference, null,
+                            emphasized);
             // After the chart, in the order the screen paints it.
-            overChart.paint(g, scene);
+            // Nothing is reserved against it: the reader's own marks
+            // belong OVER the finished chart, which is the whole of
+            // their contract.
+            overChart.paint(g, scene, java.util.List.of());
         } finally {
             g.dispose();
         }
+        SheetMetadata about =
+                SheetMetadata.of(scene, state, onPaper, paper, words);
         return new SheetRecording(recorder, paper, scene, onPaper,
-                SheetMetadata.of(scene, state, onPaper, paper, words));
+                emphasized == null ? about
+                        : about.withEmphasis(emphasized.token()));
     }
 }

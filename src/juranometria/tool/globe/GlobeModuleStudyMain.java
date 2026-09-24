@@ -39,6 +39,12 @@ import juranometria.ui.ReferenceInk;
  */
 public final class GlobeModuleStudyMain {
 
+    /** English, stated: a study says which language it renders (#350). */
+    private static final juranometria.project.PageWords ENGLISH =
+            juranometria.ui.language.PageText.in(
+                    juranometria.ui.language.InterfaceText
+                            .forLanguage("en"));
+
     private GlobeModuleStudyMain() {
     }
 
@@ -103,7 +109,8 @@ public final class GlobeModuleStudyMain {
             Beyond beyond = beyondTheLimb(onlyModules);
             List<ReferenceInk.NamePlacement> names =
                     ReferenceInk.namePlacements(page,
-                            registry.collect());
+                            registry.collect(), ENGLISH,
+                            java.util.List.of());
             System.out.printf(Locale.ROOT, "%-16s %-34s%n",
                     look.slug(),
                     String.format(Locale.ROOT, "RA %.1f, Dec %+.1f",
@@ -212,8 +219,10 @@ public final class GlobeModuleStudyMain {
         try {
             g.setColor(ChartPalette.WHITE_PAPER.ground());
             g.fillRect(0, 0, SIDE_PX, SIDE_PX);
+            // The study composes its own page with no sky text on
+            // it, so nothing is reserved.
             ReferenceInk.paint(g, page, registry.collect(),
-                    ChartPalette.WHITE_PAPER);
+                    ChartPalette.WHITE_PAPER, ENGLISH, List.of());
         } finally {
             g.dispose();
         }

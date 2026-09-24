@@ -107,20 +107,22 @@ class ChartModuleBoundaryTest {
         // gate added the great circle - a pole and a role, the one
         // geometry a straight-line reference needs and the one thing
         // a polyline could not express - and a count alone would not
-        // have said which of these had arrived.
+        // have said which of these had arrived. #359 added the
+        // direction mark: a cardinal identity at a sky position,
+        // typed geometry still, carrying no words of its own.
         assertEquals(java.util.List.of("GreatCircle", "Point", "Path",
-                        "Region"),
+                        "Region", "DirectionMark"),
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
                         .map(Class::getSimpleName).sorted(
                                 java.util.Comparator.comparingInt(
                                         java.util.List.of("GreatCircle",
-                                                "Point", "Path",
-                                                "Region")::indexOf))
+                                                "Point", "Path", "Region",
+                                                "DirectionMark")::indexOf))
                         .toList(),
-                "a great circle, a point, a path and a region - the"
-                        + " geometry a module may contribute, and"
-                        + " nothing else");
+                "a great circle, a point, a path, a region and a"
+                        + " direction mark - the geometry a module may"
+                        + " contribute, and nothing else");
     }
 
     @Test

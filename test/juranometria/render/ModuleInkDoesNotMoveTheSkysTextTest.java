@@ -59,7 +59,7 @@ class ModuleInkDoesNotMoveTheSkysTextTest {
 
         // A module's line and its name, laid across the middle of the
         // page where a dozen labels are - the worst case for the rule.
-        ChartRenderer.ReferenceLayer module = (g, drawn) -> {
+        ChartRenderer.ReferenceLayer module = (g, drawn, reserved) -> {
             g.setColor(MODULE_INK);
             g.setFont(ChartRenderer.labelFont());
             g.drawLine(0, 350, 900, 350);

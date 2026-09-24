@@ -130,10 +130,17 @@ public final class PdfSheetWriter {
         objects.add(latin(String.format(Locale.ROOT,
                 "<< /Length %d >>\nstream\n", stream.length)
                 + content + "endstream"));
+        // An explicitly emphasized export records its target as a
+        // keyword (#361); an ordinary sheet's info dictionary is
+        // byte-identical to every sheet before it.
+        String emphasisEntry = sheet.metadata().emphasis() == null ? ""
+                : " /Keywords " + pdfString(
+                        "emphasis:" + sheet.metadata().emphasis());
         objects.add(latin("<< /Type /Info /Producer "
                 + pdfString(sheet.metadata().producedBy()) + " /Title "
                 + pdfString(sheet.metadata().title()) + " /Subject "
-                + pdfString(sheet.metadata().description()) + " >>"));
+                + pdfString(sheet.metadata().description())
+                + emphasisEntry + " >>"));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(latin("%PDF-1.4\n"));

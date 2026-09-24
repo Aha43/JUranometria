@@ -31,13 +31,24 @@ public final class SheetInk {
      */
     public static ChartRenderer.ReferenceLayer reference(
             ChartComponent chart) {
+        return reference(chart, null);
+    }
+
+    /**
+     * The same ink, with the reader's explicitly exported emphasis
+     * (#361). {@code null} is the canonical layer by the same path.
+     */
+    public static ChartRenderer.ReferenceLayer reference(
+            ChartComponent chart,
+            juranometria.render.ChartStructure emphasized) {
         if (chart == null) {
             throw new IllegalArgumentException("a chart is required");
         }
         // Paper, always: the sheet has already replaced the ground,
         // and the ink has to match the ground it is on.
-        return (g, scene) -> ReferenceInk.paint(g, scene,
-                chart.overlays().collect(), ChartPalette.WHITE_PAPER);
+        return (g, scene, reserved) -> ReferenceInk.paint(g, scene,
+                chart.overlays().collect(), ChartPalette.WHITE_PAPER,
+                chart.words(), reserved, emphasized);
     }
 
     /**
@@ -65,7 +76,7 @@ public final class SheetInk {
         // The chart's own words, not a language of its own (#350).
         ChartRenderer renderer = new ChartRenderer(
                 juranometria.chart.StarSizePolicy.DEFAULT, chart.words());
-        return (g, scene) -> {
+        return (g, scene, reserved) -> {
             for (String member : members) {
                 renderer.drawSelectionHighlight(g, scene, onPaper, member);
             }

@@ -52,20 +52,20 @@ class PageTextTest {
      * this names the sentence.
      */
     @Test
-    void theEnglishIsWordForWordWhatTheAtlasHasAlwaysDrawn() {
+    void theEnglishIsWordForWordWhatTheAtlasDraws() {
         assertEquals("Centre 00h 42m 44s, +41° 16′ 09″ · ICRS J2000",
                 EN.titleCentre("00h 42m 44s", "+41° 16′ 09″"),
                 "the centre line of the title block");
-        assertEquals("Field 8.0° · Stars to V 8.0 · North up, east"
-                        + " left · gnomonic",
+        assertEquals("Field 8.0° · Stars to V 8.0 · Celestial north"
+                        + " up · celestial east left · gnomonic",
                 EN.titleFacts("8.0", "8.0", EN.projection("gnomonic")),
                 "and the facts line, with the projection at the end");
         assertEquals("Stars, visual magnitude", EN.magnitudeKeyHeading(),
                 "the heading over the magnitude key");
         assertEquals("M 31. Centre RA 10.6847, Dec +41.2687 (ICRS"
                         + " J2000). Field 8.0 degrees wide, gnomonic"
-                        + " projection. Stars to V 8.0. North up, east"
-                        + " left.",
+                        + " projection. Stars to V 8.0. Celestial north is"
+                        + " up, and celestial east is left.",
                 EN.spokenPage("M 31", "10.6847", "+41.2687", "8.0",
                         EN.projection("gnomonic"), "8.0", false),
                 "what a screen reader is told about an ordinary page");
@@ -140,6 +140,18 @@ class PageTextTest {
             @Override
             public String chartName() {
                 return EN.chartName();
+            }
+
+            @Override
+            public String directionLetter(
+                    juranometria.chart.Cardinal direction) {
+                return EN.directionLetter(direction);
+            }
+
+            @Override
+            public String directionSpoken(
+                    juranometria.chart.Cardinal direction) {
+                return EN.directionSpoken(direction);
             }
 
             @Override

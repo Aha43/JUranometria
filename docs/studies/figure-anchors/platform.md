@@ -22,15 +22,15 @@ that no endpoint is left without a node for a reader to see.
 
 | centre | field | endpoints on page | under the title block |
 |---|---:|---:|---:|
-| Orion | 42° | 41 | 2 |
-| Orion | 60° | 72 | 0 |
-| Orion | 90° | 120 | 6 |
-| Orion | 120° | 189 | 4 |
+| Orion | 42° | 41 | 3 |
+| Orion | 60° | 72 | 2 |
+| Orion | 90° | 120 | 7 |
+| Orion | 120° | 189 | 5 |
 | Sagittarius | 42° | 45 | 4 |
 | Sagittarius | 60° | 81 | 1 |
-| Sagittarius | 90° | 133 | 2 |
-| Sagittarius | 120° | 206 | 6 |
+| Sagittarius | 90° | 133 | 3 |
+| Sagittarius | 120° | 206 | 7 |
 | M31 | 42° | 27 | 1 |
 | M31 | 60° | 64 | 3 |
-| M31 | 90° | 118 | 4 |
+| M31 | 90° | 118 | 7 |
 | M31 | 120° | 179 | 3 |

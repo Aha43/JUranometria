@@ -112,8 +112,9 @@ class ProjectedCurveOnASheetTest {
         EclipticModule ecliptic = new EclipticModule();
         ecliptic.showing(permanentCircleShowing);
         registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
-        return (g, painted) -> ReferenceInk.paint(g, painted,
-                registry.collect(), ChartPalette.WHITE_PAPER);
+        return (g, painted, reserved) -> ReferenceInk.paint(g, painted,
+                registry.collect(), ChartPalette.WHITE_PAPER,
+                ENGLISH, reserved);
     }
 
     /** One whole production sheet of this rung, on A4. */

@@ -196,6 +196,17 @@ public final class MeridianModule implements ChartModule {
                     sky.horizon().pole(),
                     OverlayContribution.Reference.BOUNDARY,
                     InkRole.REFERENCE_LINE));
+            // The observer's N, E, S and W ride the horizon option
+            // (issue #359): the horizon is what they are directions
+            // ON, so they exist exactly while it does - off with the
+            // switch, gone with the detach, like everything above.
+            // No words here. The marks carry identity and position;
+            // the page's own language letters them.
+            for (juranometria.chart.Cardinal direction
+                    : juranometria.chart.Cardinal.values()) {
+                offered.add(new OverlayContribution.DirectionMark(
+                        direction, sky.cardinal(direction)));
+            }
         }
         if (zenithShowing) {
             offered.add(new OverlayContribution.Point(

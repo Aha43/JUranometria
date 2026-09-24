@@ -201,7 +201,10 @@ public final class ChartModuleHost implements ChartServices {
     public void redraw() {
         // Paint, and nothing else: no rebuild, so no catalogue query
         // and no inventory. What a module changed is its own
-        // geometry, which the chart pulls when it paints.
+        // geometry, which the chart pulls when it paints - and an
+        // emphasized structure the module just hid must settle now,
+        // not linger as an invisible mode (#361).
+        chart.revalidateEmphasis();
         chart.repaint();
     }
 
@@ -212,6 +215,9 @@ public final class ChartModuleHost implements ChartServices {
         chart.repaint();
         return () -> {
             withdraw.run();
+            // A detached module's structure cannot stay emphasized:
+            // the mode settles with the geometry (#361).
+            chart.revalidateEmphasis();
             chart.repaint();
         };
     }

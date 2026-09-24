@@ -34,7 +34,8 @@ public final class ExportSheet {
 
     /** What the reader chose, and what the chart was showing. */
     public record Request(SheetFormat format, PaperSize paper, int dpi,
-                          boolean workingSelection) {
+                          boolean workingSelection,
+                          boolean includeEmphasis) {
 
         public Request {
             if (format == null || paper == null) {
@@ -46,6 +47,16 @@ public final class ExportSheet {
                         "a resolution is a positive number of dots per"
                                 + " inch: " + dpi);
             }
+        }
+
+        /**
+         * The ordinary request: no emphasis carried onto paper,
+         * which is every export before #361 and every export where
+         * the reader leaves the choice unchecked.
+         */
+        public Request(SheetFormat format, PaperSize paper, int dpi,
+                       boolean workingSelection) {
+            this(format, paper, dpi, workingSelection, false);
         }
     }
 
@@ -131,7 +142,26 @@ public final class ExportSheet {
                                 ReplaceDecision replace,
                                 juranometria.ui.language.InterfaceText said) {
         return write(pages, state, options, ink, overChart, request,
-                destination, replace, SINK, said);
+                destination, replace, SINK, said, null);
+    }
+
+    /**
+     * The same, carrying the screen's emphasized structure - only
+     * for a request that asked for it, and only for the structure
+     * the screen holds at the moment of export (#361). {@code null}
+     * is the canonical sheet by the same path.
+     */
+    public static Outcome write(ChartSheet.Pages pages,
+                                ChartViewState state, ChartOptions options,
+                                ChartRenderer.ReferenceLayer ink,
+                                ChartRenderer.ReferenceLayer overChart,
+                                Request request, File destination,
+                                ReplaceDecision replace,
+                                juranometria.ui.language.InterfaceText said,
+                                juranometria.render.ChartStructure
+                                        emphasized) {
+        return write(pages, state, options, ink, overChart, request,
+                destination, replace, SINK, said, emphasized);
     }
 
     /** The same, writing however it is told to - a seam for tests. */
@@ -142,6 +172,19 @@ public final class ExportSheet {
                          Request request, File destination,
                          ReplaceDecision replace, ByteSink sink,
                          juranometria.ui.language.InterfaceText said) {
+        return write(pages, state, options, ink, overChart, request,
+                destination, replace, sink, said, null);
+    }
+
+    /** The deepest seam, with the emphasized structure stated. */
+    static Outcome write(ChartSheet.Pages pages,
+                         ChartViewState state, ChartOptions options,
+                         ChartRenderer.ReferenceLayer ink,
+                         ChartRenderer.ReferenceLayer overChart,
+                         Request request, File destination,
+                         ReplaceDecision replace, ByteSink sink,
+                         juranometria.ui.language.InterfaceText said,
+                         juranometria.render.ChartStructure emphasized) {
         if (destination == null) {
             return new Outcome.Refused(said.say("export.refused.nofile"));
         }
@@ -198,7 +241,8 @@ public final class ExportSheet {
             // what the screen said (#349, #350).
             SheetRecording sheet = ChartSheet.record(pages, state, options,
                     ink, overChart, request.paper(),
-                    juranometria.ui.language.PageText.in(said));
+                    juranometria.ui.language.PageText.in(said),
+                    emphasized);
             bytes = SheetWriters.write(sheet, request.format(),
                     request.dpi());
         } catch (IOException | RuntimeException failure) {

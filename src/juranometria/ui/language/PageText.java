@@ -94,6 +94,20 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String directionLetter(juranometria.chart.Cardinal direction) {
+        return said.say("direction."
+                + direction.name().toLowerCase(java.util.Locale.ROOT)
+                + ".letter");
+    }
+
+    @Override
+    public String directionSpoken(juranometria.chart.Cardinal direction) {
+        return said.say("direction."
+                + direction.name().toLowerCase(java.util.Locale.ROOT)
+                + ".spoken");
+    }
+
+    @Override
     public String sheetTitle(String application, String subject) {
         return said.say(STEM + "sheet.title", application, subject);
     }
