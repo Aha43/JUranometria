@@ -22,9 +22,18 @@ carries the centres the modules were asked at and why the sky's own labels
 cannot be moved by any of it.
 
 centred on       ink inside ink beyond  furthest     names
-zenith-overhead        7625         43    1.0009         1
+zenith-overhead        6197         43    1.0009         2
+    ecliptic       Ecliptic                 inside the disc
     meridian       Meridian                 inside the disc
-horizon-south          7811          1    1.0004         1
+horizon-south          5850          0    0.9996         3
+    ecliptic       Ecliptic                 inside the disc
     meridian       Mathematical horizon     inside the disc
-ecliptic-high          9889          2    1.0002         0
-sagittarius           10666         13    1.0005         0
+    meridian       Meridian                 inside the disc
+ecliptic-high          6717          0    0.9998         3
+    ecliptic       Ecliptic                 inside the disc
+    meridian       Mathematical horizon     inside the disc
+    meridian       Meridian                 inside the disc
+sagittarius            6721          8    1.0004         3
+    ecliptic       Ecliptic                 inside the disc
+    meridian       Mathematical horizon     inside the disc
+    meridian       Meridian                 inside the disc
