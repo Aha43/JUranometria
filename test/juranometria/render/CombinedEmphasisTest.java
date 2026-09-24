@@ -146,7 +146,8 @@ class CombinedEmphasisTest {
             SheetRecording one = ChartSheet.record(
                     Atlas.assembler()::assemble, state,
                     ChartOptions.DEFAULTS,
-                    (g, scene, reserved) -> ReferenceInk.paint(g, scene,
+                    (g, scene, reserved) -> ReferenceInk.paint(g,
+                            juranometria.project.DrawnPage.of(scene),
                             modules, ChartPalette.WHITE_PAPER, ENGLISH,
                             reserved, target),
                     ChartRenderer.ReferenceLayer.NONE, PaperSize.A4,
@@ -199,8 +200,10 @@ class CombinedEmphasisTest {
         try {
             RENDERER.render(g, scene, options,
                     (layerG, painted, reserved) -> ReferenceInk.paint(
-                            layerG, painted, modules, options.palette(),
-                            ENGLISH, reserved, target),
+                            layerG,
+                            juranometria.project.DrawnPage.of(painted),
+                            modules, options.palette(), ENGLISH, reserved,
+                            target),
                     null, target);
         } finally {
             g.dispose();

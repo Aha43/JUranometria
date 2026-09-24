@@ -121,8 +121,8 @@ public final class ReferenceInk {
                       juranometria.render.ChartPalette palette,
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved) {
-        return paint(g, DrawnPage.of(scene), contributions, palette,
-                words, reserved, structure -> false);
+        return paint(g, scene, contributions, palette, words, reserved,
+                null);
     }
 
     /** The same page with structures emphasized (#361). */
@@ -133,18 +133,6 @@ public final class ReferenceInk {
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved,
                       java.util.Set<juranometria.render.ChartStructure> emphasized) {
-        return paint(g, DrawnPage.of(scene), contributions, palette,
-                words, reserved, emphasized);
-    }
-
-    /** The released one-target form (#361); {@code null} is canonical. */
-    public static List<DirectionPlacement> paint(Graphics2D g,
-                      ChartScene scene,
-                      List<OverlayRegistry.Owned> contributions,
-                      juranometria.render.ChartPalette palette,
-                      juranometria.project.PageWords words,
-                      List<java.awt.Shape> reserved,
-                      juranometria.render.ChartStructure emphasized) {
         return paint(g, DrawnPage.of(scene), contributions, palette,
                 words, reserved, emphasized);
     }
