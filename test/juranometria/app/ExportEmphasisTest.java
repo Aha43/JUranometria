@@ -113,6 +113,39 @@ class ExportEmphasisTest {
     }
 
     @Test
+    void aCombinationExportCarriesEveryTokenInEnumOrder()
+            throws Exception {
+        // The reader raised the figures first, then the grid; the
+        // paper still names them in the enum's one order, however
+        // the choosing went.
+        SheetRecording emphasized = ChartSheet.record(
+                Atlas.assembler()::assemble, ChartViewState.DEFAULT,
+                ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH,
+                java.util.Set.of(ChartStructure.CONSTELLATION_FIGURES,
+                        ChartStructure.EQUATORIAL_GRID));
+        String joined = "equatorial-grid+constellation-figures";
+        assertEquals(joined, emphasized.metadata().emphasis(),
+                "the recording names every active structure, in enum"
+                        + " order");
+
+        // One deterministic representation across the three formats.
+        String svg = new String(SheetWriters.write(emphasized,
+                SheetFormat.SVG, 300), StandardCharsets.UTF_8);
+        assertTrue(svg.contains(
+                        "<metadata>emphasis:" + joined + "</metadata>"),
+                "SVG records the whole set");
+        String pdf = new String(SheetWriters.write(emphasized,
+                SheetFormat.PDF, 300), StandardCharsets.ISO_8859_1);
+        assertTrue(pdf.contains("/Keywords (emphasis:" + joined + ")"),
+                "PDF records the whole set");
+        String png = new String(SheetWriters.write(emphasized,
+                SheetFormat.PNG, 300), StandardCharsets.ISO_8859_1);
+        assertTrue(png.contains("Emphasis") && png.contains(joined),
+                "PNG records the whole set");
+    }
+
+    @Test
     void theEmphasizedSheetDiffersOnlyBecauseOfItsInk() throws Exception {
         // The pixels: an emphasized PNG is not the canonical PNG,
         // which is what makes the explicit choice mean something.
