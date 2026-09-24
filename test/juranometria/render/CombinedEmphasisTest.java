@@ -1,9 +1,6 @@
 package juranometria.render;
 
 import java.awt.image.BufferedImage;
-import java.security.MessageDigest;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,6 +16,7 @@ import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
 import juranometria.sheet.ChartSheet;
 import juranometria.sheet.PaperSize;
+import juranometria.sheet.SheetRecording;
 import juranometria.sheet.SheetFormat;
 import juranometria.sheet.SheetWriters;
 import juranometria.ui.ReferenceInk;
@@ -31,10 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * one-target behaviour is unmoved (the multiple-emphasis follow-up
  * to #361).
  *
- * <p>Two halves. The first half pins the released behaviour: every
- * singleton page and the one-target export bytes, fingerprinted on
- * the released chart before this change, must reproduce exactly
- * through the set-shaped seam. The second half is the ruled
+ * <p>Two halves. The first half holds the released one-target
+ * route and the one-member set route equal on whatever runtime runs
+ * it - every singleton page, and every singleton export in all three
+ * formats - with each route deciding membership its own way. The
+ * second half is the ruled
  * combination contract: away from crossings each emphasized
  * structure reproduces its singleton pixels exactly; a combination
  * introduces no changed region outside the singleton changes and
@@ -62,66 +61,6 @@ class CombinedEmphasisTest {
      */
     private static final int ENVELOPE = 2;
 
-    // ---- the released fingerprints, captured on main 3176d93 -------
-
-    private static final Map<String, String> RELEASED = Map.ofEntries(
-            Map.entry("orion-42|white-paper|meridian",
-                    "94ce86d9813221fd7dbbcaf615630b29ff11a0cecfa9d83005edec900c7073c8"),
-            Map.entry("orion-42|white-paper|ecliptic",
-                    "94ce86d9813221fd7dbbcaf615630b29ff11a0cecfa9d83005edec900c7073c8"),
-            Map.entry("orion-42|white-paper|equatorial-grid",
-                    "fd5cf22427631991dabc0158b7684bf20f8c1dcbc6b30c30ff33abbaba73be0e"),
-            Map.entry("orion-42|white-paper|horizon",
-                    "94ce86d9813221fd7dbbcaf615630b29ff11a0cecfa9d83005edec900c7073c8"),
-            Map.entry("orion-42|white-paper|constellation-boundaries",
-                    "f053b8041a12389ca8916a713c8fe4044f54408ea1aa920241589681b9bbf226"),
-            Map.entry("orion-42|white-paper|constellation-figures",
-                    "c3b6640aab037794db2710ebca9c0e41eff363f36be96e28e324ddafe36feb96"),
-            Map.entry("orion-42|black-sky|meridian",
-                    "776b45fb23965f1f1b1c5bca3d0b0c2e849e376ca11e4fe9dd2fb0aa2d701d73"),
-            Map.entry("orion-42|black-sky|ecliptic",
-                    "776b45fb23965f1f1b1c5bca3d0b0c2e849e376ca11e4fe9dd2fb0aa2d701d73"),
-            Map.entry("orion-42|black-sky|equatorial-grid",
-                    "4a9563aa8df4d4de109b241ba76a2f73f587aeefb73cb16f30a5ea4d805f5a91"),
-            Map.entry("orion-42|black-sky|horizon",
-                    "776b45fb23965f1f1b1c5bca3d0b0c2e849e376ca11e4fe9dd2fb0aa2d701d73"),
-            Map.entry("orion-42|black-sky|constellation-boundaries",
-                    "d00bc436091935b1da7a0e8983357b4e9c05a89dea80408d9c094c8903a8b2f0"),
-            Map.entry("orion-42|black-sky|constellation-figures",
-                    "ffbe55b2b49c1fbef5b500b05784de95cdb66fe346c7e1e217be977a5b2beb77"),
-            Map.entry("sagittarius-120|white-paper|meridian",
-                    "2a84eb0a49cc512c3fc919b2f2dc518df02b80ac865eaa699109c38c248717d4"),
-            Map.entry("sagittarius-120|white-paper|ecliptic",
-                    "2a84eb0a49cc512c3fc919b2f2dc518df02b80ac865eaa699109c38c248717d4"),
-            Map.entry("sagittarius-120|white-paper|equatorial-grid",
-                    "4d84df668a993353de10efb0827538d1e2f33a039c953fa2630ba35eebfc368e"),
-            Map.entry("sagittarius-120|white-paper|horizon",
-                    "2a84eb0a49cc512c3fc919b2f2dc518df02b80ac865eaa699109c38c248717d4"),
-            Map.entry("sagittarius-120|white-paper|constellation-boundaries",
-                    "4700a045776d46724d4e6f3b4767d07081d0d6a418f7c1e6c94fd7f1d6e14205"),
-            Map.entry("sagittarius-120|white-paper|constellation-figures",
-                    "d3242bba9de7b79956f054db777cae5234ea0cb068a32b8de40a05a8edc76727"),
-            Map.entry("sagittarius-120|black-sky|meridian",
-                    "b3bcd3cc6e90fefbb429a9de6a145c995baf339ed7e67d0a337bb1669eb6cb5e"),
-            Map.entry("sagittarius-120|black-sky|ecliptic",
-                    "b3bcd3cc6e90fefbb429a9de6a145c995baf339ed7e67d0a337bb1669eb6cb5e"),
-            Map.entry("sagittarius-120|black-sky|equatorial-grid",
-                    "c1c6f71ee6ca3bee178d2beec93934e6515339413db0d953d64cbb10824438b7"),
-            Map.entry("sagittarius-120|black-sky|horizon",
-                    "b3bcd3cc6e90fefbb429a9de6a145c995baf339ed7e67d0a337bb1669eb6cb5e"),
-            Map.entry("sagittarius-120|black-sky|constellation-boundaries",
-                    "44ea08927e96e3dc053b4158ba0d13af2a612403e3fde9bd4fe09400ecaeabf3"),
-            Map.entry("sagittarius-120|black-sky|constellation-figures",
-                    "50e015418104ad263d6fe02f7c2820a863bf798349c7fa1b03e5231654704702"));
-
-    private static final Map<SheetFormat, String> RELEASED_EXPORT = Map.of(
-            SheetFormat.SVG,
-            "34cb425ca6c2d73b5721b1514ca5c4ce415f3bb7150f0ee7db9c71d8ce622156",
-            SheetFormat.PDF,
-            "f5b2eeabd1d6b9f7a29e81e610a649601defe34dd834fc324af2d86acfd7d98f",
-            SheetFormat.PNG,
-            "3717f24ece8854342cfbf284e8a21ba1945ca1968bdc9ebf8c052c5736e89266");
-
     private record Page(String name, SkyPosition centre, double field) { }
 
     private static final Page[] PAGES = {
@@ -136,47 +75,193 @@ class CombinedEmphasisTest {
                 900, 700);
     }
 
-    // ---- the released one-target behaviour is unmoved ---------------
+    // ---- the one-target route and the set route agree ---------------
+    //
+    // The migration itself was proved once, on the capture machine:
+    // all 24 released singleton pages and all three export formats
+    // byte-identical before and after the refactor (recorded in
+    // docs/decisions/structure-emphasis.md). One machine's
+    // rasterization cannot be another's contract, so what holds
+    // permanently is equivalence on whatever runtime runs this: the
+    // released one-target route - membership by identity with its one
+    // target, metadata from that target's own token - against the
+    // one-member set route, drawn side by side in the same JVM.
 
+    /**
+     * Every structure alone, on both pages and both grounds, with the
+     * meridian and ecliptic modules contributing so the module
+     * structures ink too: the two routes paint the same bytes.
+     */
     @Test
-    void everyReleasedSingletonPageReproducesThroughTheSetSeam()
-            throws Exception {
+    void everySingletonPaintsTheSameThroughBothRoutes() {
+        java.util.EnumSet<ChartStructure> inked =
+                java.util.EnumSet.noneOf(ChartStructure.class);
         for (Page page : PAGES) {
             ChartScene scene = scene(page);
+            java.util.List<OverlayRegistry.Owned> modules = modules();
             for (ChartPalette ground : ChartPalette.values()) {
                 ChartOptions options =
                         ChartOptions.DEFAULTS.withPalette(ground);
+                BufferedImage canonical = viaOneTarget(scene, options,
+                        modules, null);
+                assertTrue(identical(canonical, viaSet(scene, options,
+                                modules, Set.of())),
+                        page.name() + " on " + ground.storedAs()
+                                + ": no target and the empty set are"
+                                + " the same canonical page");
                 for (ChartStructure target : ChartStructure.values()) {
-                    BufferedImage image = RENDERER.renderToImage(
-                            scene, options, Set.of(target));
-                    assertEquals(
-                            RELEASED.get(page.name() + "|"
-                                    + ground.storedAs() + "|"
-                                    + target.token()),
-                            sha(image),
-                            page.name() + " with only "
-                                    + target.token() + " raised on "
-                                    + ground.storedAs()
-                                    + " must be the released page");
+                    BufferedImage one = viaOneTarget(scene, options,
+                            modules, target);
+                    BufferedImage set = viaSet(scene, options, modules,
+                            Set.of(target));
+                    assertTrue(identical(one, set),
+                            page.name() + " with only " + target.token()
+                                    + " raised on " + ground.storedAs()
+                                    + ": the one-target and set routes"
+                                    + " must paint the same bytes");
+                    if (!identical(one, canonical)) {
+                        inked.add(target);
+                    }
                 }
+            }
+        }
+        assertEquals(java.util.EnumSet.allOf(ChartStructure.class), inked,
+                "every structure must actually change the page somewhere,"
+                        + " or its agreement proves nothing");
+    }
+
+    /**
+     * Every structure alone, exported in every format by both routes
+     * from the same page: the same bytes, and the bare released
+     * token in the metadata.
+     */
+    @Test
+    void everySingletonExportsTheSameBytesThroughBothRoutes()
+            throws Exception {
+        ChartViewState state = new ChartViewState(
+                PAGES[1].centre(), PAGES[1].field(),
+                ChartViewState.defaultMagnitudeFor(PAGES[1].field()));
+        java.util.List<OverlayRegistry.Owned> modules = modules();
+        for (ChartStructure target : ChartStructure.values()) {
+            SheetRecording one = ChartSheet.record(
+                    Atlas.assembler()::assemble, state,
+                    ChartOptions.DEFAULTS,
+                    (g, scene, reserved) -> ReferenceInk.paint(g, scene,
+                            modules, ChartPalette.WHITE_PAPER, ENGLISH,
+                            reserved, target),
+                    ChartRenderer.ReferenceLayer.NONE, PaperSize.A4,
+                    ENGLISH, target);
+            SheetRecording set = ChartSheet.record(
+                    Atlas.assembler()::assemble, state,
+                    ChartOptions.DEFAULTS,
+                    (g, scene, reserved) -> ReferenceInk.paint(g, scene,
+                            modules, ChartPalette.WHITE_PAPER, ENGLISH,
+                            reserved, Set.of(target)),
+                    ChartRenderer.ReferenceLayer.NONE, PaperSize.A4,
+                    ENGLISH, Set.of(target));
+            assertEquals(target.token(), one.metadata().emphasis(),
+                    "the one-target route records the bare token");
+            assertEquals(target.token(), set.metadata().emphasis(),
+                    "and a one-member set records the same bare token");
+            for (SheetFormat format : SheetFormat.values()) {
+                org.junit.jupiter.api.Assertions.assertArrayEquals(
+                        SheetWriters.write(one, format, 300),
+                        SheetWriters.write(set, format, 300),
+                        target.token() + " as " + format
+                                + ": both routes write the same bytes");
             }
         }
     }
 
     @Test
-    void theReleasedOneTargetExportBytesAreUnmoved() throws Exception {
-        var recording = ChartSheet.record(Atlas.assembler()::assemble,
-                new ChartViewState(new SkyPosition(83.0, 0.0), 42.0, 8.0),
-                ChartOptions.DEFAULTS,
-                ChartRenderer.ReferenceLayer.NONE,
-                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4,
-                ENGLISH, Set.of(ChartStructure.EQUATORIAL_GRID));
-        for (SheetFormat format : SheetFormat.values()) {
-            assertEquals(RELEASED_EXPORT.get(format),
-                    shaBytes(SheetWriters.write(recording, format, 300)),
-                    "a one-structure emphasized " + format
-                            + " export must carry the released bytes");
+    void severalTargetsRecordTheOrderedJoin() {
+        SheetRecording several = ChartSheet.record(
+                Atlas.assembler()::assemble,
+                new ChartViewState(PAGES[1].centre(), PAGES[1].field(),
+                        ChartViewState.defaultMagnitudeFor(
+                                PAGES[1].field())),
+                ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH,
+                Set.of(ChartStructure.HORIZON, ChartStructure.MERIDIAN,
+                        ChartStructure.CONSTELLATION_FIGURES));
+        assertEquals("meridian+horizon+constellation-figures",
+                several.metadata().emphasis(),
+                "several targets record the enum-ordered '+' join");
+    }
+
+    /** The two routes, each shaped its own way from end to end. */
+    private static BufferedImage viaOneTarget(ChartScene scene,
+            ChartOptions options,
+            java.util.List<OverlayRegistry.Owned> modules,
+            ChartStructure target) {
+        BufferedImage image = blank(scene);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            RENDERER.render(g, scene, options,
+                    (layerG, painted, reserved) -> ReferenceInk.paint(
+                            layerG, painted, modules, options.palette(),
+                            ENGLISH, reserved, target),
+                    null, target);
+        } finally {
+            g.dispose();
         }
+        return image;
+    }
+
+    private static BufferedImage viaSet(ChartScene scene,
+            ChartOptions options,
+            java.util.List<OverlayRegistry.Owned> modules,
+            Set<ChartStructure> targets) {
+        BufferedImage image = blank(scene);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            RENDERER.render(g, scene, options,
+                    (layerG, painted, reserved) -> ReferenceInk.paint(
+                            layerG, painted, modules, options.palette(),
+                            ENGLISH, reserved, targets),
+                    null, targets);
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    /**
+     * The meridian module with its horizon and cardinals, and the
+     * ecliptic with its landmarks: an observer whose meridian stands
+     * at the orion page's right ascension, so both pages carry every
+     * module structure.
+     */
+    private static java.util.List<OverlayRegistry.Owned> modules() {
+        OverlayRegistry registry = new OverlayRegistry();
+        juranometria.meridian.MeridianModule meridian =
+                new juranometria.meridian.MeridianModule(
+                        new juranometria.sky.Observer(80.0, -58.7,
+                                java.time.Instant.parse(
+                                        "2026-03-20T21:33:00Z")));
+        meridian.showing(true, true, true);
+        registry.offer(juranometria.meridian.MeridianModule.ID,
+                meridian::contributedGeometry);
+        juranometria.ecliptic.EclipticModule ecliptic =
+                new juranometria.ecliptic.EclipticModule();
+        ecliptic.showing(true);
+        registry.offer(juranometria.ecliptic.EclipticModule.ID,
+                ecliptic::contributedGeometry);
+        return registry.collect();
+    }
+
+    private static BufferedImage blank(ChartScene scene) {
+        return new BufferedImage(scene.viewport().widthPx(),
+                scene.viewport().heightPx(), BufferedImage.TYPE_INT_RGB);
+    }
+
+    private static boolean identical(BufferedImage one,
+                                     BufferedImage other) {
+        return java.util.Arrays.equals(
+                one.getRGB(0, 0, one.getWidth(), one.getHeight(), null, 0,
+                        one.getWidth()),
+                other.getRGB(0, 0, other.getWidth(), other.getHeight(),
+                        null, 0, other.getWidth()));
     }
 
     // ---- the token set is one deterministic representation ----------
@@ -452,28 +537,5 @@ class CombinedEmphasisTest {
             }
         }
         return false;
-    }
-
-    private static String sha(BufferedImage image) throws Exception {
-        java.io.ByteArrayOutputStream out =
-                new java.io.ByteArrayOutputStream();
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                int p = image.getRGB(x, y);
-                out.write(p >> 16);
-                out.write(p >> 8);
-                out.write(p);
-            }
-        }
-        return shaBytes(out.toByteArray());
-    }
-
-    private static String shaBytes(byte[] bytes) throws Exception {
-        StringBuilder hex = new StringBuilder();
-        for (byte b : MessageDigest.getInstance("SHA-256")
-                .digest(bytes)) {
-            hex.append(String.format(Locale.ROOT, "%02x", b));
-        }
-        return hex.toString();
     }
 }

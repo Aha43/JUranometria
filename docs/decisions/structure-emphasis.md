@@ -149,3 +149,60 @@ shows on Sagittarius. The control therefore disables unavailable
 targets rather than emphasizing an absent line; availability is
 read from the layers and the contributed geometry, not from
 whether the page's frame happens to intersect the structure.
+
+## Multiple emphasis (follow-up)
+
+The reader may raise any number of available structures at once.
+This supersedes the single-target wording above wherever the two
+differ; everything else stands.
+
+- **The set.** The transient state is a set of structures with one
+  deterministic order, the enum's own, still never persisted. The
+  menu shows independent checkmarks; choosing a structure toggles
+  only that structure; **Normal** clears the whole set. When a
+  structure becomes unavailable, only that member leaves; pan, zoom,
+  selection, language and unrelated options keep the rest.
+- **No new rendering rule.** No dimming, no colour blending, no new
+  draw precedence: each layer keeps its frozen accent and its
+  existing painter order, and crossings behave as they do
+  canonically. Held by three contracts on the ruled crossing pages
+  (grid with figures, grid with ecliptic, meridian with horizon),
+  both grounds: away from crossings each structure reproduces its
+  singleton pixels exactly; a combination changes nothing outside
+  the singletons' shared stroke and antialiasing envelope; at
+  crossings the later-painted structure keeps its frozen accent on
+  top. The exact union of singleton masks is deliberately not
+  demanded at crossings, where draw order and antialiasing may
+  legitimately hide or composite part of the lower stroke.
+- **The export.** A checked export carries every active token in
+  enum order joined with `+` (`meridian+horizon`), the same string in
+  SVG, PDF and PNG. A single target is the bare released token.
+- **Colour is supplementary.** Multiple emphasis does not promise
+  that every active structure can be identified by hue alone. Under
+  the common dichromacies some co-raised accents sit close together,
+  most of all when all six are raised (measured in
+  `docs/studies/structure-emphasis/measurements.md`). Geometry, dash
+  pattern, position and the menu's checked identities remain part
+  of the reading system. Accepted by the owner as a documented
+  limitation, not a defect.
+
+### The migration proof, and what holds after it
+
+On the capture Mac (macOS aarch64, Java 21.0.11), all 24 released
+singleton pages (orion at 42 degrees and sagittarius at 120 degrees,
+both grounds, all six structures) and the one-target export in all
+three formats were byte-identical before and after the set-shaped
+refactor, against hashes captured on `main` 3176d93 before any code
+changed. That proves this migration, once, on that machine.
+
+It is not a permanent contract: one machine's rasterization cannot
+be another machine's contract, and the first CI run showed exactly
+that. What holds permanently is equivalence on whatever runtime
+runs the suite. The released one-target route (membership decided by
+identity with its one target, metadata from that target's own token)
+and the one-member set route (membership by set containment,
+metadata from the ordered join) are drawn side by side in the same
+JVM and must agree to the byte: every singleton page with the
+module structures contributing, and every singleton export in SVG,
+PDF and PNG. The two routes are shaped independently, and each
+contract was proved able to fail by breaking one route at a time.

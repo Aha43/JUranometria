@@ -38,6 +38,15 @@ public enum ChartStructure {
     }
 
     /**
+     * Membership in a raised set, as the painters ask it; a
+     * {@code null} set raises nothing.
+     */
+    public static java.util.function.Predicate<ChartStructure> membersOf(
+            java.util.Set<ChartStructure> active) {
+        return active == null ? structure -> false : active::contains;
+    }
+
+    /**
      * The active set as one deterministic string: tokens in this
      * enum's own order, joined with {@code +} - and a single target
      * is the bare token, so one-target metadata is byte-identical

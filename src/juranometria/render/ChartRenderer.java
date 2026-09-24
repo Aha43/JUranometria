@@ -536,7 +536,8 @@ public final class ChartRenderer {
     public void render(Graphics2D g, ChartScene scene, ChartOptions options,
                        ReferenceLayer reference,
                        java.util.List<LabelPlacement.Placement> given) {
-        render(g, scene, options, reference, given, null);
+        renderRaising(g, scene, options, reference, given,
+                structure -> false);
     }
 
     /**
@@ -546,13 +547,39 @@ public final class ChartRenderer {
      * <p>{@code emphasized} is transient presentation context, never
      * part of {@link ChartOptions} and never persisted: it changes
      * ink only, through {@link StructureStyle}, and no geometry,
-     * placement, membership or clipping. {@code null} is the
-     * canonical page, by the same code path.
+     * placement, membership or clipping. {@code null} or empty is
+     * the canonical page, by the same code path.
      */
     public void render(Graphics2D g, ChartScene scene, ChartOptions options,
                        ReferenceLayer reference,
                        java.util.List<LabelPlacement.Placement> given,
                        java.util.Set<ChartStructure> emphasized) {
+        renderRaising(g, scene, options, reference, given,
+                ChartStructure.membersOf(emphasized));
+    }
+
+    /**
+     * The released one-target form (#361): a single structure, or
+     * {@code null} for the canonical page. It decides membership by
+     * identity with its one target and builds no set, so it stays a
+     * route independent of the set-shaped one - which is what lets
+     * the two be held equal on whatever runtime draws them.
+     */
+    public void render(Graphics2D g, ChartScene scene, ChartOptions options,
+                       ReferenceLayer reference,
+                       java.util.List<LabelPlacement.Placement> given,
+                       ChartStructure emphasized) {
+        renderRaising(g, scene, options, reference, given,
+                structure -> structure == emphasized);
+    }
+
+    private void renderRaising(Graphics2D g, ChartScene scene,
+                               ChartOptions options,
+                               ReferenceLayer reference,
+                               java.util.List<LabelPlacement.Placement>
+                                       given,
+                               java.util.function.Predicate<ChartStructure>
+                                       emphasized) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
         ChartPalette palette = options.palette();
@@ -601,7 +628,7 @@ public final class ChartRenderer {
             // here would hide a regression rather than prevent one.
             EquatorialGrid.draw(g, gridFor(g.getFontMetrics(LABEL_FONT),
                     scene, options), palette,
-                    raised(emphasized, ChartStructure.EQUATORIAL_GRID));
+                    emphasized.test(ChartStructure.EQUATORIAL_GRID));
         }
         drawGeography(g, scene, options, projection, mapping,
                 constellationNamesIn(placedText), sky, paper, emphasized);
@@ -792,8 +819,8 @@ public final class ChartRenderer {
                                               names,
                                       java.awt.Shape sky,
                                       java.awt.Shape paper,
-                                      java.util.Set<ChartStructure>
-                                              emphasized) {
+                                      java.util.function.Predicate<
+                                              ChartStructure> emphasized) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
         ChartPalette palette = options.palette();
@@ -802,8 +829,7 @@ public final class ChartRenderer {
             // and nothing else on the page (issue #361).
             StructureStyle.Style boundaries = StructureStyle.resolve(
                     palette, ChartStructure.CONSTELLATION_BOUNDARIES,
-                    raised(emphasized,
-                            ChartStructure.CONSTELLATION_BOUNDARIES),
+                    emphasized.test(ChartStructure.CONSTELLATION_BOUNDARIES),
                     palette.boundaryInk(), BOUNDARY_STROKE);
             g.setColor(boundaries.color());
             g.setStroke(boundaries.stroke());
@@ -818,8 +844,7 @@ public final class ChartRenderer {
             // and constellation names keep canonical ink (issue #361).
             StructureStyle.Style figures = StructureStyle.resolve(
                     palette, ChartStructure.CONSTELLATION_FIGURES,
-                    raised(emphasized,
-                            ChartStructure.CONSTELLATION_FIGURES),
+                    emphasized.test(ChartStructure.CONSTELLATION_FIGURES),
                     palette.figureInk(), OUTLINE_STROKE);
             g.setColor(figures.color());
             g.setStroke(figures.stroke());
@@ -1078,18 +1103,19 @@ public final class ChartRenderer {
         return image;
     }
 
-    /** One raised structure, as the set it is (compatibility form). */
+    /** The released one-target form, as an image (#361). */
     public BufferedImage renderToImage(ChartScene scene, ChartOptions options,
                                        ChartStructure emphasized) {
-        return renderToImage(scene, options, emphasized == null
-                ? java.util.Set.<ChartStructure>of()
-                : java.util.Set.of(emphasized));
-    }
-
-    /** Whether this structure is in the raised set. */
-    private static boolean raised(java.util.Set<ChartStructure> set,
-                                  ChartStructure structure) {
-        return set != null && set.contains(structure);
+        BufferedImage image = new BufferedImage(
+                scene.viewport().widthPx(), scene.viewport().heightPx(),
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        try {
+            render(g, scene, options, ReferenceLayer.NONE, null, emphasized);
+        } finally {
+            g.dispose();
+        }
+        return image;
     }
 
     /**

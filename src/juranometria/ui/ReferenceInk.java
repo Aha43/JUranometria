@@ -121,11 +121,11 @@ public final class ReferenceInk {
                       juranometria.render.ChartPalette palette,
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved) {
-        return paint(g, scene, contributions, palette, words, reserved,
-                null);
+        return paint(g, DrawnPage.of(scene), contributions, palette,
+                words, reserved, structure -> false);
     }
 
-    /** The same page with one structure emphasized (#361). */
+    /** The same page with structures emphasized (#361). */
     public static List<DirectionPlacement> paint(Graphics2D g,
                       ChartScene scene,
                       List<OverlayRegistry.Owned> contributions,
@@ -133,6 +133,18 @@ public final class ReferenceInk {
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved,
                       java.util.Set<juranometria.render.ChartStructure> emphasized) {
+        return paint(g, DrawnPage.of(scene), contributions, palette,
+                words, reserved, emphasized);
+    }
+
+    /** The released one-target form (#361); {@code null} is canonical. */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      ChartScene scene,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      juranometria.render.ChartStructure emphasized) {
         return paint(g, DrawnPage.of(scene), contributions, palette,
                 words, reserved, emphasized);
     }
@@ -153,7 +165,7 @@ public final class ReferenceInk {
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved) {
         return paint(g, page, contributions, palette, words, reserved,
-                null);
+                structure -> false);
     }
 
     /**
@@ -173,6 +185,35 @@ public final class ReferenceInk {
                       juranometria.project.PageWords words,
                       List<java.awt.Shape> reserved,
                       java.util.Set<juranometria.render.ChartStructure> emphasized) {
+        return paint(g, page, contributions, palette, words, reserved,
+                juranometria.render.ChartStructure.membersOf(emphasized));
+    }
+
+    /**
+     * The released one-target form (#361): membership decided by
+     * identity with the one target, never by building a set, so it
+     * remains a route independent of the set-shaped one.
+     */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      DrawnPage page,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      juranometria.render.ChartStructure emphasized) {
+        return paint(g, page, contributions, palette, words, reserved,
+                structure -> structure == emphasized);
+    }
+
+    private static List<DirectionPlacement> paint(Graphics2D g,
+                      DrawnPage page,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      java.util.function.Predicate<
+                              juranometria.render.ChartStructure>
+                              emphasized) {
         ChartScene scene = page.scene();
         if (contributions.isEmpty()) {
             return List.of();
@@ -280,9 +321,8 @@ public final class ReferenceInk {
             // so they take the horizon's accent with it - mark and
             // letter both, as the grid's notation does with its
             // curves - and placement never moves.
-            boolean horizonRaised = emphasized != null
-                    && emphasized.contains(
-                            juranometria.render.ChartStructure.HORIZON);
+            boolean horizonRaised = emphasized.test(
+                    juranometria.render.ChartStructure.HORIZON);
             juranometria.render.StructureStyle.Style mark =
                     juranometria.render.StructureStyle.resolve(palette,
                             juranometria.render.ChartStructure.HORIZON,
@@ -572,8 +612,8 @@ public final class ReferenceInk {
                                    PageRegion region,
                                    OverlayContribution.GreatCircle circle,
                                    juranometria.render.ChartPalette palette,
-                                   java.util.Set<juranometria.render
-                                           .ChartStructure>
+                                   java.util.function.Predicate<
+                                           juranometria.render.ChartStructure>
                                            emphasized) {
         List<CurveRun> runs = GreatCirclePage.clip(projection, mapping,
                 region, circle.pole());
@@ -592,8 +632,7 @@ public final class ReferenceInk {
                         .ofIdentity(circle.identity())
                         .map(s -> juranometria.render.StructureStyle
                                 .resolve(palette, s,
-                                        emphasized != null
-                                                && emphasized.contains(s),
+                                        emphasized.test(s),
                                         palette.figureInk(),
                                         strokeFor(circle.reference())))
                         .orElseGet(() ->
@@ -1018,9 +1057,9 @@ public final class ReferenceInk {
                                   OverlayContribution.Point point,
                                   List<Rectangle2D> taken,
                                   juranometria.render.ChartPalette palette,
-                                  java.util.Set<juranometria.render
-                                          .ChartStructure>
-                                          emphasized) {
+                                  java.util.function.Predicate<
+                                           juranometria.render.ChartStructure>
+                                           emphasized) {
         PixelPoint at = projection.project(point.at())
                 .map(mapping::toPixel).orElse(null);
         if (at == null || !sky.contains(at.x(), at.y())) {
@@ -1035,8 +1074,7 @@ public final class ReferenceInk {
                         .ofIdentity(point.identity())
                         .map(s -> juranometria.render.StructureStyle
                                 .resolve(palette, s,
-                                        emphasized != null
-                                                && emphasized.contains(s),
+                                        emphasized.test(s),
                                         palette.figureInk(), SOLID))
                         .orElseGet(() ->
                                 new juranometria.render.StructureStyle
