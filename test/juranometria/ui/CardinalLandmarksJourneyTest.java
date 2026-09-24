@@ -277,6 +277,38 @@ class CardinalLandmarksJourneyTest {
         }
     }
 
+    @Test
+    void anEquatorialObserversZenithGlobeCarriesItsNorth() throws Exception {
+        onEdt(() -> anEquatorialObserversZenithGlobeCarriesItsNorthJourney());
+    }
+
+    private static void anEquatorialObserversZenithGlobeCarriesItsNorthJourney() {
+        // On the equator the north point lies beside the celestial
+        // pole, and it used to arrive a hair behind its own globe's
+        // limb - refused every time, for a numerical reason. It is on
+        // the limb, and the real page now says so.
+        Observer equator = new Observer(0.0, -78.5,
+                Instant.parse("2026-03-20T21:33:00Z"));
+        LocalSky sky = new LocalSky(equator);
+        juranometria.project.PageWords words =
+                juranometria.ui.language.PageText.in(
+                        juranometria.ui.language.InterfaceText
+                                .forLanguage("en"));
+        ChartComponent chart = new ChartComponent(Atlas.assembler(),
+                words);
+        chart.setSize(900, 700);
+        ChartModuleHost host = new ChartModuleHost(chart,
+                new juranometria.chart.SelectionModel(), request -> { });
+        MeridianModule module = host.attach(new MeridianModule(equator));
+        module.showing(false, true, false);
+        chart.setViewState(new ChartViewState(sky.zenith(), 180.0,
+                ChartViewState.defaultMagnitudeFor(180.0)));
+        Map<Cardinal, ReferenceInk.DirectionPlacement> by = rendered(chart);
+        assertEquals(EnumSet.allOf(Cardinal.class), by.keySet(),
+                "the equatorial zenith globe carries all four, north"
+                        + " included; got " + by.keySet());
+    }
+
     // ---- off means gone ---------------------------------------------
 
     @Test
