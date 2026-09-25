@@ -335,7 +335,28 @@ public final class JUranometriaMain {
                 () -> ExportSheetSession.open(frame, controller, chart,
                         chartOptions, modules.workingSelection(),
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage()))));
+                                language.interfaceLanguage())),
+                // Help, Copy View Report (#372): the view as plain text,
+                // read from its live owners when the reader asks, and
+                // copied - never sent, saved or remembered. A clipboard
+                // that refuses is said, as an export refusal is.
+                CopyViewReport.action(
+                        () -> ViewReport.snapshot(chart, language, meridian,
+                                ecliptic, selection,
+                                modules.workingSelection(),
+                                System::getProperty),
+                        CopyViewReport.SYSTEM,
+                        reason -> {
+                            juranometria.ui.language.InterfaceText said =
+                                    juranometria.ui.language.InterfaceText
+                                            .forLanguage(language
+                                                    .interfaceLanguage());
+                            javax.swing.JOptionPane.showMessageDialog(frame,
+                                    said.say("viewReport.refused.message",
+                                            reason),
+                                    said.say("viewReport.refused.title"),
+                                    javax.swing.JOptionPane.WARNING_MESSAGE);
+                        })));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar

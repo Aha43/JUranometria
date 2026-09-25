@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Help → Copy View Report** (#372). Copies a plain-text description of
+  the view to the clipboard — centre, field and projection, page size,
+  ground, languages, star limit and chart options, modules, emphasis,
+  the stated observing place and instant, and the selections — ending
+  with a blank `Comment:` section to write beneath after pasting. It
+  says, before it is chosen, that the observing place and instant go
+  with it; nothing is sent, saved or remembered.
+
 ## [2.1.0] - 2026-09-20
 
 **The atlas speaks Norwegian.** Sprints 32–33 — the language gate,

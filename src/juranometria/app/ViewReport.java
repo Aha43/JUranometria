@@ -37,8 +37,9 @@ public final class ViewReport {
             String version,
             ChartViewState view,
             int chartWidthPx, int chartHeightPx,
-            int pageWidthPx, int pageHeightPx, int pageOffsetYPx,
-            Double displayScale,
+            int pageWidthPx, int pageHeightPx,
+            int pageOffsetXPx, int pageOffsetYPx,
+            Scale displayScale,
             ChartOptions chosen, ChartOptions drawn,
             String interfaceLanguage,
             String skyLanguageChosen, String skyLanguageOnChart,
@@ -60,6 +61,13 @@ public final class ViewReport {
     }
 
     /**
+     * The screen's scale on each axis, or {@code null} when no screen
+     * supplies one - never synthesized.
+     */
+    public record Scale(double x, double y) {
+    }
+
+    /**
      * The Place and Time module's stated place and instant, and its
      * three switches - present only while the module is attached.
      */
@@ -70,6 +78,76 @@ public final class ViewReport {
     private ViewReport() {
     }
 
+    /**
+     * The four machine facts a report states, and the only system
+     * properties it ever reads. Nothing enumerates the properties or
+     * the environment: a user name, a home directory, a path or a host
+     * name cannot reach the report because nothing asks for one.
+     */
+    static final List<String> MACHINE_FACTS =
+            List.of("os.name", "os.version", "os.arch", "java.version");
+
+    /**
+     * The live state, read from each value's one production owner at
+     * the moment the reader asks (#372): the chart for its view,
+     * options, emphasis and page; the sky-language session for both
+     * languages; each optional module for its own attachment and
+     * switches, and Place and Time's frozen instant - no clock is
+     * read; the two selection owners; the bundled version; and the
+     * allowlisted machine facts through {@code property}.
+     */
+    public static Snapshot snapshot(juranometria.ui.ChartComponent chart,
+            juranometria.ui.language.SkyLanguageSession language,
+            juranometria.meridian.MeridianModule placeAndTime,
+            juranometria.ecliptic.EclipticModule ecliptic,
+            juranometria.chart.SelectionModel selection,
+            juranometria.chart.WorkingSelection working,
+            java.util.function.UnaryOperator<String> property) {
+        juranometria.chart.ChartScene scene = chart.currentScene();
+        List<String> modules = new ArrayList<>();
+        PlaceAndTime place = null;
+        if (placeAndTime != null && placeAndTime.attached()) {
+            modules.add("place-and-time");
+            place = new PlaceAndTime(placeAndTime.observer(),
+                    placeAndTime.meridianShowing(),
+                    placeAndTime.horizonShowing(),
+                    placeAndTime.zenithShowing());
+        }
+        Boolean eclipticShowing = null;
+        if (ecliptic != null && ecliptic.attached()) {
+            modules.add("ecliptic");
+            eclipticShowing = ecliptic.showing();
+        }
+        String[] machine = new String[MACHINE_FACTS.size()];
+        for (int i = 0; i < machine.length; i++) {
+            machine[i] = nullToNone(property.apply(MACHINE_FACTS.get(i)));
+        }
+        return new Snapshot(AppInfo.version(), chart.viewState(),
+                chart.getWidth(), chart.getHeight(),
+                scene == null ? 0 : scene.viewport().widthPx(),
+                scene == null ? 0 : scene.viewport().heightPx(),
+                chart.pageOffsetX(), chart.pageOffsetY(),
+                scaleOf(chart), chart.chartOptions(),
+                chart.drawnOptions(), language.interfaceLanguage(),
+                language.current().chartLanguage(),
+                language.namesOnTheChart(), chart.emphasizedSet(),
+                modules, place, eclipticShowing, selection.selection(),
+                working.members(), working.lead(), machine[0],
+                machine[1], machine[2], machine[3]);
+    }
+
+    /** The screen's own scale, or null where no screen supplies one. */
+    private static Scale scaleOf(java.awt.Component chart) {
+        java.awt.GraphicsConfiguration screen =
+                chart.getGraphicsConfiguration();
+        if (screen == null || java.awt.GraphicsEnvironment.isHeadless()) {
+            return null;
+        }
+        java.awt.geom.AffineTransform transform =
+                screen.getDefaultTransform();
+        return new Scale(transform.getScaleX(), transform.getScaleY());
+    }
+
     /** The report, ending with a blank {@code Comment:} section. */
     public static String format(Snapshot s) {
         List<String> lines = new ArrayList<>();
@@ -78,20 +156,23 @@ public final class ViewReport {
         ChartViewState view = s.view();
         lines.add("centre: RA " + SkyFormat.formatRa(view.centre().raDegrees())
                 + "; Dec " + SkyFormat.formatDec(view.centre().decDegrees()));
-        lines.add("centre-degrees: RA " + exact(view.centre().raDegrees())
-                + "; Dec " + exact(view.centre().decDegrees()));
+        lines.add(String.format(Locale.ROOT,
+                "centre-degrees: RA %.6f; Dec %+.6f",
+                view.centre().raDegrees(), view.centre().decDegrees()));
         lines.add("field-degrees: " + exact(view.fieldWidthDegrees()));
         lines.add("projection: " + token(view.projection().name()));
-        lines.add("target: " + (view.targetIdentity() == null
-                && view.targetLabel() == null ? "none"
-                : nullToNone(view.targetLabel()) + " ("
-                        + nullToNone(view.targetIdentity()) + ")"));
+        // What the page is about, and what the reader explicitly
+        // navigated to: two facts, never collapsed into one.
+        lines.add("page-subject: " + nullToNone(view.targetLabel()));
+        lines.add("searched-target: " + nullToNone(view.targetIdentity()));
         lines.add("chart-pixels: " + s.chartWidthPx() + " x "
                 + s.chartHeightPx());
         lines.add("page-pixels: " + s.pageWidthPx() + " x "
-                + s.pageHeightPx() + " at offset " + s.pageOffsetYPx());
+                + s.pageHeightPx() + "; offset-x " + s.pageOffsetXPx()
+                + "; offset-y " + s.pageOffsetYPx());
         lines.add("display-scale: " + (s.displayScale() == null
-                ? "unavailable" : exact(s.displayScale())));
+                ? "unavailable" : exact(s.displayScale().x()) + " x "
+                        + exact(s.displayScale().y())));
         lines.add("ground: " + s.chosen().palette().storedAs());
         lines.add("interface-language: " + s.interfaceLanguage());
         lines.add("sky-language: " + s.skyLanguageOnChart() + " (chosen: "
@@ -105,13 +186,13 @@ public final class ViewReport {
                 : String.join(", ", s.modules())));
         if (s.placeAndTime() != null) {
             PlaceAndTime place = s.placeAndTime();
-            lines.add("place-and-time: meridian " + onOff(place.meridian())
+            lines.add("observer-lines: meridian " + onOff(place.meridian())
                     + ", horizon " + onOff(place.horizon()) + ", zenith "
                     + onOff(place.zenith()));
-            lines.add("observer: latitude "
-                    + exact(place.observer().latitudeDegrees())
-                    + "; longitude-east "
-                    + exact(place.observer().eastLongitudeDegrees()));
+            lines.add(String.format(Locale.ROOT,
+                    "observer: latitude %+.6f; longitude-east %+.6f",
+                    place.observer().latitudeDegrees(),
+                    place.observer().eastLongitudeDegrees()));
             lines.add("instant-utc: " + place.observer().instant());
         }
         if (s.eclipticShowing() != null) {

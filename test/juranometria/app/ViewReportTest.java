@@ -33,18 +33,19 @@ class ViewReportTest {
             Instant.parse("2026-03-20T21:33:00Z"));
 
     /** A deliberately non-default state: every field has a premise. */
-    private static ViewReport.Snapshot rich() {
+    static ViewReport.Snapshot rich() {
         ChartOptions chosen = ChartOptions.DEFAULTS
                 .withPalette(ChartPalette.BLACK_SKY);
         return new ViewReport.Snapshot("2.3.0",
                 new ChartViewState(new SkyPosition(331.98, 39.97), 60.0,
-                        6.0, null, null),
-                1180, 760, 1180, 760, 0, 2.0, chosen, chosen,
+                        6.0, "M31 \u00b7 Andromeda Galaxy region", null),
+                1180, 760, 1180, 760, 0, 0,
+                new ViewReport.Scale(2.0, 2.0), chosen, chosen,
                 "nb-NO", "follow-interface", "nb-NO",
                 EnumSet.of(ChartStructure.MERIDIAN,
                         ChartStructure.HORIZON,
                         ChartStructure.EQUATORIAL_GRID),
-                List.of("on-this-page", "place-and-time", "ecliptic"),
+                List.of("place-and-time", "ecliptic"),
                 new ViewReport.PlaceAndTime(OSLO, true, true, false),
                 Boolean.FALSE,
                 new Selection.Object(Selection.Object.Kind.STAR,
@@ -61,13 +62,14 @@ class ViewReportTest {
                 JUranometria view report
                 version: 2.3.0
                 centre: RA 22h 07.9m; Dec +39° 58′
-                centre-degrees: RA 331.98; Dec 39.97
+                centre-degrees: RA 331.980000; Dec +39.970000
                 field-degrees: 60.0
                 projection: stereographic
-                target: none
+                page-subject: M31 · Andromeda Galaxy region
+                searched-target: none
                 chart-pixels: 1180 x 760
-                page-pixels: 1180 x 760 at offset 0
-                display-scale: 2.0
+                page-pixels: 1180 x 760; offset-x 0; offset-y 0
+                display-scale: 2.0 x 2.0
                 ground: black-sky
                 interface-language: nb-NO
                 sky-language: nb-NO (chosen: follow-interface)
@@ -80,9 +82,9 @@ class ViewReportTest {
                 equatorial-grid on, title-block on, magnitude-key off
                 page-overrides: none
                 emphasis: meridian+equatorial-grid+horizon
-                modules: on-this-page, place-and-time, ecliptic
-                place-and-time: meridian on, horizon on, zenith off
-                observer: latitude 59.913; longitude-east 10.752
+                modules: place-and-time, ecliptic
+                observer-lines: meridian on, horizon on, zenith off
+                observer: latitude +59.913000; longitude-east +10.752000
                 instant-utc: 2026-03-20T21:33:00Z
                 ecliptic: off
                 selection: star star:hip-102098
@@ -123,11 +125,14 @@ class ViewReportTest {
         ChartOptions noGrid = new ChartOptions(true, true, true, true,
                 true, true, true, true, false, true, false, true, true,
                 true, true, true, ChartPalette.BLACK_SKY);
+        String subject = base.view().targetLabel();
         assertOneLine(base, with(base, new ChartViewState(
-                new SkyPosition(331.99, 39.97), 60.0, 6.0, null, null)),
+                new SkyPosition(331.99, 39.97), 60.0, 6.0, subject,
+                null)),
                 "centre-degrees", "centre");
         assertOneLine(base, with(base, new ChartViewState(
-                new SkyPosition(331.98, 39.97), 42.0, 6.0, null, null)),
+                new SkyPosition(331.98, 39.97), 42.0, 6.0, subject,
+                null)),
                 "field-degrees", "projection", "limiting-magnitude");
         assertOneLine(base, withOptions(base, noGrid), "options");
         assertOneLine(base, withEmphasis(base,
@@ -145,15 +150,16 @@ class ViewReportTest {
         ViewReport.Snapshot detached = new ViewReport.Snapshot(
                 base.version(), base.view(), base.chartWidthPx(),
                 base.chartHeightPx(), base.pageWidthPx(),
-                base.pageHeightPx(), base.pageOffsetYPx(),
-                base.displayScale(), base.chosen(), base.drawn(),
+                base.pageHeightPx(), base.pageOffsetXPx(),
+                base.pageOffsetYPx(), base.displayScale(), base.chosen(),
+                base.drawn(),
                 base.interfaceLanguage(), base.skyLanguageChosen(),
                 base.skyLanguageOnChart(), base.emphasis(),
-                List.of("on-this-page"), null, null, base.selection(),
+                List.of(), null, null, base.selection(),
                 base.workingSet(), base.workingLead(), base.osName(),
                 base.osVersion(), base.osArch(), base.javaVersion());
         String report = ViewReport.format(detached);
-        for (String gone : List.of("place-and-time:", "observer:",
+        for (String gone : List.of("observer-lines:", "observer:",
                 "instant-utc:", "ecliptic:")) {
             assertTrue(!report.contains("\n" + gone),
                     "a detached module leaves no remembered " + gone);
@@ -233,7 +239,8 @@ class ViewReportTest {
             Set<ChartStructure> emphasis, ViewReport.PlaceAndTime place) {
         return new ViewReport.Snapshot(b.version(), view,
                 b.chartWidthPx(), b.chartHeightPx(), b.pageWidthPx(),
-                b.pageHeightPx(), b.pageOffsetYPx(), b.displayScale(),
+                b.pageHeightPx(), b.pageOffsetXPx(), b.pageOffsetYPx(),
+                b.displayScale(),
                 chosen, drawn, b.interfaceLanguage(),
                 b.skyLanguageChosen(), b.skyLanguageOnChart(), emphasis,
                 b.modules(), place, b.eclipticShowing(), b.selection(),

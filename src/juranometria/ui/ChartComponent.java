@@ -452,6 +452,16 @@ public final class ChartComponent extends JComponent {
         }
     }
 
+    /**
+     * How far right of the component's left edge the page is drawn:
+     * the page always spans the component's width, so none - stated
+     * here, and used by the paint, so a report of it is the offset
+     * actually drawn (#372).
+     */
+    public int pageOffsetX() {
+        return 0;
+    }
+
     public int pageOffsetY() {
         return scene == null ? 0
                 : (getHeight() - scene.viewport().heightPx()) / 2;
@@ -499,7 +509,7 @@ public final class ChartComponent extends JComponent {
         g.fillRect(0, 0, getWidth(), getHeight());
         Graphics2D g2 = (Graphics2D) g.create();
         try {
-            g2.translate(0, pageOffsetY());
+            g2.translate(pageOffsetX(), pageOffsetY());
             // The reference layer is handed to the renderer rather
             // than painted after it: a line of reference belongs
             // above the grid and below every mark, and that is the

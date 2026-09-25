@@ -120,8 +120,23 @@ public final class AtlasChrome {
                                         Runnable openPlaceAndTime,
                                         Runnable toggleEcliptic,
                                         Runnable exportSheet) {
+        return menuBar(navigation, openSettings, openChartOptions,
+                openAbout, toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, null);
+    }
+
+    /** The same, with Help's Copy View Report (#372). */
+    public javax.swing.JMenuBar menuBar(ChartViewController navigation,
+                                        Runnable openSettings,
+                                        Runnable openChartOptions,
+                                        Runnable openAbout,
+                                        Runnable toggleInspector,
+                                        Runnable openPlaceAndTime,
+                                        Runnable toggleEcliptic,
+                                        Runnable exportSheet,
+                                        Runnable copyViewReport) {
         return AppMenuBar.create(navigation, openSettings, openChartOptions,
                 openAbout, toggleInspector, openPlaceAndTime, toggleEcliptic,
-                exportSheet, said);
+                exportSheet, copyViewReport, said);
     }
 }

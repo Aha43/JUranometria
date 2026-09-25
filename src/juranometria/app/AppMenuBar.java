@@ -230,6 +230,35 @@ public final class AppMenuBar {
                                   Runnable toggleEcliptic,
                                   Runnable exportSheet,
                                   juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, null, said);
+    }
+
+    /** The name the Copy View Report item carries, for tests to find. */
+    public static final String VIEW_REPORT_ITEM = "copyViewReportItem";
+
+    /**
+     * The menu bar with Copy View Report (issue #372).
+     *
+     * <p>Help, because it is how a reader asks for help with what
+     * they are looking at. The menu does not learn how to inspect a
+     * chart: the application hands it the action, as it hands every
+     * other.
+     *
+     * @param copyViewReport runs on Help's Copy View Report item (may
+     *     be null, omitting the item)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  Runnable exportSheet,
+                                  Runnable copyViewReport,
+                                  juranometria.ui.language.InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
                     "the menu has to say its words in some language");
@@ -423,6 +452,21 @@ public final class AppMenuBar {
                 said.say("menu.help.a11y"));
         juranometria.ui.Explain.selfExplanatory(help,
                 said.say("menu.help.explain"));
+        if (copyViewReport != null) {
+            JMenuItem report = new JMenuItem(
+                    said.say("menu.viewReport.label"));
+            report.setName(VIEW_REPORT_ITEM);
+            report.getAccessibleContext().setAccessibleName(
+                    said.say("menu.viewReport.a11y"));
+            // The copied report states the observing place and instant,
+            // and the reader must be told so before choosing it - on
+            // hover and to a screen reader alike.
+            juranometria.ui.Explain.control(report,
+                    said.say("menu.viewReport.hover"),
+                    said.say("menu.viewReport.explain"));
+            report.addActionListener(event -> copyViewReport.run());
+            help.add(report);
+        }
         // The product name is an identity handed to a pattern; the
         // sentence around it belongs to the language (#350).
         JMenuItem about =

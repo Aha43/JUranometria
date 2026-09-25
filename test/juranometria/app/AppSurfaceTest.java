@@ -62,6 +62,61 @@ class AppSurfaceTest {
 
 
     @Test
+    void helpCopiesTheViewReportAndSaysWhatItCarries() {
+        // Issue #372, in both languages: the item sits in Help before
+        // About, names itself, tells the reader on hover and to a
+        // screen reader that the copy carries the observing place and
+        // instant, and - pressed by the recorded menu convention -
+        // puts the production formatter's whole report on the
+        // clipboard it was given.
+        record Words(String language, String label, String place,
+                     String nothingKept) {
+        }
+        for (Words words : java.util.List.of(
+                new Words("en", "Copy View Report",
+                        "observing place and instant",
+                        "Nothing is sent, saved or remembered."),
+                new Words("nb-NO", "Kopier visningsrapport",
+                        "observasjonsstedet og tidspunktet",
+                        "Ingenting sendes, lagres eller huskes."))) {
+            ViewReport.Snapshot state = ViewReportTest.rich();
+            java.util.List<String> copied = new java.util.ArrayList<>();
+            java.util.List<String> refused = new java.util.ArrayList<>();
+            int[] about = new int[1];
+            JMenuBar bar = AppMenuBar.create(null, null, null,
+                    () -> about[0]++, null, null, null, null,
+                    CopyViewReport.action(() -> state, copied::add,
+                            refused::add),
+                    juranometria.ui.language.InterfaceText.forLanguage(
+                            words.language()));
+            javax.swing.JMenu help = bar.getMenu(bar.getMenuCount() - 1);
+            JMenuItem report = help.getItem(0);
+            assertEquals(AppMenuBar.VIEW_REPORT_ITEM, report.getName(),
+                    words.language() + ": first in Help, before About");
+            assertEquals(words.label(), report.getText());
+            assertEquals(words.label(), report.getAccessibleContext()
+                    .getAccessibleName());
+            assertTrue(report.getToolTipText().contains(words.place()),
+                    words.language() + ": the hover says the place and"
+                            + " instant go with it: "
+                            + report.getToolTipText());
+            String spoken = report.getAccessibleContext()
+                    .getAccessibleDescription();
+            assertTrue(spoken.contains(words.place())
+                            && spoken.contains(words.nothingKept()),
+                    words.language() + ": and so does the screen reader,"
+                            + " with nothing kept: " + spoken);
+            assertTrue(copied.isEmpty(), "premise: nothing copied yet");
+            report.doClick();
+            assertEquals(java.util.List.of(ViewReport.format(state)),
+                    copied, words.language() + ": the whole report,"
+                            + " once");
+            assertEquals(java.util.List.of(), refused);
+            assertEquals(0, about[0], "and About was not opened");
+        }
+    }
+
+    @Test
     void theInspectorItemShowsWhetherThePanelIsActuallyThere() {
         // Review, P2: a plain menu item cannot say whether the panel
         // is showing - and a narrow window can close it without the
