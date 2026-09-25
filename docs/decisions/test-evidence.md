@@ -76,8 +76,8 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **64 files** touch process-wide state —
-**33** use the shared guard, **30** restore locally,
+this document to them: **65 files** touch process-wide state —
+**33** use the shared guard, **31** restore locally,
 **0 flagged unprotected** — and **48 files** depend on a display,
 of which **19** state a focus premise and **28** a reachability
 premise through the shared route helper. (#246 added two
@@ -193,7 +193,9 @@ other. The startup journey also gained a second question in the same
 file — it opens Place and Time from the composed menu in a stored
 Norwegian session — because a surface is not translated until the
 application hands it the language, and every other test on that surface
-hands the dialog its language directly.)
+hands the dialog its language directly. #372 added its live view-report
+contract, which begins a real language session on a scratch preference
+node of its own and removes the node afterwards, restoring locally.)
 
 > **The scanner learned to read a wrapped call in #286.** It matched
 > `Preferences.userRoot` against the source as written, so a call
@@ -377,8 +379,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **442
-reads of live chart state** against **793 explicit hand-offs**
+own premise capture). The measurements count the traffic: **444
+reads of live chart state** against **794 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -422,7 +424,9 @@ reads of a component no event thread is painting, counted with the
 rest; and for the #359 completion's cardinal landmark journeys,
 which read the page they painted - its scene and page offset - on
 the event thread, because a chart painted off it raced the toolkit
-and drew the opening page). The discipline
+and drew the opening page; and for #372's live view-report
+contract, which reads the chart's page and its offset on the event
+thread to hold the report to them). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

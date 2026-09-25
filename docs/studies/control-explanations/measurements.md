@@ -34,6 +34,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
+| Menu bar | JMenuItem | Copy View Report | Copies a text description of this view, including the observing place and instant from ... | Copies a text description of this view to the clipboard, including the observing place ... | hovered |
 | Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window with the application's name, version and the software and data it is b... | self-explanatory |
 | Chart Options | JTabbedPane | Deep sky, Stars, Constellations, Chart | &mdash; | Four groups of choices: deep sky, stars, constellations and chart elements. | self-explanatory |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
@@ -98,7 +99,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**81 operable controls** across 11 surfaces: **48** hovered, **7** dynamic, **26** left to their own visible words, **0 undecided**.
+**82 operable controls** across 11 surfaces: **49** hovered, **7** dynamic, **26** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 
