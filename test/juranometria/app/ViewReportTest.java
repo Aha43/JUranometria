@@ -53,7 +53,7 @@ class ViewReportTest {
                         new SkyPosition(310.36, 45.28)),
                 List.of("star:hip-102098", "dso:ngc-7000"),
                 "star:hip-102098",
-                "Mac OS X", "26.5.2", "aarch64", "21.0.11");
+                "TestOS", "9.9", "x9", "21.0.99");
     }
 
     @Test
@@ -90,8 +90,8 @@ class ViewReportTest {
                 selection: star star:hip-102098
                 working-set: star:hip-102098, dso:ngc-7000 \
                 (lead: star:hip-102098)
-                os: Mac OS X 26.5.2 aarch64
-                java: 21.0.11
+                os: TestOS 9.9 x9
+                java: 21.0.99
 
                 Comment:
                 """, ViewReport.format(rich()));
