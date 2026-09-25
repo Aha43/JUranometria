@@ -863,14 +863,26 @@ public final class GlobeExportStudyMain {
                         x, y));
             }
         }
-        return new Read(identity,
-                outside.isEmpty()
-                        ? "no sky text anchored outside the limb"
-                        : "** sky text anchored outside the limb **",
+        String verdict;
+        if (!outside.isEmpty()) {
+            verdict = "** non-cardinal sky text anchored outside the"
+                    + " limb **";
+        } else if (landmarks == 0) {
+            verdict = "no text anchored outside the limb";
+        } else {
+            verdict = String.format(Locale.ROOT,
+                    "no non-cardinal sky text is anchored outside the"
+                            + " limb; %d accepted cardinal letter%s"
+                            + " placed outward",
+                    landmarks, landmarks == 1 ? " is" : "s are");
+        }
+        return new Read(identity, verdict,
                 String.format(Locale.ROOT,
-                        "%d text elements, %d anchored outside the"
-                                + " limb, %d cardinal letters outward",
-                        all, outside.size(), landmarks));
+                        "%d text elements, %d non-cardinal anchored"
+                                + " outside the limb, %d accepted"
+                                + " cardinal letter%s placed outward",
+                        all, outside.size(), landmarks,
+                        landmarks == 1 ? "" : "s"));
     }
 
     /** Ink beyond the limb, counted in the written picture. */

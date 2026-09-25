@@ -91,15 +91,15 @@ public final class GlobeModuleStudyMain {
                 + " drawn on a hemisphere. Ink beyond the limb");
         System.out.println("is sky drawn where there is none,"
                 + " whatever computed it. An accepted cardinal");
-        System.out.println("landmark's letter is the one exception:"
-                + " on the limb, it goes outward onto the");
-        System.out.println("unused paper by ruling, so its ink is"
-                + " counted apart, under letters, and never");
-        System.out.println("as ink beyond.");
+        System.out.println("landmark's letter is placed outward on"
+                + " the unused paper by ruling, so it is");
+        System.out.println("reported separately, under accepted"
+                + " cardinal; ink beyond still measures all");
+        System.out.println("other module ink.");
         System.out.println();
-        split.machinef("%-16s %10s %10s %9s %9s %9s%n",
+        split.machinef("%-16s %10s %10s %9s %9s %16s%n",
                 "centred on", "ink inside", "ink beyond", "furthest",
-                "names", "letters");
+                "names", "accepted cardinal");
         System.out.printf(Locale.ROOT, "%-16s %-34s%n",
                 "centred on", "centre");
 
@@ -136,7 +136,7 @@ public final class GlobeModuleStudyMain {
                     String.format(Locale.ROOT, "RA %.1f, Dec %+.1f",
                             look.centre().raDegrees(),
                             look.centre().decDegrees()));
-            split.machinef("%-16s %10d %10d %9.4f %9d %9d%n",
+            split.machinef("%-16s %10d %10d %9.4f %9d %16d%n",
                     look.slug(), beyond.inside(), beyond.outside(),
                     beyond.furthest(), names.size(), beyond.letters());
             for (ReferenceInk.NamePlacement name : names) {
