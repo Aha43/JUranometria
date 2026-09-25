@@ -438,6 +438,8 @@ public final class PackagedAcceptanceMain {
         emphasisJourney();
         combinedEmphasisJourney();
         horizonPanJourney();
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                cardinalLandmarkJourney());
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -1436,6 +1438,74 @@ public final class PackagedAcceptanceMain {
                 + " switch preserved the set; one hidden structure"
                 + " left alone; the export named " + joined
                 + " in three formats; Normal settled byte-exactly)");
+    }
+
+    /**
+     * The cardinal landmark journey (#359 completion): the zenith-
+     * centred 180-degree globe the owner opened, with the horizon on,
+     * speaks all four directions in English and Norwegian on both
+     * grounds - the chart's own description carries exactly what its
+     * paint accepted - and says none once the horizon is off. On the
+     * event thread, as the application draws.
+     */
+    private static void cardinalLandmarkJourney() {
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(
+                59.913, 10.752,
+                java.time.Instant.parse("2026-03-20T21:33:00Z"));
+        juranometria.sky.LocalSky sky =
+                new juranometria.sky.LocalSky(oslo);
+        int spoken = 0;
+        for (String language : java.util.List.of("en", "nb-NO")) {
+            juranometria.project.PageWords words =
+                    juranometria.ui.language.PageText.in(
+                            juranometria.ui.language.InterfaceText
+                                    .forLanguage(language));
+            for (juranometria.render.ChartPalette ground
+                    : juranometria.render.ChartPalette.values()) {
+                juranometria.ui.ChartComponent chart =
+                        new juranometria.ui.ChartComponent(
+                                Atlas.assembler(), words);
+                chart.setSize(900, 700);
+                chart.setChartOptions(juranometria.render.ChartOptions
+                        .DEFAULTS.withPalette(ground));
+                juranometria.ui.ChartModuleHost host =
+                        new juranometria.ui.ChartModuleHost(chart,
+                                new juranometria.chart.SelectionModel(),
+                                request -> { });
+                juranometria.meridian.MeridianModule module = host.attach(
+                        new juranometria.meridian.MeridianModule(oslo));
+                module.showing(false, true, false);
+                chart.setViewState(new ChartViewState(sky.zenith(),
+                        180.0, ChartViewState.defaultMagnitudeFor(180.0)));
+                paint(chart);
+                String said = chart.getAccessibleContext()
+                        .getAccessibleDescription();
+                for (juranometria.chart.Cardinal direction
+                        : juranometria.chart.Cardinal.values()) {
+                    require(said.contains(words.directionSpoken(direction)),
+                            language + " on " + ground.storedAs()
+                                    + ": the zenith globe speaks "
+                                    + words.directionSpoken(direction));
+                    spoken++;
+                }
+                module.showing(false, false, false);
+                paint(chart);
+                String quiet = chart.getAccessibleContext()
+                        .getAccessibleDescription();
+                for (juranometria.chart.Cardinal direction
+                        : juranometria.chart.Cardinal.values()) {
+                    require(!quiet.contains(
+                                    words.directionSpoken(direction)),
+                            language + ": horizon off, no "
+                                    + direction);
+                }
+                module.detach();
+            }
+        }
+        System.out.println("cardinal landmarks OK (" + spoken
+                + " directions spoken on the zenith globe across two"
+                + " languages and both grounds; none with the horizon"
+                + " off)");
     }
 
     /**

@@ -48,7 +48,7 @@ platform record beside this and held to reproducing within one environment.
 
 ## The same globe with modules
 
-  SVG  identity: orthographic  no text anchored outside the limb
+  SVG  identity: orthographic  no non-cardinal sky text is anchored outside the limb; 1 accepted cardinal letter is placed outward
   PDF  identity: orthographic  geometry not read back from this format
   PNG  identity: orthographic  no sky ink beyond the limb
 

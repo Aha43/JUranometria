@@ -828,26 +828,61 @@ public final class GlobeExportStudyMain {
                                        double centreX, double centreY,
                                        double discRadius) {
         Pattern text = Pattern.compile(
-                "<text[^>]*\\bx=\"([-0-9.]+)\"[^>]*\\by=\"([-0-9.]+)\"");
+                "<text[^>]*\\bx=\"([-0-9.]+)\"[^>]*\\by=\"([-0-9.]+)\"[^>]*>([^<]*)</text>");
         Matcher found = text.matcher(svg);
         int all = 0;
         List<String> outside = new ArrayList<>();
+        int landmarks = 0;
+        // An accepted cardinal landmark's letter lies outward, beyond
+        // the limb, by the #359 completion ruling: one of the page's
+        // own direction letters, within the landmark ring's reach -
+        // two gaps and two letter heights. Anything else out there is
+        // still the sky's text on the paper.
+        double reach = 2.0 * juranometria.render.CardinalLandmark.GAP
+                + 2.0 * juranometria.render.EquatorialGrid.labelMetrics()
+                        .getHeight();
+        java.util.Set<String> directionLetters = new java.util.HashSet<>();
+        for (juranometria.chart.Cardinal direction
+                : juranometria.chart.Cardinal.values()) {
+            directionLetters.add(ENGLISH.directionLetter(direction));
+        }
         while (found.find()) {
             all++;
             double x = Double.parseDouble(found.group(1));
             double y = Double.parseDouble(found.group(2));
-            if (Math.hypot(x - centreX, y - centreY) > discRadius) {
+            double beyond = Math.hypot(x - centreX, y - centreY)
+                    - discRadius;
+            if (beyond <= 0.0) {
+                continue;
+            }
+            if (directionLetters.contains(found.group(3).trim())
+                    && beyond <= reach) {
+                landmarks++;
+            } else {
                 outside.add(String.format(Locale.ROOT, "%.0f,%.0f",
                         x, y));
             }
         }
-        return new Read(identity,
-                outside.isEmpty()
-                        ? "no text anchored outside the limb"
-                        : "** text anchored outside the limb **",
+        String verdict;
+        if (!outside.isEmpty()) {
+            verdict = "** non-cardinal sky text anchored outside the"
+                    + " limb **";
+        } else if (landmarks == 0) {
+            verdict = "no text anchored outside the limb";
+        } else {
+            verdict = String.format(Locale.ROOT,
+                    "no non-cardinal sky text is anchored outside the"
+                            + " limb; %d accepted cardinal letter%s"
+                            + " placed outward",
+                    landmarks, landmarks == 1 ? " is" : "s are");
+        }
+        return new Read(identity, verdict,
                 String.format(Locale.ROOT,
-                        "%d text elements, %d anchored outside the"
-                                + " limb", all, outside.size()));
+                        "%d text elements, %d non-cardinal anchored"
+                                + " outside the limb, %d accepted"
+                                + " cardinal letter%s placed outward",
+                        all, outside.size(), landmarks,
+                        landmarks == 1 ? "" : "s"));
     }
 
     /** Ink beyond the limb, counted in the written picture. */

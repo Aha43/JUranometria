@@ -330,10 +330,32 @@ class GlobeModuleInkTest {
         ViewportMapping mapping = new ViewportMapping(page);
         var region = mapping.regionFor(page.scene().viewport(),
                 page.projection());
+        // The one ink the #359 completion ruling puts beyond the limb:
+        // an accepted cardinal landmark's letter, outward in the
+        // unused paper. Exactly its box, from the same layout the
+        // paint draws, and nothing else.
+        java.util.List<java.awt.geom.Rectangle2D> letters =
+                new java.util.ArrayList<>();
+        for (ReferenceInk.DirectionPlacement placed
+                : ReferenceInk.directionPlacements(page,
+                        modules().collect(), ENGLISH,
+                        java.util.List.of())) {
+            java.awt.geom.Rectangle2D box = placed.box();
+            letters.add(new java.awt.geom.Rectangle2D.Double(
+                    box.getX() - 1.0, box.getY() - 1.0,
+                    box.getWidth() + 2.0, box.getHeight() + 2.0));
+        }
         double deepest = 0.0;
         for (int y = 0; y < SIDE_PX; y++) {
             for (int x = 0; x < SIDE_PX; x++) {
                 if ((canvas.getRGB(x, y) & 0xFFFFFF) == 0xFFFFFF) {
+                    continue;
+                }
+                boolean aLetter = false;
+                for (java.awt.geom.Rectangle2D box : letters) {
+                    aLetter |= box.contains(x + 0.5, y + 0.5);
+                }
+                if (aLetter) {
                     continue;
                 }
                 double from = Math.hypot(x + 0.5 - region.limbX(),

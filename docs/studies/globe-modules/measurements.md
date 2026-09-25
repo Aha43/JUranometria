@@ -1,7 +1,10 @@
 # Whether the modules' lines stop where the sky does
 
 The observer's lines and the ecliptic, drawn on a hemisphere. Ink beyond the limb
-is sky drawn where there is none, whatever computed it.
+is sky drawn where there is none, whatever computed it. An accepted cardinal
+landmark's letter is placed outward on the unused paper by ruling, so it is
+reported separately, under accepted cardinal; ink beyond still measures all
+other module ink.
 
 centred on       centre                            
 zenith-overhead  RA 151.9, Dec +60.0               

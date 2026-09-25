@@ -1092,7 +1092,29 @@ class SprintThirtyTwoJourneyTest {
                     isFurniture = true;
                 }
             }
-            if (!isFurniture) {
+            // The #359 completion ruling puts an accepted cardinal
+            // landmark's letter outward, beyond the limb: one of the
+            // page's own direction letters, anchored no farther out
+            // than the landmark's ring of candidates reaches - two
+            // gaps, and the box's own extent, which one letter never
+            // makes more than its height. Any other text out there,
+            // or a letter beyond that reach, is still stray.
+            int close = svg.indexOf("</text>", end);
+            String content = close < 0 ? ""
+                    : svg.substring(end + 1, close).trim();
+            boolean aLandmark = false;
+            for (juranometria.chart.Cardinal direction
+                    : juranometria.chart.Cardinal.values()) {
+                aLandmark |= content.equals(ENGLISH
+                        .directionLetter(direction));
+            }
+            double letterHeight = juranometria.render.EquatorialGrid
+                    .labelMetrics().getHeight();
+            double reach = 2.0 * juranometria.render.CardinalLandmark.GAP
+                    + 2.0 * letterHeight;
+            aLandmark &= Math.hypot(x - centreX, y - centreY)
+                    - limb <= reach;
+            if (!isFurniture && !aLandmark) {
                 stray++;
             }
         }

@@ -99,7 +99,8 @@ public final class ReferenceInk {
     private static final double TICK = 4.0;
 
     /** Half the diagonal of a landmark's diamond, in pixels. */
-    private static final double DIAMOND = 6.0;
+    private static final double DIAMOND =
+            juranometria.render.CardinalLandmark.DIAMOND;
 
     /** How far a label sits off the paper's edge. */
     private static final double LABEL_INSET = 4.0;
@@ -324,11 +325,17 @@ public final class ReferenceInk {
                 g2.setColor(mark.color());
                 g2.setStroke(mark.stroke());
                 g2.draw(diamond(placed.at()));
+                // The letter under the paper clip: an outward letter
+                // lies beyond the limb by design, and the sky clip
+                // that halves the diamond would erase it.
+                java.awt.Shape underSky = g2.getClip();
+                g2.setClip(wholePaper);
                 g2.setColor(letterInk);
                 g2.drawString(placed.letter(),
                         (float) placed.box().getMinX(),
                         (float) (placed.box().getMaxY()
                                 - metrics.getDescent()));
+                g2.setClip(underSky);
             }
             return laid.directions();
         } finally {
@@ -471,11 +478,9 @@ public final class ReferenceInk {
      * point within a pixel and a half of it. Everything that is not
      * a cardinal mark keeps the strict rule.
      *
-     * <p>The letter takes the first clean box of four adjacent
-     * candidates - ordered inward on a bounded page, so a limb
-     * mark's letter sits inside the mapped sky - and a box is clean
-     * only when it is wholly on the sky, wholly on the paper, and
-     * touches nothing in {@code taken} or {@code reserved}. When no
+     * <p>The letter takes the first clean box {@link #letterBox}
+     * offers - outward into the unused paper first for a mark on a
+     * bounded page's limb, then the ordinary tiers. When no
      * candidate is clean the whole landmark is omitted: an
      * unexplained diamond and a letter through other ink are both
      * worse than absence, and the mark never slides to a friendlier
@@ -513,40 +518,8 @@ public final class ReferenceInk {
             String letter = words.directionLetter(mark.direction());
             double w = metrics.stringWidth(letter);
             double h = metrics.getAscent() + metrics.getDescent();
-            double gap = DIAMOND + 3.0;
-            List<Rectangle2D> candidates = new ArrayList<>(List.of(
-                    new Rectangle2D.Double(at.x() + gap,
-                            at.y() - h / 2.0, w, h),
-                    new Rectangle2D.Double(at.x() - gap - w,
-                            at.y() - h / 2.0, w, h),
-                    new Rectangle2D.Double(at.x() - w / 2.0,
-                            at.y() + gap, w, h),
-                    new Rectangle2D.Double(at.x() - w / 2.0,
-                            at.y() - gap - h, w, h)));
-            if (bounded) {
-                // Inward first: on the globe the mark is on the limb
-                // and its letter belongs inside the mapped sky, never
-                // outside it where it would read as a page-edge
-                // direction.
-                double cx = paper.getCenterX();
-                double cy = paper.getCenterY();
-                candidates.sort(java.util.Comparator.comparingDouble(
-                        box -> Math.hypot(box.getCenterX() - cx,
-                                box.getCenterY() - cy)));
-            }
-            Rectangle2D box = null;
-            for (Rectangle2D candidate : candidates) {
-                if (!paper.contains(candidate)
-                        || !sky.contains(candidate)) {
-                    continue;
-                }
-                if (overlaps(candidate, taken)
-                        || touchesAny(candidate, reserved)) {
-                    continue;
-                }
-                box = candidate;
-                break;
-            }
+            Rectangle2D box = letterBox(at, w, h, paper, sky, bounded,
+                    taken, reserved);
             if (box == null) {
                 continue;
             }
@@ -558,6 +531,104 @@ public final class ReferenceInk {
                     at, box));
         }
         return List.copyOf(placed);
+    }
+
+    /**
+     * The letter's box, or null (#359, owner rulings on its
+     * completion).
+     *
+     * <p>Candidates come in fixed tiers around the exact point: the
+     * four adjacent boxes, then the four diagonals, then the four
+     * adjacent boxes at twice the distance, then the diagonals there.
+     * A box is clean only when it is wholly on the paper and touches
+     * nothing in {@code taken} or {@code reserved}.
+     *
+     * <p>An ordinary mark's letter must also lie wholly on the sky,
+     * and the tiers are tried in order - the first tier is the four
+     * boxes this mark always had, in the order it always tried them,
+     * so a letter that had a place keeps it. On a bounded page the
+     * boxes of each tier are tried nearest the page centre first.
+     *
+     * <p>A mark on the limb of a bounded page - the horizon of a
+     * zenith-centred globe is the limb itself - looks outward first:
+     * every tier, outermost box first, into the unused paper beyond
+     * the sky, where a box must touch no sky at all. Only when paper
+     * or furniture refuses every outward box does it fall back
+     * inward, with the ordinary rule. The mark never moves: where it
+     * is IS what it says.
+     */
+    private static Rectangle2D letterBox(PixelPoint at, double w,
+            double h, Rectangle2D paper, java.awt.Shape sky,
+            boolean bounded, List<Rectangle2D> taken,
+            List<java.awt.Shape> reserved) {
+        double gap = juranometria.render.CardinalLandmark.GAP;
+        List<List<Rectangle2D>> tiers = List.of(
+                adjacent(at, w, h, gap), diagonal(at, w, h, gap),
+                adjacent(at, w, h, 2.0 * gap),
+                diagonal(at, w, h, 2.0 * gap));
+        double cx = paper.getCenterX();
+        double cy = paper.getCenterY();
+        java.util.Comparator<Rectangle2D> nearestCentre =
+                java.util.Comparator.comparingDouble(box -> Math.hypot(
+                        box.getCenterX() - cx, box.getCenterY() - cy));
+        boolean onLimb = bounded && !sky.contains(at.x() - 1.5,
+                at.y() - 1.5, 3.0, 3.0);
+        if (onLimb) {
+            for (List<Rectangle2D> tier : tiers) {
+                List<Rectangle2D> outward = new ArrayList<>(tier);
+                outward.sort(nearestCentre.reversed());
+                for (Rectangle2D candidate : outward) {
+                    if (paper.contains(candidate)
+                            && !sky.intersects(candidate)
+                            && clear(candidate, taken, reserved)) {
+                        return candidate;
+                    }
+                }
+            }
+        }
+        for (List<Rectangle2D> tier : tiers) {
+            List<Rectangle2D> ordered = new ArrayList<>(tier);
+            if (bounded) {
+                ordered.sort(nearestCentre);
+            }
+            for (Rectangle2D candidate : ordered) {
+                if (paper.contains(candidate) && sky.contains(candidate)
+                        && clear(candidate, taken, reserved)) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static List<Rectangle2D> adjacent(PixelPoint at, double w,
+                                              double h, double gap) {
+        return List.of(
+                new Rectangle2D.Double(at.x() + gap, at.y() - h / 2.0,
+                        w, h),
+                new Rectangle2D.Double(at.x() - gap - w,
+                        at.y() - h / 2.0, w, h),
+                new Rectangle2D.Double(at.x() - w / 2.0, at.y() + gap,
+                        w, h),
+                new Rectangle2D.Double(at.x() - w / 2.0,
+                        at.y() - gap - h, w, h));
+    }
+
+    /** The four corners, three quarters of the gap out on each axis. */
+    private static List<Rectangle2D> diagonal(PixelPoint at, double w,
+                                              double h, double gap) {
+        double d = 0.75 * gap;
+        return List.of(
+                new Rectangle2D.Double(at.x() + d, at.y() + d, w, h),
+                new Rectangle2D.Double(at.x() - d - w, at.y() + d, w, h),
+                new Rectangle2D.Double(at.x() + d, at.y() - d - h, w, h),
+                new Rectangle2D.Double(at.x() - d - w, at.y() - d - h,
+                        w, h));
+    }
+
+    private static boolean clear(Rectangle2D box, List<Rectangle2D> taken,
+                                 List<java.awt.Shape> reserved) {
+        return !overlaps(box, taken) && !touchesAny(box, reserved);
     }
 
     private static boolean touchesAny(Rectangle2D box,

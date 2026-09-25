@@ -316,6 +316,12 @@ public final class ChartComponent extends JComponent {
     private java.util.List<ReferenceInk.DirectionPlacement>
             spokenDirections = java.util.List.of();
 
+    /** The directions the last paint accepted; package-visible so
+     * the landmark journeys can hold letter and position. */
+    java.util.List<ReferenceInk.DirectionPlacement> renderedDirections() {
+        return spokenDirections;
+    }
+
     /**
      * The accessible description: the page, then its rendered
      * cardinal directions in the page's own language (#359).

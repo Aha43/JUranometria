@@ -152,12 +152,23 @@ public record LocalSky(Observer observer) {
                 v[2] / length};
     }
 
+    /**
+     * A unit vector as a position. The declination is taken as the
+     * angle of the vector's height over its reach in the equator's
+     * plane, not as the arcsine of its height: the two agree
+     * exactly, but near a pole the arcsine multiplies the height's
+     * rounding by the secant of the declination - four hundred and
+     * fifty times at 89.87 degrees - and put an equatorial
+     * observer's north point about 1e-12 rad behind the limb of its
+     * own zenith globe. This form's error stays a few ulps
+     * everywhere.
+     */
     private static SkyPosition positionOf(double[] v) {
         double ra = Math.toDegrees(Math.atan2(v[1], v[0]));
         if (ra < 0) {
             ra += 360.0;
         }
-        return new SkyPosition(ra, Math.toDegrees(Math.asin(
-                Math.max(-1.0, Math.min(1.0, v[2])))));
+        return new SkyPosition(ra, Math.toDegrees(Math.atan2(v[2],
+                Math.hypot(v[0], v[1]))));
     }
 }

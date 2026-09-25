@@ -90,11 +90,16 @@ public final class GlobeModuleStudyMain {
         System.out.println("The observer's lines and the ecliptic,"
                 + " drawn on a hemisphere. Ink beyond the limb");
         System.out.println("is sky drawn where there is none,"
-                + " whatever computed it.");
+                + " whatever computed it. An accepted cardinal");
+        System.out.println("landmark's letter is placed outward on"
+                + " the unused paper by ruling, so it is");
+        System.out.println("reported separately, under accepted"
+                + " cardinal; ink beyond still measures all");
+        System.out.println("other module ink.");
         System.out.println();
-        split.machinef("%-16s %10s %10s %9s %9s%n",
+        split.machinef("%-16s %10s %10s %9s %9s %16s%n",
                 "centred on", "ink inside", "ink beyond", "furthest",
-                "names");
+                "names", "accepted cardinal");
         System.out.printf(Locale.ROOT, "%-16s %-34s%n",
                 "centred on", "centre");
 
@@ -106,7 +111,22 @@ public final class GlobeModuleStudyMain {
             ImageIO.write(onlyModules, "png",
                     new File(DIR, look.slug() + ".png"));
 
-            Beyond beyond = beyondTheLimb(onlyModules);
+            // An accepted cardinal landmark's letter lies outward, on
+            // the unused paper, by the #359 completion ruling: its box
+            // comes from the same layout the paint drew, and its ink
+            // is counted apart from the lines'.
+            List<java.awt.geom.Rectangle2D> letters =
+                    new java.util.ArrayList<>();
+            for (ReferenceInk.DirectionPlacement placed
+                    : ReferenceInk.directionPlacements(page,
+                            registry.collect(), ENGLISH,
+                            java.util.List.of())) {
+                java.awt.geom.Rectangle2D box = placed.box();
+                letters.add(new java.awt.geom.Rectangle2D.Double(
+                        box.getX() - 1.0, box.getY() - 1.0,
+                        box.getWidth() + 2.0, box.getHeight() + 2.0));
+            }
+            Beyond beyond = beyondTheLimb(onlyModules, letters);
             List<ReferenceInk.NamePlacement> names =
                     ReferenceInk.namePlacements(page,
                             registry.collect(), ENGLISH,
@@ -116,9 +136,9 @@ public final class GlobeModuleStudyMain {
                     String.format(Locale.ROOT, "RA %.1f, Dec %+.1f",
                             look.centre().raDegrees(),
                             look.centre().decDegrees()));
-            split.machinef("%-16s %10d %10d %9.4f %9d%n",
+            split.machinef("%-16s %10d %10d %9.4f %9d %16d%n",
                     look.slug(), beyond.inside(), beyond.outside(),
-                    beyond.furthest(), names.size());
+                    beyond.furthest(), names.size(), beyond.letters());
             for (ReferenceInk.NamePlacement name : names) {
                 split.machinef("    %-14s %-24s %s%n", name.moduleId(),
                         name.name(),
@@ -164,21 +184,35 @@ public final class GlobeModuleStudyMain {
                         new SkyPosition(266.0, -28.0)));
     }
 
-    /** How much module ink falls inside and outside the limb. */
-    private record Beyond(int inside, int outside, double furthest) {
+    /**
+     * How much module ink falls inside and outside the limb, and how
+     * much is an accepted cardinal letter's.
+     */
+    private record Beyond(int inside, int outside, double furthest,
+                          int letters) {
     }
 
-    private static Beyond beyondTheLimb(BufferedImage ink) {
+    private static Beyond beyondTheLimb(BufferedImage ink,
+            List<java.awt.geom.Rectangle2D> letterBoxes) {
         int ground = ChartPalette.WHITE_PAPER.ground().getRGB()
                 & 0xffffff;
         double centre = SIDE_PX / 2.0;
         double discRadius = FRAME * SIDE_PX / 2.0;
         int inside = 0;
         int outside = 0;
+        int letters = 0;
         double furthest = 0.0;
         for (int y = 0; y < SIDE_PX; y++) {
             for (int x = 0; x < SIDE_PX; x++) {
                 if ((ink.getRGB(x, y) & 0xffffff) == ground) {
+                    continue;
+                }
+                boolean aLetter = false;
+                for (java.awt.geom.Rectangle2D box : letterBoxes) {
+                    aLetter |= box.contains(x + 0.5, y + 0.5);
+                }
+                if (aLetter) {
+                    letters++;
                     continue;
                 }
                 double radius = Math.hypot(x + 0.5 - centre,
@@ -191,7 +225,7 @@ public final class GlobeModuleStudyMain {
                 }
             }
         }
-        return new Beyond(inside, outside, furthest);
+        return new Beyond(inside, outside, furthest, letters);
     }
 
     private static boolean insideTheDisc(Rectangle2D box) {

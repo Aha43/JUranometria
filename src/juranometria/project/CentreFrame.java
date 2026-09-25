@@ -114,6 +114,73 @@ public final class CentreFrame {
     }
 
     /**
+     * How far {@link #directionTo}'s {@code along} can be from the
+     * exact value for this position, by the arithmetic's own error
+     * bound - so that a position exactly ninety degrees from the
+     * centre, which that arithmetic may land a hair either side of
+     * zero, can be told from one genuinely behind it.
+     *
+     * <p>Derived term by term from the computation above, in units of
+     * the unit roundoff {@code u}: each sine or cosine is within one
+     * ulp of the exact function of its argument (at most {@code 2u}
+     * for a value no larger than one) plus the error its argument
+     * already carries; a degrees-to-radians conversion carries
+     * {@code 2u} of the argument; the right-ascension difference
+     * carries both conversions and its own subtraction; each product
+     * and the final sum add {@code u} of their magnitude. The exact
+     * poles and quarter turns, answered exactly above, are bounded as
+     * if they were not: the bound is conservative there, never short.
+     */
+    public double alongUncertainty(SkyPosition position) {
+        double dec = Math.toRadians(position.decDegrees());
+        double centreDec = Math.asin(Math.max(-1.0,
+                Math.min(1.0, sinCentreDec)));
+        double ra = Math.toRadians(position.raDegrees());
+        double offset = ra - centreRaRadians;
+        double[] declination = sineAndCosineOf(position.decDegrees());
+        double s = Math.abs(declination[0]);
+        double c = Math.abs(declination[1]);
+        double s0 = Math.abs(sinCentreDec);
+        double c0 = Math.abs(cosCentreDec);
+        double co = Math.abs(Math.cos(offset));
+        return alongUncertainty(s, c, s0, c0, co, Math.abs(dec),
+                Math.abs(centreDec), Math.abs(ra),
+                Math.abs(centreRaRadians), Math.abs(offset));
+    }
+
+    /**
+     * The same bound at its worst over every position and centre:
+     * every trigonometric magnitude one, every declination a quarter
+     * turn, every right ascension a whole one.
+     */
+    public static final double ALONG_UNCERTAINTY_CEILING =
+            alongUncertainty(1.0, 1.0, 1.0, 1.0, 1.0, Math.PI / 2.0,
+                    Math.PI / 2.0, 2.0 * Math.PI, 2.0 * Math.PI,
+                    2.0 * Math.PI);
+
+    private static double alongUncertainty(double s, double c,
+                                           double s0, double c0,
+                                           double co, double dec,
+                                           double centreDec, double ra,
+                                           double centreRa,
+                                           double offset) {
+        double u = Math.ulp(1.0) / 2.0;
+        double eS = 2.0 * u + 2.0 * u * dec;
+        double eC = eS;
+        double eS0 = 2.0 * u + 2.0 * u * centreDec;
+        double eC0 = eS0;
+        double eCo = 2.0 * u + 2.0 * u * ra + 2.0 * u * centreRa
+                + u * offset;
+        double first = s0 * s;
+        double pair = c0 * c;
+        double second = pair * co;
+        double eFirst = s0 * eS + s * eS0 + u * first;
+        double ePair = c0 * eC + c * eC0 + u * pair;
+        double eSecond = co * ePair + pair * eCo + u * second;
+        return eFirst + eSecond + u * (first + second);
+    }
+
+    /**
      * The sine and cosine of a declination, exact at the poles.
      *
      * <p>Ninety degrees is recognised in degrees because

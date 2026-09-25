@@ -171,6 +171,11 @@ class PageTextTest {
             }
 
             @Override
+            public String titleFactSeparator() {
+                return EN.titleFactSeparator();
+            }
+
+            @Override
             public String magnitudeKeyHeading() {
                 return EN.magnitudeKeyHeading();
             }
