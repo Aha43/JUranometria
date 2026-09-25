@@ -418,7 +418,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/star-identity/polaris-08.png` | `b06e9cc942c61edf782f734712c3e9ac8f9c289cd62275d8535b278d66f45005` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/star-identity/polaris-36.png` | `7f5c6e6b78896dc1bad9e400fbf70579e239c452d2db4f27ab177bc1d0dd6d49` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | StarIdentityStudyMain |
 | `docs/studies/structure-emphasis/orion-120-paper-horizon.png` | `512941f5acd0998446e104c2405d108ca0bba367575afff1a16f88060f601fce` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
-| `docs/studies/structure-emphasis/strip-globe-180-paper-meridian+horizon.png` | `b6db51cc2ad1bae8c798ec53dc02f6ba0c744a8e513b30b04ebb7465cc16d35b` | 2026-09-24 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
+| `docs/studies/structure-emphasis/strip-globe-180-paper-meridian+horizon.png` | `a02bfe5284f8f8751f84feb61e2ccd08fb07e6be033bcfabaeb07c7bf2822c40` | 2026-09-25 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
 | `docs/studies/structure-emphasis/strip-orion-120-paper-ecliptic.png` | `71d369b355aaa146a83ff8a6ee224bb4625cd420a140bb0f4782da783ad472e7` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
 | `docs/studies/structure-emphasis/strip-orion-120-paper-horizon.png` | `6e2725fdf091c9372cb6f27b5c5d152072407dc17053e538c80addb66efa3910` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |
 | `docs/studies/structure-emphasis/strip-orion-42-black-constellation_figures.png` | `5e648a9bc7d9b529a73b1950d34774677c14111dcdc453c0009d1e589fa1fc71` | 2026-09-23 | Mac OS X aarch64, Java 21.0.11 | EmphasisStudyMain |

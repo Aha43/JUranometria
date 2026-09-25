@@ -21,19 +21,19 @@ this desktop's font measures, so both are here. The report beside this one
 carries the centres the modules were asked at and why the sky's own labels
 cannot be moved by any of it.
 
-centred on       ink inside ink beyond  furthest     names
-zenith-overhead        6197         43    1.0009         2
+centred on       ink inside ink beyond  furthest     names accepted cardinal
+zenith-overhead        6051         43    1.0009         2              171
     ecliptic       Ecliptic                 inside the disc
     meridian       Meridian                 inside the disc
-horizon-south          5850          0    0.9996         3
-    ecliptic       Ecliptic                 inside the disc
-    meridian       Mathematical horizon     inside the disc
-    meridian       Meridian                 inside the disc
-ecliptic-high          6717          0    0.9998         3
+horizon-south          5732          0    0.9996         3              127
     ecliptic       Ecliptic                 inside the disc
     meridian       Mathematical horizon     inside the disc
     meridian       Meridian                 inside the disc
-sagittarius            6721          8    1.0004         3
+ecliptic-high          6624          0    0.9998         3               93
+    ecliptic       Ecliptic                 inside the disc
+    meridian       Mathematical horizon     inside the disc
+    meridian       Meridian                 inside the disc
+sagittarius            6641          8    1.0004         3               80
     ecliptic       Ecliptic                 inside the disc
     meridian       Mathematical horizon     inside the disc
     meridian       Meridian                 inside the disc
