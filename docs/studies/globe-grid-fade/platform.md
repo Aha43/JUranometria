@@ -11,21 +11,21 @@ never across two - the portable half of this study is the document beside it.
 |---|---|
 | operating system | Mac OS X |
 | architecture | aarch64 |
-| Java | 21.0.11 |
+| Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 Ink and weight are read off a rendered page, so both are this desktop's
 answer. The report beside this one carries the candidates themselves and the
 rule they are candidates for.
 
 page            at limb    grid ink  grid weight  page weight
-sagittarius        100%       23.4%       10.98%       15.66%
+sagittarius        100%       23.4%       10.98%       15.65%
 sagittarius         35%       23.1%        8.27%       15.45%
-sagittarius         25%       23.1%        7.85%       15.42%
-sagittarius         15%       22.9%        7.44%       15.39%
+sagittarius         25%       23.1%        7.85%       15.41%
+sagittarius         15%       22.9%        7.44%       15.38%
 orion              100%       22.1%       10.13%       14.35%
 orion               35%       21.9%        7.49%       14.04%
-orion               25%       21.8%        7.09%       14.00%
-orion               15%       21.7%        6.68%       13.95%
+orion               25%       21.8%        7.09%       13.99%
+orion               15%       21.7%        6.68%       13.94%
