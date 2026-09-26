@@ -563,6 +563,179 @@ class SheetCaptureSizingTest {
     }
 
     /**
+     * A geometry the policy did not establish is never proved (#376).
+     *
+     * <p>The transition, exactly as the trace of the failed macOS 27
+     * gate recorded it for {@code export-nb-NO-5-pdf-letter.png}: the
+     * pack established 333x223 twice running, with the content at
+     * its preference; a resize left over from the previous sheet -
+     * 326x206, {@code export-nb-NO-4-svg-a4} - then landed while the
+     * layout settled; and the fixed point proved 326x206 with the
+     * preference still 333x223. The paint block restored that proof
+     * faithfully and painted it, because every check after the
+     * proof compared against the proof.
+     *
+     * <p>The stale resize is queued here rather than waited for, so
+     * the transition happens every run instead of once in two. The
+     * layout keeps one answer throughout: nothing about the content
+     * changed, so a capture has no business proving another size.
+     */
+    @Test
+    void aGeometryThePolicyDidNotEstablishIsRefused() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        Bistable[] content = new Bistable[1];
+        Dimension[] stale = new Dimension[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new JDialog(owner[0]);
+                content[0] = new Bistable();
+                content[0].setOpaque(true);
+                dialog[0].setContentPane(content[0]);
+                // The previous sheet's window, which is the size the
+                // leftover resize puts back.
+                content[0].narrow = true;
+                dialog[0].pack();
+                stale[0] = dialog[0].getSize();
+                content[0].narrow = false;
+            });
+            SheetCapture.Sizing packedThenStale = (window, held) -> {
+                SheetCapture.Established packed =
+                        SheetCapture.packed().establish(window, held);
+                SwingUtilities.invokeLater(() -> window.setSize(stale[0]));
+                return packed;
+            };
+            IllegalStateException refused = assertThrows(
+                    IllegalStateException.class,
+                    () -> SheetCapture.take(dialog[0], content[0],
+                            packedThenStale, SheetCapture.Premise.none(),
+                            () -> draw(content[0])),
+                    "a capture that proves a geometry its policy did"
+                            + " not establish paints the previous"
+                            + " sheet's size under this sheet's name");
+            assertTrue(refused.getMessage().contains("333x223")
+                            && refused.getMessage().contains("326x206"),
+                    "the refusal names what was established and what"
+                            + " the layout drifted to: "
+                            + refused.getMessage());
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /**
+     * The same leftover resize, under an application's policy.
+     *
+     * <p>Such a policy has a second stage whose job is to state its
+     * size again at the fixed point, and it runs - but it cannot be
+     * relied on to win. On an unshown window the native peer answers
+     * an earlier resize after a later one: measured here, the
+     * restatement to 420 was overwritten inside its own block by the
+     * answer to the stale request, 19 times in 20. So what is held
+     * is not that the restatement succeeds, but that its failure is
+     * never painted: the picture is the policy's 420, or nothing.
+     * Without a restatement it is always nothing.
+     */
+    @Test
+    void anApplicationPolicyNeverPaintsALeftoverResize() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        JPanel[] content = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new JDialog(owner[0]);
+                content[0] = canvas(300, 200);
+                dialog[0].setContentPane(content[0]);
+                dialog[0].pack();
+            });
+            Runnable restate = () -> {
+                dialog[0].setSize(Math.max(dialog[0].getWidth(), 420),
+                        dialog[0].getHeight());
+                dialog[0].validate();
+            };
+            Runnable policy = () -> {
+                dialog[0].pack();
+                restate.run();
+            };
+            try {
+                var drawn = SheetCapture.of(dialog[0], content[0],
+                        thenStale(SheetCapture.applicationSized(
+                                "test.floorPolicy", policy, restate),
+                                dialog[0], 326));
+                assertEquals(420, drawn.getWidth(),
+                        "a picture, when there is one, is the"
+                                + " policy's width");
+            } catch (IllegalStateException refused) {
+                assertTrue(refused.getMessage().contains(
+                                "content 420x200"),
+                        "or the capture refuses, naming what the"
+                                + " policy established: "
+                                + refused.getMessage());
+            }
+
+            IllegalStateException refused = assertThrows(
+                    IllegalStateException.class,
+                    () -> SheetCapture.of(dialog[0], content[0],
+                            thenStale(SheetCapture.applicationSized(
+                                    "test.silentRestate", policy,
+                                    () -> { }),
+                                    dialog[0], 326)));
+            assertTrue(refused.getMessage().contains("content 420x200"),
+                    "without a restatement the leftover is refused,"
+                            + " not proved: " + refused.getMessage());
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /**
+     * A fixed canvas resized after the study chose it is refused.
+     */
+    @Test
+    void aFixedCanvasResizedAfterItWasChosenIsRefused() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a component still has to exist");
+        JPanel[] content = new JPanel[1];
+        SwingUtilities.invokeAndWait(() -> content[0] = canvas(560, 309));
+        SheetCapture.Sizing chosen = SheetCapture.fixedCanvas(() -> {
+            content[0].setSize(560, 309);
+            content[0].doLayout();
+        });
+        SheetCapture.Sizing thenResized = (window, held) -> {
+            SheetCapture.Established said = chosen.establish(window, held);
+            SwingUtilities.invokeLater(() -> content[0].setSize(420, 309));
+            return said;
+        };
+        IllegalStateException refused = assertThrows(
+                IllegalStateException.class,
+                () -> SheetCapture.take(null, content[0], thenResized,
+                        SheetCapture.Premise.none(),
+                        () -> draw(content[0])));
+        assertTrue(refused.getMessage().contains("560x309")
+                        && refused.getMessage().contains("420x309"),
+                "the study's canvas, and the size it was moved to: "
+                        + refused.getMessage());
+    }
+
+    /** A policy followed by a resize to a stale width. */
+    private static SheetCapture.Sizing thenStale(SheetCapture.Sizing policy,
+                                                 java.awt.Window window,
+                                                 int wide) {
+        return (held, content) -> {
+            SheetCapture.Established said = policy.establish(held, content);
+            SwingUtilities.invokeLater(() ->
+                    window.setSize(wide, window.getHeight()));
+            return said;
+        };
+    }
+
+    /**
      * A fixed canvas is established before proof, never while drawn.
      *
      * <p>{@code FIXED_CANVAS} means the study owns the canvas

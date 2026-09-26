@@ -127,8 +127,11 @@ public final class SheetCapture {
          * it stops moving. What it may not be is repeated later, in
          * the block that paints, because a layout with more than one
          * stable answer can be found at a different one.
+         *
+         * @return what it decided, read where it decided it - which
+         *     is the only geometry the capture may then prove
          */
-        void establish(Window window, JComponent content)
+        Established establish(Window window, JComponent content)
                 throws Exception;
 
         /**
@@ -158,6 +161,64 @@ public final class SheetCapture {
          * that had already succeeded.
          */
         default void restate(Window window, JComponent content) {
+        }
+    }
+
+    /**
+     * The geometry a policy established, stated where it established
+     * it (#376).
+     *
+     * <p>The content is what is held: it is what gets painted, and
+     * it is laid out on the event thread alone. A packed window
+     * states the content its last pack laid out, which the pack only
+     * accepts once it is the size it asks to be; an application-sized
+     * window states the content its policy's last application laid
+     * out, once the size stopped changing; a fixed canvas states the
+     * canvas the study chose. The window is stated where there is one,
+     * and reported, but not held - see {@link #disagreement}.
+     *
+     * <p>It exists because the proof used to be of whatever the
+     * layout was when validating stopped moving it, and nothing
+     * asked whether that was what had been established. A resize
+     * left over from the previous sheet landed between the pack and
+     * the proof, the fixed point proved 326x206 where the pack had
+     * established 333x223 twice running, and restoring the proof
+     * then faithfully put the wrong size back.
+     *
+     * @param window the window's size, or {@code null} for a canvas
+     *     with no window
+     * @param content the content's size, as the policy left it
+     */
+    public record Established(java.awt.Dimension window,
+                              java.awt.Dimension content) {
+
+        /**
+         * What differs between this and the geometry about to be
+         * proved, or {@code null}.
+         */
+        String disagreement(java.awt.Dimension windowNow,
+                            java.awt.Dimension contentNow) {
+            // The content is held; the window is only reported. An
+            // unshown window's size is the native peer's to change,
+            // from its own thread and inside an event block - a
+            // capture measured 420x295 and then 326x295 across one
+            // drawing, with nothing on the event thread between -
+            // so holding it would make refusals depend on timing.
+            // The content is laid out on the event thread alone, and
+            // it is what is painted.
+            if (content == null || content.equals(contentNow)) {
+                return null;
+            }
+            return "content " + said(content) + " in a window "
+                    + said(window) + " was established, and the"
+                    + " layout is about to be proved at content "
+                    + said(contentNow) + " in a window "
+                    + said(windowNow);
+        }
+
+        private static String said(java.awt.Dimension size) {
+            return size == null ? "(none)"
+                    : size.width + "x" + size.height;
         }
     }
 
@@ -352,10 +413,15 @@ public final class SheetCapture {
             }
 
             @Override
-            public void establish(Window window, JComponent content)
+            public Established establish(Window window,
+                                         JComponent content)
                     throws Exception {
                 requireWindow(window);
-                converge(name, new Settling() {
+                // The content is read in the same block as the size
+                // the policy settled on, so what is held is the
+                // layout of that size and not of a later one.
+                java.awt.Dimension[] laidOut = new java.awt.Dimension[1];
+                java.awt.Dimension settled = converge(name, new Settling() {
 
                     @Override
                     public void apply() throws Exception {
@@ -371,8 +437,10 @@ public final class SheetCapture {
                     public java.awt.Dimension observe() throws Exception {
                         java.awt.Dimension[] now =
                                 new java.awt.Dimension[1];
-                        SwingUtilities.invokeAndWait(() ->
-                                now[0] = window.getSize());
+                        SwingUtilities.invokeAndWait(() -> {
+                            now[0] = window.getSize();
+                            laidOut[0] = content.getSize();
+                        });
                         return now[0];
                     }
 
@@ -383,6 +451,7 @@ public final class SheetCapture {
                                 + preferredOf(content);
                     }
                 });
+                return new Established(settled, laidOut[0]);
             }
         };
     }
@@ -482,8 +551,15 @@ public final class SheetCapture {
                         + ", so it is a window with a size, and its"
                         + " kind should say which");
             }
-            SwingUtilities.invokeAndWait(establish);
+            // Read in the block that sized it: the canvas the study
+            // chose, before anything else has had a turn.
+            java.awt.Dimension[] chosen = new java.awt.Dimension[1];
+            SwingUtilities.invokeAndWait(() -> {
+                establish.run();
+                chosen[0] = content.getSize();
+            });
             drain();
+            return new Established(null, chosen[0]);
         };
     }
 
@@ -572,7 +648,12 @@ public final class SheetCapture {
             throws Exception {
         drain();
         canonicalise(content);
-        sizing.establish(window, content);
+        Established established = sizing.establish(window, content);
+        if (established == null) {
+            throw new IllegalStateException("a sizing policy says what"
+                    + " it established, so that nothing else can be"
+                    + " proved in its place. This one said nothing");
+        }
         // Settling reaches the fixed point AND records it, in the
         // same event block, so nothing can move between confirming
         // the geometry and remembering it. The COORDINATOR records
@@ -580,7 +661,7 @@ public final class SheetCapture {
         // that was proved, so every kind gets it put back, and a
         // policy cannot forget to.
         java.awt.Dimension[] proved = new java.awt.Dimension[2];
-        settleLayout(window, content, sizing, proved);
+        settleLayout(window, content, sizing, established, proved);
 
         String[] wrong = new String[1];
         BufferedImage[] drawn = new BufferedImage[1];
@@ -908,9 +989,11 @@ public final class SheetCapture {
 
     private static void settleLayout(Window window, JComponent content,
                                      Sizing sizing,
+                                     Established established,
                                      java.awt.Dimension[] proved)
             throws Exception {
         String geometry = geometryOf(content);
+        String[] notEstablished = new String[1];
         for (int round = 0; round < ROUNDS; round++) {
             SwingUtilities.invokeAndWait(() -> {
                 if (window != null) {
@@ -958,7 +1041,25 @@ public final class SheetCapture {
                                 + content.getWidth() + "x"
                                 + content.getHeight());
                     }
-                    proved[0] = window == null ? null : window.getSize();
+                    // Only what was established may be proved
+                    // (#376). A fixed point is where validating
+                    // stops moving the layout, which is not the same
+                    // as where the policy put it: a resize left over
+                    // from the previous sheet can land in between,
+                    // and the layout settles just as happily at its
+                    // size. That is refused here rather than
+                    // re-established - the policy has already had
+                    // its say, and asking again until a run agrees
+                    // would make the photograph depend on timing.
+                    java.awt.Dimension windowNow =
+                            window == null ? null : window.getSize();
+                    notEstablished[0] = established.disagreement(
+                            windowNow, content.getSize());
+                    if (notEstablished[0] != null) {
+                        trace("refused", notEstablished[0]);
+                        return;
+                    }
+                    proved[0] = windowNow;
                     proved[1] = content.getSize();
                     trace("proved", "round=" + at
                             + " content=" + content.getWidth() + "x"
@@ -971,6 +1072,14 @@ public final class SheetCapture {
                                             + window.getHeight()));
                 }
             });
+            if (notEstablished[0] != null) {
+                tracing(null);
+                throw new IllegalStateException("this capture settled"
+                        + " on a geometry its sizing policy did not"
+                        + " establish: " + notEstablished[0] + ". A"
+                        + " photograph now would be of that size,"
+                        + " under this sheet's name.");
+            }
             String now = seen[0];
             if (now.equals(geometry)) {
                 traceSettled(window, content, now, round);
@@ -1083,19 +1192,26 @@ public final class SheetCapture {
      * a dialog that cannot say how wide it is has no business being
      * photographed.
      */
-    private static void packToFixedPoint(Window window,
-                                         JComponent content)
+    private static Established packToFixedPoint(Window window,
+                                                JComponent content)
             throws Exception {
         if (window == null) {
-            return;
+            // Nothing to pack, so the content's size is all there is
+            // to establish.
+            java.awt.Dimension[] alone = new java.awt.Dimension[1];
+            SwingUtilities.invokeAndWait(() ->
+                    alone[0] = content.getSize());
+            return new Established(null, alone[0]);
         }
         java.awt.Dimension was = null;
         for (int round = 0; round < ROUNDS; round++) {
             java.awt.Dimension[] now = new java.awt.Dimension[1];
+            java.awt.Dimension[] packedAt = new java.awt.Dimension[1];
             boolean[] wanted = new boolean[1];
             SwingUtilities.invokeAndWait(() -> {
                 window.pack();
                 now[0] = window.getSize();
+                packedAt[0] = content.getSize();
                 // The condition that matters, and the one two equal
                 // packs do NOT give you: the component is the size
                 // it asks to be. A wrapping label's preferred width
@@ -1114,7 +1230,10 @@ public final class SheetCapture {
                             : was.width + "x" + was.height)
                     + " contentIsItsPreference=" + wanted[0]);
             if (wanted[0] && now[0].equals(was)) {
-                return;
+                // What this pack said, read in the block that packed
+                // - not after the queue ran, which is where a
+                // leftover resize can land.
+                return new Established(now[0], packedAt[0]);
             }
             was = now[0];
         }
