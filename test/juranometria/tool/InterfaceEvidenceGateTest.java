@@ -295,6 +295,7 @@ class InterfaceEvidenceGateTest {
         Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
                 "the generators have to run to say what they own");
         Path made = Files.createTempDirectory("interface-gate-owns");
+        boolean passed = false;
         try {
             generateAll(made);
             List<String> unowned = new ArrayList<>(
@@ -306,8 +307,12 @@ class InterfaceEvidenceGateTest {
                             + " them. Either a generator is missing"
                             + " from GENERATORS, or the files are"
                             + " residue that should not be committed");
+            passed = true;
         } finally {
             remove(made);
+            if (passed) {
+                Files.deleteIfExists(traceFor(made));
+            }
         }
     }
 
@@ -319,12 +324,18 @@ class InterfaceEvidenceGateTest {
                 "the generators have to run to say what they own");
         List<String> silent = new ArrayList<>();
         Path made = Files.createTempDirectory("interface-gate-claims");
+        // One trace for every generator, BESIDE the directory the
+        // generators write into. Each generator's trace used to live
+        // inside it, so the cleanup below erased the trace of the
+        // very refusal that failed this test (#378).
+        Path trace = traceFor(made);
+        boolean passed = false;
         try {
             for (Map.Entry<String, Photographer> entry
                     : GENERATORS.entrySet()) {
                 Path alone = Files.createDirectory(
                         made.resolve(entry.getKey()));
-                run(entry.getKey(), alone);
+                run(entry.getKey(), alone, trace);
                 List<String> wrote = listing(alone);
                 if (!wrote.contains(entry.getValue().companion())) {
                     silent.add(entry.getKey() + " wrote no "
@@ -339,8 +350,12 @@ class InterfaceEvidenceGateTest {
                     "a registered generator has to produce the"
                             + " companion it is registered for, and"
                             + " the images beside it");
+            passed = true;
         } finally {
             remove(made);
+            if (passed) {
+                Files.deleteIfExists(trace);
+            }
         }
     }
 
@@ -458,6 +473,69 @@ class InterfaceEvidenceGateTest {
             remove(first);
             remove(second);
             remove(Path.of("build", "interface-gate-evidence"));
+        }
+    }
+
+    /**
+     * A refusal keeps its evidence, whatever cleans up after it.
+     *
+     * <p>Mutation-proved against the #378 defect: a real capture
+     * refusal - a probe generator whose window is resized after its
+     * pack, which the coordinator refuses to prove - run exactly as
+     * the claims test runs its generators, into a temporary
+     * directory that is then deleted. What must survive is the
+     * output the generator had written, the trace containing the
+     * refusal, the child's output, and a failure message saying
+     * where they are.
+     */
+    @Test
+    void aRefusingGeneratorKeepsItsOutputTraceAndMessage()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "the probe packs a real window");
+        String probe = "RefusingCaptureProbeMain";
+        Path made = Files.createTempDirectory("interface-gate-refusal");
+        Path trace = traceFor(made);
+        Path kept = failuresKeptAt().resolve(probe);
+        try {
+            Path alone = Files.createDirectory(made.resolve(probe));
+            AssertionError failed = org.junit.jupiter.api.Assertions
+                    .assertThrows(AssertionError.class,
+                            () -> run(probe, alone, trace),
+                            "a refusal fails the run");
+            remove(made);
+            Files.deleteIfExists(trace);
+
+            assertTrue(failed.getMessage().contains(
+                            kept.toAbsolutePath().toString()),
+                    "the failure says where its evidence is: "
+                            + failed.getMessage());
+            assertTrue(failed.getMessage().contains(
+                            "did not establish"),
+                    "and carries the refusal itself: "
+                            + failed.getMessage());
+            assertTrue(Files.exists(kept.resolve("output")
+                            .resolve(RefusingCaptureProbeMain.WROTE)),
+                    "the output the generator wrote before refusing"
+                            + " outlives the directory it was written"
+                            + " to");
+            assertTrue(Files.readString(kept.resolve("trace.tsv"),
+                            StandardCharsets.UTF_8)
+                            .contains("refused\t"),
+                    "the capture trace, with the refusal in it,"
+                            + " outlives the cleanup");
+            assertTrue(Files.readString(kept.resolve("child-output.txt"),
+                            StandardCharsets.UTF_8)
+                            .contains("did not establish"),
+                    "and so does everything the child printed");
+            assertTrue(Files.readString(kept.resolve("SUMMARY.md"),
+                            StandardCharsets.UTF_8)
+                            .contains("did not establish"),
+                    "and the summary names the refusal");
+        } finally {
+            remove(made);
+            Files.deleteIfExists(trace);
+            remove(kept);
         }
     }
 
@@ -667,6 +745,21 @@ class InterfaceEvidenceGateTest {
 
     private static void run(String generator, Path into)
             throws Exception {
+        run(generator, into, traceFor(into));
+    }
+
+    /**
+     * Runs one generator, and keeps everything it left if it fails.
+     *
+     * <p>A generator that fails has usually refused: the capture
+     * coordinator would not prove a geometry its policy did not
+     * establish (#376). That refusal is the finding, and the only
+     * way to investigate it is the trace the capture wrote while it
+     * happened. The failure used to delete it with the temporary
+     * directory, leaving a message and nothing to read (#378).
+     */
+    private static void run(String generator, Path into, Path trace)
+            throws Exception {
         Process made = new ProcessBuilder(
                 Path.of(System.getProperty("java.home"), "bin", "java")
                         .toString(),
@@ -674,16 +767,74 @@ class InterfaceEvidenceGateTest {
                 // A SIBLING of the tree, never inside it: a trace
                 // is not an artifact, and one living among them
                 // would be compared as though it were.
-                "-Djuranometria.capture.trace=" + traceFor(into),
+                "-Djuranometria.capture.trace=" + trace,
                 "juranometria.tool." + generator, into.toString())
                 .redirectErrorStream(true)
                 .start();
         String output = new String(made.getInputStream().readAllBytes(),
                 StandardCharsets.UTF_8);
-        assertTrue(made.waitFor(10, TimeUnit.MINUTES),
-                generator + " finishes");
-        assertEquals(0, made.exitValue(), generator
-                + " succeeded. It said:\n" + output);
+        boolean finished = made.waitFor(10, TimeUnit.MINUTES);
+        if (!finished || made.exitValue() != 0) {
+            // Kept BEFORE the assertion throws, and outside every
+            // temporary directory a caller cleans up.
+            Path kept = retainFailure(generator, into, trace, output,
+                    finished ? "exit " + made.exitValue()
+                            : "did not finish in 10 minutes");
+            assertTrue(finished, generator + " finishes. Its output,"
+                    + " trace and child output are kept at "
+                    + kept.toAbsolutePath());
+            assertEquals(0, made.exitValue(), generator
+                    + " succeeded. Its output directory, capture"
+                    + " trace and child output are kept at "
+                    + kept.toAbsolutePath() + " - inspect them rather"
+                    + " than running this again. It said:\n" + output);
+        }
+    }
+
+    /** Where a failed generator's evidence is kept. */
+    static Path failuresKeptAt() {
+        return Path.of("build", "interface-gate-failures");
+    }
+
+    /**
+     * Keeps a failed generator's evidence where a person can open it.
+     *
+     * <p>Its complete output directory, the capture trace, what the
+     * child process printed, and a summary naming the refusal. The
+     * test never deletes this; only a later failure of the same
+     * generator replaces it.
+     */
+    private static Path retainFailure(String generator, Path into,
+                                      Path trace, String output,
+                                      String how) throws Exception {
+        Path kept = failuresKeptAt().resolve(generator);
+        remove(kept);
+        Files.createDirectories(kept);
+        if (Files.isDirectory(into)) {
+            copyTree(into, kept.resolve("output"));
+        }
+        if (Files.exists(trace)) {
+            Files.copy(trace, kept.resolve("trace.tsv"));
+        }
+        Files.writeString(kept.resolve("child-output.txt"), output,
+                StandardCharsets.UTF_8);
+        String refusal = output.lines()
+                .filter(line -> line.contains("Exception")
+                        || line.contains("Error"))
+                .findFirst().orElse("(the child printed no exception)");
+        Files.writeString(kept.resolve("SUMMARY.md"),
+                "# " + generator + " failed\n\n"
+                        + "- how: " + how + "\n"
+                        + "- refusal: " + refusal + "\n"
+                        + "- output directory: `output/`"
+                        + (Files.isDirectory(into) ? "" : " (none)")
+                        + "\n"
+                        + "- capture trace: `trace.tsv`"
+                        + (Files.exists(trace) ? "" : " (none written)")
+                        + "\n"
+                        + "- child output: `child-output.txt`\n",
+                StandardCharsets.UTF_8);
+        return kept;
     }
 
     private static List<String> listing(Path directory)
