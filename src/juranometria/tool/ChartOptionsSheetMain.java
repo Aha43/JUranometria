@@ -211,18 +211,28 @@ public final class ChartOptionsSheetMain {
         SheetCapture.write(window, content,
                 SheetCapture.applicationSized(
                         "ChartOptionsDialog.settle",
-                        // Establishing and re-stating are the same
-                        // operation here, and may be: settle() does
-                        // not pack. It computes the height for the
-                        // tab that is showing and sets the declared
-                        // ORDINARY_WIDTH, so saying it twice says
-                        // the same thing.
-                        () -> juranometria.app.ChartOptionsDialog.settle(
-                                (juranometria.app.ChartOptionsDialog)
-                                        window),
-                        () -> juranometria.app.ChartOptionsDialog.settle(
-                                (juranometria.app.ChartOptionsDialog)
-                                        window)),
+                        new SheetCapture.ApplicationPolicy() {
+
+                            // ORDINARY_WIDTH and the tallest tab's
+                            // height, computed by the dialog's own
+                            // rule; settle() then sets that size
+                            // without packing.
+                            @Override
+                            public java.awt.Dimension declaredContent() {
+                                return juranometria.app.ChartOptionsDialog
+                                        .settledContentSize(
+                                                (juranometria.app
+                                                        .ChartOptionsDialog)
+                                                        window);
+                            }
+
+                            @Override
+                            public void apply() {
+                                juranometria.app.ChartOptionsDialog.settle(
+                                        (juranometria.app.ChartOptionsDialog)
+                                                window);
+                            }
+                        }),
                 to);
     }
 
