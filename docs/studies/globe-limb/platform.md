@@ -11,10 +11,10 @@ never across two - the portable half of this study is the document beside it.
 |---|---|
 | operating system | Mac OS X |
 | architecture | aarch64 |
-| Java | 21.0.11 |
+| Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 How much of the limb carries ink, and how heavy each candidate is against
 the paper, are read off rendered pages and are this desktop's answer. The

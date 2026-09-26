@@ -86,6 +86,27 @@ public final class PlaceAndTimeDialog extends JDialog {
     }
 
     /**
+     * The content size this dialog's policy gives it, as a value.
+     *
+     * <p>The same rule {@link #applySizePolicy()} applies - the
+     * packed size, with the width raised to {@link #ORDINARY_WIDTH} -
+     * computed from the layout's preference and the window's insets
+     * instead of read back from the window. A photographer holds the
+     * capture to this (#380): an unshown window's size is the native
+     * peer's to change, even straight after {@code setSize}, so the
+     * window cannot say what the policy asked for.
+     */
+    public java.awt.Dimension sizePolicyContent() {
+        addNotify();
+        java.awt.Insets chrome = getInsets();
+        java.awt.Dimension packed = getPreferredSize();
+        return new java.awt.Dimension(
+                Math.max(packed.width, ORDINARY_WIDTH)
+                        - chrome.left - chrome.right,
+                packed.height - chrome.top - chrome.bottom);
+    }
+
+    /**
      * States the reviewed width again, without asking the layout
      * anything.
      *

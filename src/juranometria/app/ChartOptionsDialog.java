@@ -770,16 +770,46 @@ public final class ChartOptionsDialog extends JDialog {
      */
     public static void sizeToScreen(Window window, int width,
                                     int usableHeight) {
+        window.setSize(windowSizeFor(window, width, usableHeight));
+        window.validate();
+    }
+
+    /**
+     * The window size {@link #sizeToScreen(Window, int, int)} asks
+     * for, measured by laying the content out, without asking the
+     * window for it.
+     */
+    public static java.awt.Dimension windowSizeFor(Window window,
+                                                   int width,
+                                                   int usableHeight) {
         window.addNotify();
         Insets chrome = window.getInsets();
         JComponent content = (JComponent)
                 ((javax.swing.RootPaneContainer) window).getContentPane();
         int inner = width - chrome.left - chrome.right;
         int ceiling = ceilingForUsableHeight(usableHeight);
-        window.setSize(width, Math.min(ceiling,
+        return new java.awt.Dimension(width, Math.min(ceiling,
                 tallestTab(content, inner, ceiling)
                         + chrome.top + chrome.bottom));
-        window.validate();
+    }
+
+    /**
+     * The content size {@link #settle} gives this dialog, as a value.
+     *
+     * <p>{@link #ORDINARY_WIDTH} and the height of the tallest tab,
+     * less the window's insets - the same rule, computed rather than
+     * read back from the window. A photographer holds the capture to
+     * this (#380): an unshown window's size is the native peer's to
+     * change, so the window cannot say what the policy asked for.
+     */
+    public static java.awt.Dimension settledContentSize(
+            ChartOptionsDialog dialog) {
+        java.awt.Dimension window = windowSizeFor(dialog, ORDINARY_WIDTH,
+                usableHeight(dialog.getGraphicsConfiguration()));
+        Insets chrome = dialog.getInsets();
+        return new java.awt.Dimension(
+                window.width - chrome.left - chrome.right,
+                window.height - chrome.top - chrome.bottom);
     }
 
     /**

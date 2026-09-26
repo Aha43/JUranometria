@@ -11,10 +11,10 @@ never across two - the portable half of this study is the document beside it.
 |---|---|
 | operating system | Mac OS X |
 | architecture | aarch64 |
-| Java | 21.0.11 |
+| Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 Ink is counted from a rendered page, and a machine that draws a name a
 fraction wider inks more of the paper without anything being wrong. The
@@ -26,7 +26,7 @@ but marks - so the furniture's floor can be told from what the stars add.
 
 page              V    stars       mid      limb      mid*     limb*
                                        (as drawn)      (marks only)
-sagittarius     4.0      303     17.8%     36.7%      3.7%      9.6%
+sagittarius     4.0      303     17.8%     36.6%      3.7%      9.6%
 sagittarius     5.0      910     19.9%     40.6%      6.9%     17.1%
 sagittarius     6.0     2737     24.8%     50.5%     12.8%     31.5%
 sagittarius     7.0     8401     34.8%     65.5%     24.4%     53.6%

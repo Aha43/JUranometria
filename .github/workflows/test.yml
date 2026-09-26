@@ -50,6 +50,19 @@ jobs:
         # Headless. This is the required check and it stays fast and
         # unconditional; what it cannot do is run the journeys that
         # need a screen, which is what the job below is for.
+      - name: Keep a refused generator's evidence
+        # Only when this job failed. A generator the interface gate
+        # runs that fails - usually a capture the coordinator
+        # refused - leaves its output, capture trace, child output
+        # and a summary in build/interface-gate-failures (#378). The
+        # runner is gone once the job ends, so without this a CI
+        # refusal survives only as the text of its log.
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: interface-gate-failures-test
+          path: build/interface-gate-failures
+          if-no-files-found: ignore
 
   # The display-dependent journeys (issue #209). Nineteen tests abort
   # in the headless job - every one that drives a real window - and
@@ -116,6 +129,19 @@ jobs:
           [ "$aborted" = 0 ] \
             || fail "$aborted aborted on a display run; this job" \
                     'exists so that cannot happen quietly'
+      - name: Keep a refused generator's evidence
+        # Only when this job failed. A generator the interface gate
+        # runs that fails - usually a capture the coordinator
+        # refused - leaves its output, capture trace, child output
+        # and a summary in build/interface-gate-failures (#378). The
+        # runner is gone once the job ends, so without this a CI
+        # refusal survives only as the text of its log.
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: interface-gate-failures-display
+          path: build/interface-gate-failures
+          if-no-files-found: ignore
 
   # Generated evidence, checked against its own generators (issue
   # #315). `make test` never runs this, and at the end of #314 the
