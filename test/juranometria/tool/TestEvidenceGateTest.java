@@ -530,7 +530,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(48, display.size(),
+        assertEquals(50, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -630,7 +630,14 @@ class TestEvidenceGateTest {
                         + " locale, since on an English machine \"the"
                         + " atlas installed Norwegian\" and \"the"
                         + " platform happened to agree\" are the same"
-                        + " observation");
+                        + " observation; and #380's two size"
+                        + " declarations, Place and Time's and Chart"
+                        + " Options', which measure a real dialog's"
+                        + " packed preference and insets - neither"
+                        + " exists until the window has a native"
+                        + " peer, and a declaration proved against a"
+                        + " panel would be proved against a size no"
+                        + " window has");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
