@@ -36,10 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * runs out of sixteen, while the committed sheet and every reader
  * had 420.
  *
- * <p>And a policy brought once is not enough: the peer pulls an
- * unshown window back to its packed size an event cycle later, so the
- * policy is held again in the block that paints. The first repair
- * omitted that and still produced 324 px three times in sixteen.
+ * <p>And an application's size cannot be read back from its window:
+ * the peer pulls an unshown window back to its packed size, sometimes
+ * inside the very block that set it. So an application policy
+ * declares its content size as a value, and the capture is held to
+ * that (#380).
  */
 class SheetCaptureSizingTest {
 
@@ -112,322 +113,6 @@ class SheetCaptureSizingTest {
             assertEquals(200, drawn.getHeight());
         } finally {
             dispose(owner[0]);
-        }
-    }
-
-    @Test
-    void applicationSizedPaintsThePolicysGeometry() throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a real window has to be sized");
-        JFrame[] owner = new JFrame[1];
-        JDialog[] dialog = new JDialog[1];
-        JPanel[] content = new JPanel[1];
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                owner[0] = new JFrame("owner");
-                dialog[0] = new JDialog(owner[0]);
-                content[0] = canvas(300, 200);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
-            });
-            // The same shape as Place and Time: pack, then raise the
-            // width to a floor the application states.
-            Runnable policy = () -> {
-                dialog[0].pack();
-                dialog[0].setSize(Math.max(dialog[0].getWidth(), 420),
-                        dialog[0].getHeight());
-                dialog[0].invalidate();
-                dialog[0].validate();
-            };
-            var drawn = SheetCapture.of(dialog[0], content[0],
-                    SheetCapture.applicationSized("test.floorPolicy", policy, policy));
-            assertEquals(420, drawn.getWidth(),
-                    "the policy decides, not the preference. Packing"
-                            + " would have given 300 - a width no"
-                            + " reader meets");
-        } finally {
-            dispose(dialog[0], owner[0]);
-        }
-    }
-
-    /**
-     * Packing an application-sized window gives the wrong picture.
-     *
-     * <p>The mutation, in miniature: the same window, photographed
-     * both ways, disagreeing exactly as Place and Time did before
-     * the repair.
-     */
-    @Test
-    void packingAnApplicationSizedWindowProducesTheWidthNobodySees()
-            throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a real window has to be sized");
-        JFrame[] owner = new JFrame[1];
-        JDialog[] dialog = new JDialog[1];
-        JPanel[] content = new JPanel[1];
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                owner[0] = new JFrame("owner");
-                dialog[0] = new JDialog(owner[0]);
-                content[0] = canvas(326, 263);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
-            });
-            Runnable policy = () -> {
-                dialog[0].pack();
-                dialog[0].setSize(Math.max(dialog[0].getWidth(), 420),
-                        dialog[0].getHeight());
-                dialog[0].invalidate();
-                dialog[0].validate();
-            };
-            int byPolicy = SheetCapture.of(dialog[0], content[0],
-                    SheetCapture.applicationSized("test.floorPolicy", policy, policy)).getWidth();
-            int byPacking = SheetCapture.of(dialog[0], content[0],
-                    SheetCapture.packed()).getWidth();
-
-            assertEquals(420, byPolicy, "the reader's width");
-            assertEquals(326, byPacking,
-                    "and the one packing gives, which is the defect"
-                            + " this distinction exists to prevent");
-            assertTrue(byPolicy != byPacking,
-                    "the two kinds must be able to disagree, or"
-                            + " declaring the kind would be"
-                            + " decoration");
-        } finally {
-            dispose(dialog[0], owner[0]);
-        }
-    }
-
-    /**
-     * A policy that never settles refuses, and says enough to act on.
-     *
-     * <p>Driven through the convergence seam with in-memory sizes
-     * rather than a real dialog. The earlier version invented widths
-     * on an unshown native window and trusted it to keep them; under
-     * a virtual display it does not always, so the policy appeared
-     * to settle and the refusal never came. That test passed on one
-     * machine and failed on another from identical inputs - which is
-     * the defect this whole issue is about, committed in a test.
-     *
-     * <p>What is worth holding here is the loop's own rule: a size
-     * that is different every time it is asked for has no answer to
-     * photograph. That rule is arithmetic, and needs no window.
-     */
-    @Test
-    void aPolicyThatNeverSettlesRefusesAndNamesTheGeometry()
-            throws Exception {
-        int[] wider = {400};
-        IllegalStateException refused = assertThrows(
-                IllegalStateException.class,
-                () -> SheetCapture.converge("test.neverSettles",
-                        new SheetCapture.Settling() {
-                            @Override
-                            public void apply() {
-                            }
-
-                            @Override
-                            public void letTheQueueRun() {
-                            }
-
-                            @Override
-                            public Dimension observe() {
-                                return new Dimension(wider[0]++, 200);
-                            }
-
-                            @Override
-                            public String describe() {
-                                return "its content is 300x200 and"
-                                        + " prefers 300x200";
-                            }
-                        }));
-        String said = refused.getMessage();
-        assertTrue(said.contains("never") && said.contains("settled"),
-                said);
-        assertTrue(said.contains("test.neverSettles"),
-                "the refusal NAMES the policy - a lambda's generated"
-                        + " class name points nowhere a reader can"
-                        + " open: " + said);
-        assertTrue(said.contains("300x200"),
-                "and says what the content is and prefers: " + said);
-    }
-
-    /**
-     * A settled policy is one whose answer survives its own queue.
-     *
-     * <p>The other half of the same rule, so the refusal above is
-     * not passing for want of any answer at all.
-     */
-    @Test
-    void aPolicyWhoseAnswerRepeatsHasSettled() throws Exception {
-        int[] asked = {0};
-        Dimension settled = SheetCapture.converge("test.steady",
-                new SheetCapture.Settling() {
-                    @Override
-                    public void apply() {
-                    }
-
-                    @Override
-                    public void letTheQueueRun() {
-                    }
-
-                    @Override
-                    public Dimension observe() {
-                        asked[0]++;
-                        return new Dimension(420, 263);
-                    }
-                });
-        assertEquals(new Dimension(420, 263), settled,
-                "the size it settled on is returned");
-        assertEquals(2, asked[0],
-                "and it took two observations to know that, which is"
-                        + " the least that can establish a repeat");
-    }
-
-    /** An application policy with no window is an impossible claim. */
-    @Test
-    void anApplicationPolicyWithoutAWindowIsRefused() throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a component still has to exist");
-        JPanel[] content = new JPanel[1];
-        SwingUtilities.invokeAndWait(() -> content[0] = canvas(300, 200));
-        assertThrows(IllegalArgumentException.class,
-                () -> SheetCapture.of(null, content[0],
-                        SheetCapture.applicationSized("test.nothing", () -> { }, () -> { })),
-                "a component with no window is a fixed canvas, not a"
-                        + " window with a policy. Succeeding here"
-                        + " would make an impossible declaration look"
-                        + " valid");
-    }
-
-    /**
-     * No policy operation runs between restoring and painting.
-     *
-     * <p>The last thing that was still doing harm. The coordinator
-     * had already restored the content pane to the proved 420, and
-     * a policy call after it pulled the pane back to 324 - because
-     * on an unshown window the peer answers {@code setSize} with the
-     * packed width, and validating the window carries that answer
-     * down into the content. The correction was succeeding and the
-     * policy was undoing it.
-     *
-     * <p>So the policy establishes the geometry before the proof is
-     * taken, and the block that paints only puts the snapshot back.
-     * This counts: the sizing must be asked to state its size
-     * exactly once, and not again where nothing may move.
-     */
-    @Test
-    void noPolicyOperationRunsBetweenRestoringAndPainting()
-            throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a real window has to be sized");
-        JFrame[] owner = new JFrame[1];
-        JDialog[] dialog = new JDialog[1];
-        JPanel[] content = new JPanel[1];
-        int[] stated = {0};
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                owner[0] = new JFrame("owner");
-                dialog[0] = new JDialog(owner[0]);
-                content[0] = canvas(326, 263);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
-            });
-            Runnable floorOnly = () -> {
-                stated[0]++;
-                dialog[0].setSize(Math.max(dialog[0].getWidth(), 420),
-                        dialog[0].getHeight());
-                dialog[0].invalidate();
-                dialog[0].validate();
-            };
-            Runnable establish = () -> {
-                dialog[0].pack();
-                floorOnly.run();
-            };
-
-            var drawn = SheetCapture.of(dialog[0], content[0],
-                    SheetCapture.applicationSized("test.counted",
-                            establish, floorOnly));
-
-            int duringEstablish = stated[0];
-            assertTrue(duringEstablish > 0,
-                    "the premise: the policy did state its size while"
-                            + " the geometry was being established");
-            assertEquals(420, drawn.getWidth(),
-                    "and the picture is the established width");
-
-            // The count is what matters: every statement of the size
-            // belongs to establishing it, and none to the block that
-            // paints. A policy call reintroduced there would raise
-            // this above what establishing needed.
-            SwingUtilities.invokeAndWait(() -> { });
-            assertEquals(duringEstablish, stated[0],
-                    "and nothing asked the policy again after the"
-                            + " geometry was proved");
-        } finally {
-            dispose(dialog[0], owner[0]);
-        }
-    }
-
-    /**
-     * An application-sized window is put back to its own geometry.
-     *
-     * <p>Place and Time's shape, and the recurrence's numbers. The
-     * dialog's layout prefers <strong>326</strong>; its policy
-     * raises that to a reviewed <strong>420</strong> floor, which is
-     * what a reader meets and what is committed. The capture settles
-     * at 420. Then the geometry drifts back to the packed 326 before
-     * the paint - which is what the peer does to an unshown window
-     * an event cycle later, and what the retained pair showed.
-     *
-     * <p>Restoring only packed captures was not enough: that is
-     * exactly the gap this fell through, because Place and Time is
-     * not packed. The coordinator restores after every sizing's
-     * hold, and this is the contract that says so.
-     */
-    @Test
-    void anApplicationSizedWindowIsPutBackToItsPolicysGeometry()
-            throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a real window has to be sized");
-        JFrame[] owner = new JFrame[1];
-        JDialog[] dialog = new JDialog[1];
-        JPanel[] content = new JPanel[1];
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                owner[0] = new JFrame("owner");
-                dialog[0] = new JDialog(owner[0]);
-                content[0] = canvas(326, 263);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
-            });
-            // The dialog's own policy, as PlaceAndTimeDialog states
-            // it: pack, then raise the width to the reviewed floor.
-            // Place and Time's shape exactly: establishing packs
-            // and then raises to the floor; re-stating raises to the
-            // floor and does not pack.
-            Runnable floorOnly = () -> {
-                dialog[0].setSize(Math.max(dialog[0].getWidth(), 420),
-                        dialog[0].getHeight());
-                dialog[0].invalidate();
-                dialog[0].validate();
-            };
-            Runnable policy = () -> {
-                dialog[0].pack();
-                floorOnly.run();
-            };
-            var drawn = SheetCapture.of(dialog[0], content[0],
-                    SheetCapture.applicationSized(
-                            "test.reviewedFloor", policy, floorOnly));
-
-            assertEquals(420, drawn.getWidth(),
-                    "the picture is the width a reader meets. 326 is"
-                            + " the packed width the peer pulls an"
-                            + " unshown dialog back to, and it is"
-                            + " what the retained pair was"
-                            + " photographed at");
-            assertEquals(263, drawn.getHeight());
-        } finally {
-            dispose(dialog[0], owner[0]);
         }
     }
 
@@ -627,74 +312,6 @@ class SheetCaptureSizingTest {
     }
 
     /**
-     * The same leftover resize, under an application's policy.
-     *
-     * <p>Such a policy has a second stage whose job is to state its
-     * size again at the fixed point, and it runs - but it cannot be
-     * relied on to win. On an unshown window the native peer answers
-     * an earlier resize after a later one: measured here, the
-     * restatement to 420 was overwritten inside its own block by the
-     * answer to the stale request, 19 times in 20. So what is held
-     * is not that the restatement succeeds, but that its failure is
-     * never painted: the picture is the policy's 420, or nothing.
-     * Without a restatement it is always nothing.
-     */
-    @Test
-    void anApplicationPolicyNeverPaintsALeftoverResize() throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "a real window has to be sized");
-        JFrame[] owner = new JFrame[1];
-        JDialog[] dialog = new JDialog[1];
-        JPanel[] content = new JPanel[1];
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                owner[0] = new JFrame("owner");
-                dialog[0] = new JDialog(owner[0]);
-                content[0] = canvas(300, 200);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
-            });
-            Runnable restate = () -> {
-                dialog[0].setSize(Math.max(dialog[0].getWidth(), 420),
-                        dialog[0].getHeight());
-                dialog[0].validate();
-            };
-            Runnable policy = () -> {
-                dialog[0].pack();
-                restate.run();
-            };
-            try {
-                var drawn = SheetCapture.of(dialog[0], content[0],
-                        thenStale(SheetCapture.applicationSized(
-                                "test.floorPolicy", policy, restate),
-                                dialog[0], 326));
-                assertEquals(420, drawn.getWidth(),
-                        "a picture, when there is one, is the"
-                                + " policy's width");
-            } catch (IllegalStateException refused) {
-                assertTrue(refused.getMessage().contains(
-                                "content 420x200"),
-                        "or the capture refuses, naming what the"
-                                + " policy established: "
-                                + refused.getMessage());
-            }
-
-            IllegalStateException refused = assertThrows(
-                    IllegalStateException.class,
-                    () -> SheetCapture.of(dialog[0], content[0],
-                            thenStale(SheetCapture.applicationSized(
-                                    "test.silentRestate", policy,
-                                    () -> { }),
-                                    dialog[0], 326)));
-            assertTrue(refused.getMessage().contains("content 420x200"),
-                    "without a restatement the leftover is refused,"
-                            + " not proved: " + refused.getMessage());
-        } finally {
-            dispose(dialog[0], owner[0]);
-        }
-    }
-
-    /**
      * A fixed canvas resized after the study chose it is refused.
      */
     @Test
@@ -721,18 +338,6 @@ class SheetCaptureSizingTest {
                         && refused.getMessage().contains("420x309"),
                 "the study's canvas, and the size it was moved to: "
                         + refused.getMessage());
-    }
-
-    /** A policy followed by a resize to a stale width. */
-    private static SheetCapture.Sizing thenStale(SheetCapture.Sizing policy,
-                                                 java.awt.Window window,
-                                                 int wide) {
-        return (held, content) -> {
-            SheetCapture.Established said = policy.establish(held, content);
-            SwingUtilities.invokeLater(() ->
-                    window.setSize(wide, window.getHeight()));
-            return said;
-        };
     }
 
     /**
@@ -872,74 +477,562 @@ class SheetCaptureSizingTest {
         }
     }
 
+    // ---- application-sized: a declared value, restated once (#380) --
+
+    /** The reviewed floor these contracts use, as Place and Time's. */
+    private static final int FLOOR = 420;
+
     /**
-     * A size that only lasts until the queue runs is not a size.
-     *
-     * <p>The second failure mode. An application policy sets the
-     * window to 420 and the peer answers, an event cycle later, by
-     * pulling an unshown window back to its packed width - landing
-     * somewhere slightly different each time, as this dialog's two
-     * stable widths do. Observed inside the block that applied the
-     * policy, the answer is 420 every round and the capture settles
-     * at once on a width the window does not have by the time
-     * anything is painted. Observed after the queue has run, the
-     * answer is what the window actually kept.
-     *
-     * <p>Held in memory rather than through a real dialog. The
-     * earlier version relied on an unshown native window keeping
-     * invented sizes, which under a virtual display it does not
-     * always do - so the transient never appeared, the refusal never
-     * came, and the contract passed on one machine and failed on
-     * another from identical inputs.
+     * Place and Time's rule in miniature: packed, with the width
+     * raised to the floor. The declaration is computed from the
+     * layout's preference and the window's insets, the application
+     * operation packs and raises - two statements of one rule.
+     */
+    private static SheetCapture.ApplicationPolicy floorPolicy(
+            JDialog dialog) {
+        return new SheetCapture.ApplicationPolicy() {
+
+            @Override
+            public Dimension declaredContent() {
+                dialog.addNotify();
+                java.awt.Insets chrome = dialog.getInsets();
+                Dimension packed = dialog.getPreferredSize();
+                return new Dimension(
+                        Math.max(packed.width, FLOOR)
+                                - chrome.left - chrome.right,
+                        packed.height - chrome.top - chrome.bottom);
+            }
+
+            @Override
+            public void apply() {
+                dialog.pack();
+                dialog.setSize(Math.max(dialog.getWidth(), FLOOR),
+                        dialog.getHeight());
+                dialog.invalidate();
+                dialog.validate();
+            }
+        };
+    }
+
+    /** A packed dialog around a content, so it has a native peer. */
+    private static JDialog packedAround(JFrame[] owner, JPanel content,
+                                        JDialog dialog) {
+        if (owner[0] == null) {
+            owner[0] = new JFrame("owner");
+        }
+        JDialog made = dialog != null ? dialog : new JDialog(owner[0]);
+        made.setContentPane(content);
+        made.pack();
+        return made;
+    }
+
+    /** The floor's content width on this window. */
+    private static int floorContent(JDialog dialog) {
+        java.awt.Insets chrome = dialog.getInsets();
+        return FLOOR - chrome.left - chrome.right;
+    }
+
+    /**
+     * The declared size is what is painted, not the preference.
      */
     @Test
-    void aSizeThatOnlyLastsUntilTheQueueRunsIsNotSettled()
+    void applicationSizedPaintsTheDeclaredGeometry() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        JPanel[] content = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                content[0] = canvas(300, 200);
+                dialog[0] = packedAround(owner, content[0], null);
+            });
+            var drawn = SheetCapture.of(dialog[0], content[0],
+                    SheetCapture.applicationSized("test.floorPolicy",
+                            floorPolicy(dialog[0])));
+            assertEquals(floorContent(dialog[0]), drawn.getWidth(),
+                    "the policy decides, not the preference. Packing"
+                            + " would have given 300 - a width no"
+                            + " reader meets");
+            assertEquals(200, drawn.getHeight());
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /**
+     * Packing an application-sized window gives the wrong picture.
+     *
+     * <p>The mutation, in miniature: the same window, photographed
+     * both ways, disagreeing exactly as Place and Time did before it
+     * was classified.
+     */
+    @Test
+    void packingAnApplicationSizedWindowProducesTheWidthNobodySees()
             throws Exception {
-        // What the window "is", as the policy and the peer take
-        // turns with it.
-        Dimension[] size = {new Dimension(326, 263)};
-        int[] peerKeeps = {324};
-        List<String> order = new ArrayList<>();
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        // Two dialogs, one per kind. Photographing one dialog both
+        // ways let the native reply to the first capture's sizing
+        // land in the second - the #376 transition, which the
+        // coordinator correctly refuses - and this compares the two
+        // kinds, not what one capture leaves behind for the next.
+        JFrame[] owner = new JFrame[1];
+        JDialog[] byPolicyDialog = new JDialog[1];
+        JDialog[] byPackingDialog = new JDialog[1];
+        JPanel[] policyContent = new JPanel[1];
+        JPanel[] packedContent = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                policyContent[0] = canvas(326, 263);
+                packedContent[0] = canvas(326, 263);
+                byPolicyDialog[0] = packedAround(owner, policyContent[0],
+                        null);
+                byPackingDialog[0] = packedAround(owner,
+                        packedContent[0], null);
+            });
+            int byPolicy = SheetCapture.of(byPolicyDialog[0],
+                    policyContent[0], SheetCapture.applicationSized(
+                            "test.floorPolicy",
+                            floorPolicy(byPolicyDialog[0]))).getWidth();
+            int byPacking = SheetCapture.of(byPackingDialog[0],
+                    packedContent[0], SheetCapture.packed()).getWidth();
 
-        IllegalStateException refused = assertThrows(
-                IllegalStateException.class,
-                () -> SheetCapture.converge("test.transientFloor",
-                        new SheetCapture.Settling() {
-                            @Override
-                            public void apply() {
-                                order.add("apply");
-                                size[0] = new Dimension(420, 263);
-                            }
+            assertEquals(floorContent(byPolicyDialog[0]), byPolicy,
+                    "the reader's width");
+            assertEquals(326, byPacking,
+                    "and the one packing gives, which is the defect"
+                            + " this distinction exists to prevent");
+        } finally {
+            dispose(byPolicyDialog[0], byPackingDialog[0], owner[0]);
+        }
+    }
 
-                            @Override
-                            public void letTheQueueRun() {
-                                order.add("queue");
-                                // The peer's answer, a cycle later.
-                                size[0] = new Dimension(peerKeeps[0]++,
-                                        263);
-                            }
+    /** An application policy needs a window to size. */
+    @Test
+    void anApplicationPolicyWithoutAWindowIsRefused() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a component still has to exist");
+        JPanel[] content = new JPanel[1];
+        SwingUtilities.invokeAndWait(() -> content[0] = canvas(300, 200));
+        assertThrows(IllegalArgumentException.class,
+                () -> SheetCapture.take(null, content[0],
+                        SheetCapture.applicationSized("test.nothing",
+                                new SheetCapture.ApplicationPolicy() {
+                                    @Override
+                                    public Dimension declaredContent() {
+                                        return new Dimension(300, 200);
+                                    }
 
-                            @Override
-                            public Dimension observe() {
-                                order.add("observe");
-                                return size[0];
-                            }
-                        }));
+                                    @Override
+                                    public void apply() {
+                                    }
+                                }),
+                        SheetCapture.Premise.none(),
+                        () -> draw(content[0])),
+                "a component with no window is a fixed canvas, and"
+                        + " declaring it application-sized makes an"
+                        + " impossible claim look valid");
+    }
 
-        assertTrue(refused.getMessage().contains("test.transientFloor"),
-                "the refusal names the policy: "
-                        + refused.getMessage());
-        assertTrue(refused.getMessage().contains("never")
-                        && refused.getMessage().contains("settled"),
-                "and says it never settled, rather than reporting the"
-                        + " 420 it held for one event cycle: "
-                        + refused.getMessage());
-        assertEquals(List.of("apply", "queue", "observe"),
-                order.subList(0, 3),
-                "because the size is observed AFTER the queue has"
-                        + " run. Observing before it is how a 420 the"
-                        + " peer had already answered with 324 got"
-                        + " recorded as settled");
+    /**
+     * Declared once, applied once, restated once - with the frozen
+     * value.
+     *
+     * <p>The declaration is asked for exactly once and copied: this
+     * policy hands back an object it then changes, and would answer
+     * differently if asked again. The restatement is the second and
+     * last statement of the size, and it states the original value.
+     */
+    @Test
+    void theDeclarationIsFrozenAndRestatedExactlyOnce() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        Path trace = Files.createTempFile("restated-once", ".tsv");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        JPanel[] content = new JPanel[1];
+        int[] asked = {0};
+        int[] applied = {0};
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                content[0] = canvas(300, 200);
+                dialog[0] = packedAround(owner, content[0], null);
+            });
+            SheetCapture.ApplicationPolicy rule = floorPolicy(dialog[0]);
+            Dimension[] handedOut = new Dimension[1];
+            var drawn = traced(trace, () -> SheetCapture.of(dialog[0],
+                    content[0], SheetCapture.applicationSized(
+                            "test.frozen",
+                            new SheetCapture.ApplicationPolicy() {
+                                @Override
+                                public Dimension declaredContent() {
+                                    asked[0]++;
+                                    handedOut[0] = asked[0] == 1
+                                            ? rule.declaredContent()
+                                            : new Dimension(360, 180);
+                                    return handedOut[0];
+                                }
+
+                                @Override
+                                public void apply() {
+                                    applied[0]++;
+                                    rule.apply();
+                                    // Changes what it handed out.
+                                    handedOut[0].setSize(360, 180);
+                                }
+                            })).getWidth());
+            List<String> lines = Files.readAllLines(trace,
+                    StandardCharsets.UTF_8);
+            long restated = lines.stream()
+                    .filter(one -> one.startsWith("restating")).count();
+
+            assertEquals(1, asked[0], "declared once");
+            assertEquals(1, applied[0], "applied once, and not again");
+            assertEquals(1, restated,
+                    "restated exactly once: " + lines);
+            assertTrue(lines.stream().filter(one ->
+                                    one.startsWith("restating"))
+                            .allMatch(one -> one.contains("content="
+                                    + floorContent(dialog[0]) + "x200")),
+                    "with the value frozen when it was declared, not"
+                            + " the one the policy changed it to: "
+                            + lines);
+            assertEquals(floorContent(dialog[0]), drawn,
+                    "and that value is what is painted");
+        } finally {
+            dispose(dialog[0], owner[0]);
+            Files.deleteIfExists(trace);
+        }
+    }
+
+    /**
+     * A window whose every size request is rolled back to 326 -
+     * except the restatement's.
+     *
+     * <p>The pre-restatement rollback, made persistent: anything the
+     * policy asks for through {@code setSize(int, int)} (which is
+     * also how {@code pack} sizes a window) is answered with 326, as
+     * the macOS peer answers an unshown dialog. Only the capture's
+     * restatement of the frozen declaration, which states a
+     * {@code Dimension}, is honoured. So nothing but the restatement
+     * can bring this window to the declared width.
+     */
+    private static final class RolledBackUntilRestated extends JDialog {
+
+        RolledBackUntilRestated(JFrame owner) {
+            super(owner);
+        }
+
+        @Override
+        public void setSize(int width, int height) {
+            super.setSize(326, height);
+        }
+
+        @Override
+        public void setSize(Dimension size) {
+            // Past this class's own rollback, to Window's.
+            super.setSize(size.width, size.height);
+        }
+    }
+
+    /**
+     * A rollback before the restatement is corrected by it.
+     *
+     * <p>Still part of establishing the size: the window answers the
+     * policy's own request with the packed width, and the one
+     * restatement of the frozen declaration is what puts the policy's
+     * size in place before anything is proved.
+     */
+    @Test
+    void aRollbackBeforeTheRestatementIsCorrected() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        RolledBackUntilRestated[] dialog = new RolledBackUntilRestated[1];
+        JPanel[] content = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new RolledBackUntilRestated(owner[0]);
+                content[0] = canvas(326, 263);
+                packedAround(owner, content[0], dialog[0]);
+            });
+            var drawn = SheetCapture.of(dialog[0], content[0],
+                    SheetCapture.applicationSized("test.rolledBackEarly",
+                            floorPolicy(dialog[0])));
+            assertEquals(floorContent(dialog[0]), drawn.getWidth(),
+                    "the policy's request came back as 326; the"
+                            + " restatement of the declared width is"
+                            + " what put it in place");
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /** A window that the "peer" rolls back after the restatement. */
+    private static final class RolledBackAfterRestating extends JDialog {
+
+        private boolean armed;
+
+        RolledBackAfterRestating(JFrame owner) {
+            super(owner);
+        }
+
+        @Override
+        public void setSize(Dimension size) {
+            super.setSize(size);
+            if (armed) {
+                // The measured macOS case: the peer's answer to an
+                // earlier request, landing inside the restatement's
+                // own block.
+                super.setSize(326, size.height);
+            }
+        }
+    }
+
+    /**
+     * A rollback after the restatement contradicts what was
+     * established, and refuses.
+     */
+    @Test
+    void aRollbackAfterTheRestatementRefuses() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        RolledBackAfterRestating[] dialog = new RolledBackAfterRestating[1];
+        JPanel[] content = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new RolledBackAfterRestating(owner[0]);
+                content[0] = canvas(300, 263);
+                packedAround(owner, content[0], dialog[0]);
+            });
+            SheetCapture.ApplicationPolicy rule = floorPolicy(dialog[0]);
+            IllegalStateException refused = assertThrows(
+                    IllegalStateException.class,
+                    () -> SheetCapture.of(dialog[0], content[0],
+                            SheetCapture.applicationSized(
+                                    "test.rolledBackLate",
+                                    new SheetCapture.ApplicationPolicy() {
+                                        @Override
+                                        public Dimension declaredContent() {
+                                            return rule.declaredContent();
+                                        }
+
+                                        @Override
+                                        public void apply() {
+                                            rule.apply();
+                                            dialog[0].armed = true;
+                                        }
+                                    })));
+            assertTrue(refused.getMessage().contains("content "
+                            + floorContent(dialog[0]) + "x263")
+                            && refused.getMessage().contains("326x"),
+                    "the declared width is what was established, and"
+                            + " the 326 the window was rolled back to"
+                            + " after its one restatement is refused: "
+                            + refused.getMessage());
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /**
+     * Content that lags its window catches up to the declaration.
+     *
+     * <p>Linux, measured: the window already held the policy's 420
+     * while the content still reported 374. Laying out at the
+     * restatement brings it to the declared width.
+     */
+    @Test
+    void aLaggingContentCatchesUpToTheDeclaration() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        JPanel[] content = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                content[0] = canvas(300, 263);
+                dialog[0] = packedAround(owner, content[0], null);
+            });
+            SheetCapture.ApplicationPolicy rule = floorPolicy(dialog[0]);
+            var drawn = SheetCapture.of(dialog[0], content[0],
+                    SheetCapture.applicationSized("test.lagging",
+                            new SheetCapture.ApplicationPolicy() {
+                                @Override
+                                public Dimension declaredContent() {
+                                    return rule.declaredContent();
+                                }
+
+                                @Override
+                                public void apply() {
+                                    // The window takes the width; the
+                                    // content is left where a lagging
+                                    // layout leaves it.
+                                    dialog[0].setSize(FLOOR,
+                                            dialog[0].getHeight());
+                                    content[0].setSize(374, 263);
+                                }
+                            }));
+            assertEquals(floorContent(dialog[0]), drawn.getWidth(),
+                    "the lagging 374 was laid out at the declared"
+                            + " width, and that is what is painted");
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /** A window that cannot be made wider than 300 content pixels. */
+    private static final class NarrowerThanDeclared extends JDialog {
+
+        NarrowerThanDeclared(JFrame owner) {
+            super(owner);
+        }
+
+        @Override
+        public void setSize(Dimension size) {
+            java.awt.Insets chrome = getInsets();
+            super.setSize(Math.min(size.width,
+                    300 + chrome.left + chrome.right), size.height);
+        }
+    }
+
+    /**
+     * Invalid or unrealizable declarations are refused.
+     *
+     * <p>What the coordinator can honestly check. Whether a plausible
+     * declaration is the RIGHT value is its policy's own contract -
+     * the coordinator cannot tell a false declaration from a native
+     * rollback, and does not try. It refuses a declaration that is
+     * missing or not a size, one made for content that is not the
+     * window's content pane, and one the window cannot be brought to.
+     */
+    @Test
+    void invalidOrUnrealizableDeclarationsAreRefused() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        JDialog[] dialog = new JDialog[1];
+        NarrowerThanDeclared[] narrow = new NarrowerThanDeclared[1];
+        JPanel[] content = new JPanel[1];
+        JPanel[] inside = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                content[0] = canvas(300, 200);
+                inside[0] = canvas(100, 50);
+                content[0].add(inside[0]);
+                dialog[0] = packedAround(owner, content[0], null);
+                narrow[0] = new NarrowerThanDeclared(owner[0]);
+            });
+            for (Dimension said : new Dimension[] {
+                    null, new Dimension(0, 200), new Dimension(420, -1)}) {
+                IllegalStateException refused = assertThrows(
+                        IllegalStateException.class,
+                        () -> SheetCapture.of(dialog[0], content[0],
+                                SheetCapture.applicationSized(
+                                        "test.notASize",
+                                        declaring(said))));
+                assertTrue(refused.getMessage().contains("test.notASize"),
+                        "a declaration that is not a size: "
+                                + refused.getMessage());
+            }
+
+            IllegalStateException notItsPane = assertThrows(
+                    IllegalStateException.class,
+                    () -> SheetCapture.of(dialog[0], inside[0],
+                            SheetCapture.applicationSized(
+                                    "test.notTheContentPane",
+                                    declaring(new Dimension(100, 50)))));
+            assertTrue(notItsPane.getMessage().contains("content pane"),
+                    "content the window does not hold as its content"
+                            + " pane: " + notItsPane.getMessage());
+
+            JPanel[] held = new JPanel[1];
+            SwingUtilities.invokeAndWait(() -> {
+                held[0] = canvas(300, 200);
+                packedAround(owner, held[0], narrow[0]);
+            });
+            IllegalStateException unrealizable = assertThrows(
+                    IllegalStateException.class,
+                    () -> SheetCapture.of(narrow[0], held[0],
+                            SheetCapture.applicationSized(
+                                    "test.unrealizable",
+                                    floorPolicy(narrow[0]))));
+            assertTrue(unrealizable.getMessage().contains("300x"),
+                    "and a declaration the window cannot be brought"
+                            + " to, which is refused at the proof: "
+                            + unrealizable.getMessage());
+        } finally {
+            dispose(dialog[0], narrow[0], owner[0]);
+        }
+    }
+
+    /** A policy that declares a stated value and applies nothing. */
+    private static SheetCapture.ApplicationPolicy declaring(Dimension said) {
+        return new SheetCapture.ApplicationPolicy() {
+            @Override
+            public Dimension declaredContent() {
+                return said;
+            }
+
+            @Override
+            public void apply() {
+            }
+        };
+    }
+
+    /**
+     * Packed and fixed-canvas captures never restate anything.
+     *
+     * <p>The restatement is the application policy's second
+     * statement. A packed window's size is its layout's preference and
+     * a fixed canvas is the study's; neither has a declaration to
+     * state, and neither may acquire the operation.
+     */
+    @Test
+    void packedAndFixedCanvasCapturesAreNeverRestated() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        Path trace = Files.createTempFile("never-restated", ".tsv");
+        JFrame[] owner = new JFrame[1];
+        JPanel[] content = new JPanel[1];
+        JPanel[] canvasAlone = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("packed");
+                content[0] = canvas(300, 200);
+                owner[0].setContentPane(content[0]);
+                canvasAlone[0] = canvas(560, 309);
+            });
+            traced(trace, () -> {
+                SheetCapture.of(owner[0], content[0],
+                        SheetCapture.packed());
+                SheetCapture.take(null, canvasAlone[0],
+                        SheetCapture.fixedCanvas(() -> {
+                            canvasAlone[0].setSize(560, 309);
+                            canvasAlone[0].doLayout();
+                        }),
+                        SheetCapture.Premise.none(),
+                        () -> draw(canvasAlone[0]));
+                return 0;
+            });
+            List<String> lines = Files.readAllLines(trace,
+                    StandardCharsets.UTF_8);
+            assertEquals(2, lines.stream().filter(one ->
+                            one.startsWith("pre-paint")).count(),
+                    "the premise: both captures happened");
+            assertTrue(lines.stream().noneMatch(one ->
+                            one.startsWith("restating")
+                                    || one.startsWith("declared")),
+                    "and neither declared nor restated anything: "
+                            + lines);
+        } finally {
+            dispose(owner[0]);
+            Files.deleteIfExists(trace);
+        }
     }
 
     /** Runs a body with the capture trace pointed at a file. */
