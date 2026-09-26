@@ -100,7 +100,7 @@ language choices differ.
 | comparison | result |
 |---|---|
 | interface changed, marks and positions | identical (372 marks) |
-| interface changed, non-text ink | identical (12360 lit pixels) |
+| interface changed, non-text ink | identical (12357 lit pixels) |
 | interface changed, constellation names | identical (the chart language did not move) |
 | chart language changed, title line 2 | identical |
 | chart language changed, title line 3 | identical |
