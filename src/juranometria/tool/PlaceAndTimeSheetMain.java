@@ -343,11 +343,11 @@ public final class PlaceAndTimeSheetMain {
                                   String language, Path to)
             throws Exception {
         // Application-sized: this dialog raises its packed width to
-        // its own reviewed floor, so its size is a policy. The
-        // coordinator re-applies that policy rather than packing
-        // over it - and the SAME policy object holds it in the block
-        // that paints, because the peer pulls an unshown window back
-        // to its packed width an event cycle later.
+        // its own reviewed floor, so its size is a policy - and the
+        // policy says what it asks for as a value (#380). The
+        // capture is held to that declared content, not to whatever
+        // the unshown window reports, because the peer can pull the
+        // window back to its packed width at any moment.
         // Names this sheet in the capture trace. Without it a
         // retained pair can only be mapped by counting lines and
         // knowing the order sheets are written in - which is how the
@@ -358,24 +358,22 @@ public final class PlaceAndTimeSheetMain {
         SheetCapture.Sizing sizing =
                 SheetCapture.applicationSized(
                         "PlaceAndTimeDialog.applySizePolicy",
-                        // Establishing this dialog's size takes two
-                        // stages, and both happen before anything is
-                        // proved. Stage one packs, because that is
-                        // how the height is found. Stage two states
-                        // the reviewed width once more as the layout
-                        // settles, and does NOT pack: a second pack
-                        // can return the other stable width, and on
-                        // an unshown window the peer can answer it
-                        // before the floor is applied - which is how
-                        // this dialog was photographed at 324 px
-                        // with 420 settled on.
-                        //
-                        // Both are the dialog's own methods. A
-                        // photographer that copied the arithmetic
-                        // instead is how the width drifted in the
-                        // first place.
-                        dialog::applySizePolicy,
-                        dialog::restateSizePolicy);
+                        new SheetCapture.ApplicationPolicy() {
+
+                            // Both are the dialog's own methods. A
+                            // photographer that copied the arithmetic
+                            // instead is how the width drifted in the
+                            // first place.
+                            @Override
+                            public java.awt.Dimension declaredContent() {
+                                return dialog.sizePolicyContent();
+                            }
+
+                            @Override
+                            public void apply() {
+                                dialog.applySizePolicy();
+                            }
+                        });
         Set<String> shown = new LinkedHashSet<>();
         Set<String> spoken = new LinkedHashSet<>();
         List<String> letters = new ArrayList<>();
