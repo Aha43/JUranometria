@@ -11,10 +11,10 @@ never across two - the portable half of this study is the document beside it.
 |---|---|
 | operating system | Mac OS X |
 | architecture | aarch64 |
-| Java | 21.0.11 |
+| Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 What a sheet weighs is what its fonts encode to: an SVG with its text as
 outlines carries the glyph paths of whatever font drew it, and a PNG carries
@@ -30,4 +30,4 @@ the sheet's own answer and the same everywhere.
 | `sheet-a4-modules.svg` | 392296 |
 | `sheet-a4.pdf` | 516013 |
 | `sheet-a4-modules.pdf` | 421221 |
-| `sheet-a4-300dpi.png` | 428335 |
+| `sheet-a4-300dpi.png` | 428567 |

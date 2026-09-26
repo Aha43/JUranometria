@@ -11,10 +11,10 @@ never across two - the portable half of this study is the document beside it.
 |---|---|
 | operating system | Mac OS X |
 | architecture | aarch64 |
-| Java | 21.0.11 |
+| Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 Every figure here is a fraction of pixels a renderer inked, so it is a
 measurement of the fonts and the rasteriser as much as of the chart. The report
@@ -30,7 +30,7 @@ page a reader is leaving - which is the same wherever it is measured.
 |---:|---:|---:|---:|---:|---:|
 | 42° | 6.5% | 6.8% | 7.9% | 10.1% | 13.1% |
 | 60° | 9.3% | 9.9% | 11.9% | 15.4% | 20.6% |
-| 90° | 12.0% | 13.1% | 17.3% | 23.9% | 34.3% |
+| 90° | 11.9% | 13.1% | 17.3% | 23.9% | 34.3% |
 | 120° | 15.3% | 17.3% | 23.5% | 33.9% | 48.8% |
 
 ### M31 (RA 10.685, dec 41.269)
@@ -57,5 +57,5 @@ page a reader is leaving - which is the same wherever it is measured.
 |---:|---:|---:|---:|---:|
 | 42° | V 8.0 | 13.1% | +0.0 points | 13.1% |
 | 60° | V 5.0 | 9.9% | -3.2 points | 20.6% |
-| 90° | V 4.0 | 12.0% | -1.2 points | 34.3% |
+| 90° | V 4.0 | 11.9% | -1.2 points | 34.3% |
 | 120° | V 4.0 | 15.3% | +2.1 points | 48.8% |

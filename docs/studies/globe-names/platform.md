@@ -11,10 +11,10 @@ never across two - the portable half of this study is the document beside it.
 |---|---|
 | operating system | Mac OS X |
 | architecture | aarch64 |
-| Java | 21.0.11 |
+| Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 A label's fate is decided by the box its text needs, and that box is measured
 in a font this desktop supplies. So what was asked for is in the report

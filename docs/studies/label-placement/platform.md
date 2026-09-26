@@ -18,7 +18,7 @@ section below.
 > without anything being wrong. Held to reproducing here, never to matching
 > another machine's recording. What each label is, where the policy allows it to go, which candidate it took and why a refusal was refused does not depend on a font, and is asserted by this study's gate.
 >
-> Recorded on: `Mac OS X 26.5.2/aarch64/Homebrew 21.0.11`
+> Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 ## What counts as a collision here
 
@@ -127,7 +127,7 @@ never near. The distinction is in the footnote under the table.
 | text family | grid | boundary | figure | const. name | reference | dso symbol | star disc | star label | dso label | ring | title | key |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | const. name | 148 | 71 | 194 | — | 2 | 6 | 60 | 9 | · | · | 17 | · |
-| star label | 218 | 161 | 237 | 9 | 6 | 15 | 32 | — | · | · | 23 | · |
+| star label | 217 | 161 | 237 | 9 | 6 | 15 | 32 | — | · | · | 23 | · |
 | dso label | 94 | 17 | 6 | · | 15 | 5 | 7 | · | — | · | · | · |
 
 A dot is no collision anywhere in the corpus. Since #314 one decision places
@@ -167,27 +167,27 @@ the migration section, and the two are different questions.
 | `home` | 3 | 3 | 0 | 2 | 0 | 146 | 0 | 0.00 |
 | `orion-08` | 12 | 12 | 6 | 8 | 55 | 88 | 13 | 1.00 |
 | `orion-18` | 15 | 19 | 11 | 23 | 147 | 261 | 30 | 1.00 |
-| `orion-36` | 17 | 17 | 23 | 32 | 235 | 348 | 25 | 0.98 |
+| `orion-36` | 17 | 17 | 23 | 32 | 234 | 348 | 25 | 0.98 |
 | `orion-42` | 24 | 24 | 31 | 69 | 323 | 685 | 29 | 1.20 |
-| `orion-60` | 41 | 39 | 32 | 51 | 467 | 913 | 55 | 0.96 |
-| `orion-90` | 99 | 96 | 55 | 63 | 888 | 1371 | 98 | 1.00 |
-| `orion-120` | 173 | 174 | 121 | 169 | 2116 | 3438 | 70 | 1.00 |
-| `sagittarius-90` | 97 | 88 | 82 | 84 | 1006 | 1091 | 95 | 0.94 |
-| `sagittarius-120` | 122 | 106 | 129 | 147 | 2118 | 2516 | 97 | 1.04 |
-| `cygnus-90` | 57 | 54 | 53 | 69 | 726 | 1315 | 73 | 1.00 |
-| `crux-90` | 78 | 74 | 81 | 74 | 1118 | 1319 | 61 | 1.00 |
-| `pole-120` | 116 | 95 | 87 | 114 | 1270 | 2545 | 106 | 1.00 |
-| `seam-120` | 143 | 101 | 73 | 91 | 1215 | 1442 | 94 | 0.95 |
-| `orion-120-small` | 197 | 195 | 104 | 263 | 1907 | 3414 | 86 | 1.07 |
+| `orion-60` | 41 | 39 | 32 | 51 | 465 | 913 | 55 | 0.96 |
+| `orion-90` | 99 | 96 | 55 | 63 | 886 | 1371 | 98 | 1.00 |
+| `orion-120` | 173 | 174 | 121 | 169 | 2099 | 3438 | 70 | 1.00 |
+| `sagittarius-90` | 97 | 88 | 82 | 84 | 1005 | 1091 | 95 | 0.94 |
+| `sagittarius-120` | 122 | 106 | 129 | 147 | 2116 | 2516 | 97 | 1.05 |
+| `cygnus-90` | 57 | 54 | 53 | 69 | 724 | 1315 | 73 | 1.00 |
+| `crux-90` | 78 | 74 | 81 | 74 | 1115 | 1319 | 61 | 1.00 |
+| `pole-120` | 116 | 95 | 87 | 114 | 1269 | 2545 | 106 | 1.00 |
+| `seam-120` | 143 | 101 | 73 | 91 | 1213 | 1442 | 94 | 0.95 |
+| `orion-120-small` | 197 | 195 | 104 | 263 | 1905 | 3414 | 86 | 1.07 |
 | `orion-42-a4` | 21 | 21 | 27 | 63 | 296 | 610 | 45 | 1.00 |
 | `orion-42-letter` | 20 | 24 | 36 | 84 | 290 | 821 | 19 | 1.00 |
-| `orion-90-black` | 99 | 96 | 55 | 63 | 887 | 1365 | 97 | 1.00 |
-| `sagittarius-90-key` | 96 | 87 | 82 | 84 | 1006 | 1091 | 95 | 0.94 |
-| `sagittarius-90-ecliptic` | 97 | 88 | 100 | 102 | 1616 | 1701 | 95 | 1.06 |
-| `orion-90-observer` | 99 | 96 | 60 | 68 | 950 | 1440 | 98 | 1.06 |
-| `nunki-searched` | 93 | 83 | 84 | 81 | 1203 | 1100 | 54 | 0.94 |
+| `orion-90-black` | 99 | 96 | 55 | 63 | 885 | 1365 | 97 | 1.00 |
+| `sagittarius-90-key` | 96 | 87 | 82 | 84 | 1005 | 1091 | 95 | 0.94 |
+| `sagittarius-90-ecliptic` | 97 | 88 | 100 | 102 | 1604 | 1701 | 95 | 1.06 |
+| `orion-90-observer` | 99 | 96 | 60 | 68 | 948 | 1440 | 98 | 1.06 |
+| `nunki-searched` | 93 | 83 | 83 | 81 | 1200 | 1100 | 53 | 0.94 |
 | `orion-18-selected` | 15 | 19 | 11 | 23 | 147 | 261 | 30 | 1.00 |
-| **all 23 pages** | | | **1343** | **1827** | **19986** | **29281** | | **1.20** |
+| **all 23 pages** | | | **1342** | **1827** | **19931** | **29281** | | **1.20** |
 
 The collision measure does not depend on who is on top: each participant's ink is
 measured with the other absent, and the collision is the intersection. Which of the
@@ -210,21 +210,21 @@ grid and reference notation lighter still.
 
 | what covers what | how often | pixels |
 |---|---:|---:|
-| star label over figure | 237 | 2725 |
-| star label over grid | 218 | 3137 |
+| star label over figure | 237 | 2717 |
+| star label over grid | 217 | 3127 |
 | const. name over figure | 194 | 3493 |
-| star label over boundary | 161 | 1655 |
+| star label over boundary | 161 | 1649 |
 | const. name over grid | 148 | 2923 |
-| dso label over grid | 94 | 1133 |
+| dso label over grid | 94 | 1117 |
 | const. name over boundary | 71 | 1032 |
 | star disc over const. name | 60 | 683 |
 | star label over star disc | 32 | 264 |
-| title over star label | 23 | 777 |
+| title over star label | 23 | 775 |
 | dso label over boundary | 17 | 121 |
 | title over const. name | 17 | 899 |
-| dso label over reference | 15 | 526 |
-| star label over dso symbol | 15 | 125 |
-| star label over const. name | 9 | 145 |
+| dso label over reference | 15 | 515 |
+| star label over dso symbol | 15 | 124 |
+| star label over const. name | 9 | 144 |
 | dso label over star disc | 7 | 51 |
 | dso label over figure | 6 | 22 |
 | dso symbol over const. name | 6 | 72 |
