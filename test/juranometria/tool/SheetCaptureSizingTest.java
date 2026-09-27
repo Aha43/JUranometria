@@ -707,6 +707,69 @@ class SheetCaptureSizingTest {
     }
 
     /**
+     * A window whose own validation lays the content out at its
+     * packed width, whatever width the window holds.
+     *
+     * <p>The Linux transition of #384, made to happen every run: the
+     * restatement sized the window to the declared 420 and validated
+     * it, and the content came out at its packed 371 while the window
+     * still said 420. Validating this window does the same.
+     */
+    private static final class LaysOutAtItsPackedWidth extends JDialog {
+
+        LaysOutAtItsPackedWidth(JFrame owner) {
+            super(owner);
+        }
+
+        @Override
+        public void validate() {
+            super.validate();
+            javax.swing.JRootPane root = getRootPane();
+            Dimension packed = root.getPreferredSize();
+            root.setSize(packed.width, root.getHeight());
+            root.validate();
+        }
+    }
+
+    /**
+     * Content the window's validation lays out at the packed width is
+     * laid out at the declaration (#384).
+     *
+     * <p>The window holds the declared size, so this is not a
+     * rollback; the unshown window simply did not carry its size down
+     * to the content. The declaration is authoritative, so the
+     * restatement lays the content out at it directly.
+     */
+    @Test
+    void contentTheWindowLaysOutAtItsPackedWidthIsLaidOutAtTheDeclaration()
+            throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "a real window has to be sized");
+        JFrame[] owner = new JFrame[1];
+        LaysOutAtItsPackedWidth[] dialog = new LaysOutAtItsPackedWidth[1];
+        JPanel[] content = new JPanel[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                owner[0] = new JFrame("owner");
+                dialog[0] = new LaysOutAtItsPackedWidth(owner[0]);
+                content[0] = canvas(371, 280);
+                packedAround(owner, content[0], dialog[0]);
+            });
+            var drawn = SheetCapture.of(dialog[0], content[0],
+                    SheetCapture.applicationSized("test.packedLayout",
+                            floorPolicy(dialog[0])));
+            assertEquals(floorContent(dialog[0]), drawn.getWidth(),
+                    "the window held the declared width and its"
+                            + " validation laid the content out at the"
+                            + " packed 371; the declared content is laid"
+                            + " out at 420, and that is what is painted");
+            assertEquals(280, drawn.getHeight());
+        } finally {
+            dispose(dialog[0], owner[0]);
+        }
+    }
+
+    /**
      * A window whose every size request is rolled back to 326 -
      * except the restatement's.
      *
