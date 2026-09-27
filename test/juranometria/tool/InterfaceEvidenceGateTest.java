@@ -480,23 +480,29 @@ class InterfaceEvidenceGateTest {
      * A refusal keeps its evidence, whatever cleans up after it.
      *
      * <p>Mutation-proved against the #378 defect: a real capture
-     * refusal - a probe generator whose window is resized after its
-     * pack, which the coordinator refuses to prove - run exactly as
-     * the claims test runs its generators, into a temporary
-     * directory that is then deleted. What must survive is the
-     * output the generator had written, the trace containing the
+     * refusal - a probe generator whose canvas cannot be held at the
+     * size it established, which the coordinator refuses to prove -
+     * run exactly as the claims test runs its generators, into a
+     * temporary directory that is then deleted. What must survive is
+     * the output the generator had written, the trace containing the
      * refusal, the child's output, and a failure message saying
      * where they are.
+     *
+     * <p>The refusal is pure Java and happens every run (#390): an
+     * earlier probe refused through a stale resize of a native
+     * window, which the macOS peer sometimes undid. And this contract
+     * deletes its fixture only once every assertion has passed; if it
+     * fails, what it was asserting about is kept and its path printed,
+     * rather than leaving only a log.
      */
     @Test
     void aRefusingGeneratorKeepsItsOutputTraceAndMessage()
             throws Exception {
-        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
-                "the probe packs a real window");
         String probe = "RefusingCaptureProbeMain";
         Path made = Files.createTempDirectory("interface-gate-refusal");
         Path trace = traceFor(made);
         Path kept = failuresKeptAt().resolve(probe);
+        boolean passed = false;
         try {
             Path alone = Files.createDirectory(made.resolve(probe));
             AssertionError failed = org.junit.jupiter.api.Assertions
@@ -532,10 +538,18 @@ class InterfaceEvidenceGateTest {
                             StandardCharsets.UTF_8)
                             .contains("did not establish"),
                     "and the summary names the refusal");
+            passed = true;
         } finally {
-            remove(made);
-            Files.deleteIfExists(trace);
-            remove(kept);
+            if (passed) {
+                remove(made);
+                Files.deleteIfExists(trace);
+                remove(kept);
+            } else {
+                System.err.println("the retention contract failed; its"
+                        + " fixture evidence is kept at "
+                        + kept.toAbsolutePath() + " (and " + made
+                        + ", " + trace + " where they still exist)");
+            }
         }
     }
 
