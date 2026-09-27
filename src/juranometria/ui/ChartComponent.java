@@ -36,6 +36,13 @@ public final class ChartComponent extends JComponent {
     private juranometria.render.ChartOptions chartOptions =
             juranometria.render.ChartOptions.DEFAULTS;
     private ChartScene scene;
+
+    /**
+     * The size the current scene was assembled at, so a resize event
+     * for that same size is recognised as no change at all (#389).
+     */
+    private int assembledWidth = -1;
+    private int assembledHeight = -1;
     /** The selected members, in membership order; ink only. */
     private List<String> selected = List.of();
     /** The lead identity, wearing the cross vocabulary's treatment. */
@@ -86,6 +93,17 @@ public final class ChartComponent extends JComponent {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent event) {
+                // setSize queues this event; setViewState assembles at
+                // once. A chart sized and then given a view therefore
+                // receives, afterwards, a resize for the size its page
+                // was just assembled at. Reassembling then asked the
+                // catalogue again for an identical page and replaced
+                // the scene object whenever the event thread got here
+                // (#389). A real change of size still reassembles.
+                if (scene != null && getWidth() == assembledWidth
+                        && getHeight() == assembledHeight) {
+                    return;
+                }
                 assembleScene();
             }
         });
@@ -271,6 +289,8 @@ public final class ChartComponent extends JComponent {
                 viewState.projection(), viewState.centre(),
                 viewState.fieldWidthDegrees(), getWidth()));
         scene = assembler.assemble(viewState, getWidth(), pageHeight);
+        assembledWidth = getWidth();
+        assembledHeight = getHeight();
         getAccessibleContext().setAccessibleDescription(describe(scene));
         // Consumers that describe the page - the inspector - need to
         // know it changed, because what the page can say about the
