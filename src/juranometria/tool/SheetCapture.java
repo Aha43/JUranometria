@@ -343,8 +343,10 @@ public final class SheetCapture {
      *   <li>the layout reaches its fixed point;</li>
      *   <li>the frozen declaration is restated, exactly once;</li>
      *   <li>the content is laid out and verified against the
-     *       declaration - a declaration that cannot be realised is
-     *       refused there;</li>
+     *       declaration - where the window holds the declared size
+     *       but left the content elsewhere, the content is laid out at
+     *       the declaration directly (#384); a declaration that cannot
+     *       be realised is refused there;</li>
      *   <li>it is proved;</li>
      *   <li>any later movement, before or during painting, is
      *       refused.</li>
@@ -412,6 +414,33 @@ public final class SheetCapture {
                 window.setSize(declaredWindow);
                 window.invalidate();
                 window.validate();
+                // The window is the peer's; the declared content is
+                // authoritative. Where the window holds the declared
+                // size but its validation left the content elsewhere,
+                // the content is laid out at the declaration directly,
+                // through its own root pane's layout. On Linux the
+                // restatement's validation laid the content out at its
+                // packed 371 while the window said 420 (#384): not a
+                // rollback, just an unshown window that did not carry
+                // its size down. A window that is NOT at the declared
+                // size is a rollback, and is left for the proof to
+                // refuse - nothing here moves a rolled-back window.
+                if (!content.getSize().equals(declaredContent)
+                        && window.getSize().equals(declaredWindow)
+                        && window instanceof javax.swing.RootPaneContainer
+                                held) {
+                    javax.swing.JRootPane root = held.getRootPane();
+                    java.awt.Dimension was = content.getSize();
+                    root.setSize(declaredContent);
+                    root.invalidate();
+                    root.validate();
+                    trace("laid-out", "content was " + was.width + "x"
+                            + was.height + " beside a window at the"
+                            + " declared " + declaredWindow.width + "x"
+                            + declaredWindow.height + ", and is "
+                            + content.getWidth() + "x"
+                            + content.getHeight());
+                }
             }
 
             @Override
