@@ -214,6 +214,16 @@ public final class SwingChromeSheetMain {
                 holder[0] = new JDialog();
                 holder[0].setContentPane(probe[0]);
             });
+            if (form.name().equals("chooser")) {
+                // The chooser lists its folder on a thread of its own;
+                // it is photographed once that listing is complete
+                // (#393), not whenever the build happened to finish.
+                java.util.List<String> entries = new java.util.ArrayList<>(
+                        FIXTURE_FOLDERS);
+                entries.addAll(FIXTURE_FILES);
+                awaitListing((JFileChooser) probe[0], entries,
+                        LISTING_BOUND);
+            }
             // Building and painting are two steps, not one, because
             // the rule has to run between them: pack to a fixed
             // point, drain, settle, and own focus nowhere. A dialog
@@ -308,11 +318,10 @@ public final class SwingChromeSheetMain {
             Path folder = Files.createDirectories(
                     parent.resolve("Documents"));
             FIXTURES.add(parent);
-            for (String name : List.of("Kart", "Notater")) {
+            for (String name : FIXTURE_FOLDERS) {
                 Files.createDirectory(folder.resolve(name));
             }
-            for (String name : List.of("andromeda.pdf", "orion.svg",
-                    "perseus.png")) {
+            for (String name : FIXTURE_FILES) {
                 Files.writeString(folder.resolve(name), "");
             }
             return folder.toFile();
@@ -320,6 +329,141 @@ public final class SwingChromeSheetMain {
             throw new IllegalStateException("the chooser needs a"
                     + " folder to show, and one could not be made", e);
         }
+    }
+
+    /** The folders the chooser's fixture holds. */
+    private static final List<String> FIXTURE_FOLDERS =
+            List.of("Kart", "Notater");
+
+    /** The files the chooser's fixture holds. */
+    private static final List<String> FIXTURE_FILES =
+            List.of("andromeda.pdf", "orion.svg", "perseus.png");
+
+    /** How long the chooser may take to list its fixture. */
+    private static final java.time.Duration LISTING_BOUND =
+            java.time.Duration.ofSeconds(30);
+
+    /**
+     * Waits until the chooser lists exactly the entries expected, and
+     * refuses if it does not within the bound (#393).
+     *
+     * <p>A {@code JFileChooser} lists its folder on a loader thread of
+     * its own; the directory model applies what it found on the event
+     * thread and then says it is no longer busy. The photograph used to
+     * be taken straight after the chooser was built, so it could be of
+     * a chooser that had not finished listing - and on CI two runs of
+     * the Norwegian chooser disagreed.
+     *
+     * <p>The condition is the chooser's own model: its entries are
+     * exactly the expected names, checked whenever the model reports a
+     * change or a change of busy state, and again one event boundary
+     * later, so a listing still arriving is not mistaken for a finished
+     * one. It waits on the model's events, not on the clock, and takes
+     * one photograph; a listing that never completes is refused with
+     * what it was expected to show and what it showed.
+     */
+    static void awaitListing(JFileChooser chooser,
+                             java.util.Collection<String> expected,
+                             java.time.Duration bound) throws Exception {
+        java.util.Set<String> wanted = new java.util.TreeSet<>(expected);
+        java.util.concurrent.CountDownLatch listed =
+                new java.util.concurrent.CountDownLatch(1);
+        javax.swing.plaf.basic.BasicDirectoryModel[] model =
+                new javax.swing.plaf.basic.BasicDirectoryModel[1];
+        javax.swing.event.ListDataListener[] onData =
+                new javax.swing.event.ListDataListener[1];
+        java.beans.PropertyChangeListener[] onBusy =
+                new java.beans.PropertyChangeListener[1];
+        SwingUtilities.invokeAndWait(() -> {
+            if (!(chooser.getUI()
+                    instanceof javax.swing.plaf.basic.BasicFileChooserUI ui)) {
+                return;
+            }
+            model[0] = ui.getModel();
+            Runnable check = () -> {
+                if (complete(listing(model[0]), wanted)) {
+                    listed.countDown();
+                }
+            };
+            onData[0] = new javax.swing.event.ListDataListener() {
+                @Override
+                public void intervalAdded(javax.swing.event.ListDataEvent e) {
+                    check.run();
+                }
+
+                @Override
+                public void intervalRemoved(javax.swing.event.ListDataEvent e) {
+                    check.run();
+                }
+
+                @Override
+                public void contentsChanged(javax.swing.event.ListDataEvent e) {
+                    check.run();
+                }
+            };
+            onBusy[0] = event -> check.run();
+            model[0].addListDataListener(onData[0]);
+            model[0].addPropertyChangeListener(onBusy[0]);
+            check.run();
+        });
+        if (model[0] == null) {
+            throw new IllegalStateException("the chooser's look and feel"
+                    + " keeps no directory model to wait for, so a"
+                    + " photograph could be of a chooser still listing");
+        }
+        try {
+            boolean ready = listed.await(bound.toMillis(),
+                    java.util.concurrent.TimeUnit.MILLISECONDS);
+            java.util.Set<?>[] now = new java.util.Set<?>[1];
+            if (ready) {
+                // Stable across an event boundary: a listing still
+                // arriving is not a finished one.
+                SheetCapture.drain();
+            }
+            SwingUtilities.invokeAndWait(() ->
+                    now[0] = listing(model[0]));
+            @SuppressWarnings("unchecked")
+            java.util.Set<String> shown = (java.util.Set<String>) now[0];
+            if (!ready || !complete(shown, wanted)) {
+                throw new IllegalStateException("the chooser did not"
+                        + (ready ? " keep" : " finish")
+                        + " listing its folder"
+                        + (ready ? "" : " within " + bound.toSeconds()
+                                + " s")
+                        + ": it was to show " + wanted + " and shows "
+                        + shown + ". A photograph now would be of a"
+                        + " chooser still listing, under this sheet's"
+                        + " name.");
+            }
+        } finally {
+            SwingUtilities.invokeAndWait(() -> {
+                model[0].removeListDataListener(onData[0]);
+                model[0].removePropertyChangeListener(onBusy[0]);
+            });
+        }
+    }
+
+    /**
+     * Whether a listing is the complete one: exactly the entries the
+     * photograph is of - one condition, used both when the model
+     * reports a change and when the listing is checked again after an
+     * event boundary.
+     */
+    private static boolean complete(java.util.Set<String> listed,
+                                    java.util.Set<String> wanted) {
+        return listed.equals(wanted);
+    }
+
+    /** The names a directory model lists now, sorted. */
+    private static java.util.Set<String> listing(
+            javax.swing.plaf.basic.BasicDirectoryModel model) {
+        java.util.Set<String> names = new java.util.TreeSet<>();
+        for (int i = 0; i < model.getSize(); i++) {
+            if (model.getElementAt(i) instanceof java.io.File file) {
+                names.add(file.getName());
+            }
+        }
+        return names;
     }
 
     /** Fixture folders to remove when the sheets are written. */

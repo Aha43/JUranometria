@@ -50,18 +50,24 @@ jobs:
         # Headless. This is the required check and it stays fast and
         # unconditional; what it cannot do is run the journeys that
         # need a screen, which is what the job below is for.
-      - name: Keep a refused generator's evidence
-        # Only when this job failed. A generator the interface gate
-        # runs that fails - usually a capture the coordinator
-        # refused - leaves its output, capture trace, child output
-        # and a summary in build/interface-gate-failures (#378). The
-        # runner is gone once the job ends, so without this a CI
-        # refusal survives only as the text of its log.
+      - name: Keep the interface gate's failure evidence
+        # Only when this job failed. The runner is gone once the job
+        # ends, so anything not uploaded here survives only as log
+        # text. Two directories: build/interface-gate-failures holds
+        # a failed generator run's output, capture trace, child
+        # output and summary (#378); build/interface-gate-evidence
+        # holds BOTH complete runs and their traces when two runs of
+        # the same generator disagreed - which is what a chooser
+        # photograph did on PR #388's second run, and only the log
+        # was left (#393). Every job that can fail uploads both,
+        # whether or not it created them.
         if: failure()
         uses: actions/upload-artifact@v6
         with:
-          name: interface-gate-failures-test
-          path: build/interface-gate-failures
+          name: interface-gate-evidence-test
+          path: |
+            build/interface-gate-failures
+            build/interface-gate-evidence
           if-no-files-found: ignore
 
   # The display-dependent journeys (issue #209). Nineteen tests abort
@@ -129,18 +135,24 @@ jobs:
           [ "$aborted" = 0 ] \
             || fail "$aborted aborted on a display run; this job" \
                     'exists so that cannot happen quietly'
-      - name: Keep a refused generator's evidence
-        # Only when this job failed. A generator the interface gate
-        # runs that fails - usually a capture the coordinator
-        # refused - leaves its output, capture trace, child output
-        # and a summary in build/interface-gate-failures (#378). The
-        # runner is gone once the job ends, so without this a CI
-        # refusal survives only as the text of its log.
+      - name: Keep the interface gate's failure evidence
+        # Only when this job failed. The runner is gone once the job
+        # ends, so anything not uploaded here survives only as log
+        # text. Two directories: build/interface-gate-failures holds
+        # a failed generator run's output, capture trace, child
+        # output and summary (#378); build/interface-gate-evidence
+        # holds BOTH complete runs and their traces when two runs of
+        # the same generator disagreed - which is what a chooser
+        # photograph did on PR #388's second run, and only the log
+        # was left (#393). Every job that can fail uploads both,
+        # whether or not it created them.
         if: failure()
         uses: actions/upload-artifact@v6
         with:
-          name: interface-gate-failures-display
-          path: build/interface-gate-failures
+          name: interface-gate-evidence-display
+          path: |
+            build/interface-gate-failures
+            build/interface-gate-evidence
           if-no-files-found: ignore
 
   # Generated evidence, checked against its own generators (issue
@@ -176,3 +188,22 @@ jobs:
         # which is which and skips out loud where a family cannot be
         # verified from a clean checkout.
         run: xvfb-run -a make evidence-contracts-ci
+      - name: Keep the interface gate's failure evidence
+        # Only when this job failed. The runner is gone once the job
+        # ends, so anything not uploaded here survives only as log
+        # text. Two directories: build/interface-gate-failures holds
+        # a failed generator run's output, capture trace, child
+        # output and summary (#378); build/interface-gate-evidence
+        # holds BOTH complete runs and their traces when two runs of
+        # the same generator disagreed - which is what a chooser
+        # photograph did on PR #388's second run, and only the log
+        # was left (#393). Every job that can fail uploads both,
+        # whether or not it created them.
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: interface-gate-evidence-evidence
+          path: |
+            build/interface-gate-failures
+            build/interface-gate-evidence
+          if-no-files-found: ignore
