@@ -85,6 +85,10 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
+| item label \| Copy View Report |
+| item hover \| Copies a text description of this view, including the observing place and instant from Place and Time |
+| item spoken name \| Copy View Report |
+| item spoken description \| Copies a text description of this view to the clipboard, including the observing place and instant stated in Place and Time. Nothing is sent, saved or remembered. |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
 | item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
@@ -138,6 +142,10 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
+| item label \| Copy View Report |
+| item hover \| Copies a text description of this view, including the observing place and instant from Place and Time |
+| item spoken name \| Copy View Report |
+| item spoken description \| Copies a text description of this view to the clipboard, including the observing place and instant stated in Place and Time. Nothing is sent, saved or remembered. |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
 | item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
@@ -191,6 +199,10 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
+| item label \| Copy View Report |
+| item hover \| Copies a text description of this view, including the observing place and instant from Place and Time |
+| item spoken name \| Copy View Report |
+| item spoken description \| Copies a text description of this view to the clipboard, including the observing place and instant stated in Place and Time. Nothing is sent, saved or remembered. |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
 | item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
@@ -244,6 +256,10 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
+| item label \| Copy View Report |
+| item hover \| Copies a text description of this view, including the observing place and instant from Place and Time |
+| item spoken name \| Copy View Report |
+| item spoken description \| Copies a text description of this view to the clipboard, including the observing place and instant stated in Place and Time. Nothing is sent, saved or remembered. |
 | item label \| About JUranometria |
 | item spoken name \| About JUranometria |
 | item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
@@ -254,7 +270,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 548 × 195 px; widest popup 201 px.
+Bar packed 578 × 195 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -299,6 +315,10 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
+| item label \| Kopier visningsrapport |
+| item hover \| Kopierer en tekstbeskrivelse av denne visningen, med observasjonsstedet og tidspunktet fra Sted og tid |
+| item spoken name \| Kopier visningsrapport |
+| item spoken description \| Kopierer en tekstbeskrivelse av denne visningen til utklippstavlen, med observasjonsstedet og tidspunktet som er oppgitt i Sted og tid. Ingenting sendes, lagres eller huskes. |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
 | item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
@@ -307,7 +327,7 @@ Bar packed 548 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 548 × 195 px; widest popup 201 px.
+Bar packed 578 × 195 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -352,6 +372,10 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
+| item label \| Kopier visningsrapport |
+| item hover \| Kopierer en tekstbeskrivelse av denne visningen, med observasjonsstedet og tidspunktet fra Sted og tid |
+| item spoken name \| Kopier visningsrapport |
+| item spoken description \| Kopierer en tekstbeskrivelse av denne visningen til utklippstavlen, med observasjonsstedet og tidspunktet som er oppgitt i Sted og tid. Ingenting sendes, lagres eller huskes. |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
 | item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
@@ -360,7 +384,7 @@ Bar packed 548 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 548 × 195 px; widest popup 201 px.
+Bar packed 578 × 195 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -405,6 +429,10 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
+| item label \| Kopier visningsrapport |
+| item hover \| Kopierer en tekstbeskrivelse av denne visningen, med observasjonsstedet og tidspunktet fra Sted og tid |
+| item spoken name \| Kopier visningsrapport |
+| item spoken description \| Kopierer en tekstbeskrivelse av denne visningen til utklippstavlen, med observasjonsstedet og tidspunktet som er oppgitt i Sted og tid. Ingenting sendes, lagres eller huskes. |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
 | item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
@@ -413,7 +441,7 @@ Bar packed 548 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 548 × 195 px; widest popup 201 px.
+Bar packed 578 × 195 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -458,6 +486,10 @@ Bar packed 548 × 195 px; widest popup 201 px.
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
+| item label \| Kopier visningsrapport |
+| item hover \| Kopierer en tekstbeskrivelse av denne visningen, med observasjonsstedet og tidspunktet fra Sted og tid |
+| item spoken name \| Kopier visningsrapport |
+| item spoken description \| Kopierer en tekstbeskrivelse av denne visningen til utklippstavlen, med observasjonsstedet og tidspunktet som er oppgitt i Sted og tid. Ingenting sendes, lagres eller huskes. |
 | item label \| Om JUranometria |
 | item spoken name \| Om JUranometria |
 | item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |

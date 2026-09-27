@@ -457,7 +457,7 @@ public final class ToggleShortcutStudyMain {
         JMenuBar bar = AppMenuBar.create(
                 new juranometria.ui.ChartViewController(),
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { },
+                () -> { }, () -> { }, () -> { },
                 juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (int menu = 0; menu < bar.getMenuCount(); menu++) {
             JMenu each = bar.getMenu(menu);

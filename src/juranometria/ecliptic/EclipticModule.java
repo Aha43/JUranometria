@@ -82,6 +82,16 @@ public final class EclipticModule implements ChartModule {
         this.withdraw = services.contribute(ID, this::contributedGeometry);
     }
 
+    /**
+     * Whether this module is attached to a chart right now - read
+     * from its own services, the one place that knows (#372). The
+     * host's list is not asked: a module detached directly stays in
+     * it.
+     */
+    public boolean attached() {
+        return services != null;
+    }
+
     @Override
     public void detach() {
         if (withdraw != null) {
