@@ -129,6 +129,49 @@ class ChartComponentTest {
         paint(component);
     }
 
+    /**
+     * A resize to the size the page is already assembled at assembles
+     * nothing (#389).
+     *
+     * <p>setSize queues its COMPONENT_RESIZED; setViewState assembles
+     * at once. A component sized and then given a view in one breath -
+     * which is how a chart is built - therefore receives, afterwards, a
+     * resize event for the very size its page was just assembled at.
+     * It used to reassemble anyway: an identical page, a second
+     * catalogue query, and a new scene object, landing whenever the
+     * event thread got to it. A test that had already looked at the
+     * scene saw it replaced by nothing it did (#388's first CI run).
+     */
+    @Test
+    void aResizeForTheSizeAlreadyAssembledReassemblesNothing()
+            throws Exception {
+        SceneAssemblerTest.CountingCatalogue catalogue =
+                new SceneAssemblerTest.CountingCatalogue();
+        ChartComponent[] holder = new ChartComponent[1];
+        juranometria.chart.ChartScene[] assembled =
+                new juranometria.chart.ChartScene[1];
+        SwingUtilities.invokeAndWait(() -> {
+            holder[0] = new ChartComponent(
+                    new SceneAssembler(catalogue, M31, 10.0, 1.5),
+                    ENGLISH);
+            holder[0].setSize(300, 200);
+            holder[0].setViewState(ChartViewState.DEFAULT);
+            assembled[0] = holder[0].currentScene();
+        });
+        assertEquals(1, catalogue.starQueries,
+                "the premise: the view was assembled once, at 300x200,"
+                        + " and the resize is still queued");
+
+        flushEventQueue();
+
+        assertEquals(1, catalogue.starQueries,
+                "the queued resize is for the size already assembled,"
+                        + " so no catalogue is asked again");
+        SwingUtilities.invokeAndWait(() -> org.junit.jupiter.api.Assertions
+                .assertSame(assembled[0], holder[0].currentScene(),
+                        "and the page is the same object"));
+    }
+
     @Test
     void resizesReassembleForTheNewGeometry() throws Exception {
         SceneAssemblerTest.CountingCatalogue catalogue =

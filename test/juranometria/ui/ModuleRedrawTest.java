@@ -136,6 +136,49 @@ class ModuleRedrawTest {
         });
     }
 
+    /**
+     * The transition #388's first CI run caught, made to happen every
+     * time (#389).
+     *
+     * <p>The rig sizes its chart and gives it a view on the test
+     * thread; the size posts a resize that the event thread dispatches
+     * whenever it gets to it. In a loaded suite it got to it after the
+     * test above had taken its "before" - and the scene was replaced
+     * by the rig's own setup, not by the module. Here the event thread
+     * is held until the scene has been observed, then let go.
+     */
+    @Test
+    void aResizeQueuedByTheRigDoesNotReplaceTheSceneItObserved()
+            throws Exception {
+        java.util.concurrent.CountDownLatch holding =
+                new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch release =
+                new java.util.concurrent.CountDownLatch(1);
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            holding.countDown();
+            try {
+                release.await();
+            } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        holding.await();
+        Rig rig;
+        ChartScene observed;
+        try {
+            rig = new Rig();
+            observed = rig.chart.currentScene();
+        } finally {
+            release.countDown();
+        }
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+
+        assertSame(observed, rig.chart.currentScene(),
+                "the resize the rig's own sizing queued is for the size"
+                        + " the page was already assembled at, and"
+                        + " replaces nothing");
+    }
+
     @Test
     void redrawItselfRebuildsNothingHoweverOftenItIsAsked() {
         Rig rig = new Rig();
