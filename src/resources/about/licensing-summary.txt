@@ -15,4 +15,8 @@ convention): BSD-3-Clause.
 Traditional star names and Bayer and Flamsteed designations derived
 from d3-celestial: BSD-3-Clause.
 
+Solar System ephemeris: an excerpt of NASA/JPL's DE440, modified by
+JUranometria under NAIF's rules for modified SPICE kernels (no fee
+or licence), and the IERS leap-second file, unmodified.
+
 Toolbar icons from the Tabler icon set: MIT license.

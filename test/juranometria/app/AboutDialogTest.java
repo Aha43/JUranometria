@@ -87,6 +87,8 @@ class AboutDialogTest {
                 "the practical consequence is stated in plain language");
         assertTrue(summary.contains("CC BY-SA 4.0"));
         assertTrue(summary.contains("BSD-3-Clause"));
+        assertTrue(summary.contains("DE440") && summary.contains("NAIF"),
+                "the Solar System ephemeris names its source and its terms");
         assertTrue(summary.contains("Tabler"));
     }
 
