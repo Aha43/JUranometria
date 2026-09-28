@@ -25,6 +25,13 @@ env:
   TEMURIN_PIN: '21.0.12.1'
 
 jobs:
+  # Which route this change takes (issue #398): the native images are
+  # built only on the wide route. The JAR is cheap and always builds.
+  # Called by the release workflow, this is wide by event - only a
+  # pull request can be narrow.
+  classify:
+    uses: ./.github/workflows/classify.yml
+
   jar:
     runs-on: ubuntu-latest
     steps:
@@ -46,7 +53,8 @@ jobs:
           if-no-files-found: error
 
   image:
-    needs: jar
+    needs: [jar, classify]
+    if: needs.classify.outputs.route == 'wide'
     strategy:
       fail-fast: false
       matrix:

@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run run-log test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run run-log test classify globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -59,6 +59,7 @@ help:
 	@echo "  run    Build and launch the app (also logs to build/run.log)"
 	@echo "  run-log  What the last run said, and whether it threw"
 	@echo "  test         Compile and run unit tests"
+	@echo "  classify     Which CI route the change since BASE (origin/main) takes: narrow or wide (#398)"
 	@echo "  chart-image  Write the deterministic reference chart image"
 	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
 	@echo "  regional-study    Render the Sprint 6 regional-zoom candidate charts"
@@ -690,6 +691,21 @@ dist: app
 	cd $(DIST_DIR) && find $(DIST_NAME) | LC_ALL=C sort 		| zip -X -q $(DIST_NAME).zip -@
 	@echo "dist: $(DIST_ZIP)"
 	scripts/verify-dist.sh $(DIST_ZIP)
+
+# The rendering-neutral gate (issue #398), answered before a push:
+# every path changed since the merge base with BASE, judged against
+# the rendering closure of the compiled head. The same program CI
+# runs, so the answer here is the answer there.
+# Listing the change is git's job and stays out of the shipped
+# classes (OfflinePromiseTest lets no shipped class start a process).
+BASE ?= origin/main
+classify: classes
+	@base=$$(git merge-base $(BASE) HEAD); \
+	{ git diff --name-only "$$base"; git ls-files --others --exclude-standard; } \
+		| sort -u > $(BUILD_DIR)/changed-paths.txt
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.ChangeClassifierMain \
+		--changed $(BUILD_DIR)/changed-paths.txt
 
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)

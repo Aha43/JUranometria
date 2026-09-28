@@ -18,7 +18,16 @@ on:
   workflow_call:
 
 jobs:
+  # Which route this change takes (issue #398): the archive is built
+  # and verified only on the wide route. Called by the release
+  # workflow, this is wide by event - only a pull request can be
+  # narrow.
+  classify:
+    uses: ./.github/workflows/classify.yml
+
   build:
+    needs: classify
+    if: needs.classify.outputs.route == 'wide'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
