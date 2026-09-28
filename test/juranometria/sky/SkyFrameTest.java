@@ -520,4 +520,37 @@ class SkyFrameTest {
         }
         return best;
     }
+
+    /**
+     * The forward rotation added for the Solar System service (#399)
+     * is the exact reverse of {@code toJ2000}: a round trip is the
+     * identity to rounding, at dates across the interval and at
+     * positions including the poles and the RA seam.
+     */
+    @Test
+    void toOfDateIsTheExactReverseOfToJ2000() {
+        double worst = 0.0;
+        for (double jd : new double[] {2415020.5, 2433282.5, 2451545.0,
+                2461212.9, 2470000.0, 2488434.5}) {
+            for (SkyPosition p : List.of(new SkyPosition(0.0, 0.0),
+                    new SkyPosition(359.999, -89.9), new SkyPosition(90.0, 89.9),
+                    new SkyPosition(180.0, 23.4), new SkyPosition(270.0, -66.5),
+                    new SkyPosition(12.3456, 45.6789))) {
+                SkyPosition back = SkyFrame.toJ2000(SkyFrame.toOfDate(p, jd), jd);
+                worst = Math.max(worst, back.separationDegrees(p) * 3600.0);
+                SkyPosition forth = SkyFrame.toOfDate(SkyFrame.toJ2000(p, jd), jd);
+                worst = Math.max(worst, forth.separationDegrees(p) * 3600.0);
+            }
+        }
+        assertTrue(worst < 1e-6, "round trip within a microarcsecond;"
+                + " worst " + worst + " arcsec");
+        // And it is a rotation of the right size: about 50" a year of
+        // precession, so ~0.35 degrees over the quarter century to 2026.
+        SkyPosition equinox = new SkyPosition(0.0, 0.0);
+        double moved = SkyFrame.toOfDate(equinox, 2461212.9)
+                .separationDegrees(equinox);
+        assertTrue(moved > 0.30 && moved < 0.40,
+                "J2000 to 2026 moves the equinox by about a third of a"
+                        + " degree: " + moved);
+    }
 }

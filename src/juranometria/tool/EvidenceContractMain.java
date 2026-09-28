@@ -91,6 +91,8 @@ public final class EvidenceContractMain {
                 "docs/studies/working-selection/measurements.md");
         REPORT_MAINS.put("juranometria.tool.EclipticStudyMain",
                 "docs/studies/ecliptic/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.SunTableStudyMain",
+                "docs/studies/solar-system/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
         // Not prose but an oracle: the released pages' own pixels

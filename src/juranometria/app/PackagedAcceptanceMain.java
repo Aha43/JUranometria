@@ -2323,6 +2323,39 @@ public final class PackagedAcceptanceMain {
                 + " classpath, carries their provenance, and packs no"
                 + " test fixture)");
 
+        // The Solar System pack, inside the packaged image (issue
+        // #399): the ephemeris excerpt and the leap-second file load
+        // through the image's own classpath, verify their checksums,
+        // and compute the Sun for a known instant to the exact-era
+        // target - the value JPL Horizons gave for the same request.
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.solar.SolarSystemService.SunObservation sunSample =
+                (juranometria.solar.SolarSystemService.SunObservation)
+                        solar.observe(juranometria.solar.SolarSystemService
+                                .Body.SUN, new juranometria.sky.Observer(
+                                        59.91, 10.75, java.time.Instant.parse(
+                                                "2026-06-21T10:00:00Z")));
+        double sunOff = sunSample.astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(89.670160928, 23.433999183))
+                * 3600.0;
+        require(sunOff < 0.1, "the packaged Sun agrees with Horizons for"
+                + " Oslo, 2026-06-21 10:00 UTC, within 0.1 arcsecond: "
+                + sunOff);
+        require(sunSample.timeConfidence()
+                        == juranometria.solar.time.TimeScales.Confidence.EXACT,
+                "and that instant is inside the pinned exact-time interval");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/solar-system/NOTICE-solar-system.md") != null
+                        && PackagedAcceptanceMain.class.getResourceAsStream(
+                                "/resources/solar-system/PROVENANCE.md") != null,
+                "the pack's notice and provenance travel with it");
+        System.out.println("solar system pack OK (DE440 excerpt "
+                + solar.timeScales().exactFrom() + " exact until "
+                + solar.timeScales().exactUntil() + ", Sun at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", sunOff)
+                + " arcsecond of Horizons)");
+
         // The five deep-sky families, inside the packaged image: each
         // one hides its own marks and nobody else's, the master
         // governs all five, and the family flags round-trip through

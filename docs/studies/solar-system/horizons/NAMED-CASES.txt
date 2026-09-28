@@ -1,0 +1,13 @@
+1900-01-01 00:00:00  boundary-start
+1962-01-01 00:00:00  eop-record-begins
+1972-01-01 00:00:00  first-leap-second
+1992-10-13 00:00:00  meeus-25a-civil-approx
+2000-01-01 12:00:00  j2000
+2017-01-01 00:00:00  last-leap-second
+2026-03-20 14:46:00  march-equinox-2026
+2026-06-21 02:24:00  june-solstice-2026
+2026-06-21 10:00:00  oslo-sample-row
+2026-09-22 22:05:00  september-equinox-2026
+2026-09-29 12:00:00  today
+2026-12-21 20:50:00  december-solstice-2026
+2100-12-31 23:59:59  boundary-end
