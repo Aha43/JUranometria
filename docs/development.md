@@ -218,8 +218,25 @@ asked:
   At 2.1.0 each changed exactly 127 pixels, all inside the same 10×15
   version-digit box, with no size or other content change — which is
   what a version bump should look like here, and a useful shape to
-  compare against: anything wider than that box moved for some other
-  reason and is not a version bump.
+  compare against: anything outside the changed digits' cells moved
+  for some other reason and is not a version bump. The box is one
+  digit cell wide per changed digit: at 3.0.0 two digits changed
+  (2→3 and 1→0), and each image changed exactly 231 pixels in two
+  cells, columns 206–216 and 222–231 of rows 33–47, with the dot
+  between them untouched.
+- **The page-language study.** Its companion,
+  `docs/studies/interface-language/page-language-strings.md`, quotes
+  the producer line every exported file carries, version included.
+  Run `juranometria.tool.PageLanguageSheetMain`; its images draw no
+  version and do not move.
+
+**`GalleryReleaseTest` holds all four to `VERSION`** — the gallery
+manifest and pages, the seven chart sheets' embedded producer, and the
+About and page-language companions — and fails naming the command
+that regenerates whichever is stale. It reads committed bytes, so it
+says *which release* they are of; the gates below say only that they
+reproduce. A new surface that draws `AppInfo.version()` into a
+committed artifact belongs in that test.
 
 **None of them is caught by the evidence contract**, and not by
 oversight: the portable route holds a rendering to reproducing on the runner that
