@@ -542,6 +542,7 @@ gallery-site:
 	rm -rf build/gallery-site
 	$(JAVA) -cp build/site-classes juranometria.tool.GalleryMain \
 		site build/gallery-site
+	python3 scripts/build-articles.py build/gallery-site
 
 .PHONY: gallery gallery-pages gallery-site
 

@@ -114,6 +114,28 @@ The interface language and chart language remain separate members of that
 state. English application chrome with Norwegian constellation names is a
 normal configuration, not an exception.
 
+## Paper has two languages too
+
+A chart sheet carries both astronomical names and prose about the page. Those
+follow the same ownership rule as the screen:
+
+- constellation names follow the **chart language**;
+- title sentences, projection names, magnitude-key headings and exported file
+  metadata follow the **interface language**;
+- coordinates, magnitudes, catalogue designations and tokens such as `A4` and
+  `SVG` keep their canonical notation.
+
+The distinction matters most in mixed configurations. A Norwegian interface
+with Latin chart names should produce Norwegian page prose around Latin sky
+names, not force the entire sheet into one language. SVG, PDF and PNG all
+receive that resolved prose from the same sheet recording, so changing format
+does not quietly change language.
+
+The same rule applies to transient presentation state. Structure emphasis is
+selected in the interface and can be carried explicitly onto an export, but
+its stable metadata tokens are not translated. Reader-facing explanations may
+change language; machine-readable identity does not.
+
 ## Domain types carry meaning, not English
 
 A domain or rendering type may identify a concept, but it must not decide how
@@ -127,8 +149,8 @@ domain value ──► presentation service ──► InterfaceText ──► re
 
 The rule has been applied twice, to a symbol-family enum and to the enum
 saying why a page does or does not draw an object; both had accumulated a
-label and a sentence per constant. It prevents a renderer, catalogue object or
-module from becoming an unofficial English resource bundle. It also makes the same domain value usable
+label and a sentence per constant. It prevents a renderer, catalogue object
+or module from becoming an unofficial English resource bundle. It also makes the same domain value usable
 by the chart, Inspector, settings, evidence tools and future modules without
 carrying UI grammar into each caller.
 
@@ -192,8 +214,8 @@ because a surface that measures itself — a table sizing a column from its own
 words, a label breaking a sentence against font metrics — reports widths
 nothing honours until it has been laid out. That the same resources are
 present in the shipped image is a separate question, answered by packaged
-acceptance. Sentences may wrap; coordinates, designations and magnitudes must not
-break into shapes that look like separate values. The accessible text keeps
+acceptance. Sentences may wrap; coordinates, designations and magnitudes must
+not break into shapes that look like separate values. The accessible text keeps
 the complete unwrapped sentence because visual line breaks are not grammar.
 
 ## Why packaged and visual checks are necessary

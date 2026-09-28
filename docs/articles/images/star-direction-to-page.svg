@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
+<title id="title">One star's journey from the celestial sphere to page ink</title>
+<desc id="desc">Five stages show a star direction on a sphere, the local along east north frame, three projection radii, an east-left north-up page, and the final ink mark.</desc>
+<style>text{font-family:system-ui,sans-serif;fill:#202020}.label{font-size:21px}.small{font-size:17px}.line{stroke:#555;stroke-width:2;fill:none}.quiet{stroke:#aaa;stroke-width:1.5;fill:none}.accent{stroke:#9b3f2f;fill:#9b3f2f}.arrow{marker-end:url(#a)}</style>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#555"/></marker></defs>
+<rect width="1280" height="420" fill="white"/>
+<g transform="translate(120 190)"><circle r="92" class="quiet"/><ellipse rx="92" ry="28" class="quiet"/><path d="M0 0L58 -70" class="line arrow"/><circle cx="58" cy="-70" r="7" class="accent"/><path d="M38 -47A61 61 0 0 0 0 -61" class="quiet"/><text x="22" y="-76" class="small">t</text><text x="-80" y="132" class="label">sky direction</text></g>
+<path d="M225 190H310" class="line arrow"/>
+<g transform="translate(400 190)"><circle r="7" fill="#222"/><path d="M0 0V-105" class="line arrow"/><path d="M0 0H105" class="line arrow"/><path d="M0 0L-55 62" class="line arrow"/><text x="8" y="-103" class="small">north</text><text x="70" y="-10" class="small">east</text><text x="-96" y="78" class="small">along</text><text x="-70" y="132" class="label">local frame</text></g>
+<path d="M510 190H585" class="line arrow"/>
+<g transform="translate(670 95)"><line y2="185" class="quiet"/><circle cy="38" r="6" class="accent"/><circle cy="91" r="6" class="accent"/><circle cy="142" r="6" class="accent"/><text x="18" y="44" class="small">tan(t)</text><text x="18" y="97" class="small">2 tan(t/2)</text><text x="18" y="148" class="small">sin(t)</text><text x="-50" y="227" class="label">projection plane</text></g>
+<path d="M810 190H885" class="line arrow"/>
+<g transform="translate(970 190)"><rect x="-72" y="-92" width="144" height="184" fill="none" stroke="#444" stroke-width="2"/><path d="M0 55V-60" class="quiet arrow"/><path d="M45 0H-48" class="quiet arrow"/><text x="8" y="-48" class="small">north</text><text x="-58" y="-8" class="small">east</text><circle cx="-36" cy="-42" r="7" class="accent"/><text x="-46" y="132" class="label">viewport</text></g>
+<path d="M1048 190H1125" class="line arrow"/>
+<g transform="translate(1180 190)"><circle r="12" class="accent"/><circle r="26" fill="none" stroke="#9b3f2f" stroke-width="1.5"/><text x="-36" y="132" class="label">ink</text></g>
+</svg>
