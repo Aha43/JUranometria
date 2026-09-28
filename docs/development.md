@@ -66,6 +66,16 @@ hold the measured design gates.
    contributor runs locally. Branch protection on `main` requires the
    check (administrators included), so a red or absent `test` status
    technically blocks the merge, not just culturally.
+9. Know which route the change takes before pushing: `make classify`
+   (against `origin/main`, or `BASE=<ref>`) prints, path by path,
+   whether the change can reach a renderer, a chart contribution, an
+   evidence generator, a committed image or a provenance row. If none
+   can, CI takes the **narrow** route and skips the evidence contract,
+   the native images and the portable archive, saying so in the
+   `classify` job's summary; anything else is **wide** and runs them
+   all. The unit and display suites run either way. The rule, its
+   roots and what it cannot decide are in
+   `docs/decisions/rendering-neutral-gate.md` (issue #398).
 
 Prefer a small number of meaningful commits over preserving every experiment.
 Commit messages state the result and may include `Closes #NN` when the commit
