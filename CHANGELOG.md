@@ -7,15 +7,137 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-09-28
+
+**The chart explains itself.** Sprint 34 — the observer's directions
+(#359), coordinates named on wide pages (#360), structures that rise
+from the page (#361, #369), and a report of the view (#372).
+
+A chart that is correct is not yet a chart that explains itself. By
+2.1.0 the atlas drew an honest sky in two languages, but a reader
+still had to bring knowledge the page could have carried: which *east*
+the page meant, which declination a line was when it never reached the
+edge its figure was allowed on, which of several overlapping lines
+they were following, and — when something looked wrong — what exactly
+they had been looking at. This release puts each of those on the page
+or within reach of it.
+
+**The observer's N, E, S and W on the horizon.** With Place and Time
+on and the mathematical horizon drawn, the observer's four cardinal
+points are marked on it, lettered in the page's language (N/Ø/S/V in
+Norwegian), and placed under the same collision rules as every other
+label — tied to the sky, so they travel with the stars when the chart
+is dragged. The page itself stays north up with *celestial* east to
+the left, and now says so, because those two easts disagree and a
+reader holding the chart up to the sky meets the difference. On a
+globe the letters sit outward on the limb, in the unused paper, and
+the title block leaves South its room. A direction that cannot be
+placed honestly is left out rather than moved: six crowded globe pages
+omit one mark each by design.
+
+**Coordinates named where their lines meet the frame.** On a wide
+chart, a major grid line that never reaches its preferred edge but
+cleanly meets another is now labelled once where it does, so a
+declination or right ascension line is no longer anonymous for having
+left the page by the side. Narrow pages keep the notation they had.
+Screen and every export format follow the same rule.
+
+**Structures may rise from the page.** The **Emphasis** control lets
+the meridian, the ecliptic, the equatorial grid, the mathematical
+horizon, the constellation boundaries and the constellation figures
+each rise in their own ink, and any number of them at once; **Normal**
+settles the chart back. The six accents are a fixed palette measured
+on white paper and black sky, in monochrome and under the common
+colour-vision differences, and each raised line keeps its dash pattern,
+so the distinction does not rest on colour alone. Emphasis is
+transient: it is never saved, and an ordinary export is the canonical
+chart, byte for byte. **Include current emphasis** in the export
+dialog carries it onto the sheet, and the sheet names what it carries
+in its SVG, PDF and PNG metadata alike.
+
+**Help → Copy View Report.** Copies a plain-text description of the
+view to the clipboard — centre, field and projection, page size,
+ground, languages, star limit and chart options, modules, emphasis,
+the stated observing place and instant, and the selections — ending
+with a blank `Comment:` section to write beneath after pasting. It
+says, before it is chosen, that the observing place and instant go
+with it; nothing is sent, saved or remembered.
+
+Major, for what the chart now says rather than for anything it takes
+away: new reference ink on the page, a new way of reading its
+structures, and a new Help action. Nothing a reader stored is
+invalidated, no option changes meaning, and no file format moves;
+upgrading from 2.1.0 preserves every preference, page and view.
+
+Some things are known and deliberately left as they are:
+
+- **Several raised structures cannot promise hue alone.** Some pairs
+  of accents are close under colour-vision differences, most of all
+  with all six raised. Their geometry, dash pattern, position and the
+  menu's checked items remain part of how they are told apart.
+- **A grid label may change ends.** A small drag can make a parallel
+  prefer its other valid frame crossing. The label stays on a real
+  crossing, once, never duplicated — but it moves.
+  [#373](https://github.com/Aha43/JUranometria/issues/373) tracks it.
+- **A selected star's best name is not yet shown** when its label is
+  withheld by the page's scale and magnitude limits;
+  [#387](https://github.com/Aha43/JUranometria/issues/387).
+- A horizontal (altitude–azimuth) grid is not part of this release;
+  [#370](https://github.com/Aha43/JUranometria/issues/370). Finding a
+  constellation by name is still
+  [#356](https://github.com/Aha43/JUranometria/issues/356).
+
+**macOS downloads remain unsigned and not notarised.** A browser
+download is quarantined, and macOS may refuse it as "damaged" — the
+archive is not corrupt, and `SHA256SUMS.txt` answers that. Ordinary
+Finder installation is **not supported** for this release either;
+[#282](https://github.com/Aha43/JUranometria/issues/282) stays open, and
+the documented quarantine-removal step is a workaround rather than the
+accepted route. Nothing in this release changes how it is installed.
+
+**Still not printed.** No page has been read on paper, and no globe at
+arm's length.
+[#293](https://github.com/Aha43/JUranometria/issues/293) is open for
+anyone who prints one.
+
 ### Added
 
-- **Help → Copy View Report** (#372). Copies a plain-text description of
-  the view to the clipboard — centre, field and projection, page size,
-  ground, languages, star limit and chart options, modules, emphasis,
-  the stated observing place and instant, and the selections — ending
-  with a blank `Comment:` section to write beneath after pasting. It
-  says, before it is chosen, that the observing place and instant go
-  with it; nothing is sent, saved or remembered.
+- The observer's cardinal points (N, E, S, W; N, Ø, S, V in Norwegian)
+  on the mathematical horizon, drawn on screen, in every export format
+  and in what a screen reader is told about the page (#359, #371).
+- Wide-chart coordinate labels where a major grid line meets the frame
+  away from its preferred edge (#360).
+- **Emphasis**, with independent choices for the meridian, ecliptic,
+  equatorial grid, mathematical horizon, constellation boundaries and
+  constellation figures, and **Normal** to clear them (#361, #369).
+- **Include current emphasis** when exporting, recorded by name in the
+  exported SVG, PDF and PNG (#361, #369).
+- **Help → Copy View Report** (#372).
+
+### Fixed
+
+- Dragging the chart could slide the far, invisible half of the
+  horizon, meridian and ecliptic across the near sky on a globe, and a
+  drag through the page centre near the pole could stop the chart with
+  an internal error. Reference lines now draw only their visible half,
+  and the near-degenerate case is handled rather than refused (#368).
+- On a real globe page every cardinal letter could be crowded out by
+  the page's own labels and furniture, so none was drawn; and North at
+  latitude 0 could be judged a hair behind the limb (#371).
+
+### Changed
+
+- The page states its orientation as north up, *celestial* east left
+  (#359).
+- On a globe, the title block's fact lines wrap to leave the limb's
+  lowest point clear (#371).
+- The Chart Options descriptions on the Deep sky and Chart tabs break
+  at different words on macOS 27; the text is unchanged (#375).
+- The widget photographs in the evidence were re-recorded for macOS
+  27.0 and Java 21.0.12.1, and the machinery that takes them now
+  refuses a picture of a window size nobody established instead of
+  taking it (#374, #376, #378, #380, #384, #390, #393). This is
+  developer-facing and changes nothing a reader sees.
 
 ## [2.1.0] - 2026-09-20
 

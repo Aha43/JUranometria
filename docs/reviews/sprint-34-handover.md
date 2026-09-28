@@ -216,8 +216,10 @@ which requires zero aborts.
 
 ## The owner journey
 
-Pending. The packaged application built from the closing head is to be
-driven through the journey in #386:
+Driven on 2026-09-28 on the packaged application built from
+`release/3.0.0` at `678e8c7` — `main` at `1758757` plus this
+document, so the same application as `main` — still reporting 2.1.0,
+before any release preparation. The journey in #386:
 
 1. At a wide field, the mathematical horizon on: N/E/S/W readable, tied
    to the fixed stars while dragging, gone with the horizon, taking the
@@ -237,8 +239,9 @@ driven through the journey in #386:
 6. Chart Options → Deep sky and Chart, normal and dark: the accepted
    macOS 27 wrapping remains readable.
 
-The owner's words and any finding are recorded here. A finding stops
-release preparation.
+The owner's words: *"Feels right, go ahead with release
+preparation."* No finding was reported, and release preparation
+began from that acceptance.
 
 ## Final qualification
 
