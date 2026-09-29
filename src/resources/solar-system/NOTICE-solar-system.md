@@ -2,18 +2,18 @@
 
 This pack carries a **JUranometria-modified excerpt of the JPL
 planetary ephemeris DE440** and the **IERS leap-second file**,
-so the atlas can compute where the Sun is - and, later, the Moon -
-without any network access at build, test or run time.
+so the atlas can compute where the Sun and the Moon are without
+any network access at build, test or run time.
 
 ## The ephemeris excerpt
 
-`juranometria-de440-sun-emb-earth-1900-2100.bsp` was produced by
-JUranometria from the official kernel `de440s.bsp` distributed by
-NASA/JPL's Navigation and Ancillary Information Facility (NAIF).
-It keeps three of that kernel's segments - the Sun and the
+`juranometria-de440-sun-emb-earth-moon-1900-2100.bsp` was produced
+by JUranometria from the official kernel `de440s.bsp` distributed
+by NASA/JPL's Navigation and Ancillary Information Facility (NAIF).
+It keeps four of that kernel's segments - the Sun and the
 Earth-Moon barycentre relative to the solar-system barycentre,
-and the Earth relative to the Earth-Moon barycentre - over the
-years 1900 to 2100, with every coefficient unchanged. It is a
+and the Earth and the Moon relative to the Earth-Moon barycentre -
+over the years 1900 to 2100, with every coefficient unchanged. It is a
 **modified kernel** under NAIF's rules and is named, annotated
 and attributed as such; it is not an original JPL file and JPL
 did not produce it.

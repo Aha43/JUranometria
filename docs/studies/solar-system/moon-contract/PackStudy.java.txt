@@ -1,0 +1,34 @@
+import juranometria.solar.spk.*; import juranometria.solar.*; import juranometria.sky.Observer;
+import java.nio.file.*; import java.util.*; import java.time.*;
+public class PackStudy { public static void main(String[] a) throws Exception {
+  byte[] src = Files.readAllBytes(Path.of("imports/raw/solar-system/de440s.bsp"));
+  double start = (2415020.5 - 31 - 2451545.0) * 86400.0, end = (2488434.5 + 31 - 2451545.0) * 86400.0;
+  List<SpkExcerpt.Pick> picks = List.of(new SpkExcerpt.Pick(0,3), new SpkExcerpt.Pick(0,10), new SpkExcerpt.Pick(3,399), new SpkExcerpt.Pick(3,301));
+  String comment = "study: Sun, EMB, Earth and Moon"; 
+  byte[] v2 = SpkExcerpt.of(src, picks, start, end, "JURANOMETRIA DE440 SUN EMB EARTH MOON 1900-2100 V2", comment);
+  byte[] v1 = Files.readAllBytes(Path.of("src/resources/solar-system/juranometria-de440-sun-emb-earth-1900-2100.bsp"));
+  System.out.println("v1 bytes " + v1.length + "; v2 (with Moon) bytes " + v2.length + "; delta " + (v2.length - v1.length));
+  SpkKernel k1 = SpkKernel.read(v1), k2 = SpkKernel.read(v2), full = SpkKernel.read(src);
+  System.out.println("v2 segments: " + k2.segments().stream().map(s -> s.center()+"->"+s.target()).toList());
+  // Sun invariance at kernel level: every Sun/EMB/Earth state identical between v1 and v2
+  double worst = 0; int n = 0;
+  for (double jd = 2415020.5; jd <= 2488434.5; jd += 2.3) { double et = (jd - 2451545.0) * 86400.0;
+    for (int[] s : new int[][]{{0,3},{0,10},{3,399}}) { worst = Math.max(worst, k1.state(s[0],s[1],et).position().minus(k2.state(s[0],s[1],et).position()).length()); n++; } }
+  System.out.printf("Sun/EMB/Earth states v1 vs v2 at %d epochs: worst %.3e km%n", n, worst);
+  double worstM = 0; int m = 0;
+  for (double jd = 2415020.5; jd <= 2488434.5; jd += 2.3) { double et = (jd - 2451545.0) * 86400.0; worstM = Math.max(worstM, k2.state(3,301,et).position().minus(full.state(3,301,et).position()).length()); m++; }
+  System.out.printf("Moon states v2 vs official at %d epochs: worst %.3e km%n", m, worstM);
+  // Sun observations: the service over v1 vs a service whose pack is v2 (via a temporary pack dir)
+  Path dir = Files.createTempDirectory("pack-v2"); for (String f : List.of("Leap_Second.dat","NOTICE-solar-system.md","PROVENANCE.md")) Files.copy(Path.of("src/resources/solar-system", f), dir.resolve(f));
+  Files.write(dir.resolve("juranometria-de440-sun-emb-earth-1900-2100.bsp"), v2);
+  String manifest = Files.readString(Path.of("src/resources/solar-system/manifest.properties")).replaceAll("checksum.juranometria-de440-sun-emb-earth-1900-2100.bsp=.*", "checksum.juranometria-de440-sun-emb-earth-1900-2100.bsp=" + juranometria.catalog.Sha256.hex(v2));
+  Files.writeString(dir.resolve("manifest.properties"), manifest);
+  SolarSystemService s1 = SolarSystemService.load();
+  SolarSystemService s2 = new SolarSystemService(SolarSystemPack.load(name -> { try { return Files.newInputStream(dir.resolve(name)); } catch (Exception e) { throw new RuntimeException(e); } }));
+  int rows = 0; boolean same = true;
+  for (Instant t = Instant.parse("1900-01-01T00:00:00Z"); t.isBefore(Instant.parse("2101-01-01T00:00:00Z")); t = t.plus(Duration.ofDays(37))) {
+    Observer o = new Observer(59.91, 10.75, t);
+    var a1 = s1.observe(SolarSystemService.Body.SUN, o); var a2 = s2.observe(SolarSystemService.Body.SUN, o);
+    if (!a1.equals(a2)) same = false; rows++; }
+  System.out.println("Sun observations over v1 and v2 at " + rows + " instants: " + (same ? "IDENTICAL (record equality)" : "DIFFER"));
+}}

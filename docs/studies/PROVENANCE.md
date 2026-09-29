@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**417 promoted artifacts.**
+**421 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -418,6 +418,10 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/sky-language/pair-sagittarius-globe-180.png` | `a54397d4069f471fc05039d295a542993461f572396522868425a881baaef71b` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-south-pole-120.png` | `5ef542209dff921d974219c3f2d6fb297df09ed6ce0b8c4cadb7d341c315a811` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-south-pole-globe-180.png` | `d24be7402bcb1dbb77c4ce20e5b8d01fabfc5bd6425aa459bd781f80c6574d29` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system/moon-contract/figures/bright-limb-angle.png` | `ad56a9a40b4d3bcfa61e96f0282f684a4d37bcd5e261c807890ab43bd214e3b0` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system/moon-contract/figures/bright-limb-angle.svg` | `10260987ae252fdc1458feeb71f3b1f804610d97e2bef26679ac5f9cddaf8765` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system/moon-contract/figures/phase-geometry.png` | `ece2bacb68599d85dcae0c5b738c19250432514098c488fd2b9b04b740beed91` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system/moon-contract/figures/phase-geometry.svg` | `d5d512d379502ae40e3a33f0042a1b89297a4b47a23c5f4157da9301a563e456` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/star-identity/crux-18.png` | `255a943079eecd1468121e370a6314250b84fb472640b041e41cf4d6d3d850f5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | StarIdentityStudyMain |
 | `docs/studies/star-identity/m31-08.png` | `d749cde5883dd87ec1797590f1ab5002aa8864c544efa4276f8b9ab24d8ed729` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | StarIdentityStudyMain |
 | `docs/studies/star-identity/orion-08.png` | `9ac434abe1b27243e88ca8a35d59745747fb4ff23b9861025329e38668d430c0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | StarIdentityStudyMain |

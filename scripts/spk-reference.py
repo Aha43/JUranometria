@@ -3,7 +3,7 @@
 
 An independent implementation (jplephem) evaluates the committed subset
 kernel at chosen TDB Julian dates and prints the raw segment states -
-position km and velocity km/s - for the three segments. The Java
+position km and velocity km/s - for the four segments. The Java
 reader is held to these at machine precision, because both read the
 same Chebyshev coefficients: any difference is a reading mistake.
 
@@ -41,7 +41,7 @@ for s in spk.segments:
         b = start_jd + k * step_days
         epochs += [b, b + 1e-6, b - 1e-6 if k else b, b + step_days / 2]
     epochs += [s.start_jd, s.end_jd - 1e-6]
-    break  # same grid for all three
+    break  # same grid for all four
 epochs += [2415020.5, 2429000.0, 2440587.5, 2451545.0, 2451545.25,
            2460000.0, 2461000.123456789, 2470000.0, 2488069.5]
 epochs = sorted(set(round(e, 9) for e in epochs))

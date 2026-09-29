@@ -338,7 +338,7 @@ Packed 959 × 425 px.
 | Instant (UTC) | The instant in UTC, to the minute. "est." marks an instant whose clock correction is estimated; † marks a range end that was not on the grid. |
 | Right ascension (J2000) | Hours, minutes and seconds of time, in the ICRS/J2000 frame the chart is drawn in: where the Sun is among the fixed stars, as seen from the observing place, without aberration. |
 | Declination (J2000) | Degrees, minutes and seconds of arc, in the same frame. |
-| Ecliptic longitude (J2000) | Degrees along the J2000 ecliptic from the March equinox: 0° at the March equinox, 90° at the June solstice. |
+| Ecliptic longitude (J2000) | Degrees along the J2000 ecliptic, measured from the fixed J2000 equinox. The equinoxes and solstices of a later year fall near, not exactly at, 0°, 90°, 180° and 270°, because the equinox itself moves. |
 | Altitude (no refraction) | Degrees above the mathematical horizon, without atmospheric refraction; below the horizon the number is kept and the status is added. |
 | Azimuth (from north through east) | Degrees from north through east: 90° is east, 180° south, 270° west. |
 | Distance | From the observer to the Sun's centre, in astronomical units and in millions of kilometres. |
@@ -653,7 +653,7 @@ Packed 959 × 425 px.
 | Tidspunkt (UTC) | Tidspunktet i UTC, til nærmeste minutt. «est.» merker et tidspunkt med beregnet klokkekorreksjon; † merker en slutt på tidsrommet som ikke lå på rutenettet. |
 | Rektascensjon (J2000) | Timer, minutter og sekunder av tid, i ICRS/J2000-rammen kartet tegnes i: hvor Solen står blant fiksstjernene, sett fra observasjonsstedet, uten aberrasjon. |
 | Deklinasjon (J2000) | Grader, bueminutter og buesekunder, i samme ramme. |
-| Ekliptisk lengde (J2000) | Grader langs J2000-ekliptikken fra vårjevndøgnspunktet: 0° ved jevndøgnet i mars, 90° ved solverv i juni. |
+| Ekliptisk lengde (J2000) | Grader langs J2000-ekliptikken, målt fra det faste J2000-vårjevndøgnspunktet. Jevndøgn og solverv i et senere år faller nær, ikke nøyaktig på, 0°, 90°, 180° og 270°, fordi jevndøgnspunktet selv flytter seg. |
 | Høyde (uten refraksjon) | Grader over den matematiske horisonten, uten atmosfærisk refraksjon; under horisonten beholdes tallet og statusen legges til. |
 | Asimut (fra nord via øst) | Grader fra nord via øst: 90° er øst, 180° sør, 270° vest. |
 | Avstand | Fra observatøren til Solens sentrum, i astronomiske enheter og i millioner kilometer. |

@@ -7,7 +7,7 @@ scripts/download-solar-system-sources.sh
 make import-solar-system
 ```
 
-Pack `solar-system` version 1, audited 2026-09-29.
+Pack `solar-system` version 2, audited 2026-09-29.
 
 ## Sources
 
@@ -18,23 +18,24 @@ Pack `solar-system` version 1, audited 2026-09-29.
 
 ## Extraction
 
-Tool: `juranometria.tool.SolarSystemPackMain` (this repository), using `juranometria.solar.spk.SpkExcerpt`. Segments kept, in order: 0 -> 3 (Earth-Moon barycentre), 0 -> 10 (Sun), 3 -> 399 (Earth); all SPK Type 2. Interval: 1900-01-01 to 2101-01-01 TDB, with a 31-day margin at each end; whole records are kept from the first covering the start to the last covering the end, coefficients unchanged.
+Tool: `juranometria.tool.SolarSystemPackMain` (this repository), using `juranometria.solar.spk.SpkExcerpt`. Segments kept, in order: 0 -> 3 (Earth-Moon barycentre), 0 -> 10 (Sun), 3 -> 399 (Earth), 3 -> 301 (Moon); all SPK Type 2. Interval: 1900-01-01 to 2101-01-01 TDB, with a 31-day margin at each end; whole records are kept from the first covering the start to the last covering the end, coefficients unchanged.
 
 Coverage of the written segments (seconds past J2000, TDB):
 
 - 0 -> 3: -3159518400.0 to 3191227200.0
 - 0 -> 10: -3159518400.0 to 3191227200.0
 - 3 -> 399: -3158481600.0 to 3190190400.0
+- 3 -> 301: -3158481600.0 to 3190190400.0
 
 ## Output
 
 | file | bytes | SHA-256 |
 |---|---|---|
-| `juranometria-de440-sun-emb-earth-1900-2100.bsp` | 8884224 | `2b6debd11ab32525dd6a32acbcc3289535ea0859b021c917445d749faba0540d` |
+| `juranometria-de440-sun-emb-earth-moon-1900-2100.bsp` | 14910464 | `63fbf570516667e95c0350af885924d98eee74c43e9be8bfd8616032d37b5580` |
 
 ## Validation
 
-129555 states over the coverage at 1.7-day spacing, all three segments: position and velocity identical to the source, worst difference 0.0.
+172740 states over the coverage at 1.7-day spacing, all four segments: position and velocity identical to the source, worst difference 0.0.
 
 ## Applicable rules
 

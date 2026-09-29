@@ -25,18 +25,19 @@ class SolarSystemPackTest {
     void theBundledPackLoadsAndStatesItself() {
         SolarSystemPack pack = SolarSystemPack.load();
         assertEquals("solar-system", pack.manifest().get("pack.name"));
-        assertEquals("1", pack.manifest().get("pack.version"));
+        assertEquals("2", pack.manifest().get("pack.version"),
+                "v2 added the Moon's segment (issue #407)");
         assertEquals("DE440", pack.manifest().get("ephemeris"));
-        assertEquals("3,10,399", pack.manifest().get("ephemeris.bodies"),
+        assertEquals("3,10,301,399", pack.manifest().get("ephemeris.bodies"),
                 "the bodies are explicit in the manifest");
-        assertEquals(3, pack.kernel().segments().size());
+        assertEquals(4, pack.kernel().segments().size());
         assertEquals(LocalDate.of(1972, 1, 1), pack.leapSeconds().first());
         assertTrue(pack.leapSeconds().expires().isAfter(LocalDate.of(2026, 1, 1)),
                 "the pinned record vouches for the present");
         for (String key : List.of("source.de440s.url", "source.de440s.sha256",
                 "source.leapseconds.url", "source.leapseconds.sha256",
                 "audit.date", "terms",
-                "checksum.juranometria-de440-sun-emb-earth-1900-2100.bsp",
+                "checksum.juranometria-de440-sun-emb-earth-moon-1900-2100.bsp",
                 "checksum.Leap_Second.dat", "checksum.NOTICE-solar-system.md",
                 "checksum.PROVENANCE.md")) {
             assertTrue(pack.manifest().containsKey(key), "manifest carries " + key);

@@ -17,10 +17,11 @@ import juranometria.solar.spk.SpkKernel;
 
 /**
  * Builds the bundled Solar System ephemeris pack from its pinned raw
- * inputs (Sprint 35, issue #399): a JUranometria-modified excerpt of
- * JPL's DE440 for the Sun, the Earth–Moon barycentre and the Earth
- * over 1900–2100, and the IERS leap-second file unmodified, with the
- * manifest, notice and provenance the atlas keeps beside bundled data.
+ * inputs (Sprint 35, issue #399; the Moon added in Sprint 36, issue
+ * #407): a JUranometria-modified excerpt of JPL's DE440 for the Sun,
+ * the Earth–Moon barycentre, the Earth and the Moon over 1900–2100,
+ * and the IERS leap-second file unmodified, with the manifest, notice
+ * and provenance the atlas keeps beside bundled data.
  *
  * <p>Deterministic by construction: no timestamps other than the
  * literal audit date, fixed {@code Locale.ROOT} formatting, and an
@@ -43,12 +44,12 @@ import juranometria.solar.spk.SpkKernel;
 public final class SolarSystemPackMain {
 
     static final String PACK_NAME = "solar-system";
-    static final int PACK_VERSION = 1;
+    static final int PACK_VERSION = 2;
     static final String AUDIT_DATE = "2026-09-29";
     static final String RETRIEVED = "2026-09-28";
 
     static final String KERNEL_NAME =
-            "juranometria-de440-sun-emb-earth-1900-2100.bsp";
+            "juranometria-de440-sun-emb-earth-moon-1900-2100.bsp";
     static final String LEAP_NAME = "Leap_Second.dat";
     static final String NOTICE_NAME = "NOTICE-solar-system.md";
     static final String PROVENANCE_NAME = "PROVENANCE.md";
@@ -69,7 +70,8 @@ public final class SolarSystemPackMain {
     static final List<SpkExcerpt.Pick> PICKS = List.of(
             new SpkExcerpt.Pick(0, 3),    // Earth–Moon barycentre from the SSB
             new SpkExcerpt.Pick(0, 10),   // Sun from the SSB
-            new SpkExcerpt.Pick(3, 399)); // Earth from the Earth–Moon barycentre
+            new SpkExcerpt.Pick(3, 399),  // Earth from the Earth–Moon barycentre
+            new SpkExcerpt.Pick(3, 301)); // Moon from the Earth–Moon barycentre
 
     /**
      * The civil interval, as TDB Julian dates, and the margin. The
@@ -110,7 +112,7 @@ public final class SolarSystemPackMain {
         double startEt = (COVERAGE_START_JD - MARGIN_DAYS - 2451545.0) * 86400.0;
         double endEt = (COVERAGE_END_JD + MARGIN_DAYS - 2451545.0) * 86400.0;
         byte[] kernel = SpkExcerpt.of(source, PICKS, startEt, endEt,
-                "JURANOMETRIA DE440 SUN EMB EARTH 1900-2100 V" + PACK_VERSION,
+                "JURANOMETRIA DE440 SUN EMB EARTH MOON 1900-2100 V" + PACK_VERSION,
                 comment(full.comments()));
 
         // Proof before writing: the excerpt says what the source says.
@@ -132,7 +134,7 @@ public final class SolarSystemPackMain {
                     + " source by " + worst + "; nothing was written");
         }
         String validation = String.format(Locale.ROOT, "%d states over the"
-                + " coverage at 1.7-day spacing, all three segments: position"
+                + " coverage at 1.7-day spacing, all four segments: position"
                 + " and velocity identical to the source, worst difference"
                 + " %.1f", states, worst);
 
@@ -185,6 +187,7 @@ public final class SolarSystemPackMain {
                 .append("  0 -> 3    Earth-Moon barycentre from the solar-system barycentre\n")
                 .append("  0 -> 10   Sun from the solar-system barycentre\n")
                 .append("  3 -> 399  Earth from the Earth-Moon barycentre\n")
+                .append("  3 -> 301  Moon from the Earth-Moon barycentre\n")
                 .append("over the interval 1900-01-01 to 2101-01-01 (TDB) with a margin\n")
                 .append("of 31 days at each end. Every Chebyshev coefficient kept is the\n")
                 .append("source's coefficient, unchanged; only whole records outside the\n")
@@ -218,18 +221,18 @@ public final class SolarSystemPackMain {
 
             This pack carries a **JUranometria-modified excerpt of the JPL
             planetary ephemeris DE440** and the **IERS leap-second file**,
-            so the atlas can compute where the Sun is - and, later, the Moon -
-            without any network access at build, test or run time.
+            so the atlas can compute where the Sun and the Moon are without
+            any network access at build, test or run time.
 
             ## The ephemeris excerpt
 
-            `juranometria-de440-sun-emb-earth-1900-2100.bsp` was produced by
-            JUranometria from the official kernel `de440s.bsp` distributed by
-            NASA/JPL's Navigation and Ancillary Information Facility (NAIF).
-            It keeps three of that kernel's segments - the Sun and the
+            `juranometria-de440-sun-emb-earth-moon-1900-2100.bsp` was produced
+            by JUranometria from the official kernel `de440s.bsp` distributed
+            by NASA/JPL's Navigation and Ancillary Information Facility (NAIF).
+            It keeps four of that kernel's segments - the Sun and the
             Earth-Moon barycentre relative to the solar-system barycentre,
-            and the Earth relative to the Earth-Moon barycentre - over the
-            years 1900 to 2100, with every coefficient unchanged. It is a
+            and the Earth and the Moon relative to the Earth-Moon barycentre -
+            over the years 1900 to 2100, with every coefficient unchanged. It is a
             **modified kernel** under NAIF's rules and is named, annotated
             and attributed as such; it is not an original JPL file and JPL
             did not produce it.
@@ -290,7 +293,8 @@ public final class SolarSystemPackMain {
                 .append("Tool: `juranometria.tool.SolarSystemPackMain` (this repository),")
                 .append(" using `juranometria.solar.spk.SpkExcerpt`. Segments kept,")
                 .append(" in order: 0 -> 3 (Earth-Moon barycentre), 0 -> 10 (Sun),")
-                .append(" 3 -> 399 (Earth); all SPK Type 2. Interval: 1900-01-01 to")
+                .append(" 3 -> 399 (Earth), 3 -> 301 (Moon); all SPK Type 2.")
+                .append(" Interval: 1900-01-01 to")
                 .append(" 2101-01-01 TDB, with a 31-day margin at each end; whole")
                 .append(" records are kept from the first covering the start to the")
                 .append(" last covering the end, coefficients unchanged.\n\n")
@@ -323,7 +327,7 @@ public final class SolarSystemPackMain {
         m.put("pack.version", Integer.toString(PACK_VERSION));
         m.put("audit.date", AUDIT_DATE);
         m.put("ephemeris", "DE440");
-        m.put("ephemeris.bodies", "3,10,399");
+        m.put("ephemeris.bodies", "3,10,301,399");
         m.put("ephemeris.kernel", KERNEL_NAME);
         m.put("ephemeris.coverage.start.jd", String.format(Locale.ROOT, "%.1f",
                 COVERAGE_START_JD));

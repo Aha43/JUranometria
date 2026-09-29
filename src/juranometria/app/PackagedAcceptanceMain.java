@@ -2415,11 +2415,35 @@ public final class PackagedAcceptanceMain {
                         && PackagedAcceptanceMain.class.getResourceAsStream(
                                 "/resources/solar-system/PROVENANCE.md") != null,
                 "the pack's notice and provenance travel with it");
-        System.out.println("solar system pack OK (DE440 excerpt "
+        // And the Moon (issue #407), from the same pack, for the same
+        // instant at sea level - the value Horizons gave for that
+        // request - within the same exact-era reading of the sky, plus
+        // the parallax cost of Place and Time's UT1 = UTC rule.
+        juranometria.solar.SolarSystemService.MoonObservation moonSample =
+                (juranometria.solar.SolarSystemService.MoonObservation)
+                        solar.observe(juranometria.solar.SolarSystemService
+                                .Body.MOON, new juranometria.sky.Observer(
+                                        59.91, 10.75, java.time.Instant.parse(
+                                                "2026-06-21T10:00:00Z")));
+        double moonOff = moonSample.astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(173.976203549, -0.110981655))
+                * 3600.0;
+        require(moonOff < 0.3, "the packaged Moon agrees with Horizons for"
+                + " Oslo, 2026-06-21 10:00 UTC, within 0.3 arcsecond: "
+                + moonOff);
+        require(moonSample.phase() == juranometria.solar.SolarSystemService
+                        .Phase.WAXING_CRESCENT,
+                "and that morning's Moon is a waxing crescent, as it was: "
+                        + moonSample.phase());
+        require("2".equals(juranometria.solar.SolarSystemPack.load().manifest()
+                        .get("pack.version")),
+                "the packaged pack is v2, the one with the Moon");
+        System.out.println("solar system pack OK (DE440 excerpt v2 "
                 + solar.timeScales().exactFrom() + " exact until "
                 + solar.timeScales().exactUntil() + ", Sun at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", sunOff)
-                + " arcsecond of Horizons)");
+                + " arcsecond of Horizons, Moon within "
+                + String.format(java.util.Locale.ROOT, "%.4f", moonOff) + ")");
 
         // The five deep-sky families, inside the packaged image: each
         // one hides its own marks and nobody else's, the master
