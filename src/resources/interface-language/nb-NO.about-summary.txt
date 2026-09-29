@@ -15,4 +15,8 @@ Telescope): BSD-3-Clause.
 Tradisjonelle stjernenavn samt Bayer- og Flamsteed-betegnelser
 avledet fra d3-celestial: BSD-3-Clause.
 
+Solsystemefemeride: et utdrag av NASA/JPLs DE440, endret av
+JUranometria etter NAIF-reglene for endrede SPICE-kjerner (ingen
+avgift eller lisens), og IERS' skuddsekundfil, uendret.
+
 Verktøylinjeikoner fra ikonsettet Tabler: MIT-lisens.

@@ -66,6 +66,8 @@ help:
 	@echo "  constellation-study  Render the Sprint 7 constellation-geography study"
 	@echo "  import-constellations  Regenerate the bundled constellation-geography pack"
 	@echo "  import-star-identities  Regenerate the bundled star-identity pack"
+	@echo "  import-solar-system  Regenerate the bundled Solar System ephemeris pack from pinned inputs"
+	@echo "  sun-study    Write the first Sun table from the bundled pack (issue #399)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -257,6 +259,9 @@ import-allsky: classes
 
 import-constellations: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.ConstellationPackMain
+
+import-solar-system: classes
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.SolarSystemPackMain
 
 import-star-identities: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
@@ -567,7 +572,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study printable-chart-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -644,6 +649,15 @@ printable-chart-study: classes
 		> docs/studies/printable-chart/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WiderFieldPageMain
 
+# The first Sun table (issue #399): numbers from the bundled pack,
+# in the columns and rounding the contract froze, for the owner to
+# read before any application surface exists.
+sun-study: classes
+	mkdir -p docs/studies/solar-system
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunTableStudyMain \
+		> docs/studies/solar-system/measurements.md
+	@echo "written to docs/studies/solar-system/measurements.md"
+
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.EclipticStudyMain \
@@ -682,6 +696,7 @@ dist: app
 	   $(CLASSES_DIR)/resources/geo/constellations/NOTICE-constellations.md \
 	   $(CLASSES_DIR)/resources/catalog/star-identities/NOTICE-star-identities.md \
 	   $(CLASSES_DIR)/resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
+	   $(CLASSES_DIR)/resources/solar-system/NOTICE-solar-system.md \
 	   $(DIST_STAGE)/licenses/
 	cp $(CLASSES_DIR)/resources/icons/LICENSE \
 	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt

@@ -53,6 +53,7 @@ with it paragraph by paragraph.
 | `constellations` | Constellation geography |
 | `staridentities` | Star identities |
 | `bsd3` | BSD-3-Clause licence text |
+| `solarsystem` | Solar System ephemeris |
 | `tabler` | Tabler icons licence |
 
 ### Light
@@ -70,7 +71,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 3.0.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 684 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 876 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -84,7 +85,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 26048 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28519 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -103,7 +104,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 3.0.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 684 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 876 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -117,13 +118,13 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 26048 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28519 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
 ### The compact licensing summary, in full
 
-Its own document (684 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
+Its own document (876 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
 
 ```
 Code and documentation: MIT license, copyright JUranometria
@@ -142,6 +143,10 @@ convention): BSD-3-Clause.
 
 Traditional star names and Bayer and Flamsteed designations derived
 from d3-celestial: BSD-3-Clause.
+
+Solar System ephemeris: an excerpt of NASA/JPL's DE440, modified by
+JUranometria under NAIF's rules for modified SPICE kernels (no fee
+or licence), and the IERS leap-second file, unmodified.
 
 Toolbar icons from the Tabler icon set: MIT license.
 ```
@@ -176,6 +181,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | `constellations` | Stjernebildegeografi |
 | `staridentities` | Stjerneidentiteter |
 | `bsd3` | Lisensteksten for BSD-3-Clause |
+| `solarsystem` | Solsystemefemeride |
 | `tabler` | Lisens for Tabler-ikonene |
 
 ### Light
@@ -193,7 +199,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 3.0.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 694 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 876 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -207,7 +213,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 26073 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28540 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -226,7 +232,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 3.0.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 694 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 876 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -240,13 +246,13 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 26073 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28540 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
 ### The compact licensing summary, in full
 
-Its own document (694 characters), written in this language. Every licence identifier below is exact and untranslated.
+Its own document (876 characters), written in this language. Every licence identifier below is exact and untranslated.
 
 ```
 Kode og dokumentasjon: MIT-lisens. Opphavsrett: JUranometria
@@ -266,6 +272,10 @@ Telescope): BSD-3-Clause.
 Tradisjonelle stjernenavn samt Bayer- og Flamsteed-betegnelser
 avledet fra d3-celestial: BSD-3-Clause.
 
+Solsystemefemeride: et utdrag av NASA/JPLs DE440, endret av
+JUranometria etter NAIF-reglene for endrede SPICE-kjerner (ingen
+avgift eller lisens), og IERS' skuddsekundfil, uendret.
+
 Verktøylinjeikoner fra ikonsettet Tabler: MIT-lisens.
 ```
 
@@ -281,8 +291,9 @@ Not reproduced here: they are upstream text, and a copy in a study is a copy tha
 | `constellations` | `/resources/geo/constellations/NOTICE-constellations.md` | 1258 |
 | `staridentities` | `/resources/catalog/star-identities/NOTICE-star-identities.md` | 1266 |
 | `bsd3` | `/resources/geo/constellations/LICENSE-BSD-3-Clause.txt` | 1480 |
+| `solarsystem` | `/resources/solar-system/NOTICE-solar-system.md` | 2347 |
 | `tabler` | `/resources/icons/LICENSE` | 1072 |
-| **seven** | | **25188** |
+| **seven** | | **27535** |
 
 ## The application mark
 

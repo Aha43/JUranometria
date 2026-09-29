@@ -143,6 +143,16 @@ make import-constellations
 make import-star-identities
 ```
 
+The Solar System ephemeris pack under `src/resources/solar-system/` - a
+JUranometria-modified excerpt of JPL DE440 and the IERS leap-second
+file - is generated from its own pinned inputs, and rebuilding it
+writes the same bytes:
+
+```sh
+scripts/download-solar-system-sources.sh   # ~32 MB de440s.bsp and Leap_Second.dat
+make import-solar-system                   # verifies the pins, proves the excerpt, writes the pack
+```
+
 ## Using the atlas
 
 `make run` opens the M31 region chart. The toolbar above the page:

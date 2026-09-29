@@ -14,6 +14,7 @@ this archive.
 | Deep-sky data (OpenNGC) | CC-BY-SA-4.0 | [`licenses/NOTICE-openngc.md`](licenses/NOTICE-openngc.md), [full text](licenses/LICENSE-CC-BY-SA-4.0.txt) |
 | Constellation geography (d3-celestial) | BSD-3-Clause | [`licenses/NOTICE-constellations.md`](licenses/NOTICE-constellations.md), [full text](licenses/LICENSE-BSD-3-Clause.txt) |
 | Star-identity data (d3-celestial) | BSD-3-Clause | [`licenses/NOTICE-star-identities.md`](licenses/NOTICE-star-identities.md), [full text](licenses/LICENSE-BSD-3-Clause.txt) |
+| Solar System ephemeris (a JUranometria-modified excerpt of NASA/JPL DE440; IERS leap seconds) | NAIF rules for modified SPICE kernels (no fee or licence); IERS public data | [`licenses/NOTICE-solar-system.md`](licenses/NOTICE-solar-system.md) |
 | Toolbar icons (Tabler) | MIT | [`licenses/LICENSE-Tabler-MIT.txt`](licenses/LICENSE-Tabler-MIT.txt) |
 | Application mark | MIT (JUranometria's own) | this repository's `LICENSE` |
 

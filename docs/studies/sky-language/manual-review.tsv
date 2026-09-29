@@ -146,3 +146,8 @@ d6ec4403b577d737	sheet/PngSheetWriter.java	Title	collection/alias flow not trace
 715ef47ebffe1748	sheet/PngSheetWriter.java	Description	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
 36aa094f9216be00	sheet/PngSheetWriter.java	Software	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
 3a05bc44cc171e52	sheet/PngSheetWriter.java	Emphasis	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+284e3f8afa4891b6	solar/time/LeapSeconds.java	^\\s*(\\d+(?:\\.\\d+)?)\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{4})\\s+(\\d+)\\s*$	unresolved: no route found, needs manual inspection	notation	a regular expression: the shape of one row of the IERS leap-second file, a formal pattern the parser matches and no reader sees
+32edc1b91faa4ba0	solar/SolarSystemPack.java	checksum.	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+34aa079df0bd5fb6	solar/SolarSystemPack.java	solar-system	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+c271dd35f2eefea8	solar/SolarSystemPack.java	/resources/solar-system/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+d673091a8a11b2bb	solar/spk/SpkExcerpt.java	DAF/SPK 	unresolved: no route found, needs manual inspection	notation	the SPK file format's own magic word, written into a kernel's file record; never shown
