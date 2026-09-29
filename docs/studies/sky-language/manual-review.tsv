@@ -151,3 +151,4 @@ d6ec4403b577d737	sheet/PngSheetWriter.java	Title	collection/alias flow not trace
 34aa079df0bd5fb6	solar/SolarSystemPack.java	solar-system	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 c271dd35f2eefea8	solar/SolarSystemPack.java	/resources/solar-system/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 d673091a8a11b2bb	solar/spk/SpkExcerpt.java	DAF/SPK 	unresolved: no route found, needs manual inspection	notation	the SPK file format's own magic word, written into a kernel's file record; never shown
+8a90e69519156f3d	app/AppMenuBar.java	sunTableItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it

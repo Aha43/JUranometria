@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 572 × 218 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -66,6 +66,11 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -97,7 +102,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 572 × 218 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -123,6 +128,11 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
 | item label [checked] \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -154,7 +164,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 572 × 218 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -180,6 +190,11 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -211,7 +226,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 572 × 218 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -237,6 +252,11 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -270,7 +290,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 218 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -296,6 +316,11 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -327,7 +352,7 @@ Bar packed 578 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 218 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -353,6 +378,11 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
 | item label [checked] \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -384,7 +414,7 @@ Bar packed 578 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 218 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -410,6 +440,11 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -441,7 +476,7 @@ Bar packed 578 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 218 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -467,6 +502,11 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |

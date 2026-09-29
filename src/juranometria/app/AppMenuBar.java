@@ -238,6 +238,28 @@ public final class AppMenuBar {
     /** The name the Copy View Report item carries, for tests to find. */
     public static final String VIEW_REPORT_ITEM = "copyViewReportItem";
 
+    /** The name the Sun table item carries, for tests to find (#400). */
+    public static final String SUN_ITEM = "sunTableItem";
+
+    /**
+     * The same, without the Sun table (#400): kept so every earlier
+     * caller keeps its arity, as was done for Copy View Report.
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  Runnable exportSheet,
+                                  Runnable copyViewReport,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, copyViewReport, null, said);
+    }
+
     /**
      * The menu bar with Copy View Report (issue #372).
      *
@@ -258,6 +280,7 @@ public final class AppMenuBar {
                                   Runnable toggleEcliptic,
                                   Runnable exportSheet,
                                   Runnable copyViewReport,
+                                  Runnable openSunTable,
                                   juranometria.ui.language.InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
@@ -343,6 +366,22 @@ public final class AppMenuBar {
                 placeAndTime.addActionListener(event ->
                         openPlaceAndTime.run());
                 view.add(placeAndTime);
+            }
+            if (openSunTable != null) {
+                // The Sun table (#400): where the Sun is for the place
+                // and instant Place and Time owns, as numbers. It sits
+                // beside Place and Time because that is what it reads;
+                // the hover says so before the reader chooses it.
+                JMenuItem sun = new JMenuItem(said.say("menu.sun.label"));
+                sun.setName(SUN_ITEM);
+                letters.apply(sun, "menu.sun.mnemonic");
+                sun.getAccessibleContext().setAccessibleName(
+                        said.say("menu.sun.a11y"));
+                juranometria.ui.Explain.control(sun,
+                        said.say("menu.sun.hover"),
+                        said.say("menu.sun.explain"));
+                sun.addActionListener(event -> openSunTable.run());
+                view.add(sun);
             }
             if (toggleInspector != null) {
                 // A checkbox, because the reader must be able to see

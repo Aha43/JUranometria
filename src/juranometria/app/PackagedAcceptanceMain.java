@@ -440,8 +440,73 @@ public final class PackagedAcceptanceMain {
         horizonPanJourney();
         javax.swing.SwingUtilities.invokeAndWait(() ->
                 cardinalLandmarkJourney());
+        sunTableJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
+    }
+
+    /**
+     * The Sun table inside the packaged image (issue #400): the
+     * reader's surface over the bundled pack, headless-constructible,
+     * in both languages, answering an instant, a range and a refusal
+     * with the words the language files ship.
+     */
+    private static void sunTableJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer[] observer = {new juranometria.sky.Observer(
+                59.91, 10.75, java.time.Instant.parse("2026-06-21T10:00:00Z"))};
+        juranometria.ui.solar.SunTableDialog.Content[] table =
+                new juranometria.ui.solar.SunTableDialog.Content[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> table[0] =
+                juranometria.ui.solar.SunTableDialog.content(() -> observer[0],
+                        solar, juranometria.ui.language.InterfaceText
+                                .forLanguage("en")));
+        require(table[0].model.getRowCount() == 1
+                        && "51.01\u00b0".equals(table[0].model.getValueAt(0, 4))
+                        && "1.016165 AU (152.016 mill. km)".equals(
+                                table[0].model.getValueAt(0, 6)),
+                "the packaged Sun table shows Oslo's midsummer row as the"
+                        + " contract spells it: " + table[0].model.getValueAt(0, 4)
+                        + ", " + table[0].model.getValueAt(0, 6));
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            table[0].rangeView.setSelected(true);
+            table[0].end.setText("2026-06-24 07:30");
+            table[0].update();
+        });
+        require(table[0].model.getRowCount() == 4
+                        && String.valueOf(table[0].model.getValueAt(3, 0))
+                                .endsWith("\u2020"),
+                "a range of four rows with the appended end marked: "
+                        + table[0].status());
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            table[0].end.setText("2026-06-21 09:00");
+            table[0].update();
+        });
+        require(table[0].model.getRowCount() == 0
+                        && table[0].status().contains("backwards"),
+                "a backwards range is refused with its reason: "
+                        + table[0].status());
+        juranometria.ui.solar.SunTableDialog.Content[] norsk =
+                new juranometria.ui.solar.SunTableDialog.Content[1];
+        observer[0] = new juranometria.sky.Observer(-0.18, -78.5,
+                java.time.Instant.parse("2026-12-21T20:50:09Z"));
+        javax.swing.SwingUtilities.invokeAndWait(() -> norsk[0] =
+                juranometria.ui.solar.SunTableDialog.content(() -> observer[0],
+                        solar, juranometria.ui.language.InterfaceText
+                                .forLanguage("nb-NO")));
+        require("Tidspunkt (UTC)".equals(norsk[0].model.getColumnName(0))
+                        && "1 rader.".equals(norsk[0].status())
+                        && norsk[0].observerNote.getText().startsWith("Observat")
+                        && String.valueOf(norsk[0].model.getValueAt(0, 4))
+                                .contains(",")
+                        && !String.valueOf(norsk[0].model.getValueAt(0, 4))
+                                .contains("."),
+                "and speaks Norwegian through the packaged classpath: "
+                        + norsk[0].status());
+        System.out.println("sun table OK (Oslo's midsummer row, a four-row"
+                + " range with its appended end, a stated refusal, and the"
+                + " Norwegian surface, all inside the image)");
     }
 
 

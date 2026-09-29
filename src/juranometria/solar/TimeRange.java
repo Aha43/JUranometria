@@ -82,6 +82,20 @@ public record TimeRange(Instant start, Instant end, Duration step) {
         return (int) rowsFor(start, end, step);
     }
 
+    /**
+     * How many rows a range would answer, before one is built: what a
+     * surface needs to refuse with the number stated rather than by
+     * catching the refusal.
+     */
+    public static long rowsOf(Instant start, Instant end, Duration step) {
+        if (start == null || end == null || step == null
+                || end.isBefore(start) || step.isNegative() || step.isZero()) {
+            throw new IllegalArgumentException("a forward range and a"
+                    + " positive step");
+        }
+        return rowsFor(start, end, step);
+    }
+
     private static long rowsFor(Instant start, Instant end, Duration step) {
         long span = Duration.between(start, end).toNanos();
         long stepNanos = step.toNanos();

@@ -37,7 +37,7 @@ class MenuMnemonicTest {
 
     private static final List<String> ITEMS = List.of(
             "menu.export", "menu.chartoptions", "menu.placeandtime",
-            "menu.inspector", "menu.ecliptic");
+            "menu.sun", "menu.inspector", "menu.ecliptic");
 
     /** Each item carries the letter its own language declares. */
     @Test
@@ -171,7 +171,8 @@ class MenuMnemonicTest {
         JMenuBar[] bar = new JMenuBar[1];
         SwingUtilities.invokeAndWait(() -> bar[0] = AppMenuBar.create(
                 new ChartViewController(), () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { }, () -> { }, () -> { }, said));
+                () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                () -> { }, said));
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> check.on(bar[0]));
     }

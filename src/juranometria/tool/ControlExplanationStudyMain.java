@@ -332,10 +332,16 @@ public final class ControlExplanationStudyMain {
                 () -> { }, new juranometria.chart.SelectionMode(), english));
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { }, english));
+                () -> { }, () -> { }, () -> { }, english));
         surfaces.put("Chart Options",
                 ChartOptionsDialog.contentForStudy(options()));
         surfaces.put("Place and Time", placeAndTime());
+        // The Sun table (#400), over a stated observer: the audit is of
+        // its controls, not its numbers.
+        surfaces.put("Sun table", juranometria.ui.solar.SunTableDialog.content(
+                () -> new juranometria.sky.Observer(59.91, 10.75,
+                        java.time.Instant.parse("2026-06-21T10:00:00Z")),
+                juranometria.solar.SolarSystemService.load(), english));
         surfaces.put("Export Chart Sheet",
                 ExportSheetDialog.contentForStudy());
         surfaces.put("Settings", SettingsDialog.contentForStudy());

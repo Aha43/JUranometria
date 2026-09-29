@@ -293,6 +293,20 @@ public final class JUranometriaMain {
         // is the truth it reads, and nothing about it is persisted.
         toolbar.attachEmphasis(chart);
 
+        // The Solar System service reads an 8.9 MB pack; once, and
+        // only when a reader first opens the Sun table (#400).
+        java.util.function.Supplier<juranometria.solar.SolarSystemService>
+                solarSystem = new java.util.function.Supplier<>() {
+                    private juranometria.solar.SolarSystemService loaded;
+
+                    @Override
+                    public synchronized juranometria.solar.SolarSystemService get() {
+                        if (loaded == null) {
+                            loaded = juranometria.solar.SolarSystemService.load();
+                        }
+                        return loaded;
+                    }
+                };
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
         // derived from the session (#350).
@@ -356,7 +370,16 @@ public final class JUranometriaMain {
                                             reason),
                                     said.say("viewReport.refused.title"),
                                     javax.swing.JOptionPane.WARNING_MESSAGE);
-                        })));
+                        }),
+                // View, Sun (#400): where the Sun is for the place and
+                // instant the meridian module owns, as a table. The
+                // observer is read from the module when the table asks,
+                // never copied; the pack is read on first opening.
+                () -> juranometria.ui.solar.SunTableDialog.open(frame,
+                        () -> meridian.attached() ? meridian.observer() : null,
+                        solarSystem.get(),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()))));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
