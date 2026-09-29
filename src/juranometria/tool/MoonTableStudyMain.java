@@ -8,15 +8,14 @@ import java.util.Map;
 import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
-import juranometria.solar.SolarSystemService.CompassPoint;
-import juranometria.solar.SolarSystemService.LimbConditioning;
 import juranometria.solar.SolarSystemService.MoonObservation;
-import juranometria.solar.SolarSystemService.Phase;
 import juranometria.solar.SolarSystemService.Row;
-import juranometria.solar.SolarSystemService.Side;
 import juranometria.solar.TimeRange;
 import juranometria.solar.time.TimeScales;
+import juranometria.ui.language.InterfaceText;
 import juranometria.ui.solar.MoonTableFormat;
+import juranometria.ui.solar.SolarTable;
+import juranometria.ui.solar.SolarTableWords;
 import juranometria.ui.solar.SunTableFormat;
 
 /**
@@ -27,8 +26,8 @@ import juranometria.ui.solar.SunTableFormat;
  *
  * <p>Deterministic: the instants are literals or come from the cited
  * fixtures - "today" is a chosen day, never the clock - and the
- * formatting is {@code Locale.ROOT}. The words are English here; the
- * reader's table takes them from the language files (#408). The
+ * formatting is {@code Locale.ROOT}. The words are the English
+ * language file's, through the reader's table's own seam (#408). The
  * evidence contract regenerates this report and holds it to its
  * committed bytes. Written to stdout by {@code make moon-study}.
  */
@@ -46,23 +45,13 @@ public final class MoonTableStudyMain {
     private record Case(String label, String instant) {
     }
 
-    /** The English words of the phase categories (#406, M5). */
-    static final Map<Phase, String> PHASE_WORDS = Map.of(
-            Phase.NEAR_NEW, "near new Moon",
-            Phase.WAXING_CRESCENT, "waxing crescent",
-            Phase.NEAR_FIRST_QUARTER, "near first quarter",
-            Phase.WAXING_GIBBOUS, "waxing gibbous",
-            Phase.NEAR_FULL, "near full Moon",
-            Phase.WANING_GIBBOUS, "waning gibbous",
-            Phase.NEAR_LAST_QUARTER, "near last quarter",
-            Phase.WANING_CRESCENT, "waning crescent");
-
-    /** The English words of the sixteen compass points (#406, M6). */
-    static final String[] COMPASS_WORDS = {"north", "north-northeast",
-            "northeast", "east-northeast", "east", "east-southeast", "southeast",
-            "south-southeast", "south", "south-southwest", "southwest",
-            "west-southwest", "west", "west-northwest", "northwest",
-            "north-northwest"};
+    /**
+     * The words, from the English language file through the same seam
+     * the reader's table uses (#408), so the study and the table can
+     * never disagree about what a phase or a compass point is called.
+     */
+    private static final SolarTableWords WORDS = new SolarTableWords(
+            InterfaceText.forLanguage("en"), SolarTable.moon().stem());
 
     /**
      * The named events come from the cited fixture, never from a
@@ -182,17 +171,6 @@ public final class MoonTableStudyMain {
         System.out.println("|---|---|---|---|---|---|---|---|---|---|---|---|");
     }
 
-    static String litSide(MoonObservation o) {
-        if (o.brightLimbConditioning() == LimbConditioning.NEAR_NEW_OR_FULL) {
-            return o.phase() == Phase.NEAR_NEW
-                    ? "not well-defined (near new Moon)"
-                    : "not well-defined (near full Moon)";
-        }
-        CompassPoint point = o.brightLimbCompassPoint();
-        return MoonTableFormat.positionAngle(o.brightLimbAngleDegrees())
-                + " (" + COMPASS_WORDS[point.ordinal()] + ")";
-    }
-
     private static void row(String label, MoonObservation o, boolean appended) {
         String instant = SunTableFormat.minute(o.instant())
                 + (appended ? " †" : "")
@@ -207,10 +185,9 @@ public final class MoonTableStudyMain {
                 + " | " + MoonTableFormat.kilometres(o.distanceKm())
                 + " | " + SunTableFormat.minutesSeconds(o.angularDiameterArcseconds())
                 + " | " + MoonTableFormat.percent(o.illuminatedFraction())
-                + " | " + PHASE_WORDS.get(o.phase())
-                + " | " + MoonTableFormat.elongation(o.elongationDegrees(),
-                        o.side() == Side.EAST_OF_SUN ? "E" : "W")
-                + " | " + litSide(o)
+                + " | " + SolarTable.Moon.phaseWord(o.phase(), WORDS)
+                + " | " + SolarTable.Moon.elongation(o, WORDS)
+                + " | " + SolarTable.Moon.litSide(o, WORDS)
                 + " |");
     }
 }

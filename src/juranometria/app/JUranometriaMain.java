@@ -375,11 +375,20 @@ public final class JUranometriaMain {
                 // instant the meridian module owns, as a table. The
                 // observer is read from the module when the table asks,
                 // never copied; the pack is read on first opening.
-                () -> juranometria.ui.solar.SunTableDialog.open(frame,
+                () -> juranometria.ui.solar.SolarTableDialog.open(frame,
                         () -> meridian.attached() ? meridian.observer() : null,
                         solarSystem.get(),
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage()))));
+                                language.interfaceLanguage()),
+                        juranometria.ui.solar.SolarTable.sun()),
+                // View, Moon (#408): the same table shell over the same
+                // observer and pack, for the Moon's own columns.
+                () -> juranometria.ui.solar.SolarTableDialog.open(frame,
+                        () -> meridian.attached() ? meridian.observer() : null,
+                        solarSystem.get(),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()),
+                        juranometria.ui.solar.SolarTable.moon())));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar

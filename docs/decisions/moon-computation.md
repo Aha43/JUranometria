@@ -255,6 +255,60 @@ nothing a reader uses. `docs/studies/solar-system/moon-measurements.md`
 is the table as numbers, four observers at the named events and chosen
 instants, a daily range through one lunation and an hourly night.
 
+## The reader's table (issue #408)
+
+`View → Moon…` opens the Moon's table beside the Sun's, through one
+shell: `juranometria.ui.solar.SolarTableDialog`, built over a
+`SolarTable` that says which body, which columns and which words. The
+Sun's dialog of #400 became that shell without a change to what it
+shows or says - its companion evidence moved by one word, the class's
+new name. Decisions taken there:
+
+- **One seam, two bodies.** The observer note, the two views, the
+  range and its refusals, the marks on an instant, the update and
+  close actions and the shared column headings are written once. What
+  a body contributes is its columns, how a cell is spelled, and its
+  own words. The dialog is singular per body: opening the Moon's table
+  again brings the one Moon table to the front and leaves the Sun's
+  alone.
+- **Two key families, resolved body first.** `solartable.*` holds the
+  shared words once; `suntable.*` and `moontable.*` hold each body's
+  own - its title, its name in a sentence, what its distance is
+  measured in, what its lit side means. A word is looked up under the
+  body's family and falls back to the shared one, so a body-specific
+  key is an override, never a copy (`SolarTableWords`). The shared
+  "This instant" explanation named the Sun, which the
+  control-explanation study caught on the Moon's surface: both bodies
+  now say it themselves.
+- **The Moon's columns**, as ruled: instant; right ascension and
+  declination (J2000); altitude and azimuth; distance to the
+  kilometre, `386 363 km`; apparent diameter; illuminated, `45.6 %`;
+  phase, in the ruled words of each language; elongation from the Sun
+  to a tenth of a degree with the side's letter, `84.8° E` and
+  `84,8° Ø`; lit side, `294° (west-northwest)` and `294°
+  (vest-nordvest)`, or *not well-defined (near new Moon)* / *ikke
+  veldefinert (nær nymåne)*. The words come from the language files
+  through the same seam the study uses, so the first Moon table and
+  the reader's table can never disagree about what a phase is called.
+- **Wide enough to be read.** The Sun's viewport is 760 px and scrolls;
+  the Moon's is sized for all eleven columns, because the phase and
+  the lit side are the columns a reader opens it for and a photograph
+  that cut them off would prove nothing.
+- **Nothing else changes.** Place and Time stays the authority; the
+  range, the refusals, the 1 000-row cap, the appended-end mark, the
+  *est.* mark, the decimal separator and the accessibility contract
+  are the Sun's, held by `MoonTableDialogTest` against the same
+  expectations `SunTableDialogTest` holds. No copy or export, by the
+  standing deferral. No clock, store, file or network, held by the
+  source scan.
+- **Evidence.** `MoonTableSheetMain` photographs the dialog in both
+  languages and appearances - Oslo's midsummer morning, a range with
+  its appended end, a refused range, Cape Town at the June full Moon
+  with the lit side not well-defined - and the menu photographs,
+  the control-explanation study and the test-evidence study
+  re-record for the new item and surface; the packaged image drives
+  the content headless in both languages. Wide, and correctly so.
+
 ## Fixtures
 
 `docs/studies/solar-system/horizons-moon/` - thirteen Horizons

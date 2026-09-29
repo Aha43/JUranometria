@@ -11,7 +11,7 @@ interface language resources ship in the application image.
 ## The window, not a panel
 
 Each capture is the production dialog built through
-`SunTableDialog.packedForStudy`, which has no "English if
+`SolarTableDialog.packedForStudy`, which has no "English if
 omitted" overload. The title and the window description are
 read from the `JDialog` itself; every shown, hovered and
 spoken string is walked from the content; the column

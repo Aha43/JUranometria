@@ -241,6 +241,9 @@ public final class AppMenuBar {
     /** The name the Sun table item carries, for tests to find (#400). */
     public static final String SUN_ITEM = "sunTableItem";
 
+    /** The name the Moon table item carries, for tests to find (#408). */
+    public static final String MOON_ITEM = "moonTableItem";
+
     /**
      * The same, without the Sun table (#400): kept so every earlier
      * caller keeps its arity, as was done for Copy View Report.
@@ -281,6 +284,30 @@ public final class AppMenuBar {
                                   Runnable exportSheet,
                                   Runnable copyViewReport,
                                   Runnable openSunTable,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, copyViewReport, openSunTable, null, said);
+    }
+
+    /**
+     * The menu bar with View's Moon table (Sprint 36, issue #408),
+     * beside the Sun's: the same seam, one more body.
+     *
+     * @param openMoonTable runs on View's Moon item (may be null,
+     *     omitting the item)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  Runnable exportSheet,
+                                  Runnable copyViewReport,
+                                  Runnable openSunTable,
+                                  Runnable openMoonTable,
                                   juranometria.ui.language.InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
@@ -382,6 +409,20 @@ public final class AppMenuBar {
                         said.say("menu.sun.explain"));
                 sun.addActionListener(event -> openSunTable.run());
                 view.add(sun);
+            }
+            if (openMoonTable != null) {
+                // The Moon table (#408), under the Sun's, over the same
+                // Place and Time; the hover says so.
+                JMenuItem moon = new JMenuItem(said.say("menu.moon.label"));
+                moon.setName(MOON_ITEM);
+                letters.apply(moon, "menu.moon.mnemonic");
+                moon.getAccessibleContext().setAccessibleName(
+                        said.say("menu.moon.a11y"));
+                juranometria.ui.Explain.control(moon,
+                        said.say("menu.moon.hover"),
+                        said.say("menu.moon.explain"));
+                moon.addActionListener(event -> openMoonTable.run());
+                view.add(moon);
             }
             if (toggleInspector != null) {
                 // A checkbox, because the reader must be able to see
