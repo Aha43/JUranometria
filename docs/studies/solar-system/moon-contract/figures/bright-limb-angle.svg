@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620" font-family="Helvetica, Arial, sans-serif" font-size="15">
+  <rect width="1000" height="620" fill="white"/>
+  <title>The bright-limb position angle on a north-up, east-left chart, and in the local sky</title>
+  <defs>
+    <clipPath id="disc"><circle cx="0" cy="0" r="120"/></clipPath>
+    <!-- a gibbous lit region whose bright limb points to +x (3 o'clock) before any rotation -->
+    <path id="lit" d="M 0 -120 A 120 120 0 0 1 0 120 A 60 120 0 0 0 0 -120 Z" fill="#e8e8e8"/>
+  </defs>
+  <!-- Left: chart view, north up, east LEFT -->
+  <g transform="translate(250 270)">
+    <text x="0" y="-210" text-anchor="middle" font-weight="bold">On the chart: north up, east left (J2000 frame)</text>
+    <circle cx="0" cy="0" r="120" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- chi = 285 deg from north through east; east is left, so "through east" is counter-clockwise on screen: 285 deg ccw = 75 deg cw from up = 15 deg ccw from +x -->
+    <g clip-path="url(#disc)" transform="rotate(-15)"><use href="#lit"/></g>
+    <line x1="0" y1="-120" x2="0" y2="-160" stroke="#1a1a1a" stroke-width="2"/>
+    <text x="0" y="-168" text-anchor="middle" font-weight="bold">N</text>
+    <line x1="-120" y1="0" x2="-160" y2="0" stroke="#1a1a1a" stroke-width="2"/>
+    <text x="-172" y="6" text-anchor="middle" font-weight="bold">E</text>
+    <line x1="120" y1="0" x2="160" y2="0" stroke="#999" stroke-width="1"/>
+    <text x="172" y="6" text-anchor="middle" fill="#999">W</text>
+    <!-- chi arc: from north, counter-clockwise (through east) round to the bright-limb midpoint -->
+    <path d="M 0 -140 A 140 140 0 1 0 135.2 -36.2" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="-150" y="-95" fill="#c0392b" font-weight="bold" font-size="20">χ</text>
+    <circle cx="115.9" cy="-31.1" r="5" fill="#c0392b"/>
+    <text x="0" y="200" text-anchor="middle" font-size="14">χ: position angle of the bright limb's midpoint, from celestial</text>
+    <text x="0" y="220" text-anchor="middle" font-size="14">north through east. Here χ ≈ 285°: the light comes from the west-northwest.</text>
+  </g>
+  <!-- Right: local sky, zenith up: the whole disc turned by the parallactic angle q -->
+  <g transform="translate(720 270)">
+    <text x="0" y="-210" text-anchor="middle" font-weight="bold">In the local sky: zenith up</text>
+    <g transform="rotate(-38)">
+      <circle cx="0" cy="0" r="120" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
+      <g clip-path="url(#disc)" transform="rotate(-15)"><use href="#lit"/></g>
+      <line x1="0" y1="-120" x2="0" y2="-160" stroke="#1a1a1a" stroke-width="2"/>
+      <text x="0" y="-168" text-anchor="middle" font-weight="bold">N</text>
+    </g>
+    <line x1="0" y1="-120" x2="0" y2="-185" stroke="#2f5d8a" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="0" y="-192" text-anchor="middle" fill="#2f5d8a" font-weight="bold">zenith</text>
+    <path d="M 0 -150 A 150 150 0 0 0 -92.4 -118.2" fill="none" stroke="#1f7a4d" stroke-width="2.5"/>
+    <text x="-70" y="-160" fill="#1f7a4d" font-weight="bold" font-size="20">q</text>
+    <text x="0" y="200" text-anchor="middle" font-size="14">The same Moon, turned by the parallactic angle q between celestial</text>
+    <text x="0" y="220" text-anchor="middle" font-size="14">north and the zenith: the bright limb sits at χ − q from the vertical.</text>
+  </g>
+  <g font-size="14">
+    <text x="40" y="530">χ is computed from the apparent positions of the Sun and the Moon (Meeus, Astronomical Algorithms, eq. 48.5) on the true</text>
+    <text x="40" y="550">equator and equinox of date the atlas already uses; the fixed J2000 chart turns it by the small rotation of north (under 0.4° to 2100).</text>
+    <text x="40" y="570">A drawn phase, later, needs only χ and k: the terminator is an ellipse of axis ratio |cos i| whose lit side faces χ.</text>
+  </g>
+  <text x="40" y="605" font-size="12" fill="#666">JUranometria, issue #406 - figure 2 of 2.</text>
+</svg>
