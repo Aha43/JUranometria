@@ -85,7 +85,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 28519 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28525 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -118,7 +118,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 28519 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28525 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -213,7 +213,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 28540 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28546 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -246,7 +246,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 28540 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 28546 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -291,9 +291,9 @@ Not reproduced here: they are upstream text, and a copy in a study is a copy tha
 | `constellations` | `/resources/geo/constellations/NOTICE-constellations.md` | 1258 |
 | `staridentities` | `/resources/catalog/star-identities/NOTICE-star-identities.md` | 1266 |
 | `bsd3` | `/resources/geo/constellations/LICENSE-BSD-3-Clause.txt` | 1480 |
-| `solarsystem` | `/resources/solar-system/NOTICE-solar-system.md` | 2347 |
+| `solarsystem` | `/resources/solar-system/NOTICE-solar-system.md` | 2353 |
 | `tabler` | `/resources/icons/LICENSE` | 1072 |
-| **seven** | | **27535** |
+| **seven** | | **27541** |
 
 ## The application mark
 

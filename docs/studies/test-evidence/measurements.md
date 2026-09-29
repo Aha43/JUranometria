@@ -201,10 +201,10 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 69 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 25 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 73 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 42 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 417 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 421 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
@@ -215,6 +215,20 @@ The byte-exact fixtures:
 - docs/studies/place-and-time/reference-vectors.txt
 - docs/studies/sky-language/iau-constellations.tsv
 - docs/studies/sky-language/manual-review.tsv
+- docs/studies/solar-system/horizons-moon/NAMED-CASES.txt
+- docs/studies/solar-system/horizons-moon/dense-2026-oslo.txt
+- docs/studies/solar-system/horizons-moon/geocentric-meeus-47a-tt.txt
+- docs/studies/solar-system/horizons-moon/matrix-7d-alert.txt
+- docs/studies/solar-system/horizons-moon/matrix-7d-cape-town.txt
+- docs/studies/solar-system/horizons-moon/matrix-7d-chatham.txt
+- docs/studies/solar-system/horizons-moon/matrix-7d-oslo.txt
+- docs/studies/solar-system/horizons-moon/matrix-7d-quito.txt
+- docs/studies/solar-system/horizons-moon/named-alert.txt
+- docs/studies/solar-system/horizons-moon/named-cape-town.txt
+- docs/studies/solar-system/horizons-moon/named-chatham.txt
+- docs/studies/solar-system/horizons-moon/named-oslo.txt
+- docs/studies/solar-system/horizons-moon/named-quito.txt
+- docs/studies/solar-system/horizons-moon/sun-matrix-7d-oslo.txt
 - docs/studies/solar-system/horizons/NAMED-CASES.txt
 - docs/studies/solar-system/horizons/dense-2026-oslo.txt
 - docs/studies/solar-system/horizons/geocentric-meeus-25a-tt.txt
@@ -228,8 +242,11 @@ The byte-exact fixtures:
 - docs/studies/solar-system/horizons/named-chatham.txt
 - docs/studies/solar-system/horizons/named-oslo.txt
 - docs/studies/solar-system/horizons/named-quito.txt
+- docs/studies/solar-system/moon-contract/PackStudy.java.txt
+- docs/studies/solar-system/moon-events-2026.txt
 - docs/studies/solar-system/seasons-2026.txt
 - docs/studies/solar-system/spk-reference.txt
+- docs/studies/solar-system/sun-invariance.txt
 - docs/studies/wider-field/released-pages.txt
 - docs/studies/wider-field/released-text.txt
 - scripts/ecliptic-vectors.c
