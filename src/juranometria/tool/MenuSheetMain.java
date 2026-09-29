@@ -190,7 +190,7 @@ public final class MenuSheetMain {
                 // menu a reader opens.
                 bar[0] = chrome.menuBar(navigation, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { }, () -> { },
-                        () -> { }, () -> { });
+                        () -> { }, () -> { }, () -> { });
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {

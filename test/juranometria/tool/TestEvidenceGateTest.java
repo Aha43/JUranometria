@@ -314,12 +314,15 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
                         "src/juranometria/tool/PlaceAndTimeSheetMain.java",
                         "src/juranometria/tool/SettingsSheetMain.java",
+                        "src/juranometria/tool/SunTableSheetMain.java",
                         "src/juranometria/tool/SwingChromeSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the twenty widget photographers, whose font and theme"
+                "the twenty-one widget photographers - the twenty-first"
+                        + " is #400's Sun table sheet, arriving by this"
+                        + " decision - whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"

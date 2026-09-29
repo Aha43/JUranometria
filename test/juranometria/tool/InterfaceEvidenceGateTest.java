@@ -87,6 +87,8 @@ class InterfaceEvidenceGateTest {
         GENERATORS.put("SwingChromeSheetMain",
                 new Photographer("swing-chrome-strings.md",
                         SheetCapture.Kind.PACKED));
+        GENERATORS.put("SunTableSheetMain",
+                new Photographer("suntable-strings.md", SheetCapture.Kind.PACKED));
         // Components inside a packed study frame.
         GENERATORS.put("ChartKeyboardSheetMain",
                 new Photographer("chartkeyboard-strings.md",

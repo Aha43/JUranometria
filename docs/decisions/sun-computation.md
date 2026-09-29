@@ -218,6 +218,45 @@ instants; the accounting was rerun on all 12 670 rows with the same
 membership, and the maxima moved only where the corrected row was
 itself the worst (exact-era distance, 2.2351 → 2.2342 km).
 
+## The reader's table (issue #400)
+
+`View → Sun…` opens `juranometria.ui.solar.SunTableDialog`, modeless
+and singular like Place and Time. Decisions taken there:
+
+- **Place and Time stays the authority.** The dialog is handed a
+  supplier of the meridian module's current observer and reads it
+  when it opens, whenever it comes to the front, and on *Update from
+  Place and Time*; it copies nothing, stores nothing and keeps no
+  clock. The module has no change notification, so the reading is on
+  demand and the observer note says what was read.
+- **Two views.** The single instant, one row at Place and Time's
+  instant, is the fresh state; the range is start (defaulting to that
+  instant), end (a week later) and a fixed elapsed-time step of one,
+  six or twenty-four hours, seven or thirty days. A range that runs
+  backwards, asks for more than 1 000 rows, cannot be read, or leaves
+  1900–2100 is refused on the status line with its reason and an
+  empty table.
+- **Nothing is persisted**, on the smallest-surface precedent: the
+  instant is never stored anywhere in the atlas, and a stored range
+  would be a second clock in disguise.
+- **Numbers are notation.** Every value is formatted in
+  `Locale.ROOT` by `SunTableFormat`, the formatter promoted out of the
+  study so the reader's table and the evidence contract's table are
+  the same bytes; Norwegian keeps the decimal point (`−12.34° (under
+  horisonten)`), against the ruling's example, because the interface
+  files' standing rule is that a value must parse if a reader carries
+  it into Place and Time. A word from the owner turns it into a comma
+  in Norwegian only.
+- **No copy or export.** The rule allows it only with an explicitly
+  decided format; nothing in the checkpoint needs it, so the decision
+  is deferred, not made silently.
+- **Evidence.** `SunTableSheetMain` photographs the dialog in both
+  languages and appearances; the menu photographs and the
+  control-explanation study re-record for the new item and surface;
+  the packaged image drives the content headless in both languages.
+  The change is wide, and correctly so: it moves committed interface
+  evidence. No chart rendering moved.
+
 ## The range
 
 Inclusive start and end; a positive fixed elapsed-time step on the UTC

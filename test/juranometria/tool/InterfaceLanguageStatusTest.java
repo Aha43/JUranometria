@@ -44,7 +44,8 @@ class InterfaceLanguageStatusTest {
             "inspector-strings.md", "menu-strings.md",
             "onthispage-strings.md", "page-language-strings.md",
             "placeandtime-strings.md", "settings-strings.md",
-            "swing-chrome-strings.md", "toolbar-strings.md");
+            "suntable-strings.md", "swing-chrome-strings.md",
+            "toolbar-strings.md");
 
     @Test
     void theManifestIsWhereTheStatusLives() {

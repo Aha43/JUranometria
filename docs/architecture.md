@@ -220,8 +220,10 @@ instant and answers where the Sun is - chart position in J2000, apparent
 place of date, altitude and azimuth, distance, apparent diameter - from
 a bundled, digest-verified excerpt of JPL DE440 and the IERS leap-second
 file, offline, under the contract in
-[`decisions/sun-computation.md`](decisions/sun-computation.md). It draws
-nothing yet. A later module drawing the Sun, the Moon or a planet will
+[`decisions/sun-computation.md`](decisions/sun-computation.md), and
+`juranometria.ui.solar` is the reader's table over it - View → Sun… -
+which reads the observer from the meridian module on demand and keeps
+no state of its own. It draws nothing yet. A later module drawing the Sun, the Moon or a planet will
 express its positions through `juranometria.sky.Ecliptic` and contribute
 them as ordinary points and paths, while the chart stays fixed to J2000
 and learns no ephemeris: the service is held to refer to no renderer,

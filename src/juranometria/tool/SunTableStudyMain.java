@@ -2,13 +2,9 @@ package juranometria.tool;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import juranometria.chart.SkyPosition;
 import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
@@ -16,6 +12,7 @@ import juranometria.solar.SolarSystemService.Row;
 import juranometria.solar.SolarSystemService.SunObservation;
 import juranometria.solar.TimeRange;
 import juranometria.solar.time.TimeScales;
+import juranometria.ui.solar.SunTableFormat;
 
 /**
  * The first Sun table, as numbers on a page (Sprint 35, issue #399):
@@ -64,9 +61,6 @@ public final class SunTableStudyMain {
                 new Case("First civil instant", "1900-01-01T00:00:00Z"),
                 new Case("Last civil instant", "2100-12-31T23:59:59Z"));
     }
-
-    private static final DateTimeFormatter MINUTE = DateTimeFormatter
-            .ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT).withZone(ZoneOffset.UTC);
 
     private SunTableStudyMain() {
     }
@@ -152,79 +146,21 @@ public final class SunTableStudyMain {
     }
 
     private static void row(String label, SunObservation o, boolean appended) {
-        String instant = MINUTE.format(o.instant().plusSeconds(30)
-                        .truncatedTo(java.time.temporal.ChronoUnit.MINUTES))
-                + (appended ? " †" : "")
+        String instant = SunTableFormat.minute(o.instant())
+                + (appended ? " \u2020" : "")
                 + (o.timeConfidence() == TimeScales.Confidence.EXACT
                         ? "" : " *est.*");
         System.out.println("| " + label + " | " + instant + " | "
-                + hms(o.astrometricJ2000()) + " | " + dms(o.astrometricJ2000())
-                + " | " + String.format(Locale.ROOT, "%.2f°",
-                        o.eclipticLongitudeJ2000Degrees())
-                + " | " + altitude(o.horizontal().altitudeDegrees())
-                + " | " + String.format(Locale.ROOT, "%.2f°",
-                        o.horizontal().azimuthDegrees())
-                + " | " + String.format(Locale.ROOT, "%.6f AU (%.3f mill. km)",
-                        o.distanceAu(), o.distanceKm() / 1e6)
-                + " | " + minutesSeconds(o.angularDiameterArcseconds()) + " |");
-    }
-
-    /** Hours, minutes and seconds to a tenth of a second. */
-    static String hms(SkyPosition p) {
-        double hours = p.raDegrees() / 15.0;
-        int h = (int) hours;
-        double m = (hours - h) * 60.0;
-        int mm = (int) m;
-        double s = (m - mm) * 60.0;
-        s = Math.round(s * 10.0) / 10.0;
-        if (s >= 60.0) {
-            s -= 60.0;
-            mm++;
-        }
-        if (mm >= 60) {
-            mm -= 60;
-            h = (h + 1) % 24;
-        }
-        return String.format(Locale.ROOT, "%02dh %02dm %04.1fs", h, mm, s);
-    }
-
-    /** Degrees, minutes and seconds to a second, sign always shown. */
-    static String dms(SkyPosition p) {
-        double dec = p.decDegrees();
-        String sign = dec < 0 ? "−" : "+";
-        double a = Math.abs(dec);
-        int d = (int) a;
-        double m = (a - d) * 60.0;
-        int mm = (int) m;
-        long s = Math.round((m - mm) * 60.0);
-        if (s >= 60) {
-            s -= 60;
-            mm++;
-        }
-        if (mm >= 60) {
-            mm -= 60;
-            d++;
-        }
-        return String.format(Locale.ROOT, "%s%d° %02d′ %02d″",
-                sign, d, mm, s);
-    }
-
-    /** Altitude to 0.01°, keeping the number when below the horizon. */
-    static String altitude(double degrees) {
-        String value = String.format(Locale.ROOT, "%.2f°", degrees)
-                .replace("-", "−");
-        return degrees < 0 ? value + " (below the horizon)" : value;
-    }
-
-    /** Arcminutes and arcseconds to a tenth of a second. */
-    static String minutesSeconds(double arcseconds) {
-        int m = (int) (arcseconds / 60.0);
-        double s = arcseconds - m * 60.0;
-        s = Math.round(s * 10.0) / 10.0;
-        if (s >= 60.0) {
-            s -= 60.0;
-            m++;
-        }
-        return String.format(Locale.ROOT, "%d′ %04.1f″", m, s);
+                + SunTableFormat.hms(o.astrometricJ2000()) + " | "
+                + SunTableFormat.dms(o.astrometricJ2000())
+                + " | " + SunTableFormat.degrees(o.eclipticLongitudeJ2000Degrees())
+                + " | " + SunTableFormat.altitude(o.horizontal().altitudeDegrees(),
+                        "(below the horizon)")
+                + " | " + SunTableFormat.degrees(o.horizontal().azimuthDegrees())
+                + " | " + SunTableFormat.astronomicalUnits(o.distanceAu())
+                + " AU (" + SunTableFormat.millionKilometres(o.distanceKm())
+                + " mill. km)"
+                + " | " + SunTableFormat.minutesSeconds(o.angularDiameterArcseconds())
+                + " |");
     }
 }
