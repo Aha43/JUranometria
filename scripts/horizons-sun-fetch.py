@@ -23,7 +23,7 @@ import urllib.request
 from pathlib import Path
 
 BASE = "https://ssd.jpl.nasa.gov/api/horizons.api"
-OUT = Path(__file__).parent / "horizons"
+OUT = Path(__file__).parent.parent / "docs/studies/solar-system/horizons"
 OUT.mkdir(exist_ok=True)
 
 # name: (east longitude deg, latitude deg, altitude km)
@@ -35,6 +35,23 @@ OBSERVERS = {
     "chatham": (183.5, -43.95, 0.02),
 }
 
+# The seasonal instants are never typed here: they are read from the
+# cited fixture, so the requests, the table and the contract share one
+# source (owner checkpoint on #399).
+SEASONS = Path(__file__).parent.parent / "docs/studies/solar-system/seasons-2026.txt"
+
+
+def seasons():
+    events = {}
+    for line in SEASONS.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        name, iso, _ = line.split("\t")
+        events[name.strip()] = iso.strip().replace("T", " ").rstrip("Z")
+    return events
+
+
+_S = seasons()
 NAMED = [
     ("1900-01-01 00:00:00", "boundary-start"),
     ("1962-01-01 00:00:00", "eop-record-begins"),
@@ -42,12 +59,12 @@ NAMED = [
     ("1992-10-13 00:00:00", "meeus-25a-civil-approx"),
     ("2000-01-01 12:00:00", "j2000"),
     ("2017-01-01 00:00:00", "last-leap-second"),
-    ("2026-03-20 14:46:00", "march-equinox-2026"),
-    ("2026-06-21 02:24:00", "june-solstice-2026"),
+    (_S["march-equinox"], "march-equinox-2026-imcce"),
+    (_S["june-solstice"], "june-solstice-2026-imcce"),
     ("2026-06-21 10:00:00", "oslo-sample-row"),
-    ("2026-09-22 22:05:00", "september-equinox-2026"),
+    (_S["september-equinox"], "september-equinox-2026-imcce"),
     ("2026-09-29 12:00:00", "today"),
-    ("2026-12-21 20:50:00", "december-solstice-2026"),
+    (_S["december-solstice"], "december-solstice-2026-imcce"),
     ("2100-12-31 23:59:59", "boundary-end"),
 ]
 
@@ -83,6 +100,7 @@ def keep(name, url, when, body):
 
 def main():
     failures = 0
+    only_named = "--only-named" in sys.argv
     for site, (lon, lat, alt) in OBSERVERS.items():
         coord = f"'{lon},{lat},{alt}'"
         # the named instants, one query per site, via TLIST
@@ -90,12 +108,19 @@ def main():
         url, when, body = query({"SITE_COORD": coord, "TLIST": tlist,
                                  "TLIST_TYPE": "'CAL'"})
         failures += not keep(f"named-{site}", url, when, body)
+        if only_named:
+            continue
         # the matrix: every 30 days across the whole interval
         url, when, body = query({"SITE_COORD": coord,
                                  "START_TIME": "'1900-01-01 00:00'",
                                  "STOP_TIME": "'2100-12-31 00:00'",
                                  "STEP_SIZE": "'30 d'"})
         failures += not keep(f"matrix-30d-{site}", url, when, body)
+    if only_named:
+        (OUT / "NAMED-CASES.txt").write_text(
+            "\n".join(f"{t}  {label}" for t, label in NAMED) + "\n")
+        print(f"failures={failures}")
+        sys.exit(1 if failures else 0)
     # one dense year at Oslo, daily, to see the within-year extremes
     url, when, body = query({"SITE_COORD": "'10.75,59.91,0.02'",
                              "START_TIME": "'2026-01-01 00:00'",

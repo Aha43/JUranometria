@@ -195,9 +195,28 @@ J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den
 valgte modellen.* Both are polished and ledger-checked in #400.
 
 `docs/studies/solar-system/measurements.md` is the table as numbers:
-four observers at the 2026 solstices and equinoxes, a chosen "today",
-a midsummer midnight and both ends of the interval; a daily range with
-an appended, marked end; an hourly range through a summer night.
+four observers at the 2026 equinoxes and solstices, a chosen "today",
+an instant near Oslo's solar midnight at midsummer, and both ends of
+the interval; a daily range with an appended, marked end; an hourly
+range through a summer night.
+
+**The seasonal instants are published, not typed.** The owner's review
+of the first table caught the June solstice named at 02:24 UTC and the
+September equinox at 22:05 UTC on the 22nd - instants supplied from
+memory, hours wrong, under the right names. They now come from one
+cited fixture, `docs/studies/solar-system/seasons-2026.txt`: the
+IMCCE's tables of the equinoxes and solstices 1583–2999 (P. Rocher,
+Observatoire de Paris), quoted to the second in UT with the documents'
+URLs and digests - 2026-03-20 14:45:53, 06-21 08:24:26, 09-23 00:05:08,
+12-21 20:50:09. The study, the Horizons request script and
+`SeasonalEventsTest` all read that file; the test holds the requests,
+the named-case list and the generated table to it without computing a
+position, and separately checks that at those instants the Sun's
+apparent longitude of date is at its cardinal value within 1″. The
+five named Horizons responses were refetched for the published
+instants; the accounting was rerun on all 12 670 rows with the same
+membership, and the maxima moved only where the corrected row was
+itself the worst (exact-era distance, 2.2351 → 2.2342 km).
 
 ## The range
 

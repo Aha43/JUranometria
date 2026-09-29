@@ -6,6 +6,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import juranometria.chart.SkyPosition;
 import juranometria.sky.Observer;
@@ -41,15 +42,28 @@ public final class SunTableStudyMain {
     private record Case(String label, String instant) {
     }
 
-    private static final List<Case> INSTANTS = List.of(
-            new Case("March equinox 2026", "2026-03-20T14:46:00Z"),
-            new Case("June solstice 2026", "2026-06-21T02:24:00Z"),
-            new Case("September equinox 2026", "2026-09-22T22:05:00Z"),
-            new Case("December solstice 2026", "2026-12-21T20:50:00Z"),
-            new Case("A chosen \"today\"", "2026-09-29T12:00:00Z"),
-            new Case("Local midnight, midsummer", "2026-06-21T23:00:00Z"),
-            new Case("First civil instant", "1900-01-01T00:00:00Z"),
-            new Case("Last civil instant", "2100-12-31T23:59:59Z"));
+    /**
+     * The seasonal instants come from the cited fixture, never from a
+     * literal here; the others are chosen instants and say so.
+     */
+    private static List<Case> instants() throws java.io.IOException {
+        Map<String, SeasonalEventsFixture.Event> seasons =
+                SeasonalEventsFixture.read();
+        return List.of(
+                new Case("March equinox 2026 (IMCCE)",
+                        seasons.get("march-equinox").instant().toString()),
+                new Case("June solstice 2026 (IMCCE)",
+                        seasons.get("june-solstice").instant().toString()),
+                new Case("September equinox 2026 (IMCCE)",
+                        seasons.get("september-equinox").instant().toString()),
+                new Case("December solstice 2026 (IMCCE)",
+                        seasons.get("december-solstice").instant().toString()),
+                new Case("A chosen \"today\"", "2026-09-29T12:00:00Z"),
+                new Case("Near local solar midnight, midsummer (23:00 UTC)",
+                        "2026-06-21T23:00:00Z"),
+                new Case("First civil instant", "1900-01-01T00:00:00Z"),
+                new Case("Last civil instant", "2100-12-31T23:59:59Z"));
+    }
 
     private static final DateTimeFormatter MINUTE = DateTimeFormatter
             .ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT).withZone(ZoneOffset.UTC);
@@ -57,7 +71,8 @@ public final class SunTableStudyMain {
     private SunTableStudyMain() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws java.io.IOException {
+        List<Case> instants = instants();
         SolarSystemService service = SolarSystemService.load();
         TimeScales scales = service.timeScales();
         System.out.println("# The Sun, computed: the first table");
@@ -75,14 +90,17 @@ public final class SunTableStudyMain {
         System.out.println("Time is exact from " + scales.exactFrom() + " until "
                 + scales.exactUntil() + " (the pinned record's own validity);"
                 + " earlier and later instants use an estimated clock correction"
-                + " and are marked *est.* in the Instant column.");
+                + " and are marked *est.* in the Instant column. The seasonal"
+                + " instants are the IMCCE's published values, read from"
+                + " `docs/studies/solar-system/seasons-2026.txt`; the instant"
+                + " shown is rounded to the minute.");
         System.out.println();
 
         for (Site site : SITES) {
             System.out.println("## " + site.name());
             System.out.println();
             header();
-            for (Case c : INSTANTS) {
+            for (Case c : instants) {
                 Observer observer = new Observer(site.latitude(),
                         site.eastLongitude(), Instant.parse(c.instant()));
                 SunObservation o = (SunObservation) service.observe(Body.SUN,
@@ -134,7 +152,8 @@ public final class SunTableStudyMain {
     }
 
     private static void row(String label, SunObservation o, boolean appended) {
-        String instant = MINUTE.format(o.instant())
+        String instant = MINUTE.format(o.instant().plusSeconds(30)
+                        .truncatedTo(java.time.temporal.ChronoUnit.MINUTES))
                 + (appended ? " †" : "")
                 + (o.timeConfidence() == TimeScales.Confidence.EXACT
                         ? "" : " *est.*");

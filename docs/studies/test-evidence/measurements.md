@@ -201,7 +201,7 @@ Whether a particular read happens on the event thread is control flow, which tex
 | class | the contract | files |
 |---|---|---|
 | deterministic-report | regenerates byte-for-byte on the same tree | 68 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 24 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 25 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 407 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
@@ -227,6 +227,7 @@ The byte-exact fixtures:
 - docs/studies/solar-system/horizons/named-chatham.txt
 - docs/studies/solar-system/horizons/named-oslo.txt
 - docs/studies/solar-system/horizons/named-quito.txt
+- docs/studies/solar-system/seasons-2026.txt
 - docs/studies/solar-system/spk-reference.txt
 - docs/studies/wider-field/released-pages.txt
 - docs/studies/wider-field/released-text.txt
