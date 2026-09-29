@@ -15,4 +15,6 @@ contract regenerates: a record of what the #406 checkpoint rested on.
   added to the modified DE440 excerpt, footprint measured, every Sun,
   barycentre and Earth state proved bit-identical, the Moon's states proved
   identical to the official kernel, and the Sun's observations through the
-  service proved record-equal.
+  service proved record-equal. Its 14 849 024 bytes were measured with a
+  one-record comment area; the released pack v2 keeps the source kernel's
+  full comment area as v1 does, 60 records more: 14 910 464 bytes.

@@ -34,7 +34,7 @@ difference 0.0.
 |---|---|
 | `de440s.bsp`, unmodified, 1849–2150, 14 segments (not bundled) | 32 726 016 |
 | **the bundled excerpt, Sun + EMB + Earth, 1900–2100** | **8 884 224** |
-| the same with the Moon added, for the Moon sprint | ≈ 14.9 MB, one pack regenerated |
+| **pack v2: the same with the Moon added (issue #407)** | **14 910 464** |
 
 NAIF's rules make an unmodified kernel freely redistributable and a
 modified one a different thing that must be renamed and re-attributed:
@@ -171,7 +171,13 @@ members of the authority family and serves as a cross-check envelope.
 ## The first table
 
 Instant (UTC); right ascension and declination (J2000); ecliptic
-longitude (J2000, the atlas's own ecliptic); altitude (no refraction)
+longitude (J2000, the atlas's own ecliptic, measured from the *fixed*
+J2000 equinox - so the equinoxes and solstices of a later year fall
+near, not exactly at, 0°, 90°, 180° and 270°, the 2026 events at
+359.64°, 89.63°, 179.63° and 269.63°, because the equinox itself has
+moved a third of a degree since 2000; the first explanation shipped
+said "0° at the March equinox", which issue #410 corrected in both
+languages, here and in the interface evidence); altitude (no refraction)
 and azimuth (from north through east); distance; apparent diameter.
 Rounding: RA to 0.1 s, Dec to 1″, longitude and altitude and azimuth
 to 0.01°, distance to 6 decimals of an AU followed by thousandths of a

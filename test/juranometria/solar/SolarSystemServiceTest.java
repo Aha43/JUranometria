@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService.Body;
+import juranometria.solar.SolarSystemService.MoonObservation;
 import juranometria.solar.SolarSystemService.Row;
 import juranometria.solar.SolarSystemService.SunObservation;
 import juranometria.solar.time.TimeScales;
@@ -41,6 +42,82 @@ class SolarSystemServiceTest {
         assertTrue(before.getMessage().contains("1900-01-01"), before.getMessage());
         assertThrows(IllegalArgumentException.class, () -> SERVICE.observe(Body.SUN,
                 OSLO.at(Instant.parse("2101-01-01T00:00:00Z"))));
+        // The Moon answers for the same interval and refuses the same way.
+        SERVICE.observe(Body.MOON, OSLO.at(Instant.parse("1900-01-01T00:00:00Z")));
+        SERVICE.observe(Body.MOON, OSLO.at(Instant.parse("2100-12-31T23:59:59Z")));
+        IllegalArgumentException moon = assertThrows(
+                IllegalArgumentException.class, () -> SERVICE.observe(Body.MOON,
+                        OSLO.at(Instant.parse("1899-12-31T23:59:59Z"))));
+        assertTrue(moon.getMessage().contains("Moon")
+                && moon.getMessage().contains("1900-01-01"), moon.getMessage());
+    }
+
+    @Test
+    void theMoonInheritsTheRangeAndTheConfidenceUnchanged() {
+        TimeRange range = new TimeRange(OSLO.instant(),
+                OSLO.instant().plus(Duration.ofMinutes(150)), Duration.ofHours(1));
+        List<Row> sun = SERVICE.observe(Body.SUN, OSLO, range);
+        List<Row> moon = SERVICE.observe(Body.MOON, OSLO, range);
+        assertEquals(sun.size(), moon.size(), "the same samples");
+        for (int i = 0; i < sun.size(); i++) {
+            assertEquals(sun.get(i).sample(), moon.get(i).sample(),
+                    "the same sample, marks included");
+            assertEquals(sun.get(i).observation().timeConfidence(),
+                    moon.get(i).observation().timeConfidence(),
+                    "the same reading of time");
+        }
+        MoonObservation first = (MoonObservation) moon.get(0).observation();
+        MoonObservation last = (MoonObservation) moon.get(3).observation();
+        double moved = first.astrometricJ2000().separationDegrees(
+                last.astrometricJ2000());
+        assertTrue(moved > 1.2 && moved < 1.6, "the Moon moves about half a"
+                + " degree an hour among the stars: " + moved + "° in 2.5 h");
+        assertEquals(TimeScales.Confidence.ESTIMATED_AFTER_RECORD,
+                SERVICE.observe(Body.MOON, OSLO.at(
+                        Instant.parse("2080-01-01T00:00:00Z"))).timeConfidence());
+    }
+
+    @Test
+    void theMoonsObserverChangesExactlyWhatItShould() {
+        MoonObservation oslo = (MoonObservation) SERVICE.observe(Body.MOON, OSLO);
+        MoonObservation quito = (MoonObservation) SERVICE.observe(Body.MOON,
+                new Observer(-0.18, 281.5, OSLO.instant()));
+        double parallax = oslo.astrometricJ2000().separationDegrees(
+                quito.astrometricJ2000());
+        assertTrue(parallax > 0.3 && parallax < 2.0, "the chart position"
+                + " differs by the Moon's parallax, a large fraction of a"
+                + " degree: " + parallax + "°");
+        assertEquals(oslo.trend(), quito.trend(), "but waxing or waning is global");
+        assertEquals(oslo.phase(), quito.phase(), "and so is the phase word");
+        assertTrue(Math.abs(oslo.illuminatedFraction() - quito.illuminatedFraction())
+                < 0.01, "the illuminated fraction is what each observer sees:"
+                + " the parallax turns the phase angle by up to a degree, which"
+                + " near a quarter is under a percentage point of k");
+        assertTrue(Math.abs(oslo.distanceKm() - quito.distanceKm()) < 6400.0,
+                "the two distances differ by less than an Earth radius");
+        assertTrue(oslo.elongationDegrees() > 0.0 && oslo.elongationDegrees() < 180.0);
+        assertEquals(oslo.brightLimbCompassPoint(),
+                SolarSystemService.CompassPoint.of(oslo.brightLimbAngleDegrees()));
+    }
+
+    @Test
+    void thePhaseCategoriesAreTheRuledBands() {
+        SolarSystemService.Trend up = SolarSystemService.Trend.WAXING;
+        SolarSystemService.Trend down = SolarSystemService.Trend.WANING;
+        assertEquals(SolarSystemService.Phase.NEAR_NEW, SolarSystemService.phase(0.0199, up));
+        assertEquals(SolarSystemService.Phase.NEAR_NEW, SolarSystemService.phase(0.0199, down));
+        assertEquals(SolarSystemService.Phase.WAXING_CRESCENT, SolarSystemService.phase(0.02, up));
+        assertEquals(SolarSystemService.Phase.WANING_CRESCENT, SolarSystemService.phase(0.4799, down));
+        assertEquals(SolarSystemService.Phase.NEAR_FIRST_QUARTER, SolarSystemService.phase(0.48, up));
+        assertEquals(SolarSystemService.Phase.NEAR_LAST_QUARTER, SolarSystemService.phase(0.5199, down));
+        assertEquals(SolarSystemService.Phase.WAXING_GIBBOUS, SolarSystemService.phase(0.52, up));
+        assertEquals(SolarSystemService.Phase.WANING_GIBBOUS, SolarSystemService.phase(0.9799, down));
+        assertEquals(SolarSystemService.Phase.NEAR_FULL, SolarSystemService.phase(0.98, up));
+        assertEquals(SolarSystemService.Phase.NEAR_FULL, SolarSystemService.phase(1.0, down));
+        assertEquals(SolarSystemService.CompassPoint.WNW, SolarSystemService.CompassPoint.of(285.0));
+        assertEquals(SolarSystemService.CompassPoint.N, SolarSystemService.CompassPoint.of(359.0));
+        assertEquals(SolarSystemService.CompassPoint.NNE, SolarSystemService.CompassPoint.of(11.25));
+        assertEquals(SolarSystemService.CompassPoint.E, SolarSystemService.CompassPoint.of(90.0));
     }
 
     @Test
@@ -119,6 +196,10 @@ class SolarSystemServiceTest {
                     TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("UTC")));
                     SunObservation b = (SunObservation) SERVICE.observe(Body.SUN, OSLO);
                     assertEquals(a, b, "locale and zone change nothing");
+                    Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+                    MoonObservation m = (MoonObservation) SERVICE.observe(Body.MOON, OSLO);
+                    Locale.setDefault(Locale.forLanguageTag("en-GB"));
+                    assertEquals(m, SERVICE.observe(Body.MOON, OSLO), "nor for the Moon");
                 }));
     }
 

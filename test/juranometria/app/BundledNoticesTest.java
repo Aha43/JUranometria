@@ -114,7 +114,7 @@ class BundledNoticesTest {
     void everySolarSystemResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties",
-                "juranometria-de440-sun-emb-earth-1900-2100.bsp",
+                "juranometria-de440-sun-emb-earth-moon-1900-2100.bsp",
                 "Leap_Second.dat", "NOTICE-solar-system.md", "PROVENANCE.md"}) {
             assertNotNull(BundledNoticesTest.class.getResource(
                             "/resources/solar-system/" + resource),

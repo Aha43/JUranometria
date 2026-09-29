@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch the JPL Horizons oracle responses for the #398 checkpoint.
+"""Fetch the JPL Horizons oracle responses for the Moon (#406, #407).
 
 Every response is kept whole, exactly as returned, in a file whose first
 lines record the request URL, the UTC time of the request and the
@@ -26,13 +26,18 @@ BASE = "https://ssd.jpl.nasa.gov/api/horizons.api"
 OUT = Path(__file__).parent.parent / "docs/studies/solar-system/horizons-moon"
 OUT.mkdir(exist_ok=True)
 
-# name: (east longitude deg, latitude deg, altitude km)
+# name: (east longitude deg, latitude deg, altitude km). The altitude
+# is 0: the contract's observer stands on the WGS 84 ellipsoid at sea
+# level (Place and Time carries no height), and the Moon's parallax is
+# large enough that Quito's real 2.85 km would show as 1.6 arcseconds
+# - which the first Moon fetch, made with the Sun's site heights,
+# measured before these responses replaced it (issue #407).
 OBSERVERS = {
-    "oslo": (10.75, 59.91, 0.02),
-    "quito": (281.5, -0.18, 2.85),
-    "cape-town": (18.42, -33.93, 0.01),
-    "alert": (297.66, 82.50, 0.03),
-    "chatham": (183.5, -43.95, 0.02),
+    "oslo": (10.75, 59.91, 0.0),
+    "quito": (281.5, -0.18, 0.0),
+    "cape-town": (18.42, -33.93, 0.0),
+    "alert": (297.66, 82.50, 0.0),
+    "chatham": (183.5, -43.95, 0.0),
 }
 
 # The seasonal instants are never typed here: they are read from the
@@ -88,7 +93,7 @@ def keep(name, url, when, body):
     digest = hashlib.sha256(body).hexdigest()
     text = body.decode("utf-8", "replace")
     ok = "$$SOE" in text and "$$EOE" in text
-    header = (f"# JPL Horizons response, kept whole (#398)\n"
+    header = (f"# JPL Horizons response, kept whole (#406)\n"
               f"# request-url: {url}\n# requested-utc: {when}\n"
               f"# body-sha256: {digest}\n# body-bytes: {len(body)}\n"
               f"# complete: {ok}\n")
@@ -122,12 +127,19 @@ def main():
         print(f"failures={failures}")
         sys.exit(1 if failures else 0)
     # one dense year at Oslo, daily, to see the within-year extremes
-    url, when, body = query({"SITE_COORD": "'10.75,59.91,0.02'",
+    url, when, body = query({"SITE_COORD": "'10.75,59.91,0.0'",
                              "START_TIME": "'2026-01-01 00:00'",
                              "STOP_TIME": "'2026-12-31 00:00'",
                              "STEP_SIZE": "'1 d'"})
     failures += not keep("dense-2026-oslo", url, when, body)
-    # geocentric, for the Meeus 25.a case (geocentric apparent, TT)
+    # the Sun on the same Oslo grid, so the bright-limb angle can be
+    # held to Meeus 48.5 applied to Horizons' own Sun and Moon
+    url, when, body = query({"COMMAND": "'10'", "SITE_COORD": "'10.75,59.91,0.0'",
+                             "START_TIME": "'1900-01-01 00:00'",
+                             "STOP_TIME": "'2100-12-31 00:00'",
+                             "STEP_SIZE": "'7 d'", "QUANTITIES": "'1,2,4,20,31'"})
+    failures += not keep("sun-matrix-7d-oslo", url, when, body)
+    # geocentric, for the Meeus 47.a case (geocentric apparent, TT)
     url, when, body = query({"CENTER": "'500@399'",
                              "TLIST": "'1992-04-12 00:00:00'",
                              "TLIST_TYPE": "'CAL'", "TIME_TYPE": "'TT'",

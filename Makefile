@@ -68,6 +68,7 @@ help:
 	@echo "  import-star-identities  Regenerate the bundled star-identity pack"
 	@echo "  import-solar-system  Regenerate the bundled Solar System ephemeris pack from pinned inputs"
 	@echo "  sun-study    Write the first Sun table from the bundled pack (issue #399)"
+	@echo "  moon-study   Write the first Moon table from the bundled pack (issue #407)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -572,7 +573,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study printable-chart-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -657,6 +658,14 @@ sun-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunTableStudyMain \
 		> docs/studies/solar-system/measurements.md
 	@echo "written to docs/studies/solar-system/measurements.md"
+
+# The first Moon table (issue #407): the same, for the Moon, in the
+# columns and rounding the #406 ruling froze.
+moon-study: classes
+	mkdir -p docs/studies/solar-system
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MoonTableStudyMain \
+		> docs/studies/solar-system/moon-measurements.md
+	@echo "written to docs/studies/solar-system/moon-measurements.md"
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic

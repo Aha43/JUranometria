@@ -33,7 +33,7 @@ class SpkKernelTest {
             Path.of("docs/studies/solar-system/spk-reference.txt");
 
     private static final String KERNEL = "/resources/solar-system/"
-            + "juranometria-de440-sun-emb-earth-1900-2100.bsp";
+            + "juranometria-de440-sun-emb-earth-moon-1900-2100.bsp";
 
     private static SpkKernel kernel;
 
@@ -67,8 +67,8 @@ class SpkKernelTest {
     }
 
     @Test
-    void theKernelCarriesExactlyTheThreeSegmentsThePackNames() {
-        assertEquals(List.of("0->3", "0->10", "3->399"),
+    void theKernelCarriesExactlyTheFourSegmentsThePackNames() {
+        assertEquals(List.of("0->3", "0->10", "3->399", "3->301"),
                 kernel.segments().stream()
                         .map(s -> s.center() + "->" + s.target()).toList());
         for (SpkKernel.Segment s : kernel.segments()) {
@@ -119,9 +119,9 @@ class SpkKernelTest {
     @Test
     void aSegmentTheKernelDoesNotCarryIsRefusedByName() {
         IllegalArgumentException refused = assertThrows(
-                IllegalArgumentException.class, () -> kernel.state(3, 301, 0.0));
-        assertTrue(refused.getMessage().contains("3 -> 301"),
-                "the Moon is not in this pack, and the refusal says so");
+                IllegalArgumentException.class, () -> kernel.state(0, 4, 0.0));
+        assertTrue(refused.getMessage().contains("0 -> 4"),
+                "Mars is not in this pack, and the refusal says so");
     }
 
     @Test
