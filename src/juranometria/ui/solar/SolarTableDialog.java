@@ -13,8 +13,10 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.swing.Box;
@@ -36,16 +38,18 @@ import javax.swing.table.TableCellRenderer;
 import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
-import juranometria.solar.SolarSystemService.SunObservation;
+import juranometria.solar.SolarSystemService.Observation;
 import juranometria.solar.TimeRange;
 import juranometria.ui.Explain;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.MnemonicText;
 
 /**
- * The Sun table (Sprint 35, issue #400): where the Sun is, for the
- * observing place and instant Place and Time owns, as a table the
- * reader can read at that instant or over a range of instants.
+ * A Solar System body's table (Sprint 35, issue #400 for the Sun; Sprint
+ * 36, issue #408 for the Moon): where the body is, for the observing
+ * place and instant Place and Time owns, as a table the reader can read
+ * at that instant or over a range of instants. One shell, built over the
+ * {@link SolarTable} that says which body, which columns and which words.
  *
  * <p>Place and Time is the authority. The dialog is handed a supplier
  * of the module's current observer and reads it - never copies it,
@@ -64,22 +68,25 @@ import juranometria.ui.language.MnemonicText;
  * every column heading says its unit and frame. Nothing is drawn on
  * the chart.
  */
-public final class SunTableDialog extends JDialog {
+public final class SolarTableDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private static SunTableDialog current;
+    /** The one open table per body. */
+    private static final Map<Body, SolarTableDialog> current =
+            new EnumMap<>(Body.class);
 
     private final Content content;
 
-    private SunTableDialog(Frame owner, Supplier<Observer> observer,
-                           SolarSystemService service, InterfaceText said) {
-        super(owner, said.say("suntable.title"), false);
-        getAccessibleContext().setAccessibleName(said.say("suntable.a11y"));
-        getAccessibleContext().setAccessibleDescription(
-                said.say("suntable.explain"));
+    private SolarTableDialog(Frame owner, Supplier<Observer> observer,
+                             SolarSystemService service, InterfaceText said,
+                             SolarTable table) {
+        super(owner, new SolarTableWords(said, table.stem()).say("title"), false);
+        SolarTableWords words = new SolarTableWords(said, table.stem());
+        getAccessibleContext().setAccessibleName(words.say("a11y"));
+        getAccessibleContext().setAccessibleDescription(words.say("explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        content = new Content(observer, service, said, this::dispose);
+        content = new Content(observer, service, said, table, this::dispose);
         setContentPane(content);
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -94,31 +101,36 @@ public final class SunTableDialog extends JDialog {
         setLocationRelativeTo(owner);
     }
 
-    /** Opens the one Sun table, or brings it to the front. */
+    /** Opens the one table of that body, or brings it to the front. */
     public static void open(Frame owner, Supplier<Observer> observer,
-                            SolarSystemService service, InterfaceText said) {
-        if (current != null && current.isDisplayable()) {
-            current.toFront();
-            current.requestFocus();
+                            SolarSystemService service, InterfaceText said,
+                            SolarTable table) {
+        SolarTableDialog open = current.get(table.body());
+        if (open != null && open.isDisplayable()) {
+            open.toFront();
+            open.requestFocus();
             return;
         }
-        current = new SunTableDialog(owner, observer, service, said);
-        current.setVisible(true);
+        SolarTableDialog dialog = new SolarTableDialog(owner, observer, service,
+                said, table);
+        current.put(table.body(), dialog);
+        dialog.setVisible(true);
     }
 
     /** A packed dialog for a photographer; never shown by this class. */
-    public static SunTableDialog packedForStudy(Frame owner,
-                                                Supplier<Observer> observer,
-                                                SolarSystemService service,
-                                                InterfaceText said) {
-        return new SunTableDialog(owner, observer, service, said);
+    public static SolarTableDialog packedForStudy(Frame owner,
+                                                  Supplier<Observer> observer,
+                                                  SolarSystemService service,
+                                                  InterfaceText said,
+                                                  SolarTable table) {
+        return new SolarTableDialog(owner, observer, service, said, table);
     }
 
     /** The content, headless-constructible, for tests and studies. */
     public static Content content(Supplier<Observer> observer,
                                   SolarSystemService service,
-                                  InterfaceText said) {
-        return new Content(observer, service, said, () -> { });
+                                  InterfaceText said, SolarTable table) {
+        return new Content(observer, service, said, table, () -> { });
     }
 
     /** This dialog's content. */
@@ -129,7 +141,9 @@ public final class SunTableDialog extends JDialog {
     /**
      * Everything inside the dialog, with no window of its own: the
      * observer note, the two views, the range controls, the table
-     * and the notes under it.
+     * and the notes under it. The words are looked up body first
+     * ({@link SolarTableWords}); the component names carry the
+     * body's prefix.
      */
     public static final class Content extends JPanel {
 
@@ -142,18 +156,18 @@ public final class SunTableDialog extends JDialog {
                 .ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT)
                 .withResolverStyle(ResolverStyle.STRICT).withZone(ZoneOffset.UTC);
 
-        /** The steps offered, in order, by key and duration. */
-        static final List<String> STEP_KEYS = List.of("suntable.step.hour",
-                "suntable.step.sixHours", "suntable.step.day",
-                "suntable.step.week", "suntable.step.month");
+        /** The steps offered, in order, by key suffix and duration. */
+        static final List<String> STEP_KEYS = List.of("step.hour",
+                "step.sixHours", "step.day", "step.week", "step.month");
         static final List<Duration> STEPS = List.of(Duration.ofHours(1),
                 Duration.ofHours(6), Duration.ofDays(1), Duration.ofDays(7),
                 Duration.ofDays(30));
 
         private final Supplier<Observer> observer;
         private final SolarSystemService service;
-        private final InterfaceText said;
-        public final SunTableModel model;
+        private final SolarTable body;
+        private final SolarTableWords said;
+        public final SolarTableModel model;
         public final JTable table;
         public final JLabel observerNote = new JLabel();
         public final JRadioButton instantView;
@@ -168,28 +182,31 @@ public final class SunTableDialog extends JDialog {
         public final JLabel timeNote = new JLabel();
 
         Content(Supplier<Observer> observer, SolarSystemService service,
-                InterfaceText said, Runnable closeAction) {
-            if (observer == null || service == null || said == null) {
+                InterfaceText language, SolarTable body, Runnable closeAction) {
+            if (observer == null || service == null || language == null
+                    || body == null) {
                 throw new IllegalArgumentException("the table reads an"
-                        + " observer, a service and a language");
+                        + " observer, a service, a language and a body");
             }
             this.observer = observer;
             this.service = service;
-            this.said = said;
-            MnemonicText letters = MnemonicText.in(said);
+            this.body = body;
+            this.said = new SolarTableWords(language, body.stem());
+            MnemonicText letters = MnemonicText.in(language);
+            String names = body.prefix();
             setLayout(new BorderLayout(0, 8));
             setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
             JPanel top = new JPanel();
             top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
-            observerNote.setName("sunObserverNote");
+            observerNote.setName(names + "ObserverNote");
             observerNote.setAlignmentX(0.0f);
             top.add(observerNote);
             top.add(Box.createVerticalStrut(8));
 
-            instantView = view("suntable.view.instant", "sunInstantView",
+            instantView = view("view.instant", names + "InstantView",
                     true, letters);
-            rangeView = view("suntable.view.range", "sunRangeView", false,
+            rangeView = view("view.range", names + "RangeView", false,
                     letters);
             ButtonGroup views = new ButtonGroup();
             views.add(instantView);
@@ -203,28 +220,28 @@ public final class SunTableDialog extends JDialog {
             top.add(viewRow);
             top.add(Box.createVerticalStrut(8));
 
-            start.setName("sunRangeStart");
-            end.setName("sunRangeEnd");
+            start.setName(names + "RangeStart");
+            end.setName(names + "RangeEnd");
             step = new JComboBox<>(STEP_KEYS.stream().map(said::say)
                     .toArray(String[]::new));
-            step.setName("sunRangeStep");
+            step.setName(names + "RangeStep");
             step.setSelectedIndex(2);
             step.setMaximumSize(step.getPreferredSize());
             step.getAccessibleContext().setAccessibleName(
-                    said.say("suntable.range.step.a11y"));
-            Explain.control(step, said.say("suntable.range.step.hover"),
-                    said.say("suntable.range.step.explain"));
-            compute = button("suntable.compute", "sunCompute", letters);
+                    said.say("range.step.a11y"));
+            Explain.control(step, said.say("range.step.hover"),
+                    said.say("range.step.explain"));
+            compute = button("compute", names + "Compute", letters);
             JPanel rangeRow = new JPanel();
             rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
             rangeRow.setAlignmentX(0.0f);
-            rangeRow.add(field("suntable.range.start", start, letters));
+            rangeRow.add(field("range.start", start, letters));
             rangeRow.add(Box.createHorizontalStrut(12));
-            rangeRow.add(field("suntable.range.end", end, letters));
+            rangeRow.add(field("range.end", end, letters));
             rangeRow.add(Box.createHorizontalStrut(12));
-            JLabel every = new JLabel(said.say("suntable.range.step.label"));
+            JLabel every = new JLabel(said.say("range.step.label"));
             every.setLabelFor(step);
-            letters.apply(every, "suntable.range.step.mnemonic");
+            letters.apply(every, said.key("range.step.mnemonic"));
             rangeRow.add(every);
             rangeRow.add(Box.createHorizontalStrut(6));
             rangeRow.add(step);
@@ -232,19 +249,19 @@ public final class SunTableDialog extends JDialog {
             rangeRow.add(compute);
             top.add(rangeRow);
             top.add(Box.createVerticalStrut(6));
-            status.setName("sunStatus");
+            status.setName(names + "Status");
             status.setAlignmentX(0.0f);
             top.add(status);
             add(top, BorderLayout.NORTH);
 
-            model = new SunTableModel(said);
-            table = new JTable(model);
-            table.setName("sunTable");
-            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            table.setFillsViewportHeight(true);
-            table.getAccessibleContext().setAccessibleName(
-                    said.say("suntable.table.a11y"));
-            Explain.selfExplanatory(table, said.say("suntable.table.explain"));
+            model = new SolarTableModel(language, body);
+            this.table = new JTable(model);
+            this.table.setName(names + "Table");
+            this.table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            this.table.setFillsViewportHeight(true);
+            this.table.getAccessibleContext().setAccessibleName(
+                    said.say("table.a11y"));
+            Explain.selfExplanatory(this.table, said.say("table.explain"));
             // Each heading names its unit and frame for a screen reader
             // and on hover, through the look-and-feel's own renderer:
             // keyed by model index, so it travels with the column.
@@ -263,28 +280,31 @@ public final class SunTableDialog extends JDialog {
                 }
                 return cell;
             };
-            int[] widths = {150, 130, 120, 130, 170, 150, 190, 130};
+            int[] widths = body.widths();
             for (int c = 0; c < model.getColumnCount(); c++) {
-                table.getColumnModel().getColumn(c).setHeaderRenderer(headings);
-                table.getColumnModel().getColumn(c).setPreferredWidth(widths[c]);
+                this.table.getColumnModel().getColumn(c).setHeaderRenderer(headings);
+                this.table.getColumnModel().getColumn(c).setPreferredWidth(widths[c]);
             }
-            JScrollPane scroll = new JScrollPane(table);
-            scroll.setPreferredSize(new Dimension(760, 220));
+            JScrollPane scroll = new JScrollPane(this.table);
+            scroll.setPreferredSize(new Dimension(body.preferredWidth(), 220));
             add(scroll, BorderLayout.CENTER);
 
             JPanel bottom = new JPanel();
             bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
-            timeNote.setName("sunTimeNote");
+            timeNote.setName(names + "TimeNote");
             timeNote.setAlignmentX(0.0f);
+            // The note wraps at the Sun table's proven width whatever
+            // the table's: a wider hint stops it wrapping and it, not
+            // the table, would then set the dialog's width.
             timeNote.setText("<html><body style='width: 720px'>"
-                    + said.say("suntable.time.note",
+                    + said.say("time.note",
                             service.timeScales().exactFrom().toString(),
                             service.timeScales().exactUntil().toString())
                     + "</body></html>");
             bottom.add(timeNote);
             bottom.add(Box.createVerticalStrut(8));
-            update = button("suntable.update", "sunUpdate", letters);
-            close = button("suntable.close", "sunClose", letters);
+            update = button("update", names + "Update", letters);
+            close = button("close", names + "Close", letters);
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0.0f);
@@ -319,18 +339,16 @@ public final class SunTableDialog extends JDialog {
                 c.setEnabled(present);
             }
             if (!present) {
-                observerNote.setText(said.say("suntable.observer.absent"));
+                observerNote.setText(said.say("observer.absent"));
                 observerNote.getAccessibleContext().setAccessibleName(
                         observerNote.getText());
                 model.show(List.of());
                 say(" ");
                 return;
             }
-            observerNote.setText(said.say("suntable.observer.note",
-                    SunTableFormat.decimal(degrees(now.latitudeDegrees()),
-                            model.decimal()),
-                    SunTableFormat.decimal(degrees(now.eastLongitudeFolded()),
-                            model.decimal()),
+            observerNote.setText(said.say("observer.note",
+                    said.n(degrees(now.latitudeDegrees())),
+                    said.n(degrees(now.eastLongitudeFolded())),
                     shown(now.instant())));
             observerNote.getAccessibleContext().setAccessibleName(
                     observerNote.getText());
@@ -346,16 +364,16 @@ public final class SunTableDialog extends JDialog {
             if (day.isBefore(SolarSystemService.FIRST_DAY)
                     || day.isAfter(SolarSystemService.LAST_DAY)) {
                 model.show(List.of());
-                say(said.say("suntable.refused.interval",
+                say(said.say("refused.interval",
                         SolarSystemService.FIRST_DAY.toString(),
                         SolarSystemService.LAST_DAY.toString(),
                         shown(now.instant())));
                 return;
             }
-            SunObservation o = (SunObservation) service.observe(Body.SUN, now);
-            model.show(List.of(new SunTableModel.Row(
+            Observation o = service.observe(body.body(), now);
+            model.show(List.of(new SolarTableModel.Row(
                     new TimeRange.Sample(now.instant(), false), o)));
-            say(said.say("suntable.status.rows", "1"));
+            say(said.say("status.rows", "1"));
         }
 
         private void showRange(Observer now) {
@@ -363,7 +381,7 @@ public final class SunTableDialog extends JDialog {
             Instant to = parse(end.getText());
             if (from == null || to == null) {
                 model.show(List.of());
-                say(said.say("suntable.refused.instant",
+                say(said.say("refused.instant",
                         from == null ? start.getText().strip()
                                 : end.getText().strip()));
                 return;
@@ -371,13 +389,13 @@ public final class SunTableDialog extends JDialog {
             Duration by = STEPS.get(step.getSelectedIndex());
             if (to.isBefore(from)) {
                 model.show(List.of());
-                say(said.say("suntable.refused.backwards"));
+                say(said.say("refused.backwards"));
                 return;
             }
             long rows = TimeRange.rowsOf(from, to, by);
             if (rows > TimeRange.MAX_ROWS) {
                 model.show(List.of());
-                say(said.say("suntable.refused.rows", Long.toString(rows),
+                say(said.say("refused.rows", Long.toString(rows),
                         Integer.toString(TimeRange.MAX_ROWS)));
                 return;
             }
@@ -386,7 +404,7 @@ public final class SunTableDialog extends JDialog {
                 if (day.isBefore(SolarSystemService.FIRST_DAY)
                         || day.isAfter(SolarSystemService.LAST_DAY)) {
                     model.show(List.of());
-                    say(said.say("suntable.refused.interval",
+                    say(said.say("refused.interval",
                             SolarSystemService.FIRST_DAY.toString(),
                             SolarSystemService.LAST_DAY.toString(), shown(edge)));
                     return;
@@ -394,15 +412,15 @@ public final class SunTableDialog extends JDialog {
             }
             TimeRange range = new TimeRange(from, to, by);
             List<SolarSystemService.Row> answered =
-                    service.observe(Body.SUN, now, range);
+                    service.observe(body.body(), now, range);
             model.show(answered, true);
             boolean appended = answered.get(answered.size() - 1).sample()
                     .appendedEnd();
             say(appended
-                    ? said.say("suntable.status.appended",
+                    ? said.say("status.appended",
                             Integer.toString(answered.size()),
-                            said.say("suntable.appended"))
-                    : said.say("suntable.status.rows",
+                            said.say("appended"))
+                    : said.say("status.rows",
                             Integer.toString(answered.size())));
         }
 
@@ -446,7 +464,7 @@ public final class SunTableDialog extends JDialog {
             button.setName(name);
             button.getAccessibleContext().setAccessibleName(
                     said.say(stem + ".a11y"));
-            letters.apply(button, stem + ".mnemonic");
+            letters.apply(button, said.key(stem + ".mnemonic"));
             return Explain.control(button, said.say(stem + ".hover"),
                     said.say(stem + ".explain"));
         }
@@ -456,7 +474,7 @@ public final class SunTableDialog extends JDialog {
             button.setName(name);
             button.getAccessibleContext().setAccessibleName(
                     said.say(stem + ".a11y"));
-            letters.apply(button, stem + ".mnemonic");
+            letters.apply(button, said.key(stem + ".mnemonic"));
             String hover = said.sayIfDefined(stem + ".hover");
             if (hover != null && !hover.isBlank()) {
                 return Explain.control(button, hover,
@@ -471,7 +489,7 @@ public final class SunTableDialog extends JDialog {
             row.setAlignmentX(0.0f);
             JLabel name = new JLabel(said.say(stem + ".label"));
             name.setLabelFor(field);
-            letters.apply(name, stem + ".mnemonic");
+            letters.apply(name, said.key(stem + ".mnemonic"));
             field.getAccessibleContext().setAccessibleName(
                     said.say(stem + ".label"));
             field.setMaximumSize(field.getPreferredSize());

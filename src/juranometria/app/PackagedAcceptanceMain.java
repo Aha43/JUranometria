@@ -441,6 +441,7 @@ public final class PackagedAcceptanceMain {
         javax.swing.SwingUtilities.invokeAndWait(() ->
                 cardinalLandmarkJourney());
         sunTableJourney();
+        moonTableJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -456,12 +457,13 @@ public final class PackagedAcceptanceMain {
                 juranometria.solar.SolarSystemService.load();
         juranometria.sky.Observer[] observer = {new juranometria.sky.Observer(
                 59.91, 10.75, java.time.Instant.parse("2026-06-21T10:00:00Z"))};
-        juranometria.ui.solar.SunTableDialog.Content[] table =
-                new juranometria.ui.solar.SunTableDialog.Content[1];
+        juranometria.ui.solar.SolarTableDialog.Content[] table =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> table[0] =
-                juranometria.ui.solar.SunTableDialog.content(() -> observer[0],
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0],
                         solar, juranometria.ui.language.InterfaceText
-                                .forLanguage("en")));
+                                .forLanguage("en"),
+                        juranometria.ui.solar.SolarTable.sun()));
         require(table[0].model.getRowCount() == 1
                         && "51.01\u00b0".equals(table[0].model.getValueAt(0, 4))
                         && "1.016165 AU (152.016 mill. km)".equals(
@@ -487,14 +489,15 @@ public final class PackagedAcceptanceMain {
                         && table[0].status().contains("backwards"),
                 "a backwards range is refused with its reason: "
                         + table[0].status());
-        juranometria.ui.solar.SunTableDialog.Content[] norsk =
-                new juranometria.ui.solar.SunTableDialog.Content[1];
+        juranometria.ui.solar.SolarTableDialog.Content[] norsk =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
         observer[0] = new juranometria.sky.Observer(-0.18, -78.5,
                 java.time.Instant.parse("2026-12-21T20:50:09Z"));
         javax.swing.SwingUtilities.invokeAndWait(() -> norsk[0] =
-                juranometria.ui.solar.SunTableDialog.content(() -> observer[0],
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0],
                         solar, juranometria.ui.language.InterfaceText
-                                .forLanguage("nb-NO")));
+                                .forLanguage("nb-NO"),
+                        juranometria.ui.solar.SolarTable.sun()));
         require("Tidspunkt (UTC)".equals(norsk[0].model.getColumnName(0))
                         && "1 rader.".equals(norsk[0].status())
                         && norsk[0].observerNote.getText().startsWith("Observat")
@@ -507,6 +510,64 @@ public final class PackagedAcceptanceMain {
         System.out.println("sun table OK (Oslo's midsummer row, a four-row"
                 + " range with its appended end, a stated refusal, and the"
                 + " Norwegian surface, all inside the image)");
+    }
+
+    /**
+     * The Moon table inside the packaged image (issue #408): the same
+     * shell over the Moon's columns, in both languages, with the phase
+     * and lit-side words the language files ship.
+     */
+    private static void moonTableJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer[] observer = {new juranometria.sky.Observer(
+                59.91, 10.75, java.time.Instant.parse("2026-06-21T10:00:00Z"))};
+        juranometria.ui.solar.SolarTableDialog.Content[] table =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> table[0] =
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0],
+                        solar, juranometria.ui.language.InterfaceText
+                                .forLanguage("en"),
+                        juranometria.ui.solar.SolarTable.moon()));
+        String litSide = String.valueOf(table[0].model.getValueAt(0, 10));
+        require(table[0].model.getRowCount() == 1
+                        && table[0].model.getColumnCount() == 11
+                        && "waxing crescent".equals(table[0].model.getValueAt(0, 8))
+                        && String.valueOf(table[0].model.getValueAt(0, 9)).endsWith("\u00b0 E")
+                        && litSide.matches("\\d+\u00b0 \\([a-z-]+\\)")
+                        && String.valueOf(table[0].model.getValueAt(0, 5)).endsWith(" km"),
+                "the packaged Moon table shows Oslo's midsummer morning as a"
+                        + " waxing crescent east of the Sun with a lit side: "
+                        + table[0].model.getValueAt(0, 8) + ", "
+                        + table[0].model.getValueAt(0, 9) + ", " + litSide);
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            table[0].rangeView.setSelected(true);
+            table[0].end.setText("2026-06-24 07:30");
+            table[0].update();
+        });
+        require(table[0].model.getRowCount() == 4
+                        && String.valueOf(table[0].model.getValueAt(3, 0))
+                                .endsWith("\u2020"),
+                "the Moon's range behaves as the Sun's: four rows, appended"
+                        + " end marked: " + table[0].status());
+        juranometria.ui.solar.SolarTableDialog.Content[] norsk =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> norsk[0] =
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0],
+                        solar, juranometria.ui.language.InterfaceText
+                                .forLanguage("nb-NO"),
+                        juranometria.ui.solar.SolarTable.moon()));
+        require("Fase".equals(norsk[0].model.getColumnName(8))
+                        && "tiltagende m\u00e5nesigd".equals(norsk[0].model.getValueAt(0, 8))
+                        && String.valueOf(norsk[0].model.getValueAt(0, 9)).endsWith("\u00b0 \u00d8")
+                        && String.valueOf(norsk[0].model.getValueAt(0, 7)).contains(",")
+                        && "1 rader.".equals(norsk[0].status()),
+                "and speaks Norwegian: " + norsk[0].model.getValueAt(0, 8)
+                        + ", " + norsk[0].model.getValueAt(0, 9));
+        System.out.println("moon table OK (Oslo's midsummer morning as a waxing"
+                + " crescent with its lit side, a four-row range with its"
+                + " appended end, and the Norwegian surface, all inside the"
+                + " image)");
     }
 
 

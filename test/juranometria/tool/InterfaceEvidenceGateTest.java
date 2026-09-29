@@ -89,6 +89,8 @@ class InterfaceEvidenceGateTest {
                         SheetCapture.Kind.PACKED));
         GENERATORS.put("SunTableSheetMain",
                 new Photographer("suntable-strings.md", SheetCapture.Kind.PACKED));
+        GENERATORS.put("MoonTableSheetMain",
+                new Photographer("moontable-strings.md", SheetCapture.Kind.PACKED));
         // Components inside a packed study frame.
         GENERATORS.put("ChartKeyboardSheetMain",
                 new Photographer("chartkeyboard-strings.md",

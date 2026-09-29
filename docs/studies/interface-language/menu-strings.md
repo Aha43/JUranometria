@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 572 × 218 px; widest popup 211 px.
+Bar packed 572 × 241 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -71,6 +71,11 @@ Bar packed 572 × 218 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -102,7 +107,7 @@ Bar packed 572 × 218 px; widest popup 211 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 572 × 218 px; widest popup 211 px.
+Bar packed 572 × 241 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -133,6 +138,11 @@ Bar packed 572 × 218 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label [checked] \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -164,7 +174,7 @@ Bar packed 572 × 218 px; widest popup 211 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 572 × 218 px; widest popup 211 px.
+Bar packed 572 × 241 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -195,6 +205,11 @@ Bar packed 572 × 218 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -226,7 +241,7 @@ Bar packed 572 × 218 px; widest popup 211 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 572 × 218 px; widest popup 211 px.
+Bar packed 572 × 241 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -257,6 +272,11 @@ Bar packed 572 × 218 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -290,7 +310,7 @@ Bar packed 572 × 218 px; widest popup 211 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 578 × 218 px; widest popup 201 px.
+Bar packed 578 × 241 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -321,6 +341,11 @@ Bar packed 578 × 218 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -352,7 +377,7 @@ Bar packed 578 × 218 px; widest popup 201 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 578 × 218 px; widest popup 201 px.
+Bar packed 578 × 241 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -383,6 +408,11 @@ Bar packed 578 × 218 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label [checked] \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -414,7 +444,7 @@ Bar packed 578 × 218 px; widest popup 201 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 578 × 218 px; widest popup 201 px.
+Bar packed 578 × 241 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -445,6 +475,11 @@ Bar packed 578 × 218 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -476,7 +511,7 @@ Bar packed 578 × 218 px; widest popup 201 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 578 × 218 px; widest popup 201 px.
+Bar packed 578 × 241 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -507,6 +542,11 @@ Bar packed 578 × 218 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |

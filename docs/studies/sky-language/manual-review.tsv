@@ -152,3 +152,7 @@ d6ec4403b577d737	sheet/PngSheetWriter.java	Title	collection/alias flow not trace
 c271dd35f2eefea8	solar/SolarSystemPack.java	/resources/solar-system/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 d673091a8a11b2bb	solar/spk/SpkExcerpt.java	DAF/SPK 	unresolved: no route found, needs manual inspection	notation	the SPK file format's own magic word, written into a kernel's file record; never shown
 8a90e69519156f3d	app/AppMenuBar.java	sunTableItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+1458bbb76eb4d309	app/AppMenuBar.java	moonTableItem	declared name used, but never at a known sink	identifier	the Moon table item's component name, which tests find it by; no language changes it
+72296b89cd993f9e	ui/solar/SolarTableModel.java	column.	declared name used, but never at a known sink	identifier	a language-key prefix assembled with a column's suffix; the key, not a word
+66de225c0d51797a	ui/solar/SolarTableModel.java	.explain	declared name used, but never at a known sink	identifier	a language-key suffix assembled onto a column's key; the key, not a word
+9298072bfdac6e2d	ui/solar/SolarTableWords.java	solartable	declared name used, but never at a known sink	identifier	the shared key family's stem, under which the table's words are looked up; no language changes it

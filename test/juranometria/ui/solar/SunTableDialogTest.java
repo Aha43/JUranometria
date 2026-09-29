@@ -33,7 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * The Sun table's content, headless (issue #400): what it shows, what
  * it refuses and says, what it reads from Place and Time and when,
- * and what it never does.
+ * and what it never does - through the shared shell of #408, whose
+ * words for the Sun are exactly the words of #400.
  */
 class SunTableDialogTest {
 
@@ -50,13 +51,13 @@ class SunTableDialogTest {
     private static final class Rig {
         Observer observer = OSLO;
         int reads;
-        final SunTableDialog.Content content;
+        final SolarTableDialog.Content content;
 
         Rig(String language) {
-            content = SunTableDialog.content(() -> {
+            content = SolarTableDialog.content(() -> {
                 reads++;
                 return observer;
-            }, service, InterfaceText.forLanguage(language));
+            }, service, InterfaceText.forLanguage(language), SolarTable.sun());
         }
     }
 
@@ -81,7 +82,7 @@ class SunTableDialogTest {
     void theRowIsTheServicesAnswerSpelledByTheFormat() {
         Rig rig = new Rig("en");
         SunObservation o = (SunObservation) service.observe(Body.SUN, OSLO);
-        SunTableModel m = rig.content.model;
+        SolarTableModel m = rig.content.model;
         assertEquals(SunTableFormat.minute(MIDSUMMER), m.getValueAt(0, 0));
         assertEquals(SunTableFormat.hms(o.astrometricJ2000()), m.getValueAt(0, 1));
         assertEquals(SunTableFormat.dms(o.astrometricJ2000()), m.getValueAt(0, 2));
@@ -274,9 +275,12 @@ class SunTableDialogTest {
     @Test
     void theTableReadsNoClockAndRemembersNothing() throws Exception {
         for (String source : List.of(
-                "src/juranometria/ui/solar/SunTableDialog.java",
-                "src/juranometria/ui/solar/SunTableModel.java",
-                "src/juranometria/ui/solar/SunTableFormat.java")) {
+                "src/juranometria/ui/solar/SolarTableDialog.java",
+                "src/juranometria/ui/solar/SolarTableModel.java",
+                "src/juranometria/ui/solar/SolarTable.java",
+                "src/juranometria/ui/solar/SolarTableWords.java",
+                "src/juranometria/ui/solar/SunTableFormat.java",
+                "src/juranometria/ui/solar/MoonTableFormat.java")) {
             String text = Files.readString(Path.of(source), StandardCharsets.UTF_8);
             for (String forbidden : List.of("Instant.now", "currentTimeMillis",
                     "nanoTime", "Clock.", "Preferences", "java.io.File",
@@ -288,7 +292,7 @@ class SunTableDialogTest {
         }
     }
 
-    private static List<String> columnNames(SunTableModel model) {
+    private static List<String> columnNames(SolarTableModel model) {
         List<String> names = new ArrayList<>();
         for (int c = 0; c < model.getColumnCount(); c++) {
             names.add(model.getColumnName(c));

@@ -308,6 +308,7 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ExportSheetDialogSheetMain.java",
                         "src/juranometria/tool/InspectorSheetMain.java",
                         "src/juranometria/tool/MenuSheetMain.java",
+                        "src/juranometria/tool/MoonTableSheetMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/OnThisPageSheetMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
@@ -320,8 +321,9 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the twenty-one widget photographers - the twenty-first"
-                        + " is #400's Sun table sheet, arriving by this"
+                "the twenty-two widget photographers - the twenty-first"
+                        + " is #400's Sun table sheet and the twenty-second"
+                        + " #408's Moon table sheet, arriving by this"
                         + " decision - whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
