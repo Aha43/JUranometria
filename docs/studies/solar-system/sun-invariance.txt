@@ -1,6 +1,6 @@
 # The released Sun, before the pack was regenerated (issue #407)
 # generator: juranometria.tool.SolarSystemInvarianceMain, run once against pack solar-system v1, kernel juranometria-de440-sun-emb-earth-1900-2100.bsp sha256 2b6debd11ab32525dd6a32acbcc3289535ea0859b021c917445d749faba0540d
-# Every later pack must reproduce every line exactly; this file is never regenerated.
+# Every later pack must reproduce every state line exactly and every sun line to floating-point rounding (the trigonometric intrinsics differ by a last bit between platforms); this file is never regenerated.
 # state <center>-><target> <et_seconds_past_j2000_tdb, %.17g> x y z vx vy vz   (km, km/s, %.17g)
 # sun <site> <instant> <confidence> ra dec eclLon raApp decApp alt az distanceKm diameterArcsec   (%.17g)
 state 0->3 -3158395200.0000000 50929477.024796070 128000398.35412470 55512664.868936970 -28.493816786218765 9.2499134541607170 4.0125037731645140

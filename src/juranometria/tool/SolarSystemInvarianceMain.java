@@ -22,9 +22,10 @@ import juranometria.solar.spk.SpkKernel;
  * Sun's every quantity for the five reference observers at the named
  * instants, all at full precision. Run once against pack v1 and
  * committed as {@code docs/studies/solar-system/sun-invariance.txt};
- * {@code SunInvarianceTest} then holds every later pack to it bit for
- * bit. It is a fixture, not a regenerated report: regenerating it from
- * a later pack would prove nothing.
+ * {@code SunInvarianceTest} then holds every later pack to it: the
+ * states bit for bit, the answers to floating-point rounding. It is a
+ * fixture, not a regenerated report: regenerating it from a later pack
+ * would prove nothing.
  */
 public final class SolarSystemInvarianceMain {
 
@@ -58,8 +59,10 @@ public final class SolarSystemInvarianceMain {
                 + pack.manifest().get("ephemeris.kernel") + " sha256 "
                 + pack.manifest().get("checksum."
                         + pack.manifest().get("ephemeris.kernel")));
-        System.out.println("# Every later pack must reproduce every line exactly;"
-                + " this file is never regenerated.");
+        System.out.println("# Every later pack must reproduce every state line"
+                + " exactly and every sun line to floating-point rounding (the"
+                + " trigonometric intrinsics differ by a last bit between"
+                + " platforms); this file is never regenerated.");
         System.out.println("# state <center>-><target> <et_seconds_past_j2000_tdb, %.17g>"
                 + " x y z vx vy vz   (km, km/s, %.17g)");
         System.out.println("# sun <site> <instant> <confidence> ra dec eclLon"

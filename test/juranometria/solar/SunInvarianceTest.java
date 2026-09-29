@@ -27,9 +27,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * segments at 4 001 epochs each, and the Sun's every quantity for the
  * five reference observers at the thirteen named instants, all at
  * full precision. The pack now on the classpath must reproduce every
- * number bit for bit - not to rounding, because the coefficients are
- * the same coefficients and the code path is the same code path, so
- * any difference at all is a change that needs a name.
+ * kernel state bit for bit - the coefficients are the same
+ * coefficients evaluated by the same arithmetic - and every Sun answer
+ * to floating-point rounding: the observation chain runs through the
+ * platform's trigonometric intrinsics, and the first CI run of this
+ * test on Linux measured exactly one last-bit difference in a
+ * declination (1 ulp, 3.6e-15°) against a fixture written on macOS.
+ * The tolerance is a thousand times below anything physical and a
+ * million times below the table's rounding; any larger difference is
+ * a change that needs a name, and the largest seen is printed.
  */
 class SunInvarianceTest {
 
@@ -41,13 +47,21 @@ class SunInvarianceTest {
     private static final List<String> NAMES = List.of("oslo", "quito",
             "cape-town", "alert", "chatham");
 
+    /** Rounding across platforms: degrees, kilometres, arcseconds. */
+    static final double ANGLE_DEGREES = 1e-10;
+    static final double DISTANCE_KM = 1e-6;
+    static final double DIAMETER_ARCSEC = 1e-9;
+
     @Test
-    void everyReleasedStateAndSunAnswerIsReproducedBitForBit() throws IOException {
+    void everyReleasedStateIsReproducedBitForBitAndEverySunAnswerToRounding()
+            throws IOException {
         SolarSystemPack pack = SolarSystemPack.load();
         SpkKernel kernel = pack.kernel();
         SolarSystemService service = new SolarSystemService(pack);
         int states = 0;
         int suns = 0;
+        double largest = 0.0;
+        String largestAt = "";
         String origin = null;
         for (String line : Files.readAllLines(FIXTURE, StandardCharsets.UTF_8)) {
             if (line.startsWith("# generator:")) {
@@ -83,16 +97,30 @@ class SunInvarianceTest {
                         o.horizontal().altitudeDegrees(),
                         o.horizontal().azimuthDegrees(),
                         o.distanceKm(), o.angularDiameterArcseconds()};
+                double[] within = {ANGLE_DEGREES, ANGLE_DEGREES, ANGLE_DEGREES,
+                        ANGLE_DEGREES, ANGLE_DEGREES, ANGLE_DEGREES, ANGLE_DEGREES,
+                        DISTANCE_KM, DIAMETER_ARCSEC};
                 for (int i = 0; i < actual.length; i++) {
-                    assertEquals(Double.parseDouble(f[4 + i]), actual[i],
-                            f[1] + " " + f[2] + ", quantity " + i
-                                    + ": the released Sun, exactly");
+                    double expected = Double.parseDouble(f[4 + i]);
+                    double difference = Math.abs(actual[i] - expected);
+                    assertTrue(difference <= within[i], f[1] + " " + f[2]
+                            + ", quantity " + i + ": the released Sun to rounding;"
+                            + " expected " + expected + ", found " + actual[i]);
+                    if (difference / within[i] > largest) {
+                        largest = difference / within[i];
+                        largestAt = f[1] + " " + f[2] + " quantity " + i + ": "
+                                + difference;
+                    }
                 }
                 suns++;
             }
         }
         assertEquals(3 * 4001, states, "three released segments at 4 001 epochs");
         assertEquals(5 * 13, suns, "five observers at thirteen named instants");
+        System.out.println("Sun invariance: every state exact; the largest Sun"
+                + " answer difference is " + (largestAt.isEmpty() ? "none"
+                        : largestAt + " (" + String.format(java.util.Locale.ROOT,
+                                "%.3f", largest) + " of its tolerance)"));
         assertTrue(origin != null && origin.contains("pack solar-system v1")
                         && origin.contains("juranometria-de440-sun-emb-earth-1900-2100.bsp"),
                 "the fixture says it was taken from pack v1: " + origin);

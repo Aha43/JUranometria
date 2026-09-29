@@ -40,15 +40,21 @@ The #406 checkpoint measured 14 849 024 bytes for the same segments with
 a one-record comment area; the released pack keeps the source kernel's
 full comment area as v1 does, 60 records more. Nothing else differs.
 
-**The Sun is unchanged, bit for bit.** Before regeneration,
+**The Sun is unchanged.** Before regeneration,
 `SolarSystemInvarianceMain` wrote the raw states of the three released
 segments at 4 001 epochs each and the Sun's every quantity for the five
 reference observers at the thirteen named instants, at full precision,
 from pack v1 (`docs/studies/solar-system/sun-invariance.txt`, never
-regenerated). `SunInvarianceTest` holds pack v2 to every number
-exactly. The jplephem reference states (`spk-reference.txt`) were
-regenerated on the v2 kernel: every v1 row is reproduced unchanged and
-36 Moon rows are added.
+regenerated). `SunInvarianceTest` holds pack v2 to every state **bit
+for bit** and to every Sun answer **to floating-point rounding**
+(1e-10° of angle, a millimetre of distance): the first CI run on Linux
+measured exactly one last-bit difference, 1 ulp of a declination
+against the macOS-written fixture, in the platform's trigonometric
+intrinsics - which is the honest limit of "unchanged" for a
+trigonometric chain, and a million times below the table's rounding.
+The jplephem reference states (`spk-reference.txt`) were regenerated on
+the v2 kernel: every v1 row is reproduced unchanged and 36 Moon rows
+are added.
 
 ## Frames, with their meanings frozen (M1, M2)
 
