@@ -64,13 +64,20 @@ regenerated on the v2 kernel: every v1 row is reproduced unchanged and
   the table and a later untextured disc; not a topographic limb.
 - **Parallax is not optional.** The topocentric–geocentric difference
   reaches 1.024°; a geocentric Moon is two diameters wrong.
-- **Phase angle i** - at the Moon, Horizons' S-T-O. Measured, not
-  assumed: Horizons publishes two phase angles, the geometric "phi"
-  and S-T-O, which differ by up to ±21″; S-T-O is the angle between
-  the *apparent* Sun as the Moon sees it - light-time corrected and
-  aberrated by the Moon's own barycentric motion - and the down-leg to
-  the observer *as the observer sees it*, the aberrated direction
-  reversed. With both aberrations the service reproduces S-T-O to
+- **Phase angle i** - at the Moon, Horizons' S-T-O, confirmed on #407
+  (M2). Measured, not assumed: Horizons publishes two phase angles,
+  the geometric "phi" and S-T-O, which differ by up to ±21″. Two light
+  paths define S-T-O. The *up-leg*: light leaves the Sun and reaches
+  the Moon at the instant the Moon's own light leaves it for the
+  observer, so the Sun is taken where it was one Sun–Moon light-time
+  earlier, and its direction is aberrated by the Moon's barycentric
+  velocity (about 30 km/s, up to 20.6″) - the Sun *as the Moon sees
+  it*. The *down-leg*: the Moon's light reaches the observer at the
+  civil instant, so the Moon is taken where it was one Moon–observer
+  light-time earlier, and the direction is aberrated by the observer's
+  barycentric velocity - the Moon *as the observer sees it* - and
+  reversed to point from the Moon to the observer. The angle between
+  the two is S-T-O. With both aberrations the service reproduces it to
   0.33″ through the exact interval; with neither it is 44″ off, with
   one 22″. The checkpoint's guess that the 43″ was an epoch difference
   was wrong; the measurement says what it is.
@@ -177,23 +184,28 @@ the named instants and a daily 2026 series at Oslo, 52 870 rows:
 | **1972 → 2027-06-28** | 14 890 | **0.20″** | **0.24″** | **12.2″** | **0.34 km** | **0.0022″** | **0.003 %** | **0.35″** | **0.33″** |
 | after 2027-06-28 | 19 185 | 86.7″ | 86.8″ | 85.8″ (not asserted) | 11.9 km | 0.061″ | 0.019 % | 79″ | 79″ |
 
-**The targets, as ruled (M9), and what the measurement says.** Met:
-apparent ≤ 1″, horizontal ≤ 20″, distance ≤ 1 km, diameter ≤ 0.01″,
-illuminated ≤ 0.01 point, elongation ≤ 1″, phase angle ≤ 5″ through
-the exact interval; astrometric ≤ 0.5″ in 1962–1971; χ ≤ 0.1°; after
-the interval, direction within the 90″ budget (86.7″, the DE440/DE441
-lunar divergence of 6.9″ plus the ΔT models' 133 s at 0.55″/s) and
-distance within the 25 km budget (11.9 km). **Exceeded, and returned to
-the owner with their causes rather than widened** (checkpoint on #407):
-astrometric 0.74″ in 1900–1961 against ≤ 0.1″ (the accepted ΔT model
-against the record, 0.55″ per second); astrometric 0.20″ from 1972
-against ≤ 0.1″ (UT1 = UTC through the station, bounded at 0.24″);
-diameter 0.061″ and illuminated fraction 0.019 points after the
-interval against 0.01 (the 11.9 km of DE441 divergence at 0.005″ per
-km; the 133 s of ΔT at 0.5″ per second on the phase angle). None is an
-implementation residual: each scales with cos φ, with the era's ΔT, or
-with the families' own divergence, and each was decomposed before it
-was named.
+**The targets the tests hold.** As ruled on #406 (M9) and revised on
+#407 after the measurement was returned with its causes: through the
+exact interval, apparent ≤ 1″, horizontal ≤ 20″, distance ≤ 1 km,
+diameter ≤ 0.01″, illuminated ≤ 0.01 percentage point, elongation
+≤ 1″, phase angle ≤ 5″; χ ≤ 0.1° clear of new and full; astrometric
+**≤ 1.0″ for 1900–1961** (the accepted ΔT model against the record,
+about 1.3 s at 0.55″ per second - the Sun paid 0.05″ for the same
+seconds), **≤ 0.5″ for 1962–1971** (Horizons' own reading of those
+civil instants), **≤ 0.3″ from 1972** (UT1 = UTC through the station,
+bounded at 0.24″ at the equator and scaling with cos φ exactly as
+measured: Quito 0.20″, Oslo 0.11″, Alert 0.03″). After the interval:
+direction ≤ 90″ (measured 86.7″: the families' 6.9″ lunar divergence
+plus the ΔT models' 133 s at 0.55″/s), distance ≤ 25 km (11.9 km),
+**diameter ≤ 0.1″** (the 11.9 km at 0.005″ per km) and **illuminated
+fraction ≤ 0.03 percentage points** - points of the percentage shown,
+not of the fraction - (the 133 s at 0.51″/s on the phase angle,
+measured 0.019 points); horizontal unasserted. Each widened number
+bounds an accepted time-scale or DE440/DE441 difference, never
+unexplained implementation error, and beside every target the test
+pins the maximum measured on 2026-09-29 to four decimals, so later
+drift cannot hide inside the wider limit. The four numbers were
+returned to the owner before they were widened, and would be again.
 
 **A published case outside the JPL family** (`MoonPublishedCaseTest`):
 Meeus 47.a and 48.a, 1992 April 12.0 TD, geocentric. Apparent α, δ
@@ -240,13 +252,19 @@ instants, a daily range through one lunation and an hourly night.
 ## Fixtures
 
 `docs/studies/solar-system/horizons-moon/` - thirteen Horizons
-responses kept whole with request URL, time and body digest, fetched by
-`scripts/horizons-moon-fetch.py`: five named, five 7-day matrices
-(3.0 MB each; the 7-day step is what keeps the lunation from
+responses kept whole, each with its full request URL and query
+parameters, the UTC of the request and the SHA-256 of the whole body,
+fetched by `scripts/horizons-moon-fetch.py`: five named, five 7-day
+matrices (3.0 MB each; the 7-day step is what keeps the lunation from
 aliasing), the daily year, the geocentric published case and the Sun on
-Oslo's grid for χ. `MoonReferenceVectorTest` re-hashes each. The
-comparison that preceded the ruling is `scripts/moon-authority-comparison.py`
-with the study directory's own README.
+Oslo's grid for χ - 16 MB of study evidence that no build, test or
+runtime path depends on beyond reading it as a fixture. They replaced
+a first fetch made with the Sun fixtures' site heights, because the
+contract's observer stands at sea level and Quito's 2.85 km showed as
+1.65″ of the Moon's parallax; the directory's README records it.
+`MoonReferenceVectorTest` re-hashes each. The comparison that preceded
+the ruling is `scripts/moon-authority-comparison.py` with the study
+directory's own README.
 
 ## What the implementation issues inherit
 

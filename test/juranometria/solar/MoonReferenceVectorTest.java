@@ -45,20 +45,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * the same JPL authority family (DE441 there, DE440 here), with its
  * own time scales and Earth orientation.
  *
- * <p>Targets, as ruled. Through the exact-time interval: astrometric
- * ≤ 0.1″ for 1900–1961, ≤ 0.5″ for 1962–1971 (Horizons reads those
- * civil instants about 0.7 s differently, and the Moon moves 0.55″ a
- * second), ≤ 0.1″ from 1972; apparent ≤ 1″; horizontal ≤ 20″;
- * distance ≤ 1 km; diameter ≤ 0.01″; illuminated fraction ≤ 0.01
- * percentage point; elongation ≤ 1″; Horizons-definition phase angle
- * ≤ 5″; bright-limb angle ≤ 0.1° when 2 % ≤ k ≤ 98 %. After the
- * interval the two families themselves diverge for the Moon (DE441
- * assumes an undamped lunar core) and the ΔT models differ by up to
- * 133 s: the ruled study budgets are 90″ of direction and 25 km of
- * distance, horizontal unasserted; a measurement beyond either stops
- * the work rather than widening the number. Every worst case must be
- * greater than zero: two implementations, not one compared with
- * itself.
+ * <p>Targets, as ruled on #406 (M9) and revised on #407 by
+ * measurement. Through the exact-time interval: astrometric ≤ 1.0″ for
+ * 1900–1961 (the accepted Espenak–Meeus ΔT sits about 1.3 s from the
+ * record there, and the Moon moves 0.55″ a second), ≤ 0.5″ for
+ * 1962–1971 (Horizons reads those civil instants about 0.7 s
+ * differently), ≤ 0.3″ from 1972 (Place and Time's UT1 = UTC moves the
+ * station up to 420 m, which is 0.24″ of the Moon's parallax at the
+ * equator); apparent ≤ 1″; horizontal ≤ 20″; distance ≤ 1 km;
+ * diameter ≤ 0.01″; illuminated fraction ≤ 0.01 percentage point;
+ * elongation ≤ 1″; Horizons-definition phase angle ≤ 5″; bright-limb
+ * angle ≤ 0.1° when 2 % ≤ k ≤ 98 %. After the interval the two families
+ * themselves diverge for the Moon (DE441 assumes an undamped lunar
+ * core, 11.9 km of distance by 2100) and the ΔT models differ by up to
+ * 133 s: the ruled budgets are 90″ of direction, 25 km of distance,
+ * 0.1″ of diameter (the 11.9 km at 0.005″ per km) and 0.03 percentage
+ * points of illumination (133 s at 0.51″ per second on the phase
+ * angle), horizontal unasserted. Each widened number bounds an
+ * accepted time-scale or DE440/DE441 difference, never unexplained
+ * implementation error, and beside every target the measured maximum
+ * of 2026-09-29 is pinned, so drift cannot hide inside the wider
+ * limit. A measurement beyond a target stops the work rather than
+ * widening the number. Every worst case must be greater than zero:
+ * two implementations, not one compared with itself.
  */
 class MoonReferenceVectorTest {
 
@@ -259,7 +268,10 @@ class MoonReferenceVectorTest {
 
         for (String era : List.of("1900-1961", "1962-1971", "1972-exact")) {
             SunReferenceVectorTest.Worst w = byEra.get(era);
-            double astrometric = era.equals("1962-1971") ? 0.5 : 0.1;
+            // The accepted ΔT model's residual before 1962; Horizons' own
+            // reading of 1962-1971; UT1 = UTC through the station after.
+            double astrometric = era.equals("1900-1961") ? 1.0
+                    : era.equals("1962-1971") ? 0.5 : 0.3;
             hold(era, w, "astrometric", astrometric);
             hold(era, w, "apparent", 1.0);
             hold(era, w, "horizontal", 20.0);
@@ -273,11 +285,24 @@ class MoonReferenceVectorTest {
         hold("after", after, "astrometric", 90.0);
         hold("after", after, "apparent", 90.0);
         hold("after", after, "distance km", 25.0);
-        hold("after", after, "diameter", 0.01);
-        hold("after", after, "illuminated %", 0.01);
+        // The DE440/DE441 distance divergence, 11.9 km at 0.005″ per km.
+        hold("after", after, "diameter", 0.1);
+        // The ΔT models' 133 s on the phase angle: percentage points of k.
+        hold("after", after, "illuminated %", 0.03);
         hold("after", after, "elongation", 90.0);
         hold("after", after, "phase angle", 90.0);
         // Horizontal after the exact interval: measured, printed, not asserted.
+
+        // The measured maxima, pinned: what this implementation measured
+        // on 2026-09-29 against these fixtures, to four decimals. A later
+        // change that moves any of them is a change with a name.
+        for (Map.Entry<String, double[]> pin : PINNED.entrySet()) {
+            String[] key = pin.getKey().split("/");
+            double worst = byEra.get(key[0]).get(key[1]);
+            assertTrue(worst <= pin.getValue()[0] + 0.00005, key[0] + ": " + key[1]
+                    + " measured " + worst + ", pinned at " + pin.getValue()[0]
+                    + " at " + byEra.get(key[0]).where.get(key[1]));
+        }
 
         for (SunReferenceVectorTest.Worst w : byEra.values()) {
             for (String key : w.values.keySet()) {
@@ -294,6 +319,40 @@ class MoonReferenceVectorTest {
         assertTrue(sideWorstRa < 0.01, "and every disagreement is at RA"
                 + " equality or opposition: " + sideWorstRa + "° at " + sideWorstAt);
     }
+
+    /** The measured maxima of 2026-09-29, era/quantity, to four decimals. */
+    static final Map<String, double[]> PINNED = Map.ofEntries(
+            Map.entry("1900-1961/astrometric", new double[] {0.7398}),
+            Map.entry("1900-1961/apparent", new double[] {0.8045}),
+            Map.entry("1900-1961/horizontal", new double[] {1.3993}),
+            Map.entry("1900-1961/distance km", new double[] {0.1010}),
+            Map.entry("1900-1961/diameter", new double[] {0.0009}),
+            Map.entry("1900-1961/illuminated %", new double[] {0.0027}),
+            Map.entry("1900-1961/elongation", new double[] {0.8360}),
+            Map.entry("1900-1961/phase angle", new double[] {0.8475}),
+            Map.entry("1962-1971/astrometric", new double[] {0.2349}),
+            Map.entry("1962-1971/apparent", new double[] {0.1662}),
+            Map.entry("1962-1971/horizontal", new double[] {2.5290}),
+            Map.entry("1962-1971/distance km", new double[] {0.0640}),
+            Map.entry("1962-1971/diameter", new double[] {0.0007}),
+            Map.entry("1962-1971/illuminated %", new double[] {0.0026}),
+            Map.entry("1962-1971/elongation", new double[] {0.3836}),
+            Map.entry("1962-1971/phase angle", new double[] {0.3776}),
+            Map.entry("1972-exact/astrometric", new double[] {0.1976}),
+            Map.entry("1972-exact/apparent", new double[] {0.2402}),
+            Map.entry("1972-exact/horizontal", new double[] {12.1845}),
+            Map.entry("1972-exact/distance km", new double[] {0.3400}),
+            Map.entry("1972-exact/diameter", new double[] {0.0022}),
+            Map.entry("1972-exact/illuminated %", new double[] {0.0026}),
+            Map.entry("1972-exact/elongation", new double[] {0.3533}),
+            Map.entry("1972-exact/phase angle", new double[] {0.3262}),
+            Map.entry("after/astrometric", new double[] {86.6727}),
+            Map.entry("after/apparent", new double[] {86.7864}),
+            Map.entry("after/distance km", new double[] {11.9003}),
+            Map.entry("after/diameter", new double[] {0.0610}),
+            Map.entry("after/illuminated %", new double[] {0.0185}),
+            Map.entry("after/elongation", new double[] {79.2245}),
+            Map.entry("after/phase angle", new double[] {79.2696}));
 
     /** The Sun's apparent RA of date at the row, through the service. */
     private static double sunApparentRa(MoonObservation moon, Row row) {
@@ -411,8 +470,8 @@ class MoonReferenceVectorTest {
                 MoonObservation o = observe(row);
                 double astrometric = arcsec(o.astrometricJ2000(), row.ra, row.dec);
                 int year = row.when.atOffset(ZoneOffset.UTC).getYear();
-                double target = !exact(row.when) ? 90.0
-                        : year >= 1962 && year < 1972 ? 0.5 : 0.1;
+                double target = !exact(row.when) ? 90.0 : year < 1962 ? 1.0
+                        : year < 1972 ? 0.5 : 0.3;
                 assertTrue(astrometric <= target, row.site + " " + row.when
                         + ": astrometric " + astrometric + "″");
                 checked.add(row.site + " " + row.when);
