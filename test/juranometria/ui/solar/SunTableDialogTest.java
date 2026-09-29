@@ -197,12 +197,25 @@ class SunTableDialogTest {
                 "Deklinasjon (J2000)", "Ekliptisk lengde (J2000)",
                 "Høyde (uten refraksjon)", "Asimut (fra nord via øst)",
                 "Avstand", "Tilsynelatende diameter"), columnNames(nb.content.model));
-        for (int c = 0; c < 8; c++) {
-            assertEquals(en.content.model.getValueAt(0, c),
-                    nb.content.model.getValueAt(0, c),
-                    "column " + c + ": a number is notation, the same in"
-                            + " both languages");
+        // The owner ruled a decimal comma for the Norwegian reader's
+        // table (#400); the digits are the same, the separator is the
+        // language's, and what is parsed back keeps the point.
+        assertEquals("51,01\u00b0", nb.content.model.getValueAt(0, 4));
+        assertEquals("1,016165 AU (152,016 mill. km)", nb.content.model.getValueAt(0, 6));
+        assertEquals("31\u2032 27,9\u2033", nb.content.model.getValueAt(0, 7));
+        assertEquals("05h 58m 40,8s", nb.content.model.getValueAt(0, 1));
+        for (int c : List.of(0, 1, 2, 3, 4, 5, 7)) {
+            assertEquals(String.valueOf(en.content.model.getValueAt(0, c))
+                            .replace(".", ","),
+                    String.valueOf(nb.content.model.getValueAt(0, c)),
+                    "column " + c + ": the same digits with the language's"
+                            + " separator; the abbreviation point in"
+                            + " \"mill. km\" is not a decimal and stays");
         }
+        assertEquals("2026-06-21 10:00:00", nb.content.start.getText(),
+                "the typed range keeps the machine form");
+        assertTrue(nb.content.observerNote.getText().contains("59,91"),
+                "the observer note follows the language too");
         assertEquals("1 rader.", nb.content.status());
         nb.observer = new Observer(59.91, 10.75,
                 Instant.parse("2026-12-21T20:50:09Z"));

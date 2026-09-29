@@ -41,6 +41,7 @@ public final class SunTableModel extends AbstractTableModel {
     }
 
     private final InterfaceText said;
+    private final String decimal;
     private List<Row> rows = List.of();
 
     public SunTableModel(InterfaceText said) {
@@ -49,6 +50,16 @@ public final class SunTableModel extends AbstractTableModel {
                     + " some language");
         }
         this.said = said;
+        this.decimal = said.say("suntable.decimal");
+    }
+
+    /** The language's decimal separator for what the reader sees. */
+    public String decimal() {
+        return decimal;
+    }
+
+    private String n(String rootNumber) {
+        return SunTableFormat.decimal(rootNumber, decimal);
     }
 
     /** Replaces every row. */
@@ -113,16 +124,17 @@ public final class SunTableModel extends AbstractTableModel {
         SunObservation o = r.observation();
         return switch (column) {
             case 0 -> instant(r);
-            case 1 -> SunTableFormat.hms(o.astrometricJ2000());
+            case 1 -> n(SunTableFormat.hms(o.astrometricJ2000()));
             case 2 -> SunTableFormat.dms(o.astrometricJ2000());
-            case 3 -> SunTableFormat.degrees(o.eclipticLongitudeJ2000Degrees());
-            case 4 -> SunTableFormat.altitude(o.horizontal().altitudeDegrees(),
-                    said.say("suntable.below"));
-            case 5 -> SunTableFormat.degrees(o.horizontal().azimuthDegrees());
+            case 3 -> n(SunTableFormat.degrees(o.eclipticLongitudeJ2000Degrees()));
+            case 4 -> SunTableFormat.altitude(
+                    n(SunTableFormat.degrees(o.horizontal().altitudeDegrees())),
+                    o.horizontal().altitudeDegrees(), said.say("suntable.below"));
+            case 5 -> n(SunTableFormat.degrees(o.horizontal().azimuthDegrees()));
             case 6 -> said.say("suntable.distance.pattern",
-                    SunTableFormat.astronomicalUnits(o.distanceAu()),
-                    SunTableFormat.millionKilometres(o.distanceKm()));
-            case 7 -> SunTableFormat.minutesSeconds(o.angularDiameterArcseconds());
+                    n(SunTableFormat.astronomicalUnits(o.distanceAu())),
+                    n(SunTableFormat.millionKilometres(o.distanceKm())));
+            case 7 -> n(SunTableFormat.minutesSeconds(o.angularDiameterArcseconds()));
             default -> throw new IndexOutOfBoundsException(column);
         };
     }

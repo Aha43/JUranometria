@@ -239,17 +239,19 @@ and singular like Place and Time. Decisions taken there:
 - **Nothing is persisted**, on the smallest-surface precedent: the
   instant is never stored anywhere in the atlas, and a stored range
   would be a second clock in disguise.
-- **Numbers are notation.** Every value is formatted in
-  `Locale.ROOT` by `SunTableFormat`, the formatter promoted out of the
-  study so the reader's table and the evidence contract's table are
-  the same bytes; Norwegian keeps the decimal point (`−12.34° (under
-  horisonten)`), against the ruling's example, because the interface
-  files' standing rule is that a value must parse if a reader carries
-  it into Place and Time. A word from the owner turns it into a comma
-  in Norwegian only.
+- **Numbers are notation; the separator is the language's.** Every
+  value is formatted in `Locale.ROOT` by `SunTableFormat`, the
+  formatter promoted out of the study so the reader's table and the
+  evidence contract's table are the same bytes. The owner ruled that
+  the Norwegian reader's table uses the decimal comma - `51,01°`,
+  `1,016165 AU (152,016 mill. km)`, `31′ 27,9″`, `−12,34° (under
+  horisonten)` - and English the point; the separator is a value in
+  each language file (`suntable.decimal`) applied to what is shown,
+  never to what is parsed: the range fields, the fixtures, the
+  manifests and the study keep the point.
 - **No copy or export.** The rule allows it only with an explicitly
-  decided format; nothing in the checkpoint needs it, so the decision
-  is deferred, not made silently.
+  decided format; the owner deferred it until dogfooding shows what
+  form is useful.
 - **Evidence.** `SunTableSheetMain` photographs the dialog in both
   languages and appearances; the menu photographs and the
   control-explanation study re-record for the new item and surface;

@@ -86,8 +86,13 @@ public final class SunTableFormat {
      * when the Sun is below the horizon.
      */
     public static String altitude(double degrees, String belowTheHorizon) {
-        String value = degrees(degrees);
-        return degrees < 0 ? value + " " + belowTheHorizon : value;
+        return altitude(degrees(degrees), degrees, belowTheHorizon);
+    }
+
+    /** The same, over a number already spelled for the reader. */
+    public static String altitude(String spelled, double degrees,
+                                  String belowTheHorizon) {
+        return degrees < 0 ? spelled + " " + belowTheHorizon : spelled;
     }
 
     /** {@code 1.016165}: astronomical units to six decimals. */
@@ -110,6 +115,17 @@ public final class SunTableFormat {
             m++;
         }
         return String.format(Locale.ROOT, "%d′ %04.1f″", m, s);
+    }
+
+    /**
+     * A {@code Locale.ROOT} number respelled with a language's decimal
+     * separator - {@code 51.01°} to {@code 51,01°} - for what a reader
+     * sees (issue #400, owner ruling). Never applied to what is parsed
+     * back: the range fields, the fixtures and the study keep the point.
+     */
+    public static String decimal(String rootNumber, String separator) {
+        return ".".equals(separator) ? rootNumber
+                : rootNumber.replace(".", separator);
     }
 
     /** {@code 2026-06-21 08:24}: UTC, rounded to the minute. */

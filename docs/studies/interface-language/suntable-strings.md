@@ -358,7 +358,7 @@ Packed 959 × 425 px.
 |---|
 | Solen |
 | Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Observatør på bredde 59.91, lengde 10.75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
+| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
 | Vis Solen ved tidspunktet satt i Sted og tid |
@@ -394,7 +394,7 @@ Packed 959 × 425 px.
 | Asimut (fra nord via øst) |
 | Avstand |
 | Tilsynelatende diameter |
-| 2026-06-21 10:00 · 05h 58m 40.8s · +23° 26′ 02″ · 89.70° · 51.01° · 150.56° · 1.016165 AU (152.016 mill. km) · 31′ 27.9″ |
+| 2026-06-21 10:00 · 05h 58m 40,8s · +23° 26′ 02″ · 89,70° · 51,01° · 150,56° · 1,016165 AU (152,016 mill. km) · 31′ 27,9″ |
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
@@ -418,7 +418,7 @@ Packed 959 × 425 px.
 |---|
 | Solen |
 | Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Observatør på bredde 59.91, lengde 10.75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
+| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
 | Vis Solen ved tidspunktet satt i Sted og tid |
@@ -454,10 +454,10 @@ Packed 959 × 425 px.
 | Asimut (fra nord via øst) |
 | Avstand |
 | Tilsynelatende diameter |
-| 2026-06-21 10:00 · 05h 58m 40.8s · +23° 26′ 02″ · 89.70° · 51.01° · 150.56° · 1.016165 AU (152.016 mill. km) · 31′ 27.9″ |
-| 2026-06-22 10:00 · 06h 02m 50.5s · +23° 25′ 58″ · 90.65° · 50.99° · 150.48° · 1.016222 AU (152.025 mill. km) · 31′ 27.8″ |
-| 2026-06-23 10:00 · 06h 07m 00.0s · +23° 25′ 28″ · 91.61° · 50.96° · 150.41° · 1.016274 AU (152.032 mill. km) · 31′ 27.7″ |
-| 2026-06-24 07:30 † · 06h 10m 43.6s · +23° 24′ 40″ · 92.46° · 36.29° · 106.52° · 1.016326 AU (152.040 mill. km) · 31′ 27.6″ |
+| 2026-06-21 10:00 · 05h 58m 40,8s · +23° 26′ 02″ · 89,70° · 51,01° · 150,56° · 1,016165 AU (152,016 mill. km) · 31′ 27,9″ |
+| 2026-06-22 10:00 · 06h 02m 50,5s · +23° 25′ 58″ · 90,65° · 50,99° · 150,48° · 1,016222 AU (152,025 mill. km) · 31′ 27,8″ |
+| 2026-06-23 10:00 · 06h 07m 00,0s · +23° 25′ 28″ · 91,61° · 50,96° · 150,41° · 1,016274 AU (152,032 mill. km) · 31′ 27,7″ |
+| 2026-06-24 07:30 † · 06h 10m 43,6s · +23° 24′ 40″ · 92,46° · 36,29° · 106,52° · 1,016326 AU (152,040 mill. km) · 31′ 27,6″ |
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
@@ -481,7 +481,7 @@ Packed 959 × 425 px.
 |---|
 | Solen |
 | Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Observatør på bredde 59.91, lengde 10.75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
+| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
 | Vis Solen ved tidspunktet satt i Sted og tid |
@@ -540,7 +540,7 @@ Packed 959 × 425 px.
 |---|
 | Solen |
 | Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Observatør på bredde -0.18, lengde -78.5 øst; tidspunkt 2026-12-21 20:50:09 UTC, fra Sted og tid. |
+| Observatør på bredde -0,18, lengde -78,5 øst; tidspunkt 2026-12-21 20:50:09 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
 | Vis Solen ved tidspunktet satt i Sted og tid |
@@ -576,7 +576,7 @@ Packed 959 × 425 px.
 | Asimut (fra nord via øst) |
 | Avstand |
 | Tilsynelatende diameter |
-| 2026-12-21 20:50 · 17h 58m 21.7s · −23° 26′ 08″ · 269.62° · 32.30° · 242.06° · 0.983709 AU (147.161 mill. km) · 32′ 30.2″ |
+| 2026-12-21 20:50 · 17h 58m 21,7s · −23° 26′ 08″ · 269,62° · 32,30° · 242,06° · 0,983709 AU (147,161 mill. km) · 32′ 30,2″ |
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
@@ -598,7 +598,7 @@ Packed 959 × 425 px.
 |---|
 | Solen |
 | Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Observatør på bredde 59.91, lengde 10.75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
+| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
 | Vis Solen ved tidspunktet satt i Sted og tid |
@@ -634,7 +634,7 @@ Packed 959 × 425 px.
 | Asimut (fra nord via øst) |
 | Avstand |
 | Tilsynelatende diameter |
-| 2026-06-21 10:00 · 05h 58m 40.8s · +23° 26′ 02″ · 89.70° · 51.01° · 150.56° · 1.016165 AU (152.016 mill. km) · 31′ 27.9″ |
+| 2026-06-21 10:00 · 05h 58m 40,8s · +23° 26′ 02″ · 89,70° · 51,01° · 150,56° · 1,016165 AU (152,016 mill. km) · 31′ 27,9″ |
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |

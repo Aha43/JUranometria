@@ -327,8 +327,11 @@ public final class SunTableDialog extends JDialog {
                 return;
             }
             observerNote.setText(said.say("suntable.observer.note",
-                    degrees(now.latitudeDegrees()),
-                    degrees(now.eastLongitudeFolded()), shown(now.instant())));
+                    SunTableFormat.decimal(degrees(now.latitudeDegrees()),
+                            model.decimal()),
+                    SunTableFormat.decimal(degrees(now.eastLongitudeFolded()),
+                            model.decimal()),
+                    shown(now.instant())));
             observerNote.getAccessibleContext().setAccessibleName(
                     observerNote.getText());
             if (instantView.isSelected()) {

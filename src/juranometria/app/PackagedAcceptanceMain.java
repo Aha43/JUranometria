@@ -497,7 +497,11 @@ public final class PackagedAcceptanceMain {
                                 .forLanguage("nb-NO")));
         require("Tidspunkt (UTC)".equals(norsk[0].model.getColumnName(0))
                         && "1 rader.".equals(norsk[0].status())
-                        && norsk[0].observerNote.getText().startsWith("Observat"),
+                        && norsk[0].observerNote.getText().startsWith("Observat")
+                        && String.valueOf(norsk[0].model.getValueAt(0, 4))
+                                .contains(",")
+                        && !String.valueOf(norsk[0].model.getValueAt(0, 4))
+                                .contains("."),
                 "and speaks Norwegian through the packaged classpath: "
                         + norsk[0].status());
         System.out.println("sun table OK (Oslo's midsummer row, a four-row"
