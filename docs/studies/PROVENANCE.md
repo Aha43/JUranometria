@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**431 promoted artifacts.**
+**440 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -428,6 +428,15 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/sky-language/pair-sagittarius-globe-180.png` | `a54397d4069f471fc05039d295a542993461f572396522868425a881baaef71b` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-south-pole-120.png` | `5ef542209dff921d974219c3f2d6fb297df09ed6ce0b8c4cadb7d341c315a811` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-south-pole-globe-180.png` | `d24be7402bcb1dbb77c4ce20e5b8d01fabfc5bd6425aa459bd781f80c6574d29` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/conjunction-8.png` | `ca19e8150985b98aaa0a6cce1a8e58930c14d11b76d7370a14e903dc65889a81` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/equinox-sun-24.png` | `e37f13eaa8bb92bef245d6482ce5ce23e36a15d5c9ad542d9a03b62c4a544b60` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/horizon-dimmed-24.png` | `1c61216d2e53182a8ca444267424fc02db1d361c1eb73bbc6c32b0d3ce24ec96` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/horizon-omitted-24.png` | `43e82f9d07afd264153ed53da4931d774375aa422f68bd882eccc4bafb55a39a` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/moon-first-quarter-1.png` | `296126702976116c3625c6e0cadc8fc9ef95a25c41b2c9cf176073d26fac78de` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/moon-first-quarter-3.png` | `4f19de0b288b4b5ca68362173fc713a8c372426c52ee156b7fe893d3050a6244` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/moon-first-quarter-8.png` | `167b12c2f8216bd00d94fafc3e356b8e4237f77635832f85a3d8bc7baa4bd5b3` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/moon-over-stars-3.png` | `efce7c1d867b07686aa91ce1e2912d285b6aacbd15b3b90b6a5cc14afefaae93` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-cartography/off-page-hint-24.png` | `5bbdfe142d2a8a21d95fab5803a18ba0fa5b6c59aa266489ffa6aabc24c90b48` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/bright-limb-angle.png` | `ad56a9a40b4d3bcfa61e96f0282f684a4d37bcd5e261c807890ab43bd214e3b0` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/bright-limb-angle.svg` | `10260987ae252fdc1458feeb71f3b1f804610d97e2bef26679ac5f9cddaf8765` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/phase-geometry.png` | `ece2bacb68599d85dcae0c5b738c19250432514098c488fd2b9b04b740beed91` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
