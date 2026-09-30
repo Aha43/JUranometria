@@ -1191,4 +1191,228 @@ public final class ReferenceInk {
         shape.closePath();
         return shape;
     }
+
+    // ---- Solar System bodies (Sprint 37, issue #415) -------------------
+
+    /**
+     * A body the page drew: which, where its centre landed, the disc's
+     * opaque ink in page pixels, and the box its name took or null
+     * when every candidate was refused (#414 ruling C4: the mark stays
+     * where it is; the name may go).
+     */
+    public record BodyPlacement(String identity, PixelPoint centre,
+                                Shape disc, String name, Rectangle2D box,
+                                boolean belowHorizon) {
+        /** Whether a page point lies on this body's opaque ink. */
+        public boolean covers(double x, double y) {
+            return disc.contains(x, y);
+        }
+    }
+
+    /**
+     * Paints every {@link OverlayContribution.Body} at its true
+     * angular size, after the catalogue's marks and labels and before
+     * the furniture (the renderer's bodies layer), and returns what
+     * was drawn so the page can answer a pointer and a screen reader.
+     *
+     * <p>The ruling of #414: the Sun is a ring with its centre dot, the
+     * disc filled with the ground so what it covers is covered; below
+     * the drawn horizon the ink is dimmed towards the ground and the
+     * name carries the language's status; the name takes the first
+     * clean adjacent box around the disc and is refused, not moved,
+     * when none is clean; a body whose disc leaves the page entirely
+     * is not drawn at all - no edge hint. A lit disc (the Moon, #416)
+     * is refused here until that issue draws it.
+     */
+    public static List<BodyPlacement> paintBodies(Graphics2D g,
+            DrawnPage page, List<OverlayRegistry.Owned> contributions,
+            juranometria.render.ChartPalette palette,
+            juranometria.project.PageWords words, List<Shape> reserved,
+            List<Rectangle2D> referenceBoxes) {
+        List<OverlayContribution.Body> bodies = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : contributions) {
+            if (owned.geometry() instanceof OverlayContribution.Body body) {
+                bodies.add(body);
+            }
+        }
+        if (bodies.isEmpty()) {
+            return List.of();
+        }
+        bodies.sort(Comparator.comparing(OverlayContribution.Body::identity));
+        ChartScene scene = page.scene();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(scene);
+        PageRegion region = mapping.regionFor(scene.viewport(), projection);
+        Shape sky = skyOf(region, paper);
+        boolean bounded = region.bounded();
+        List<BodyPlacement> placed = new ArrayList<>();
+        // The reference layer's own names and letters are taken before
+        // any body's name asks (#414 ruling C4): the equinox landmark's
+        // word is never overwritten and never fused with the Sun's.
+        List<Rectangle2D> taken = new ArrayList<>(referenceBoxes);
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setFont(EquatorialGrid.GRID_LABEL_FONT);
+            FontMetrics metrics = g2.getFontMetrics();
+            for (OverlayContribution.Body body : bodies) {
+                if (body.lit() != null) {
+                    throw new IllegalArgumentException("a lit disc is the"
+                            + " Moon's, which issue #416 draws: " + body.identity());
+                }
+                Optional<juranometria.project.PlanePoint> projected =
+                        projection.project(body.at());
+                if (projected.isEmpty()) {
+                    continue;
+                }
+                PixelPoint centre = mapping.toPixel(projected.get());
+                double radius = radiusPx(projection, mapping, body.at(),
+                        body.angularDiameterArcseconds() / 3600.0 / 2.0);
+                Ellipse2D disc = new Ellipse2D.Double(centre.x() - radius,
+                        centre.y() - radius, 2.0 * radius, 2.0 * radius);
+                if (!disc.intersects(paper)
+                        || (bounded && !sky.intersects(disc.getBounds2D()))) {
+                    continue;
+                }
+                Color ink = body.belowHorizon()
+                        ? ChartRenderer.quiet(palette.starInk(), palette.ground())
+                        : palette.starInk();
+                // The ground first: whatever the disc covers is covered.
+                g2.setColor(palette.ground());
+                g2.fill(disc);
+                g2.setColor(ink);
+                g2.setStroke(new BasicStroke((float) Math.max(1.0, radius / 12.0)));
+                g2.draw(disc);
+                double dot = Math.max(1.5, radius / 6.0);
+                g2.fill(new Ellipse2D.Double(centre.x() - dot, centre.y() - dot,
+                        2.0 * dot, 2.0 * dot));
+                String name = words.bodyName(body.identity());
+                if (body.belowHorizon()) {
+                    name = name + " " + words.bodyBelowHorizon();
+                }
+                double w = metrics.stringWidth(name);
+                double h = metrics.getAscent() + metrics.getDescent();
+                Rectangle2D box = bodyNameBox(centre, radius, w, h, paper, sky,
+                        bounded, taken, reserved);
+                if (box != null) {
+                    taken.add(box);
+                    g2.setColor(body.belowHorizon()
+                            ? ChartRenderer.quiet(palette.textInk(), palette.ground())
+                            : palette.textInk());
+                    g2.drawString(name, (float) box.getMinX(),
+                            (float) (box.getMaxY() - metrics.getDescent()));
+                }
+                placed.add(new BodyPlacement(body.identity(), centre, disc,
+                        name, box, body.belowHorizon()));
+            }
+        } finally {
+            g2.dispose();
+        }
+        return List.copyOf(placed);
+    }
+
+    /** What the page drew for the bodies, laid out without painting. */
+    public static List<BodyPlacement> bodyPlacements(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions,
+            juranometria.render.ChartPalette palette,
+            juranometria.project.PageWords words, List<Shape> reserved) {
+        java.awt.image.BufferedImage scratch = new java.awt.image.BufferedImage(
+                1, 1, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scratch.createGraphics();
+        try {
+            return paintBodies(g, page, contributions, palette, words, reserved,
+                    referenceBoxes(page, contributions, words, reserved,
+                            structure -> false));
+        } finally {
+            g.dispose();
+        }
+    }
+
+    /**
+     * Every box the reference layer's names and letters take on this
+     * page - the line names, the cardinal letters and the landmarks'
+     * and places' words - laid out exactly as {@link #paint} lays them
+     * out, without painting, so a later layer can stay clear of them.
+     */
+    public static List<Rectangle2D> referenceBoxes(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions,
+            juranometria.project.PageWords words, List<Shape> reserved,
+            java.util.function.Predicate<juranometria.render.ChartStructure>
+                    emphasized) {
+        List<OverlayRegistry.Owned> reference = referenceOf(contributions);
+        if (reference.isEmpty()) {
+            return List.of();
+        }
+        ChartScene scene = page.scene();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(scene);
+        PageRegion region = mapping.regionFor(scene.viewport(), projection);
+        Shape sky = skyOf(region, paper);
+        boolean bounded = region.bounded();
+        Laid laid = laidOut(page, contributions, words, reserved);
+        List<Rectangle2D> taken = new ArrayList<>(laid.taken());
+        java.awt.image.BufferedImage scratch = new java.awt.image.BufferedImage(
+                1, 1, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scratch.createGraphics();
+        try {
+            g.setFont(EquatorialGrid.GRID_LABEL_FONT);
+            g.setClip(paper);
+            for (OverlayRegistry.Owned owned : reference) {
+                if (owned.geometry() instanceof OverlayContribution.Point point) {
+                    drawPoint(g, projection, mapping, paper, sky, bounded, point,
+                            taken, juranometria.render.ChartPalette.WHITE_PAPER,
+                            emphasized);
+                }
+            }
+        } finally {
+            g.dispose();
+        }
+        return List.copyOf(taken);
+    }
+
+    /**
+     * The disc's radius on the page, by projecting its northern limb:
+     * true scale through the page's own projection, which stretches a
+     * disc towards a tangent page's corners exactly as it stretches
+     * the sky there.
+     */
+    private static double radiusPx(Projection projection,
+                                   ViewportMapping mapping,
+                                   juranometria.chart.SkyPosition at,
+                                   double halfDegrees) {
+        PixelPoint centre = mapping.toPixel(projection.project(at).orElseThrow());
+        juranometria.chart.SkyPosition limb = new juranometria.chart.SkyPosition(
+                at.raDegrees(), Math.min(89.999, at.decDegrees() + halfDegrees));
+        PixelPoint edge = mapping.toPixel(projection.project(limb).orElseThrow());
+        return Math.hypot(edge.x() - centre.x(), edge.y() - centre.y());
+    }
+
+    /**
+     * The name's box: the same tiers a cardinal letter is offered,
+     * measured from the disc's edge rather than a point, and refused
+     * when none is clean of the paper's edge, the sky's edge, other
+     * names and the catalogue's own ink.
+     */
+    private static Rectangle2D bodyNameBox(PixelPoint centre, double radius,
+            double w, double h, Rectangle2D paper, Shape sky,
+            boolean bounded, List<Rectangle2D> taken, List<Shape> reserved) {
+        double gap = juranometria.render.CardinalLandmark.GAP + radius;
+        List<List<Rectangle2D>> tiers = List.of(
+                adjacent(centre, w, h, gap), diagonal(centre, w, h, gap),
+                adjacent(centre, w, h, gap + juranometria.render.CardinalLandmark.GAP),
+                diagonal(centre, w, h, gap + juranometria.render.CardinalLandmark.GAP));
+        for (List<Rectangle2D> tier : tiers) {
+            for (Rectangle2D candidate : tier) {
+                if (paper.contains(candidate)
+                        && (!bounded || sky.contains(candidate))
+                        && clear(candidate, taken, reserved)) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
 }

@@ -36,7 +36,8 @@ record StartupStores(AppearanceStore appearance,
                      ChartOptionsStore chartOptions,
                      SkyLanguageStore language,
                      PlaceStore place,
-                     EclipticStore ecliptic) {
+                     EclipticStore ecliptic,
+                     juranometria.ui.solar.SunChartStore sunChart) {
 
     StartupStores {
         require(appearance, "appearance");
@@ -44,6 +45,7 @@ record StartupStores(AppearanceStore appearance,
         require(language, "language");
         require(place, "place and time");
         require(ecliptic, "ecliptic");
+        require(sunChart, "sun on the chart");
     }
 
     /**
@@ -55,7 +57,8 @@ record StartupStores(AppearanceStore appearance,
     static StartupStores user() {
         return new StartupStores(AppearanceStore.user(),
                 ChartOptionsStore.user(), SkyLanguageStore.user(),
-                PlaceStore.user(), EclipticStore.user());
+                PlaceStore.user(), EclipticStore.user(),
+                juranometria.ui.solar.SunChartStore.user());
     }
 
     private static void require(Object store, String what) {

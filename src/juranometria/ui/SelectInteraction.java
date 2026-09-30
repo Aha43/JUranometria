@@ -157,6 +157,19 @@ public final class SelectInteraction extends MouseAdapter {
         // chrome, and the hit test is defined on the paper.
         double x = point.x;
         double y = point.y - chart.pageOffsetY();
+        // A Solar System body's opaque disc hides what it covers, for
+        // the pointer as for the eye (#414 ruling C4, C6): a click on
+        // it is the empty sky at that place, and no catalogue object
+        // concealed behind the disc is offered or selected.
+        if (chart.bodyAt(x, y).isPresent()) {
+            juranometria.chart.SkyPosition under =
+                    ChartHitTest.skyAt(scene, x, y);
+            if (under != null) {
+                emptySky(new ChartHitTest.Hit(List.of(),
+                        new Selection.EmptySky(under)), additive);
+            }
+            return;
+        }
         ChartHitTest.Hit hit =
                 hitTest.at(scene, chart.chartOptions(), x, y);
         if (hit == null) {

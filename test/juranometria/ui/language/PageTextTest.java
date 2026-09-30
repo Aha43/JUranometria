@@ -221,6 +221,16 @@ class PageTextTest {
             public String ground(String paletteToken) {
                 return EN.ground(paletteToken);
             }
+
+            @Override
+            public String bodyName(String bodyIdentity) {
+                return EN.bodyName(bodyIdentity);
+            }
+
+            @Override
+            public String bodyBelowHorizon() {
+                return EN.bodyBelowHorizon();
+            }
         };
 
         assertEquals("spherical Mercator",

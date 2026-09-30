@@ -28,5 +28,12 @@ public enum InkRole {
     REFERENCE_LINE,
 
     /** The path of something that moves against the fixed sky. */
-    TRACK
+    TRACK,
+
+    /**
+     * A Solar System body's disc at its true angular size (Sprint 37,
+     * issue #415): opaque ink above the catalogue's marks and their
+     * labels, so what it covers is seen to be covered.
+     */
+    BODY
 }
