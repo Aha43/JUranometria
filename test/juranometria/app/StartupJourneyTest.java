@@ -223,7 +223,8 @@ class StartupJourneyTest {
                             juranometria.ui.placeandtime.PlaceStore
                                     .forNode(node),
                             ecliptic,
-                            juranometria.ui.solar.SunChartStore.forNode(node));
+                            juranometria.ui.solar.SunChartStore.forNode(node),
+                            juranometria.ui.solar.MoonChartStore.forNode(node));
 
                     JFrame[] frame = new JFrame[1];
                     try {

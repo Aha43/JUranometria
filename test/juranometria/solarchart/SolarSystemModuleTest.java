@@ -79,6 +79,35 @@ class SolarSystemModuleTest {
     }
 
     @Test
+    void shownTheMoonCarriesHowItIsLitExactlyAsTheTableStatesIt() {
+        Rig rig = new Rig();
+        rig.module.moonShowing(true);
+        List<OverlayContribution> offered = rig.module.contributedGeometry();
+        assertEquals(1, offered.size(), "the Moon's switch offers the Moon alone");
+        OverlayContribution.Body moon = (OverlayContribution.Body) offered.get(0);
+        juranometria.solar.SolarSystemService.MoonObservation expected =
+                (juranometria.solar.SolarSystemService.MoonObservation)
+                        SERVICE.observe(Body.MOON, OSLO);
+        assertEquals(SolarSystemModule.MOON, moon.identity());
+        assertEquals(expected.astrometricJ2000(), moon.at());
+        assertEquals(expected.angularDiameterArcseconds(),
+                moon.angularDiameterArcseconds(), 0.0);
+        assertEquals(expected.distanceKm(), moon.distanceKm(), 0.0);
+        assertEquals(expected.illuminatedFraction(), moon.lit().illuminatedFraction(), 0.0,
+                "k, the table's");
+        assertEquals(expected.brightLimbAngleDegrees(),
+                moon.lit().brightLimbAngleDegrees(), 0.0, "χ, the table's, never recomputed");
+        assertEquals(expected.phaseAngleDegrees(), moon.lit().phaseAngleDegrees(), 0.0,
+                "i, the table's");
+        rig.module.sunShowing(true);
+        List<OverlayContribution> both = rig.module.contributedGeometry();
+        assertEquals(2, both.size());
+        OverlayContribution.Body sun = (OverlayContribution.Body) both.get(0);
+        assertTrue(sun.distanceKm() > moon.distanceKm(),
+                "the Sun is the farther, so the page paints it first");
+    }
+
+    @Test
     void belowTheHorizonIsSaidOnlyWhileTheHorizonIsDrawn() {
         Rig rig = new Rig();
         rig.module.sunShowing(true);

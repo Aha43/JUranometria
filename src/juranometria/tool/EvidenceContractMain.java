@@ -104,6 +104,9 @@ public final class EvidenceContractMain {
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
                 "docs/studies/sun-on-the-chart/measurements.md");
+        // The Moon on production pages (#416), the same way.
+        REPORT_MAINS.put("juranometria.tool.MoonOnTheChartStudyMain",
+                "docs/studies/moon-on-the-chart/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
         // Not prose but an oracle: the released pages' own pixels
@@ -370,6 +373,9 @@ public final class EvidenceContractMain {
             // The Sun on the chart (issue #415): production pages
             // composed by the component with the module attached.
             "juranometria.tool.SunOnTheChartStudyMain",
+            // The Moon on the chart (issue #416): the same, and the
+            // lunation strip cut from production pages.
+            "juranometria.tool.MoonOnTheChartStudyMain",
             // The working-selection surface mock-ups (issue #258):
             // widget-rendered inspection, the selection- prefix.
             "juranometria.tool.WorkingSelectionMockupMain",

@@ -315,6 +315,8 @@ public final class JUranometriaMain {
         // draws it. Hidden until the reader switches it on, and the
         // choice is remembered like the ecliptic's.
         juranometria.ui.solar.SunChartStore sunChartStore = stores.sunChart();
+        // The Moon (#416) on the same module, with a switch of its own.
+        juranometria.ui.solar.MoonChartStore moonChartStore = stores.moonChart();
         juranometria.solarchart.SolarSystemModule sunOnChart =
                 juranometria.ui.solar.SunChartSession.begin(modules,
                         () -> meridian.attached() ? meridian.observer() : null,
@@ -403,7 +405,11 @@ public final class JUranometriaMain {
                         juranometria.ui.solar.SolarTable.moon()),
                 // View, Sun on the chart (#415): the switch, remembered.
                 juranometria.ui.solar.SunChartSession.toggle(sunOnChart,
-                        sunChartStore)));
+                        sunChartStore),
+                // View, Moon on the chart (#416): its own switch on the
+                // same module, remembered the same way.
+                juranometria.ui.solar.MoonChartSession.toggle(sunOnChart,
+                        moonChartStore)));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
@@ -418,6 +424,8 @@ public final class JUranometriaMain {
                 AppMenuBar.eclipticItem(frame.getJMenuBar()));
         juranometria.ui.solar.SunChartSession.restore(sunOnChart,
                 sunChartStore, AppMenuBar.sunChartItem(frame.getJMenuBar()));
+        juranometria.ui.solar.MoonChartSession.restore(sunOnChart,
+                moonChartStore, AppMenuBar.moonChartItem(frame.getJMenuBar()));
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

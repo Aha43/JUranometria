@@ -48,6 +48,12 @@ class BodyInkTest {
             new ChartViewState(new SkyPosition(0.0, 0.0), 24.0, 8.0, null, null),
             900, 700);
     private static final double SUN_DIAMETER = 32.0 * 60.0; // 32′, nominal
+    /**
+     * Placeholder distances, not measurements: only their order is read,
+     * to paint the farther body first.
+     */
+    private static final double FAR = 2.0;
+    private static final double NEAR = 1.0;
 
     private static OverlayRegistry offering(OverlayContribution... bodies) {
         OverlayRegistry registry = new OverlayRegistry();
@@ -57,7 +63,7 @@ class BodyInkTest {
 
     private static OverlayContribution.Body sun(SkyPosition at, boolean below) {
         return new OverlayContribution.Body("sun", "Sun", at, SUN_DIAMETER, null,
-                below, InkRole.BODY);
+                below, FAR, InkRole.BODY);
     }
 
     private static List<ReferenceInk.BodyPlacement> placed(ChartScene scene,
@@ -157,16 +163,18 @@ class BodyInkTest {
         // its name is not.
         SkyPosition at = new SkyPosition(2.0, 1.0);
         OverlayContribution.Body other = new OverlayContribution.Body("moon", "Moon",
-                at, SUN_DIAMETER, null, false, InkRole.BODY);
+                at, SUN_DIAMETER, null, false, NEAR, InkRole.BODY);
         List<ReferenceInk.BodyPlacement> bodies = placed(EQUINOX, offering(other,
                 sun(at, false)), ENGLISH);
         assertEquals(2, bodies.size());
-        assertEquals("moon", bodies.get(0).identity(), "drawn in identity order");
-        assertNotNull(bodies.get(0).box());
-        ReferenceInk.BodyPlacement second = bodies.get(1);
-        assertEquals(bodies.get(0).centre(), second.centre(), "the mark never moves");
-        if (second.box() != null) {
-            assertFalse(second.box().intersects(bodies.get(0).box()),
+        assertEquals("sun", bodies.get(0).identity(), "painted farthest first");
+        ReferenceInk.BodyPlacement nearer = bodies.get(1);
+        assertEquals("moon", nearer.identity());
+        assertNotNull(nearer.box(), "the nearer body is named first");
+        ReferenceInk.BodyPlacement farther = bodies.get(0);
+        assertEquals(nearer.centre(), farther.centre(), "the mark never moves");
+        if (farther.box() != null) {
+            assertFalse(farther.box().intersects(nearer.box()),
                     "a placed name never overwrites another");
         }
     }
@@ -197,22 +205,16 @@ class BodyInkTest {
     }
 
     @Test
-    void aLitDiscIsTheMoonsAndWaitsForItsIssue() {
-        OverlayContribution.Body moon = new OverlayContribution.Body("moon", "Moon",
-                new SkyPosition(2.0, 1.0), SUN_DIAMETER,
-                new OverlayContribution.Lit(0.5, 293.0, 90.0), false, InkRole.BODY);
-        IllegalArgumentException refused = assertThrows(IllegalArgumentException.class,
-                () -> placed(EQUINOX, offering(moon), ENGLISH));
-        assertTrue(refused.getMessage().contains("#416"), refused.getMessage());
-    }
-
-    @Test
     void theContributionRefusesWhatItCannotDraw() {
         SkyPosition at = new SkyPosition(2.0, 1.0);
         assertThrows(IllegalArgumentException.class, () -> new OverlayContribution.Body(
-                "sun", "Sun", at, 0.0, null, false, InkRole.BODY));
+                "sun", "Sun", at, 0.0, null, false, FAR, InkRole.BODY));
         assertThrows(IllegalArgumentException.class, () -> new OverlayContribution.Body(
-                "sun", "Sun", at, SUN_DIAMETER, null, false, InkRole.REFERENCE_LINE));
+                "sun", "Sun", at, SUN_DIAMETER, null, false, FAR, InkRole.REFERENCE_LINE));
+        assertThrows(IllegalArgumentException.class, () -> new OverlayContribution.Body(
+                "sun", "Sun", at, SUN_DIAMETER, null, false, 0.0, InkRole.BODY));
+        assertThrows(IllegalArgumentException.class, () -> new OverlayContribution.Lit(
+                0.5, 90.0, 190.0));
         assertThrows(IllegalArgumentException.class, () -> new OverlayContribution.Lit(
                 1.5, 0.0, 0.0));
         assertNull(sun(at, false).lit());

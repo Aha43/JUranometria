@@ -71,6 +71,7 @@ help:
 	@echo "  moon-study   Write the first Moon table from the bundled pack (issue #407)"
 	@echo "  solar-cartography-study  Measure the Sun and Moon on the atlas's pages, with mockups (issue #414)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
+	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -575,7 +576,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study sun-on-the-chart-study printable-chart-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -685,6 +686,14 @@ sun-on-the-chart-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunOnTheChartStudyMain \
 		> docs/studies/sun-on-the-chart/measurements.md
 	@echo "written to docs/studies/sun-on-the-chart/measurements.md"
+
+# The Moon on the chart (issue #416): production pages with the module
+# attached, and the June 2026 lunation measured from its own pixels.
+moon-on-the-chart-study: classes
+	mkdir -p docs/studies/moon-on-the-chart
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MoonOnTheChartStudyMain \
+		> docs/studies/moon-on-the-chart/measurements.md
+	@echo "written to docs/studies/moon-on-the-chart/measurements.md"
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic

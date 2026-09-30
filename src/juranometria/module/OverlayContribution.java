@@ -259,10 +259,14 @@ public sealed interface OverlayContribution {
      *                     observer's mathematical horizon and that
      *                     horizon is drawn: the page dims it and may
      *                     say so
+     * @param distanceKm how far the body is from the observer: the
+     *                   page paints the farthest first, so the nearer
+     *                   covers the farther as it does in the sky - the
+     *                   Moon over the Sun at a new Moon (issue #416)
      */
     record Body(String identity, String accessibleName, SkyPosition at,
                 double angularDiameterArcseconds, Lit lit,
-                boolean belowHorizon, InkRole role)
+                boolean belowHorizon, double distanceKm, InkRole role)
             implements OverlayContribution {
         public Body {
             requireIdentified(identity, accessibleName, role);
@@ -275,6 +279,10 @@ public sealed interface OverlayContribution {
                 throw new IllegalArgumentException(
                         "a body has a positive apparent diameter: "
                                 + identity);
+            }
+            if (!(distanceKm > 0.0) || !Double.isFinite(distanceKm)) {
+                throw new IllegalArgumentException(
+                        "a body is at a positive distance: " + identity);
             }
             if (role != InkRole.BODY) {
                 throw new IllegalArgumentException(
@@ -295,6 +303,14 @@ public sealed interface OverlayContribution {
                 throw new IllegalArgumentException(
                         "an illuminated fraction is in [0, 1]: "
                                 + illuminatedFraction);
+            }
+            if (!Double.isFinite(brightLimbAngleDegrees)) {
+                throw new IllegalArgumentException(
+                        "a bright limb has an angle: " + brightLimbAngleDegrees);
+            }
+            if (!(phaseAngleDegrees >= 0.0 && phaseAngleDegrees <= 180.0)) {
+                throw new IllegalArgumentException(
+                        "a phase angle is in [0°, 180°]: " + phaseAngleDegrees);
             }
         }
     }

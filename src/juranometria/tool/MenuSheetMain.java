@@ -187,11 +187,13 @@ public final class MenuSheetMain {
                         () -> { }, new SelectionMode());
                 // Every action the application hands the bar, Copy
                 // View Report (#372), the Sun and Moon tables (#400,
-                // #408) and the Sun on the chart (#415) included: the
-                // picture is of the menu a reader opens.
+                // #408) and the Sun and the Moon on the chart (#415,
+                // #416) included: the picture is of the menu a reader
+                // opens.
                 bar[0] = chrome.menuBar(navigation, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { }, () -> { },
-                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { });
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { });
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {

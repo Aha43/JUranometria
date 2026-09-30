@@ -247,6 +247,15 @@ public final class AppMenuBar {
     /** The name the Sun-on-the-chart switch carries, for tests to find (#415). */
     public static final String SUN_CHART_ITEM = "sunOnChartItem";
 
+    /** The name the Moon-on-the-chart switch carries, for tests to find (#416). */
+    public static final String MOON_CHART_ITEM = "moonOnChartItem";
+
+    /** View's Moon-on-the-chart switch, or null when the bar has none. */
+    public static javax.swing.JCheckBoxMenuItem moonChartItem(
+            javax.swing.JMenuBar bar) {
+        return checkBoxItem(bar, MOON_CHART_ITEM);
+    }
+
     /** View's Sun-on-the-chart switch, or null when the bar has none. */
     public static javax.swing.JCheckBoxMenuItem sunChartItem(
             javax.swing.JMenuBar bar) {
@@ -344,6 +353,34 @@ public final class AppMenuBar {
                                   Runnable openSunTable,
                                   Runnable openMoonTable,
                                   Runnable toggleSunOnChart,
+                                  juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, copyViewReport, openSunTable, openMoonTable,
+                toggleSunOnChart, null, said);
+    }
+
+    /**
+     * The menu bar with View's Moon-on-the-chart switch (Sprint 37,
+     * issue #416), directly below the Sun's: the same kind of layer,
+     * switched the same way, one more body.
+     *
+     * @param toggleMoonOnChart runs on View's Moon on the chart item
+     *     (may be null, omitting the item)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  Runnable exportSheet,
+                                  Runnable copyViewReport,
+                                  Runnable openSunTable,
+                                  Runnable openMoonTable,
+                                  Runnable toggleSunOnChart,
+                                  Runnable toggleMoonOnChart,
                                   juranometria.ui.language.InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
@@ -518,6 +555,21 @@ public final class AppMenuBar {
                         said.say("menu.sunchart.explain"));
                 sunOnChart.addActionListener(event -> toggleSunOnChart.run());
                 view.add(sunOnChart);
+            }
+            if (toggleMoonOnChart != null) {
+                // The Moon on the chart (#416): the Sun's kind of
+                // layer, directly below it, switched the same way.
+                javax.swing.JCheckBoxMenuItem moonOnChart =
+                        new javax.swing.JCheckBoxMenuItem(
+                                said.say("menu.moonchart.label"));
+                moonOnChart.setName(MOON_CHART_ITEM);
+                letters.apply(moonOnChart, "menu.moonchart.mnemonic");
+                moonOnChart.getAccessibleContext().setAccessibleName(
+                        said.say("menu.moonchart.a11y"));
+                juranometria.ui.Explain.selfExplanatory(moonOnChart,
+                        said.say("menu.moonchart.explain"));
+                moonOnChart.addActionListener(event -> toggleMoonOnChart.run());
+                view.add(moonOnChart);
             }
             if (navigation != null) {
                 // Centre-preserving zoom, exactly the toolbar's

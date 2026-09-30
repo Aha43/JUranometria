@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 572 × 264 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -88,6 +88,10 @@ Bar packed 572 × 264 px; widest popup 211 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -111,7 +115,7 @@ Bar packed 572 × 264 px; widest popup 211 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 572 × 264 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -159,6 +163,10 @@ Bar packed 572 × 264 px; widest popup 211 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -182,7 +190,7 @@ Bar packed 572 × 264 px; widest popup 211 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 572 × 264 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -230,6 +238,10 @@ Bar packed 572 × 264 px; widest popup 211 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -253,7 +265,7 @@ Bar packed 572 × 264 px; widest popup 211 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 572 × 264 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -301,6 +313,10 @@ Bar packed 572 × 264 px; widest popup 211 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
 | item spoken description [unavailable] \| Unavailable: this is the narrowest field the atlas draws |
@@ -326,7 +342,7 @@ Bar packed 572 × 264 px; widest popup 211 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 578 × 264 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -374,6 +390,10 @@ Bar packed 578 × 264 px; widest popup 201 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -397,7 +417,7 @@ Bar packed 578 × 264 px; widest popup 201 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 578 × 264 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -445,6 +465,10 @@ Bar packed 578 × 264 px; widest popup 201 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -468,7 +492,7 @@ Bar packed 578 × 264 px; widest popup 201 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 578 × 264 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -516,6 +540,10 @@ Bar packed 578 × 264 px; widest popup 201 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -539,7 +567,7 @@ Bar packed 578 × 264 px; widest popup 201 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 578 × 264 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -587,6 +615,10 @@ Bar packed 578 × 264 px; widest popup 201 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
 | item spoken description [unavailable] \| Utilgjengelig: dette er atlasets smaleste synsfelt |
