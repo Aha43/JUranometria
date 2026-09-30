@@ -442,6 +442,7 @@ public final class PackagedAcceptanceMain {
                 cardinalLandmarkJourney());
         sunTableJourney();
         moonTableJourney();
+        sunOnTheChartJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -568,6 +569,90 @@ public final class PackagedAcceptanceMain {
                 + " crescent with its lit side, a four-row range with its"
                 + " appended end, and the Norwegian surface, all inside the"
                 + " image)");
+    }
+
+    /**
+     * The Sun on the chart inside the packaged image (issue #415): the
+     * production component with the Solar System module attached
+     * draws the Sun at true scale where the service puts it, names it
+     * in the page's language, and answers a click on the disc as the
+     * empty sky rather than a star behind it.
+     */
+    private static void sunOnTheChartJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(
+                59.913, 10.752, java.time.Instant.parse("2026-03-20T14:45:53Z"));
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(),
+                    juranometria.ui.language.PageText.in(
+                            juranometria.ui.language.InterfaceText.forLanguage("en")));
+            chart[0].setSize(900, 700);
+            chart[0].setViewState(new juranometria.chart.ChartViewState(
+                    new juranometria.chart.SkyPosition(0.0, 0.0), 24.0, 8.0, null, null));
+            juranometria.ui.SelectInteraction.install(chart[0], selection,
+                    new juranometria.chart.WorkingSelection(),
+                    new juranometria.chart.SelectionMode());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> oslo,
+                            () -> solar, () -> false);
+            module.sunShowing(true);
+            chart[0].overlays().offer(juranometria.solarchart.SolarSystemModule.ID,
+                    module::contributedGeometry);
+        });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                900, 700, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            java.awt.Graphics2D g = image.createGraphics();
+            try {
+                chart[0].paint(g);
+            } finally {
+                g.dispose();
+            }
+        });
+        java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                chart[0].renderedBodies();
+        require(drawn.size() == 1 && "sun".equals(drawn.get(0).identity()),
+                "the packaged chart drew the Sun: " + drawn);
+        juranometria.solar.SolarSystemService.SunObservation sun =
+                (juranometria.solar.SolarSystemService.SunObservation)
+                        solar.observe(juranometria.solar.SolarSystemService.Body.SUN, oslo);
+        juranometria.project.DrawnPage page =
+                juranometria.project.DrawnPage.of(chart[0].currentScene());
+        juranometria.project.PixelPoint expected =
+                new juranometria.project.ViewportMapping(page).toPixel(
+                        page.projection().project(sun.astrometricJ2000()).orElseThrow());
+        double off = Math.hypot(drawn.get(0).centre().x() - expected.x(),
+                drawn.get(0).centre().y() - expected.y());
+        double diameter = drawn.get(0).disc().getBounds2D().getWidth();
+        require(off < 0.01 && diameter > 19.0 && diameter < 22.0,
+                "at the projected position, at true scale: " + off + " px off,"
+                        + " " + diameter + " px across");
+        require("Sun".equals(drawn.get(0).name()) && drawn.get(0).box() != null,
+                "named in the page's language beside the disc");
+        require(chart[0].getAccessibleContext().getAccessibleDescription().endsWith(" Sun."),
+                "and spoken: " + chart[0].getAccessibleContext().getAccessibleDescription());
+        // A click on the disc: the empty sky there, never a hidden star.
+        int cx = (int) Math.round(drawn.get(0).centre().x());
+        int cy = (int) Math.round(drawn.get(0).centre().y()) + chart[0].pageOffsetY();
+        for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
+                java.awt.event.MouseEvent.MOUSE_RELEASED,
+                java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+            javax.swing.SwingUtilities.invokeAndWait(() -> chart[0].dispatchEvent(
+                    new java.awt.event.MouseEvent(chart[0], id,
+                            System.nanoTime() / 1_000_000, 0, cx, cy, 1, false,
+                            java.awt.event.MouseEvent.BUTTON1)));
+        }
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        require(selection.selection() instanceof juranometria.chart.Selection.EmptySky,
+                "a click on the Sun's disc is the empty sky there: "
+                        + selection.selection());
+        System.out.println("sun on the chart OK (the packaged component draws"
+                + " the Sun at true scale where the service puts it, names it,"
+                + " speaks it, and a click on the disc selects nothing behind it)");
     }
 
 

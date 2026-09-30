@@ -70,6 +70,7 @@ help:
 	@echo "  sun-study    Write the first Sun table from the bundled pack (issue #399)"
 	@echo "  moon-study   Write the first Moon table from the bundled pack (issue #407)"
 	@echo "  solar-cartography-study  Measure the Sun and Moon on the atlas's pages, with mockups (issue #414)"
+	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -574,7 +575,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study printable-chart-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study sun-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -676,6 +677,14 @@ solar-cartography-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SolarCartographyStudyMain \
 		> docs/studies/solar-cartography/measurements.md
 	@echo "written to docs/studies/solar-cartography/measurements.md"
+
+# The Sun on the chart (issue #415): the production composition's own
+# pages with the module attached - production ink, no study overlay.
+sun-on-the-chart-study: classes
+	mkdir -p docs/studies/sun-on-the-chart
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunOnTheChartStudyMain \
+		> docs/studies/sun-on-the-chart/measurements.md
+	@echo "written to docs/studies/sun-on-the-chart/measurements.md"
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic

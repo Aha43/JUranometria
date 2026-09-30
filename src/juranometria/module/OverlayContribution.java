@@ -243,6 +243,62 @@ public sealed interface OverlayContribution {
     }
 
     /** An open run of sky positions. */
+    /**
+     * A Solar System body drawn at its true angular size (Sprint 37,
+     * issue #415, under the #414 ruling): the centre, the disc's
+     * apparent diameter, whether it is below the observer's drawn
+     * horizon, and - for the Moon - how it is lit. Nothing about how
+     * to draw it: the page draws the Sun as a ring with its centre
+     * dot and the Moon as a phased disc, in its own ink, and never
+     * enlarges either.
+     *
+     * @param angularDiameterArcseconds the disc's apparent diameter
+     * @param lit how the disc is lit, or null for a body lit entirely
+     *            (the Sun)
+     * @param belowHorizon true when the body stands below the
+     *                     observer's mathematical horizon and that
+     *                     horizon is drawn: the page dims it and may
+     *                     say so
+     */
+    record Body(String identity, String accessibleName, SkyPosition at,
+                double angularDiameterArcseconds, Lit lit,
+                boolean belowHorizon, InkRole role)
+            implements OverlayContribution {
+        public Body {
+            requireIdentified(identity, accessibleName, role);
+            if (at == null) {
+                throw new IllegalArgumentException(
+                        "a body is somewhere: " + identity);
+            }
+            if (!(angularDiameterArcseconds > 0.0)
+                    || !Double.isFinite(angularDiameterArcseconds)) {
+                throw new IllegalArgumentException(
+                        "a body has a positive apparent diameter: "
+                                + identity);
+            }
+            if (role != InkRole.BODY) {
+                throw new IllegalArgumentException(
+                        "a body is drawn in the body role: " + identity);
+            }
+        }
+    }
+
+    /**
+     * How a disc is lit (issue #416): the illuminated fraction, the
+     * bright limb's position angle from celestial north through east,
+     * and the phase angle whose cosine is the terminator's axis ratio.
+     */
+    record Lit(double illuminatedFraction, double brightLimbAngleDegrees,
+               double phaseAngleDegrees) {
+        public Lit {
+            if (!(illuminatedFraction >= 0.0 && illuminatedFraction <= 1.0)) {
+                throw new IllegalArgumentException(
+                        "an illuminated fraction is in [0, 1]: "
+                                + illuminatedFraction);
+            }
+        }
+    }
+
     record Path(String identity, String accessibleName,
                 List<SkyPosition> along, InkRole role)
             implements OverlayContribution {

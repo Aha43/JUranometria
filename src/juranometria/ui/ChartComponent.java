@@ -335,6 +335,28 @@ public final class ChartComponent extends JComponent {
     /** The directions the last paint accepted, for the description. */
     private java.util.List<ReferenceInk.DirectionPlacement>
             spokenDirections = java.util.List.of();
+    /** The Solar System bodies the last paint drew (#415). */
+    private java.util.List<ReferenceInk.BodyPlacement>
+            drawnBodies = java.util.List.of();
+
+    /** The bodies the last paint drew, for journeys and the packaged image. */
+    public java.util.List<ReferenceInk.BodyPlacement> renderedBodies() {
+        return drawnBodies;
+    }
+
+    /**
+     * The opaque body under a page point, if any (#414 ruling C4 and
+     * C6): what it covers is covered, for the pointer as for the eye.
+     */
+    public java.util.Optional<ReferenceInk.BodyPlacement> bodyAt(double x,
+                                                                double y) {
+        for (ReferenceInk.BodyPlacement body : drawnBodies) {
+            if (body.covers(x, y)) {
+                return java.util.Optional.of(body);
+            }
+        }
+        return java.util.Optional.empty();
+    }
 
     /** The directions the last paint accepted; package-visible so
      * the landmark journeys can hold letter and position. */
@@ -354,6 +376,19 @@ public final class ChartComponent extends JComponent {
         StringBuilder said = new StringBuilder(base);
         for (ReferenceInk.DirectionPlacement placed : directions) {
             said.append(' ').append(placed.spokenName()).append('.');
+        }
+        return said.toString();
+    }
+
+    /** The description, then each drawn body by its name on the page (#415). */
+    static String withBodies(String base,
+            java.util.List<ReferenceInk.BodyPlacement> bodies) {
+        if (bodies.isEmpty()) {
+            return base;
+        }
+        StringBuilder said = new StringBuilder(base);
+        for (ReferenceInk.BodyPlacement body : bodies) {
+            said.append(' ').append(body.name()).append('.');
         }
         return said.toString();
     }
@@ -544,6 +579,20 @@ public final class ChartComponent extends JComponent {
                                     overlays.collect(),
                                     drawn.palette(), words, reserved,
                                     emphasized),
+                    // The Solar System bodies (#415), above every
+                    // catalogue mark and label: opaque, at true scale.
+                    (layerG, layerScene, reserved) -> {
+                        juranometria.project.DrawnPage page =
+                                juranometria.project.DrawnPage.of(layerScene);
+                        java.util.List<juranometria.module.OverlayRegistry.Owned>
+                                offered = overlays.collect();
+                        drawnBodies = ReferenceInk.paintBodies(layerG, page,
+                                offered, drawn.palette(), words, reserved,
+                                ReferenceInk.referenceBoxes(page, offered,
+                                        words, reserved,
+                                        juranometria.render.ChartStructure
+                                                .membersOf(emphasized)));
+                    },
                     null, emphasized);
             // What a reader who cannot see the page is told follows
             // what the page actually rendered (#359): the base
@@ -553,7 +602,8 @@ public final class ChartComponent extends JComponent {
             // description of ink that is not there would be the lie
             // accessibility exists to prevent.
             getAccessibleContext().setAccessibleDescription(
-                    withDirections(describe(scene), spokenDirections));
+                    withBodies(withDirections(describe(scene), spokenDirections),
+                            drawnBodies));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its

@@ -64,6 +64,16 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String bodyName(String bodyIdentity) {
+        return said.say(STEM + "body." + bodyIdentity);
+    }
+
+    @Override
+    public String bodyBelowHorizon() {
+        return said.say(STEM + "body.belowHorizon");
+    }
+
+    @Override
     public String chartInstructions() {
         return said.say(STEM + "chart.explain");
     }

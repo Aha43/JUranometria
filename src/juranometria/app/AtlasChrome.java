@@ -168,8 +168,27 @@ public final class AtlasChrome {
                                         Runnable copyViewReport,
                                         Runnable openSunTable,
                                         Runnable openMoonTable) {
+        return menuBar(navigation, openSettings, openChartOptions,
+                openAbout, toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, copyViewReport, openSunTable, openMoonTable, null);
+    }
+
+    /** The same, with View's Sun-on-the-chart switch (#415). */
+    public javax.swing.JMenuBar menuBar(ChartViewController navigation,
+                                        Runnable openSettings,
+                                        Runnable openChartOptions,
+                                        Runnable openAbout,
+                                        Runnable toggleInspector,
+                                        Runnable openPlaceAndTime,
+                                        Runnable toggleEcliptic,
+                                        Runnable exportSheet,
+                                        Runnable copyViewReport,
+                                        Runnable openSunTable,
+                                        Runnable openMoonTable,
+                                        Runnable toggleSunOnChart) {
         return AppMenuBar.create(navigation, openSettings, openChartOptions,
                 openAbout, toggleInspector, openPlaceAndTime, toggleEcliptic,
-                exportSheet, copyViewReport, openSunTable, openMoonTable, said);
+                exportSheet, copyViewReport, openSunTable, openMoonTable,
+                toggleSunOnChart, said);
     }
 }

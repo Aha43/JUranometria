@@ -307,6 +307,18 @@ public final class JUranometriaMain {
                         return loaded;
                     }
                 };
+        // The Sun on the chart (Sprint 37, issue #415): one Solar
+        // System module over Place and Time's observer, read through
+        // the meridian module when the page paints and never copied;
+        // the pack through the same lazy supplier the tables use;
+        // dimmed below the horizon only while the meridian module
+        // draws it. Hidden until the reader switches it on, and the
+        // choice is remembered like the ecliptic's.
+        juranometria.ui.solar.SunChartStore sunChartStore = stores.sunChart();
+        juranometria.solarchart.SolarSystemModule sunOnChart =
+                juranometria.ui.solar.SunChartSession.begin(modules,
+                        () -> meridian.attached() ? meridian.observer() : null,
+                        solarSystem, meridian::horizonShowing);
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
         // derived from the session (#350).
@@ -388,7 +400,10 @@ public final class JUranometriaMain {
                         solarSystem.get(),
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage()),
-                        juranometria.ui.solar.SolarTable.moon())));
+                        juranometria.ui.solar.SolarTable.moon()),
+                // View, Sun on the chart (#415): the switch, remembered.
+                juranometria.ui.solar.SunChartSession.toggle(sunOnChart,
+                        sunChartStore)));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
@@ -401,6 +416,8 @@ public final class JUranometriaMain {
         juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
                 eclipticStore,
                 AppMenuBar.eclipticItem(frame.getJMenuBar()));
+        juranometria.ui.solar.SunChartSession.restore(sunOnChart,
+                sunChartStore, AppMenuBar.sunChartItem(frame.getJMenuBar()));
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

@@ -109,19 +109,23 @@ class ChartModuleBoundaryTest {
         // a polyline could not express - and a count alone would not
         // have said which of these had arrived. #359 added the
         // direction mark: a cardinal identity at a sky position,
-        // typed geometry still, carrying no words of its own.
+        // typed geometry still, carrying no words of its own. #415
+        // added the body: a Solar System disc at its true angular
+        // size - identity, position, diameter, how it is lit and
+        // whether it stands below a drawn horizon - typed geometry
+        // still, named by the page's language, never by the module.
         assertEquals(java.util.List.of("GreatCircle", "Point", "Path",
-                        "Region", "DirectionMark"),
+                        "Region", "DirectionMark", "Body"),
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
                         .map(Class::getSimpleName).sorted(
                                 java.util.Comparator.comparingInt(
                                         java.util.List.of("GreatCircle",
                                                 "Point", "Path", "Region",
-                                                "DirectionMark")::indexOf))
+                                                "DirectionMark", "Body")::indexOf))
                         .toList(),
-                "a great circle, a point, a path, a region and a"
-                        + " direction mark - the geometry a module may"
+                "a great circle, a point, a path, a region, a"
+                        + "direction mark and a body - the geometry a module may"
                         + " contribute, and nothing else");
     }
 

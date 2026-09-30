@@ -33,6 +33,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenuItem | Moon... | Where the Moon is, for the place and instant set in Place and Time | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the pla... | self-explanatory |
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
@@ -119,7 +120,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**102 operable controls** across 13 surfaces: **65** hovered, **7** dynamic, **30** left to their own visible words, **0 undecided**.
+**103 operable controls** across 13 surfaces: **65** hovered, **7** dynamic, **31** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 
