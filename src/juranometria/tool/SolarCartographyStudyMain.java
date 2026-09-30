@@ -11,8 +11,6 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -63,7 +61,8 @@ import juranometria.ui.language.PageText;
  * atlas draws, how the chart's north turns across a page, and where
  * the bodies stand at the instants the mockups show.
  *
- * <p>Written to {@code docs/studies/solar-cartography/} by
+ * <p>The report is printed to stdout and the mockups written beside
+ * it, under {@code docs/studies/solar-cartography/}, by
  * {@code make solar-cartography-study}.
  */
 public final class SolarCartographyStudyMain {
@@ -116,9 +115,12 @@ public final class SolarCartographyStudyMain {
         northRotation();
         mockups();
         proposals();
-        Files.writeString(new File(DIR, "measurements.md").toPath(),
-                REPORT.toString(), StandardCharsets.UTF_8);
-        System.out.println("solar cartography study written to " + DIR);
+        // The report goes to stdout, as every deterministic report
+        // does: the Makefile redirects it into the study directory and
+        // the evidence contract compares the stream with the committed
+        // bytes. The mockups are written beside it by this class.
+        System.out.print(REPORT);
+        System.out.flush();
     }
 
     // ---- A. true angular scale on every page ---------------------------

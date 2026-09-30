@@ -672,7 +672,10 @@ moon-study: classes
 # discs on every page, how north turns, and candidate marks drawn over
 # production pages as mockups. Needs a display, like the gallery.
 solar-cartography-study: classes
-	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SolarCartographyStudyMain
+	mkdir -p docs/studies/solar-cartography
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SolarCartographyStudyMain \
+		> docs/studies/solar-cartography/measurements.md
+	@echo "written to docs/studies/solar-cartography/measurements.md"
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic
