@@ -480,13 +480,16 @@ class TestEvidenceGateTest {
                         "EclipticStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
                         "PlaceStore.us" + "er(",
-                        "SkyLanguageStore.us" + "er("),
+                        "SkyLanguageStore.us" + "er(",
+                        "SunChartStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the seven production entry points to the reader's"
+                "the eight production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
-                        + " and the seventh is #348's, which keeps the"
-                        + " two language keys. Each arrived by this"
+                        + " the seventh is #348's, which keeps the"
+                        + " two language keys, and the eighth is"
+                        + " #415's, which keeps one key for whether the"
+                        + " Sun is on the chart. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");

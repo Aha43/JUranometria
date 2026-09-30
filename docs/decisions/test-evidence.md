@@ -76,8 +76,8 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **69 files** touch process-wide state —
-**35** use the shared guard, **33** restore locally,
+this document to them: **70 files** touch process-wide state —
+**35** use the shared guard, **34** restore locally,
 **0 flagged unprotected** — and **50 files** depend on a display,
 of which **19** state a focus premise and **28** a reachability
 premise through the shared route helper. (#246 added two
