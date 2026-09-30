@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**445 promoted artifacts.**
+**446 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -462,10 +462,11 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/structure-emphasis/strip-sagittarius-120-paper-equatorial_grid+constellation_figures.png` | `b35ab378c9cc30450434f9fd3b345fe7c159c5e0130f891af38bac44623e0adc` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | EmphasisStudyMain |
 | `docs/studies/structure-emphasis/strip-sagittarius-120-paper-meridian+ecliptic+equatorial_grid+horizon+constellation_boundaries+constellation_figures.png` | `4f4054b85a15e47864ad7f84c767a670644983b82a3fff922f41b1952957bad5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | EmphasisStudyMain |
 | `docs/studies/structure-emphasis/strip-sagittarius-42-paper-constellation_boundaries.png` | `cb650a2ed15a40943dfd5a4afc61d2af4e6b4be4a1a227e6833948bdc5b2169d` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | EmphasisStudyMain |
-| `docs/studies/sun-on-the-chart/equinox-24-dark.png` | `2ab0785be089382c6f3714fc88763e70e6ec0122bf21e4f24acd52dd5544e769` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/sun-on-the-chart/equinox-24.png` | `5f950a84376bcbbeb9d2db1cb97ffee3e1bd8d4287c34ff999ad0909458d9dab` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/sun-on-the-chart/equinox-24-dark.png` | `04b0425932c035b477f1a5b397d044f7b01c9692ec18476b00c285431c36558b` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/sun-on-the-chart/equinox-24.png` | `3019e15c2e13137f63d419f09f9defbc6a023b02ed57c1de269575609deaf521` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sun-on-the-chart/equinox-3-nb.png` | `44dff8ecace0cb2ecab180f1f419e3972348b40bcaad7d827b5b6cefca3e9e05` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sun-on-the-chart/horizon-below-36.png` | `cd55b3e45dd7159db1ec9a9516d658754b16db04cff95f43fe49532e5af3f61d` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sun-on-the-chart/horizon-hidden-36.png` | `79bceb5f4822819e7c45bf79a71714d1d4b55cf24a492ebfdabdf1c9589a5dbd` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/sun-on-the-chart/september-equinox-6.png` | `7e3e40f38f01c1677dd1b08c7e3c82189c158a6f9ae988dfd3f89117bcdd2354` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/decided-members.png` | `2db34e7aa922b3f75c0cd4c8903c2620b24a7f83d92608ee6ae1a9775c32c527` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/today-two-leads.png` | `306cf50272170cbcbbb50e8385789143b59b5fb43ee98081f248eb08be7f80f0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

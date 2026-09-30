@@ -80,8 +80,9 @@ public final class SunOnTheChartStudyMain {
                 "The Sun on the ecliptic at RA 0h, "
                         + String.format(Locale.ROOT, "%.1f", sunE.horizontal().altitudeDegrees())
                         + "° above Oslo's horizon; the ecliptic's own equinox"
-                        + " landmark sits under it, and the Sun's name yields to it"
-                        + " or takes a clear box, never both meanings in one label.");
+                        + " landmark sits under it, its word takes a box clear of"
+                        + " the disc, and the Sun's name takes another, never both"
+                        + " meanings in one label.");
         page("equinox-24-dark", "The same page on the black sky",
                 new ChartViewState(new SkyPosition(0.0, 0.0), 24.0, 8.0, null, null),
                 ENGLISH, ChartPalette.BLACK_SKY, atEquinox, service, false, true,
@@ -91,6 +92,18 @@ public final class SunOnTheChartStudyMain {
                 NORSK, ChartPalette.WHITE_PAPER, atEquinox, service, false, false,
                 "The disc at true scale, 160 px across on a 3° page, named"
                         + " *Solen*.");
+        // The owner's #415 checkpoint finding: at the September
+        // equinox the Sun's disc lay over the landmark's word on a 6°
+        // page. The disc is an obstacle for that word, never
+        // permission to paint over it.
+        Instant autumn = SeasonalEventsFixture.read().get("september-equinox").instant();
+        page("september-equinox-6", "The September equinox page at the IMCCE's equinox instant, Oslo, 6° field",
+                new ChartViewState(new SkyPosition(180.0, 0.0), 6.0, 8.0, null, null),
+                ENGLISH, ChartPalette.WHITE_PAPER, OSLO.at(autumn), service, false, true,
+                "The Sun at its exact position and true size, a little"
+                        + " west of the J2000 landmark by precession; the"
+                        + " landmark's word takes a box beside its own diamond"
+                        + " clear of the disc, and the Sun's name yields after it.");
         // The horizon page nearest the Sun in the evening twilight of
         // the equinox day at Oslo: a chosen instant, the Sun a few
         // degrees below the ground, so the page can show it there.

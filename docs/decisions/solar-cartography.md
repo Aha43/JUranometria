@@ -88,6 +88,28 @@ candidates over production pages; the owner inspected them.
   letters' own tiers measured from the disc's edge, clear of the
   paper's edge, the sky's edge, other names and the catalogue's own
   ink; refused when none is clean. The mark never moves.
+- **The disc is an obstacle, not permission (owner checkpoint).** The
+  owner's packaged review found the September-equinox landmark's word
+  partly hidden under the Sun on a 6° page at the IMCCE's 2026
+  September equinox (centre RA 12h, Dec 0°, ecliptic drawn); the
+  committed March-equinox study page showed the same fault at 24°.
+  The ruling: the Sun's exact position and true size stay; its disc
+  is an obstacle for annotation placement; the landmark's word is
+  preserved by a legal alternate placement; the Sun's optional name
+  tries its own alternatives and yields first. So the reference layer
+  knows every disc before it writes (`ReferenceInk.bodyDiscs`, the
+  disc's ink including half the ring's stroke and a pixel of
+  antialiasing): a landmark's or place's word keeps its released box
+  whenever no disc touches it - every page without a body, and every
+  page whose body is elsewhere, is unchanged - and otherwise takes the
+  first clean box of the cardinal letters' tiers around its own mark,
+  falling back to the released slide only when all are refused; line
+  names and cardinal letters treat the disc the same way. The Sun's
+  name is placed after all of them. `SunOverTheEquinoxWordTest` holds
+  the owner's page: the disc exactly where and as large as before, the
+  word clear of its ink and beside its own diamond, nothing the bodies
+  layer paints inside the word's box, and the released box back when
+  the Sun is switched off.
 - **The pointer.** The component keeps what the last paint drew; a
   click inside an opaque body is the empty sky at that place - the
   inspector answers the position, nothing is selected, and no object
@@ -106,10 +128,10 @@ candidates over production pages; the owner inspected them.
 
 `docs/studies/sun-on-the-chart/` - the production composition's own
 pages with the Sun on them (the equinox page in both palettes, a 3°
-page in Norwegian, the horizon page with the Sun dimmed below the
+page in Norwegian, the owner's September-equinox 6° page, the horizon page with the Sun dimmed below the
 ground and the same page with the horizon hidden), a deterministic
 report with its images; the menu photographs and companion, the
 control-explanation and test-evidence studies and provenance
 re-recorded. `SolarSystemModuleTest`, `BodyInkTest`,
-`SunOnTheChartJourneyTest` and the packaged image's journey hold the
-contract.
+`SunOnTheChartJourneyTest`, `SunOverTheEquinoxWordTest` and the
+packaged image's journey hold the contract.
