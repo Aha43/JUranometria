@@ -25,6 +25,7 @@ import juranometria.project.Projection;
 import juranometria.project.Projections;
 import juranometria.project.CurveRun;
 import juranometria.project.GreatCirclePage;
+import juranometria.project.PageBasis;
 import juranometria.project.PageRegion;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
@@ -1281,13 +1282,23 @@ public final class ReferenceInk {
      * was drawn so the page can answer a pointer and a screen reader.
      *
      * <p>The ruling of #414: the Sun is a ring with its centre dot, the
-     * disc filled with the ground so what it covers is covered; below
-     * the drawn horizon the ink is dimmed towards the ground and the
-     * name carries the language's status; the name takes the first
-     * clean adjacent box around the disc and is refused, not moved,
-     * when none is clean; a body whose disc leaves the page entirely
-     * is not drawn at all - no edge hint. A lit disc (the Moon, #416)
-     * is refused here until that issue draws it.
+     * disc filled with the ground so what it covers is covered; the
+     * Moon is a phased disc (#416) - its dark side inked, its lit side
+     * turned to the bright limb through the page's own north and east
+     * at the Moon ({@link PageBasis}), the terminator a half-ellipse
+     * of axis ratio |cos i|. Below the drawn horizon the ink is dimmed
+     * towards the ground and the name carries the language's status; a
+     * body whose disc leaves the page entirely is not drawn at all - no
+     * edge hint.
+     *
+     * <p>Three passes. Every disc is placed first; they are painted
+     * farthest first, so the nearer covers the farther as it does in
+     * the sky - the Moon over the Sun at a new Moon; and then they are
+     * named, nearest first, each name in the first clean adjacent box
+     * around its disc - clear of the reference layer's words, of the
+     * catalogue's ink and of <em>every</em> disc, so no name is painted
+     * over by another body or written across one - and refused, not
+     * moved, when none is clean.
      */
     public static List<BodyPlacement> paintBodies(Graphics2D g,
             DrawnPage page, List<OverlayRegistry.Owned> contributions,
@@ -1303,7 +1314,11 @@ public final class ReferenceInk {
         if (bodies.isEmpty()) {
             return List.of();
         }
-        bodies.sort(Comparator.comparing(OverlayContribution.Body::identity));
+        // Farthest first; identity breaks a tie, so the page never
+        // depends on the order the modules happened to offer.
+        bodies.sort(Comparator.comparingDouble(OverlayContribution.Body::distanceKm)
+                .reversed()
+                .thenComparing(OverlayContribution.Body::identity));
         ChartScene scene = page.scene();
         Projection projection = page.projection();
         ViewportMapping mapping = new ViewportMapping(page);
@@ -1311,69 +1326,196 @@ public final class ReferenceInk {
         PageRegion region = mapping.regionFor(scene.viewport(), projection);
         Shape sky = skyOf(region, paper);
         boolean bounded = region.bounded();
-        List<BodyPlacement> placed = new ArrayList<>();
-        // The reference layer's own names and letters are taken before
-        // any body's name asks (#414 ruling C4): the equinox landmark's
-        // word is never overwritten and never fused with the Sun's.
-        List<Rectangle2D> taken = new ArrayList<>(referenceBoxes);
+
+        // Pass one: where each disc lands, and how large it is.
+        List<OverlayContribution.Body> drawn = new ArrayList<>();
+        List<PixelPoint> centres = new ArrayList<>();
+        List<Ellipse2D> discs = new ArrayList<>();
+        List<Shape> inks = new ArrayList<>();
+        for (OverlayContribution.Body body : bodies) {
+            Optional<juranometria.project.PlanePoint> projected =
+                    projection.project(body.at());
+            if (projected.isEmpty()) {
+                continue;
+            }
+            PixelPoint centre = mapping.toPixel(projected.get());
+            double radius = radiusPx(projection, mapping, body.at(),
+                    body.angularDiameterArcseconds() / 3600.0 / 2.0);
+            Ellipse2D disc = discOn(centre, radius, paper, sky, bounded);
+            if (disc == null) {
+                continue;
+            }
+            drawn.add(body);
+            centres.add(centre);
+            discs.add(disc);
+            inks.add(inkOf(disc, body.lit() != null));
+        }
+        String[] names = new String[drawn.size()];
+        Rectangle2D[] boxes = new Rectangle2D[drawn.size()];
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
+            // Pass two: the discs, farthest first.
+            for (int i = 0; i < drawn.size(); i++) {
+                OverlayContribution.Body body = drawn.get(i);
+                Ellipse2D disc = discs.get(i);
+                double radius = disc.getWidth() / 2.0;
+                if (body.lit() == null) {
+                    paintSun(g2, disc, centres.get(i), radius, palette,
+                            body.belowHorizon());
+                } else {
+                    PageBasis basis = PageBasis.at(page, body.at()).orElse(null);
+                    paintMoon(g2, disc, centres.get(i), radius, basis,
+                            body.lit(), palette, body.belowHorizon());
+                }
+            }
+            // Pass three: the names, nearest first.
             g2.setFont(EquatorialGrid.GRID_LABEL_FONT);
             FontMetrics metrics = g2.getFontMetrics();
-            for (OverlayContribution.Body body : bodies) {
-                if (body.lit() != null) {
-                    throw new IllegalArgumentException("a lit disc is the"
-                            + " Moon's, which issue #416 draws: " + body.identity());
-                }
-                Optional<juranometria.project.PlanePoint> projected =
-                        projection.project(body.at());
-                if (projected.isEmpty()) {
-                    continue;
-                }
-                PixelPoint centre = mapping.toPixel(projected.get());
-                double radius = radiusPx(projection, mapping, body.at(),
-                        body.angularDiameterArcseconds() / 3600.0 / 2.0);
-                Ellipse2D disc = discOn(centre, radius, paper, sky, bounded);
-                if (disc == null) {
-                    continue;
-                }
-                Color ink = body.belowHorizon()
-                        ? ChartRenderer.quiet(palette.starInk(), palette.ground())
-                        : palette.starInk();
-                // The ground first: whatever the disc covers is covered.
-                g2.setColor(palette.ground());
-                g2.fill(disc);
-                g2.setColor(ink);
-                g2.setStroke(new BasicStroke((float) ringWidth(radius)));
-                g2.draw(disc);
-                double dot = Math.max(1.5, radius / 6.0);
-                g2.fill(new Ellipse2D.Double(centre.x() - dot, centre.y() - dot,
-                        2.0 * dot, 2.0 * dot));
+            List<Rectangle2D> taken = new ArrayList<>(referenceBoxes);
+            List<Shape> obstacles = new ArrayList<>(reserved);
+            obstacles.addAll(inks);
+            for (int i = drawn.size() - 1; i >= 0; i--) {
+                OverlayContribution.Body body = drawn.get(i);
                 String name = words.bodyName(body.identity());
                 if (body.belowHorizon()) {
                     name = name + " " + words.bodyBelowHorizon();
                 }
+                names[i] = name;
                 double w = metrics.stringWidth(name);
                 double h = metrics.getAscent() + metrics.getDescent();
-                Rectangle2D box = bodyNameBox(centre, radius, w, h, paper, sky,
-                        bounded, taken, reserved);
+                Rectangle2D box = bodyNameBox(centres.get(i),
+                        inks.get(i).getBounds2D().getWidth() / 2.0, w, h, paper,
+                        sky, bounded, taken, obstacles);
                 if (box != null) {
                     taken.add(box);
+                    boxes[i] = box;
                     g2.setColor(body.belowHorizon()
                             ? ChartRenderer.quiet(palette.textInk(), palette.ground())
                             : palette.textInk());
                     g2.drawString(name, (float) box.getMinX(),
                             (float) (box.getMaxY() - metrics.getDescent()));
                 }
-                placed.add(new BodyPlacement(body.identity(), centre, disc,
-                        name, box, body.belowHorizon()));
             }
         } finally {
             g2.dispose();
         }
+        List<BodyPlacement> placed = new ArrayList<>();
+        for (int i = 0; i < drawn.size(); i++) {
+            placed.add(new BodyPlacement(drawn.get(i).identity(), centres.get(i),
+                    discs.get(i), names[i], boxes[i], drawn.get(i).belowHorizon()));
+        }
         return List.copyOf(placed);
+    }
+
+    /** The Sun: the ground, then the ring and its centre dot in star ink. */
+    private static void paintSun(Graphics2D g2, Ellipse2D disc, PixelPoint centre,
+            double radius, juranometria.render.ChartPalette palette,
+            boolean belowHorizon) {
+        Color ink = belowHorizon
+                ? ChartRenderer.quiet(palette.starInk(), palette.ground())
+                : palette.starInk();
+        // The ground first: whatever the disc covers is covered.
+        g2.setColor(palette.ground());
+        g2.fill(disc);
+        g2.setColor(ink);
+        g2.setStroke(new BasicStroke((float) ringWidth(radius)));
+        g2.draw(disc);
+        double dot = Math.max(1.5, radius / 6.0);
+        g2.fill(new Ellipse2D.Double(centre.x() - dot, centre.y() - dot,
+                2.0 * dot, 2.0 * dot));
+    }
+
+    /**
+     * How far the Moon's dark side lies from the page's darker ink
+     * towards its lighter: dark enough to read as unlit on both
+     * palettes, light enough on paper that the disc still reads as a
+     * disc and not a hole, and opaque on both, so the stars it hides
+     * are seen to be hidden (#414 ruling C4).
+     */
+    static final double DARK_SIDE = 0.3;
+
+    /**
+     * The Moon: the whole disc in the dark side's ink, the lit region
+     * in the page's lighter ink, and the limb in star ink.
+     */
+    private static void paintMoon(Graphics2D g2, Ellipse2D disc, PixelPoint centre,
+            double radius, PageBasis basis, OverlayContribution.Lit lit,
+            juranometria.render.ChartPalette palette, boolean belowHorizon) {
+        Color lighter = brightness(palette.ground()) >= brightness(palette.starInk())
+                ? palette.ground() : palette.starInk();
+        Color darker = lighter == palette.ground() ? palette.starInk() : palette.ground();
+        Color dark = mix(darker, lighter, DARK_SIDE);
+        Color limb = palette.starInk();
+        if (belowHorizon) {
+            lighter = ChartRenderer.quiet(lighter, palette.ground());
+            dark = ChartRenderer.quiet(dark, palette.ground());
+            limb = ChartRenderer.quiet(limb, palette.ground());
+        }
+        g2.setColor(dark);
+        g2.fill(disc);
+        if (basis != null) {
+            g2.setColor(lighter);
+            g2.fill(litRegion(centre, radius, basis, lit));
+        }
+        g2.setColor(limb);
+        g2.setStroke(new BasicStroke((float) moonLimbWidth(radius)));
+        g2.draw(disc);
+    }
+
+    /**
+     * The lit part of a disc on the page (#414 ruling C3): in a frame
+     * whose +x points at the bright limb - the page direction of χ
+     * through the page's own north and east at the body - the half
+     * disc towards the limb, with the half-ellipse of semi-axis
+     * r·|cos i| across it added beyond the centre when gibbous
+     * (cos i &gt; 0) and taken away from it when crescent. Its area
+     * is k = (1 + cos i) / 2 of the disc's.
+     */
+    static java.awt.geom.Area litRegion(PixelPoint centre, double radius,
+            PageBasis basis, OverlayContribution.Lit lit) {
+        double cosI = Math.cos(Math.toRadians(lit.phaseAngleDegrees()));
+        double r = radius;
+        java.awt.geom.Area half = new java.awt.geom.Area(
+                new Rectangle2D.Double(0.0, -r - 1.0, r + 1.0, 2.0 * r + 2.0));
+        half.intersect(new java.awt.geom.Area(
+                new Ellipse2D.Double(-r, -r, 2.0 * r, 2.0 * r)));
+        double across = r * Math.abs(cosI);
+        java.awt.geom.Area terminator = new java.awt.geom.Area(
+                new Ellipse2D.Double(-across, -r, 2.0 * across, 2.0 * r));
+        java.awt.geom.Area litArea = new java.awt.geom.Area(half);
+        if (cosI >= 0.0) {
+            terminator.intersect(new java.awt.geom.Area(new Rectangle2D.Double(
+                    -r - 1.0, -r - 1.0, r + 1.0, 2.0 * r + 2.0)));
+            litArea.add(terminator);
+        } else {
+            terminator.intersect(new java.awt.geom.Area(new Rectangle2D.Double(
+                    0.0, -r - 1.0, r + 1.0, 2.0 * r + 2.0)));
+            litArea.subtract(terminator);
+        }
+        double[] towards = basis.direction(lit.brightLimbAngleDegrees());
+        AffineTransform to = new AffineTransform();
+        to.translate(centre.x(), centre.y());
+        to.rotate(Math.atan2(towards[1], towards[0]));
+        litArea.transform(to);
+        return litArea;
+    }
+
+    private static double brightness(Color c) {
+        return 0.299 * c.getRed() + 0.587 * c.getGreen() + 0.114 * c.getBlue();
+    }
+
+    private static Color mix(Color from, Color to, double t) {
+        return new Color(
+                (int) Math.round(from.getRed() + (to.getRed() - from.getRed()) * t),
+                (int) Math.round(from.getGreen() + (to.getGreen() - from.getGreen()) * t),
+                (int) Math.round(from.getBlue() + (to.getBlue() - from.getBlue()) * t));
+    }
+
+    /** The Moon's limb stroke width for a disc of this radius. */
+    private static double moonLimbWidth(double radius) {
+        return Math.max(1.0, radius / 40.0);
     }
 
     /** The ring's stroke width for a disc of this radius. */
@@ -1385,9 +1527,10 @@ public final class ReferenceInk {
      * Everything a disc's ink covers: the disc, half the ring's stroke
      * outside its limb, and the antialiased pixel beyond that.
      */
-    private static Shape inkOf(Ellipse2D disc) {
+    private static Shape inkOf(Ellipse2D disc, boolean lit) {
         double radius = disc.getWidth() / 2.0;
-        double grown = radius + ringWidth(radius) / 2.0 + 1.0;
+        double stroke = lit ? moonLimbWidth(radius) : ringWidth(radius);
+        double grown = radius + stroke / 2.0 + 1.0;
         return new Ellipse2D.Double(disc.getCenterX() - grown,
                 disc.getCenterY() - grown, 2.0 * grown, 2.0 * grown);
     }
@@ -1442,7 +1585,7 @@ public final class ReferenceInk {
                             body.angularDiameterArcseconds() / 3600.0 / 2.0),
                     paper, sky, bounded);
             if (disc != null) {
-                discs.add(inkOf(disc));
+                discs.add(inkOf(disc, body.lit() != null));
             }
         }
         return List.copyOf(discs);
@@ -1557,7 +1700,9 @@ public final class ReferenceInk {
 
     /**
      * The name's box: the same tiers a cardinal letter is offered,
-     * measured from the disc's edge rather than a point, and refused
+     * measured from the edge of the disc's ink - its limb and the
+     * outer half of its ring (#416: at 1° the Sun's ring reaches 11 px
+     * beyond the limb) - rather than a point, and refused
      * when none is clean of the paper's edge, the sky's edge, other
      * names and the catalogue's own ink.
      */

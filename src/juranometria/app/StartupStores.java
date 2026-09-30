@@ -15,15 +15,16 @@ import juranometria.ui.placeandtime.PlaceStore;
  * preferences, which the evidence gate forbids and which would be
  * wrong even if it did not.
  *
- * <p>So the five are gathered and handed in. {@link #user()} is the
+ * <p>So they are gathered and handed in - seven since the Sun and the
+ * Moon joined the chart (#415, #416). {@link #user()} is the
  * one place that reaches for the reader's nodes, and {@code main} is
  * the one caller of it. A journey that wants to prove the shipping
- * route supplies its own five and gets the real
+ * route supplies its own and gets the real
  * {@code JUranometriaMain.start} - the same lines, in the same order,
  * with the same wiring.
  *
- * <p><strong>All five, or none.</strong> Injecting four and letting
- * the fifth fall through to {@code user()} would leave a journey that
+ * <p><strong>All of them, or none.</strong> Injecting all but one and
+ * letting the last fall through to {@code user()} would leave a journey that
  * reads a real reader preference and reports on a session it did not
  * fully determine. A missing store is refused here rather than
  * defaulted, so that cannot happen quietly.
@@ -37,7 +38,8 @@ record StartupStores(AppearanceStore appearance,
                      SkyLanguageStore language,
                      PlaceStore place,
                      EclipticStore ecliptic,
-                     juranometria.ui.solar.SunChartStore sunChart) {
+                     juranometria.ui.solar.SunChartStore sunChart,
+                     juranometria.ui.solar.MoonChartStore moonChart) {
 
     StartupStores {
         require(appearance, "appearance");
@@ -46,26 +48,29 @@ record StartupStores(AppearanceStore appearance,
         require(place, "place and time");
         require(ecliptic, "ecliptic");
         require(sunChart, "sun on the chart");
+        require(moonChart, "moon on the chart");
     }
 
     /**
      * The reader's own preferences.
      *
-     * <p>The only place all five {@code user()} nodes are opened, and
+     * <p>The only place the reader's {@code user()} nodes are opened, and
      * called from {@code main} alone.
      */
     static StartupStores user() {
         return new StartupStores(AppearanceStore.user(),
                 ChartOptionsStore.user(), SkyLanguageStore.user(),
                 PlaceStore.user(), EclipticStore.user(),
-                juranometria.ui.solar.SunChartStore.user());
+                juranometria.ui.solar.SunChartStore.user(),
+                juranometria.ui.solar.MoonChartStore.user());
     }
 
     private static void require(Object store, String what) {
         if (store == null) {
             throw new IllegalArgumentException("startup needs a " + what
-                    + " store: a session that reads four preferences and"
-                    + " lets the fifth find its own is not a session"
+                    + " store: a session that is handed all but one of its"
+                    + " preferences and lets the last find its own is not a"
+                    + " session"
                     + " anything can account for");
         }
     }

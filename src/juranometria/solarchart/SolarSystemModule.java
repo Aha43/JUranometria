@@ -12,6 +12,7 @@ import juranometria.module.OverlayContribution;
 import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
+import juranometria.solar.SolarSystemService.MoonObservation;
 import juranometria.solar.SolarSystemService.SunObservation;
 
 /**
@@ -39,11 +40,13 @@ public final class SolarSystemModule implements ChartModule {
 
     public static final String ID = "solar-system";
     public static final String SUN = "sun";
+    public static final String MOON = "moon";
 
     private final Supplier<Observer> observer;
     private final Supplier<SolarSystemService> service;
     private final BooleanSupplier horizonDrawn;
     private boolean sunShowing;
+    private boolean moonShowing;
     private ChartServices services;
     private Runnable withdraw;
     private long contributions;
@@ -113,31 +116,62 @@ public final class SolarSystemModule implements ChartModule {
         }
     }
 
+    /** Whether the Moon is drawn. */
+    public boolean moonShowing() {
+        return moonShowing;
+    }
+
+    /** Shows or hides the Moon; the chart redraws. */
+    public void moonShowing(boolean showing) {
+        this.moonShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+    }
+
     /** How many times the chart asked, for tests of pull-not-push. */
     public long timesAsked() {
         return contributions;
     }
 
     /**
-     * What the page is offered now: the Sun at Place and Time's
-     * observer and instant, if the Sun is shown and an observer is
-     * attached; nothing otherwise. Pulled by the chart when it paints.
+     * What the page is offered now: the Sun and the Moon, each if it
+     * is shown, at Place and Time's observer and instant; nothing when
+     * no observer is attached. Pulled by the chart when it paints.
+     *
+     * <p>The Moon carries how it is lit exactly as the Moon table
+     * states it (#416): the illuminated fraction k, the bright limb's
+     * position angle χ from celestial north through east, and the phase
+     * angle i. The page turns χ into its own directions at the Moon;
+     * nothing here recomputes it.
      */
     public List<OverlayContribution> contributedGeometry() {
         contributions++;
-        if (!sunShowing) {
+        if (!sunShowing && !moonShowing) {
             return List.of();
         }
         Observer now = observer.get();
         if (now == null) {
             return List.of();
         }
+        boolean horizon = horizonDrawn.getAsBoolean();
         List<OverlayContribution> offered = new ArrayList<>();
-        SunObservation sun = (SunObservation) service.get().observe(Body.SUN, now);
-        offered.add(new OverlayContribution.Body(SUN, "Sun",
-                sun.astrometricJ2000(), sun.angularDiameterArcseconds(), null,
-                horizonDrawn.getAsBoolean() && sun.horizontal().altitudeDegrees() < 0.0,
-                InkRole.BODY));
+        if (sunShowing) {
+            SunObservation sun = (SunObservation) service.get().observe(Body.SUN, now);
+            offered.add(new OverlayContribution.Body(SUN, "Sun",
+                    sun.astrometricJ2000(), sun.angularDiameterArcseconds(), null,
+                    horizon && sun.horizontal().altitudeDegrees() < 0.0,
+                    sun.distanceKm(), InkRole.BODY));
+        }
+        if (moonShowing) {
+            MoonObservation moon = (MoonObservation) service.get().observe(Body.MOON, now);
+            offered.add(new OverlayContribution.Body(MOON, "Moon",
+                    moon.astrometricJ2000(), moon.angularDiameterArcseconds(),
+                    new OverlayContribution.Lit(moon.illuminatedFraction(),
+                            moon.brightLimbAngleDegrees(), moon.phaseAngleDegrees()),
+                    horizon && moon.horizontal().altitudeDegrees() < 0.0,
+                    moon.distanceKm(), InkRole.BODY));
+        }
         return List.copyOf(offered);
     }
 }

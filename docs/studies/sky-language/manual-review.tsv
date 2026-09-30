@@ -160,3 +160,6 @@ d673091a8a11b2bb	solar/spk/SpkExcerpt.java	DAF/SPK 	unresolved: no route found, 
 278d7b4778128b64	solarchart/SolarSystemModule.java	solar-system	declared name used, but never at a known sink	identifier	the module's registry id, under which its geometry is offered; no language changes it
 e5c2b8b6872573f7	solarchart/SolarSystemModule.java	sun	declared name used, but never at a known sink	identifier	the body's identity, which the page's language names; the key, not a word
 ab19dedf996fa2ad	ui/solar/SunChartStore.java	sunOnChartShown	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it
+daf7e6d12102006e	app/AppMenuBar.java	moonOnChartItem	declared name used, but never at a known sink	identifier	the Moon-on-the-chart item's component name, which tests find it by; no language changes it
+1f27c4b123d1bc34	solarchart/SolarSystemModule.java	moon	declared name used, but never at a known sink	identifier	the body's identity, which the page's language names; the key, not a word
+83a967abf1390b96	ui/solar/MoonChartStore.java	moonOnChartShown	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it

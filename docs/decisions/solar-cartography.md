@@ -124,9 +124,80 @@ candidates over production pages; the owner inspected them.
 - **Not done, by ruling.** No selection, no emphasis, no edge hints,
   no range, no daylight, no tracks, no events.
 
+## The Moon's implementation (#416)
+
+- **The same module, a second switch.** `SolarSystemModule` offers the
+  Moon as a `Body` carrying `Lit(k, χ, i)` exactly as the Moon table
+  states them - the illuminated fraction, the bright limb's position
+  angle from celestial north through east, and the phase angle - and
+  nothing recomputes them. `View → Moon on the chart` sits directly
+  below the Sun's switch, hidden by default and remembered the same
+  way (`MoonChartStore`, `MoonChartSession`, preference
+  `moonOnChartShown`); the two switches are independent.
+- **The rotation contract (C3).** `PageBasis` is the page's own
+  north n̂ and east ê at the Moon, found by projecting the position
+  and a point one arcsecond towards each; the lit side faces
+  cos χ · n̂ + sin χ · ê. The round trip is taken exactly: a drawn
+  direction's components (a, b) in the (n̂, ê) basis give χ =
+  atan2(b, a). Where the basis is square this is the ruled
+  atan2(d·ê, d·n̂); where a tangent page skews it (88.3° at the 36°
+  page's corner) the dot-product form would be off by up to the skew,
+  and the exact inverse is not. `PageBasisTest` holds the round trip
+  to 10⁻⁹ degrees at the page centre, three quarters of the way to
+  every corner of each page the cartography study measured, and near
+  the pole.
+- **The phased disc (C2).** The whole disc in the dark side's ink,
+  the lit region over it, the limb in star ink (r/40, at least 1 px).
+  The lit region, in a frame whose +x is the bright limb's page
+  direction: the half disc towards the limb, with the half-ellipse of
+  semi-axis r·|cos i| added beyond the centre when gibbous and taken
+  from it when crescent - an area of exactly k of the disc. The lit
+  side is the page's lighter ink (the paper; the black sky's star
+  ink); the dark side lies 30 % of the way from the page's darker ink
+  towards its lighter - dark enough to read as unlit on both palettes,
+  light enough on paper that the disc reads as a disc, and opaque, so
+  the stars it hides are seen to be hidden (C4). Below a drawn
+  horizon all three inks are dimmed towards the ground, as the Sun's.
+- **The nearer covers the farther.** Each `Body` carries its
+  distance; the page paints the farthest first, so the Moon covers the
+  Sun where they overlap, as in the sky. Names are placed after every
+  disc is painted, nearest first, each clear of every disc's ink, the
+  reference layer's words and the catalogue's ink - so no name is
+  painted over by another body - and refused when no box is clean.
+- **Names measured from the ink's edge.** A body's name box is now
+  spaced from the outer edge of its limb's ink rather than from the
+  limb: at 1° the Sun's ring (r/12) reaches 11 px beyond the limb,
+  more than the gap, so a name there touched the ring. The Sun's
+  study pages move by the half-ring width as a result.
+- **Proof.** `PageBasisTest` (the contract); `MoonInkTest` (the lit
+  area is k and faces χ to 0.5° at every phase angle and χ on a skewed
+  corner; the June 2026 lunation's four phases drawn as the table
+  states them; opaque, in front of the Sun; dimmed and named in both
+  languages; the black sky); `MoonOnTheChartJourneyTest` (drawn where
+  the service puts it and spoken; a click on the disc never selects
+  the star it hides; the switch its own, remembered and restored with
+  its menu item in both languages); `SolarSystemModuleTest` (k, χ and
+  i are the table's); the packaged image's `moonOnTheChartJourney`,
+  whose first-quarter instant `PackagedMoonInstantTest` holds to the
+  fixture.
+- **The lunation as a row of phases.** `docs/studies/moon-on-the-chart/`
+  draws the June 2026 lunation daily from the fixture's new Moon, each
+  disc cut from its own production page, and measures every day's
+  rendered pixels on a 1° page: on all 24 days where the table states a
+  lit side, the drawn disc faces the table's compass point and shows
+  its k within 2 percentage points; on the six near new or full, where
+  the table says the lit side is not well defined, the share agrees.
+- **Not done, by ruling.** No libration, no surface, no earthshine,
+  no eclipse, no selection, no emphasis, no edge hints, no tracks.
+
 ## Evidence
 
-`docs/studies/sun-on-the-chart/` - the production composition's own
+`docs/studies/moon-on-the-chart/` - the Moon's production pages (the
+June 2026 lunation's four phases at Oslo, the first quarter from Cape
+Town, on the black sky and in Norwegian, the year's nearest perigee
+and farthest apogee, the new Moon with the Sun, the Moon below a drawn
+horizon) and the lunation as a row of phases measured against the
+table. `docs/studies/sun-on-the-chart/` - the production composition's own
 pages with the Sun on them (the equinox page in both palettes, a 3°
 page in Norwegian, the owner's September-equinox 6° page, the horizon page with the Sun dimmed below the
 ground and the same page with the horizon hidden), a deterministic

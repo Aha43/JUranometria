@@ -34,6 +34,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the pla... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the pl... | self-explanatory |
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
@@ -120,7 +121,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**103 operable controls** across 13 surfaces: **65** hovered, **7** dynamic, **31** left to their own visible words, **0 undecided**.
+**104 operable controls** across 13 surfaces: **65** hovered, **7** dynamic, **32** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 
