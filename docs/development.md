@@ -210,9 +210,9 @@ asked:
 
 - **The chart sheets.** `juranometria.sheet.SheetMetadata` writes
   `AppInfo.version()` into every exported sheet — the SVG `<metadata>`
-  element, the PDF `/Producer` entry, the PNG text chunk — so the seven
-  artifacts under `docs/studies/chart-sheet/` carry the version that
-  drew them. `make chart-sheet-study`, then `make evidence-provenance`,
+  element, the PDF `/Producer` entry, the PNG text chunk — so every
+  sheet under `docs/studies/chart-sheet/` (ten at 4.0.0, with the
+  solar-system sheet's three) carries the version that drew them. `make chart-sheet-study`, then `make evidence-provenance`,
   which re-dates only the rows whose bytes moved.
 - **The gallery.** `docs/gallery/manifest.json` carries `release` and
   `downloads` by hand; `GalleryMain` only reads them. Update both, run
@@ -233,16 +233,25 @@ asked:
   digit cell wide per changed digit: at 3.0.0 two digits changed
   (2→3 and 1→0), and each image changed exactly 231 pixels in two
   cells, columns 206–216 and 222–231 of rows 33–47, with the dot
-  between them untouched.
+  between them untouched. At 4.0.0 one digit changed (3→4), and each
+  image changed exactly 125 pixels in the first cell alone, columns
+  206–216 of rows 33–47.
+- **The articles.** Their footer names the release, and
+  `scripts/build-articles.py` reads it from `VERSION` when the site is
+  built rather than carrying a number - so there is nothing to
+  regenerate, and `GalleryReleaseTest` fails if a release number is
+  ever written into the script again. Like the gallery, the articles
+  are rebuilt by `pages` only when a watched path changes; a release's
+  gallery-manifest change is what rebuilds them.
 - **The page-language study.** Its companion,
   `docs/studies/interface-language/page-language-strings.md`, quotes
   the producer line every exported file carries, version included.
   Run `juranometria.tool.PageLanguageSheetMain`; its images draw no
   version and do not move.
 
-**`GalleryReleaseTest` holds all four to `VERSION`** — the gallery
-manifest and pages, the seven chart sheets' embedded producer, and the
-About and page-language companions — and fails naming the command
+**`GalleryReleaseTest` holds them all to `VERSION`** — the gallery
+manifest and pages, every chart sheet's embedded producer, the About
+and page-language companions, and the articles' build — and fails naming the command
 that regenerates whichever is stale. It reads committed bytes, so it
 says *which release* they are of; the gates below say only that they
 reproduce. A new surface that draws `AppInfo.version()` into a
